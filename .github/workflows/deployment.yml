@@ -17,7 +17,7 @@ jobs:
         java-version: 14
     - name: Create artifacts
       run: |
-        ./gradlew desktop:dist server:dist core:javadoc -Pbuildversion=${GITHUB_REF:1}"
+        ./gradlew desktop:dist server:dist core:javadoc -Pbuildversion=${GITHUB_REF:1}
     - name: Update docs
       run: |
         cd ../
