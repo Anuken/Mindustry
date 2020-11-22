@@ -405,7 +405,7 @@ public class ServerControl implements ApplicationListener{
                 info("Path: @", mod.file.path());
                 info("Description: @", mod.meta.description);
             }else{
-                info("No mod with name '@' found.", arg[0]);
+                info("No mod with name '@' found.");
             }
         });
 
