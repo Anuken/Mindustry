@@ -1508,7 +1508,6 @@ public class Blocks implements ContentList{
             shootEffect = Fx.shootLiquid;
             range = 110f;
             health = 250 * size * size;
-            flags = EnumSet.of(BlockFlag.turret, BlockFlag.extinguisher);
         }};
 
         lancer = new ChargeTurret("lancer"){{
@@ -2055,12 +2054,11 @@ public class Blocks implements ContentList{
         }};
 
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 9000, Items.silicon, 9000, Items.thorium, 9000, Items.titanium, 9000, Items.surgeAlloy, 5000, Items.phaseFabric, 4000));
             researchCostMultiplier = 0.1f;
             size = 7;
             hasPower = true;
             consumes.power(10f);
-            buildCostMultiplier = 0.5f;
         }};
 
         //endregion campaign

@@ -23,9 +23,7 @@ public enum BlockFlag{
     /** Any reactor block. */
     reactor,
     /** Any block that boosts unit capacity. */
-    unitModifier,
-    /** Blocks that extinguishes fires. */
-    extinguisher;
+    unitModifier;
 
     public final static BlockFlag[] all = values();
 }

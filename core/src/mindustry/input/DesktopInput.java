@@ -47,7 +47,6 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void buildUI(Group group){
-        //respawn hints
         group.fill(t -> {
             t.visible(() -> Core.settings.getBool("hints") && ui.hudfrag.shown && !player.dead() && !player.unit().spawnedByCore() && !(Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty()));
             t.bottom();
@@ -57,7 +56,6 @@ public class DesktopInput extends InputHandler{
             }).margin(6f);
         });
 
-        //building hints
         group.fill(t -> {
             t.bottom();
             t.visible(() -> {
@@ -76,7 +74,6 @@ public class DesktopInput extends InputHandler{
             }).margin(10f);
         });
 
-        //schematic controls
         group.fill(t -> {
             t.visible(() -> ui.hudfrag.shown && lastSchematic != null && !selectRequests.isEmpty());
             t.bottom();
@@ -237,9 +234,8 @@ public class DesktopInput extends InputHandler{
             player.shooting = false;
         }
 
-        if(state.isGame() && !scene.hasDialog() && !(scene.getKeyboardFocus() instanceof TextField)){
-            if(Core.input.keyTap(Binding.minimap)) ui.minimapfrag.toggle();
-            if(Core.input.keyTap(Binding.planet_map) && state.isCampaign()) ui.planet.toggle();
+        if(state.isGame() && Core.input.keyTap(Binding.minimap) && !scene.hasDialog() && !(scene.getKeyboardFocus() instanceof TextField)){
+            ui.minimapfrag.toggle();
         }
 
         if(state.isMenu() || Core.scene.hasDialog()) return;

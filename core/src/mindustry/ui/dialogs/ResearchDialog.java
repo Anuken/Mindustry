@@ -169,7 +169,7 @@ public class ResearchDialog extends BaseDialog{
     public Dialog show(){
         if(net.client()){
             ui.showInfo("@research.multiplayer");
-            return this;
+            return null;
         }
 
         return super.show();
