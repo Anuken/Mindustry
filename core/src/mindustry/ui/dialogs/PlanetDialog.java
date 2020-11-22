@@ -239,7 +239,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     Sector findLauncher(Sector to){
-        Sector launchSector = this.launchSector != null && this.launchSector.hasBase() ? this.launchSector : null;
         //directly nearby.
         if(to.near().contains(launchSector)) return launchSector;
 
@@ -712,7 +711,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         if((sector.hasBase() && mode == look) || canSelect(sector) || (sector.preset != null && sector.preset.alwaysUnlocked) || debugSelect){
             stable.button(mode == select ? "@sectors.select" : sector.hasBase() ? "@sectors.resume" : "@sectors.launch", Icon.play, () -> {
-                if(sector.isBeingPlayed()){
+                if(state.rules.sector == sector && !state.isMenu()){
                     //already at this sector
                     hide();
                     return;
