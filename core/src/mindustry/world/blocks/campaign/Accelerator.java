@@ -32,8 +32,10 @@ public class Accelerator extends Block{
 
     @Override
     public void init(){
+        itemCapacity = 0;
         for(ItemStack stack : launching.requirements){
             capacities[stack.item.id] = stack.amount;
+            itemCapacity += stack.amount;
         }
         consumes.items(launching.requirements);
         super.init();
