@@ -396,7 +396,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("blockstatus", false);
         graphics.checkPref("playerchat", true);
         if(!mobile){
-            graphics.checkPref("coreitems", false);
+            graphics.checkPref("coreitems", true);
         }
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("smoothcamera", true);
