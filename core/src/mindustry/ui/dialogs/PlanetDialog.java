@@ -700,11 +700,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(sector.save != null && sector.info.resources.any()){
             stable.table(t -> {
                 t.add("@sectors.resources").padRight(4);
-                int idx = 0;
-                int max = 5;
                 for(UnlockableContent c : sector.info.resources){
                     t.image(c.icon(Cicon.small)).padRight(3).size(Cicon.small.size);
-                    //if(++idx % max == 0) t.row();
                 }
             }).padLeft(10f).fillX().row();
         }

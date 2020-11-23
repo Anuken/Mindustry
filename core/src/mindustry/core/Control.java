@@ -223,7 +223,7 @@ public class Control implements ApplicationListener, Loadable{
 
         for(TechNode node : TechTree.all){
             if(!node.content.unlocked() && node.requirements.length == 0 && !node.objectives.contains(o -> !o.complete())){
-                node.content.unlocked();
+                node.content.unlock();
             }
         }
     }
