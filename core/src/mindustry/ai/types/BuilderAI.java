@@ -19,10 +19,6 @@ public class BuilderAI extends AIController{
     @Override
     public void updateMovement(){
 
-        if(unit.moving()){
-            unit.lookAt(unit.vel.angle());
-        }
-
         if(target != null && shouldShoot()){
             unit.lookAt(target);
         }
@@ -49,7 +45,7 @@ public class BuilderAI extends AIController{
             BuildPlan req = unit.buildPlan();
 
             boolean valid =
-                (req.tile().build instanceof ConstructBuild && req.tile().<ConstructBuild>bc().cblock == req.block) ||
+                (req.tile() != null && req.tile().build instanceof ConstructBuild && req.tile().<ConstructBuild>bc().cblock == req.block) ||
                 (req.breaking ?
                     Build.validBreak(unit.team(), req.x, req.y) :
                     Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation));

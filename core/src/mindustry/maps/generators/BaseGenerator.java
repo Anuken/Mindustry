@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
 import mindustry.game.*;
@@ -143,6 +144,15 @@ public class BaseGenerator{
 
                 if(walls >= 3){
                     curr.setBlock(wallLarge, team);
+                }
+            });
+        }
+
+        //clear path for ground units
+        for(Tile tile : cores){
+            Astar.pathfind(tile, spawn, t -> t.team() == state.rules.waveTeam && !t.within(tile, 25f * 8) ? 100000 : t.floor().hasSurface() ? 1 : 10, t -> !t.block().isStatic()).each(t -> {
+                if(t.team() == state.rules.waveTeam && !t.within(tile, 25f * 8)){
+                    t.setBlock(Blocks.air);
                 }
             });
         }

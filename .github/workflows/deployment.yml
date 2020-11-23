@@ -17,7 +17,7 @@ jobs:
         java-version: 14
     - name: Create artifacts
       run: |
-        ./gradlew desktop:dist server:dist core:javadoc -Pbuildversion=${GITHUB_REF:1}"
+        ./gradlew desktop:dist server:dist core:javadoc -Pbuildversion=${GITHUB_REF:1}
     - name: Update docs
       run: |
         cd ../
@@ -27,6 +27,13 @@ jobs:
         git add .
         git commit -m "Update ${GITHUB_REF:1}"
         git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/MindustryGame/docs
+        cd ../Mindustry
+    - name: Add Arc release
+      run: |
+        git clone --depth=1 --branch=master https://github.com/Anuken/Arc ../Arc
+        cd ../Arc
+        git tag ${GITHUB_REF}
+        git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/Anuken/Arc ${GITHUB_REF};
         cd ../Mindustry
     - name: Update F-Droid build string
       run: |

@@ -830,7 +830,7 @@ public class Mods implements Loadable{
 
     /** Mod metadata information.*/
     public static class ModMeta{
-        public String name, displayName, author, description, version, main, minGameVersion = "0";
+        public String name, displayName, author, description, version, main, minGameVersion = "0", repo;
         public Seq<String> dependencies = Seq.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;

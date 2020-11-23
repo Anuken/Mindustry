@@ -36,7 +36,7 @@ public class Universe{
 
         //update base coverage on capture
         Events.on(SectorCaptureEvent.class, e -> {
-            if(state.isCampaign()){
+            if(!net.client() && state.isCampaign()){
                 state.getSector().planet.updateBaseCoverage();
             }
         });
@@ -215,7 +215,7 @@ public class Universe{
                     //queue random invasions
                     if(!sector.isAttacked() && turn > invasionGracePeriod && sector.info.hasSpawns){
                         //invasion chance depends on # of nearby bases
-                        if(Mathf.chance(baseInvasionChance * sector.near().count(Sector::hasEnemyBase))){
+                        if(Mathf.chance(baseInvasionChance * Math.min(sector.near().count(Sector::hasEnemyBase), 1))){
                             int waveMax = Math.max(sector.info.winWave, sector.isBeingPlayed() ? state.wave : sector.info.wave + sector.info.wavesPassed) + Mathf.random(2, 5) * 5;
 
                             //assign invasion-related things

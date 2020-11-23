@@ -405,7 +405,7 @@ public class ServerControl implements ApplicationListener{
                 info("Path: @", mod.file.path());
                 info("Description: @", mod.meta.description);
             }else{
-                info("No mod with name '@' found.");
+                info("No mod with name '@' found.", arg[0]);
             }
         });
 
@@ -1006,6 +1006,10 @@ public class ServerControl implements ApplicationListener{
             String date = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss").format(LocalDateTime.now());
             currentLogFile.writeString("[End of log file. Date: " + date + "]\n", true);
             currentLogFile = null;
+        }
+
+        for(String value : values){
+            text = text.replace(value, "");
         }
 
         if(currentLogFile == null){

@@ -1,5 +1,7 @@
 package mindustry.ai;
 
+import arc.*;
+import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -17,16 +19,18 @@ import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
 
 public class BaseAI{
     private static final Vec2 axis = new Vec2(), rotator = new Vec2();
     private static final float correctPercent = 0.5f;
-    private static final float step = 5;
     private static final int attempts = 4;
     private static final float emptyChance = 0.01f;
-    private static final int timerStep = 0, timerSpawn = 1;
+    private static final int timerStep = 0, timerSpawn = 1, timerRefreshPath = 2;
+    private static final int pathStep = 50;
+    private static final Seq<Tile> tmpTiles = new Seq<>();
 
     private static int correct = 0, incorrect = 0;
 
@@ -35,6 +39,13 @@ public class BaseAI{
 
     TeamData data;
     Interval timer = new Interval(4);
+
+    IntSet path = new IntSet();
+    IntSet calcPath = new IntSet();
+    @Nullable Tile calcTile;
+    boolean calculating, startedCalculating;
+    int calcCount = 0;
+    int totalCalcs = 0;
 
     public BaseAI(TeamData data){
         this.data = data;
@@ -53,8 +64,76 @@ public class BaseAI{
             }
         }
 
+        //refresh path
+        if(!calculating && (timer.get(timerRefreshPath, 3f * Time.toMinutes) || !startedCalculating) && data.hasCore()){
+            calculating = true;
+            startedCalculating = true;
+            calcPath.clear();
+        }
+
+        //didn't find tile in time
+        if(calculating && calcCount >= world.width() * world.height()){
+            calculating = false;
+            calcCount = 0;
+            calcPath.clear();
+            totalCalcs ++;
+        }
+
+        //calculate path for units so schematics are not placed on it
+        if(calculating){
+            if(calcTile == null){
+                Vars.spawner.eachGroundSpawn((x, y) -> calcTile = world.tile(x, y));
+                if(calcTile == null){
+                    calculating = false;
+                }
+            }else{
+                var field = pathfinder.getField(state.rules.waveTeam, Pathfinder.costGround, Pathfinder.fieldCore);
+
+                int[][] weights = field.weights;
+                for(int i = 0; i < pathStep; i++){
+                    int minCost = Integer.MAX_VALUE;
+                    int cx = calcTile.x, cy = calcTile.y;
+                    boolean foundAny = false;
+                    for(Point2 p : Geometry.d4){
+                        int nx = cx + p.x, ny = cy + p.y;
+
+                        Tile other = world.tile(nx, ny);
+                        if(other != null && weights[nx][ny] < minCost && weights[nx][ny] != -1){
+                            minCost = weights[nx][ny];
+                            calcTile = other;
+                            foundAny = true;
+                        }
+                    }
+
+                    //didn't find anything, break out of loop, this will trigger a clear later
+                    if(!foundAny){
+                        calcCount = Integer.MAX_VALUE;
+                        break;
+                    }
+
+                    calcPath.add(calcTile.pos());
+
+                    //found the end.
+                    if(calcTile.build instanceof CoreBuild b && b.team == state.rules.defaultTeam){
+                        //clean up calculations and flush results
+                        calculating = false;
+                        calcCount = 0;
+                        path.clear();
+                        path.addAll(calcPath);
+                        calcPath.clear();
+                        calcTile = null;
+                        totalCalcs ++;
+
+                        break;
+                    }
+
+                    calcCount ++;
+                }
+            }
+        }
+
         //only schedule when there's something to build.
-        if(data.blocks.isEmpty() && timer.get(timerStep, Mathf.lerp(20f, 4f, data.team.rules().aiTier))){
+        if(totalCalcs > 0 && data.blocks.isEmpty() && timer.get(timerStep, Mathf.lerp(20f, 4f, data.team.rules().aiTier))){
             if(!triedWalls){
                 tryWalls();
                 triedWalls = true;
@@ -121,6 +200,13 @@ public class BaseAI{
         for(Stile tile : result.tiles){
             int realX = tile.x + cx, realY = tile.y + cy;
             if(!Build.validPlace(tile.block, data.team, realX, realY, tile.rotation)){
+                return false;
+            }
+            Tile wtile = world.tile(realX, realY);
+
+            //may intersect AI path
+            tmpTiles.clear();
+            if(tile.block.solid && wtile != null && wtile.getLinkedTilesAs(tile.block, tmpTiles).contains(t -> path.contains(t.pos()))){
                 return false;
             }
         }
@@ -191,7 +277,8 @@ public class BaseAI{
                     }
                 }
 
-                if(any && Build.validPlace(wall, data.team, tile.x, tile.y, 0)){
+                tmpTiles.clear();
+                if(any && Build.validPlace(wall, data.team, tile.x, tile.y, 0) && !tile.getLinkedTilesAs(wall, tmpTiles).contains(t -> path.contains(t.pos()))){
                     data.blocks.add(new BlockPlan(tile.x, tile.y, (short)0, wall.id, null));
                 }
             }

@@ -39,7 +39,7 @@ public class Blocks implements ContentList{
     //environment
     air, spawn, cliff, deepwater, water, taintedWater, tar, slag, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space,
     dacite, stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
-    iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, grass, salt,
+    iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
@@ -412,6 +412,10 @@ public class Blocks implements ContentList{
         }};
 
         daciteBoulder = new Boulder("dacite-boulder"){{
+            variants = 2;
+        }};
+
+        basaltBoulder = new Boulder("basalt-boulder"){{
             variants = 2;
         }};
 
@@ -1153,7 +1157,7 @@ public class Blocks implements ContentList{
         }};
 
         battery = new Battery("battery"){{
-            requirements(Category.power, with(Items.copper, 4, Items.lead, 20));
+            requirements(Category.power, with(Items.copper, 5, Items.lead, 20));
             consumes.powerBuffered(4000f);
         }};
 
@@ -1354,7 +1358,7 @@ public class Blocks implements ContentList{
         //region storage
 
         coreShard = new CoreBlock("core-shard"){{
-            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.copper, 1000, Items.lead, 1000));
+            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.copper, 1000, Items.lead, 800));
             alwaysUnlocked = true;
 
             unitType = UnitTypes.alpha;
@@ -1508,6 +1512,7 @@ public class Blocks implements ContentList{
             shootEffect = Fx.shootLiquid;
             range = 110f;
             health = 250 * size * size;
+            flags = EnumSet.of(BlockFlag.turret, BlockFlag.extinguisher);
         }};
 
         lancer = new ChargeTurret("lancer"){{
@@ -2054,11 +2059,12 @@ public class Blocks implements ContentList{
         }};
 
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 9000, Items.silicon, 9000, Items.thorium, 9000, Items.titanium, 9000, Items.surgeAlloy, 5000, Items.phaseFabric, 4000));
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
             researchCostMultiplier = 0.1f;
             size = 7;
             hasPower = true;
             consumes.power(10f);
+            buildCostMultiplier = 0.5f;
         }};
 
         //endregion campaign

@@ -44,7 +44,6 @@ import static mindustry.Vars.*;
 public class Control implements ApplicationListener, Loadable{
     public Saves saves;
     public SoundControl sound;
-    public Tutorial tutorial;
     public InputHandler input;
 
     private Interval timer = new Interval(2);
@@ -53,7 +52,6 @@ public class Control implements ApplicationListener, Loadable{
 
     public Control(){
         saves = new Saves();
-        tutorial = new Tutorial();
         sound = new SoundControl();
 
         Events.on(StateChangeEvent.class, event -> {
@@ -87,7 +85,6 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(ResetEvent.class, event -> {
             player.reset();
-            tutorial.reset();
 
             hiscore = false;
             saves.resetSave();
@@ -164,7 +161,7 @@ public class Control implements ApplicationListener, Loadable{
             if(state.isCampaign() && !net.client() && !headless){
 
                 //save gameover sate immediately
-                if(saves.getCurrent() != null && !state.rules.tutorial){
+                if(saves.getCurrent() != null){
                     saves.getCurrent().save();
                 }
             }
@@ -226,7 +223,7 @@ public class Control implements ApplicationListener, Loadable{
 
         for(TechNode node : TechTree.all){
             if(!node.content.unlocked() && node.requirements.length == 0 && !node.objectives.contains(o -> !o.complete())){
-                node.content.unlocked();
+                node.content.unlock();
             }
         }
     }
@@ -408,13 +405,6 @@ public class Control implements ApplicationListener, Loadable{
     public void init(){
         platform.updateRPC();
 
-        //just a regular reminder
-        if(!OS.prop("user.name").equals("anuke") && !OS.hasEnv("iknowwhatimdoing")){
-            app.post(() -> app.post(() -> {
-                ui.showStartupInfo("@indev.popup");
-            }));
-        }
-
         //display UI scale changed dialog
         if(Core.settings.getBool("uiscalechanged", false)){
             Core.app.post(() -> Core.app.post(() -> {
@@ -478,10 +468,6 @@ public class Control implements ApplicationListener, Loadable{
 
         if(state.isGame()){
             input.update();
-
-            if(state.rules.tutorial){
-                tutorial.update();
-            }
 
             //auto-update rpc every 5 seconds
             if(timer.get(0, 60 * 5)){

@@ -21,6 +21,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.layout.*;
@@ -114,6 +115,12 @@ public class ResearchDialog extends BaseDialog{
 
         addCloseButton();
 
+        keyDown(key -> {
+            if(key == Core.keybinds.get(Binding.research).key){
+                Core.app.post(this::hide);
+            }
+        });
+
         buttons.button("@database", Icon.book, () -> {
             hide();
             ui.database.show();
@@ -169,7 +176,7 @@ public class ResearchDialog extends BaseDialog{
     public Dialog show(){
         if(net.client()){
             ui.showInfo("@research.multiplayer");
-            return null;
+            return this;
         }
 
         return super.show();
