@@ -484,6 +484,7 @@ public class TechTree implements ContentList{
                                                 new Research(bryde),
                                                 new Research(spectre),
                                                 new Research(launchPad),
+                                                new Research(massDriver),
                                                 new Research(impactReactor),
                                                 new Research(additiveReconstructor),
                                                 new Research(exponentialReconstructor)

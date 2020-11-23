@@ -1413,12 +1413,12 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.missile;
                 bullet = new MissileBulletType(2.7f, 12, "missile"){{
+                    keepVelocity = true;
                     width = 8f;
                     height = 8f;
                     shrinkY = 0f;
                     drag = -0.003f;
                     homingRange = 60f;
-                    keepVelocity = false;
                     splashDamageRadius = 25f;
                     splashDamage = 10f;
                     lifetime = 80f;

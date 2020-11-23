@@ -277,7 +277,7 @@ public class Waves{
         int cap = 150;
 
         float shieldStart = 30, shieldsPerWave = 20 + difficulty*30f;
-        float[] scaling = {1, 1.2f, 1.5f, 3f, 4f};
+        float[] scaling = {1, 1.2f, 2f, 3f, 4f};
 
         Intc createProgression = start -> {
             //main sequence
