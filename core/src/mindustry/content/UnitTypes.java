@@ -556,7 +556,7 @@ public class UnitTypes implements ContentList{
             range = 40f;
 
             weapons.add(new Weapon(){{
-                reload = 12f;
+                reload = 24f;
                 shootCone = 180f;
                 ejectEffect = Fx.none;
                 shootSound = Sounds.explosion;
@@ -1321,7 +1321,7 @@ public class UnitTypes implements ContentList{
                     sprite = "large-bomb";
                     width = height = 120/4f;
 
-                    range = 30f;
+                    maxRange = 30f;
                     ignoreRotation = true;
 
                     backColor = Pal.heal;

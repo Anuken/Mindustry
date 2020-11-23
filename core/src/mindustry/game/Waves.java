@@ -277,7 +277,7 @@ public class Waves{
         int cap = 150;
 
         float shieldStart = 30, shieldsPerWave = 20 + difficulty*30f;
-        float[] scaling = {1, 1, 1.5f, 3f, 4f};
+        float[] scaling = {1, 1.2f, 1.5f, 3f, 4f};
 
         Intc createProgression = start -> {
             //main sequence
@@ -298,7 +298,7 @@ public class Waves{
                     begin = f;
                     end = f + next >= cap ? never : f + next;
                     max = 13;
-                    unitScaling = (difficulty < 0.4f ? rand.random(2.5f, 4f) : rand.random(1f, 4f)) * scaling[ctier];
+                    unitScaling = (difficulty < 0.4f ? rand.random(2.5f, 5f) : rand.random(1f, 4f)) * scaling[ctier];
                     shields = shieldAmount;
                     shieldScaling = shieldsPerWave;
                     spacing = space;
@@ -310,7 +310,7 @@ public class Waves{
                     begin = f + next - 1;
                     end = f + next + rand.random(6, 10);
                     max = 6;
-                    unitScaling = rand.random(1f, 2f);
+                    unitScaling = rand.random(2f, 4f);
                     spacing = rand.random(2, 4);
                     shields = shieldAmount/2f;
                     shieldScaling = shieldsPerWave;

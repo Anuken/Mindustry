@@ -6,6 +6,7 @@ import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
@@ -16,6 +17,7 @@ import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Objectives.*;
 import mindustry.game.Saves.*;
 import mindustry.gen.*;
 import mindustry.input.*;
@@ -24,6 +26,7 @@ import mindustry.io.SaveIO.*;
 import mindustry.maps.Map;
 import mindustry.net.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 
@@ -124,10 +127,18 @@ public class Control implements ApplicationListener, Loadable{
             }
         }));
 
-        Events.on(UnlockEvent.class, e -> ui.hudfrag.showUnlock(e.content));
-
         Events.on(UnlockEvent.class, e -> {
+            ui.hudfrag.showUnlock(e.content);
+
             checkAutoUnlocks();
+
+            if(e.content instanceof SectorPreset){
+                for(TechNode node : TechTree.all){
+                    if(!node.content.unlocked() && node.objectives.contains(o -> o instanceof SectorComplete sec && sec.preset == e.content) && !node.objectives.contains(o -> !o.complete())){
+                        ui.hudfrag.showToast(new TextureRegionDrawable(node.content.icon(Cicon.large)), bundle.get("available"));
+                    }
+                }
+            }
         });
 
         Events.on(SectorCaptureEvent.class, e -> {
