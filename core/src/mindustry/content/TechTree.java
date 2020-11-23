@@ -198,10 +198,10 @@ public class TechTree implements ContentList{
                                 });
                             });
                         });
-                    });
 
-                    node(illuminator, () -> {
-                        
+                        node(illuminator, () -> {
+
+                        });
                     });
                 });
 

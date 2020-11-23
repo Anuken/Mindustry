@@ -298,7 +298,7 @@ public class Waves{
                     begin = f;
                     end = f + next >= cap ? never : f + next;
                     max = 13;
-                    unitScaling = (difficulty < 0.4f ? rand.random(2.5f, 5f) : rand.random(1f, 4f)) * scaling[ctier];
+                    unitScaling = (difficulty < 0.4f ? rand.random(2.5f, 4f) : rand.random(1f, 4f)) * scaling[ctier];
                     shields = shieldAmount;
                     shieldScaling = shieldsPerWave;
                     spacing = space;
