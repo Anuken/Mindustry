@@ -187,10 +187,10 @@ public class Planet extends UnlockableContent{
             }
 
             if(sector.hasEnemyBase()){
-                sum += 2.5f;
+                sum += 1.9f;
             }
 
-            sector.threat = sector.preset == null ? Math.min(sum / 5f, 1.5f) : Mathf.clamp(sector.preset.difficulty / 10f);
+            sector.threat = sector.preset == null ? Math.min(sum / 5f, 1.2f) : Mathf.clamp(sector.preset.difficulty / 10f);
         }
     }
 

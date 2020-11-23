@@ -551,7 +551,9 @@ public class TechTree implements ContentList{
                                 node(nuclearComplex, Seq.with(
                                     new SectorComplete(fungalPass),
                                     new Research(thermalGenerator),
-                                    new Research(laserDrill)
+                                    new Research(laserDrill),
+                                    new Research(Items.plastanium),
+                                    new Research(swarmer)
                                 ), () -> {
 
                                 });
@@ -613,7 +615,9 @@ public class TechTree implements ContentList{
                         });
 
                         nodeProduce(Liquids.oil, () -> {
+                            nodeProduce(Items.plastanium, () -> {
 
+                            });
                         });
                     });
                 });

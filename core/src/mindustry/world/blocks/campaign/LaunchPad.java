@@ -58,7 +58,7 @@ public class LaunchPad extends Block{
 
         @Override
         public Cursor getCursor(){
-            return !state.isCampaign() ? SystemCursor.arrow : super.getCursor();
+            return !state.isCampaign() || net.client() ? SystemCursor.arrow : super.getCursor();
         }
 
         @Override
@@ -136,7 +136,7 @@ public class LaunchPad extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            if(!state.isCampaign()){
+            if(!state.isCampaign() || net.client()){
                 deselect();
                 return;
             }
@@ -234,7 +234,9 @@ public class LaunchPad extends Block{
                         Events.fire(new LaunchItemEvent(stack));
                     }
 
-                    destsec.addItems(dest);
+                    if(!net.client()){
+                        destsec.addItems(dest);
+                    }
                 }
             }
         }
