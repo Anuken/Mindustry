@@ -28,6 +28,26 @@ public class Objectives{
         }
     }
 
+    public static class Produce implements Objective{
+        public UnlockableContent content;
+
+        public Produce(UnlockableContent content){
+            this.content = content;
+        }
+
+        protected Produce(){}
+
+        @Override
+        public boolean complete(){
+            return content.unlocked();
+        }
+
+        @Override
+        public String display(){
+            return Core.bundle.format("requirement.produce", content.emoji() + " " + content.localizedName);
+        }
+    }
+
     public static class SectorComplete extends SectorObjective{
 
         public SectorComplete(SectorPreset zone){

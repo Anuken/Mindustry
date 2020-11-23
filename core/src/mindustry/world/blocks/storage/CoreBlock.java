@@ -50,8 +50,8 @@ public class CoreBlock extends StorageBlock{
         priority = TargetPriority.core;
         flags = EnumSet.of(BlockFlag.core, BlockFlag.unitModifier);
         unitCapModifier = 10;
-        activeSound = Sounds.respawning;
-        activeSoundVolume = 1f;
+        loopSound = Sounds.respawning;
+        loopSoundVolume = 1f;
         group = BlockGroup.none;
     }
 
@@ -62,6 +62,8 @@ public class CoreBlock extends StorageBlock{
         CoreBuild entity = tile.bc();
         CoreBlock block = (CoreBlock)tile.block();
         Fx.spawn.at(entity);
+
+        player.set(entity);
 
         if(!net.client()){
             Unit unit = block.unitType.create(tile.team());
@@ -210,7 +212,7 @@ public class CoreBlock extends StorageBlock{
             super.onDestroyed();
 
             //add a spawn to the map for future reference - waves should be disabled, so it shouldn't matter
-            if(state.isCampaign() && team == state.rules.waveTeam){
+            if(state.isCampaign() && team == state.rules.waveTeam && team.cores().size <= 1){
                 //do not recache
                 tile.setOverlayQuiet(Blocks.spawn);
 
@@ -363,10 +365,6 @@ public class CoreBlock extends StorageBlock{
                     noEffect = false;
                 }else{
                     super.handleItem(source, item);
-                }
-
-                if(state.rules.tutorial){
-                    Events.fire(new CoreItemDeliverEvent());
                 }
             }
         }

@@ -53,11 +53,14 @@ public class UnitFactory extends UnitBlock{
     @Override
     public void init(){
         capacities = new int[Vars.content.items().size];
+        itemCapacity = 0;
         for(UnitPlan plan : plans){
             for(ItemStack stack : plan.requirements){
                 capacities[stack.item.id] = Math.max(capacities[stack.item.id], stack.amount * 2);
-                itemCapacity = Math.max(itemCapacity, stack.amount * 2);
             }
+        }
+        for(int i : capacities){
+            itemCapacity += i;
         }
 
         super.init();
@@ -174,7 +177,7 @@ public class UnitFactory extends UnitBlock{
                     i.setScaling(Scaling.fit);
                     i.setColor(currentPlan == -1 ? Color.lightGray : Color.white);
                 }).size(32).padBottom(-4).padRight(2);
-                t.label(() -> currentPlan == -1 ? "@none" : plans.get(currentPlan).unit.localizedName).color(Color.lightGray);
+                t.label(() -> currentPlan == -1 ? "@none" : plans.get(currentPlan).unit.localizedName).wrap().width(230f).color(Color.lightGray);
             }).left();
         }
 

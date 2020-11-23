@@ -303,6 +303,14 @@ public class Maps{
                     block = Blocks.sandBoulder;
                 }},
                 new ScatterFilter(){{
+                    flooronto = Blocks.darksand;
+                    block = Blocks.basaltBoulder;
+                }},
+                new ScatterFilter(){{
+                    flooronto = Blocks.basalt;
+                    block = Blocks.basaltBoulder;
+                }},
+                new ScatterFilter(){{
                     flooronto = Blocks.dacite;
                     block = Blocks.daciteBoulder;
                 }},

@@ -65,7 +65,7 @@ public class LogicDialog extends BaseDialog{
                     if(example instanceof InvalidStatement || example.hidden()) continue;
 
                     TextButtonStyle style = new TextButtonStyle(Styles.cleart);
-                    style.fontColor = example.category().color;
+                    style.fontColor = example.color();
                     style.font = Fonts.outline;
 
                     t.button(example.name(), style, () -> {

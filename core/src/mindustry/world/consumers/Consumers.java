@@ -101,6 +101,7 @@ public class Consumers{
         return (T)map[type.ordinal()];
     }
 
+    @Nullable
     public Consume[] all(){
         return results;
     }

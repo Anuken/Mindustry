@@ -14,6 +14,7 @@ import mindustry.world.*;
 /** "Compiles" a sequence of statements into instructions. */
 public class LAssembler{
     public static ObjectMap<String, Func<String[], LStatement>> customParsers = new ObjectMap<>();
+    public static final int maxTokenLength = 40;
 
     private int lastVar;
     /** Maps names to variable IDs. */
@@ -96,11 +97,13 @@ public class LAssembler{
         if(data == null || data.isEmpty()) return new Seq<>();
 
         Seq<LStatement> statements = new Seq<>();
-        String[] lines = data.split("[;\n]+");
+        String[] lines = data.split("\n");
         int index = 0;
         for(String line : lines){
             //comments
-            if(line.startsWith("#")) continue;
+            if(line.startsWith("#") || line.isEmpty()) continue;
+            //remove trailing semicolons in case someone adds them in for no reason
+            if(line.endsWith(";")) line = line.substring(0, line.length() - 1);
 
             if(index++ > max) break;
 
@@ -120,7 +123,7 @@ public class LAssembler{
                         if(c == '"'){
                             inString = !inString;
                         }else if(c == ' ' && !inString){
-                            tokens.add(line.substring(lastIdx, i));
+                            tokens.add(line.substring(lastIdx, Math.min(i, lastIdx + maxTokenLength)));
                             lastIdx = i + 1;
                         }
                     }

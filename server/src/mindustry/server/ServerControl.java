@@ -3,7 +3,6 @@ package mindustry.server;
 import arc.*;
 import arc.files.*;
 import arc.struct.*;
-import arc.struct.Seq.*;
 import arc.util.*;
 import arc.util.Timer;
 import arc.util.CommandHandler.*;
@@ -22,6 +21,7 @@ import mindustry.maps.Maps.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
+import mindustry.net.*;
 import mindustry.type.*;
 
 import java.io.*;
@@ -58,6 +58,10 @@ public class ServerControl implements ApplicationListener{
     private String suggested;
 
     public ServerControl(String[] args){
+        setup(args);
+    }
+
+    protected void setup(String[] args){
         Core.settings.defaults(
             "bans", "",
             "admins", "",
@@ -254,7 +258,7 @@ public class ServerControl implements ApplicationListener{
         info("Server loaded. Type @ for help.", "'help'");
     }
 
-    private void registerCommands(){
+    protected void registerCommands(){
         handler.register("help", "Displays this command list.", arg -> {
             info("Commands:");
             for(Command command : handler.getCommandList()){
@@ -272,6 +276,7 @@ public class ServerControl implements ApplicationListener{
             net.dispose();
             Core.app.exit();
         });
+
 
         handler.register("stop", "Stop hosting the server.", arg -> {
             net.closeServer();
@@ -400,7 +405,7 @@ public class ServerControl implements ApplicationListener{
                 info("Path: @", mod.file.path());
                 info("Description: @", mod.meta.description);
             }else{
-                info("No mod with name '@' found.");
+                info("No mod with name '@' found.", arg[0]);
             }
         });
 
@@ -657,7 +662,7 @@ public class ServerControl implements ApplicationListener{
             Player target = Groups.player.find(p -> p.name().equals(arg[0]));
 
             if(target != null){
-                Call.sendMessage("[scarlet] " + target.name() + "[scarlet] has been kicked by the server.");
+                Call.sendMessage("[scarlet]" + target.name() + "[scarlet] has been kicked by the server.");
                 target.kick(KickReason.kick);
                 info("It is done.");
             }else{
@@ -686,7 +691,7 @@ public class ServerControl implements ApplicationListener{
 
             for(Player player : Groups.player){
                 if(netServer.admins.isIDBanned(player.uuid())){
-                    Call.sendMessage("[scarlet] " + player.name + " has been banned.");
+                    Call.sendMessage("[scarlet]" + player.name + " has been banned.");
                     player.con.kick(KickReason.banned);
                 }
             }
@@ -723,7 +728,7 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("unban", "<ip/ID>", "Completely unban a person by IP or ID.", arg -> {
             if(netServer.admins.unbanPlayerIP(arg[0]) || netServer.admins.unbanPlayerID(arg[0])){
-                info("Unbanned player.", arg[0]);
+                info("Unbanned player: @", arg[0]);
             }else{
                 err("That IP/ID is not banned!");
             }
@@ -946,7 +951,7 @@ public class ServerControl implements ApplicationListener{
                 }
             }
 
-            if(closest != null){
+            if(closest != null && !closest.text.equals("yes")){
                 err("Command not found. Did you mean \"" + closest.text + "\"?");
                 suggested = line.replace(response.runCommand, closest.text);
             }else{
@@ -964,30 +969,16 @@ public class ServerControl implements ApplicationListener{
     private void play(boolean wait, Runnable run){
         inExtraRound = true;
         Runnable r = () -> {
-            Seq<Player> players = new Seq<>();
-            for(Player p : Groups.player){
-                players.add(p);
-                p.clearUnit();
-            }
+            WorldReloader reloader = new WorldReloader();
 
-            logic.reset();
+            reloader.begin();
 
-            Call.worldDataBegin();
             run.run();
+
             state.rules = state.map.applyRules(lastMode);
             logic.play();
 
-            for(Player p : players){
-                if(p.con == null) continue;
-
-                boolean wasAdmin = p.admin;
-                p.reset();
-                p.admin = wasAdmin;
-                if(state.rules.pvp){
-                    p.team(netServer.assignTeam(p, new SeqIterable<>(players)));
-                }
-                netServer.sendWorldData(p);
-            }
+            reloader.end();
             inExtraRound = false;
         };
 
@@ -1015,6 +1006,10 @@ public class ServerControl implements ApplicationListener{
             String date = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss").format(LocalDateTime.now());
             currentLogFile.writeString("[End of log file. Date: " + date + "]\n", true);
             currentLogFile = null;
+        }
+
+        for(String value : values){
+            text = text.replace(value, "");
         }
 
         if(currentLogFile == null){

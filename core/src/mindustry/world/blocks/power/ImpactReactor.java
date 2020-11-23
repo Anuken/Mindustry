@@ -92,6 +92,11 @@ public class ImpactReactor extends PowerGenerator{
         }
 
         @Override
+        public float ambientVolume(){
+            return warmup;
+        }
+
+        @Override
         public void draw(){
             Draw.rect(bottomRegion, x, y);
 

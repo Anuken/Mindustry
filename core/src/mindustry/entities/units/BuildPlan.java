@@ -9,7 +9,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 /** Class for storing build requests. Can be either a place or remove request. */
-public class BuildPlan{
+public class BuildPlan implements Position{
     /** Position and rotation of this request. */
     public int x, y, rotation;
     /** Block being placed. If null, this is a breaking request.*/
@@ -127,11 +127,11 @@ public class BuildPlan{
     }
 
     public float drawx(){
-        return x*tilesize + block.offset;
+        return x*tilesize + (block == null ? 0 : block.offset);
     }
 
     public float drawy(){
-        return y*tilesize + block.offset;
+        return y*tilesize + (block == null ? 0 : block.offset);
     }
 
     public @Nullable Tile tile(){
@@ -140,6 +140,16 @@ public class BuildPlan{
 
     public @Nullable Building build(){
         return world.build(x, y);
+    }
+
+    @Override
+    public float getX(){
+        return drawx();
+    }
+
+    @Override
+    public float getY(){
+        return drawy();
     }
 
     @Override

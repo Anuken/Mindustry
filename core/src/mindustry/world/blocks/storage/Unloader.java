@@ -71,6 +71,8 @@ public class Unloader extends Block{
                                 other.items.remove(item, 1);
                             }
                             other.itemTaken(item);
+                        }else if(sortItem == null){
+                            other.items.failTake();
                         }
                     }
                 }

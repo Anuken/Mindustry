@@ -55,6 +55,12 @@ public class ItemSeq implements Iterable<ItemStack>, Serializable{
         return out;
     }
 
+    public void min(int number){
+        for(Item item : Vars.content.items()){
+            set(item, Math.min(get(item), number));
+        }
+    }
+
     public boolean has(Item item){
         return values[item.id] > 0;
     }
@@ -133,7 +139,7 @@ public class ItemSeq implements Iterable<ItemStack>, Serializable{
 
     @Override
     public String toString(){
-        return JsonIO.write(this);
+        return JsonIO.print(JsonIO.write(this));
     }
 
     @Override

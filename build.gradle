@@ -36,7 +36,7 @@ allprojects{
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
-        rhinoVersion = '2c3ad8c29560f695ad147a8e8cf5ed9f0ae834b3'
+        rhinoVersion = '2617981f706e50b8753155d8e15e326308be3b22'
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -97,6 +97,17 @@ allprojects{
 
         getPackage = {
             return project.ext.mainClassName.substring(0, project.ext.mainClassName.indexOf("desktop") - 1)
+        }
+
+        findSdkDir = {
+            //null because IntelliJ doesn't get env variables
+            def v = System.getenv("ANDROID_HOME")
+            if(v != null) return v
+            //rootDir is null here, amazing. brilliant.
+            def file = new File("local.properties")
+            if(!file.exists()) file = new File("../local.properties")
+            def props = new Properties().with{p -> p.load(file.newReader()); return p }
+            return props.get("sdk.dir")
         }
 
         generateLocales = {
@@ -172,11 +183,20 @@ allprojects{
         jcenter()
     }
 
+    task clearCache{
+        doFirst{
+            delete{
+                delete "$rootDir/core/assets/cache"
+            }
+        }
+    }
+
     tasks.withType(JavaCompile){
         targetCompatibility = 8
         sourceCompatibility = 14
         options.encoding = "UTF-8"
         options.compilerArgs += ["-Xlint:deprecation"]
+        dependsOn clearCache
     }
 }
 
