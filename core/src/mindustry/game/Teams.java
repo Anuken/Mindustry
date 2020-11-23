@@ -146,6 +146,7 @@ public class Teams{
 
     public void updateTeamStats(){
         present.clear();
+        boss = null;
 
         for(Team team : Team.all){
             TeamData data = team.data();
