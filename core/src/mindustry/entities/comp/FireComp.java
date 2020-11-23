@@ -34,7 +34,9 @@ abstract class FireComp implements Timedc, Posc, Firec, Syncc{
             Fx.fireSmoke.at(x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
-        loops.play(Sounds.fire, this, 0.07f);
+        if(!headless){
+            control.sound.loop(Sounds.fire, this, 0.07f);
+        }
 
         time = Mathf.clamp(time + Time.delta, 0, lifetime());
 

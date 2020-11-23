@@ -92,9 +92,7 @@ public class LogicAI extends AIController{
                 }
             }
             case stop -> {
-                if(unit instanceof Builderc build){
-                    build.clearBuilding();
-                }
+                unit.clearBuilding();
             }
         }
 

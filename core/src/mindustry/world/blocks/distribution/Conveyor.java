@@ -10,6 +10,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -32,7 +33,7 @@ public class Conveyor extends Block implements Autotiler{
     public float speed = 0f;
     public float displayedSpeed = 0f;
 
-    protected Conveyor(String name){
+    public Conveyor(String name){
         super(name);
         rotate = true;
         update = true;

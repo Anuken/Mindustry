@@ -36,12 +36,17 @@ public class ContentInfoDialog extends BaseDialog{
         table.row();
 
         if(content.description != null){
-            table.add("@category.purpose").color(Pal.accent).fillX().padTop(10);
-            table.row();
-            table.add("[lightgray]" + content.displayDescription()).wrap().fillX().padLeft(10).width(500f).left();
+            var any = content.stats.toMap().size > 0;
+
+            if(any){
+                table.add("@category.purpose").color(Pal.accent).fillX().padTop(10);
+                table.row();
+            }
+
+            table.add("[lightgray]" + content.displayDescription()).wrap().fillX().padLeft(any ? 10 : 0).width(500f).padTop(any ? 0 : 10).left();
             table.row();
 
-            if(!content.stats.useCategories){
+            if(!content.stats.useCategories && any){
                 table.add("@category.general").fillX().color(Pal.accent);
                 table.row();
             }

@@ -139,7 +139,7 @@ public class ItemSeq implements Iterable<ItemStack>, Serializable{
 
     @Override
     public String toString(){
-        return JsonIO.write(this);
+        return JsonIO.print(JsonIO.write(this));
     }
 
     @Override

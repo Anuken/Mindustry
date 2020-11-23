@@ -57,6 +57,7 @@ public class PlanetRenderer implements Disposable{
         camPos.set(0, 0f, camLength);
         projector.setScaling(1f / 150f);
         cam.fov = 60f;
+        cam.far = 150f;
     }
 
     /** Render the entire planet scene to the screen. */
@@ -93,6 +94,8 @@ public class PlanetRenderer implements Disposable{
 
         renderPlanet(solarSystem);
 
+        renderTransparent(solarSystem);
+
         endBloom();
 
         Events.fire(Trigger.universeDrawEnd);
@@ -125,11 +128,21 @@ public class PlanetRenderer implements Disposable{
 
         renderOrbit(planet);
 
+        for(Planet child : planet.children){
+            renderPlanet(child);
+        }
+    }
+
+    public void renderTransparent(Planet planet){
+        if(!planet.visible()) return;
+
         if(planet.isLandable() && planet == this.planet){
             renderSectors(planet);
         }
 
         if(planet.parent != null && planet.hasAtmosphere && Core.settings.getBool("atmosphere")){
+            Gl.depthMask(false);
+
             Blending.additive.apply();
 
             Shaders.atmosphere.camera = cam;
@@ -140,10 +153,12 @@ public class PlanetRenderer implements Disposable{
             atmosphere.render(Shaders.atmosphere, Gl.triangles);
 
             Blending.normal.apply();
+
+            Gl.depthMask(true);
         }
 
         for(Planet child : planet.children){
-            renderPlanet(child);
+            renderTransparent(child);
         }
     }
 
@@ -152,7 +167,7 @@ public class PlanetRenderer implements Disposable{
 
         Vec3 center = planet.parent.position;
         float radius = planet.orbitRadius;
-        int points = (int)(radius * 50);
+        int points = (int)(radius * 10);
         Angles.circleVectors(points, radius, (cx, cy) -> batch.vertex(Tmp.v32.set(center).add(cx, 0, cy), Pal.gray));
         batch.flush(Gl.lineLoop);
     }

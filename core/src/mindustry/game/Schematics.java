@@ -108,9 +108,6 @@ public class Schematics implements Loadable{
         if(shadowBuffer == null){
             Core.app.post(() -> shadowBuffer = new FrameBuffer(maxSchematicSize + padding + 8, maxSchematicSize + padding + 8));
         }
-
-        //load base schematics
-        bases.load();
     }
 
     private void loadLoadouts(){

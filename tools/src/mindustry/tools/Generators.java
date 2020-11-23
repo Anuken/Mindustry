@@ -504,7 +504,6 @@ public class Generators{
                         scaled.save(type.name + "-icon-logic");
                     }
                 }
-
             }catch(IllegalArgumentException e){
                 Log.err("WARNING: Skipping unit @: @", type.name, e.getMessage());
             }

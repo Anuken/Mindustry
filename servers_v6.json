@@ -4,17 +4,16 @@
     "address": ["mindustry.pl:6000", "mindustry.pl:6666"]
   },
   {
-    "address": "routerchain.ddns.net"
-  },
-  {
-    "address": "pandorum.su:8000"
+    "name": "C.A.M.S.",
+    "address": ["routerchain.ddns.net", "pandorum.su:8000"]
   },
   {
     "name": "ECAN",
     "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
   },
   {
-    "address": "Chaotic-Neutral.ddns.net:5555"
+    "name": "Chaotic Neutral",
+    "address": ["Chaotic-Neutral.ddns.net:5555", "Chaotic-Neutral.ddns.net:6666"]
   },
   {
     "address": "cheginde.ddns.net"
