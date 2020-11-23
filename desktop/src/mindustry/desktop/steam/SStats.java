@@ -317,7 +317,7 @@ public class SStats implements SteamUserStatsCallback{
                 SStat.attacksWon.add();
             }
 
-            if(!e.sector.isBeingPlayed()){
+            if(!e.sector.isBeingPlayed() && !net.client()){
                 captureBackground.complete();
             }
 
