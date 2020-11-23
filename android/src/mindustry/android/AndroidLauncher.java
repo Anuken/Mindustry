@@ -27,7 +27,6 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-
 public class AndroidLauncher extends AndroidApplication{
     public static final int PERMISSION_REQUEST_CODE = 1;
     boolean doubleScaleTablets = true;
@@ -78,11 +77,11 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
-            public void showFileChooser(boolean open, String extension, Cons<Fi> cons){
-                showFileChooser(open, cons, extension);
+            public void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
+                showFileChooser(open, title, cons, extension);
             }
 
-            void showFileChooser(boolean open, Cons<Fi> cons, String... extensions){
+            void showFileChooser(boolean open, String title, Cons<Fi> cons, String... extensions){
                 String extension = extensions[0];
 
                 if(VERSION.SDK_INT >= VERSION_CODES.Q){
@@ -119,7 +118,7 @@ public class AndroidLauncher extends AndroidApplication{
                     });
                 }else if(VERSION.SDK_INT >= VERSION_CODES.M && !(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                     checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
-                    chooser = new FileChooser(open ? "@open" : "@save", file -> Structs.contains(extensions, file.extension().toLowerCase()), open, file -> {
+                    chooser = new FileChooser(title, file -> Structs.contains(extensions, file.extension().toLowerCase()), open, file -> {
                         if(!open){
                             cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
                         }else{
@@ -137,16 +136,16 @@ public class AndroidLauncher extends AndroidApplication{
                     requestPermissions(perms.toArray(new String[0]), PERMISSION_REQUEST_CODE);
                 }else{
                     if(open){
-                        new FileChooser("@open", file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
+                        new FileChooser(title, file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
                     }else{
-                        super.showFileChooser(open, extension, cons);
+                        super.showFileChooser(open, "@open", extension, cons);
                     }
                 }
             }
 
             @Override
             public void showMultiFileChooser(Cons<Fi> cons, String... extensions){
-                showFileChooser(true, cons, extensions);
+                showFileChooser(true, "@open", cons, extensions);
             }
 
             @Override
@@ -166,29 +165,33 @@ public class AndroidLauncher extends AndroidApplication{
         }});
         checkFiles(getIntent());
 
+        try{
+            //new external folder
+            Fi data = Core.files.absolute(getContext().getExternalFilesDir(null).getAbsolutePath());
+            Core.settings.setDataDirectory(data);
 
-        //new external folder
-        Fi data = Core.files.absolute(getContext().getExternalFilesDir(null).getAbsolutePath());
-        Core.settings.setDataDirectory(data);
+            //move to internal storage if there's no file indicating that it moved
+            if(!Core.files.local("files_moved").exists()){
+                Log.info("Moving files to external storage...");
 
-        //move to internal storage if there's no file indicating that it moved
-        if(!Core.files.local("files_moved").exists()){
-            Log.info("Moving files to external storage...");
-
-            try{
-                //current local storage folder
-                Fi src = Core.files.absolute(Core.files.getLocalStoragePath());
-                for(Fi fi : src.list()){
-                    fi.copyTo(data);
+                try{
+                    //current local storage folder
+                    Fi src = Core.files.absolute(Core.files.getLocalStoragePath());
+                    for(Fi fi : src.list()){
+                        fi.copyTo(data);
+                    }
+                    //create marker
+                    Core.files.local("files_moved").writeString("files moved to " + data);
+                    Core.files.local("files_moved_103").writeString("files moved again");
+                    Log.info("Files moved.");
+                }catch(Throwable t){
+                    Log.err("Failed to move files!");
+                    t.printStackTrace();
                 }
-                //create marker
-                Core.files.local("files_moved").writeString("files moved to " + data);
-                Core.files.local("files_moved_103").writeString("files moved again");
-                Log.info("Files moved.");
-            }catch(Throwable t){
-                Log.err("Failed to move files!");
-                t.printStackTrace();
             }
+        }catch(Exception e){
+            //print log but don't crash
+            Log.err(e);
         }
     }
 

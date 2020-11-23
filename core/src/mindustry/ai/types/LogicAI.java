@@ -14,7 +14,7 @@ import static mindustry.Vars.*;
 
 public class LogicAI extends AIController{
     /** Minimum delay between item transfers. */
-    public static final float transferDelay = 60f * 3f;
+    public static final float transferDelay = 60f * 2f;
     /** Time after which the unit resets its controlled and reverts to a normal unit. */
     public static final float logicControlTimeout = 10f * 60f;
 
@@ -44,8 +44,8 @@ public class LogicAI extends AIController{
 
     @Override
     protected void updateMovement(){
-        if(itemTimer > 0) itemTimer -= Time.delta;
-        if(payTimer > 0) payTimer -= Time.delta;
+        if(itemTimer >= 0) itemTimer -= Time.delta;
+        if(payTimer >= 0) payTimer -= Time.delta;
 
         if(targetTimer > 0f){
             targetTimer -= Time.delta;
@@ -92,9 +92,7 @@ public class LogicAI extends AIController{
                 }
             }
             case stop -> {
-                if(unit instanceof Builderc build){
-                    build.clearBuilding();
-                }
+                unit.clearBuilding();
             }
         }
 
@@ -104,9 +102,7 @@ public class LogicAI extends AIController{
 
         //look where moving if there's nothing to aim at
         if(!shoot){
-            if(unit.moving()){
-                unit.lookAt(unit.vel().angle());
-            }
+            unit.lookAt(unit.prefRotation());
         }else if(unit.hasWeapons()){ //if there is, look at the object
             unit.lookAt(unit.mounts[0].aimX, unit.mounts[0].aimY);
         }

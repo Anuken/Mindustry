@@ -9,7 +9,6 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
@@ -29,19 +28,14 @@ public class GenericCrafter extends Block{
         update = true;
         solid = true;
         hasItems = true;
-        idleSound = Sounds.machine;
+        ambientSound = Sounds.machine;
         sync = true;
-        idleSoundVolume = 0.03f;
+        ambientSoundVolume = 0.03f;
         flags = EnumSet.of(BlockFlag.factory);
     }
 
     @Override
     public void setStats(){
-        if(consumes.has(ConsumeType.liquid)){
-            ConsumeLiquidBase cons = consumes.get(ConsumeType.liquid);
-            cons.timePeriod = craftTime;
-        }
-
         super.setStats();
         stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
 
@@ -50,7 +44,7 @@ public class GenericCrafter extends Block{
         }
 
         if(outputLiquid != null){
-            stats.add(Stat.output, outputLiquid.liquid, outputLiquid.amount, false);
+            stats.add(Stat.output, outputLiquid.liquid, outputLiquid.amount * (60f / craftTime), true);
         }
     }
 
@@ -142,7 +136,7 @@ public class GenericCrafter extends Block{
         }
 
         @Override
-        public boolean shouldIdleSound(){
+        public boolean shouldAmbientSound(){
             return cons.valid();
         }
 

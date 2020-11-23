@@ -141,7 +141,7 @@ public class BlockInventoryFragment extends Fragment{
                 Boolp canPick = () -> player.unit().acceptsItem(item) && !state.isPaused() && player.within(tile, itemTransferRange);
 
                 HandCursorListener l = new HandCursorListener();
-                l.setEnabled(canPick);
+                l.enabled = canPick;
 
                 Element image = itemImage(item.icon(Cicon.xlarge), () -> {
                     if(tile == null || !tile.isValid()){

@@ -28,7 +28,7 @@ public class OverlayRenderer{
         if(player.dead()) return;
 
         if(player.isBuilder()){
-            player.builder().drawBuildRequests();
+            player.unit().drawBuildRequests();
         }
 
         input.drawBottom();
@@ -36,7 +36,7 @@ public class OverlayRenderer{
 
     public void drawTop(){
 
-        if(!player.dead()){
+        if(!player.dead() && ui.hudfrag.shown){
             if(Core.settings.getBool("playerindicators")){
                 for(Player player : Groups.player){
                     if(Vars.player != player && Vars.player.team() == player.team()){
@@ -154,7 +154,7 @@ public class OverlayRenderer{
 
         input.drawOverSelect();
 
-        if(ui.hudfrag.blockfrag.hover() instanceof Unit unit && unit.controller() instanceof LogicAI ai && ai.controller instanceof Building build){
+        if(ui.hudfrag.blockfrag.hover() instanceof Unit unit && unit.controller() instanceof LogicAI ai && ai.controller instanceof Building build && build.isValid()){
             Drawf.square(build.x, build.y, build.block.size * tilesize/2f + 2f);
             if(!unit.within(build, unit.hitSize * 2f)){
                 Drawf.arrow(unit.x, unit.y, build.x, build.y, unit.hitSize *2f, 4f);
@@ -171,7 +171,7 @@ public class OverlayRenderer{
             Draw.reset();
 
             Building tile = world.buildWorld(v.x, v.y);
-            if(tile != null && tile.interactable(player.team()) && tile.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 && player.within(tile, itemTransferRange)){
+            if(input.canDropItem() && tile != null && tile.interactable(player.team()) && tile.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 && player.within(tile, itemTransferRange)){
                 Lines.stroke(3f, Pal.gray);
                 Lines.square(tile.x, tile.y, tile.block.size * tilesize / 2f + 3 + Mathf.absin(Time.time(), 5f, 1f));
                 Lines.stroke(1f, Pal.place);

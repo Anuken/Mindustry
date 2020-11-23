@@ -26,6 +26,6 @@ public class DistortFilter extends GenerateFilter{
 
         in.floor = tile.floor();
         if(!tile.block().synthetic() && !in.block.synthetic()) in.block = tile.block();
-        in.ore = tile.overlay();
+        in.overlay = tile.overlay();
     }
 }

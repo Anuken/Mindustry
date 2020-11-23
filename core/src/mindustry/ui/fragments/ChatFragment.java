@@ -163,15 +163,16 @@ public class ChatFragment extends Table{
 
         Draw.color();
 
-        if(fadetime > 0 && !shown)
+        if(fadetime > 0 && !shown){
             fadetime -= Time.delta / 180f;
+        }
     }
 
     private void sendMessage(){
-        String message = chatfield.getText();
+        String message = chatfield.getText().trim();
         clearChatInput();
 
-        if(message.replace(" ", "").isEmpty()) return;
+        if(message.isEmpty()) return;
 
         history.insert(1, message);
 
@@ -182,7 +183,7 @@ public class ChatFragment extends Table{
 
         if(!shown){
             scene.setKeyboardFocus(chatfield);
-            shown = !shown;
+            shown = true;
             if(mobile){
                 TextInput input = new TextInput();
                 input.maxLength = maxTextLength;
@@ -198,10 +199,13 @@ public class ChatFragment extends Table{
                 chatfield.fireClick();
             }
         }else{
-            scene.setKeyboardFocus(null);
-            shown = !shown;
-            scrollPos = 0;
-            sendMessage();
+            //sending chat has a delay; workaround for issue #1943
+            Time.run(2f, () ->{
+                scene.setKeyboardFocus(null);
+                shown = false;
+                scrollPos = 0;
+                sendMessage();
+            });
         }
     }
 

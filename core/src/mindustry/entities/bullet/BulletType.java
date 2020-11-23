@@ -79,8 +79,10 @@ public abstract class BulletType extends Content{
     public boolean backMove = true;
     /** Bullet range override. */
     public float range = -1f;
-    /** Heal Bullet Percent **/
+    /** % of block health healed **/
     public float healPercent = 0f;
+    /** whether to make fire on impact */
+    public boolean makeFire = false;
 
     //additional effects
 
@@ -114,6 +116,8 @@ public abstract class BulletType extends Content{
     public float lightningDamage = -1;
     public float lightningCone = 360f;
     public float lightningAngle = 0f;
+    /** The bullet created at lightning points. */
+    public @Nullable BulletType lightningType = null;
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
@@ -157,15 +161,18 @@ public abstract class BulletType extends Content{
         return healPercent <= 0.001f || tile.team != bullet.team || tile.healthf() < 1f;
     }
 
-    public void hitTile(Bullet b, Building tile, float initialHealth){
-        if(status == StatusEffects.burning) {
-            Fires.create(tile.tile);
+    /** If direct is false, this is an indirect hit and the tile was already damaged.
+     * TODO this is a mess. */
+    public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
+        if(makeFire && build.team != b.team){
+            Fires.create(build.tile);
         }
-        hit(b);
 
-        if(healPercent > 0f && tile.team == b.team && !(tile.block instanceof ConstructBlock)){
-            Fx.healBlockFull.at(tile.x, tile.y, tile.block.size, Pal.heal);
-            tile.heal(healPercent / 100f * tile.maxHealth());
+        if(healPercent > 0f && build.team == b.team && !(build.block instanceof ConstructBlock)){
+            Fx.healBlockFull.at(build.x, build.y, build.block.size, Pal.heal);
+            build.heal(healPercent / 100f * build.maxHealth());
+        }else if(build.team != b.team && direct){
+            hit(b);
         }
     }
 
@@ -202,21 +209,21 @@ public abstract class BulletType extends Content{
             Damage.createIncend(x, y, incendSpread, incendAmount);
         }
 
-        if(splashDamageRadius > 0){
+        if(splashDamageRadius > 0 && !b.absorbed){
             Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
 
             if(status != StatusEffects.none){
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
             }
-            
-            if(healPercent > 0f) {
-                indexer.eachBlock(b.team, x, y, splashDamageRadius, other -> other.damaged(), other -> {
+
+            if(healPercent > 0f){
+                indexer.eachBlock(b.team, x, y, splashDamageRadius, Building::damaged, other -> {
                     Fx.healBlockFull.at(other.x, other.y, other.block.size, Pal.heal);
                     other.heal(healPercent / 100f * other.maxHealth());
                 });
             }
 
-            if(status == StatusEffects.burning) {
+            if(makeFire){
                 indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> {
                     Fires.create(other.tile);
                 });
@@ -247,13 +254,9 @@ public abstract class BulletType extends Content{
     }
 
     public void init(Bullet b){
-        if(pierceCap >= 1) {
-            pierce = true;
-            //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
-        }
 
-        if(killShooter && b.owner() instanceof Healthc){
-            ((Healthc)b.owner()).kill();
+        if(killShooter && b.owner() instanceof Healthc h){
+            h.kill();
         }
 
         if(instantDisappear){
@@ -277,6 +280,18 @@ public abstract class BulletType extends Content{
             if(Mathf.chanceDelta(trailChance)){
                 trailEffect.at(b.x, b.y, trailParam, trailColor);
             }
+        }
+    }
+
+    @Override
+    public void init(){
+        if(pierceCap >= 1){
+            pierce = true;
+            //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
+        }
+
+        if(lightningType == null){
+            lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
         }
     }
 

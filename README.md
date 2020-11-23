@@ -1,7 +1,7 @@
 ![Logo](core/assets-raw/sprites/ui/logo.png)
 
 [![Build Status](https://travis-ci.org/Anuken/Mindustry.svg?branch=master)](https://travis-ci.org/Anuken/Mindustry) 
-[![Discord](https://img.shields.io/discord/391020510269669376.svg)](https://discord.gg/mindustry)  
+[![Discord](https://img.shields.io/discord/391020510269669376.svg?logo=discord&logoColor=white&logoWidth=20&labelColor=7289DA&label=Discord)](https://discord.gg/mindustry)  
 
 A sandbox tower defense game written in Java.
 
@@ -61,18 +61,5 @@ Post feature requests and feedback [here](https://github.com/Anuken/Mindustry-Su
 
 ## Downloads
 
-[<img src="https://static.itch.io/images/badge.svg"
-     alt="Get it on Itch.io"
-     height="60">](https://anuke.itch.io/mindustry)
-
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
-     alt="Get it on Google Play"
-     height="80">](https://play.google.com/store/apps/details?id=io.anuke.mindustry)
-
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-     alt="Get it on F-Droid"
-     height="80">](https://f-droid.org/packages/io.anuke.mindustry/)
-
-[<img src="https://flathub.org/assets/badges/flathub-badge-en.svg"
-     alt="Download On Flathub"
-     height="60">](https://flathub.org/apps/details/com.github.Anuken.Mindustry)
+| [![](https://static.itch.io/images/badge.svg)](https://anuke.itch.io/mindustry)    |    [![](https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png)](https://play.google.com/store/apps/details?id=io.anuke.mindustry)   |    [![](https://fdroid.gitlab.io/artwork/badge/get-it-on.png)](https://f-droid.org/packages/io.anuke.mindustry)	| [![](https://flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/details/com.github.Anuken.Mindustry)     |
+|---	|---	|---	|---	|

@@ -27,12 +27,12 @@ uniform vec3 u_rcampos;
 uniform mat4 u_invproj;
 uniform vec3 u_light;
 
-vec2 rayIntersection(vec3 p, vec3 dir, float radius) {
+vec2 rayIntersection(vec3 p, vec3 dir, float radius){
     float b = dot(p, dir);
     float c = dot(p, p) - radius * radius;
 
     float d = b * b - c;
-    if (d < 0.0) {
+    if(d < 0.0){
         return vec2(MAX, -MAX);
     }
     d = sqrt(d);
@@ -43,7 +43,7 @@ vec2 rayIntersection(vec3 p, vec3 dir, float radius) {
     return vec2(near, far);
 }
 
-float miePhase(float g, float c, float cc) {
+float miePhase(float g, float c, float cc){
     float gg = g * g;
 
     float a = (1.0 - gg) * (1.0 + cc);
@@ -55,20 +55,20 @@ float miePhase(float g, float c, float cc) {
     return 1.5 * a / b;
 }
 
-float rayleighPhase(float cc) {
+float rayleighPhase(float cc){
     return 0.75 * (1.0 + cc);
 }
 
-float density(vec3 p) {
+float density(vec3 p){
     return exp(-(length(p) - u_innerRadius) * (4.0 / (u_outerRadius - u_innerRadius)));
 }
 
-float optic(vec3 p, vec3 q) {
+float optic(vec3 p, vec3 q){
     vec3 step = (q - p) / fNumOutScatter;
     vec3 v = p + step * 0.5;
 
     float sum = 0.0;
-    for (int i = 0; i < numOutScatter; i++) {
+    for(int i = 0; i < numOutScatter; i++){
         sum += density(v);
         v += step;
     }
@@ -76,7 +76,7 @@ float optic(vec3 p, vec3 q) {
     return sum;
 }
 
-vec3 inScatter(vec3 o, vec3 dir, vec2 e, vec3 l) {
+vec3 inScatter(vec3 o, vec3 dir, vec2 e, vec3 l){
     float len = (e.y - e.x) / fNumInScatter;
     vec3 step = dir * len;
     vec3 p = o + dir * e.x;

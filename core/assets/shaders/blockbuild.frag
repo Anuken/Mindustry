@@ -24,7 +24,7 @@ bool cont(vec2 T, vec2 v){
            		id(T + vec2(step, 0) * v, base) || id(T + vec2(-step, 0) * v, base));
 }
 
-void main() {
+void main(){
 
 	vec2 t = v_texCoords.xy;
 

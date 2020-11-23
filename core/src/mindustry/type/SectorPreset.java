@@ -15,15 +15,18 @@ public class SectorPreset extends UnlockableContent{
 
     public int captureWave = 0;
     public Cons<Rules> rules = rules -> rules.winWave = captureWave;
+    public boolean useAI = true;
     /** Difficulty, 0-10. */
     public float difficulty;
+    public boolean addStartingItems = false;
 
     public SectorPreset(String name, Planet planet, int sector){
         super(name);
-        this.generator = new FileMapGenerator(name);
+        this.generator = new FileMapGenerator(name, this);
         this.planet = planet;
         sector %= planet.sectors.size;
         this.sector = planet.sectors.get(sector);
+        inlineDescription = false;
 
         planet.preset(sector, this);
     }
@@ -35,7 +38,7 @@ public class SectorPreset extends UnlockableContent{
 
     @Override
     public boolean isHidden(){
-        return true;
+        return description == null;
     }
 
     @Override

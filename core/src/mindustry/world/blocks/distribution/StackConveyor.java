@@ -44,8 +44,8 @@ public class StackConveyor extends Block implements Autotiler{
         itemCapacity = 10;
         conveyorPlacement = true;
 
-        idleSound = Sounds.conveyor;
-        idleSoundVolume = 0.004f;
+        ambientSound = Sounds.conveyor;
+        ambientSoundVolume = 0.004f;
         unloadable = false;
     }
 
@@ -58,16 +58,16 @@ public class StackConveyor extends Block implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        if(tile.build instanceof StackConveyorBuild){
-            int state = ((StackConveyorBuild)tile.build).state;
+        if(tile.build instanceof StackConveyorBuild b){
+            int state = b.state;
             if(state == stateLoad){ //standard conveyor mode
                 return otherblock.outputsItems() && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
             }else if(state == stateUnload){ //router mode
                 return otherblock.acceptsItems &&
                     (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) ||
                     (otherblock instanceof StackConveyor && facing(otherx, othery, otherrot, tile.x, tile.y))) &&
-                    !(world.build(otherx, othery) instanceof StackConveyorBuild && ((StackConveyorBuild)world.build(otherx, othery)).state == stateUnload) &&
-                    !(world.build(otherx, othery) instanceof StackConveyorBuild && ((StackConveyorBuild)world.build(otherx, othery)).state == stateMove &&
+                    !(world.build(otherx, othery) instanceof StackConveyorBuild s && s.state == stateUnload) &&
+                    !(world.build(otherx, othery) instanceof StackConveyorBuild s2 && s2.state == stateMove &&
                         !facing(otherx, othery, otherrot, tile.x, tile.y));
             }
         }
@@ -105,6 +105,8 @@ public class StackConveyor extends Block implements Autotiler{
         public int link = -1;
         public float cooldown;
         public Item lastItem;
+
+        boolean proxUpdating = false;
 
         @Override
         public void draw(){
@@ -156,25 +158,27 @@ public class StackConveyor extends Block implements Autotiler{
             if(bits[0] == 0 &&  blends(tile, rotation, 0) && !blends(tile, rotation, 2)) state = stateLoad;  // a 0 that faces into a conveyor with none behind it
             if(bits[0] == 0 && !blends(tile, rotation, 0) && blends(tile, rotation, 2)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
 
-            blendprox = 0;
+            if(!headless){
+                blendprox = 0;
 
-            for(int i = 0; i < 4; i++){
-                if(blends(tile, rotation, i)){
-                    blendprox |= (1 << i);
+                for(int i = 0; i < 4; i++){
+                    if(blends(tile, rotation, i)){
+                        blendprox |= (1 << i);
+                    }
                 }
             }
 
             //update other conveyor state when this conveyor's state changes
             if(state != lastState){
+                proxUpdating = true;
                 for(Building near : proximity){
-                    if(near instanceof StackConveyorBuild){
+                    if(!(near instanceof StackConveyorBuild b && b.proxUpdating && b.state != stateUnload)){
                         near.onProximityUpdate();
-                        for(Building other : near.proximity){
-                            if(!(other instanceof StackConveyorBuild)) other.onProximityUpdate();
-                        }
                     }
                 }
+                proxUpdating = false;
             }
+
         }
 
         @Override
@@ -229,7 +233,7 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
-        public boolean shouldIdleSound(){
+        public boolean shouldAmbientSound(){
             return false; // has no moving parts;
         }
 

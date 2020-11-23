@@ -2,6 +2,7 @@ package mindustry.io.legacy;
 
 import arc.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.ui.dialogs.JoinDialog.*;
@@ -70,15 +71,14 @@ public class LegacyIO{
                             String name = stream.readUTF();
                             Content out = Vars.content.getByName(type, name);
                             if(out instanceof UnlockableContent u){
-                                u.unlock();
+                                u.quietUnlock();
                             }
                         }
                     }
                 }
             }
         }catch(Exception e){
-            e.printStackTrace();
+            Log.err(e);
         }
     }
-
 }

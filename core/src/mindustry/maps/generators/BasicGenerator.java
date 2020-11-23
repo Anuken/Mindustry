@@ -248,7 +248,7 @@ public abstract class BasicGenerator implements WorldGenerator{
         for(int x = -rad; x <= rad; x++){
             for(int y = -rad; y <= rad; y++){
                 int wx = cx + x, wy = cy + y;
-                if(Structs.inBounds(wx, wy, width, height) && Mathf.dst(x, y, 0, 0) <= rad){
+                if(Structs.inBounds(wx, wy, width, height) && Mathf.within(x, y, rad)){
                     Tile other = tiles.getn(wx, wy);
                     other.setBlock(Blocks.air);
                 }

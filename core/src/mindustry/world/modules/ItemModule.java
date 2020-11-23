@@ -103,7 +103,7 @@ public class ItemModule extends BlockModule{
 
     public void each(ItemConsumer cons){
         for(int i = 0; i < items.length; i++){
-            if(items[i] > 0){
+            if(items[i] != 0){
                 cons.accept(content.item(i), items[i]);
             }
         }
@@ -222,6 +222,18 @@ public class ItemModule extends BlockModule{
         items[item.id] --;
         total --;
         takeRotation = item.id + 1;
+    }
+
+    public void failTake(){
+        for(int i = 1; i < items.length; i++){
+            int index = (i + takeRotation);
+            if(index >= items.length) index -= items.length;
+            if(items[index] > 0){
+                takeRotation += i;
+                takeRotation %= items.length;
+                return;
+            }
+        }
     }
 
     public int get(int id){

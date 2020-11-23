@@ -20,10 +20,14 @@ public abstract class UnlockableContent extends MappableContent{
     public Stats stats = new Stats();
     /** Localized, formal name. Never null. Set to internal name if not found in bundle. */
     public String localizedName;
-    /** Localized description. May be null. */
-    public @Nullable String description;
+    /** Localized description & details. May be null. */
+    public @Nullable String description, details;
     /** Whether this content is always unlocked in the tech tree. */
     public boolean alwaysUnlocked = false;
+    /** Whether to show the description in the research dialog preview. */
+    public boolean inlineDescription = true;
+    /** Special logic icon ID. */
+    public int iconId = 0;
     /** Icons by Cicon ID.*/
     protected TextureRegion[] cicons = new TextureRegion[Cicon.all.length];
     /** Unlock state. Loaded from settings. Do not modify outside of the constructor. */
@@ -34,6 +38,7 @@ public abstract class UnlockableContent extends MappableContent{
 
         this.localizedName = Core.bundle.get(getContentType() + "." + this.name + ".name", this.name);
         this.description = Core.bundle.getOrNull(getContentType() + "." + this.name + ".description");
+        this.details = Core.bundle.getOrNull(getContentType() + "." + this.name + ".details");
         this.unlocked = Core.settings != null && Core.settings.getBool(this.name + "-unlocked", false);
     }
 
@@ -49,7 +54,7 @@ public abstract class UnlockableContent extends MappableContent{
         }
     }
 
-    /** Intializes stats on demand. Should only be called once. Only called before something is displayed. */
+    /** Initializes stats on demand. Should only be called once. Only called before something is displayed. */
     public void setStats(){
     }
 
@@ -74,9 +79,11 @@ public abstract class UnlockableContent extends MappableContent{
             cicons[icon.ordinal()] =
                 Core.atlas.find(getContentType().name() + "-" + name + "-" + icon.name(),
                 Core.atlas.find(getContentType().name() + "-" + name + "-full",
+                Core.atlas.find(name + "-" + icon.name(),
+                Core.atlas.find(name + "-full",
                 Core.atlas.find(name,
                 Core.atlas.find(getContentType().name() + "-" + name,
-                Core.atlas.find(name + "1")))));
+                Core.atlas.find(name + "1")))))));
         }
         return cicons[icon.ordinal()];
     }
@@ -113,7 +120,7 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     /** Unlocks this content, but does not fire any events. */
-    public void quiteUnlock(){
+    public void quietUnlock(){
         if(!unlocked()){
             unlocked = true;
             Core.settings.put(name + "-unlocked", true);
@@ -121,8 +128,16 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     public boolean unlocked(){
-        if(net.client()) return state.rules.researched.contains(name);
+        if(net != null && net.client()) return alwaysUnlocked || state.rules.researched.contains(name);
         return unlocked || alwaysUnlocked;
+    }
+
+    /** Locks this content again. */
+    public void clearUnlock(){
+        if(unlocked){
+            unlocked = false;
+            Core.settings.put(name + "-unlocked", false);
+        }
     }
 
     /** @return whether this content is unlocked, or the player is in a custom (non-campaign) game. */

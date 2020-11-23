@@ -34,11 +34,6 @@ public class Separator extends Block{
 
     @Override
     public void setStats(){
-        if(consumes.has(ConsumeType.liquid)){
-            ConsumeLiquidBase cons = consumes.get(ConsumeType.liquid);
-            cons.timePeriod = craftTime;
-        }
-
         super.setStats();
 
         stats.add(Stat.output, new ItemFilterValue(item -> {
@@ -57,7 +52,7 @@ public class Separator extends Block{
         public float warmup;
 
         @Override
-        public boolean shouldIdleSound(){
+        public boolean shouldAmbientSound(){
             return cons.valid();
         }
 

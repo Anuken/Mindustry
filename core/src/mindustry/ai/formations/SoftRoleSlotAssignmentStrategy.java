@@ -51,7 +51,6 @@ public class SoftRoleSlotAssignmentStrategy extends BoundedSlotAssignmentStrateg
 
     @Override
     public void updateSlotAssignments(Seq<SlotAssignment> assignments){
-
         // Holds a list of member and slot data for each member.
         Seq<MemberAndSlots> memberData = new Seq<>();
 
@@ -125,7 +124,6 @@ public class SoftRoleSlotAssignmentStrategy extends BoundedSlotAssignmentStrateg
             // Some sensible action should be taken, such as reporting to the player.
             throw new ArcRuntimeException("SoftRoleSlotAssignmentStrategy cannot find valid slot assignment for member " + memberDatum.member);
         }
-
     }
 
     static class CostAndSlot implements Comparable<CostAndSlot>{

@@ -33,8 +33,6 @@ public class UnitFactory extends UnitBlock{
         hasPower = true;
         hasItems = true;
         solid = true;
-        //flags = EnumSet.of(BlockFlag.producer, BlockFlag.unitModifier);
-        //unitCapModifier = 2;
         configurable = true;
         outputsPayload = true;
         rotate = true;
@@ -44,17 +42,25 @@ public class UnitFactory extends UnitBlock{
             tile.progress = 0;
         });
 
+        config(UnitType.class, (UnitFactoryBuild tile, UnitType val) -> {
+            tile.currentPlan = plans.indexOf(p -> p.unit == val);
+            tile.progress = 0;
+        });
+
         consumes.add(new ConsumeItemDynamic((UnitFactoryBuild e) -> e.currentPlan != -1 ? plans.get(e.currentPlan).requirements : ItemStack.empty));
     }
 
     @Override
     public void init(){
         capacities = new int[Vars.content.items().size];
+        itemCapacity = 0;
         for(UnitPlan plan : plans){
             for(ItemStack stack : plan.requirements){
                 capacities[stack.item.id] = Math.max(capacities[stack.item.id], stack.amount * 2);
-                itemCapacity = Math.max(itemCapacity, stack.amount * 2);
             }
+        }
+        for(int i : capacities){
+            itemCapacity += i;
         }
 
         super.init();
@@ -88,6 +94,18 @@ public class UnitFactory extends UnitBlock{
         super.setStats();
 
         stats.remove(Stat.itemCapacity);
+
+        stats.add(Stat.output, table -> {
+            Seq<UnitPlan> p = plans.select(u -> u.unit.unlockedNow());
+            table.row();
+            for(var plan : p){
+                if(plan.unit.unlockedNow()){
+                    table.image(plan.unit.icon(Cicon.small)).size(8 * 3).padRight(2).right();
+                    table.add(plan.unit.localizedName).left();
+                    table.row();
+                }
+            }
+        });
     }
 
     @Override
@@ -159,7 +177,7 @@ public class UnitFactory extends UnitBlock{
                     i.setScaling(Scaling.fit);
                     i.setColor(currentPlan == -1 ? Color.lightGray : Color.white);
                 }).size(32).padBottom(-4).padRight(2);
-                t.label(() -> currentPlan == -1 ? "@none" : plans.get(currentPlan).unit.localizedName).color(Color.lightGray);
+                t.label(() -> currentPlan == -1 ? "@none" : plans.get(currentPlan).unit.localizedName).wrap().width(230f).color(Color.lightGray);
             }).left();
         }
 

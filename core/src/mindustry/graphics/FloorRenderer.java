@@ -32,7 +32,8 @@ public class FloorRenderer implements Disposable{
 
     /**Queues up a cache change for a tile. Only runs in render loop. */
     public void recacheTile(Tile tile){
-        recacheSet.add(Point2.pack(tile.x / chunksize, tile.y / chunksize));
+        //currently a no-op
+        //recacheSet.add(Point2.pack(tile.x / chunksize, tile.y / chunksize));
     }
 
     public void drawFloor(){
@@ -216,7 +217,6 @@ public class FloorRenderer implements Disposable{
         }
 
         Core.batch = current;
-        cbatch.reserve(layer.capacity * chunksize * chunksize);
         chunk[layer.ordinal()] = cbatch.endCache();
     }
 

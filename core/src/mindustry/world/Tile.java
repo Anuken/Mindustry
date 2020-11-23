@@ -217,6 +217,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                                     //assign entity and type to blocks, so they act as proxies for this one
                                     other.build = entity;
                                     other.block = block;
+
                                 }
                             }
                         }
@@ -599,6 +600,14 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     @Remote(called = Loc.server)
     public static void setTile(Tile tile, Block block, Team team, int rotation){
         tile.setBlock(block, team, rotation);
+    }
+
+    @Remote(called = Loc.server)
+    public static void setTeam(Building build, Team team){
+        if(build != null){
+            build.team = team;
+            indexer.updateIndices(build.tile);
+        }
     }
 
     @Remote(called = Loc.server, unreliable = true)

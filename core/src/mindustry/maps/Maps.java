@@ -29,7 +29,7 @@ import static mindustry.Vars.*;
 
 public class Maps{
     /** List of all built-in maps. Filenames only. */
-    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "veins", "glacier"};
+    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "archipelago", "debrisField", "veins", "glacier"};
     /** Maps tagged as PvP */
     static final String[] pvpMaps = {"veins", "glacier"};
     /** All maps stored in an ordered array. */
@@ -301,6 +301,14 @@ public class Maps{
                 new ScatterFilter(){{
                     flooronto = Blocks.sand;
                     block = Blocks.sandBoulder;
+                }},
+                new ScatterFilter(){{
+                    flooronto = Blocks.darksand;
+                    block = Blocks.basaltBoulder;
+                }},
+                new ScatterFilter(){{
+                    flooronto = Blocks.basalt;
+                    block = Blocks.basaltBoulder;
                 }},
                 new ScatterFilter(){{
                     flooronto = Blocks.dacite;

@@ -114,13 +114,14 @@ abstract class StatusComp implements Posc, Flyingc{
             StatusEntry entry = statuses.get(index++);
 
             entry.time = Math.max(entry.time - Time.delta, 0);
-            applied.set(entry.effect.id);
 
-            if(entry.time <= 0 && !entry.effect.permanent){
+            if(entry.effect == null || (entry.time <= 0 && !entry.effect.permanent)){
                 Pools.free(entry);
                 index --;
                 statuses.remove(index);
             }else{
+                applied.set(entry.effect.id);
+
                 speedMultiplier *= entry.effect.speedMultiplier;
                 healthMultiplier *= entry.effect.healthMultiplier;
                 damageMultiplier *= entry.effect.damageMultiplier;

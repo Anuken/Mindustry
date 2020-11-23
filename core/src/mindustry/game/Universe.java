@@ -21,15 +21,22 @@ public class Universe{
     private int turn;
     private float turnCounter;
 
-    private Schematic lastLoadout;
+    private @Nullable Schematic lastLoadout;
     private ItemSeq lastLaunchResources = new ItemSeq();
 
     public Universe(){
         load();
 
+        //load legacy research
+        Events.on(ClientLoadEvent.class, e -> {
+            if(Core.settings.has("unlocks")){
+                LegacyIO.readResearch();
+            }
+        });
+
         //update base coverage on capture
         Events.on(SectorCaptureEvent.class, e -> {
-            if(state.isCampaign()){
+            if(!net.client() && state.isCampaign()){
                 state.getSector().planet.updateBaseCoverage();
             }
         });
@@ -84,12 +91,21 @@ public class Universe{
         if(state.hasSector()){
             //update sector light
             float light = state.getSector().getLight();
-            float alpha = Mathf.clamp(Mathf.map(light, 0f, 0.8f, 0.1f, 1f));
+            float alpha = Mathf.clamp(Mathf.map(light, 0f, 0.8f, 0.2f, 1f));
 
             //assign and map so darkness is not 100% dark
             state.rules.ambientLight.a = 1f - alpha;
             state.rules.lighting = !Mathf.equal(alpha, 1f);
         }
+    }
+
+    public void clearLoadoutInfo(){
+        lastLoadout = null;
+        lastLaunchResources = new ItemSeq();
+        Core.settings.remove("launch-resources-seq");
+        Core.settings.remove("lastloadout-core-shard");
+        Core.settings.remove("lastloadout-core-nucleus");
+        Core.settings.remove("lastloadout-core-foundation");
     }
 
     public ItemSeq getLaunchResources(){
@@ -141,8 +157,11 @@ public class Universe{
 
                     //increment seconds passed for this sector by the time that just passed with this turn
                     if(!sector.isBeingPlayed()){
-                        //increment time
-                        sector.info.secondsPassed += turnDuration/60f;
+
+                        //increment time if attacked
+                        if(sector.isAttacked()){
+                            sector.info.secondsPassed += turnDuration/60f;
+                        }
 
                         int wavesPassed = (int)(sector.info.secondsPassed*60f / sector.info.waveSpacing);
                         boolean attacked = sector.info.waves;
@@ -194,10 +213,10 @@ public class Universe{
                     }
 
                     //queue random invasions
-                    if(!sector.isAttacked() && turn > invasionGracePeriod){
+                    if(!sector.isAttacked() && turn > invasionGracePeriod && sector.info.hasSpawns){
                         //invasion chance depends on # of nearby bases
-                        if(Mathf.chance(baseInvasionChance * sector.near().count(Sector::hasEnemyBase))){
-                            int waveMax = Math.max(sector.info.winWave, sector.isBeingPlayed() ? state.wave : 0) + Mathf.random(2, 5) * 5;
+                        if(Mathf.chance(baseInvasionChance * Math.min(sector.near().count(Sector::hasEnemyBase), 1))){
+                            int waveMax = Math.max(sector.info.winWave, sector.isBeingPlayed() ? state.wave : sector.info.wave + sector.info.wavesPassed) + Mathf.random(2, 5) * 5;
 
                             //assign invasion-related things
                             if(sector.isBeingPlayed()){
@@ -261,11 +280,6 @@ public class Universe{
     private void load(){
         seconds = Core.settings.getInt("utimei");
         turn = Core.settings.getInt("turn");
-
-        if(Core.settings.has("unlocks")){
-            LegacyIO.readResearch();
-            Core.settings.remove("unlocks");
-        }
     }
 
 }

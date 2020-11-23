@@ -51,11 +51,7 @@ public class FileChooser extends BaseDialog{
             ok.fireClick();
         });
 
-        keyDown(key -> {
-            if(key == KeyCode.escape || key == KeyCode.back){
-                Core.app.post(this::hide);
-            }
-        });
+        addCloseListener();
     }
 
     private void setupWidgets(){

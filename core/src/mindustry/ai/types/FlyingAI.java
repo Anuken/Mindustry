@@ -55,7 +55,7 @@ public class FlyingAI extends AIController{
             vec.setAngle(Mathf.slerpDelta(unit.vel().angle(), vec.angle(), 0.6f));
         }
 
-        vec.setLength(unit.type.speed);
+        vec.setLength(unit.speed());
 
         unit.moveAt(vec);
     }

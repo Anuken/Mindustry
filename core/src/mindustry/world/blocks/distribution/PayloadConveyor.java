@@ -12,6 +12,7 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.production.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -24,7 +25,7 @@ public class PayloadConveyor extends Block{
 
     public PayloadConveyor(String name){
         super(name);
-
+        group = BlockGroup.transportation;
         size = 3;
         rotate = true;
         update = true;
@@ -45,7 +46,7 @@ public class PayloadConveyor extends Block{
         for(int i = 0; i < 4; i++){
             Building other = world.build(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
             if(other != null && other.block.outputsPayload && other.block.size == size){
-                Drawf.selected(other.tileX(), other.tileY(), other.block, Pal.accent);
+                Drawf.selected(other.tileX(), other.tileY(), other.block, other.team.color);
             }
         }
     }
@@ -161,7 +162,7 @@ public class PayloadConveyor extends Block{
             float dst = 0.8f;
 
             float glow = Math.max((dst - (Math.abs(fract() - 0.5f) * 2)) / dst, 0);
-            Draw.mixcol(Pal.accent, glow);
+            Draw.mixcol(team.color, glow);
 
             float trnext = fract() * size * tilesize, trprev = size * tilesize * (fract() - 1), rot = rotdeg();
 

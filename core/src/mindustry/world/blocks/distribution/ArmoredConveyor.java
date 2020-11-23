@@ -11,7 +11,7 @@ public class ArmoredConveyor extends Conveyor{
     }
 
     @Override
-    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock) {
+    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 

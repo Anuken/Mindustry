@@ -1,6 +1,8 @@
 package mindustry.world.blocks.campaign;
 
 import arc.*;
+import arc.Graphics.*;
+import arc.Graphics.Cursor.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -53,6 +55,11 @@ public class LaunchPad extends Block{
     }
 
     public class LaunchPadBuild extends Building{
+
+        @Override
+        public Cursor getCursor(){
+            return !state.isCampaign() ? SystemCursor.arrow : super.getCursor();
+        }
 
         @Override
         public void draw(){
@@ -119,7 +126,7 @@ public class LaunchPad extends Block{
 
             table.row();
             table.label(() -> {
-                Sector dest = state.secinfo.getRealDestination();
+                Sector dest = state.rules.sector == null ? null : state.rules.sector.info.getRealDestination();
 
                 return Core.bundle.format("launch.destination",
                     dest == null ? Core.bundle.get("sectors.nonelaunch") :
@@ -135,7 +142,11 @@ public class LaunchPad extends Block{
             }
 
             table.button(Icon.upOpen, Styles.clearTransi, () -> {
-                ui.planet.showSelect(state.rules.sector, other -> state.secinfo.destination = other);
+                ui.planet.showSelect(state.rules.sector, other -> {
+                    if(state.isCampaign()){
+                        state.rules.sector.info.destination = other;
+                    }
+                });
                 deselect();
             }).size(40f);
         }
@@ -208,7 +219,7 @@ public class LaunchPad extends Block{
         public void remove(){
             if(!state.isCampaign()) return;
 
-            Sector destsec = state.secinfo.getRealDestination();
+            Sector destsec = state.rules.sector.info.getRealDestination();
 
             //actually launch the items upon removal
             if(team() == state.rules.defaultTeam){
@@ -219,7 +230,7 @@ public class LaunchPad extends Block{
                         dest.add(stack);
 
                         //update export
-                        state.secinfo.handleItemExport(stack);
+                        state.rules.sector.info.handleItemExport(stack);
                         Events.fire(new LaunchItemEvent(stack));
                     }
 

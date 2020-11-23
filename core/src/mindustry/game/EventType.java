@@ -17,14 +17,12 @@ public class EventType{
         phaseDeflectHit,
         impactPower,
         thoriumReactorOverheat,
-        itemLaunch,
         fireExtinguish,
         newGame,
         tutorialComplete,
         flameAmmo,
         turretCool,
         enablePixelation,
-        drown,
         exclusionDeath,
         suicideBomb,
         openWiki,
@@ -93,6 +91,22 @@ public class EventType{
 
         public LaunchItemEvent(ItemStack stack){
             this.stack = stack;
+        }
+    }
+
+    public static class SectorLaunchEvent{
+        public final Sector sector;
+
+        public SectorLaunchEvent(Sector sector){
+            this.sector = sector;
+        }
+    }
+
+    public static class SchematicCreateEvent{
+        public final Schematic schematic;
+
+        public SchematicCreateEvent(Schematic schematic){
+            this.schematic = schematic;
         }
     }
 
@@ -184,6 +198,34 @@ public class EventType{
         public TapEvent(Player player, Tile tile){
             this.tile = tile;
             this.player = player;
+        }
+    }
+
+    public static class PickupEvent{
+        public final Unit carrier;
+        public final @Nullable Unit unit;
+        public final @Nullable Building build;
+
+        public PickupEvent(Unit carrier, Unit unit){
+            this.carrier = carrier;
+            this.unit = unit;
+            this.build = null;
+        }
+
+        public PickupEvent(Unit carrier, Building build){
+            this.carrier = carrier;
+            this.build = build;
+            this.unit = null;
+        }
+    }
+
+    public static class UnitControlEvent{
+        public final Player player;
+        public final @Nullable Unit unit;
+
+        public UnitControlEvent(Player player, @Nullable Unit unit){
+            this.player = player;
+            this.unit = unit;
         }
     }
 

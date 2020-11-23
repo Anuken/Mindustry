@@ -19,12 +19,14 @@ public class LiquidTurret extends Turret{
     public ObjectMap<Liquid, BulletType> ammoTypes = new ObjectMap<>();
     public @Load("@-liquid") TextureRegion liquidRegion;
     public @Load("@-top") TextureRegion topRegion;
+    public boolean extinguish = true;
 
     public LiquidTurret(String name){
         super(name);
         acceptCoolant = false;
         hasLiquids = true;
-        activeSound = Sounds.spray;
+        loopSound = Sounds.spray;
+        shootSound = Sounds.none;
     }
 
     /** Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...] */
@@ -74,7 +76,7 @@ public class LiquidTurret extends Turret{
 
         @Override
         public boolean shouldActiveSound(){
-            return target != null && hasAmmo();
+            return wasShooting;
         }
 
         @Override
@@ -86,7 +88,7 @@ public class LiquidTurret extends Turret{
 
         @Override
         protected void findTarget(){
-            if(liquids.current().canExtinguish()){
+            if(extinguish && liquids.current().canExtinguish()){
                 int tr = (int)(range / tilesize);
                 for(int x = -tr; x <= tr; x++){
                     for(int y = -tr; y <= tr; y++){
@@ -144,7 +146,7 @@ public class LiquidTurret extends Turret{
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
             return ammoTypes.get(liquid) != null
-                && (liquids.current() == liquid || (ammoTypes.containsKey(liquids.current())
+                && (liquids.current() == liquid || (ammoTypes.containsKey(liquid)
                 && liquids.get(liquids.current()) <= 1f / ammoTypes.get(liquids.current()).ammoMultiplier + 0.001f));
         }
     }

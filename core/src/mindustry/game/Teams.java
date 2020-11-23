@@ -133,10 +133,10 @@ public class Teams{
     private void count(Unit unit){
         unit.team.data().updateCount(unit.type, 1);
 
-        if(unit instanceof Payloadc){
-            ((Payloadc)unit).payloads().each(p -> {
-                if(p instanceof UnitPayload){
-                    count(((UnitPayload)p).unit);
+        if(unit instanceof Payloadc payloadc){
+            payloadc.payloads().each(p -> {
+                if(p instanceof UnitPayload payload){
+                    count(payload.unit);
                 }
             });
         }
@@ -261,11 +261,12 @@ public class Teams{
         }
 
         public void updateCount(UnitType type, int amount){
+            if(type == null) return;
             unitCount = Math.max(amount + unitCount, 0);
             if(typeCounts == null || typeCounts.length <= type.id){
                 typeCounts  = new int[Vars.content.units().size];
             }
-            typeCounts [type.id] = Math.max(amount + typeCounts [type.id], 0);
+            typeCounts[type.id] = Math.max(amount + typeCounts[type.id], 0);
         }
 
         public QuadTree<Unit> tree(){

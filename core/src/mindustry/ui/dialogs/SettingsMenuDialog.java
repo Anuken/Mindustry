@@ -14,8 +14,11 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.content.*;
+import mindustry.content.TechTree.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -116,6 +119,45 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.row();
 
+            t.button("@settings.clearresearch", Icon.trash, style, () -> {
+                ui.showConfirm("@confirm", "@settings.clearresearch.confirm", () -> {
+                    universe.clearLoadoutInfo();
+                    for(TechNode node : TechTree.all){
+                        node.reset();
+                    }
+                    content.each(c -> {
+                        if(c instanceof UnlockableContent u){
+                            u.clearUnlock();
+                        }
+                    });
+                    settings.remove("unlocks");
+                });
+            }).marginLeft(4);
+
+            t.row();
+
+            t.button("@settings.clearcampaignsaves", Icon.trash, style, () -> {
+                ui.showConfirm("@confirm", "@settings.clearcampaignsaves.confirm", () -> {
+                    for(var planet : content.planets()){
+                        for(var sec : planet.sectors){
+                            sec.clearInfo();
+                            if(sec.save != null){
+                                sec.save.delete();
+                                sec.save = null;
+                            }
+                        }
+                    }
+                    
+                    for(var slot : control.saves.getSaveSlots().copy()){
+                        if(slot.isSector()){
+                            slot.delete();
+                        }
+                    }
+                });
+            }).marginLeft(4);
+
+            t.row();
+
             t.button("@data.export", Icon.upload, style, () -> {
                 if(ios){
                     Fi file = Core.files.local("mindustry-data-export.zip");
@@ -160,6 +202,25 @@ public class SettingsMenuDialog extends SettingsDialog{
                 t.row();
                 t.button("@data.openfolder", Icon.folder, style, () -> Core.app.openFolder(Core.settings.getDataDirectory().absolutePath())).marginLeft(4);
             }
+
+            t.row();
+
+            t.button("@crash.export", Icon.upload, style, () -> {
+                if(settings.getDataDirectory().child("crashes").list().length == 0 && !settings.getDataDirectory().child("last_log.txt").exists()){
+                    ui.showInfo("@crash.none");
+                }else{
+                    if(ios){
+                        Fi logs = tmpDirectory.child("logs.txt");
+                        logs.writeString(getLogs());
+                        platform.shareFile(logs);
+                    }else{
+                        platform.showFileChooser(false, "txt", file -> {
+                            file.writeString(getLogs());
+                            app.post(() -> ui.showInfo("@crash.exported"));
+                        });
+                    }
+                }
+            }).marginLeft(4);
         });
 
         ScrollPane pane = new ScrollPane(prefs);
@@ -189,6 +250,21 @@ public class SettingsMenuDialog extends SettingsDialog{
         add(buttons).fillX();
 
         addSettings();
+    }
+
+    String getLogs(){
+        Fi log = settings.getDataDirectory().child("last_log.txt");
+
+        StringBuilder out = new StringBuilder();
+        for(Fi fi : settings.getDataDirectory().child("crashes").list()){
+            out.append(fi.name()).append("\n\n").append(fi.readString()).append("\n");
+        }
+
+        if(log.exists()){
+            out.append("\nlast log:\n").append(log.readString());
+        }
+
+        return out.toString();
     }
 
     void rebuildMenu(){
@@ -238,8 +314,6 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.sliderPref("saveinterval", 60, 10, 5 * 120, 10, i -> Core.bundle.format("setting.seconds", i));
 
         if(!mobile){
-            game.sliderPref("blockselecttimeout", 750, 0, 2000, 50, i -> Core.bundle.format("setting.milliseconds", i));
-
             game.checkPref("crashreport", true);
         }
 
@@ -247,7 +321,9 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
         game.checkPref("hints", true);
+
         if(!mobile){
+            game.checkPref("backgroundpause", true);
             game.checkPref("buildautopause", false);
         }
 
@@ -263,19 +339,6 @@ public class SettingsMenuDialog extends SettingsDialog{
                 });
             }
         }
-
-        game.pref(new Setting(){
-            @Override
-            public void add(SettingsTable table){
-                table.button("@tutorial.retake", () -> {
-                    hide();
-                    control.playTutorial();
-                }).size(220f, 60f).pad(6).left();
-                table.add();
-                table.row();
-                hide();
-            }
-        });
 
         graphics.sliderPref("uiscale", 100, 25, 300, 25, s -> {
             if(ui.settings != null){
@@ -333,7 +396,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("blockstatus", false);
         graphics.checkPref("playerchat", true);
         if(!mobile){
-            graphics.checkPref("coreitems", false);
+            graphics.checkPref("coreitems", true);
         }
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("smoothcamera", true);
@@ -345,13 +408,12 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(Shaders.shield != null){
             graphics.checkPref("animatedshields", !mobile);
         }
+
         if(!ios){
             graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
         }else{
             Core.settings.put("bloom", false);
         }
-
-
 
         graphics.checkPref("pixelate", false, val -> {
             if(val){
@@ -410,12 +472,17 @@ public class SettingsMenuDialog extends SettingsDialog{
             throw new IllegalArgumentException("Not valid save data.");
         }
 
+        //delete old saves so they don't interfere
+        saveDirectory.deleteDirectory();
+
         //purge existing tmp data, keep everything else
         tmpDirectory.deleteDirectory();
 
         zipped.walk(f -> f.copyTo(base.child(f.path())));
         dest.delete();
 
+        //clear old data
+        settings.clear();
         //load data so it's saved on exit
         settings.load();
     }

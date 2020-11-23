@@ -108,7 +108,6 @@ public class MenuFragment extends Fragment{
             editor = new MobileButton(Icon.terrain, "@editor", () -> checkPlay(ui.maps::show)),
             tools = new MobileButton(Icon.settings, "@settings", ui.settings::show),
             mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
-            donate = new MobileButton(Icon.link, "@website", () -> Core.app.openURI("https://anuke.itch.io/mindustry")),
             exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit());
 
         if(!Core.graphics.isPortrait()){
@@ -169,11 +168,10 @@ public class MenuFragment extends Fragment{
                     new Buttoni("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
                     new Buttoni("@joingame", Icon.add, () -> checkPlay(ui.join::show)),
                     new Buttoni("@customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
-                    new Buttoni("@loadgame", Icon.download, () -> checkPlay(ui.load::show)),
-                    new Buttoni("@tutorial", Icon.info, () -> checkPlay(control::playTutorial))
+                    new Buttoni("@loadgame", Icon.download, () -> checkPlay(ui.load::show))
                 ),
                 new Buttoni("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("@workshop", Icon.book, platform::openWorkshop) : null,
-                new Buttoni(Core.bundle.get("mods"), Icon.bookOpen, ui.mods::show),
+                new Buttoni("@mods", Icon.book, ui.mods::show),
                 //not enough space for this button
                 //new Buttoni("@schematics", Icon.paste, ui.schematics::show),
                 new Buttoni("@settings", Icon.settings, ui.settings::show),
@@ -195,6 +193,7 @@ public class MenuFragment extends Fragment{
     }
 
     private void checkPlay(Runnable run){
+
         if(!mods.hasContentErrors()){
             run.run();
         }else{

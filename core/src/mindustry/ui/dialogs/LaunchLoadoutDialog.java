@@ -2,7 +2,6 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.func.*;
-import arc.input.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -37,16 +36,19 @@ public class LaunchLoadoutDialog extends BaseDialog{
         buttons.defaults().size(160f, 64f);
         buttons.button("@back", Icon.left, this::hide);
 
-        keyDown(key -> {
-            if(key == KeyCode.escape || key == KeyCode.back){
-                Core.app.post(this::hide);
-            }
-        });
+        addCloseListener();
 
-        ItemSeq sitems = sector.getItems();
+        ItemSeq sitems = sector.items();
 
         //updates sum requirements
         Runnable update = () -> {
+            int cap = selected.findCore().itemCapacity;
+
+            //cap resources based on core type
+            ItemSeq resources = universe.getLaunchResources();
+            resources.min(cap);
+            universe.updateLaunchResources(resources);
+
             total.clear();
             selected.requirements().each(total::add);
             universe.getLaunchResources().each(total::add);
@@ -61,10 +63,10 @@ public class LaunchLoadoutDialog extends BaseDialog{
             ItemSeq launches = universe.getLaunchResources();
 
             for(ItemStack s : total){
-                table.image(s.item.icon(Cicon.small)).left();
+                table.image(s.item.icon(Cicon.small)).left().size(Cicon.small.size);
                 int as = schems.get(s.item), al = launches.get(s.item);
 
-                String amountStr = "[lightgray]" + (al + " + [accent]" + as + "[lightgray]");
+                String amountStr = (al + as) + "[gray] (" + (al + " + " + as + ")");
 
                 table.add(
                     sitems.has(s.item, s.amount) ? amountStr :
@@ -84,7 +86,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
             ItemSeq stacks = universe.getLaunchResources();
             Seq<ItemStack> out = stacks.toSeq();
 
-            loadout.show(core.itemCapacity, out, UnlockableContent::unlocked, out::clear, () -> {}, () -> {
+            loadout.show(selected.findCore().itemCapacity, out, UnlockableContent::unlocked, out::clear, () -> {}, () -> {
                 universe.updateLaunchResources(new ItemSeq(out));
                 update.run();
                 rebuildItems.run();
@@ -101,25 +103,35 @@ public class LaunchLoadoutDialog extends BaseDialog{
         ButtonGroup<Button> group = new ButtonGroup<>();
         selected = universe.getLoadout(core);
 
+        cont.add(Core.bundle.format("launch.from", sector.name())).row();
+
         cont.pane(t -> {
             int i = 0;
 
-            for(Schematic s : schematics.getLoadouts(core)){
+            for(var entry : schematics.getLoadouts()){
+                if(entry.key.size <= core.size){
+                    for(Schematic s : entry.value){
 
-                t.button(b -> b.add(new SchematicImage(s)), Styles.togglet, () -> {
-                    selected = s;
-                    update.run();
-                    rebuildItems.run();
-                }).group(group).pad(4).disabled(!sitems.has(s.requirements())).checked(s == selected).size(200f);
+                        t.button(b -> b.add(new SchematicImage(s)), Styles.togglet, () -> {
+                            selected = s;
+                            update.run();
+                            rebuildItems.run();
+                        }).group(group).pad(4).checked(s == selected).size(200f);
 
-                if(++i % cols == 0){
-                    t.row();
+                        if(++i % cols == 0){
+                            t.row();
+                        }
+                    }
                 }
             }
+
+
         }).growX().get().setScrollingDisabled(true, false);
 
         cont.row();
-        cont.add(items);
+        cont.pane(items);
+        cont.row();
+        cont.add("@sector.missingresources").visible(() -> !valid);
 
         update.run();
         rebuildItems.run();

@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.ai.types.*;
 import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -35,6 +36,7 @@ public class LogicBlock extends Block{
         update = true;
         solid = true;
         configurable = true;
+        group = BlockGroup.logic;
 
         config(byte[].class, (LogicBuild build, byte[] data) -> build.readCompressed(data, true));
 
@@ -146,7 +148,11 @@ public class LogicBlock extends Block{
                     String name = stream.readUTF();
                     short x = stream.readShort(), y = stream.readShort();
 
-                    transformer.get(Tmp.p1.set(x, y));
+                    Tmp.p2.set((int)(offset / (tilesize/2)), (int)(offset / (tilesize/2)));
+                    transformer.get(Tmp.p1.set(x * 2, y * 2).sub(Tmp.p2));
+                    Tmp.p1.add(Tmp.p2);
+                    Tmp.p1.x /= 2;
+                    Tmp.p1.y /= 2;
                     links.add(new LogicLink(Tmp.p1.x, Tmp.p1.y, name, true));
                 }
 
@@ -213,6 +219,16 @@ public class LogicBlock extends Block{
                             x += tileX();
                             y += tileY();
                         }
+
+                        Building build = world.build(x, y);
+
+                        if(build != null){
+                            String bestName = getLinkName(build.block);
+                            if(!name.startsWith(bestName)){
+                                name = findLinkName(build.block);
+                            }
+                        }
+
                         links.add(new LogicLink(x, y, name, validLink(world.build(x, y))));
                     }
                 }
@@ -289,6 +305,8 @@ public class LogicBlock extends Block{
                         }
                     }
 
+                    asm.putConst("@mapw", world.width());
+                    asm.putConst("@maph", world.height());
                     asm.putConst("@links", executor.links.length);
                     asm.putConst("@ipt", instructionsPerTick);
 
@@ -313,7 +331,8 @@ public class LogicBlock extends Block{
 
                     executor.load(asm);
                 }catch(Exception e){
-                    e.printStackTrace();
+                    Log.err("Failed to compile logic program @", code);
+                    Log.err(e);
 
                     //handle malformed code and replace it with nothing
                     executor.load("", LExecutor.maxInstructions);
@@ -419,6 +438,13 @@ public class LogicBlock extends Block{
                     build.block.drawPlaceText(l.name, build.tileX(), build.tileY(), true);
                 }
             }
+        }
+
+        @Override
+        public void drawSelect(){
+            Groups.unit.each(u -> u.controller() instanceof LogicAI ai && ai.controller == this, unit -> {
+                Drawf.square(unit.x, unit.y, unit.hitSize, unit.rotation + 45);
+            });
         }
 
         public boolean validLink(Building other){

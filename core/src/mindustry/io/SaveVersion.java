@@ -72,7 +72,7 @@ public abstract class SaveVersion extends SaveFileReader{
     public void writeMeta(DataOutput stream, StringMap tags) throws IOException{
         //prepare campaign data for writing
         if(state.isCampaign()){
-            state.secinfo.prepare();
+            state.rules.sector.info.prepare();
             state.rules.sector.saveInfo();
         }
 
@@ -107,13 +107,8 @@ public abstract class SaveVersion extends SaveFileReader{
         state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
         state.stats = JsonIO.read(GameStats.class, map.get("stats", "{}"));
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
-        if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
+        if(state.rules.spawns.isEmpty()) state.rules.spawns = waves.get();
         lastReadBuild = map.getInt("build", -1);
-
-        //load in sector info
-        if(state.rules.sector != null){
-            state.secinfo = state.rules.sector.info;
-        }
 
         if(!headless){
             Tmp.v1.tryFromString(map.get("viewpos"));
@@ -268,6 +263,8 @@ public abstract class SaveVersion extends SaveFileReader{
                             //skip the entity region, as the entity and its IO code are now gone
                             skipChunk(stream, true);
                         }
+
+                        context.onReadBuilding();
                     }
                 }else if(hadData){
                     tile.setBlock(block);
