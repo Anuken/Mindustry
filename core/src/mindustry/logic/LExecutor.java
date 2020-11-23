@@ -25,7 +25,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class LExecutor{
-    public static final int maxInstructions = 1000;
+    public static final int maxInstructions = 2500;
 
     //for noise operations
     public static final Simplex noise = new Simplex();
