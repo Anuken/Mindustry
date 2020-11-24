@@ -356,7 +356,7 @@ public class SectorDamage{
         for(Tile tile : tiles){
             if((tile.block() instanceof CoreBlock && tile.team() == state.rules.waveTeam) || tile.overlay() == Blocks.spawn){
                 frontier.add(tile);
-                values[tile.x][tile.y] = fraction * 23;
+                values[tile.x][tile.y] = fraction * 26;
             }
         }
 

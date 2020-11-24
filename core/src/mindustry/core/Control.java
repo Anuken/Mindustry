@@ -332,6 +332,8 @@ public class Control implements ApplicationListener, Loadable{
 
                         //reset wave so things are more fair
                         state.wave = 1;
+                        //set up default wave time
+                        state.wavetime = state.rules.waveSpacing * 2f;
 
                         //reset win wave??
                         state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null ? sector.preset.captureWave : 40;
