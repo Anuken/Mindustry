@@ -167,6 +167,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         newPresets.reverse();
+        updateSelected();
 
         if(planets.planet.getLastSector() != null){
             lookAt(planets.planet.getLastSector());

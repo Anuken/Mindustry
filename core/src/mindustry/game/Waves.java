@@ -10,7 +10,7 @@ import mindustry.type.*;
 import static mindustry.content.UnitTypes.*;
 
 public class Waves{
-    public static final int waveVersion = 3;
+    public static final int waveVersion = 4;
 
     private Seq<SpawnGroup> spawns;
 
@@ -277,7 +277,7 @@ public class Waves{
         int cap = 150;
 
         float shieldStart = 30, shieldsPerWave = 20 + difficulty*30f;
-        float[] scaling = {1, 1.2f, 2f, 3f, 4f};
+        float[] scaling = {1, 1.5f, 3f, 4f, 5f};
 
         Intc createProgression = start -> {
             //main sequence
@@ -286,7 +286,7 @@ public class Waves{
 
             for(int i = start; i < cap;){
                 int f = i;
-                int next = rand.random(8, 16) + (int)Mathf.lerp(4f, 0f, difficulty) + curTier * 4;
+                int next = rand.random(8, 16) + (int)Mathf.lerp(5f, 0f, difficulty) + curTier * 4;
 
                 float shieldAmount = Math.max((i - shieldStart) * shieldsPerWave, 0);
                 int space = start == 0 ? 1 : rand.random(1, 2);
@@ -298,7 +298,7 @@ public class Waves{
                     begin = f;
                     end = f + next >= cap ? never : f + next;
                     max = 13;
-                    unitScaling = (difficulty < 0.4f ? rand.random(2.5f, 4f) : rand.random(1f, 4f)) * scaling[ctier];
+                    unitScaling = (difficulty < 0.4f ? rand.random(2.5f, 5f) : rand.random(1f, 4f)) * scaling[ctier];
                     shields = shieldAmount;
                     shieldScaling = shieldsPerWave;
                     spacing = space;

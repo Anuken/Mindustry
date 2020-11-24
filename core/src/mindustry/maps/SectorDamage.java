@@ -437,7 +437,7 @@ public class SectorDamage{
         float falloff = (fraction) / (Math.max(tiles.width, tiles.height) * Mathf.sqrt2);
         int peak = 0;
 
-        if(fraction > 0.1f){
+        if(fraction > 0.15f){
             //phase two: propagate the damage
             while(!frontier.isEmpty()){
                 peak = Math.max(peak, frontier.size);

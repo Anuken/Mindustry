@@ -1195,7 +1195,7 @@ public class Blocks implements ContentList{
             size = 2;
 
             ambientSound = Sounds.smelter;
-            ambientSoundVolume = 0.05f;
+            ambientSoundVolume = 0.06f;
         }};
 
         differentialGenerator = new SingleTypeGenerator("differential-generator"){{
