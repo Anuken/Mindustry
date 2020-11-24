@@ -208,6 +208,8 @@ public class Universe{
 
                         //add production, making sure that it's capped
                         sector.info.production.each((item, stat) -> sector.info.items.add(item, Math.min((int)(stat.mean * newSecondsPassed * scl), sector.info.storageCapacity - sector.info.items.get(item))));
+                        //prevent negative values with unloaders
+                        sector.info.items.checkNegative();
 
                         sector.saveInfo();
                     }
