@@ -17,6 +17,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
+import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -271,6 +272,10 @@ public class BaseAI{
                     }
 
                     Tile o = world.tile(tile.x + p.x, tile.y + p.y);
+                    if(o != null && (o.block() instanceof PayloadAcceptor || o.block() instanceof PayloadConveyor)){
+                        break;
+                    }
+
                     if(o != null && o.team() == data.team && !(o.block() instanceof Wall)){
                         any = true;
                         break;

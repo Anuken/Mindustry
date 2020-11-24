@@ -187,7 +187,7 @@ public class Planet extends UnlockableContent{
             }
 
             if(sector.hasEnemyBase()){
-                sum += 1f;
+                sum += 0.88f;
             }
 
             sector.threat = sector.preset == null ? Math.min(sum / 5f, 1.2f) : Mathf.clamp(sector.preset.difficulty / 10f);

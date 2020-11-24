@@ -340,10 +340,10 @@ public class Waves{
             step += (int)(rand.random(15, 30) * Mathf.lerp(1f, 0.5f, difficulty));
         }
 
-        int bossWave = (int)(rand.random(50, 70) * Mathf.lerp(1f, 0.5f, difficulty));
+        int bossWave = (int)(rand.random(50, 70) * Mathf.lerp(1f, 0.75f, difficulty));
         int bossSpacing = (int)(rand.random(25, 40) * Mathf.lerp(1f, 0.6f, difficulty));
 
-        int bossTier = difficulty < 0.5 ? 3 : 4;
+        int bossTier = difficulty < 0.6 ? 3 : 4;
 
         //main boss progression
         out.add(new SpawnGroup(Structs.random(species)[bossTier]){{
@@ -411,7 +411,7 @@ public class Waves{
         }
 
         //shift back waves on higher difficulty for a harder start
-        int shift = Math.max((int)(difficulty * 15 - 5), 0);
+        int shift = Math.max((int)(difficulty * 14 - 5), 0);
 
         for(SpawnGroup group : out){
             group.begin -= shift;
