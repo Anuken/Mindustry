@@ -279,7 +279,7 @@ public abstract class BulletType extends Content{
 
         if(trailChance > 0){
             if(Mathf.chanceDelta(trailChance)){
-                trailEffect.at(b.x, b.y, b.rotation + 180 + Mathf.range(trailParam), trailColor);
+                trailEffect.at(b.x, b.y, b.rotation() + 180 + Mathf.range(trailParam), trailColor);
             }
         }
     }
