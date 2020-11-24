@@ -1003,8 +1003,7 @@ public class ServerControl implements ApplicationListener{
 
     private void logToFile(String text){
         if(currentLogFile != null && currentLogFile.length() > maxLogLength){
-            String date = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss").format(LocalDateTime.now());
-            currentLogFile.writeString("[End of log file. Date: " + date + "]\n", true);
+            currentLogFile.writeString("[End of log file. Date: " + dateTime.format(LocalDateTime.now()) + "]\n", true);
             currentLogFile = null;
         }
 
