@@ -1554,7 +1554,7 @@ public class Blocks implements ContentList{
                 lightningLength = 25;
                 collidesAir = false;
                 lightningTypeChance = 0.07f;
-                lightningType = LightningBulletType(){{
+                lightningType = new LightningBulletType(){{
                     damage = 12;
                     lightningLength = 4;
                     lightningLengthRand = 4;
