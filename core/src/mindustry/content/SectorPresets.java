@@ -24,6 +24,7 @@ public class SectorPresets implements ContentList{
 
         saltFlats = new SectorPreset("saltFlats", serpulo, 101){{
             difficulty = 5;
+            useAI = false;
         }};
 
         frozenForest = new SectorPreset("frozenForest", serpulo, 86){{

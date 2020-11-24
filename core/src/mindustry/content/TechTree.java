@@ -421,7 +421,7 @@ public class TechTree implements ContentList{
                 });
 
                 node(additiveReconstructor, Seq.with(new SectorComplete(biomassFacility)), () -> {
-                    node(multiplicativeReconstructor, Seq.with(new SectorComplete(overgrowth)), () -> {
+                    node(multiplicativeReconstructor, () -> {
                         node(exponentialReconstructor, () -> {
                             node(tetrativeReconstructor, () -> {
                                 
@@ -508,6 +508,7 @@ public class TechTree implements ContentList{
 
                                 node(saltFlats, Seq.with(
                                     new SectorComplete(windsweptIslands),
+                                    new Research(commandCenter),
                                     new Research(groundFactory),
                                     new Research(airFactory),
                                     new Research(door),
@@ -646,7 +647,7 @@ public class TechTree implements ContentList{
     static TechNode node(UnlockableContent content, ItemStack[] requirements, Seq<Objective> objectives, Runnable children){
         TechNode node = new TechNode(context, content, requirements);
         if(objectives != null){
-            node.objectives = objectives;
+            node.objectives.addAll(objectives);
         }
 
         TechNode prev = context;
