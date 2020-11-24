@@ -510,6 +510,7 @@ public class TechTree implements ContentList{
                                     new SectorComplete(windsweptIslands),
                                     new Research(commandCenter),
                                     new Research(groundFactory),
+                                    new Research(additiveReconstructor),
                                     new Research(airFactory),
                                     new Research(door),
                                     new Research(waterExtractor)
