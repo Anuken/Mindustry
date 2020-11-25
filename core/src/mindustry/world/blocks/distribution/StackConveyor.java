@@ -106,6 +106,8 @@ public class StackConveyor extends Block implements Autotiler{
         public float cooldown;
         public Item lastItem;
 
+        boolean proxUpdating = false;
+
         @Override
         public void draw(){
             Draw.rect(regions[state], x, y, rotdeg());
@@ -168,15 +170,15 @@ public class StackConveyor extends Block implements Autotiler{
 
             //update other conveyor state when this conveyor's state changes
             if(state != lastState){
+                proxUpdating = true;
                 for(Building near : proximity){
-                    if(near instanceof StackConveyorBuild){
+                    if(!(near instanceof StackConveyorBuild b && b.proxUpdating && b.state != stateUnload)){
                         near.onProximityUpdate();
-                        for(Building other : near.proximity){
-                            if(!(other instanceof StackConveyorBuild)) other.onProximityUpdate();
-                        }
                     }
                 }
+                proxUpdating = false;
             }
+
         }
 
         @Override

@@ -108,7 +108,7 @@ public class Sector{
 
     public boolean isBeingPlayed(){
         //after the launch dialog, a sector is no longer considered being played
-        return Vars.state.isGame() && Vars.state.rules.sector == this && !Vars.state.gameOver;
+        return Vars.state.isGame() && Vars.state.rules.sector == this && !Vars.state.gameOver && !net.client();
     }
 
     public String name(){
@@ -169,6 +169,8 @@ public class Sector{
     }
 
     public void addItems(ItemSeq items){
+        if(net.client()) return;
+
         if(isBeingPlayed()){
             if(state.rules.defaultTeam.core() != null){
                 ItemModule storage = state.rules.defaultTeam.items();

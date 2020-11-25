@@ -121,7 +121,7 @@ public class TechTree implements ContentList{
 
                             });
 
-                            node(waterExtractor, () -> {
+                            node(waterExtractor, Seq.with(new SectorComplete(saltFlats)), () -> {
                                 node(oilExtractor, () -> {
 
                                 });
@@ -198,10 +198,10 @@ public class TechTree implements ContentList{
                                 });
                             });
                         });
-                    });
 
-                    node(illuminator, () -> {
-                        
+                        node(illuminator, () -> {
+
+                        });
                     });
                 });
 
@@ -421,7 +421,7 @@ public class TechTree implements ContentList{
                 });
 
                 node(additiveReconstructor, Seq.with(new SectorComplete(biomassFacility)), () -> {
-                    node(multiplicativeReconstructor, Seq.with(new SectorComplete(overgrowth)), () -> {
+                    node(multiplicativeReconstructor, () -> {
                         node(exponentialReconstructor, () -> {
                             node(tetrativeReconstructor, () -> {
                                 
@@ -484,6 +484,7 @@ public class TechTree implements ContentList{
                                                 new Research(bryde),
                                                 new Research(spectre),
                                                 new Research(launchPad),
+                                                new Research(massDriver),
                                                 new Research(impactReactor),
                                                 new Research(additiveReconstructor),
                                                 new Research(exponentialReconstructor)
@@ -507,7 +508,9 @@ public class TechTree implements ContentList{
 
                                 node(saltFlats, Seq.with(
                                     new SectorComplete(windsweptIslands),
+                                    new Research(commandCenter),
                                     new Research(groundFactory),
+                                    new Research(additiveReconstructor),
                                     new Research(airFactory),
                                     new Research(door),
                                     new Research(waterExtractor)
@@ -551,7 +554,9 @@ public class TechTree implements ContentList{
                                 node(nuclearComplex, Seq.with(
                                     new SectorComplete(fungalPass),
                                     new Research(thermalGenerator),
-                                    new Research(laserDrill)
+                                    new Research(laserDrill),
+                                    new Research(Items.plastanium),
+                                    new Research(swarmer)
                                 ), () -> {
 
                                 });
@@ -613,7 +618,9 @@ public class TechTree implements ContentList{
                         });
 
                         nodeProduce(Liquids.oil, () -> {
+                            nodeProduce(Items.plastanium, () -> {
 
+                            });
                         });
                     });
                 });
@@ -641,7 +648,7 @@ public class TechTree implements ContentList{
     static TechNode node(UnlockableContent content, ItemStack[] requirements, Seq<Objective> objectives, Runnable children){
         TechNode node = new TechNode(context, content, requirements);
         if(objectives != null){
-            node.objectives = objectives;
+            node.objectives.addAll(objectives);
         }
 
         TechNode prev = context;

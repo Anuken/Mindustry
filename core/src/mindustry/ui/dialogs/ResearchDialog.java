@@ -21,6 +21,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.layout.*;
@@ -63,8 +64,8 @@ public class ResearchDialog extends BaseDialog{
                                 ItemSeq cached = sector.items();
                                 cache.put(sector, cached);
                                 cached.each((item, amount) -> {
-                                    values[item.id] += amount;
-                                    total += amount;
+                                    values[item.id] += Math.max(amount, 0);
+                                    total += Math.max(amount, 0);
                                 });
                             }
                         }
@@ -113,6 +114,12 @@ public class ResearchDialog extends BaseDialog{
         hidden(ui.planet::setup);
 
         addCloseButton();
+
+        keyDown(key -> {
+            if(key == Core.keybinds.get(Binding.research).key){
+                Core.app.post(this::hide);
+            }
+        });
 
         buttons.button("@database", Icon.book, () -> {
             hide();

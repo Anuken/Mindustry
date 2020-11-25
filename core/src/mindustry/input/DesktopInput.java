@@ -240,6 +240,7 @@ public class DesktopInput extends InputHandler{
         if(state.isGame() && !scene.hasDialog() && !(scene.getKeyboardFocus() instanceof TextField)){
             if(Core.input.keyTap(Binding.minimap)) ui.minimapfrag.toggle();
             if(Core.input.keyTap(Binding.planet_map) && state.isCampaign()) ui.planet.toggle();
+            if(Core.input.keyTap(Binding.research) && state.isCampaign()) ui.research.toggle();
         }
 
         if(state.isMenu() || Core.scene.hasDialog()) return;
@@ -484,7 +485,7 @@ public class DesktopInput extends InputHandler{
                 deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(selected.build) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && !player.unit().activelyBuilding() && !droppingItem &&
+                if(!tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && !tileTapped(selected.build) && !player.unit().activelyBuilding() && !droppingItem &&
                     !tryBeginMine(selected) && player.unit().mineTile == null && !Core.scene.hasKeyboard()){
                     player.shooting = shouldShoot;
                 }

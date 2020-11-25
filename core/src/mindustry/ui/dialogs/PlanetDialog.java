@@ -22,6 +22,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
+import mindustry.input.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -60,7 +61,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         shouldPause = true;
 
         keyDown(key -> {
-            if(key == KeyCode.escape || key == KeyCode.back){
+            if(key == KeyCode.escape || key == KeyCode.back || key == Core.keybinds.get(Binding.planet_map).key){
                 if(showing() && newPresets.size > 1){
                     //clear all except first, which is the last sector.
                     newPresets.truncate(1);
@@ -166,6 +167,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         newPresets.reverse();
+        updateSelected();
 
         if(planets.planet.getLastSector() != null){
             lookAt(planets.planet.getLastSector());
@@ -684,7 +686,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             if(sector.info.wavesSurvived >= 0 && sector.info.wavesSurvived - sector.info.wavesPassed >= 0 && !sector.isBeingPlayed()){
                 int toCapture = sector.info.attack || sector.info.winWave <= 1 ? -1 : sector.info.winWave - (sector.info.wave + sector.info.wavesPassed);
                 boolean plus = (sector.info.wavesSurvived - sector.info.wavesPassed) >= SectorDamage.maxRetWave - 1;
-                stable.add(Core.bundle.format("sectors.survives", Math.min(sector.info.wavesSurvived - sector.info.wavesPassed, toCapture <= 0 ? 200 : 0) +
+                stable.add(Core.bundle.format("sectors.survives", Math.min(sector.info.wavesSurvived - sector.info.wavesPassed, toCapture <= 0 ? 200 : toCapture) +
                 (plus ? "+" : "") + (toCapture < 0 ? "" : "/" + toCapture)));
                 stable.row();
             }
@@ -699,11 +701,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(sector.save != null && sector.info.resources.any()){
             stable.table(t -> {
                 t.add("@sectors.resources").padRight(4);
-                int idx = 0;
-                int max = 5;
                 for(UnlockableContent c : sector.info.resources){
                     t.image(c.icon(Cicon.small)).padRight(3).size(Cicon.small.size);
-                    //if(++idx % max == 0) t.row();
                 }
             }).padLeft(10f).fillX().row();
         }
@@ -715,7 +714,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         if((sector.hasBase() && mode == look) || canSelect(sector) || (sector.preset != null && sector.preset.alwaysUnlocked) || debugSelect){
-            stable.button(mode == select ? "@sectors.select" : sector.hasBase() ? "@sectors.resume" : "@sectors.launch", Icon.play, () -> {
+            stable.button(mode == select ? "@sectors.select" : sector.isBeingPlayed() ? "@sectors.resume" : sector.hasBase() ? "@sectors.go" : "@sectors.launch", Icon.play, () -> {
                 if(sector.isBeingPlayed()){
                     //already at this sector
                     hide();

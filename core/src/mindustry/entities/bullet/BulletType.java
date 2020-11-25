@@ -78,7 +78,7 @@ public abstract class BulletType extends Content{
      * Do not change unless you know what you're doing. */
     public boolean backMove = true;
     /** Bullet range override. */
-    public float range = -1f;
+    public float maxRange = -1f;
     /** % of block health healed **/
     public float healPercent = 0f;
     /** whether to make fire on impact */
@@ -154,7 +154,7 @@ public abstract class BulletType extends Content{
 
     /** Returns maximum distance the bullet this bullet type has can travel. */
     public float range(){
-        return Math.max(speed * lifetime * (1f - drag), range);
+        return Math.max(speed * lifetime * (1f - drag), maxRange);
     }
 
     public boolean collides(Bullet bullet, Building tile){
@@ -317,11 +317,11 @@ public abstract class BulletType extends Content{
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle){
-        return create(parent.owner(), parent.team, x, y, angle);
+        return create(parent.owner, parent.team, x, y, angle);
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl, float lifeScale){
-        return create(parent.owner(), parent.team, x, y, angle, velocityScl, lifeScale);
+        return create(parent.owner, parent.team, x, y, angle, velocityScl, lifeScale);
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){

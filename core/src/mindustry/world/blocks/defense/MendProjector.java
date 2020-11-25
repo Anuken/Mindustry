@@ -60,6 +60,7 @@ public class MendProjector extends Block{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
+        float smoothEfficiency;
 
         @Override
         public float range(){
@@ -68,6 +69,7 @@ public class MendProjector extends Block{
 
         @Override
         public void updateTile(){
+            smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency(), 0.08f);
             heat = Mathf.lerpDelta(heat, consValid() || cheating() ? 1f : 0f, 0.08f);
             charge += heat * delta();
 
@@ -115,7 +117,7 @@ public class MendProjector extends Block{
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, 50f * efficiency(), baseColor, 0.7f * efficiency());
+            Drawf.light(team, x, y, 50f * smoothEfficiency, baseColor, 0.7f * smoothEfficiency);
         }
 
         @Override

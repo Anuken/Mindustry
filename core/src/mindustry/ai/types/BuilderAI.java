@@ -1,5 +1,6 @@
 package mindustry.ai.types;
 
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.*;
@@ -45,7 +46,7 @@ public class BuilderAI extends AIController{
             BuildPlan req = unit.buildPlan();
 
             boolean valid =
-                (req.tile().build instanceof ConstructBuild && req.tile().<ConstructBuild>bc().cblock == req.block) ||
+                (req.tile() != null && req.tile().build instanceof ConstructBuild && req.tile().<ConstructBuild>bc().cblock == req.block) ||
                 (req.breaking ?
                     Build.validBreak(unit.team(), req.x, req.y) :
                     Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation));
@@ -83,8 +84,10 @@ public class BuilderAI extends AIController{
                 });
             }
 
+            float rebuildTime = (unit.team.rules().ai ? Mathf.lerp(15f, 2f, unit.team.rules().aiTier) : 2f) * 60f;
+
             //find new request
-            if(!unit.team.data().blocks.isEmpty() && following == null && timer.get(timerTarget3, 60 * 2f)){
+            if(!unit.team.data().blocks.isEmpty() && following == null && timer.get(timerTarget3, rebuildTime)){
                 Queue<BlockPlan> blocks = unit.team.data().blocks;
                 BlockPlan block = blocks.first();
 

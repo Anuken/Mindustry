@@ -144,7 +144,7 @@ public class CoreBlock extends StorageBlock{
             //right before placing, create a "destination" item array which is all the previous items minus core requirements
             ItemModule items = tile.build.items.copy();
             if(!state.rules.infiniteResources){
-                items.remove(requirements);
+                items.remove(ItemStack.mult(requirements, state.rules.buildCostMultiplier));
             }
 
             nextItems = items;
@@ -157,7 +157,7 @@ public class CoreBlock extends StorageBlock{
 
         if(!canPlaceOn(world.tile(x, y), player.team())){
 
-            drawPlaceText(Core.bundle.get((player.team().core() != null && player.team().core().items.has(requirements)) || state.rules.infiniteResources ?
+            drawPlaceText(Core.bundle.get((player.team().core() != null && player.team().core().items.has(requirements, state.rules.buildCostMultiplier)) || state.rules.infiniteResources ?
                 "bar.corereq" :
                 "bar.noresources"
             ), x, y, valid);
@@ -266,6 +266,26 @@ public class CoreBlock extends StorageBlock{
             for(CoreBuild other : state.teams.cores(team)){
                 other.storageCapacity = storageCapacity;
             }
+        }
+
+        @Override
+        public void handleStack(Item item, int amount, Teamc source){
+            super.handleStack(item, amount, source);
+
+            if(team == state.rules.defaultTeam && state.isCampaign()){
+                state.rules.sector.info.handleCoreItem(item, amount);
+            }
+        }
+
+        @Override
+        public int removeStack(Item item, int amount){
+            int result = super.removeStack(item, amount);
+
+            if(team == state.rules.defaultTeam && state.isCampaign()){
+                state.rules.sector.info.handleCoreItem(item, -result);
+            }
+
+            return result;
         }
 
         @Override

@@ -6,6 +6,7 @@ import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
@@ -16,14 +17,17 @@ import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Objectives.*;
 import mindustry.game.Saves.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;
+import mindustry.maps.*;
 import mindustry.maps.Map;
 import mindustry.net.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 
@@ -124,10 +128,18 @@ public class Control implements ApplicationListener, Loadable{
             }
         }));
 
-        Events.on(UnlockEvent.class, e -> ui.hudfrag.showUnlock(e.content));
-
         Events.on(UnlockEvent.class, e -> {
+            ui.hudfrag.showUnlock(e.content);
+
             checkAutoUnlocks();
+
+            if(e.content instanceof SectorPreset){
+                for(TechNode node : TechTree.all){
+                    if(!node.content.unlocked() && node.objectives.contains(o -> o instanceof SectorComplete sec && sec.preset == e.content) && !node.objectives.contains(o -> !o.complete())){
+                        ui.hudfrag.showToast(new TextureRegionDrawable(node.content.icon(Cicon.large)), bundle.get("available"));
+                    }
+                }
+            }
         });
 
         Events.on(SectorCaptureEvent.class, e -> {
@@ -223,7 +235,7 @@ public class Control implements ApplicationListener, Loadable{
 
         for(TechNode node : TechTree.all){
             if(!node.content.unlocked() && node.requirements.length == 0 && !node.objectives.contains(o -> !o.complete())){
-                node.content.unlocked();
+                node.content.unlock();
             }
         }
     }
@@ -311,8 +323,17 @@ public class Control implements ApplicationListener, Loadable{
                             return;
                         }
 
+                        //set spawn for sector damage to use
+                        Tile spawn = world.tile(sector.info.spawnPosition);
+                        spawn.setBlock(Blocks.coreShard, state.rules.defaultTeam);
+
+                        //add extra damage.
+                        SectorDamage.apply(1f);
+
                         //reset wave so things are more fair
                         state.wave = 1;
+                        //set up default wave time
+                        state.wavetime = state.rules.waveSpacing * 2f;
 
                         //reset win wave??
                         state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null ? sector.preset.captureWave : 40;
@@ -320,8 +341,8 @@ public class Control implements ApplicationListener, Loadable{
                         //kill all units, since they should be dead anyway
                         Groups.unit.clear();
                         Groups.fire.clear();
+                        Groups.puddle.clear();
 
-                        Tile spawn = world.tile(sector.info.spawnPosition);
                         Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
                         //set up camera/player locations
