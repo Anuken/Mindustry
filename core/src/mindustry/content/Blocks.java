@@ -39,7 +39,7 @@ public class Blocks implements ContentList{
     //environment
     air, spawn, cliff, deepwater, water, taintedWater, tar, slag, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space,
     dacite, stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
-    iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, grass, salt,
+    iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
@@ -89,7 +89,7 @@ public class Blocks implements ContentList{
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
 
     //campaign
-    launchPad, launchPadLarge,
+    launchPad, launchPadLarge, interplanetaryAccelerator,
 
     //misc experimental
     blockForge, blockLoader, blockUnloader;
@@ -363,7 +363,7 @@ public class Blocks implements ContentList{
 
         sandWall = new StaticWall("sand-wall"){{
             variants = 2;
-            sandWater.asFloor().wall = this;
+            sandWater.asFloor().wall = water.asFloor().wall = deepwater.asFloor().wall = this;
         }};
 
         saltWall = new StaticWall("salt-wall");
@@ -412,6 +412,10 @@ public class Blocks implements ContentList{
         }};
 
         daciteBoulder = new Boulder("dacite-boulder"){{
+            variants = 2;
+        }};
+
+        basaltBoulder = new Boulder("basalt-boulder"){{
             variants = 2;
         }};
 
@@ -1153,7 +1157,7 @@ public class Blocks implements ContentList{
         }};
 
         battery = new Battery("battery"){{
-            requirements(Category.power, with(Items.copper, 4, Items.lead, 20));
+            requirements(Category.power, with(Items.copper, 5, Items.lead, 20));
             consumes.powerBuffered(4000f);
         }};
 
@@ -1191,7 +1195,7 @@ public class Blocks implements ContentList{
             size = 2;
 
             ambientSound = Sounds.smelter;
-            ambientSoundVolume = 0.05f;
+            ambientSoundVolume = 0.06f;
         }};
 
         differentialGenerator = new SingleTypeGenerator("differential-generator"){{
@@ -1354,7 +1358,7 @@ public class Blocks implements ContentList{
         //region storage
 
         coreShard = new CoreBlock("core-shard"){{
-            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.copper, 1000, Items.lead, 1000));
+            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.copper, 1000, Items.lead, 800));
             alwaysUnlocked = true;
 
             unitType = UnitTypes.alpha;
@@ -1373,7 +1377,7 @@ public class Blocks implements ContentList{
             itemCapacity = 9000;
             size = 4;
 
-            unitCapModifier = 14;
+            unitCapModifier = 16;
             researchCostMultiplier = 0.04f;
         }};
 
@@ -1385,7 +1389,7 @@ public class Blocks implements ContentList{
             itemCapacity = 13000;
             size = 5;
 
-            unitCapModifier = 20;
+            unitCapModifier = 24;
             researchCostMultiplier = 0.05f;
         }};
 
@@ -1508,16 +1512,17 @@ public class Blocks implements ContentList{
             shootEffect = Fx.shootLiquid;
             range = 110f;
             health = 250 * size * size;
+            flags = EnumSet.of(BlockFlag.turret, BlockFlag.extinguisher);
         }};
 
         lancer = new ChargeTurret("lancer"){{
             requirements(Category.turret, with(Items.copper, 25, Items.lead, 50, Items.silicon, 45));
-            range = 155f;
-            chargeTime = 50f;
+            range = 165f;
+            chargeTime = 40f;
             chargeMaxDelay = 30f;
             chargeEffects = 7;
             recoilAmount = 2f;
-            reloadTime = 90f;
+            reloadTime = 80f;
             cooldown = 0.03f;
             powerUse = 6f;
             shootShake = 2f;
@@ -1539,6 +1544,7 @@ public class Blocks implements ContentList{
                 lifetime = 16f;
                 drawSize = 400f;
                 collidesAir = false;
+                length = 173f;
             }};
         }};
 
@@ -1552,7 +1558,7 @@ public class Blocks implements ContentList{
             reloadTime = 35f;
             shootCone = 40f;
             rotateSpeed = 8f;
-            powerUse = 3f;
+            powerUse = 3.3f;
             targetAir = false;
             range = 90f;
             shootEffect = Fx.lightningShoot;
@@ -1777,7 +1783,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.railgun;
             unitSort = (u, x, y) -> -u.maxHealth;
 
-            coolantMultiplier = 0.11f;
+            coolantMultiplier = 0.2f;
 
             health = 150 * size * size;
             coolantUsage = 1f;
@@ -2046,12 +2052,20 @@ public class Blocks implements ContentList{
 
         //TODO remove
         launchPadLarge = new LaunchPad("launch-pad-large"){{
-            //requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
             size = 4;
             itemCapacity = 300;
             launchTime = 60f * 35;
             hasPower = true;
             consumes.power(6f);
+        }};
+
+        interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
+            researchCostMultiplier = 0.1f;
+            size = 7;
+            hasPower = true;
+            consumes.power(10f);
+            buildCostMultiplier = 0.5f;
         }};
 
         //endregion campaign

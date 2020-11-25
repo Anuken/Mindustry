@@ -21,6 +21,7 @@ import mindustry.net.Administration.*;
 import mindustry.net.Net.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.modules.*;
 
@@ -338,6 +339,13 @@ public class NetClient implements ApplicationListener{
         if(message == null) return;
 
         ui.showInfoToast(message, duration);
+    }
+    
+    @Remote(variants = Variant.both)
+    public static void warningToast(int unicode, String text){
+        if(text == null || Fonts.icon.getData().getGlyph((char)unicode) == null) return;
+
+        ui.hudfrag.showToast(Fonts.getGlyph(Fonts.icon, (char)unicode), text);
     }
 
     @Remote(variants = Variant.both)

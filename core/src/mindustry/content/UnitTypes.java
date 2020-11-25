@@ -453,7 +453,7 @@ public class UnitTypes implements ContentList{
 
                     shootEffect = Fx.greenLaserChargeSmall;
 
-                    incendChance = 0.05f;
+                    incendChance = 0.075f;
                     incendSpread = 5f;
                     incendAmount = 1;
 
@@ -556,7 +556,7 @@ public class UnitTypes implements ContentList{
             range = 40f;
 
             weapons.add(new Weapon(){{
-                reload = 12f;
+                reload = 24f;
                 shootCone = 180f;
                 ejectEffect = Fx.none;
                 shootSound = Sounds.explosion;
@@ -995,6 +995,7 @@ public class UnitTypes implements ContentList{
                 shots = 2;
                 inaccuracy = 5f;
                 velocityRnd = 0.2f;
+                shootSound = Sounds.missile;
 
                 bullet = new MissileBulletType(3f, 12){{
                     width = 8f;
@@ -1055,7 +1056,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.casing1;
                 rotateSpeed = 8f;
                 bullet = missiles;
-                shootSound = Sounds.shoot;
+                shootSound = Sounds.missile;
                 rotate = true;
                 occlusion = 6f;
             }},
@@ -1066,7 +1067,7 @@ public class UnitTypes implements ContentList{
                 rotateSpeed = 8f;
                 ejectEffect = Fx.casing1;
                 bullet = missiles;
-                shootSound = Sounds.shoot;
+                shootSound = Sounds.missile;
                 rotate = true;
                 occlusion = 6f;
             }},
@@ -1147,7 +1148,7 @@ public class UnitTypes implements ContentList{
                 y = 27f;
                 rotateSpeed = 2f;
                 reload = 9f;
-                shootSound = Sounds.flame;
+                shootSound = Sounds.shoot;
                 occlusion = 7f;
                 rotate = true;
                 recoil = 0.5f;
@@ -1249,6 +1250,7 @@ public class UnitTypes implements ContentList{
             defaultController = RepairAI::new;
 
             mineTier = 3;
+            mineSpeed = 4f;
             health = 500;
             armor = 5f;
             speed = 2.5f;
@@ -1319,7 +1321,7 @@ public class UnitTypes implements ContentList{
                     sprite = "large-bomb";
                     width = height = 120/4f;
 
-                    range = 30f;
+                    maxRange = 30f;
                     ignoreRotation = true;
 
                     backColor = Pal.heal;
@@ -1411,12 +1413,12 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.missile;
                 bullet = new MissileBulletType(2.7f, 12, "missile"){{
+                    keepVelocity = true;
                     width = 8f;
                     height = 8f;
                     shrinkY = 0f;
                     drag = -0.003f;
                     homingRange = 60f;
-                    keepVelocity = false;
                     splashDamageRadius = 25f;
                     splashDamage = 10f;
                     lifetime = 80f;
@@ -1692,8 +1694,8 @@ public class UnitTypes implements ContentList{
 
                 bullet = new RailBulletType(){{
                     shootEffect = Fx.railShoot;
-                    speed = 67f;
-                    lifetime = 8f;
+                    length = 500;
+                    updateEffectSeg = 60f;
                     pierceEffect = Fx.railHit;
                     updateEffect = Fx.railTrail;
                     hitEffect = Fx.massiveExplosion;
@@ -1731,6 +1733,7 @@ public class UnitTypes implements ContentList{
                 x = 2.75f;
                 y = 1f;
                 top = false;
+                ejectEffect = Fx.casing1;
 
                 bullet = new BasicBulletType(2.5f, 10){{
                     width = 7f;
@@ -1738,7 +1741,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.03f;
+                    tileDamageMultiplier = 0.02f;
                 }};
             }});
         }};
@@ -1772,6 +1775,7 @@ public class UnitTypes implements ContentList{
                 shots = 2;
                 shotDelay = 4f;
                 spacing = 0f;
+                ejectEffect = Fx.casing1;
 
                 bullet = new BasicBulletType(3f, 10){{
                     width = 7f;
@@ -1779,7 +1783,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.03f;
+                    tileDamageMultiplier = 0.02f;
                 }};
             }});
         }};
@@ -1811,6 +1815,7 @@ public class UnitTypes implements ContentList{
                 spacing = 2f;
                 inaccuracy = 3f;
                 shotDelay = 3f;
+                ejectEffect = Fx.casing1;
 
                 bullet = new BasicBulletType(3.5f, 10){{
                     width = 6.5f;
@@ -1818,7 +1823,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 70f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.03f;
+                    tileDamageMultiplier = 0.02f;
                     homingPower = 0.04f;
                 }};
             }});

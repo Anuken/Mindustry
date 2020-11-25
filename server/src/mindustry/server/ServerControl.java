@@ -405,7 +405,7 @@ public class ServerControl implements ApplicationListener{
                 info("Path: @", mod.file.path());
                 info("Description: @", mod.meta.description);
             }else{
-                info("No mod with name '@' found.");
+                info("No mod with name '@' found.", arg[0]);
             }
         });
 
@@ -662,7 +662,7 @@ public class ServerControl implements ApplicationListener{
             Player target = Groups.player.find(p -> p.name().equals(arg[0]));
 
             if(target != null){
-                Call.sendMessage("[scarlet] " + target.name() + "[scarlet] has been kicked by the server.");
+                Call.sendMessage("[scarlet]" + target.name() + "[scarlet] has been kicked by the server.");
                 target.kick(KickReason.kick);
                 info("It is done.");
             }else{
@@ -691,7 +691,7 @@ public class ServerControl implements ApplicationListener{
 
             for(Player player : Groups.player){
                 if(netServer.admins.isIDBanned(player.uuid())){
-                    Call.sendMessage("[scarlet] " + player.name + " has been banned.");
+                    Call.sendMessage("[scarlet]" + player.name + " has been banned.");
                     player.con.kick(KickReason.banned);
                 }
             }
@@ -728,7 +728,7 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("unban", "<ip/ID>", "Completely unban a person by IP or ID.", arg -> {
             if(netServer.admins.unbanPlayerIP(arg[0]) || netServer.admins.unbanPlayerID(arg[0])){
-                info("Unbanned player.", arg[0]);
+                info("Unbanned player: @", arg[0]);
             }else{
                 err("That IP/ID is not banned!");
             }
@@ -1006,6 +1006,10 @@ public class ServerControl implements ApplicationListener{
             String date = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss").format(LocalDateTime.now());
             currentLogFile.writeString("[End of log file. Date: " + date + "]\n", true);
             currentLogFile = null;
+        }
+
+        for(String value : values){
+            text = text.replace(value, "");
         }
 
         if(currentLogFile == null){

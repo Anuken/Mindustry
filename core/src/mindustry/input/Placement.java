@@ -241,35 +241,10 @@ public class Placement{
     }
 
     public static class NormalizeDrawResult{
-        float x, y, x2, y2;
+        public float x, y, x2, y2;
     }
 
     public static class NormalizeResult{
         public int x, y, x2, y2, rotation;
-
-        boolean isX(){
-            return Math.abs(x2 - x) > Math.abs(y2 - y);
-        }
-
-        /**
-         * Returns length of greater edge of the selection.
-         */
-        int getLength(){
-            return Math.max(x2 - x, y2 - y);
-        }
-
-        /**
-         * Returns the X position of a specific index along this area as a line.
-         */
-        int getScaledX(int i){
-            return x + (x2 - x > y2 - y ? i : 0);
-        }
-
-        /**
-         * Returns the Y position of a specific index along this area as a line.
-         */
-        int getScaledY(int i){
-            return y + (x2 - x > y2 - y ? 0 : i);
-        }
     }
 }
