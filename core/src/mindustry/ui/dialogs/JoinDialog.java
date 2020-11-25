@@ -469,10 +469,12 @@ public class JoinDialog extends BaseDialog{
                 connect(lastIp, lastPort);
             }, exception -> {});
         }, 1, 1);
-
+        
         ui.loadfrag.setButton(() -> {
             ui.loadfrag.hide();
-            if(ping != null) ping.cancel();
+            if(ping == null) return;
+            ping.cancel();
+            ping = null;
         });
     }
 
