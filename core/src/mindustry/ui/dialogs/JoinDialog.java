@@ -458,7 +458,7 @@ public class JoinDialog extends BaseDialog{
     }
 
     public void reconnect(){
-        if(lastIp.isEmpty()) return;
+        if(lastIp == null || lastIp.isEmpty()) return;
         ui.loadfrag.show("@reconnecting");
 
         ping = Timer.schedule(() -> {
