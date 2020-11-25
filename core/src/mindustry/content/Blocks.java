@@ -1221,13 +1221,13 @@ public class Blocks implements ContentList{
 
         solarPanel = new SolarGenerator("solar-panel"){{
             requirements(Category.power, with(Items.lead, 10, Items.silicon, 15));
-            powerProduction = 0.08f;
+            powerProduction = 0.1f;
         }};
 
         largeSolarPanel = new SolarGenerator("solar-panel-large"){{
-            requirements(Category.power, with(Items.lead, 100, Items.silicon, 145, Items.phaseFabric, 15));
+            requirements(Category.power, with(Items.lead, 80, Items.silicon, 110, Items.phaseFabric, 15));
             size = 3;
-            powerProduction = 1f;
+            powerProduction = 1.3f;
         }};
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{

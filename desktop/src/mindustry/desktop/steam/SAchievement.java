@@ -3,8 +3,7 @@ package mindustry.desktop.steam;
 public enum SAchievement{
     kill1kEnemies(SStat.unitsDestroyed, 1000),
     kill100kEnemies(SStat.unitsDestroyed, 100_000),
-    launch10kItems(SStat.itemsLaunched, 10_000),
-    launch1milItems(SStat.itemsLaunched, 1_000_000),
+    launch100kItems(SStat.itemsLaunched, 100_000),
 
     produce1kMin(SStat.maxProduction, 1000),
     produce20kMin(SStat.maxProduction, 20_000),
