@@ -24,6 +24,10 @@ public enum LAccess{
     rotation,
     x,
     y,
+    velX,
+    velY,
+    hovering,
+    flying,
     shootX,
     shootY,
     shooting,
@@ -38,6 +42,7 @@ public enum LAccess{
     config,
     payloadCount,
     payloadType,
+    dead,
 
     //values with parameters are considered controllable
     enabled("to"), //"to" is standard for single parameter access
