@@ -458,18 +458,21 @@ public class JoinDialog extends BaseDialog{
     }
 
     public void reconnect(){
+        if(lastIp.isEmpty()) return;
         ui.loadfrag.show("@reconnecting");
 
-        this.ping = Timer.schedule(() -> {
+        ping = Timer.schedule(() -> {
             net.pingHost(lastIp, lastPort, host -> {
+                if(ping == null) return;
                 ping.cancel();
+                ping = null;
                 connect(lastIp, lastPort);
             }, exception -> {});
         }, 1, 1);
 
         ui.loadfrag.setButton(() -> {
             ui.loadfrag.hide();
-            ping.cancel();
+            if(ping != null) ping.cancel();
         });
     }
 
