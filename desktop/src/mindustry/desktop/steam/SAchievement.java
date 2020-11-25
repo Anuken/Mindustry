@@ -13,11 +13,7 @@ public enum SAchievement{
     launch30Times(SStat.timesLaunched, 30),
     captureBackground,
     survive100Waves(SStat.maxWavesSurvived, 100),
-    //this seems near-impossible?
-    //survive500Waves(SStat.maxWavesSurvived, 500),
     researchAll,
-    //TODO
-    //useAllUnits,
     shockWetEnemy,
     killEnemyPhaseWall,
     researchRouter,
@@ -61,6 +57,7 @@ public enum SAchievement{
     enablePixelation,
     openWiki,
     useAccelerator,
+
     ;
 
     private final SStat stat;
