@@ -120,8 +120,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case ammoCapacity -> type.ammoCapacity;
             case x -> World.conv(x);
             case y -> World.conv(y);
-            case velX -> vel().x;
-            case velY -> vel().y;
+            case velX -> vel().x/8;
+            case velY -> vel().y/8;
             case hovering -> elevation > 0 ? 1 : 0;
             case flying -> type.flying ? 1 : 0;
             case team -> team.id;
