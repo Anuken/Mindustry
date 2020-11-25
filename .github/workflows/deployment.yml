@@ -21,6 +21,8 @@ jobs:
     - name: Update docs
       run: |
         cd ../
+        git config --global user.email "cli@github.com"
+        git config --global user.name "Github Actions"
         git clone --depth=1 https://github.com/MindustryGame/docs.git
         cp -a Mindustry/core/build/docs/javadoc/. docs/
         cd docs
