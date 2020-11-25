@@ -50,12 +50,12 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: desktop/libs/Mindustry.jar
+        file: desktop/build/libs/Mindustry.jar
         tag: ${{ github.ref }}
     - name: Upload server artifacts
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: server/libs/server-release.jar
+        file: server/build/libs/server-release.jar
         tag: ${{ github.ref }}
 
