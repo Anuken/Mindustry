@@ -1,6 +1,6 @@
 name: Tests
 
-on: [push]
+on: [push, workflow_dispatch]
 
 jobs:
   buildJava14:
