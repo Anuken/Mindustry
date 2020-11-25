@@ -208,6 +208,8 @@ public class Universe{
 
                         //add production, making sure that it's capped
                         sector.info.production.each((item, stat) -> sector.info.items.add(item, Math.min((int)(stat.mean * newSecondsPassed * scl), sector.info.storageCapacity - sector.info.items.get(item))));
+                        //prevent negative values with unloaders
+                        sector.info.items.checkNegative();
 
                         sector.saveInfo();
                     }
@@ -216,7 +218,7 @@ public class Universe{
                     if(!sector.isAttacked() && turn > invasionGracePeriod && sector.info.hasSpawns){
                         //invasion chance depends on # of nearby bases
                         if(Mathf.chance(baseInvasionChance * Math.min(sector.near().count(Sector::hasEnemyBase), 1))){
-                            int waveMax = Math.max(sector.info.winWave, sector.isBeingPlayed() ? state.wave : sector.info.wave + sector.info.wavesPassed) + Mathf.random(2, 5) * 5;
+                            int waveMax = Math.max(sector.info.winWave, sector.isBeingPlayed() ? state.wave : sector.info.wave + sector.info.wavesPassed) + Mathf.random(2, 4) * 5;
 
                             //assign invasion-related things
                             if(sector.isBeingPlayed()){

@@ -269,6 +269,26 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
+        public void handleStack(Item item, int amount, Teamc source){
+            super.handleStack(item, amount, source);
+
+            if(team == state.rules.defaultTeam && state.isCampaign()){
+                state.rules.sector.info.handleCoreItem(item, amount);
+            }
+        }
+
+        @Override
+        public int removeStack(Item item, int amount){
+            int result = super.removeStack(item, amount);
+
+            if(team == state.rules.defaultTeam && state.isCampaign()){
+                state.rules.sector.info.handleCoreItem(item, -result);
+            }
+
+            return result;
+        }
+
+        @Override
         public void drawSelect(){
             Lines.stroke(1f, Pal.accent);
             Cons<Building> outline = t -> {

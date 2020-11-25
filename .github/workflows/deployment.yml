@@ -21,6 +21,8 @@ jobs:
     - name: Update docs
       run: |
         cd ../
+        git config --global user.email "cli@github.com"
+        git config --global user.name "Github Actions"
         git clone --depth=1 https://github.com/MindustryGame/docs.git
         cp -a Mindustry/core/build/docs/javadoc/. docs/
         cd docs
@@ -48,12 +50,12 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: desktop/libs/Mindustry.jar
+        file: desktop/build/libs/Mindustry.jar
         tag: ${{ github.ref }}
     - name: Upload server artifacts
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: server/libs/server-release.jar
+        file: server/build/libs/server-release.jar
         tag: ${{ github.ref }}
 

@@ -127,6 +127,9 @@ public class Schematics implements Loadable{
         newSchematic.tags.putAll(target.tags);
         newSchematic.file = target.file;
 
+        loadouts.each((block, list) -> list.remove(target));
+        checkLoadout(target, true);
+
         try{
             write(newSchematic, target.file);
         }catch(Exception e){
@@ -134,6 +137,8 @@ public class Schematics implements Loadable{
             Log.err(e);
             ui.showException(e);
         }
+
+
     }
 
     private @Nullable Schematic loadFile(Fi file){

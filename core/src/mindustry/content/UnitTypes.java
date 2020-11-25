@@ -556,7 +556,7 @@ public class UnitTypes implements ContentList{
             range = 40f;
 
             weapons.add(new Weapon(){{
-                reload = 12f;
+                reload = 24f;
                 shootCone = 180f;
                 ejectEffect = Fx.none;
                 shootSound = Sounds.explosion;
@@ -1321,7 +1321,7 @@ public class UnitTypes implements ContentList{
                     sprite = "large-bomb";
                     width = height = 120/4f;
 
-                    range = 30f;
+                    maxRange = 30f;
                     ignoreRotation = true;
 
                     backColor = Pal.heal;
@@ -1413,12 +1413,12 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.missile;
                 bullet = new MissileBulletType(2.7f, 12, "missile"){{
+                    keepVelocity = true;
                     width = 8f;
                     height = 8f;
                     shrinkY = 0f;
                     drag = -0.003f;
                     homingRange = 60f;
-                    keepVelocity = false;
                     splashDamageRadius = 25f;
                     splashDamage = 10f;
                     lifetime = 80f;

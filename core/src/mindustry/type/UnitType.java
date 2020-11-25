@@ -328,7 +328,7 @@ public class UnitType extends UnlockableContent{
             //suicide enemy
             if(weapons.contains(w -> w.bullet.killShooter)){
                 //scale down DPS to be insignificant
-                dpsEstimate /= 20f;
+                dpsEstimate /= 25f;
             }
         }
     }

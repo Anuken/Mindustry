@@ -363,7 +363,7 @@ public class Blocks implements ContentList{
 
         sandWall = new StaticWall("sand-wall"){{
             variants = 2;
-            sandWater.asFloor().wall = this;
+            sandWater.asFloor().wall = water.asFloor().wall = deepwater.asFloor().wall = this;
         }};
 
         saltWall = new StaticWall("salt-wall");
@@ -1195,7 +1195,7 @@ public class Blocks implements ContentList{
             size = 2;
 
             ambientSound = Sounds.smelter;
-            ambientSoundVolume = 0.05f;
+            ambientSoundVolume = 0.06f;
         }};
 
         differentialGenerator = new SingleTypeGenerator("differential-generator"){{
@@ -1216,7 +1216,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.lead, 100, Items.silicon, 75, Items.phaseFabric, 25, Items.plastanium, 75, Items.thorium, 50));
             size = 2;
             powerProduction = 4.5f;
-            itemDuration = 60 * 15f;
+            itemDuration = 60 * 14f;
         }};
 
         solarPanel = new SolarGenerator("solar-panel"){{
@@ -1377,7 +1377,7 @@ public class Blocks implements ContentList{
             itemCapacity = 9000;
             size = 4;
 
-            unitCapModifier = 14;
+            unitCapModifier = 16;
             researchCostMultiplier = 0.04f;
         }};
 
@@ -1389,7 +1389,7 @@ public class Blocks implements ContentList{
             itemCapacity = 13000;
             size = 5;
 
-            unitCapModifier = 20;
+            unitCapModifier = 24;
             researchCostMultiplier = 0.05f;
         }};
 
@@ -1517,12 +1517,12 @@ public class Blocks implements ContentList{
 
         lancer = new ChargeTurret("lancer"){{
             requirements(Category.turret, with(Items.copper, 25, Items.lead, 50, Items.silicon, 45));
-            range = 155f;
-            chargeTime = 50f;
+            range = 165f;
+            chargeTime = 40f;
             chargeMaxDelay = 30f;
             chargeEffects = 7;
             recoilAmount = 2f;
-            reloadTime = 90f;
+            reloadTime = 80f;
             cooldown = 0.03f;
             powerUse = 6f;
             shootShake = 2f;
@@ -1544,6 +1544,7 @@ public class Blocks implements ContentList{
                 lifetime = 16f;
                 drawSize = 400f;
                 collidesAir = false;
+                length = 173f;
             }};
         }};
 
@@ -1557,7 +1558,7 @@ public class Blocks implements ContentList{
             reloadTime = 35f;
             shootCone = 40f;
             rotateSpeed = 8f;
-            powerUse = 3f;
+            powerUse = 3.3f;
             targetAir = false;
             range = 90f;
             shootEffect = Fx.lightningShoot;

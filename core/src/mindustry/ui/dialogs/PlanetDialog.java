@@ -140,6 +140,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             return this;
         }
 
+        rebuildButtons();
         mode = look;
         selected = hovered = launchSector = null;
         launching = false;
@@ -167,6 +168,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         newPresets.reverse();
+        updateSelected();
 
         if(planets.planet.getLastSector() != null){
             lookAt(planets.planet.getLastSector());
