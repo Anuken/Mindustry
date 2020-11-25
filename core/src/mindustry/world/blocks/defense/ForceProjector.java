@@ -48,6 +48,7 @@ public class ForceProjector extends Block{
         super(name);
         update = true;
         solid = true;
+        group = BlockGroup.projectors;
         hasPower = true;
         hasLiquids = true;
         hasItems = true;
