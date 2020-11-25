@@ -61,6 +61,7 @@ public enum SAchievement{
     coolTurret,
     enablePixelation,
     openWiki,
+    useAccelerator,
     ;
 
     private final SStat stat;

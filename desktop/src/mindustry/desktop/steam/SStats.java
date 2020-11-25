@@ -215,6 +215,8 @@ public class SStats implements SteamUserStatsCallback{
             }
         });
 
+        trigger(Trigger.acceleratorUse, useAccelerator);
+
         trigger(Trigger.impactPower, powerupImpactReactor);
 
         trigger(Trigger.flameAmmo, useFlameAmmo);

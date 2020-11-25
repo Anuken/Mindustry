@@ -1,5 +1,6 @@
 package mindustry.world.blocks.campaign;
 
+import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
@@ -8,6 +9,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -91,6 +93,7 @@ public class Accelerator extends Block{
             if(!state.isCampaign() || !consValid()) return;
 
             ui.showInfo("@indev.campaign");
+            Events.fire(Trigger.acceleratorUse);
         }
 
         @Override
