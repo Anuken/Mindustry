@@ -61,7 +61,6 @@ public enum SAchievement{
     enablePixelation,
     openWiki,
     useAccelerator,
-
     ;
 
     private final SStat stat;
