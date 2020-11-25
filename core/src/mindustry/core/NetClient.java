@@ -257,6 +257,11 @@ public class NetClient implements ApplicationListener{
     public static void kick(KickReason reason){
         netClient.disconnectQuietly();
         logic.reset();
+        
+        if(reason == KickReason.serverRestarting){
+            ui.join.reconnect();
+            return;
+        }
 
         if(!reason.quiet){
             if(reason.extraText() != null){

@@ -8,6 +8,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Timer.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.core.*;
@@ -32,6 +33,10 @@ public class JoinDialog extends BaseDialog{
     int totalHosts;
     int refreshes;
     boolean showHidden;
+
+    String lastIp;
+    int lastPort;
+    Task ping;
 
     public JoinDialog(){
         super("@joingame");
@@ -445,10 +450,31 @@ public class JoinDialog extends BaseDialog{
             logic.reset();
             net.reset();
             Vars.netClient.beginConnecting();
-            net.connect(ip, port, () -> {
+            net.connect(lastIp = ip, lastPort = port, () -> {
                 hide();
                 add.hide();
             });
+        });
+    }
+
+    public void reconnect(){
+        if(lastIp == null || lastIp.isEmpty()) return;
+        ui.loadfrag.show("@reconnecting");
+
+        ping = Timer.schedule(() -> {
+            net.pingHost(lastIp, lastPort, host -> {
+                if(ping == null) return;
+                ping.cancel();
+                ping = null;
+                connect(lastIp, lastPort);
+            }, exception -> {});
+        }, 1, 1);
+        
+        ui.loadfrag.setButton(() -> {
+            ui.loadfrag.hide();
+            if(ping == null) return;
+            ping.cancel();
+            ping = null;
         });
     }
 
