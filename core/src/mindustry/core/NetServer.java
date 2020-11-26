@@ -447,6 +447,11 @@ public class NetServer implements ApplicationListener{
                     return;
                 }
 
+                if(currentlyKicking[0].target.team() != player.team()){
+                    player.sendMessage("[scarlet]You can't vote for other teams.");
+                    return;
+                }
+
                 if(!arg[0].toLowerCase().equals("y") && !arg[0].toLowerCase().equals("n")){
                     player.sendMessage("[scarlet]Vote either 'y' (yes) or 'n' (no).");
                     return;
