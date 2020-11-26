@@ -1513,7 +1513,7 @@ public class Blocks implements ContentList{
             flags = EnumSet.of(BlockFlag.turret, BlockFlag.extinguisher);
         }};
 
-        lancer = new ChargeTurret("lancer"){{
+        lancer = new PowerTurret("lancer"){{
             requirements(Category.turret, with(Items.copper, 25, Items.lead, 50, Items.silicon, 45));
             range = 165f;
             chargeTime = 40f;
