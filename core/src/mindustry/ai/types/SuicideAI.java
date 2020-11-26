@@ -21,7 +21,7 @@ public class SuicideAI extends GroundAI{
         }
 
         if(retarget()){
-            target = target(unit.x, unit.y, unit.range(), unit.type.targetAir, unit.type.targetGround);
+            target = target(unit.x, unit.y, unit.range(), false, unit.type.targetGround);
         }
 
         Building core = unit.closestEnemyCore();
