@@ -30,12 +30,6 @@ public class SuicideAI extends GroundAI{
 
         if(!Units.invalidateTarget(target, unit, unit.range()) && unit.hasWeapons()){
             rotate = true;
-            shoot = unit.within(target, unit.type.weapons.first().bullet.range() +
-                (target instanceof Building b ? b.block.size * Vars.tilesize / 2f : ((Hitboxc)target).hitSize() / 2f));
-
-            if(unit.type.hasWeapons()){
-                unit.aimLook(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
-            }
 
             //do not move toward walls or transport blocks
             if(!(target instanceof Building build && (
