@@ -512,8 +512,7 @@ public class TechTree implements ContentList{
                                     new Research(groundFactory),
                                     new Research(additiveReconstructor),
                                     new Research(airFactory),
-                                    new Research(door),
-                                    new Research(waterExtractor)
+                                    new Research(door)
                                 ), () -> {
 
                                 });

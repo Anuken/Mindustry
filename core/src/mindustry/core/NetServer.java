@@ -422,7 +422,7 @@ public class NetServer implements ApplicationListener{
                         currentlyKicking[0] = session;
                     }
                 }else{
-                    player.sendMessage("[scarlet]No player[orange]'" + args[0] + "'[scarlet] found.");
+                    player.sendMessage("[scarlet]No player [orange]'" + args[0] + "'[scarlet] found.");
                 }
             }
         });
