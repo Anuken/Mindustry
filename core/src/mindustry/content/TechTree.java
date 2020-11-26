@@ -98,11 +98,11 @@ public class TechTree implements ContentList{
                                     node(platedConduit, () -> {
 
                                     });
-                                });
 
-                                node(rotaryPump, () -> {
-                                    node(thermalPump, () -> {
+                                    node(rotaryPump, () -> {
+                                        node(thermalPump, () -> {
 
+                                        });
                                     });
                                 });
                             });

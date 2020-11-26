@@ -977,27 +977,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
-    /**
-     * Returns the flammability of the  Used for fire calculations.
-     * Takes flammability of floor liquid into account.
-     */
-    public float getFlammability(){
-        if(!block.hasItems){
-            if(floor().isLiquid && !block.solid){
-                return floor().liquidDrop.flammability;
-            }
-            return 0;
-        }else{
-            float result = items.sum((item, amount) -> item.flammability * amount);
-
-            if(block.hasLiquids){
-                result += liquids.sum((liquid, amount) -> liquid.flammability * amount / 3f);
-            }
-
-            return result;
-        }
-    }
-
     public String getDisplayName(){
         return block.localizedName;
     }
