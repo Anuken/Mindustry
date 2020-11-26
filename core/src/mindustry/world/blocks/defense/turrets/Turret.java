@@ -205,7 +205,7 @@ public abstract class Turret extends ReloadTurret{
         }
 
         public boolean isActive(){
-            return target != null || (logicControlled() && logicShooting) || (isControlled() && unit.isShooting());
+            return target != null || wasShooting;
         }
 
         public void targetPosition(Posc pos){
