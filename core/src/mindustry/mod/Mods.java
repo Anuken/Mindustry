@@ -677,7 +677,7 @@ public class Mods implements Loadable{
         public Seq<String> missingDependencies = new Seq<>();
         /** Script files to run. */
         public Seq<Fi> scripts = new Seq<>();
-        /** Content with intialization code. */
+        /** Content with initialization code. */
         public ObjectSet<Content> erroredContent = new ObjectSet<>();
         /** Current state of this mod. */
         public ModState state = ModState.enabled;
@@ -708,7 +708,7 @@ public class Mods implements Loadable{
             return !erroredContent.isEmpty();
         }
 
-        /** @return whether this mod is supported by the game verison */
+        /** @return whether this mod is supported by the game version */
         public boolean isSupported(){
             if(isOutdated()) return false;
 
