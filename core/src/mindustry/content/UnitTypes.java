@@ -71,11 +71,12 @@ public class UnitTypes implements ContentList{
             speed = 0.5f;
             hitSize = 8f;
             health = 140;
+            range = 40f;
 
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
-                shootCone = 180f;
+                shootCone = 360f;
                 ejectEffect = Fx.none;
                 shootSound = Sounds.explosion;
                 bullet = new BombBulletType(0f, 0f, "clear"){{
@@ -97,6 +98,7 @@ public class UnitTypes implements ContentList{
             hitSize = 9f;
             health = 500;
             armor = 4f;
+            range = 40f;
 
             immunities.add(StatusEffects.burning);
 
@@ -127,8 +129,10 @@ public class UnitTypes implements ContentList{
             targetAir = false;
             health = 790;
             armor = 9f;
+            range = 40f;
             mechFrontSway = 0.55f;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -162,6 +166,7 @@ public class UnitTypes implements ContentList{
             mechStepShake = 0.15f;
             singleTarget = true;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -194,6 +199,7 @@ public class UnitTypes implements ContentList{
             mechFrontSway = 1.9f;
             mechSideSway = 0.6f;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -230,6 +236,7 @@ public class UnitTypes implements ContentList{
             abilities.add(new RepairFieldAbility(10f, 60f * 4, 60f));
             ammoType = AmmoTypes.power;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -266,6 +273,7 @@ public class UnitTypes implements ContentList{
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 5, 60f));
             ammoType = AmmoTypes.power;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -308,6 +316,7 @@ public class UnitTypes implements ContentList{
 
             abilities.add(new ForceFieldAbility(60f, 0.3f, 400f, 60f * 6));
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -353,6 +362,7 @@ public class UnitTypes implements ContentList{
 
             commandLimit = 8;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -400,6 +410,7 @@ public class UnitTypes implements ContentList{
             mineSpeed = 7f;
             drawShields = false;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -471,6 +482,7 @@ public class UnitTypes implements ContentList{
             visualElevation = 0.2f;
             groundLayer = Layer.legUnit - 1f;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -513,6 +525,8 @@ public class UnitTypes implements ContentList{
             visualElevation = 0.3f;
             groundLayer = Layer.legUnit;
 
+
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -564,6 +578,7 @@ public class UnitTypes implements ContentList{
             visualElevation = 0.65f;
             groundLayer = Layer.legUnit;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -615,6 +630,7 @@ public class UnitTypes implements ContentList{
             visualElevation = 0.95f;
             groundLayer = Layer.legUnit;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -649,6 +665,8 @@ public class UnitTypes implements ContentList{
             targetAir = false;
             commandLimit = 4;
 
+
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -684,6 +702,7 @@ public class UnitTypes implements ContentList{
             targetFlag = BlockFlag.factory;
             commandLimit = 5;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -718,6 +737,8 @@ public class UnitTypes implements ContentList{
             engineOffset = 12f;
             engineSize = 3f;
 
+
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -752,6 +773,7 @@ public class UnitTypes implements ContentList{
             hitSize = 56f;
             targetFlag = BlockFlag.battery;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -787,6 +809,7 @@ public class UnitTypes implements ContentList{
             armor = 13f;
             targetFlag = BlockFlag.reactor;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -830,7 +853,6 @@ public class UnitTypes implements ContentList{
         }};
 
         poly = new UnitType("poly"){{
-            defaultController = BuilderAI::new;
 
             flying = true;
             drag = 0.05f;
@@ -851,41 +873,28 @@ public class UnitTypes implements ContentList{
 
             abilities.add(new RepairFieldAbility(5f, 60f * 5, 50f));
 
-            weapons.add(new Weapon("heal-weapon-mount"){{
-                top = false;
-                y = -2.5f;
-                x = 3.5f;
-                reload = 30f;
+            range = 40f;
+            defaultController = SuicideAI::new;
+            weapons.add(new Weapon(){{
+                reload = 12f;
+                shootCone = 180f;
                 ejectEffect = Fx.none;
-                recoil = 2f;
-                shootSound = Sounds.missile;
-                shots = 1;
-                velocityRnd = 0.5f;
-                inaccuracy = 15f;
-                alternate = true;
-
-                bullet = new MissileBulletType(4f, 12){{
-                    homingPower = 0.08f;
-                    weaveMag = 4;
-                    weaveScale = 4;
-                    lifetime = 56f;
-                    keepVelocity = false;
-                    shootEffect = Fx.shootHeal;
-                    smokeEffect = Fx.hitLaser;
-                    hitEffect = despawnEffect = Fx.hitLaser;
-                    frontColor = Color.white;
-                    hitSound = Sounds.none;
-
-                    healPercent = 5.5f;
-                    collidesTeam = true;
-                    backColor = Pal.heal;
-                    trailColor = Pal.heal;
+                shootSound = Sounds.explosion;
+                bullet = new BombBulletType(0f, 0f, "clear"){{
+                    hitEffect = Fx.pulverize;
+                    lifetime = 10f;
+                    speed = 1f;
+                    splashDamageRadius = 70f;
+                    instantDisappear = true;
+                    splashDamage = 80f;
+                    killShooter = true;
+                    hittable = false;
+                    collidesAir = true;
                 }};
             }});
         }};
 
         mega = new UnitType("mega"){{
-            defaultController = RepairAI::new;
 
             mineTier = 3;
             mineSpeed = 4f;
@@ -905,6 +914,8 @@ public class UnitTypes implements ContentList{
 
             ammoType = AmmoTypes.power;
 
+
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -946,6 +957,7 @@ public class UnitTypes implements ContentList{
 
             ammoType = AmmoTypes.powerHigh;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -989,6 +1001,7 @@ public class UnitTypes implements ContentList{
 
             abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8), new RepairFieldAbility(130f, 60f * 2, 140f));
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -1024,6 +1037,7 @@ public class UnitTypes implements ContentList{
 
             armor = 2f;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -1061,6 +1075,7 @@ public class UnitTypes implements ContentList{
 
             abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 6, 60f * 6f, 60f));
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -1098,6 +1113,7 @@ public class UnitTypes implements ContentList{
 
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 4, 60f));
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -1134,6 +1150,7 @@ public class UnitTypes implements ContentList{
             trailY = -21f;
             trailScl = 3f;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;
@@ -1173,6 +1190,7 @@ public class UnitTypes implements ContentList{
             trailY = -32f;
             trailScl = 3.5f;
 
+            range = 40f;
             defaultController = SuicideAI::new;
             weapons.add(new Weapon(){{
                 reload = 12f;

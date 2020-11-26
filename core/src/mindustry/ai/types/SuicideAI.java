@@ -8,6 +8,7 @@ import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.liquid.*;
+import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.*;
 
 public class SuicideAI extends GroundAI{
@@ -30,6 +31,13 @@ public class SuicideAI extends GroundAI{
 
         if(!Units.invalidateTarget(target, unit, unit.range()) && unit.hasWeapons()){
             rotate = true;
+
+            shoot = unit.within(target, unit.type.weapons.first().bullet.range() +
+                (target instanceof Building b ? b.block.size * Vars.tilesize / 2f : ((Hitboxc)target).hitSize() / 2f));
+
+            if(unit.type.hasWeapons()){
+                unit.aimLook(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
+            }
 
             //do not move toward walls or transport blocks
             if(!(target instanceof Building build && (
@@ -83,7 +91,7 @@ public class SuicideAI extends GroundAI{
 
     @Override
     protected Teamc target(float x, float y, float range, boolean air, boolean ground){
-        return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground &&
-            !(t.block instanceof Conveyor || t.block instanceof Conduit)); //do not target conveyors/conduits
+        return Units.closestTargetTile(unit.team, x, y, range, t -> ground &&
+            (t.block instanceof CoreBlock)); //target core blocks
     }
 }
