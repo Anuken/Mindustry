@@ -399,7 +399,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void destroy(){
         float explosiveness = 2f + item().explosiveness * stack().amount / 3f;
         float flammability = item().flammability * stack().amount / 3f;
-        Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame, state.rules.damageExplosions);
+        if(!spawnedByCore){
+            Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame, state.rules.damageExplosions);
+        }
 
         float shake = hitSize / 3f;
 
@@ -415,7 +417,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //if this unit crash landed (was flying), damage stuff in a radius
-        if(type.flying){
+        if(type.flying && !spawnedByCore){
             Damage.damage(team,x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f, true, false, true);
         }
 
