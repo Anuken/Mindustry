@@ -31,6 +31,7 @@ public class MendProjector extends Block{
         super(name);
         solid = true;
         update = true;
+        group = BlockGroup.projectors;
         hasPower = true;
         hasItems = true;
     }

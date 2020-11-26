@@ -18,6 +18,7 @@ public class EventType{
         impactPower,
         thoriumReactorOverheat,
         fireExtinguish,
+        acceleratorUse,
         newGame,
         tutorialComplete,
         flameAmmo,
