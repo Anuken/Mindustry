@@ -17,16 +17,25 @@ jobs:
         java-version: 14
     - name: Create artifacts
       run: |
-        ./gradlew desktop:dist server:dist core:javadoc -Pbuildversion=${GITHUB_REF:1}"
+        ./gradlew desktop:dist server:dist core:javadoc -Pbuildversion=${GITHUB_REF:1}
     - name: Update docs
       run: |
         cd ../
+        git config --global user.email "cli@github.com"
+        git config --global user.name "Github Actions"
         git clone --depth=1 https://github.com/MindustryGame/docs.git
         cp -a Mindustry/core/build/docs/javadoc/. docs/
         cd docs
         git add .
         git commit -m "Update ${GITHUB_REF:1}"
         git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/MindustryGame/docs
+        cd ../Mindustry
+    - name: Add Arc release
+      run: |
+        git clone --depth=1 --branch=master https://github.com/Anuken/Arc ../Arc
+        cd ../Arc
+        git tag ${GITHUB_REF}
+        git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/Anuken/Arc ${GITHUB_REF};
         cd ../Mindustry
     - name: Update F-Droid build string
       run: |
@@ -41,12 +50,12 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: desktop/libs/Mindustry.jar
+        file: desktop/build/libs/Mindustry.jar
         tag: ${{ github.ref }}
     - name: Upload server artifacts
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: server/libs/server-release.jar
+        file: server/build/libs/server-release.jar
         tag: ${{ github.ref }}
 

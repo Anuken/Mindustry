@@ -433,7 +433,7 @@ public class UnitTypes implements ContentList{
             range = 40f;
 
             weapons.add(new Weapon(){{
-                reload = 12f;
+                reload = 24f;
                 shootCone = 180f;
                 ejectEffect = Fx.none;
                 shootSound = Sounds.explosion;
@@ -888,6 +888,7 @@ public class UnitTypes implements ContentList{
             defaultController = RepairAI::new;
 
             mineTier = 3;
+            mineSpeed = 4f;
             health = 500;
             armor = 5f;
             speed = 2.5f;

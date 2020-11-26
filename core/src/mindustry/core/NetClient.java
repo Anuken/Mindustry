@@ -41,7 +41,7 @@ public class NetClient implements ApplicationListener{
     private boolean connecting = false;
     /** If true, no message will be shown on disconnect. */
     private boolean quiet = false;
-    /** Whether to supress disconnect events completely.*/
+    /** Whether to suppress disconnect events completely.*/
     private boolean quietReset = false;
     /** Counter for data timeout. */
     private float timeoutTime = 0f;
@@ -257,6 +257,11 @@ public class NetClient implements ApplicationListener{
     public static void kick(KickReason reason){
         netClient.disconnectQuietly();
         logic.reset();
+        
+        if(reason == KickReason.serverRestarting){
+            ui.join.reconnect();
+            return;
+        }
 
         if(!reason.quiet){
             if(reason.extraText() != null){
@@ -340,7 +345,7 @@ public class NetClient implements ApplicationListener{
 
         ui.showInfoToast(message, duration);
     }
-    
+
     @Remote(variants = Variant.both)
     public static void warningToast(int unicode, String text){
         if(text == null || Fonts.icon.getData().getGlyph((char)unicode) == null) return;

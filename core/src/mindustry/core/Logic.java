@@ -107,7 +107,7 @@ public class Logic implements ApplicationListener{
                 if(!(state.getSector().preset != null && !state.getSector().preset.useAI)){
                     state.rules.waveTeam.rules().ai = true;
                 }
-                state.rules.waveTeam.rules().aiTier = state.getSector().threat;
+                state.rules.waveTeam.rules().aiTier = state.getSector().threat * 0.8f;
                 state.rules.waveTeam.rules().infiniteResources = true;
             }
 
@@ -264,7 +264,7 @@ public class Logic implements ApplicationListener{
         Events.fire(new SectorCaptureEvent(state.rules.sector));
 
         //save, just in case
-        if(!headless){
+        if(!headless && !net.client()){
             control.saves.saveSector(state.rules.sector);
         }
     }

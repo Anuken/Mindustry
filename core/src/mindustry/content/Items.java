@@ -72,6 +72,7 @@ public class Items implements ContentList{
         }};
 
         surgeAlloy = new Item("surge-alloy", Color.valueOf("f3e979")){{
+            cost = 1.2f;
         }};
 
         sporePod = new Item("spore-pod", Color.valueOf("7457ce")){{

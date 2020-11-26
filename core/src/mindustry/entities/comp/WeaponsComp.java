@@ -91,6 +91,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                 mount.bullet.time = mount.bullet.lifetime - 10f;
                 mount.bullet = null;
             }
+
+            if(mount.sound != null){
+                mount.sound.stop();
+            }
         }
     }
 
