@@ -112,7 +112,7 @@ public class UnitType extends UnlockableContent{
     public UnitType(String name){
         super(name);
 
-        constructor = EntityMapping.map(name);
+        constructor = EntityMapping.map(this.name);
     }
 
     public UnitController createController(){
