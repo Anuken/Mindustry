@@ -4,6 +4,7 @@ import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.gen.*;
 
 import java.util.*;
@@ -93,6 +94,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         return map != null;
     }
 
+    @Nullable
     public T getByID(int id){
         if(map == null) throw new RuntimeException("Mapping is not enabled for group " + id + "!");
         return map.get(id);
@@ -188,8 +190,14 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         clearing = false;
     }
 
+    @Nullable
     public T find(Boolf<T> pred){
         return array.find(pred);
+    }
+
+    @Nullable
+    public T first(){
+        return array.first();
     }
 
     @Override

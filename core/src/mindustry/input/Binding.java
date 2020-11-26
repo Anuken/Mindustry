@@ -58,6 +58,8 @@ public enum Binding implements KeyBind{
     fullscreen(KeyCode.f11),
     pause(KeyCode.space),
     minimap(KeyCode.m),
+    research(KeyCode.b),
+    planet_map(KeyCode.n),
     toggle_menus(KeyCode.c),
     screenshot(KeyCode.p),
     toggle_power_lines(KeyCode.f5),

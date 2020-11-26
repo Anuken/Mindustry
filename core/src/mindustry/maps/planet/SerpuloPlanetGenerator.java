@@ -10,7 +10,9 @@ import mindustry.ai.*;
 import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
 import mindustry.game.*;
+import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.generators.*;
+import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -57,6 +59,43 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     float rawHeight(Vec3 position){
         position = Tmp.v33.set(position).scl(scl);
         return (Mathf.pow((float)noise.octaveNoise3D(7, 0.5f, 1f/3f, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
+    }
+
+    @Override
+    public void generateSector(Sector sector){
+
+        //these always have bases
+        if(sector.id == 154 || sector.id == 0){
+            sector.generateEnemyBase = true;
+            return;
+        }
+
+        Ptile tile = sector.tile;
+
+        boolean any = false;
+        float poles = Math.abs(tile.v.y);
+        float noise = Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 0.001f, 0.58f);
+
+        if(noise + poles/7.1 > 0.12 && poles > 0.23){
+            any = true;
+        }
+
+        if(noise < 0.16){
+            for(Ptile other : tile.tiles){
+                var osec = sector.planet.getSector(other);
+
+                //no sectors near start sector!
+                if(
+                    osec.id == sector.planet.startSector || //near starting sector
+                    osec.generateEnemyBase && poles < 0.85 || //near other base
+                    (sector.preset != null && noise < 0.11) //near preset
+                ){
+                    return;
+                }
+            }
+        }
+
+        sector.generateEnemyBase = any;
     }
 
     @Override
@@ -158,7 +197,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         //check positions on the map to place the player spawn. this needs to be in the corner of the map
         Room spawn = null;
         Seq<Room> enemies = new Seq<>();
-        int enemySpawns = rand.chance(0.3) ? 2 : 1;
+        int enemySpawns = rand.random(1, Math.max((int)(sector.threat * 4), 1));
         int offset = rand.nextInt(360);
         float length = width/2.55f - rand.random(13, 23);
         int angleStep = 5;
@@ -237,7 +276,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
         FloatSeq frequencies = new FloatSeq();
         for(int i = 0; i < ores.size; i++){
-            frequencies.add(rand.random(-0.09f, 0.01f) - i * 0.01f);
+            frequencies.add(rand.random(-0.1f, 0.01f) - i * 0.01f + poles * 0.04f);
         }
 
         pass((x, y) -> {
@@ -439,7 +478,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         state.rules.waves = sector.info.waves = true;
         state.rules.enemyCoreBuildRadius = 600f;
 
-        state.rules.spawns = Waves.generate(difficulty);
+        state.rules.spawns = Waves.generate(difficulty, new Rand(), state.rules.attackMode);
     }
 
     @Override

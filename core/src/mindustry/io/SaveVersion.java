@@ -286,7 +286,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
     public void writeEntities(DataOutput stream) throws IOException{
         //write team data with entities.
-        Seq<TeamData> data = state.teams.getActive();
+        Seq<TeamData> data = state.teams.getActive().and(Team.sharded.data());
         stream.writeInt(data.size);
         for(TeamData team : data){
             stream.writeInt(team.team.id);

@@ -40,8 +40,6 @@ public class Planets implements ContentList{
             startSector = 10;
             atmosphereRadIn = -0.01f;
             atmosphereRadOut = 0.3f;
-            accessible = false;
-            visible = false;
         }};*/
 
         serpulo = new Planet("serpulo", sun, 3, 1){{
