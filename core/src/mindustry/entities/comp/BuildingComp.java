@@ -435,7 +435,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     /** Handle a stack input. */
-    public void handleStack(Item item, int amount, Teamc source){
+    public void handleStack(Item item, int amount, @Nullable Teamc source){
         noSleep();
         items.add(item, amount);
     }

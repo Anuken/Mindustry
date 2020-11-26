@@ -96,9 +96,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void transferItemTo(Unit unit, Item item, int amount, float x, float y, Building build){
+    public static void setItem(Building build, Item item, int amount){
         if(build == null || build.items == null) return;
-        unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
+        build.items.set(item, amount);
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void transferItemTo(@Nullable Unit unit, Item item, int amount, float x, float y, Building build){
+        if(build == null || build.items == null) return;
+
+        if(unit != null) unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
+
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
             Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
         }
