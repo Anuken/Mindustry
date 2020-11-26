@@ -50,7 +50,7 @@ public class Junction extends Block{
                         Building dest = nearby(i);
 
                         //skip blocks that don't want the item, keep waiting until they do
-                        if(dest == null || !dest.acceptItem(this, item) || dest.team != team){
+                        if(item == null || dest == null || !dest.acceptItem(this, item) || dest.team != team){
                             continue;
                         }
 

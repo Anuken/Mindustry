@@ -97,7 +97,7 @@ public class PlacementFragment extends Fragment{
     boolean gridUpdate(InputHandler input){
         scrollPositions.put(currentCategory, blockPane.getScrollY());
 
-        if(Core.input.keyDown(Binding.pick) && player.isBuilder()){ //mouse eyedropper select
+        if(Core.input.keyTap(Binding.pick) && player.isBuilder()){ //mouse eyedropper select
             Building tile = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             Block tryRecipe = tile == null ? null : tile.block instanceof ConstructBlock ? ((ConstructBuild)tile).cblock : tile.block;
             Object tryConfig = tile == null ? null : tile.config();
@@ -145,7 +145,7 @@ public class PlacementFragment extends Fragment{
                             break;
                         }
                     }
-                }else if(blockSelectEnd || Time.timeSinceMillis(blockSelectSeqMillis) > Core.settings.getInt("blockselecttimeout")){ //1st number of combo, select category
+                }else if(blockSelectEnd || Time.timeSinceMillis(blockSelectSeqMillis) > 750){ //1st number of combo, select category
                     //select only visible categories
                     if(!getUnlockedByCategory(Category.all[i]).isEmpty()){
                         currentCategory = Category.all[i];
