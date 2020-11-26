@@ -229,12 +229,12 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return items.get(item) < getMaximumAccepted(item) || incinerate();
+            return items.get(item) < getMaximumAccepted(item);
         }
 
         @Override
         public int getMaximumAccepted(Item item){
-            return storageCapacity;
+            return incinerate() ? storageCapacity * 2 : storageCapacity;
         }
 
         @Override
@@ -270,10 +270,15 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void handleStack(Item item, int amount, Teamc source){
-            super.handleStack(item, amount, source);
+            int realAmount = Math.min(amount, storageCapacity - items.get(item));
+            super.handleStack(item, realAmount, source);
 
             if(team == state.rules.defaultTeam && state.isCampaign()){
                 state.rules.sector.info.handleCoreItem(item, amount);
+
+                if(realAmount == 0){
+                    Fx.coreBurn.at(x, y);
+                }
             }
         }
 
@@ -377,7 +382,7 @@ public class CoreBlock extends StorageBlock{
                     state.rules.sector.info.handleCoreItem(item, 1);
                 }
 
-                if(items.get(item) >= getMaximumAccepted(item)){
+                if(items.get(item) >= storageCapacity){
                     //create item incineration effect at random intervals
                     if(!noEffect){
                         incinerateEffect(this, source);
