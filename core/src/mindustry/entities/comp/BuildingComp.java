@@ -519,6 +519,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void dumpLiquid(Liquid liquid){
         int dump = this.cdump;
 
+        if(liquids.get(liquid) <= 0.0001f) return;
+
         if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) liquid.unlock();
 
         for(int i = 0; i < proximity.size; i++){
