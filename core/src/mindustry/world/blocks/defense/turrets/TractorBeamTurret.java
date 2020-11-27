@@ -93,33 +93,34 @@ public class TractorBeamTurret extends BaseTurret{
                 coolant = 1f + (used * liquid.heatCapacity * coolantMultiplier);
             }
 
+            any = false;
+
             //look at target
-            if(target != null && target.within(this, range) && target.team() != team && target.type.flying && efficiency() > 0.01f){
+            if(target != null && target.within(this, range) && target.team() != team && target.type.flying && efficiency() > 0.02f){
                 if(!headless){
                     control.sound.loop(shootSound, this, shootSoundVolume);
                 }
 
-                any = true;
                 float dest = angleTo(target);
                 rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
                 lastX = target.x;
                 lastY = target.y;
                 strength = Mathf.lerpDelta(strength, 1f, 0.1f);
 
-                if(damage > 0){
-                    target.damageContinuous(damage * efficiency());
-                }
-                
-                if(status != StatusEffects.none){
-                    target.apply(status, statusDuration);
-                }
-
                 //shoot when possible
                 if(Angles.within(rotation, dest, shootCone)){
+                    if(damage > 0){
+                        target.damageContinuous(damage * efficiency());
+                    }
+
+                    if(status != StatusEffects.none){
+                        target.apply(status, statusDuration);
+                    }
+
+                    any = true;
                     target.impulse(Tmp.v1.set(this).sub(target).limit((force + (1f - target.dst(this) / range) * scaledForce) * efficiency() * timeScale));
                 }
             }else{
-                target = null;
                 strength = Mathf.lerpDelta(strength, 0, 0.1f);
             }
         }

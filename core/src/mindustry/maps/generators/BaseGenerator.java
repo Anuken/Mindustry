@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
 import mindustry.game.*;
@@ -54,7 +55,7 @@ public class BaseGenerator{
         BasePart coreschem = bases.cores.getFrac(difficulty);
         int passes = difficulty < 0.4 ? 1 : difficulty < 0.8 ? 2 : 3;
 
-        Block wall = wallsSmall.getFrac(difficulty), wallLarge = wallsLarge.getFrac(difficulty);
+        Block wall = wallsSmall.getFrac(difficulty * 0.91f), wallLarge = wallsLarge.getFrac(difficulty * 0.91f);
 
         for(Tile tile : cores){
             tile.clearOverlay();
@@ -143,6 +144,15 @@ public class BaseGenerator{
 
                 if(walls >= 3){
                     curr.setBlock(wallLarge, team);
+                }
+            });
+        }
+
+        //clear path for ground units
+        for(Tile tile : cores){
+            Astar.pathfind(tile, spawn, t -> t.team() == state.rules.waveTeam && !t.within(tile, 25f * 8) ? 100000 : t.floor().hasSurface() ? 1 : 10, t -> !t.block().isStatic()).each(t -> {
+                if(t.team() == state.rules.waveTeam && !t.within(tile, 25f * 8)){
+                    t.setBlock(Blocks.air);
                 }
             });
         }

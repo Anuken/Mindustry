@@ -32,7 +32,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
     }
 
     boolean mining(){
-        return mineTile != null && !(((Object)this) instanceof Builderc b && b.activelyBuilding());
+        return mineTile != null && !this.<Unit>self().activelyBuilding();
     }
 
     public boolean validMine(Tile tile, boolean checkDst){
@@ -44,6 +44,10 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
         return validMine(tile, true);
     }
 
+    public boolean canMine(){
+        return type.mineSpeed > 0 && type.mineTier >= 0;
+    }
+
     @Override
     public void update(){
         Building core = closestCore();
@@ -51,7 +55,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
         if(core != null && mineTile != null && mineTile.drop() != null && !acceptsItem(mineTile.drop()) && within(core, mineTransferRange) && !offloadImmediately()){
             int accepted = core.acceptStack(item(), stack().amount, this);
             if(accepted > 0){
-                Call.transferItemTo(item(), accepted,
+                Call.transferItemTo(self(), item(), accepted,
                 mineTile.worldx() + Mathf.range(tilesize / 2f),
                 mineTile.worldy() + Mathf.range(tilesize / 2f), core);
                 clearItem();
@@ -73,7 +77,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
                 mineTimer = 0;
 
                 if(core != null && within(core, mineTransferRange) && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
-                    Call.transferItemTo(item, 1,
+                    Call.transferItemTo(self(), item, 1,
                     mineTile.worldx() + Mathf.range(tilesize / 2f),
                     mineTile.worldy() + Mathf.range(tilesize / 2f), core);
                 }else if(acceptsItem(item)){

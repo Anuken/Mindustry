@@ -33,6 +33,8 @@ public class SectorInfo{
     public int storageCapacity = 0;
     /** Whether a core is available here. */
     public boolean hasCore = true;
+    /** Whether this sector was ever fully captured. */
+    public boolean wasCaptured = false;
     /** Sector that was launched from. */
     public @Nullable Sector origin;
     /** Launch destination. */
@@ -43,6 +45,8 @@ public class SectorInfo{
     public boolean waves = true;
     /** Whether attack mode is enabled here. */
     public boolean attack = false;
+    /** Whether this sector has any enemy spawns. */
+    public boolean hasSpawns = true;
     /** Wave # from state */
     public int wave = 1, winWave = -1;
     /** Waves this sector can survive if under attack. Based on wave in info. <0 means uncalculated. */
@@ -168,6 +172,7 @@ public class SectorInfo{
         secondsPassed = 0;
         wavesPassed = 0;
         damage = 0;
+        hasSpawns = spawner.countSpawns() > 0;
 
         if(state.rules.sector != null){
             state.rules.sector.saveInfo();

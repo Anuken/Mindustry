@@ -21,7 +21,7 @@ import static mindustry.Vars.*;
 
 public abstract class Weather extends UnlockableContent{
     /** Default duration of this weather event in ticks. */
-    public float duration = 9f * Time.toMinutes;
+    public float duration = 10f * Time.toMinutes;
     public float opacityMultiplier = 1f;
     public Attributes attrs = new Attributes();
     public Sound sound = Sounds.none;
