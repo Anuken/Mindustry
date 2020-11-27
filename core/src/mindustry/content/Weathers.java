@@ -53,7 +53,7 @@ public class Weathers implements ContentList{
             baseSpeed = 5.4f;
             attrs.set(Attribute.light, -0.1f);
             attrs.set(Attribute.water, -0.1f);
-            opacityMultiplier = 0.4f;
+            opacityMultiplier = 0.35f;
             force = 0.1f;
             sound = Sounds.wind;
             soundVol = 0.8f;
