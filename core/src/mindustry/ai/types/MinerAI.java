@@ -65,7 +65,7 @@ public class MinerAI extends AIController{
 
             if(unit.within(core, unit.type.range)){
                 if(core.acceptStack(unit.stack.item, unit.stack.amount, unit) > 0){
-                    Call.transferItemTo(unit.stack.item, unit.stack.amount, unit.x, unit.y, core);
+                    Call.transferItemTo(unit, unit.stack.item, unit.stack.amount, unit.x, unit.y, core);
                 }
 
                 unit.clearItem();

@@ -109,6 +109,13 @@ public class Logic implements ApplicationListener{
                 }
                 state.rules.waveTeam.rules().aiTier = state.getSector().threat * 0.8f;
                 state.rules.waveTeam.rules().infiniteResources = true;
+
+                //fill enemy cores by default.
+                for(var core : state.rules.waveTeam.cores()){
+                    for(Item item : content.items()){
+                        core.items.set(item, core.block.itemCapacity);
+                    }
+                }
             }
 
             //save settings
@@ -259,6 +266,8 @@ public class Logic implements ApplicationListener{
         state.rules.attackMode = false;
 
         if(state.rules.sector == null) return;
+
+        state.rules.sector.info.wasCaptured = true;
 
         //fire capture event
         Events.fire(new SectorCaptureEvent(state.rules.sector));

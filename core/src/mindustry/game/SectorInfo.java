@@ -33,6 +33,8 @@ public class SectorInfo{
     public int storageCapacity = 0;
     /** Whether a core is available here. */
     public boolean hasCore = true;
+    /** Whether this sector was ever fully captured. */
+    public boolean wasCaptured = false;
     /** Sector that was launched from. */
     public @Nullable Sector origin;
     /** Launch destination. */

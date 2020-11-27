@@ -6,7 +6,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
-import mindustry.io.legacy.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
@@ -26,13 +25,6 @@ public class Universe{
 
     public Universe(){
         load();
-
-        //load legacy research
-        Events.on(ClientLoadEvent.class, e -> {
-            if(Core.settings.has("unlocks")){
-                LegacyIO.readResearch();
-            }
-        });
 
         //update base coverage on capture
         Events.on(SectorCaptureEvent.class, e -> {
@@ -188,6 +180,7 @@ public class Universe{
                         }else if(attacked && wavesPassed > 0 && sector.info.winWave > 1 && sector.info.wave + wavesPassed >= sector.info.winWave && !sector.hasEnemyBase()){
                             //autocapture the sector
                             sector.info.waves = false;
+                            sector.info.wasCaptured = true;
 
                             //fire the event
                             Events.fire(new SectorCaptureEvent(sector));

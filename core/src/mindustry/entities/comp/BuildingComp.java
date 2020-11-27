@@ -435,7 +435,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     /** Handle a stack input. */
-    public void handleStack(Item item, int amount, Teamc source){
+    public void handleStack(Item item, int amount, @Nullable Teamc source){
         noSleep();
         items.add(item, amount);
     }
@@ -518,6 +518,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void dumpLiquid(Liquid liquid){
         int dump = this.cdump;
+
+        if(liquids.get(liquid) <= 0.0001f) return;
 
         if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) liquid.unlock();
 
@@ -970,31 +972,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             });
         }
 
-        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, Pal.darkFlame, state.rules.damageExplosions);
+        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, state.rules.damageExplosions);
 
         if(!floor().solid && !floor().isLiquid){
             Effect.rubble(x, y, block.size);
-        }
-    }
-
-    /**
-     * Returns the flammability of the  Used for fire calculations.
-     * Takes flammability of floor liquid into account.
-     */
-    public float getFlammability(){
-        if(!block.hasItems){
-            if(floor().isLiquid && !block.solid){
-                return floor().liquidDrop.flammability;
-            }
-            return 0;
-        }else{
-            float result = items.sum((item, amount) -> item.flammability * amount);
-
-            if(block.hasLiquids){
-                result += liquids.sum((liquid, amount) -> liquid.flammability * amount / 3f);
-            }
-
-            return result;
         }
     }
 

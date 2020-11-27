@@ -98,11 +98,11 @@ public class TechTree implements ContentList{
                                     node(platedConduit, () -> {
 
                                     });
-                                });
 
-                                node(rotaryPump, () -> {
-                                    node(thermalPump, () -> {
+                                    node(rotaryPump, () -> {
+                                        node(thermalPump, () -> {
 
+                                        });
                                     });
                                 });
                             });
@@ -422,7 +422,7 @@ public class TechTree implements ContentList{
 
                 node(additiveReconstructor, Seq.with(new SectorComplete(biomassFacility)), () -> {
                     node(multiplicativeReconstructor, () -> {
-                        node(exponentialReconstructor, () -> {
+                        node(exponentialReconstructor, Seq.with(new SectorComplete(overgrowth)), () -> {
                             node(tetrativeReconstructor, () -> {
                                 
                             });
