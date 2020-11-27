@@ -17,7 +17,9 @@ public class MoveBulletAbility extends Ability{
     //Length of the lightning
     public int length = 12;
     //Bullet of unit that he shoot
-    public BulletType bullet = Bullets.damageLightning;
+    public BulletType bulletType = Bullets.damageLightning;
+    //If you need lightning just write true
+    public boolean bullet = false;
     //If you need lightning just write true
     public boolean lightning = false;
     //Speeds for when to start lightninging and when to stop getting faster
@@ -30,30 +32,48 @@ public class MoveBulletAbility extends Ability{
     
     MoveBulletAbility(){}
     
-    public MoveBulletAbility(BulletType bullet, boolean lightning, Effect shootEffect, Sound shootSound, float damage, float chance, int length, float minSpeed, float maxSpeed, Color color){
+    public MoveBulletAbility(BulletType bulletType, boolean bullet, Effect shootEffect, Sound shootSound, float chance, float minSpeed, float maxSpeed, Color color){
+        this.bulletType = bulletType;
         this.bullet = bullet;
+        abilityStats(shootEffect, shootSound, chance, minSpeed, maxSpeed, color);
+    }
+
+    public MoveBulletAbility(boolean lightning, Effect shootEffect, Sound shootSound, float damage, float chance, int length, float minSpeed, float maxSpeed, Color color){
         this.lightning = lightning;
+        this.damage = damage;
+        this.length = length;
+        abilityStats(shootEffect, shootSound, chance, minSpeed, maxSpeed, color);
+    }
+
+    public MoveBulletAbility(BulletType bulletType, boolean bullet, boolean lightning, Effect shootEffect, Sound shootSound, float damage, float chance, int length, float minSpeed, float maxSpeed, Color color){
+        this.bulletType = bulletType;
+        this.lightning = lightning;
+        this.bullet = bullet;
+        this.damage = damage;
+        this.length = length;
+        abilityStats(shootEffect, shootSound, chance, minSpeed, maxSpeed, color);
+    }
+
+    public void abilityStats(Effect shootEffect, Sound shootSound, float chance, float minSpeed, float maxSpeed, Color color){
         this.shootEffect = shootEffect;
         this.shootSound = shootSound;
-        this.damage = damage;
         this.chance = chance;
-        this.length = length;
         this.minSpeed = minSpeed;
         this.maxSpeed = maxSpeed;
         this.color = color;
     }
-    
+
     @Override
     public void update(Unit unit){
         float scl = Mathf.clamp((unit.vel().len() - minSpeed) / (maxSpeed - minSpeed));
-        if(Mathf.chance(Time.delta * chance * scl)){
-            shootEffect.at(unit.x, unit.y, unit.rotation, color);
-            bullet.create(unit, unit.team, unit.x, unit.y, unit.rotation);
-            shootSound.at(unit);
-            if(lightning){
-                Fx.sparkShoot.at(unit.x, unit.y, unit.rotation, color);
+        if(Mathf.chance(Time.delta * scl * (chance * 2))){
+            if(bullet){
+                shootEffect.at(unit.x, unit.y, unit.rotation, color);
+                bulletType.create(unit, unit.team, unit.x, unit.y, unit.rotation);
+                shootSound.at(unit);
+            }
+            if(lightning && Mathf.chance(chance / 2)){
                 Lightning.create(unit.team, color, damage, unit.x + unit.vel.x, unit.y + unit.vel.y, unit.rotation, length);
-                Sounds.spark.at(unit);
             }
         }
     }
