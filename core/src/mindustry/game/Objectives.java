@@ -59,7 +59,7 @@ public class Objectives{
 
         @Override
         public boolean complete(){
-            return preset.sector.save != null && !preset.sector.isAttacked() && preset.sector.hasBase();
+            return preset.sector.save != null && (!preset.sector.isAttacked() || preset.sector.info.wasCaptured) && preset.sector.hasBase();
         }
 
         @Override

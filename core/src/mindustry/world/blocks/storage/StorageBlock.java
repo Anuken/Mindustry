@@ -58,6 +58,13 @@ public class StorageBlock extends Block{
         }
 
         @Override
+        public void itemTaken(Item item){
+            if(linkedCore != null){
+                linkedCore.itemTaken(item);
+            }
+        }
+
+        @Override
         public int getMaximumAccepted(Item item){
             return itemCapacity;
         }

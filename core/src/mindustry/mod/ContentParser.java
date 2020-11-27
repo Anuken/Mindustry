@@ -225,7 +225,7 @@ public class ContentParser{
             currentContent = block;
 
             read(() -> {
-                if(value.has("consumes")){
+                if(value.has("consumes") && value.get("consumes").isObject()){
                     for(JsonValue child : value.get("consumes")){
                         if(child.name.equals("item")){
                             block.consumes.item(find(ContentType.item, child.asString()));

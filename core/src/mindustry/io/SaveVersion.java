@@ -286,7 +286,8 @@ public abstract class SaveVersion extends SaveFileReader{
 
     public void writeEntities(DataOutput stream) throws IOException{
         //write team data with entities.
-        Seq<TeamData> data = state.teams.getActive().and(Team.sharded.data());
+        Seq<TeamData> data = state.teams.getActive().copy();
+        if(!data.contains(Team.sharded.data())) data.add(Team.sharded.data());
         stream.writeInt(data.size);
         for(TeamData team : data){
             stream.writeInt(team.team.id);
@@ -313,12 +314,23 @@ public abstract class SaveVersion extends SaveFileReader{
 
     public void readEntities(DataInput stream) throws IOException{
         int teamc = stream.readInt();
+
         for(int i = 0; i < teamc; i++){
             Team team = Team.get(stream.readInt());
             TeamData data = team.data();
             int blocks = stream.readInt();
+            data.blocks.clear();
+            data.blocks.ensureCapacity(Math.min(blocks, 1000));
+            var reads = Reads.get(stream);
+            var set = new IntSet();
+
             for(int j = 0; j < blocks; j++){
-                data.blocks.addLast(new BlockPlan(stream.readShort(), stream.readShort(), stream.readShort(), content.block(stream.readShort()).id, TypeIO.readObject(Reads.get(stream))));
+                short x = stream.readShort(), y = stream.readShort(), rot = stream.readShort(), bid = stream.readShort();
+                var obj = TypeIO.readObject(reads);
+                //cannot have two in the same position
+                if(set.add(Point2.pack(x, y))){
+                    data.blocks.addLast(new BlockPlan(x, y, rot, content.block(bid).id, obj));
+                }
             }
         }
 

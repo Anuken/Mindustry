@@ -56,6 +56,11 @@ public class LaunchPad extends Block{
         bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
     }
 
+    @Override
+    public boolean outputsItems(){
+        return false;
+    }
+
     public class LaunchPadBuild extends Building{
 
         @Override

@@ -23,6 +23,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.input.*;
+import mindustry.io.legacy.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -140,6 +141,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             return this;
         }
 
+        //load legacy research
+        if(Core.settings.has("unlocks") && !Core.settings.has("junction-unlocked")){
+            Core.app.post(() -> {
+                ui.showCustomConfirm("@research", "@research.legacy", "@research.load", "@research.discard", LegacyIO::readResearch, () -> Core.settings.remove("unlocks"));
+            });
+        }
+
+        rebuildButtons();
         mode = look;
         selected = hovered = launchSector = null;
         launching = false;
@@ -553,7 +562,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                 if(t.getChildren().any()){
                     c.add(name).left().row();
-                    c.add(t).padLeft(10f).row();
+                    c.add(t).padLeft(10f).left().row();
                 }
             };
 

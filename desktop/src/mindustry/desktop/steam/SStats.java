@@ -65,13 +65,6 @@ public class SStats implements SteamUserStatsCallback{
                  active10Polys.complete();
             }
 
-            tmpSet.clear();
-            tmpSet.addAll(t5s);
-            Groups.unit.each(u -> tmpSet.remove(u.type));
-            if(tmpSet.size == 0){
-                activeAllT5.complete();
-            }
-
             for(Building entity : player.team().cores()){
                 if(!content.items().contains(i -> entity.items.get(i) < entity.block.itemCapacity)){
                     fillCoreAllCampaign.complete();
@@ -141,7 +134,7 @@ public class SStats implements SteamUserStatsCallback{
 
                 if(blocksBuilt.add(e.tile.block().name)){
                     if(blocksBuilt.contains("meltdown") && blocksBuilt.contains("spectre") && blocksBuilt.contains("foreshadow")){
-                        buildMeltdownSpectreForeshadow.complete();
+                        buildMeltdownSpectre.complete();
                     }
 
                     save();
@@ -214,6 +207,8 @@ public class SStats implements SteamUserStatsCallback{
                 drown.complete();
             }
         });
+
+        trigger(Trigger.acceleratorUse, useAccelerator);
 
         trigger(Trigger.impactPower, powerupImpactReactor);
 

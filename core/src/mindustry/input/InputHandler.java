@@ -47,6 +47,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Maximum line length. */
     final static int maxLength = 100;
     final static Rect r1 = new Rect(), r2 = new Rect();
+    final static Seq<Point2> tmpPoints = new Seq<>(), tmpPoints2 = new Seq<>();
 
     public final OverlayFragment frag = new OverlayFragment();
 
@@ -95,18 +96,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void transferItemTo(Item item, int amount, float x, float y, Building build){
+    public static void setItem(Building build, Item item, int amount){
         if(build == null || build.items == null) return;
-        for(int i = 0; i < Mathf.clamp(amount / 5, 1, 8); i++){
-            Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
-        }
-        build.items.add(item, amount);
+        build.items.set(item, amount);
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void transferItemTo(Unit unit, Item item, int amount, float x, float y, Building build){
+    public static void transferItemTo(@Nullable Unit unit, Item item, int amount, float x, float y, Building build){
         if(build == null || build.items == null) return;
-        unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
+
+        if(unit != null) unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
+
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
             Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
         }
@@ -1164,27 +1164,39 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             points = Placement.normalizeLine(startX, startY, endX, endY);
         }
 
-        if(block instanceof PowerNode){
-            Seq<Point2> skip = new Seq<>();
+        if(block instanceof PowerNode node){
+            var base = tmpPoints2;
+            var result = tmpPoints.clear();
 
-            for(int i = 1; i < points.size; i++){
-                int overlaps = 0;
-                Point2 point = points.get(i);
+            base.selectFrom(points, p -> p == points.first() || p == points.peek() || Build.validPlace(block, player.team(), p.x, p.y, rotation, false));
+            boolean addedLast = false;
 
-                //check with how many powernodes the *next* tile will overlap
-                for(int j = 0; j < i; j++){
-                    if(!skip.contains(points.get(j)) && ((PowerNode)block).overlaps(world.tile(point.x, point.y), world.tile(points.get(j).x, points.get(j).y))){
-                        overlaps++;
+            outer:
+            for(int i = 0; i < base.size;){
+                var point = base.get(i);
+                result.add(point);
+                if(i == base.size - 1) addedLast = true;
+
+                //find the furthest node that overlaps this one
+                for(int j = base.size - 1; j > i; j--){
+                    var other = base.get(j);
+                    boolean over = node.overlaps(world.tile(point.x, point.y), world.tile(other.x, other.y));
+
+                    if(over){
+                        //add node to list and start searching for node that overlaps the next one
+                        i = j;
+                        continue outer;
                     }
                 }
 
-                //if it's more than one, it can bridge the gap
-                if(overlaps > 1){
-                    skip.add(points.get(i-1));
-                }
+                //if it got here, that means nothing was found. try to proceed to the next node anyway
+                i ++;
             }
-            //remove skipped points
-            points.removeAll(skip);
+
+            if(!addedLast) result.add(base.peek());
+
+            points.clear();
+            points.addAll(result);
         }
 
         float angle = Angles.angle(startX, startY, endX, endY);

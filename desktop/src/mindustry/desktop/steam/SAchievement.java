@@ -3,8 +3,7 @@ package mindustry.desktop.steam;
 public enum SAchievement{
     kill1kEnemies(SStat.unitsDestroyed, 1000),
     kill100kEnemies(SStat.unitsDestroyed, 100_000),
-    launch10kItems(SStat.itemsLaunched, 10_000),
-    launch1milItems(SStat.itemsLaunched, 1_000_000),
+    launch100kItems(SStat.itemsLaunched, 100_000),
 
     produce1kMin(SStat.maxProduction, 1000),
     produce20kMin(SStat.maxProduction, 20_000),
@@ -14,11 +13,7 @@ public enum SAchievement{
     launch30Times(SStat.timesLaunched, 30),
     captureBackground,
     survive100Waves(SStat.maxWavesSurvived, 100),
-    //this seems near-impossible?
-    //survive500Waves(SStat.maxWavesSurvived, 500),
     researchAll,
-    //TODO
-    //useAllUnits,
     shockWetEnemy,
     killEnemyPhaseWall,
     researchRouter,
@@ -43,13 +38,12 @@ public enum SAchievement{
     buildAllUnits(SStat.unitTypesBuilt, 30),
     buildT5,
     pickupT5,
-    activeAllT5,
     active10Polys,
     dieExclusion,
     drown,
     fillCoreAllCampaign,
     hostServer10(SStat.maxPlayersServer, 10),
-    buildMeltdownSpectreForeshadow,
+    buildMeltdownSpectre, //technically inaccurate
     launchItemPad,
     chainRouters,
     circleConveyor,
@@ -61,6 +55,8 @@ public enum SAchievement{
     coolTurret,
     enablePixelation,
     openWiki,
+    useAccelerator,
+
     ;
 
     private final SStat stat;

@@ -40,6 +40,7 @@ public abstract class Turret extends ReloadTurret{
     public Effect ammoUseEffect = Fx.none;
     public Sound shootSound = Sounds.shoot;
 
+    //general info
     public int maxAmmo = 30;
     public int ammoPerShot = 1;
     public float ammoEjectBack = 1f;
@@ -60,6 +61,14 @@ public abstract class Turret extends ReloadTurret{
     public boolean alternate = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
+
+    //charging
+    public float chargeTime = -1f;
+    public int chargeEffects = 5;
+    public float chargeMaxDelay = 10f;
+    public Effect chargeEffect = Fx.none;
+    public Effect chargeBeginEffect = Fx.none;
+    public Sound chargeSound = Sounds.none;
 
     public Sortf unitSort = Unit::dst2;
 
@@ -136,7 +145,7 @@ public abstract class Turret extends ReloadTurret{
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
         public BlockUnitc unit = Nulls.blockUnit;
-        public boolean wasShooting;
+        public boolean wasShooting, charging;
 
         @Override
         public void created(){
@@ -196,7 +205,7 @@ public abstract class Turret extends ReloadTurret{
         }
 
         public boolean isActive(){
-            return target != null || (logicControlled() && logicShooting) || (isControlled() && unit.isShooting());
+            return target != null || wasShooting;
         }
 
         public void targetPosition(Posc pos){
@@ -313,7 +322,7 @@ public abstract class Turret extends ReloadTurret{
         }
 
         public boolean shouldTurn(){
-            return true;
+            return !charging;
         }
 
         /** Consume ammo and return a type. */
@@ -352,11 +361,37 @@ public abstract class Turret extends ReloadTurret{
         }
 
         protected void shoot(BulletType type){
-            recoil = recoilAmount;
-            heat = 1f;
 
-            //when burst spacing is enabled, use the burst pattern
-            if(burstSpacing > 0.0001f){
+            //when charging is enabled, use the charge shoot pattern
+            if(chargeTime > 0){
+                useAmmo();
+
+                tr.trns(rotation, size * tilesize / 2f);
+                chargeBeginEffect.at(x + tr.x, y + tr.y, rotation);
+                chargeSound.at(x + tr.x, y + tr.y, 1);
+
+                for(int i = 0; i < chargeEffects; i++){
+                    Time.run(Mathf.random(chargeMaxDelay), () -> {
+                        if(!isValid()) return;
+                        tr.trns(rotation, size * tilesize / 2f);
+                        chargeEffect.at(x + tr.x, y + tr.y, rotation);
+                    });
+                }
+
+                charging = true;
+
+                Time.run(chargeTime, () -> {
+                    if(!isValid()) return;
+                    tr.trns(rotation, size * tilesize / 2f);
+                    recoil = recoilAmount;
+                    heat = 1f;
+                    bullet(type, rotation + Mathf.range(inaccuracy));
+                    effects();
+                    charging = false;
+                });
+
+                //when burst spacing is enabled, use the burst pattern
+            }else if(burstSpacing > 0.0001f){
                 for(int i = 0; i < shots; i++){
                     Time.run(burstSpacing * i, () -> {
                         if(!isValid() || !hasAmmo()) return;
@@ -367,6 +402,8 @@ public abstract class Turret extends ReloadTurret{
                         bullet(type, rotation + Mathf.range(inaccuracy));
                         effects();
                         useAmmo();
+                        recoil = recoilAmount;
+                        heat = 1f;
                     });
                 }
 
@@ -388,6 +425,8 @@ public abstract class Turret extends ReloadTurret{
 
                 shotCounter++;
 
+                recoil = recoilAmount;
+                heat = 1f;
                 effects();
                 useAmmo();
             }

@@ -21,7 +21,7 @@ import mindustry.world.blocks.storage.*;
 import static mindustry.Vars.*;
 
 public class SectorDamage{
-    public static final int maxRetWave = 30, maxWavesSimulated = 50;
+    public static final int maxRetWave = 40, maxWavesSimulated = 50;
 
     //direct damage is for testing only
     private static final boolean direct = false, rubble = true;
@@ -338,9 +338,9 @@ public class SectorDamage{
         info.waveDpsSlope = reg.slope;
 
         //enemy units like to aim for a lot of non-essential things, so increase resulting health slightly
-        info.sumHealth = sumHealth * 1.2f;
+        info.sumHealth = sumHealth * 1.05f;
         //players tend to have longer range units/turrets, so assume DPS is higher
-        info.sumDps = sumDps * 1.2f;
+        info.sumDps = sumDps * 1.05f;
         info.sumRps = sumRps;
 
         info.wavesSurvived = getWavesSurvived(info);
@@ -356,7 +356,7 @@ public class SectorDamage{
         for(Tile tile : tiles){
             if((tile.block() instanceof CoreBlock && tile.team() == state.rules.waveTeam) || tile.overlay() == Blocks.spawn){
                 frontier.add(tile);
-                values[tile.x][tile.y] = fraction * 23;
+                values[tile.x][tile.y] = fraction * 26;
             }
         }
 
