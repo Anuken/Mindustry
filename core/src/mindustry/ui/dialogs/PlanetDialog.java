@@ -562,7 +562,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                 if(t.getChildren().any()){
                     c.add(name).left().row();
-                    c.add(t).padLeft(10f).row();
+                    c.add(t).padLeft(10f).left().row();
                 }
             };
 
