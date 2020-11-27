@@ -23,6 +23,7 @@ public class Router extends Block{
         noUpdateDisabled = true;
     }
 
+    @Override
     public boolean canReplace(Block other){
         if(other.alwaysReplace) return true;
         return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group;
