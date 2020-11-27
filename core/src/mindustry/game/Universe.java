@@ -180,6 +180,7 @@ public class Universe{
                         }else if(attacked && wavesPassed > 0 && sector.info.winWave > 1 && sector.info.wave + wavesPassed >= sector.info.winWave && !sector.hasEnemyBase()){
                             //autocapture the sector
                             sector.info.waves = false;
+                            sector.info.wasCaptured = true;
 
                             //fire the event
                             Events.fire(new SectorCaptureEvent(sector));

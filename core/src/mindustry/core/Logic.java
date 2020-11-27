@@ -267,6 +267,8 @@ public class Logic implements ApplicationListener{
 
         if(state.rules.sector == null) return;
 
+        state.rules.sector.info.wasCaptured = true;
+
         //fire capture event
         Events.fire(new SectorCaptureEvent(state.rules.sector));
 
