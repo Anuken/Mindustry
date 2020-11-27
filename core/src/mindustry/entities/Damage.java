@@ -33,11 +33,11 @@ public class Damage{
 
     /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage){
-        dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, true);
+        dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, true, null);
     }
 
     /** Creates a dynamic explosion based on specified parameters. */
-    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire){
+    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam){
         if(damage){
             for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
                 int branches = 5 + Mathf.clamp((int)(power / 30), 1, 20);
@@ -55,7 +55,7 @@ public class Damage{
             for(int i = 0; i < waves; i++){
                 int f = i;
                 Time.run(i * 2f, () -> {
-                    Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f);
+                    Damage.damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f, false);
                     Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
                 });
             }

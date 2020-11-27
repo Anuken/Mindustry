@@ -401,7 +401,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         float flammability = item().flammability * stack().amount / 1.9f;
 
         if(!spawnedByCore){
-            Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, state.rules.damageExplosions, item().flammability > 1);
+            Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, state.rules.damageExplosions, item().flammability > 1, team);
         }
 
         float shake = hitSize / 3f;
