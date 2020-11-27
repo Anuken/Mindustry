@@ -88,7 +88,7 @@ public class SectorPresets implements ContentList{
         }};
 
         nuclearComplex = new SectorPreset("nuclearComplex", serpulo, 130){{
-            captureWave = 50;
+            captureWave = 45;
             difficulty = 7;
         }};
 
