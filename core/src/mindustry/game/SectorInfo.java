@@ -71,7 +71,9 @@ public class SectorInfo{
     public boolean shown = false;
 
     /** Special variables for simulation. */
-    public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope;
+    public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope, bossHealth, bossDps;
+    /** Wave where first boss shows up. */
+    public int bossWave = -1;
 
     /** Counter refresh state. */
     private transient Interval time = new Interval();

@@ -336,6 +336,8 @@ public class Control implements ApplicationListener, Loadable{
                         state.wavetime = state.rules.waveSpacing * 2f;
                         //reset captured state
                         sector.info.wasCaptured = false;
+                        //re-enable waves
+                        state.rules.waves = true;
 
                         //reset win wave??
                         state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null ? sector.preset.captureWave : 40;
