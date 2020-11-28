@@ -1557,7 +1557,7 @@ public class Blocks implements ContentList{
                     damage = 12;
                     instantDisappear = true;
                     despawnEffect = Fx.none;
-                    hitEffect = Fx.hitLancer;
+                    hitEffect = Fx.none;
                     lightningLength = 4;
                     lightningLengthRand = 4;
                     lightningCone = 90;
