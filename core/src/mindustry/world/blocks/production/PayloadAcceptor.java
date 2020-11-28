@@ -138,7 +138,6 @@ public class PayloadAcceptor extends Block{
             }
         }
 
-
         public void dumpPayload(){
             if(payload.dump()){
                 payload = null;
