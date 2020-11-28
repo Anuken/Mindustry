@@ -11,7 +11,6 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
-import static arc.util.Timer.post;
 import static mindustry.Vars.*;
 
 public class PayloadAcceptor extends Block{
