@@ -21,7 +21,7 @@ public class WeaponListValue implements StatValue{
     @Override
     public void display(Table table){
         table.row();
-        for(int i = 0;i < weapons.size;i ++){
+        for(int i = 0; i < weapons.size;i ++){
             Weapon weapon = weapons.get(i);
 
             if(weapon.flipSprite){
@@ -29,7 +29,7 @@ public class WeaponListValue implements StatValue{
                 continue;
             }
 
-            TextureRegion region = weapon.outlineRegion.found() ? weapon.outlineRegion : unit.icon(Cicon.full);
+            TextureRegion region = !weapon.name.equals("") && weapon.outlineRegion.found() ? weapon.outlineRegion : unit.icon(Cicon.full);
 
             table.image(region).size(60).scaling(Scaling.bounded).right().top();
 
