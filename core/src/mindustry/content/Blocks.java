@@ -1552,11 +1552,15 @@ public class Blocks implements ContentList{
                 damage = 20;
                 lightningLength = 25;
                 collidesAir = false;
-                lightningTypeChance = 0.07f;
-                lightningType = new LightningBulletType(){{
+                lightningTypeChance = 0.05f;
+                lightningType = new BulletType(){{
                     damage = 12;
+                    instantDisappear = true;
                     lightningLength = 4;
                     lightningLengthRand = 4;
+                    lightningCone = 45;
+                    lightningColor = Pal.lancerLaser;
+                    lightning = 1;
                     collidesAir = false;                    
                 }};
             }};
