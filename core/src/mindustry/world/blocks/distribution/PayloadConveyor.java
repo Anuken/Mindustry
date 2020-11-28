@@ -237,7 +237,7 @@ public class PayloadConveyor extends Block{
         @Override
         public void onRemoved(){
             super.onRemoved();
-            if (item != null) item.dump();
+            if(item != null) item.dump();
         }
 
         @Override
