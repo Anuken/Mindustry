@@ -26,7 +26,7 @@ public class Router extends Block{
     @Override
     public boolean canReplace(Block other){
         if(other.alwaysReplace) return true;
-        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group;
+        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && size >= other.size;
     }
 
     public class RouterBuild extends Building implements ControlBlock{
