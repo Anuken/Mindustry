@@ -44,7 +44,7 @@ public class Pathfinder implements Runnable{
 
     public static final Seq<PathCost> costTypes = Seq.with(
         //ground
-        (team, tile) -> (PathTile.team(tile) == team.id || PathTile.team(tile) == 0) && PathTile.isWalkable(tile) ? 1 : -1,
+        (team, tile) -> (PathTile.isWalkable(tile) ? 1 : -1) + (PathTile.isAcceptable(tile) ? 1 : 0),
 
         //legs
         (team, tile) -> PathTile.legSolid(tile) ? impassable : 1 +
@@ -69,8 +69,6 @@ public class Pathfinder implements Runnable{
     /** Current pathfinding thread */
     @Nullable Thread thread;
     IntSeq tmpArray = new IntSeq();
-
-    Floor walkableBlock = (Floor) Blocks.snow;
 
     public Pathfinder(){
         clearCache();
@@ -139,7 +137,8 @@ public class Pathfinder implements Runnable{
             nearSolid,
             tile.floor().isDeep(),
             tile.floor().damageTaken > 0.00001f,
-                tile.floor() == walkableBlock
+                tile.floor() == Blocks.darkPanel5,
+                tile.floor() == Blocks.darkPanel4;
         );
     }
 
@@ -529,5 +528,7 @@ public class Pathfinder implements Runnable{
         boolean damages;
         //whether the floor is walkable on (tower defense)
         boolean isWalkable;
+        //whether the floor is acceptable (tower defense)
+        boolean isAcceptable;
     }
 }
