@@ -1556,9 +1556,11 @@ public class Blocks implements ContentList{
                 lightningType = new BulletType(){{
                     damage = 12;
                     instantDisappear = true;
+                    despawnEffect = Fx.none;
+                    hitEffect = Fx.hitLancer;
                     lightningLength = 4;
                     lightningLengthRand = 4;
-                    lightningCone = 45;
+                    lightningCone = 90;
                     lightningColor = Pal.lancerLaser;
                     lightning = 1;
                     collidesAir = false;                    
