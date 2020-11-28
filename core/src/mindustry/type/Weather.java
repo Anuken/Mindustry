@@ -262,7 +262,7 @@ public abstract class Weather extends UnlockableContent{
 
         /** Creates a weather entry with some approximate weather values. */
         public WeatherEntry(Weather weather){
-            this(weather, weather.duration * 3f, weather.duration * 6f, weather.duration / 2f, weather.duration * 1.5f);
+            this(weather, weather.duration * 2f, weather.duration * 6f, weather.duration / 2f, weather.duration * 1.5f);
         }
 
         public WeatherEntry(Weather weather, float minFrequency, float maxFrequency, float minDuration, float maxDuration){

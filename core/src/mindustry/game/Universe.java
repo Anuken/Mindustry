@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
+import mindustry.game.SectorInfo.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
@@ -198,6 +199,13 @@ public class Universe{
                                 to.addItems(items);
                             }
                         }
+
+                        sector.info.export.each((item, amount) -> {
+                            if(sector.info.items.get(item) <= 0 && sector.info.production.get(item, ExportStat::new).mean <= 0){
+                                //disable export when production is negative.
+                                sector.info.export.get(item).mean = 0f;
+                            }
+                        });
 
                         //add production, making sure that it's capped
                         sector.info.production.each((item, stat) -> sector.info.items.add(item, Math.min((int)(stat.mean * newSecondsPassed * scl), sector.info.storageCapacity - sector.info.items.get(item))));
