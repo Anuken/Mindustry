@@ -104,7 +104,7 @@ public class Fonts{
     }
 
     public static void setIcon(String name, int ch, TextureRegion region){
-        //ensure that modded icons don't interfere with existing ones; put them arter vanilla
+        //ensure that modded icons don't interfere with existing ones; put them after vanilla
         if(ch > biggestIconId){
             biggestIconId = ch;
         }
