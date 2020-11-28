@@ -83,13 +83,13 @@ public class PayloadAcceptor extends Block{
         }
 
         @Override
-        public void onDestroyed() {
+        public void onDestroyed(){
             super.onDestroyed();
             if (payload != null) payload.dump();
         }
 
         @Override
-        public void onRemoved() {
+        public void onRemoved(){
             super.onRemoved();
             if (payload != null) payload.dump();
         }
