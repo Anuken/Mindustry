@@ -135,8 +135,8 @@ public class Logic implements ApplicationListener{
                     //convert all blocks to neutral, randomly killing them
                     if(tile.isCenter() && tile.build != null && tile.build.team == state.rules.waveTeam){
                         Building b = tile.build;
+                        Call.setTeam(b, Team.derelict);
                         Time.run(Mathf.random(0f, 60f * 6f), () -> {
-                            Call.setTeam(b, Team.derelict);
                             if(Mathf.chance(0.25)){
                                 b.kill();
                             }
