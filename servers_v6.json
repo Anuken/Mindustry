@@ -3,6 +3,10 @@
     "name": "mindustry.pl",
     "address": ["mindustry.pl:6000", "mindustry.pl:6666"]
   },
+   {
+    "name": "Atanner",
+    "address": ["atannergaming.com:13000"]
+  },
   {
     "name": "C.A.M.S.",
     "address": ["routerchain.ddns.net", "pandorum.su:8000"]
