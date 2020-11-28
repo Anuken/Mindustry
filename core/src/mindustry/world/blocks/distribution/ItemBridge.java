@@ -93,7 +93,7 @@ public class ItemBridge extends Block{
         Draw.reset();
         Draw.color(Pal.placing);
         Lines.stroke(1f);
-        if(link != null){
+        if(link != null && Math.abs(link.x - x) + Math.abs(link.y - y) > 1){
             int rot = link.absoluteRelativeTo(x, y);
             float w = (link.x == x ? tilesize : Math.abs(link.x - x) * tilesize - tilesize);
             float h = (link.y == y ? tilesize : Math.abs(link.y - y) * tilesize - tilesize);
@@ -145,7 +145,7 @@ public class ItemBridge extends Block{
             if(config != null) return;
 
             Tile link = findLink(tile.x, tile.y);
-            if(linkValid(tile, link)){
+            if(linkValid(tile, link) && !proximity.contains(link.build)){
                 link.build.configure(tile.pos());
             }
 

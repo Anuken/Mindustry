@@ -78,6 +78,9 @@ public class Bar extends Element{
             lastValue = computed;
         }
 
+        if(Float.isNaN(computed)) computed = 0;
+        if(Float.isInfinite(computed)) computed = 1f;
+
         blink = Mathf.lerpDelta(blink, 0f, 0.2f);
         value = Mathf.lerpDelta(value, computed, 0.15f);
 

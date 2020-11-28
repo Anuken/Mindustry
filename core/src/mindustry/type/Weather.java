@@ -21,7 +21,7 @@ import static mindustry.Vars.*;
 
 public abstract class Weather extends UnlockableContent{
     /** Default duration of this weather event in ticks. */
-    public float duration = 9f * Time.toMinutes;
+    public float duration = 10f * Time.toMinutes;
     public float opacityMultiplier = 1f;
     public Attributes attrs = new Attributes();
     public Sound sound = Sounds.none;
@@ -262,7 +262,7 @@ public abstract class Weather extends UnlockableContent{
 
         /** Creates a weather entry with some approximate weather values. */
         public WeatherEntry(Weather weather){
-            this(weather, weather.duration * 3f, weather.duration * 6f, weather.duration / 2f, weather.duration * 1.5f);
+            this(weather, weather.duration * 2f, weather.duration * 6f, weather.duration / 2f, weather.duration * 1.5f);
         }
 
         public WeatherEntry(Weather weather, float minFrequency, float maxFrequency, float minDuration, float maxDuration){

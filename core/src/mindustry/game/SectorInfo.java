@@ -33,6 +33,8 @@ public class SectorInfo{
     public int storageCapacity = 0;
     /** Whether a core is available here. */
     public boolean hasCore = true;
+    /** Whether this sector was ever fully captured. */
+    public boolean wasCaptured = false;
     /** Sector that was launched from. */
     public @Nullable Sector origin;
     /** Launch destination. */
@@ -69,7 +71,9 @@ public class SectorInfo{
     public boolean shown = false;
 
     /** Special variables for simulation. */
-    public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope;
+    public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope, bossHealth, bossDps;
+    /** Wave where first boss shows up. */
+    public int bossWave = -1;
 
     /** Counter refresh state. */
     private transient Interval time = new Interval();
