@@ -1252,8 +1252,8 @@ public class UnitTypes implements ContentList{
 
             mineTier = 3;
             mineSpeed = 4f;
-            health = 500;
-            armor = 5f;
+            health = 460;
+            armor = 3f;
             speed = 2.5f;
             accel = 0.06f;
             drag = 0.017f;

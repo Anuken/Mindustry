@@ -3,6 +3,10 @@
     "name": "mindustry.pl",
     "address": ["mindustry.pl:6000", "mindustry.pl:6666"]
   },
+   {
+    "name": "Atanner",
+    "address": ["atannergaming.com:13000"]
+  },
   {
     "name": "C.A.M.S.",
     "address": ["routerchain.ddns.net", "pandorum.su:8000"]
@@ -14,6 +18,10 @@
   {
     "name": "Chaotic Neutral",
     "address": ["Chaotic-Neutral.ddns.net:5555", "Chaotic-Neutral.ddns.net:6666"]
+  },
+  {
+    "name": "Ranked",
+    "address": ["mindustryranked.ddns.net:16567"]
   },
   {
     "address": "cheginde.ddns.net"

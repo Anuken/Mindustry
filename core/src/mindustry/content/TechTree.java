@@ -471,7 +471,8 @@ public class TechTree implements ContentList{
                                         node(desolateRift, Seq.with(
                                             new SectorComplete(impact0078),
                                             new Research(thermalGenerator),
-                                            new Research(thoriumReactor)
+                                            new Research(thoriumReactor),
+                                            new Research(coreNucleus)
                                         ), () -> {
                                             node(planetaryTerminal, Seq.with(
                                                 new SectorComplete(desolateRift),
