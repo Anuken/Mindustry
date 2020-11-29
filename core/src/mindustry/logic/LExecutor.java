@@ -782,14 +782,6 @@ public class LExecutor{
         }
     }
 
-    public static class EndI implements LInstruction{
-
-        @Override
-        public void run(LExecutor exec){
-            exec.vars[varCounter].numval = exec.instructions.length;
-        }
-    }
-
     public static class NoopI implements LInstruction{
         @Override
         public void run(LExecutor exec){}

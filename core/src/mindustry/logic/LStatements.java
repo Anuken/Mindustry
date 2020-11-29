@@ -644,7 +644,8 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new EndI();
+            //jump to the first line
+            return new JumpI(ConditionOp.always, 0, 0, 0);
         }
 
         @Override
