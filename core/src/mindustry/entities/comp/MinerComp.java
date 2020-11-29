@@ -55,7 +55,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
         if(core != null && mineTile != null && mineTile.drop() != null && !acceptsItem(mineTile.drop()) && within(core, mineTransferRange) && !offloadImmediately()){
             int accepted = core.acceptStack(item(), stack().amount, this);
             if(accepted > 0){
-                Call.transferItemTo(item(), accepted,
+                Call.transferItemTo(self(), item(), accepted,
                 mineTile.worldx() + Mathf.range(tilesize / 2f),
                 mineTile.worldy() + Mathf.range(tilesize / 2f), core);
                 clearItem();
@@ -76,8 +76,12 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
             if(mineTimer >= 50f + item.hardness*15f){
                 mineTimer = 0;
 
+                if(state.rules.sector != null && team() == state.rules.defaultTeam) state.rules.sector.info.handleProduction(item, 1);
+
                 if(core != null && within(core, mineTransferRange) && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
-                    Call.transferItemTo(item, 1,
+                    //add item to inventory before it is transferred
+                    if(item() == item) addItem(item);
+                    Call.transferItemTo(self(), item, 1,
                     mineTile.worldx() + Mathf.range(tilesize / 2f),
                     mineTile.worldy() + Mathf.range(tilesize / 2f), core);
                 }else if(acceptsItem(item)){

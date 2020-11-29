@@ -4,7 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import mindustry.world.*;
 
-/**A type of floor that is overlaid on top of over floors.*/
+/**A type of floor that is overlaid on top of other floors.*/
 public class OverlayFloor extends Floor{
 
     public OverlayFloor(String name){

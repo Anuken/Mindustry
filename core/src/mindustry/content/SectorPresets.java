@@ -83,7 +83,7 @@ public class SectorPresets implements ContentList{
         }};
 
         desolateRift = new SectorPreset("desolateRift", serpulo, 123){{
-            captureWave = 30;
+            captureWave = 18;
             difficulty = 8;
         }};
 

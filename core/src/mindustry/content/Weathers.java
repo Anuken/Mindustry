@@ -53,10 +53,11 @@ public class Weathers implements ContentList{
             baseSpeed = 5.4f;
             attrs.set(Attribute.light, -0.1f);
             attrs.set(Attribute.water, -0.1f);
-            opacityMultiplier = 0.5f;
+            opacityMultiplier = 0.35f;
             force = 0.1f;
             sound = Sounds.wind;
-            soundVol = 0.3f;
+            soundVol = 0.8f;
+            duration = 7f * Time.toMinutes;
         }};
 
         sporestorm = new ParticleWeather("sporestorm"){{
@@ -77,7 +78,8 @@ public class Weathers implements ContentList{
             opacityMultiplier = 0.75f;
             force = 0.1f;
             sound = Sounds.wind;
-            soundVol = 0.3f;
+            soundVol = 0.7f;
+            duration = 7f * Time.toMinutes;
         }};
 
         fog = new ParticleWeather("fog"){{

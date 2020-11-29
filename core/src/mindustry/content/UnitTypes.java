@@ -268,7 +268,7 @@ public class UnitTypes implements ContentList{
 
             mineTier = 2;
             mineSpeed = 5f;
-            commandLimit = 8;
+            commandLimit = 9;
 
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 5, 60f));
             ammoType = AmmoTypes.power;
@@ -508,7 +508,7 @@ public class UnitTypes implements ContentList{
             drag = 0.4f;
             hitSize = 12f;
             rotateSpeed = 3f;
-            health = 800;
+            health = 900;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
             legCount = 6;
             legLength = 13f;
@@ -725,7 +725,7 @@ public class UnitTypes implements ContentList{
 
         zenith = new UnitType("zenith"){{
             health = 700;
-            speed = 1.7f;
+            speed = 1.8f;
             accel = 0.04f;
             drag = 0.016f;
             flying = true;
@@ -898,8 +898,8 @@ public class UnitTypes implements ContentList{
 
             mineTier = 3;
             mineSpeed = 4f;
-            health = 500;
-            armor = 5f;
+            health = 460;
+            armor = 3f;
             speed = 2.5f;
             accel = 0.06f;
             drag = 0.017f;
@@ -911,6 +911,7 @@ public class UnitTypes implements ContentList{
             engineSize = 3f;
             payloadCapacity = (2 * 2) * tilePayload;
             buildSpeed = 2.6f;
+            isCounted = false;
 
             ammoType = AmmoTypes.power;
 
