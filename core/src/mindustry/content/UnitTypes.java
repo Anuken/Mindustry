@@ -1034,6 +1034,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 3.3f;
             trailLength = 20;
             rotateShooting = false;
+            swimming = true;
 
             armor = 2f;
 
@@ -1067,6 +1068,7 @@ public class UnitTypes implements ContentList{
             accel = 0.3f;
             rotateSpeed = 2.6f;
             rotateShooting = false;
+            swimming = true;
 
             trailLength = 20;
             trailX = 5.5f;
@@ -1105,6 +1107,7 @@ public class UnitTypes implements ContentList{
             hitSize = 16f;
             armor = 7f;
             rotateShooting = false;
+            swimming = true;
 
             trailLength = 22;
             trailX = 7f;
@@ -1137,6 +1140,7 @@ public class UnitTypes implements ContentList{
         sei = new UnitType("sei"){{
             health = 10000;
             armor = 12f;
+            swimming = true;
 
             speed = 0.73f;
             drag = 0.17f;
@@ -1173,6 +1177,7 @@ public class UnitTypes implements ContentList{
 
         omura = new UnitType("omura"){{
             health = 22000;
+            swimming = true;
             speed = 0.62f;
             drag = 0.18f;
             hitSize = 50f;

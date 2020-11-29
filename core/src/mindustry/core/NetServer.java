@@ -471,6 +471,11 @@ public class NetServer implements ApplicationListener{
                 netServer.sendWorldData(player);
             }
         });
+
+        clientCommands.<Player>register("hud", "Toggle viewing resource & other elements on screen.", (args, player) -> {
+            player.showHud = !player.showHud;
+            player.sendMessage("[accent]Toggled resources HUD.");
+        });
     }
 
     public int votesRequired(){

@@ -14,6 +14,8 @@ import static mindustry.Vars.*;
 public class GameState{
     /** Current wave number, can be anything in non-wave modes. */
     public int wave = 1;
+    public float multiplier = 1f;
+    public Building core;
     /** Wave countdown in ticks. */
     public float wavetime;
     /** Whether the game is in game over state. */

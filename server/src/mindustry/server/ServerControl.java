@@ -2,6 +2,7 @@ package mindustry.server;
 
 import arc.*;
 import arc.files.*;
+import arc.math.Mathf;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Timer;
@@ -9,6 +10,7 @@ import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
+import mindustry.ai.BlockIndexer;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
@@ -23,6 +25,8 @@ import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.net.*;
 import mindustry.type.*;
+import mindustry.world.Tile;
+import mindustry.world.blocks.storage.CoreBlock;
 
 import java.io.*;
 import java.net.*;
@@ -56,6 +60,10 @@ public class ServerControl implements ApplicationListener{
     private ServerSocket serverSocket;
     private PrintWriter socketOutput;
     private String suggested;
+
+    String getTrafficlightColor(double value){
+        return "#"+Integer.toHexString(java.awt.Color.HSBtoRGB((float)value/3f, 1f, 1f)).substring(2);
+    }
 
     public ServerControl(String[] args){
         setup(args);
@@ -162,6 +170,8 @@ public class ServerControl implements ApplicationListener{
 
         Events.on(GameOverEvent.class, event -> {
             if(inExtraRound) return;
+
+            state.multiplier = 1f;
             if(state.rules.waves){
                 info("Game over! Reached wave @ with @ players online on map @.", state.wave, Groups.player.size(), Strings.capitalize(state.map.name()));
             }else{
@@ -193,6 +203,8 @@ public class ServerControl implements ApplicationListener{
 
         //reset autosave on world load
         Events.on(WorldLoadEvent.class, e -> {
+            state.multiplier = 1f;
+            state.core = null;
             autosaveCount.reset(0, Config.autosaveSpacing.num() * 60);
         });
 
@@ -245,6 +257,60 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        Events.on(PlayerJoin.class, e -> {
+            // please keep this credit if you plan on using this in your server !
+            player.sendMessage("Welcome to [accent]<[]io[accent]>[] Tower Defense!\nYour goal is to prevent the enemy units from reaching your core.\nGain resources by destroying enemy units.");
+        });
+
+        Timer.schedule(() -> {
+            Call.infoPopup("\uE84F [accent]Unit health multiplier:[" + getTrafficlightColor(Mathf.clamp(1f - (state.multiplier / 10f), 0f, 1f)) + "] " + (String.valueOf(state.multiplier).length() > 3 ? String.valueOf(state.multiplier).substring(0, 4) : state.multiplier) + "x", 10f, 20, 50, 20, 450, 0);
+            Call.infoPopup("\uE816 [accent]Toggle HUD:[] /hud", 10f, 20, 50, 20, 480, 0);
+        }, 0, 10);
+
+        Events.on(WaveEvent.class, e -> {
+            int wave = state.wave;
+            state.multiplier = Mathf.clamp(((wave * wave / 3000f) + 0.5f), state.multiplier, 100000f);
+        });
+
+        Events.on(BlockDestroyEvent.class, event -> {
+            // find new core
+            for(Tile tile : world.tiles){
+                if(tile.build instanceof CoreBlock.CoreBuild && tile.build.team == Team.sharded){
+                    state.core = tile.build;
+                    return;
+                }
+            }
+        });
+
+        Events.on(EventType.UnitDestroyEvent.class, event -> {
+            var unit = event.unit;
+            if(unit.team != state.rules.waveTeam) return;
+
+            var is = UnitDrops.drops.get(unit.type());
+            if(is == null || state.core == null) return;
+
+            StringBuilder message = new StringBuilder();
+            for(ItemStack stack : is){
+                Item item = stack.item;
+                int amount = stack.amount;
+
+                if(item != null && UnitDrops.itemIcons.containsKey(item)) {
+                    int calc = Mathf.random(amount - amount / 2, amount + amount / 2);
+                    message.append("[accent]+").append(calc).append("[] ").append(UnitDrops.itemIcons.get(item)).append("  ");
+                    amount = state.core.tile.build.acceptStack(item, calc, Team.sharded.core());
+                    if (amount > 0) {
+                        Call.transferItemTo(item, amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f), state.core);
+                    }
+                }
+            }
+            String msg = message.toString();
+            for(Player p : Groups.player) {
+                if(p.showHud) {
+                    Call.label(p.con, msg, Strings.stripColors(msg.replaceAll(" ", "")).length() / 8f, unit.x + Mathf.range(-2f, 2f), unit.y + Mathf.range(-2f, 2f));
+                }
+            }
+        });
+
         //autosave settings once a minute
         float saveInterval = 60;
         Timer.schedule(() -> Core.settings.forceSave(), saveInterval, saveInterval);
@@ -259,6 +325,10 @@ public class ServerControl implements ApplicationListener{
     }
 
     protected void registerCommands(){
+
+        // yes i know i am totally supposed to do this here
+        UnitDrops.init();
+
         handler.register("help", "Displays this command list.", arg -> {
             info("Commands:");
             for(Command command : handler.getCommandList()){
