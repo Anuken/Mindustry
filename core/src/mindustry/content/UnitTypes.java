@@ -1411,6 +1411,7 @@ public class UnitTypes implements ContentList{
         //region naval attack
 
         risso = new UnitType("risso"){{
+            swimming = true;
             defaultController = SuicideAI::new;
             speed = 1.1f;
             drag = 0.13f;
@@ -1463,6 +1464,7 @@ public class UnitTypes implements ContentList{
         }};
 
         minke = new UnitType("minke"){{
+            swimming = true;
             defaultController = SuicideAI::new;
             health = 600;
             speed = 0.9f;
@@ -1507,6 +1509,7 @@ public class UnitTypes implements ContentList{
         }};
 
         bryde = new UnitType("bryde"){{
+            swimming = true;
             defaultController = SuicideAI::new;
             health = 900;
             speed = 0.85f;
@@ -1603,6 +1606,7 @@ public class UnitTypes implements ContentList{
         }};
 
         sei = new UnitType("sei"){{
+            swimming = true;
             defaultController = SuicideAI::new;
             health = 10000;
             armor = 12f;
@@ -1689,6 +1693,7 @@ public class UnitTypes implements ContentList{
         }};
 
         omura = new UnitType("omura"){{
+            swimming = true;
             defaultController = SuicideAI::new;
             health = 22000;
             speed = 0.62f;
