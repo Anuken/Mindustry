@@ -473,8 +473,9 @@ public class NetServer implements ApplicationListener{
         });
 
         clientCommands.<Player>register("hud", "Toggle viewing resource & other elements on screen.", (args, player) -> {
-            player.showHud = !player.showHud;
-            player.sendMessage("[accent]Toggled resources HUD.");
+            if(state.huds.containsKey(player.uuid()))
+                state.huds.put(player.uuid(), !state.huds.get(player.uuid()));
+            player.sendMessage("[accent]Turned " + (state.huds.get(player.uuid()) ? "on" : "off") + " resources HUD.");
         });
     }
 

@@ -59,7 +59,7 @@ public class UnitDrops {
         drops.put(UnitTypes.nova, ItemStack.with(Items.copper, 12, Items.lead, 12, Items.metaglass, 8));
         drops.put(UnitTypes.pulsar, ItemStack.with(Items.lead, 25, Items.silicon, 28, Items.graphite, 24, Items.metaglass, 17));
         drops.put(UnitTypes.quasar, ItemStack.with(Items.metaglass, 108, Items.plastanium, 2));
-        drops.put(UnitTypes.vela, ItemStack.with(Items.phaseFabric, Items.surgeAlloy, 8, Items.plastanium, 8, Items.metaglass, 74, Items.plastanium, 34));
+        drops.put(UnitTypes.vela, ItemStack.with(Items.phaseFabric, 6, Items.surgeAlloy, 8, Items.plastanium, 8, Items.metaglass, 74, Items.plastanium, 34));
         drops.put(UnitTypes.corvus, ItemStack.with(Items.phaseFabric, 200, Items.surgeAlloy, 150));
 
         // Flyers

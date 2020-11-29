@@ -65,6 +65,15 @@ public class ServerControl implements ApplicationListener{
         return "#"+Integer.toHexString(java.awt.Color.HSBtoRGB((float)value/3f, 1f, 1f)).substring(2);
     }
 
+    void locateCore(){
+        for(Tile tile : world.tiles){
+            if(tile.build instanceof CoreBlock.CoreBuild && tile.build.team == Team.sharded){
+                state.core = tile.build;
+                return;
+            }
+        }
+    }
+
     public ServerControl(String[] args){
         setup(args);
     }
@@ -259,7 +268,15 @@ public class ServerControl implements ApplicationListener{
 
         Events.on(PlayerJoin.class, e -> {
             // please keep this credit if you plan on using this in your server !
-            player.sendMessage("Welcome to [accent]<[]io[accent]>[] Tower Defense!\nYour goal is to prevent the enemy units from reaching your core.\nGain resources by destroying enemy units.");
+            Timer.schedule(() -> {
+                state.huds.put(e.player.uuid(), true);
+                e.player.sendMessage("Welcome to [accent]<[]io[accent]>[] Tower Defense!\nYour goal is to prevent the enemy units from reaching your core.\nGain resources by destroying enemy units.");
+            }, 1);
+        });
+
+        Events.on(PlayerLeave.class, e -> {
+            if(state.huds.containsKey(e.player.uuid()))
+                state.huds.remove(e.player.uuid());
         });
 
         Timer.schedule(() -> {
@@ -268,25 +285,21 @@ public class ServerControl implements ApplicationListener{
         }, 0, 10);
 
         Events.on(WaveEvent.class, e -> {
+            locateCore();
             int wave = state.wave;
             state.multiplier = Mathf.clamp(((wave * wave / 3000f) + 0.5f), state.multiplier, 100000f);
         });
 
         Events.on(BlockDestroyEvent.class, event -> {
             // find new core
-            for(Tile tile : world.tiles){
-                if(tile.build instanceof CoreBlock.CoreBuild && tile.build.team == Team.sharded){
-                    state.core = tile.build;
-                    return;
-                }
-            }
+            locateCore();
         });
 
         Events.on(EventType.UnitDestroyEvent.class, event -> {
-            var unit = event.unit;
-            if(unit.team != state.rules.waveTeam) return;
+            Unit unit = event.unit;
+            if(unit.team != Team.crux) return;
 
-            var is = UnitDrops.drops.get(unit.type());
+            ItemStack[] is = UnitDrops.drops.get(unit.type());
             if(is == null || state.core == null) return;
 
             StringBuilder message = new StringBuilder();
@@ -294,7 +307,7 @@ public class ServerControl implements ApplicationListener{
                 Item item = stack.item;
                 int amount = stack.amount;
 
-                if(item != null && UnitDrops.itemIcons.containsKey(item)) {
+                if(item != null && UnitDrops.itemIcons.containsKey(item) && state.core != null && state.core.tile != null && state.core.tile.build != null) {
                     int calc = Mathf.random(amount - amount / 2, amount + amount / 2);
                     message.append("[accent]+").append(calc).append("[] ").append(UnitDrops.itemIcons.get(item)).append("  ");
                     amount = state.core.tile.build.acceptStack(item, calc, Team.sharded.core());
@@ -305,8 +318,9 @@ public class ServerControl implements ApplicationListener{
             }
             String msg = message.toString();
             for(Player p : Groups.player) {
-                if(p.showHud) {
-                    Call.label(p.con, msg, Strings.stripColors(msg.replaceAll(" ", "")).length() / 8f, unit.x + Mathf.range(-2f, 2f), unit.y + Mathf.range(-2f, 2f));
+                if(state.huds.containsKey(p.uuid()) && state.huds.get(p.uuid())) {
+                    Log.info("showing hud to " + p.name);
+                    Call.label(p.con, msg, Strings.stripColors(msg.replaceAll(" ", "")).length() / 14f, unit.x + Mathf.range(-2f, 2f), unit.y + Mathf.range(-2f, 2f));
                 }
             }
         });
