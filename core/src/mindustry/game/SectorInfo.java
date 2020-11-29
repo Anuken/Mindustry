@@ -242,11 +242,8 @@ public class SectorInfo{
             stat.loaded = true;
         }
 
-        //get item delta
-        int delta = deltas[item.id];
-
         //store means
-        stat.means.add(delta);
+        stat.means.add(deltas[item.id]);
         stat.mean = stat.means.rawMean();
     }
 

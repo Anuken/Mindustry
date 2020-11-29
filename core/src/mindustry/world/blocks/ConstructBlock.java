@@ -276,7 +276,8 @@ public class ConstructBlock extends Block{
                     if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
                         if(core != null && requirements[i].item.unlockedNow()){ //only accept items that are unlocked
                             int accepting = core.acceptStack(requirements[i].item, accumulated, builder);
-                            core.handleStack(requirements[i].item, accepting, builder);
+                            //transfer items directly, as this is not production.
+                            core.items.add(requirements[i].item, accepting);
                             accumulator[i] -= accepting;
                         }else{
                             accumulator[i] -= accumulated;
