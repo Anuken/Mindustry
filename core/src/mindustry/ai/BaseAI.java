@@ -55,11 +55,12 @@ public class BaseAI{
     public void update(){
         if(data.team.rules().aiCoreSpawn && timer.get(timerSpawn, 60 * 2.5f) && data.hasCore()){
             CoreBlock block = (CoreBlock)data.core().block;
+            int coreUnits = Groups.unit.count(u -> u.team == data.team && u.type == block.unitType);
 
-            //create AI core unit
-            if(!state.isEditor() && !Groups.unit.contains(u -> u.team() == data.team && u.type == block.unitType)){
+            //create AI core unit(s)
+            if(!state.isEditor() && coreUnits < data.cores.size){
                 Unit unit = block.unitType.create(data.team);
-                unit.set(data.core());
+                unit.set(data.cores.random());
                 unit.add();
                 Fx.spawn.at(unit);
             }

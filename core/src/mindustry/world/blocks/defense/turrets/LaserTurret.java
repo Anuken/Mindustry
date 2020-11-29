@@ -54,6 +54,7 @@ public class LaserTurret extends PowerTurret{
             super.updateTile();
 
             if(bulletLife > 0 && bullet != null){
+                wasShooting = true;
                 tr.trns(rotation, size * tilesize / 2f, 0f);
                 bullet.rotation(rotation);
                 bullet.set(x + tr.x, y + tr.y);
@@ -65,6 +66,7 @@ public class LaserTurret extends PowerTurret{
                     bullet = null;
                 }
             }else if(reload > 0){
+                wasShooting = true;
                 Liquid liquid = liquids.current();
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
@@ -76,7 +78,6 @@ public class LaserTurret extends PowerTurret{
                     coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
                 }
             }
-
         }
 
         @Override
