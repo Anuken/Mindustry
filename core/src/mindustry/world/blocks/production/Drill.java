@@ -259,7 +259,7 @@ public class Drill extends Block{
                 progress += delta() * dominantItems * speed * warmup;
 
                 if(Mathf.chanceDelta(updateEffectChance * warmup))
-                    updateEffect.at(getX() + Mathf.range(size * 2f), getY() + Mathf.range(size * 2f));
+                    updateEffect.at(x + Mathf.range(size * 2f), y + Mathf.range(size * 2f));
             }else{
                 lastDrillSpeed = 0f;
                 warmup = Mathf.lerpDelta(warmup, 0f, warmupSpeed);
@@ -274,7 +274,7 @@ public class Drill extends Block{
                 index ++;
                 progress %= delay;
 
-                drillEffect.at(getX() + Mathf.range(size), getY() + Mathf.range(size), dominantItem.color);
+                drillEffect.at(x + Mathf.range(size), y + Mathf.range(size), dominantItem.color);
             }
         }
 
