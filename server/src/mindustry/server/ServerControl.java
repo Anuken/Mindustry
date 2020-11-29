@@ -215,6 +215,11 @@ public class ServerControl implements ApplicationListener{
             state.multiplier = 1f;
             state.core = null;
             autosaveCount.reset(0, Config.autosaveSpacing.num() * 60);
+            Timer.schedule(() -> {
+                for(Player p : Groups.player){
+                    state.huds.put(p.uuid(), true);
+                }
+            }, 1);
         });
 
         //autosave periodically
