@@ -232,7 +232,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public void setType(UnitType type){
         this.type = type;
-        this.maxHealth = type.health;
+        this.maxHealth = type.health * (team != Team.sharded ? state.multiplier : 1);
         this.drag = type.drag;
         this.armor = type.armor;
         this.hitSize = type.hitSize;

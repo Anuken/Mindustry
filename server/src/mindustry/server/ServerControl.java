@@ -312,14 +312,13 @@ public class ServerControl implements ApplicationListener{
                     message.append("[accent]+").append(calc).append("[] ").append(UnitDrops.itemIcons.get(item)).append("  ");
                     amount = state.core.tile.build.acceptStack(item, calc, Team.sharded.core());
                     if (amount > 0) {
-                        Call.transferItemTo(item, amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f), state.core);
+                        Call.transferItemTo(unit, item, amount, unit.x + Mathf.range(2f), unit.y + Mathf.range(2f), state.core);
                     }
                 }
             }
             String msg = message.toString();
             for(Player p : Groups.player) {
                 if(state.huds.containsKey(p.uuid()) && state.huds.get(p.uuid())) {
-                    Log.info("showing hud to " + p.name);
                     Call.label(p.con, msg, Strings.stripColors(msg.replaceAll(" ", "")).length() / 14f, unit.x + Mathf.range(-2f, 2f), unit.y + Mathf.range(-2f, 2f));
                 }
             }

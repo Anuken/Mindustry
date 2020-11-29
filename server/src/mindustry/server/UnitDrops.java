@@ -30,11 +30,9 @@ public class UnitDrops {
                 return b;
             }
 
-            boolean b = action.tile.block() != null && !(action.tile.block() instanceof CoreBlock);
-            if (action.type == Administration.ActionType.depositItem || action.type == Administration.ActionType.withdrawItem) {
-                if (!b && player.con != null)
+            if ((action.type == Administration.ActionType.depositItem || action.type == Administration.ActionType.withdrawItem) && action.tile != null && action.tile.block() != null && action.tile.block() instanceof CoreBlock) {
+                if (player.con != null)
                     Call.infoToast(player.con, "[accent]You can not interact with the core.", 8f);
-                return b;
             }
             return true;
         });
