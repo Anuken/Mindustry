@@ -14,7 +14,7 @@ import mindustry.world.*;
 /** "Compiles" a sequence of statements into instructions. */
 public class LAssembler{
     public static ObjectMap<String, Func<String[], LStatement>> customParsers = new ObjectMap<>();
-    public static final int maxTokenLength = 40;
+    public static final int maxTokenLength = 36;
 
     private int lastVar;
     /** Maps names to variable IDs. */

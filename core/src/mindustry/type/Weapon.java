@@ -13,7 +13,7 @@ import mindustry.io.*;
 
 public class Weapon{
     /** displayed weapon region */
-    public String name;
+    public String name = "";
     /** bullet shot */
     public BulletType bullet;
     /** shell ejection effect */

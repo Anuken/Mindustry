@@ -105,7 +105,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void transferItemTo(@Nullable Unit unit, Item item, int amount, float x, float y, Building build){
         if(build == null || build.items == null) return;
 
-        if(unit != null) unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
+        if(unit != null && unit.item() == item) unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
 
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
             Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));

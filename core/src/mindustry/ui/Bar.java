@@ -29,7 +29,11 @@ public class Bar extends Element{
 
     public Bar(Prov<String> name, Prov<Color> color, Floatp fraction){
         this.fraction = fraction;
-        lastValue = value = Mathf.clamp(fraction.get());
+        try{
+            lastValue = value = Mathf.clamp(fraction.get());
+        }catch(Exception e){ //getting the fraction may involve referring to invalid data
+            lastValue = value = 0f;
+        }
         update(() -> {
             try{
                 this.name = name.get();

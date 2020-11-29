@@ -27,7 +27,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public abstract class Turret extends ReloadTurret{
+public class Turret extends ReloadTurret{
     //after being logic-controlled and this amount of time passes, the turret will resume normal AI
     public final static float logicControlCooldown = 60 * 2;
 

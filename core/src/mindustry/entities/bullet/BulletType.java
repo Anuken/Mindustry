@@ -273,7 +273,8 @@ public abstract class BulletType extends Content{
         }
 
         if(weaveMag > 0){
-            b.vel.rotate(Mathf.sin(Mathf.randomSeed(b.id, 10f) + b.time, weaveScale, weaveMag) * Time.delta);
+            float scl = Mathf.randomSeed(id, 0.9f, 1.1f);
+            b.vel.rotate(Mathf.sin(b.time + Mathf.PI * weaveScale/2f * scl, weaveScale * scl, weaveMag) * Time.delta);
         }
 
         if(trailChance > 0){

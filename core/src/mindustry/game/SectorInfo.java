@@ -23,6 +23,8 @@ public class SectorInfo{
 
     /** Core input statistics. */
     public ObjectMap<Item, ExportStat> production = new ObjectMap<>();
+    /** Raw item production statistics. */
+    public ObjectMap<Item, ExportStat> rawProduction = new ObjectMap<>();
     /** Export statistics. */
     public ObjectMap<Item, ExportStat> export = new ObjectMap<>();
     /** Items stored in all cores. */
@@ -77,15 +79,21 @@ public class SectorInfo{
 
     /** Counter refresh state. */
     private transient Interval time = new Interval();
-    /** Core item storage to prevent spoofing. */
-    private transient int[] coreItemCounts;
+    /** Core item storage input/output deltas. */
+    private @Nullable transient int[] coreDeltas;
+    /** Core item storage input/output deltas. */
+    private @Nullable transient int[] productionDeltas;
 
     /** Handles core item changes. */
     public void handleCoreItem(Item item, int amount){
-        if(coreItemCounts == null){
-            coreItemCounts = new int[content.items().size];
-        }
-        coreItemCounts[item.id] += amount;
+        if(coreDeltas == null) coreDeltas = new int[content.items().size];
+        coreDeltas[item.id] += amount;
+    }
+
+    /** Handles raw production stats. */
+    public void handleProduction(Item item, int amount){
+        if(productionDeltas == null) productionDeltas = new int[content.items().size];
+        productionDeltas[item.id] += amount;
     }
 
     /** @return the real location items go when launched on this sector */
@@ -176,6 +184,11 @@ public class SectorInfo{
         damage = 0;
         hasSpawns = spawner.countSpawns() > 0;
 
+        //cap production at raw production.
+        production.each((item, stat) -> {
+            stat.mean = Math.min(stat.mean, rawProduction.get(item, ExportStat::new).mean);
+        });
+
         if(state.rules.sector != null){
             state.rules.sector.saveInfo();
         }
@@ -188,8 +201,6 @@ public class SectorInfo{
     public void update(){
         //updating in multiplayer as a client doesn't make sense
         if(net.client()) return;
-
-        CoreBuild ent = state.rules.defaultTeam.core();
 
         //refresh throughput
         if(time.get(refreshPeriod)){
@@ -208,28 +219,32 @@ public class SectorInfo{
                 stat.mean = stat.means.rawMean();
             });
 
-            if(coreItemCounts == null){
-                coreItemCounts = new int[content.items().size];
-            }
+            if(coreDeltas == null) coreDeltas = new int[content.items().size];
+            if(productionDeltas == null) productionDeltas = new int[content.items().size];
 
             //refresh core items
             for(Item item : content.items()){
-                ExportStat stat = production.get(item, ExportStat::new);
-                if(!stat.loaded){
-                    stat.means.fill(stat.mean);
-                    stat.loaded = true;
-                }
+                updateDelta(item, production, coreDeltas);
+                updateDelta(item, rawProduction, productionDeltas);
 
-                //get item delta
-                int delta = coreItemCounts[item.id];
-
-                //store means
-                stat.means.add(delta);
-                stat.mean = stat.means.rawMean();
+                production.get(item).mean = Math.min(production.get(item).mean, rawProduction.get(item).mean);
             }
 
-            Arrays.fill(coreItemCounts, 0);
+            Arrays.fill(coreDeltas, 0);
+            Arrays.fill(productionDeltas, 0);
         }
+    }
+
+    void updateDelta(Item item, ObjectMap<Item, ExportStat> map, int[] deltas){
+        ExportStat stat = map.get(item, ExportStat::new);
+        if(!stat.loaded){
+            stat.means.fill(stat.mean);
+            stat.loaded = true;
+        }
+
+        //store means
+        stat.means.add(deltas[item.id]);
+        stat.mean = stat.means.rawMean();
     }
 
     public ObjectFloatMap<Item> exportRates(){
