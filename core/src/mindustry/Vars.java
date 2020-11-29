@@ -56,7 +56,7 @@ public class Vars implements Loadable{
     /** URL for sending crash reports to */
     public static final String crashReportURL = "http://192.99.169.18/report";
     /** URL the links to the wiki's modding guide.*/
-    public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/";
+    public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/1-modding/";
     /** URL to the JSON file containing all the global, public servers. Not queried in BE. */
     public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers.json";
     /** URL to the JSON file containing all the BE servers. Only queried in BE. */
