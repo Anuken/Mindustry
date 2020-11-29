@@ -97,7 +97,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         }
 
         if(tile.build instanceof ConstructBuild && !current.initialized){
-            Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, team, (Builderc)this, current.breaking)));
+            Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, team, self(), current.breaking)));
             current.initialized = true;
         }
 
