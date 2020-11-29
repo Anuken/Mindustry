@@ -225,9 +225,11 @@ public class Universe{
                             if(sector.isBeingPlayed()){
                                 state.rules.winWave = waveMax;
                                 state.rules.waves = true;
+                                state.rules.attackMode = false;
                             }else{
                                 sector.info.winWave = waveMax;
                                 sector.info.waves = true;
+                                sector.info.attack = false;
                                 sector.saveInfo();
                             }
 

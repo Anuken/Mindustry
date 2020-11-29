@@ -1657,6 +1657,7 @@ public class UnitTypes implements ContentList{
                 recoil = 3f;
                 occlusion = 12f;
                 ejectEffect = Fx.casing3;
+                shootSound = Sounds.shootBig;
 
                 shots = 3;
                 shotDelay = 4f;
