@@ -769,7 +769,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY){
-        if(Core.scene.hasDialog() || Core.settings.getBool("keyboard")) return false;
+        if(Core.scene == null || Core.scene.hasDialog() || Core.settings.getBool("keyboard")) return false;
 
         float scale = Core.camera.width / Core.graphics.getWidth();
         deltaX *= scale;
