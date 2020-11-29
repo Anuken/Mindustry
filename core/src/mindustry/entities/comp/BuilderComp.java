@@ -81,12 +81,12 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
                 boolean hasAll = infinite || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item));
 
                 if(hasAll){
-                    Call.beginPlace(current.block, team, current.x, current.y, current.rotation);
+                    Call.beginPlace(self(), current.block, team, current.x, current.y, current.rotation);
                 }else{
                     current.stuck = true;
                 }
             }else if(!current.initialized && current.breaking && Build.validBreak(team, current.x, current.y)){
-                Call.beginBreak(team, current.x, current.y);
+                Call.beginBreak(self(), team, current.x, current.y);
             }else{
                 plans.removeFirst();
                 return;
