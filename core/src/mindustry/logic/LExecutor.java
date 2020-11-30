@@ -285,6 +285,8 @@ public class LExecutor{
                     exec.setnum(outX, cache.x);
                     exec.setnum(outY, cache.y);
                 }
+            }else{
+                exec.setbool(outFound, false);
             }
         }
 

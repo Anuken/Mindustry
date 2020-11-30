@@ -55,7 +55,7 @@ public class BaseGenerator{
         BasePart coreschem = bases.cores.getFrac(difficulty);
         int passes = difficulty < 0.4 ? 1 : difficulty < 0.8 ? 2 : 3;
 
-        Block wall = wallsSmall.getFrac(difficulty), wallLarge = wallsLarge.getFrac(difficulty);
+        Block wall = wallsSmall.getFrac(difficulty * 0.91f), wallLarge = wallsLarge.getFrac(difficulty * 0.91f);
 
         for(Tile tile : cores){
             tile.clearOverlay();

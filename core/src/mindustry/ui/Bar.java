@@ -29,7 +29,11 @@ public class Bar extends Element{
 
     public Bar(Prov<String> name, Prov<Color> color, Floatp fraction){
         this.fraction = fraction;
-        lastValue = value = Mathf.clamp(fraction.get());
+        try{
+            lastValue = value = Mathf.clamp(fraction.get());
+        }catch(Exception e){ //getting the fraction may involve referring to invalid data
+            lastValue = value = 0f;
+        }
         update(() -> {
             try{
                 this.name = name.get();
@@ -77,6 +81,9 @@ public class Bar extends Element{
             blink = 1f;
             lastValue = computed;
         }
+
+        if(Float.isNaN(computed)) computed = 0;
+        if(Float.isInfinite(computed)) computed = 1f;
 
         blink = Mathf.lerpDelta(blink, 0f, 0.2f);
         value = Mathf.lerpDelta(value, computed, 0.15f);

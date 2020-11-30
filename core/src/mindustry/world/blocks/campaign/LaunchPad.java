@@ -19,6 +19,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -38,6 +39,7 @@ public class LaunchPad extends Block{
         solid = true;
         update = true;
         configurable = true;
+        drawDisabled = false;
     }
 
     @Override
@@ -54,11 +56,22 @@ public class LaunchPad extends Block{
         bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
     }
 
+    @Override
+    public boolean outputsItems(){
+        return false;
+    }
+
     public class LaunchPadBuild extends Building{
 
         @Override
         public Cursor getCursor(){
             return !state.isCampaign() || net.client() ? SystemCursor.arrow : super.getCursor();
+        }
+
+        //cannot be disabled
+        @Override
+        public float efficiency(){
+            return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
         }
 
         @Override

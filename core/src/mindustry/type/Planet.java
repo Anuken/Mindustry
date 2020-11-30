@@ -182,12 +182,12 @@ public class Planet extends UnlockableContent{
             float sum = 1f;
             for(Sector other : sector.near()){
                 if(other.generateEnemyBase){
-                    sum += 1f;
+                    sum += 0.9f;
                 }
             }
 
             if(sector.hasEnemyBase()){
-                sum += 1.9f;
+                sum += 0.88f;
             }
 
             sector.threat = sector.preset == null ? Math.min(sum / 5f, 1.2f) : Mathf.clamp(sector.preset.difficulty / 10f);

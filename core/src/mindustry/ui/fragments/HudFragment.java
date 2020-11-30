@@ -275,7 +275,7 @@ public class HudFragment extends Fragment{
             t.name = "nearpoint";
             t.touchable = Touchable.disabled;
             t.table(Styles.black, c -> c.add("@nearpoint")
-            .update(l -> l.setColor(Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.absin(Time.time(), 10f, 1f))))
+            .update(l -> l.setColor(Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.absin(Time.time, 10f, 1f))))
             .get().setAlignment(Align.center, Align.center))
             .margin(6).update(u -> u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(spawner.playerNear()), 0.1f)).get().color.a = 0f;
         });
@@ -317,7 +317,7 @@ public class HudFragment extends Fragment{
                 return coreAttackOpacity[0] > 0;
             });
             t.table(Tex.button, top -> top.add("@coreattack").pad(2)
-            .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
+            .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time, 2f, 1f)))).touchable(Touchable.disabled);
         });
 
         //'saving' indicator

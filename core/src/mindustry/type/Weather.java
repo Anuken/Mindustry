@@ -19,9 +19,9 @@ import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
-public abstract class Weather extends UnlockableContent{
+public class Weather extends UnlockableContent{
     /** Default duration of this weather event in ticks. */
-    public float duration = 9f * Time.toMinutes;
+    public float duration = 10f * Time.toMinutes;
     public float opacityMultiplier = 1f;
     public Attributes attrs = new Attributes();
     public Sound sound = Sounds.none;
@@ -90,7 +90,7 @@ public abstract class Weather extends UnlockableContent{
         }
 
         if(!headless && sound != Sounds.none){
-            float noise = soundVolOscMag > 0 ? (float)Math.abs(Noise.rawNoise(Time.time() / soundVolOscScl)) * soundVolOscMag : 0;
+            float noise = soundVolOscMag > 0 ? (float)Math.abs(Noise.rawNoise(Time.time / soundVolOscScl)) * soundVolOscMag : 0;
             control.sound.loop(sound, Math.max((soundVol + noise) * state.opacity, soundVolMin));
         }
     }
@@ -120,8 +120,8 @@ public abstract class Weather extends UnlockableContent{
             float scl = rand.random(0.5f, 1f);
             float scl2 = rand.random(0.5f, 1f);
             float size = rand.random(sizeMin, sizeMax);
-            float x = (rand.random(0f, world.unitWidth()) + Time.time() * windx * scl2);
-            float y = (rand.random(0f, world.unitHeight()) + Time.time() * windy * scl);
+            float x = (rand.random(0f, world.unitWidth()) + Time.time * windx * scl2);
+            float y = (rand.random(0f, world.unitHeight()) + Time.time * windy * scl);
             float alpha = rand.random(minAlpha, maxAlpha);
 
             x += Mathf.sin(y, rand.random(sinSclMin, sinSclMax), rand.random(sinMagMin, sinMagMax));
@@ -155,8 +155,8 @@ public abstract class Weather extends UnlockableContent{
             float scl = rand.random(0.5f, 1f);
             float scl2 = rand.random(0.5f, 1f);
             float size = rand.random(sizeMin, sizeMax);
-            float x = (rand.random(0f, world.unitWidth()) + Time.time() * xspeed * scl2);
-            float y = (rand.random(0f, world.unitHeight()) - Time.time() * yspeed * scl);
+            float x = (rand.random(0f, world.unitWidth()) + Time.time * xspeed * scl2);
+            float y = (rand.random(0f, world.unitHeight()) - Time.time * yspeed * scl);
             float tint = rand.random(1f) * alpha;
 
             x -= Tmp.r1.x;
@@ -180,7 +180,7 @@ public abstract class Weather extends UnlockableContent{
         int total = (int)(Tmp.r1.area() / density * intensity) / 2;
         Lines.stroke(stroke);
 
-        float t = Time.time() / timeScale;
+        float t = Time.time / timeScale;
 
         for(int i = 0; i < total; i++){
             float offset = rand.random(0f, 1f);
@@ -227,7 +227,7 @@ public abstract class Weather extends UnlockableContent{
         float windx = vwindx * speed, windy = vwindy * speed;
 
         float scale = 1f / noisescl;
-        float scroll = Time.time() * scale + offset;
+        float scroll = Time.time * scale + offset;
         Tmp.tr1.texture = noise;
         Core.camera.bounds(Tmp.r1);
         Tmp.tr1.set(Tmp.r1.x*scale, Tmp.r1.y*scale, (Tmp.r1.x + Tmp.r1.width)*scale, (Tmp.r1.y + Tmp.r1.height)*scale);
@@ -262,7 +262,7 @@ public abstract class Weather extends UnlockableContent{
 
         /** Creates a weather entry with some approximate weather values. */
         public WeatherEntry(Weather weather){
-            this(weather, weather.duration * 3f, weather.duration * 6f, weather.duration / 2f, weather.duration * 1.5f);
+            this(weather, weather.duration * 2f, weather.duration * 6f, weather.duration / 2f, weather.duration * 1.5f);
         }
 
         public WeatherEntry(Weather weather, float minFrequency, float maxFrequency, float minDuration, float maxDuration){

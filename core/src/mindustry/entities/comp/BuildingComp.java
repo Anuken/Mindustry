@@ -14,6 +14,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
 import mindustry.content.*;
@@ -29,8 +30,8 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
@@ -435,7 +436,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     /** Handle a stack input. */
-    public void handleStack(Item item, int amount, Teamc source){
+    public void handleStack(Item item, int amount, @Nullable Teamc source){
         noSleep();
         items.add(item, amount);
     }
@@ -518,6 +519,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void dumpLiquid(Liquid liquid){
         int dump = this.cdump;
+
+        if(liquids.get(liquid) <= 0.0001f) return;
 
         if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) liquid.unlock();
 
@@ -619,6 +622,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * containers, it gets added to the block's inventory.
      */
     public void offload(Item item){
+        produced(item, 1);
         int dump = this.cdump;
         if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) item.unlock();
 
@@ -650,6 +654,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         return false;
+    }
+
+    public void produced(Item item){
+        produced(item, 1);
+    }
+
+    public void produced(Item item, int amount){
+        if(Vars.state.rules.sector != null && team == state.rules.defaultTeam) Vars.state.rules.sector.info.handleProduction(item, amount);
     }
 
     /** Try dumping any item near the  */
@@ -917,6 +929,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //null is of type void.class; anonymous classes use their superclass.
         Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() || value.getClass().getSimpleName().startsWith("adapter") ? value.getClass().getSuperclass() : value.getClass();
 
+        if(value instanceof Block) type = Block.class;
+        
         if(builder != null && builder.isPlayer()){
             lastAccessed = builder.getPlayer().name;
         }
@@ -970,31 +984,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             });
         }
 
-        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, Pal.darkFlame, state.rules.damageExplosions);
+        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, state.rules.damageExplosions);
 
         if(!floor().solid && !floor().isLiquid){
             Effect.rubble(x, y, block.size);
-        }
-    }
-
-    /**
-     * Returns the flammability of the  Used for fire calculations.
-     * Takes flammability of floor liquid into account.
-     */
-    public float getFlammability(){
-        if(!block.hasItems){
-            if(floor().isLiquid && !block.solid){
-                return floor().liquidDrop.flammability;
-            }
-            return 0;
-        }else{
-            float result = items.sum((item, amount) -> item.flammability * amount);
-
-            if(block.hasLiquids){
-                result += liquids.sum((liquid, amount) -> liquid.flammability * amount / 3f);
-            }
-
-            return result;
         }
     }
 

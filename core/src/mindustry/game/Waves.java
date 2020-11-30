@@ -10,7 +10,7 @@ import mindustry.type.*;
 import static mindustry.content.UnitTypes.*;
 
 public class Waves{
-    public static final int waveVersion = 3;
+    public static final int waveVersion = 4;
 
     private Seq<SpawnGroup> spawns;
 
@@ -277,7 +277,7 @@ public class Waves{
         int cap = 150;
 
         float shieldStart = 30, shieldsPerWave = 20 + difficulty*30f;
-        float[] scaling = {1, 1.2f, 1.5f, 3f, 4f};
+        float[] scaling = {1, 1.5f, 3f, 4f, 5f};
 
         Intc createProgression = start -> {
             //main sequence
@@ -286,7 +286,7 @@ public class Waves{
 
             for(int i = start; i < cap;){
                 int f = i;
-                int next = rand.random(8, 16) + (int)Mathf.lerp(4f, 0f, difficulty) + curTier * 4;
+                int next = rand.random(8, 16) + (int)Mathf.lerp(5f, 0f, difficulty) + curTier * 4;
 
                 float shieldAmount = Math.max((i - shieldStart) * shieldsPerWave, 0);
                 int space = start == 0 ? 1 : rand.random(1, 2);
@@ -340,10 +340,10 @@ public class Waves{
             step += (int)(rand.random(15, 30) * Mathf.lerp(1f, 0.5f, difficulty));
         }
 
-        int bossWave = (int)(rand.random(50, 70) * Mathf.lerp(1f, 0.5f, difficulty));
+        int bossWave = (int)(rand.random(50, 70) * Mathf.lerp(1f, 0.7f, difficulty));
         int bossSpacing = (int)(rand.random(25, 40) * Mathf.lerp(1f, 0.6f, difficulty));
 
-        int bossTier = difficulty < 0.5 ? 3 : 4;
+        int bossTier = difficulty < 0.6 ? 3 : 4;
 
         //main boss progression
         out.add(new SpawnGroup(Structs.random(species)[bossTier]){{
@@ -411,7 +411,7 @@ public class Waves{
         }
 
         //shift back waves on higher difficulty for a harder start
-        int shift = Math.max((int)(difficulty * 15 - 5), 0);
+        int shift = Math.max((int)(difficulty * 14 - 5), 0);
 
         for(SpawnGroup group : out){
             group.begin -= shift;

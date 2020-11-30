@@ -110,7 +110,7 @@ public abstract class UnlockableContent extends MappableContent{
 
     /** Makes this piece of content unlocked; if it already unlocked, nothing happens. */
     public void unlock(){
-        if(!unlocked()){
+        if(!net.client() && !unlocked()){
             unlocked = true;
             Core.settings.put(name + "-unlocked", true);
 

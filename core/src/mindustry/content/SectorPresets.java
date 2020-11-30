@@ -24,6 +24,7 @@ public class SectorPresets implements ContentList{
 
         saltFlats = new SectorPreset("saltFlats", serpulo, 101){{
             difficulty = 5;
+            useAI = false;
         }};
 
         frozenForest = new SectorPreset("frozenForest", serpulo, 86){{
@@ -82,7 +83,7 @@ public class SectorPresets implements ContentList{
         }};
 
         desolateRift = new SectorPreset("desolateRift", serpulo, 123){{
-            captureWave = 30;
+            captureWave = 18;
             difficulty = 8;
         }};
 

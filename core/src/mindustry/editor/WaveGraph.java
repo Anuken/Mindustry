@@ -17,7 +17,7 @@ import mindustry.ui.*;
 
 public class WaveGraph extends Table{
     public Seq<SpawnGroup> groups = new Seq<>();
-    public int from, to = 20;
+    public int from = 0, to = 20;
 
     private Mode mode = Mode.counts;
     private int[][] values;
@@ -114,7 +114,7 @@ public class WaveGraph extends Table{
 
                 Lines.line(cx, cy, cx, cy + len);
                 if(i == values.length/2){
-                    font.draw("" + (i + from), cx, cy - 2f, Align.center);
+                    font.draw("" + (i + from + 1), cx, cy - 2f, Align.center);
                 }
             }
             font.setColor(Color.white);

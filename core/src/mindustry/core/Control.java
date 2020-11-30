@@ -23,6 +23,7 @@ import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;
+import mindustry.maps.*;
 import mindustry.maps.Map;
 import mindustry.net.*;
 import mindustry.type.*;
@@ -322,17 +323,45 @@ public class Control implements ApplicationListener, Loadable{
                             return;
                         }
 
+                        //set spawn for sector damage to use
+                        Tile spawn = world.tile(sector.info.spawnPosition);
+                        spawn.setBlock(Blocks.coreShard, state.rules.defaultTeam);
+
+                        //add extra damage.
+                        SectorDamage.apply(1f);
+
                         //reset wave so things are more fair
                         state.wave = 1;
+                        //set up default wave time
+                        state.wavetime = state.rules.waveSpacing * 2f;
+                        //reset captured state
+                        sector.info.wasCaptured = false;
+                        //re-enable waves
+                        state.rules.waves = true;
 
                         //reset win wave??
-                        state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null ? sector.preset.captureWave : 40;
+                        state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null ? sector.preset.captureWave : state.rules.winWave > state.wave ? state.rules.winWave : 40;
+
+                        //if there's still an enemy base left, fix it
+                        if(state.rules.attackMode){
+                            //replace all broken blocks
+                            for(var plan : state.rules.waveTeam.data().blocks){
+                                Tile tile = world.tile(plan.x, plan.y);
+                                if(tile != null){
+                                    tile.setBlock(content.block(plan.block), state.rules.waveTeam, plan.rotation);
+                                    if(plan.config != null && tile.build != null){
+                                        tile.build.configure(plan.config);
+                                    }
+                                }
+                            }
+                            state.rules.waveTeam.data().blocks.clear();
+                        }
 
                         //kill all units, since they should be dead anyway
                         Groups.unit.clear();
                         Groups.fire.clear();
+                        Groups.puddle.clear();
 
-                        Tile spawn = world.tile(sector.info.spawnPosition);
                         Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
                         //set up camera/player locations

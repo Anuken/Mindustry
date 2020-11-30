@@ -98,11 +98,11 @@ public class TechTree implements ContentList{
                                     node(platedConduit, () -> {
 
                                     });
-                                });
 
-                                node(rotaryPump, () -> {
-                                    node(thermalPump, () -> {
+                                    node(rotaryPump, () -> {
+                                        node(thermalPump, () -> {
 
+                                        });
                                     });
                                 });
                             });
@@ -121,7 +121,7 @@ public class TechTree implements ContentList{
 
                             });
 
-                            node(waterExtractor, () -> {
+                            node(waterExtractor, Seq.with(new SectorComplete(saltFlats)), () -> {
                                 node(oilExtractor, () -> {
 
                                 });
@@ -198,10 +198,10 @@ public class TechTree implements ContentList{
                                 });
                             });
                         });
-                    });
 
-                    node(illuminator, () -> {
-                        
+                        node(illuminator, () -> {
+
+                        });
                     });
                 });
 
@@ -421,8 +421,8 @@ public class TechTree implements ContentList{
                 });
 
                 node(additiveReconstructor, Seq.with(new SectorComplete(biomassFacility)), () -> {
-                    node(multiplicativeReconstructor, Seq.with(new SectorComplete(overgrowth)), () -> {
-                        node(exponentialReconstructor, () -> {
+                    node(multiplicativeReconstructor, () -> {
+                        node(exponentialReconstructor, Seq.with(new SectorComplete(overgrowth)), () -> {
                             node(tetrativeReconstructor, () -> {
                                 
                             });
@@ -471,7 +471,8 @@ public class TechTree implements ContentList{
                                         node(desolateRift, Seq.with(
                                             new SectorComplete(impact0078),
                                             new Research(thermalGenerator),
-                                            new Research(thoriumReactor)
+                                            new Research(thoriumReactor),
+                                            new Research(coreNucleus)
                                         ), () -> {
                                             node(planetaryTerminal, Seq.with(
                                                 new SectorComplete(desolateRift),
@@ -484,6 +485,7 @@ public class TechTree implements ContentList{
                                                 new Research(bryde),
                                                 new Research(spectre),
                                                 new Research(launchPad),
+                                                new Research(massDriver),
                                                 new Research(impactReactor),
                                                 new Research(additiveReconstructor),
                                                 new Research(exponentialReconstructor)
@@ -507,10 +509,11 @@ public class TechTree implements ContentList{
 
                                 node(saltFlats, Seq.with(
                                     new SectorComplete(windsweptIslands),
+                                    new Research(commandCenter),
                                     new Research(groundFactory),
+                                    new Research(additiveReconstructor),
                                     new Research(airFactory),
-                                    new Research(door),
-                                    new Research(waterExtractor)
+                                    new Research(door)
                                 ), () -> {
 
                                 });
@@ -645,7 +648,7 @@ public class TechTree implements ContentList{
     static TechNode node(UnlockableContent content, ItemStack[] requirements, Seq<Objective> objectives, Runnable children){
         TechNode node = new TechNode(context, content, requirements);
         if(objectives != null){
-            node.objectives = objectives;
+            node.objectives.addAll(objectives);
         }
 
         TechNode prev = context;
