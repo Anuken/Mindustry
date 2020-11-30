@@ -224,7 +224,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         float tx = plan.drawx(), ty = plan.drawy();
 
         Lines.stroke(1f, Pal.accent);
-        float focusLen = 3.8f + Mathf.absin(Time.time(), 1.1f, 0.6f);
+        float focusLen = 3.8f + Mathf.absin(Time.time, 1.1f, 0.6f);
         float px = x + Angles.trnsx(rotation, focusLen);
         float py = y + Angles.trnsy(rotation, focusLen);
 
@@ -246,7 +246,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         Lines.line(px, py, x1, y1);
         Lines.line(px, py, x3, y3);
 
-        Fill.circle(px, py, 1.6f + Mathf.absin(Time.time(), 0.8f, 1.5f));
+        Fill.circle(px, py, 1.6f + Mathf.absin(Time.time, 0.8f, 1.5f));
 
         Draw.color();
     }

@@ -287,7 +287,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                     Color color =
                     sec.hasBase() ? Tmp.c2.set(Team.sharded.color).lerp(Team.crux.color, sec.hasEnemyBase() ? 0.5f : 0f) :
-                    sec.preset != null ? Tmp.c2.set(Team.derelict.color).lerp(Color.white, Mathf.absin(Time.time(), 10f, 1f)) :
+                    sec.preset != null ? Tmp.c2.set(Team.derelict.color).lerp(Color.white, Mathf.absin(Time.time, 10f, 1f)) :
                     sec.hasEnemyBase() ? Team.crux.color :
                     null;
 
@@ -627,6 +627,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         Table stable = sectorTop;
 
         if(sector == null){
+            stable.clear();
             return;
         }
 

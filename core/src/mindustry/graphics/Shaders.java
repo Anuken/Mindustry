@@ -66,7 +66,7 @@ public class Shaders{
         public void apply(){
             setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
 
-            setUniformf("u_time", Time.globalTime() / 10f);
+            setUniformf("u_time", Time.globalTime / 10f);
             setUniformf("u_campos", camera.position);
             setUniformf("u_rcampos", Tmp.v31.set(camera.position).sub(planet.position));
             setUniformf("u_light", planet.getLightNormal());
@@ -174,7 +174,7 @@ public class Shaders{
             setUniformf("u_color", color);
             setUniformf("u_uv", region.u, region.v);
             setUniformf("u_uv2", region.u2, region.v2);
-            setUniformf("u_time", Time.time());
+            setUniformf("u_time", Time.time);
             setUniformf("u_texsize", region.texture.width, region.texture.height);
         }
     }
@@ -188,7 +188,7 @@ public class Shaders{
         @Override
         public void apply(){
             setUniformf("u_dp", Scl.scl(1f));
-            setUniformf("u_time", Time.time() / Scl.scl(1f));
+            setUniformf("u_time", Time.time / Scl.scl(1f));
             setUniformf("u_offset",
             Core.camera.position.x - Core.camera.width / 2,
             Core.camera.position.y - Core.camera.height / 2);
@@ -216,7 +216,7 @@ public class Shaders{
             setUniformf("u_campos", Core.camera.position.x, Core.camera.position.y);
             setUniformf("u_ccampos", Core.camera.position);
             setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
-            setUniformf("u_time", Time.time());
+            setUniformf("u_time", Time.time);
 
             texture.bind(1);
             renderer.effectBuffer.getTexture().bind(0);
@@ -240,7 +240,7 @@ public class Shaders{
         public void apply(){
             setUniformf("u_campos", Core.camera.position.x - Core.camera.width / 2, Core.camera.position.y - Core.camera.height / 2);
             setUniformf("u_resolution", Core.camera.width, Core.camera.height);
-            setUniformf("u_time", Time.time());
+            setUniformf("u_time", Time.time);
 
             if(hasUniform("u_noise")){
                 Core.assets.get("sprites/noise.png", Texture.class).bind(1);

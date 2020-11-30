@@ -209,7 +209,7 @@ public class PlanetRenderer implements Disposable{
 
         for(int i = 0; i < pointCount + 1; i++){
             float f = i / (float)pointCount;
-            Tmp.c1.set(from).lerp(to, (f+Time.globalTime()/timeScale)%1f);
+            Tmp.c1.set(from).lerp(to, (f+ Time.globalTime /timeScale)%1f);
             batch.color(Tmp.c1);
             batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f));
 
@@ -218,7 +218,7 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void drawBorders(Sector sector, Color base){
-        Color color = Tmp.c1.set(base).a(base.a + 0.3f + Mathf.absin(Time.globalTime(), 5f, 0.3f));
+        Color color = Tmp.c1.set(base).a(base.a + 0.3f + Mathf.absin(Time.globalTime, 5f, 0.3f));
 
         float r1 = 1f;
         float r2 = outlineRad + 0.001f;

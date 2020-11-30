@@ -749,7 +749,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         boolean valid = validPlace(request.x, request.y, request.block, request.rotation);
 
         Draw.reset();
-        Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime(), 6f, 0.28f));
+        Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
         Draw.alpha(1f);
         request.block.drawRequestConfigTop(request, selectRequests);
         Draw.reset();
