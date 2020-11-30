@@ -16,6 +16,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class OverlayRenderer{
+    private static final TextureRegion = Core.atlas.find("select-arrow");
     private static final float indicatorLength = 14f;
     private static final float spawnerMargin = tilesize*11f;
     private static final Rect rect = new Rect();
@@ -90,9 +91,9 @@ public class OverlayRenderer{
 
 
             for(int i = 0; i < 4; i++){
-                float rot = i * 90f + 45f + (-Time.time() / 3f) % 360f;
+                float rot = i * 90f + 45f + (-Time.time / 3f) % 360f;
                 float length = select.hitSize() * 1.5f + (unitFade * 2.5f);
-                Draw.rect(Core.atlas.find("select-arrow"), select.x + Angles.trnsx(rot, length), select.y + Angles.trnsy(rot, length), length / 1.9f, length / 1.9f, rot - 180f);
+                Draw.rect(, select.x + Angles.trnsx(rot, length), select.y + Angles.trnsy(rot, length), length / 1.9f, length / 1.9f, rot - 180f);
             }
             Draw.reset();
         }
