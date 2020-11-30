@@ -37,6 +37,7 @@ public class PlanetRenderer implements Disposable{
     public final VertexBatch3D batch = new VertexBatch3D(20000, false, true, 0);
 
     public float zoom = 1f;
+    public float orbitAlpha = 1f;
 
     private final Mesh[] outlines = new Mesh[10];
     public final PlaneBatch3D projector = new PlaneBatch3D();
@@ -168,7 +169,7 @@ public class PlanetRenderer implements Disposable{
         Vec3 center = planet.parent.position;
         float radius = planet.orbitRadius;
         int points = (int)(radius * 10);
-        Angles.circleVectors(points, radius, (cx, cy) -> batch.vertex(Tmp.v32.set(center).add(cx, 0, cy), Pal.gray));
+        Angles.circleVectors(points, radius, (cx, cy) -> batch.vertex(Tmp.v32.set(center).add(cx, 0, cy), Pal.gray.write(Tmp.c1).a(orbitAlpha)));
         batch.flush(Gl.lineLoop);
     }
 

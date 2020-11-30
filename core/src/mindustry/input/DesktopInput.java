@@ -629,8 +629,8 @@ public class DesktopInput extends InputHandler{
             unit.moveAt(movement);
         }else{
             unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
-            if(!movement.isZero() && ground){
-                unit.vel.rotateTo(movement.angle(), unit.type.rotateSpeed);
+            if(!movement.isZero()){
+                unit.vel.rotateTo(movement.angle(), unit.type.rotateSpeed * Math.max(Time.delta, 1));
             }
         }
 

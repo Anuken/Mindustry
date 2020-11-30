@@ -409,6 +409,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             @Override
             public void draw(){
+                planets.orbitAlpha = selectAlpha;
                 planets.render(PlanetDialog.this);
                 if(Core.scene.getDialog() == PlanetDialog.this){
                     Core.scene.setScrollFocus(PlanetDialog.this);
@@ -711,6 +712,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.table(t -> {
                 t.add("@sectors.resources").padRight(4);
                 for(UnlockableContent c : sector.info.resources){
+                    if(c == null) continue; //apparently this is possible.
                     t.image(c.icon(Cicon.small)).padRight(3).size(Cicon.small.size);
                 }
             }).padLeft(10f).fillX().row();
