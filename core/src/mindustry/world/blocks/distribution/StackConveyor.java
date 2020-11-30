@@ -140,6 +140,7 @@ public class StackConveyor extends Block implements Autotiler{
             Draw.rect(stackRegion, Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interp.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
 
             //item
+            Draw.z(Layer.blockOver + 0.1f);
             float size = itemSize * Mathf.lerp(Math.min((float)items.total() / itemCapacity, 1), 1f, 0.4f);
             Drawf.shadow(Tmp.v1.x, Tmp.v1.y, size * 1.2f);
             Draw.rect(lastItem.icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
@@ -158,7 +159,7 @@ public class StackConveyor extends Block implements Autotiler{
 
             //team
             Draw.color(team.color);
-            Draw.rect(stackRegion, Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interp.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
+            Draw.rect(stackTeamRegion, Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interp.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
             Draw.color();
         }
 
