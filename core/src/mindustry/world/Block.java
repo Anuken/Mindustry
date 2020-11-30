@@ -632,18 +632,16 @@ public class Block extends UnlockableContent{
             cons.get(stack.item);
         }
 
-        if(consumes.any()){
-            //also requires inputs
-            for(Consume c : consumes.all()){
-                if(c instanceof ConsumeItems i){
-                    for(ItemStack stack : i.items){
-                        cons.get(stack.item);
-                    }
-                }else if(c instanceof ConsumeLiquid i){
-                    cons.get(i.liquid);
+        //also requires inputs
+        consumes.each(c -> {
+            if(c instanceof ConsumeItems i){
+                for(ItemStack stack : i.items){
+                    cons.get(stack.item);
                 }
+            }else if(c instanceof ConsumeLiquid i){
+                cons.get(i.liquid);
             }
-        }
+        });
     }
 
     @Override

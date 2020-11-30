@@ -249,9 +249,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
     boolean canSelect(Sector sector){
         if(mode == select) return sector.hasBase();
+        //preset sectors can only be selected once unlocked
+        if(sector.preset != null) return sector.preset.unlocked() || sector.hasBase();
 
-        return sector.hasBase() || sector.near().contains(Sector::hasBase) //near an occupied sector
-            || (sector.preset != null && sector.preset.unlocked()); //is an unlocked preset
+        return sector.hasBase() || sector.near().contains(Sector::hasBase); //near an occupied sector
     }
 
     Sector findLauncher(Sector to){
