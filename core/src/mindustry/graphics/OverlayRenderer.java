@@ -89,7 +89,7 @@ public class OverlayRenderer{
             }
 
             Lines.stroke(unitFade);
-            Lines.square(select.x, select.y, select.hitSize() * 1.5f, Time.time() * 2f);
+            Lines.square(select.x, select.y, select.hitSize() * 1.5f, Time.time * 2f);
             Draw.reset();
         }
 
@@ -112,14 +112,14 @@ public class OverlayRenderer{
                 if(dst < state.rules.enemyCoreBuildRadius * 2.2f){
                     Draw.color(Color.darkGray);
                     Lines.circle(core.x, core.y - 2, state.rules.enemyCoreBuildRadius);
-                    Draw.color(Pal.accent, core.team.color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
+                    Draw.color(Pal.accent, core.team.color, 0.5f + Mathf.absin(Time.time, 10f, 0.5f));
                     Lines.circle(core.x, core.y, state.rules.enemyCoreBuildRadius);
                 }
             });
         }
 
         Lines.stroke(2f);
-        Draw.color(Color.gray, Color.lightGray, Mathf.absin(Time.time(), 8f, 1f));
+        Draw.color(Color.gray, Color.lightGray, Mathf.absin(Time.time, 8f, 1f));
 
         if(state.hasSpawns()){
             for(Tile tile : spawner.getSpawns()){
@@ -167,15 +167,15 @@ public class OverlayRenderer{
             float size = 8;
             Draw.rect(player.unit().item().icon(Cicon.medium), v.x, v.y, size, size);
             Draw.color(Pal.accent);
-            Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time(), 5f, 1f));
+            Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time, 5f, 1f));
             Draw.reset();
 
             Building tile = world.buildWorld(v.x, v.y);
             if(input.canDropItem() && tile != null && tile.interactable(player.team()) && tile.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 && player.within(tile, itemTransferRange)){
                 Lines.stroke(3f, Pal.gray);
-                Lines.square(tile.x, tile.y, tile.block.size * tilesize / 2f + 3 + Mathf.absin(Time.time(), 5f, 1f));
+                Lines.square(tile.x, tile.y, tile.block.size * tilesize / 2f + 3 + Mathf.absin(Time.time, 5f, 1f));
                 Lines.stroke(1f, Pal.place);
-                Lines.square(tile.x, tile.y, tile.block.size * tilesize / 2f + 2 + Mathf.absin(Time.time(), 5f, 1f));
+                Lines.square(tile.x, tile.y, tile.block.size * tilesize / 2f + 2 + Mathf.absin(Time.time, 5f, 1f));
                 Draw.reset();
 
             }

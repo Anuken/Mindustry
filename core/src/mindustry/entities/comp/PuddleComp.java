@@ -101,10 +101,10 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
         float sscl = 25f;
 
         Draw.color(tmp.set(liquid.color).shiftValue(-0.05f));
-        Fill.circle(x + Mathf.sin(Time.time() + seeds * 532, sscl, smag), y + Mathf.sin(Time.time() + seeds * 53, sscl, smag), f * 8f);
+        Fill.circle(x + Mathf.sin(Time.time + seeds * 532, sscl, smag), y + Mathf.sin(Time.time + seeds * 53, sscl, smag), f * 8f);
         Angles.randLenVectors(id(), 3, f * 6f, (ex, ey) -> {
-            Fill.circle(x + ex + Mathf.sin(Time.time() + seeds * 532, sscl, smag),
-            y + ey + Mathf.sin(Time.time() + seeds * 53, sscl, smag), f * 5f);
+            Fill.circle(x + ex + Mathf.sin(Time.time + seeds * 532, sscl, smag),
+            y + ey + Mathf.sin(Time.time + seeds * 53, sscl, smag), f * 5f);
             seeds++;
         });
         Draw.color();

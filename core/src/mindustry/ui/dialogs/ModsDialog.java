@@ -102,12 +102,16 @@ public class ModsDialog extends BaseDialog{
 
                     t.button("@mod.import.github", Icon.github, bstyle, () -> {
                         dialog.hide();
+                        var modString = Core.settings.getString("lastmod", "");
+                        var suggested = Structs.random(suggestedMods);
 
-                        ui.showTextInput("@mod.import.github", "", 64, Core.settings.getString("lastmod", "Anuken/ExampleMod"), text -> {
-                            Core.settings.put("lastmod", text);
+                        ui.showTextInput("@mod.import.github", "", 64, modString.isEmpty() ? suggested : modString, text -> {
+                            if(!modString.isEmpty() || !Structs.eq(suggested, text)){
+                                Core.settings.put("lastmod", text);
+                            }
 
                             ui.loadfrag.show();
-                            //Try to download the 6.0 branch first, but if it doesn't exist try master.
+                            //Try to download the 6.0 branch first, but if it doesn't exist, try master.
                             githubImport("6.0", text, e1 -> {
                                 githubImport("master", text, e2 -> {
                                     githubImport("main", text, e3 -> {

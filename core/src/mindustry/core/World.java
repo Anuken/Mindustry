@@ -311,7 +311,7 @@ public class World{
         //TODO bad code
         boolean hasSnow = floors[0].name.contains("ice") || floors[0].name.contains("snow");
         boolean hasRain = !hasSnow && content.contains(Liquids.water) && !floors[0].name.contains("sand");
-        boolean hasDesert = !hasSnow && !hasRain && floors[0].name.contains("sand");
+        boolean hasDesert = !hasSnow && !hasRain && floors[0] == Blocks.sand;
         boolean hasSpores = floors[0].name.contains("spore") || floors[0].name.contains("moss") || floors[0].name.contains("tainted");
 
         if(hasSnow){

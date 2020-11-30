@@ -10,6 +10,8 @@ import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class StorageBlock extends Block{
 
     public StorageBlock(String name){
@@ -55,6 +57,24 @@ public class StorageBlock extends Block{
             }else{
                 super.handleItem(source, item);
             }
+        }
+
+        @Override
+        public void itemTaken(Item item){
+            if(linkedCore != null){
+                linkedCore.itemTaken(item);
+            }
+        }
+
+        @Override
+        public int removeStack(Item item, int amount){
+            int result = super.removeStack(item, amount);
+
+            if(linkedCore != null && team == state.rules.defaultTeam && state.isCampaign()){
+                state.rules.sector.info.handleCoreItem(item, -result);
+            }
+
+            return result;
         }
 
         @Override
