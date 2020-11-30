@@ -53,6 +53,8 @@ public class Planet extends UnlockableContent{
     public int startSector = 0;
     /** Whether the bloom render effect is enabled. */
     public boolean bloom = false;
+    /** Whether this planet is displayed. */
+    public boolean visible = true;
     /** For suns, this is the color that shines on other planets. Does nothing for children. */
     public Color lightColor = Color.white.cpy();
     /** Atmosphere tint for landable planets. */
@@ -180,15 +182,15 @@ public class Planet extends UnlockableContent{
             float sum = 1f;
             for(Sector other : sector.near()){
                 if(other.generateEnemyBase){
-                    sum += 1f;
+                    sum += 0.9f;
                 }
             }
 
             if(sector.hasEnemyBase()){
-                sum += 2.5f;
+                sum += 0.88f;
             }
 
-            sector.threat = sector.preset == null ? Math.min(sum / 5f, 1.5f) : Mathf.clamp(sector.preset.difficulty / 10f);
+            sector.threat = sector.preset == null ? Math.min(sum / 5f, 1.2f) : Mathf.clamp(sector.preset.difficulty / 10f);
         }
     }
 
@@ -266,7 +268,7 @@ public class Planet extends UnlockableContent{
     }
 
     public boolean visible(){
-        return true;
+        return visible;
     }
 
     public void draw(Mat3D projection, Mat3D transform){

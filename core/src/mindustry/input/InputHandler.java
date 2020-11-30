@@ -47,6 +47,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Maximum line length. */
     final static int maxLength = 100;
     final static Rect r1 = new Rect(), r2 = new Rect();
+    final static Seq<Point2> tmpPoints = new Seq<>(), tmpPoints2 = new Seq<>();
 
     public final OverlayFragment frag = new OverlayFragment();
 
@@ -95,18 +96,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void transferItemTo(Item item, int amount, float x, float y, Building build){
+    public static void setItem(Building build, Item item, int amount){
         if(build == null || build.items == null) return;
-        for(int i = 0; i < Mathf.clamp(amount / 5, 1, 8); i++){
-            Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
-        }
-        build.items.add(item, amount);
+        build.items.set(item, amount);
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void transferItemTo(Unit unit, Item item, int amount, float x, float y, Building build){
+    public static void transferItemTo(@Nullable Unit unit, Item item, int amount, float x, float y, Building build){
         if(build == null || build.items == null) return;
-        unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
+
+        if(unit != null && unit.item() == item) unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
+
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
             Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
         }
@@ -169,7 +169,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(variants = Variant.one)
     public static void removeQueueBlock(int x, int y, boolean breaking){
-        player.builder().removeBuild(x, y, breaking);
+        player.unit().removeBuild(x, y, breaking);
     }
 
     @Remote(targets = Loc.both, called = Loc.server)
@@ -383,7 +383,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public Eachable<BuildPlan> allRequests(){
         return cons -> {
-            for(BuildPlan request : player.builder().plans()) cons.get(request);
+            for(BuildPlan request : player.unit().plans()) cons.get(request);
             for(BuildPlan request : selectRequests) cons.get(request);
             for(BuildPlan request : lineRequests) cons.get(request);
         };
@@ -401,7 +401,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         player.typing = ui.chatfrag.shown();
 
         if(player.isBuilder()){
-            player.builder().updateBuilding(isBuilding);
+            player.unit().updateBuilding(isBuilding);
         }
 
         if(player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && player.unit().ammo <= 0){
@@ -653,7 +653,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             return r2.overlaps(r1);
         };
 
-        for(BuildPlan req : player.builder().plans()){
+        for(BuildPlan req : player.unit().plans()){
             if(test.get(req)) return req;
         }
 
@@ -678,7 +678,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.color(Pal.remove);
         Lines.stroke(1f);
 
-        for(BuildPlan req : player.builder().plans()){
+        for(BuildPlan req : player.unit().plans()){
             if(req.breaking) continue;
             if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 drawBreaking(req);
@@ -740,7 +740,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(BuildPlan req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
                 BuildPlan copy = req.copy();
-                player.builder().addBuild(copy);
+                player.unit().addBuild(copy);
             }
         }
     }
@@ -749,7 +749,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         boolean valid = validPlace(request.x, request.y, request.block, request.rotation);
 
         Draw.reset();
-        Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime(), 6f, 0.28f));
+        Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
         Draw.alpha(1f);
         request.block.drawRequestConfigTop(request, selectRequests);
         Draw.reset();
@@ -778,7 +778,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** Remove everything from the queue in a selection. */
     protected void removeSelection(int x1, int y1, int x2, int y2, boolean flush){
-        removeSelection(x1, y1, x2, y2, false, maxLength);
+        removeSelection(x1, y1, x2, y2, flush, maxLength);
     }
 
     /** Remove everything from the queue in a selection. */
@@ -804,7 +804,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //remove build requests
         Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
 
-        Iterator<BuildPlan> it = player.builder().plans().iterator();
+        Iterator<BuildPlan> it = player.unit().plans().iterator();
         while(it.hasNext()){
             BuildPlan req = it.next();
             if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
@@ -925,7 +925,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     boolean tryBeginMine(Tile tile){
         if(canMine(tile)){
             //if a block is clicked twice, reset it
-            player.miner().mineTile(player.miner().mineTile() == tile ? null : tile);
+            player.unit().mineTile = player.unit().mineTile == tile ? null : tile;
             return true;
         }
         return false;
@@ -934,7 +934,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     boolean canMine(Tile tile){
         return !Core.scene.hasMouse()
             && tile.drop() != null
-            && player.miner().validMine(tile)
+            && player.unit().validMine(tile)
             && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
             && player.unit().acceptsItem(tile.drop())
             && tile.block() == Blocks.air;
@@ -1044,7 +1044,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public boolean canShoot(){
-        return block == null && !onConfigurable() && !isDroppingItem() && !player.builder().activelyBuilding() &&
+        return block == null && !onConfigurable() && !isDroppingItem() && !player.unit().activelyBuilding() &&
             !(player.unit() instanceof Mechc && player.unit().isFlying());
     }
 
@@ -1054,6 +1054,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean isDroppingItem(){
         return droppingItem;
+    }
+
+    public boolean canDropItem(){
+        return droppingItem && !canTapPlayer(Core.input.mouseWorldX(), Core.input.mouseWorldY());
     }
 
     public void tryDropItems(@Nullable Building tile, float x, float y){
@@ -1090,7 +1094,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public boolean validPlace(int x, int y, Block type, int rotation, BuildPlan ignore){
-        for(BuildPlan req : player.builder().plans()){
+        for(BuildPlan req : player.unit().plans()){
             if(req != ignore
                     && !req.breaking
                     && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
@@ -1108,15 +1112,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void placeBlock(int x, int y, Block block, int rotation){
         BuildPlan req = getRequest(x, y);
         if(req != null){
-            player.builder().plans().remove(req);
+            player.unit().plans().remove(req);
         }
-        player.builder().addBuild(new BuildPlan(x, y, rotation, block, block.nextConfig()));
+        player.unit().addBuild(new BuildPlan(x, y, rotation, block, block.nextConfig()));
     }
 
     public void breakBlock(int x, int y){
         Tile tile = world.tile(x, y);
         if(tile != null && tile.build != null) tile = tile.build.tile;
-        player.builder().addBuild(new BuildPlan(tile.x, tile.y));
+        player.unit().addBuild(new BuildPlan(tile.x, tile.y));
     }
 
     public void drawArrow(Block block, int x, int y, int rotation){
@@ -1160,27 +1164,39 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             points = Placement.normalizeLine(startX, startY, endX, endY);
         }
 
-        if(block instanceof PowerNode){
-            Seq<Point2> skip = new Seq<>();
+        if(block instanceof PowerNode node){
+            var base = tmpPoints2;
+            var result = tmpPoints.clear();
 
-            for(int i = 1; i < points.size; i++){
-                int overlaps = 0;
-                Point2 point = points.get(i);
+            base.selectFrom(points, p -> p == points.first() || p == points.peek() || Build.validPlace(block, player.team(), p.x, p.y, rotation, false));
+            boolean addedLast = false;
 
-                //check with how many powernodes the *next* tile will overlap
-                for(int j = 0; j < i; j++){
-                    if(!skip.contains(points.get(j)) && ((PowerNode)block).overlaps(world.tile(point.x, point.y), world.tile(points.get(j).x, points.get(j).y))){
-                        overlaps++;
+            outer:
+            for(int i = 0; i < base.size;){
+                var point = base.get(i);
+                result.add(point);
+                if(i == base.size - 1) addedLast = true;
+
+                //find the furthest node that overlaps this one
+                for(int j = base.size - 1; j > i; j--){
+                    var other = base.get(j);
+                    boolean over = node.overlaps(world.tile(point.x, point.y), world.tile(other.x, other.y));
+
+                    if(over){
+                        //add node to list and start searching for node that overlaps the next one
+                        i = j;
+                        continue outer;
                     }
                 }
 
-                //if it's more than one, it can bridge the gap
-                if(overlaps > 1){
-                    skip.add(points.get(i-1));
-                }
+                //if it got here, that means nothing was found. try to proceed to the next node anyway
+                i ++;
             }
-            //remove skipped points
-            points.removeAll(skip);
+
+            if(!addedLast) result.add(base.peek());
+
+            points.clear();
+            points.addAll(result);
         }
 
         float angle = Angles.angle(startX, startY, endX, endY);

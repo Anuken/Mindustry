@@ -32,7 +32,7 @@ allprojects{
 
     ext{
         versionNumber = '6'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'beta'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'release'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
@@ -97,6 +97,17 @@ allprojects{
 
         getPackage = {
             return project.ext.mainClassName.substring(0, project.ext.mainClassName.indexOf("desktop") - 1)
+        }
+
+        findSdkDir = {
+            //null because IntelliJ doesn't get env variables
+            def v = System.getenv("ANDROID_HOME")
+            if(v != null) return v
+            //rootDir is null here, amazing. brilliant.
+            def file = new File("local.properties")
+            if(!file.exists()) file = new File("../local.properties")
+            def props = new Properties().with{p -> p.load(file.newReader()); return p }
+            return props.get("sdk.dir")
         }
 
         generateLocales = {

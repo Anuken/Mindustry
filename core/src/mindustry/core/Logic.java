@@ -107,8 +107,15 @@ public class Logic implements ApplicationListener{
                 if(!(state.getSector().preset != null && !state.getSector().preset.useAI)){
                     state.rules.waveTeam.rules().ai = true;
                 }
-                state.rules.waveTeam.rules().aiTier = state.getSector().threat;
+                state.rules.waveTeam.rules().aiTier = state.getSector().threat * 0.8f;
                 state.rules.waveTeam.rules().infiniteResources = true;
+
+                //fill enemy cores by default.
+                for(var core : state.rules.waveTeam.cores()){
+                    for(Item item : content.items()){
+                        core.items.set(item, core.block.itemCapacity);
+                    }
+                }
             }
 
             //save settings
@@ -123,13 +130,13 @@ public class Logic implements ApplicationListener{
         });
 
         Events.on(SectorCaptureEvent.class, e -> {
-            if(!net.client()){
+            if(!net.client() && e.sector == state.getSector() && e.sector.isBeingPlayed()){
                 for(Tile tile : world.tiles){
                     //convert all blocks to neutral, randomly killing them
                     if(tile.isCenter() && tile.build != null && tile.build.team == state.rules.waveTeam){
                         Building b = tile.build;
+                        Call.setTeam(b, Team.derelict);
                         Time.run(Mathf.random(0f, 60f * 6f), () -> {
-                            Call.setTeam(b, Team.derelict);
                             if(Mathf.chance(0.25)){
                                 b.kill();
                             }
@@ -260,11 +267,13 @@ public class Logic implements ApplicationListener{
 
         if(state.rules.sector == null) return;
 
+        state.rules.sector.info.wasCaptured = true;
+
         //fire capture event
         Events.fire(new SectorCaptureEvent(state.rules.sector));
 
         //save, just in case
-        if(!headless){
+        if(!headless && !net.client()){
             control.saves.saveSector(state.rules.sector);
         }
     }

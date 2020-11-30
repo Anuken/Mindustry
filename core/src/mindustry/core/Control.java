@@ -6,6 +6,7 @@ import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
@@ -16,13 +17,17 @@ import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Objectives.*;
 import mindustry.game.Saves.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;
+import mindustry.maps.*;
 import mindustry.maps.Map;
+import mindustry.net.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 
@@ -43,7 +48,6 @@ import static mindustry.Vars.*;
 public class Control implements ApplicationListener, Loadable{
     public Saves saves;
     public SoundControl sound;
-    public Tutorial tutorial;
     public InputHandler input;
 
     private Interval timer = new Interval(2);
@@ -52,7 +56,6 @@ public class Control implements ApplicationListener, Loadable{
 
     public Control(){
         saves = new Saves();
-        tutorial = new Tutorial();
         sound = new SoundControl();
 
         Events.on(StateChangeEvent.class, event -> {
@@ -86,7 +89,6 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(ResetEvent.class, event -> {
             player.reset();
-            tutorial.reset();
 
             hiscore = false;
             saves.resetSave();
@@ -126,10 +128,18 @@ public class Control implements ApplicationListener, Loadable{
             }
         }));
 
-        Events.on(UnlockEvent.class, e -> ui.hudfrag.showUnlock(e.content));
-
         Events.on(UnlockEvent.class, e -> {
+            ui.hudfrag.showUnlock(e.content);
+
             checkAutoUnlocks();
+
+            if(e.content instanceof SectorPreset){
+                for(TechNode node : TechTree.all){
+                    if(!node.content.unlocked() && node.objectives.contains(o -> o instanceof SectorComplete sec && sec.preset == e.content) && !node.objectives.contains(o -> !o.complete())){
+                        ui.hudfrag.showToast(new TextureRegionDrawable(node.content.icon(Cicon.large)), bundle.get("available"));
+                    }
+                }
+            }
         });
 
         Events.on(SectorCaptureEvent.class, e -> {
@@ -162,8 +172,8 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(GameOverEvent.class, e -> {
             if(state.isCampaign() && !net.client() && !headless){
 
-                //delete the save, it is gone.
-                if(saves.getCurrent() != null && !state.rules.tutorial){
+                //save gameover sate immediately
+                if(saves.getCurrent() != null){
                     saves.getCurrent().save();
                 }
             }
@@ -225,7 +235,7 @@ public class Control implements ApplicationListener, Loadable{
 
         for(TechNode node : TechTree.all){
             if(!node.content.unlocked() && node.requirements.length == 0 && !node.objectives.contains(o -> !o.complete())){
-                node.content.unlocked();
+                node.content.unlock();
             }
         }
     }
@@ -279,6 +289,10 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     public void playSector(@Nullable Sector origin, Sector sector){
+        playSector(origin, sector, new WorldReloader());
+    }
+
+    void playSector(@Nullable Sector origin, Sector sector, WorldReloader reloader){
         ui.loadAnd(() -> {
             if(saves.getCurrent() != null && state.isGame()){
                 control.saves.getCurrent().save();
@@ -291,7 +305,7 @@ public class Control implements ApplicationListener, Loadable{
             if(slot != null && !clearSectors){
 
                 try{
-                    net.reset();
+                    reloader.begin();
                     slot.load();
                     slot.setAutosave(true);
                     state.rules.sector = sector;
@@ -305,21 +319,49 @@ public class Control implements ApplicationListener, Loadable{
                             sector.save = null;
                             slot.delete();
                             //play again
-                            playSector(origin, sector);
+                            playSector(origin, sector, reloader);
                             return;
                         }
 
+                        //set spawn for sector damage to use
+                        Tile spawn = world.tile(sector.info.spawnPosition);
+                        spawn.setBlock(Blocks.coreShard, state.rules.defaultTeam);
+
+                        //add extra damage.
+                        SectorDamage.apply(1f);
+
                         //reset wave so things are more fair
                         state.wave = 1;
+                        //set up default wave time
+                        state.wavetime = state.rules.waveSpacing * 2f;
+                        //reset captured state
+                        sector.info.wasCaptured = false;
+                        //re-enable waves
+                        state.rules.waves = true;
 
                         //reset win wave??
-                        state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null ? sector.preset.captureWave : 40;
+                        state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null ? sector.preset.captureWave : state.rules.winWave > state.wave ? state.rules.winWave : 40;
+
+                        //if there's still an enemy base left, fix it
+                        if(state.rules.attackMode){
+                            //replace all broken blocks
+                            for(var plan : state.rules.waveTeam.data().blocks){
+                                Tile tile = world.tile(plan.x, plan.y);
+                                if(tile != null){
+                                    tile.setBlock(content.block(plan.block), state.rules.waveTeam, plan.rotation);
+                                    if(plan.config != null && tile.build != null){
+                                        tile.build.configure(plan.config);
+                                    }
+                                }
+                            }
+                            state.rules.waveTeam.data().blocks.clear();
+                        }
 
                         //kill all units, since they should be dead anyway
                         Groups.unit.clear();
                         Groups.fire.clear();
+                        Groups.puddle.clear();
 
-                        Tile spawn = world.tile(sector.info.spawnPosition);
                         Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
                         //set up camera/player locations
@@ -331,6 +373,7 @@ public class Control implements ApplicationListener, Loadable{
                     }
 
                     state.set(State.playing);
+                    reloader.end();
 
                 }catch(SaveException e){
                     Log.err(e);
@@ -341,8 +384,7 @@ public class Control implements ApplicationListener, Loadable{
                 }
                 ui.planet.hide();
             }else{
-                net.reset();
-                logic.reset();
+                reloader.begin();
                 world.loadSector(sector);
                 state.rules.sector = sector;
                 //assign origin when launching
@@ -352,6 +394,7 @@ public class Control implements ApplicationListener, Loadable{
                 control.saves.saveSector(sector);
                 Events.fire(new SectorLaunchEvent(sector));
                 Events.fire(Trigger.newGame);
+                reloader.end();
             }
         });
     }
@@ -401,13 +444,6 @@ public class Control implements ApplicationListener, Loadable{
     @Override
     public void init(){
         platform.updateRPC();
-
-        //just a regular reminder
-        if(!OS.prop("user.name").equals("anuke") && !OS.hasEnv("iknowwhatimdoing")){
-            app.post(() -> app.post(() -> {
-                ui.showStartupInfo("@indev.popup");
-            }));
-        }
 
         //display UI scale changed dialog
         if(Core.settings.getBool("uiscalechanged", false)){
@@ -473,10 +509,6 @@ public class Control implements ApplicationListener, Loadable{
         if(state.isGame()){
             input.update();
 
-            if(state.rules.tutorial){
-                tutorial.update();
-            }
-
             //auto-update rpc every 5 seconds
             if(timer.get(0, 60 * 5)){
                 platform.updateRPC();
@@ -484,7 +516,7 @@ public class Control implements ApplicationListener, Loadable{
 
             //unlock core items
             var core = state.rules.defaultTeam.core();
-            if(!net.client() && core != null){
+            if(!net.client() && core != null && state.isCampaign()){
                 core.items.each((i, a) -> i.unlock());
             }
 

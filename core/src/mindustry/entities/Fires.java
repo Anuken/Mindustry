@@ -15,7 +15,7 @@ public class Fires{
     private static final float baseLifetime = 1000f;
     private static final IntMap<Fire> map = new IntMap<>();
 
-    /** Start a fire on the tile. If there already is a file there, refreshes its lifetime. */
+    /** Start a fire on the tile. If there already is a fire there, refreshes its lifetime. */
     public static void create(Tile tile){
         if(net.client() || tile == null || !state.rules.fire) return; //not clientside.
 

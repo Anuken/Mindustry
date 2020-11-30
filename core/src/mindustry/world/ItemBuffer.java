@@ -20,7 +20,7 @@ public class ItemBuffer{
 
     public void accept(Item item, short data){
         //if(!accepts()) return;
-        buffer[index++] = Pack.longInt(Float.floatToIntBits(Time.time()), Pack.shortInt(item.id, data));
+        buffer[index++] = Pack.longInt(Float.floatToIntBits(Time.time), Pack.shortInt(item.id, data));
     }
 
     public void accept(Item item){
@@ -32,7 +32,7 @@ public class ItemBuffer{
             long l = buffer[0];
             float time = Float.intBitsToFloat(Pack.leftInt(l));
 
-            if(Time.time() >= time + speed || Time.time() < time){
+            if(Time.time >= time + speed || Time.time < time){
                 return content.item(Pack.leftShort(Pack.rightInt(l)));
             }
         }

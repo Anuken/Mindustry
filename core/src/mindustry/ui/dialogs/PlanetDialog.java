@@ -22,6 +22,8 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
+import mindustry.input.*;
+import mindustry.io.legacy.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -60,7 +62,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         shouldPause = true;
 
         keyDown(key -> {
-            if(key == KeyCode.escape || key == KeyCode.back){
+            if(key == KeyCode.escape || key == KeyCode.back || key == Core.keybinds.get(Binding.planet_map).key){
                 if(showing() && newPresets.size > 1){
                     //clear all except first, which is the last sector.
                     newPresets.truncate(1);
@@ -134,6 +136,19 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     /** show with no limitations, just as a map. */
     @Override
     public Dialog show(){
+        if(net.client()){
+            ui.showInfo("@map.multiplayer");
+            return this;
+        }
+
+        //load legacy research
+        if(Core.settings.has("unlocks") && !Core.settings.has("junction-unlocked")){
+            Core.app.post(() -> {
+                ui.showCustomConfirm("@research", "@research.legacy", "@research.load", "@research.discard", LegacyIO::readResearch, () -> Core.settings.remove("unlocks"));
+            });
+        }
+
+        rebuildButtons();
         mode = look;
         selected = hovered = launchSector = null;
         launching = false;
@@ -161,6 +176,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         newPresets.reverse();
+        updateSelected();
 
         if(planets.planet.getLastSector() != null){
             lookAt(planets.planet.getLastSector());
@@ -239,6 +255,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     Sector findLauncher(Sector to){
+        Sector launchSector = this.launchSector != null && this.launchSector.hasBase() ? this.launchSector : null;
         //directly nearby.
         if(to.near().contains(launchSector)) return launchSector;
 
@@ -270,7 +287,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                     Color color =
                     sec.hasBase() ? Tmp.c2.set(Team.sharded.color).lerp(Team.crux.color, sec.hasEnemyBase() ? 0.5f : 0f) :
-                    sec.preset != null ? Tmp.c2.set(Team.derelict.color).lerp(Color.white, Mathf.absin(Time.time(), 10f, 1f)) :
+                    sec.preset != null ? Tmp.c2.set(Team.derelict.color).lerp(Color.white, Mathf.absin(Time.time, 10f, 1f)) :
                     sec.hasEnemyBase() ? Team.crux.color :
                     null;
 
@@ -392,6 +409,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             @Override
             public void draw(){
+                planets.orbitAlpha = selectAlpha;
                 planets.render(PlanetDialog.this);
                 if(Core.scene.getDialog() == PlanetDialog.this){
                     Core.scene.setScrollFocus(PlanetDialog.this);
@@ -545,7 +563,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                 if(t.getChildren().any()){
                     c.add(name).left().row();
-                    c.add(t).padLeft(10f).row();
+                    c.add(t).padLeft(10f).left().row();
                 }
             };
 
@@ -609,6 +627,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         Table stable = sectorTop;
 
         if(sector == null){
+            stable.clear();
             return;
         }
 
@@ -671,34 +690,31 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.add(Core.bundle.get("sectors.threat") + " [accent]" + sector.displayThreat()).row();
         }
 
-        if(sector.isAttacked()){ //TODO localize
-            //these mechanics are likely to change and as such are not added to the bundle
-            stable.add("[scarlet]Under attack! [accent]" + (int)(sector.info.damage * 100) + "% damaged");
+        if(sector.isAttacked()){
+            stable.add(Core.bundle.format("sectors.underattack", (int)(sector.info.damage * 100)));
             stable.row();
 
             if(sector.info.wavesSurvived >= 0 && sector.info.wavesSurvived - sector.info.wavesPassed >= 0 && !sector.isBeingPlayed()){
                 int toCapture = sector.info.attack || sector.info.winWave <= 1 ? -1 : sector.info.winWave - (sector.info.wave + sector.info.wavesPassed);
                 boolean plus = (sector.info.wavesSurvived - sector.info.wavesPassed) >= SectorDamage.maxRetWave - 1;
-                stable.add("[accent]Survives " + Math.min(sector.info.wavesSurvived - sector.info.wavesPassed, toCapture) +
-                (plus ? "+" : "") + (toCapture < 0 ? "" : "/" + toCapture) + " waves");
+                stable.add(Core.bundle.format("sectors.survives", Math.min(sector.info.wavesSurvived - sector.info.wavesPassed, toCapture <= 0 ? 200 : toCapture) +
+                (plus ? "+" : "") + (toCapture < 0 ? "" : "/" + toCapture)));
                 stable.row();
             }
-        }else if(sector.hasBase() && sector.near().contains(Sector::hasEnemyBase)){ //TODO localize
-            stable.add("[scarlet]Vulnerable");
+        }else if(sector.hasBase() && sector.near().contains(Sector::hasEnemyBase)){
+            stable.add("@sectors.vulnerable");
             stable.row();
-        }else if(!sector.hasBase() && sector.hasEnemyBase()){ //TODO localize
-            stable.add("[scarlet]Enemy Base");
+        }else if(!sector.hasBase() && sector.hasEnemyBase()){
+            stable.add("@sectors.enemybase");
             stable.row();
         }
 
         if(sector.save != null && sector.info.resources.any()){
             stable.table(t -> {
                 t.add("@sectors.resources").padRight(4);
-                int idx = 0;
-                int max = 5;
                 for(UnlockableContent c : sector.info.resources){
+                    if(c == null) continue; //apparently this is possible.
                     t.image(c.icon(Cicon.small)).padRight(3).size(Cicon.small.size);
-                    //if(++idx % max == 0) t.row();
                 }
             }).padLeft(10f).fillX().row();
         }
@@ -710,8 +726,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         if((sector.hasBase() && mode == look) || canSelect(sector) || (sector.preset != null && sector.preset.alwaysUnlocked) || debugSelect){
-            stable.button(mode == select ? "@sectors.select" : sector.hasBase() ? "@sectors.resume" : "@sectors.launch", Icon.play, () -> {
-                if(state.rules.sector == sector && !state.isMenu()){
+            stable.button(mode == select ? "@sectors.select" : sector.isBeingPlayed() ? "@sectors.resume" : sector.hasBase() ? "@sectors.go" : "@sectors.launch", Icon.play, () -> {
+                if(sector.isBeingPlayed()){
                     //already at this sector
                     hide();
                     return;

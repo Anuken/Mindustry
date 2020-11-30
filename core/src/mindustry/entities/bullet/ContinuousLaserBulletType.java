@@ -85,10 +85,10 @@ public class ContinuousLaserBulletType extends BulletType{
 
         Lines.lineAngle(b.x, b.y, b.rotation(), baseLen);
         for(int s = 0; s < colors.length; s++){
-            Draw.color(Tmp.c1.set(colors[s]).mul(1f + Mathf.absin(Time.time(), 1f, 0.1f)));
+            Draw.color(Tmp.c1.set(colors[s]).mul(1f + Mathf.absin(Time.time, 1f, 0.1f)));
             for(int i = 0; i < tscales.length; i++){
                 Tmp.v1.trns(b.rotation() + 180f, (lenscales[i] - 1f) * spaceMag);
-                Lines.stroke((width + Mathf.absin(Time.time(), oscScl, oscMag)) * fout * strokes[s] * tscales[i]);
+                Lines.stroke((width + Mathf.absin(Time.time, oscScl, oscMag)) * fout * strokes[s] * tscales[i]);
                 Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation(), baseLen * lenscales[i], false);
             }
         }

@@ -35,7 +35,8 @@ dependencies{
     natives "com.github.Anuken.Arc:natives-box2d-android:${getArcHash()}"
 
     //android dependencies magically disappear during compilation, thanks gradle!
-    if(new File(projectDir.parent, '../Arc').exists()) compileOnly fileTree(dir: '../../Arc/backends/backend-android/libs', include: ['*.jar'])
+    def sdkFile = new File((String)findSdkDir(), "/platforms/android-29/android.jar")
+    if(sdkFile.exists()) compileOnly files(sdkFile.absolutePath)
 }
 
 task deploy(type: Copy){

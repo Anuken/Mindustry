@@ -12,6 +12,8 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
+import static mindustry.Vars.*;
+
 public class UnitSpawnAbility extends Ability{
     public UnitType type;
     public float spawnTime = 60f, spawnX, spawnY;
@@ -31,7 +33,7 @@ public class UnitSpawnAbility extends Ability{
 
     @Override
     public void update(Unit unit){
-        timer += Time.delta;
+        timer += Time.delta * state.rules.unitBuildSpeedMultiplier;
 
         if(timer >= spawnTime && Units.canCreate(unit.team, type)){
             float x = unit.x + Angles.trnsx(unit.rotation, spawnY, spawnX), y = unit.y + Angles.trnsy(unit.rotation, spawnY, spawnX);

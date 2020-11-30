@@ -42,7 +42,7 @@ public class Incinerator extends Block{
                 float g = 0.3f;
                 float r = 0.06f;
 
-                Draw.alpha(((1f - g) + Mathf.absin(Time.time(), 8f, g) + Mathf.random(r) - r) * heat);
+                Draw.alpha(((1f - g) + Mathf.absin(Time.time, 8f, g) + Mathf.random(r) - r) * heat);
 
                 Draw.tint(flameColor);
                 Fill.circle(x, y, 2f);

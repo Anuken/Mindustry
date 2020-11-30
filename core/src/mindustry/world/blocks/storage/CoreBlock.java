@@ -63,6 +63,8 @@ public class CoreBlock extends StorageBlock{
         CoreBlock block = (CoreBlock)tile.block();
         Fx.spawn.at(entity);
 
+        player.set(entity);
+
         if(!net.client()){
             Unit unit = block.unitType.create(tile.team());
             unit.set(entity);
@@ -142,7 +144,7 @@ public class CoreBlock extends StorageBlock{
             //right before placing, create a "destination" item array which is all the previous items minus core requirements
             ItemModule items = tile.build.items.copy();
             if(!state.rules.infiniteResources){
-                items.remove(requirements);
+                items.remove(ItemStack.mult(requirements, state.rules.buildCostMultiplier));
             }
 
             nextItems = items;
@@ -155,7 +157,7 @@ public class CoreBlock extends StorageBlock{
 
         if(!canPlaceOn(world.tile(x, y), player.team())){
 
-            drawPlaceText(Core.bundle.get((player.team().core() != null && player.team().core().items.has(requirements)) || state.rules.infiniteResources ?
+            drawPlaceText(Core.bundle.get((player.team().core() != null && player.team().core().items.has(requirements, state.rules.buildCostMultiplier)) || state.rules.infiniteResources ?
                 "bar.corereq" :
                 "bar.noresources"
             ), x, y, valid);
@@ -227,12 +229,12 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return items.get(item) < getMaximumAccepted(item) || incinerate();
+            return items.get(item) < getMaximumAccepted(item);
         }
 
         @Override
         public int getMaximumAccepted(Item item){
-            return storageCapacity;
+            return incinerate() ? storageCapacity * 2 : storageCapacity;
         }
 
         @Override
@@ -264,6 +266,31 @@ public class CoreBlock extends StorageBlock{
             for(CoreBuild other : state.teams.cores(team)){
                 other.storageCapacity = storageCapacity;
             }
+        }
+
+        @Override
+        public void handleStack(Item item, int amount, Teamc source){
+            int realAmount = Math.min(amount, storageCapacity - items.get(item));
+            super.handleStack(item, realAmount, source);
+
+            if(team == state.rules.defaultTeam && state.isCampaign()){
+                state.rules.sector.info.handleCoreItem(item, amount);
+
+                if(realAmount == 0){
+                    Fx.coreBurn.at(x, y);
+                }
+            }
+        }
+
+        @Override
+        public int removeStack(Item item, int amount){
+            int result = super.removeStack(item, amount);
+
+            if(team == state.rules.defaultTeam && state.isCampaign()){
+                state.rules.sector.info.handleCoreItem(item, -result);
+            }
+
+            return result;
         }
 
         @Override
@@ -355,7 +382,7 @@ public class CoreBlock extends StorageBlock{
                     state.rules.sector.info.handleCoreItem(item, 1);
                 }
 
-                if(items.get(item) >= getMaximumAccepted(item)){
+                if(items.get(item) >= storageCapacity){
                     //create item incineration effect at random intervals
                     if(!noEffect){
                         incinerateEffect(this, source);
@@ -363,10 +390,6 @@ public class CoreBlock extends StorageBlock{
                     noEffect = false;
                 }else{
                     super.handleItem(source, item);
-                }
-
-                if(state.rules.tutorial){
-                    Events.fire(new CoreItemDeliverEvent());
                 }
             }
         }

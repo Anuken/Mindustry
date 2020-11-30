@@ -11,7 +11,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public abstract class BaseTurret extends Block{
+public class BaseTurret extends Block{
     public float range = 80f;
     public float rotateSpeed = 5;
 
