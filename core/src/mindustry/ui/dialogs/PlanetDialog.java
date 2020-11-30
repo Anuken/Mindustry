@@ -409,6 +409,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             @Override
             public void draw(){
+                planets.orbitAlpha = selectAlpha;
                 planets.render(PlanetDialog.this);
                 if(Core.scene.getDialog() == PlanetDialog.this){
                     Core.scene.setScrollFocus(PlanetDialog.this);
