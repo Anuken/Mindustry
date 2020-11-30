@@ -28,7 +28,6 @@ public class ShockMine extends Block{
     }
 
     public class ShockMineBuild extends Building{
-
         private float progress = 0f;
         private float blinkDelay = 40f;
 
@@ -40,7 +39,7 @@ public class ShockMine extends Block{
         @Override
         public void draw(){
             super.draw();
-            if(isActive() || progress < 20f){
+            if(isActive() || progress < blinkDelay * 0.5f){
                 Draw.color(team.color);
                 Draw.alpha(0.5f);
                 Fill.rect(x, y, 2f, 2f);
@@ -54,7 +53,7 @@ public class ShockMine extends Block{
 
         @Override
         public void unitOn(Unit unit){
-            if(enabled && unit.team != team && timer(timerDamage, cooldown) && isActive()){
+            if(isActive() && enabled && unit.team != team && timer(timerDamage, cooldown)){
                 for(int i = 0; i < tendrils; i++){
                     Lightning.create(team, lightningColor, damage, x, y, Mathf.random(360f), length);
                 }
