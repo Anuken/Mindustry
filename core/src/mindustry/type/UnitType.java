@@ -512,7 +512,7 @@ public class UnitType extends UnlockableContent{
 
             Draw.mixcol();
 
-            Lines.stroke(1f, Pal.accent);
+            Lines.stroke(1f, unit.team.color);
             Lines.circle(
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
@@ -522,7 +522,7 @@ public class UnitType extends UnlockableContent{
                 Fonts.outline.draw(unit.stack.amount + "",
                 unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
                 unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY) - 3,
-                Pal.accent, 0.25f * unit.itemTime / Scl.scl(1f), false, Align.center
+                unit.team.color, 0.25f * unit.itemTime / Scl.scl(1f), false, Align.center
                 );
             }
 
