@@ -340,7 +340,7 @@ public class Control implements ApplicationListener, Loadable{
                         state.rules.waves = true;
 
                         //reset win wave??
-                        state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null ? sector.preset.captureWave : 40;
+                        state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null ? sector.preset.captureWave : state.rules.winWave > state.wave ? state.rules.winWave : 40;
 
                         //if there's still an enemy base left, fix it
                         if(state.rules.attackMode){

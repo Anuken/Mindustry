@@ -201,7 +201,7 @@ public class Universe{
                         }
 
                         sector.info.export.each((item, amount) -> {
-                            if(sector.info.items.get(item) <= 0 && sector.info.production.get(item, ExportStat::new).mean <= 0){
+                            if(sector.info.items.get(item) <= 0 && sector.info.production.get(item, ExportStat::new).mean < 0){
                                 //disable export when production is negative.
                                 sector.info.export.get(item).mean = 0f;
                             }
@@ -225,9 +225,11 @@ public class Universe{
                             if(sector.isBeingPlayed()){
                                 state.rules.winWave = waveMax;
                                 state.rules.waves = true;
+                                state.rules.attackMode = false;
                             }else{
                                 sector.info.winWave = waveMax;
                                 sector.info.waves = true;
+                                sector.info.attack = false;
                                 sector.saveInfo();
                             }
 

@@ -13,7 +13,6 @@ public class Liquids implements ContentList{
         water = new Liquid("water", Color.valueOf("596ab8")){{
             heatCapacity = 0.4f;
             effect = StatusEffects.wet;
-            alwaysUnlocked = true;
         }};
 
         slag = new Liquid("slag", Color.valueOf("ffa166")){{

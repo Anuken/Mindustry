@@ -249,9 +249,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
     boolean canSelect(Sector sector){
         if(mode == select) return sector.hasBase();
+        //preset sectors can only be selected once unlocked
+        if(sector.preset != null) return sector.preset.unlocked() || sector.hasBase();
 
-        return sector.hasBase() || sector.near().contains(Sector::hasBase) //near an occupied sector
-            || (sector.preset != null && sector.preset.unlocked()); //is an unlocked preset
+        return sector.hasBase() || sector.near().contains(Sector::hasBase); //near an occupied sector
     }
 
     Sector findLauncher(Sector to){
@@ -287,7 +288,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                     Color color =
                     sec.hasBase() ? Tmp.c2.set(Team.sharded.color).lerp(Team.crux.color, sec.hasEnemyBase() ? 0.5f : 0f) :
-                    sec.preset != null ? Tmp.c2.set(Team.derelict.color).lerp(Color.white, Mathf.absin(Time.time(), 10f, 1f)) :
+                    sec.preset != null ? Tmp.c2.set(Team.derelict.color).lerp(Color.white, Mathf.absin(Time.time, 10f, 1f)) :
                     sec.hasEnemyBase() ? Team.crux.color :
                     null;
 
@@ -409,6 +410,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             @Override
             public void draw(){
+                planets.orbitAlpha = selectAlpha;
                 planets.render(PlanetDialog.this);
                 if(Core.scene.getDialog() == PlanetDialog.this){
                     Core.scene.setScrollFocus(PlanetDialog.this);
@@ -626,6 +628,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         Table stable = sectorTop;
 
         if(sector == null){
+            stable.clear();
             return;
         }
 
@@ -711,6 +714,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.table(t -> {
                 t.add("@sectors.resources").padRight(4);
                 for(UnlockableContent c : sector.info.resources){
+                    if(c == null) continue; //apparently this is possible.
                     t.image(c.icon(Cicon.small)).padRight(3).size(Cicon.small.size);
                 }
             }).padLeft(10f).fillX().row();

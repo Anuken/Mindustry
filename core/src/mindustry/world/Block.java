@@ -392,7 +392,7 @@ public class Block extends UnlockableContent{
 
     public void drawRequest(BuildPlan req, Eachable<BuildPlan> list, boolean valid){
         Draw.reset();
-        Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime(), 6f, 0.28f));
+        Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
         Draw.alpha(1f);
         float prevScale = Draw.scl;
         Draw.scl *= req.animScale;
@@ -632,18 +632,16 @@ public class Block extends UnlockableContent{
             cons.get(stack.item);
         }
 
-        if(consumes.any()){
-            //also requires inputs
-            for(Consume c : consumes.all()){
-                if(c instanceof ConsumeItems i){
-                    for(ItemStack stack : i.items){
-                        cons.get(stack.item);
-                    }
-                }else if(c instanceof ConsumeLiquid i){
-                    cons.get(i.liquid);
+        //also requires inputs
+        consumes.each(c -> {
+            if(c instanceof ConsumeItems i){
+                for(ItemStack stack : i.items){
+                    cons.get(stack.item);
                 }
+            }else if(c instanceof ConsumeLiquid i){
+                cons.get(i.liquid);
             }
-        }
+        });
     }
 
     @Override

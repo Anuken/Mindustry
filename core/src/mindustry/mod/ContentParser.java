@@ -309,6 +309,10 @@ public class ContentParser{
 
                 }
 
+                if(value.has("controller")){
+                    unit.defaultController = make(resolve(value.getString("controller"), "mindustry.ai.type"));
+                }
+
                 //read extra default waves
                 if(value.has("waves")){
                     JsonValue waves = value.remove("waves");

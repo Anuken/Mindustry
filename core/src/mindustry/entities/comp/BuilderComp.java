@@ -11,6 +11,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -28,6 +29,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
 
     @Import float x, y, rotation;
     @Import UnitType type;
+    @Import Team team;
 
     @SyncLocal Queue<BuildPlan> plans = new Queue<>(1);
     @SyncLocal transient boolean updateBuilding = true;
@@ -75,27 +77,27 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         Tile tile = world.tile(current.x, current.y);
 
         if(!(tile.block() instanceof ConstructBlock)){
-            if(!current.initialized && !current.breaking && Build.validPlace(current.block, team(), current.x, current.y, current.rotation)){
+            if(!current.initialized && !current.breaking && Build.validPlace(current.block, team, current.x, current.y, current.rotation)){
                 boolean hasAll = infinite || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item));
 
                 if(hasAll){
-                    Call.beginPlace(current.block, team(), current.x, current.y, current.rotation);
+                    Call.beginPlace(self(), current.block, team, current.x, current.y, current.rotation);
                 }else{
                     current.stuck = true;
                 }
-            }else if(!current.initialized && current.breaking && Build.validBreak(team(), current.x, current.y)){
-                Call.beginBreak(team(), current.x, current.y);
+            }else if(!current.initialized && current.breaking && Build.validBreak(team, current.x, current.y)){
+                Call.beginBreak(self(), team, current.x, current.y);
             }else{
                 plans.removeFirst();
                 return;
             }
-        }else if(tile.team() != team()){
+        }else if(tile.team() != team){
             plans.removeFirst();
             return;
         }
 
         if(tile.build instanceof ConstructBuild && !current.initialized){
-            Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, team(), (Builderc)this, current.breaking)));
+            Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, team, self(), current.breaking)));
             current.initialized = true;
         }
 
@@ -128,7 +130,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
                 control.input.drawBreaking(request);
             }else{
                 request.block.drawRequest(request, control.input.allRequests(),
-                Build.validPlace(request.block, team(), request.x, request.y, request.rotation) || control.input.requestMatches(request));
+                Build.validPlace(request.block, team, request.x, request.y, request.rotation) || control.input.requestMatches(request));
             }
         }
 
@@ -138,7 +140,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
     /** @return whether this request should be skipped, in favor of the next one. */
     boolean shouldSkip(BuildPlan request, @Nullable Building core){
         //requests that you have at least *started* are considered
-        if(state.rules.infiniteResources || team().rules().infiniteResources || request.breaking || core == null) return false;
+        if(state.rules.infiniteResources || team.rules().infiniteResources || request.breaking || core == null) return false;
         return (request.stuck && !core.items.has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items.has(i.item) && Mathf.round(i.amount * state.rules.buildCostMultiplier) > 0) && !request.initialized);
     }
 
@@ -222,7 +224,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         float tx = plan.drawx(), ty = plan.drawy();
 
         Lines.stroke(1f, Pal.accent);
-        float focusLen = 3.8f + Mathf.absin(Time.time(), 1.1f, 0.6f);
+        float focusLen = 3.8f + Mathf.absin(Time.time, 1.1f, 0.6f);
         float px = x + Angles.trnsx(rotation, focusLen);
         float py = y + Angles.trnsy(rotation, focusLen);
 
@@ -244,7 +246,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         Lines.line(px, py, x1, y1);
         Lines.line(px, py, x3, y3);
 
-        Fill.circle(px, py, 1.6f + Mathf.absin(Time.time(), 0.8f, 1.5f));
+        Fill.circle(px, py, 1.6f + Mathf.absin(Time.time, 0.8f, 1.5f));
 
         Draw.color();
     }
