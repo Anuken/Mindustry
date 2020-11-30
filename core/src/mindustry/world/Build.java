@@ -58,7 +58,7 @@ public class Build{
         if(tile == null) return;
 
         //auto-rotate the block to the correct orientation and bail out
-        if(tile.team() == team && tile.block == result && tile.build != null){
+        if(tile.team() == team && tile.block == result && tile.build != null && tile.block.quickRotate){
             if(unit != null && unit.isPlayer()) tile.build.lastAccessed = unit.getPlayer().name;
             tile.build.rotation = Mathf.mod(rotation, 4);
             tile.build.updateProximity();
