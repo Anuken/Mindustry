@@ -30,9 +30,7 @@ public class SchematicsDialog extends BaseDialog{
 
     public SchematicsDialog(){
         super("@schematics");
-        Core.assets.load("sprites/schematic-background.png", Texture.class).loaded = t -> {
-            ((Texture)t).setWrap(TextureWrap.repeat);
-        };
+        Core.assets.load("sprites/schematic-background.png", Texture.class).loaded = t -> ((Texture)t).setWrap(TextureWrap.repeat);
 
         shouldPause = true;
         addCloseButton();
@@ -281,6 +279,17 @@ public class SchematicsDialog extends BaseDialog{
         if(searchField == null) return;
 
         Core.scene.setKeyboardFocus(searchField);
+    }
+
+    @Override
+    public Dialog show(){
+        super.show();
+
+        if(Core.app.isDesktop()){
+            focusSearchField();
+        }
+
+        return this;
     }
 
     public static class SchematicImage extends Image{

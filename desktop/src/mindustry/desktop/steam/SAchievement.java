@@ -3,22 +3,17 @@ package mindustry.desktop.steam;
 public enum SAchievement{
     kill1kEnemies(SStat.unitsDestroyed, 1000),
     kill100kEnemies(SStat.unitsDestroyed, 100_000),
-    launch10kItems(SStat.itemsLaunched, 10_000),
-    launch1milItems(SStat.itemsLaunched, 1_000_000),
+    launch100kItems(SStat.itemsLaunched, 100_000),
 
-    produce1kMin(SStat.maxProduction, 1000),
-    produce20kMin(SStat.maxProduction, 20_000),
+    produce5kMin(SStat.maxProduction, 5000),
+    produce50kMin(SStat.maxProduction, 50_000),
     win10Attack(SStat.attacksWon, 10),
     win10PvP(SStat.pvpsWon, 10),
     defeatAttack5Waves,
     launch30Times(SStat.timesLaunched, 30),
     captureBackground,
     survive100Waves(SStat.maxWavesSurvived, 100),
-    //this seems near-impossible?
-    //survive500Waves(SStat.maxWavesSurvived, 500),
     researchAll,
-    //TODO
-    //useAllUnits,
     shockWetEnemy,
     killEnemyPhaseWall,
     researchRouter,
@@ -30,7 +25,7 @@ public enum SAchievement{
     publishMap(SStat.mapsPublished, 1),
     defeatBoss(SStat.bossesDefeated, 1),
     captureAllSectors,
-    control10Sectors,
+    control10Sectors(SStat.sectorsControlled, 10),
     drop10kitems,
     powerupImpactReactor,
     obtainThorium,
@@ -43,13 +38,12 @@ public enum SAchievement{
     buildAllUnits(SStat.unitTypesBuilt, 30),
     buildT5,
     pickupT5,
-    activeAllT5,
     active10Polys,
     dieExclusion,
     drown,
     fillCoreAllCampaign,
     hostServer10(SStat.maxPlayersServer, 10),
-    buildMeltdownSpectreForeshadow,
+    buildMeltdownSpectre, //technically inaccurate
     launchItemPad,
     chainRouters,
     circleConveyor,
@@ -61,6 +55,8 @@ public enum SAchievement{
     coolTurret,
     enablePixelation,
     openWiki,
+    useAccelerator,
+
     ;
 
     private final SStat stat;

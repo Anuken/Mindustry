@@ -392,7 +392,7 @@ public class Block extends UnlockableContent{
 
     public void drawRequest(BuildPlan req, Eachable<BuildPlan> list, boolean valid){
         Draw.reset();
-        Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime(), 6f, 0.28f));
+        Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
         Draw.alpha(1f);
         float prevScale = Draw.scl;
         Draw.scl *= req.animScale;
@@ -556,17 +556,17 @@ public class Block extends UnlockableContent{
         return cacheLayer == CacheLayer.walls;
     }
 
-    protected void requirements(Category cat, ItemStack[] stacks, boolean unlocked){
+    public void requirements(Category cat, ItemStack[] stacks, boolean unlocked){
         requirements(cat, BuildVisibility.shown, stacks);
         this.alwaysUnlocked = unlocked;
     }
 
-    protected void requirements(Category cat, ItemStack[] stacks){
+    public void requirements(Category cat, ItemStack[] stacks){
         requirements(cat, BuildVisibility.shown, stacks);
     }
 
     /** Sets up requirements. Use only this method to set up requirements. */
-    protected void requirements(Category cat, BuildVisibility visible, ItemStack[] stacks){
+    public void requirements(Category cat, BuildVisibility visible, ItemStack[] stacks){
         this.category = cat;
         this.requirements = stacks;
         this.buildVisibility = visible;
@@ -617,7 +617,7 @@ public class Block extends UnlockableContent{
     public ItemStack[] researchRequirements(){
         ItemStack[] out = new ItemStack[requirements.length];
         for(int i = 0; i < out.length; i++){
-            int quantity = 60 + Mathf.round(Mathf.pow(requirements[i].amount, 1.09f) * 20 * researchCostMultiplier, 10);
+            int quantity = 60 + Mathf.round(Mathf.pow(requirements[i].amount, 1.1f) * 20 * researchCostMultiplier, 10);
 
             out[i] = new ItemStack(requirements[i].item, UI.roundAmount(quantity));
         }
@@ -631,6 +631,17 @@ public class Block extends UnlockableContent{
         for(ItemStack stack : requirements){
             cons.get(stack.item);
         }
+
+        //also requires inputs
+        consumes.each(c -> {
+            if(c instanceof ConsumeItems i){
+                for(ItemStack stack : i.items){
+                    cons.get(stack.item);
+                }
+            }else if(c instanceof ConsumeLiquid i){
+                cons.get(i.liquid);
+            }
+        });
     }
 
     @Override

@@ -21,7 +21,7 @@ import mindustry.world.blocks.storage.*;
 import static mindustry.Vars.*;
 
 public class SectorDamage{
-    public static final int maxRetWave = 30, maxWavesSimulated = 50;
+    public static final int maxRetWave = 40, maxWavesSimulated = 50;
 
     //direct damage is for testing only
     private static final boolean direct = false, rubble = true;
@@ -68,6 +68,11 @@ public class SectorDamage{
                 float enemyDps = info.waveDpsBase + info.waveDpsSlope * (i);
                 float enemyHealth = info.waveHealthBase + info.waveHealthSlope * (i);
 
+                if(info.bossWave == i){
+                    enemyDps += info.bossDps;
+                    enemyHealth += info.bossHealth;
+                }
+
                 //happens due to certain regressions
                 if(enemyHealth < 0 || enemyDps < 0) continue;
 
@@ -111,22 +116,25 @@ public class SectorDamage{
         float damage = getDamage(state.rules.sector.info);
 
         //scaled damage has a power component to make it seem a little more realistic (as systems fail, enemy capturing gets easier and easier)
-        float scaled = Mathf.pow(damage, 1.6f);
+        float scaled = Mathf.pow(damage, 1.2f);
 
-        //apply damage to units
-        float unitDamage = damage * state.rules.sector.info.sumHealth;
         Tile spawn = spawner.getFirstSpawn();
 
         //damage only units near the spawn point
         if(spawn != null){
             Seq<Unit> allies = new Seq<>();
+            float sumUnitHealth = 0f;
             for(Unit ally : Groups.unit){
                 if(ally.team == state.rules.defaultTeam && ally.within(spawn, state.rules.dropZoneRadius * 2.5f)){
                     allies.add(ally);
+                    sumUnitHealth += ally.health;
                 }
             }
 
             allies.sort(u -> u.dst2(spawn));
+
+            //apply damage to units
+            float unitDamage = damage * sumUnitHealth;
 
             //damage units one by one, not uniformly
             for(var u : allies){
@@ -302,6 +310,7 @@ public class SectorDamage{
 
         //calculate DPS and health for the next few waves and store in list
         var reg = new LinearRegression();
+        SpawnGroup bossGroup = null;
         Seq<Vec2> waveDps = new Seq<>(), waveHealth = new Seq<>();
 
         for(int wave = state.wave; wave < state.wave + 10; wave ++){
@@ -317,12 +326,32 @@ public class SectorDamage{
                 float healthMult = 1f + Mathf.clamp(group.type.armor / 20f);
                 StatusEffect effect = (group.effect == null ? StatusEffects.none : group.effect);
                 int spawned = group.getSpawned(wave);
+                //save the boss group
+                if(group.effect == StatusEffects.boss){
+                    bossGroup = group;
+                    continue;
+                }
                 if(spawned <= 0) continue;
                 sumWaveHealth += spawned * (group.getShield(wave) + group.type.health * effect.healthMultiplier * healthMult);
                 sumWaveDps += spawned * group.type.dpsEstimate * effect.damageMultiplier;
             }
             waveDps.add(new Vec2(wave, sumWaveDps));
             waveHealth.add(new Vec2(wave, sumWaveHealth));
+        }
+
+        if(bossGroup != null){
+            float bossMult = 1.1f;
+            //calculate first boss appearaance
+            for(int wave = state.wave; wave < state.wave + 60; wave++){
+                int spawned = bossGroup.getSpawned(wave - 1);
+                if(spawned > 0){
+                    //set up relevant stats
+                    info.bossWave = wave;
+                    info.bossDps = spawned * bossGroup.type.dpsEstimate * StatusEffects.boss.damageMultiplier * bossMult;
+                    info.bossHealth = spawned * (bossGroup.getShield(wave) + bossGroup.type.health * StatusEffects.boss.healthMultiplier * (1f + Mathf.clamp(bossGroup.type.armor / 20f))) * bossMult;
+                    break;
+                }
+            }
         }
 
         //calculate linear regression of the wave data and store it
@@ -335,9 +364,9 @@ public class SectorDamage{
         info.waveDpsSlope = reg.slope;
 
         //enemy units like to aim for a lot of non-essential things, so increase resulting health slightly
-        info.sumHealth = sumHealth * 1.2f;
+        info.sumHealth = sumHealth * 1.05f;
         //players tend to have longer range units/turrets, so assume DPS is higher
-        info.sumDps = sumDps * 1.2f;
+        info.sumDps = sumDps * 1.05f;
         info.sumRps = sumRps;
 
         info.wavesSurvived = getWavesSurvived(info);
@@ -348,13 +377,12 @@ public class SectorDamage{
 
         Queue<Tile> frontier = new Queue<>();
         float[][] values = new float[tiles.width][tiles.height];
-        float damage = fraction*80; //arbitrary damage value
 
         //phase one: find all spawnpoints
         for(Tile tile : tiles){
             if((tile.block() instanceof CoreBlock && tile.team() == state.rules.waveTeam) || tile.overlay() == Blocks.spawn){
                 frontier.add(tile);
-                values[tile.x][tile.y] = damage;
+                values[tile.x][tile.y] = fraction * 24;
             }
         }
 
@@ -368,14 +396,16 @@ public class SectorDamage{
                 int radius = 3;
 
                 //only penetrate a certain % by health, not by distance
-                float totalHealth = damage >= 1f ? 1f : path.sumf(t -> {
+                float totalHealth = fraction >= 1f ? 1f : path.sumf(t -> {
                     float s = 0;
                     for(int dx = -radius; dx <= radius; dx++){
                         for(int dy = -radius; dy <= radius; dy++){
                             int wx = dx + t.x, wy = dy + t.y;
                             if(wx >= 0 && wy >= 0 && wx < world.width() && wy < world.height() && Mathf.within(dx, dy, radius)){
                                 Tile other = world.rawTile(wx, wy);
-                                s += other.team() == state.rules.defaultTeam ? other.build.health / other.block().size : 0f;
+                                if(!(other.block() instanceof CoreBlock)){
+                                    s += other.team() == state.rules.defaultTeam ? other.build.health / other.block().size : 0f;
+                                }
                             }
                         }
                     }
@@ -385,7 +415,7 @@ public class SectorDamage{
                 float healthCount = 0;
 
                 out:
-                for(int i = 0; i < path.size && (healthCount < targetHealth || damage >= 1f); i++){
+                for(int i = 0; i < path.size && (healthCount < targetHealth || fraction >= 1f); i++){
                     Tile t = path.get(i);
 
                     for(int dx = -radius; dx <= radius; dx++){
@@ -405,7 +435,7 @@ public class SectorDamage{
 
                                     removal.add(other.build);
 
-                                    if(healthCount >= targetHealth && damage < 0.999f){
+                                    if(healthCount >= targetHealth && fraction < 0.999f){
                                         break out;
                                     }
                                 }
@@ -430,10 +460,10 @@ public class SectorDamage{
             }
         }
 
-        float falloff = (damage) / (Math.max(tiles.width, tiles.height) * Mathf.sqrt2);
+        float falloff = (fraction) / (Math.max(tiles.width, tiles.height) * Mathf.sqrt2);
         int peak = 0;
 
-        if(damage > 0.1f){
+        if(fraction > 0.15f){
             //phase two: propagate the damage
             while(!frontier.isEmpty()){
                 peak = Math.max(peak, frontier.size);

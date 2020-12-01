@@ -13,7 +13,7 @@ import mindustry.io.*;
 
 public class Weapon{
     /** displayed weapon region */
-    public String name;
+    public String name = "";
     /** bullet shot */
     public BulletType bullet;
     /** shell ejection effect */
@@ -75,7 +75,7 @@ public class Weapon{
     /** sound used for weapons that have a delay */
     public Sound chargeSound = Sounds.none;
     /** sound played when there is nothing to shoot */
-    public Sound noAmmoSound = Sounds.click;
+    public Sound noAmmoSound = Sounds.noammo;
     /** displayed region (autoloaded) */
     public TextureRegion region;
     /** heat region, must be same size as region (optional) */

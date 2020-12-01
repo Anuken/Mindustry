@@ -24,6 +24,8 @@ public abstract class UnlockableContent extends MappableContent{
     public @Nullable String description, details;
     /** Whether this content is always unlocked in the tech tree. */
     public boolean alwaysUnlocked = false;
+    /** Whether to show the description in the research dialog preview. */
+    public boolean inlineDescription = true;
     /** Special logic icon ID. */
     public int iconId = 0;
     /** Icons by Cicon ID.*/
@@ -108,7 +110,7 @@ public abstract class UnlockableContent extends MappableContent{
 
     /** Makes this piece of content unlocked; if it already unlocked, nothing happens. */
     public void unlock(){
-        if(!unlocked()){
+        if(!net.client() && !unlocked()){
             unlocked = true;
             Core.settings.put(name + "-unlocked", true);
 

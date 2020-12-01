@@ -5,7 +5,6 @@ public enum SStat{
     attacksWon,
     pvpsWon,
     timesLaunched,
-    zoneMechsUsed, //TODO
     blocksDestroyed,
     itemsLaunched,
     reactorsOverheated,

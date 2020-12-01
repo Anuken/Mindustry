@@ -82,6 +82,12 @@ public class PayloadAcceptor extends Block{
             return t;
         }
 
+        @Override
+        public void onRemoved(){
+            super.onRemoved();
+            if(payload != null) payload.dump();
+        }
+
         public boolean blends(int direction){
             return PayloadAcceptor.blends(this, direction);
         }

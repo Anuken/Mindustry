@@ -79,16 +79,13 @@ public class MobileInput extends InputHandler implements GestureListener{
         Unit unit = Units.closestEnemy(player.team(), x, y, 20f, u -> !u.dead);
 
         if(unit != null){
-            player.miner().mineTile(null);
+            player.unit().mineTile = null;
             target = unit;
         }else{
             Building tile = world.buildWorld(x, y);
 
-            if(tile != null && player.team().isEnemy(tile.team)){
-                player.miner().mineTile(null);
-                target = tile;
-            }else if(tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged()){
-                player.miner().mineTile(null);
+            if((tile != null && player.team().isEnemy(tile.team) && tile.team != Team.derelict) || (tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged())){
+                player.unit().mineTile = null;
                 target = tile;
             }
         }
@@ -117,7 +114,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        for(BuildPlan req : player.builder().plans()){
+        for(BuildPlan req : player.unit().plans()){
             Tile other = world.tile(req.x, req.y);
 
             if(other == null || req.breaking) continue;
@@ -222,10 +219,10 @@ public class MobileInput extends InputHandler implements GestureListener{
                             BuildPlan copy = request.copy();
 
                             if(other == null){
-                                player.builder().addBuild(copy);
+                                player.unit().addBuild(copy);
                             }else if(!other.breaking && other.x == request.x && other.y == request.y && other.block.size == request.block.size){
-                                player.builder().plans().remove(other);
-                                player.builder().addBuild(copy);
+                                player.unit().plans().remove(other);
+                                player.unit().addBuild(copy);
                             }
                         }
 
@@ -248,14 +245,14 @@ public class MobileInput extends InputHandler implements GestureListener{
         Boolp schem = () -> lastSchematic != null && !selectRequests.isEmpty();
 
         group.fill(t -> {
-            t.visible(() -> (player.builder().isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
+            t.visible(() -> (player.unit().isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
             t.bottom().left();
             t.button("@cancel", Icon.cancel, () -> {
-                player.builder().clearBuilding();
+                player.unit().clearBuilding();
                 selectRequests.clear();
                 mode = none;
                 block = null;
-            }).width(155f).margin(12f);
+            }).width(155f).height(50f).margin(12f);
         });
 
         group.fill(t -> {
@@ -379,8 +376,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             float radius = Interp.swingIn.apply(crosshairScale);
 
-            Lines.poly(target.getX(), target.getY(), 4, 7f * radius, Time.time() * 1.5f);
-            Lines.spikes(target.getX(), target.getY(), 3f * radius, 6f * radius, 4, Time.time() * 1.5f);
+            Lines.poly(target.getX(), target.getY(), 4, 7f * radius, Time.time * 1.5f);
+            Lines.spikes(target.getX(), target.getY(), 3f * radius, 6f * radius, 4, Time.time * 1.5f);
         }
 
         Draw.reset();
@@ -772,7 +769,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY){
-        if(Core.scene.hasDialog() || Core.settings.getBool("keyboard")) return false;
+        if(Core.scene == null || Core.scene.hasDialog() || Core.settings.getBool("keyboard")) return false;
 
         float scale = Core.camera.width / Core.graphics.getWidth();
         deltaX *= scale;
@@ -839,7 +836,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(type == null) return;
 
         boolean omni = unit.type.omniMovement;
-        boolean legs = unit.isGrounded();
+        boolean ground = unit.isGrounded();
         boolean allowHealing = type.canHeal;
         boolean validHealTarget = allowHealing && target instanceof Building && ((Building)target).isValid() && target.team() == unit.team &&
             ((Building)target).damaged() && target.within(unit, type.range);
@@ -854,9 +851,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         targetPos.set(Core.camera.position);
         float attractDst = 15f;
-        float strafePenalty = legs ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(unit.vel.angle(), unit.rotation) / 180f);
 
-        float speed = unit.realSpeed() * strafePenalty;
+        float speed = unit.realSpeed();
         float range = unit.hasWeapons() ? unit.range() : 0f;
         float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
@@ -912,13 +908,13 @@ public class MobileInput extends InputHandler implements GestureListener{
             unit.moveAt(movement);
         }else{
             unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
-            if(!movement.isZero() && legs){
-                unit.vel.rotateTo(movement.angle(), type.rotateSpeed);
+            if(!movement.isZero()){
+                unit.vel.rotateTo(movement.angle(), unit.type.rotateSpeed * Math.max(Time.delta, 1));
             }
         }
 
         //update shooting if not building + not mining
-        if(!player.builder().isBuilding() && player.miner().mineTile() == null){
+        if(!player.unit().isBuilding() && player.unit().mineTile == null){
 
             //autofire targeting
             if(manualShooting){
