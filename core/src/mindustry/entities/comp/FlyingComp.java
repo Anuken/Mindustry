@@ -46,8 +46,8 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     }
 
     void wobble(){
-        x += Mathf.sin(Time.time() + (id() % 10) * 12, 25f, 0.05f) * Time.delta * elevation;
-        y += Mathf.cos(Time.time() + (id() % 10) * 12, 25f, 0.05f) * Time.delta * elevation;
+        x += Mathf.sin(Time.time + (id() % 10) * 12, 25f, 0.05f) * Time.delta * elevation;
+        y += Mathf.cos(Time.time + (id() % 10) * 12, 25f, 0.05f) * Time.delta * elevation;
     }
 
     void moveAt(Vec2 vector, float acceleration){

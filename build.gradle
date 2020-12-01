@@ -32,7 +32,7 @@ allprojects{
 
     ext{
         versionNumber = '6'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'beta'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'release'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
@@ -297,9 +297,10 @@ project(":core"){
             def props = loadVersionProps()
             def androidVersion = props['androidBuildCode'].toInteger() - 2
             def loglines = file("../changelog").text.split("\n")
+            def notice = "[This is a truncated changelog, see Github for full notes]"
             def maxLength = 460
 
-            def androidLogList = loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]")}
+            def androidLogList = [notice] + loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]")}
             def result = ""
             androidLogList.forEach{line ->
                 if(result.length() + line.length() + 1 < maxLength){

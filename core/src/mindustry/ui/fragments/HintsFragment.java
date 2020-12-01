@@ -38,7 +38,7 @@ public class HintsFragment extends Fragment{
     public void build(Group parent){
         group.setFillParent(true);
         group.touchable = Touchable.childrenOnly;
-        group.visibility = () -> Core.settings.getBool("hints", true);
+        group.visibility = () -> Core.settings.getBool("hints", true) && ui.hudfrag.shown;
         group.update(() -> {
             if(current != null){
                 //current got completed
@@ -106,7 +106,7 @@ public class HintsFragment extends Fragment{
                 if(current != null){
                     complete();
                 }
-            }).size(100f, 40f).left();
+            }).size(112f, 40f).left();
         });
 
         this.current = hint;

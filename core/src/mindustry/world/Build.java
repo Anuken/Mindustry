@@ -42,7 +42,7 @@ public class Build{
         tile.build.health = tile.build.maxHealth * prevPercent;
         if(unit != null && unit.isPlayer()) tile.build.lastAccessed = unit.getPlayer().name;
 
-        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, true)));
+        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, unit, true)));
     }
 
     /** Places a ConstructBlock at this location. */
@@ -58,7 +58,7 @@ public class Build{
         if(tile == null) return;
 
         //auto-rotate the block to the correct orientation and bail out
-        if(tile.team() == team && tile.block == result && tile.build != null){
+        if(tile.team() == team && tile.block == result && tile.build != null && tile.block.quickRotate){
             if(unit != null && unit.isPlayer()) tile.build.lastAccessed = unit.getPlayer().name;
             tile.build.rotation = Mathf.mod(rotation, 4);
             tile.build.updateProximity();
@@ -89,7 +89,7 @@ public class Build{
 
         result.placeBegan(tile, previous);
 
-        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, false)));
+        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, unit, false)));
     }
 
     /** Returns whether a tile can be placed at this location by this team. */

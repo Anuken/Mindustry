@@ -227,7 +227,11 @@ public class SectorInfo{
                 updateDelta(item, production, coreDeltas);
                 updateDelta(item, rawProduction, productionDeltas);
 
+                //cap production/export by production
                 production.get(item).mean = Math.min(production.get(item).mean, rawProduction.get(item).mean);
+                if(export.containsKey(item)){
+                    export.get(item).mean = Math.min(export.get(item).mean, rawProduction.get(item).mean);
+                }
             }
 
             Arrays.fill(coreDeltas, 0);

@@ -376,8 +376,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             float radius = Interp.swingIn.apply(crosshairScale);
 
-            Lines.poly(target.getX(), target.getY(), 4, 7f * radius, Time.time() * 1.5f);
-            Lines.spikes(target.getX(), target.getY(), 3f * radius, 6f * radius, 4, Time.time() * 1.5f);
+            Lines.poly(target.getX(), target.getY(), 4, 7f * radius, Time.time * 1.5f);
+            Lines.spikes(target.getX(), target.getY(), 3f * radius, 6f * radius, 4, Time.time * 1.5f);
         }
 
         Draw.reset();
@@ -836,7 +836,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(type == null) return;
 
         boolean omni = unit.type.omniMovement;
-        boolean legs = unit.isGrounded();
+        boolean ground = unit.isGrounded();
         boolean allowHealing = type.canHeal;
         boolean validHealTarget = allowHealing && target instanceof Building && ((Building)target).isValid() && target.team() == unit.team &&
             ((Building)target).damaged() && target.within(unit, type.range);
@@ -908,8 +908,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             unit.moveAt(movement);
         }else{
             unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
-            if(!movement.isZero() && legs){
-                unit.vel.rotateTo(movement.angle(), type.rotateSpeed);
+            if(!movement.isZero()){
+                unit.vel.rotateTo(movement.angle(), unit.type.rotateSpeed * Math.max(Time.delta, 1));
             }
         }
 

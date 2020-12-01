@@ -204,7 +204,7 @@ public class PayloadConveyor extends Block{
         }
 
         public float time(){
-            return Time.time();
+            return Time.time;
         }
 
         @Override

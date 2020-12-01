@@ -17,7 +17,7 @@
   },
   {
     "name": "Chaotic Neutral",
-    "address": ["Chaotic-Neutral.ddns.net:5555", "Chaotic-Neutral.ddns.net:6666"]
+    "address": ["Chaotic-Neutral.ddns.net:5555", "Chaotic-Neutral.ddns.net:6666", "Chaotic-Neutral.ddns.net:7777"]
   },
   {
     "name": "Ranked",
@@ -25,5 +25,10 @@
   },
   {
     "address": "cheginde.ddns.net"
+    
+  },
+  {
+    "name": "mindustry.ddns.net",
+    "address": ["mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
   }
 ]
