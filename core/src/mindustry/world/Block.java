@@ -634,6 +634,8 @@ public class Block extends UnlockableContent{
 
         //also requires inputs
         consumes.each(c -> {
+            if(c.isOptional()) return;
+
             if(c instanceof ConsumeItems i){
                 for(ItemStack stack : i.items){
                     cons.get(stack.item);
