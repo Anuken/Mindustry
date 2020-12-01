@@ -46,7 +46,7 @@ public class PayloadConveyor extends Block{
         for(int i = 0; i < 4; i++){
             Building other = world.build(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
             if(other != null && other.block.outputsPayload && other.block.size == size){
-                Drawf.selected(other.tileX(), other.tileY(), other.block, Pal.accent);
+                Drawf.selected(other.tileX(), other.tileY(), other.block, other.team.color);
             }
         }
     }
@@ -162,7 +162,7 @@ public class PayloadConveyor extends Block{
             float dst = 0.8f;
 
             float glow = Math.max((dst - (Math.abs(fract() - 0.5f) * 2)) / dst, 0);
-            Draw.mixcol(Pal.accent, glow);
+            Draw.mixcol(team.color, glow);
 
             float trnext = fract() * size * tilesize, trprev = size * tilesize * (fract() - 1), rot = rotdeg();
 
@@ -204,7 +204,7 @@ public class PayloadConveyor extends Block{
         }
 
         public float time(){
-            return Time.time();
+            return Time.time;
         }
 
         @Override
@@ -232,6 +232,12 @@ public class PayloadConveyor extends Block{
             this.animation = 0;
 
             updatePayload();
+        }
+
+        @Override
+        public void onRemoved(){
+            super.onRemoved();
+            if(item != null) item.dump();
         }
 
         @Override

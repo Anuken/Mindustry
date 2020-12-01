@@ -37,7 +37,7 @@ public class Bullets implements ContentList{
     waterShot, cryoShot, slagShot, oilShot, heavyWaterShot, heavyCryoShot, heavySlagShot, heavyOilShot,
 
     //environment, misc.
-    damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig;
+    damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame, driverBolt;
 
     @Override
     public void load(){
@@ -358,6 +358,7 @@ public class Bullets implements ContentList{
             shootEffect = Fx.shootBig;
             pierceCap = 2;
             pierceBuilding = true;
+            knockback = 0.7f;
         }};
 
         standardIncendiaryBig = new BasicBulletType(7f, 60, "bullet"){{
@@ -370,20 +371,7 @@ public class Bullets implements ContentList{
             makeFire = true;
             pierceCap = 2;
             pierceBuilding = true;
-        }};
-
-        healBullet = new LaserBoltBulletType(5.2f, 13){{
-            healPercent = 3f;
-            collidesTeam = true;
-            backColor = Pal.heal;
-            frontColor = Color.white;
-        }};
-
-        healBulletBig = new LaserBoltBulletType(5.2f, 15){{
-            healPercent = 5.5f;
-            collidesTeam = true;
-            backColor = Pal.heal;
-            frontColor = Color.white;
+            knockback = 0.7f;            
         }};
 
         fireball = new BulletType(1f, 4){

@@ -1,3 +1,3 @@
-Open("core/assets/fonts/font.ttf")
-MergeFonts("core/assets-raw/fontgen/out/font.ttf")
-Generate("core/assets/fonts/font.ttf")
+Open($2)
+MergeFonts($1)
+Generate($1)

@@ -30,7 +30,7 @@ This means:
 - No underscores for anything. (Yes, I know `Bindings` violates this principle, but that's for legacy reasons and really should be cleaned up some day)
 - Do not use braceless `if/else` statements. `if(x) statement else statement2` should **never** be done. In very specific situations, having braceless if-statements on one line is allowed: `if(cond) return;` would be valid.
 - Prefer single-line javadoc `/** @return for example */` instead of multiline javadoc whenver possible
-- Short method/variable names (multipleLongWords should be avoided if it's possible to so reasonably, especially for variables)
+- Short method/variable names (multipleLongWords should be avoided if it's possible to do so reasonably, especially for variables)
 - Use wildcard imports - `import some.package.*` - for everything. This makes incorrect class usage more obvious (*e.g. arc.util.Timer vs java.util.Timer*) and leads to cleaner-looking code.
 
 Import [this style file](.github/Mindustry-CodeStyle-IJ.xml) into IntelliJ to get correct formatting when developing Mindustry.

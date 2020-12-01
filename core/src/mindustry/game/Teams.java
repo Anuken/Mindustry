@@ -26,6 +26,8 @@ public class Teams{
     public Seq<TeamData> active = new Seq<>();
     /** Teams with block or unit presence. */
     public Seq<TeamData> present = new Seq<>(TeamData.class);
+    /** Current boss unit. */
+    public @Nullable Unit boss;
 
     public Teams(){
         active.add(get(Team.crux));
@@ -133,10 +135,10 @@ public class Teams{
     private void count(Unit unit){
         unit.team.data().updateCount(unit.type, 1);
 
-        if(unit instanceof Payloadc){
-            ((Payloadc)unit).payloads().each(p -> {
-                if(p instanceof UnitPayload){
-                    count(((UnitPayload)p).unit);
+        if(unit instanceof Payloadc payloadc){
+            payloadc.payloads().each(p -> {
+                if(p instanceof UnitPayload payload){
+                    count(payload.unit);
                 }
             });
         }
@@ -144,6 +146,7 @@ public class Teams{
 
     public void updateTeamStats(){
         present.clear();
+        boss = null;
 
         for(Team team : Team.all){
             TeamData data = team.data();
@@ -177,6 +180,10 @@ public class Teams{
             data.tree().insert(unit);
             data.units.add(unit);
             data.presentFlag = true;
+
+            if(unit.team == state.rules.waveTeam && unit.isBoss()){
+                boss = unit;
+            }
 
             if(data.unitsByType == null || data.unitsByType.length <= unit.type.id){
                 data.unitsByType = new Seq[content.units().size];

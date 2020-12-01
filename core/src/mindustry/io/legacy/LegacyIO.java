@@ -2,6 +2,7 @@ package mindustry.io.legacy;
 
 import arc.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.ui.dialogs.JoinDialog.*;
@@ -77,8 +78,7 @@ public class LegacyIO{
                 }
             }
         }catch(Exception e){
-            e.printStackTrace();
+            Log.err(e);
         }
     }
-
 }

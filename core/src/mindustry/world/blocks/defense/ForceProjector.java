@@ -48,9 +48,12 @@ public class ForceProjector extends Block{
         super(name);
         update = true;
         solid = true;
+        group = BlockGroup.projectors;
         hasPower = true;
         hasLiquids = true;
         hasItems = true;
+        ambientSound = Sounds.shield;
+        ambientSoundVolume = 0.08f;
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).boost().update(false);
     }
 
@@ -105,6 +108,11 @@ public class ForceProjector extends Block{
             drawer.build = this;
             drawer.set(x, y);
             drawer.add();
+        }
+
+        @Override
+        public boolean shouldAmbientSound(){
+            return !broken && realRadius() > 1f;
         }
 
         @Override

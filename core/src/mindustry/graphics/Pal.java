@@ -98,5 +98,11 @@ public class Pal{
 
     plasticSmoke = Color.valueOf("f1e479"),
 	
-    adminChat = Color.valueOf("ff4000");
+    adminChat = Color.valueOf("ff4000"),
+
+    logicBlocks = Color.valueOf("d4816b"),
+    logicControl = Color.valueOf("6bb2b2"),
+    logicOperations = Color.valueOf("877bad"),
+    logicIo = Color.valueOf("a08a8a"),
+    logicUnits = Color.valueOf("c7b59d");
 }

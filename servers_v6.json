@@ -1,26 +1,46 @@
 [
   {
-    "address": "mindustry.pl:6000"
+    "name": "mindustry.pl",
+    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "91.134.217.10:6006"]
   },
   {
-    "address": "mindustry.pl:6666"
+    "name": "{AA}",
+    "address": ["aamindustry.play.ai:6571", "aamindustry.play.ai:6572"]
+  },
+   {
+    "name": "Atanner",
+    "address": ["atannergaming.com:13000"]
   },
   {
-    "address": "routerchain.ddns.net"
+    "name": "C.A.M.S.",
+    "address": ["routerchain.ddns.net", "pandorum.su:8000"]
   },
   {
-    "address": "mindustry.atannergaming.com:13000"
+	"name": "io",
+	"address": ["mindustry.io", "mindustry.io:1000", "mindustry.io:2000", "mindustry.io:3000"]
   },
   {
-    "address": "pandorum.su:8000"
+    "name": "ECAN",
+    "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
   },
   {
-    "address": "mindustry.ecansol.com:6597"
+    "name": "Chaotic Neutral",
+    "address": ["Chaotic-Neutral.ddns.net:5555", "Chaotic-Neutral.ddns.net:6666", "Chaotic-Neutral.ddns.net:7777"]
   },
   {
-    "address": "mindustry.ecansol.com:6499"
+    "name": "Ranked",
+    "address": ["mindustryranked.ddns.net:16567"]
   },
   {
-    "address": "mindustry.ecansol.com:6599"
+    "address": "cheginde.ddns.net"
+    
+  },
+  {
+    "name": "mindustry.ddns.net",
+    "address": ["mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
+  },
+  {
+    "name": "Gearblock",
+    "address": ["attack.gearblock.app"]
   }
 ]

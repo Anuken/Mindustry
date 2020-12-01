@@ -44,8 +44,8 @@ public class StackConveyor extends Block implements Autotiler{
         itemCapacity = 10;
         conveyorPlacement = true;
 
-        idleSound = Sounds.conveyor;
-        idleSoundVolume = 0.004f;
+        ambientSound = Sounds.conveyor;
+        ambientSoundVolume = 0.004f;
         unloadable = false;
     }
 
@@ -105,6 +105,8 @@ public class StackConveyor extends Block implements Autotiler{
         public int link = -1;
         public float cooldown;
         public Item lastItem;
+
+        boolean proxUpdating = false;
 
         @Override
         public void draw(){
@@ -168,14 +170,13 @@ public class StackConveyor extends Block implements Autotiler{
 
             //update other conveyor state when this conveyor's state changes
             if(state != lastState){
+                proxUpdating = true;
                 for(Building near : proximity){
-                    if(near instanceof StackConveyorBuild){
+                    if(!(near instanceof StackConveyorBuild b && b.proxUpdating && b.state != stateUnload)){
                         near.onProximityUpdate();
-                        for(Building other : near.proximity){
-                            if(!(other instanceof StackConveyorBuild)) other.onProximityUpdate();
-                        }
                     }
                 }
+                proxUpdating = false;
             }
         }
 
@@ -231,7 +232,7 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
-        public boolean shouldIdleSound(){
+        public boolean shouldAmbientSound(){
             return false; // has no moving parts;
         }
 

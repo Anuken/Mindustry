@@ -197,7 +197,7 @@ public class Units{
         cdist = 0f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(e.dead() || !predicate.get(e)) return;
+            if(e.dead() || !predicate.get(e) || e.team == Team.derelict) return;
 
             float dst2 = e.dst2(x, y);
             if(dst2 < range*range && (result == null || dst2 < cdist)){

@@ -51,7 +51,7 @@ public class Drawf{
     }
 
     private static boolean allowLight(Team team){
-        return team == Team.derelict || team == Vars.player.team() || state.rules.enemyLights;
+        return renderer != null && (team == Team.derelict || team == Vars.player.team() || state.rules.enemyLights);
     }
 
     public static void selected(Building tile, Color color){

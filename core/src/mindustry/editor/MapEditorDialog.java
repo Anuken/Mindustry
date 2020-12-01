@@ -42,6 +42,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private MapGenerateDialog generateDialog;
     private ScrollPane pane;
     private BaseDialog menu;
+    private Table blockSelection;
     private Rules lastSavedRules;
     private boolean saved = false;
     private boolean shownWithMap = false;
@@ -665,9 +666,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
         ui.showConfirm("@confirm", "@editor.unsaved", this::hide);
     }
 
-    private void addBlockSelection(Table table){
-        Table content = new Table();
-        pane = new ScrollPane(content);
+    private void addBlockSelection(Table cont){
+        blockSelection = new Table();
+        pane = new ScrollPane(blockSelection);
         pane.setFadeScrollBars(false);
         pane.setOverscroll(true, false);
         pane.exited(() -> {
@@ -675,9 +676,22 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 Core.scene.setScrollFocus(view);
             }
         });
-        ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
-        int i = 0;
+        cont.table(search -> {
+            search.image(Icon.zoom).padRight(8);
+            search.field("", this::rebuildBlockSelection)
+            .name("editor/search").maxTextLength(maxNameLength).get().setMessageText("@players.search");
+        }).pad(-2);
+        cont.row();
+        cont.table(Tex.underline, extra -> extra.labelWrap(() -> editor.drawBlock.localizedName).width(200f).center()).growX();
+        cont.row();
+        cont.add(pane).expandY().top().left();
+
+        rebuildBlockSelection("");
+    }
+
+    private void rebuildBlockSelection(String searchText){
+        blockSelection.clear();
 
         blocksOut.clear();
         blocksOut.addAll(Vars.content.blocks());
@@ -691,28 +705,32 @@ public class MapEditorDialog extends Dialog implements Disposable{
             return Integer.compare(b1.id, b2.id);
         });
 
+        int i = 0;
+
         for(Block block : blocksOut){
             TextureRegion region = block.icon(Cicon.medium);
 
-            if(!Core.atlas.isFound(region) || !block.inEditor || (block.buildVisibility == BuildVisibility.debugOnly)) continue;
+            if(!Core.atlas.isFound(region) || !block.inEditor
+                    || block.buildVisibility == BuildVisibility.debugOnly
+                    || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.toLowerCase()))
+            ) continue;
 
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearTogglei);
             button.getStyle().imageUp = new TextureRegionDrawable(region);
             button.clicked(() -> editor.drawBlock = block);
             button.resizeImage(8 * 4f);
             button.update(() -> button.setChecked(editor.drawBlock == block));
-            group.add(button);
-            content.add(button).size(50f);
+            blockSelection.add(button).size(50f).tooltip(block.localizedName);
+
+            if(i == 0) editor.drawBlock = block;
 
             if(++i % 4 == 0){
-                content.row();
+                blockSelection.row();
             }
         }
 
-        group.getButtons().get(2).setChecked(true);
-
-        table.table(Tex.underline, extra -> extra.labelWrap(() -> editor.drawBlock.localizedName).width(200f).center()).growX();
-        table.row();
-        table.add(pane).growY().fillX();
+        if(i == 0){
+            blockSelection.add("@none").color(Color.lightGray).padLeft(80f).padTop(10f);
+        }
     }
 }

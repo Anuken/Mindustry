@@ -63,7 +63,7 @@ public abstract class SaveFileReader{
     protected int lastRegionLength;
     protected @Nullable CounterInputStream currCounter;
 
-    protected void region(String name, DataInput stream, CounterInputStream counter, IORunner<DataInput> cons) throws IOException{
+    public void region(String name, DataInput stream, CounterInputStream counter, IORunner<DataInput> cons) throws IOException{
         counter.resetCount();
         this.currCounter = counter;
         int length;
@@ -78,7 +78,7 @@ public abstract class SaveFileReader{
         }
     }
 
-    protected void region(String name, DataOutput stream, IORunner<DataOutput> cons) throws IOException{
+    public void region(String name, DataOutput stream, IORunner<DataOutput> cons) throws IOException{
         try{
             writeChunk(stream, cons);
         }catch(Throwable e){
@@ -156,7 +156,7 @@ public abstract class SaveFileReader{
 
     public abstract void write(DataOutputStream stream) throws IOException;
 
-    protected interface IORunner<T>{
+    public interface IORunner<T>{
         void accept(T stream) throws IOException;
     }
 }

@@ -1,6 +1,7 @@
 package mindustry.world.blocks.environment;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
@@ -10,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
@@ -33,7 +35,11 @@ public class Floor extends Block{
     /** How many ticks it takes to drown on this. */
     public float drownTime = 0f;
     /** Effect when walking on this floor. */
-    public Effect walkEffect = Fx.ripple;
+    public Effect walkEffect = Fx.none;
+    /** Sound made when walking. */
+    public Sound walkSound = Sounds.none;
+    /** Volume of sound made when walking. */
+    public float walkSoundVolume = 0.1f, walkSoundPitchMin = 0.8f, walkSoundPitchMax = 1.2f;
     /** Effect displayed when drowning on this floor. */
     public Effect drownUpdateEffect = Fx.bubble;
     /** Status effect applied when walking on. */
@@ -114,6 +120,14 @@ public class Floor extends Block{
 
         if(decoration == Blocks.air){
             decoration = content.blocks().min(b -> b instanceof Boulder && b.breakable ? mapColor.diff(b.mapColor) : Float.POSITIVE_INFINITY);
+        }
+
+        if(isLiquid && walkEffect == Fx.none){
+            walkEffect = Fx.ripple;
+        }
+
+        if(isLiquid && walkSound == Sounds.none){
+            walkSound = Sounds.splash;
         }
     }
 

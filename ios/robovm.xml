@@ -39,7 +39,6 @@
     </forceLinkClasses>
     <libs>
         <lib>z</lib>
-        <lib>libs/libObjectAL.a</lib>
         <lib>libs/libarc.a</lib>
         <lib>libs/libarc-freetype.a</lib>
     </libs>
@@ -48,7 +47,7 @@
         <framework>OpenGLES</framework>
         <framework>QuartzCore</framework>
         <framework>CoreGraphics</framework>
-        <framework>OpenAL</framework>
+        <framework>CoreAudio</framework>
         <framework>AudioToolbox</framework>
         <framework>AVFoundation</framework>
     </frameworks>

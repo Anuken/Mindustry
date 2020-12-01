@@ -153,7 +153,7 @@ public class PowerNode extends PowerBlock{
         float fract = 1f - satisfaction;
 
         Draw.color(laserColor1, laserColor2, fract * 0.86f + Mathf.absin(3f, 0.1f));
-        Draw.alpha(renderer.laserOpacity);
+        Draw.alpha(renderer == null ? 0.5f : renderer.laserOpacity);
     }
 
     protected void drawLaser(Team team, float x1, float y1, float x2, float y2, int size1, int size2){
@@ -226,7 +226,7 @@ public class PowerNode extends PowerBlock{
 
                 if(otherReq == null || otherReq.block == null) return;
 
-                drawLaser(player.team(), req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy(), size, otherReq.block.size);
+                drawLaser(player == null ? Team.sharded : player.team(), req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy(), size, otherReq.block.size);
             }
             Draw.color();
         }
@@ -362,7 +362,7 @@ public class PowerNode extends PowerBlock{
         @Override
         public void drawConfigure(){
 
-            Drawf.circles(x, y, tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time(), 4f, 1f));
+            Drawf.circles(x, y, tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time, 4f, 1f));
             Drawf.circles(x, y, laserRange * tilesize);
 
             for(int x = (int)(tile.x - laserRange - 2); x <= tile.x + laserRange + 2; x++){

@@ -42,6 +42,7 @@ public class UI implements ApplicationListener, Loadable{
     public MinimapFragment minimapfrag;
     public PlayerListFragment listfrag;
     public LoadingFragment loadfrag;
+    public HintsFragment hints;
 
     public WidgetGroup menuGroup, hudGroup;
 
@@ -104,7 +105,7 @@ public class UI implements ApplicationListener, Loadable{
         Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black5).margin(4f).add(text));
 
         Core.settings.setErrorHandler(e -> {
-            e.printStackTrace();
+            Log.err(e);
             Core.app.post(() -> showErrorMessage("Failed to access local storage.\nSettings will not be saved."));
         });
 
@@ -140,12 +141,6 @@ public class UI implements ApplicationListener, Loadable{
             }
         }
 
-        //draw overlay for buttons
-        if(state.rules.tutorial){
-            control.tutorial.draw();
-            Draw.flush();
-        }
-
         Events.fire(Trigger.uiDrawEnd);
     }
 
@@ -156,6 +151,7 @@ public class UI implements ApplicationListener, Loadable{
 
         menufrag = new MenuFragment();
         hudfrag = new HudFragment();
+        hints = new HintsFragment();
         chatfrag = new ChatFragment();
         minimapfrag = new MinimapFragment();
         listfrag = new PlayerListFragment();
@@ -262,11 +258,11 @@ public class UI implements ApplicationListener, Loadable{
                 TextField field = cont.field(def, t -> {}).size(330f, 50f).get();
                 field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
                 buttons.defaults().size(120, 54).pad(4);
+                buttons.button("@cancel", this::hide);
                 buttons.button("@ok", () -> {
                     confirmed.get(field.getText());
                     hide();
                 }).disabled(b -> field.getText().isEmpty());
-                buttons.button("@cancel", this::hide);
                 keyDown(KeyCode.enter, () -> {
                     String text = field.getText();
                     if(!text.isEmpty()){
@@ -357,6 +353,7 @@ public class UI implements ApplicationListener, Loadable{
                 hide();
                 listener.run();
             }).size(110, 50).pad(4);
+            closeOnBack();
         }}.show();
     }
 
@@ -365,6 +362,7 @@ public class UI implements ApplicationListener, Loadable{
             getCell(cont).growX();
             cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.left);
             buttons.button("@ok", this::hide).size(110, 50).pad(4);
+            closeOnBack();
         }}.show();
     }
 
@@ -390,7 +388,7 @@ public class UI implements ApplicationListener, Loadable{
     public void showException(String text, Throwable exc){
         loadfrag.hide();
         new Dialog(""){{
-            String message = Strings.getFinalMesage(exc);
+            String message = Strings.getFinalMessage(exc);
 
             setFillParent(true);
             cont.margin(15);
@@ -506,6 +504,7 @@ public class UI implements ApplicationListener, Loadable{
         t.update(() -> t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center));
         t.actions(Actions.fadeOut(duration, Interp.pow4In), Actions.remove());
         t.pack();
+        t.act(0.1f);
         Core.scene.add(t);
     }
 
@@ -523,7 +522,7 @@ public class UI implements ApplicationListener, Loadable{
 
     //TODO move?
 
-    public static String formatAmount(long number){
+    public static String formatAmount(int number){
         if(number >= 1_000_000_000){
             return Strings.fixed(number / 1_000_000_000f, 1) + "[gray]" + Core.bundle.get("unit.billions") + "[]";
         }else if(number >= 1_000_000){

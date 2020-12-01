@@ -15,7 +15,7 @@ import static mindustry.Vars.*;
 
 public class Pump extends LiquidBlock{
     /** Pump amount per tile. */
-    protected float pumpAmount = 0.2f;
+    public float pumpAmount = 0.2f;
 
     public Pump(String name){
         super(name);
