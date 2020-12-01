@@ -340,7 +340,7 @@ public class SectorDamage{
         }
 
         if(bossGroup != null){
-            float bossMult = 1.1f;
+            float bossMult = 1.2f;
             //calculate first boss appearaance
             for(int wave = state.wave; wave < state.wave + 60; wave++){
                 int spawned = bossGroup.getSpawned(wave - 1);

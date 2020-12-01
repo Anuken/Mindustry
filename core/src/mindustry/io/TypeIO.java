@@ -296,7 +296,7 @@ public class TypeIO{
         if(control instanceof Player p){
             write.b(0);
             write.i(p.id);
-        }else if(control instanceof FormationAI form){
+        }else if(control instanceof FormationAI form && form.leader != null){
             write.b(1);
             write.i(form.leader.id);
         }else if(control instanceof LogicAI logic && logic.controller != null){
