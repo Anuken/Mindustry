@@ -106,7 +106,7 @@ public class HintsFragment extends Fragment{
                 if(current != null){
                     complete();
                 }
-            }).size(100f, 40f).left();
+            }).size(112f, 40f).left();
         });
 
         this.current = hint;
