@@ -345,7 +345,11 @@ public class Turret extends ReloadTurret{
 
         /** @return  whether the turret has ammo. */
         public boolean hasAmmo(){
-            return ammo.size > 0 && ammo.peek().amount >= 1;
+            //skip first entry if it has less than the required amount of ammo
+            if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot){
+                ammo.pop();
+            }
+            return ammo.size > 0 && ammo.peek().amount >= ammoPerShot;
         }
 
         protected void updateShooting(){
