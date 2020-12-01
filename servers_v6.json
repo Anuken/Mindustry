@@ -12,6 +12,10 @@
     "address": ["routerchain.ddns.net", "pandorum.su:8000"]
   },
   {
+	"name": "io",
+	"address": ["mindustry.io", "mindustry.io:1000", "mindustry.io:2000", "mindustry.io:3000"]
+  },
+  {
     "name": "ECAN",
     "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
   },
