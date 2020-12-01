@@ -257,18 +257,6 @@ public class ResearchDialog extends BaseDialog{
         return node.content.unlocked() || !node.objectives.contains(i -> !i.complete());
     }
 
-    public void showToast(String info){
-        Table table = new Table();
-        table.actions(Actions.fadeOut(0.5f, Interp.fade), Actions.remove());
-        table.top().add(info);
-        table.name = "toast";
-        table.update(() -> {
-            table.toFront();
-            table.setPosition(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() - 21, Align.top);
-        });
-        Core.scene.add(table);
-    }
-
     boolean locked(TechNode node){
         return node.content.locked();
     }
@@ -451,7 +439,6 @@ public class ResearchDialog extends BaseDialog{
 
         void unlock(TechNode node){
             node.content.unlock();
-            showToast(Core.bundle.format("researched", node.content.localizedName));
             checkNodes(root);
             hoverNode = null;
             treeLayout();
