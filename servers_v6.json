@@ -1,7 +1,7 @@
 [
   {
     "name": "mindustry.pl",
-    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl:6006"]
+    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "91.134.217.10:6006"]
   },
   {
     "name": "{AA}",
