@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.Net.*;
 import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
@@ -501,9 +502,16 @@ public class JoinDialog extends BaseDialog{
             Core.settings.remove("server-list");
         }
 
+        var url = becontrol.active() ? serverJsonBeURL : serverJsonV6URL;
+        Log.info("Fetching community servers at @", url);
+
         //get servers
-        Core.net.httpGet(becontrol.active() ? serverJsonBeURL : serverJsonV6URL, result -> {
+        Core.net.httpGet(url, result -> {
             try{
+                if(result.getStatus() != HttpStatus.OK){
+                    Log.warn("Failed to fetch community servers: @", result.getStatus());
+                    return;
+                }
 
                 Jval val = Jval.read(result.getResultAsString());
                 Core.app.post(() -> {
@@ -519,8 +527,8 @@ public class JoinDialog extends BaseDialog{
                             }
                             defaultServers.add(new ServerGroup(name, addresses));
                         });
-                        Log.info("Fetched @ global servers.", defaultServers.size);
-                    }catch(Throwable ignored){
+                        Log.info("Fetched @ community servers.", defaultServers.size);
+                    }catch(Throwable e){
                         Log.err("Failed to parse community servers.");
                     }
                 });
