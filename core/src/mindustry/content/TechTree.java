@@ -121,7 +121,7 @@ public class TechTree implements ContentList{
 
                             });
 
-                            node(waterExtractor, Seq.with(new SectorComplete(saltFlats)), () -> {
+                            node(waterExtractor, Seq.with(new SectorComplete(ruinousShores)), () -> {
                                 node(oilExtractor, () -> {
 
                                 });
