@@ -1749,7 +1749,7 @@ public class Blocks implements ContentList{
         }};
 
         foreshadow = new ItemTurret("foreshadow"){{
-            float brange = range = 500f;
+            float brange = range = 400f;
 
             requirements(Category.turret, with(Items.copper, 1000, Items.metaglass, 600, Items.surgeAlloy, 300, Items.plastanium, 200, Items.silicon, 600));
             ammo(
@@ -1760,33 +1760,32 @@ public class Blocks implements ContentList{
                 trailEffect = Fx.instTrail;
                 despawnEffect = Fx.instBomb;
                 trailSpacing = 20f;
-                damage = 1350;
-                tileDamageMultiplier = 0.3f;
+                damage = 500f;
+                tileDamageMultiplier = 0.25f;
                 speed = brange;
-                hitShake = 6f;
+                hitShake = 2f;
                 ammoMultiplier = 1f;
+                ammoPerShot = 8;
             }}
             );
 
-            rotateSpeed = 2.5f;
-            reloadTime = 200f;
+            itemCapacity = 50;
+            rotateSpeed = 0.5f;
+            reloadTime = 100f;
             ammoUseEffect = Fx.casing3Double;
-            recoilAmount = 5f;
-            restitution = 0.009f;
-            cooldown = 0.009f;
-            shootShake = 4f;
+            recoilAmount = 2f;
+            restitution = 0.01f;
+            shootShake = 2f;
             shots = 1;
             size = 4;
             shootCone = 2f;
             shootSound = Sounds.railgun;
-            unitSort = (u, x, y) -> -u.maxHealth;
-
-            coolantMultiplier = 0.2f;
 
             health = 150 * size * size;
-            coolantUsage = 1f;
 
-            consumes.powerCond(10f, TurretBuild::isActive);
+            acceptCoolant = false;
+            consumes.powerCond(15f, TurretBuild::isActive);
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.4f && liquid.flammability < 0.1f, 0.5f)).update(false);
         }};
 
         spectre = new ItemTurret("spectre"){{
