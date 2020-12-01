@@ -93,7 +93,7 @@ public class OverlayRenderer{
             for(int i = 0; i < 4; i++){
                 float rot = i * 90f + 45f + (-Time.time / 3f) % 360f;
                 float length = select.hitSize() * 1.5f + (unitFade * 2.5f);
-                Draw.rect(arrowRegion, select.x + Angles.trnsx(rot, length), select.y + Angles.trnsy(rot, length), length / 1.9f, length / 1.9f, rot - 180f);
+                Draw.rect(arrowRegion, select.x + Angles.trnsx(rot, length), select.y + Angles.trnsy(rot, length), length / 1.9f, length / 1.9f, rot - 135f);
             }
             Draw.reset();
         }
