@@ -35,11 +35,18 @@ public class LoadRenderer implements Disposable{
     private Mesh mesh = MeshBuilder.buildHex(colorRed, 2, true, 1f);
     private Camera3D cam = new Camera3D();
     private int lastLength = -1;
-    private FxProcessor fx = new FxProcessor(Format.rgba8888, 2, 2, false, true);
+    private FxProcessor fx;
     private WindowedMean renderTimes = new WindowedMean(20);
     private long lastFrameTime;
 
     {
+        //some systems don't support rgba8888 w/ a stencil buffer
+        try{
+            fx = new FxProcessor(Format.rgba8888, 2, 2, false, true);
+        }catch(Exception e){
+            fx = new FxProcessor(Format.rgb565, 2, 2, false, true);
+        }
+
         //vignetting is probably too much
         //fx.addEffect(new VignettingFilter(false));
         fx.addEffect(new BloomFilter());
