@@ -3,6 +3,10 @@
     "name": "mindustry.pl",
     "address": ["mindustry.pl:6000", "mindustry.pl:6666"]
   },
+  {
+    "name": "{AA}",
+    "address": ["aamindustry.play.ai:6571"]
+  },
    {
     "name": "Atanner",
     "address": ["atannergaming.com:13000"]
