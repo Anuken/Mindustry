@@ -267,7 +267,7 @@ project(":ios"){
         
         props['app.build'] = (!props.containsKey("app.build") ? 40 : props['app.build'].toInteger() + 1) + ""
         if(bversion != "custom build"){
-            props['app.version'] = versionNumber + ".0" + ("." + bversion)
+            props['app.version'] = versionNumber + "." + bversion + (bversion.contains(".") ? "" : ".0")
         }
         props.store(vfile.newWriter(), null)
     }

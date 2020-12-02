@@ -144,7 +144,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         //load legacy research
         if(Core.settings.has("unlocks") && !Core.settings.has("junction-unlocked")){
             Core.app.post(() -> {
-                ui.showCustomConfirm("@research", "@research.legacy", "@research.load", "@research.discard", LegacyIO::readResearch, () -> Core.settings.remove("unlocks"));
+                ui.showCustomConfirm("@research", "@research.legacy", "@research.load", "@research.discard", () -> {
+                    LegacyIO.readResearch();
+                    Core.settings.remove("unlocks");
+                }, () -> Core.settings.remove("unlocks"));
             });
         }
 
