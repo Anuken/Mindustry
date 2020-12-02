@@ -19,7 +19,6 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.modules.*;
 
@@ -289,11 +288,8 @@ public class ConstructBlock extends Block{
             }
 
             progress = Mathf.clamp(progress - amount);
-            
-            // fast forward boulder deconstruction when visually already gone
-            if(progress <= 0.35f && previous instanceof Boulder) progress = 0;
 
-            if(progress <= 0 || state.rules.infiniteResources){
+            if(progress <= previous.deconstructThreshold || state.rules.infiniteResources){
                 if(lastBuilder == null) lastBuilder = builder;
                 Call.deconstructFinish(tile, this.cblock == null ? previous : this.cblock, lastBuilder);
             }
