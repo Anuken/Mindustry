@@ -11,7 +11,7 @@
         <key>CFBundleIdentifier</key>
         <string>${app.id}</string>
         <key>CFBundleInfoDictionaryVersion</key>
-        <string>6.0</string>
+        <string>6.0.120.3</string>
         <key>MinimumOSVersion</key>
         <string>9.0.0</string>
         <key>CFBundleName</key>
