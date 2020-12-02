@@ -42,5 +42,9 @@
   {
     "name": "Gearblock",
     "address": ["attack.gearblock.app"]
+  },
+  {
+    "name": "Surrealment",
+    "address": ["md.surrealment.com"]
   }
 ]
