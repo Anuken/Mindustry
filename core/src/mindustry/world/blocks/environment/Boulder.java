@@ -13,7 +13,7 @@ public class Boulder extends Block{
         breakable = true;
         alwaysReplace = true;
         
-        deconstructThreshold = 0.35;
+        deconstructThreshold = 0.35f;
     }
 
     @Override
