@@ -10,7 +10,7 @@ import mindustry.type.*;
 import static mindustry.content.UnitTypes.*;
 
 public class Waves{
-    public static final int waveVersion = 4;
+    public static final int waveVersion = 5;
 
     private Seq<SpawnGroup> spawns;
 
@@ -277,7 +277,7 @@ public class Waves{
         int cap = 150;
 
         float shieldStart = 30, shieldsPerWave = 20 + difficulty*30f;
-        float[] scaling = {1, 1.5f, 3f, 4f, 5f};
+        float[] scaling = {1, 2f, 3f, 4f, 5f};
 
         Intc createProgression = start -> {
             //main sequence
