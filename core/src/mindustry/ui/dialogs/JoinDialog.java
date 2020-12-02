@@ -402,7 +402,16 @@ public class JoinDialog extends BaseDialog{
 
         container.button(b -> buildServer(host, b), Styles.cleart, () -> {
             Events.fire(new ClientPreConnectEvent(host));
-            safeConnect(host.address, host.port, host.version);
+            if(!Core.settings.getBool("server-disclaimer", false)){
+                ui.showCustomConfirm("@warning", "@servers.disclaimer", "@ok", "@back", () -> {
+                    Core.settings.put("server-disclaimer", true);
+                    safeConnect(host.address, host.port, host.version);
+                }, () -> {
+                    Core.settings.put("server-disclaimer", false);
+                });
+            }else{
+                safeConnect(host.address, host.port, host.version);
+            }
         }).width(w).row();
     }
 
