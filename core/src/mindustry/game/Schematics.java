@@ -68,13 +68,12 @@ public class Schematics implements Loadable{
             shadowBuffer.dispose();
             if(errorTexture != null){
                 errorTexture.dispose();
+                errorTexture = null;
             }
         });
 
         Events.on(ClientLoadEvent.class, event -> {
-            Pixmap pixmap = Core.atlas.getPixmap("error").crop();
-            errorTexture = new Texture(pixmap);
-            pixmap.dispose();
+            errorTexture = new Texture("sprites/error.png");
         });
     }
 
