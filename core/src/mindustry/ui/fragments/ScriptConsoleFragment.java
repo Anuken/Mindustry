@@ -112,7 +112,7 @@ public class ScriptConsoleFragment extends Table{
         Draw.color(shadowColor);
 
         if(open){
-            Fill.crect(offsetx, chatfield.y, chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
+            Fill.crect(offsetx, chatfield.y + scene.marginBottom, chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
         }
 
         super.draw();
@@ -125,7 +125,7 @@ public class ScriptConsoleFragment extends Table{
         Draw.color(shadowColor);
         Draw.alpha(shadowColor.a * opacity);
 
-        float theight = offsety + spacing + getMarginBottom();
+        float theight = offsety + spacing + getMarginBottom() + scene.marginBottom;
         for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos; i++){
 
             layout.setText(font, messages.get(i), Color.white, textWidth, Align.bottomLeft, true);

@@ -1,5 +1,6 @@
 package mindustry.ui.fragments;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.scene.*;
@@ -18,7 +19,11 @@ public class LoadingFragment extends Fragment{
 
     @Override
     public void build(Group parent){
-        parent.fill(Styles.black8, t -> {
+        parent.fill(t -> {
+            //rect must fill screen completely.
+            t.rect((x, y, w, h) -> {
+                Styles.black8.draw(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
+            });
             t.visible = false;
             t.touchable = Touchable.enabled;
             t.add().height(133f).row();

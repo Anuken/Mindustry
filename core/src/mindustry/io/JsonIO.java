@@ -83,8 +83,9 @@ public class JsonIO{
 
             @Override
             public Sector read(Json json, JsonValue jsonData, Class type){
-                String[] split = jsonData.asString().split("-");
-                return Vars.content.<Planet>getByName(ContentType.planet, split[0]).sectors.get(Integer.parseInt(split[1]));
+                String name = jsonData.asString();
+                int idx = name.lastIndexOf('-');
+                return Vars.content.<Planet>getByName(ContentType.planet, name.substring(0, idx)).sectors.get(Integer.parseInt(name.substring(idx + 1)));
             }
         });
 
