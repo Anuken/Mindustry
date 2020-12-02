@@ -242,7 +242,7 @@ public class MassDriver extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            //mass drivers that ouput only cannot accept items
+            //mass drivers that output only cannot accept items
             return items.total() < itemCapacity && linkValid();
         }
 
