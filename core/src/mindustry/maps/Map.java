@@ -70,11 +70,11 @@ public class Map implements Comparable<Map>, Publishable{
     }
 
     public Fi previewFile(){
-        return Vars.mapPreviewDirectory.child((workshop ? file.parent().name() : file.nameWithoutExtension()) + ".png");
+        return Vars.mapPreviewDirectory.child((workshop ? file.parent().name() : file.nameWithoutExtension()) + "_v2.png");
     }
 
     public Fi cacheFile(){
-        return Vars.mapPreviewDirectory.child(workshop ? file.parent().name() + "-workshop-cache.dat" : file.nameWithoutExtension() + "-cache.dat");
+        return Vars.mapPreviewDirectory.child(workshop ? file.parent().name() + "-workshop-cache.dat" : file.nameWithoutExtension() + "-cache_v2.dat");
     }
 
     public void setHighScore(int score){

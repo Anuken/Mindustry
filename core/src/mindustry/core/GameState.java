@@ -33,9 +33,8 @@ public class GameState{
     /** Current game state. */
     private State state = State.menu;
 
-    //TODO optimize
     public Unit boss(){
-        return Groups.unit.find(u -> u.isBoss() && u.team == rules.waveTeam);
+        return teams.boss;
     }
 
     public void set(State astate){
@@ -69,7 +68,7 @@ public class GameState{
     }
 
     public boolean isPaused(){
-        return (is(State.paused) && !net.active()) || (gameOver && !net.active()) || (serverPaused && !isMenu());
+        return (is(State.paused) && !net.active()) || (gameOver && (!net.active() || isCampaign())) || (serverPaused && !isMenu());
     }
 
     public boolean isPlaying(){

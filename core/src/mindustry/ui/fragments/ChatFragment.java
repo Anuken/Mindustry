@@ -124,7 +124,7 @@ public class ChatFragment extends Table{
         Draw.color(shadowColor);
 
         if(shown){
-            Fill.crect(offsetx, chatfield.y, chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
+            Fill.crect(offsetx, chatfield.y + scene.marginBottom, chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
         }
 
         super.draw();
@@ -137,7 +137,7 @@ public class ChatFragment extends Table{
         Draw.color(shadowColor);
         Draw.alpha(shadowColor.a * opacity);
 
-        float theight = offsety + spacing + getMarginBottom();
+        float theight = offsety + spacing + getMarginBottom() + scene.marginBottom;
         for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos && (i < fadetime || shown); i++){
 
             layout.setText(font, messages.get(i).formattedMessage, Color.white, textWidth, Align.bottomLeft, true);
@@ -163,15 +163,16 @@ public class ChatFragment extends Table{
 
         Draw.color();
 
-        if(fadetime > 0 && !shown)
+        if(fadetime > 0 && !shown){
             fadetime -= Time.delta / 180f;
+        }
     }
 
     private void sendMessage(){
-        String message = chatfield.getText();
+        String message = chatfield.getText().trim();
         clearChatInput();
 
-        if(message.replace(" ", "").isEmpty()) return;
+        if(message.isEmpty()) return;
 
         history.insert(1, message);
 
@@ -182,7 +183,7 @@ public class ChatFragment extends Table{
 
         if(!shown){
             scene.setKeyboardFocus(chatfield);
-            shown = !shown;
+            shown = true;
             if(mobile){
                 TextInput input = new TextInput();
                 input.maxLength = maxTextLength;
@@ -198,10 +199,13 @@ public class ChatFragment extends Table{
                 chatfield.fireClick();
             }
         }else{
-            scene.setKeyboardFocus(null);
-            shown = !shown;
-            scrollPos = 0;
-            sendMessage();
+            //sending chat has a delay; workaround for issue #1943
+            Time.run(2f, () ->{
+                scene.setKeyboardFocus(null);
+                shown = false;
+                scrollPos = 0;
+                sendMessage();
+            });
         }
     }
 

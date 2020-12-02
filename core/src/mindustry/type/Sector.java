@@ -2,6 +2,9 @@ package mindustry.type;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -9,6 +12,7 @@ import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.game.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
+import mindustry.ui.*;
 import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
@@ -28,7 +32,7 @@ public class Sector{
     public SectorInfo info = new SectorInfo();
 
     /** Number 0-1 indicating the difficulty based on nearby bases. */
-    public float baseCoverage;
+    public float threat;
     public boolean generateEnemyBase;
 
     public Sector(Planet planet, Ptile tile){
@@ -37,17 +41,6 @@ public class Sector{
         this.plane = new Plane();
         this.rect = makeRect();
         this.id = tile.id;
-    }
-
-    /** @return a copy of the items in this sector - may be core items, or stored data. */
-    public ItemSeq getItems(){
-        if(isBeingPlayed()){
-            ItemSeq out = new ItemSeq();
-            if(state.rules.defaultTeam.core() != null) out.add(state.rules.defaultTeam.core().items);
-            return out;
-        }else{
-            return info.items;
-        }
     }
 
     public Seq<Sector> near(){
@@ -63,6 +56,15 @@ public class Sector{
         for(Ptile tile : tile.tiles){
             cons.get(planet.getSector(tile));
         }
+    }
+
+    /** Displays threat as a formatted string. */
+    public String displayThreat(){
+        float step = 0.25f;
+        String color = Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.round(threat, step)).toString();
+        String[] threats = {"low", "medium", "high", "extreme", "eradication"};
+        int index = Math.min((int)(threat / step), threats.length - 1);
+        return "[#" + color + "]" + Core.bundle.get("threat." + threats[index]);
     }
 
     /** @return whether this sector can be landed on at all.
@@ -96,27 +98,32 @@ public class Sector{
 
     /** @return whether the player has a base here. */
     public boolean hasBase(){
-        return save != null && info.hasCore;
+        return save != null && info.hasCore && !(Vars.state.isGame() && Vars.state.rules.sector == this && state.gameOver);
     }
 
     /** @return whether the enemy has a generated base here. */
     public boolean hasEnemyBase(){
-        return generateEnemyBase && (save == null || info.waves);
+        return ((generateEnemyBase && preset == null) || (preset != null && preset.captureWave == 0)) && (save == null || info.attack);
     }
 
     public boolean isBeingPlayed(){
         //after the launch dialog, a sector is no longer considered being played
-        return Vars.state.isGame() && Vars.state.rules.sector == this && !Vars.state.gameOver;
+        return Vars.state.isGame() && Vars.state.rules.sector == this && !Vars.state.gameOver && !net.client();
     }
 
     public String name(){
-        if(preset != null) return preset.localizedName;
+        if(preset != null && info.name == null) return preset.localizedName;
         return info.name == null ? id + "" : info.name;
     }
 
     public void setName(String name){
         info.name = name;
         saveInfo();
+    }
+
+    @Nullable
+    public TextureRegion icon(){
+        return info.icon == null ? null : Fonts.getLargeIcon(info.icon);
     }
 
     public boolean isCaptured(){
@@ -162,6 +169,8 @@ public class Sector{
     }
 
     public void addItems(ItemSeq items){
+        if(net.client()) return;
+
         if(isBeingPlayed()){
             if(state.rules.defaultTeam.core() != null){
                 ItemModule storage = state.rules.defaultTeam.items();
@@ -170,6 +179,7 @@ public class Sector{
             }
         }else if(hasBase()){
             items.each((item, amount) -> info.items.add(item, Math.min(info.storageCapacity - info.items.get(item), amount)));
+            info.items.checkNegative();
             saveInfo();
         }
     }
@@ -180,7 +190,7 @@ public class Sector{
 
         //for sectors being played on, add items directly
         if(isBeingPlayed()){
-            count.add(state.rules.defaultTeam.items());
+            if(state.rules.defaultTeam.core() != null) count.add(state.rules.defaultTeam.items());
         }else{
             //add items already present
             count.add(info.items);
@@ -190,7 +200,7 @@ public class Sector{
     }
 
     public String toString(){
-        return planet.name + "#" + id;
+        return planet.name + "#" + id + " (" + name() + ")";
     }
 
     /** Projects this sector onto a 4-corner square for use in map gen.

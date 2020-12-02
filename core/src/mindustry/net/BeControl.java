@@ -45,7 +45,7 @@ public class BeControl{
             }, updateInterval, updateInterval);
         }
 
-        if(System.getProperties().contains("becopy")){
+        if(System.getProperties().containsKey("becopy")){
             try{
                 Fi dest = Fi.get(System.getProperty("becopy"));
                 Fi self = Fi.get(BeControl.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());

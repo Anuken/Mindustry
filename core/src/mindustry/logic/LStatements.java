@@ -8,6 +8,7 @@ import arc.scene.ui.layout.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.type.*;
@@ -29,8 +30,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.control;
+        public Color color(){
+            return Pal.logicControl;
         }
 
         @Override
@@ -47,8 +48,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.operations;
+        public Color color(){
+            return Pal.logicOperations;
         }
 
         @Override
@@ -79,8 +80,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.io;
+        public Color color(){
+            return Pal.logicIo;
         }
 
         @Override
@@ -111,8 +112,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.io;
+        public Color color(){
+            return Pal.logicIo;
         }
 
         @Override
@@ -233,8 +234,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.io;
+        public Color color(){
+            return Pal.logicIo;
         }
 
         @Override
@@ -258,8 +259,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.io;
+        public Color color(){
+            return Pal.logicIo;
         }
     }
 
@@ -274,8 +275,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -295,8 +296,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -319,8 +320,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -372,8 +373,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -443,8 +444,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -546,8 +547,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -571,8 +572,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.operations;
+        public Color color(){
+            return Pal.logicOperations;
         }
 
         @Override
@@ -629,8 +630,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.operations;
+        public Color color(){
+            return Pal.logicOperations;
         }
     }
 
@@ -647,8 +648,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.control;
+        public Color color(){
+            return Pal.logicControl;
         }
     }
 
@@ -712,8 +713,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.control;
+        public Color color(){
+            return Pal.logicControl;
         }
     }
 
@@ -750,8 +751,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.units;
+        public Color color(){
+            return Pal.logicUnits;
         }
 
         @Override
@@ -803,8 +804,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.units;
+        public Color color(){
+            return Pal.logicUnits;
         }
 
         @Override
@@ -823,8 +824,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.units;
+        public Color color(){
+            return Pal.logicUnits;
         }
 
         @Override
@@ -932,8 +933,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.units;
+        public Color color(){
+            return Pal.logicUnits;
         }
 
         @Override

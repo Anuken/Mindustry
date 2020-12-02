@@ -177,11 +177,14 @@ public class MapsDialog extends BaseDialog{
             t.row();
             t.add("@editor.author").padRight(10).color(Color.gray);
             t.row();
-            t.add(!map.custom && map.author().isEmpty() ? "Anuke" : map.author()).growX().wrap().padTop(2);
+            t.add(!map.custom && map.tags.get("author", "").isEmpty() ? "Anuke" : map.author()).growX().wrap().padTop(2);
             t.row();
-            t.add("@editor.description").padRight(10).color(Color.gray).top();
-            t.row();
-            t.add(map.description()).growX().wrap().padTop(2);
+
+            if(!map.tags.get("description", "").isEmpty()){
+                t.add("@editor.description").padRight(10).color(Color.gray).top();
+                t.row();
+                t.add(map.description()).growX().wrap().padTop(2);
+            }
         }).height(mapsize).width(mapsize);
 
         table.row();

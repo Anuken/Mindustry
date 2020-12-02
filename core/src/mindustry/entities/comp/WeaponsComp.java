@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.audio.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
@@ -23,8 +24,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
     /** weapon mount array, never null */
     @SyncLocal WeaponMount[] mounts = {};
-    @ReadOnly transient float aimX, aimY;
     @ReadOnly transient boolean isRotate;
+    transient float aimX, aimY;
     boolean isShooting;
     float ammo;
 
@@ -90,6 +91,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                 mount.bullet.time = mount.bullet.lifetime - 10f;
                 mount.bullet = null;
             }
+
+            if(mount.sound != null){
+                mount.sound.stop();
+            }
         }
     }
 
@@ -116,11 +121,20 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                 }else{
                     mount.bullet.rotation(weaponRotation + 90);
                     mount.bullet.set(shootX, shootY);
+                    mount.reload = weapon.reload;
                     vel.add(Tmp.v1.trns(rotation + 180f, mount.bullet.type.recoil));
+                    if(weapon.shootSound != Sounds.none && !headless){
+                        if(mount.sound == null) mount.sound = new SoundLoop(weapon.shootSound, 1f);
+                        mount.sound.update(x, y, true);
+                    }
                 }
             }else{
                 //heat decreases when not firing
                 mount.heat = Math.max(mount.heat - Time.delta * reloadMultiplier / mount.weapon.cooldownTime, 0);
+
+                if(mount.sound != null){
+                    mount.sound.update(x, y, false);
+                }
             }
 
             //flip weapon shoot side for alternating weapons at half reload
@@ -152,7 +166,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                 mount.reload <= 0.0001f && //reload has to be 0
                 Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone) //has to be within the cone
             ){
-                shoot(mount, shootX, shootY, mount.aimX, mount.aimY, shootAngle, Mathf.sign(weapon.x));
+                shoot(mount, shootX, shootY, mount.aimX, mount.aimY, mountX, mountY, shootAngle, Mathf.sign(weapon.x));
 
                 mount.reload = weapon.reload;
 
@@ -162,13 +176,13 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
         }
     }
 
-    private void shoot(WeaponMount mount, float x, float y, float aimX, float aimY, float rotation, int side){
+    private void shoot(WeaponMount mount, float x, float y, float aimX, float aimY, float mountX, float mountY, float rotation, int side){
         Weapon weapon = mount.weapon;
 
         float baseX = this.x, baseY = this.y;
         boolean delay = weapon.firstShotDelay + weapon.shotDelay > 0f;
 
-        (delay ? weapon.chargeSound : weapon.shootSound).at(x, y, Mathf.random(0.8f, 1.0f));
+        (delay ? weapon.chargeSound : weapon.continuous ? Sounds.none : weapon.shootSound).at(x, y, Mathf.random(weapon.soundPitchMin, weapon.soundPitchMax));
 
         BulletType ammo = weapon.bullet;
         float lifeScl = ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, aimX, aimY) / ammo.range()) : 1f;
@@ -195,7 +209,9 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                 vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
                 Effect.shake(weapon.shake, weapon.shake, x, y);
                 mount.heat = 1f;
-                weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
+                if(!weapon.continuous){
+                    weapon.shootSound.at(x, y, Mathf.random(weapon.soundPitchMin, weapon.soundPitchMax));
+                }
             });
         }else{
             vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
@@ -203,7 +219,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
             mount.heat = 1f;
         }
 
-        weapon.ejectEffect.at(x, y, rotation * side);
+        weapon.ejectEffect.at(mountX, mountY, rotation * side);
         ammo.shootEffect.at(x, y, rotation, parentize ? this : null);
         ammo.smokeEffect.at(x, y, rotation, parentize ? this : null);
         apply(weapon.shootStatus, weapon.shootStatusDuration);

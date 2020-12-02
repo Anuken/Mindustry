@@ -15,7 +15,7 @@ import static mindustry.Vars.*;
 
 public class Pump extends LiquidBlock{
     /** Pump amount per tile. */
-    protected float pumpAmount = 0.2f;
+    public float pumpAmount = 0.2f;
 
     public Pump(String name){
         super(name);
@@ -30,7 +30,7 @@ public class Pump extends LiquidBlock{
     }
 
     @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid) {
+    public void drawPlace(int x, int y, int rotation, boolean valid){
         Tile tile = world.tile(x, y);
         if(tile == null) return;
 

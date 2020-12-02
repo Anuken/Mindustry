@@ -9,7 +9,6 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
@@ -29,9 +28,9 @@ public class GenericCrafter extends Block{
         update = true;
         solid = true;
         hasItems = true;
-        idleSound = Sounds.machine;
+        ambientSound = Sounds.machine;
         sync = true;
-        idleSoundVolume = 0.03f;
+        ambientSoundVolume = 0.03f;
         flags = EnumSet.of(BlockFlag.factory);
     }
 
@@ -137,7 +136,7 @@ public class GenericCrafter extends Block{
         }
 
         @Override
-        public boolean shouldIdleSound(){
+        public boolean shouldAmbientSound(){
             return cons.valid();
         }
 

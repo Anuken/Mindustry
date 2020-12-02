@@ -21,6 +21,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.layout.*;
@@ -59,10 +60,13 @@ public class ResearchDialog extends BaseDialog{
                     //add global counts of each sector
                     for(Planet planet : content.planets()){
                         for(Sector sector : planet.sectors){
-                            if(sector.hasSave()){
+                            if(sector.hasSave() && sector.hasBase()){
                                 ItemSeq cached = sector.items();
-                                add(cached);
                                 cache.put(sector, cached);
+                                cached.each((item, amount) -> {
+                                    values[item.id] += Math.max(amount, 0);
+                                    total += Math.max(amount, 0);
+                                });
                             }
                         }
                     }
@@ -110,6 +114,12 @@ public class ResearchDialog extends BaseDialog{
         hidden(ui.planet::setup);
 
         addCloseButton();
+
+        keyDown(key -> {
+            if(key == Core.keybinds.get(Binding.research).key){
+                Core.app.post(this::hide);
+            }
+        });
 
         buttons.button("@database", Icon.book, () -> {
             hide();
@@ -166,7 +176,7 @@ public class ResearchDialog extends BaseDialog{
     public Dialog show(){
         if(net.client()){
             ui.showInfo("@research.multiplayer");
-            return null;
+            return this;
         }
 
         return super.show();
@@ -245,18 +255,6 @@ public class ResearchDialog extends BaseDialog{
 
     boolean selectable(TechNode node){
         return node.content.unlocked() || !node.objectives.contains(i -> !i.complete());
-    }
-
-    public void showToast(String info){
-        Table table = new Table();
-        table.actions(Actions.fadeOut(0.5f, Interp.fade), Actions.remove());
-        table.top().add(info);
-        table.name = "toast";
-        table.update(() -> {
-            table.toFront();
-            table.setPosition(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() - 21, Align.top);
-        });
-        Core.scene.add(table);
     }
 
     boolean locked(TechNode node){
@@ -441,7 +439,6 @@ public class ResearchDialog extends BaseDialog{
 
         void unlock(TechNode node){
             node.content.unlock();
-            showToast(Core.bundle.format("researched", node.content.localizedName));
             checkNodes(root);
             hoverNode = null;
             treeLayout();
@@ -484,7 +481,7 @@ public class ResearchDialog extends BaseDialog{
             infoTable.table(b -> {
                 b.margin(0).left().defaults().left();
 
-                if(selectable){
+                if(selectable && (node.content.description != null || node.content.stats.toMap().size > 0)){
                     b.button(Icon.info, Styles.cleari, () -> ui.content.show(node.content)).growY().width(50f);
                 }
                 b.add().grow();
@@ -509,8 +506,7 @@ public class ResearchDialog extends BaseDialog{
                                         if(shine != null) shiny |= shine[i];
                                     }
 
-                                    int percent = (int)(used / sum * 100);
-                                    Label label = t.add(Core.bundle.format("research.progress", percent)).left().get();
+                                    Label label = t.add(Core.bundle.format("research.progress", Math.min((int)(used / sum * 100), 99))).left().get();
 
                                     if(shiny){
                                         label.setColor(Pal.accent);
@@ -580,7 +576,7 @@ public class ResearchDialog extends BaseDialog{
             });
 
             infoTable.row();
-            if(node.content.description != null && selectable){
+            if(node.content.description != null && node.content.inlineDescription && selectable){
                 infoTable.table(t -> t.margin(3f).left().labelWrap(node.content.displayDescription()).color(Color.lightGray).growX()).fillX();
             }
 

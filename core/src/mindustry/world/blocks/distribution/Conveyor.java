@@ -33,7 +33,7 @@ public class Conveyor extends Block implements Autotiler{
     public float speed = 0f;
     public float displayedSpeed = 0f;
 
-    protected Conveyor(String name){
+    public Conveyor(String name){
         super(name);
         rotate = true;
         update = true;
@@ -42,8 +42,8 @@ public class Conveyor extends Block implements Autotiler{
         itemCapacity = 4;
         conveyorPlacement = true;
 
-        idleSound = Sounds.conveyor;
-        idleSoundVolume = 0.004f;
+        ambientSound = Sounds.conveyor;
+        ambientSoundVolume = 0.0022f;
         unloadable = false;
         noUpdateDisabled = false;
     }
@@ -159,7 +159,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void draw(){
-            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * timeScale())) % 4) : 0;
+            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time * speed * 8f * timeScale())) % 4) : 0;
 
             //draw extra conveyors facing this one for non-square tiling purposes
             Draw.z(Layer.blockUnder);
@@ -206,7 +206,7 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public boolean shouldIdleSound(){
+        public boolean shouldAmbientSound(){
             return clogHeat <= 0.5f;
         }
 
@@ -299,7 +299,7 @@ public class Conveyor extends Block implements Autotiler{
             noSleep();
         }
 
-        public boolean pass(Item item) {
+        public boolean pass(Item item){
             if(next != null && next.team == team && next.acceptItem(this, item)){
                 next.handleItem(this, item);
                 return true;
@@ -356,7 +356,7 @@ public class Conveyor extends Block implements Autotiler{
             if(len >= capacity) return false;
             Tile facing = Edges.getFacingEdge(source.tile, tile);
             int direction = Math.abs(facing.relativeTo(tile.x, tile.y) - rotation);
-            return (((direction == 0) && minitem >= itemSpace) || ((direction % 2 == 1) && minitem > 0.7f)) && !(source.block.rotate && (source.rotation + 2) % 4 == rotation);
+            return (((direction == 0) && minitem >= itemSpace) || ((direction % 2 == 1) && minitem > 0.7f)) && !(source.block.rotate && next == source);
         }
 
         @Override

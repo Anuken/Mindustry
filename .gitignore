@@ -19,12 +19,13 @@ logs/
 /annotations/out/
 /net/build/
 /tools/build/
-/core/build/
 /tests/build/
 /server/build/
 changelog
 saves/
 /core/assets-raw/fontgen/out/
+/core/assets-raw/fontgen/icons/
+/core/assets-raw/fontgen/icon_parts/
 core/assets/saves/
 /core/assets/saves/
 steam_appid.txt
@@ -35,6 +36,7 @@ steam_appid.txt
 /annotations/src/main/resources/META-INF/services
 /core/assets/version.properties
 /core/assets/locales
+/core/assets/cache/
 /ios/src/mindustry/gen/
 /core/src/mindustry/gen/
 ios/robovm.properties
@@ -143,13 +145,6 @@ nb-configuration.xml
 /local.properties
 .gradle/
 gradle-app.setting
-/build/
-/android/build/
-/core/build/
-/desktop/build/
-/html/build/
-/ios/build/
-/ios-moe/build/
 
 ## OS Specific
 .DS_Store

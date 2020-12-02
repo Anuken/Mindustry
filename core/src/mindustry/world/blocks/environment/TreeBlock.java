@@ -22,7 +22,7 @@ public class TreeBlock extends Block{
     public void drawBase(Tile tile){
 
         float x = tile.worldx(), y = tile.worldy();
-        float rot = Mathf.randomSeed(tile.pos(), 0, 4) * 90 + Mathf.sin(Time.time() + x, 50f, 0.5f) + Mathf.sin(Time.time() - y, 65f, 0.9f) + Mathf.sin(Time.time() + y - x, 85f, 0.9f);
+        float rot = Mathf.randomSeed(tile.pos(), 0, 4) * 90 + Mathf.sin(Time.time + x, 50f, 0.5f) + Mathf.sin(Time.time - y, 65f, 0.9f) + Mathf.sin(Time.time + y - x, 85f, 0.9f);
         float w = region.width * Draw.scl, h = region.height * Draw.scl;
         float scl = 30f, mag = 0.2f;
 
@@ -34,8 +34,8 @@ public class TreeBlock extends Block{
         Draw.z(Layer.power + 1);
         Draw.rectv(region, x, y, w, h, rot, vec -> {
             vec.add(
-            Mathf.sin(vec.y*3 + Time.time(), scl, mag) + Mathf.sin(vec.x*3 - Time.time(), 70, 0.8f),
-            Mathf.cos(vec.x*3 + Time.time() + 8, scl + 6f, mag * 1.1f) + Mathf.sin(vec.y*3 - Time.time(), 50, 0.2f)
+            Mathf.sin(vec.y*3 + Time.time, scl, mag) + Mathf.sin(vec.x*3 - Time.time, 70, 0.8f),
+            Mathf.cos(vec.x*3 + Time.time + 8, scl + 6f, mag * 1.1f) + Mathf.sin(vec.y*3 - Time.time, 50, 0.2f)
             );
         });
     }

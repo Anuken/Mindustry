@@ -16,8 +16,9 @@ public class FreeSlotAssignmentStrategy implements SlotAssignmentStrategy{
     public void updateSlotAssignments(Seq<SlotAssignment> assignments){
         // A very simple assignment algorithm: we simply go through
         // each assignment in the list and assign sequential slot numbers
-        for(int i = 0; i < assignments.size; i++)
+        for(int i = 0; i < assignments.size; i++){
             assignments.get(i).slotNumber = i;
+        }
     }
 
     @Override

@@ -54,7 +54,7 @@ public class Renderer implements ApplicationListener{
     public void init(){
         planets = new PlanetRenderer();
 
-        if(settings.getBool("bloom")){
+        if(settings.getBool("bloom", !ios)){
             setupBloom();
         }
     }
@@ -121,10 +121,6 @@ public class Renderer implements ApplicationListener{
 
     @Override
     public void resize(int width, int height){
-        if(settings.getBool("bloom")){
-            setupBloom();
-        }
-
         fx.resize(width, height);
     }
 
@@ -143,9 +139,9 @@ public class Renderer implements ApplicationListener{
             }
             bloom = new Bloom(true);
         }catch(Throwable e){
-            e.printStackTrace();
             settings.put("bloom", false);
             ui.showErrorMessage("@error.bloom");
+            Log.err(e);
         }
     }
 
@@ -240,6 +236,7 @@ public class Renderer implements ApplicationListener{
         }
 
         if(bloom != null){
+            bloom.resize(graphics.getWidth() / 4, graphics.getHeight() / 4);
             Draw.draw(Layer.bullet - 0.01f, bloom::capture);
             Draw.draw(Layer.effect + 0.01f, bloom::render);
         }
@@ -367,5 +364,4 @@ public class Renderer implements ApplicationListener{
 
         buffer.dispose();
     }
-
 }

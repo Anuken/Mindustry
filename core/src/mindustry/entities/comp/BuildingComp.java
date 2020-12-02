@@ -14,6 +14,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
 import mindustry.content.*;
@@ -30,6 +31,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
@@ -106,8 +108,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         this.block = block;
         this.team = team;
 
-        if(block.activeSound != Sounds.none){
-            sound = new SoundLoop(block.activeSound, block.activeSoundVolume);
+        if(block.loopSound != Sounds.none){
+            sound = new SoundLoop(block.loopSound, block.loopSoundVolume);
         }
 
         health = block.health;
@@ -434,7 +436,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     /** Handle a stack input. */
-    public void handleStack(Item item, int amount, Teamc source){
+    public void handleStack(Item item, int amount, @Nullable Teamc source){
         noSleep();
         items.add(item, amount);
     }
@@ -517,6 +519,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void dumpLiquid(Liquid liquid){
         int dump = this.cdump;
+
+        if(liquids.get(liquid) <= 0.0001f) return;
+
+        if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) liquid.unlock();
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -616,7 +622,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * containers, it gets added to the block's inventory.
      */
     public void offload(Item item){
+        produced(item, 1);
         int dump = this.cdump;
+        if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) item.unlock();
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -646,6 +654,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         return false;
+    }
+
+    public void produced(Item item){
+        produced(item, 1);
+    }
+
+    public void produced(Item item, int amount){
+        if(Vars.state.rules.sector != null && team == state.rules.defaultTeam) Vars.state.rules.sector.info.handleProduction(item, amount);
     }
 
     /** Try dumping any item near the  */
@@ -780,7 +796,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     /** @return whether this block should play its idle sound.*/
-    public boolean shouldIdleSound(){
+    public boolean shouldAmbientSound(){
         return shouldConsume();
     }
 
@@ -913,6 +929,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //null is of type void.class; anonymous classes use their superclass.
         Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() || value.getClass().getSimpleName().startsWith("adapter") ? value.getClass().getSuperclass() : value.getClass();
 
+        if(value instanceof Item) type = Item.class;
+        if(value instanceof Block) type = Block.class;
+        if(value instanceof Liquid) type = Liquid.class;
+        
         if(builder != null && builder.isPlayer()){
             lastAccessed = builder.getPlayer().name;
         }
@@ -966,31 +986,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             });
         }
 
-        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, Pal.darkFlame, state.rules.damageExplosions);
+        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, state.rules.damageExplosions);
 
         if(!floor().solid && !floor().isLiquid){
             Effect.rubble(x, y, block.size);
-        }
-    }
-
-    /**
-     * Returns the flammability of the  Used for fire calculations.
-     * Takes flammability of floor liquid into account.
-     */
-    public float getFlammability(){
-        if(!block.hasItems){
-            if(floor().isLiquid && !block.solid){
-                return floor().liquidDrop.flammability;
-            }
-            return 0;
-        }else{
-            float result = items.sum((item, amount) -> item.flammability * amount);
-
-            if(block.hasLiquids){
-                result += liquids.sum((liquid, amount) -> liquid.flammability * amount / 3f);
-            }
-
-            return result;
         }
     }
 
@@ -1118,7 +1117,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Returns whether or not a hand cursor should be shown over this block. */
     public Cursor getCursor(){
-        return block.configurable ? SystemCursor.hand : SystemCursor.arrow;
+        return block.configurable && team == player.team() ? SystemCursor.hand : SystemCursor.arrow;
     }
 
     /**
@@ -1225,6 +1224,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     }
 
+    /** @return ambient sound volume scale. */
+    public float ambientVolume(){
+        return efficiency();
+    }
+
     //endregion
     //region overrides
 
@@ -1285,6 +1289,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();
             case powerNetCapacity -> power == null ? 0 : power.graph.getLastCapacity();
             case enabled -> enabled ? 1 : 0;
+            case controlled -> this instanceof ControlBlock c ? c.isControlled() ? 1 : 0 : 0;
             case payloadCount -> getPayload() != null ? 1 : 0;
             default -> 0;
         };
@@ -1319,7 +1324,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     @Override
     public void control(LAccess type, Object p1, double p2, double p3, double p4){
-        if(type == LAccess.configure && block.logicConfigurable){
+        //don't execute configure instructions as the client
+        if(type == LAccess.configure && block.logicConfigurable && !net.client()){
             //change config only if it's new
             Object prev = senseObject(LAccess.config);
             if(prev != p1){
@@ -1347,6 +1353,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Final
     @Override
     public void update(){
+        if(state.isEditor()) return;
+
         timeScaleDuration -= Time.delta;
         if(timeScaleDuration <= 0f || !block.canOverdrive){
             timeScale = 1f;
@@ -1360,12 +1368,18 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
-        if(sound != null){
-            sound.update(x, y, shouldActiveSound());
+        if(team == Team.derelict){
+            enabled = false;
         }
 
-        if(block.idleSound != Sounds.none && shouldIdleSound()){
-            loops.play(block.idleSound, self(), block.idleSoundVolume);
+        if(!headless){
+            if(sound != null){
+                sound.update(x, y, shouldActiveSound());
+            }
+
+            if(block.ambientSound != Sounds.none && shouldAmbientSound()){
+                control.sound.loop(block.ambientSound, self(), block.ambientSoundVolume * ambientVolume());
+            }
         }
 
         if(enabled || !block.noUpdateDisabled){

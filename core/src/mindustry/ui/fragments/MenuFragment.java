@@ -77,12 +77,13 @@ public class MenuFragment extends Fragment{
         String versionText = ((Version.build == -1) ? "[#fc8140aa]" : "[#ffffffba]") + Version.combined();
         parent.fill((x, y, w, h) -> {
             TextureRegion logo = Core.atlas.find("logo");
+            float width = Core.graphics.getWidth(), height = Core.graphics.getHeight() - Core.scene.marginTop;
             float logoscl = Scl.scl(1);
             float logow = Math.min(logo.width * logoscl, Core.graphics.getWidth() - Scl.scl(20));
             float logoh = logow * (float)logo.height / logo.width;
 
-            float fx = (int)(Core.graphics.getWidth() / 2f);
-            float fy = (int)(Core.graphics.getHeight() - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Scl.scl(30f) : 0f);
+            float fx = (int)(width / 2f);
+            float fy = (int)(height - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Scl.scl(30f) : 0f);
 
             Draw.color();
             Draw.rect(logo, fx, fy, logow, logoh);
@@ -108,7 +109,6 @@ public class MenuFragment extends Fragment{
             editor = new MobileButton(Icon.terrain, "@editor", () -> checkPlay(ui.maps::show)),
             tools = new MobileButton(Icon.settings, "@settings", ui.settings::show),
             mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
-            donate = new MobileButton(Icon.link, "@website", () -> Core.app.openURI("https://anuke.itch.io/mindustry")),
             exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit());
 
         if(!Core.graphics.isPortrait()){
@@ -169,11 +169,10 @@ public class MenuFragment extends Fragment{
                     new Buttoni("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
                     new Buttoni("@joingame", Icon.add, () -> checkPlay(ui.join::show)),
                     new Buttoni("@customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
-                    new Buttoni("@loadgame", Icon.download, () -> checkPlay(ui.load::show)),
-                    new Buttoni("@tutorial", Icon.info, () -> checkPlay(control::playTutorial))
+                    new Buttoni("@loadgame", Icon.download, () -> checkPlay(ui.load::show))
                 ),
                 new Buttoni("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("@workshop", Icon.book, platform::openWorkshop) : null,
-                new Buttoni(Core.bundle.get("mods"), Icon.bookOpen, ui.mods::show),
+                new Buttoni("@mods", Icon.book, ui.mods::show),
                 //not enough space for this button
                 //new Buttoni("@schematics", Icon.paste, ui.schematics::show),
                 new Buttoni("@settings", Icon.settings, ui.settings::show),
@@ -195,6 +194,7 @@ public class MenuFragment extends Fragment{
     }
 
     private void checkPlay(Runnable run){
+
         if(!mods.hasContentErrors()){
             run.run();
         }else{
@@ -231,7 +231,7 @@ public class MenuFragment extends Fragment{
                         submenu.clearChildren();
                         fadeInMenu();
                         //correctly offset the button
-                        submenu.add().height((Core.graphics.getHeight() - out[0].getY(Align.topLeft)) / Scl.scl(1f));
+                        submenu.add().height((Core.graphics.getHeight() - Core.scene.marginTop - Core.scene.marginBottom - out[0].getY(Align.topLeft)) / Scl.scl(1f));
                         submenu.row();
                         buttons(submenu, b.submenu);
                     }else{

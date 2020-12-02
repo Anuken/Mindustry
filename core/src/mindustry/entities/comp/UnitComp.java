@@ -9,6 +9,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
+import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -30,12 +31,13 @@ import mindustry.world.blocks.payloads.*;
 import static mindustry.Vars.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Commanderc, Displayable, Senseable, Ranged{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Commanderc, Displayable, Senseable, Ranged, Minerc, Builderc{
 
     @Import boolean hovering, dead;
-    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo;
+    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo, minFormationSpeed;
     @Import Team team;
     @Import int id;
+    @Import @Nullable Tile mineTile;
 
     private UnitController controller;
     UnitType type;
@@ -67,15 +69,33 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return type.hasWeapons();
     }
 
+    public float speed(){
+        float strafePenalty = isGrounded() || !isPlayer() ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(vel().angle(), rotation) / 180f);
+        //limit speed to minimum formation speed to preserve formation
+        return (isCommanding() ? minFormationSpeed * 0.98f : type.speed) * strafePenalty;
+    }
+
     /** @return speed with boost multipliers factored in. */
     public float realSpeed(){
-        return Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation) * type.speed;
+        return Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation) * speed();
     }
 
     /** Iterates through this unit and everything it is controlling. */
     public void eachGroup(Cons<Unit> cons){
         cons.get(self());
         controlling().each(cons);
+    }
+
+    /** @return where the unit wants to look at. */
+    public float prefRotation(){
+        if(activelyBuilding()){
+            return angleTo(buildPlan());
+        }else if(mineTile != null){
+            return angleTo(mineTile);
+        }else if(moving()){
+            return vel().angle();
+        }
+        return rotation;
     }
 
     @Override
@@ -104,7 +124,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case shooting -> isShooting() ? 1 : 0;
             case shootX -> World.conv(aimX());
             case shootY -> World.conv(aimY());
+            case mining -> mining() ? 1 : 0;
+            case mineX -> mining() ? mineTile.x : -1;
+            case mineY -> mining() ? mineTile.y : -1;
             case flag -> flag;
+            case controlled -> controller instanceof LogicAI || controller instanceof Player ? 1 : 0;
             case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
             default -> 0;
         };
@@ -286,7 +310,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         drag = type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f);
 
         //apply knockback based on spawns
-        if(team != state.rules.waveTeam && state.hasSpawns()){
+        if(team != state.rules.waveTeam && state.hasSpawns() && (!net.client() || isLocal())){
             float relativeSize = state.rules.dropZoneRadius + hitSize/2f + 1f;
             for(Tile spawn : spawner.getSpawns()){
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
@@ -361,7 +385,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //remove units spawned by the core
-        if(spawnedByCore && !isPlayer()){
+        if(spawnedByCore && !isPlayer() && !dead){
             Call.unitDespawn(self());
         }
     }
@@ -373,9 +397,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     /** Actually destroys the unit, removing it and creating explosions. **/
     public void destroy(){
-        float explosiveness = 2f + item().explosiveness * stack().amount / 2f;
-        float flammability = item().flammability * stack().amount / 2f;
-        Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame, state.rules.damageExplosions);
+        float explosiveness = 2f + item().explosiveness * stack().amount * 1.53f;
+        float flammability = item().flammability * stack().amount / 1.9f;
+
+        if(!spawnedByCore){
+            Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, state.rules.damageExplosions, item().flammability > 1, team);
+        }
 
         float shake = hitSize / 3f;
 
@@ -391,7 +418,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //if this unit crash landed (was flying), damage stuff in a radius
-        if(type.flying){
+        if(type.flying && !spawnedByCore){
             Damage.damage(team,x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f, true, false, true);
         }
 

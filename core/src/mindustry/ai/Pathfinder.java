@@ -7,11 +7,13 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.async.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -86,6 +88,8 @@ public class Pathfinder implements Runnable{
                 tiles[tile.x][tile.y] = packTile(tile);
             }
 
+            preloadPath(getField(state.rules.waveTeam, costGround, fieldCore));
+
             start();
         });
 
@@ -112,11 +116,11 @@ public class Pathfinder implements Runnable{
         }
 
         return PathTile.get(
-            tile.build == null || !tile.solid() ? 0 : Math.min((int)(tile.build.health / 40), 80),
+            tile.build == null || !tile.solid() || tile.block() instanceof CoreBlock ? 0 : Math.min((int)(tile.build.health / 40), 80),
             tile.getTeamID(),
             tile.solid(),
             tile.floor().isLiquid,
-            tile.staticDarkness() >= 2,
+            tile.staticDarkness() >= 2 || (tile.floor().solid && tile.block() == Blocks.air),
             nearLiquid,
             nearGround,
             nearSolid,
@@ -350,13 +354,7 @@ public class Pathfinder implements Runnable{
         threadList.add(path);
 
         //add to main thread's list of paths
-        Core.app.post(() -> {
-            mainList.add(path);
-            //TODO
-            //if(fieldMap[team.id] != null){
-            //    fieldMap[team.id].put(target, path);
-            //}
-        });
+        Core.app.post(() -> mainList.add(path));
 
         //fill with impassables by default
         for(int x = 0; x < world.width(); x++){
@@ -444,13 +442,12 @@ public class Pathfinder implements Runnable{
         public void getPositions(IntSeq out){
             out.add(Point2.pack(World.toTile(position.getX()), World.toTile(position.getY())));
         }
-
     }
 
     /**
      * Data for a flow field to some set of destinations.
      * Concrete subclasses must specify a way to fetch costs and destinations.
-     * */
+     */
     public static abstract class Flowfield{
         /** Refresh rate in milliseconds. Return any number <= 0 to disable. */
         protected int refreshRate;
@@ -462,7 +459,7 @@ public class Pathfinder implements Runnable{
         /** costs of getting to a specific tile */
         public int[][] weights;
         /** search IDs of each position - the highest, most recent search is prioritized and overwritten */
-        int[][] searches;
+        public int[][] searches;
         /** search frontier, these are Pos objects */
         IntQueue frontier = new IntQueue();
         /** all target positions; these positions have a cost of 0, and must be synchronized on! */

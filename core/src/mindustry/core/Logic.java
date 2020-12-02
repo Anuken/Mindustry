@@ -34,7 +34,6 @@ public class Logic implements ApplicationListener{
         Events.on(BlockDestroyEvent.class, event -> {
             //blocks that get broken are appended to the team's broken block queue
             Tile tile = event.tile;
-            Block block = tile.block();
             //skip null entities or un-rebuildables, for obvious reasons; also skip client since they can't modify these requests
             if(tile.build == null || !tile.block().rebuildable || net.client()) return;
 
@@ -80,6 +79,13 @@ public class Logic implements ApplicationListener{
                     state.wavetime = state.rules.waveSpacing;
 
                     SectorDamage.applyCalculatedDamage();
+
+                    //make sure damaged buildings are counted
+                    for(Tile tile : world.tiles){
+                        if(tile.build != null && tile.build.damaged()){
+                            indexer.notifyTileDamaged(tile.build);
+                        }
+                    }
                 }
 
                 //reset values
@@ -95,10 +101,21 @@ public class Logic implements ApplicationListener{
         Events.on(WorldLoadEvent.class, e -> {
             //enable infinite ammo for wave team by default
             state.rules.waveTeam.rules().infiniteAmmo = true;
+
             if(state.isCampaign()){
-                //enable building AI
-                state.rules.waveTeam.rules().ai = true;
+                //enable building AI on campaign unless the preset disables it
+                if(!(state.getSector().preset != null && !state.getSector().preset.useAI)){
+                    state.rules.waveTeam.rules().ai = true;
+                }
+                state.rules.waveTeam.rules().aiTier = state.getSector().threat * 0.8f;
                 state.rules.waveTeam.rules().infiniteResources = true;
+
+                //fill enemy cores by default.
+                for(var core : state.rules.waveTeam.cores()){
+                    for(Item item : content.items()){
+                        core.items.set(item, core.block.itemCapacity);
+                    }
+                }
             }
 
             //save settings
@@ -109,6 +126,30 @@ public class Logic implements ApplicationListener{
         Events.on(ResearchEvent.class, e -> {
             if(net.server()){
                 Call.researched(e.content);
+            }
+        });
+
+        Events.on(SectorCaptureEvent.class, e -> {
+            if(!net.client() && e.sector == state.getSector() && e.sector.isBeingPlayed()){
+                for(Tile tile : world.tiles){
+                    //convert all blocks to neutral, randomly killing them
+                    if(tile.isCenter() && tile.build != null && tile.build.team == state.rules.waveTeam){
+                        Building b = tile.build;
+                        Call.setTeam(b, Team.derelict);
+                        Time.run(Mathf.random(0f, 60f * 6f), () -> {
+                            if(Mathf.chance(0.25)){
+                                b.kill();
+                            }
+                        });
+                    }
+                }
+
+                //kill all units
+                Groups.unit.each(u -> {
+                    if(u.team == state.rules.waveTeam){
+                        Time.run(Mathf.random(0f, 60f * 5f), u::kill);
+                    }
+                });
             }
         });
 
@@ -180,18 +221,8 @@ public class Logic implements ApplicationListener{
             //if there's a "win" wave and no enemies are present, win automatically
             if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()) ||
                 (state.rules.attackMode && state.rules.waveTeam.cores().isEmpty())){
-                //the sector has been conquered - waves get disabled
-                state.rules.waves = false;
-                //disable attack mode
-                state.rules.attackMode = false;
 
-                //fire capture event
-                Events.fire(new SectorCaptureEvent(state.rules.sector));
-
-                //save, just in case
-                if(!headless){
-                    control.saves.saveSector(state.rules.sector);
-                }
+                Call.sectorCapture();
             }
         }else{
             if(!state.rules.attackMode && state.teams.playerCores().size == 0 && !state.gameOver){
@@ -224,6 +255,26 @@ public class Logic implements ApplicationListener{
                 Tmp.v1.setToRandomDirection();
                 Call.createWeather(entry.weather, entry.intensity, duration, Tmp.v1.x, Tmp.v1.y);
             }
+        }
+    }
+
+    @Remote(called = Loc.server)
+    public static void sectorCapture(){
+        //the sector has been conquered - waves get disabled
+        state.rules.waves = false;
+        //disable attack mode
+        state.rules.attackMode = false;
+
+        if(state.rules.sector == null) return;
+
+        state.rules.sector.info.wasCaptured = true;
+
+        //fire capture event
+        Events.fire(new SectorCaptureEvent(state.rules.sector));
+
+        //save, just in case
+        if(!headless && !net.client()){
+            control.saves.saveSector(state.rules.sector);
         }
     }
 
@@ -318,5 +369,4 @@ public class Logic implements ApplicationListener{
     public boolean isWaitingWave(){
         return (state.rules.waitEnemies || (state.wave >= state.rules.winWave && state.rules.winWave > 0)) && state.enemies > 0;
     }
-
 }

@@ -160,8 +160,8 @@ public class ContentLoader{
     public void removeLast(){
         if(lastAdded != null && contentMap[lastAdded.getContentType().ordinal()].peek() == lastAdded){
             contentMap[lastAdded.getContentType().ordinal()].pop();
-            if(lastAdded instanceof MappableContent){
-                contentNameMap[lastAdded.getContentType().ordinal()].remove(((MappableContent)lastAdded).name);
+            if(lastAdded instanceof MappableContent c){
+                contentNameMap[lastAdded.getContentType().ordinal()].remove(c.name);
             }
         }
     }

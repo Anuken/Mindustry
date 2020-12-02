@@ -78,9 +78,11 @@ public abstract class BulletType extends Content{
      * Do not change unless you know what you're doing. */
     public boolean backMove = true;
     /** Bullet range override. */
-    public float range = -1f;
-    /** Heal Bullet Percent **/
+    public float maxRange = -1f;
+    /** % of block health healed **/
     public float healPercent = 0f;
+    /** whether to make fire on impact */
+    public boolean makeFire = false;
 
     //additional effects
 
@@ -114,6 +116,8 @@ public abstract class BulletType extends Content{
     public float lightningDamage = -1;
     public float lightningCone = 360f;
     public float lightningAngle = 0f;
+    /** The bullet created at lightning points. */
+    public @Nullable BulletType lightningType = null;
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
@@ -150,22 +154,25 @@ public abstract class BulletType extends Content{
 
     /** Returns maximum distance the bullet this bullet type has can travel. */
     public float range(){
-        return Math.max(speed * lifetime * (1f - drag), range);
+        return Math.max(speed * lifetime * (1f - drag), maxRange);
     }
 
     public boolean collides(Bullet bullet, Building tile){
         return healPercent <= 0.001f || tile.team != bullet.team || tile.healthf() < 1f;
     }
 
-    public void hitTile(Bullet b, Building tile, float initialHealth){
-        if(status == StatusEffects.burning) {
-            Fires.create(tile.tile);
+    /** If direct is false, this is an indirect hit and the tile was already damaged.
+     * TODO this is a mess. */
+    public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
+        if(makeFire && build.team != b.team){
+            Fires.create(build.tile);
         }
-        hit(b);
 
-        if(healPercent > 0f && tile.team == b.team && !(tile.block instanceof ConstructBlock)){
-            Fx.healBlockFull.at(tile.x, tile.y, tile.block.size, Pal.heal);
-            tile.heal(healPercent / 100f * tile.maxHealth());
+        if(healPercent > 0f && build.team == b.team && !(build.block instanceof ConstructBlock)){
+            Fx.healBlockFull.at(build.x, build.y, build.block.size, Pal.heal);
+            build.heal(healPercent / 100f * build.maxHealth());
+        }else if(build.team != b.team && direct){
+            hit(b);
         }
     }
 
@@ -202,21 +209,21 @@ public abstract class BulletType extends Content{
             Damage.createIncend(x, y, incendSpread, incendAmount);
         }
 
-        if(splashDamageRadius > 0){
+        if(splashDamageRadius > 0 && !b.absorbed){
             Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
 
             if(status != StatusEffects.none){
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
             }
-            
-            if(healPercent > 0f) {
-                indexer.eachBlock(b.team, x, y, splashDamageRadius, other -> other.damaged(), other -> {
+
+            if(healPercent > 0f){
+                indexer.eachBlock(b.team, x, y, splashDamageRadius, Building::damaged, other -> {
                     Fx.healBlockFull.at(other.x, other.y, other.block.size, Pal.heal);
                     other.heal(healPercent / 100f * other.maxHealth());
                 });
             }
 
-            if(status == StatusEffects.burning) {
+            if(makeFire){
                 indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> {
                     Fires.create(other.tile);
                 });
@@ -247,13 +254,9 @@ public abstract class BulletType extends Content{
     }
 
     public void init(Bullet b){
-        if(pierceCap >= 1) {
-            pierce = true;
-            //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
-        }
 
-        if(killShooter && b.owner() instanceof Healthc){
-            ((Healthc)b.owner()).kill();
+        if(killShooter && b.owner() instanceof Healthc h){
+            h.kill();
         }
 
         if(instantDisappear){
@@ -270,13 +273,26 @@ public abstract class BulletType extends Content{
         }
 
         if(weaveMag > 0){
-            b.vel.rotate(Mathf.sin(Mathf.randomSeed(b.id, 10f) + b.time, weaveScale, weaveMag) * Time.delta);
+            float scl = Mathf.randomSeed(id, 0.9f, 1.1f);
+            b.vel.rotate(Mathf.sin(b.time + Mathf.PI * weaveScale/2f * scl, weaveScale * scl, weaveMag) * Time.delta);
         }
 
         if(trailChance > 0){
             if(Mathf.chanceDelta(trailChance)){
                 trailEffect.at(b.x, b.y, trailParam, trailColor);
             }
+        }
+    }
+
+    @Override
+    public void init(){
+        if(pierceCap >= 1){
+            pierce = true;
+            //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
+        }
+
+        if(lightningType == null){
+            lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
         }
     }
 
@@ -302,11 +318,11 @@ public abstract class BulletType extends Content{
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle){
-        return create(parent.owner(), parent.team, x, y, angle);
+        return create(parent.owner, parent.team, x, y, angle);
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl, float lifeScale){
-        return create(parent.owner(), parent.team, x, y, angle, velocityScl, lifeScale);
+        return create(parent.owner, parent.team, x, y, angle, velocityScl, lifeScale);
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){
@@ -331,7 +347,7 @@ public abstract class BulletType extends Content{
         bullet.damage = (damage < 0 ? this.damage : damage) * bullet.damageMultiplier();
         bullet.add();
 
-        if(keepVelocity && owner instanceof Velc) bullet.vel.add(((Velc)owner).vel().x, ((Velc)owner).vel().y);
+        if(keepVelocity && owner instanceof Velc v) bullet.vel.add(v.vel().x, v.vel().y);
         return bullet;
     }
 
@@ -341,6 +357,7 @@ public abstract class BulletType extends Content{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void createBullet(BulletType type, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
+        if(type == null) return;
         type.create(null, team, x, y, angle, damage, velocityScl, lifetimeScl, null);
     }
 }

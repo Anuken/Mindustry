@@ -23,6 +23,12 @@ public class Router extends Block{
         noUpdateDisabled = true;
     }
 
+    @Override
+    public boolean canReplace(Block other){
+        if(other.alwaysReplace) return true;
+        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && size >= other.size;
+    }
+
     public class RouterBuild extends Building implements ControlBlock{
         public Item lastItem;
         public Tile lastInput;
@@ -99,6 +105,7 @@ public class Router extends Block{
                 unit.health(health);
                 unit.ammo(unit.type().ammoCapacity * (items.total() > 0 ? 1f : 0f));
                 unit.team(team);
+                unit.set(x, y);
 
                 int angle = Mathf.mod((int)((angleTo(unit.aimX(), unit.aimY()) + 45) / 90), 4);
 

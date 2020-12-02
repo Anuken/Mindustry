@@ -1,0 +1,11 @@
+The final beta build.
+
+- Updated link to wiki modding guide, now points to new wiki
+- Fixed weaving missiles consistently moving off to one direction
+- Fixed units shooting fast bullets on servers in certain conditions
+- Fixed some crashes
+- Made construction of rotated blocks free/instant (i.e. equivalent to manually rotating it)
+
+Campaign:
+- Better production calculation system
+- Fixed deconstruction counting as production

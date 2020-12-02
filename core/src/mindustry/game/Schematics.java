@@ -68,13 +68,12 @@ public class Schematics implements Loadable{
             shadowBuffer.dispose();
             if(errorTexture != null){
                 errorTexture.dispose();
+                errorTexture = null;
             }
         });
 
         Events.on(ClientLoadEvent.class, event -> {
-            Pixmap pixmap = Core.atlas.getPixmap("error").crop();
-            errorTexture = new Texture(pixmap);
-            pixmap.dispose();
+            errorTexture = new Texture("sprites/error.png");
         });
     }
 
@@ -108,13 +107,10 @@ public class Schematics implements Loadable{
         if(shadowBuffer == null){
             Core.app.post(() -> shadowBuffer = new FrameBuffer(maxSchematicSize + padding + 8, maxSchematicSize + padding + 8));
         }
-
-        //load base schematics
-        bases.load();
     }
 
     private void loadLoadouts(){
-        Seq.with(Loadouts.basicShard, Loadouts.basicFoundation, Loadouts.basicNucleus).each(s -> checkLoadout(s,false));
+        Seq.with(Loadouts.basicShard, Loadouts.basicFoundation, Loadouts.basicNucleus).each(s -> checkLoadout(s, false));
     }
 
     public void overwrite(Schematic target, Schematic newSchematic){
@@ -130,12 +126,18 @@ public class Schematics implements Loadable{
         newSchematic.tags.putAll(target.tags);
         newSchematic.file = target.file;
 
+        loadouts.each((block, list) -> list.remove(target));
+        checkLoadout(target, true);
+
         try{
             write(newSchematic, target.file);
         }catch(Exception e){
+            Log.err("Failed to overwrite schematic '@' (@)", newSchematic.name(), target.file);
             Log.err(e);
             ui.showException(e);
         }
+
+
     }
 
     private @Nullable Schematic loadFile(Fi file){
@@ -153,6 +155,7 @@ public class Schematics implements Loadable{
 
             return s;
         }catch(Throwable e){
+            Log.err("Failed to read schematic from file '@'", file);
             Log.err(e);
         }
         return null;
@@ -188,6 +191,7 @@ public class Schematics implements Loadable{
         try{
             return getBuffer(schematic).getTexture();
         }catch(Throwable t){
+            Log.err("Failed to get preview for schematic '@' (@)", schematic.name(), schematic.file);
             Log.err(t);
             errored.add(schematic);
             return errorTexture;
@@ -281,7 +285,7 @@ public class Schematics implements Loadable{
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
     public Seq<BuildPlan> toRequests(Schematic schem, int x, int y){
         return schem.tiles.map(t -> new BuildPlan(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block, t.config).original(t.x, t.y, schem.width, schem.height))
-            .removeAll(s -> !s.block.isVisible() || !s.block.unlockedNow());
+            .removeAll(s -> (!s.block.isVisible() && !(s.block instanceof CoreBlock)) || !s.block.unlockedNow());
     }
 
     /** @return all the valid loadouts for a specific core type. */
@@ -354,7 +358,7 @@ public class Schematics implements Loadable{
             for(int cy = y; cy <= y2; cy++){
                 Building linked = world.build(cx, cy);
 
-                if(linked != null && linked.block.isVisible() && !(linked.block instanceof ConstructBlock)){
+                if(linked != null && (linked.block.isVisible() || linked.block() instanceof CoreBlock) && !(linked.block instanceof ConstructBlock)){
                     int top = linked.block.size/2;
                     int bot = linked.block.size % 2 == 1 ? -linked.block.size/2 : -(linked.block.size - 1)/2;
                     minx = Math.min(linked.tileX() + bot, minx);
@@ -383,7 +387,7 @@ public class Schematics implements Loadable{
                 Building tile = world.build(cx, cy);
 
                 if(tile != null && !counted.contains(tile.pos()) && !(tile.block instanceof ConstructBlock)
-                    && (tile.block.isVisible() || (tile.block instanceof CoreBlock))){
+                    && (tile.block.isVisible() || tile.block instanceof CoreBlock)){
                     Object config = tile.config();
 
                     tiles.add(new Stile(tile.block, tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
@@ -418,12 +422,26 @@ public class Schematics implements Loadable{
     }
 
     public static void placeLoadout(Schematic schem, int x, int y, Team team, Block resource){
+        placeLoadout(schem, x, y, team, resource, true);
+    }
+
+    public static void placeLoadout(Schematic schem, int x, int y, Team team, Block resource, boolean check){
         Stile coreTile = schem.tiles.find(s -> s.block instanceof CoreBlock);
+        Seq<Tile> seq = new Seq<>();
         if(coreTile == null) throw new IllegalArgumentException("Loadout schematic has no core tile!");
         int ox = x - coreTile.x, oy = y - coreTile.y;
         schem.tiles.each(st -> {
             Tile tile = world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
+
+            //check for blocks that are in the way.
+            if(check && !(st.block instanceof CoreBlock)){
+                seq.clear();
+                tile.getLinkedTilesAs(st.block, seq);
+                if(seq.contains(t -> !t.block().alwaysReplace && !t.synthetic())){
+                    return;
+                }
+            }
 
             tile.setBlock(st.block, team, st.rotation);
 

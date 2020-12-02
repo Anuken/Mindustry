@@ -26,7 +26,7 @@ abstract class FireComp implements Timedc, Posc, Firec, Syncc{
 
     @Override
     public void update(){
-        if(Mathf.chance(0.1 * Time.delta)){
+        if(Mathf.chance(0.09 * Time.delta)){
             Fx.fire.at(x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
@@ -34,8 +34,8 @@ abstract class FireComp implements Timedc, Posc, Firec, Syncc{
             Fx.fireSmoke.at(x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
-        if(Mathf.chance(0.001 * Time.delta)){
-            Sounds.fire.at(this);
+        if(!headless){
+            control.sound.loop(Sounds.fire, this, 0.07f);
         }
 
         time = Mathf.clamp(time + Time.delta, 0, lifetime());
@@ -59,7 +59,7 @@ abstract class FireComp implements Timedc, Posc, Firec, Syncc{
         }
 
         if(baseFlammability < 0 || block != tile.block()){
-            baseFlammability = tile.build == null ? 0 : tile.build.getFlammability();
+            baseFlammability = tile.build == null ? 0 : tile.getFlammability();
             block = tile.block();
         }
 
@@ -77,12 +77,12 @@ abstract class FireComp implements Timedc, Posc, Firec, Syncc{
             }
         }
 
-        if(Mathf.chance(0.1 * Time.delta)){
+        if(Mathf.chance(0.025 * Time.delta)){
             Puddlec p = Puddles.get(tile);
             puddleFlammability = p != null ? p.getFlammability() / 3f : 0;
 
             if(damage){
-                entity.damage(0.4f);
+                entity.damage(1.6f);
             }
             Damage.damageUnits(null, tile.worldx(), tile.worldy(), tilesize, 3f,
             unit -> !unit.isFlying() && !unit.isImmune(StatusEffects.burning),

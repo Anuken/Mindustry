@@ -13,7 +13,7 @@ public class DrawOperation{
     private MapEditor editor;
     private LongSeq array = new LongSeq();
 
-    public DrawOperation(MapEditor editor) {
+    public DrawOperation(MapEditor editor){
         this.editor = editor;
     }
 
@@ -37,7 +37,7 @@ public class DrawOperation{
         }
     }
 
-    private void updateTile(int i) {
+    private void updateTile(int i){
         long l = array.get(i);
         array.set(i, TileOp.get(TileOp.x(l), TileOp.y(l), TileOp.type(l), getTile(editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l))));
         setTile(editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l), TileOp.value(l));

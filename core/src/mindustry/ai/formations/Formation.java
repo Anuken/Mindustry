@@ -17,10 +17,8 @@ import arc.struct.*;
  * @author davebaol
  */
 public class Formation{
-
     /** A list of slots assignments. */
     public Seq<SlotAssignment> slotAssignments;
-
     /** The anchor point of this formation. */
     public Vec3 anchor;
     /** The formation pattern */
@@ -138,7 +136,6 @@ public class Formation{
      * @return {@code false} if no more slots are available; {@code true} otherwise.
      */
     public boolean addMember(FormationMember member){
-
         // Check if the pattern supports one more slot
         if(pattern.supportsSlots(slotAssignments.size + 1)){
             // Add a new slot assignment

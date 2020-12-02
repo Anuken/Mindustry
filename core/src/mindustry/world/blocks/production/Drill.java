@@ -66,8 +66,8 @@ public class Drill extends Block{
         hasLiquids = true;
         liquidCapacity = 5f;
         hasItems = true;
-        idleSound = Sounds.drill;
-        idleSoundVolume = 0.003f;
+        ambientSound = Sounds.drill;
+        ambientSoundVolume = 0.018f;
     }
 
     @Override
@@ -205,8 +205,13 @@ public class Drill extends Block{
         }
 
         @Override
-        public boolean shouldIdleSound(){
-            return efficiency() > 0.01f;
+        public boolean shouldAmbientSound(){
+            return efficiency() > 0.01f && items.total() < itemCapacity;
+        }
+
+        @Override
+        public float ambientVolume(){
+            return efficiency() * (size * size) / 4f;
         }
 
         @Override
@@ -254,7 +259,7 @@ public class Drill extends Block{
                 progress += delta() * dominantItems * speed * warmup;
 
                 if(Mathf.chanceDelta(updateEffectChance * warmup))
-                    updateEffect.at(getX() + Mathf.range(size * 2f), getY() + Mathf.range(size * 2f));
+                    updateEffect.at(x + Mathf.range(size * 2f), y + Mathf.range(size * 2f));
             }else{
                 lastDrillSpeed = 0f;
                 warmup = Mathf.lerpDelta(warmup, 0f, warmupSpeed);
@@ -269,7 +274,7 @@ public class Drill extends Block{
                 index ++;
                 progress %= delay;
 
-                drillEffect.at(getX() + Mathf.range(size), getY() + Mathf.range(size), dominantItem.color);
+                drillEffect.at(x + Mathf.range(size), y + Mathf.range(size), dominantItem.color);
             }
         }
 
@@ -286,7 +291,7 @@ public class Drill extends Block{
 
             if(drawRim){
                 Draw.color(heatColor);
-                Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Time.time(), 3f, s)));
+                Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Time.time, 3f, s)));
                 Draw.blend(Blending.additive);
                 Draw.rect(rimRegion, x, y);
                 Draw.blend();

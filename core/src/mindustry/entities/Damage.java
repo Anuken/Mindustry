@@ -2,7 +2,6 @@ package mindustry.entities;
 
 import arc.*;
 import arc.func.*;
-import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -25,6 +24,7 @@ public class Damage{
     private static Rect rect = new Rect();
     private static Rect hitrect = new Rect();
     private static Vec2 tr = new Vec2();
+    private static Seq<Unit> units = new Seq<>();
     private static GridBits bits = new GridBits(30, 30);
     private static IntQueue propagation = new IntQueue();
     private static IntSet collidedBlocks = new IntSet();
@@ -32,15 +32,22 @@ public class Damage{
     private static Unit tmpUnit;
 
     /** Creates a dynamic explosion based on specified parameters. */
-    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color, boolean damage){
+    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage){
+        dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, true, null);
+    }
+
+    /** Creates a dynamic explosion based on specified parameters. */
+    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam){
         if(damage){
             for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
                 int branches = 5 + Mathf.clamp((int)(power / 30), 1, 20);
                 Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3, x, y, Mathf.random(360f), branches + Mathf.range(2)));
             }
 
-            for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
-                Time.run(i / 2f, () -> Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), Bullets.fireball.damage, 1, 1));
+            if(fire){
+                for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
+                    Time.run(i / 2f, () -> Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), Bullets.fireball.damage, 1, 1));
+                }
             }
 
             int waves = Mathf.clamp((int)(explosiveness / 4), 0, 30);
@@ -48,7 +55,7 @@ public class Damage{
             for(int i = 0; i < waves; i++){
                 int f = i;
                 Time.run(i * 2f, () -> {
-                    Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f);
+                    Damage.damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f, false);
                     Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
                 });
             }
@@ -115,10 +122,18 @@ public class Damage{
         tr.trns(angle, length);
         Intc2 collider = (cx, cy) -> {
             Building tile = world.build(cx, cy);
-            if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.team != team && tile.collide(hitter)){
-                tile.collision(hitter);
-                collidedBlocks.add(tile.pos());
-                hitter.type.hit(hitter, tile.x, tile.y);
+            boolean collide = tile != null && collidedBlocks.add(tile.pos());
+
+            if(hitter.damage > 0){
+                if(collide && tile.team != team && tile.collide(hitter)){
+                    tile.collision(hitter);
+                    hitter.type.hit(hitter, tile.x, tile.y);
+                }
+
+                //try to heal the tile
+                if(collide && hitter.type.collides(hitter, tile)){
+                    hitter.type.hitTile(hitter, tile, tile.health, false);
+                }
             }
         };
 
@@ -155,20 +170,27 @@ public class Damage{
         rect.height += expand * 2;
 
         Cons<Unit> cons = e -> {
-            if(!e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)) return;
-
             e.hitbox(hitrect);
 
             Vec2 vec = Geometry.raycastRect(x, y, x2, y2, hitrect.grow(expand * 2));
 
-            if(vec != null){
+            if(vec != null && hitter.damage > 0){
                 effect.at(vec.x, vec.y);
                 e.collision(hitter, vec.x, vec.y);
                 hitter.collision(e, vec.x, vec.y);
             }
         };
 
-        Units.nearbyEnemies(team, rect, cons);
+        units.clear();
+
+        Units.nearbyEnemies(team, rect, u -> {
+            if(u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)){
+                units.add(u);
+            }
+        });
+
+        units.sort(u -> u.dst2(hitter));
+        units.each(cons);
     }
 
     /**
@@ -402,8 +424,7 @@ public class Damage{
     }
 
     @Struct
-    static
-    class PropCellStruct{
+    static class PropCellStruct{
         byte x;
         byte y;
         short damage;

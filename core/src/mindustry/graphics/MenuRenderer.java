@@ -244,7 +244,7 @@ public class MenuRenderer implements Disposable{
         float size = Math.max(icon.width, icon.height) * Draw.scl * 1.6f;
 
         flyers((x, y) -> {
-            Draw.rect(flyerType.region, x - 12f, y - 13f, flyerRot - 90);
+            Draw.rect(icon, x - 12f, y - 13f, flyerRot - 90);
         });
 
         flyers((x, y) -> {
@@ -257,14 +257,14 @@ public class MenuRenderer implements Disposable{
 
             Draw.color(Pal.engine);
             Fill.circle(x + Angles.trnsx(rotation + 180, engineOffset), y + Angles.trnsy(rotation + 180, engineOffset),
-            engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f));
+            engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f));
 
             Draw.color(Color.white);
             Fill.circle(x + Angles.trnsx(rotation + 180, engineOffset - 1f), y + Angles.trnsy(rotation + 180, engineOffset - 1f),
-            (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f)) / 2f);
+            (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) / 2f);
             Draw.color();
 
-            Draw.rect(flyerType.region, x, y, flyerRot - 90);
+            Draw.rect(icon, x, y, flyerRot - 90);
         });
     }
 

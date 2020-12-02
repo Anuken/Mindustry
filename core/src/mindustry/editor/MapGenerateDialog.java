@@ -404,7 +404,7 @@ public class MapGenerateDialog extends BaseDialog{
                 });
             }catch(Exception e){
                 generating = false;
-                e.printStackTrace();
+                Log.err(e);
             }
             world.setGenerating(false);
         });

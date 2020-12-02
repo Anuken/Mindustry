@@ -21,6 +21,12 @@ public class ItemSeq implements Iterable<ItemStack>, Serializable{
         stacks.each(this::add);
     }
 
+    public void checkNegative(){
+        for(int i = 0; i < values.length; i++){
+            if(values[i] < 0) values[i] = 0;
+        }
+    }
+
     public ItemSeq copy(){
         ItemSeq out = new ItemSeq();
         out.total = total;
@@ -47,6 +53,12 @@ public class ItemSeq implements Iterable<ItemStack>, Serializable{
             if(values[i] != 0) out.add(new ItemStack(Vars.content.item(i), values[i]));
         }
         return out;
+    }
+
+    public void min(int number){
+        for(Item item : Vars.content.items()){
+            set(item, Math.min(get(item), number));
+        }
     }
 
     public boolean has(Item item){
@@ -127,7 +139,7 @@ public class ItemSeq implements Iterable<ItemStack>, Serializable{
 
     @Override
     public String toString(){
-        return JsonIO.write(this);
+        return JsonIO.print(JsonIO.write(this));
     }
 
     @Override
