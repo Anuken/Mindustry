@@ -714,8 +714,14 @@ public class TechTree implements ContentList{
                 finishedRequirements[i] = new ItemStack(requirements[i].item, Core.settings == null ? 0 : Core.settings.getInt("req-" + content.name + "-" + requirements[i].item.name));
             }
 
+            var used = new ObjectSet<Content>();
+
             //add dependencies as objectives.
-            content.getDependencies(d -> objectives.add(new Research(d)));
+            content.getDependencies(d -> {
+                if(used.add(d)){
+                    objectives.add(new Research(d));
+                }
+            });
 
             map.put(content, this);
             all.add(this);
