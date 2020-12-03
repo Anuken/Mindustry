@@ -362,7 +362,7 @@ public class PowerNode extends PowerBlock{
         @Override
         public void drawConfigure(){
 
-            Drawf.circles(x, y, tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time(), 4f, 1f));
+            Drawf.circles(x, y, tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time, 4f, 1f));
             Drawf.circles(x, y, laserRange * tilesize);
 
             for(int x = (int)(tile.x - laserRange - 2); x <= tile.x + laserRange + 2; x++){

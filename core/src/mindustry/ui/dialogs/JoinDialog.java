@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.Net.*;
 import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
@@ -199,7 +200,7 @@ public class JoinDialog extends BaseDialog{
 
     void refreshServer(Server server){
         server.content.clear();
-        server.content.label(() -> Core.bundle.get("server.refreshing") + Strings.animated(Time.time(), 4, 11, "."));
+        server.content.label(() -> Core.bundle.get("server.refreshing") + Strings.animated(Time.time, 4, 11, "."));
 
         net.pingHost(server.ip, server.port, host -> setupServer(server, host), e -> {
             server.content.clear();
@@ -340,7 +341,7 @@ public class JoinDialog extends BaseDialog{
 
         local.clear();
         local.background(null);
-        local.table(Tex.button, t -> t.label(() -> "[accent]" + Core.bundle.get("hosts.discovering.any") + Strings.animated(Time.time(), 4, 10f, ".")).pad(10f)).growX();
+        local.table(Tex.button, t -> t.label(() -> "[accent]" + Core.bundle.get("hosts.discovering.any") + Strings.animated(Time.time, 4, 10f, ".")).pad(10f)).growX();
         net.discoverServers(this::addLocalHost, this::finishLocalHosts);
     }
 
@@ -401,7 +402,16 @@ public class JoinDialog extends BaseDialog{
 
         container.button(b -> buildServer(host, b), Styles.cleart, () -> {
             Events.fire(new ClientPreConnectEvent(host));
-            safeConnect(host.address, host.port, host.version);
+            if(!Core.settings.getBool("server-disclaimer", false)){
+                ui.showCustomConfirm("@warning", "@servers.disclaimer", "@ok", "@back", () -> {
+                    Core.settings.put("server-disclaimer", true);
+                    safeConnect(host.address, host.port, host.version);
+                }, () -> {
+                    Core.settings.put("server-disclaimer", false);
+                });
+            }else{
+                safeConnect(host.address, host.port, host.version);
+            }
         }).width(w).row();
     }
 
@@ -501,9 +511,16 @@ public class JoinDialog extends BaseDialog{
             Core.settings.remove("server-list");
         }
 
+        var url = becontrol.active() ? serverJsonBeURL : serverJsonV6URL;
+        Log.info("Fetching community servers at @", url);
+
         //get servers
-        Core.net.httpGet(becontrol.active() ? serverJsonBeURL : serverJsonV6URL, result -> {
+        Core.net.httpGet(url, result -> {
             try{
+                if(result.getStatus() != HttpStatus.OK){
+                    Log.warn("Failed to fetch community servers: @", result.getStatus());
+                    return;
+                }
 
                 Jval val = Jval.read(result.getResultAsString());
                 Core.app.post(() -> {
@@ -519,8 +536,8 @@ public class JoinDialog extends BaseDialog{
                             }
                             defaultServers.add(new ServerGroup(name, addresses));
                         });
-                        Log.info("Fetched @ global servers.", defaultServers.size);
-                    }catch(Throwable ignored){
+                        Log.info("Fetched @ community servers.", defaultServers.size);
+                    }catch(Throwable e){
                         Log.err("Failed to parse community servers.");
                     }
                 });

@@ -929,6 +929,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //null is of type void.class; anonymous classes use their superclass.
         Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() || value.getClass().getSimpleName().startsWith("adapter") ? value.getClass().getSuperclass() : value.getClass();
 
+        if(value instanceof Item) type = Item.class;
+        if(value instanceof Block) type = Block.class;
+        if(value instanceof Liquid) type = Liquid.class;
+        
         if(builder != null && builder.isPlayer()){
             lastAccessed = builder.getPlayer().name;
         }

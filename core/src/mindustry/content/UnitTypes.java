@@ -1006,7 +1006,7 @@ public class UnitTypes implements ContentList{
                     homingRange = 60f;
                     keepVelocity = false;
                     splashDamageRadius = 25f;
-                    splashDamage = 14f;
+                    splashDamage = 16f;
                     lifetime = 60f;
                     trailColor = Pal.unitBack;
                     backColor = Pal.unitBack;
@@ -1657,6 +1657,7 @@ public class UnitTypes implements ContentList{
                 recoil = 3f;
                 occlusion = 12f;
                 ejectEffect = Fx.casing3;
+                shootSound = Sounds.shootBig;
 
                 shots = 3;
                 shotDelay = 4f;
@@ -1749,13 +1750,13 @@ public class UnitTypes implements ContentList{
                 top = false;
                 ejectEffect = Fx.casing1;
 
-                bullet = new BasicBulletType(2.5f, 10){{
+                bullet = new BasicBulletType(2.5f, 11){{
                     width = 7f;
                     height = 9f;
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.02f;
+                    tileDamageMultiplier = 0.01f;
                 }};
             }});
         }};
@@ -1791,13 +1792,13 @@ public class UnitTypes implements ContentList{
                 spacing = 0f;
                 ejectEffect = Fx.casing1;
 
-                bullet = new BasicBulletType(3f, 10){{
+                bullet = new BasicBulletType(3f, 11){{
                     width = 7f;
                     height = 9f;
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.02f;
+                    tileDamageMultiplier = 0.01f;
                 }};
             }});
         }};
@@ -1831,13 +1832,13 @@ public class UnitTypes implements ContentList{
                 shotDelay = 3f;
                 ejectEffect = Fx.casing1;
 
-                bullet = new BasicBulletType(3.5f, 10){{
+                bullet = new BasicBulletType(3.5f, 11){{
                     width = 6.5f;
                     height = 11f;
                     lifetime = 70f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.02f;
+                    tileDamageMultiplier = 0.01f;
                     homingPower = 0.04f;
                 }};
             }});

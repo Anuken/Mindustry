@@ -316,11 +316,11 @@ public class SStats implements SteamUserStatsCallback{
                 captureBackground.complete();
             }
 
-            if(!e.sector.planet.sectors.contains(s -> s.hasBase())){
+            if(!e.sector.planet.sectors.contains(s -> !s.hasBase())){
                 captureAllSectors.complete();
             }
 
-            SStat.sectorsControlled.set(e.sector.planet.sectors.count(s -> s.hasBase()));
+            SStat.sectorsControlled.set(e.sector.planet.sectors.count(Sector::hasBase));
         });
 
         //TODO dead achievement

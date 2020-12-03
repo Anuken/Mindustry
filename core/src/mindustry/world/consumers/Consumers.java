@@ -20,6 +20,14 @@ public class Consumers{
         return results != null && results.length > 0;
     }
 
+    public void each(Cons<Consume> c){
+        for(var cons : map){
+            if(cons != null){
+                c.get(cons);
+            }
+        }
+    }
+
     public void init(){
         results = Structs.filter(Consume.class, map, m -> m != null);
         optionalResults = Structs.filter(Consume.class, map, m -> m != null && m.isOptional());

@@ -37,6 +37,7 @@ public class PlanetRenderer implements Disposable{
     public final VertexBatch3D batch = new VertexBatch3D(20000, false, true, 0);
 
     public float zoom = 1f;
+    public float orbitAlpha = 1f;
 
     private final Mesh[] outlines = new Mesh[10];
     public final PlaneBatch3D projector = new PlaneBatch3D();
@@ -168,7 +169,7 @@ public class PlanetRenderer implements Disposable{
         Vec3 center = planet.parent.position;
         float radius = planet.orbitRadius;
         int points = (int)(radius * 10);
-        Angles.circleVectors(points, radius, (cx, cy) -> batch.vertex(Tmp.v32.set(center).add(cx, 0, cy), Pal.gray));
+        Angles.circleVectors(points, radius, (cx, cy) -> batch.vertex(Tmp.v32.set(center).add(cx, 0, cy), Pal.gray.write(Tmp.c1).a(orbitAlpha)));
         batch.flush(Gl.lineLoop);
     }
 
@@ -208,7 +209,7 @@ public class PlanetRenderer implements Disposable{
 
         for(int i = 0; i < pointCount + 1; i++){
             float f = i / (float)pointCount;
-            Tmp.c1.set(from).lerp(to, (f+Time.globalTime()/timeScale)%1f);
+            Tmp.c1.set(from).lerp(to, (f+ Time.globalTime /timeScale)%1f);
             batch.color(Tmp.c1);
             batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f));
 
@@ -217,7 +218,7 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void drawBorders(Sector sector, Color base){
-        Color color = Tmp.c1.set(base).a(base.a + 0.3f + Mathf.absin(Time.globalTime(), 5f, 0.3f));
+        Color color = Tmp.c1.set(base).a(base.a + 0.3f + Mathf.absin(Time.globalTime, 5f, 0.3f));
 
         float r1 = 1f;
         float r2 = outlineRad + 0.001f;

@@ -347,7 +347,7 @@ public abstract class BulletType extends Content{
         bullet.damage = (damage < 0 ? this.damage : damage) * bullet.damageMultiplier();
         bullet.add();
 
-        if(keepVelocity && owner instanceof Velc) bullet.vel.add(((Velc)owner).vel().x, ((Velc)owner).vel().y);
+        if(keepVelocity && owner instanceof Velc v) bullet.vel.add(v.vel().x, v.vel().y);
         return bullet;
     }
 
@@ -357,6 +357,7 @@ public abstract class BulletType extends Content{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void createBullet(BulletType type, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
+        if(type == null) return;
         type.create(null, team, x, y, angle, damage, velocityScl, lifetimeScl, null);
     }
 }

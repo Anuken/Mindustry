@@ -75,7 +75,7 @@ public class Weathers implements ContentList{
             attrs.set(Attribute.spores, 1f);
             attrs.set(Attribute.light, -0.15f);
             status = StatusEffects.sporeSlowed;
-            opacityMultiplier = 0.75f;
+            opacityMultiplier = 0.5f;
             force = 0.1f;
             sound = Sounds.wind;
             soundVol = 0.7f;

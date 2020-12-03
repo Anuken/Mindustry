@@ -705,9 +705,9 @@ public class NetServer implements ApplicationListener{
 
     @Remote(targets = Loc.client, called = Loc.server)
     public static void adminRequest(Player player, Player other, AdminAction action){
-        if(!player.admin){
+        if(!player.admin && !player.isLocal()){
             warn("ACCESS DENIED: Player @ / @ attempted to perform admin action '@' on '@' without proper security access.",
-            player.name, player.con.address, action.name(), other == null ? null : other.name);
+            player.name, player.con == null ? "null" : player.con.address, action.name(), other == null ? null : other.name);
             return;
         }
 

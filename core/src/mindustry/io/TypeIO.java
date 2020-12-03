@@ -166,10 +166,13 @@ public class TypeIO{
     }
 
     public static void writeUnit(Writes write, Unit unit){
-        write.b(unit.isNull() ? 0 : unit instanceof BlockUnitc ? 1 : 2);
+        write.b(unit == null || unit.isNull() ? 0 : unit instanceof BlockUnitc ? 1 : 2);
+
         //block units are special
         if(unit instanceof BlockUnitc){
             write.i(((BlockUnitc)unit).tile().pos());
+        }else if(unit == null){
+            write.i(0);
         }else{
             write.i(unit.id);
         }
@@ -293,7 +296,7 @@ public class TypeIO{
         if(control instanceof Player p){
             write.b(0);
             write.i(p.id);
-        }else if(control instanceof FormationAI form){
+        }else if(control instanceof FormationAI form && form.leader != null){
             write.b(1);
             write.i(form.leader.id);
         }else if(control instanceof LogicAI logic && logic.controller != null){
