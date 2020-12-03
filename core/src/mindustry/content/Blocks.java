@@ -1312,13 +1312,13 @@ public class Blocks implements ContentList{
         waterExtractor = new SolidPump("water-extractor"){{
             requirements(Category.production, with(Items.copper, 25, Items.graphite, 25, Items.lead, 20));
             result = Liquids.water;
-            pumpAmount = 0.11f;
+            pumpAmount = 0.07f;
             size = 2;
             liquidCapacity = 30f;
             rotateSpeed = 1.4f;
             attribute = Attribute.water;
 
-            consumes.power(1.5f);
+            consumes.power(3f);
         }};
 
         cultivator = new Cultivator("cultivator"){{
