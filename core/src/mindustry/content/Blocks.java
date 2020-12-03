@@ -1515,7 +1515,6 @@ public class Blocks implements ContentList{
 
         lancer = new PowerTurret("lancer"){{
             requirements(Category.turret, with(Items.copper, 25, Items.lead, 50, Items.silicon, 45, Items.graphite, 20));
-
             range = 165f;
             chargeTime = 40f;
             chargeMaxDelay = 30f;
