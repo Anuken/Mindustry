@@ -1514,7 +1514,7 @@ public class Blocks implements ContentList{
         }};
 
         lancer = new PowerTurret("lancer"){{
-            requirements(Category.turret, with(Items.copper, 25, Items.lead, 50, Items.silicon, 45, Items.graphite, 30));
+            requirements(Category.turret, with(Items.copper, 25, Items.lead, 50, Items.silicon, 45, Items.graphite, 20));
             range = 165f;
             chargeTime = 40f;
             chargeMaxDelay = 30f;
@@ -1547,7 +1547,7 @@ public class Blocks implements ContentList{
         }};
 
         arc = new PowerTurret("arc"){{
-            requirements(Category.turret, with(Items.copper, 35, Items.lead, 50, Items.graphite, 20));
+            requirements(Category.turret, with(Items.copper, 35, Items.lead, 50));
             shootType = new LightningBulletType(){{
                 damage = 20;
                 lightningLength = 25;
