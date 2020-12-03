@@ -17,6 +17,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -105,7 +106,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
             sidePlacableOn = !frontTile(tile.x, tile.y, i).floor().isDeep();
             if(sidePlacableOn) break;
         }
-        return (tile.block() instanceof Conduit || tile.block() == Blocks.air) && (!tile.floor().isDeep() || (sidePlacableOn && floating));
+        return ((tile.block().group == group && tile.block().size <= size) || tile.block().alwaysReplace) && (!tile.floor().isDeep() || (sidePlacableOn && floating));
     }
 
     @Override
