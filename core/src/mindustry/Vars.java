@@ -48,7 +48,7 @@ public class Vars implements Loadable{
     /** global charset, since Android doesn't support the Charsets class */
     public static final Charset charset = Charset.forName("UTF-8");
     /** mods suggested for import */
-    public static final String[] suggestedMods = {""};
+    public static final String[] suggestedMods = {"DeltaNedas/routorio", "sk7725/Commands", "Gdeft/bleach"};
     /** main application name, capitalized */
     public static final String appName = "Mindustry";
     /** URL for itch.io donations. */
