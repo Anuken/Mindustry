@@ -154,22 +154,22 @@ public class TechTree implements ContentList{
                         });
 
                         node(kiln, Seq.with(new SectorComplete(craters)), () -> {
-                            node(incinerator, () -> {
-                                node(melter, () -> {
-                                    node(surgeSmelter, () -> {
+                            node(pulverizer, () -> {
+                                node(incinerator, () -> {
+                                    node(melter, () -> {
+                                        node(surgeSmelter, () -> {
 
-                                    });
+                                        });
 
-                                    node(separator, () -> {
-                                        node(pulverizer, () -> {
+                                        node(separator, () -> {
                                             node(disassembler, () -> {
 
                                             });
                                         });
-                                    });
 
-                                    node(cryofluidMixer, () -> {
+                                        node(cryofluidMixer, () -> {
 
+                                        });
                                     });
                                 });
                             });
