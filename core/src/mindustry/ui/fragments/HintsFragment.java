@@ -172,6 +172,7 @@ public class HintsFragment extends Fragment{
             && SectorPresets.frozenForest.unlocked()
             && SectorPresets.frozenForest.sector.save == null,
             () -> state.isCampaign() && state.getSector().preset == SectorPresets.frozenForest),
+        coreIncinerate(() -> state.isCampaign() && state.rules.defaultTeam.core() != null && state.rules.defaultTeam.core().items.get(Items.copper) >= state.rules.defaultTeam.core().storageCapacity - 10, () -> false),
         ;
 
         @Nullable

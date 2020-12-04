@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Log.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -52,11 +53,13 @@ public class ApplicationTests{
                             return 0;
                         }
                     };
+                    Log.info("creating base content");
                     content.createBaseContent();
 
                     add(logic = new Logic());
                     add(netServer = new NetServer());
 
+                    Log.info("initializing content");
                     content.init();
                 }
 
@@ -494,8 +497,9 @@ public class ApplicationTests{
 
     @Test
     void buildingOverlap(){
-        Log.info("Testing buildingOverlap, initialized = @", initialized);
-
+        Log.level = LogLevel.debug;
+        Log.info("log content");
+        Vars.content.logContent();
         initBuilding();
 
         Unit d1 = UnitTypes.poly.create(Team.sharded);
@@ -525,8 +529,8 @@ public class ApplicationTests{
     void buildingDestruction(){
         initBuilding();
 
-        Builderc d1 = (Builderc)UnitTypes.poly.create(Team.sharded);
-        Builderc d2 = (Builderc)UnitTypes.poly.create(Team.sharded);
+        Builderc d1 = UnitTypes.poly.create(Team.sharded);
+        Builderc d2 = UnitTypes.poly.create(Team.sharded);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
