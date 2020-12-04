@@ -25,7 +25,6 @@ public class PowerTestFixture{
 
     @BeforeAll
     static void initializeDependencies(){
-        Log.info("init power test fixture");
         headless = true;
         Core.graphics = new FakeGraphics();
         Core.files = new MockFiles();

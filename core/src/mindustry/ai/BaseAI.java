@@ -36,7 +36,7 @@ public class BaseAI{
     private static int correct = 0, incorrect = 0;
 
     private int lastX, lastY, lastW, lastH;
-    private boolean triedWalls;
+    private boolean triedWalls, foundPath;
 
     TeamData data;
     Interval timer = new Interval(4);
@@ -125,6 +125,7 @@ public class BaseAI{
                         calcPath.clear();
                         calcTile = null;
                         totalCalcs ++;
+                        foundPath = true;
 
                         break;
                     }
@@ -135,7 +136,7 @@ public class BaseAI{
         }
 
         //only schedule when there's something to build.
-        if(totalCalcs > 0 && data.blocks.isEmpty() && timer.get(timerStep, Mathf.lerp(20f, 4f, data.team.rules().aiTier))){
+        if(foundPath && data.blocks.isEmpty() && timer.get(timerStep, Mathf.lerp(20f, 4f, data.team.rules().aiTier))){
             if(!triedWalls){
                 tryWalls();
                 triedWalls = true;
