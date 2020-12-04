@@ -81,7 +81,7 @@ public class ContinuousLaserBulletType extends BulletType{
     @Override
     public void draw(Bullet b){
         float realLength = Damage.findLaserLength(b, length);
-        float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
+        float fout = 1 - Mathf.curve(b.time, b.lifetime - fadeTime, b.lifetime);
         float baseLen = realLength * fout;
 
         Lines.lineAngle(b.x, b.y, b.rotation(), baseLen);
