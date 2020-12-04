@@ -19,6 +19,7 @@ import java.io.*;
 import static mindustry.Vars.*;
 
 public class ModsDialog extends BaseDialog{
+    private static String[] suggestedMods = {""};
 
     public ModsDialog(){
         super("@mods");
@@ -39,6 +40,12 @@ public class ModsDialog extends BaseDialog{
                 ui.showText("@mods", "@mods.alphainfo");
             });
         }));
+
+        Core.net.httpGet(suggestedModsURL, res -> {
+             if(res.getStatus() == HttpStatus.OK){
+                suggestedMods = res.getResultAsString().split("\\n");
+            }
+        }, error -> {});
     }
 
     void modError(Throwable error){

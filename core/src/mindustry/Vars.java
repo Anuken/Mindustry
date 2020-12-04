@@ -47,8 +47,6 @@ public class Vars implements Loadable{
     public static final int bufferSize = 8192;
     /** global charset, since Android doesn't support the Charsets class */
     public static final Charset charset = Charset.forName("UTF-8");
-    /** mods suggested for import */
-    public static final String[] suggestedMods = {"DeltaNedas/routorio", "DeltaNedas/anuke-logic", "sk7725/Commands", "sk7725/TimeControl", "Gdeft/bleach"};
     /** main application name, capitalized */
     public static final String appName = "Mindustry";
     /** URL for itch.io donations. */
@@ -65,6 +63,8 @@ public class Vars implements Loadable{
     public static final String serverJsonBeURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_be.json";
     /** URL to the JSON file containing all the BE servers. Only queried in the V6 alpha (will be removed once it's out). */
     public static final String serverJsonV6URL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_v6.json";
+    /** URL to the text file containing a list of suggested mods for importing. */
+    public static final String suggestedModsURL = "https://raw.githubusercontent.com/Anukeb/Mindustry/master/suggested_mods.txt";
     /** URL of the github issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
