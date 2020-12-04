@@ -50,21 +50,21 @@ public class PowerTestFixture{
     }
 
     protected static PowerGenerator createFakeProducerBlock(float producedPower){
-        return new PowerGenerator("fakegen"){{
+        return new PowerGenerator("fakegen" + System.nanoTime()){{
             buildType = () -> new GeneratorBuild();
             powerProduction = producedPower;
         }};
     }
 
     protected static Battery createFakeBattery(float capacity){
-        return new Battery("fakebattery"){{
+        return new Battery("fakebattery" + System.nanoTime()){{
             buildType = () -> new BatteryBuild();
             consumes.powerBuffered(capacity);
         }};
     }
 
     protected static Block createFakeDirectConsumer(float powerPerTick){
-        return new PowerBlock("fakedirectconsumer"){{
+        return new PowerBlock("fakedirectconsumer" + System.nanoTime()){{
             buildType = Building::create;
             consumes.power(powerPerTick);
         }};
