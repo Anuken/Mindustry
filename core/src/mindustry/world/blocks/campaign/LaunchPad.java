@@ -34,7 +34,7 @@ public class LaunchPad extends Block{
     // fallback podRegion if a custom podRegion is not found
     public @Load("launchpod") TextureRegion podRegionDefault;
     public Color lightColor = Color.valueOf("eab678");
-    public Color podEngineColor = Pal.engine;
+    public Color podEngineColor = Color.valueOf("ffbb64");
 
     public LaunchPad(String name){
         super(name);
