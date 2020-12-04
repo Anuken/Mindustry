@@ -30,8 +30,11 @@ public class LaunchPad extends Block{
     public float launchTime;
 
     public @Load("@-light") TextureRegion lightRegion;
-    public @Load("launchpod") TextureRegion podRegion;
+    public @Load("@-pod") TextureRegion podRegion;
+    // fallback podRegion if a custom podRegion is not found
+    public @Load("launchpod") TextureRegion podRegionDefault;
     public Color lightColor = Color.valueOf("eab678");
+    public Color podEngineColor = Pal.engine;
 
     public LaunchPad(String name){
         super(name);
@@ -103,7 +106,12 @@ public class LaunchPad extends Block{
 
             Draw.mixcol(lightColor, 1f - cooldown);
 
-            Draw.rect(podRegion, x, y);
+            if(podRegion.found()){
+                Draw.rect(podRegion, x, y);
+            }
+            else{
+                Draw.rect(podRegionDefault, x, y);    
+            }
 
             Draw.reset();
         }
@@ -182,11 +190,11 @@ public class LaunchPad extends Block{
 
             Draw.z(Layer.effect + 0.001f);
 
-            Draw.color(Pal.engine);
+            Draw.color(podEngineColor);
 
             float rad = 0.2f + fslope();
 
-            Fill.light(cx, cy, 10, 25f * (rad + scale-1f), Tmp.c2.set(Pal.engine).a(alpha), Tmp.c1.set(Pal.engine).a(0f));
+            Fill.light(cx, cy, 10, 25f * (rad + scale-1f), Tmp.c2.set(podEngineColor).a(alpha), Tmp.c1.set(podEngineColor).a(0f));
 
             Draw.alpha(alpha);
             for(int i = 0; i < 4; i++){
@@ -196,8 +204,12 @@ public class LaunchPad extends Block{
             Draw.color();
 
             Draw.z(Layer.weather - 1);
-
-            TextureRegion region = Core.atlas.find("launchpod");
+            if(podRegion.found()){
+                region = podRegion;
+            }
+            else{
+                region = podRegionDefault;
+            }
             float rw = region.width * Draw.scl * scale, rh = region.height * Draw.scl * scale;
 
             Draw.alpha(alpha);
