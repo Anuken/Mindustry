@@ -31,7 +31,7 @@ public abstract class Content implements Comparable<Content>, Disposable{
      */
     public void load(){}
 
-    /** @return whether an error ocurred during mod loading. */
+    /** @return whether an error occurred during mod loading. */
     public boolean hasErrored(){
         return minfo.error != null;
     }

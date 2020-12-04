@@ -68,13 +68,12 @@ public class Schematics implements Loadable{
             shadowBuffer.dispose();
             if(errorTexture != null){
                 errorTexture.dispose();
+                errorTexture = null;
             }
         });
 
         Events.on(ClientLoadEvent.class, event -> {
-            Pixmap pixmap = Core.atlas.getPixmap("error").crop();
-            errorTexture = new Texture(pixmap);
-            pixmap.dispose();
+            errorTexture = new Texture("sprites/error.png");
         });
     }
 
@@ -127,6 +126,9 @@ public class Schematics implements Loadable{
         newSchematic.tags.putAll(target.tags);
         newSchematic.file = target.file;
 
+        loadouts.each((block, list) -> list.remove(target));
+        checkLoadout(target, true);
+
         try{
             write(newSchematic, target.file);
         }catch(Exception e){
@@ -134,6 +136,8 @@ public class Schematics implements Loadable{
             Log.err(e);
             ui.showException(e);
         }
+
+
     }
 
     private @Nullable Schematic loadFile(Fi file){

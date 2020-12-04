@@ -38,7 +38,7 @@ public class HintsFragment extends Fragment{
     public void build(Group parent){
         group.setFillParent(true);
         group.touchable = Touchable.childrenOnly;
-        group.visibility = () -> Core.settings.getBool("hints", true);
+        group.visibility = () -> Core.settings.getBool("hints", true) && ui.hudfrag.shown;
         group.update(() -> {
             if(current != null){
                 //current got completed
@@ -106,7 +106,7 @@ public class HintsFragment extends Fragment{
                 if(current != null){
                     complete();
                 }
-            }).size(100f, 40f).left();
+            }).size(112f, 40f).left();
         });
 
         this.current = hint;
@@ -150,7 +150,7 @@ public class HintsFragment extends Fragment{
         depositItems(() -> player.unit().hasItem(), () -> !player.unit().hasItem()),
         desktopPause(visibleDesktop, () -> isTutorial.get() && !Vars.net.active(), () -> Core.input.keyTap(Binding.pause)),
         research(isTutorial, () -> ui.research.isShown()),
-        unitControl(() -> state.rules.defaultTeam.data().units.size > 1 && !net.active(), () -> !player.dead() && !player.unit().spawnedByCore),
+        unitControl(() -> state.rules.defaultTeam.data().units.size > 2 && !net.active() && !player.dead(), () -> !player.dead() && !player.unit().spawnedByCore),
         respawn(visibleMobile, () -> !player.dead() && !player.unit().spawnedByCore, () -> !player.dead() && player.unit().spawnedByCore),
         launch(() -> isTutorial.get() && state.rules.sector.isCaptured(), () -> ui.planet.isShown()),
         schematicSelect(visibleDesktop, () -> ui.hints.placedBlocks.contains(Blocks.router), () -> Core.input.keyRelease(Binding.schematic_select) || Core.input.keyTap(Binding.pick)),
@@ -161,6 +161,17 @@ public class HintsFragment extends Fragment{
         payloadDrop(() -> !player.unit().dead && player.unit() instanceof Payloadc p && p.payloads().any(), () -> player.unit() instanceof Payloadc p && p.payloads().isEmpty()),
         waveFire(() -> Groups.fire.size() > 0 && Blocks.wave.unlockedNow(), () -> indexer.getAllied(state.rules.defaultTeam, BlockFlag.extinguisher).size() > 0),
         generator(() -> control.input.block == Blocks.combustionGenerator, () -> ui.hints.placedBlocks.contains(Blocks.combustionGenerator)),
+        guardian(() -> state.boss() != null && state.boss().armor >= 4, () -> state.boss() == null),
+        coreUpgrade(() -> state.isCampaign() && Blocks.coreFoundation.unlocked()
+            && state.rules.defaultTeam.core() != null
+            && state.rules.defaultTeam.core().block == Blocks.coreShard
+            && state.rules.defaultTeam.core().items.has(Blocks.coreFoundation.requirements),
+            () -> ui.hints.placedBlocks.contains(Blocks.coreFoundation)),
+        presetLaunch(() -> state.isCampaign()
+            && state.getSector().preset == null
+            && SectorPresets.frozenForest.unlocked()
+            && SectorPresets.frozenForest.sector.save == null,
+            () -> state.isCampaign() && state.getSector().preset == SectorPresets.frozenForest),
         ;
 
         @Nullable

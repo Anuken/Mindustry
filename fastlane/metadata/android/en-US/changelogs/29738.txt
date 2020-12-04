@@ -1,0 +1,23 @@
+[This is a truncated changelog, see Github for full notes]
+After more than 9 months of development, 6.0 is finally here. There have been far too many changes to reasonably list here, so I'll go over the highlights.
+
+Units:
+
+- The unit system has been completely reworked
+- All unit sprites have been re-drawn and cleaned up
+- Many new unit types have been added
+- Player-specific pads and unit-specific factories have been removed
+
+
+Campaign:
+
+
+
+
+
+
+
+
+
+Maps:
+

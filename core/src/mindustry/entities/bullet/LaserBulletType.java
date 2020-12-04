@@ -40,9 +40,10 @@ public class LaserBulletType extends BulletType{
         this(1f);
     }
 
+    //assume it pierces at least 3 blocks
     @Override
     public float estimateDPS(){
-        return super.estimateDPS() * 2f;
+        return super.estimateDPS() * 3f;
     }
 
     @Override

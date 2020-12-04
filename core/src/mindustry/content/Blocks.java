@@ -14,8 +14,6 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.campaign.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
-import mindustry.world.blocks.defense.turrets.PointDefenseTurret;
-import mindustry.world.blocks.defense.turrets.TractorBeamTurret;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.experimental.*;
@@ -363,7 +361,7 @@ public class Blocks implements ContentList{
 
         sandWall = new StaticWall("sand-wall"){{
             variants = 2;
-            sandWater.asFloor().wall = this;
+            sandWater.asFloor().wall = water.asFloor().wall = deepwater.asFloor().wall = this;
         }};
 
         saltWall = new StaticWall("salt-wall");
@@ -1195,7 +1193,7 @@ public class Blocks implements ContentList{
             size = 2;
 
             ambientSound = Sounds.smelter;
-            ambientSoundVolume = 0.05f;
+            ambientSoundVolume = 0.06f;
         }};
 
         differentialGenerator = new SingleTypeGenerator("differential-generator"){{
@@ -1216,18 +1214,18 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.lead, 100, Items.silicon, 75, Items.phaseFabric, 25, Items.plastanium, 75, Items.thorium, 50));
             size = 2;
             powerProduction = 4.5f;
-            itemDuration = 60 * 15f;
+            itemDuration = 60 * 14f;
         }};
 
         solarPanel = new SolarGenerator("solar-panel"){{
             requirements(Category.power, with(Items.lead, 10, Items.silicon, 15));
-            powerProduction = 0.08f;
+            powerProduction = 0.1f;
         }};
 
         largeSolarPanel = new SolarGenerator("solar-panel-large"){{
-            requirements(Category.power, with(Items.lead, 100, Items.silicon, 145, Items.phaseFabric, 15));
+            requirements(Category.power, with(Items.lead, 80, Items.silicon, 110, Items.phaseFabric, 15));
             size = 3;
-            powerProduction = 1f;
+            powerProduction = 1.3f;
         }};
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
@@ -1377,7 +1375,7 @@ public class Blocks implements ContentList{
             itemCapacity = 9000;
             size = 4;
 
-            unitCapModifier = 14;
+            unitCapModifier = 16;
             researchCostMultiplier = 0.04f;
         }};
 
@@ -1389,8 +1387,8 @@ public class Blocks implements ContentList{
             itemCapacity = 13000;
             size = 5;
 
-            unitCapModifier = 20;
-            researchCostMultiplier = 0.05f;
+            unitCapModifier = 24;
+            researchCostMultiplier = 0.06f;
         }};
 
         vault = new StorageBlock("vault"){{
@@ -1515,14 +1513,14 @@ public class Blocks implements ContentList{
             flags = EnumSet.of(BlockFlag.turret, BlockFlag.extinguisher);
         }};
 
-        lancer = new ChargeTurret("lancer"){{
+        lancer = new PowerTurret("lancer"){{
             requirements(Category.turret, with(Items.copper, 25, Items.lead, 50, Items.silicon, 45));
-            range = 155f;
-            chargeTime = 50f;
+            range = 165f;
+            chargeTime = 40f;
             chargeMaxDelay = 30f;
             chargeEffects = 7;
             recoilAmount = 2f;
-            reloadTime = 90f;
+            reloadTime = 80f;
             cooldown = 0.03f;
             powerUse = 6f;
             shootShake = 2f;
@@ -1544,6 +1542,7 @@ public class Blocks implements ContentList{
                 lifetime = 16f;
                 drawSize = 400f;
                 collidesAir = false;
+                length = 173f;
             }};
         }};
 
@@ -1557,7 +1556,7 @@ public class Blocks implements ContentList{
             reloadTime = 35f;
             shootCone = 40f;
             rotateSpeed = 8f;
-            powerUse = 3f;
+            powerUse = 3.3f;
             targetAir = false;
             range = 90f;
             shootEffect = Fx.lightningShoot;
@@ -1769,6 +1768,8 @@ public class Blocks implements ContentList{
             }}
             );
 
+            maxAmmo = 40;
+            ammoPerShot = 4;
             rotateSpeed = 2.5f;
             reloadTime = 200f;
             ammoUseEffect = Fx.casing3Double;

@@ -20,7 +20,7 @@ public class Build{
     private static final IntSet tmp = new IntSet();
 
     @Remote(called = Loc.server)
-    public static void beginBreak(Team team, int x, int y){
+    public static void beginBreak(@Nullable Unit unit, Team team, int x, int y){
         if(!validBreak(team, x, y)){
             return;
         }
@@ -37,17 +37,21 @@ public class Build{
         Block previous = tile.block();
         Block sub = ConstructBlock.get(previous.size);
 
+        Seq<Building> prevBuild = new Seq<>(1);
+        if(tile.build != null) prevBuild.add(tile.build);
+
         tile.setBlock(sub, team, rotation);
         tile.<ConstructBuild>bc().setDeconstruct(previous);
+        tile.<ConstructBuild>bc().prevBuild = prevBuild;
         tile.build.health = tile.build.maxHealth * prevPercent;
+        if(unit != null && unit.isPlayer()) tile.build.lastAccessed = unit.getPlayer().name;
 
-
-        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, true)));
+        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, unit, true)));
     }
 
     /** Places a ConstructBlock at this location. */
     @Remote(called = Loc.server)
-    public static void beginPlace(Block result, Team team, int x, int y, int rotation){
+    public static void beginPlace(@Nullable Unit unit, Block result, Team team, int x, int y, int rotation){
         if(!validPlace(result, team, x, y, rotation)){
             return;
         }
@@ -56,6 +60,15 @@ public class Build{
 
         //just in case
         if(tile == null) return;
+
+        //auto-rotate the block to the correct orientation and bail out
+        if(tile.team() == team && tile.block == result && tile.build != null && tile.block.quickRotate){
+            if(unit != null && unit.isPlayer()) tile.build.lastAccessed = unit.getPlayer().name;
+            tile.build.rotation = Mathf.mod(rotation, 4);
+            tile.build.updateProximity();
+            tile.build.noSleep();
+            return;
+        }
 
         Block previous = tile.block();
         Block sub = ConstructBlock.get(result.size);
@@ -76,10 +89,11 @@ public class Build{
 
         build.setConstruct(previous.size == sub.size ? previous : Blocks.air, result);
         build.prevBuild = prevBuild;
+        if(unit != null && unit.isPlayer()) build.lastAccessed = unit.getPlayer().name;
 
         result.placeBegan(tile, previous);
 
-        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, false)));
+        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, unit, false)));
     }
 
     /** Returns whether a tile can be placed at this location by this team. */
