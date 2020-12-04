@@ -99,7 +99,7 @@ public class SStats implements SteamUserStatsCallback{
                 for(Sector sec : planet.sectors){
                     if(sec.hasBase()){
                         for(var v : sec.info.production.values()){
-                            total += v.mean;
+                            total += (int)(v.mean * 60);
                         }
                     }
                 }
