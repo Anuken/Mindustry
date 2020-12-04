@@ -518,35 +518,34 @@ public class JoinDialog extends BaseDialog{
 
         //get servers
         Core.net.httpGet(url, result -> {
-            try{
-                if(result.getStatus() != HttpStatus.OK){
-                    Log.warn("Failed to fetch community servers: @", result.getStatus());
-                    return;
-                }
-
-                Jval val = Jval.read(result.getResultAsString());
-                Core.app.post(() -> {
-                    try{
-                        defaultServers.clear();
-                        val.asArray().each(child -> {
-                            String name = child.getString("name", "");
-                            String[] addresses;
-                            if(child.has("addresses") || (child.has("address") && child.get("address").isArray())){
-                                addresses = (child.has("addresses") ? child.get("addresses") : child.get("address")).asArray().map(Jval::asString).toArray(String.class);
-                            }else{
-                                addresses = new String[]{child.getString("address", "<invalid>")};
-                            }
-                            defaultServers.add(new ServerGroup(name, addresses));
-                        });
-                        Log.info("Fetched @ community servers.", defaultServers.size);
-                    }catch(Throwable e){
-                        Log.err("Failed to parse community servers.");
-                    }
-                });
-            }catch(Throwable e){
-                Log.err("Failed to fetch community servers.");
+            if(result.getStatus() != HttpStatus.OK){
+                Log.warn("Failed to fetch community servers: @", result.getStatus());
+                return;
             }
-        }, t -> {});
+
+            Jval val = Jval.read(result.getResultAsString());
+            Core.app.post(() -> {
+                try{
+                    defaultServers.clear();
+                    val.asArray().each(child -> {
+                        String name = child.getString("name", "");
+                        String[] addresses;
+                        if(child.has("addresses") || (child.has("address") && child.get("address").isArray())){
+                            addresses = (child.has("addresses") ? child.get("addresses") : child.get("address")).asArray().map(Jval::asString).toArray(String.class);
+                        }else{
+                            addresses = new String[]{child.getString("address", "<invalid>")};
+                        }
+                        defaultServers.add(new ServerGroup(name, addresses));
+                    });
+                    Log.info("Fetched @ community servers.", defaultServers.size);
+                }catch(Throwable e){
+                    Log.err("Failed to parse community servers.");
+                }
+            });
+        }, e -> {
+            Log.err("Failed to fetch community servers.");
+            Log.err(e);
+        });
     }
 
     private void saveServers(){
