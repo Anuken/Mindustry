@@ -30,7 +30,7 @@ public class LaunchPad extends Block{
     public float launchTime;
 
     public @Load("@-light") TextureRegion lightRegion;
-    public @Load("launchpod") TextureRegion podRegion;
+    public @Load(value = "@-pod", fallback = "launchpod") TextureRegion podRegion;
     public Color lightColor = Color.valueOf("eab678");
 
     public LaunchPad(String name){
