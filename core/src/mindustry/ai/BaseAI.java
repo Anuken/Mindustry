@@ -114,6 +114,9 @@ public class BaseAI{
                     }
 
                     calcPath.add(calcTile.pos());
+                    for(Point2 p : Geometry.d8){
+                        calcPath.add(Point2.pack(p.x + calcTile.x, p.y + calcTile.y));
+                    }
 
                     //found the end.
                     if(calcTile.build instanceof CoreBuild b && b.team == state.rules.defaultTeam){
