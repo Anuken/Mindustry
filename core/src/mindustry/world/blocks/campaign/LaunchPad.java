@@ -172,6 +172,9 @@ public class LaunchPad extends Block{
     @Component(base = true)
     abstract class LaunchPayloadComp implements Drawc, Timedc, Teamc{
         @Import float x,y;
+        @Import TextureRegion podRegion;
+        @Import TextureRegion podRegionDefault;
+        @Import Color podEngineColor;
 
         Seq<ItemStack> stacks = new Seq<>();
         transient Interval in = new Interval();
