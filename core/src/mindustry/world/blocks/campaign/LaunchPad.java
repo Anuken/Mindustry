@@ -204,12 +204,7 @@ public class LaunchPad extends Block{
             Draw.color();
 
             Draw.z(Layer.weather - 1);
-            if(podRegion.found()){
-                region = podRegion;
-            }
-            else{
-                region = podRegionDefault;
-            }
+            region = podRegion.found() ? podRegion : podRegionDefault;
             float rw = region.width * Draw.scl * scale, rh = region.height * Draw.scl * scale;
 
             Draw.alpha(alpha);
