@@ -140,7 +140,7 @@ public class LogicBlock extends Block{
 
                 int bytelen = stream.readInt();
 
-                if(bytelen > maxByteLen) throw new RuntimeException("Malformed logic data! Length: " + bytelen);
+                //if(bytelen > maxByteLen) throw new RuntimeException("Malformed logic data! Length: " + bytelen);
 
                 byte[] bytes = new byte[bytelen];
                 stream.readFully(bytes);
@@ -202,7 +202,7 @@ public class LogicBlock extends Block{
                 int version = stream.read();
 
                 int bytelen = stream.readInt();
-                if(bytelen > maxByteLen) throw new RuntimeException("Malformed logic data! Length: " + bytelen);
+                //if(bytelen > maxByteLen) throw new RuntimeException("Malformed logic data! Length: " + bytelen);
                 byte[] bytes = new byte[bytelen];
                 stream.readFully(bytes);
 

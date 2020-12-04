@@ -197,7 +197,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //region utility methods
 
     public void addPlan(boolean checkPrevious){
-        if(!block.rebuildable) return;
+        if(!block.rebuildable || (team == state.rules.defaultTeam && state.isCampaign() && !block.isVisible())) return;
 
         if(self() instanceof ConstructBuild entity){
             //update block to reflect the fact that something was being constructed
