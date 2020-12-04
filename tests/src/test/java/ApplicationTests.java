@@ -85,6 +85,8 @@ public class ApplicationTests{
         }catch(Throwable r){
             fail(r);
         }
+
+        Log.info("init app");
     }
 
     @BeforeEach

@@ -25,18 +25,26 @@ public class PowerTestFixture{
 
     @BeforeAll
     static void initializeDependencies(){
+        Log.info("init power test fixture");
         headless = true;
         Core.graphics = new FakeGraphics();
         Core.files = new MockFiles();
-        Vars.content = new ContentLoader(){
-            @Override
-            public void handleMappableContent(MappableContent content){
 
-            }
-        };
+        boolean make = content == null;
+
+        if(make){
+            Vars.content = new ContentLoader(){
+                @Override
+                public void handleMappableContent(MappableContent content){
+
+                }
+            };
+        }
         Vars.state = new GameState();
         Vars.tree = new FileTree();
-        content.createBaseContent();
+        if(make){
+            content.createBaseContent();
+        }
         Log.useColors = false;
         Time.setDeltaProvider(() -> 0.5f);
     }
