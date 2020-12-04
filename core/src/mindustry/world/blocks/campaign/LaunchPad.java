@@ -106,12 +106,7 @@ public class LaunchPad extends Block{
 
             Draw.mixcol(lightColor, 1f - cooldown);
 
-            if(podRegion.found()){
-                Draw.rect(podRegion, x, y);
-            }
-            else{
-                Draw.rect(podRegionDefault, x, y);    
-            }
+            Draw.rect(podRegion.found() ? podRegion : podRegionDefault, x, y);
 
             Draw.reset();
         }
