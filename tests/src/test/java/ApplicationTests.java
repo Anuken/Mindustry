@@ -5,7 +5,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.Log.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -53,14 +52,13 @@ public class ApplicationTests{
                             return 0;
                         }
                     };
-                    Log.info("creating base content");
                     content.createBaseContent();
 
                     add(logic = new Logic());
                     add(netServer = new NetServer());
 
-                    Log.info("initializing content");
                     content.init();
+
                 }
 
                 @Override
@@ -80,6 +78,10 @@ public class ApplicationTests{
                 }
                 Thread.sleep(10);
             }
+
+
+            Block block = content.getByName(ContentType.block, "build2");
+            assertEquals("build2", block == null ? null : block.name, "2x2 construct block doesn't exist?");
         }catch(Throwable r){
             fail(r);
         }
@@ -497,9 +499,6 @@ public class ApplicationTests{
 
     @Test
     void buildingOverlap(){
-        Log.level = LogLevel.debug;
-        Log.info("log content");
-        Vars.content.logContent();
         initBuilding();
 
         Unit d1 = UnitTypes.poly.create(Team.sharded);
