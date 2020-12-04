@@ -170,7 +170,7 @@ public class LaunchPad extends Block{
 
     @EntityDef(LaunchPayloadc.class)
     @Component(base = true)
-    static abstract class LaunchPayloadComp implements Drawc, Timedc, Teamc{
+    abstract class LaunchPayloadComp implements Drawc, Timedc, Teamc{
         @Import float x,y;
 
         Seq<ItemStack> stacks = new Seq<>();
