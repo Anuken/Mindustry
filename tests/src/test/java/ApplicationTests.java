@@ -494,10 +494,12 @@ public class ApplicationTests{
 
     @Test
     void buildingOverlap(){
+        Log.info("Testing buildingOverlap, initialized = @", initialized);
+
         initBuilding();
 
-        Builderc d1 = (Builderc)UnitTypes.poly.create(Team.sharded);
-        Builderc d2 = (Builderc)UnitTypes.poly.create(Team.sharded);
+        Unit d1 = UnitTypes.poly.create(Team.sharded);
+        Unit d2 = UnitTypes.poly.create(Team.sharded);
 
         //infinite build range
         state.rules.editor = true;
