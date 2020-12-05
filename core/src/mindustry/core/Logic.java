@@ -243,8 +243,10 @@ public class Logic implements ApplicationListener{
     }
 
     private void updateWeather(){
+        state.rules.weather.removeAll(w -> w.weather == null);
 
         for(WeatherEntry entry : state.rules.weather){
+            if(entry.weather == null) continue;
             //update cooldown
             entry.cooldown -= Time.delta;
 
