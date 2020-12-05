@@ -123,7 +123,7 @@ public class Logic implements ApplicationListener{
         });
 
         //sync research
-        Events.on(ResearchEvent.class, e -> {
+        Events.on(UnlockEvent.class, e -> {
             if(net.server()){
                 Call.researched(e.content);
             }
