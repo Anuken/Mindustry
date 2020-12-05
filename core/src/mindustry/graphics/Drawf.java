@@ -34,6 +34,10 @@ public class Drawf{
         if(allowLight(team)) renderer.lights.add(x, y, radius, color, opacity);
     }
 
+    public static void light(Team team, float x, float y, float radius, Color color, float opacity, float startDeg, float endDeg){
+        if(allowLight(team)) renderer.lights.add(x, y, radius, color, opacity, startDeg, endDeg);
+    }
+
     public static void light(Team team, Position pos, float radius, Color color, float opacity){
        light(team, pos.getX(), pos.getY(), radius, color, opacity);
     }

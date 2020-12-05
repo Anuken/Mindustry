@@ -37,6 +37,19 @@ public class LightRenderer{
         });
     }
 
+    public void add(float x, float y, float radius, Color color, float opacity, float startDeg, float endDeg){
+        if(!enabled()) return;
+
+        float res = color.toFloatBits();
+        add(() -> {
+            for(int deg = (int)startDeg;deg <= endDeg;deg += 5) {
+                Draw.color(res);
+                Draw.alpha(opacity);
+                Draw.rect("circle-shadow-slice", x, y, radius * 2, radius * 2, deg);
+            }
+        });
+    }
+
     public void add(float x, float y, TextureRegion region, Color color, float opacity){
         if(!enabled()) return;
 

@@ -50,7 +50,7 @@ public class Blocks implements ContentList{
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
-    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, illuminator,
+    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, illuminator, floodlight, 
 
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
@@ -2023,6 +2023,14 @@ public class Blocks implements ContentList{
             brightness = 0.75f;
             radius = 120f;
             consumes.power(0.05f);
+        }};
+
+        floodlight = new LightProjector("floodlight"){{
+            requirements(Category.effect, BuildVisibility.lightingOnly, with(Items.silicon, 50, Items.metaglass, 30, Items.titanium, 25));
+            size = 2;
+            brightness = 0.75f;
+            radius = 300f;
+            consumes.power(0.15f);
         }};
 
         //endregion
