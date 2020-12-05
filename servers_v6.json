@@ -1,5 +1,9 @@
 [
   {
+    "name": "Mindustry.ru",
+    "address": ["mindustry.ru:6567", "mindustry.ru:6577", "mindustry.ru:6587", "mindustry.ru:6597", "mindustry.ru:6667", "mindustry.ru:6676",]
+  },	
+  {
     "name": "mindustry.pl",
     "address": ["mindustry.pl:6000", "mindustry.pl:6666", "91.134.217.10:6006"]
   },
