@@ -202,6 +202,12 @@ public class Fonts{
             ((Font)f).getData().down *= 1.5f;
         };
     }
+    
+    /** Mod's custom emoji support **/
+    @SuppressWarnings("unused")
+    public static void addEmoji(TextureRegion textureRegion){
+
+    }
 
     /** Merges the UI and font atlas together for better performance. */
     public static void mergeFontAtlas(TextureAtlas atlas){
