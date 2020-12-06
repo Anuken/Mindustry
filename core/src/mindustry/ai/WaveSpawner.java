@@ -96,8 +96,8 @@ public class WaveSpawner{
     }
 
     public void doShockwave(float x, float y){
-        Time.run(20f, () -> Fx.spawnShockwave.at(x, y, state.rules.dropZoneRadius));
-        Time.run(40f, () -> Damage.damage(state.rules.waveTeam, x, y, state.rules.dropZoneRadius, 99999999f, true));
+        Fx.spawnShockwave.at(x, y, state.rules.dropZoneRadius);
+        Damage.damage(state.rules.waveTeam, x, y, state.rules.dropZoneRadius, 99999999f, true);
     }
 
     public void eachGroundSpawn(Intc2 cons){
