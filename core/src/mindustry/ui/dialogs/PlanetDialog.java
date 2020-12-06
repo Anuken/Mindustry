@@ -254,6 +254,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
     boolean canSelect(Sector sector){
         if(mode == select) return sector.hasBase();
+        if(sector.hasBase()) return true;
         //preset sectors can only be selected once unlocked
         if(sector.preset != null){
             TechNode node = sector.preset.node();
@@ -702,7 +703,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         stable.image().color(Pal.accent).fillX().height(3f).pad(3f).row();
 
-        boolean locked = sector.preset != null && sector.preset.locked() && sector.preset.node() != null;
+        boolean locked = sector.preset != null && sector.preset.locked() && !sector.hasBase() && sector.preset.node() != null;
 
         if(locked){
             stable.table(r -> {
@@ -769,7 +770,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     return;
                 }
 
-                if(sector.preset != null && sector.preset.locked()){
+                if(sector.preset != null && sector.preset.locked() && !sector.hasBase()){
                     return;
                 }
 
