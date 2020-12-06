@@ -405,6 +405,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         stack(
         new Element(){
+            long tapMillis;
+
             {
                 //add listener to the background rect, so it doesn't get unnecessary touch input
                 addListener(new ElementGestureListener(){
@@ -412,12 +414,13 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     public void tap(InputEvent event, float x, float y, int count, KeyCode button){
                         if(showing()) return;
 
-                        if(selected == hovered){
+                        if(selected == hovered && Time.timeSinceMillis(tapMillis) < 500){
                             playSelected();
                         }
 
                         if(hovered != null && (canSelect(hovered) || debugSelect)){
                             selected = hovered;
+                            tapMillis = Time.millis();
                         }
 
                         if(selected != null){
