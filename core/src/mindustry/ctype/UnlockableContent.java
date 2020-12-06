@@ -117,7 +117,7 @@ public abstract class UnlockableContent extends MappableContent{
 
     /** Makes this piece of content unlocked; if it already unlocked, nothing happens. */
     public void unlock(){
-        if(!net.client() && !unlocked()){
+        if(!unlocked && !alwaysUnlocked){
             unlocked = true;
             Core.settings.put(name + "-unlocked", true);
 
@@ -135,7 +135,7 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     public boolean unlocked(){
-        if(net != null && net.client()) return alwaysUnlocked || state.rules.researched.contains(name);
+        if(net != null && net.client()) return unlocked || alwaysUnlocked || state.rules.researched.contains(name);
         return unlocked || alwaysUnlocked;
     }
 

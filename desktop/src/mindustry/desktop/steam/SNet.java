@@ -31,8 +31,8 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     final NetProvider provider;
 
     final PacketSerializer serializer = new PacketSerializer();
-    final ByteBuffer writeBuffer = ByteBuffer.allocateDirect(1024 * 4);
-    final ByteBuffer readBuffer = ByteBuffer.allocateDirect(1024 * 4);
+    final ByteBuffer writeBuffer = ByteBuffer.allocateDirect(16384);
+    final ByteBuffer readBuffer = ByteBuffer.allocateDirect(16384);
 
     final CopyOnWriteArrayList<SteamConnection> connections = new CopyOnWriteArrayList<>();
     final IntMap<SteamConnection> steamConnections = new IntMap<>(); //maps steam ID -> valid net connection
@@ -131,9 +131,10 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                 writeBuffer.limit(writeBuffer.capacity());
                 writeBuffer.position(0);
                 serializer.write(writeBuffer, object);
+                int length = writeBuffer.position();
                 writeBuffer.flip();
 
-                snet.sendP2PPacket(currentServer, writeBuffer, mode == SendMode.tcp ? P2PSend.Reliable : P2PSend.UnreliableNoDelay, 0);
+                snet.sendP2PPacket(currentServer, writeBuffer, mode == SendMode.tcp || length >= 1200 ? P2PSend.Reliable : P2PSend.UnreliableNoDelay, 0);
             }catch(Exception e){
                 net.showError(e);
             }

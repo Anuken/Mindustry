@@ -130,7 +130,7 @@ public class SectorInfo{
         }
 
         //if there are infinite waves and no win wave, add a win wave.
-        if(waves && winWave <= 0 && !attack){
+        if(winWave <= 0 && !attack){
             winWave = 30;
         }
 

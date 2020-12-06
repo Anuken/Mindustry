@@ -318,9 +318,10 @@ public class LogicBlock extends Block{
 
                     //store any older variables
                     for(Var var : executor.vars){
-                        if(!var.constant){
+                        boolean unit = var.name.equals("@unit");
+                        if(!var.constant || unit){
                             BVar dest = asm.getVar(var.name);
-                            if(dest != null && !dest.constant){
+                            if(dest != null && (!dest.constant || unit)){
                                 dest.value = var.isobj ? var.objval : var.numval;
                             }
                         }
