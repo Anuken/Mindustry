@@ -91,14 +91,16 @@ public class StorageBlock extends Block{
 
         @Override
         public void overwrote(Seq<Building> previous){
-            for(Building other : previous){
-                if(other.items != null){
-                    items.add(other.items);
+            //only add prev items when core is not linked
+            if(linkedCore == null){
+                for(Building other : previous){
+                    if(other.items != null && other.items != items){
+                        items.add(other.items);
+                    }
                 }
-            }
 
-            //ensure item counts are not too high
-            items.each((i, a) -> items.set(i, Math.min(a, itemCapacity)));
+                items.each((i, a) -> items.set(i, Math.min(a, itemCapacity)));
+            }
         }
 
         @Override

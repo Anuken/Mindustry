@@ -32,6 +32,10 @@
     "address": ["mindustryranked.ddns.net:16567"]
   },
   {
+    "name": "TWS",
+    "address": ["twsmindustry.24x7.hk:6701", "twsmindustry.24x7.hk:6702"]
+  },
+  {
     "address": "cheginde.ddns.net"
     
   },
@@ -46,5 +50,9 @@
   {
     "name": "Surrealment",
     "address": ["md.surrealment.com"]
+  },
+  {
+     "name": "MindustryBR",
+     "address": ["mindustryptbr.ddns.net", "mindustryptbr.ddns.net:4444", "mindustryptbr.myddns.me:6666", "mindustryptbr.myddns.me:5555"]
   }
 ]

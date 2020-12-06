@@ -541,12 +541,14 @@ public class JoinDialog extends BaseDialog{
                         Log.info("Fetched @ community servers.", defaultServers.size);
                     }catch(Throwable e){
                         Log.err("Failed to parse community servers.");
+                        Log.err(e);
                     }
                 });
             }catch(Throwable e){
                 Log.err("Failed to fetch community servers.");
+                Log.err(e);
             }
-        }, t -> {});
+        }, Log::err);
     }
 
     private void saveServers(){
