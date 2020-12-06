@@ -710,8 +710,8 @@ public class UnitTypes implements ContentList{
             ammoType = AmmoTypes.power;
             buildSpeed = 1f;
 
-            legSplashDamage = 32;
-            legSplashRange = 30;
+            legSplashDamage = 0;
+            legSplashRange = 0;
 
             hovering = true;
             allowLegStep = true;
@@ -814,8 +814,8 @@ public class UnitTypes implements ContentList{
             ammoType = AmmoTypes.powerHigh;
             buildSpeed = 1f;
 
-            legSplashDamage = 80;
-            legSplashRange = 60;
+            legSplashDamage = 0;
+            legSplashRange = 0;
 
             hovering = true;
             allowLegStep = true;
