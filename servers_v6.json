@@ -32,6 +32,10 @@
     "address": ["mindustryranked.ddns.net:16567"]
   },
   {
+    "name": "TWS",
+    "address": ["twsmindustry.24x7.hk:6701", "twsmindustry.24x7.hk:6702"]
+  },
+  {
     "address": "cheginde.ddns.net"
     
   },

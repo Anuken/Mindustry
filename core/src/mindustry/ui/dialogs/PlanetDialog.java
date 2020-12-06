@@ -413,6 +413,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     public void tap(InputEvent event, float x, float y, int count, KeyCode button){
                         if(showing()) return;
 
+                        if(selected == hovered && count == 2){
+                            playSelected();
+                        }
+
                         if(hovered != null && (canSelect(hovered) || debugSelect)){
                             selected = hovered;
                         }
@@ -762,59 +766,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 sector.isBeingPlayed() ? "@sectors.resume" :
                 sector.hasBase() ? "@sectors.go" :
                 locked ? "@locked" : "@sectors.launch",
-                locked ? Icon.lock :Icon.play, () -> {
-
-                if(sector.isBeingPlayed()){
-                    //already at this sector
-                    hide();
-                    return;
-                }
-
-                if(sector.preset != null && sector.preset.locked() && !sector.hasBase()){
-                    return;
-                }
-
-                boolean shouldHide = true;
-
-                //save before launch.
-                if(control.saves.getCurrent() != null && state.isGame() && mode != select){
-                    try{
-                        control.saves.getCurrent().save();
-                    }catch(Throwable e){
-                        e.printStackTrace();
-                        ui.showException("[accent]" + Core.bundle.get("savefail"), e);
-                    }
-                }
-
-                if(mode == look && !sector.hasBase()){
-                    shouldHide = false;
-                    Sector from = findLauncher(sector);
-                    if(from == null){
-                        //clear loadout information, so only the basic loadout gets used
-                        universe.clearLoadoutInfo();
-                        //free launch.
-                        control.playSector(sector);
-                    }else{
-                        CoreBlock block = from.info.bestCoreType instanceof CoreBlock b ? b : (CoreBlock)Blocks.coreShard;
-
-                        loadouts.show(block, from, () -> {
-                            from.removeItems(universe.getLastLoadout().requirements());
-                            from.removeItems(universe.getLaunchResources());
-
-                            launching = true;
-                            zoom = 0.5f;
-
-                            ui.hudfrag.showLaunchDirect();
-                            Time.runTask(launchDuration, () -> control.playSector(from, sector));
-                        });
-                    }
-                }else if(mode == select){
-                    listener.get(sector);
-                }else{
-                    control.playSector(sector);
-                }
-
-                if(shouldHide) hide();
+                locked ? Icon.lock : Icon.play, () -> {
+                    playSelected();
             }).growX().height(54f).minWidth(170f).padTop(4).disabled(locked);
         }
 
@@ -839,6 +792,62 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         });
 
         stable.act(0f);
+    }
+
+    void playSelected(){
+        Sector sector = selected;
+
+        if(sector.isBeingPlayed()){
+            //already at this sector
+            hide();
+            return;
+        }
+
+        if(sector.preset != null && sector.preset.locked() && !sector.hasBase()){
+            return;
+        }
+
+        boolean shouldHide = true;
+
+        //save before launch.
+        if(control.saves.getCurrent() != null && state.isGame() && mode != select){
+            try{
+                control.saves.getCurrent().save();
+            }catch(Throwable e){
+                e.printStackTrace();
+                ui.showException("[accent]" + Core.bundle.get("savefail"), e);
+            }
+        }
+
+        if(mode == look && !sector.hasBase()){
+            shouldHide = false;
+            Sector from = findLauncher(sector);
+            if(from == null){
+                //clear loadout information, so only the basic loadout gets used
+                universe.clearLoadoutInfo();
+                //free launch.
+                control.playSector(sector);
+            }else{
+                CoreBlock block = from.info.bestCoreType instanceof CoreBlock b ? b : (CoreBlock)Blocks.coreShard;
+
+                loadouts.show(block, from, () -> {
+                    from.removeItems(universe.getLastLoadout().requirements());
+                    from.removeItems(universe.getLaunchResources());
+
+                    launching = true;
+                    zoom = 0.5f;
+
+                    ui.hudfrag.showLaunchDirect();
+                    Time.runTask(launchDuration, () -> control.playSector(from, sector));
+                });
+            }
+        }else if(mode == select){
+            listener.get(sector);
+        }else{
+            control.playSector(sector);
+        }
+
+        if(shouldHide) hide();
     }
 
     public enum Mode{
