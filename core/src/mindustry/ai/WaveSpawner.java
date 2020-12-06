@@ -55,6 +55,12 @@ public class WaveSpawner{
     public void spawnEnemies(){
         spawning = true;
 
+        eachGroundSpawn((spawnX, spawnY, doShockwave) -> {
+            if(doShockwave){
+                doShockwave(spawnX, spawnY);
+            }
+        });
+
         for(SpawnGroup group : state.rules.spawns){
             if(group.type == null) continue;
 
@@ -85,12 +91,6 @@ public class WaveSpawner{
                 });
             }
         }
-
-        eachGroundSpawn((spawnX, spawnY, doShockwave) -> {
-            if(doShockwave){
-                doShockwave(spawnX, spawnY);
-            }
-        });
 
         Time.runTask(121f, () -> spawning = false);
     }
