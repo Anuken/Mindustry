@@ -253,18 +253,22 @@ project(":ios"){
 
     task incrementConfig{
         def vfile = file('robovm.properties')
+        def bversion = getBuildVersion()
         def props = new Properties()
         if(vfile.exists()){
             props.load(new FileInputStream(vfile))
         }else{
             props['app.id'] = 'io.anuke.mindustry'
-            props['app.version'] = '5.0'
+            props['app.version'] = '6.0'
             props['app.mainclass'] = 'mindustry.IOSLauncher'
             props['app.executable'] = 'IOSLauncher'
             props['app.name'] = 'Mindustry'
         }
         
         props['app.build'] = (!props.containsKey("app.build") ? 40 : props['app.build'].toInteger() + 1) + ""
+        if(bversion != "custom build"){
+            props['app.version'] = versionNumber + "." + bversion + (bversion.contains(".") ? "" : ".0")
+        }
         props.store(vfile.newWriter(), null)
     }
 

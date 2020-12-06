@@ -162,6 +162,18 @@ public class HintsFragment extends Fragment{
         waveFire(() -> Groups.fire.size() > 0 && Blocks.wave.unlockedNow(), () -> indexer.getAllied(state.rules.defaultTeam, BlockFlag.extinguisher).size() > 0),
         generator(() -> control.input.block == Blocks.combustionGenerator, () -> ui.hints.placedBlocks.contains(Blocks.combustionGenerator)),
         guardian(() -> state.boss() != null && state.boss().armor >= 4, () -> state.boss() == null),
+        coreUpgrade(() -> state.isCampaign() && Blocks.coreFoundation.unlocked()
+            && state.rules.defaultTeam.core() != null
+            && state.rules.defaultTeam.core().block == Blocks.coreShard
+            && state.rules.defaultTeam.core().items.has(Blocks.coreFoundation.requirements),
+            () -> ui.hints.placedBlocks.contains(Blocks.coreFoundation)),
+        presetLaunch(() -> state.isCampaign()
+            && state.getSector().preset == null
+            && SectorPresets.frozenForest.unlocked()
+            && SectorPresets.frozenForest.sector.save == null,
+            () -> state.isCampaign() && state.getSector().preset == SectorPresets.frozenForest),
+        coreIncinerate(() -> state.isCampaign() && state.rules.defaultTeam.core() != null && state.rules.defaultTeam.core().items.get(Items.copper) >= state.rules.defaultTeam.core().storageCapacity - 10, () -> false),
+        coopCampaign(() -> net.client() && state.isCampaign() && SectorPresets.groundZero.sector.hasBase(), () -> false),
         ;
 
         @Nullable

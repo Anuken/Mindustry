@@ -37,8 +37,12 @@ public class Build{
         Block previous = tile.block();
         Block sub = ConstructBlock.get(previous.size);
 
+        Seq<Building> prevBuild = new Seq<>(1);
+        if(tile.build != null) prevBuild.add(tile.build);
+
         tile.setBlock(sub, team, rotation);
         tile.<ConstructBuild>bc().setDeconstruct(previous);
+        tile.<ConstructBuild>bc().prevBuild = prevBuild;
         tile.build.health = tile.build.maxHealth * prevPercent;
         if(unit != null && unit.isPlayer()) tile.build.lastAccessed = unit.getPlayer().name;
 

@@ -197,7 +197,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //region utility methods
 
     public void addPlan(boolean checkPrevious){
-        if(!block.rebuildable) return;
+        if(!block.rebuildable || (team == state.rules.defaultTeam && state.isCampaign() && !block.isVisible())) return;
 
         if(self() instanceof ConstructBuild entity){
             //update block to reflect the fact that something was being constructed
@@ -929,7 +929,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //null is of type void.class; anonymous classes use their superclass.
         Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() || value.getClass().getSimpleName().startsWith("adapter") ? value.getClass().getSuperclass() : value.getClass();
 
+        if(value instanceof Item) type = Item.class;
         if(value instanceof Block) type = Block.class;
+        if(value instanceof Liquid) type = Liquid.class;
         
         if(builder != null && builder.isPlayer()){
             lastAccessed = builder.getPlayer().name;
@@ -1097,8 +1099,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void displayBars(Table table){
         for(Func<Building, Bar> bar : block.bars.list()){
-            table.add(bar.get(self())).growX();
-            table.row();
+            //TODO fix conclusively
+            try{
+                table.add(bar.get(self())).growX();
+                table.row();
+            }catch(ClassCastException e){
+                break;
+            }
         }
     }
 

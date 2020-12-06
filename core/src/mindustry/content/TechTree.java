@@ -154,22 +154,22 @@ public class TechTree implements ContentList{
                         });
 
                         node(kiln, Seq.with(new SectorComplete(craters)), () -> {
-                            node(incinerator, () -> {
-                                node(melter, () -> {
-                                    node(surgeSmelter, () -> {
+                            node(pulverizer, () -> {
+                                node(incinerator, () -> {
+                                    node(melter, () -> {
+                                        node(surgeSmelter, () -> {
 
-                                    });
+                                        });
 
-                                    node(separator, () -> {
-                                        node(pulverizer, () -> {
+                                        node(separator, () -> {
                                             node(disassembler, () -> {
 
                                             });
                                         });
-                                    });
 
-                                    node(cryofluidMixer, () -> {
+                                        node(cryofluidMixer, () -> {
 
+                                        });
                                     });
                                 });
                             });
@@ -462,10 +462,11 @@ public class TechTree implements ContentList{
                                     new Research(conduit),
                                     new Research(wave)
                                 ), () -> {
-                                    //TODO change positions?
                                     node(impact0078, Seq.with(
                                         new SectorComplete(tarFields),
                                         new Research(Items.thorium),
+                                        new Research(lancer),
+                                        new Research(salvo),
                                         new Research(coreFoundation)
                                     ), () -> {
                                         node(desolateRift, Seq.with(
@@ -714,8 +715,14 @@ public class TechTree implements ContentList{
                 finishedRequirements[i] = new ItemStack(requirements[i].item, Core.settings == null ? 0 : Core.settings.getInt("req-" + content.name + "-" + requirements[i].item.name));
             }
 
+            var used = new ObjectSet<Content>();
+
             //add dependencies as objectives.
-            content.getDependencies(d -> objectives.add(new Research(d)));
+            content.getDependencies(d -> {
+                if(used.add(d)){
+                    objectives.add(new Research(d));
+                }
+            });
 
             map.put(content, this);
             all.add(this);

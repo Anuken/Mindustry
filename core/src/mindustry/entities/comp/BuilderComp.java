@@ -91,7 +91,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
                 plans.removeFirst();
                 return;
             }
-        }else if(tile.team() != team){
+        }else if(tile.team() != team && tile.team() != Team.derelict){
             plans.removeFirst();
             return;
         }

@@ -296,7 +296,7 @@ public class TypeIO{
         if(control instanceof Player p){
             write.b(0);
             write.i(p.id);
-        }else if(control instanceof FormationAI form){
+        }else if(control instanceof FormationAI form && form.leader != null){
             write.b(1);
             write.i(form.leader.id);
         }else if(control instanceof LogicAI logic && logic.controller != null){
@@ -545,6 +545,22 @@ public class TypeIO{
     public static byte[] readBytes(Reads read){
         short length = read.s();
         return read.b(new byte[length]);
+    }
+
+    public static void writeInts(Writes write, int[] ints){
+        write.s((short)ints.length);
+        for(int i : ints){
+            write.i(i);
+        }
+    }
+
+    public static int[] readInts(Reads read){
+        short length = read.s();
+        int[] out = new int[length];
+        for(int i = 0; i < length; i++){
+            out[i] = read.i();
+        }
+        return out;
     }
 
     public static void writeTraceInfo(Writes write, TraceInfo trace){

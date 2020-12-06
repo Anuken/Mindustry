@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.Net.*;
 import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
@@ -355,43 +356,45 @@ public class JoinDialog extends BaseDialog{
                 continue;
             }
 
+            Table[] groupTable = {null};
+
             //table containing all groups
-            global.table(g -> {
-                for(String address : group.addresses){
-                    String resaddress = address.contains(":") ? address.split(":")[0] : address;
-                    int resport = address.contains(":") ? Strings.parseInt(address.split(":")[1]) : port;
-                    net.pingHost(resaddress, resport, res -> {
-                        if(refreshes != cur) return;
-                        res.port = resport;
+            for(String address : group.addresses){
+                String resaddress = address.contains(":") ? address.split(":")[0] : address;
+                int resport = address.contains(":") ? Strings.parseInt(address.split(":")[1]) : port;
+                net.pingHost(resaddress, resport, res -> {
+                    if(refreshes != cur) return;
+                    res.port = resport;
 
-                        //add header
-                        if(g.getChildren().isEmpty()){
-                            g.table(head -> {
-                                if(!group.name.isEmpty()){
-                                    head.add(group.name).color(Color.lightGray).padRight(4);
-                                }
-                                head.image().height(3f).growX().color(Color.lightGray);
+                    //add header
+                    if(groupTable[0] == null){
+                        global.table(t -> groupTable[0] = t).row();
 
-                                //button for showing/hiding servers
-                                ImageButton[] image = {null};
-                                image[0] = head.button(hidden ? Icon.eyeOffSmall : Icon.eyeSmall, Styles.accenti, () -> {
-                                   group.setHidden(!group.hidden());
-                                   image[0].getStyle().imageUp = group.hidden() ? Icon.eyeOffSmall : Icon.eyeSmall;
-                                   if(group.hidden() && !showHidden){
-                                       g.remove();
-                                   }
-                                }).size(40f).get();
-                                image[0].addListener(new Tooltip(t -> t.background(Styles.black6).margin(4).label(() -> !group.hidden() ? "@server.shown" : "@server.hidden")));
-                            }).width(targetWidth()).padBottom(-2).row();
-                        }
+                        groupTable[0].table(head -> {
+                            if(!group.name.isEmpty()){
+                                head.add(group.name).color(Color.lightGray).padRight(4);
+                            }
+                            head.image().height(3f).growX().color(Color.lightGray);
 
-                        addGlobalHost(res, g);
+                            //button for showing/hiding servers
+                            ImageButton[] image = {null};
+                            image[0] = head.button(hidden ? Icon.eyeOffSmall : Icon.eyeSmall, Styles.accenti, () -> {
+                               group.setHidden(!group.hidden());
+                               image[0].getStyle().imageUp = group.hidden() ? Icon.eyeOffSmall : Icon.eyeSmall;
+                               if(group.hidden() && !showHidden){
+                                   groupTable[0].remove();
+                               }
+                            }).size(40f).get();
+                            image[0].addListener(new Tooltip(t -> t.background(Styles.black6).margin(4).label(() -> !group.hidden() ? "@server.shown" : "@server.hidden")));
+                        }).width(targetWidth()).padBottom(-2).row();
+                    }
 
-                        g.margin(5f);
-                        g.pack();
-                    }, e -> {});
-                }
-            }).row();
+                    addGlobalHost(res, groupTable[0]);
+
+                    groupTable[0].margin(5f);
+                    groupTable[0].pack();
+                }, e -> {});
+            }
         }
     }
 
@@ -401,7 +404,16 @@ public class JoinDialog extends BaseDialog{
 
         container.button(b -> buildServer(host, b), Styles.cleart, () -> {
             Events.fire(new ClientPreConnectEvent(host));
-            safeConnect(host.address, host.port, host.version);
+            if(!Core.settings.getBool("server-disclaimer", false)){
+                ui.showCustomConfirm("@warning", "@servers.disclaimer", "@ok", "@back", () -> {
+                    Core.settings.put("server-disclaimer", true);
+                    safeConnect(host.address, host.port, host.version);
+                }, () -> {
+                    Core.settings.put("server-disclaimer", false);
+                });
+            }else{
+                safeConnect(host.address, host.port, host.version);
+            }
         }).width(w).row();
     }
 
@@ -501,9 +513,16 @@ public class JoinDialog extends BaseDialog{
             Core.settings.remove("server-list");
         }
 
+        var url = becontrol.active() ? serverJsonBeURL : serverJsonV6URL;
+        Log.info("Fetching community servers at @", url);
+
         //get servers
-        Core.net.httpGet(becontrol.active() ? serverJsonBeURL : serverJsonV6URL, result -> {
+        Core.net.httpGet(url, result -> {
             try{
+                if(result.getStatus() != HttpStatus.OK){
+                    Log.warn("Failed to fetch community servers: @", result.getStatus());
+                    return;
+                }
 
                 Jval val = Jval.read(result.getResultAsString());
                 Core.app.post(() -> {
@@ -519,15 +538,17 @@ public class JoinDialog extends BaseDialog{
                             }
                             defaultServers.add(new ServerGroup(name, addresses));
                         });
-                        Log.info("Fetched @ global servers.", defaultServers.size);
-                    }catch(Throwable ignored){
+                        Log.info("Fetched @ community servers.", defaultServers.size);
+                    }catch(Throwable e){
                         Log.err("Failed to parse community servers.");
+                        Log.err(e);
                     }
                 });
             }catch(Throwable e){
                 Log.err("Failed to fetch community servers.");
+                Log.err(e);
             }
-        }, t -> {});
+        }, Log::err);
     }
 
     private void saveServers(){

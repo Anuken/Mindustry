@@ -110,6 +110,8 @@ public class UnitType extends UnlockableContent{
         occlusionRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion;
     public TextureRegion[] wreckRegions;
 
+    protected @Nullable ItemStack[] cachedRequirements;
+
     public UnitType(String name){
         super(name);
 
@@ -193,6 +195,10 @@ public class UnitType extends UnlockableContent{
                     }
                 }
             }
+        }
+
+        for(ItemStack stack : researchRequirements()){
+            cons.get(stack.item);
         }
     }
 
@@ -358,6 +364,10 @@ public class UnitType extends UnlockableContent{
 
     @Override
     public ItemStack[] researchRequirements(){
+        if(cachedRequirements != null){
+            return cachedRequirements;
+        }
+
         ItemStack[] stacks = null;
 
         //calculate costs based on reconstructors or factories found
@@ -377,6 +387,8 @@ public class UnitType extends UnlockableContent{
             for(int i = 0; i < out.length; i++){
                 out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(Math.pow(stacks[i].amount, 1.1) * 50)));
             }
+
+            cachedRequirements = out;
 
             return out;
         }

@@ -126,7 +126,7 @@ public class Block extends UnlockableContent{
     public BlockGroup group = BlockGroup.none;
     /** List of block flags. Used for AI indexing. */
     public EnumSet<BlockFlag> flags = EnumSet.of();
-    /** Targeting priority of this block, as seen by enemies.*/
+    /** Targeting priority of this block, as seen by enemies .*/
     public TargetPriority priority = TargetPriority.base;
     /** How much this block affects the unit cap by.
      * The block flags must contain unitModifier in order for this to work. */
@@ -139,9 +139,9 @@ public class Block extends UnlockableContent{
     public boolean consumesTap;
     /** Whether to draw the glow of the liquid for this block, if it has one. */
     public boolean drawLiquidLight = true;
-    /** Whether to periodically sync this block across the network.*/
+    /** Whether to periodically sync this block across the network. */
     public boolean sync;
-    /** Whether this block uses conveyor-type placement mode.*/
+    /** Whether this block uses conveyor-type placement mode. */
     public boolean conveyorPlacement;
     /**
      * The color of this block when displayed on the minimap or map preview.
@@ -173,12 +173,12 @@ public class Block extends UnlockableContent{
     /** Radius of the light emitted by this block. */
     public float lightRadius = 60f;
 
-    /** The sound that this block makes while active. One sound loop. Do not overuse.*/
+    /** The sound that this block makes while active. One sound loop. Do not overuse. */
     public Sound loopSound = Sounds.none;
     /** Active sound base volume. */
     public float loopSoundVolume = 0.5f;
 
-    /** The sound that this block makes while idle. Uses one sound loop for all blocks.*/
+    /** The sound that this block makes while idle. Uses one sound loop for all blocks. */
     public Sound ambientSound = Sounds.none;
     /** Idle sound base volume. */
     public float ambientSoundVolume = 0.05f;
@@ -193,6 +193,8 @@ public class Block extends UnlockableContent{
     public BuildVisibility buildVisibility = BuildVisibility.hidden;
     /** Multiplier for speed of building this block. */
     public float buildCostMultiplier = 1f;
+    /** Build completion at which deconstruction finishes. */
+    public float deconstructThreshold = 0f;
     /** Multiplier for cost of research in tech tree. */
     public float researchCostMultiplier = 1;
     /** Whether this block has instant transfer.*/
@@ -634,6 +636,8 @@ public class Block extends UnlockableContent{
 
         //also requires inputs
         consumes.each(c -> {
+            if(c.isOptional()) return;
+
             if(c instanceof ConsumeItems i){
                 for(ItemStack stack : i.items){
                     cons.get(stack.item);

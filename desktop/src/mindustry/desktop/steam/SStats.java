@@ -1,6 +1,7 @@
 package mindustry.desktop.steam;
 
 import arc.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import com.codedisaster.steamworks.*;
@@ -99,13 +100,13 @@ public class SStats implements SteamUserStatsCallback{
                 for(Sector sec : planet.sectors){
                     if(sec.hasBase()){
                         for(var v : sec.info.production.values()){
-                            total += v.mean;
+                            if(v.mean > 0) total += v.mean * 60;
                         }
                     }
                 }
             }
 
-            SStat.maxProduction.max((int)total);
+            SStat.maxProduction.max(Mathf.round(total));
         });
 
         Events.run(Trigger.newGame, () -> Core.app.post(() -> {
