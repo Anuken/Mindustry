@@ -461,9 +461,10 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                 writeBuffer.limit(writeBuffer.capacity());
                 writeBuffer.position(0);
                 serializer.write(writeBuffer, object);
+                int length = writeBuffer.position();
                 writeBuffer.flip();
 
-                snet.sendP2PPacket(sid, writeBuffer, mode == SendMode.tcp ? object instanceof StreamChunk ? P2PSend.ReliableWithBuffering : P2PSend.Reliable : P2PSend.UnreliableNoDelay, 0);
+                snet.sendP2PPacket(sid, writeBuffer, mode == SendMode.tcp || length >= 1200 ? object instanceof StreamChunk ? P2PSend.ReliableWithBuffering : P2PSend.Reliable : P2PSend.UnreliableNoDelay, 0);
             }catch(Exception e){
                 Log.err(e);
                 Log.info("Error sending packet. Disconnecting invalid client!");
