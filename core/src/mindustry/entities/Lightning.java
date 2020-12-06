@@ -43,7 +43,7 @@ public class Lightning{
         bhit = false;
 
         for(int i = 0; i < length / 2; i++){
-            if(hitter != null && (hitter.type.lightningTypeChance < Mathf.random() || hitter.type.lightningTypeChance >= 1)){
+            if(hitter != null && Mathf.chance(hitter.type.lightningTypeChance)){
                 hitCreate.create(null, team, x, y, rotation, damage, 1f, 1f, hitter);
             }
             lines.add(new Vec2(x + Mathf.range(3f), y + Mathf.range(3f)));
