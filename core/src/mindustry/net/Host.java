@@ -9,14 +9,14 @@ public class Host{
     public final String address;
     public final String mapname, description;
     public final int wave;
-    public final int players, playerLimit;
+    public final int playerLimit, players, admins;
     public final int version;
     public final String versionType;
     public final Gamemode mode;
     public final @Nullable String modeName;
     public int ping, port = Vars.port;
 
-    public Host(int ping, String name, String address, String mapname, int wave, int players, int version, String versionType, Gamemode mode, int playerLimit, String description, String modeName){
+    public Host(int ping, String name, String address, String mapname, int wave, int players, int version, String versionType, Gamemode mode, int playerLimit, String description, String modeName, int admins){
         this.ping = ping;
         this.name = name;
         this.address = address;
@@ -29,5 +29,6 @@ public class Host{
         this.mode = mode;
         this.description = description;
         this.modeName = modeName;
+        this.admins = admins;
     }
 }
