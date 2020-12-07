@@ -3,13 +3,14 @@ package mindustry.world;
 import arc.math.*;
 import arc.math.geom.*;
 import mindustry.gen.*;
+import mindustry.world.blocks.ConstructBlock;
 
 import java.util.*;
 
 import static mindustry.Vars.*;
 
 public class Edges{
-    private static final int maxSize = 14;
+    private static final int maxSize = ConstructBlock.maxSize;
     private static final int maxRadius = 12;
     private static Point2[][] edges = new Point2[maxSize][0];
     private static Point2[][] edgeInside = new Point2[maxSize][0];
