@@ -34,7 +34,7 @@ public class ShockMine extends Block{
         @Override
         public void drawTeam(){
             //no
-        }
+        } //yes
 
         @Override
         public void draw(){
