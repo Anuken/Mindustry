@@ -614,6 +614,7 @@ public class Blocks implements ContentList{
             craftTime = 75f;
             size = 3;
             hasPower = true;
+            itemCapacity = 20;
 
             consumes.power(4f);
             consumes.items(with(Items.copper, 3, Items.lead, 4, Items.titanium, 2, Items.silicon, 3));
