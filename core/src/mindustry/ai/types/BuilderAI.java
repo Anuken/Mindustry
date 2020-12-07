@@ -45,6 +45,16 @@ public class BuilderAI extends AIController{
             //approach request if building
             BuildPlan req = unit.buildPlan();
 
+            //clear break plan if another player is breaking something.
+            if(!req.breaking && timer.get(timerTarget2, 40f)){
+                for(Player player : Groups.player){
+                    if(player.isBuilder() && player.unit().activelyBuilding() && player.unit().buildPlan().samePos(req) && player.unit().buildPlan().breaking){
+                        unit.plans.removeFirst();
+                        return;
+                    }
+                }
+            }
+
             boolean valid =
                 (req.tile() != null && req.tile().build instanceof ConstructBuild && req.tile().<ConstructBuild>bc().cblock == req.block) ||
                 (req.breaking ?
