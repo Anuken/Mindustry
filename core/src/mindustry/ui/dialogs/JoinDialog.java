@@ -241,7 +241,7 @@ public class JoinDialog extends BaseDialog{
                 t.add("[gray]" + host.description).width(targetWidth() - 10f).left().wrap();
                 t.row();
             }
-            t.add("[lightgray]" + (Core.bundle.format("players" + (host.players == 1 && host.playerLimit <= 0 ? ".single" : ""), (host.players == 0 ? "[lightgray]" : "[accent]") + host.players + (host.playerLimit > 0 ? "[lightgray]/[accent]" + host.playerLimit : "")+ "[lightgray]"))).left();
+            t.add("[lightgray]" + (Core.bundle.format("players" + (host.players == 1 && host.playerLimit <= 0 ? ".single" : ""), (host.players == 0 ? "[lightgray]" : "[accent]") + host.players + (host.playerLimit > 0 ? "[lightgray]/[accent]" + host.playerLimit : "")+ "[lightgray]")) + (host.admins > 0 ? "[lightgray] (" + (Core.bundle.format("admins" + (host.admins == 1 ? ".single" : ""), "[accent]" + host.admins + "[lightgray]")) + ")" : "")).left();
             t.row();
             t.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[lightgray] / " + (host.modeName == null ? host.mode.toString() : host.modeName)).width(targetWidth() - 10f).left().get().setEllipsis(true);
             if(host.ping > 0){
