@@ -56,7 +56,7 @@ public class BuilderAI extends AIController{
             }
 
             boolean valid =
-                (req.tile() != null && req.tile().build instanceof ConstructBuild && req.tile().<ConstructBuild>bc().cblock == req.block) ||
+                (req.tile() != null && req.tile().build instanceof ConstructBuild cons && cons.cblock == req.block) ||
                 (req.breaking ?
                     Build.validBreak(unit.team(), req.x, req.y) :
                     Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation));

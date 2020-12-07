@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
+import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -134,7 +135,7 @@ public class Blocks implements ContentList{
 
         //Registers build blocks
         //no reference is needed here since they can be looked up by name later
-        for(int i = 1; i <= ConstructBlock.maxSize; i++){
+        for(int i = 1; i <= Vars.maxBlockSize; i++){
             new ConstructBlock(i);
         }
 

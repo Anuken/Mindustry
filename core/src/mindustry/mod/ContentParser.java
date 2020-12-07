@@ -39,6 +39,8 @@ import mindustry.world.meta.*;
 import java.lang.reflect.*;
 import java.util.*;
 
+import static mindustry.Vars.*;
+
 @SuppressWarnings("unchecked")
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
@@ -250,8 +252,8 @@ public class ContentParser{
 
                 readFields(block, value, true);
 
-                if(block.size > ConstructBlock.maxSize){
-                    throw new IllegalArgumentException("Blocks cannot be larger than " + ConstructBlock.maxSize);
+                if(block.size > maxBlockSize){
+                    throw new IllegalArgumentException("Blocks cannot be larger than " + maxBlockSize);
                 }
 
                 //make block visible by default if there are requirements and no visibility set

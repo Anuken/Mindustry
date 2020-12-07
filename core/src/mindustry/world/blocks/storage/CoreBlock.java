@@ -58,9 +58,8 @@ public class CoreBlock extends StorageBlock{
 
     @Remote(called = Loc.server)
     public static void playerSpawn(Tile tile, Player player){
-        if(player == null || tile == null) return;
+        if(player == null || tile == null || !(tile.build instanceof CoreBuild entity)) return;
 
-        CoreBuild entity = tile.bc();
         CoreBlock block = (CoreBlock)tile.block();
         Fx.spawn.at(entity);
 
