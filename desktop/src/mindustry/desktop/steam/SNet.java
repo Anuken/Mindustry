@@ -332,7 +332,8 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                         Gamemode.valueOf(smat.getLobbyData(lobby, "gamemode")),
                         smat.getLobbyMemberLimit(lobby),
                         "",
-                        null
+                        null,
+                        0 // todo, check if its possible to get admin count via steam
                     );
                     hosts.add(out);
                 }catch(Exception e){
