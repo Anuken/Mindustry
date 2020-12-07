@@ -87,7 +87,7 @@ public class NetworkIO{
         writeString(buffer, name, 100);
         writeString(buffer, map, 64);
 
-        buffer.putInt(Core.settings.getInt("totalPlayers", Groups.player.size()));
+        buffer.putInt(5); // todo, swap back out for the player count
         buffer.putInt(state.wave);
         buffer.putInt(Version.build);
         writeString(buffer, Version.type);
@@ -96,9 +96,8 @@ public class NetworkIO{
         buffer.putInt(netServer.admins.getPlayerLimit());
 
         writeString(buffer, description, 100);
-        if(state.rules.modeName != null){
-            writeString(buffer, state.rules.modeName, 50);
-        }
+        writeString(buffer, state.rules.modeName == null ? "" : state.rules.modeName, 50); // todo, figure out how to handle an optional non-last
+        buffer.putInt(2); // todo, compute the actual online admin number
         return buffer;
     }
 
@@ -113,8 +112,10 @@ public class NetworkIO{
         int limit = buffer.getInt();
         String description = readString(buffer);
         String modeName = readString(buffer);
+        int admins = buffer.getInt(); // todo, figure out why this stays 0
+        admins = 2;
 
-        return new Host(ping, host, hostAddress, map, wave, players, version, vertype, gamemode, limit, description, modeName.isEmpty() ? null : modeName);
+        return new Host(ping, host, hostAddress, map, wave, players, version, vertype, gamemode, limit, description, modeName.isEmpty() ? null : modeName, admins);
     }
 
     private static void writeString(ByteBuffer buffer, String string, int maxlen){
