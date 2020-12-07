@@ -378,7 +378,7 @@ public class Bullets implements ContentList{
             {
                 pierce = true;
                 collidesTiles = false;
-                collides = false;
+                canCollide = false;
                 drag = 0.03f;
                 hitEffect = despawnEffect = Fx.none;
             }

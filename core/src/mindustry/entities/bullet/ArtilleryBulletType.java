@@ -11,7 +11,7 @@ public class ArtilleryBulletType extends BasicBulletType{
     public ArtilleryBulletType(float speed, float damage, String bulletSprite){
         super(speed, damage, bulletSprite);
         collidesTiles = false;
-        collides = false;
+        canCollide = false;
         collidesAir = false;
         scaleVelocity = true;
         hitShake = 1f;

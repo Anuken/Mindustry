@@ -9,7 +9,7 @@ public class BombBulletType extends BasicBulletType{
         splashDamageRadius = radius;
         splashDamage = damage;
         collidesTiles = false;
-        collides = false;
+        canCollide = false;
         shrinkY = 0.7f;
         lifetime = 30f;
         drag = 0.05f;

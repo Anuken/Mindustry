@@ -80,7 +80,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Replace
     @Override
     public boolean collides(Hitboxc other){
-        return type.collides && (other instanceof Teamc && ((Teamc)other).team() != team)
+        return type.canCollide && (other instanceof Teamc && ((Teamc)other).team() != team)
             && !(other instanceof Flyingc && !((Flyingc)other).checkTarget(type.collidesAir, type.collidesGround))
             && !(type.pierce && collided.contains(other.id())); //prevent multiple collisions
     }
@@ -119,7 +119,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     public void update(){
         type.update(self());
 
-        if(type.collidesTiles && type.collides && type.collidesGround){
+        if(type.collidesTiles && type.canCollide && type.collidesGround){
             world.raycastEach(World.toTile(lastX()), World.toTile(lastY()), tileX(), tileY(), (x, y) -> {
 
                 Building tile = world.build(x, y);

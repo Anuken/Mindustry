@@ -63,7 +63,7 @@ public abstract class BulletType extends Content{
     /** Whether this bullet type collides with air/ground units. */
     public boolean collidesAir = true, collidesGround = true;
     /** Whether this bullet types collides with anything at all. */
-    public boolean collides = true;
+    public boolean canCollide = true;
     /** Whether velocity is inherited from the shooter. */
     public boolean keepVelocity = true;
     /** Whether to scale velocity to disappear at the target position. Used for artillery. */

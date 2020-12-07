@@ -135,7 +135,7 @@ public class UnitTypes implements ContentList{
                     knockback = 0.8f;
                     lifetime = 110f;
                     width = height = 14f;
-                    collides = true;
+                    canCollide = true;
                     collidesTiles = true;
                     splashDamageRadius = 24f;
                     splashDamage = 45f;
@@ -866,7 +866,7 @@ public class UnitTypes implements ContentList{
                     knockback = 0.8f;
                     lifetime = 80f;
                     width = height = 25f;
-                    collidesTiles = collides = true;
+                    collidesTiles = canCollide = true;
                     ammoMultiplier = 4f;
                     splashDamageRadius = 90f;
                     splashDamage = 75f;
@@ -1360,7 +1360,7 @@ public class UnitTypes implements ContentList{
                     shrinkX = shrinkY = 0.7f;
 
                     speed = 0.001f;
-                    collides = false;
+                    canCollide = false;
 
                     healPercent = 15f;
                     splashDamage = 230f;

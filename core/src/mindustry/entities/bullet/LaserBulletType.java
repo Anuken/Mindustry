@@ -30,7 +30,7 @@ public class LaserBulletType extends BulletType{
         hitSize = 4;
         lifetime = 16f;
         keepVelocity = false;
-        collides = false;
+        canCollide = false;
         pierce = true;
         hittable = false;
         absorbable = false;

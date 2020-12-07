@@ -20,7 +20,7 @@ public class SapBulletType extends BulletType{
         speed = 0.0001f;
         despawnEffect = Fx.none;
         pierce = false;
-        collides = false;
+        canCollide = false;
         hitSize = 0f;
         hittable = false;
         hitEffect = Fx.hitLiquid;

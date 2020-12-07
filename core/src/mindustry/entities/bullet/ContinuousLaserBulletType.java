@@ -36,7 +36,7 @@ public class ContinuousLaserBulletType extends BulletType{
         incendChance = 0.4f;
         lightColor = Color.orange;
         keepVelocity = false;
-        collides = false;
+        canCollide = false;
         pierce = true;
         hittable = false;
         absorbable = false;
