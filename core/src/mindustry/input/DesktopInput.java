@@ -61,7 +61,7 @@ public class DesktopInput extends InputHandler{
         group.fill(t -> {
             t.bottom();
             t.visible(() -> {
-                t.color.a = Mathf.lerpDelta(t.color.a, player.unit().isBuilding() ? 1f : 0f, 0.15f);
+                t.color.a = Mathf.lerpDelta(t.color.a, !isBuilding && !buildWasAutoPaused || player.unit().isBuilding() ? 1f : 0f, 0.15f);
 
                 return ui.hudfrag.shown && Core.settings.getBool("hints") && selectRequests.isEmpty() && t.color.a > 0.01f;
             });
