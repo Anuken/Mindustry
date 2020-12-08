@@ -249,15 +249,6 @@ public class SStats implements SteamUserStatsCallback{
             }
         });
 
-        Events.on(LoseEvent.class, e -> {
-            if(campaign()){
-                //TODO implement
-                //if(state.getSector().metCondition() && (state.wave - state.getSector().conditionWave) / state.getSector().launchPeriod >= 1){
-                //    skipLaunching2Death.complete();
-                //}
-            }
-        });
-
         Events.on(SectorLaunchEvent.class, e -> {
             SStat.timesLaunched.add();
         });
@@ -325,16 +316,6 @@ public class SStats implements SteamUserStatsCallback{
 
             SStat.sectorsControlled.set(e.sector.planet.sectors.count(Sector::hasBase));
         });
-
-        //TODO dead achievement
-        /*
-        Events.on(MechChangeEvent.class, e -> {
-            if(campaign()){
-                if(mechs.add(e.mech.name)){
-                    SStat.zoneMechsUsed.max(mechs.size);
-                }
-            }
-        });*/
     }
 
     private void save(){
