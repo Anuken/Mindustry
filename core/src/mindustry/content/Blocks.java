@@ -2019,6 +2019,9 @@ public class Blocks implements ContentList{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
         }};
+        
+        //endregion
+        //region lighting
 
         illuminator = new LightBlock("illuminator"){{
             requirements(Category.effect, BuildVisibility.lightingOnly, with(Items.graphite, 12, Items.silicon, 8));
