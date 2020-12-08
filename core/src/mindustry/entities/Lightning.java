@@ -43,9 +43,6 @@ public class Lightning{
         bhit = false;
 
         for(int i = 0; i < length / 2; i++){
-            if(hitter != null && Mathf.chance(hitter.type.lightningTypeChance)){
-                hitCreate.create(null, team, x, y, rotation, damage, 1f, 1f, hitter);
-            }
             lines.add(new Vec2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
             if(lines.size > 1){
@@ -86,6 +83,10 @@ public class Lightning{
                 rotation += random.range(20f);
                 x += Angles.trnsx(rotation, hitRange / 2f);
                 y += Angles.trnsy(rotation, hitRange / 2f);
+            }
+            
+            if(hitter != null && Mathf.chance(hitter.type.lightningTypeChance)){
+                hitCreate.create(null, team, x, y, rotation, damage, 1f, 1f, hitter);
             }
         }
 
