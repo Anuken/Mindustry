@@ -1,0 +1,56 @@
+[img]{STEAM_APP_IMAGE}/extras/ezgif-4-0e70c282f775.gif[/img]
+
+[h2]Spielmechanik[/h2]
+
+[list]
+[*] Baue komplexe Produktionsketten aus Förderbändern, um deine Geschütztürme mit Munition zu versorgen
+[*] Stelle Materialien her, um deine Fabrik zu vergrößern und sie vor Gegnerwellen zu schützen
+[*] Spiele mit deinen Freunden in plattformübergreifenden Partien oder fordere sie zum Kampf heraus
+[*] Es gibt immer etwas zu tun: Wenn du deine Kühlsysteme nicht im Blick behältst, könnte dein Reaktor explodieren!
+[*] Produziere Einheiten, die bei deiner Basis helfen oder den Gegner angreifen
+[/list]
+
+[img]{STEAM_APP_IMAGE}/extras/ezgif-1-8679abe089cd.gif[/img]
+
+[h2]Kampagne[/h2]
+
+[list]
+[*] Erobere den Planeten Serpulo, indem du über 250 prozedural generierte Sektoren und 16 handgemachte Karten eroberst
+[*] Stelle Materialien in eroberten Sektoren her, während du den nächsten Sektor eroberst
+[*] Verteidige deine Sektoren vor regelmäßigen Invasionen
+[*] Transportiere Materialien zwischen deinen Sektoren
+[*] Schalte neue Blöcke in der Forschung frei
+[*] Schließe Missionen zusammen mit deinen Freunden ab
+[*] 33 verschiedene Einheiten
+[*] über 50 Erfolge
+[/list]
+
+[h2]Spielmodi[/h2]
+
+[list]
+[*] [b]Überleben[/b]: Baue Geschütztürme und verteidige Wellen von Gegnern. Bereite dich auf zwischenzeitliche Zerstörungsangriffe von flugfähigen Einheiten vor.
+[*] [b]Angriff[/b]: Stelle Einheiten her, um den gegnerischen Kern zu zerstören. Vergesse dabei nicht, deinen eigenen Kern zu schützen!
+[*] [b]PvP[/b]: Kämpfe gegen andere Spieler in Teams und zerstöre die gegnerischen Kerne.
+[*] [b]Sandkasten[/b]: Probiere deine Designs mit unendlichen Ressourcen und Gegnerwellen auf Anfrage aus.
+[/list]
+
+[img]{STEAM_APP_IMAGE}/extras/2020-11-30_10-46-02.gif[/img]
+
+[h2]Mehrspielermodus[/h2]
+
+[list]
+[*] Trete einem öffentlichen Server bei oder eröffne ein Spiel für deine Freunde
+[*] Ändere die Spielregeln: Kosten, Schadenswerte und mehr!
+[*] Kombiniere PvP und PvE (player versus enemies)
+[/list]
+
+[h2]Karteneditor[/h2]
+
+[list]
+[*] Passe die Werkzeuge nach deinen Vorstellungen an
+[*] Viele Filter für das prozedurale Generieren der Umgebung
+[*] Verschönere die Landschaft mit Rauschen, Verzerrungen, Erosion, Symmetrie und Zufallsgenerierung
+[*] Modifiziere die Gegnerwellen
+[*] Teile deine Karten im Steam-Workshop
+[*] Nutze über 80 verschiedene Umgebungsblöcke
+[/list]

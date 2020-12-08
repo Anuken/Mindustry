@@ -1,0 +1,11 @@
+Baue komplexe Produktionsketten aus Förderbändern, um deine Geschütztürme mit Munition zu versorgen. Stelle Materialien her, um deine Fabrik zu vergrößern und sie vor Gegnerwellen zu schützen. Spiele mit deinen Freunden in plattformübergreifenden Partien oder fordere sie zum Kampf heraus.
+
+Dieses Tower-Defense-Spiel bietet:
+- 24 Karten
+- Eine Kampagne, die ins Spiel einführt und einen Forschungsbaum enthält
+- 4 mächtige Bosse
+- Transportsysteme für Materialien, Flüssigkeiten und Strom
+- 19 verschiedene Einheiten, die du kommandieren kannst
+- Mehrspielerpartien im lokalen Netzwerk oder über einen Server
+
+Mithilfe eines eingebauten Editors können eigene Karten und Gegnerwellen erstellt werden. Die Spielregeln kannst du flexibel nach deinen Wünschen anpassen.
