@@ -301,12 +301,14 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(SectorCaptureEvent.class, e -> {
-            if(Vars.state.wave <= 5 && state.rules.attackMode){
-                defeatAttack5Waves.complete();
-            }
+            if(e.sector.isBeingPlayed() || net.client()){
+                if(Vars.state.wave <= 5 && state.rules.attackMode){
+                    defeatAttack5Waves.complete();
+                }
 
-            if(state.stats.buildingsDestroyed == 0){
-                captureNoBlocksBroken.complete();
+                if(state.stats.buildingsDestroyed == 0){
+                    captureNoBlocksBroken.complete();
+                }
             }
 
             if(Vars.state.rules.attackMode){
