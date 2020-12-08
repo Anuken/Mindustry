@@ -54,5 +54,9 @@
   {
      "name": "MindustryBR",
      "address": ["mindustryptbr.ddns.net", "mindustryptbr.ddns.net:4444", "mindustryptbr.myddns.me:6666", "mindustryptbr.myddns.me:5555"]
+  },
+  {
+     "name": "ALEX",
+     "address": ["209.127.178.13:6568", "209.127.178.13:6569"]
   }
 ]
