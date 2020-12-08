@@ -1975,18 +1975,7 @@ public class Blocks implements ContentList{
             repairRadius = 65f;
             powerUse = 1f;
         }};
-
-        resupplyPoint = new ResupplyPoint("resupply-point"){{
-            requirements(Category.units, BuildVisibility.ammoOnly, with(Items.lead, 20, Items.copper, 15, Items.silicon, 15));
-
-            size = 2;
-            range = 80f;
-            itemCapacity = 20;
-            ammoAmount = 5;
-
-            consumes.item(Items.copper, 1);
-        }};
-
+        
         //endregion
         //region sandbox
 
@@ -2021,13 +2010,33 @@ public class Blocks implements ContentList{
         }};
         
         //endregion
-        //region lighting
+        //region misc
+
+        resupplyPoint = new ResupplyPoint("resupply-point"){{
+            requirements(Category.units, BuildVisibility.ammoOnly, with(Items.lead, 20, Items.copper, 15, Items.silicon, 15));
+
+            size = 2;
+            range = 80f;
+            itemCapacity = 20;
+            ammoAmount = 5;
+
+            consumes.item(Items.copper, 1);
+        }};
 
         illuminator = new LightBlock("illuminator"){{
             requirements(Category.effect, BuildVisibility.lightingOnly, with(Items.graphite, 12, Items.silicon, 8));
             brightness = 0.75f;
             radius = 120f;
             consumes.power(0.05f);
+        }};
+        
+        //TODO remove
+        launchPadLarge = new LaunchPad("launch-pad-large"){{
+            size = 4;
+            itemCapacity = 300;
+            launchTime = 60f * 35;
+            hasPower = true;
+            consumes.power(6f);
         }};
 
         //endregion
@@ -2053,15 +2062,6 @@ public class Blocks implements ContentList{
             launchTime = 60f * 20;
             hasPower = true;
             consumes.power(4f);
-        }};
-
-        //TODO remove
-        launchPadLarge = new LaunchPad("launch-pad-large"){{
-            size = 4;
-            itemCapacity = 300;
-            launchTime = 60f * 35;
-            hasPower = true;
-            consumes.power(6f);
         }};
 
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
