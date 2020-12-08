@@ -371,6 +371,7 @@ public class Blocks implements ContentList{
 
         shaleWall = new StaticWall("shale-wall"){{
             variants = 2;
+            basalt.asFloor().wall = this;
         }};
 
         sporePine = new StaticTree("spore-pine"){{
@@ -404,58 +405,87 @@ public class Blocks implements ContentList{
 
         shaleBoulder = new Boulder("shale-boulder"){{
             variants = 2;
+            shale.asFloor().decoration = this;
         }};
 
         sandBoulder = new Boulder("sand-boulder"){{
             variants = 2;
+            sand.asFloor().decoration = this;
         }};
 
         daciteBoulder = new Boulder("dacite-boulder"){{
             variants = 2;
+            shale.asFloor().decoration = this;
         }};
 
         basaltBoulder = new Boulder("basalt-boulder"){{
             variants = 2;
+            basalt.asFloor().decoration = darksand.asFloor().decoration = this;
         }};
 
         moss = new Floor("moss"){{
             variants = 3;
             attributes.set(Attribute.spores, 0.15f);
             wall = sporePine;
+            decoration = sporeCluster;
         }};
 
         sporeMoss = new Floor("spore-moss"){{
             variants = 3;
             attributes.set(Attribute.spores, 0.3f);
             wall = sporeWall;
+            decoration = sporeCluster;
         }};
 
         metalFloor = new Floor("metal-floor"){{
             variants = 0;
+            decoration = boulder;
         }};
 
         metalFloorDamaged = new Floor("metal-floor-damaged"){{
             variants = 3;
+            decoration = boulder;
         }};
 
         metalFloor2 = new Floor("metal-floor-2"){{
             variants = 0;
+            decoration = boulder;
         }};
 
         metalFloor3 = new Floor("metal-floor-3"){{
             variants = 0;
+            decoration = boulder;
         }};
 
         metalFloor5 = new Floor("metal-floor-5"){{
             variants = 0;
+            decoration = boulder;
         }};
 
-        darkPanel1 = new Floor("dark-panel-1"){{ variants = 0; }};
-        darkPanel2 = new Floor("dark-panel-2"){{ variants = 0; }};
-        darkPanel3 = new Floor("dark-panel-3"){{ variants = 0; }};
-        darkPanel4 = new Floor("dark-panel-4"){{ variants = 0; }};
-        darkPanel5 = new Floor("dark-panel-5"){{ variants = 0; }};
-        darkPanel6 = new Floor("dark-panel-6"){{ variants = 0; }};
+        darkPanel1 = new Floor("dark-panel-1"){{ 
+            variants = 0;
+            decoration = boulder;
+        }};
+        darkPanel2 = new Floor("dark-panel-2"){{
+            variants = 0;
+            decoration = boulder;
+        }};
+        darkPanel3 = new Floor("dark-panel-3"){{
+            variants = 0;
+            decoration = boulder;
+        }};
+        darkPanel4 = new Floor("dark-panel-4"){{
+            variants = 0;
+            decoration = boulder;
+        }};
+        darkPanel5 = new Floor("dark-panel-5"){{
+            variants = 0;
+            decoration = boulder;
+        }};
+        darkPanel6 = new Floor("dark-panel-6"){{
+            variants = 0;
+            decoration = boulder;
+        }};
 
         darkMetal = new StaticWall("dark-metal");
 
