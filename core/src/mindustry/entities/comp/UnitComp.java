@@ -129,6 +129,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case mineY -> mining() ? mineTile.y : -1;
             case flag -> flag;
             case controlled -> controller instanceof LogicAI || controller instanceof Player ? 1 : 0;
+            case commanded -> controller instanceof FormationAI ? 1 : 0;
             case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
             default -> 0;
         };
