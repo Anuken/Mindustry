@@ -41,7 +41,7 @@ public class ShockMine extends Block{
             super.draw();
             if(isActive() || progress < blinkDelay * 0.5f){
                 Draw.color(team.color);
-                Draw.alpha(0.5f);
+                Draw.alpha(0.2f);
                 Fill.rect(x, y, 2f, 2f);
                 Draw.color();
             }
