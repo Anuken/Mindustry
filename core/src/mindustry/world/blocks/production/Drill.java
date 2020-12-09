@@ -160,13 +160,13 @@ public class Drill extends Block{
         itemArray.clear();
 
 
-        int lowPriority = -1000; // max drill area is 4 by 4 so it's not a big deal
+        int lowPriority = -1000; //max drill area is 4 by 4 so it's not a big deal
         for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
             if(canMine(other)){
-                if(other.floor().playerUnmineable){
-                    oreCount.increment(getDrop(other), lowPriority, 1); //sand and etc. is low priority
-                }else{
+                if(other.overlay() != null && other.overlay().itemDrop != null){ //there is an ore
                     oreCount.increment(getDrop(other), 0, 1);
+                }else{
+                    oreCount.increment(getDrop(other), lowPriority, 1); //sand and etc. is low priority
                 }
             }
         }
