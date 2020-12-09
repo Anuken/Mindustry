@@ -22,7 +22,6 @@ public class SStats implements SteamUserStatsCallback{
     public final SteamUserStats stats = new SteamUserStats(this);
 
     private boolean updated = false;
-    //private ObjectSet<String> mechs = new ObjectSet<>();
     private int statSavePeriod = 4; //in minutes
 
     private ObjectSet<String> blocksBuilt = new ObjectSet<>(), unitsBuilt = new ObjectSet<>();
@@ -32,7 +31,9 @@ public class SStats implements SteamUserStatsCallback{
         stats.requestCurrentStats();
 
         Events.on(ClientLoadEvent.class, e -> {
-            //mechs = Core.settings.getObject("mechs", ObjectSet.class, ObjectSet::new);
+            unitsBuilt = Core.settings.getJson("units-built" , ObjectSet.class, String.class, ObjectSet::new);
+            blocksBuilt = Core.settings.getJson("blocks-built" , ObjectSet.class, String.class, ObjectSet::new);
+            t5s = ObjectSet.with(UnitTypes.omura, UnitTypes.reign, UnitTypes.toxopid, UnitTypes.eclipse, UnitTypes.oct, UnitTypes.corvus);
 
             Core.app.addListener(new ApplicationListener(){
                 Interval i = new Interval();
@@ -75,11 +76,6 @@ public class SStats implements SteamUserStatsCallback{
     }
 
     private void registerEvents(){
-        Events.on(ClientLoadEvent.class, e -> {
-            unitsBuilt = Core.settings.getJson("units-built" , ObjectSet.class, String.class, ObjectSet::new);
-            blocksBuilt = Core.settings.getJson("blocks-built" , ObjectSet.class, String.class, ObjectSet::new);
-            t5s = ObjectSet.with(UnitTypes.omura, UnitTypes.reign, UnitTypes.toxopid, UnitTypes.eclipse, UnitTypes.oct, UnitTypes.corvus);
-        });
 
         Events.on(UnitDestroyEvent.class, e -> {
             if(ncustom()){
