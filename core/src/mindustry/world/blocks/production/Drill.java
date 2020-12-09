@@ -20,6 +20,8 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
+import java.util.Comparator;
+
 import static mindustry.Vars.*;
 
 public class Drill extends Block{
@@ -157,9 +159,15 @@ public class Drill extends Block{
         oreCount.clear();
         itemArray.clear();
 
+
+        int lowPriority = -1000;
         for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
             if(canMine(other)){
-                oreCount.increment(getDrop(other), 0, 1);
+                if(other.floor() instanceof OreBlock) {
+                    oreCount.increment(getDrop(other), 0, 1);
+                }else{
+                    oreCount.increment(getDrop(other), lowPriority, 1); //sand and etc. is low priority
+                }
             }
         }
 
@@ -167,13 +175,7 @@ public class Drill extends Block{
             itemArray.add(item);
         }
 
-        itemArray.sort((item1, item2) -> {
-            int type = Boolean.compare(item1 != Items.sand, item2 != Items.sand);
-            if(type != 0) return type;
-            int amounts = Integer.compare(oreCount.get(item1, 0), oreCount.get(item2, 0));
-            if(amounts != 0) return amounts;
-            return Integer.compare(item1.id, item2.id);
-        });
+        itemArray.sort(Comparator.comparingInt((Item item) -> oreCount.get(item, 0)).thenComparingInt(item -> item.id));
 
         if(itemArray.size == 0){
             return;
@@ -181,6 +183,7 @@ public class Drill extends Block{
 
         returnItem = itemArray.peek();
         returnCount = oreCount.get(itemArray.peek(), 0);
+        if(returnCount < 0) returnCount -= lowPriority; //we added -1000 before, now it's time to subtract -1000
     }
 
     public boolean canMine(Tile tile){
