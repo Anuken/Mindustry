@@ -175,7 +175,11 @@ public class Drill extends Block{
             itemArray.add(item);
         }
 
-        itemArray.sort(Comparator.comparingInt((Item item) -> oreCount.get(item, 0)).thenComparingInt(item -> item.id));
+        itemArray.sort((item1, item2) -> {
+            int amounts = Integer.compare(oreCount.get(item1, 0), oreCount.get(item2, 0));
+            if(amounts != 0) return amounts;
+            return Integer.compare(item1.id, item2.id);
+        });
 
         if(itemArray.size == 0){
             return;
