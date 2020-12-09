@@ -27,7 +27,6 @@ public class SStats implements SteamUserStatsCallback{
 
     private ObjectSet<String> blocksBuilt = new ObjectSet<>(), unitsBuilt = new ObjectSet<>();
     private ObjectSet<UnitType> t5s = new ObjectSet<>();
-    private ObjectSet<UnitType> tmpSet = new ObjectSet<>();
 
     public SStats(){
         stats.requestCurrentStats();
@@ -106,7 +105,7 @@ public class SStats implements SteamUserStatsCallback{
                 }
             }
 
-            SStat.maxProduction.max(Mathf.round(total));
+            SStat.maxProduction.max(Math.round(total));
         });
 
         Events.run(Trigger.newGame, () -> Core.app.post(() -> {
