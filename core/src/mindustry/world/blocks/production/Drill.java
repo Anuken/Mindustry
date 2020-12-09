@@ -158,8 +158,6 @@ public class Drill extends Block{
 
         oreCount.clear();
         itemArray.clear();
-
-
         int lowPriority = -1000; //max drill area is 4 by 4 so it's not a big deal
         for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
             if(canMine(other)){
