@@ -163,10 +163,10 @@ public class Drill extends Block{
         int lowPriority = -1000;
         for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
             if(canMine(other)){
-                if(other.floor() instanceof OreBlock) {
-                    oreCount.increment(getDrop(other), 0, 1);
-                }else{
+                if(other.floor().playerUnmineable) {
                     oreCount.increment(getDrop(other), lowPriority, 1); //sand and etc. is low priority
+                }else{
+                    oreCount.increment(getDrop(other), 0, 1);
                 }
             }
         }
