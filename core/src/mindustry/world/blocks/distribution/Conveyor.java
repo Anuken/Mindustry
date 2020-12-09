@@ -136,7 +136,7 @@ public class Conveyor extends Block implements Autotiler{
                 Item item = ids[i];
                 tr1.trns(rotation * 90, tilesize, 0);
                 tr2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
-                float itemx (tile.x * tilesize + tr1.x * ys[i] + tr2.x), itemy (tile.y * tilesize + tr1.y * ys[i] + tr2.y);
+                float itemx = (tile.x * tilesize + tr1.x * ys[i] + tr2.x), itemy = (tile.y * tilesize + tr1.y * ys[i] + tr2.y);
 
                 Drawf.shadow(itemx, itemy, itemSize * 1.2f);
 
