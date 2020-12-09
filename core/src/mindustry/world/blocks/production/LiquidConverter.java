@@ -17,7 +17,11 @@ public class LiquidConverter extends GenericCrafter{
 
     @Override
     public void init(){
-        ConsumeLiquidBase cl = consumes.get(ConsumeType.liquid);
+        if(!consumes.has(ConsumeType.liquid) || !(consumes.get(ConsumeType.liquid) instanceof ConsumeLiquid)){
+            throw new RuntimeException("LiquidsConverters must have a ConsumeLiquid. Note that filters are not supported.");
+        }
+
+        ConsumeLiquid cl = consumes.get(ConsumeType.liquid);
         cl.update(false);
         outputLiquid.amount = cl.amount;
         super.init();

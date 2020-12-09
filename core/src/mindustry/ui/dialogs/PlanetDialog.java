@@ -413,7 +413,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     public void tap(InputEvent event, float x, float y, int count, KeyCode button){
                         if(showing()) return;
 
-                        if(selected == hovered && count == 2){
+                        if(hovered != null && selected == hovered && count == 2){
                             playSelected();
                         }
 

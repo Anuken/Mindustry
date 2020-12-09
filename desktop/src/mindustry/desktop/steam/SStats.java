@@ -1,7 +1,6 @@
 package mindustry.desktop.steam;
 
 import arc.*;
-import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import com.codedisaster.steamworks.*;
@@ -78,7 +77,7 @@ public class SStats implements SteamUserStatsCallback{
     private void registerEvents(){
 
         Events.on(UnitDestroyEvent.class, e -> {
-            if(ncustom()){
+            if(campaign()){
                 if(e.unit.team != Vars.player.team()){
                     SStat.unitsDestroyed.add();
 
@@ -253,7 +252,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(WaveEvent.class, e -> {
-            if(ncustom()){
+            if(campaign()){
                 SStat.maxWavesSurvived.max(Vars.state.wave);
 
                 if(state.stats.buildingsBuilt == 0 && state.wave >= 10){
@@ -324,10 +323,6 @@ public class SStats implements SteamUserStatsCallback{
                 ach.complete();
             }
         });
-    }
-
-    private boolean ncustom(){
-        return campaign();
     }
 
     private boolean campaign(){
