@@ -615,6 +615,7 @@ public class World{
                 GenerateInput input = new GenerateInput();
 
                 for(GenerateFilter filter : filters){
+                    filter.randomize();
                     input.begin(filter, width(), height(), (x, y) -> tiles.getn(x, y));
                     filter.apply(tiles, input);
                 }

@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -57,9 +58,8 @@ public class CoreBlock extends StorageBlock{
 
     @Remote(called = Loc.server)
     public static void playerSpawn(Tile tile, Player player){
-        if(player == null || tile == null) return;
+        if(player == null || tile == null || !(tile.build instanceof CoreBuild entity)) return;
 
-        CoreBuild entity = tile.bc();
         CoreBlock block = (CoreBlock)tile.block();
         Fx.spawn.at(entity);
 
@@ -246,17 +246,18 @@ public class CoreBlock extends StorageBlock{
             }
             state.teams.registerCore(this);
 
-            storageCapacity = itemCapacity + proximity().sum(e -> isContainer(e) && owns(e) ? e.block.itemCapacity : 0);
-            proximity.each(e -> isContainer(e) && owns(e), t -> {
+            storageCapacity = itemCapacity + proximity().sum(e -> owns(e) ? e.block.itemCapacity : 0);
+            proximity.each(e -> owns(e), t -> {
                 t.items = items;
                 ((StorageBuild)t).linkedCore = this;
             });
 
             for(Building other : state.teams.cores(team)){
                 if(other.tile() == tile) continue;
-                storageCapacity += other.block.itemCapacity + other.proximity().sum(e -> isContainer(e) && owns(other, e) ? e.block.itemCapacity : 0);
+                storageCapacity += other.block.itemCapacity + other.proximity().sum(e -> owns(e) && owns(other, e) ? e.block.itemCapacity : 0);
             }
 
+            //Team.sharded.core().items.set(Items.surgeAlloy, 12000)
             if(!world.isGenerating()){
                 for(Item item : content.items()){
                     items.set(item, Math.min(items.get(item), storageCapacity));
@@ -303,24 +304,19 @@ public class CoreBlock extends StorageBlock{
                     Draw.rect("block-select", t.x + offset * p.x, t.y + offset * p.y, i * 90);
                 }
             };
-            if(proximity.contains(e -> isContainer(e) && e.items == items)){
+            if(proximity.contains(e -> owns(e) && e.items == items)){
                 outline.get(this);
             }
-            proximity.each(e -> isContainer(e) && e.items == items, outline);
+            proximity.each(e -> owns(e) && e.items == items, outline);
             Draw.reset();
         }
 
-
-        public boolean isContainer(Building tile){
-            return tile instanceof StorageBuild && (((StorageBuild)tile).linkedCore == this || ((StorageBuild)tile).linkedCore == null);
-        }
-
         public boolean owns(Building tile){
-            return tile instanceof StorageBuild && (((StorageBuild)tile).linkedCore == this || ((StorageBuild)tile).linkedCore == null);
+            return owns(this, tile);
         }
 
         public boolean owns(Building core, Building tile){
-            return tile instanceof StorageBuild && (((StorageBuild)tile).linkedCore == core || ((StorageBuild)tile).linkedCore == null);
+            return tile instanceof StorageBuild b && (b.linkedCore == core || b.linkedCore == null);
         }
 
         public boolean incinerate(){
@@ -340,7 +336,7 @@ public class CoreBlock extends StorageBlock{
             int total = proximity.count(e -> e.items != null && e.items == items);
             float fract = 1f / total / state.teams.cores(team).size;
 
-            proximity.each(e -> isContainer(e) && e.items == items && owns(e), t -> {
+            proximity.each(e -> owns(e) && e.items == items && owns(e), t -> {
                 StorageBuild ent = (StorageBuild)t;
                 ent.linkedCore = null;
                 ent.items = new ItemModule();

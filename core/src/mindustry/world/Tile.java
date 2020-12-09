@@ -125,13 +125,6 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return 0;
     }
 
-    /** Convenience method that returns the building of this tile with a cast.
-     * Method name is shortened to prevent conflict. */
-    @SuppressWarnings("unchecked")
-    public <T extends Building> T bc(){
-        return (T)build;
-    }
-
     public float worldx(){
         return x * tilesize;
     }

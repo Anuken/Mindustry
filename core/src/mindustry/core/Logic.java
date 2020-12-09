@@ -123,7 +123,7 @@ public class Logic implements ApplicationListener{
         });
 
         //sync research
-        Events.on(ResearchEvent.class, e -> {
+        Events.on(UnlockEvent.class, e -> {
             if(net.server()){
                 Call.researched(e.content);
             }
@@ -150,6 +150,18 @@ public class Logic implements ApplicationListener{
                         Time.run(Mathf.random(0f, 60f * 5f), u::kill);
                     }
                 });
+            }
+        });
+
+        //send out items to each client
+        Events.on(TurnEvent.class, e -> {
+            if(net.server() && state.isCampaign()){
+                int[] out = new int[content.items().size];
+                state.getSector().info.production.each((item, stat) -> {
+                    out[item.id] = Math.max(0, (int)(stat.mean * turnDuration / 60));
+                });
+
+                Call.sectorProduced(out);
             }
         });
 
@@ -243,8 +255,10 @@ public class Logic implements ApplicationListener{
     }
 
     private void updateWeather(){
+        state.rules.weather.removeAll(w -> w.weather == null);
 
         for(WeatherEntry entry : state.rules.weather){
+            if(entry.weather == null) continue;
             //update cooldown
             entry.cooldown -= Time.delta;
 
@@ -295,8 +309,46 @@ public class Logic implements ApplicationListener{
     public static void researched(Content content){
         if(!(content instanceof UnlockableContent u)) return;
 
+        var node = u.node();
+
+        //unlock all direct dependencies on client, permanently
+        while(node != null){
+            node.content.unlock();
+            node = node.parent;
+        }
+
         state.rules.researched.add(u.name);
-        Events.fire(new UnlockEvent(u));
+    }
+
+    //called when the remote server runs a turn and produces something
+    @Remote
+    public static void sectorProduced(int[] amounts){
+        if(!state.isCampaign()) return;
+        Planet planet = state.rules.sector.planet;
+        boolean any = false;
+
+        for(Item item : content.items()){
+            int am = amounts[item.id];
+            if(am > 0){
+                int sumMissing = planet.sectors.sum(s -> s.hasBase() ? s.info.storageCapacity - s.info.items.get(item) : 0);
+                if(sumMissing == 0) continue;
+                //how much % to add
+                double percent = Math.min((double)am / sumMissing, 1);
+                for(Sector sec : planet.sectors){
+                    if(sec.hasBase()){
+                        int added = (int)Math.ceil(((sec.info.storageCapacity - sec.info.items.get(item)) * percent));
+                        sec.info.items.add(item, added);
+                        any = true;
+                    }
+                }
+            }
+        }
+
+        if(any){
+            for(Sector sec : planet.sectors){
+                sec.saveInfo();
+            }
+        }
     }
 
     @Override

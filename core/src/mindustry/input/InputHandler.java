@@ -278,8 +278,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot drop an item.");
         }
 
-        Fx.dropItem.at(player.x, player.y, angle, Color.white, player.unit().item());
-        player.unit().clearItem();
+        player.unit().eachGroup(unit -> {
+            Fx.dropItem.at(unit.x, unit.y, angle, Color.white, unit.item());
+            unit.clearItem();
+        });
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true, unreliable = true)
@@ -514,7 +516,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean requestMatches(BuildPlan request){
         Tile tile = world.tile(request.x, request.y);
-        return tile != null && tile.block() instanceof ConstructBlock && tile.<ConstructBuild>bc().cblock == request.block;
+        return tile != null && tile.build instanceof ConstructBuild cons && cons.cblock == request.block;
     }
 
     public void drawBreaking(int x, int y){

@@ -102,13 +102,11 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         }
 
         //if there is no core to build with or no build entity, stop building!
-        if((core == null && !infinite) || !(tile.build instanceof ConstructBuild)){
+        if((core == null && !infinite) || !(tile.build instanceof ConstructBuild entity)){
             return;
         }
 
         //otherwise, update it.
-        ConstructBuild entity = tile.bc();
-
         if(current.breaking){
             entity.deconstruct(self(), core, 1f / entity.buildCost * Time.delta * type.buildSpeed * state.rules.buildSpeedMultiplier);
         }else{
@@ -182,8 +180,8 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
             plans.remove(replace);
         }
         Tile tile = world.tile(place.x, place.y);
-        if(tile != null && tile.build instanceof ConstructBuild){
-            place.progress = tile.<ConstructBuild>bc().progress;
+        if(tile != null && tile.build instanceof ConstructBuild cons){
+            place.progress = cons.progress;
         }
         if(tail){
             plans.addLast(place);

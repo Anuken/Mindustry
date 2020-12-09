@@ -26,8 +26,7 @@ import static mindustry.Vars.*;
 
 /** A block in the process of construction. */
 public class ConstructBlock extends Block{
-    public static final int maxSize = 16;
-    private static final ConstructBlock[] consBlocks = new ConstructBlock[maxSize];
+    private static final ConstructBlock[] consBlocks = new ConstructBlock[maxBlockSize];
 
     private static long lastTime = 0;
     private static int pitchSeq = 0;
@@ -46,7 +45,7 @@ public class ConstructBlock extends Block{
 
     /** Returns a ConstructBlock by size. */
     public static ConstructBlock get(int size){
-        if(size > maxSize) throw new IllegalArgumentException("No. Don't place ConstructBlock of size greater than " + maxSize);
+        if(size > maxBlockSize) throw new IllegalArgumentException("No. Don't place ConstructBlock of size greater than " + maxBlockSize);
         return consBlocks[size - 1];
     }
 
@@ -147,6 +146,7 @@ public class ConstructBlock extends Block{
          */
         public Block previous;
         public Object lastConfig;
+        public boolean wasConstructing;
 
         @Nullable
         public Unit lastBuilder;
@@ -218,6 +218,7 @@ public class ConstructBlock extends Block{
         }
 
         public void construct(Unit builder, @Nullable Building core, float amount, Object config){
+            wasConstructing = true;
             if(cblock == null){
                 kill();
                 return;
@@ -252,6 +253,7 @@ public class ConstructBlock extends Block{
         }
 
         public void deconstruct(Unit builder, @Nullable Building core, float amount){
+            wasConstructing = false;
             float deconstructMultiplier = state.rules.deconstructRefundMultiplier;
 
             if(builder.isPlayer()){
@@ -331,6 +333,7 @@ public class ConstructBlock extends Block{
         }
 
         public void setConstruct(Block previous, Block block){
+            wasConstructing = true;
             this.cblock = block;
             this.previous = previous;
             this.accumulator = new float[block.requirements.length];
@@ -340,6 +343,7 @@ public class ConstructBlock extends Block{
 
         public void setDeconstruct(Block previous){
             if(previous == null) return;
+            wasConstructing = false;
             this.previous = previous;
             this.progress = 1f;
             if(previous.buildCost >= 0.01f){

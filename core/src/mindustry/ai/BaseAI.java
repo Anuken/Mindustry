@@ -36,7 +36,7 @@ public class BaseAI{
     private static int correct = 0, incorrect = 0;
 
     private int lastX, lastY, lastW, lastH;
-    private boolean triedWalls;
+    private boolean triedWalls, foundPath;
 
     TeamData data;
     Interval timer = new Interval(4);
@@ -114,6 +114,9 @@ public class BaseAI{
                     }
 
                     calcPath.add(calcTile.pos());
+                    for(Point2 p : Geometry.d8){
+                        calcPath.add(Point2.pack(p.x + calcTile.x, p.y + calcTile.y));
+                    }
 
                     //found the end.
                     if(calcTile.build instanceof CoreBuild b && b.team == state.rules.defaultTeam){
@@ -125,6 +128,7 @@ public class BaseAI{
                         calcPath.clear();
                         calcTile = null;
                         totalCalcs ++;
+                        foundPath = true;
 
                         break;
                     }
@@ -135,7 +139,7 @@ public class BaseAI{
         }
 
         //only schedule when there's something to build.
-        if(totalCalcs > 0 && data.blocks.isEmpty() && timer.get(timerStep, Mathf.lerp(20f, 4f, data.team.rules().aiTier))){
+        if(foundPath && data.blocks.isEmpty() && timer.get(timerStep, Mathf.lerp(20f, 4f, data.team.rules().aiTier))){
             if(!triedWalls){
                 tryWalls();
                 triedWalls = true;

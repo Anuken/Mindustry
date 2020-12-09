@@ -10,21 +10,22 @@ import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
-import mindustry.game.*;
 import mindustry.game.Objectives.*;
+import mindustry.game.*;
 import mindustry.game.Saves.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;
-import mindustry.maps.*;
 import mindustry.maps.Map;
+import mindustry.maps.*;
 import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -340,7 +341,7 @@ public class Control implements ApplicationListener, Loadable{
                         state.rules.waves = true;
 
                         //reset win wave??
-                        state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null ? sector.preset.captureWave : state.rules.winWave > state.wave ? state.rules.winWave : 40;
+                        state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null && sector.preset.captureWave > 0 ? sector.preset.captureWave : state.rules.winWave > state.wave ? state.rules.winWave : 40;
 
                         //if there's still an enemy base left, fix it
                         if(state.rules.attackMode){
@@ -505,6 +506,13 @@ public class Control implements ApplicationListener, Loadable{
             }
             settings.put("fullscreen", !full);
         }
+
+        if(Float.isNaN(Vars.player.x) || Float.isNaN(Vars.player.y)){
+            player.set(0, 0);
+            if(!player.dead()) player.unit().kill();
+        }
+        if(Float.isNaN(camera.position.x)) camera.position.x = world.unitWidth()/2f;
+        if(Float.isNaN(camera.position.y)) camera.position.y = world.unitHeight()/2f;
 
         if(state.isGame()){
             input.update();

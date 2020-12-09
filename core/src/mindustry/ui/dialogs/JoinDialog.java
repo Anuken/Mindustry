@@ -356,43 +356,45 @@ public class JoinDialog extends BaseDialog{
                 continue;
             }
 
+            Table[] groupTable = {null};
+
             //table containing all groups
-            global.table(g -> {
-                for(String address : group.addresses){
-                    String resaddress = address.contains(":") ? address.split(":")[0] : address;
-                    int resport = address.contains(":") ? Strings.parseInt(address.split(":")[1]) : port;
-                    net.pingHost(resaddress, resport, res -> {
-                        if(refreshes != cur) return;
-                        res.port = resport;
+            for(String address : group.addresses){
+                String resaddress = address.contains(":") ? address.split(":")[0] : address;
+                int resport = address.contains(":") ? Strings.parseInt(address.split(":")[1]) : port;
+                net.pingHost(resaddress, resport, res -> {
+                    if(refreshes != cur) return;
+                    res.port = resport;
 
-                        //add header
-                        if(g.getChildren().isEmpty()){
-                            g.table(head -> {
-                                if(!group.name.isEmpty()){
-                                    head.add(group.name).color(Color.lightGray).padRight(4);
-                                }
-                                head.image().height(3f).growX().color(Color.lightGray);
+                    //add header
+                    if(groupTable[0] == null){
+                        global.table(t -> groupTable[0] = t).row();
 
-                                //button for showing/hiding servers
-                                ImageButton[] image = {null};
-                                image[0] = head.button(hidden ? Icon.eyeOffSmall : Icon.eyeSmall, Styles.accenti, () -> {
-                                   group.setHidden(!group.hidden());
-                                   image[0].getStyle().imageUp = group.hidden() ? Icon.eyeOffSmall : Icon.eyeSmall;
-                                   if(group.hidden() && !showHidden){
-                                       g.remove();
-                                   }
-                                }).size(40f).get();
-                                image[0].addListener(new Tooltip(t -> t.background(Styles.black6).margin(4).label(() -> !group.hidden() ? "@server.shown" : "@server.hidden")));
-                            }).width(targetWidth()).padBottom(-2).row();
-                        }
+                        groupTable[0].table(head -> {
+                            if(!group.name.isEmpty()){
+                                head.add(group.name).color(Color.lightGray).padRight(4);
+                            }
+                            head.image().height(3f).growX().color(Color.lightGray);
 
-                        addGlobalHost(res, g);
+                            //button for showing/hiding servers
+                            ImageButton[] image = {null};
+                            image[0] = head.button(hidden ? Icon.eyeOffSmall : Icon.eyeSmall, Styles.accenti, () -> {
+                               group.setHidden(!group.hidden());
+                               image[0].getStyle().imageUp = group.hidden() ? Icon.eyeOffSmall : Icon.eyeSmall;
+                               if(group.hidden() && !showHidden){
+                                   groupTable[0].remove();
+                               }
+                            }).size(40f).get();
+                            image[0].addListener(new Tooltip(t -> t.background(Styles.black6).margin(4).label(() -> !group.hidden() ? "@server.shown" : "@server.hidden")));
+                        }).width(targetWidth()).padBottom(-2).row();
+                    }
 
-                        g.margin(5f);
-                        g.pack();
-                    }, e -> {});
-                }
-            }).row();
+                    addGlobalHost(res, groupTable[0]);
+
+                    groupTable[0].margin(5f);
+                    groupTable[0].pack();
+                }, e -> {});
+            }
         }
     }
 
@@ -539,12 +541,14 @@ public class JoinDialog extends BaseDialog{
                         Log.info("Fetched @ community servers.", defaultServers.size);
                     }catch(Throwable e){
                         Log.err("Failed to parse community servers.");
+                        Log.err(e);
                     }
                 });
             }catch(Throwable e){
                 Log.err("Failed to fetch community servers.");
+                Log.err(e);
             }
-        }, t -> {});
+        }, Log::err);
     }
 
     private void saveServers(){
