@@ -795,6 +795,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     void playSelected(){
+        if(selected == null) return;
+
         Sector sector = selected;
 
         if(sector.isBeingPlayed()){
