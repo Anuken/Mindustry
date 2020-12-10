@@ -25,7 +25,7 @@ public class MoveLightningAbility extends Ability{
     //Shifts where the lightning spawns along the Y axis
     public float offset = 0f;
     //Jittering heat sprite like the shield on v5 Javelin
-    public TextureRegion heatRegion;
+    public TextureRegion heatRegion = Core.atlas.find("error");
     
     public Effect shootEffect = Fx.sparkShoot;
     public Sound shootSound = Sounds.spark;
