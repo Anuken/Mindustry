@@ -43,6 +43,17 @@ public class MoveLightningAbility extends Ability{
         this.heatRegion = heatRegion;
     }
     
+    public MoveLightningAbility(float damage, int length, float chance, float offset, float minSpeed, float maxSpeed, Color color, String heatName){
+        this.damage = damage;
+        this.length = length;
+        this.chance = chance;
+        this.offset = offset;
+        this.minSpeed = minSpeed;
+        this.maxSpeed = maxSpeed;
+        this.color = color;
+        this.heatRegion = Core.atlas.find(heatName);
+    }
+    
     public MoveLightningAbility(float damage, int length, float chance, float offset, float minSpeed, float maxSpeed, Color color){
         this.damage = damage;
         this.length = length;
