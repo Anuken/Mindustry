@@ -57,8 +57,6 @@ public class Unloader extends Block{
                     rotations = new int[proximity.size];
                 }
 
-                Log.info("unloader @", id);
-
                 for(int i = 0; i < proximity.size; i++){
                     int pos = (offset + i) % proximity.size;
                     var other = proximity.get(pos);
