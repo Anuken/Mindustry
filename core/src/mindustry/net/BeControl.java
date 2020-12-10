@@ -50,7 +50,7 @@ public class BeControl{
                 Fi dest = Fi.get(System.getProperty("becopy"));
                 Fi self = Fi.get(BeControl.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
                 
-                self.parent().findAll(f -> f != self).forEach(Fi::delete);
+                for(Fi file : self.parent().findAll(f -> !f.equals(self))) file.delete();
 
                 self.copyTo(dest);
             }catch(Throwable e){
