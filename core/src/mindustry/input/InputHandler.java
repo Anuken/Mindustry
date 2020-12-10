@@ -417,7 +417,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(controlledType != null && player.dead()){
-            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type == controlledType && !u.dead);
+            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type == controlledType && !u.dead && !(u.controller() instanceof FormationAI));
 
             if(unit != null){
                 //only trying controlling once a second to prevent packet spam
