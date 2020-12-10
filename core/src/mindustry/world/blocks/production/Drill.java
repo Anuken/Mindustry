@@ -20,8 +20,6 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
-import java.util.Comparator;
-
 import static mindustry.Vars.*;
 
 public class Drill extends Block{
