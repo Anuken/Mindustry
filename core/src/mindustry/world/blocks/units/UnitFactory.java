@@ -13,6 +13,7 @@ import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
