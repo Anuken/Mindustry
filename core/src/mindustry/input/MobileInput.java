@@ -71,6 +71,8 @@ public class MobileInput extends InputHandler implements GestureListener{
     public Teamc target;
     /** Payload target being moved to. Can be a position (for dropping), or a unit/block. */
     public Position payloadTarget;
+    /** General target being moved to. The player will attempt a click at the destination. Can be a position, or a unit/block. Overrides payloadTarget. */
+    public Position moveTarget;
 
     //region utility methods
 
@@ -640,6 +642,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             mode = none;
             manualShooting = false;
             payloadTarget = null;
+            moveTarget = null;
         }
 
         //zoom camera
@@ -883,6 +886,18 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }else{
             payloadTarget = null;
+        }
+        
+        if(moveTarget != null){
+            targetPos.set(moveTarget);
+            attractDst = 0f;
+            if(unit.within(moveTarget, 3f * Time.delta)){
+                if(moveTarget instanceof Building build && build.isValid() && !build.dead){
+                    //building -> answering its call
+                    build.tapped();
+                }
+                moveTarget = null;
+            }
         }
 
         movement.set(targetPos).sub(player).limit(speed);
