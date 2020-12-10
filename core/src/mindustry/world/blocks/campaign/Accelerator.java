@@ -44,6 +44,11 @@ public class Accelerator extends Block{
         super.init();
     }
 
+    @Override
+    public boolean outputsItems(){
+        return false;
+    }
+    
     public class AcceleratorBuild extends Building{
 
         @Override
