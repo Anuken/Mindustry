@@ -5,7 +5,9 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.pooling.*;
+import mindustry.gen.Building;
 import mindustry.world.*;
+import mindustry.world.blocks.distribution.*;
 
 import static mindustry.Vars.*;
 
@@ -23,7 +25,6 @@ public class Placement{
     /** Normalize a diagonal line into points. */
     public static Seq<Point2> pathfindLine(boolean conveyors, int startX, int startY, int endX, int endY){
         Pools.freeAll(points);
-
         points.clear();
         if(conveyors && Core.settings.getBool("conveyorpathfinding")){
             if(astar(startX, startY, endX, endY)){
@@ -50,6 +51,20 @@ public class Placement{
             for(int i = 0; i <= Math.abs(startY - endY); i++){
                 points.add(Pools.obtain(Point2.class, Point2::new).set(startX, startY + i * Mathf.sign(endY - startY)));
             }
+        }
+        return points;
+    }
+
+    public static Seq<Point2> upgradeLine(int startX, int startY, int endX, int endY){
+        Pools.freeAll(points);
+        points.clear();
+        Building building = world.tile(startX, startY).build;
+        points.add(Pools.obtain(Point2.class, Point2::new).set(startX, startY));
+        while((building.tile.x != endX || building.tile.y != endY)){
+            ChainedBuilding chained = (ChainedBuilding)building;
+            if(chained.next() == null) return pathfindLine(true, startX, startY, endX, endY);
+            building = chained.next();
+            points.add(Pools.obtain(Point2.class, Point2::new).set(building.tile.x, building.tile.y));
         }
         return points;
     }

@@ -32,6 +32,7 @@ import mindustry.ui.fragments.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
+import mindustry.world.blocks.distribution.ChainedBuilding;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -1161,7 +1162,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(diagonal){
-            points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
+            Tile start = world.tile(startX, startY);
+            Tile end = world.tile(endX, endY);
+            if(block != null && block instanceof Autotiler
+                    && start.build instanceof ChainedBuilding && end.build instanceof ChainedBuilding
+                    && block.canReplace(end.build.block) && block.canReplace(start.build.block)){
+                points = Placement.upgradeLine(startX, startY, endX, endY);
+            }else{
+                points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
+            }
         }else{
             points = Placement.normalizeLine(startX, startY, endX, endY);
         }
