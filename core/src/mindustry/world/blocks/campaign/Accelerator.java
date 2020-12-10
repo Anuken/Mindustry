@@ -43,7 +43,12 @@ public class Accelerator extends Block{
         consumes.items(launching.requirements);
         super.init();
     }
-
+    
+    @Override
+    public boolean outputsItems(){
+        return false;
+    }
+    
     public class AcceleratorBuild extends Building{
 
         @Override
