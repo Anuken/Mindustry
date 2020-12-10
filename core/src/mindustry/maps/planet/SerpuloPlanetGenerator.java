@@ -23,7 +23,6 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     float scl = 5f;
     float waterOffset = 0.07f;
 
-    //TODO fix sand near snow (sector 173)
     Block[][] arr =
     {
     {Blocks.water, Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.darksand, Blocks.darksand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.darksandTaintedWater, Blocks.stone, Blocks.stone},
@@ -54,7 +53,6 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     );
 
     float water = 2f / arr[0].length;
-
 
     float rawHeight(Vec3 position){
         position = Tmp.v33.set(position).scl(scl);
