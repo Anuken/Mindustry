@@ -335,8 +335,6 @@ public class Control implements ApplicationListener, Loadable{
                         state.wave = 1;
                         //set up default wave time
                         state.wavetime = state.rules.waveSpacing * 2f;
-                        //slightly increase wave spacing as a handicap
-                        state.rules.waveSpacing += 60f * 10;
                         //reset captured state
                         sector.info.wasCaptured = false;
                         //re-enable waves

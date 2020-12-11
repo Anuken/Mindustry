@@ -918,6 +918,7 @@ public class UnitTypes implements ContentList{
             range = 140f;
             targetAir = false;
             commandLimit = 4;
+            circleTarget = true;
 
             weapons.add(new Weapon(){{
                 y = 0f;
@@ -950,6 +951,7 @@ public class UnitTypes implements ContentList{
             armor = 3f;
             targetFlag = BlockFlag.factory;
             commandLimit = 5;
+            circleTarget = true;
 
             weapons.add(new Weapon(){{
                 minShootVelocity = 0.75f;
