@@ -231,6 +231,6 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
         return weapon.bullet.create(this, team(),
         x + Angles.trnsx(angle, 0, xr),
         y + Angles.trnsy(angle, 0, xr),
-        angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd), lifescl);
+        angle, 1f + Mathf.range(weapon.velocityRnd), lifescl);
     }
 }
