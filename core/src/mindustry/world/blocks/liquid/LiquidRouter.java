@@ -30,6 +30,6 @@ public class LiquidRouter extends LiquidBlock{
     @Override
     public boolean canReplace(Block other){
         if(other.alwaysReplace) return true;
-        return (other != this) && this.group != BlockGroup.none && other.group == this.group && other != this && other instanceof Conduit;
+        return this.group != BlockGroup.none && other.group == this.group && other instanceof Conduit;
     }
 }
