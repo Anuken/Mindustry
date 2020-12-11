@@ -32,6 +32,8 @@ public class Weapon{
     public boolean continuous;
     /** rotation speed of weapon when rotation is enabled, in degrees/t*/
     public float rotateSpeed = 20f;
+    /** rotation speed of weapon when rotation is enabled, in degrees/t*/
+    public float rotateLimit = 0f;
     /** weapon reload in frames */
     public float reload;
     /** amount of shots per fire */
