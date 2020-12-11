@@ -12,5 +12,6 @@ class GroupDefs<G>{
     @GroupDef(value = Syncc.class, mapping = true) G sync;
     @GroupDef(value = Drawc.class) G draw;
     @GroupDef(value = Firec.class) G fire;
+    @GroupDef(value = Puddlec.class) G puddle;
     @GroupDef(value = WeatherStatec.class) G weather;
 }

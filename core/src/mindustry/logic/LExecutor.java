@@ -97,28 +97,33 @@ public class LExecutor{
 
     //region utility
 
+    public Var var(int index){
+        //global constants have variable IDs < 0, and they are fetched from the global constants object after being negated
+        return index < 0 ? constants.get(-index) : vars[index];
+    }
+
     public @Nullable Building building(int index){
-        Object o = vars[index].objval;
-        return vars[index].isobj && o instanceof Building building ? building : null;
+        Object o = var(index).objval;
+        return var(index).isobj && o instanceof Building building ? building : null;
     }
 
     public @Nullable Object obj(int index){
-        Object o = vars[index].objval;
-        return vars[index].isobj ? o : null;
+        Object o = var(index).objval;
+        return var(index).isobj ? o : null;
     }
 
     public boolean bool(int index){
-        Var v = vars[index];
+        Var v = var(index);
         return v.isobj ? v.objval != null : Math.abs(v.numval) >= 0.00001;
     }
 
     public double num(int index){
-        Var v = vars[index];
+        Var v = var(index);
         return v.isobj ? v.objval != null ? 1 : 0 : Double.isNaN(v.numval) || Double.isInfinite(v.numval) ? 0 : v.numval;
     }
 
     public float numf(int index){
-        Var v = vars[index];
+        Var v = var(index);
         return v.isobj ? v.objval != null ? 1 : 0 : Double.isNaN(v.numval) || Double.isInfinite(v.numval) ? 0 : (float)v.numval;
     }
 
@@ -131,7 +136,7 @@ public class LExecutor{
     }
 
     public void setnum(int index, double value){
-        Var v = vars[index];
+        Var v = var(index);
         if(v.constant) return;
         v.numval = Double.isNaN(value) || Double.isInfinite(value) ? 0 : value;
         v.objval = null;
@@ -139,20 +144,21 @@ public class LExecutor{
     }
 
     public void setobj(int index, Object value){
-        Var v = vars[index];
+        Var v = var(index);
         if(v.constant) return;
         v.objval = value;
         v.isobj = true;
     }
 
     public void setconst(int index, Object value){
-        Var v = vars[index];
+        Var v = var(index);
         v.objval = value;
         v.isobj = true;
     }
 
     //endregion
 
+    /** A logic variable. */
     public static class Var{
         public final String name;
 
@@ -285,6 +291,8 @@ public class LExecutor{
                     exec.setnum(outX, cache.x);
                     exec.setnum(outY, cache.y);
                 }
+            }else{
+                exec.setbool(outFound, false);
             }
         }
 
@@ -321,13 +329,8 @@ public class LExecutor{
                     ((LogicAI)unit.controller()).controller = exec.building(varThis);
 
                     //clear old state
-                    if(unit instanceof Minerc miner){
-                        miner.mineTile(null);
-                    }
-
-                    if(unit instanceof Builderc builder){
-                        builder.clearBuilding();
-                    }
+                    unit.mineTile = null;
+                    unit.clearBuilding();
 
                     return (LogicAI)unit.controller();
                 }
@@ -357,12 +360,8 @@ public class LExecutor{
 
                         //stop mining/building
                         if(type == LUnitControl.stop){
-                            if(unit instanceof Minerc miner){
-                                miner.mineTile(null);
-                            }
-                            if(unit instanceof Builderc build){
-                                build.clearBuilding();
-                            }
+                            unit.mineTile = null;
+                            unit.clearBuilding();
                         }
                     }
                     case within -> {
@@ -390,8 +389,8 @@ public class LExecutor{
                     }
                     case mine -> {
                         Tile tile = world.tileWorld(x1, y1);
-                        if(unit instanceof Minerc miner){
-                            miner.mineTile(miner.validMine(tile) ? tile : null);
+                        if(unit.canMine()){
+                            unit.mineTile = unit.validMine(tile) ? tile : null;
                         }
                     }
                     case payDrop -> {
@@ -432,12 +431,12 @@ public class LExecutor{
                         }
                     }
                     case build -> {
-                        if(unit instanceof Builderc builder && exec.obj(p3) instanceof Block block){
+                        if(unit.canBuild() && exec.obj(p3) instanceof Block block){
                             int x = World.toTile(x1), y = World.toTile(y1);
                             int rot = exec.numi(p4);
 
                             //reset state of last request when necessary
-                            if(ai.plan.x != x || ai.plan.y != y || ai.plan.block != block || builder.plans().isEmpty()){
+                            if(ai.plan.x != x || ai.plan.y != y || ai.plan.block != block || unit.plans.isEmpty()){
                                 ai.plan.progress = 0;
                                 ai.plan.initialized = false;
                                 ai.plan.stuck = false;
@@ -446,11 +445,11 @@ public class LExecutor{
                             ai.plan.set(x, y, rot, block);
                             ai.plan.config = exec.obj(p5) instanceof Content c ? c : null;
 
-                            builder.clearBuilding();
+                            unit.clearBuilding();
 
                             if(ai.plan.tile() != null){
-                                builder.updateBuilding(true);
-                                builder.addBuild(ai.plan);
+                                unit.updateBuilding = true;
+                                unit.addBuild(ai.plan);
                             }
                         }
                     }
@@ -742,8 +741,8 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            Var v = exec.vars[to];
-            Var f = exec.vars[from];
+            Var v = exec.var(to);
+            Var f = exec.var(from);
 
             //TODO error out when the from-value is a constant
             if(!v.constant){
@@ -776,8 +775,8 @@ public class LExecutor{
             if(op.unary){
                 exec.setnum(dest, op.function1.get(exec.num(a)));
             }else{
-                Var va = exec.vars[a];
-                Var vb = exec.vars[b];
+                Var va = exec.var(a);
+                Var vb = exec.var(b);
 
                 if(op.objFunction2 != null && (va.isobj || vb.isobj)){
                     //use object function if provided, and one of the variables is an object
@@ -795,7 +794,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            exec.vars[varCounter].numval = exec.instructions.length;
+            exec.var(varCounter).numval = exec.instructions.length;
         }
     }
 
@@ -883,7 +882,7 @@ public class LExecutor{
             if(exec.textBuffer.length() >= maxTextBuffer) return;
 
             //this should avoid any garbage allocation
-            Var v = exec.vars[value];
+            Var v = exec.var(value);
             if(v.isobj && value != 0){
                 String strValue =
                     v.objval == null ? "null" :
@@ -947,8 +946,8 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             if(address != -1){
-                Var va = exec.vars[value];
-                Var vb = exec.vars[compare];
+                Var va = exec.var(value);
+                Var vb = exec.var(compare);
                 boolean cmp;
 
                 if(op.objFunction != null && (va.isobj || vb.isobj)){
@@ -959,7 +958,7 @@ public class LExecutor{
                 }
 
                 if(cmp){
-                    exec.vars[varCounter].numval = address;
+                    exec.var(varCounter).numval = address;
                 }
             }
         }

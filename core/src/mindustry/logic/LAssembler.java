@@ -4,16 +4,14 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.logic.LStatements.*;
-import mindustry.type.*;
-import mindustry.world.*;
 
 /** "Compiles" a sequence of statements into instructions. */
 public class LAssembler{
     public static ObjectMap<String, Func<String[], LStatement>> customParsers = new ObjectMap<>();
+    public static final int maxTokenLength = 36;
 
     private int lastVar;
     /** Maps names to variable IDs. */
@@ -30,42 +28,6 @@ public class LAssembler{
         putConst("@unit", null);
         //reference to self
         putConst("@this", null);
-
-        //add default constants
-        putConst("false", 0);
-        putConst("true", 1);
-        putConst("null", null);
-
-        //store base content (TODO hacky?)
-
-        for(Item item : Vars.content.items()){
-            putConst("@" + item.name, item);
-        }
-
-        for(Liquid liquid : Vars.content.liquids()){
-            putConst("@" + liquid.name, liquid);
-        }
-
-        for(Block block : Vars.content.blocks()){
-            if(block.synthetic()){
-                putConst("@" + block.name, block);
-            }
-        }
-
-        //used as a special value for any environmental solid block
-        putConst("@solid", Blocks.stoneWall);
-
-        putConst("@air", Blocks.air);
-
-        for(UnitType type : Vars.content.units()){
-            putConst("@" + type.name, type);
-        }
-
-        //store sensor constants
-
-        for(LAccess sensor : LAccess.all){
-            putConst("@" + sensor.name(), sensor);
-        }
     }
 
     public static LAssembler assemble(String data, int maxInstructions){
@@ -122,7 +84,7 @@ public class LAssembler{
                         if(c == '"'){
                             inString = !inString;
                         }else if(c == ' ' && !inString){
-                            tokens.add(line.substring(lastIdx, i));
+                            tokens.add(line.substring(lastIdx, Math.min(i, lastIdx + maxTokenLength)));
                             lastIdx = i + 1;
                         }
                     }
@@ -184,6 +146,12 @@ public class LAssembler{
     /** @return a variable ID by name.
      * This may be a constant variable referring to a number or object. */
     public int var(String symbol){
+        int constId = Vars.constants.get(symbol);
+        if(constId > 0){
+            //global constants are *negated* and stored separately
+            return -constId;
+        }
+
         symbol = symbol.trim();
 
         //string case

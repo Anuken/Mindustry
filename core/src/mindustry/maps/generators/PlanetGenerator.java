@@ -11,6 +11,7 @@ import mindustry.world.*;
 public abstract class PlanetGenerator extends BasicGenerator implements HexMesher{
     protected IntSeq ints = new IntSeq();
     protected Sector sector;
+    protected Simplex noise = new Simplex();
 
     /** Should generate sector bases for a planet. */
     public void generateSector(Sector sector){
@@ -44,6 +45,12 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
 
     protected void genTile(Vec3 position, TileGen tile){
 
+    }
+
+    @Override
+    protected float noise(float x, float y, double octaves, double falloff, double scl, double mag){
+        Vec3 v = sector.rect.project(x, y);
+        return (float)noise.octaveNoise3D(octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float)mag;
     }
 
     public void generate(Tiles tiles, Sector sec){

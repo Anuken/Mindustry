@@ -32,7 +32,7 @@ allprojects{
 
     ext{
         versionNumber = '6'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'beta'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'release'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
@@ -97,6 +97,17 @@ allprojects{
 
         getPackage = {
             return project.ext.mainClassName.substring(0, project.ext.mainClassName.indexOf("desktop") - 1)
+        }
+
+        findSdkDir = {
+            //null because IntelliJ doesn't get env variables
+            def v = System.getenv("ANDROID_HOME")
+            if(v != null) return v
+            //rootDir is null here, amazing. brilliant.
+            def file = new File("local.properties")
+            if(!file.exists()) file = new File("../local.properties")
+            def props = new Properties().with{p -> p.load(file.newReader()); return p }
+            return props.get("sdk.dir")
         }
 
         generateLocales = {
@@ -242,18 +253,22 @@ project(":ios"){
 
     task incrementConfig{
         def vfile = file('robovm.properties')
+        def bversion = getBuildVersion()
         def props = new Properties()
         if(vfile.exists()){
             props.load(new FileInputStream(vfile))
         }else{
             props['app.id'] = 'io.anuke.mindustry'
-            props['app.version'] = '5.0'
+            props['app.version'] = '6.0'
             props['app.mainclass'] = 'mindustry.IOSLauncher'
             props['app.executable'] = 'IOSLauncher'
             props['app.name'] = 'Mindustry'
         }
         
         props['app.build'] = (!props.containsKey("app.build") ? 40 : props['app.build'].toInteger() + 1) + ""
+        if(bversion != "custom build"){
+            props['app.version'] = versionNumber + "." + bversion + (bversion.contains(".") ? "" : ".0")
+        }
         props.store(vfile.newWriter(), null)
     }
 
@@ -286,9 +301,10 @@ project(":core"){
             def props = loadVersionProps()
             def androidVersion = props['androidBuildCode'].toInteger() - 2
             def loglines = file("../changelog").text.split("\n")
+            def notice = "[This is a truncated changelog, see Github for full notes]"
             def maxLength = 460
 
-            def androidLogList = loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]")}
+            def androidLogList = [notice] + loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]")}
             def result = ""
             androidLogList.forEach{line ->
                 if(result.length() + line.length() + 1 < maxLength){

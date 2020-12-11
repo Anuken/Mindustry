@@ -32,22 +32,28 @@ public class AssetsProcess extends BaseProcessor{
         MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder loadStyles = MethodSpec.methodBuilder("loadStyles").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder icload = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        CodeBlock.Builder ichinit = CodeBlock.builder();
         String resources = rootDirectory + "/core/assets-raw/sprites/ui";
         Jval icons = Jval.read(Fi.get(rootDirectory + "/core/assets-raw/fontgen/config.json").readString());
 
         ObjectMap<String, String> texIcons = new OrderedMap<>();
         PropertiesUtils.load(texIcons, Fi.get(rootDirectory + "/core/assets/icons/icons.properties").reader());
 
+        StringBuilder iconcAll = new StringBuilder();
+
         texIcons.each((key, val) -> {
             String[] split = val.split("\\|");
             String name = Strings.kebabToCamel(split[1]).replace("Medium", "").replace("Icon", "");
             if(SourceVersion.isKeyword(name) || name.equals("char")) name += "i";
 
-            ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("(char)" + key).build());
+            ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).addJavadoc(String.format("\\u%04x", Integer.parseInt(key))).initializer("'" + ((char)Integer.parseInt(key)) + "'").build());
         });
 
         ictype.addField(FieldSpec.builder(ParameterizedTypeName.get(ObjectMap.class, String.class, TextureRegionDrawable.class),
                 "icons", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("new ObjectMap<>()").build());
+
+        ichtype.addField(FieldSpec.builder(ParameterizedTypeName.get(ObjectIntMap.class, String.class),
+            "codes", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("new ObjectIntMap<>()").build());
 
         ObjectSet<String> used = new ObjectSet<>();
 
@@ -57,7 +63,9 @@ public class AssetsProcess extends BaseProcessor{
             if(!val.getBool("selected", true) || !used.add(name)) continue;
 
             int code = val.getInt("code", 0);
-            ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("(char)" + code).build());
+            iconcAll.append((char)code);
+            ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).addJavadoc(String.format("\\u%04x", code)).initializer("'" + ((char)code) + "'").build());
+            ichinit.addStatement("codes.put($S, $L)", name, code);
 
             ictype.addField(TextureRegionDrawable.class, name + "Small", Modifier.PUBLIC, Modifier.STATIC);
             icload.addStatement(name + "Small = mindustry.ui.Fonts.getGlyph(mindustry.ui.Fonts.def, (char)" + code + ")");
@@ -68,6 +76,9 @@ public class AssetsProcess extends BaseProcessor{
             icload.addStatement("icons.put($S, " + name + ")", name);
             icload.addStatement("icons.put($S, " + name + "Small)", name + "Small");
         }
+
+        ichtype.addField(FieldSpec.builder(String.class, "all", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("$S", iconcAll.toString()).build());
+        ichtype.addStaticBlock(ichinit.build());
 
         Fi.get(resources).walk(p -> {
             if(!p.extEquals("png")) return;

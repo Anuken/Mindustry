@@ -37,6 +37,7 @@ public class PlanetRenderer implements Disposable{
     public final VertexBatch3D batch = new VertexBatch3D(20000, false, true, 0);
 
     public float zoom = 1f;
+    public float orbitAlpha = 1f;
 
     private final Mesh[] outlines = new Mesh[10];
     public final PlaneBatch3D projector = new PlaneBatch3D();
@@ -57,6 +58,7 @@ public class PlanetRenderer implements Disposable{
         camPos.set(0, 0f, camLength);
         projector.setScaling(1f / 150f);
         cam.fov = 60f;
+        cam.far = 150f;
     }
 
     /** Render the entire planet scene to the screen. */
@@ -93,6 +95,8 @@ public class PlanetRenderer implements Disposable{
 
         renderPlanet(solarSystem);
 
+        renderTransparent(solarSystem);
+
         endBloom();
 
         Events.fire(Trigger.universeDrawEnd);
@@ -125,11 +129,21 @@ public class PlanetRenderer implements Disposable{
 
         renderOrbit(planet);
 
+        for(Planet child : planet.children){
+            renderPlanet(child);
+        }
+    }
+
+    public void renderTransparent(Planet planet){
+        if(!planet.visible()) return;
+
         if(planet.isLandable() && planet == this.planet){
             renderSectors(planet);
         }
 
         if(planet.parent != null && planet.hasAtmosphere && Core.settings.getBool("atmosphere")){
+            Gl.depthMask(false);
+
             Blending.additive.apply();
 
             Shaders.atmosphere.camera = cam;
@@ -140,10 +154,12 @@ public class PlanetRenderer implements Disposable{
             atmosphere.render(Shaders.atmosphere, Gl.triangles);
 
             Blending.normal.apply();
+
+            Gl.depthMask(true);
         }
 
         for(Planet child : planet.children){
-            renderPlanet(child);
+            renderTransparent(child);
         }
     }
 
@@ -152,8 +168,8 @@ public class PlanetRenderer implements Disposable{
 
         Vec3 center = planet.parent.position;
         float radius = planet.orbitRadius;
-        int points = (int)(radius * 50);
-        Angles.circleVectors(points, radius, (cx, cy) -> batch.vertex(Tmp.v32.set(center).add(cx, 0, cy), Pal.gray));
+        int points = (int)(radius * 10);
+        Angles.circleVectors(points, radius, (cx, cy) -> batch.vertex(Tmp.v32.set(center).add(cx, 0, cy), Pal.gray.write(Tmp.c1).a(orbitAlpha)));
         batch.flush(Gl.lineLoop);
     }
 
@@ -193,7 +209,7 @@ public class PlanetRenderer implements Disposable{
 
         for(int i = 0; i < pointCount + 1; i++){
             float f = i / (float)pointCount;
-            Tmp.c1.set(from).lerp(to, (f+Time.globalTime()/timeScale)%1f);
+            Tmp.c1.set(from).lerp(to, (f+ Time.globalTime /timeScale)%1f);
             batch.color(Tmp.c1);
             batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f));
 
@@ -202,7 +218,7 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void drawBorders(Sector sector, Color base){
-        Color color = Tmp.c1.set(base).a(base.a + 0.3f + Mathf.absin(Time.globalTime(), 5f, 0.3f));
+        Color color = Tmp.c1.set(base).a(base.a + 0.3f + Mathf.absin(Time.globalTime, 5f, 0.3f));
 
         float r1 = 1f;
         float r2 = outlineRad + 0.001f;

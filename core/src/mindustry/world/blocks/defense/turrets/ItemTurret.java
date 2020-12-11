@@ -46,7 +46,7 @@ public class ItemTurret extends Turret{
             public void build(Building tile, Table table){
                 MultiReqImage image = new MultiReqImage();
                 content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
-                () -> tile != null && !((ItemTurretBuild)tile).ammo.isEmpty() && ((ItemEntry)((ItemTurretBuild)tile).ammo.peek()).item == item)));
+                () -> tile instanceof ItemTurretBuild it && !it.ammo.isEmpty() && ((ItemEntry)it.ammo.peek()).item == item)));
 
                 table.add(image).size(8 * 4);
             }
@@ -54,7 +54,7 @@ public class ItemTurret extends Turret{
             @Override
             public boolean valid(Building entity){
                 //valid when there's any ammo in the turret
-                return !((ItemTurretBuild)entity).ammo.isEmpty();
+                return entity instanceof ItemTurretBuild it && !it.ammo.isEmpty();
             }
 
             @Override
@@ -139,11 +139,6 @@ public class ItemTurret extends Turret{
 
             //must not be found
             ammo.add(new ItemEntry(item, (int)type.ammoMultiplier));
-
-            //fire events for the tutorial
-            if(state.rules.tutorial){
-                Events.fire(new TurretAmmoDeliverEvent());
-            }
         }
 
         @Override

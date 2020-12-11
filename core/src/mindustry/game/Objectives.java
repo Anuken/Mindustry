@@ -48,7 +48,8 @@ public class Objectives{
         }
     }
 
-    public static class SectorComplete extends SectorObjective{
+    public static class SectorComplete implements Objective{
+        public SectorPreset preset;
 
         public SectorComplete(SectorPreset zone){
             this.preset = zone;
@@ -58,18 +59,13 @@ public class Objectives{
 
         @Override
         public boolean complete(){
-            return preset.sector.save != null && !preset.sector.isAttacked() && preset.sector.hasBase();
+            return preset.sector.save != null && (!preset.sector.isAttacked() || preset.sector.info.wasCaptured) && preset.sector.hasBase();
         }
 
         @Override
         public String display(){
             return Core.bundle.format("requirement.capture", preset.localizedName);
         }
-    }
-
-    //TODO merge
-    public abstract static class SectorObjective implements Objective{
-        public SectorPreset preset;
     }
 
     /** Defines a specific objective for a game. */
@@ -85,10 +81,6 @@ public class Objectives{
         /** Build a display for this zone requirement.*/
         default void build(Table table){
 
-        }
-
-        default SectorPreset zone(){
-            return this instanceof SectorObjective ? ((SectorObjective)this).preset : null;
         }
     }
 }

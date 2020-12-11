@@ -80,7 +80,7 @@ public class UnitType extends UnlockableContent{
     public int ammoCapacity = -1;
     public AmmoType ammoType = AmmoTypes.copper;
     public int mineTier = -1;
-    public float buildSpeed = 1f, mineSpeed = 1f;
+    public float buildSpeed = -1f, mineSpeed = 1f;
     public Sound mineSound = Sounds.minebeam;
     public float mineSoundVolume = 0.6f;
 
@@ -108,6 +108,8 @@ public class UnitType extends UnlockableContent{
     public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion,
         occlusionRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion;
     public TextureRegion[] wreckRegions;
+
+    protected @Nullable ItemStack[] cachedRequirements;
 
     public UnitType(String name){
         super(name);
@@ -193,6 +195,10 @@ public class UnitType extends UnlockableContent{
                 }
             }
         }
+
+        for(ItemStack stack : researchRequirements()){
+            cons.get(stack.item);
+        }
     }
 
     @Override
@@ -225,7 +231,7 @@ public class UnitType extends UnlockableContent{
             stats.addPercent(Stat.mineSpeed, mineSpeed);
             stats.add(Stat.mineTier, new BlockFilterValue(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= mineTier && !f.playerUnmineable));
         }
-        if(inst instanceof Builderc){
+        if(buildSpeed > 0){
             stats.addPercent(Stat.buildSpeed, buildSpeed);
         }
         if(inst instanceof Payloadc){
@@ -328,7 +334,7 @@ public class UnitType extends UnlockableContent{
             //suicide enemy
             if(weapons.contains(w -> w.bullet.killShooter)){
                 //scale down DPS to be insignificant
-                dpsEstimate /= 20f;
+                dpsEstimate /= 25f;
             }
         }
     }
@@ -357,6 +363,10 @@ public class UnitType extends UnlockableContent{
 
     @Override
     public ItemStack[] researchRequirements(){
+        if(cachedRequirements != null){
+            return cachedRequirements;
+        }
+
         ItemStack[] stacks = null;
 
         //calculate costs based on reconstructors or factories found
@@ -376,6 +386,8 @@ public class UnitType extends UnlockableContent{
             for(int i = 0; i < out.length; i++){
                 out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(Math.pow(stacks[i].amount, 1.1) * 50)));
             }
+
+            cachedRequirements = out;
 
             return out;
         }
@@ -502,9 +514,9 @@ public class UnitType extends UnlockableContent{
 
         //draw back items
         if(unit.item() != null && unit.itemTime > 0.01f){
-            float size = (itemSize + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime;
+            float size = (itemSize + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime;
 
-            Draw.mixcol(Pal.accent, Mathf.absin(Time.time(), 5f, 0.5f));
+            Draw.mixcol(Pal.accent, Mathf.absin(Time.time, 5f, 0.5f));
             Draw.rect(unit.item().icon(Cicon.medium),
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
@@ -516,7 +528,7 @@ public class UnitType extends UnlockableContent{
             Lines.circle(
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
-            (3f + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime);
+            (3f + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime);
 
             if(unit.isLocal() && !renderer.pixelator.enabled()){
                 Fonts.outline.draw(unit.stack.amount + "",
@@ -538,20 +550,20 @@ public class UnitType extends UnlockableContent{
 
         if(unit instanceof Trailc){
             Trail trail = ((Trailc)unit).trail();
-            trail.draw(unit.team.color, (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f) * scale) * trailScl);
+            trail.draw(unit.team.color, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * scale) * trailScl);
         }
 
         Draw.color(unit.team.color);
         Fill.circle(
             unit.x + Angles.trnsx(unit.rotation + 180, offset),
             unit.y + Angles.trnsy(unit.rotation + 180, offset),
-            (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f)) * scale
+            (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) * scale
         );
         Draw.color(Color.white);
         Fill.circle(
             unit.x + Angles.trnsx(unit.rotation + 180, offset - 1f),
             unit.y + Angles.trnsy(unit.rotation + 180, offset - 1f),
-            (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f)) / 2f  * scale
+            (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) / 2f  * scale
         );
         Draw.color();
     }
@@ -632,7 +644,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public Color cellColor(Unit unit){
-        return Tmp.c1.set(Color.black).lerp(unit.team.color, unit.healthf() + Mathf.absin(Time.time(), Math.max(unit.healthf() * 5f, 1f), 1f - unit.healthf()));
+        return Tmp.c1.set(Color.black).lerp(unit.team.color, unit.healthf() + Mathf.absin(Time.time, Math.max(unit.healthf() * 5f, 1f), 1f - unit.healthf()));
     }
 
     public void drawLight(Unit unit){

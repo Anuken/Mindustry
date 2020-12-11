@@ -30,15 +30,15 @@ public class ContinuousLaserBulletType extends BulletType{
         hitSize = 4;
         drawSize = 420f;
         lifetime = 16f;
-        keepVelocity = false;
-        pierce = true;
-        hittable = false;
         hitColor = colors[2];
-        collidesTiles = false;
         incendAmount = 1;
         incendSpread = 5;
         incendChance = 0.4f;
         lightColor = Color.orange;
+        keepVelocity = false;
+        collides = false;
+        pierce = true;
+        hittable = false;
         absorbable = false;
     }
 
@@ -49,7 +49,8 @@ public class ContinuousLaserBulletType extends BulletType{
     @Override
     public float estimateDPS(){
         //assume firing duration is about 100 by default, may not be accurate there's no way of knowing in this method
-        return damage * 100f / 5f;
+        //assume it pierces 3 blocks/units
+        return damage * 100f / 5f * 3f;
     }
 
     @Override
@@ -85,10 +86,10 @@ public class ContinuousLaserBulletType extends BulletType{
 
         Lines.lineAngle(b.x, b.y, b.rotation(), baseLen);
         for(int s = 0; s < colors.length; s++){
-            Draw.color(Tmp.c1.set(colors[s]).mul(1f + Mathf.absin(Time.time(), 1f, 0.1f)));
+            Draw.color(Tmp.c1.set(colors[s]).mul(1f + Mathf.absin(Time.time, 1f, 0.1f)));
             for(int i = 0; i < tscales.length; i++){
                 Tmp.v1.trns(b.rotation() + 180f, (lenscales[i] - 1f) * spaceMag);
-                Lines.stroke((width + Mathf.absin(Time.time(), oscScl, oscMag)) * fout * strokes[s] * tscales[i]);
+                Lines.stroke((width + Mathf.absin(Time.time, oscScl, oscMag)) * fout * strokes[s] * tscales[i]);
                 Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation(), baseLen * lenscales[i], false);
             }
         }

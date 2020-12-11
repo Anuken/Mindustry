@@ -23,25 +23,27 @@ public class LaserBulletType extends BulletType{
     public LaserBulletType(float damage){
         super(0.01f, damage);
 
-        keepVelocity = false;
         hitEffect = Fx.hitLancer;
         despawnEffect = Fx.none;
         shootEffect = Fx.hitLancer;
         smokeEffect = Fx.none;
-        collides = false;
         hitSize = 4;
         lifetime = 16f;
+        keepVelocity = false;
+        collides = false;
         pierce = true;
         hittable = false;
+        absorbable = false;
     }
 
     public LaserBulletType(){
         this(1f);
     }
 
+    //assume it pierces at least 3 blocks
     @Override
     public float estimateDPS(){
-        return super.estimateDPS() * 2f;
+        return super.estimateDPS() * 3f;
     }
 
     @Override

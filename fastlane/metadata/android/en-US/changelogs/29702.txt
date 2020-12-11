@@ -1,0 +1,10 @@
+- Sound fixes for various platforms
+- Added a few new sound effects
+- Added stats for unit weapons (Contributed by @genNAowl)
+- Logic: Added logical AND operation
+- Disabled automatic targeting of derelict structures
+- Campaign: Many various bugfixes
+- Campaign: Added random water pool generation
+- Campaign: Added more preset sectors
+- Campaign: Removed item/liquid research costs, items are now discovered upon production
+- Campaign: More scrap generation

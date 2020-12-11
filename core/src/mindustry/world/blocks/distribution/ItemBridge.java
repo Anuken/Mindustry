@@ -93,7 +93,7 @@ public class ItemBridge extends Block{
         Draw.reset();
         Draw.color(Pal.placing);
         Lines.stroke(1f);
-        if(link != null){
+        if(link != null && Math.abs(link.x - x) + Math.abs(link.y - y) > 1){
             int rot = link.absoluteRelativeTo(x, y);
             float w = (link.x == x ? tilesize : Math.abs(link.x - x) * tilesize - tilesize);
             float h = (link.y == y ? tilesize : Math.abs(link.y - y) * tilesize - tilesize);
@@ -120,7 +120,7 @@ public class ItemBridge extends Block{
 
         return ((other.block() == tile.block() && tile.block() == this) || (!(tile.block() instanceof ItemBridge) && other.block() == this))
             && (other.team() == tile.team() || tile.block() != this)
-            && (!checkDouble || other.<ItemBridgeBuild>bc().link != tile.pos());
+            && (!checkDouble || ((ItemBridgeBuild)other.build).link != tile.pos());
     }
 
     public Tile findLink(int x, int y){
@@ -145,7 +145,7 @@ public class ItemBridge extends Block{
             if(config != null) return;
 
             Tile link = findLink(tile.x, tile.y);
-            if(linkValid(tile, link)){
+            if(linkValid(tile, link) && !proximity.contains(link.build)){
                 link.build.configure(tile.pos());
             }
 
@@ -170,7 +170,7 @@ public class ItemBridge extends Block{
             Tmp.v2.trns(tile.angleTo(other), 2f);
             float tx = tile.drawx(), ty = tile.drawy();
             float ox = other.drawx(), oy = other.drawy();
-            float alpha = Math.abs((linked ? 100 : 0)-(Time.time() * 2f) % 100f) / 100f;
+            float alpha = Math.abs((linked ? 100 : 0)-(Time.time * 2f) % 100f) / 100f;
             float x = Mathf.lerp(ox, tx, alpha);
             float y = Mathf.lerp(oy, ty, alpha);
 
@@ -207,7 +207,7 @@ public class ItemBridge extends Block{
                         boolean linked = other.pos() == link;
 
                         Drawf.select(other.drawx(), other.drawy(),
-                            other.block().size * tilesize / 2f + 2f + (linked ? 0f : Mathf.absin(Time.time(), 4f, 1f)), linked ? Pal.place : Pal.breakInvalid);
+                            other.block().size * tilesize / 2f + 2f + (linked ? 0f : Mathf.absin(Time.time, 4f, 1f)), linked ? Pal.place : Pal.breakInvalid);
                     }
                 }
             }
@@ -238,7 +238,7 @@ public class ItemBridge extends Block{
             while(it.hasNext){
                 int i = it.next();
                 Tile other = world.tile(i);
-                if(!linkValid(tile, other, false) || other.<ItemBridgeBuild>bc().link != tile.pos()){
+                if(!linkValid(tile, other, false) || ((ItemBridgeBuild)other.build).link != tile.pos()){
                     it.remove();
                 }
             }
@@ -298,7 +298,7 @@ public class ItemBridge extends Block{
 
             int i = relativeTo(other.x, other.y);
 
-            Draw.color(Color.white, Color.black, Mathf.absin(Time.time(), 6f, 0.07f));
+            Draw.color(Color.white, Color.black, Mathf.absin(Time.time, 6f, 0.07f));
             Draw.alpha(Math.max(uptime, 0.25f) * opacity);
 
             Draw.rect(endRegion, x, y, i * 90 + 90);

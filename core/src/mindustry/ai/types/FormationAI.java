@@ -37,7 +37,6 @@ public class FormationAI extends AIController implements FormationMember{
         }
 
         unit.controlWeapons(true, leader.isShooting);
-        // unit.moveAt(Tmp.v1.set(deltaX, deltaY).limit(unit.type().speed));
 
         unit.aim(leader.aimX(), leader.aimY());
 
@@ -47,39 +46,32 @@ public class FormationAI extends AIController implements FormationMember{
             unit.lookAt(unit.vel.angle());
         }
 
-        Vec2 realtarget = vec.set(target);
+        Vec2 realtarget = vec.set(target).add(leader.vel.x, leader.vel.y);
 
-        float margin = 4f;
+        float speed = unit.realSpeed() * unit.floorSpeedMultiplier();
+        unit.approach(Mathf.arrive(unit.x, unit.y, realtarget.x, realtarget.y, unit.vel, 0f, 0.01f, speed, 1f));
 
-        float speed = unit.realSpeed();
-
-        if(unit.dst(realtarget) <= margin){
-            //unit.vel.approachDelta(Vec2.ZERO, speed * type.accel / 2f);
-        }else{
-            unit.moveAt(realtarget.sub(unit).limit(speed));
-        }
-
-        if(unit instanceof Minerc mine && leader instanceof Minerc com){
-            if(com.mineTile() != null && mine.validMine(com.mineTile())){
-                mine.mineTile(com.mineTile());
+        if(unit.canMine() && leader.canMine()){
+            if(leader.mineTile != null && unit.validMine(leader.mineTile)){
+                unit.mineTile(leader.mineTile);
 
                 CoreBuild core = unit.team.core();
 
-                if(core != null && com.mineTile().drop() != null && unit.within(core, unit.type.range) && !unit.acceptsItem(com.mineTile().drop())){
+                if(core != null && leader.mineTile.drop() != null && unit.within(core, unit.type.range) && !unit.acceptsItem(leader.mineTile.drop())){
                     if(core.acceptStack(unit.stack.item, unit.stack.amount, unit) > 0){
-                        Call.transferItemTo(unit.stack.item, unit.stack.amount, unit.x, unit.y, core);
+                        Call.transferItemTo(unit, unit.stack.item, unit.stack.amount, unit.x, unit.y, core);
 
                         unit.clearItem();
                     }
                 }
             }else{
-                mine.mineTile(null);
+                unit.mineTile(null);
             }
         }
 
-        if(unit instanceof Builderc build && leader instanceof Builderc com && com.activelyBuilding()){
-            build.clearBuilding();
-            build.addBuild(com.buildPlan());
+        if(unit.canBuild() && leader.canBuild() && leader.activelyBuilding()){
+            unit.clearBuilding();
+            unit.addBuild(leader.buildPlan());
         }
     }
 

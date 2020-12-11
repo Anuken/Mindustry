@@ -17,8 +17,12 @@ public class LiquidConverter extends GenericCrafter{
 
     @Override
     public void init(){
-        ConsumeLiquidBase cl = consumes.get(ConsumeType.liquid);
-        cl.update(true);
+        if(!consumes.has(ConsumeType.liquid) || !(consumes.get(ConsumeType.liquid) instanceof ConsumeLiquid)){
+            throw new RuntimeException("LiquidsConverters must have a ConsumeLiquid. Note that filters are not supported.");
+        }
+
+        ConsumeLiquid cl = consumes.get(ConsumeType.liquid);
+        cl.update(false);
         outputLiquid.amount = cl.amount;
         super.init();
     }
@@ -40,10 +44,12 @@ public class LiquidConverter extends GenericCrafter{
 
         @Override
         public void updateTile(){
-            ConsumeLiquidBase cl = consumes.get(ConsumeType.liquid);
+            ConsumeLiquid cl = consumes.get(ConsumeType.liquid);
 
             if(cons.valid()){
                 float use = Math.min(cl.amount * edelta(), liquidCapacity - liquids.get(outputLiquid.liquid));
+
+                liquids.remove(cl.liquid, Math.min(use, liquids.get(cl.liquid)));
 
                 progress += use / cl.amount;
                 liquids.add(outputLiquid.liquid, use);
