@@ -216,14 +216,13 @@ public class ModsDialog extends BaseDialog{
                             }
                         }).growX().right().padRight(-8f).padTop(-8f);
                     }, Styles.clearPartialt, () -> showMod(mod)).size(w, h).growX().pad(4f);
+                    table.row();
                 }).margin(10f).top();
         }else{
             cont.table(Styles.black6, t -> t.add("@mods.none")).height(80f);
         }
 
         cont.row();
-
-
     }
 
     private void reload(){
