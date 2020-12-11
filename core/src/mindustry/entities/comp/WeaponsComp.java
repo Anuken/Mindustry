@@ -149,7 +149,12 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                 float axisX = this.x + Angles.trnsx(this.rotation - 90,  weapon.x, weapon.y),
                     axisY = this.y + Angles.trnsy(this.rotation - 90,  weapon.x, weapon.y);
 
-                mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - this.rotation;
+                if(weapon.rotateLimit > 0){
+                    mount.targetRotation = Mathf.clamp(Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - this.rotation, mount.rotation - weapon.rotateLimit, mount.rotation + weapon.rotateLimit);
+                }
+                else{
+                    mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - this.rotation;
+                }
                 mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, weapon.rotateSpeed * Time.delta);
             }else if(!weapon.rotate){
                 mount.rotation = 0;
