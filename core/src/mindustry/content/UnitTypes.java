@@ -165,6 +165,10 @@ public class UnitTypes implements ContentList{
                 x = 16f;
                 shootY = 8f;
                 reload = 45f;
+                rotate = true;
+                rotateSpeed = 7f;
+                rotateLimit = 30f;
+                shootCone = 3f;
                 recoil = 5f;
                 shake = 2f;
                 ejectEffect = Fx.casing3;
@@ -178,8 +182,9 @@ public class UnitTypes implements ContentList{
                     height = 20f;
                     lifetime = 25f;
                     shootEffect = Fx.shootBig;
-                    lightning = 2;
-                    lightningLength = 6;
+                    lightning = 3;
+                    lightningLength = 4;
+                    lightningLengthRand = 4;
                     lightningColor = Pal.surge;
                     //standard bullet damage is far too much for lightning
                     lightningDamage = 30;
@@ -225,6 +230,10 @@ public class UnitTypes implements ContentList{
                 x = 21.5f;
                 shootY = 11f;
                 reload = 9f;
+                rotate = true;
+                rotateSpeed = 4f;
+                rotateLimit = 30f;
+                shootCone = 3f;
                 recoil = 5f;
                 shake = 2f;
                 ejectEffect = Fx.casing4;
@@ -757,6 +766,7 @@ public class UnitTypes implements ContentList{
                 reload = 45;
                 shake = 3f;
                 rotateSpeed = 2f;
+                rotateLimit = 65f;
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.artillery;
                 rotate = true;
@@ -824,6 +834,7 @@ public class UnitTypes implements ContentList{
                 reload = 30;
                 shake = 4f;
                 rotateSpeed = 2f;
+                rotateLimit = 49f;
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.shootBig;
                 rotate = true;
