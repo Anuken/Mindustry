@@ -50,8 +50,8 @@ public class Weapon{
     public float x = 5f, y = 0f;
     /** random spread on the X axis */
     public float xRand = 0f;
-    /** radius of occlusion drawn under the weapon; <0 to disable */
-    public float occlusion = -1f;
+    /** radius of shadow drawn under the weapon; <0 to disable */
+    public float shadow = -1f;
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;
     /** delay in ticks between shots */

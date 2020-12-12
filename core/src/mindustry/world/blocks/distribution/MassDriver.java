@@ -302,8 +302,7 @@ public class MassDriver extends Block{
 
         protected boolean shooterValid(Tile other){
             if(other == null) return true;
-            if(!(other.block() instanceof MassDriver)) return false;
-            MassDriverBuild entity = other.bc();
+            if(!(other.build instanceof MassDriverBuild entity)) return false;
             return entity.link == tile.pos() && tile.dst(other) <= range;
         }
 

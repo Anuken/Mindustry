@@ -23,7 +23,6 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     float scl = 5f;
     float waterOffset = 0.07f;
 
-    //TODO fix sand near snow (sector 173)
     Block[][] arr =
     {
     {Blocks.water, Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.darksand, Blocks.darksand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.darksandTaintedWater, Blocks.stone, Blocks.stone},
@@ -54,7 +53,6 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     );
 
     float water = 2f / arr[0].length;
-
 
     float rawHeight(Vec3 position){
         position = Tmp.v33.set(position).scl(scl);
@@ -340,11 +338,12 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                 }
             }else if(floor != Blocks.basalt && floor != Blocks.ice && floor.asFloor().hasSurface()){
                 float noise = noise(x + 782, y, 5, 0.75f, 260f, 1f);
-                if(noise > 0.72f){
-                    floor = noise > 0.78f ? Blocks.taintedWater : (floor == Blocks.sand ? Blocks.sandWater : Blocks.darksandTaintedWater);
-                    ore = Blocks.air;
-                }else if(noise > 0.67f){
-                    floor = (floor == Blocks.sand ? floor : Blocks.darksand);
+                if(noise > 0.67f && !enemies.contains(e -> Mathf.within(x, y, e.x, e.y, 8))){
+                    if(noise > 0.72f){
+                        floor = noise > 0.78f ? Blocks.taintedWater : (floor == Blocks.sand ? Blocks.sandWater : Blocks.darksandTaintedWater);
+                    }else{
+                        floor = (floor == Blocks.sand ? floor : Blocks.darksand);
+                    }
                     ore = Blocks.air;
                 }
             }

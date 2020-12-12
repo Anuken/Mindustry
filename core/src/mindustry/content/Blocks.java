@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
+import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -134,7 +135,7 @@ public class Blocks implements ContentList{
 
         //Registers build blocks
         //no reference is needed here since they can be looked up by name later
-        for(int i = 1; i <= ConstructBlock.maxSize; i++){
+        for(int i = 1; i <= Vars.maxBlockSize; i++){
             new ConstructBlock(i);
         }
 
@@ -613,6 +614,7 @@ public class Blocks implements ContentList{
             craftTime = 75f;
             size = 3;
             hasPower = true;
+            itemCapacity = 20;
 
             consumes.power(4f);
             consumes.items(with(Items.copper, 3, Items.lead, 4, Items.titanium, 2, Items.silicon, 3));
@@ -981,7 +983,7 @@ public class Blocks implements ContentList{
         junction = new Junction("junction"){{
             requirements(Category.distribution, with(Items.copper, 2), true);
             speed = 26;
-            capacity = 12;
+            capacity = 9;
             health = 30;
             buildCostMultiplier = 6f;
         }};
@@ -1514,7 +1516,7 @@ public class Blocks implements ContentList{
         }};
 
         lancer = new PowerTurret("lancer"){{
-            requirements(Category.turret, with(Items.copper, 25, Items.lead, 50, Items.silicon, 45));
+            requirements(Category.turret, with(Items.copper, 60, Items.lead, 70, Items.silicon, 50));
             range = 165f;
             chargeTime = 40f;
             chargeMaxDelay = 30f;
@@ -1547,7 +1549,7 @@ public class Blocks implements ContentList{
         }};
 
         arc = new PowerTurret("arc"){{
-            requirements(Category.turret, with(Items.copper, 35, Items.lead, 50));
+            requirements(Category.turret, with(Items.copper, 50, Items.lead, 50));
             shootType = new LightningBulletType(){{
                 damage = 20;
                 lightningLength = 25;
@@ -1601,7 +1603,7 @@ public class Blocks implements ContentList{
         }};
 
         salvo = new ItemTurret("salvo"){{
-            requirements(Category.turret, with(Items.copper, 105, Items.graphite, 95, Items.titanium, 60));
+            requirements(Category.turret, with(Items.copper, 100, Items.graphite, 90, Items.titanium, 60));
             ammo(
             Items.copper, Bullets.standardCopper,
             Items.graphite, Bullets.standardDense,

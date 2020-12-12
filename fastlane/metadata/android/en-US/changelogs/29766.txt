@@ -1,0 +1,9 @@
+[This is a truncated changelog, see Github for full notes]
+- Fixed certain sectors having infinite waves in very specific situations
+- Fixed various crashes
+- Fixed community servers not displaying on Linux
+- Fixed some logic UI bugs
+- Fixed Distort filter not working in map post-generation
+- Fixed clients in multiplayer not getting item unlocks
+- Fixed enemy AI blocking ground unit paths in some circumstances
+- Made night in campaign slightly less dark

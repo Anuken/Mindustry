@@ -154,22 +154,22 @@ public class TechTree implements ContentList{
                         });
 
                         node(kiln, Seq.with(new SectorComplete(craters)), () -> {
-                            node(incinerator, () -> {
-                                node(melter, () -> {
-                                    node(surgeSmelter, () -> {
+                            node(pulverizer, () -> {
+                                node(incinerator, () -> {
+                                    node(melter, () -> {
+                                        node(surgeSmelter, () -> {
 
-                                    });
+                                        });
 
-                                    node(separator, () -> {
-                                        node(pulverizer, () -> {
+                                        node(separator, () -> {
                                             node(disassembler, () -> {
 
                                             });
                                         });
-                                    });
 
-                                    node(cryofluidMixer, () -> {
+                                        node(cryofluidMixer, () -> {
 
+                                        });
                                     });
                                 });
                             });
@@ -462,10 +462,11 @@ public class TechTree implements ContentList{
                                     new Research(conduit),
                                     new Research(wave)
                                 ), () -> {
-                                    //TODO change positions?
                                     node(impact0078, Seq.with(
                                         new SectorComplete(tarFields),
                                         new Research(Items.thorium),
+                                        new Research(lancer),
+                                        new Research(salvo),
                                         new Research(coreFoundation)
                                     ), () -> {
                                         node(desolateRift, Seq.with(

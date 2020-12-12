@@ -1,6 +1,7 @@
 package mindustry.ai.types;
 
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
@@ -67,7 +68,7 @@ public class LogicAI extends AIController{
                 moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
             }
             case approach -> {
-                moveTo(Tmp.v1.set(moveX, moveY), moveRad - 8f, 8f);
+                moveTo(Tmp.v1.set(moveX, moveY), moveRad - 7f, 7);
             }
             case pathfind -> {
                 Building core = unit.closestEnemyCore();
@@ -103,13 +104,31 @@ public class LogicAI extends AIController{
         //look where moving if there's nothing to aim at
         if(!shoot){
             unit.lookAt(unit.prefRotation());
-        }else if(unit.hasWeapons()){ //if there is, look at the object
+        }else if(unit.hasWeapons() && unit.mounts.length > 0){ //if there is, look at the object
             unit.lookAt(unit.mounts[0].aimX, unit.mounts[0].aimY);
         }
     }
 
     public boolean checkTargetTimer(Object radar){
         return radars.add(radar);
+    }
+
+    @Override
+    protected void moveTo(Position target, float circleLength, float smooth){
+        if(target == null) return;
+
+        vec.set(target).sub(unit);
+
+        float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / smooth, -1f, 1f);
+
+        vec.setLength(unit.realSpeed() * length);
+        if(length < -0.5f){
+            vec.rotate(180f);
+        }else if(length < 0){
+            vec.setZero();
+        }
+
+        unit.approach(vec);
     }
 
     //always retarget

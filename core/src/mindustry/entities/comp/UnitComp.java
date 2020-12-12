@@ -38,6 +38,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Import Team team;
     @Import int id;
     @Import @Nullable Tile mineTile;
+    @Import Vec2 vel;
 
     private UnitController controller;
     UnitType type;
@@ -49,6 +50,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
+    }
+
+    public void approach(Vec2 vector){
+        vel.approachDelta(vector, type.accel * realSpeed() * floorSpeedMultiplier());
     }
 
     public void aimLook(Position pos){

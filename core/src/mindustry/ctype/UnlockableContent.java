@@ -6,6 +6,8 @@ import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
+import mindustry.content.TechTree.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -40,6 +42,11 @@ public abstract class UnlockableContent extends MappableContent{
         this.description = Core.bundle.getOrNull(getContentType() + "." + this.name + ".description");
         this.details = Core.bundle.getOrNull(getContentType() + "." + this.name + ".details");
         this.unlocked = Core.settings != null && Core.settings.getBool(this.name + "-unlocked", false);
+    }
+
+    /** @return the tech node for this content. may be null. */
+    public @Nullable TechNode node(){
+        return TechTree.get(this);
     }
 
     public String displayDescription(){
@@ -110,7 +117,7 @@ public abstract class UnlockableContent extends MappableContent{
 
     /** Makes this piece of content unlocked; if it already unlocked, nothing happens. */
     public void unlock(){
-        if(!net.client() && !unlocked()){
+        if(!unlocked && !alwaysUnlocked){
             unlocked = true;
             Core.settings.put(name + "-unlocked", true);
 
@@ -128,7 +135,7 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     public boolean unlocked(){
-        if(net != null && net.client()) return alwaysUnlocked || state.rules.researched.contains(name);
+        if(net != null && net.client()) return unlocked || alwaysUnlocked || state.rules.researched.contains(name);
         return unlocked || alwaysUnlocked;
     }
 

@@ -197,11 +197,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //region utility methods
 
     public void addPlan(boolean checkPrevious){
-        if(!block.rebuildable) return;
+        if(!block.rebuildable || (team == state.rules.defaultTeam && state.isCampaign() && !block.isVisible())) return;
 
         if(self() instanceof ConstructBuild entity){
             //update block to reflect the fact that something was being constructed
-            if(entity.cblock != null && entity.cblock.synthetic()){
+            if(entity.cblock != null && entity.cblock.synthetic() && entity.wasConstructing){
                 block = entity.cblock;
             }else{
                 //otherwise this was a deconstruction that was interrupted, don't want to rebuild that
@@ -1099,8 +1099,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void displayBars(Table table){
         for(Func<Building, Bar> bar : block.bars.list()){
-            table.add(bar.get(self())).growX();
-            table.row();
+            //TODO fix conclusively
+            try{
+                table.add(bar.get(self())).growX();
+                table.row();
+            }catch(ClassCastException e){
+                break;
+            }
         }
     }
 

@@ -6,9 +6,12 @@ import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.scene.style.*;
 import arc.scene.ui.TextButton.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.mod.Mods.*;
@@ -102,13 +105,9 @@ public class ModsDialog extends BaseDialog{
 
                     t.button("@mod.import.github", Icon.github, bstyle, () -> {
                         dialog.hide();
-                        var modString = Core.settings.getString("lastmod", "");
-                        var suggested = Structs.random(suggestedMods);
 
-                        ui.showTextInput("@mod.import.github", "", 64, modString.isEmpty() ? suggested : modString, text -> {
-                            if(!modString.isEmpty() || !Structs.eq(suggested, text)){
-                                Core.settings.put("lastmod", text);
-                            }
+                        ui.showTextInput("@mod.import.github", "", 64, Core.settings.getString("lastmod", ""), text -> {
+                            Core.settings.put("lastmod", text);
 
                             ui.loadfrag.show();
                             //Try to download the 6.0 branch first, but if it doesn't exist, try master.
@@ -266,54 +265,73 @@ public class ModsDialog extends BaseDialog{
                 desc.add("@editor.description").padRight(10).color(Color.gray).top();
                 desc.row();
                 desc.add(mod.meta.description).growX().wrap().padTop(2);
+                desc.row();
             }
 
-            //TODO add this when mods work properly
-            /*
-            Array<UnlockableContent> all = Array.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent).as(UnlockableContent.class);
+        }).width(400f);
+
+        //TODO maybe enable later
+        if(false){
+            Seq<UnlockableContent> all = Seq.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent).as();
             if(all.any()){
-                desc.add("@mod.content").padRight(10).color(Color.gray).top();
-                desc.row();
-                desc.pane(cs -> {
+                dialog.cont.row();
+                dialog.cont.pane(cs -> {
                     int i = 0;
                     for(UnlockableContent c : all){
-                        cs.addImageButton(new TextureRegionDrawable(c.icon(Cicon.medium)), () -> {
+                        cs.button(new TextureRegionDrawable(c.icon(Cicon.medium)), Styles.cleari, Cicon.medium.size, () -> {
                             ui.content.show(c);
+                        }).size(50f).with(im -> {
+                            var click = im.getClickListener();
+                            im.update(() -> im.getImage().color.lerp(!click.isOver() ? Color.lightGray : Color.white, 0.4f * Time.delta));
                         });
 
                         if(++i % 8 == 0) cs.row();
                     }
                 }).growX().minHeight(60f);
-            }*/
-        }).width(400f);
+            }
+        }
+
+
 
         dialog.show();
     }
 
-    private void githubImport(String branch, String repo, Cons<HttpStatus> err){
-        Core.net.httpGet("http://api.github.com/repos/" + repo + "/zipball/" + branch, loc -> {
-            Core.net.httpGet(loc.getHeader("Location"), result -> {
-                if(result.getStatus() != HttpStatus.OK){
-                    err.get(result.getStatus());
-                }else{
-                    try{
-                        Fi file = tmpDirectory.child(repo.replace("/", "") + ".zip");
-                        Streams.copy(result.getResultAsStream(), file.write(false));
-                        mods.importMod(file);
-                        file.delete();
-                        Core.app.post(() -> {
-                            try{
-                                setup();
-                                ui.loadfrag.hide();
-                            }catch(Throwable e){
-                                ui.showException(e);
-                            }
-                        });
-                    }catch(Throwable e){
-                        modError(e);
-                    }
+    private void handleMod(String repo, HttpResponse result){
+        try{
+            Fi file = tmpDirectory.child(repo.replace("/", "") + ".zip");
+            Streams.copy(result.getResultAsStream(), file.write(false));
+            mods.importMod(file);
+            file.delete();
+            Core.app.post(() -> {
+                try{
+                    setup();
+                    ui.loadfrag.hide();
+                }catch(Throwable e){
+                    ui.showException(e);
                 }
-             }, t2 -> Core.app.post(() -> modError(t2)));
+            });
+        }catch(Throwable e){
+            modError(e);
+        }
+    }
+
+    private void githubImport(String branch, String repo, Cons<HttpStatus> err){
+        Core.net.httpGet("https://api.github.com/repos/" + repo + "/zipball/" + branch, loc -> {
+            if(loc.getStatus() == HttpStatus.OK){
+                if(loc.getHeader("Location") != null){
+                    Core.net.httpGet(loc.getHeader("Location"), result -> {
+                        if(result.getStatus() != HttpStatus.OK){
+                            err.get(result.getStatus());
+                        }else{
+                            handleMod(repo, result);
+                        }
+                    }, t2 -> Core.app.post(() -> modError(t2)));
+                }else{
+                    handleMod(repo, loc);
+                }
+            }else{
+                err.get(loc.getStatus());
+            }
          }, t2 -> Core.app.post(() -> modError(t2)));
     }
 }
