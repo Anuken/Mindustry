@@ -120,6 +120,7 @@ public abstract class BulletType extends Content{
     public @Nullable BulletType lightningType = null;
 
     public float weaveScale = 1f;
+    public float weaveSclRnd = 0.1f;
     public float weaveMag = -1f;
     public float hitShake = 0f, despawnShake = 0f;
 
@@ -273,8 +274,8 @@ public abstract class BulletType extends Content{
         }
 
         if(weaveMag > 0){
-            float scl = Mathf.randomSeed(id, 0.9f, 1.1f);
-            b.vel.rotate(Mathf.sin(b.time + Mathf.PI * weaveScale/2f * scl, weaveScale * scl, weaveMag) * Time.delta);
+            float scl = Mathf.randomSeed(b.id, 1f - weaveSclRnd, 1f + weaveSclRnd);
+            b.vel.rotate(Mathf.sin((b.time + Mathf.PI * weaveScale/2f * scl) * Mathf.sign(Mathf.randomSeed(b.id, -1, 1)), weaveScale * scl, weaveMag) * Time.delta);
         }
 
         if(trailChance > 0){
