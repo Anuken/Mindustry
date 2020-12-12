@@ -52,7 +52,7 @@ const cons = method => new Cons(){get: method}
 const prov = method => new Prov(){get: method}
 const func = method => new Func(){get: method}
 
-const newEffect = (lifetime, renderer) => new Effects.Effect(lifetime, new Effects.EffectRenderer({render: renderer}))
+const newEffect = (lifetime, renderer) => new Effect.Effect(lifetime, new Effects.EffectRenderer({render: renderer}))
 Call = Packages.mindustry.gen.Call
 
 importPackage(Packages.arc)
