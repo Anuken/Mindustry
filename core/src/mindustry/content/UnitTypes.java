@@ -760,7 +760,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.artillery;
                 rotate = true;
-                occlusion = 8f;
+                shadow = 8f;
                 recoil = 3f;
 
                 bullet = new ArtilleryBulletType(2f, 12){{
@@ -827,7 +827,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.shootBig;
                 rotate = true;
-                occlusion = 12f;
+                shadow = 12f;
                 recoil = 3f;
                 shots = 2;
                 spacing = 17f;
@@ -859,7 +859,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.casing3;
                 shootSound = Sounds.artillery;
                 rotate = true;
-                occlusion = 30f;
+                shadow = 30f;
 
                 bullet = new ArtilleryBulletType(3f, 50){{
                     hitEffect = Fx.sapExplosion;
@@ -1061,7 +1061,7 @@ public class UnitTypes implements ContentList{
                 bullet = missiles;
                 shootSound = Sounds.missile;
                 rotate = true;
-                occlusion = 6f;
+                shadow = 6f;
             }},
             new Weapon("missiles-mount"){{
                 y = -8f;
@@ -1072,7 +1072,7 @@ public class UnitTypes implements ContentList{
                 bullet = missiles;
                 shootSound = Sounds.missile;
                 rotate = true;
-                occlusion = 6f;
+                shadow = 6f;
             }},
             new Weapon("large-bullet-mount"){{
                 y = 2f;
@@ -1084,7 +1084,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.shootBig;
                 rotate = true;
-                occlusion = 8f;
+                shadow = 8f;
                 bullet = new BasicBulletType(7f, 50){{
                     width = 12f;
                     height = 18f;
@@ -1132,7 +1132,7 @@ public class UnitTypes implements ContentList{
                 reload = 45f;
                 recoil = 4f;
                 shootSound = Sounds.laser;
-                occlusion = 20f;
+                shadow = 20f;
                 rotate = true;
 
                 bullet = new LaserBulletType(){{
@@ -1152,7 +1152,7 @@ public class UnitTypes implements ContentList{
                 rotateSpeed = 2f;
                 reload = 9f;
                 shootSound = Sounds.shoot;
-                occlusion = 7f;
+                shadow = 7f;
                 rotate = true;
                 recoil = 0.5f;
 
@@ -1167,7 +1167,7 @@ public class UnitTypes implements ContentList{
                 shake = 1f;
                 shootSound = Sounds.shoot;
                 rotate = true;
-                occlusion = 12f;
+                shadow = 12f;
                 bullet = fragBullet;
             }});
         }};
@@ -1519,7 +1519,7 @@ public class UnitTypes implements ContentList{
                 shootY = 7f;
                 shake = 5f;
                 recoil = 4f;
-                occlusion = 12f;
+                shadow = 12f;
 
                 shots = 1;
                 inaccuracy = 3f;
@@ -1555,7 +1555,7 @@ public class UnitTypes implements ContentList{
                 x = 8.5f;
                 y = -9f;
 
-                occlusion = 6f;
+                shadow = 6f;
 
                 rotateSpeed = 4f;
                 rotate = true;
@@ -1611,7 +1611,7 @@ public class UnitTypes implements ContentList{
                 rotateSpeed = 4f;
                 mirror = false;
 
-                occlusion = 20f;
+                shadow = 20f;
 
                 shootY = 2f;
                 recoil = 4f;
@@ -1657,7 +1657,7 @@ public class UnitTypes implements ContentList{
                 shootY = 7f;
                 shake = 2f;
                 recoil = 3f;
-                occlusion = 12f;
+                shadow = 12f;
                 ejectEffect = Fx.casing3;
                 shootSound = Sounds.shootBig;
 
@@ -1703,7 +1703,7 @@ public class UnitTypes implements ContentList{
                 shootY = 23f;
                 shake = 6f;
                 recoil = 10.5f;
-                occlusion = 50f;
+                shadow = 50f;
                 shootSound = Sounds.railgun;
 
                 shots = 1;
