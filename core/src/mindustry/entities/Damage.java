@@ -131,7 +131,7 @@ public class Damage{
                 }
 
                 //try to heal the tile
-                if(collide && hitter.type.collides(hitter, tile)){
+                if(collide && hitter.type.testCollision(hitter, tile)){
                     hitter.type.hitTile(hitter, tile, tile.health, false);
                 }
             }

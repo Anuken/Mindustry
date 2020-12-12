@@ -157,7 +157,7 @@ public abstract class BulletType extends Content{
         return Math.max(speed * lifetime * (1f - drag), maxRange);
     }
 
-    public boolean collides(Bullet bullet, Building tile){
+    public boolean testCollision(Bullet bullet, Building tile){
         return healPercent <= 0.001f || tile.team != bullet.team || tile.healthf() < 1f;
     }
 
