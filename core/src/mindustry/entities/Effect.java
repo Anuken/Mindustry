@@ -163,10 +163,14 @@ public class Effect{
     }
 
     public static void decal(TextureRegion region, float x, float y, float rotation, float lifetime, Color color){
+        decal(region, x, y, rotation, lifetime, color, true);
+    }
+    
+    public static void decal(TextureRegion region, float x, float y, float rotation, float lifetime, Color color, boolean checkSurface){
         if(headless || region == null || !Core.atlas.isFound(region)) return;
 
         Tile tile = world.tileWorld(x, y);
-        if(tile == null || !tile.floor().hasSurface()) return;
+        if((tile == null || !tile.floor().hasSurface()) && checkSurface) return;
 
         Decal decal = Decal.create();
         decal.set(x, y);
@@ -177,13 +181,13 @@ public class Effect{
         decal.add();
     }
 
-    public static void scorch(float x, float y, int size){
+    public static void scorch(float x, float y, int size, boolean checkSurface){
         if(headless) return;
 
         size = Mathf.clamp(size, 0, 9);
 
         TextureRegion region = Core.atlas.find("scorch-" + size + "-" + Mathf.random(2));
-        decal(region, x, y, Mathf.random(4) * 90, 3600, Pal.rubble);
+        decal(region, x, y, Mathf.random(4) * 90, 3600, Pal.rubble, checkSurface);
     }
 
     public static void rubble(float x, float y, int blockSize){

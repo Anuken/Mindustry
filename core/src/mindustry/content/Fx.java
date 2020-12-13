@@ -201,19 +201,19 @@ public class Fx{
     }),
 
     unitWreck = new Effect(200f, e -> {
-        if(!(e.data instanceof TextureRegion)) return;
+        Object[] data = e.data();
+        
+        if(!((TextureRegion)data[0] instanceof TextureRegion)) return;
 
         Draw.mixcol(Pal.rubble, 1f);
 
-        TextureRegion reg = e.data();
-        float vel = e.fin(Interp.pow5Out) * 2f * Mathf.randomSeed(e.id, 1f);
+        TextureRegion reg = (TextureRegion)data[0];
         float totalRot = Mathf.randomSeed(e.id + 1, 10f);
-        Tmp.v1.trns(Mathf.randomSeed(e.id + 2, 360f), vel);
+        Tmp.v1.trns((float)data[2], (float)data[3] * e.fin(Interp.pow5Out));
 
-        Draw.z(Mathf.lerp(Layer.flyingUnitLow, Layer.debris, e.fin()));
-        Draw.alpha(e.fout(Interp.pow5Out));
+        Draw.z(Mathf.lerp((float)data[1], Layer.debris, e.fin()));
 
-        Draw.rect(reg, e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.rotation - 90 + totalRot * e.fin(Interp.pow5Out));
+        Draw.rect(reg, e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.rotation);
     }),
 
     rocketSmoke = new Effect(120, e -> {

@@ -413,7 +413,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         float shake = hitSize / 3f;
 
-        Effect.scorch(x, y, (int)(hitSize / 5));
+        Effect.scorch(x, y, (int)(hitSize / 5), false);
         Fx.explosion.at(this);
         Effect.shake(shake, shake, this);
         type.deathSound.at(this);
@@ -432,9 +432,19 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(!headless){
             for(int i = 0; i < type.wreckRegions.length; i++){
                 if(type.wreckRegions[i].found()){
-                    float range = type.hitSize /4f;
+                    float z = type.groundLayer + Mathf.clamp(type.hitSize / 4000f, 0, 0.01f);
+                    float range = type.hitSize / 3f;
                     Tmp.v1.rnd(range);
-                    Effect.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
+                    
+                    Object[] data = {type.wreckRegions[i], z, Angles.angle(x, y, x + Tmp.v1.x, y + Tmp.v1.y), range};
+                    Fx.unitWreck.at(x, y, rotation - 90, data);
+                    
+                    final float wreckX = x + Tmp.v1.x;
+                    final float wreckY = y + Tmp.v1.y;
+                    final TextureRegion wreckTex = type.wreckRegions[i];
+                    Time.run(195f, () -> {
+                        Effect.decal(wreckTex, wreckX, wreckY, rotation - 90, 3600f - 195f, Pal.rubble, false);
+                    });
                 }
             }
         }
