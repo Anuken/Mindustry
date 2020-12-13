@@ -335,13 +335,22 @@ public abstract class BulletType extends Content{
         bullet.type = this;
         bullet.owner = owner;
         bullet.team = team;
-        bullet.vel.trns(angle, speed * velocityScl);
+        bullet.lifetime = lifetime * lifetimeScl;
+        if(weaveMag > 0){
+            float weaveInit = 0;
+            float scl = Mathf.randomSeed(bullet.id, 1f - weaveSclRnd, 1f + weaveSclRnd);
+            for(int i = 0; i < Mathf.randomSeed(bullet.id, 0, bullet.lifetime) - 1; i++){
+                weaveInit += Mathf.sin(i + Mathf.PI * weaveScale/2f * scl, weaveScale * scl, weaveMag);
+            }
+            bullet.vel.trns(angle + weaveInit, speed * velocityScl);
+        }else{
+            bullet.vel.trns(angle, speed * velocityScl);
+        }
         if(backMove){
             bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
         }else{
             bullet.set(x, y);
         }
-        bullet.lifetime = lifetime * lifetimeScl;
         bullet.data = data;
         bullet.drag = drag;
         bullet.hitSize = hitSize;
