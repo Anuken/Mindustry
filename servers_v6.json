@@ -54,5 +54,8 @@
   {
      "name": "MindustryBR",
      "address": ["mindustryptbr.ddns.net", "mindustryptbr.ddns.net:4444", "mindustryptbr.myddns.me:6666", "mindustryptbr.myddns.me:5555"]
-  }
+  },
+  {
+     "name": "HiveMind",
+     "address": ["sandbox.thehivemind.tk:2991", "pvp.thehivemind.tk:26570", "survival.thehivemind.tk:26572"]
 ]
