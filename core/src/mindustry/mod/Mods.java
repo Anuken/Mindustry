@@ -647,6 +647,14 @@ public class Mods implements Loadable{
                 meta.hidden = true;
             }
 
+            //disallow putting a description after the version
+            if(meta.version != null){
+                int line = meta.version.indexOf('\n');
+                if(line != -1){
+                    meta.version = meta.version.substring(0, line);
+                }
+            }
+
             if(!headless){
                 Log.info("Loaded mod '@' in @ms", meta.name, Time.elapsed());
             }
