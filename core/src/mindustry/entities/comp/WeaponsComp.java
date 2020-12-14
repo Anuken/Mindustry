@@ -35,7 +35,9 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
     void setWeaponRotation(float rotation){
         for(WeaponMount mount : mounts){
-            mount.rotation = rotation;
+            if(!mount.weapon.ignoreControl){
+                mount.rotation = rotation;
+            }
         }
     }
 
@@ -52,8 +54,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
     void controlWeapons(boolean rotate, boolean shoot){
         for(WeaponMount mount : mounts){
-            mount.rotate = rotate;
-            mount.shoot = shoot;
+            if(!mount.weapon.ignoreControl){
+                mount.rotate = rotate;
+                mount.shoot = shoot;
+            }
         }
         isRotate = rotate;
         isShooting = shoot;
@@ -72,8 +76,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
         y = Tmp.v1.y + this.y;
 
         for(WeaponMount mount : mounts){
-            mount.aimX = x;
-            mount.aimY = y;
+            if(!mount.weapon.ignoreControl){
+                mount.aimX = x;
+                mount.aimY = y;
+            }
         }
 
         aimX = x;

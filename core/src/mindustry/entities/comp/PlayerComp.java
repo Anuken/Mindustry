@@ -4,16 +4,19 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.graphics.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
@@ -35,7 +38,9 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     @ReadOnly Unit unit = Nulls.unit;
     transient private Unit lastReadUnit = Nulls.unit;
     transient @Nullable NetConnection con;
-
+    
+    /** targets for each weapon, used for ignoreControl = true weapons */
+    protected Teamc[] targets = {};
     @ReadOnly Team team = Team.sharded;
     @SyncLocal boolean typing, shooting, boosting;
     boolean admin;
@@ -136,7 +141,45 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         }
 
         textFadeTime -= Time.delta / (60 * 5);
+        
+        if(targets.length != unit.mounts.length) targets = new Teamc[unit.mounts.length];
 
+        float rotation = unit.rotation - 90;
+        boolean ret = retarget();
+
+        for(int i = 0; i < targets.length; i++){
+            WeaponMount mount = unit.mounts[i];
+            Weapon weapon = mount.weapon;
+            if(!weapon.ignoreControl) continue;
+
+            float mountX = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y),
+                mountY = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y);
+
+            if(ret){
+                targets[i] = Units.closestTarget(unit.team, mountX, mountY, weapon.bullet.range(), u -> u.checkTarget(weapon.bullet.collidesAir, weapon.bullet.collidesGround), t -> weapon.bullet.collidesGround);
+            }
+
+            if(Units.invalidateTarget(targets[i], unit.team, mountX, mountY, weapon.bullet.range())){
+                targets[i] = null;
+            }
+
+            boolean shoot = false;
+
+            if(targets[i] != null){
+                shoot = targets[i].within(mountX, mountY, weapon.bullet.range());
+
+                Vec2 to = Predict.intercept(unit, targets[i], weapon.bullet.speed);
+                mount.aimX = to.x;
+                mount.aimY = to.y;
+            }
+
+            mount.shoot = shoot;
+            mount.rotate = shoot;
+        }
+    }
+    
+    boolean retarget(){
+        return timer(2, 40f);
     }
 
     @Override

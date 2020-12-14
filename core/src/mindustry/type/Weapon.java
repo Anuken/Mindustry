@@ -88,6 +88,8 @@ public class Weapon{
     public StatusEffect shootStatus = StatusEffects.none;
     /** status effect duration when shot */
     public float shootStatusDuration = 60f * 5f;
+    /** weather the weapon should ignore mass control such as player or commander control */
+    public boolean ignoreControl = false;
 
     public Weapon(String name){
         this.name = name;

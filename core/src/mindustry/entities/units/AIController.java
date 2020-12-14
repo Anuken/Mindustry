@@ -116,7 +116,7 @@ public class AIController implements UnitController{
             float mountX = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y),
                 mountY = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y);
 
-            if(unit.type.singleTarget){
+            if(unit.type.singleTarget && !weapon.ignoreControl){
                 targets[i] = target;
             }else{
                 if(ret){
