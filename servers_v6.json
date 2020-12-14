@@ -58,5 +58,9 @@
   {
      "name": "HiveMind",
      "address": ["sandbox.thehivemind.tk:2991", "pvp.thehivemind.tk:26570", "survival.thehivemind.tk:26572"]
+  },
+  {
+     "name": "ALEX",
+     "address": ["alexmindustry.ddns.net:6568", "alexmindustry.ddns.net:6569"]
   }
 ]
