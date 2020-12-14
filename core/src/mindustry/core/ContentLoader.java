@@ -100,12 +100,7 @@ public class ContentLoader{
     public void init(){
         initialize(Content::init);
         if(constants != null) constants.init();
-        try{
-            Events.fire(new ContentInitEvent());
-        }catch(Throwable e){
-            CrashSender.log(e);
-            throw e;
-        }
+        Events.fire(new ContentInitEvent());
     }
 
     /** Calls Content#load() on everything. Use only after all modules have been created on the client.*/
