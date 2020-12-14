@@ -254,7 +254,7 @@ public class CoreBlock extends StorageBlock{
 
             for(Building other : state.teams.cores(team)){
                 if(other.tile() == tile) continue;
-                storageCapacity += other.block.itemCapacity + other.proximity().sum(e -> owns(e) && owns(other, e) ? e.block.itemCapacity : 0);
+                storageCapacity += other.block.itemCapacity + other.proximity().sum(e -> owns(other, e) ? e.block.itemCapacity : 0);
             }
 
             //Team.sharded.core().items.set(Items.surgeAlloy, 12000)

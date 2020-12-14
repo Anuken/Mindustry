@@ -50,5 +50,9 @@
   {
     "name": "Surrealment",
     "address": ["md.surrealment.com"]
+  },
+  {
+    "name": "ALEX",
+    "address": ["alexmindustry.ddns.net:6568", "alexmindustry.ddns.net:6569"]
   }
 ]

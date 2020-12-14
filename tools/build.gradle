@@ -429,3 +429,10 @@ task icongen(dependsOn: classes, type: JavaExec){
     standardInput = System.in
     workingDir = "../core/assets-raw"
 }
+
+task updateScripts(dependsOn: classes, type: JavaExec){
+    main = "mindustry.tools.ScriptMainGenerator"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = "../"
+}

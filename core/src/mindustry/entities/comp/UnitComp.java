@@ -38,6 +38,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Import Team team;
     @Import int id;
     @Import @Nullable Tile mineTile;
+    @Import Vec2 vel;
 
     private UnitController controller;
     UnitType type;
@@ -49,6 +50,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
+    }
+
+    public void approach(Vec2 vector){
+        vel.approachDelta(vector, type.accel * realSpeed() * floorSpeedMultiplier());
     }
 
     public void aimLook(Position pos){
@@ -397,6 +402,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     /** Actually destroys the unit, removing it and creating explosions. **/
     public void destroy(){
+        if(!isAdded()) return;
+
         float explosiveness = 2f + item().explosiveness * stack().amount * 1.53f;
         float flammability = item().flammability * stack().amount / 1.9f;
 
