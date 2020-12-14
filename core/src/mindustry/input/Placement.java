@@ -5,7 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.pooling.*;
-import mindustry.gen.Building;
+import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 
@@ -60,7 +60,7 @@ public class Placement{
         points.clear();
         Building building = world.tile(startX, startY).build;
         points.add(Pools.obtain(Point2.class, Point2::new).set(startX, startY));
-        while((building.tile.x != endX || building.tile.y != endY)){
+        while(building.tile.x != endX || building.tile.y != endY){
             ChainedBuilding chained = (ChainedBuilding)building;
             if(chained.next() == null) return pathfindLine(true, startX, startY, endX, endY);
             building = chained.next();
