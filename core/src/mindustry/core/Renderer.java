@@ -111,7 +111,10 @@ public class Renderer implements ApplicationListener{
         minimap.dispose();
         effectBuffer.dispose();
         blocks.dispose();
-        planets.dispose();
+        if(planets != null){
+            planets.dispose();
+            planets = null;
+        }
         if(bloom != null){
             bloom.dispose();
             bloom = null;
