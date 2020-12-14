@@ -165,6 +165,7 @@ const SectorInvasionEvent = Packages.mindustry.game.EventType.SectorInvasionEven
 const SectorLoseEvent = Packages.mindustry.game.EventType.SectorLoseEvent
 const WorldLoadEvent = Packages.mindustry.game.EventType.WorldLoadEvent
 const ClientLoadEvent = Packages.mindustry.game.EventType.ClientLoadEvent
+const ContentInitEvent = Packages.mindustry.game.EventType.ContentInitEvent
 const BlockInfoEvent = Packages.mindustry.game.EventType.BlockInfoEvent
 const CoreItemDeliverEvent = Packages.mindustry.game.EventType.CoreItemDeliverEvent
 const TurretAmmoDeliverEvent = Packages.mindustry.game.EventType.TurretAmmoDeliverEvent

@@ -64,6 +64,8 @@ public class EventType{
     public static class CoreItemDeliverEvent{}
     /** Called when the player opens info for a specific block.*/
     public static class BlockInfoEvent{}
+    /** Called *after* all content has been initialized. */
+    public static class ContentInitEvent{}
     /** Called when the client game is first loaded. */
     public static class ClientLoadEvent{}
     /** Called when a game begins and the world is loaded. */
