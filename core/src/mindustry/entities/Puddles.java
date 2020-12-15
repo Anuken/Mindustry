@@ -14,12 +14,12 @@ public class Puddles{
 
     public static final float maxLiquid = 70f;
 
-    /** Deposists a Puddle between tile and source. */
+    /** Deposits a Puddle between tile and source. */
     public static void deposit(Tile tile, Tile source, Liquid liquid, float amount){
         deposit(tile, source, liquid, amount, 0);
     }
 
-    /** Deposists a Puddle at a tile. */
+    /** Deposits a Puddle at a tile. */
     public static void deposit(Tile tile, Liquid liquid, float amount){
         deposit(tile, tile, liquid, amount, 0);
     }
