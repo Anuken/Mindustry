@@ -25,8 +25,8 @@ public class LCanvas extends Table{
     public DragLayout statements;
     public ScrollPane pane;
     public Group jumps;
-    StatementElem dragging;
-    StatementElem hovered;
+    public StatementElem dragging;
+    public StatementElem hovered;
     float targetWidth;
     int jumpCount = 0;
 
@@ -79,7 +79,11 @@ public class LCanvas extends Table{
     }
 
     public void add(LStatement statement){
-        statements.addChild(new StatementElem(statement));
+        dragging = new StatementElem(statement);
+        dragging.pack();
+        //add to center of screen
+        dragging.y = dragging.stageToParentCoordinates(Tmp.v1.set(0, Core.graphics.getHeight() / 2)).y;
+        statements.addChild(dragging);
     }
 
     public String save(){
