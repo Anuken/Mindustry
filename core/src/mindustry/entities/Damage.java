@@ -23,7 +23,7 @@ public class Damage{
     private static Tile furthest;
     private static Rect rect = new Rect();
     private static Rect hitrect = new Rect();
-    private static Vec2 tr = new Vec2();
+    private static Vec2 tr = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2();
     private static Seq<Unit> units = new Seq<>();
     private static GridBits bits = new GridBits(30, 30);
     private static IntQueue propagation = new IntQueue();
@@ -120,6 +120,7 @@ public class Damage{
 
         collidedBlocks.clear();
         tr.trns(angle, length);
+
         Intc2 collider = (cx, cy) -> {
             Building tile = world.build(cx, cy);
             boolean collide = tile != null && collidedBlocks.add(tile.pos());
@@ -131,17 +132,21 @@ public class Damage{
                 }
 
                 //try to heal the tile
-                if(collide && hitter.type.collides(hitter, tile)){
+                if(collide && hitter.type.testCollision(hitter, tile)){
                     hitter.type.hitTile(hitter, tile, tile.health, false);
                 }
             }
         };
 
         if(hitter.type.collidesGround){
-            world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
+            seg1.set(x, y);
+            seg2.set(seg1).add(tr);
+            world.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
                 collider.get(cx, cy);
-                if(large){
-                    for(Point2 p : Geometry.d4){
+
+                for(Point2 p : Geometry.d4){
+                    Tile other = world.tile(p.x + cx, p.y + cy);
+                    if(other != null && (large || Intersector.intersectSegmentRectangle(seg1, seg2, other.getBounds(Tmp.r1)))){
                         collider.get(cx + p.x, cy + p.y);
                     }
                 }

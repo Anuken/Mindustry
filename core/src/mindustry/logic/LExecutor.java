@@ -778,7 +778,7 @@ public class LExecutor{
                 Var va = exec.var(a);
                 Var vb = exec.var(b);
 
-                if(op.objFunction2 != null && (va.isobj || vb.isobj)){
+                if(op.objFunction2 != null && va.isobj && vb.isobj){
                     //use object function if provided, and one of the variables is an object
                     exec.setnum(dest, op.objFunction2.get(exec.obj(a), exec.obj(b)));
                 }else{

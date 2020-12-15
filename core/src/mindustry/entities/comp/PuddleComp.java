@@ -22,8 +22,7 @@ import static mindustry.entities.Puddles.*;
 abstract class PuddleComp implements Posc, Puddlec, Drawc{
     private static final int maxGeneration = 2;
     private static final Color tmp = new Color();
-    private static final Rect rect = new Rect();
-    private static final Rect rect2 = new Rect();
+    private static final Rect rect = new Rect(), rect2 = new Rect();
     private static int seeds;
 
     @Import float x, y;
@@ -44,7 +43,6 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
         float addSpeed = accepting > 0 ? 3f : 0f;
 
         amount -= Time.delta * (1f - liquid.viscosity) / (5f + addSpeed);
-
         amount += accepting;
         accepting = 0f;
 
@@ -54,7 +52,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
                 Tile other = world.tile(tile.x + point.x, tile.y + point.y);
                 if(other != null && other.block() == Blocks.air){
                     Puddles.deposit(other, tile, liquid, deposited, generation + 1);
-                    amount -= deposited / 2f; //tweak to speed up/slow down Puddlec propagation
+                    amount -= deposited / 2f; //tweak to speed up/slow down Puddle propagation
                 }
             }
         }
