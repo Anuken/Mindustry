@@ -28,7 +28,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
 
     @Import float x, y;
 
-    transient float accepting, updateTime, lastRipple;
+    transient float accepting, updateTime;
     float amount;
     int generation;
     Tile tile;
