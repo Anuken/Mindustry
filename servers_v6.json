@@ -54,5 +54,8 @@
   {
     "name": "ALEX",
     "address": ["alexmindustry.ddns.net:6568", "alexmindustry.ddns.net:6569"]
+  },
+  {
+    "address": ["shizashizashiza.ml:6567"]
   }
 ]
