@@ -152,3 +152,10 @@ task run(type: Exec){
     def adb = path + "/platform-tools/adb"
     commandLine "$adb", 'shell', 'am', 'start', '-n', 'io.anuke.mindustry/mindustry.android.AndroidLauncher'
 }
+
+if(!project.ext.hasSprites()){
+    println "Re-packing sprites."
+    run.dependsOn ":tools:pack"
+    assembleRelease.dependsOn ":tools:pack"
+    assembleDebug.dependsOn ":tools:pack"
+}
