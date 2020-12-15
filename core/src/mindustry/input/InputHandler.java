@@ -1162,11 +1162,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(diagonal){
-            Tile start = world.tile(startX, startY);
-            Tile end = world.tile(endX, endY);
-            if(block != null && block instanceof Autotiler
-                    && start.build instanceof ChainedBuilding && end.build instanceof ChainedBuilding
-                    && block.canReplace(end.build.block) && block.canReplace(start.build.block)){
+            var start = world.build(startX, startY);
+            var end = world.build(endX, endY);
+            if(block != null && start instanceof ChainedBuilding && end instanceof ChainedBuilding
+                    && block.canReplace(end.block) && block.canReplace(start.block)){
                 points = Placement.upgradeLine(startX, startY, endX, endY);
             }else{
                 points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
