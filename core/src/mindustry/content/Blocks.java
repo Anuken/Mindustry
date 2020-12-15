@@ -1785,7 +1785,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.railgun;
             unitSort = (u, x, y) -> -u.maxHealth;
 
-            coolantMultiplier = 0.2f;
+            coolantMultiplier = 0.4f;
 
             health = 150 * size * size;
             coolantUsage = 1f;
