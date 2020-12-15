@@ -44,7 +44,6 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
         float addSpeed = accepting > 0 ? 3f : 0f;
 
         amount -= Time.delta * (1f - liquid.viscosity) / (5f + addSpeed);
-
         amount += accepting;
         accepting = 0f;
 
