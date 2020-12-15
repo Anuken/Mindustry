@@ -52,10 +52,6 @@
     "address": ["md.surrealment.com"]
   },
   {
-     "name": "MindustryBR",
-     "address": ["mindustryptbr.ddns.net", "mindustryptbr.ddns.net:4444", "mindustryptbr.myddns.me:6666", "mindustryptbr.myddns.me:5555"]
-  },
-  {
     "name": "ALEX",
     "address": ["alexmindustry.ddns.net:6568", "alexmindustry.ddns.net:6569"]
   }
