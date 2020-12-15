@@ -49,9 +49,9 @@ version.properties
 
 #sprites
 
-#core/assets/sprites/sprites*
-#core/assets/sprites/fallback/
-#core/assets/sprites/block_colors.png
+core/assets/sprites/sprites*
+core/assets/sprites/fallback/
+core/assets/sprites/block_colors.png
 
 .attach_*
 ## Java
