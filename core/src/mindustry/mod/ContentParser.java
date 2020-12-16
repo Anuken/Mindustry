@@ -312,7 +312,7 @@ public class ContentParser{
                 }
 
                 if(value.has("controller")){
-                    unit.defaultController = make(resolve(value.getString("controller"), "mindustry.ai.type"));
+                    unit.defaultController = make(resolve(value.getString("controller"), "mindustry.ai.types"));
                 }
 
                 //read extra default waves
