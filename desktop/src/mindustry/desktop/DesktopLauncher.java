@@ -187,6 +187,13 @@ public class DesktopLauncher extends ClientLauncher{
             if(!fbgp){
                 dialog.get(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + fc.getClass().getSimpleName().replace("Exception", "") + (fc.getMessage() == null ? "" : ":\n" + fc.getMessage())));
             }
+            else{
+                dialog.get(() -> message(
+                total.contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + finalMessage :
+                            "Your graphics card does not support the right OpenGL features.\n" +
+                                    "Try to update your graphics drivers. If this doesn't work, your computer may not support Mindustry.\n\n" +
+                                    "Full message: " + finalMessage));
+            }
         });
     }
 
