@@ -34,14 +34,14 @@ public class ShockMine extends Block{
         @Override
         public void drawTeam(){
             //no
-        } //yes
+        }
 
         @Override
         public void draw(){
             super.draw();
             if(isActive() || progress < blinkDelay * 0.5f){
                 Draw.color(team.color);
-                Draw.alpha(0.2f);
+                Draw.alpha(0.25f);
                 Fill.rect(x, y, 2f, 2f);
                 Draw.color();
             }
@@ -59,6 +59,11 @@ public class ShockMine extends Block{
                 }
                 damage(tileDamage);
             }
+        }
+
+        @Override
+        public void drawCracks() {
+            //no
         }
 
         private boolean isActive(){
