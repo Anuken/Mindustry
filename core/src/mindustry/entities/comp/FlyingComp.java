@@ -68,7 +68,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
         if(isFlying() != wasFlying){
             if(wasFlying){
                 if(tileOn() != null){
-                    Fx.unitLand.at(x, y, floorOn().isLiquid ? 1f : 0.5f, floorOn().mapColor);
+                    Fx.unitLand.at(x, y, floorOn().isLiquid ? 1f : 0.5f, tileOn().floor().mapColor);
                 }
             }
 

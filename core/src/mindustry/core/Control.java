@@ -424,7 +424,7 @@ public class Control implements ApplicationListener, Loadable{
         net.dispose();
         Musics.dispose();
         Sounds.dispose();
-        ui.editor.dispose();
+        if(ui != null && ui.editor != null) ui.editor.dispose();
     }
 
     @Override

@@ -25,6 +25,7 @@ public class SStats implements SteamUserStatsCallback{
 
     private ObjectSet<String> blocksBuilt = new ObjectSet<>(), unitsBuilt = new ObjectSet<>();
     private ObjectSet<UnitType> t5s = new ObjectSet<>();
+    private IntSet checked = new IntSet();
 
     public SStats(){
         stats.requestCurrentStats();
@@ -136,9 +137,11 @@ public class SStats implements SteamUserStatsCallback{
                 }
 
                 if(e.tile.block() instanceof Conveyor){
+                    checked.clear();
                     check: {
                         Tile current = e.tile;
                         for(int i = 0; i < 4; i++){
+                            checked.add(current.pos());
                             if(current.build == null) break check;
                             Tile next = current.nearby(current.build.rotation);
                             if(next != null && next.block() instanceof Conveyor){
@@ -148,7 +151,7 @@ public class SStats implements SteamUserStatsCallback{
                             }
                         }
 
-                        if(current == e.tile){
+                        if(current == e.tile && checked.size == 4){
                             circleConveyor.complete();
                         }
                     }

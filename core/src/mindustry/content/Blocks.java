@@ -983,7 +983,7 @@ public class Blocks implements ContentList{
         junction = new Junction("junction"){{
             requirements(Category.distribution, with(Items.copper, 2), true);
             speed = 26;
-            capacity = 9;
+            capacity = 6;
             health = 30;
             buildCostMultiplier = 6f;
         }};
@@ -1785,7 +1785,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.railgun;
             unitSort = (u, x, y) -> -u.maxHealth;
 
-            coolantMultiplier = 0.2f;
+            coolantMultiplier = 0.4f;
 
             health = 150 * size * size;
             coolantUsage = 1f;
