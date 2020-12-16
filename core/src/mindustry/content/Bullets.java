@@ -444,19 +444,20 @@ public class Bullets implements ContentList{
 
         waterShot = new LiquidBulletType(Liquids.water){{
             knockback = 0.7f;
+            drag = 0.01f;
         }};
 
         cryoShot = new LiquidBulletType(Liquids.cryofluid){{
-
+            drag = 0.01f;
         }};
 
         slagShot = new LiquidBulletType(Liquids.slag){{
             damage = 4;
-            drag = 0.03f;
+            drag = 0.01f;
         }};
 
         oilShot = new LiquidBulletType(Liquids.oil){{
-            drag = 0.03f;
+            drag = 0.01f;
         }};
 
         heavyWaterShot = new LiquidBulletType(Liquids.water){{
