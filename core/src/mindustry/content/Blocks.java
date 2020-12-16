@@ -1772,7 +1772,7 @@ public class Blocks implements ContentList{
 
             maxAmmo = 40;
             ammoPerShot = 4;
-            rotateSpeed = 2.5f;
+            rotateSpeed = 2f;
             reloadTime = 200f;
             ammoUseEffect = Fx.casing3Double;
             recoilAmount = 5f;
