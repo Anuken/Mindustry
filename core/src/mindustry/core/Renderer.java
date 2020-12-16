@@ -31,7 +31,7 @@ public class Renderer implements ApplicationListener{
     public FrameBuffer effectBuffer = new FrameBuffer();
     public float laserOpacity = 1f;
     /** minZoom = zooming out, maxZoom = zooming in */
-    public float minZoom = 1.5f, maxZoom = 1.5f * 6;
+    public float minZoom = 1.5f, maxZoom = 6f;
 
     //TODO unused
     private FxProcessor fx = new FxProcessor();
