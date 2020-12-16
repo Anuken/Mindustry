@@ -982,7 +982,7 @@ public class Blocks implements ContentList{
 
         junction = new Junction("junction"){{
             requirements(Category.distribution, with(Items.copper, 2), true);
-            speed = 26;
+            speed = 13;
             capacity = 6;
             health = 30;
             buildCostMultiplier = 6f;
