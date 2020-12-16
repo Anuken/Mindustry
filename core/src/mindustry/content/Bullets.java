@@ -172,7 +172,7 @@ public class Bullets implements ContentList{
         }};
 
         flakGlass = new FlakBulletType(4f, 3){{
-            lifetime = 70f;
+            lifetime = 60f;
             ammoMultiplier = 5f;
             shootEffect = Fx.shootSmall;
             reloadMultiplier = 0.8f;
@@ -206,7 +206,6 @@ public class Bullets implements ContentList{
         }};
 
         fragGlass = new FlakBulletType(4f, 3){{
-            lifetime = 70f;
             ammoMultiplier = 3f;
             shootEffect = Fx.shootSmall;
             reloadMultiplier = 0.8f;
