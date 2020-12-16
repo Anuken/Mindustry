@@ -11,7 +11,6 @@ import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.entities.bullet.*;
 import mindustry.mod.Mods.*;
-import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.world.*;
 

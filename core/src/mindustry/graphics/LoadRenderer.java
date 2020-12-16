@@ -311,7 +311,7 @@ public class LoadRenderer implements Disposable{
                         float vsize = vcont - vpad*2;
                         int rx = (int)(vx + vw/2f - vsize/2f), ry = (int)(vy + vh/2f - vsize/2f), rw = (int)vsize, rh = (int)vsize;
 
-                        float vrad = vsize/2f + vpad / 1f;
+                        float vrad = vsize/2f + vpad;
 
                         //planet + bars
                         if(!graphics.isPortrait()){
