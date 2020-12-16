@@ -312,11 +312,11 @@ public class Renderer implements ApplicationListener{
     }
 
     public float minScale(){
-        return Math.round(Scl.scl(minZoom));
+        return Scl.scl(minZoom);
     }
 
     public float maxScale(){
-        return Math.round(Scl.scl(maxZoom));
+        return Mathf.round(Scl.scl(maxZoom));
     }
 
     public float getScale(){
