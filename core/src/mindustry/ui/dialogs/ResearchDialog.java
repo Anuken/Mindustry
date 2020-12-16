@@ -172,16 +172,6 @@ public class ResearchDialog extends BaseDialog{
         });
     }
 
-    @Override
-    public Dialog show(){
-        if(net.client()){
-            ui.showInfo("@research.multiplayer");
-            return this;
-        }
-
-        return super.show();
-    }
-
     void treeLayout(){
         float spacing = 20f;
         LayoutNode node = new LayoutNode(root, null);
@@ -439,6 +429,14 @@ public class ResearchDialog extends BaseDialog{
 
         void unlock(TechNode node){
             node.content.unlock();
+
+            //unlock parent nodes in multiplayer.
+            TechNode parent = node.parent;
+            while(parent != null){
+                parent.content.unlock();
+                parent = parent.parent;
+            }
+
             checkNodes(root);
             hoverNode = null;
             treeLayout();

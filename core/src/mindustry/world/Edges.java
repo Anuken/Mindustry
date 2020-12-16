@@ -9,10 +9,9 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Edges{
-    private static final int maxSize = 14;
     private static final int maxRadius = 12;
-    private static Point2[][] edges = new Point2[maxSize][0];
-    private static Point2[][] edgeInside = new Point2[maxSize][0];
+    private static Point2[][] edges = new Point2[maxBlockSize][0];
+    private static Point2[][] edgeInside = new Point2[maxBlockSize][0];
     private static Vec2[][] polygons = new Vec2[maxRadius * 2][0];
 
     static{
@@ -20,7 +19,7 @@ public class Edges{
             polygons[i] = Geometry.pixelCircle((i + 1) / 2f);
         }
 
-        for(int i = 0; i < maxSize; i++){
+        for(int i = 0; i < maxBlockSize; i++){
             int bot = -(int)(i / 2f) - 1;
             int top = (int)(i / 2f + 0.5f) + 1;
             edges[i] = new Point2[(i + 1) * 4];
@@ -72,13 +71,13 @@ public class Edges{
     }
 
     public static Point2[] getEdges(int size){
-        if(size < 0 || size > maxSize) throw new RuntimeException("Block size must be between 0 and " + maxSize);
+        if(size < 0 || size > maxBlockSize) throw new RuntimeException("Block size must be between 0 and " + maxBlockSize);
 
         return edges[size - 1];
     }
 
     public static Point2[] getInsideEdges(int size){
-        if(size < 0 || size > maxSize) throw new RuntimeException("Block size must be between 0 and " + maxSize);
+        if(size < 0 || size > maxBlockSize) throw new RuntimeException("Block size must be between 0 and " + maxBlockSize);
 
         return edgeInside[size - 1];
     }

@@ -13,7 +13,7 @@ jobs:
       with:
         java-version: 14
     - name: Run unit tests
-      run: ./gradlew test
+      run: ./gradlew clean cleanTest test
     - name: Trigger BE build
       if: ${{ github.repository == 'Anuken/Mindustry' }}
       run: |

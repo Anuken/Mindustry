@@ -1,5 +1,6 @@
 package mindustry.core;
 
+import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
@@ -7,8 +8,10 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.game.EventType.*;
 import mindustry.entities.bullet.*;
 import mindustry.mod.Mods.*;
+import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -96,6 +99,8 @@ public class ContentLoader{
     /** Calls Content#init() on everything. Use only after all modules have been created.*/
     public void init(){
         initialize(Content::init);
+        if(constants != null) constants.init();
+        Events.fire(new ContentInitEvent());
     }
 
     /** Calls Content#load() on everything. Use only after all modules have been created on the client.*/

@@ -151,8 +151,17 @@ public class BaseGenerator{
         //clear path for ground units
         for(Tile tile : cores){
             Astar.pathfind(tile, spawn, t -> t.team() == state.rules.waveTeam && !t.within(tile, 25f * 8) ? 100000 : t.floor().hasSurface() ? 1 : 10, t -> !t.block().isStatic()).each(t -> {
-                if(t.team() == state.rules.waveTeam && !t.within(tile, 25f * 8)){
-                    t.setBlock(Blocks.air);
+                if(!t.within(tile, 25f * 8)){
+                    if(t.team() == state.rules.waveTeam){
+                        t.setBlock(Blocks.air);
+                    }
+
+                    for(Point2 p : Geometry.d8){
+                        Tile other = t.nearby(p);
+                        if(other != null && other.team() == state.rules.waveTeam){
+                            other.setBlock(Blocks.air);
+                        }
+                    }
                 }
             });
         }

@@ -186,14 +186,14 @@ public class World{
 
     /**
      * Call to signify the beginning of map loading.
-     * BuildinghangeEvents will not be fired until endMapLoad().
+     * TileEvents will not be fired until endMapLoad().
      */
     public void beginMapLoad(){
         generating = true;
     }
 
     /**
-     * Call to signify the end of map loading. Updates tile occlusions and sets up physics for the world.
+     * Call to signify the end of map loading. Updates tile proximities and sets up physics for the world.
      * A WorldLoadEvent will be fire.
      */
     public void endMapLoad(){
@@ -615,6 +615,7 @@ public class World{
                 GenerateInput input = new GenerateInput();
 
                 for(GenerateFilter filter : filters){
+                    filter.randomize();
                     input.begin(filter, width(), height(), (x, y) -> tiles.getn(x, y));
                     filter.apply(tiles, input);
                 }

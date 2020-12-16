@@ -41,7 +41,7 @@ public class NetServer implements ApplicationListener{
     private static final Vec2 vector = new Vec2();
     private static final Rect viewport = new Rect();
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
-    private static final float correctDist = tilesize * 8f;
+    private static final float correctDist = tilesize * 12f;
 
     public final Administration admins = new Administration();
     public final CommandHandler clientCommands = new CommandHandler("/");
@@ -284,7 +284,7 @@ public class NetServer implements ApplicationListener{
             }
 
             StringBuilder result = new StringBuilder();
-            result.append(Strings.format("[orange]-- Commands Page[lightgray] @[gray]/[lightgray]@[orange] --\n\n", (page+1), pages));
+            result.append(Strings.format("[orange]-- Commands Page[lightgray] @[gray]/[lightgray]@[orange] --\n\n", (page + 1), pages));
 
             for(int i = commandsPerPage * page; i < Math.min(commandsPerPage * (page + 1), clientCommands.getCommandList().size); i++){
                 Command command = clientCommands.getCommandList().get(i);
@@ -347,8 +347,8 @@ public class NetServer implements ApplicationListener{
 
             boolean checkPass(){
                 if(votes >= votesRequired()){
-                    Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] @[orange] will be banned from the server for @ minutes.", target.name, (kickDuration/60)));
-                    target.getInfo().lastKicked = Time.millis() + kickDuration*1000;
+                    Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] @[orange] will be banned from the server for @ minutes.", target.name, (kickDuration / 60)));
+                    target.getInfo().lastKicked = Time.millis() + kickDuration * 1000;
                     Groups.player.each(p -> p.uuid().equals(target.uuid()), p -> p.kick(KickReason.vote));
                     map[0] = null;
                     task.cancel();

@@ -287,7 +287,7 @@ public class Block extends UnlockableContent{
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
-            .sumf(other -> other.floor().attributes.get(attr));
+            .sumf(other -> !floating && other.floor().isDeep() ? 0 : other.floor().attributes.get(attr));
     }
 
     public TextureRegion getDisplayIcon(Tile tile){
@@ -377,7 +377,8 @@ public class Block extends UnlockableContent{
 
     public boolean canReplace(Block other){
         if(other.alwaysReplace) return true;
-        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && (size == other.size || (size >= other.size && subclass != null && subclass == other.subclass));
+        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group &&
+            (size == other.size || (size >= other.size && ((subclass != null && subclass == other.subclass) || group.anyReplace)));
     }
 
     /** @return a possible replacement for this block when placed in a line by the player. */

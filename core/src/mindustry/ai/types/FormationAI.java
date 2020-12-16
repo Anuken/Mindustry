@@ -33,11 +33,10 @@ public class FormationAI extends AIController implements FormationMember{
         }
 
         if(unit.type.canBoost){
-            unit.elevation = Mathf.approachDelta(unit.elevation, !unit.canPassOn() ? 1f : leader.type.canBoost ? leader.elevation : 0f, 0.08f);
+            unit.elevation = Mathf.approachDelta(unit.elevation, unit.onSolid() ? 1f : leader.type.canBoost ? leader.elevation : 0f, 0.08f);
         }
 
         unit.controlWeapons(true, leader.isShooting);
-        // unit.moveAt(Tmp.v1.set(deltaX, deltaY).limit(unit.type().speed));
 
         unit.aim(leader.aimX(), leader.aimY());
 
@@ -47,17 +46,10 @@ public class FormationAI extends AIController implements FormationMember{
             unit.lookAt(unit.vel.angle());
         }
 
-        Vec2 realtarget = vec.set(target);
+        Vec2 realtarget = vec.set(target).add(leader.vel.x, leader.vel.y);
 
-        float margin = 4f;
-
-        float speed = unit.realSpeed();
-
-        if(unit.dst(realtarget) <= margin){
-            //unit.vel.approachDelta(Vec2.ZERO, speed * type.accel / 2f);
-        }else{
-            unit.moveAt(realtarget.sub(unit).limit(speed));
-        }
+        float speed = unit.realSpeed() * unit.floorSpeedMultiplier();
+        unit.approach(Mathf.arrive(unit.x, unit.y, realtarget.x, realtarget.y, unit.vel, 0f, 0.01f, speed, 1f));
 
         if(unit.canMine() && leader.canMine()){
             if(leader.mineTile != null && unit.validMine(leader.mineTile)){

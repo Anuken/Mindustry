@@ -78,7 +78,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
 
         if(!(tile.block() instanceof ConstructBlock)){
             if(!current.initialized && !current.breaking && Build.validPlace(current.block, team, current.x, current.y, current.rotation)){
-                boolean hasAll = infinite || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item));
+                boolean hasAll = infinite || current.isRotation(team) || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item));
 
                 if(hasAll){
                     Call.beginPlace(self(), current.block, team, current.x, current.y, current.rotation);
@@ -102,13 +102,11 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         }
 
         //if there is no core to build with or no build entity, stop building!
-        if((core == null && !infinite) || !(tile.build instanceof ConstructBuild)){
+        if((core == null && !infinite) || !(tile.build instanceof ConstructBuild entity)){
             return;
         }
 
         //otherwise, update it.
-        ConstructBuild entity = tile.bc();
-
         if(current.breaking){
             entity.deconstruct(self(), core, 1f / entity.buildCost * Time.delta * type.buildSpeed * state.rules.buildSpeedMultiplier);
         }else{
@@ -140,7 +138,8 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
     /** @return whether this request should be skipped, in favor of the next one. */
     boolean shouldSkip(BuildPlan request, @Nullable Building core){
         //requests that you have at least *started* are considered
-        if(state.rules.infiniteResources || team.rules().infiniteResources || request.breaking || core == null) return false;
+        if(state.rules.infiniteResources || team.rules().infiniteResources || request.breaking || core == null || request.isRotation(team)) return false;
+
         return (request.stuck && !core.items.has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items.has(i.item) && Mathf.round(i.amount * state.rules.buildCostMultiplier) > 0) && !request.initialized);
     }
 
@@ -182,8 +181,8 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
             plans.remove(replace);
         }
         Tile tile = world.tile(place.x, place.y);
-        if(tile != null && tile.build instanceof ConstructBuild){
-            place.progress = tile.<ConstructBuild>bc().progress;
+        if(tile != null && tile.build instanceof ConstructBuild cons){
+            place.progress = cons.progress;
         }
         if(tail){
             plans.addLast(place);

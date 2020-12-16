@@ -117,6 +117,8 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         u.rotation(rotation);
         //reset the ID to a new value to make sure it's synced
         u.id = EntityGroup.nextId();
+        //decrement count to prevent double increment
+        if(!u.isAdded()) u.team.data().updateCount(u.type, -1);
         u.add();
 
         return true;
