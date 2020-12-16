@@ -228,7 +228,7 @@ public class Shaders{
 
     public static class SurfaceShader extends Shader{
         public SurfaceShader(String frag){
-            super(getShaderFi("screenspace.vert"), getShaderFi(frag+".frag"));
+            super(getShaderFi("screenspace.vert"), getShaderFi(frag + ".frag"));
             loadNoise();
         }
 
