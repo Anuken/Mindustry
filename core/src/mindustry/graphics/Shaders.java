@@ -1,7 +1,7 @@
 package mindustry.graphics;
 
 import arc.*;
-import arc.files.Fi;
+import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
