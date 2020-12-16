@@ -103,7 +103,7 @@ public class LogicAI extends AIController{
         //look where moving if there's nothing to aim at
         if(!shoot){
             unit.lookAt(unit.prefRotation());
-        }else if(unit.hasWeapons()){ //if there is, look at the object
+        }else if(unit.hasWeapons() && unit.mounts.length > 0){ //if there is, look at the object
             unit.lookAt(unit.mounts[0].aimX, unit.mounts[0].aimY);
         }
     }

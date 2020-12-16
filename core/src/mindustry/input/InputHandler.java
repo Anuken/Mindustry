@@ -96,18 +96,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void transferItemTo(Item item, int amount, float x, float y, Building build){
+    public static void setItem(Building build, Item item, int amount){
         if(build == null || build.items == null) return;
-        for(int i = 0; i < Mathf.clamp(amount / 5, 1, 8); i++){
-            Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
-        }
-        build.items.add(item, amount);
+        build.items.set(item, amount);
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void transferItemTo(Unit unit, Item item, int amount, float x, float y, Building build){
+    public static void transferItemTo(@Nullable Unit unit, Item item, int amount, float x, float y, Building build){
         if(build == null || build.items == null) return;
-        unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
+
+        if(unit != null && unit.item() == item) unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
+
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
             Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
         }
@@ -279,8 +278,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot drop an item.");
         }
 
-        Fx.dropItem.at(player.x, player.y, angle, Color.white, player.unit().item());
-        player.unit().clearItem();
+        player.unit().eachGroup(unit -> {
+            Fx.dropItem.at(unit.x, unit.y, angle, Color.white, unit.item());
+            unit.clearItem();
+        });
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true, unreliable = true)
@@ -515,7 +516,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean requestMatches(BuildPlan request){
         Tile tile = world.tile(request.x, request.y);
-        return tile != null && tile.block() instanceof ConstructBlock && tile.<ConstructBuild>bc().cblock == request.block;
+        return tile != null && tile.build instanceof ConstructBuild cons && cons.cblock == request.block;
     }
 
     public void drawBreaking(int x, int y){
@@ -750,7 +751,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         boolean valid = validPlace(request.x, request.y, request.block, request.rotation);
 
         Draw.reset();
-        Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime(), 6f, 0.28f));
+        Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
         Draw.alpha(1f);
         request.block.drawRequestConfigTop(request, selectRequests);
         Draw.reset();

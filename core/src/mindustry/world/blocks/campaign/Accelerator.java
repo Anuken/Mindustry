@@ -1,5 +1,6 @@
 package mindustry.world.blocks.campaign;
 
+import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
@@ -8,6 +9,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -19,7 +21,7 @@ public class Accelerator extends Block{
     public @Load("launch-arrow") TextureRegion arrowRegion;
 
     public Block launching = Blocks.coreNucleus;
-    public int[] capacities = new int[content.items().size];
+    public int[] capacities;
 
     public Accelerator(String name){
         super(name);
@@ -33,6 +35,7 @@ public class Accelerator extends Block{
     @Override
     public void init(){
         itemCapacity = 0;
+        capacities = new int[content.items().size];
         for(ItemStack stack : launching.requirements){
             capacities[stack.item.id] = stack.amount;
             itemCapacity += stack.amount;
@@ -49,7 +52,7 @@ public class Accelerator extends Block{
 
             for(int l = 0; l < 4; l++){
                 float length = 7f + l * 5f;
-                Draw.color(team.color, Pal.darkMetal, Mathf.absin(Time.time() + l*50f, 10f, 1f));
+                Draw.color(team.color, Pal.darkMetal, Mathf.absin(Time.time + l*50f, 10f, 1f));
 
                 for(int i = 0; i < 4; i++){
                     float rot = i*90f + 45f;
@@ -65,13 +68,13 @@ public class Accelerator extends Block{
             Lines.square(x, y, rad * 1.22f, 45f);
 
             Lines.stroke(3f, Pal.accent);
-            Lines.square(x, y, rad, Time.time() / scl);
-            Lines.square(x, y, rad, -Time.time() / scl);
+            Lines.square(x, y, rad, Time.time / scl);
+            Lines.square(x, y, rad, -Time.time / scl);
 
             Draw.color(team.color);
 
             for(int i = 0; i < 4; i++){
-                float rot = i*90f + 45f + (-Time.time()/3f)%360f;
+                float rot = i*90f + 45f + (-Time.time /3f)%360f;
                 float length = 26f;
                 Draw.rect(arrowRegion, x + Angles.trnsx(rot, length), y + Angles.trnsy(rot, length), rot + 180f);
             }
@@ -91,6 +94,7 @@ public class Accelerator extends Block{
             if(!state.isCampaign() || !consValid()) return;
 
             ui.showInfo("@indev.campaign");
+            Events.fire(Trigger.acceleratorUse);
         }
 
         @Override

@@ -292,6 +292,7 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.lasershoot;
 
                 bullet = new LaserBoltBulletType(5.2f, 14){{
+                    lifetime = 37f;
                     healPercent = 5f;
                     collidesTeam = true;
                     backColor = Pal.heal;
@@ -311,7 +312,7 @@ public class UnitTypes implements ContentList{
 
             mineTier = 2;
             mineSpeed = 5f;
-            commandLimit = 8;
+            commandLimit = 9;
 
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 5, 60f));
             ammoType = AmmoTypes.power;
@@ -619,7 +620,7 @@ public class UnitTypes implements ContentList{
             drag = 0.4f;
             hitSize = 12f;
             rotateSpeed = 3f;
-            health = 800;
+            health = 900;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
             legCount = 6;
             legLength = 13f;
@@ -650,7 +651,7 @@ public class UnitTypes implements ContentList{
                 bullet = new SapBulletType(){{
                     sapStrength = 0.4f;
                     length = 75f;
-                    damage = 18;
+                    damage = 20;
                     shootEffect = Fx.shootSmall;
                     hitColor = color = Color.valueOf("bf92f9");
                     despawnEffect = Fx.none;
@@ -670,7 +671,7 @@ public class UnitTypes implements ContentList{
                 bullet = new SapBulletType(){{
                     sapStrength = 0.8f;
                     length = 40f;
-                    damage = 15;
+                    damage = 16;
                     shootEffect = Fx.shootSmall;
                     hitColor = color = Color.valueOf("bf92f9");
                     despawnEffect = Fx.none;
@@ -975,7 +976,7 @@ public class UnitTypes implements ContentList{
 
         zenith = new UnitType("zenith"){{
             health = 700;
-            speed = 1.7f;
+            speed = 1.8f;
             accel = 0.04f;
             drag = 0.016f;
             flying = true;
@@ -997,7 +998,7 @@ public class UnitTypes implements ContentList{
                 velocityRnd = 0.2f;
                 shootSound = Sounds.missile;
 
-                bullet = new MissileBulletType(3f, 12){{
+                bullet = new MissileBulletType(3f, 14){{
                     width = 8f;
                     height = 8f;
                     shrinkY = 0f;
@@ -1005,7 +1006,7 @@ public class UnitTypes implements ContentList{
                     homingRange = 60f;
                     keepVelocity = false;
                     splashDamageRadius = 25f;
-                    splashDamage = 10f;
+                    splashDamage = 16f;
                     lifetime = 60f;
                     trailColor = Pal.unitBack;
                     backColor = Pal.unitBack;
@@ -1251,8 +1252,8 @@ public class UnitTypes implements ContentList{
 
             mineTier = 3;
             mineSpeed = 4f;
-            health = 500;
-            armor = 5f;
+            health = 460;
+            armor = 3f;
             speed = 2.5f;
             accel = 0.06f;
             drag = 0.017f;
@@ -1264,6 +1265,7 @@ public class UnitTypes implements ContentList{
             engineSize = 3f;
             payloadCapacity = (2 * 2) * tilePayload;
             buildSpeed = 2.6f;
+            isCounted = false;
 
             ammoType = AmmoTypes.power;
 
@@ -1274,7 +1276,13 @@ public class UnitTypes implements ContentList{
                 x = 8f;
                 y = -6f;
                 rotate = true;
-                bullet = Bullets.healBulletBig;
+                bullet = new LaserBoltBulletType(5.2f, 10){{
+                    lifetime = 35f;
+                    healPercent = 5.5f;
+                    collidesTeam = true;
+                    backColor = Pal.heal;
+                    frontColor = Color.white;
+                }};
             }},
             new Weapon("heal-weapon-mount"){{
                 shootSound = Sounds.lasershoot;
@@ -1282,7 +1290,13 @@ public class UnitTypes implements ContentList{
                 x = 4f;
                 y = 5f;
                 rotate = true;
-                bullet = Bullets.healBullet;
+                bullet = new LaserBoltBulletType(5.2f, 8){{
+                    lifetime = 35f;
+                    healPercent = 3f;
+                    collidesTeam = true;
+                    backColor = Pal.heal;
+                    frontColor = Color.white;
+                }};
             }});
         }};
 
@@ -1349,7 +1363,7 @@ public class UnitTypes implements ContentList{
                     collides = false;
 
                     healPercent = 15f;
-                    splashDamage = 240f;
+                    splashDamage = 230f;
                     splashDamageRadius = 120f;
                 }};
             }});
@@ -1610,7 +1624,7 @@ public class UnitTypes implements ContentList{
                 xRand = 8f;
                 shotDelay = 1f;
 
-                bullet = new MissileBulletType(4.2f, 40){{
+                bullet = new MissileBulletType(4.2f, 42){{
                     homingPower = 0.12f;
                     width = 8f;
                     height = 8f;
@@ -1620,7 +1634,7 @@ public class UnitTypes implements ContentList{
                     keepVelocity = false;
                     splashDamageRadius = 35f;
                     splashDamage = 45f;
-                    lifetime = 56f;
+                    lifetime = 62f;
                     trailColor = Pal.bulletYellowBack;
                     backColor = Pal.bulletYellowBack;
                     frontColor = Pal.bulletYellow;
@@ -1643,15 +1657,16 @@ public class UnitTypes implements ContentList{
                 recoil = 3f;
                 occlusion = 12f;
                 ejectEffect = Fx.casing3;
+                shootSound = Sounds.shootBig;
 
                 shots = 3;
                 shotDelay = 4f;
                 inaccuracy = 1f;
-                bullet = new BasicBulletType(7f, 55){{
+                bullet = new BasicBulletType(7f, 57){{
                     width = 13f;
                     height = 19f;
                     shootEffect = Fx.shootBig;
-                    lifetime = 30f;
+                    lifetime = 35f;
                 }};
             }});
         }};
@@ -1735,13 +1750,13 @@ public class UnitTypes implements ContentList{
                 top = false;
                 ejectEffect = Fx.casing1;
 
-                bullet = new BasicBulletType(2.5f, 10){{
+                bullet = new BasicBulletType(2.5f, 11){{
                     width = 7f;
                     height = 9f;
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.02f;
+                    tileDamageMultiplier = 0.01f;
                 }};
             }});
         }};
@@ -1777,13 +1792,13 @@ public class UnitTypes implements ContentList{
                 spacing = 0f;
                 ejectEffect = Fx.casing1;
 
-                bullet = new BasicBulletType(3f, 10){{
+                bullet = new BasicBulletType(3f, 11){{
                     width = 7f;
                     height = 9f;
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.02f;
+                    tileDamageMultiplier = 0.01f;
                 }};
             }});
         }};
@@ -1817,13 +1832,13 @@ public class UnitTypes implements ContentList{
                 shotDelay = 3f;
                 ejectEffect = Fx.casing1;
 
-                bullet = new BasicBulletType(3.5f, 10){{
+                bullet = new BasicBulletType(3.5f, 11){{
                     width = 6.5f;
                     height = 11f;
                     lifetime = 70f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.02f;
+                    tileDamageMultiplier = 0.01f;
                     homingPower = 0.04f;
                 }};
             }});

@@ -17,9 +17,11 @@ assignees: ''
 
 **Link(s) to mod(s) used**: *The mod repositories or zip files that are related to the issue, if applicable.*
 
-**Save file**: *The (zipped) save file you were playing on when the bug happened. THIS IS REQUIRED FOR ANY ISSUE HAPPENING IN-GAME, REGARDLESS OF WHETHER YOU THINK IT HAPPENS EVERYWHERE. DO NOT DELETE OR OMIT THIS LINE UNLESS YOU ARE SURE THAT THE ISSUE DOES NOT HAPPEN IN-GAME.*
+**Save file**: *The (zipped) save file you were playing on when the bug happened. THIS IS REQUIRED FOR ANY ISSUE HAPPENING IN-GAME OR IN MULTIPLAYER, REGARDLESS OF WHETHER YOU THINK IT HAPPENS EVERYWHERE. DO NOT DELETE OR OMIT THIS LINE UNLESS YOU ARE SURE THAT THE ISSUE DOES NOT HAPPEN IN-GAME.*
 
-**Crash report**: *The contents of relevant crash report files. REQUIRED if you are reporting a crash.*
+If you remove the line above without reading it properly and understanding what it means, I will reap your soul. Even if you're playing on someone's server, you can still save the game to a slot.
+
+**(Crash) logs**: *Either crash reports from the crash folder, or the file you get when you go into Settings -> Game Data -> Export Crash logs. REQUIRED if you are reporting a crash.*
 
 ---
 

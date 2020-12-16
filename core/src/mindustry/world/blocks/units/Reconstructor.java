@@ -115,6 +115,13 @@ public class Reconstructor extends UnitBlock{
         }
 
         @Override
+        public void overwrote(Seq<Building> builds){
+            if(builds.first().block == block){
+                items.add(builds.first().items);
+            }
+        }
+
+        @Override
         public void draw(){
             Draw.rect(region, x, y);
 

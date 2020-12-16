@@ -68,6 +68,16 @@ public class SectorDamage{
                 float enemyDps = info.waveDpsBase + info.waveDpsSlope * (i);
                 float enemyHealth = info.waveHealthBase + info.waveHealthSlope * (i);
 
+                if(info.bossWave == i){
+                    enemyDps += info.bossDps;
+                    enemyHealth += info.bossHealth;
+                }
+
+                if(i == waveBegin){
+                    enemyDps += info.curEnemyDps;
+                    enemyHealth += info.curEnemyHealth;
+                }
+
                 //happens due to certain regressions
                 if(enemyHealth < 0 || enemyDps < 0) continue;
 
@@ -288,44 +298,60 @@ public class SectorDamage{
             //skip player
             if(unit.isPlayer()) continue;
 
-            if(unit.team == state.rules.defaultTeam){
-                //scale health based on armor - yes, this is inaccurate, but better than nothing
-                float healthMult = 1f + Mathf.clamp(unit.armor / 20f);
+            //scale health based on armor - yes, this is inaccurate, but better than nothing
+            float healthMult = 1f + Mathf.clamp(unit.armor / 20f);
 
+            if(unit.team == state.rules.defaultTeam){
                 sumHealth += unit.health*healthMult + unit.shield;
                 sumDps += unit.type.dpsEstimate;
                 if(unit.abilities.find(a -> a instanceof RepairFieldAbility) instanceof RepairFieldAbility h){
                     sumRps += h.amount / h.reload * 60f;
                 }
             }else{
-                curEnemyDps += unit.type.dpsEstimate;
-                curEnemyHealth += unit.health;
+                float bossMult = unit.isBoss() ? 3f : 1f;
+                curEnemyDps += unit.type.dpsEstimate * unit.damageMultiplier() * bossMult;
+                curEnemyHealth += unit.health * healthMult * unit.healthMultiplier() * bossMult + unit.shield;
             }
         }
 
         //calculate DPS and health for the next few waves and store in list
         var reg = new LinearRegression();
+        SpawnGroup bossGroup = null;
         Seq<Vec2> waveDps = new Seq<>(), waveHealth = new Seq<>();
 
         for(int wave = state.wave; wave < state.wave + 10; wave ++){
             float sumWaveDps = 0f, sumWaveHealth = 0f;
 
-            //first wave has to take into account current dps
-            if(wave == state.wave){
-                sumWaveDps += curEnemyDps;
-                sumWaveHealth += curEnemyHealth;
-            }
-
             for(SpawnGroup group : state.rules.spawns){
                 float healthMult = 1f + Mathf.clamp(group.type.armor / 20f);
                 StatusEffect effect = (group.effect == null ? StatusEffects.none : group.effect);
                 int spawned = group.getSpawned(wave);
+                //save the boss group
+                if(group.effect == StatusEffects.boss){
+                    bossGroup = group;
+                    continue;
+                }
                 if(spawned <= 0) continue;
                 sumWaveHealth += spawned * (group.getShield(wave) + group.type.health * effect.healthMultiplier * healthMult);
                 sumWaveDps += spawned * group.type.dpsEstimate * effect.damageMultiplier;
             }
             waveDps.add(new Vec2(wave, sumWaveDps));
             waveHealth.add(new Vec2(wave, sumWaveHealth));
+        }
+
+        if(bossGroup != null){
+            float bossMult = 1.2f;
+            //calculate first boss appearaance
+            for(int wave = state.wave; wave < state.wave + 60; wave++){
+                int spawned = bossGroup.getSpawned(wave - 1);
+                if(spawned > 0){
+                    //set up relevant stats
+                    info.bossWave = wave;
+                    info.bossDps = spawned * bossGroup.type.dpsEstimate * StatusEffects.boss.damageMultiplier * bossMult;
+                    info.bossHealth = spawned * (bossGroup.getShield(wave) + bossGroup.type.health * StatusEffects.boss.healthMultiplier * (1f + Mathf.clamp(bossGroup.type.armor / 20f))) * bossMult;
+                    break;
+                }
+            }
         }
 
         //calculate linear regression of the wave data and store it
@@ -338,10 +364,15 @@ public class SectorDamage{
         info.waveDpsSlope = reg.slope;
 
         //enemy units like to aim for a lot of non-essential things, so increase resulting health slightly
-        info.sumHealth = sumHealth * 1.2f;
+        info.sumHealth = sumHealth * 1.05f;
         //players tend to have longer range units/turrets, so assume DPS is higher
-        info.sumDps = sumDps * 1.2f;
+        info.sumDps = sumDps * 1.05f;
         info.sumRps = sumRps;
+
+        float cmult = 1.5f;
+
+        info.curEnemyDps = curEnemyDps*cmult;
+        info.curEnemyHealth = curEnemyHealth*cmult;
 
         info.wavesSurvived = getWavesSurvived(info);
     }
@@ -356,7 +387,7 @@ public class SectorDamage{
         for(Tile tile : tiles){
             if((tile.block() instanceof CoreBlock && tile.team() == state.rules.waveTeam) || tile.overlay() == Blocks.spawn){
                 frontier.add(tile);
-                values[tile.x][tile.y] = fraction * 26;
+                values[tile.x][tile.y] = fraction * 24;
             }
         }
 

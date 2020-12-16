@@ -39,6 +39,8 @@ import mindustry.world.meta.*;
 import java.lang.reflect.*;
 import java.util.*;
 
+import static mindustry.Vars.*;
+
 @SuppressWarnings("unchecked")
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
@@ -225,7 +227,7 @@ public class ContentParser{
             currentContent = block;
 
             read(() -> {
-                if(value.has("consumes")){
+                if(value.has("consumes") && value.get("consumes").isObject()){
                     for(JsonValue child : value.get("consumes")){
                         if(child.name.equals("item")){
                             block.consumes.item(find(ContentType.item, child.asString()));
@@ -250,8 +252,8 @@ public class ContentParser{
 
                 readFields(block, value, true);
 
-                if(block.size > ConstructBlock.maxSize){
-                    throw new IllegalArgumentException("Blocks cannot be larger than " + ConstructBlock.maxSize);
+                if(block.size > maxBlockSize){
+                    throw new IllegalArgumentException("Blocks cannot be larger than " + maxBlockSize);
                 }
 
                 //make block visible by default if there are requirements and no visibility set
@@ -307,6 +309,10 @@ public class ContentParser{
                         throw new IllegalArgumentException("Missing a valid 'block' in 'requirements'");
                     }
 
+                }
+
+                if(value.has("controller")){
+                    unit.defaultController = make(resolve(value.getString("controller"), "mindustry.ai.type"));
                 }
 
                 //read extra default waves

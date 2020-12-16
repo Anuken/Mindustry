@@ -1,6 +1,7 @@
 package mindustry.desktop.steam;
 
 import arc.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import com.codedisaster.steamworks.*;
@@ -65,13 +66,6 @@ public class SStats implements SteamUserStatsCallback{
                  active10Polys.complete();
             }
 
-            tmpSet.clear();
-            tmpSet.addAll(t5s);
-            Groups.unit.each(u -> tmpSet.remove(u.type));
-            if(tmpSet.size == 0){
-                activeAllT5.complete();
-            }
-
             for(Building entity : player.team().cores()){
                 if(!content.items().contains(i -> entity.items.get(i) < entity.block.itemCapacity)){
                     fillCoreAllCampaign.complete();
@@ -106,13 +100,13 @@ public class SStats implements SteamUserStatsCallback{
                 for(Sector sec : planet.sectors){
                     if(sec.hasBase()){
                         for(var v : sec.info.production.values()){
-                            total += v.mean;
+                            if(v.mean > 0) total += v.mean * 60;
                         }
                     }
                 }
             }
 
-            SStat.maxProduction.max((int)total);
+            SStat.maxProduction.max(Mathf.round(total));
         });
 
         Events.run(Trigger.newGame, () -> Core.app.post(() -> {
@@ -141,7 +135,7 @@ public class SStats implements SteamUserStatsCallback{
 
                 if(blocksBuilt.add(e.tile.block().name)){
                     if(blocksBuilt.contains("meltdown") && blocksBuilt.contains("spectre") && blocksBuilt.contains("foreshadow")){
-                        buildMeltdownSpectreForeshadow.complete();
+                        buildMeltdownSpectre.complete();
                     }
 
                     save();
@@ -214,6 +208,8 @@ public class SStats implements SteamUserStatsCallback{
                 drown.complete();
             }
         });
+
+        trigger(Trigger.acceleratorUse, useAccelerator);
 
         trigger(Trigger.impactPower, powerupImpactReactor);
 
@@ -321,11 +317,11 @@ public class SStats implements SteamUserStatsCallback{
                 captureBackground.complete();
             }
 
-            if(!e.sector.planet.sectors.contains(s -> s.hasBase())){
+            if(!e.sector.planet.sectors.contains(s -> !s.hasBase())){
                 captureAllSectors.complete();
             }
 
-            SStat.sectorsControlled.set(e.sector.planet.sectors.count(s -> s.hasBase()));
+            SStat.sectorsControlled.set(e.sector.planet.sectors.count(Sector::hasBase));
         });
 
         //TODO dead achievement

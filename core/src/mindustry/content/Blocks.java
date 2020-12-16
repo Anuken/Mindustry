@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
+import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -14,8 +15,6 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.campaign.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
-import mindustry.world.blocks.defense.turrets.PointDefenseTurret;
-import mindustry.world.blocks.defense.turrets.TractorBeamTurret;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.experimental.*;
@@ -136,7 +135,7 @@ public class Blocks implements ContentList{
 
         //Registers build blocks
         //no reference is needed here since they can be looked up by name later
-        for(int i = 1; i <= ConstructBlock.maxSize; i++){
+        for(int i = 1; i <= Vars.maxBlockSize; i++){
             new ConstructBlock(i);
         }
 
@@ -615,6 +614,7 @@ public class Blocks implements ContentList{
             craftTime = 75f;
             size = 3;
             hasPower = true;
+            itemCapacity = 20;
 
             consumes.power(4f);
             consumes.items(with(Items.copper, 3, Items.lead, 4, Items.titanium, 2, Items.silicon, 3));
@@ -1216,18 +1216,18 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.lead, 100, Items.silicon, 75, Items.phaseFabric, 25, Items.plastanium, 75, Items.thorium, 50));
             size = 2;
             powerProduction = 4.5f;
-            itemDuration = 60 * 15f;
+            itemDuration = 60 * 14f;
         }};
 
         solarPanel = new SolarGenerator("solar-panel"){{
             requirements(Category.power, with(Items.lead, 10, Items.silicon, 15));
-            powerProduction = 0.08f;
+            powerProduction = 0.1f;
         }};
 
         largeSolarPanel = new SolarGenerator("solar-panel-large"){{
-            requirements(Category.power, with(Items.lead, 100, Items.silicon, 145, Items.phaseFabric, 15));
+            requirements(Category.power, with(Items.lead, 80, Items.silicon, 110, Items.phaseFabric, 15));
             size = 3;
-            powerProduction = 1f;
+            powerProduction = 1.3f;
         }};
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
@@ -1390,7 +1390,7 @@ public class Blocks implements ContentList{
             size = 5;
 
             unitCapModifier = 24;
-            researchCostMultiplier = 0.05f;
+            researchCostMultiplier = 0.06f;
         }};
 
         vault = new StorageBlock("vault"){{
@@ -1515,8 +1515,8 @@ public class Blocks implements ContentList{
             flags = EnumSet.of(BlockFlag.turret, BlockFlag.extinguisher);
         }};
 
-        lancer = new ChargeTurret("lancer"){{
-            requirements(Category.turret, with(Items.copper, 25, Items.lead, 50, Items.silicon, 45));
+        lancer = new PowerTurret("lancer"){{
+            requirements(Category.turret, with(Items.copper, 60, Items.lead, 70, Items.silicon, 50));
             range = 165f;
             chargeTime = 40f;
             chargeMaxDelay = 30f;
@@ -1549,7 +1549,7 @@ public class Blocks implements ContentList{
         }};
 
         arc = new PowerTurret("arc"){{
-            requirements(Category.turret, with(Items.copper, 35, Items.lead, 50));
+            requirements(Category.turret, with(Items.copper, 50, Items.lead, 50));
             shootType = new LightningBulletType(){{
                 damage = 20;
                 lightningLength = 25;
@@ -1603,7 +1603,7 @@ public class Blocks implements ContentList{
         }};
 
         salvo = new ItemTurret("salvo"){{
-            requirements(Category.turret, with(Items.copper, 105, Items.graphite, 95, Items.titanium, 60));
+            requirements(Category.turret, with(Items.copper, 100, Items.graphite, 90, Items.titanium, 60));
             ammo(
             Items.copper, Bullets.standardCopper,
             Items.graphite, Bullets.standardDense,
@@ -1770,6 +1770,8 @@ public class Blocks implements ContentList{
             }}
             );
 
+            maxAmmo = 40;
+            ammoPerShot = 4;
             rotateSpeed = 2.5f;
             reloadTime = 200f;
             ammoUseEffect = Fx.casing3Double;

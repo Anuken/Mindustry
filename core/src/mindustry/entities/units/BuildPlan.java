@@ -61,6 +61,10 @@ public class BuildPlan implements Position{
 
     }
 
+    public boolean samePos(BuildPlan other){
+        return x == other.x && y == other.y;
+    }
+
     /** Transforms the internal position of this config using the specified function, and return the result. */
     public static Object pointConfig(Block block, Object config, Cons<Point2> cons){
         if(config instanceof Point2){

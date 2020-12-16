@@ -44,7 +44,7 @@ public class Junction extends Block{
                     long l = buffer.buffers[i][0];
                     float time = BufferItem.time(l);
 
-                    if(Time.time() >= time + speed / timeScale || Time.time() < time){
+                    if(Time.time >= time + speed / timeScale || Time.time < time){
 
                         Item item = content.item(BufferItem.item(l));
                         Building dest = nearby(i);

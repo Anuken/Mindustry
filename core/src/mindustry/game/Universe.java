@@ -6,7 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
-import mindustry.io.legacy.*;
+import mindustry.game.SectorInfo.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
@@ -26,13 +26,6 @@ public class Universe{
 
     public Universe(){
         load();
-
-        //load legacy research
-        Events.on(ClientLoadEvent.class, e -> {
-            if(Core.settings.has("unlocks")){
-                LegacyIO.readResearch();
-            }
-        });
 
         //update base coverage on capture
         Events.on(SectorCaptureEvent.class, e -> {
@@ -91,7 +84,7 @@ public class Universe{
         if(state.hasSector()){
             //update sector light
             float light = state.getSector().getLight();
-            float alpha = Mathf.clamp(Mathf.map(light, 0f, 0.8f, 0.2f, 1f));
+            float alpha = Mathf.clamp(Mathf.map(light, 0f, 0.8f, 0.3f, 1f));
 
             //assign and map so darkness is not 100% dark
             state.rules.ambientLight.a = 1f - alpha;
@@ -188,6 +181,7 @@ public class Universe{
                         }else if(attacked && wavesPassed > 0 && sector.info.winWave > 1 && sector.info.wave + wavesPassed >= sector.info.winWave && !sector.hasEnemyBase()){
                             //autocapture the sector
                             sector.info.waves = false;
+                            sector.info.wasCaptured = true;
 
                             //fire the event
                             Events.fire(new SectorCaptureEvent(sector));
@@ -205,6 +199,13 @@ public class Universe{
                                 to.addItems(items);
                             }
                         }
+
+                        sector.info.export.each((item, amount) -> {
+                            if(sector.info.items.get(item) <= 0 && sector.info.production.get(item, ExportStat::new).mean < 0){
+                                //disable export when production is negative.
+                                sector.info.export.get(item).mean = 0f;
+                            }
+                        });
 
                         //add production, making sure that it's capped
                         sector.info.production.each((item, stat) -> sector.info.items.add(item, Math.min((int)(stat.mean * newSecondsPassed * scl), sector.info.storageCapacity - sector.info.items.get(item))));
@@ -224,9 +225,11 @@ public class Universe{
                             if(sector.isBeingPlayed()){
                                 state.rules.winWave = waveMax;
                                 state.rules.waves = true;
+                                state.rules.attackMode = false;
                             }else{
                                 sector.info.winWave = waveMax;
                                 sector.info.waves = true;
+                                sector.info.attack = false;
                                 sector.saveInfo();
                             }
 
