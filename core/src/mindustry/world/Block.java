@@ -518,7 +518,7 @@ public class Block extends UnlockableContent{
     }
 
     public boolean isVisible(){
-        return buildVisibility.visible() && !isHidden();
+        return (buildVisibility.visible() || state.rules.revealedBlocks.contains(this)) && !isHidden();
     }
 
     public boolean isPlaceable(){
@@ -714,7 +714,7 @@ public class Block extends UnlockableContent{
 
     @Override
     public boolean isHidden(){
-        return !buildVisibility.visible();
+        return !buildVisibility.visible() && !state.rules.revealedBlocks.contains(this);
     }
 
     @Override
