@@ -145,7 +145,7 @@ public class Block extends UnlockableContent{
     public boolean conveyorPlacement;
     /**
      * The color of this block when displayed on the minimap or map preview.
-     * Do not set manually! This is overriden when loading for most blocks.
+     * Do not set manually! This is overridden when loading for most blocks.
      */
     public Color mapColor = new Color(0, 0, 0, 1);
     /** Whether this block has a minimap color. */
