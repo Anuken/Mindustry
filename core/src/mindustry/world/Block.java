@@ -522,7 +522,7 @@ public class Block extends UnlockableContent{
     }
 
     public boolean isVisible(){
-        return (buildVisibility.visible() || state.rules.revealedBlocks.contains(this)) && !isHidden();
+        return !isHidden();
     }
 
     public boolean isPlaceable(){

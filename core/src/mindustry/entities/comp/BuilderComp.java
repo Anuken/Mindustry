@@ -215,7 +215,6 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
     public void draw(){
         if(!activelyBuilding()) return;
 
-        //TODO check correctness
         Draw.z(Layer.flyingUnit);
 
         BuildPlan plan = buildPlan();
