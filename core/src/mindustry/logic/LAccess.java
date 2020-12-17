@@ -34,6 +34,7 @@ public enum LAccess{
     type,
     flag,
     controlled,
+    commanded,
     name,
     config,
     payloadCount,
