@@ -117,22 +117,27 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         current.progress = entity.progress;
     }
 
-    /** Draw all current build requests. Does not draw the beam effect, only the positions. */
-    void drawBuildRequests(){
+    /** Draw all current build plans. Does not draw the beam effect, only the positions. */
+    void drawBuildPlans(){
 
         for(BuildPlan request : plans){
-            if(request.progress > 0.01f || (buildPlan() == request && request.initialized && (dst(request.x * tilesize, request.y * tilesize) <= buildingRange || state.isEditor()))) continue;
+            if(request.progress > 0.01f || (buildPlan() == request && request.initialized && (within(request.x * tilesize, request.y * tilesize, buildingRange) || state.isEditor()))) continue;
 
-            request.animScale = 1f;
-            if(request.breaking){
-                control.input.drawBreaking(request);
-            }else{
-                request.block.drawRequest(request, control.input.allRequests(),
-                Build.validPlace(request.block, team, request.x, request.y, request.rotation) || control.input.requestMatches(request));
-            }
+            drawPlan(request, 1f);
         }
 
         Draw.reset();
+    }
+
+    void drawPlan(BuildPlan request, float alpha){
+        request.animScale = 1f;
+        if(request.breaking){
+            control.input.drawBreaking(request);
+        }else{
+            request.block.drawPlan(request, control.input.allRequests(),
+            Build.validPlace(request.block, team, request.x, request.y, request.rotation) || control.input.requestMatches(request),
+            alpha);
+        }
     }
 
     /** @return whether this request should be skipped, in favor of the next one. */
@@ -193,8 +198,10 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
 
     boolean activelyBuilding(){
         //not actively building when not near the build plan
-        if(isBuilding() && !within(buildPlan(), state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange)){
-            return false;
+        if(isBuilding()){
+            if(!within(buildPlan(), state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange)){
+                return false;
+            }
         }
         return isBuilding() && updateBuilding;
     }
@@ -206,17 +213,24 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
     }
 
     public void draw(){
-        if(!isBuilding() || !updateBuilding || !canBuild()) return;
+        if(!activelyBuilding()) return;
 
         //TODO check correctness
         Draw.z(Layer.flyingUnit);
 
         BuildPlan plan = buildPlan();
         Tile tile = world.tile(plan.x, plan.y);
-
+        var core = team.core();
 
         if(tile == null || (!within(tile, buildingRange) && !state.isEditor())){
             return;
+        }
+
+        //draw remote plans.
+        if(core != null && !isLocal() && !(tile.block() instanceof ConstructBlock)){
+            Draw.z(Layer.plans - 1f);
+            drawPlan(plan, 0.5f);
+            Draw.z(Layer.flyingUnit);
         }
 
         int size = plan.breaking ? tile.block().size : plan.block.size;

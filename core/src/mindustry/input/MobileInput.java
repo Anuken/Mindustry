@@ -292,7 +292,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(request.breaking){
                 drawSelected(request.x, request.y, tile.block(), Pal.remove);
             }else{
-                request.block.drawRequest(request, allRequests(), true);
+                request.block.drawPlan(request, allRequests(), true);
             }
         }
 
@@ -311,7 +311,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     if(i == lineRequests.size - 1 && request.block.rotate){
                         drawArrow(block, request.x, request.y, request.rotation);
                     }
-                    request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(request.x, request.y, request.block.size, null) == null);
+                    request.block.drawPlan(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(request.x, request.y, request.block.size, null) == null);
                     drawSelected(request.x, request.y, request.block, Pal.accent);
                 }
             }else if(mode == breaking){
@@ -391,7 +391,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(request.breaking){
             drawSelected(request.x, request.y, request.tile().block(), Pal.remove);
         }else{
-            request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
+            request.block.drawPlan(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
             drawSelected(request.x, request.y, request.block, Pal.accent);
         }
     }
@@ -736,6 +736,10 @@ public class MobileInput extends InputHandler implements GestureListener{
                 i--;
             }
         }
+
+        if(player.shooting && (player.unit().activelyBuilding() || player.unit().mining())){
+            player.shooting = false;
+        }
     }
 
     protected void autoPan(){
@@ -913,7 +917,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //update shooting if not building + not mining
-        if(!player.unit().isBuilding() && player.unit().mineTile == null){
+        if(!player.unit().activelyBuilding() && player.unit().mineTile == null){
 
             //autofire targeting
             if(manualShooting){

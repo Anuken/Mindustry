@@ -759,14 +759,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawRequest(BuildPlan request){
-        request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
+        request.block.drawPlan(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
     }
 
     /** Draws a placement icon for a specific block. */
     protected void drawRequest(int x, int y, Block block, int rotation){
         brequest.set(x, y, rotation, block);
         brequest.animScale = 1f;
-        block.drawRequest(brequest, allRequests(), validPlace(x, y, block, rotation));
+        block.drawPlan(brequest, allRequests(), validPlace(x, y, block, rotation));
     }
 
     /** Remove everything from the queue in a selection. */
@@ -1048,7 +1048,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean canShoot(){
         return block == null && !onConfigurable() && !isDroppingItem() && !player.unit().activelyBuilding() &&
-            !(player.unit() instanceof Mechc && player.unit().isFlying());
+            !(player.unit() instanceof Mechc && player.unit().isFlying()) && !player.unit().mining();
     }
 
     public boolean onConfigurable(){
