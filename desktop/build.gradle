@@ -51,7 +51,7 @@ task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
 }
 
 if(!project.ext.hasSprites()){
-    println "Scheduling sprite packi."
+    println "Scheduling sprite packing."
     run.dependsOn ":tools:pack"
     dist.dependsOn ":tools:pack"
 }
