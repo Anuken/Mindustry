@@ -18,6 +18,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
+import mindustry.world.blocks.distribution.ItemBridge;
 
 import java.util.*;
 
@@ -64,8 +65,10 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
             int total = 0;
             BuildPlan req;
             while((dst((req = buildPlan()).tile()) > finalPlaceDst || shouldSkip(req, core)) && total < plans.size){
-                plans.removeFirst();
-                plans.addLast(req);
+                if(!(req.block instanceof ItemBridge)){//to prevent bridges from messing up connections
+                    plans.removeFirst();
+                    plans.addLast(req);
+                }
                 total++;
             }
         }
