@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -120,10 +121,9 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
     /** Draw all current build plans. Does not draw the beam effect, only the positions. */
     void drawBuildPlans(){
 
-        for(BuildPlan request : plans){
-            if(request.progress > 0.01f || (buildPlan() == request && request.initialized && (within(request.x * tilesize, request.y * tilesize, buildingRange) || state.isEditor()))) continue;
-
-            drawPlan(request, 1f);
+        for(BuildPlan plan : plans){
+            if(plan.progress > 0.01f || (buildPlan() == plan && plan.initialized && (within(plan.x * tilesize, plan.y * tilesize, buildingRange) || state.isEditor()))) continue;
+            drawPlan(plan, 1f);
         }
 
         Draw.reset();
@@ -137,6 +137,11 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
             request.block.drawPlan(request, control.input.allRequests(),
             Build.validPlace(request.block, team, request.x, request.y, request.rotation) || control.input.requestMatches(request),
             alpha);
+
+            Draw.reset();
+            Draw.mixcol(Color.white, 0.24f + Mathf.absin(Time.globalTime, 6f, 0.28f));
+            Draw.alpha(alpha);
+            request.block.drawRequestConfigTop(request, plans);
         }
     }
 

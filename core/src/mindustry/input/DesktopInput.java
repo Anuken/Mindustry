@@ -168,7 +168,6 @@ public class DesktopInput extends InputHandler{
                     block.drawRequestConfig(brequest, allRequests());
                     brequest.config = null;
                 }
-
             }
         }
 

@@ -743,6 +743,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(BuildPlan req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
                 BuildPlan copy = req.copy();
+                req.block.onNewPlan(copy);
                 player.unit().addBuild(copy);
             }
         }
@@ -1080,12 +1081,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    public void tryPlaceBlock(int x, int y){
-        if(block != null && validPlace(x, y, block, rotation)){
-            placeBlock(x, y, block, rotation);
-        }
-    }
-
     public void tryBreakBlock(int x, int y){
         if(validBreak(x, y)){
             breakBlock(x, y);
@@ -1110,14 +1105,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean validBreak(int x, int y){
         return Build.validBreak(player.team(), x, y);
-    }
-
-    public void placeBlock(int x, int y, Block block, int rotation){
-        BuildPlan req = getRequest(x, y);
-        if(req != null){
-            player.unit().plans().remove(req);
-        }
-        player.unit().addBuild(new BuildPlan(x, y, rotation, block, block.nextConfig()));
     }
 
     public void breakBlock(int x, int y){

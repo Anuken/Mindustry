@@ -354,6 +354,9 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             Draw.reset();
             drawRequest(request);
+            if(!request.breaking){
+                drawOverRequest(request);
+            }
 
             //draw last placed request
             if(!request.breaking && request == lastPlaced && request.block != null){
@@ -596,6 +599,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, block, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, block)){
             //add to selection queue if it's a valid place position
             selectRequests.add(lastPlaced = new BuildPlan(cursor.x, cursor.y, rotation, block, block.nextConfig()));
+            block.onNewPlan(lastPlaced);
         }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasRequest(linked)){
             //add to selection queue if it's a valid BREAK position
             selectRequests.add(new BuildPlan(linked.x, linked.y));

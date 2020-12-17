@@ -393,6 +393,11 @@ public class Block extends UnlockableContent{
         return null;
     }
 
+    /** Called when a new build plan is created in the player's queue. Blocks can maintain a reference to this plan and add configs to it later. */
+    public void onNewPlan(BuildPlan plan){
+
+    }
+
     public void drawPlan(BuildPlan req, Eachable<BuildPlan> list, boolean valid){
         drawPlan(req, list, valid, 1f);
     }
