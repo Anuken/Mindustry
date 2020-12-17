@@ -1286,6 +1286,7 @@ public class Blocks implements ContentList{
             tier = 4;
             updateEffect = Fx.pulverizeMedium;
             drillEffect = Fx.mineBig;
+            drawMineItem = true;
 
             consumes.power(1.10f);
             consumes.liquid(Liquids.water, 0.08f).boost();
@@ -1303,6 +1304,7 @@ public class Blocks implements ContentList{
             drillEffect = Fx.mineHuge;
             rotateSpeed = 6f;
             warmupSpeed = 0.01f;
+            drawMineItem = true;
 
             //more than the laser drill
             liquidBoostIntensity = 1.8f;
