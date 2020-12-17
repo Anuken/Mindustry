@@ -328,7 +328,7 @@ task tileImages(){
     }
 }
 
-task pack(dependsOn: classes){
+task pack(dependsOn: [classes, configurations.runtimeClasspath]){
 
     doLast{
         //cleanup old sprites
