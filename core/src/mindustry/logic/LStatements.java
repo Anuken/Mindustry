@@ -20,7 +20,7 @@ import static mindustry.world.blocks.logic.LogicDisplay.*;
 public class LStatements{
 
     //TODO broken
-    //@RegisterStatement("#")
+    @RegisterStatement("#")
     public static class CommentStatement extends LStatement{
         public String comment = "";
 
@@ -31,12 +31,37 @@ public class LStatements{
 
         @Override
         public Color color(){
-            return Pal.logicControl;
+            return Pal.logicVerbose;
         }
 
         @Override
         public LInstruction build(LAssembler builder){
             return null;
+        }
+    }
+
+    @RegisterStatement("label")
+    public static class LabelStatement extends LStatement{
+        public String image = "@crawler";
+
+//        @Override
+//        public void build(Table table){
+//            fields(table, "image", image, v -> image = v).width(240f);
+//        }
+
+        @Override
+        public void build(Table table){
+            table.area(image, Styles.nodeArea, v -> image = v).growX().height(45f).padLeft(2).padRight(6).color(table.color);
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new LabelI(builder.var(image));
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicVerbose;
         }
     }
 
