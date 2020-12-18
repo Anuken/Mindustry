@@ -989,9 +989,9 @@ public class Blocks implements ContentList{
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
-            requirements(Category.distribution, with(Items.lead, 4, Items.copper, 4));
+            requirements(Category.distribution, with(Items.lead, 6, Items.copper, 6));
             range = 4;
-            speed = 70f;
+            speed = 74f;
             bufferCapacity = 14;
         }};
 

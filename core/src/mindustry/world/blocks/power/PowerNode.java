@@ -14,6 +14,7 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -153,38 +154,7 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void changePlacementPath(Seq<Point2> points, int rotation){
-        var base = tmpPoints2;
-        var result = tmpPoints.clear();
-
-        base.selectFrom(points, p -> p == points.first() || p == points.peek() || Build.validPlace(this, player.team(), p.x, p.y, rotation, false));
-        boolean addedLast = false;
-
-        outer:
-        for(int i = 0; i < base.size;){
-            var point = base.get(i);
-            result.add(point);
-            if(i == base.size - 1) addedLast = true;
-
-            //find the furthest node that overlaps this one
-            for(int j = base.size - 1; j > i; j--){
-                var other = base.get(j);
-                boolean over = overlaps(world.tile(point.x, point.y), world.tile(other.x, other.y));
-
-                if(over){
-                    //add node to list and start searching for node that overlaps the next one
-                    i = j;
-                    continue outer;
-                }
-            }
-
-            //if it got here, that means nothing was found. try to proceed to the next node anyway
-            i ++;
-        }
-
-        if(!addedLast) result.add(base.peek());
-
-        points.clear();
-        points.addAll(result);
+        Placement.calculateNodes(points, this, rotation, (point, other) -> overlaps(world.tile(point.x, point.y), world.tile(other.x, other.y)));
     }
 
     protected void setupColor(float satisfaction){

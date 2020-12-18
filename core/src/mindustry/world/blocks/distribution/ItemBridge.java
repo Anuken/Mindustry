@@ -13,6 +13,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -150,6 +151,11 @@ public class ItemBridge extends Block{
         }
 
         lastPlan = plan;
+    }
+
+    @Override
+    public void changePlacementPath(Seq<Point2> points, int rotation){
+        Placement.calculateNodes(points, this, rotation, (point, other) -> Math.max(Math.abs(point.x - other.x), Math.abs(point.y - other.y)) <= range);
     }
 
     public class ItemBridgeBuild extends Building{
