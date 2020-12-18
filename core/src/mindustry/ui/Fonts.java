@@ -16,7 +16,6 @@ import arc.graphics.g2d.*;
 import arc.graphics.g2d.Font.*;
 import arc.graphics.g2d.PixmapPacker.*;
 import arc.graphics.g2d.TextureAtlas.*;
-import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;

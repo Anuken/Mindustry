@@ -165,14 +165,15 @@ public class BuildPlan implements Position{
 
     @Override
     public String toString(){
-        return "BuildRequest{" +
+        return "BuildPlan{" +
         "x=" + x +
         ", y=" + y +
         ", rotation=" + rotation +
-        ", recipe=" + block +
+        ", block=" + block +
         ", breaking=" + breaking +
         ", progress=" + progress +
         ", initialized=" + initialized +
+        ", config=" + config +
         '}';
     }
 }

@@ -83,6 +83,10 @@ allprojects{
             return "v$buildVersion"
         }
 
+        hasSprites = {
+            return new File(rootDir, "core/assets/sprites/sprites.atlas").exists()
+        }
+
         getModifierString = {
             if(versionModifier != "release"){
                 return "[${versionModifier.toUpperCase()}]"

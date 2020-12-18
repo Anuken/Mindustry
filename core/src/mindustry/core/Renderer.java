@@ -30,6 +30,8 @@ public class Renderer implements ApplicationListener{
     public @Nullable Bloom bloom;
     public FrameBuffer effectBuffer = new FrameBuffer();
     public float laserOpacity = 1f;
+    /** minZoom = zooming out, maxZoom = zooming in */
+    public float minZoom = 1.5f, maxZoom = 6f;
 
     //TODO unused
     private FxProcessor fx = new FxProcessor();
@@ -302,8 +304,7 @@ public class Renderer implements ApplicationListener{
     }
 
     public void clampScale(){
-        float s = Scl.scl(1f);
-        targetscale = Mathf.clamp(targetscale, minScale(), Math.round(s * 6));
+        targetscale = Mathf.clamp(targetscale, minScale(), maxScale());
     }
 
     public float getDisplayScale(){
@@ -311,7 +312,11 @@ public class Renderer implements ApplicationListener{
     }
 
     public float minScale(){
-        return Scl.scl(1.5f);
+        return Scl.scl(minZoom);
+    }
+
+    public float maxScale(){
+        return Mathf.round(Scl.scl(maxZoom));
     }
 
     public float getScale(){

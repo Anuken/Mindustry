@@ -110,7 +110,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
         type.hitEntity(self(), other, health);
 
-        if(owner instanceof WallBuild && player != null && team != player.team() && other instanceof Unit unit && unit.dead){
+        if(owner instanceof WallBuild && player != null && team == player.team() && other instanceof Unit unit && unit.dead){
             Events.fire(Trigger.phaseDeflectHit);
         }
     }

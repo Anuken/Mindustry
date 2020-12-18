@@ -41,7 +41,7 @@ public class BlockForge extends PayloadAcceptor{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", (BlockForgeBuild entity) -> new Bar("bar.progress", Pal.ammo, () -> entity.recipe == null ? 0f : (float)(entity.progress / entity.recipe.buildCost)));
+        bars.add("progress", (BlockForgeBuild entity) -> new Bar("bar.progress", Pal.ammo, () -> entity.recipe == null ? 0f : (entity.progress / entity.recipe.buildCost)));
     }
 
     @Override

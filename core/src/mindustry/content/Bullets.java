@@ -172,7 +172,7 @@ public class Bullets implements ContentList{
         }};
 
         flakGlass = new FlakBulletType(4f, 3){{
-            lifetime = 70f;
+            lifetime = 60f;
             ammoMultiplier = 5f;
             shootEffect = Fx.shootSmall;
             reloadMultiplier = 0.8f;
@@ -206,7 +206,6 @@ public class Bullets implements ContentList{
         }};
 
         fragGlass = new FlakBulletType(4f, 3){{
-            lifetime = 70f;
             ammoMultiplier = 3f;
             shootEffect = Fx.shootSmall;
             reloadMultiplier = 0.8f;
@@ -445,19 +444,20 @@ public class Bullets implements ContentList{
 
         waterShot = new LiquidBulletType(Liquids.water){{
             knockback = 0.7f;
+            drag = 0.01f;
         }};
 
         cryoShot = new LiquidBulletType(Liquids.cryofluid){{
-
+            drag = 0.01f;
         }};
 
         slagShot = new LiquidBulletType(Liquids.slag){{
             damage = 4;
-            drag = 0.03f;
+            drag = 0.01f;
         }};
 
         oilShot = new LiquidBulletType(Liquids.oil){{
-            drag = 0.03f;
+            drag = 0.01f;
         }};
 
         heavyWaterShot = new LiquidBulletType(Liquids.water){{

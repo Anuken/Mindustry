@@ -1311,6 +1311,7 @@ public class UnitTypes implements ContentList{
             drag = 0.017f;
             lowAltitude = false;
             flying = true;
+            circleTarget = true;
             engineOffset = 12f;
             engineSize = 6f;
             rotateShooting = false;

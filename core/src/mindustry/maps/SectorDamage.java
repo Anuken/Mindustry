@@ -260,8 +260,8 @@ public class SectorDamage{
 
                         if(tile.build != null && tile.team() == state.rules.defaultTeam && counted.add(tile.pos())){
                             //health is divided by block size, because multiblocks are counted multiple times.
-                            sumHealth += tile.build.health / tile.block().size;
-                            totalPathBuild += 1f / tile.block().size;
+                            sumHealth += tile.build.health / (tile.block().size * tile.block().size);
+                            totalPathBuild += 1f / (tile.block().size * tile.block().size);
                         }
                     }
                 }
@@ -285,7 +285,7 @@ public class SectorDamage{
 
                     if(build.block instanceof ForceProjector f){
                         sumHealth += f.shieldHealth * e;
-                        sumRps += 1f * e;
+                        sumRps += e;
                     }
                 }
             }
@@ -409,7 +409,7 @@ public class SectorDamage{
                             if(wx >= 0 && wy >= 0 && wx < world.width() && wy < world.height() && Mathf.within(dx, dy, radius)){
                                 Tile other = world.rawTile(wx, wy);
                                 if(!(other.block() instanceof CoreBlock)){
-                                    s += other.team() == state.rules.defaultTeam ? other.build.health / other.block().size : 0f;
+                                    s += other.team() == state.rules.defaultTeam ? other.build.health / (other.block().size * other.block().size) : 0f;
                                 }
                             }
                         }
