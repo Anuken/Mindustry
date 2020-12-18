@@ -16,6 +16,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.logic.*;
+import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 import mindustry.world.blocks.logic.MemoryBlock.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
@@ -176,6 +177,23 @@ public class LExecutor{
 
     public interface LInstruction{
         void run(LExecutor exec);
+    }
+
+    public static class LabelI implements LInstruction{
+        public int p1;
+
+        public LabelI(int p1){
+            this.p1 = p1;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            int icon = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
+
+            if(exec.building(varThis) instanceof LogicBuild){
+                ((LogicBuild) exec.building(varThis)).label = icon;
+            }
+        }
     }
 
     /** Binds the processor to a unit based on some filters. */
