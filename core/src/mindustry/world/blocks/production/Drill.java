@@ -77,7 +77,7 @@ public class Drill extends Block{
         if(tile == null) return;
 
         countOre(req.tile());
-        if(returnItem == null) return;
+        if(returnItem == null || !drawMineItem) return;
 
         Draw.color(returnItem.color);
         Draw.rect("drill-top", req.drawx(), req.drawy());
