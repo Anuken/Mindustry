@@ -100,6 +100,7 @@ public class Pal{
 	
     adminChat = Color.valueOf("ff4000"),
 
+    logicVerbose = Color.valueOf("808080"),
     logicBlocks = Color.valueOf("d4816b"),
     logicControl = Color.valueOf("6bb2b2"),
     logicOperations = Color.valueOf("877bad"),
