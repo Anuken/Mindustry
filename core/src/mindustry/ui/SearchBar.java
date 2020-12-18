@@ -13,7 +13,7 @@ public class SearchBar{
 
         parent.table(search -> {
             rebuild[0] = str -> {
-                final String query = queryf.get(str);
+                String query = queryf.get(str);
 
                 pane[0].clear();
                 list.each(item -> {
