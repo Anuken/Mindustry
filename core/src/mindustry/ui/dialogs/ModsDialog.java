@@ -30,6 +30,9 @@ public class ModsDialog extends BaseDialog{
         buttons.button("@mods.guide", Icon.link, () -> Core.app.openURI(modGuideURL)).size(210, 64f);
 
         shown(this::setup);
+        if(mobile){
+            onResize(this::setup);
+        }
 
         hidden(() -> {
             if(mods.requiresReload()){
@@ -218,6 +221,11 @@ public class ModsDialog extends BaseDialog{
                     }, Styles.clearPartialt, () -> showMod(mod)).size(w, h).growX().pad(4f);
                     table.row();
                 }).margin(10f).top();
+
+                if(mobile && !Core.graphics.isPortrait()){
+                    //hide search bar on mobile, takes up too much space
+                    cont.getCells().get(2).get().clear();
+                }
         }else{
             cont.table(Styles.black6, t -> t.add("@mods.none")).height(80f);
         }
