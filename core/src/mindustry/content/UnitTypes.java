@@ -336,7 +336,7 @@ public class UnitTypes implements ContentList{
 
                 bullet = new LightningBulletType(){{
                     lightningColor = hitColor = Pal.heal;
-                    damage = 15f;
+                    damage = 12f;
                     lightningLength = 7;
                     lightningLengthRand = 7;
                     shootEffect = Fx.shootHeal;
