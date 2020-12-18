@@ -141,7 +141,7 @@ public class ModsDialog extends BaseDialog{
         if(!mods.list().isEmpty()){
             boolean[] anyDisabled = {false};
             SearchBar.add(cont, mods.list(),
-                mod -> Strings.stripColors(mod.meta.displayName()),
+                mod -> mod.meta.displayName(),
                 (table, mod) -> {
                     if(!mod.enabled() && !anyDisabled[0] && mods.list().size > 0){
                         anyDisabled[0] = true;
@@ -220,12 +220,12 @@ public class ModsDialog extends BaseDialog{
                         }).growX().right().padRight(-8f).padTop(-8f);
                     }, Styles.clearPartialt, () -> showMod(mod)).size(w, h).growX().pad(4f);
                     table.row();
+                }, bar -> {
+                    if(mobile && !Core.graphics.isPortrait()){
+                        //hide search bar on mobile, takes up too much space
+                        bar.get().clear();
+                    }
                 }).margin(10f).top();
-
-                if(mobile && !Core.graphics.isPortrait()){
-                    //hide search bar on mobile, takes up too much space
-                    cont.getCells().get(2).get().clear();
-                }
         }else{
             cont.table(Styles.black6, t -> t.add("@mods.none")).height(80f);
         }
