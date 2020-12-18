@@ -6,14 +6,17 @@ import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.input.*;
 import arc.scene.style.*;
 import arc.scene.ui.TextButton.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import arc.util.serialization.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.ui.*;
 
@@ -22,6 +25,8 @@ import java.io.*;
 import static mindustry.Vars.*;
 
 public class ModsDialog extends BaseDialog{
+    private String searchtxt = "";
+    private @Nullable Seq<ModListing> modList;
 
     public ModsDialog(){
         super("@mods");
@@ -51,6 +56,25 @@ public class ModsDialog extends BaseDialog{
             ui.showErrorMessage("@feature.unsupported");
         }else{
             ui.showException(error);
+        }
+    }
+
+    void getModList(Cons<Seq<ModListing>> listener){
+        if(modList == null){
+            Core.net.httpGet("https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", response -> {
+                String strResult = response.getResultAsString();
+                var status = response.getStatus();
+
+                Core.app.post(() -> {
+                    if(status != HttpStatus.OK){
+                        ui.showErrorMessage(Core.bundle.format("connectfail", status));
+                    }else{
+                        listener.get(modList = new Json().fromJson(Seq.class, ModListing.class, strResult));
+                    }
+                });
+            }, error -> Core.app.post(() -> ui.showException(error)));
+        }else{
+            listener.get(modList);
         }
     }
 
@@ -110,22 +134,82 @@ public class ModsDialog extends BaseDialog{
                             Core.settings.put("lastmod", text);
 
                             ui.loadfrag.show();
-                            //Try to download the 6.0 branch first, but if it doesn't exist, try master.
-                            githubImport("6.0", text, e1 -> {
-                                githubImport("master", text, e2 -> {
-                                    githubImport("main", text, e3 -> {
-                                        ui.showErrorMessage(Core.bundle.format("connectfail", e2));
-                                        ui.loadfrag.hide();
-                                    });
-                                });
-                            });
+                            githubImportMod(text);
                         });
                     }).margin(12f);
-                });
 
+                    t.row();
+
+                    t.button("@mod.featured.title", Icon.star, bstyle, () -> {
+                        Runnable[] rebuildBrowser = {null};
+                        dialog.hide();
+                        BaseDialog browser = new BaseDialog("$mod.featured.dialog.title");
+                        browser.cont.table(table -> {
+                            table.left();
+                            table.image(Icon.zoom);
+                            table.field(searchtxt, res -> {
+                                searchtxt = res;
+                                rebuildBrowser[0].run();
+                            }).growX().get();
+                        }).fillX().padBottom(4);
+
+                        browser.cont.row();
+
+                        browser.cont.pane(tablebrow -> {
+                            tablebrow.margin(10f).top();
+                            rebuildBrowser[0] = () -> {
+                                tablebrow.clear();
+                                tablebrow.add("@loading");
+
+                                getModList(listings -> {
+                                    tablebrow.clear();
+
+                                    for(ModListing mod : listings){
+                                        if(!searchtxt.isEmpty() && !mod.repo.contains(searchtxt)) continue;
+
+                                        tablebrow.button(btn -> {
+                                            btn.top().left();
+                                            btn.margin(12f);
+                                            btn.table(con -> {
+                                                con.left();
+                                                con.add("[lightgray]Name:[] " + mod.name + "\n[lightgray]Author:[] " + mod.author + "\n[accent]\uE809 " + mod.stars)
+                                                .width(388f).wrap().growX().pad(0f, 6f, 0f, 6f).left().labelAlign(Align.left);
+                                                con.add().growX().pad(0f, 6f, 0f, 6f);
+                                            }).fillY().growX().pad(0f, 6f, 0f, 6f);
+                                        }, Styles.modsb, () -> {
+                                            var sel = new BaseDialog((Core.bundle.get("mods.browser.selected")) + ": " + mod.name);
+                                            sel.cont.add(mod.description).width(mobile ? 400f : 500f).wrap().pad(4f).labelAlign(Align.center, Align.left);
+                                            sel.buttons.defaults().size(200f, 54f).pad(2f);
+                                            sel.setFillParent(false);
+                                            sel.buttons.button("@back", Icon.left, () -> {
+                                                sel.clear();
+                                                sel.hide();
+                                            });
+                                            sel.buttons.button("@mods.browser.add", Icon.download, () -> {
+                                                sel.hide();
+                                                githubImportMod(mod.repo);
+                                            });
+                                            sel.buttons.button("@mods.github.open", Icon.link, () -> {
+                                                Core.app.openURI("https://github.com/" + mod.repo);
+                                            });
+                                            sel.keyDown(KeyCode.escape, sel::hide);
+                                            sel.keyDown(KeyCode.back, sel::hide);
+                                            sel.show();
+                                        }).width(480f).growX().left().fillY();
+                                        tablebrow.row();
+                                    }
+                                });
+                            };
+                            rebuildBrowser[0].run();
+                        });
+                        browser.addCloseButton();
+                        browser.show();
+                    }).margin(12f);
+                });
                 dialog.addCloseButton();
 
                 dialog.show();
+
             }).margin(margin);
 
             if(!mobile){
@@ -315,7 +399,20 @@ public class ModsDialog extends BaseDialog{
         }
     }
 
-    private void githubImport(String branch, String repo, Cons<HttpStatus> err){
+    private void githubImportMod(String name){
+        //try several branches
+        //TODO use only the main branch as specified in meta
+        githubImportBranch("6.0", name, e1 -> {
+            githubImportBranch("master", name, e2 -> {
+                githubImportBranch("main", name, e3 -> {
+                    ui.showErrorMessage(Core.bundle.format("connectfail", e2));
+                    ui.loadfrag.hide();
+                });
+            });
+        });
+    }
+
+    private void githubImportBranch(String branch, String repo, Cons<HttpStatus> err){
         Core.net.httpGet("https://api.github.com/repos/" + repo + "/zipball/" + branch, loc -> {
             if(loc.getStatus() == HttpStatus.OK){
                 if(loc.getHeader("Location") != null){
