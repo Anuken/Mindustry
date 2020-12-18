@@ -1,6 +1,7 @@
 package mindustry.world.blocks.logic;
 
 import arc.func.*;
+import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.Bits;
@@ -194,6 +195,7 @@ public class LogicBlock extends Block{
         public LExecutor executor = new LExecutor();
         public float accumulator = 0;
         public Seq<LogicLink> links = new Seq<>();
+        public int label = 0;
 
         public void readCompressed(byte[] data, boolean relative){
             DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
@@ -423,6 +425,17 @@ public class LogicBlock extends Block{
                 copy.add(c);
             }
             return copy;
+        }
+
+        @Override
+        public void draw(){
+            super.draw();
+
+            if(label == 0) return;
+
+            Draw.alpha(0.75f);
+            Draw.rect(Fonts.logicIcon(label), x, y, 4 * size, 4 * size);
+            Draw.reset();
         }
 
         @Override
