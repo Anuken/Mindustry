@@ -284,18 +284,22 @@ public class CustomRulesDialog extends BaseDialog{
                             f.defaults().padRight(4).left();
 
                             f.add("@rules.weather.duration");
-                            field(f, entry.minDuration / toMinutes, v -> entry.minDuration = v * toMinutes);
+                            field(f, entry.minDuration / toMinutes, v -> entry.minDuration = v * toMinutes).disabled(v -> entry.always);
                             f.add("@waves.to");
-                            field(f, entry.maxDuration / toMinutes, v -> entry.maxDuration = v * toMinutes);
+                            field(f, entry.maxDuration / toMinutes, v -> entry.maxDuration = v * toMinutes).disabled(v -> entry.always);
                             f.add("@unit.minutes");
 
                             f.row();
 
                             f.add("@rules.weather.frequency");
-                            field(f, entry.minFrequency / toMinutes, v -> entry.minFrequency = v * toMinutes);
+                            field(f, entry.minFrequency / toMinutes, v -> entry.minFrequency = v * toMinutes).disabled(v -> entry.always);
                             f.add("@waves.to");
-                            field(f, entry.maxFrequency / toMinutes, v -> entry.maxFrequency = v * toMinutes);
+                            field(f, entry.maxFrequency / toMinutes, v -> entry.maxFrequency = v * toMinutes).disabled(v -> entry.always);
                             f.add("@unit.minutes");
+
+                            f.row();
+
+                            f.check("@rules.weather.always", val -> entry.always = val).checked(cc -> entry.always).padBottom(4);
 
                             //intensity can't currently be customized
 
