@@ -292,7 +292,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(request.breaking){
                 drawSelected(request.x, request.y, tile.block(), Pal.remove);
             }else{
-                request.block.drawRequest(request, allRequests(), true);
+                request.block.drawPlan(request, allRequests(), true);
             }
         }
 
@@ -311,7 +311,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     if(i == lineRequests.size - 1 && request.block.rotate){
                         drawArrow(block, request.x, request.y, request.rotation);
                     }
-                    request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(request.x, request.y, request.block.size, null) == null);
+                    request.block.drawPlan(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(request.x, request.y, request.block.size, null) == null);
                     drawSelected(request.x, request.y, request.block, Pal.accent);
                 }
             }else if(mode == breaking){
@@ -354,6 +354,9 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             Draw.reset();
             drawRequest(request);
+            if(!request.breaking){
+                drawOverRequest(request);
+            }
 
             //draw last placed request
             if(!request.breaking && request == lastPlaced && request.block != null){
@@ -391,7 +394,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(request.breaking){
             drawSelected(request.x, request.y, request.tile().block(), Pal.remove);
         }else{
-            request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
+            request.block.drawPlan(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
             drawSelected(request.x, request.y, request.block, Pal.accent);
         }
     }
@@ -596,6 +599,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, block, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, block)){
             //add to selection queue if it's a valid place position
             selectRequests.add(lastPlaced = new BuildPlan(cursor.x, cursor.y, rotation, block, block.nextConfig()));
+            block.onNewPlan(lastPlaced);
         }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasRequest(linked)){
             //add to selection queue if it's a valid BREAK position
             selectRequests.add(new BuildPlan(linked.x, linked.y));
@@ -735,6 +739,10 @@ public class MobileInput extends InputHandler implements GestureListener{
                 removals.remove(i);
                 i--;
             }
+        }
+
+        if(player.shooting && (player.unit().activelyBuilding() || player.unit().mining())){
+            player.shooting = false;
         }
     }
 
@@ -913,7 +921,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //update shooting if not building + not mining
-        if(!player.unit().isBuilding() && player.unit().mineTile == null){
+        if(!player.unit().activelyBuilding() && player.unit().mineTile == null){
 
             //autofire targeting
             if(manualShooting){

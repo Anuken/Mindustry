@@ -1154,7 +1154,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return false;
     }
 
-
     public float handleDamage(float amount){
         return amount;
     }
@@ -1173,6 +1172,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public boolean canPickup(){
         return true;
+    }
+
+    public void pickedUp(){
+
     }
 
     public void removeFromProximity(){

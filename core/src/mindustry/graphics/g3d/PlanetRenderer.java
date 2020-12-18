@@ -89,7 +89,15 @@ public class PlanetRenderer implements Disposable{
 
         beginBloom();
 
+        //render skybox at 0,0,0
+        Vec3 lastPos = Tmp.v31.set(cam.position);
+        cam.position.setZero();
+        cam.update();
+
         skybox.render(cam.combined);
+
+        cam.position.set(lastPos);
+        cam.update();
 
         Events.fire(Trigger.universeDraw);
 
