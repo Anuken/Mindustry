@@ -318,8 +318,8 @@ public class CustomRulesDialog extends BaseDialog{
         dialog.addCloseButton();
 
         dialog.buttons.button("@add", Icon.add, () -> {
-            BaseDialog addd = new BaseDialog("@add");
-            addd.cont.pane(t -> {
+            BaseDialog add = new BaseDialog("@add");
+            add.cont.pane(t -> {
                 t.background(Tex.button);
                 int i = 0;
                 for(Weather weather : content.<Weather>getBy(ContentType.weather)){
@@ -328,13 +328,13 @@ public class CustomRulesDialog extends BaseDialog{
                         rules.weather.add(new WeatherEntry(weather));
                         rebuild[0].run();
 
-                        addd.hide();
+                        add.hide();
                     }).size(140f, 50f);
                     if(++i % 2 == 0) t.row();
                 }
             });
-            addd.addCloseButton();
-            addd.show();
+            add.addCloseButton();
+            add.show();
         }).width(170f);
 
         //reset cooldown to random number
