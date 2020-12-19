@@ -389,9 +389,9 @@ public class Damage{
                 if(scaledDamage <= 0 || tile == null) continue;
 
                 //apply damage to entity if needed
-                if(tile.build != null && tile.team() != team){
-                    int health = (int)tile.build.health();
-                    if(tile.build.health() > 0){
+                if(tile.build != null && tile.build.team != team){
+                    int health = (int)(tile.build.health / (tile.block().size * tile.block().size));
+                    if(tile.build.health > 0){
                         tile.build.damage(scaledDamage);
                         scaledDamage -= health;
 

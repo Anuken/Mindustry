@@ -989,9 +989,9 @@ public class Blocks implements ContentList{
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
-            requirements(Category.distribution, with(Items.lead, 4, Items.copper, 4));
+            requirements(Category.distribution, with(Items.lead, 6, Items.copper, 6));
             range = 4;
-            speed = 70f;
+            speed = 74f;
             bufferCapacity = 14;
         }};
 
@@ -1772,7 +1772,7 @@ public class Blocks implements ContentList{
 
             maxAmmo = 40;
             ammoPerShot = 4;
-            rotateSpeed = 2.5f;
+            rotateSpeed = 2f;
             reloadTime = 200f;
             ammoUseEffect = Fx.casing3Double;
             recoilAmount = 5f;
