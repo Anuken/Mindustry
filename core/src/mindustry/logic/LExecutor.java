@@ -190,8 +190,8 @@ public class LExecutor{
         public void run(LExecutor exec){
             int icon = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
 
-            if(exec.building(varThis) instanceof LogicBuild){
-                ((LogicBuild) exec.building(varThis)).label = icon;
+            if(exec.building(varThis) instanceof LogicBuild build){
+                build.label = icon;
             }
         }
     }
