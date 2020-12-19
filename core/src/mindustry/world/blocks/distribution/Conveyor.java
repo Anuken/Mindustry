@@ -98,25 +98,23 @@ public class Conveyor extends Block implements Autotiler{
             return Blocks.junction;
         }
 
-        int ogRot = req.rotation;
         for(int i = 0;i < 2;i ++){
             //TODO: automatically generate bridges?
             Block[] bridges = {Blocks.itemBridge, Blocks.phaseConveyor};
+            final int checkRotation = (req.rotation + i*2) % 4;
             for(int j = 0;j < bridges.length;j ++){
                 final int distance = ((ItemBridge)bridges[j]).range;
-                if(req.block instanceof Conveyor && !thisPlaceableOn(frontTile(req.x, req.y, req.rotation)) && requests.contains(o -> 
+                if(req.block instanceof Conveyor && !thisPlaceableOn(frontTile(req.x, req.y, checkRotation)) && requests.contains(o -> 
                     (o.block instanceof Conveyor || o.block instanceof ItemBridge) && 
                     thisPlaceableOn(world.tile(req.x, req.y)) &&
                     thisPlaceableOn(world.tile(o.x, o.y)) &&
-                    !thisPlaceableOn(frontTile(o.x, o.y, (req.rotation + 2) % 4)) && 
-                    inFront(req.x, req.y, req.rotation, o) && 
+                    !thisPlaceableOn(frontTile(o.x, o.y, (checkRotation + 2) % 4)) && 
+                    inFront(req.x, req.y, checkRotation, o) && 
                     Mathf.dstm(req.x, req.y, o.x, o.y) <= distance)){
                     return bridges[j];
                 }
             }
-            req.rotation = (req.rotation + 2) % 4;
         }
-        req.rotation = ogRot;
 
         return this;
     }
