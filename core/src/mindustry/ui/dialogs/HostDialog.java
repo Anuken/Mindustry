@@ -75,7 +75,7 @@ public class HostDialog extends BaseDialog{
                             }, () -> {
                                 Core.settings.put("publichost", false);
                                 platform.updateLobby();
-                            }
+                            });
                         }, () -> {
                             Core.settings.put("publichost", false);
                             platform.updateLobby();
