@@ -67,7 +67,7 @@ public class HostDialog extends BaseDialog{
                 player.admin(true);
 
                 if(steam){
-                    Core.app.post(() -> Core.settings.getBoolOnce("steampublic2", () -> {
+                    Core.app.post(() -> Core.settings.getBoolOnce("steampublic3", () -> {
                         ui.showCustomConfirm("@setting.publichost.name", "@public.confirm", "@yes", "@no", () -> {
                             ui.showCustomConfirm("@setting.publichost.name", "@public.confirm.really", "@no", "@yes", () -> {
                                 Core.settings.put("publichost", true);
