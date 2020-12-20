@@ -38,6 +38,11 @@ public class BlockForge extends PayloadAcceptor{
     }
 
     @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region, outRegion};
+    }
+
+    @Override
     public void setBars(){
         super.setBars();
 
