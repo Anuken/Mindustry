@@ -57,6 +57,7 @@ public class Drill extends Block{
     public @Load("@-rim") TextureRegion rimRegion;
     public @Load("@-rotator") TextureRegion rotatorRegion;
     public @Load("@-top") TextureRegion topRegion;
+    public @Load(value = "@-item", fallback = "drill-item-@size") TextureRegion itemRegion;
 
     public Drill(String name){
         super(name);
@@ -80,7 +81,7 @@ public class Drill extends Block{
         if(returnItem == null || !drawMineItem) return;
 
         Draw.color(returnItem.color);
-        Draw.rect("drill-top", req.drawx(), req.drawy());
+        Draw.rect(itemRegion, req.drawx(), req.drawy());
         Draw.color();
     }
 
@@ -304,7 +305,7 @@ public class Drill extends Block{
 
             if(dominantItem != null && drawMineItem){
                 Draw.color(dominantItem.color);
-                Draw.rect("drill-top", x, y);
+                Draw.rect(itemRegion, x, y);
                 Draw.color();
             }
         }
