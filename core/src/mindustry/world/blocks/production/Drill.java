@@ -127,7 +127,7 @@ public class Drill extends Block{
 
             if(drawMineItem){
                 Draw.color(returnItem.color);
-                Draw.rect("drill-top", tile.worldx() + offset, tile.worldy() + offset);
+                Draw.rect(itemRegion, tile.worldx() + offset, tile.worldy() + offset);
                 Draw.color();
             }
         }else{
