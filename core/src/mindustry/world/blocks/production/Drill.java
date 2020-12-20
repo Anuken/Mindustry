@@ -77,7 +77,7 @@ public class Drill extends Block{
         Tile tile = req.tile();
         if(tile == null) return;
 
-        countOre(req.tile());
+        countOre(tile);
         if(returnItem == null || !drawMineItem) return;
 
         Draw.color(returnItem.color);
