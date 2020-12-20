@@ -125,6 +125,12 @@ public class Drill extends Block{
             Draw.rect(returnItem.icon(Cicon.small), dx, dy - 1);
             Draw.reset();
             Draw.rect(returnItem.icon(Cicon.small), dx, dy);
+
+            if(drawMineItem){
+                Draw.color(returnItem.color);
+                Draw.rect(itemRegion, tile.worldx() + offset, tile.worldy() + offset);
+                Draw.color();
+            }
         }else{
             Tile to = tile.getLinkedTilesAs(this, tempTiles).find(t -> t.drop() != null && t.drop().hardness > tier);
             Item item = to == null ? null : to.drop();
