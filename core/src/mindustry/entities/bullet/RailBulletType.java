@@ -37,7 +37,7 @@ public class RailBulletType extends BulletType{
     }
 
     void handle(Bullet b, Posc pos, float initialHealth){
-        float sub = initialHealth*pierceDamageFactor;
+        float sub = Math.max(initialHealth*pierceDamageFactor, 0);
 
         if(b.damage <= 0){
             b.fdata = Math.min(b.fdata, b.dst(pos));
