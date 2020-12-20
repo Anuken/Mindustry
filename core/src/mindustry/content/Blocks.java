@@ -1262,7 +1262,6 @@ public class Blocks implements ContentList{
 
         mechanicalDrill = new Drill("mechanical-drill"){{
             requirements(Category.production, with(Items.copper, 12), true);
-            drawMineItem = true;
             tier = 2;
             drillTime = 600;
             size = 2;
@@ -1272,7 +1271,6 @@ public class Blocks implements ContentList{
 
         pneumaticDrill = new Drill("pneumatic-drill"){{
             requirements(Category.production, with(Items.copper, 18, Items.graphite, 10));
-            drawMineItem = true;
             tier = 3;
             drillTime = 400;
             size = 2;
@@ -1282,7 +1280,6 @@ public class Blocks implements ContentList{
 
         laserDrill = new Drill("laser-drill"){{
             requirements(Category.production, with(Items.copper, 35, Items.graphite, 30, Items.silicon, 30, Items.titanium, 20));
-            drawMineItem = true;
             drillTime = 280;
             size = 3;
             hasPower = true;
@@ -1296,7 +1293,6 @@ public class Blocks implements ContentList{
 
         blastDrill = new Drill("blast-drill"){{
             requirements(Category.production, with(Items.copper, 65, Items.silicon, 60, Items.titanium, 50, Items.thorium, 75));
-            drawMineItem = true;
             drillTime = 280;
             size = 4;
             drawRim = true;

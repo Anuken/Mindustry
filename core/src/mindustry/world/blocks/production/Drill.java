@@ -42,7 +42,7 @@ public class Drill extends Block{
     protected int returnCount;
 
     /** Whether to draw the item this drill is mining. */
-    public boolean drawMineItem = false;
+    public boolean drawMineItem = true;
     /** Effect played when an item is produced. This is colored. */
     public Effect drillEffect = Fx.mine;
     /** Speed the drill bit rotates at. */
