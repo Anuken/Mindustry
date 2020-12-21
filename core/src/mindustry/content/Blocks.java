@@ -872,7 +872,7 @@ public class Blocks implements ContentList{
             size = 4;
         }};
 
-        thruster = new Wall("thruster"){{
+        thruster = new Thruster("thruster"){{
             health = 55 * 16 * wallHealthMultiplier;
             size = 4;
         }};
