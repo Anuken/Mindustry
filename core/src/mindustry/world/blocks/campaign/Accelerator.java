@@ -50,10 +50,30 @@ public class Accelerator extends Block{
     }
     
     public class AcceleratorBuild extends Building{
+        public float heat;
 
+        @Override
+        public void updateTile(){
+            super.updateTile();
+            heat = Mathf.lerpDelta(heat, consValid() ? 1f : 0f, 0.05f);
+        }
+        
         @Override
         public void draw(){
             super.draw();
+            
+            if(heat < 0.0001f){
+                for(int l = 0; l < 4; l++){
+                    float length = 7f + l * 5f;
+                    Draw.color(Pal.darkMetal);
+
+                    for(int i = 0; i < 4; i++){
+                        float rot = i*90f + 45f;
+                        Draw.rect(arrowRegion, x + Angles.trnsx(rot, length), y + Angles.trnsy(rot, length), rot + 180f);
+                    }
+                }
+                return;
+            }
 
             for(int l = 0; l < 4; l++){
                 float length = 7f + l * 5f;
@@ -69,10 +89,10 @@ public class Accelerator extends Block{
             float scl = 2f;
 
             Draw.z(Layer.bullet - 0.0001f);
-            Lines.stroke(1.75f, Pal.accent);
+            Lines.stroke(1.75f * heat, Pal.accent);
             Lines.square(x, y, rad * 1.22f, 45f);
 
-            Lines.stroke(3f, Pal.accent);
+            Lines.stroke(3f * heat, Pal.accent);
             Lines.square(x, y, rad, Time.time / scl);
             Lines.square(x, y, rad, -Time.time / scl);
 
@@ -80,7 +100,7 @@ public class Accelerator extends Block{
 
             for(int i = 0; i < 4; i++){
                 float rot = i*90f + 45f + (-Time.time /3f)%360f;
-                float length = 26f;
+                float length = 26f * heat;
                 Draw.rect(arrowRegion, x + Angles.trnsx(rot, length), y + Angles.trnsy(rot, length), rot + 180f);
             }
 
