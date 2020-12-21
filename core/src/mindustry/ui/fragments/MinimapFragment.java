@@ -28,7 +28,7 @@ public class MinimapFragment extends Fragment{
             float size = baseSize * zoom * world.width();
 
             Draw.color(Color.black);
-            Fill.crect(x, y, w, h);
+            Fill.crect(0, 0, w, h);
 
             if(renderer.minimap.getTexture() != null){
                 Draw.color();
@@ -108,6 +108,10 @@ public class MinimapFragment extends Fragment{
 
     public boolean shown(){
         return shown;
+    }
+
+    public void hide(){
+        shown = false;
     }
 
     public void toggle(){

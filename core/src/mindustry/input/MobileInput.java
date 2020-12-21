@@ -252,7 +252,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 selectRequests.clear();
                 mode = none;
                 block = null;
-            }).width(155f).margin(12f);
+            }).width(155f).height(50f).margin(12f);
         });
 
         group.fill(t -> {
@@ -292,7 +292,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(request.breaking){
                 drawSelected(request.x, request.y, tile.block(), Pal.remove);
             }else{
-                request.block.drawRequest(request, allRequests(), true);
+                request.block.drawPlan(request, allRequests(), true);
             }
         }
 
@@ -311,7 +311,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     if(i == lineRequests.size - 1 && request.block.rotate){
                         drawArrow(block, request.x, request.y, request.rotation);
                     }
-                    request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(request.x, request.y, request.block.size, null) == null);
+                    request.block.drawPlan(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(request.x, request.y, request.block.size, null) == null);
                     drawSelected(request.x, request.y, request.block, Pal.accent);
                 }
             }else if(mode == breaking){
@@ -354,6 +354,9 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             Draw.reset();
             drawRequest(request);
+            if(!request.breaking){
+                drawOverRequest(request);
+            }
 
             //draw last placed request
             if(!request.breaking && request == lastPlaced && request.block != null){
@@ -376,8 +379,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             float radius = Interp.swingIn.apply(crosshairScale);
 
-            Lines.poly(target.getX(), target.getY(), 4, 7f * radius, Time.time() * 1.5f);
-            Lines.spikes(target.getX(), target.getY(), 3f * radius, 6f * radius, 4, Time.time() * 1.5f);
+            Lines.poly(target.getX(), target.getY(), 4, 7f * radius, Time.time * 1.5f);
+            Lines.spikes(target.getX(), target.getY(), 3f * radius, 6f * radius, 4, Time.time * 1.5f);
         }
 
         Draw.reset();
@@ -391,7 +394,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(request.breaking){
             drawSelected(request.x, request.y, request.tile().block(), Pal.remove);
         }else{
-            request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
+            request.block.drawPlan(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
             drawSelected(request.x, request.y, request.block, Pal.accent);
         }
     }
@@ -596,6 +599,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, block, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, block)){
             //add to selection queue if it's a valid place position
             selectRequests.add(lastPlaced = new BuildPlan(cursor.x, cursor.y, rotation, block, block.nextConfig()));
+            block.onNewPlan(lastPlaced);
         }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasRequest(linked)){
             //add to selection queue if it's a valid BREAK position
             selectRequests.add(new BuildPlan(linked.x, linked.y));
@@ -736,6 +740,10 @@ public class MobileInput extends InputHandler implements GestureListener{
                 i--;
             }
         }
+
+        if(player.shooting && (player.unit().activelyBuilding() || player.unit().mining())){
+            player.shooting = false;
+        }
     }
 
     protected void autoPan(){
@@ -769,7 +777,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY){
-        if(Core.scene.hasDialog() || Core.settings.getBool("keyboard")) return false;
+        if(Core.scene == null || Core.scene.hasDialog() || Core.settings.getBool("keyboard")) return false;
 
         float scale = Core.camera.width / Core.graphics.getWidth();
         deltaX *= scale;
@@ -836,7 +844,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(type == null) return;
 
         boolean omni = unit.type.omniMovement;
-        boolean legs = unit.isGrounded();
         boolean allowHealing = type.canHeal;
         boolean validHealTarget = allowHealing && target instanceof Building && ((Building)target).isValid() && target.team() == unit.team &&
             ((Building)target).damaged() && target.within(unit, type.range);
@@ -908,13 +915,13 @@ public class MobileInput extends InputHandler implements GestureListener{
             unit.moveAt(movement);
         }else{
             unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
-            if(!movement.isZero() && legs){
-                unit.vel.rotateTo(movement.angle(), type.rotateSpeed);
+            if(!movement.isZero()){
+                unit.vel.rotateTo(movement.angle(), unit.type.rotateSpeed * Math.max(Time.delta, 1));
             }
         }
 
         //update shooting if not building + not mining
-        if(!player.unit().isBuilding() && player.unit().mineTile == null){
+        if(!player.unit().activelyBuilding() && player.unit().mineTile == null){
 
             //autofire targeting
             if(manualShooting){

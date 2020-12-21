@@ -1,5 +1,6 @@
 package mindustry.ai.types;
 
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.*;
@@ -18,10 +19,6 @@ public class BuilderAI extends AIController{
 
     @Override
     public void updateMovement(){
-
-        if(unit.moving()){
-            unit.lookAt(unit.vel.angle());
-        }
 
         if(target != null && shouldShoot()){
             unit.lookAt(target);
@@ -48,8 +45,18 @@ public class BuilderAI extends AIController{
             //approach request if building
             BuildPlan req = unit.buildPlan();
 
+            //clear break plan if another player is breaking something.
+            if(!req.breaking && timer.get(timerTarget2, 40f)){
+                for(Player player : Groups.player){
+                    if(player.isBuilder() && player.unit().activelyBuilding() && player.unit().buildPlan().samePos(req) && player.unit().buildPlan().breaking){
+                        unit.plans.removeFirst();
+                        return;
+                    }
+                }
+            }
+
             boolean valid =
-                (req.tile().build instanceof ConstructBuild && req.tile().<ConstructBuild>bc().cblock == req.block) ||
+                (req.tile() != null && req.tile().build instanceof ConstructBuild cons && cons.cblock == req.block) ||
                 (req.breaking ?
                     Build.validBreak(unit.team(), req.x, req.y) :
                     Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation));
@@ -87,8 +94,10 @@ public class BuilderAI extends AIController{
                 });
             }
 
+            float rebuildTime = (unit.team.rules().ai ? Mathf.lerp(15f, 2f, unit.team.rules().aiTier) : 2f) * 60f;
+
             //find new request
-            if(!unit.team.data().blocks.isEmpty() && following == null && timer.get(timerTarget3, 60 * 2f)){
+            if(!unit.team.data().blocks.isEmpty() && following == null && timer.get(timerTarget3, rebuildTime)){
                 Queue<BlockPlan> blocks = unit.team.data().blocks;
                 BlockPlan block = blocks.first();
 
@@ -121,6 +130,6 @@ public class BuilderAI extends AIController{
 
     @Override
     public boolean shouldShoot(){
-        return !((Builderc)unit).isBuilding();
+        return !unit.isBuilding();
     }
 }

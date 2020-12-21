@@ -20,7 +20,6 @@ import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -38,6 +37,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Import Team team;
     @Import int id;
     @Import @Nullable Tile mineTile;
+    @Import Vec2 vel;
 
     private UnitController controller;
     UnitType type;
@@ -49,6 +49,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
+    }
+
+    public void approach(Vec2 vector){
+        vel.approachDelta(vector, type.accel * realSpeed() * floorSpeedMultiplier());
     }
 
     public void aimLook(Position pos){
@@ -90,8 +94,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public float prefRotation(){
         if(activelyBuilding()){
             return angleTo(buildPlan());
-        }else if(mineTile() != null){
-            return angleTo(mineTile());
+        }else if(mineTile != null){
+            return angleTo(mineTile);
         }else if(moving()){
             return vel().angle();
         }
@@ -129,6 +133,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case mineY -> mining() ? mineTile.y : -1;
             case flag -> flag;
             case controlled -> controller instanceof LogicAI || controller instanceof Player ? 1 : 0;
+            case commanded -> controller instanceof FormationAI ? 1 : 0;
             case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
             default -> 0;
         };
@@ -310,7 +315,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         drag = type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f);
 
         //apply knockback based on spawns
-        if(team != state.rules.waveTeam && state.hasSpawns()){
+        if(team != state.rules.waveTeam && state.hasSpawns() && (!net.client() || isLocal())){
             float relativeSize = state.rules.dropZoneRadius + hitSize/2f + 1f;
             for(Tile spawn : spawner.getSpawns()){
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
@@ -397,9 +402,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     /** Actually destroys the unit, removing it and creating explosions. **/
     public void destroy(){
-        float explosiveness = 2f + item().explosiveness * stack().amount / 2f;
-        float flammability = item().flammability * stack().amount / 2f;
-        Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame, state.rules.damageExplosions);
+        if(!isAdded()) return;
+
+        float explosiveness = 2f + item().explosiveness * stack().amount * 1.53f;
+        float flammability = item().flammability * stack().amount / 1.9f;
+
+        if(!spawnedByCore){
+            Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, state.rules.damageExplosions, item().flammability > 1, team);
+        }
 
         float shake = hitSize / 3f;
 
@@ -415,7 +425,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //if this unit crash landed (was flying), damage stuff in a radius
-        if(type.flying){
+        if(type.flying && !spawnedByCore){
             Damage.damage(team,x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f, true, false, true);
         }
 

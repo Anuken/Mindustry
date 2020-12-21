@@ -30,13 +30,13 @@ public class GenericSmelter extends GenericCrafter{
                 float r = 0.06f;
                 float cr = Mathf.random(0.1f);
 
-                Draw.alpha(((1f - g) + Mathf.absin(Time.time(), 8f, g) + Mathf.random(r) - r) * warmup);
+                Draw.alpha(((1f - g) + Mathf.absin(Time.time, 8f, g) + Mathf.random(r) - r) * warmup);
 
                 Draw.tint(flameColor);
-                Fill.circle(x, y, 3f + Mathf.absin(Time.time(), 5f, 2f) + cr);
+                Fill.circle(x, y, 3f + Mathf.absin(Time.time, 5f, 2f) + cr);
                 Draw.color(1f, 1f, 1f, warmup);
                 Draw.rect(topRegion, x, y);
-                Fill.circle(x, y, 1.9f + Mathf.absin(Time.time(), 5f, 1f) + cr);
+                Fill.circle(x, y, 1.9f + Mathf.absin(Time.time, 5f, 1f) + cr);
 
                 Draw.color();
             }

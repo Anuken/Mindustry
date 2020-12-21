@@ -108,7 +108,8 @@ public class HudFragment extends Fragment{
             t.top().right();
         });
 
-        //TODO tear this all down
+        ui.hints.build(parent);
+
         //menu at top left
         parent.fill(cont -> {
             cont.name = "overlaymarker";
@@ -251,11 +252,10 @@ public class HudFragment extends Fragment{
 
                 if(android){
                     info.label(() -> memnative.get((int)(Core.app.getJavaHeap() / 1024 / 1024), (int)(Core.app.getNativeHeap() / 1024 / 1024))).left().style(Styles.outlineLabel).name("memory2");
-                    info.row();
                 }else{
                     info.label(() -> mem.get((int)(Core.app.getJavaHeap() / 1024 / 1024))).left().style(Styles.outlineLabel).name("memory");
-                    info.row();
                 }
+                info.row();
 
                 info.label(() -> ping.get(netClient.getPing())).visible(net::client).left().style(Styles.outlineLabel).name("ping");
 
@@ -274,7 +274,7 @@ public class HudFragment extends Fragment{
             t.name = "nearpoint";
             t.touchable = Touchable.disabled;
             t.table(Styles.black, c -> c.add("@nearpoint")
-            .update(l -> l.setColor(Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.absin(Time.time(), 10f, 1f))))
+            .update(l -> l.setColor(Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.absin(Time.time, 10f, 1f))))
             .get().setAlignment(Align.center, Align.center))
             .margin(6).update(u -> u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(spawner.playerNear()), 0.1f)).get().color.a = 0f;
         });
@@ -316,30 +316,7 @@ public class HudFragment extends Fragment{
                 return coreAttackOpacity[0] > 0;
             });
             t.table(Tex.button, top -> top.add("@coreattack").pad(2)
-            .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
-        });
-
-        //TODO tutorial text
-        parent.fill(t -> {
-            t.name = "tutorial";
-            Runnable resize = () -> {
-                t.clearChildren();
-                t.top().right().visible(() -> false);
-                t.stack(new Button(){{
-                    marginLeft(48f);
-                    labelWrap(() -> control.tutorial.stage.text() + (control.tutorial.canNext() ? "\n\n" + Core.bundle.get("tutorial.next") : "")).width(!Core.graphics.isPortrait() ? 400f : 160f).pad(2f);
-                    clicked(() -> control.tutorial.nextSentence());
-                    setDisabled(() -> !control.tutorial.canNext());
-                }},
-                new Table(f -> {
-                    f.left().button(Icon.left, Styles.emptyi, () -> {
-                        control.tutorial.prevSentence();
-                    }).width(44f).growY().visible(() -> control.tutorial.canPrev());
-                }));
-            };
-
-            resize.run();
-            Events.on(ResizeEvent.class, e -> resize.run());
+            .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time, 2f, 1f)))).touchable(Touchable.disabled);
         });
 
         //'saving' indicator
@@ -720,19 +697,15 @@ public class HudFragment extends Fragment{
             float bw = 40f;
             float pad = -20;
             t.margin(0);
-
-            t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
-            t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f).with(i -> {
-                if(mobile){
-                    //on mobile, cause a respawn on tap
-                    i.clicked(() -> {
-                        if(!player.unit().spawnedByCore && !player.dead()){
-                            Call.unitClear(player);
-                            control.input.controlledType = null;
-                        }
-                    });
+            t.clicked(() -> {
+                if(!player.dead() && mobile){
+                    Call.unitClear(player);
+                    control.input.controlledType = null;
                 }
             });
+
+            t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
+            t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
             t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> {
                 b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type.ammoType.color : Pal.health);
             });
@@ -781,8 +754,6 @@ public class HudFragment extends Fragment{
 
             return builder;
         }).growX().pad(8f);
-
-        table.touchable(() -> state.rules.waves ? Touchable.enabled : Touchable.disabled);
 
         return table;
     }

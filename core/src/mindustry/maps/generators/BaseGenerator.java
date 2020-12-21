@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
 import mindustry.game.*;
@@ -26,12 +27,10 @@ public class BaseGenerator{
     private static final int range = 160;
 
     private Tiles tiles;
-    private Team team;
     private Seq<Tile> cores;
 
     public void generate(Tiles tiles, Seq<Tile> cores, Tile spawn, Team team, Sector sector, float difficulty){
         this.tiles = tiles;
-        this.team = team;
         this.cores = cores;
 
         //don't generate bases when there are no loaded schematics
@@ -54,7 +53,7 @@ public class BaseGenerator{
         BasePart coreschem = bases.cores.getFrac(difficulty);
         int passes = difficulty < 0.4 ? 1 : difficulty < 0.8 ? 2 : 3;
 
-        Block wall = wallsSmall.getFrac(difficulty), wallLarge = wallsLarge.getFrac(difficulty);
+        Block wall = wallsSmall.getFrac(difficulty * 0.91f), wallLarge = wallsLarge.getFrac(difficulty * 0.91f);
 
         for(Tile tile : cores){
             tile.clearOverlay();
@@ -143,6 +142,24 @@ public class BaseGenerator{
 
                 if(walls >= 3){
                     curr.setBlock(wallLarge, team);
+                }
+            });
+        }
+
+        //clear path for ground units
+        for(Tile tile : cores){
+            Astar.pathfind(tile, spawn, t -> t.team() == state.rules.waveTeam && !t.within(tile, 25f * 8) ? 100000 : t.floor().hasSurface() ? 1 : 10, t -> !t.block().isStatic()).each(t -> {
+                if(!t.within(tile, 25f * 8)){
+                    if(t.team() == state.rules.waveTeam){
+                        t.setBlock(Blocks.air);
+                    }
+
+                    for(Point2 p : Geometry.d8){
+                        Tile other = t.nearby(p);
+                        if(other != null && other.team() == state.rules.waveTeam){
+                            other.setBlock(Blocks.air);
+                        }
+                    }
                 }
             });
         }

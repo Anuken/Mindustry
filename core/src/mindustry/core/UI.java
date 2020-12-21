@@ -42,6 +42,7 @@ public class UI implements ApplicationListener, Loadable{
     public MinimapFragment minimapfrag;
     public PlayerListFragment listfrag;
     public LoadingFragment loadfrag;
+    public HintsFragment hints;
 
     public WidgetGroup menuGroup, hudGroup;
 
@@ -90,6 +91,12 @@ public class UI implements ApplicationListener, Loadable{
         Core.assets.getAll(Font.class, new Seq<>()).each(font -> font.setUseIntegerPositions(true));
         Core.scene = new Scene();
         Core.input.addProcessor(Core.scene);
+
+        int[] insets = Core.graphics.getSafeInsets();
+        Core.scene.marginLeft = insets[0];
+        Core.scene.marginRight = insets[1];
+        Core.scene.marginTop = insets[2];
+        Core.scene.marginBottom = insets[3];
 
         Tex.load();
         Icon.load();
@@ -150,6 +157,7 @@ public class UI implements ApplicationListener, Loadable{
 
         menufrag = new MenuFragment();
         hudfrag = new HudFragment();
+        hints = new HintsFragment();
         chatfrag = new ChatFragment();
         minimapfrag = new MinimapFragment();
         listfrag = new PlayerListFragment();
@@ -256,11 +264,11 @@ public class UI implements ApplicationListener, Loadable{
                 TextField field = cont.field(def, t -> {}).size(330f, 50f).get();
                 field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
                 buttons.defaults().size(120, 54).pad(4);
+                buttons.button("@cancel", this::hide);
                 buttons.button("@ok", () -> {
                     confirmed.get(field.getText());
                     hide();
                 }).disabled(b -> field.getText().isEmpty());
-                buttons.button("@cancel", this::hide);
                 keyDown(KeyCode.enter, () -> {
                     String text = field.getText();
                     if(!text.isEmpty()){
@@ -520,7 +528,7 @@ public class UI implements ApplicationListener, Loadable{
 
     //TODO move?
 
-    public static String formatAmount(long number){
+    public static String formatAmount(int number){
         if(number >= 1_000_000_000){
             return Strings.fixed(number / 1_000_000_000f, 1) + "[gray]" + Core.bundle.get("unit.billions") + "[]";
         }else if(number >= 1_000_000){

@@ -27,6 +27,8 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
+    private static final int maxByteLen = 1024 * 500;
+
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
     public float range = 8 * 10;
@@ -66,7 +68,7 @@ public class LogicBlock extends Block{
         });
     }
 
-    static String getLinkName(Block block){
+    public static String getLinkName(Block block){
         String name = block.name;
         if(name.contains("-")){
             String[] split = name.split("-");
@@ -80,11 +82,11 @@ public class LogicBlock extends Block{
         return name;
     }
 
-    static byte[] compress(String code, Seq<LogicLink> links){
+    public static byte[] compress(String code, Seq<LogicLink> links){
         return compress(code.getBytes(charset), links);
     }
 
-    static byte[] compress(byte[] bytes, Seq<LogicLink> links){
+    public static byte[] compress(byte[] bytes, Seq<LogicLink> links){
         try{
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             DataOutputStream stream = new DataOutputStream(new DeflaterOutputStream(baos));
@@ -137,6 +139,9 @@ public class LogicBlock extends Block{
                 stream.read();
 
                 int bytelen = stream.readInt();
+
+                if(bytelen > maxByteLen) throw new RuntimeException("Malformed logic data! Length: " + bytelen);
+
                 byte[] bytes = new byte[bytelen];
                 stream.readFully(bytes);
 
@@ -197,6 +202,7 @@ public class LogicBlock extends Block{
                 int version = stream.read();
 
                 int bytelen = stream.readInt();
+                if(bytelen > maxByteLen) throw new RuntimeException("Malformed logic data! Length: " + bytelen);
                 byte[] bytes = new byte[bytelen];
                 stream.readFully(bytes);
 
@@ -312,9 +318,10 @@ public class LogicBlock extends Block{
 
                     //store any older variables
                     for(Var var : executor.vars){
-                        if(!var.constant){
+                        boolean unit = var.name.equals("@unit");
+                        if(!var.constant || unit){
                             BVar dest = asm.getVar(var.name);
-                            if(dest != null && !dest.constant){
+                            if(dest != null && (!dest.constant || unit)){
                                 dest.value = var.isobj ? var.objval : var.numval;
                             }
                         }

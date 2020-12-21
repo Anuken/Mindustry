@@ -2,7 +2,6 @@ package mindustry.maps.filters;
 
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 
 import static mindustry.maps.filters.FilterOption.*;

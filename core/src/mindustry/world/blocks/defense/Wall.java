@@ -69,12 +69,6 @@ public class Wall extends Block{
         return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
     }
 
-    @Override
-    public boolean canReplace(Block other){
-        if(other.alwaysReplace) return true;
-        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && other != this && size >= other.size;
-    }
-
     public class WallBuild extends Building{
         public float hit;
 

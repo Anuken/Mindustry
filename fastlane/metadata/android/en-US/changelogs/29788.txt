@@ -1,0 +1,3 @@
+[This is a truncated changelog, see Github for full notes]
+- Decreased junction item capacity - this may cause slight desync on servers running previous 121 versions, servers are advised to update
+- Many various small bugfixes

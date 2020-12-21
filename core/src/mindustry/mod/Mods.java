@@ -247,7 +247,7 @@ public class Mods implements Loadable{
                 mods.add(mod);
             }catch(Throwable e){
                 if(e instanceof ClassNotFoundException && e.getMessage().contains("mindustry.plugin.Plugin")){
-                    Log.info("Plugin @ is outdated and needs to be ported to 6.0! Update its main class to inherit from 'mindustry.mod.Plugin'.");
+                    Log.info("Plugin @ is outdated and needs to be ported to 6.0! Update its main class to inherit from 'mindustry.mod.Plugin'. See https://mindustrygame.github.io/wiki/modding/6-migrationv6/");
                 }else{
                     Log.err("Failed to load mod file @. Skipping.", file);
                     Log.err(e);
@@ -647,6 +647,14 @@ public class Mods implements Loadable{
                 meta.hidden = true;
             }
 
+            //disallow putting a description after the version
+            if(meta.version != null){
+                int line = meta.version.indexOf('\n');
+                if(line != -1){
+                    meta.version = meta.version.substring(0, line);
+                }
+            }
+
             if(!headless){
                 Log.info("Loaded mod '@' in @ms", meta.name, Time.elapsed());
             }
@@ -677,7 +685,7 @@ public class Mods implements Loadable{
         public Seq<String> missingDependencies = new Seq<>();
         /** Script files to run. */
         public Seq<Fi> scripts = new Seq<>();
-        /** Content with intialization code. */
+        /** Content with initialization code. */
         public ObjectSet<Content> erroredContent = new ObjectSet<>();
         /** Current state of this mod. */
         public ModState state = ModState.enabled;
@@ -708,7 +716,7 @@ public class Mods implements Loadable{
             return !erroredContent.isEmpty();
         }
 
-        /** @return whether this mod is supported by the game verison */
+        /** @return whether this mod is supported by the game version */
         public boolean isSupported(){
             if(isOutdated()) return false;
 
@@ -830,7 +838,7 @@ public class Mods implements Loadable{
 
     /** Mod metadata information.*/
     public static class ModMeta{
-        public String name, displayName, author, description, version, main, minGameVersion = "0";
+        public String name, displayName, author, description, version, main, minGameVersion = "0", repo;
         public Seq<String> dependencies = Seq.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;

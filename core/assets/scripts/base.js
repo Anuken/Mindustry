@@ -36,3 +36,24 @@ const func = method => new Func(){get: method};
 
 const newEffect = (lifetime, renderer) => new Effects.Effect(lifetime, new Effects.EffectRenderer({ render: renderer }));
 const Call = Packages.mindustry.gen.Call;
+
+//js 'extend(Base, ..., {})' = java 'new Base(...) {}'
+function extend(/*Base, ..., def*/){
+    const Base = arguments[0];
+    const def = arguments[arguments.length - 1];
+    //swap order from Base, def, ... to Base, ..., def
+    const args = [Base, def].concat(Array.from(arguments).splice(1, arguments.length - 2));
+
+    //forward constructor arguments to new JavaAdapter
+    const instance = JavaAdapter.apply(null, args);
+    //JavaAdapter only overrides functions; set fields too
+    for(const i in def){
+        if(typeof(def[i]) != "function"){
+            instance[i] = def[i];
+        }
+    }
+    return instance;
+}
+
+//For backwards compatibility, use extend instead
+const extendContent = extend;

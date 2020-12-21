@@ -1,6 +1,6 @@
 name: Tests
 
-on: [push]
+on: [push, workflow_dispatch]
 
 jobs:
   buildJava14:
@@ -13,8 +13,9 @@ jobs:
       with:
         java-version: 14
     - name: Run unit tests
-      run: ./gradlew test
+      run: ./gradlew clean cleanTest test
     - name: Trigger BE build
+      if: ${{ github.repository == 'Anuken/Mindustry' }}
       run: |
         git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
         cd ../MindustryBuilds

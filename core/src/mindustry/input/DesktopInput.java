@@ -47,6 +47,7 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void buildUI(Group group){
+        //respawn hints
         group.fill(t -> {
             t.visible(() -> Core.settings.getBool("hints") && ui.hudfrag.shown && !player.dead() && !player.unit().spawnedByCore() && !(Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty()));
             t.bottom();
@@ -56,6 +57,7 @@ public class DesktopInput extends InputHandler{
             }).margin(6f);
         });
 
+        //building hints
         group.fill(t -> {
             t.bottom();
             t.visible(() -> {
@@ -74,6 +76,7 @@ public class DesktopInput extends InputHandler{
             }).margin(10f);
         });
 
+        //schematic controls
         group.fill(t -> {
             t.visible(() -> ui.hudfrag.shown && lastSchematic != null && !selectRequests.isEmpty());
             t.bottom();
@@ -120,7 +123,7 @@ public class DesktopInput extends InputHandler{
                 drawArrow(sreq.block, sreq.x, sreq.y, sreq.rotation, valid);
             }
 
-            sreq.block.drawRequest(sreq, allRequests(), valid);
+            sreq.block.drawPlan(sreq, allRequests(), valid);
 
             drawSelected(sreq.x, sreq.y, sreq.block, getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null ? Pal.remove : Pal.accent);
         }
@@ -151,6 +154,7 @@ public class DesktopInput extends InputHandler{
                     }
                     drawRequest(lineRequests.get(i));
                 }
+                lineRequests.each(this::drawOverRequest);
             }else if(isPlacing()){
                 if(block.rotate){
                     drawArrow(block, cursorX, cursorY, rotation);
@@ -165,7 +169,6 @@ public class DesktopInput extends InputHandler{
                     block.drawRequestConfig(brequest, allRequests());
                     brequest.config = null;
                 }
-
             }
         }
 
@@ -234,8 +237,10 @@ public class DesktopInput extends InputHandler{
             player.shooting = false;
         }
 
-        if(state.isGame() && Core.input.keyTap(Binding.minimap) && !scene.hasDialog() && !(scene.getKeyboardFocus() instanceof TextField)){
-            ui.minimapfrag.toggle();
+        if(state.isGame() && !scene.hasDialog() && !(scene.getKeyboardFocus() instanceof TextField)){
+            if(Core.input.keyTap(Binding.minimap)) ui.minimapfrag.toggle();
+            if(Core.input.keyTap(Binding.planet_map) && state.isCampaign()) ui.planet.toggle();
+            if(Core.input.keyTap(Binding.research) && state.isCampaign()) ui.research.toggle();
         }
 
         if(state.isMenu() || Core.scene.hasDialog()) return;
@@ -480,7 +485,7 @@ public class DesktopInput extends InputHandler{
                 deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(selected.build) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && !player.unit().activelyBuilding() && !droppingItem &&
+                if(!tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && !tileTapped(selected.build) && !player.unit().activelyBuilding() && !droppingItem &&
                     !tryBeginMine(selected) && player.unit().mineTile == null && !Core.scene.hasKeyboard()){
                     player.shooting = shouldShoot;
                 }
@@ -624,8 +629,8 @@ public class DesktopInput extends InputHandler{
             unit.moveAt(movement);
         }else{
             unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
-            if(!movement.isZero() && ground){
-                unit.vel.rotateTo(movement.angle(), unit.type.rotateSpeed);
+            if(!movement.isZero()){
+                unit.vel.rotateTo(movement.angle(), unit.type.rotateSpeed * Math.max(Time.delta, 1));
             }
         }
 

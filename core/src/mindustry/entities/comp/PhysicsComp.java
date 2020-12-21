@@ -29,4 +29,15 @@ abstract class PhysicsComp implements Velc, Hitboxc, Flyingc{
     void impulse(Vec2 v){
         impulse(v.x, v.y);
     }
+
+    void impulseNet(Vec2 v){
+        impulse(v.x, v.y);
+
+        //manually move units to simulate velocity for remote players
+        if(isRemote()){
+            float mass = mass();
+            move(v.x / mass, v.y / mass);
+        }
+
+    }
 }

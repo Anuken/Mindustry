@@ -1,0 +1,9 @@
+- Added tutorial hints (Can be disabled in settings)
+- Fixed game crashing on systems without audio devices
+- Removed game startup dialog
+- Campaign: Balancing of certain preset sectors
+- Campaign: Made attacks less frequent
+- Campaign: Shifted AI bases toward poles
+- Campaign: Increased resource quantities near poles
+- Campaign: Fixed sectors being accessible after defeat
+- Campaign: Fixed AI builders sometimes blocking ground unit paths

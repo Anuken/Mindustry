@@ -12,6 +12,8 @@ public class Boulder extends Block{
         super(name);
         breakable = true;
         alwaysReplace = true;
+        
+        deconstructThreshold = 0.35f;
     }
 
     @Override
