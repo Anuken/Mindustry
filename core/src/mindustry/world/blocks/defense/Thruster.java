@@ -5,10 +5,8 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
