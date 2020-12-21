@@ -1165,7 +1165,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Handle a bullet collision.
      * @return whether the bullet should be removed. */
     public boolean collision(Bullet other){
-        damage(other.damage() * other.type().tileDamageMultiplier);
+        damage(other.damage() * other.type().buildingDamageMultiplier);
 
         return true;
     }

@@ -182,7 +182,7 @@ public class UnitTypes implements ContentList{
                     lightningLength = 6;
                     lightningColor = Pal.surge;
                     //standard bullet damage is far too much for lightning
-                    lightningDamage = 30;
+                    lightningDamage = 20;
                 }};
             }},
 
@@ -1759,7 +1759,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0.01f;
                 }};
             }});
         }};
@@ -1801,7 +1801,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0.01f;
                 }};
             }});
         }};
@@ -1841,7 +1841,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 70f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0.01f;
                     homingPower = 0.04f;
                 }};
             }});
