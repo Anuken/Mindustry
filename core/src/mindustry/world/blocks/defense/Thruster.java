@@ -45,7 +45,7 @@ public class Thruster extends Wall{
 
     @Override
     public TextureRegion[] icons(){
-        return new TextureRegion[]{region, topRegions[0]};
+        return new TextureRegion[]{region, topRegion};
     }
 
     public class ThrusterBuild extends WallBuild{
