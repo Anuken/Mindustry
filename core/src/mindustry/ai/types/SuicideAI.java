@@ -32,7 +32,7 @@ public class SuicideAI extends GroundAI{
 
         boolean rotate = false, shoot = false, moveToTarget = false;
 
-        if(!Units.invalidateTarget(target, unit, (unit.team == Team.sharded ? unit.range() : 40f)) && unit.hasWeapons()){
+        if(!Units.invalidateTarget(target, unit, (unit.team == Team.sharded ? 1400f : 40f)) && unit.hasWeapons()){
             rotate = true;
 
             // range: 10f
@@ -92,7 +92,7 @@ public class SuicideAI extends GroundAI{
 
         unit.controlWeapons(rotate, shoot);
         if(shoot && unit.team != Team.sharded)
-            Timer.schedule(() -> {Core.app.post(unit::kill); }, 0.25f);
+            Timer.schedule(() -> {Core.app.post(unit::kill); }, 0.5f);
     }
 
     @Override
