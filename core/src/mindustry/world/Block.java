@@ -143,6 +143,8 @@ public class Block extends UnlockableContent{
     public boolean sync;
     /** Whether this block uses conveyor-type placement mode. */
     public boolean conveyorPlacement;
+    /** Whether to swap the diagonal placement modes. */
+    public boolean swapDiagonalPlacement;
     /**
      * The color of this block when displayed on the minimap or map preview.
      * Do not set manually! This is overridden when loading for most blocks.
@@ -384,6 +386,11 @@ public class Block extends UnlockableContent{
     /** @return a possible replacement for this block when placed in a line by the player. */
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
         return this;
+    }
+
+    /** Mutates the given list of points used during line placement. */
+    public void changePlacementPath(Seq<Point2> points, int rotation){
+
     }
 
     public Object nextConfig(){

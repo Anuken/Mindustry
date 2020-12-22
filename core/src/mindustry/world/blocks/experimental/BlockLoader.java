@@ -32,6 +32,11 @@ public class BlockLoader extends PayloadAcceptor{
     }
 
     @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region, inRegion, outRegion, topRegion};
+    }
+
+    @Override
     public boolean outputsItems(){
         return false;
     }
@@ -72,7 +77,7 @@ public class BlockLoader extends PayloadAcceptor{
             //draw input
             for(int i = 0; i < 4; i++){
                 if(blends(i) && i != rotation){
-                    Draw.rect(inRegion, x, y, i * 90);
+                    Draw.rect(inRegion, x, y, (i * 90) - 180);
                 }
             }
 

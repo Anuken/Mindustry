@@ -48,7 +48,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Maximum line length. */
     final static int maxLength = 100;
     final static Rect r1 = new Rect(), r2 = new Rect();
-    final static Seq<Point2> tmpPoints = new Seq<>(), tmpPoints2 = new Seq<>();
 
     public final OverlayFragment frag = new OverlayFragment();
 
@@ -1144,7 +1143,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             diagonal = !diagonal;
         }
 
-        if(block instanceof PowerNode){
+        if(block != null && block.swapDiagonalPlacement){
             diagonal = !diagonal;
         }
 
@@ -1161,39 +1160,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             points = Placement.normalizeLine(startX, startY, endX, endY);
         }
 
-        if(block instanceof PowerNode node){
-            var base = tmpPoints2;
-            var result = tmpPoints.clear();
-
-            base.selectFrom(points, p -> p == points.first() || p == points.peek() || Build.validPlace(block, player.team(), p.x, p.y, rotation, false));
-            boolean addedLast = false;
-
-            outer:
-            for(int i = 0; i < base.size;){
-                var point = base.get(i);
-                result.add(point);
-                if(i == base.size - 1) addedLast = true;
-
-                //find the furthest node that overlaps this one
-                for(int j = base.size - 1; j > i; j--){
-                    var other = base.get(j);
-                    boolean over = node.overlaps(world.tile(point.x, point.y), world.tile(other.x, other.y));
-
-                    if(over){
-                        //add node to list and start searching for node that overlaps the next one
-                        i = j;
-                        continue outer;
-                    }
-                }
-
-                //if it got here, that means nothing was found. try to proceed to the next node anyway
-                i ++;
-            }
-
-            if(!addedLast) result.add(base.peek());
-
-            points.clear();
-            points.addAll(result);
+        if(block != null){
+            block.changePlacementPath(points, rotation);
         }
 
         float angle = Angles.angle(startX, startY, endX, endY);

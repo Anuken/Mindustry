@@ -54,5 +54,9 @@
   {
     "name": "ALEX",
     "address": ["alexmindustry.ddns.net:6568", "alexmindustry.ddns.net:6569"]
+  },
+  {
+    "name": "Minty [subzero]",
+    "address": ["minty-server.ddns.net"]
   }
 ]

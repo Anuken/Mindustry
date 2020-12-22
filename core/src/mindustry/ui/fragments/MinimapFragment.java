@@ -110,6 +110,10 @@ public class MinimapFragment extends Fragment{
         return shown;
     }
 
+    public void hide(){
+        shown = false;
+    }
+
     public void toggle(){
         float size = baseSize * zoom * world.width();
         float ratio = (float)renderer.minimap.getTexture().height / renderer.minimap.getTexture().width;

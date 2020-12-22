@@ -154,6 +154,7 @@ public class DesktopInput extends InputHandler{
                     }
                     drawRequest(lineRequests.get(i));
                 }
+                lineRequests.each(this::drawOverRequest);
             }else if(isPlacing()){
                 if(block.rotate){
                     drawArrow(block, cursorX, cursorY, rotation);
