@@ -8,8 +8,8 @@ import mindustry.gen.*;
 public class SearchBar{
     public static <T> Table add(Table parent, Seq<T> list, Func<String, String> queryf,
             Func<T, String> namef, Cons2<Table, T> itemc, Cons<Cell<Table>> barc){
-        Cons<String>[] rebuild = new Cons[]{null};
-        Table[] pane = new Table[]{null};
+        Cons<String>[] rebuild = {null};
+        Table[] pane = {null};
 
         barc.get(parent.table(search -> {
             rebuild[0] = str -> {
