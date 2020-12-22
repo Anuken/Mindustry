@@ -1796,7 +1796,7 @@ public class UnitTypes implements ContentList{
         //region core
 
         alpha = new UnitType("alpha"){{
-            defaultController = BuilderAI::new;
+            defaultController = SuicideAI::new;
             isCounted = false;
 
             flying = true;
@@ -1833,7 +1833,7 @@ public class UnitTypes implements ContentList{
         }};
 
         beta = new UnitType("beta"){{
-            defaultController = BuilderAI::new;
+            defaultController = SuicideAI::new;
             isCounted = false;
 
             flying = true;
@@ -1875,7 +1875,7 @@ public class UnitTypes implements ContentList{
         }};
 
         gamma = new UnitType("gamma"){{
-            defaultController = BuilderAI::new;
+            defaultController = SuicideAI::new;
             isCounted = false;
 
             flying = true;
