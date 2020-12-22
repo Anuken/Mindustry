@@ -1405,6 +1405,53 @@ public class UnitTypes implements ContentList{
             ammoResupplyAmount = 20;
 
             abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8), new RepairFieldAbility(130f, 60f * 2, 140f));
+
+            weapons.add(
+                    new Weapon(){{
+                        x = y = 0f;
+                        mirror = false;
+                        reload = 505f;
+                        minShootVelocity = 0.01f;
+
+                        soundPitchMin = 1f;
+                        shootSound = Sounds.plasmadrop;
+
+                        bullet = new BasicBulletType(){{
+                            sprite = "large-bomb";
+                            width = height = 120/4f;
+
+                            maxRange = 30f;
+                            ignoreRotation = true;
+
+                            backColor = Pal.heal;
+                            frontColor = Color.white;
+                            mixColorTo = Color.white;
+
+                            hitSound = Sounds.plasmaboom;
+
+                            shootCone = 180f;
+                            ejectEffect = Fx.none;
+                            despawnShake = 4f;
+
+                            collidesAir = false;
+
+                            lifetime = 70f;
+
+                            despawnEffect = Fx.greenBomb;
+                            hitEffect = Fx.massiveExplosion;
+                            keepVelocity = false;
+                            spin = 2f;
+
+                            shrinkX = shrinkY = 0.7f;
+
+                            speed = 0.001f;
+                            collides = false;
+
+                            healPercent = 15f;
+                            splashDamage = 930f;
+                            splashDamageRadius = 120f;
+                        }};
+                    }});
         }};
 
         //endregion
