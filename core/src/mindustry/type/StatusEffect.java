@@ -52,7 +52,7 @@ public class StatusEffect extends MappableContent{
         if(damage > 0){
             unit.damageContinuousPierce(damage);
         }else if(damage < 0){ //heal unit
-            unit.heal(damage * Time.delta);
+            unit.heal(-1f * damage * Time.delta);
         }
 
         if(effect != Fx.none && Mathf.chanceDelta(effectChance)){
