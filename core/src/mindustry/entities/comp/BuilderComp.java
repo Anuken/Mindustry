@@ -33,7 +33,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
     @Import Team team;
 
     @SyncLocal Queue<BuildPlan> plans = new Queue<>(1);
-    @SyncLocal transient boolean updateBuilding = true;
+    @SyncLocal boolean updateBuilding = true;
 
     public boolean canBuild(){
         return type.buildSpeed > 0;
