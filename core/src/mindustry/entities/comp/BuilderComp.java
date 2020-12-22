@@ -77,7 +77,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
 
         Tile tile = world.tile(current.x, current.y);
 
-        if(!(tile.block() instanceof ConstructBlock)){
+        if(!(tile.build instanceof ConstructBuild cb)){
             if(!current.initialized && !current.breaking && Build.validPlace(current.block, team, current.x, current.y, current.rotation)){
                 boolean hasAll = infinite || current.isRotation(team) || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item));
 
@@ -92,7 +92,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
                 plans.removeFirst();
                 return;
             }
-        }else if(tile.team() != team && tile.team() != Team.derelict){
+        }else if((tile.team() != team && tile.team() != Team.derelict) || (!current.breaking && cb.cblock != current.block)){
             plans.removeFirst();
             return;
         }
