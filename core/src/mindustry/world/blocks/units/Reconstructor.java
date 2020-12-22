@@ -39,7 +39,7 @@ public class Reconstructor extends UnitBlock{
 
     @Override
     public TextureRegion[] icons(){
-        return new TextureRegion[]{region, outRegion, topRegion};
+        return new TextureRegion[]{region, inRegion, outRegion, topRegion};
     }
 
     @Override
@@ -129,7 +129,7 @@ public class Reconstructor extends UnitBlock{
             //draw input
             for(int i = 0; i < 4; i++){
                 if(blends(i) && i != rotation){
-                    Draw.rect(inRegion, x, y, i * 90);
+                    Draw.rect(inRegion, x, y, (i * 90) - 180);
                 }
             }
 

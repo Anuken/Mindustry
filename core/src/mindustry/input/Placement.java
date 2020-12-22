@@ -1,6 +1,7 @@
 package mindustry.input;
 
 import arc.*;
+import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -11,6 +12,7 @@ import mindustry.world.blocks.distribution.*;
 import static mindustry.Vars.*;
 
 public class Placement{
+    private final static Seq<Point2> tmpPoints = new Seq<>(), tmpPoints2 = new Seq<>();
     private static final NormalizeResult result = new NormalizeResult();
     private static final NormalizeDrawResult drawResult = new NormalizeDrawResult();
     private static Bresenham2 bres = new Bresenham2();
@@ -66,6 +68,42 @@ public class Placement{
             points.add(Pools.obtain(Point2.class, Point2::new).set(build.tile.x, build.tile.y));
         }
         return points;
+    }
+
+    /** Calculates optimal node placement for nodes with spacing. Used for bridges and power nodes. */
+    public static void calculateNodes(Seq<Point2> points, Block block, int rotation, Boolf2<Point2, Point2> overlapper){
+        var base = tmpPoints2;
+        var result = tmpPoints.clear();
+
+        base.selectFrom(points, p -> p == points.first() || p == points.peek() || Build.validPlace(block, player.team(), p.x, p.y, rotation, false));
+        boolean addedLast = false;
+
+        outer:
+        for(int i = 0; i < base.size;){
+            var point = base.get(i);
+            result.add(point);
+            if(i == base.size - 1) addedLast = true;
+
+            //find the furthest node that overlaps this one
+            for(int j = base.size - 1; j > i; j--){
+                var other = base.get(j);
+                boolean over = overlapper.get(point, other);
+
+                if(over){
+                    //add node to list and start searching for node that overlaps the next one
+                    i = j;
+                    continue outer;
+                }
+            }
+
+            //if it got here, that means nothing was found. try to proceed to the next node anyway
+            i ++;
+        }
+
+        if(!addedLast) result.add(base.peek());
+
+        points.clear();
+        points.addAll(result);
     }
 
     private static float tileHeuristic(Tile tile, Tile other){
