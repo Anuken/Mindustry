@@ -51,11 +51,7 @@ abstract class HealthComp implements Entityc, Posc{
 
     /** Damage and pierce armor. */
     void damagePierce(float amount, boolean withEffect){
-        if(this instanceof Shieldc c){
-            damage(amount + c.armor(), withEffect);
-        }else{
-            damage(amount, withEffect);
-        }
+        damage(amount, withEffect);
     }
 
     /** Damage and pierce armor. */
