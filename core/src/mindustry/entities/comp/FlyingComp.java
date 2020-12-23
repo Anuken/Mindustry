@@ -51,8 +51,8 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     }
 
     void moveAt(Vec2 vector, float acceleration){
-        Vec2 t = tmp1.set(vector).scl(floorSpeedMultiplier()); //target vector
-        tmp2.set(t).sub(vel).limit(acceleration * vector.len() * Time.delta); //delta vector
+        Vec2 t = tmp1.set(vector); //target vector
+        tmp2.set(t).sub(vel).limit(acceleration * vector.len() * Time.delta * floorSpeedMultiplier()); //delta vector
         vel.add(tmp2);
     }
 

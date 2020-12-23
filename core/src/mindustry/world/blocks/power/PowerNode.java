@@ -14,6 +14,7 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -25,7 +26,8 @@ public class PowerNode extends PowerBlock{
     protected static boolean returnValue = false;
     protected static BuildPlan otherReq;
 
-    protected final ObjectSet<PowerGraph> graphs = new ObjectSet<>();
+    protected final static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
+    protected final static Seq<Point2> tmpPoints = new Seq<>(), tmpPoints2 = new Seq<>();
 
     public @Load("laser") TextureRegion laser;
     public @Load("laser-end") TextureRegion laserEnd;
@@ -40,6 +42,7 @@ public class PowerNode extends PowerBlock{
         consumesPower = false;
         outputsPower = false;
         canOverdrive = false;
+        swapDiagonalPlacement = true;
 
         config(Integer.class, (entity, value) -> {
             PowerModule power = entity.power;
@@ -149,17 +152,20 @@ public class PowerNode extends PowerBlock{
         Draw.reset();
     }
 
-    protected void setupColor(float satisfaction){
-        float fract = 1f - satisfaction;
+    @Override
+    public void changePlacementPath(Seq<Point2> points, int rotation){
+        Placement.calculateNodes(points, this, rotation, (point, other) -> overlaps(world.tile(point.x, point.y), world.tile(other.x, other.y)));
+    }
 
-        Draw.color(laserColor1, laserColor2, fract * 0.86f + Mathf.absin(3f, 0.1f));
+    protected void setupColor(float satisfaction){
+        Draw.color(laserColor1, laserColor2, (1f - satisfaction) * 0.86f + Mathf.absin(3f, 0.1f));
         Draw.alpha(renderer == null ? 0.5f : renderer.laserOpacity);
     }
 
     protected void drawLaser(Team team, float x1, float y1, float x2, float y2, int size1, int size2){
-        float angle1 = Angles.angle(x1, y1, x2, y2);
-        float vx = Mathf.cosDeg(angle1), vy = Mathf.sinDeg(angle1);
-        float len1 = size1 * tilesize / 2f - 1.5f, len2 = size2 * tilesize / 2f - 1.5f;
+        float angle1 = Angles.angle(x1, y1, x2, y2),
+            vx = Mathf.cosDeg(angle1), vy = Mathf.sinDeg(angle1),
+            len1 = size1 * tilesize / 2f - 1.5f, len2 = size2 * tilesize / 2f - 1.5f;
 
         Drawf.laser(team, laser, laserEnd, x1 + vx*len1, y1 + vy*len1, x2 - vx*len2, y2 - vy*len2, 0.25f);
     }

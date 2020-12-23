@@ -399,6 +399,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     void setup(){
         zoom = planets.zoom = 1f;
         selectAlpha = 1f;
+        ui.minimapfrag.hide();
 
         clearChildren();
 

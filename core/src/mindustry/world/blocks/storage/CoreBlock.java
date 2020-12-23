@@ -386,6 +386,13 @@ public class CoreBlock extends StorageBlock{
                 }else{
                     super.handleItem(source, item);
                 }
+            }else if(incinerate()){
+                if(items.get(item) >= storageCapacity){
+                    //create item incineration effect at random intervals
+                    if(!noEffect){
+                        incinerateEffect(this, source);
+                    }
+                }
             }
         }
     }

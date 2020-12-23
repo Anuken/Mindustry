@@ -876,7 +876,7 @@ public class Blocks implements ContentList{
             size = 4;
         }};
 
-        thruster = new Wall("thruster"){{
+        thruster = new Thruster("thruster"){{
             health = 55 * 16 * wallHealthMultiplier;
             size = 4;
         }};
@@ -989,9 +989,9 @@ public class Blocks implements ContentList{
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
-            requirements(Category.distribution, with(Items.lead, 4, Items.copper, 4));
+            requirements(Category.distribution, with(Items.lead, 6, Items.copper, 6));
             range = 4;
-            speed = 70f;
+            speed = 74f;
             bufferCapacity = 14;
         }};
 
@@ -1265,7 +1265,7 @@ public class Blocks implements ContentList{
             tier = 2;
             drillTime = 600;
             size = 2;
-            drawMineItem = true;
+
             consumes.liquid(Liquids.water, 0.05f).boost();
         }};
 
@@ -1274,7 +1274,7 @@ public class Blocks implements ContentList{
             tier = 3;
             drillTime = 400;
             size = 2;
-            drawMineItem = true;
+
             consumes.liquid(Liquids.water, 0.06f).boost();
         }};
 
@@ -1763,7 +1763,7 @@ public class Blocks implements ContentList{
                 despawnEffect = Fx.instBomb;
                 trailSpacing = 20f;
                 damage = 1350;
-                tileDamageMultiplier = 0.3f;
+                buildingDamageMultiplier = 0.3f;
                 speed = brange;
                 hitShake = 6f;
                 ammoMultiplier = 1f;
@@ -1992,6 +1992,7 @@ public class Blocks implements ContentList{
 
         powerSource = new PowerSource("power-source"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, with());
+            powerProduction = 10000f / 60f;
             alwaysUnlocked = true;
         }};
 

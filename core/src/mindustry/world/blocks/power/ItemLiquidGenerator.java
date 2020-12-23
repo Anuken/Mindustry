@@ -93,11 +93,6 @@ public class ItemLiquidGenerator extends PowerGenerator{
         }
 
         @Override
-        public float ambientVolume(){
-            return Mathf.clamp(productionEfficiency);
-        }
-
-        @Override
         public void updateTile(){
             //Note: Do not use this delta when calculating the amount of power or the power efficiency, but use it for resource consumption if necessary.
             //Power amount is delta'd by PowerGraph class already.

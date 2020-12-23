@@ -126,6 +126,8 @@ public class Damage{
             boolean collide = tile != null && collidedBlocks.add(tile.pos());
 
             if(hitter.damage > 0){
+                float health = !collide ? 0 : tile.health;
+
                 if(collide && tile.team != team && tile.collide(hitter)){
                     tile.collision(hitter);
                     hitter.type.hit(hitter, tile.x, tile.y);
@@ -133,7 +135,7 @@ public class Damage{
 
                 //try to heal the tile
                 if(collide && hitter.type.testCollision(hitter, tile)){
-                    hitter.type.hitTile(hitter, tile, tile.health, false);
+                    hitter.type.hitTile(hitter, tile, health, false);
                 }
             }
         };
@@ -389,9 +391,9 @@ public class Damage{
                 if(scaledDamage <= 0 || tile == null) continue;
 
                 //apply damage to entity if needed
-                if(tile.build != null && tile.team() != team){
-                    int health = (int)tile.build.health();
-                    if(tile.build.health() > 0){
+                if(tile.build != null && tile.build.team != team){
+                    int health = (int)(tile.build.health / (tile.block().size * tile.block().size));
+                    if(tile.build.health > 0){
                         tile.build.damage(scaledDamage);
                         scaledDamage -= health;
 
