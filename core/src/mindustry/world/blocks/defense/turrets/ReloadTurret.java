@@ -9,7 +9,7 @@ import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
-public abstract class ReloadTurret extends BaseTurret{
+public class ReloadTurret extends BaseTurret{
     public float reloadTime = 10f;
 
     public ReloadTurret(String name){

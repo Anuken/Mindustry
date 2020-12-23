@@ -2,7 +2,6 @@ package mindustry.mod;
 
 import arc.*;
 import arc.assets.*;
-import arc.assets.loaders.*;
 import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
@@ -10,7 +9,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.mock.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
@@ -29,7 +27,6 @@ import mindustry.gen.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
 import mindustry.world.consumers.*;
@@ -37,6 +34,8 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 import java.lang.reflect.*;
+
+import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class ContentParser{
@@ -224,7 +223,7 @@ public class ContentParser{
             currentContent = block;
 
             read(() -> {
-                if(value.has("consumes")){
+                if(value.has("consumes") && value.get("consumes").isObject()){
                     for(JsonValue child : value.get("consumes")){
                         if(child.name.equals("item")){
                             block.consumes.item(find(ContentType.item, child.asString()));
@@ -249,8 +248,8 @@ public class ContentParser{
 
                 readFields(block, value, true);
 
-                if(block.size > ConstructBlock.maxSize){
-                    throw new IllegalArgumentException("Blocks cannot be larger than " + ConstructBlock.maxSize);
+                if(block.size > maxBlockSize){
+                    throw new IllegalArgumentException("Blocks cannot be larger than " + maxBlockSize);
                 }
 
                 //make block visible by default if there are requirements and no visibility set
@@ -267,7 +266,13 @@ public class ContentParser{
             UnitType unit;
             if(locate(ContentType.unit, name) == null){
                 unit = new UnitType(mod + "-" + name);
-                unit.constructor = Reflect.cons(resolve(Strings.capitalize(getType(value)), "mindustry.gen"));
+                var typeVal = value.get("type");
+
+                if(typeVal != null && !typeVal.isString()){
+                    throw new RuntimeException("Unit '" + name + "' has an incorrect type. Types must be strings.");
+                }
+
+                unit.constructor = unitType(typeVal);
             }else{
                 unit = locate(ContentType.unit, name);
             }
@@ -300,6 +305,10 @@ public class ContentParser{
                         throw new IllegalArgumentException("Missing a valid 'block' in 'requirements'");
                     }
 
+                }
+
+                if(value.has("controller")){
+                    unit.defaultController = make(resolve(value.getString("controller"), "mindustry.ai.types"));
                 }
 
                 //read extra default waves
@@ -336,6 +345,18 @@ public class ContentParser{
         ContentType.liquid, parser(ContentType.liquid, Liquid::new)
         //ContentType.sector, parser(ContentType.sector, SectorPreset::new)
     );
+
+    private Prov<Unit> unitType(JsonValue value){
+        if(value == null) return UnitEntity::create;
+        return switch(value.asString()){
+            case "flying" -> UnitEntity::create;
+            case "mech" -> MechUnit::create;
+            case "legs" -> LegsUnit::create;
+            case "naval" -> UnitWaterMove::create;
+            case "payload" -> PayloadUnit::create;
+            default -> throw new RuntimeException("Invalid unit type: '" + value + "'. Must be 'flying/mech/legs/naval/payload'.");
+        };
+    }
 
     private String getString(JsonValue value, String key){
         if(value.has(key)){

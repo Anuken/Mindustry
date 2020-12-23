@@ -41,7 +41,7 @@ public abstract class BulletType extends Content{
     /** Multiplied by turret reload speed to get final shoot speed. */
     public float reloadMultiplier = 1f;
     /** Multiplier of how much base damage is done to tiles. */
-    public float tileDamageMultiplier = 1f;
+    public float buildingDamageMultiplier = 1f;
     /** Recoil from shooter entities. */
     public float recoil;
     /** Whether to kill the shooter when this is shot. For suicide bombers. */
@@ -78,7 +78,7 @@ public abstract class BulletType extends Content{
      * Do not change unless you know what you're doing. */
     public boolean backMove = true;
     /** Bullet range override. */
-    public float range = -1f;
+    public float maxRange = -1f;
     /** % of block health healed **/
     public float healPercent = 0f;
     /** whether to make fire on impact */
@@ -154,22 +154,24 @@ public abstract class BulletType extends Content{
 
     /** Returns maximum distance the bullet this bullet type has can travel. */
     public float range(){
-        return Math.max(speed * lifetime * (1f - drag), range);
+        return Math.max(speed * lifetime * (1f - drag), maxRange);
     }
 
-    public boolean collides(Bullet bullet, Building tile){
+    public boolean testCollision(Bullet bullet, Building tile){
         return healPercent <= 0.001f || tile.team != bullet.team || tile.healthf() < 1f;
     }
 
-    public void hitTile(Bullet b, Building tile, float initialHealth){
-        if(makeFire && tile.team != b.team){
-            Fires.create(tile.tile);
+    /** If direct is false, this is an indirect hit and the tile was already damaged.
+     * TODO this is a mess. */
+    public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
+        if(makeFire && build.team != b.team){
+            Fires.create(build.tile);
         }
 
-        if(healPercent > 0f && tile.team == b.team && !(tile.block instanceof ConstructBlock)){
-            Fx.healBlockFull.at(tile.x, tile.y, tile.block.size, Pal.heal);
-            tile.heal(healPercent / 100f * tile.maxHealth());
-        }else if(tile.team != b.team){
+        if(healPercent > 0f && build.team == b.team && !(build.block instanceof ConstructBlock)){
+            Fx.healBlockFull.at(build.x, build.y, build.block.size, Pal.heal);
+            build.heal(healPercent / 100f * build.maxHealth());
+        }else if(build.team != b.team && direct){
             hit(b);
         }
     }
@@ -271,7 +273,8 @@ public abstract class BulletType extends Content{
         }
 
         if(weaveMag > 0){
-            b.vel.rotate(Mathf.sin(Mathf.randomSeed(b.id, 10f) + b.time, weaveScale, weaveMag) * Time.delta);
+            float scl = Mathf.randomSeed(id, 0.9f, 1.1f);
+            b.vel.rotate(Mathf.sin(b.time + Mathf.PI * weaveScale/2f * scl, weaveScale * scl, weaveMag) * Time.delta);
         }
 
         if(trailChance > 0){
@@ -315,11 +318,11 @@ public abstract class BulletType extends Content{
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle){
-        return create(parent.owner(), parent.team, x, y, angle);
+        return create(parent.owner, parent.team, x, y, angle);
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl, float lifeScale){
-        return create(parent.owner(), parent.team, x, y, angle, velocityScl, lifeScale);
+        return create(parent.owner, parent.team, x, y, angle, velocityScl, lifeScale);
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){
@@ -344,7 +347,7 @@ public abstract class BulletType extends Content{
         bullet.damage = (damage < 0 ? this.damage : damage) * bullet.damageMultiplier();
         bullet.add();
 
-        if(keepVelocity && owner instanceof Velc) bullet.vel.add(((Velc)owner).vel().x, ((Velc)owner).vel().y);
+        if(keepVelocity && owner instanceof Velc v) bullet.vel.add(v.vel().x, v.vel().y);
         return bullet;
     }
 
@@ -354,6 +357,7 @@ public abstract class BulletType extends Content{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void createBullet(BulletType type, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
+        if(type == null) return;
         type.create(null, team, x, y, angle, damage, velocityScl, lifetimeScl, null);
     }
 }

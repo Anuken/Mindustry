@@ -32,8 +32,6 @@ public class Rules{
     public boolean attackMode = false;
     /** Whether this is the editor gamemode. */
     public boolean editor = false;
-    /** Whether the tutorial is enabled. False by default. */
-    public boolean tutorial = false;
     /** Whether a gameover can happen at all. Set this to false to implement custom gameover conditions. */
     public boolean canGameOver = true;
     /** Whether reactors can explode and damage other blocks. */
@@ -82,6 +80,8 @@ public class Rules{
     public Seq<WeatherEntry> weather = new Seq<>(1);
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
+    /** Reveals blocks normally hidden by build visibility */
+    public ObjectSet<Block> revealedBlocks = new ObjectSet<>();
     /** Unlocked content names. Only used in multiplayer when the campaign is enabled. */
     public ObjectSet<String> researched = new ObjectSet<>();
     /** Whether ambient lighting is enabled. */

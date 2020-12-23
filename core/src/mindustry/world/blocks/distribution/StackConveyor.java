@@ -29,7 +29,7 @@ public class StackConveyor extends Block implements Autotiler{
 
     public float speed = 0f;
     public boolean splitOut = true;
-    /** (minimum) amount of loading docks needed to fill a line */
+    /** (minimum) amount of loading docks needed to fill a line. */
     public float recharge = 2f;
     public Effect loadEffect = Fx.plasticburn;
     public Effect unloadEffect = Fx.plasticburn;
@@ -46,7 +46,6 @@ public class StackConveyor extends Block implements Autotiler{
 
         ambientSound = Sounds.conveyor;
         ambientSoundVolume = 0.004f;
-        unloadable = false;
     }
 
     @Override
@@ -105,6 +104,8 @@ public class StackConveyor extends Block implements Autotiler{
         public int link = -1;
         public float cooldown;
         public Item lastItem;
+
+        boolean proxUpdating = false;
 
         @Override
         public void draw(){
@@ -168,14 +169,13 @@ public class StackConveyor extends Block implements Autotiler{
 
             //update other conveyor state when this conveyor's state changes
             if(state != lastState){
+                proxUpdating = true;
                 for(Building near : proximity){
-                    if(near instanceof StackConveyorBuild){
+                    if(!(near instanceof StackConveyorBuild b && b.proxUpdating && b.state != stateUnload)){
                         near.onProximityUpdate();
-                        for(Building other : near.proximity){
-                            if(!(other instanceof StackConveyorBuild)) other.onProximityUpdate();
-                        }
                     }
                 }
+                proxUpdating = false;
             }
         }
 
@@ -266,6 +266,11 @@ public class StackConveyor extends Block implements Autotiler{
             }finally{
                 if(items.empty()) poofOut();
             }
+        }
+
+        @Override
+        public void itemTaken(Item item){
+            if(items.empty()) poofOut();
         }
 
         @Override

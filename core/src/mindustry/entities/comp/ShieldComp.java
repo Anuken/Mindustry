@@ -14,7 +14,7 @@ abstract class ShieldComp implements Healthc, Posc{
 
     /** Absorbs health damage. */
     float shield;
-    /** Absorbs percentage of damage. */
+    /** Substracts an amount from damage. */
     float armor;
     /** Shield opacity. */
     transient float shieldAlpha = 0f;
@@ -26,8 +26,22 @@ abstract class ShieldComp implements Healthc, Posc{
         amount = Math.max(amount - armor, minArmorDamage * amount);
         amount /= healthMultiplier;
 
-        hitTime = 1f;
+        rawDamage(amount);
+    }
 
+    @Replace
+    @Override
+    public void damagePierce(float amount, boolean withEffect){
+        float pre = hitTime;
+
+        rawDamage(amount);
+
+        if(!withEffect){
+            hitTime = pre;
+        }
+    }
+
+    private void rawDamage(float amount){
         boolean hadShields = shield > 0.0001f;
 
         if(hadShields){

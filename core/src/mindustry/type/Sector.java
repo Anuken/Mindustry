@@ -98,7 +98,7 @@ public class Sector{
 
     /** @return whether the player has a base here. */
     public boolean hasBase(){
-        return save != null && info.hasCore;
+        return save != null && info.hasCore && !(Vars.state.isGame() && Vars.state.rules.sector == this && state.gameOver);
     }
 
     /** @return whether the enemy has a generated base here. */
@@ -108,7 +108,7 @@ public class Sector{
 
     public boolean isBeingPlayed(){
         //after the launch dialog, a sector is no longer considered being played
-        return Vars.state.isGame() && Vars.state.rules.sector == this && !Vars.state.gameOver;
+        return Vars.state.isGame() && Vars.state.rules.sector == this && !Vars.state.gameOver && !net.client();
     }
 
     public String name(){
@@ -152,10 +152,6 @@ public class Sector{
         return res % 2 == 0 ? res : res + 1;
     }
 
-    public void addItem(Item item, int amount){
-        removeItem(item, -amount);
-    }
-
     public void removeItems(ItemSeq items){
         ItemSeq copy = items.copy();
         copy.each((i, a) -> copy.set(i, -a));
@@ -169,6 +165,7 @@ public class Sector{
     }
 
     public void addItems(ItemSeq items){
+
         if(isBeingPlayed()){
             if(state.rules.defaultTeam.core() != null){
                 ItemModule storage = state.rules.defaultTeam.items();
@@ -198,7 +195,7 @@ public class Sector{
     }
 
     public String toString(){
-        return planet.name + "#" + id;
+        return planet.name + "#" + id + " (" + name() + ")";
     }
 
     /** Projects this sector onto a 4-corner square for use in map gen.

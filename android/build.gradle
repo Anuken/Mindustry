@@ -35,7 +35,8 @@ dependencies{
     natives "com.github.Anuken.Arc:natives-box2d-android:${getArcHash()}"
 
     //android dependencies magically disappear during compilation, thanks gradle!
-    if(new File(projectDir.parent, '../Arc').exists()) compileOnly fileTree(dir: '../../Arc/backends/backend-android/libs', include: ['*.jar'])
+    def sdkFile = new File((String)findSdkDir(), "/platforms/android-29/android.jar")
+    if(sdkFile.exists()) compileOnly files(sdkFile.absolutePath)
 }
 
 task deploy(type: Copy){
@@ -150,4 +151,10 @@ task run(type: Exec){
 
     def adb = path + "/platform-tools/adb"
     commandLine "$adb", 'shell', 'am', 'start', '-n', 'io.anuke.mindustry/mindustry.android.AndroidLauncher'
+}
+
+if(!project.ext.hasSprites()){
+    println "Scheduling sprite pack."
+    run.dependsOn ":tools:pack"
+    deploy.dependsOn ":tools:pack"
 }

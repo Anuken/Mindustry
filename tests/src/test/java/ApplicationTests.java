@@ -58,6 +58,7 @@ public class ApplicationTests{
                     add(netServer = new NetServer());
 
                     content.init();
+
                 }
 
                 @Override
@@ -77,6 +78,10 @@ public class ApplicationTests{
                 }
                 Thread.sleep(10);
             }
+
+
+            Block block = content.getByName(ContentType.block, "build2");
+            assertEquals("build2", block == null ? null : block.name, "2x2 construct block doesn't exist?");
         }catch(Throwable r){
             fail(r);
         }
@@ -434,6 +439,15 @@ public class ApplicationTests{
     }
 
     @Test
+    void load114Save(){
+        resetWorld();
+        SaveIO.load(Core.files.internal("114.msav"));
+
+        assertEquals(500, world.width());
+        assertEquals(500, world.height());
+    }
+
+    @Test
     void arrayIterators(){
         Seq<String> arr = Seq.with("a", "b" , "c", "d", "e", "f");
         Seq<String> results = new Seq<>();
@@ -487,8 +501,8 @@ public class ApplicationTests{
     void buildingOverlap(){
         initBuilding();
 
-        Builderc d1 = (Builderc)UnitTypes.poly.create(Team.sharded);
-        Builderc d2 = (Builderc)UnitTypes.poly.create(Team.sharded);
+        Unit d1 = UnitTypes.poly.create(Team.sharded);
+        Unit d2 = UnitTypes.poly.create(Team.sharded);
 
         //infinite build range
         state.rules.editor = true;
@@ -514,8 +528,8 @@ public class ApplicationTests{
     void buildingDestruction(){
         initBuilding();
 
-        Builderc d1 = (Builderc)UnitTypes.poly.create(Team.sharded);
-        Builderc d2 = (Builderc)UnitTypes.poly.create(Team.sharded);
+        Builderc d1 = UnitTypes.poly.create(Team.sharded);
+        Builderc d2 = UnitTypes.poly.create(Team.sharded);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);

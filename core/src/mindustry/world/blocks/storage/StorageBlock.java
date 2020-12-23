@@ -10,6 +10,8 @@ import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class StorageBlock extends Block{
 
     public StorageBlock(String name){
@@ -58,6 +60,24 @@ public class StorageBlock extends Block{
         }
 
         @Override
+        public void itemTaken(Item item){
+            if(linkedCore != null){
+                linkedCore.itemTaken(item);
+            }
+        }
+
+        @Override
+        public int removeStack(Item item, int amount){
+            int result = super.removeStack(item, amount);
+
+            if(linkedCore != null && team == state.rules.defaultTeam && state.isCampaign()){
+                state.rules.sector.info.handleCoreItem(item, -result);
+            }
+
+            return result;
+        }
+
+        @Override
         public int getMaximumAccepted(Item item){
             return itemCapacity;
         }
@@ -71,14 +91,16 @@ public class StorageBlock extends Block{
 
         @Override
         public void overwrote(Seq<Building> previous){
-            for(Building other : previous){
-                if(other.items != null){
-                    items.add(other.items);
+            //only add prev items when core is not linked
+            if(linkedCore == null){
+                for(Building other : previous){
+                    if(other.items != null && other.items != items){
+                        items.add(other.items);
+                    }
                 }
-            }
 
-            //ensure item counts are not too high
-            items.each((i, a) -> items.set(i, Math.min(a, itemCapacity)));
+                items.each((i, a) -> items.set(i, Math.min(a, itemCapacity)));
+            }
         }
 
         @Override

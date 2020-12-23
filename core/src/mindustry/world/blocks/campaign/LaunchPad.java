@@ -1,6 +1,8 @@
 package mindustry.world.blocks.campaign;
 
 import arc.*;
+import arc.Graphics.*;
+import arc.Graphics.Cursor.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -17,6 +19,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -36,6 +39,7 @@ public class LaunchPad extends Block{
         solid = true;
         update = true;
         configurable = true;
+        drawDisabled = false;
     }
 
     @Override
@@ -52,7 +56,23 @@ public class LaunchPad extends Block{
         bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
     }
 
+    @Override
+    public boolean outputsItems(){
+        return false;
+    }
+
     public class LaunchPadBuild extends Building{
+
+        @Override
+        public Cursor getCursor(){
+            return !state.isCampaign() || net.client() ? SystemCursor.arrow : super.getCursor();
+        }
+
+        //cannot be disabled
+        @Override
+        public float efficiency(){
+            return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
+        }
 
         @Override
         public void draw(){
@@ -129,7 +149,7 @@ public class LaunchPad extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            if(!state.isCampaign()){
+            if(!state.isCampaign() || net.client()){
                 deselect();
                 return;
             }
@@ -227,7 +247,9 @@ public class LaunchPad extends Block{
                         Events.fire(new LaunchItemEvent(stack));
                     }
 
-                    destsec.addItems(dest);
+                    if(!net.client()){
+                        destsec.addItems(dest);
+                    }
                 }
             }
         }

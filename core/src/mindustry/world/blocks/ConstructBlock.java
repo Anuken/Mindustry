@@ -19,14 +19,14 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
 /** A block in the process of construction. */
 public class ConstructBlock extends Block{
-    public static final int maxSize = 16;
-    private static final ConstructBlock[] consBlocks = new ConstructBlock[maxSize];
+    private static final ConstructBlock[] consBlocks = new ConstructBlock[maxBlockSize];
 
     private static long lastTime = 0;
     private static int pitchSeq = 0;
@@ -40,11 +40,12 @@ public class ConstructBlock extends Block{
         consumesTap = true;
         solidifes = true;
         consBlocks[size - 1] = this;
+        sync = true;
     }
 
     /** Returns a ConstructBlock by size. */
     public static ConstructBlock get(int size){
-        if(size > maxSize) throw new IllegalArgumentException("No. Don't place ConstructBlock of size greater than " + maxSize);
+        if(size > maxBlockSize) throw new IllegalArgumentException("No. Don't place ConstructBlock of size greater than " + maxBlockSize);
         return consBlocks[size - 1];
     }
 
@@ -145,6 +146,7 @@ public class ConstructBlock extends Block{
          */
         public Block previous;
         public Object lastConfig;
+        public boolean wasConstructing;
 
         @Nullable
         public Unit lastBuilder;
@@ -179,7 +181,7 @@ public class ConstructBlock extends Block{
                 if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
                     control.input.isBuilding = true;
                 }
-                player.builder().addBuild(new BuildPlan(tile.x, tile.y, rotation, cblock, lastConfig), false);
+                player.unit().addBuild(new BuildPlan(tile.x, tile.y, rotation, cblock, lastConfig), false);
             }
         }
 
@@ -216,6 +218,7 @@ public class ConstructBlock extends Block{
         }
 
         public void construct(Unit builder, @Nullable Building core, float amount, Object config){
+            wasConstructing = true;
             if(cblock == null){
                 kill();
                 return;
@@ -250,6 +253,7 @@ public class ConstructBlock extends Block{
         }
 
         public void deconstruct(Unit builder, @Nullable Building core, float amount){
+            wasConstructing = false;
             float deconstructMultiplier = state.rules.deconstructRefundMultiplier;
 
             if(builder.isPlayer()){
@@ -274,8 +278,9 @@ public class ConstructBlock extends Block{
 
                     if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
                         if(core != null && requirements[i].item.unlockedNow()){ //only accept items that are unlocked
-                            int accepting = core.acceptStack(requirements[i].item, accumulated, builder);
-                            core.handleStack(requirements[i].item, accepting, builder);
+                            int accepting = Math.min(accumulated, ((CoreBuild)core).storageCapacity - core.items.get(requirements[i].item));
+                            //transfer items directly, as this is not production.
+                            core.items.add(requirements[i].item, accepting);
                             accumulator[i] -= accepting;
                         }else{
                             accumulator[i] -= accumulated;
@@ -286,7 +291,7 @@ public class ConstructBlock extends Block{
 
             progress = Mathf.clamp(progress - amount);
 
-            if(progress <= 0 || state.rules.infiniteResources){
+            if(progress <= (previous == null ? 0 : previous.deconstructThreshold) || state.rules.infiniteResources){
                 if(lastBuilder == null) lastBuilder = builder;
                 Call.deconstructFinish(tile, this.cblock == null ? previous : this.cblock, lastBuilder);
             }
@@ -328,6 +333,7 @@ public class ConstructBlock extends Block{
         }
 
         public void setConstruct(Block previous, Block block){
+            wasConstructing = true;
             this.cblock = block;
             this.previous = previous;
             this.accumulator = new float[block.requirements.length];
@@ -337,6 +343,7 @@ public class ConstructBlock extends Block{
 
         public void setDeconstruct(Block previous){
             if(previous == null) return;
+            wasConstructing = false;
             this.previous = previous;
             this.progress = 1f;
             if(previous.buildCost >= 0.01f){

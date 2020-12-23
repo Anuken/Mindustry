@@ -24,8 +24,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
     /** weapon mount array, never null */
     @SyncLocal WeaponMount[] mounts = {};
-    @ReadOnly transient float aimX, aimY;
     @ReadOnly transient boolean isRotate;
+    transient float aimX, aimY;
     boolean isShooting;
     float ammo;
 
@@ -91,6 +91,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                 mount.bullet.time = mount.bullet.lifetime - 10f;
                 mount.bullet = null;
             }
+
+            if(mount.sound != null){
+                mount.sound.stop();
+            }
         }
     }
 
@@ -117,6 +121,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                 }else{
                     mount.bullet.rotation(weaponRotation + 90);
                     mount.bullet.set(shootX, shootY);
+                    mount.reload = weapon.reload;
                     vel.add(Tmp.v1.trns(rotation + 180f, mount.bullet.type.recoil));
                     if(weapon.shootSound != Sounds.none && !headless){
                         if(mount.sound == null) mount.sound = new SoundLoop(weapon.shootSound, 1f);
@@ -134,7 +139,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
             //flip weapon shoot side for alternating weapons at half reload
             if(weapon.otherSide != -1 && weapon.alternate && mount.side == weapon.flipSprite &&
-                mount.reload + Time.delta > weapon.reload/2f && mount.reload <= weapon.reload/2f){
+                mount.reload + Time.delta * reloadMultiplier > weapon.reload/2f && mount.reload <= weapon.reload/2f){
                 mounts[weapon.otherSide].side = !mounts[weapon.otherSide].side;
                 mount.side = !mount.side;
             }

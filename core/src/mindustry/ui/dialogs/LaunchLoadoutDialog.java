@@ -103,6 +103,8 @@ public class LaunchLoadoutDialog extends BaseDialog{
         ButtonGroup<Button> group = new ButtonGroup<>();
         selected = universe.getLoadout(core);
 
+        cont.add(Core.bundle.format("launch.from", sector.name())).row();
+
         cont.pane(t -> {
             int i = 0;
 
@@ -114,7 +116,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
                             selected = s;
                             update.run();
                             rebuildItems.run();
-                        }).group(group).pad(4).disabled(!sitems.has(s.requirements())).checked(s == selected).size(200f);
+                        }).group(group).pad(4).checked(s == selected).size(200f);
 
                         if(++i % cols == 0){
                             t.row();

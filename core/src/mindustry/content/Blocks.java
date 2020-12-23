@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
+import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -14,8 +15,6 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.campaign.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
-import mindustry.world.blocks.defense.turrets.PointDefenseTurret;
-import mindustry.world.blocks.defense.turrets.TractorBeamTurret;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.experimental.*;
@@ -39,7 +38,7 @@ public class Blocks implements ContentList{
     //environment
     air, spawn, cliff, deepwater, water, taintedWater, tar, slag, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space,
     dacite, stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
-    iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, grass, salt,
+    iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
@@ -89,7 +88,7 @@ public class Blocks implements ContentList{
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
 
     //campaign
-    launchPad, launchPadLarge,
+    launchPad, launchPadLarge, interplanetaryAccelerator,
 
     //misc experimental
     blockForge, blockLoader, blockUnloader;
@@ -136,7 +135,7 @@ public class Blocks implements ContentList{
 
         //Registers build blocks
         //no reference is needed here since they can be looked up by name later
-        for(int i = 1; i <= ConstructBlock.maxSize; i++){
+        for(int i = 1; i <= Vars.maxBlockSize; i++){
             new ConstructBlock(i);
         }
 
@@ -363,7 +362,7 @@ public class Blocks implements ContentList{
 
         sandWall = new StaticWall("sand-wall"){{
             variants = 2;
-            sandWater.asFloor().wall = this;
+            sandWater.asFloor().wall = water.asFloor().wall = deepwater.asFloor().wall = this;
         }};
 
         saltWall = new StaticWall("salt-wall");
@@ -412,6 +411,10 @@ public class Blocks implements ContentList{
         }};
 
         daciteBoulder = new Boulder("dacite-boulder"){{
+            variants = 2;
+        }};
+
+        basaltBoulder = new Boulder("basalt-boulder"){{
             variants = 2;
         }};
 
@@ -611,6 +614,7 @@ public class Blocks implements ContentList{
             craftTime = 75f;
             size = 3;
             hasPower = true;
+            itemCapacity = 20;
 
             consumes.power(4f);
             consumes.items(with(Items.copper, 3, Items.lead, 4, Items.titanium, 2, Items.silicon, 3));
@@ -872,7 +876,7 @@ public class Blocks implements ContentList{
             size = 4;
         }};
 
-        thruster = new Wall("thruster"){{
+        thruster = new Thruster("thruster"){{
             health = 55 * 16 * wallHealthMultiplier;
             size = 4;
         }};
@@ -979,15 +983,15 @@ public class Blocks implements ContentList{
         junction = new Junction("junction"){{
             requirements(Category.distribution, with(Items.copper, 2), true);
             speed = 26;
-            capacity = 12;
+            capacity = 6;
             health = 30;
             buildCostMultiplier = 6f;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
-            requirements(Category.distribution, with(Items.lead, 4, Items.copper, 4));
+            requirements(Category.distribution, with(Items.lead, 6, Items.copper, 6));
             range = 4;
-            speed = 70f;
+            speed = 74f;
             bufferCapacity = 14;
         }};
 
@@ -1153,7 +1157,7 @@ public class Blocks implements ContentList{
         }};
 
         battery = new Battery("battery"){{
-            requirements(Category.power, with(Items.copper, 4, Items.lead, 20));
+            requirements(Category.power, with(Items.copper, 5, Items.lead, 20));
             consumes.powerBuffered(4000f);
         }};
 
@@ -1191,7 +1195,7 @@ public class Blocks implements ContentList{
             size = 2;
 
             ambientSound = Sounds.smelter;
-            ambientSoundVolume = 0.05f;
+            ambientSoundVolume = 0.06f;
         }};
 
         differentialGenerator = new SingleTypeGenerator("differential-generator"){{
@@ -1212,18 +1216,18 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.lead, 100, Items.silicon, 75, Items.phaseFabric, 25, Items.plastanium, 75, Items.thorium, 50));
             size = 2;
             powerProduction = 4.5f;
-            itemDuration = 60 * 15f;
+            itemDuration = 60 * 14f;
         }};
 
         solarPanel = new SolarGenerator("solar-panel"){{
             requirements(Category.power, with(Items.lead, 10, Items.silicon, 15));
-            powerProduction = 0.08f;
+            powerProduction = 0.1f;
         }};
 
         largeSolarPanel = new SolarGenerator("solar-panel-large"){{
-            requirements(Category.power, with(Items.lead, 100, Items.silicon, 145, Items.phaseFabric, 15));
+            requirements(Category.power, with(Items.lead, 80, Items.silicon, 110, Items.phaseFabric, 15));
             size = 3;
-            powerProduction = 1f;
+            powerProduction = 1.3f;
         }};
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
@@ -1261,7 +1265,7 @@ public class Blocks implements ContentList{
             tier = 2;
             drillTime = 600;
             size = 2;
-            drawMineItem = true;
+
             consumes.liquid(Liquids.water, 0.05f).boost();
         }};
 
@@ -1270,7 +1274,7 @@ public class Blocks implements ContentList{
             tier = 3;
             drillTime = 400;
             size = 2;
-            drawMineItem = true;
+
             consumes.liquid(Liquids.water, 0.06f).boost();
         }};
 
@@ -1354,7 +1358,7 @@ public class Blocks implements ContentList{
         //region storage
 
         coreShard = new CoreBlock("core-shard"){{
-            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.copper, 1000, Items.lead, 1000));
+            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.copper, 1000, Items.lead, 800));
             alwaysUnlocked = true;
 
             unitType = UnitTypes.alpha;
@@ -1373,7 +1377,7 @@ public class Blocks implements ContentList{
             itemCapacity = 9000;
             size = 4;
 
-            unitCapModifier = 14;
+            unitCapModifier = 16;
             researchCostMultiplier = 0.04f;
         }};
 
@@ -1385,8 +1389,8 @@ public class Blocks implements ContentList{
             itemCapacity = 13000;
             size = 5;
 
-            unitCapModifier = 20;
-            researchCostMultiplier = 0.05f;
+            unitCapModifier = 24;
+            researchCostMultiplier = 0.06f;
         }};
 
         vault = new StorageBlock("vault"){{
@@ -1508,16 +1512,17 @@ public class Blocks implements ContentList{
             shootEffect = Fx.shootLiquid;
             range = 110f;
             health = 250 * size * size;
+            flags = EnumSet.of(BlockFlag.turret, BlockFlag.extinguisher);
         }};
 
-        lancer = new ChargeTurret("lancer"){{
-            requirements(Category.turret, with(Items.copper, 25, Items.lead, 50, Items.silicon, 45));
-            range = 155f;
-            chargeTime = 50f;
+        lancer = new PowerTurret("lancer"){{
+            requirements(Category.turret, with(Items.copper, 60, Items.lead, 70, Items.silicon, 50));
+            range = 165f;
+            chargeTime = 40f;
             chargeMaxDelay = 30f;
             chargeEffects = 7;
             recoilAmount = 2f;
-            reloadTime = 90f;
+            reloadTime = 80f;
             cooldown = 0.03f;
             powerUse = 6f;
             shootShake = 2f;
@@ -1539,11 +1544,12 @@ public class Blocks implements ContentList{
                 lifetime = 16f;
                 drawSize = 400f;
                 collidesAir = false;
+                length = 173f;
             }};
         }};
 
         arc = new PowerTurret("arc"){{
-            requirements(Category.turret, with(Items.copper, 35, Items.lead, 50));
+            requirements(Category.turret, with(Items.copper, 50, Items.lead, 50));
             shootType = new LightningBulletType(){{
                 damage = 20;
                 lightningLength = 25;
@@ -1552,7 +1558,7 @@ public class Blocks implements ContentList{
             reloadTime = 35f;
             shootCone = 40f;
             rotateSpeed = 8f;
-            powerUse = 3f;
+            powerUse = 3.3f;
             targetAir = false;
             range = 90f;
             shootEffect = Fx.lightningShoot;
@@ -1597,7 +1603,7 @@ public class Blocks implements ContentList{
         }};
 
         salvo = new ItemTurret("salvo"){{
-            requirements(Category.turret, with(Items.copper, 105, Items.graphite, 95, Items.titanium, 60));
+            requirements(Category.turret, with(Items.copper, 100, Items.graphite, 90, Items.titanium, 60));
             ammo(
             Items.copper, Bullets.standardCopper,
             Items.graphite, Bullets.standardDense,
@@ -1757,14 +1763,16 @@ public class Blocks implements ContentList{
                 despawnEffect = Fx.instBomb;
                 trailSpacing = 20f;
                 damage = 1350;
-                tileDamageMultiplier = 0.3f;
+                buildingDamageMultiplier = 0.3f;
                 speed = brange;
                 hitShake = 6f;
                 ammoMultiplier = 1f;
             }}
             );
 
-            rotateSpeed = 2.5f;
+            maxAmmo = 40;
+            ammoPerShot = 4;
+            rotateSpeed = 2f;
             reloadTime = 200f;
             ammoUseEffect = Fx.casing3Double;
             recoilAmount = 5f;
@@ -1777,7 +1785,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.railgun;
             unitSort = (u, x, y) -> -u.maxHealth;
 
-            coolantMultiplier = 0.11f;
+            coolantMultiplier = 0.4f;
 
             health = 150 * size * size;
             coolantUsage = 1f;
@@ -1984,6 +1992,7 @@ public class Blocks implements ContentList{
 
         powerSource = new PowerSource("power-source"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, with());
+            powerProduction = 10000f / 60f;
             alwaysUnlocked = true;
         }};
 
@@ -2046,12 +2055,20 @@ public class Blocks implements ContentList{
 
         //TODO remove
         launchPadLarge = new LaunchPad("launch-pad-large"){{
-            //requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
             size = 4;
             itemCapacity = 300;
             launchTime = 60f * 35;
             hasPower = true;
             consumes.power(6f);
+        }};
+
+        interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
+            researchCostMultiplier = 0.1f;
+            size = 7;
+            hasPower = true;
+            consumes.power(10f);
+            buildCostMultiplier = 0.5f;
         }};
 
         //endregion campaign

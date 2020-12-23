@@ -142,6 +142,10 @@ public class AIController implements UnitController{
             mount.rotate = shoot;
 
             unit.isShooting |= shoot;
+            if(shoot){
+                unit.aimX = mount.aimX;
+                unit.aimY = mount.aimY;
+            }
         }
     }
 

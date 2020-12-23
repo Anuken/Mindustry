@@ -126,7 +126,7 @@ public class Block extends UnlockableContent{
     public BlockGroup group = BlockGroup.none;
     /** List of block flags. Used for AI indexing. */
     public EnumSet<BlockFlag> flags = EnumSet.of();
-    /** Targeting priority of this block, as seen by enemies.*/
+    /** Targeting priority of this block, as seen by enemies .*/
     public TargetPriority priority = TargetPriority.base;
     /** How much this block affects the unit cap by.
      * The block flags must contain unitModifier in order for this to work. */
@@ -139,13 +139,15 @@ public class Block extends UnlockableContent{
     public boolean consumesTap;
     /** Whether to draw the glow of the liquid for this block, if it has one. */
     public boolean drawLiquidLight = true;
-    /** Whether to periodically sync this block across the network.*/
+    /** Whether to periodically sync this block across the network. */
     public boolean sync;
-    /** Whether this block uses conveyor-type placement mode.*/
+    /** Whether this block uses conveyor-type placement mode. */
     public boolean conveyorPlacement;
+    /** Whether to swap the diagonal placement modes. */
+    public boolean swapDiagonalPlacement;
     /**
      * The color of this block when displayed on the minimap or map preview.
-     * Do not set manually! This is overriden when loading for most blocks.
+     * Do not set manually! This is overridden when loading for most blocks.
      */
     public Color mapColor = new Color(0, 0, 0, 1);
     /** Whether this block has a minimap color. */
@@ -173,12 +175,12 @@ public class Block extends UnlockableContent{
     /** Radius of the light emitted by this block. */
     public float lightRadius = 60f;
 
-    /** The sound that this block makes while active. One sound loop. Do not overuse.*/
+    /** The sound that this block makes while active. One sound loop. Do not overuse. */
     public Sound loopSound = Sounds.none;
     /** Active sound base volume. */
     public float loopSoundVolume = 0.5f;
 
-    /** The sound that this block makes while idle. Uses one sound loop for all blocks.*/
+    /** The sound that this block makes while idle. Uses one sound loop for all blocks. */
     public Sound ambientSound = Sounds.none;
     /** Idle sound base volume. */
     public float ambientSoundVolume = 0.05f;
@@ -193,6 +195,8 @@ public class Block extends UnlockableContent{
     public BuildVisibility buildVisibility = BuildVisibility.hidden;
     /** Multiplier for speed of building this block. */
     public float buildCostMultiplier = 1f;
+    /** Build completion at which deconstruction finishes. */
+    public float deconstructThreshold = 0f;
     /** Multiplier for cost of research in tech tree. */
     public float researchCostMultiplier = 1;
     /** Whether this block has instant transfer.*/
@@ -285,7 +289,7 @@ public class Block extends UnlockableContent{
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
-            .sumf(other -> other.floor().attributes.get(attr));
+            .sumf(other -> !floating && other.floor().isDeep() ? 0 : other.floor().attributes.get(attr));
     }
 
     public TextureRegion getDisplayIcon(Tile tile){
@@ -375,12 +379,18 @@ public class Block extends UnlockableContent{
 
     public boolean canReplace(Block other){
         if(other.alwaysReplace) return true;
-        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && (size == other.size || (size >= other.size && subclass != null && subclass == other.subclass));
+        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group &&
+            (size == other.size || (size >= other.size && ((subclass != null && subclass == other.subclass) || group.anyReplace)));
     }
 
     /** @return a possible replacement for this block when placed in a line by the player. */
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
         return this;
+    }
+
+    /** Mutates the given list of points used during line placement. */
+    public void changePlacementPath(Seq<Point2> points, int rotation){
+
     }
 
     public Object nextConfig(){
@@ -390,10 +400,19 @@ public class Block extends UnlockableContent{
         return null;
     }
 
-    public void drawRequest(BuildPlan req, Eachable<BuildPlan> list, boolean valid){
+    /** Called when a new build plan is created in the player's queue. Blocks can maintain a reference to this plan and add configs to it later. */
+    public void onNewPlan(BuildPlan plan){
+
+    }
+
+    public void drawPlan(BuildPlan req, Eachable<BuildPlan> list, boolean valid){
+        drawPlan(req, list, valid, 1f);
+    }
+
+    public void drawPlan(BuildPlan req, Eachable<BuildPlan> list, boolean valid, float alpha){
         Draw.reset();
-        Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime(), 6f, 0.28f));
-        Draw.alpha(1f);
+        Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
+        Draw.alpha(alpha);
         float prevScale = Draw.scl;
         Draw.scl *= req.animScale;
         drawRequestRegion(req, list);
@@ -515,7 +534,7 @@ public class Block extends UnlockableContent{
     }
 
     public boolean isVisible(){
-        return buildVisibility.visible() && !isHidden();
+        return !isHidden();
     }
 
     public boolean isPlaceable(){
@@ -617,7 +636,7 @@ public class Block extends UnlockableContent{
     public ItemStack[] researchRequirements(){
         ItemStack[] out = new ItemStack[requirements.length];
         for(int i = 0; i < out.length; i++){
-            int quantity = 60 + Mathf.round(Mathf.pow(requirements[i].amount, 1.13f) * 20 * researchCostMultiplier, 10);
+            int quantity = 60 + Mathf.round(Mathf.pow(requirements[i].amount, 1.1f) * 20 * researchCostMultiplier, 10);
 
             out[i] = new ItemStack(requirements[i].item, UI.roundAmount(quantity));
         }
@@ -632,18 +651,18 @@ public class Block extends UnlockableContent{
             cons.get(stack.item);
         }
 
-        if(consumes.any()){
-            //also requires inputs
-            for(Consume c : consumes.all()){
-                if(c instanceof ConsumeItems i){
-                    for(ItemStack stack : i.items){
-                        cons.get(stack.item);
-                    }
-                }else if(c instanceof ConsumeLiquid i){
-                    cons.get(i.liquid);
+        //also requires inputs
+        consumes.each(c -> {
+            if(c.isOptional()) return;
+
+            if(c instanceof ConsumeItems i){
+                for(ItemStack stack : i.items){
+                    cons.get(stack.item);
                 }
+            }else if(c instanceof ConsumeLiquid i){
+                cons.get(i.liquid);
             }
-        }
+        });
     }
 
     @Override
@@ -711,7 +730,7 @@ public class Block extends UnlockableContent{
 
     @Override
     public boolean isHidden(){
-        return !buildVisibility.visible();
+        return !buildVisibility.visible() && !state.rules.revealedBlocks.contains(this);
     }
 
     @Override

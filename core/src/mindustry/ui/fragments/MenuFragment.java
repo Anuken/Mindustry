@@ -77,12 +77,13 @@ public class MenuFragment extends Fragment{
         String versionText = ((Version.build == -1) ? "[#fc8140aa]" : "[#ffffffba]") + Version.combined();
         parent.fill((x, y, w, h) -> {
             TextureRegion logo = Core.atlas.find("logo");
+            float width = Core.graphics.getWidth(), height = Core.graphics.getHeight() - Core.scene.marginTop;
             float logoscl = Scl.scl(1);
             float logow = Math.min(logo.width * logoscl, Core.graphics.getWidth() - Scl.scl(20));
             float logoh = logow * (float)logo.height / logo.width;
 
-            float fx = (int)(Core.graphics.getWidth() / 2f);
-            float fy = (int)(Core.graphics.getHeight() - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Scl.scl(30f) : 0f);
+            float fx = (int)(width / 2f);
+            float fy = (int)(height - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Scl.scl(30f) : 0f);
 
             Draw.color();
             Draw.rect(logo, fx, fy, logow, logoh);
@@ -230,7 +231,7 @@ public class MenuFragment extends Fragment{
                         submenu.clearChildren();
                         fadeInMenu();
                         //correctly offset the button
-                        submenu.add().height((Core.graphics.getHeight() - out[0].getY(Align.topLeft)) / Scl.scl(1f));
+                        submenu.add().height((Core.graphics.getHeight() - Core.scene.marginTop - Core.scene.marginBottom - out[0].getY(Align.topLeft)) / Scl.scl(1f));
                         submenu.row();
                         buttons(submenu, b.submenu);
                     }else{

@@ -78,10 +78,10 @@ public class Cultivator extends GenericCrafter{
             for(int i = 0; i < 12; i++){
                 float offset = random.nextFloat() * 999999f;
                 float x = random.range(4f), y = random.range(4f);
-                float life = 1f - (((Time.time() + offset) / 50f) % recurrence);
+                float life = 1f - (((Time.time + offset) / 50f) % recurrence);
 
                 if(life > 0){
-                    Lines.stroke(warmup * (life * 1f + 0.2f));
+                    Lines.stroke(warmup * (life + 0.2f));
                     Lines.poly(x + x, y + y, 8, (1f - life) * 3f);
                 }
             }

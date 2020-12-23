@@ -25,8 +25,8 @@ import static mindustry.gen.Tex.*;
 public class Styles{
     //TODO all these names are inconsistent and not descriptive
     public static Drawable black, black9, black8, black6, black3, black5, none, flatDown, flatOver;
-    public static ButtonStyle defaultb, waveb;
-    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, infot, clearPartialt, clearTogglet, clearToggleMenut, togglet, transt, fullTogglet, logict;
+    public static ButtonStyle defaultb, waveb, modsb;
+    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, nonet, infot, clearPartialt, clearTogglet, clearToggleMenut, togglet, transt, fullTogglet, logict;
     public static ImageButtonStyle defaulti, nodei, righti, emptyi, emptytogglei, selecti, logici, geni, colori, accenti, cleari, clearFulli, clearPartiali, clearPartial2i, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
     public static ScrollPaneStyle defaultPane, horizontalPane, smallPane;
     public static KeybindDialogStyle defaultKeybindDialog;
@@ -52,6 +52,12 @@ public class Styles{
             up = button;
             over = buttonOver;
             disabled = buttonDisabled;
+        }};
+
+        modsb = new ButtonStyle(){{
+            down = flatOver;
+            up = underline;
+            over = underlineWhite;
         }};
         
         waveb = new ButtonStyle(){{
@@ -85,6 +91,13 @@ public class Styles{
             disabledFontColor = Color.gray;
             up = buttonOver;
             over = buttonDown;
+        }};
+        nonet = new TextButtonStyle(){{
+            font = Fonts.outline;
+            fontColor = Color.lightGray;
+            overFontColor = Pal.accent;
+            disabledFontColor = Color.gray;
+            up = none;
         }};
         cleart = new TextButtonStyle(){{
             over = flatOver;

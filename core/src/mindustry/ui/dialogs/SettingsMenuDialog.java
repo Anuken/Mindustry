@@ -8,7 +8,6 @@ import arc.input.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
-import arc.scene.ui.SettingsDialog.SettingsTable.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -33,9 +32,9 @@ import static mindustry.Vars.net;
 import static mindustry.Vars.*;
 
 public class SettingsMenuDialog extends SettingsDialog{
-    private SettingsTable graphics;
-    private SettingsTable game;
-    private SettingsTable sound;
+    public SettingsTable graphics;
+    public SettingsTable game;
+    public SettingsTable sound;
 
     private Table prefs;
     private Table menu;
@@ -130,6 +129,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                             u.clearUnlock();
                         }
                     });
+                    settings.remove("unlocks");
                 });
             }).marginLeft(4);
 
@@ -313,8 +313,6 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.sliderPref("saveinterval", 60, 10, 5 * 120, 10, i -> Core.bundle.format("setting.seconds", i));
 
         if(!mobile){
-            game.sliderPref("blockselecttimeout", 750, 0, 2000, 50, i -> Core.bundle.format("setting.milliseconds", i));
-
             game.checkPref("crashreport", true);
         }
 
@@ -397,7 +395,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("blockstatus", false);
         graphics.checkPref("playerchat", true);
         if(!mobile){
-            graphics.checkPref("coreitems", false);
+            graphics.checkPref("coreitems", true);
         }
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("smoothcamera", true);
@@ -406,6 +404,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("playerindicators", true);
         graphics.checkPref("indicators", true);
         graphics.checkPref("buildradius", true);
+        graphics.checkPref("showweather", true);
         graphics.checkPref("animatedwater", true);
         if(Shaders.shield != null){
             graphics.checkPref("animatedshields", !mobile);

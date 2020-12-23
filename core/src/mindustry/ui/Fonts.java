@@ -16,7 +16,6 @@ import arc.graphics.g2d.*;
 import arc.graphics.g2d.Font.*;
 import arc.graphics.g2d.PixmapPacker.*;
 import arc.graphics.g2d.TextureAtlas.*;
-import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;
@@ -67,7 +66,7 @@ public class Fonts{
     }
 
     public static int cursorScale(){
-        return Math.max(1, Mathf.round(Scl.scl(1f)));
+        return 1;
     }
 
     public static void loadFonts(){
@@ -95,6 +94,7 @@ public class Fonts{
             var region = new TextureRegion();
             int code = Iconc.codes.get(name, '\uF8D4');
             var glyph = iconLarge.getData().getGlyph((char)code);
+            if(glyph == null) return Core.atlas.find("error");
             region.set(iconLarge.getRegion().texture);
             region.set(glyph.u, glyph.v2, glyph.u2, glyph.v);
             return region;
@@ -128,7 +128,7 @@ public class Fonts{
                 glyph.srcX = 0;
                 glyph.srcY = 0;
                 glyph.width = size;
-                glyph.height = size;
+                glyph.height = (int)((float)region.height / region.width * size);
                 glyph.u = region.u;
                 glyph.v = region.v2;
                 glyph.u2 = region.u2;
