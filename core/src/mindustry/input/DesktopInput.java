@@ -604,7 +604,6 @@ public class DesktopInput extends InputHandler{
 
     protected void updateMovement(Unit unit){
         boolean omni = unit.type.omniMovement;
-        boolean ground = unit.isGrounded();
 
         float speed = unit.realSpeed();
         float xa = Core.input.axis(Binding.move_x);

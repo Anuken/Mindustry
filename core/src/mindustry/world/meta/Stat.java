@@ -70,6 +70,7 @@ public enum Stat{
     targetsGround(StatCat.function),
     damage(StatCat.function),
     ammo(StatCat.function),
+    ammoUse(StatCat.function),
     shieldHealth(StatCat.function),
     cooldownTime(StatCat.function),
 
