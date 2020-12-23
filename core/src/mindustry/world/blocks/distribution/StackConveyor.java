@@ -29,7 +29,7 @@ public class StackConveyor extends Block implements Autotiler{
 
     public float speed = 0f;
     public boolean splitOut = true;
-    /** (minimum) amount of loading docks needed to fill a line */
+    /** (minimum) amount of loading docks needed to fill a line. */
     public float recharge = 2f;
     public Effect loadEffect = Fx.plasticburn;
     public Effect unloadEffect = Fx.plasticburn;
@@ -46,7 +46,6 @@ public class StackConveyor extends Block implements Autotiler{
 
         ambientSound = Sounds.conveyor;
         ambientSoundVolume = 0.004f;
-        unloadable = false;
     }
 
     @Override
@@ -267,6 +266,11 @@ public class StackConveyor extends Block implements Autotiler{
             }finally{
                 if(items.empty()) poofOut();
             }
+        }
+
+        @Override
+        public void itemTaken(Item item){
+            if(items.empty()) poofOut();
         }
 
         @Override
