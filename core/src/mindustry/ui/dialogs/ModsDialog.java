@@ -71,7 +71,12 @@ public class ModsDialog extends BaseDialog{
                     if(status != HttpStatus.OK){
                         ui.showErrorMessage(Core.bundle.format("connectfail", status));
                     }else{
-                        listener.get(modList = new Json().fromJson(Seq.class, ModListing.class, strResult));
+                        modList = new Json().fromJson(Seq.class, ModListing.class, strResult);
+
+                        //potentially sort mods by game version compatibility, or other criteria
+                        //modList.sort(Structs.comparingBool(m -> !Version.isAtLeast(m.minGameVersion)));
+
+                        listener.get(modList);
                     }
                 });
             }, error -> Core.app.post(() -> ui.showException(error)));
@@ -167,14 +172,14 @@ public class ModsDialog extends BaseDialog{
                                     tablebrow.clear();
 
                                     for(ModListing mod : listings){
-                                        if(!searchtxt.isEmpty() && !mod.repo.contains(searchtxt) || (Vars.ios && (mod.hasScripts || mod.hasJava))) continue;
+                                        if(mod.hasJava || !searchtxt.isEmpty() && !mod.repo.contains(searchtxt) || (Vars.ios && mod.hasScripts)) continue;
 
                                         tablebrow.button(btn -> {
                                             btn.top().left();
                                             btn.margin(12f);
                                             btn.table(con -> {
                                                 con.left();
-                                                con.add("[accent]" + mod.name + "\n[lightgray]Author:[] " + mod.author + "\n[accent]\uE809 " + mod.stars +
+                                                con.add("[accent]" + mod.name + "[white]\n[lightgray]Author:[] " + mod.author + "\n[accent]\uE809 " + mod.stars +
                                                 (Version.isAtLeast(mod.minGameVersion) ? "" : "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
                                                 .width(388f).wrap().growX().pad(0f, 6f, 0f, 6f).left().labelAlign(Align.left);
                                                 con.add().growX().pad(0f, 6f, 0f, 6f);
