@@ -13,6 +13,8 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
+import mindustry.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -165,21 +167,22 @@ public class ModsDialog extends BaseDialog{
                                     tablebrow.clear();
 
                                     for(ModListing mod : listings){
-                                        if(!searchtxt.isEmpty() && !mod.repo.contains(searchtxt)) continue;
+                                        if(!searchtxt.isEmpty() && !mod.repo.contains(searchtxt) || (Vars.ios && (mod.hasScripts || mod.hasJava))) continue;
 
                                         tablebrow.button(btn -> {
                                             btn.top().left();
                                             btn.margin(12f);
                                             btn.table(con -> {
                                                 con.left();
-                                                con.add("[lightgray]Name:[] " + mod.name + "\n[lightgray]Author:[] " + mod.author + "\n[accent]\uE809 " + mod.stars)
+                                                con.add("[accent]" + mod.name + "\n[lightgray]Author:[] " + mod.author + "\n[accent]\uE809 " + mod.stars +
+                                                (Version.isAtLeast(mod.minGameVersion) ? "" : "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
                                                 .width(388f).wrap().growX().pad(0f, 6f, 0f, 6f).left().labelAlign(Align.left);
                                                 con.add().growX().pad(0f, 6f, 0f, 6f);
                                             }).fillY().growX().pad(0f, 6f, 0f, 6f);
                                         }, Styles.modsb, () -> {
-                                            var sel = new BaseDialog((Core.bundle.get("mods.browser.selected")) + ": " + mod.name);
+                                            var sel = new BaseDialog(mod.name);
                                             sel.cont.add(mod.description).width(mobile ? 400f : 500f).wrap().pad(4f).labelAlign(Align.center, Align.left);
-                                            sel.buttons.defaults().size(200f, 54f).pad(2f);
+                                            sel.buttons.defaults().size(150f, 54f).pad(2f);
                                             sel.setFillParent(false);
                                             sel.buttons.button("@back", Icon.left, () -> {
                                                 sel.clear();
