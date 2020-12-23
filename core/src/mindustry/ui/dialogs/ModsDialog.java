@@ -147,7 +147,7 @@ public class ModsDialog extends BaseDialog{
 
                     t.row();
 
-                    t.button("@mod.featured.title", Icon.star, bstyle, () -> {
+                    t.button("@mod.featured.dialog.title", Icon.star, bstyle, () -> {
                         Runnable[] rebuildBrowser = {null};
                         dialog.hide();
                         BaseDialog browser = new BaseDialog("$mod.featured.dialog.title");
@@ -179,7 +179,7 @@ public class ModsDialog extends BaseDialog{
                                             btn.margin(12f);
                                             btn.table(con -> {
                                                 con.left();
-                                                con.add("[accent]" + mod.name + "[white]\n[lightgray]Author:[] " + mod.author + "\n[accent]\uE809 " + mod.stars +
+                                                con.add("[accent]" + mod.name + "[white]\n[lightgray]Author:[] " + mod.author + "\n[lightgray]\uE809 " + mod.stars +
                                                 (Version.isAtLeast(mod.minGameVersion) ? "" : "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
                                                 .width(388f).wrap().growX().pad(0f, 6f, 0f, 6f).left().labelAlign(Align.left);
                                                 con.add().growX().pad(0f, 6f, 0f, 6f);
