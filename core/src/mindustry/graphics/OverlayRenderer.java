@@ -116,6 +116,9 @@ public class OverlayRenderer{
                     Lines.circle(core.x, core.y, state.rules.enemyCoreBuildRadius);
                 }
             });
+
+            Draw.color(Pal.accent);
+            Lines.circle(player.x, player.y, 208.2f);
         }
 
         Lines.stroke(2f);
