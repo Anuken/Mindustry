@@ -351,7 +351,7 @@ public class Control implements ApplicationListener, Loadable{
                                 if(tile != null){
                                     tile.setBlock(content.block(plan.block), state.rules.waveTeam, plan.rotation);
                                     if(plan.config != null && tile.build != null){
-                                        tile.build.configure(plan.config);
+                                        tile.build.configureAny(plan.config);
                                     }
                                 }
                             }
