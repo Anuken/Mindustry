@@ -700,6 +700,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
             if(core != 0) return core;
             int synth = Boolean.compare(b1.synthetic(), b2.synthetic());
             if(synth != 0) return synth;
+            int editorVis = Boolean.compare(b1.buildVisibility == BuildVisibility.editorOnly, b2.buildVisibility == BuildVisibility.editorOnly);
+            if(editorVis != 0) return editorVis;
             int ore = Boolean.compare(b1 instanceof OverlayFloor, b2 instanceof OverlayFloor);
             if(ore != 0) return ore;
             return Integer.compare(b1.id, b2.id);
