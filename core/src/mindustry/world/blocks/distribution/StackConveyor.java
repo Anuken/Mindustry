@@ -177,8 +177,11 @@ public class StackConveyor extends Block implements Autotiler{
                 }
                 proxUpdating = false;
             }
+        }
 
-            unloadable = state != stateLoad;
+        @Override
+        public boolean unloadable(){
+            return state != stateLoad;
         }
 
         @Override

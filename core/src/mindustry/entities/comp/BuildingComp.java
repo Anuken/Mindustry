@@ -63,7 +63,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient boolean enabled = true;
     transient float enabledControlTime;
     transient String lastAccessed;
-    transient boolean unloadable = true;
 
     PowerModule power;
     ItemModule items;
@@ -384,6 +383,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     //endregion
     //region handler methods
+
+    public boolean unloadable(){
+        return block.unloadable;
+    }
 
     /** Called when an unloader takes an item. */
     public void itemTaken(Item item){
