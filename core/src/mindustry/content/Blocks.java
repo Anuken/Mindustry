@@ -1992,6 +1992,7 @@ public class Blocks implements ContentList{
 
         powerSource = new PowerSource("power-source"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, with());
+            powerProduction = 10000f / 60f;
             alwaysUnlocked = true;
         }};
 
