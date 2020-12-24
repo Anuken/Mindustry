@@ -182,7 +182,7 @@ public class UnitTypes implements ContentList{
                     lightningLength = 6;
                     lightningColor = Pal.surge;
                     //standard bullet damage is far too much for lightning
-                    lightningDamage = 30;
+                    lightningDamage = 20;
                 }};
             }},
 
@@ -336,7 +336,7 @@ public class UnitTypes implements ContentList{
 
                 bullet = new LightningBulletType(){{
                     lightningColor = hitColor = Pal.heal;
-                    damage = 15f;
+                    damage = 12f;
                     lightningLength = 7;
                     lightningLengthRand = 7;
                     shootEffect = Fx.shootHeal;
@@ -1311,6 +1311,7 @@ public class UnitTypes implements ContentList{
             drag = 0.017f;
             lowAltitude = false;
             flying = true;
+            circleTarget = true;
             engineOffset = 12f;
             engineSize = 6f;
             rotateShooting = false;
@@ -1758,7 +1759,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0.01f;
                 }};
             }});
         }};
@@ -1800,7 +1801,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0.01f;
                 }};
             }});
         }};
@@ -1840,7 +1841,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 70f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0.01f;
                     homingPower = 0.04f;
                 }};
             }});

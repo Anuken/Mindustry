@@ -299,7 +299,7 @@ public class JoinDialog extends BaseDialog{
                 pad = 6;
             }
 
-            Cell cell = ((Table)pane.parent).getCell(button);
+            var cell = ((Table)pane.parent).getCell(button);
 
             if(!Mathf.equal(cell.minWidth(), pw)){
                 cell.width(pw);

@@ -351,7 +351,7 @@ public class Control implements ApplicationListener, Loadable{
                                 if(tile != null){
                                     tile.setBlock(content.block(plan.block), state.rules.waveTeam, plan.rotation);
                                     if(plan.config != null && tile.build != null){
-                                        tile.build.configure(plan.config);
+                                        tile.build.configureAny(plan.config);
                                     }
                                 }
                             }
@@ -424,7 +424,7 @@ public class Control implements ApplicationListener, Loadable{
         net.dispose();
         Musics.dispose();
         Sounds.dispose();
-        ui.editor.dispose();
+        if(ui != null && ui.editor != null) ui.editor.dispose();
     }
 
     @Override

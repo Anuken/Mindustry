@@ -58,6 +58,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     }
 
     void pickup(Building tile){
+        tile.pickedUp();
         tile.tile.remove();
         payloads.add(new BuildPayload(tile));
         Fx.unitPickup.at(tile);

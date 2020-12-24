@@ -6,7 +6,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -386,6 +385,13 @@ public class CoreBlock extends StorageBlock{
                     noEffect = false;
                 }else{
                     super.handleItem(source, item);
+                }
+            }else if(incinerate()){
+                if(items.get(item) >= storageCapacity){
+                    //create item incineration effect at random intervals
+                    if(!noEffect){
+                        incinerateEffect(this, source);
+                    }
                 }
             }
         }

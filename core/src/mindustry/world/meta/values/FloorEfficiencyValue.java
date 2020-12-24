@@ -10,16 +10,18 @@ import mindustry.world.meta.*;
 public class FloorEfficiencyValue implements StatValue{
     private final Floor floor;
     private final float multiplier;
+    private final boolean startZero;
 
-    public FloorEfficiencyValue(Floor floor, float multiplier){
+    public FloorEfficiencyValue(Floor floor, float multiplier, boolean startZero){
         this.floor = floor;
         this.multiplier = multiplier;
+        this.startZero = startZero;
     }
 
     @Override
     public void display(Table table){
         table.stack(new Image(floor.icon(Cicon.medium)).setScaling(Scaling.fit), new Table(t -> {
-            t.top().right().add((multiplier < 0 ? "[scarlet]" : "[accent]+") + (int)((multiplier) * 100) + "%").style(Styles.outlineLabel);
+            t.top().right().add((multiplier < 0 ? "[scarlet]" : startZero ? "[accent]" : "[accent]+") + (int)((multiplier) * 100) + "%").style(Styles.outlineLabel);
         }));
     }
 }

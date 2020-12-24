@@ -8,7 +8,6 @@ import arc.input.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
-import arc.scene.ui.SettingsDialog.SettingsTable.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -33,9 +32,9 @@ import static mindustry.Vars.net;
 import static mindustry.Vars.*;
 
 public class SettingsMenuDialog extends SettingsDialog{
-    private SettingsTable graphics;
-    private SettingsTable game;
-    private SettingsTable sound;
+    public SettingsTable graphics;
+    public SettingsTable game;
+    public SettingsTable sound;
 
     private Table prefs;
     private Table menu;

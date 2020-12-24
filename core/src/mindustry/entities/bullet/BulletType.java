@@ -41,7 +41,7 @@ public abstract class BulletType extends Content{
     /** Multiplied by turret reload speed to get final shoot speed. */
     public float reloadMultiplier = 1f;
     /** Multiplier of how much base damage is done to tiles. */
-    public float tileDamageMultiplier = 1f;
+    public float buildingDamageMultiplier = 1f;
     /** Recoil from shooter entities. */
     public float recoil;
     /** Whether to kill the shooter when this is shot. For suicide bombers. */
@@ -157,7 +157,7 @@ public abstract class BulletType extends Content{
         return Math.max(speed * lifetime * (1f - drag), maxRange);
     }
 
-    public boolean collides(Bullet bullet, Building tile){
+    public boolean testCollision(Bullet bullet, Building tile){
         return healPercent <= 0.001f || tile.team != bullet.team || tile.healthf() < 1f;
     }
 

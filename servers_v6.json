@@ -1,11 +1,11 @@
 [
   {
     "name": "mindustry.pl",
-    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "91.134.217.10:6006"]
+    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl"]
   },
   {
     "name": "{AA}",
-    "address": ["aamindustry.play.ai", "aamindustry.play.ai:6571", "aamindustry.play.ai:6572", "aamindustry.play.ai:6573"]
+    "address": ["aamindustry.play.ai", "aamindustry.play.ai:6571", "aamindustry.play.ai:6572", "aamindustry.play.ai:6573", "aamindustry.play.ai:6574"]
   },
    {
     "name": "Atanner",
@@ -25,7 +25,7 @@
   },
   {
     "name": "Chaotic Neutral",
-    "address": ["Chaotic-Neutral.ddns.net:5555", "Chaotic-Neutral.ddns.net:6666", "Chaotic-Neutral.ddns.net:7777"]
+    "address": ["Chaotic-Neutral.ddns.net:1111", "Chaotic-Neutral.ddns.net:5555", "Chaotic-Neutral.ddns.net:6666", "Chaotic-Neutral.ddns.net:7777"]
   },
   {
     "name": "Ranked",
@@ -52,7 +52,11 @@
     "address": ["md.surrealment.com"]
   },
   {
-     "name": "MindustryBR",
-     "address": ["mindustryptbr.ddns.net", "mindustryptbr.ddns.net:4444", "mindustryptbr.myddns.me:6666", "mindustryptbr.myddns.me:5555"]
+    "name": "ALEX",
+    "address": ["alexmindustry.ddns.net:6568"]
+  },
+  {
+    "name": "Minty [subzero]",
+    "address": ["minty-server.ddns.net"]
   }
 ]
