@@ -180,6 +180,11 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
+        public boolean canUnload(){
+            return state != stateLoad;
+        }
+
+        @Override
         public float efficiency(){
             return 1f;
         }
