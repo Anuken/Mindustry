@@ -98,7 +98,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
             //Power amount is delta'd by PowerGraph class already.
             float calculationDelta = delta();
 
-            heat = Mathf.lerpDelta(heat, generateTime >= 0.001f ? 1f : 0f, 0.05f);
+            heat = Mathf.lerpDelta(heat, generateTime >= 0.001f && enabled ? 1f : 0f, 0.05f);
 
             if(!consValid()){
                 productionEfficiency = 0.0f;
