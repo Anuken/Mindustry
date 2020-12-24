@@ -701,7 +701,6 @@ public class UnitTypes implements ContentList{
             legSpeed = 0.1f;
             legLengthScl = 0.96f;
             rippleScale = 2f;
-            legSpeed = 0.2f;
             ammoType = AmmoTypes.power;
             buildSpeed = 1f;
 
