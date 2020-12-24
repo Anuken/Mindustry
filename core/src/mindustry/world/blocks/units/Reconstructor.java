@@ -10,6 +10,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -38,7 +39,7 @@ public class Reconstructor extends UnitBlock{
 
     @Override
     public TextureRegion[] icons(){
-        return new TextureRegion[]{region, outRegion, topRegion};
+        return new TextureRegion[]{region, inRegion, outRegion, topRegion};
     }
 
     @Override
@@ -128,7 +129,7 @@ public class Reconstructor extends UnitBlock{
             //draw input
             for(int i = 0; i < 4; i++){
                 if(blends(i) && i != rotation){
-                    Draw.rect(inRegion, x, y, i * 90);
+                    Draw.rect(inRegion, x, y, (i * 90) - 180);
                 }
             }
 
@@ -174,6 +175,7 @@ public class Reconstructor extends UnitBlock{
                             Effect.shake(2f, 3f, this);
                             Fx.producesmoke.at(this);
                             consume();
+                            Events.fire(new UnitCreateEvent(payload.unit));
                         }
                     }
                 }

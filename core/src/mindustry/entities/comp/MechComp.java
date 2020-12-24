@@ -83,4 +83,12 @@ abstract class MechComp implements Posc, Flyingc, Hitboxc, Unitc, Mechc, Elevati
             walked = true;
         }
     }
+
+    @Override
+    public void approach(Vec2 vector){
+        if(!vector.isZero(0.09f)){
+            //mark walking state when moving in a controlled manner
+            walked = true;
+        }
+    }
 }

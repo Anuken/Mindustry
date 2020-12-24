@@ -143,9 +143,11 @@ public class Block extends UnlockableContent{
     public boolean sync;
     /** Whether this block uses conveyor-type placement mode. */
     public boolean conveyorPlacement;
+    /** Whether to swap the diagonal placement modes. */
+    public boolean swapDiagonalPlacement;
     /**
      * The color of this block when displayed on the minimap or map preview.
-     * Do not set manually! This is overriden when loading for most blocks.
+     * Do not set manually! This is overridden when loading for most blocks.
      */
     public Color mapColor = new Color(0, 0, 0, 1);
     /** Whether this block has a minimap color. */
@@ -287,7 +289,7 @@ public class Block extends UnlockableContent{
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
-            .sumf(other -> other.floor().attributes.get(attr));
+            .sumf(other -> !floating && other.floor().isDeep() ? 0 : other.floor().attributes.get(attr));
     }
 
     public TextureRegion getDisplayIcon(Tile tile){
@@ -377,12 +379,18 @@ public class Block extends UnlockableContent{
 
     public boolean canReplace(Block other){
         if(other.alwaysReplace) return true;
-        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && (size == other.size || (size >= other.size && subclass != null && subclass == other.subclass));
+        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group &&
+            (size == other.size || (size >= other.size && ((subclass != null && subclass == other.subclass) || group.anyReplace)));
     }
 
     /** @return a possible replacement for this block when placed in a line by the player. */
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
         return this;
+    }
+
+    /** Mutates the given list of points used during line placement. */
+    public void changePlacementPath(Seq<Point2> points, int rotation){
+
     }
 
     public Object nextConfig(){
@@ -392,10 +400,19 @@ public class Block extends UnlockableContent{
         return null;
     }
 
-    public void drawRequest(BuildPlan req, Eachable<BuildPlan> list, boolean valid){
+    /** Called when a new build plan is created in the player's queue. Blocks can maintain a reference to this plan and add configs to it later. */
+    public void onNewPlan(BuildPlan plan){
+
+    }
+
+    public void drawPlan(BuildPlan req, Eachable<BuildPlan> list, boolean valid){
+        drawPlan(req, list, valid, 1f);
+    }
+
+    public void drawPlan(BuildPlan req, Eachable<BuildPlan> list, boolean valid, float alpha){
         Draw.reset();
         Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
-        Draw.alpha(1f);
+        Draw.alpha(alpha);
         float prevScale = Draw.scl;
         Draw.scl *= req.animScale;
         drawRequestRegion(req, list);
@@ -517,7 +534,7 @@ public class Block extends UnlockableContent{
     }
 
     public boolean isVisible(){
-        return buildVisibility.visible() && !isHidden();
+        return !isHidden();
     }
 
     public boolean isPlaceable(){
@@ -713,7 +730,7 @@ public class Block extends UnlockableContent{
 
     @Override
     public boolean isHidden(){
-        return !buildVisibility.visible();
+        return !buildVisibility.visible() && !state.rules.revealedBlocks.contains(this);
     }
 
     @Override

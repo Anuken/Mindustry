@@ -1,7 +1,5 @@
-import com.badlogicgames.packr.*
-
-import java.nio.*
-import java.security.*
+import com.badlogicgames.packr.Packr
+import com.badlogicgames.packr.PackrConfig
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 
@@ -11,27 +9,6 @@ project.ext.assetsDir = new File("../core/assets")
 def enableTemplates = true
 def JDK_DIR = "$System.env.JDK_DIR"
 def ICON_DIR = new File("$rootDir/core/assets/icons/icon.icns")
-def spriteHashFile = new File(project.rootDir, "build/spritehash")
-
-def hashDirectory = {
-    def root = new File(project.rootDir, "core/assets-raw/sprites/")
-    MessageDigest digest = MessageDigest.getInstance("MD5")
-    ByteBuffer buffer = ByteBuffer.allocate(16)
-    def files = []
-    root.eachFileRecurse{ file ->
-        if(!file.name.startsWith(".")) files += file
-    }
-
-    files.sort()
-
-    for(File file : files){
-        buffer.position(0)
-        buffer.putLong(file.lastModified())
-        digest.update(buffer.array())
-    }
-
-    return digest.digest().encodeHex()
-}
 
 task run(dependsOn: classes, type: JavaExec){
     main = project.mainClassName
@@ -45,13 +22,6 @@ task run(dependsOn: classes, type: JavaExec){
     }
 
     jvmArgs += "-XX:+ShowCodeDetailsInExceptionMessages"
-
-    /*spriteHashFile.parentFile.mkdirs()
-    String spriteHash = hashDirectory()
-    if(spriteHashFile.exists() && spriteHashFile.text != spriteHash){
-        dependsOn ":tools:pack"
-    }
-    spriteHashFile.text = spriteHash*/
 
     if(project.hasProperty("args")){
         args Eval.me(project.getProperties()["args"])
@@ -78,6 +48,12 @@ task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     manifest{
         attributes 'Main-Class': project.mainClassName
     }
+}
+
+if(!project.ext.hasSprites()){
+    println "Scheduling sprite packing."
+    run.dependsOn ":tools:pack"
+    dist.dependsOn ":tools:pack"
 }
 
 task steamtest(dependsOn: dist){

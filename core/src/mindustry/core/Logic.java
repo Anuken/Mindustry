@@ -258,13 +258,12 @@ public class Logic implements ApplicationListener{
         state.rules.weather.removeAll(w -> w.weather == null);
 
         for(WeatherEntry entry : state.rules.weather){
-            if(entry.weather == null) continue;
             //update cooldown
             entry.cooldown -= Time.delta;
 
             //create new event when not active
-            if(entry.cooldown < 0 && !entry.weather.isActive()){
-                float duration = Mathf.random(entry.minDuration, entry.maxDuration);
+            if((entry.cooldown < 0 || entry.always) && !entry.weather.isActive()){
+                float duration = entry.always ? Float.POSITIVE_INFINITY : Mathf.random(entry.minDuration, entry.maxDuration);
                 entry.cooldown = duration + Mathf.random(entry.minFrequency, entry.maxFrequency);
                 Tmp.v1.setToRandomDirection();
                 Call.createWeather(entry.weather, entry.intensity, duration, Tmp.v1.x, Tmp.v1.y);

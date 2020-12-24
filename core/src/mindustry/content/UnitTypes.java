@@ -162,49 +162,49 @@ public class UnitTypes implements ContentList{
             singleTarget = true;
 
             weapons.add(
-                    new Weapon("scepter-weapon"){{
-                        top = false;
-                        y = 1f;
-                        x = 16f;
-                        shootY = 8f;
-                        reload = 45f;
-                        recoil = 5f;
-                        shake = 2f;
-                        ejectEffect = Fx.casing3;
-                        shootSound = Sounds.bang;
-                        shots = 3;
-                        inaccuracy = 3f;
-                        shotDelay = 4f;
+            new Weapon("scepter-weapon"){{
+                top = false;
+                y = 1f;
+                x = 16f;
+                shootY = 8f;
+                reload = 45f;
+                recoil = 5f;
+                shake = 2f;
+                ejectEffect = Fx.casing3;
+                shootSound = Sounds.bang;
+                shots = 3;
+                inaccuracy = 3f;
+                shotDelay = 4f;
 
-                        bullet = new BasicBulletType(7f, 50){{
-                            width = 11f;
-                            height = 20f;
-                            lifetime = 25f;
-                            shootEffect = Fx.shootBig;
-                            lightning = 2;
-                            lightningLength = 6;
-                            lightningColor = Pal.surge;
-                            //standard bullet damage is far too much for lightning
-                            lightningDamage = 30;
-                        }};
-                    }},
+                bullet = new BasicBulletType(7f, 50){{
+                    width = 11f;
+                    height = 20f;
+                    lifetime = 25f;
+                    shootEffect = Fx.shootBig;
+                    lightning = 2;
+                    lightningLength = 6;
+                    lightningColor = Pal.surge;
+                    //standard bullet damage is far too much for lightning
+                    lightningDamage = 20;
+                }};
+            }},
 
-                    new Weapon("mount-weapon"){{
-                        reload = 13f;
-                        x = 8.5f;
-                        y = 6f;
-                        rotate = true;
-                        ejectEffect = Fx.casing1;
-                        bullet = Bullets.standardCopper;
-                    }},
-                    new Weapon("mount-weapon"){{
-                        reload = 16f;
-                        x = 8.5f;
-                        y = -7f;
-                        rotate = true;
-                        ejectEffect = Fx.casing1;
-                        bullet = Bullets.standardCopper;
-                    }}
+            new Weapon("mount-weapon"){{
+                reload = 13f;
+                x = 8.5f;
+                y = 6f;
+                rotate = true;
+                ejectEffect = Fx.casing1;
+                bullet = Bullets.standardCopper;
+            }},
+            new Weapon("mount-weapon"){{
+                reload = 16f;
+                x = 8.5f;
+                y = -7f;
+                rotate = true;
+                ejectEffect = Fx.casing1;
+                bullet = Bullets.standardCopper;
+            }}
 
             );
         }};
@@ -339,7 +339,7 @@ public class UnitTypes implements ContentList{
 
                 bullet = new LightningBulletType(){{
                     lightningColor = hitColor = Pal.heal;
-                    damage = 15f;
+                    damage = 12f;
                     lightningLength = 7;
                     lightningLengthRand = 7;
                     shootEffect = Fx.shootHeal;
@@ -731,63 +731,63 @@ public class UnitTypes implements ContentList{
             }};
 
             weapons.add(
-                    new Weapon("spiroct-weapon"){{
-                        reload = 9f;
-                        x = 4f;
-                        y = 8f;
-                        rotate = true;
-                        bullet = sapper;
-                        shootSound = Sounds.sap;
-                    }},
-                    new Weapon("spiroct-weapon"){{
-                        reload = 15f;
-                        x = 9f;
-                        y = 6f;
-                        rotate = true;
-                        bullet = sapper;
-                        shootSound = Sounds.sap;
-                    }},
-                    new Weapon("spiroct-weapon"){{
-                        reload = 23f;
-                        x = 14f;
-                        y = 0f;
-                        rotate = true;
-                        bullet = sapper;
-                        shootSound = Sounds.sap;
-                    }},
-                    new Weapon("large-purple-mount"){{
-                        y = -7f;
-                        x = 9f;
-                        shootY = 7f;
-                        reload = 45;
-                        shake = 3f;
-                        rotateSpeed = 2f;
-                        ejectEffect = Fx.casing1;
-                        shootSound = Sounds.artillery;
-                        rotate = true;
-                        occlusion = 8f;
-                        recoil = 3f;
+            new Weapon("spiroct-weapon"){{
+                reload = 9f;
+                x = 4f;
+                y = 8f;
+                rotate = true;
+                bullet = sapper;
+                shootSound = Sounds.sap;
+            }},
+            new Weapon("spiroct-weapon"){{
+                reload = 15f;
+                x = 9f;
+                y = 6f;
+                rotate = true;
+                bullet = sapper;
+                shootSound = Sounds.sap;
+            }},
+            new Weapon("spiroct-weapon"){{
+                reload = 23f;
+                x = 14f;
+                y = 0f;
+                rotate = true;
+                bullet = sapper;
+                shootSound = Sounds.sap;
+            }},
+            new Weapon("large-purple-mount"){{
+                y = -7f;
+                x = 9f;
+                shootY = 7f;
+                reload = 45;
+                shake = 3f;
+                rotateSpeed = 2f;
+                ejectEffect = Fx.casing1;
+                shootSound = Sounds.artillery;
+                rotate = true;
+                shadow = 8f;
+                recoil = 3f;
 
-                        bullet = new ArtilleryBulletType(2f, 12){{
-                            hitEffect = Fx.sapExplosion;
-                            knockback = 0.8f;
-                            lifetime = 70f;
-                            width = height = 19f;
-                            collidesTiles = true;
-                            ammoMultiplier = 4f;
-                            splashDamageRadius = 95f;
-                            splashDamage = 65f;
-                            backColor = Pal.sapBulletBack;
-                            frontColor = lightningColor = Pal.sapBullet;
-                            lightning = 3;
-                            lightningLength = 10;
-                            smokeEffect = Fx.shootBigSmoke2;
-                            shake = 5f;
+                bullet = new ArtilleryBulletType(2f, 12){{
+                    hitEffect = Fx.sapExplosion;
+                    knockback = 0.8f;
+                    lifetime = 70f;
+                    width = height = 19f;
+                    collidesTiles = true;
+                    ammoMultiplier = 4f;
+                    splashDamageRadius = 95f;
+                    splashDamage = 65f;
+                    backColor = Pal.sapBulletBack;
+                    frontColor = lightningColor = Pal.sapBullet;
+                    lightning = 3;
+                    lightningLength = 10;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    shake = 5f;
 
-                            status = StatusEffects.sapped;
-                            statusDuration = 60f * 10;
-                        }};
-                    }});
+                    status = StatusEffects.sapped;
+                    statusDuration = 60f * 10;
+                }};
+            }});
         }};
 
         toxopid = new UnitType("toxopid"){{
@@ -823,35 +823,35 @@ public class UnitTypes implements ContentList{
             groundLayer = Layer.legUnit;
 
             weapons.add(
-                    new Weapon("large-purple-mount"){{
-                        y = -5f;
-                        x = 11f;
-                        shootY = 7f;
-                        reload = 30;
-                        shake = 4f;
-                        rotateSpeed = 2f;
-                        ejectEffect = Fx.casing1;
-                        shootSound = Sounds.shootBig;
-                        rotate = true;
-                        occlusion = 12f;
-                        recoil = 3f;
-                        shots = 2;
-                        spacing = 17f;
+            new Weapon("large-purple-mount"){{
+                y = -5f;
+                x = 11f;
+                shootY = 7f;
+                reload = 30;
+                shake = 4f;
+                rotateSpeed = 2f;
+                ejectEffect = Fx.casing1;
+                shootSound = Sounds.shootBig;
+                rotate = true;
+                shadow = 12f;
+                recoil = 3f;
+                shots = 2;
+                spacing = 17f;
 
-                        bullet = new ShrapnelBulletType(){{
-                            length = 90f;
-                            damage = 110f;
-                            width = 25f;
-                            serrationLenScl = 7f;
-                            serrationSpaceOffset = 60f;
-                            serrationFadeOffset = 0f;
-                            serrations = 10;
-                            serrationWidth = 6f;
-                            fromColor = Pal.sapBullet;
-                            toColor = Pal.sapBulletBack;
-                            shootEffect = smokeEffect = Fx.sparkShoot;
-                        }};
-                    }});
+                bullet = new ShrapnelBulletType(){{
+                    length = 90f;
+                    damage = 110f;
+                    width = 25f;
+                    serrationLenScl = 7f;
+                    serrationSpaceOffset = 60f;
+                    serrationFadeOffset = 0f;
+                    serrations = 10;
+                    serrationWidth = 6f;
+                    fromColor = Pal.sapBullet;
+                    toColor = Pal.sapBulletBack;
+                    shootEffect = smokeEffect = Fx.sparkShoot;
+                }};
+            }});
 
             weapons.add(new Weapon("toxopid-cannon"){{
                 y = -14f;
@@ -865,7 +865,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.casing3;
                 shootSound = Sounds.artillery;
                 rotate = true;
-                occlusion = 30f;
+                shadow = 30f;
 
                 bullet = new ArtilleryBulletType(3f, 50){{
                     hitEffect = Fx.sapExplosion;
@@ -925,6 +925,7 @@ public class UnitTypes implements ContentList{
             range = 140f;
             targetAir = false;
             commandLimit = 4;
+            circleTarget = true;
 
             weapons.add(new Weapon(){{
                 y = 0f;
@@ -958,6 +959,7 @@ public class UnitTypes implements ContentList{
             armor = 3f;
             targetFlag = BlockFlag.factory;
             commandLimit = 5;
+            circleTarget = true;
 
             weapons.add(new Weapon(){{
                 minShootVelocity = 0.75f;
@@ -1060,46 +1062,46 @@ public class UnitTypes implements ContentList{
             }};
 
             weapons.add(
-                    new Weapon("missiles-mount"){{
-                        y = 8f;
-                        x = 17f;
-                        reload = 20f;
-                        ejectEffect = Fx.casing1;
-                        rotateSpeed = 8f;
-                        bullet = missiles;
-                        shootSound = Sounds.missile;
-                        rotate = true;
-                        occlusion = 6f;
-                    }},
-                    new Weapon("missiles-mount"){{
-                        y = -8f;
-                        x = 17f;
-                        reload = 35;
-                        rotateSpeed = 8f;
-                        ejectEffect = Fx.casing1;
-                        bullet = missiles;
-                        shootSound = Sounds.missile;
-                        rotate = true;
-                        occlusion = 6f;
-                    }},
-                    new Weapon("large-bullet-mount"){{
-                        y = 2f;
-                        x = 10f;
-                        shootY = 10f;
-                        reload = 12;
-                        shake = 1f;
-                        rotateSpeed = 2f;
-                        ejectEffect = Fx.casing1;
-                        shootSound = Sounds.shootBig;
-                        rotate = true;
-                        occlusion = 8f;
-                        bullet = new BasicBulletType(7f, 50){{
-                            width = 12f;
-                            height = 18f;
-                            lifetime = 25f;
-                            shootEffect = Fx.shootBig;
-                        }};
-                    }}
+            new Weapon("missiles-mount"){{
+                y = 8f;
+                x = 17f;
+                reload = 20f;
+                ejectEffect = Fx.casing1;
+                rotateSpeed = 8f;
+                bullet = missiles;
+                shootSound = Sounds.missile;
+                rotate = true;
+                shadow = 6f;
+            }},
+            new Weapon("missiles-mount"){{
+                y = -8f;
+                x = 17f;
+                reload = 35;
+                rotateSpeed = 8f;
+                ejectEffect = Fx.casing1;
+                bullet = missiles;
+                shootSound = Sounds.missile;
+                rotate = true;
+                shadow = 6f;
+            }},
+            new Weapon("large-bullet-mount"){{
+                y = 2f;
+                x = 10f;
+                shootY = 10f;
+                reload = 12;
+                shake = 1f;
+                rotateSpeed = 2f;
+                ejectEffect = Fx.casing1;
+                shootSound = Sounds.shootBig;
+                rotate = true;
+                shadow = 8f;
+                bullet = new BasicBulletType(7f, 50){{
+                    width = 12f;
+                    height = 18f;
+                    lifetime = 25f;
+                    shootEffect = Fx.shootBig;
+                }};
+            }}
             );
         }};
 
@@ -1132,53 +1134,53 @@ public class UnitTypes implements ContentList{
             }};
 
             weapons.add(
-                    new Weapon("large-laser-mount"){{
-                        shake = 4f;
-                        shootY = 9f;
-                        x = 18f;
-                        y = 5f;
-                        rotateSpeed = 2f;
-                        reload = 45f;
-                        recoil = 4f;
-                        shootSound = Sounds.laser;
-                        occlusion = 20f;
-                        rotate = true;
+            new Weapon("large-laser-mount"){{
+                shake = 4f;
+                shootY = 9f;
+                x = 18f;
+                y = 5f;
+                rotateSpeed = 2f;
+                reload = 45f;
+                recoil = 4f;
+                shootSound = Sounds.laser;
+                shadow = 20f;
+                rotate = true;
 
-                        bullet = new LaserBulletType(){{
-                            damage = 90f;
-                            sideAngle = 20f;
-                            sideWidth = 1.5f;
-                            sideLength = 80f;
-                            width = 25f;
-                            length = 200f;
-                            shootEffect = Fx.shockwave;
-                            colors = new Color[]{Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
-                        }};
-                    }},
-                    new Weapon("large-artillery"){{
-                        x = 11f;
-                        y = 27f;
-                        rotateSpeed = 2f;
-                        reload = 9f;
-                        shootSound = Sounds.shoot;
-                        occlusion = 7f;
-                        rotate = true;
-                        recoil = 0.5f;
+                bullet = new LaserBulletType(){{
+                    damage = 90f;
+                    sideAngle = 20f;
+                    sideWidth = 1.5f;
+                    sideLength = 80f;
+                    width = 25f;
+                    length = 200f;
+                    shootEffect = Fx.shockwave;
+                    colors = new Color[]{Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
+                }};
+            }},
+            new Weapon("large-artillery"){{
+                x = 11f;
+                y = 27f;
+                rotateSpeed = 2f;
+                reload = 9f;
+                shootSound = Sounds.shoot;
+                shadow = 7f;
+                rotate = true;
+                recoil = 0.5f;
 
-                        bullet = fragBullet;
-                    }},
-                    new Weapon("large-artillery"){{
-                        y = -13f;
-                        x = 20f;
-                        reload = 12f;
-                        ejectEffect = Fx.casing1;
-                        rotateSpeed = 7f;
-                        shake = 1f;
-                        shootSound = Sounds.shoot;
-                        rotate = true;
-                        occlusion = 12f;
-                        bullet = fragBullet;
-                    }});
+                bullet = fragBullet;
+            }},
+            new Weapon("large-artillery"){{
+                y = -13f;
+                x = 20f;
+                reload = 12f;
+                ejectEffect = Fx.casing1;
+                rotateSpeed = 7f;
+                shake = 1f;
+                shootSound = Sounds.shoot;
+                rotate = true;
+                shadow = 12f;
+                bullet = fragBullet;
+            }});
         }};
 
         //endregion
@@ -1322,6 +1324,7 @@ public class UnitTypes implements ContentList{
             drag = 0.017f;
             lowAltitude = false;
             flying = true;
+            circleTarget = true;
             engineOffset = 12f;
             engineSize = 6f;
             rotateShooting = false;
@@ -1584,7 +1587,7 @@ public class UnitTypes implements ContentList{
                 shootY = 7f;
                 shake = 5f;
                 recoil = 4f;
-                occlusion = 12f;
+                shadow = 12f;
 
                 shots = 1;
                 inaccuracy = 3f;
@@ -1620,7 +1623,7 @@ public class UnitTypes implements ContentList{
                 x = 8.5f;
                 y = -9f;
 
-                occlusion = 6f;
+                shadow = 6f;
 
                 rotateSpeed = 4f;
                 rotate = true;
@@ -1678,7 +1681,7 @@ public class UnitTypes implements ContentList{
                 rotateSpeed = 4f;
                 mirror = false;
 
-                occlusion = 20f;
+                shadow = 20f;
 
                 shootY = 2f;
                 recoil = 4f;
@@ -1724,7 +1727,7 @@ public class UnitTypes implements ContentList{
                 shootY = 7f;
                 shake = 2f;
                 recoil = 3f;
-                occlusion = 12f;
+                shadow = 12f;
                 ejectEffect = Fx.casing3;
                 shootSound = Sounds.shootBig;
 
@@ -1772,7 +1775,7 @@ public class UnitTypes implements ContentList{
                 shootY = 23f;
                 shake = 6f;
                 recoil = 10.5f;
-                occlusion = 50f;
+                shadow = 50f;
                 shootSound = Sounds.railgun;
 
                 shots = 1;
@@ -1827,7 +1830,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0.01f;
                 }};
             }});
         }};
@@ -1869,7 +1872,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0.01f;
                 }};
             }});
         }};
@@ -1909,7 +1912,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 70f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0.01f;
                     homingPower = 0.04f;
                 }};
             }});

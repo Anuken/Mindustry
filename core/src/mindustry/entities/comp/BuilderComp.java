@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -32,7 +33,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
     @Import Team team;
 
     @SyncLocal Queue<BuildPlan> plans = new Queue<>(1);
-    @SyncLocal transient boolean updateBuilding = true;
+    @SyncLocal boolean updateBuilding = true;
 
     public boolean canBuild(){
         return type.buildSpeed > 0;
@@ -76,9 +77,9 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
 
         Tile tile = world.tile(current.x, current.y);
 
-        if(!(tile.block() instanceof ConstructBlock)){
+        if(!(tile.build instanceof ConstructBuild cb)){
             if(!current.initialized && !current.breaking && Build.validPlace(current.block, team, current.x, current.y, current.rotation)){
-                boolean hasAll = infinite || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item));
+                boolean hasAll = infinite || current.isRotation(team) || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item));
 
                 if(hasAll){
                     Call.beginPlace(self(), current.block, team, current.x, current.y, current.rotation);
@@ -91,7 +92,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
                 plans.removeFirst();
                 return;
             }
-        }else if(tile.team() != team && tile.team() != Team.derelict){
+        }else if((tile.team() != team && tile.team() != Team.derelict) || (!current.breaking && cb.cblock != current.block)){
             plans.removeFirst();
             return;
         }
@@ -102,13 +103,11 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         }
 
         //if there is no core to build with or no build entity, stop building!
-        if((core == null && !infinite) || !(tile.build instanceof ConstructBuild)){
+        if((core == null && !infinite) || !(tile.build instanceof ConstructBuild entity)){
             return;
         }
 
         //otherwise, update it.
-        ConstructBuild entity = tile.bc();
-
         if(current.breaking){
             entity.deconstruct(self(), core, 1f / entity.buildCost * Time.delta * type.buildSpeed * state.rules.buildSpeedMultiplier);
         }else{
@@ -119,28 +118,38 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         current.progress = entity.progress;
     }
 
-    /** Draw all current build requests. Does not draw the beam effect, only the positions. */
-    void drawBuildRequests(){
+    /** Draw all current build plans. Does not draw the beam effect, only the positions. */
+    void drawBuildPlans(){
 
-        for(BuildPlan request : plans){
-            if(request.progress > 0.01f || (buildPlan() == request && request.initialized && (dst(request.x * tilesize, request.y * tilesize) <= buildingRange || state.isEditor()))) continue;
-
-            request.animScale = 1f;
-            if(request.breaking){
-                control.input.drawBreaking(request);
-            }else{
-                request.block.drawRequest(request, control.input.allRequests(),
-                Build.validPlace(request.block, team, request.x, request.y, request.rotation) || control.input.requestMatches(request));
-            }
+        for(BuildPlan plan : plans){
+            if(plan.progress > 0.01f || (buildPlan() == plan && plan.initialized && (within(plan.x * tilesize, plan.y * tilesize, buildingRange) || state.isEditor()))) continue;
+            drawPlan(plan, 1f);
         }
 
         Draw.reset();
     }
 
+    void drawPlan(BuildPlan request, float alpha){
+        request.animScale = 1f;
+        if(request.breaking){
+            control.input.drawBreaking(request);
+        }else{
+            request.block.drawPlan(request, control.input.allRequests(),
+            Build.validPlace(request.block, team, request.x, request.y, request.rotation) || control.input.requestMatches(request),
+            alpha);
+
+            Draw.reset();
+            Draw.mixcol(Color.white, 0.24f + Mathf.absin(Time.globalTime, 6f, 0.28f));
+            Draw.alpha(alpha);
+            request.block.drawRequestConfigTop(request, plans);
+        }
+    }
+
     /** @return whether this request should be skipped, in favor of the next one. */
     boolean shouldSkip(BuildPlan request, @Nullable Building core){
         //requests that you have at least *started* are considered
-        if(state.rules.infiniteResources || team.rules().infiniteResources || request.breaking || core == null) return false;
+        if(state.rules.infiniteResources || team.rules().infiniteResources || request.breaking || core == null || request.isRotation(team)) return false;
+
         return (request.stuck && !core.items.has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items.has(i.item) && Mathf.round(i.amount * state.rules.buildCostMultiplier) > 0) && !request.initialized);
     }
 
@@ -182,8 +191,8 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
             plans.remove(replace);
         }
         Tile tile = world.tile(place.x, place.y);
-        if(tile != null && tile.build instanceof ConstructBuild){
-            place.progress = tile.<ConstructBuild>bc().progress;
+        if(tile != null && tile.build instanceof ConstructBuild cons){
+            place.progress = cons.progress;
         }
         if(tail){
             plans.addLast(place);
@@ -194,8 +203,10 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
 
     boolean activelyBuilding(){
         //not actively building when not near the build plan
-        if(isBuilding() && !within(buildPlan(), state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange)){
-            return false;
+        if(isBuilding()){
+            if(!within(buildPlan(), state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange)){
+                return false;
+            }
         }
         return isBuilding() && updateBuilding;
     }
@@ -207,17 +218,23 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
     }
 
     public void draw(){
-        if(!isBuilding() || !updateBuilding || !canBuild()) return;
+        if(!activelyBuilding()) return;
 
-        //TODO check correctness
         Draw.z(Layer.flyingUnit);
 
         BuildPlan plan = buildPlan();
         Tile tile = world.tile(plan.x, plan.y);
-
+        var core = team.core();
 
         if(tile == null || (!within(tile, buildingRange) && !state.isEditor())){
             return;
+        }
+
+        //draw remote plans.
+        if(core != null && !isLocal() && !(tile.block() instanceof ConstructBlock)){
+            Draw.z(Layer.plans - 1f);
+            drawPlan(plan, 0.5f);
+            Draw.z(Layer.flyingUnit);
         }
 
         int size = plan.breaking ? tile.block().size : plan.block.size;

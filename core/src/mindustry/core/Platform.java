@@ -22,8 +22,8 @@ public interface Platform{
 
     /** Dynamically loads a jar file. */
     default Class<?> loadJar(Fi jar, String mainClass) throws Exception{
-        URLClassLoader classLoader = new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
-        return classLoader.loadClass(mainClass);
+        URLClassLoader classLoader = new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, getClass().getClassLoader());
+        return Class.forName(mainClass, true, classLoader);
     }
 
     /** Steam: Update lobby visibility.*/

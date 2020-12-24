@@ -32,6 +32,7 @@ import mindustry.ui.fragments.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
+import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -47,7 +48,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Maximum line length. */
     final static int maxLength = 100;
     final static Rect r1 = new Rect(), r2 = new Rect();
-    final static Seq<Point2> tmpPoints = new Seq<>(), tmpPoints2 = new Seq<>();
 
     public final OverlayFragment frag = new OverlayFragment();
 
@@ -194,14 +194,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(tile != null && tile.team == unit.team
         && unit.within(tile, tilesize * tile.block.size * 1.2f + tilesize * 5f)){
-            //pick up block directly
-            if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
+
+            //pick up block's payload
+            Payload current = tile.getPayload();
+            if(current != null && pay.canPickupPayload(current)){
+                Call.pickedBuildPayload(unit, tile, false);
+                //pick up whole building directly
+            }else if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
                 Call.pickedBuildPayload(unit, tile, true);
-            }else{ //pick up block payload
-                Payload current = tile.getPayload();
-                if(current != null && pay.canPickupPayload(current)){
-                    Call.pickedBuildPayload(unit, tile, false);
-                }
             }
         }
     }
@@ -278,8 +278,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot drop an item.");
         }
 
-        Fx.dropItem.at(player.x, player.y, angle, Color.white, player.unit().item());
-        player.unit().clearItem();
+        player.unit().eachGroup(unit -> {
+            Fx.dropItem.at(unit.x, unit.y, angle, Color.white, unit.item());
+            unit.clearItem();
+        });
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true, unreliable = true)
@@ -447,7 +449,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Unit unit = player.unit();
         if(!(unit instanceof Payloadc pay)) return;
 
-        Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type.hitSize * 2.5f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
+        Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type.hitSize * 2f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize));
         if(target != null){
             Call.requestUnitPayload(player, target);
         }else{
@@ -514,7 +516,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean requestMatches(BuildPlan request){
         Tile tile = world.tile(request.x, request.y);
-        return tile != null && tile.block() instanceof ConstructBlock && tile.<ConstructBuild>bc().cblock == request.block;
+        return tile != null && tile.build instanceof ConstructBuild cons && cons.cblock == request.block;
     }
 
     public void drawBreaking(int x, int y){
@@ -740,6 +742,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(BuildPlan req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
                 BuildPlan copy = req.copy();
+                req.block.onNewPlan(copy);
                 player.unit().addBuild(copy);
             }
         }
@@ -756,14 +759,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawRequest(BuildPlan request){
-        request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
+        request.block.drawPlan(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
     }
 
     /** Draws a placement icon for a specific block. */
     protected void drawRequest(int x, int y, Block block, int rotation){
         brequest.set(x, y, rotation, block);
         brequest.animScale = 1f;
-        block.drawRequest(brequest, allRequests(), validPlace(x, y, block, rotation));
+        block.drawPlan(brequest, allRequests(), validPlace(x, y, block, rotation));
     }
 
     /** Remove everything from the queue in a selection. */
@@ -1045,7 +1048,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean canShoot(){
         return block == null && !onConfigurable() && !isDroppingItem() && !player.unit().activelyBuilding() &&
-            !(player.unit() instanceof Mechc && player.unit().isFlying());
+            !(player.unit() instanceof Mechc && player.unit().isFlying()) && !player.unit().mining();
     }
 
     public boolean onConfigurable(){
@@ -1077,12 +1080,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    public void tryPlaceBlock(int x, int y){
-        if(block != null && validPlace(x, y, block, rotation)){
-            placeBlock(x, y, block, rotation);
-        }
-    }
-
     public void tryBreakBlock(int x, int y){
         if(validBreak(x, y)){
             breakBlock(x, y);
@@ -1107,14 +1104,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean validBreak(int x, int y){
         return Build.validBreak(player.team(), x, y);
-    }
-
-    public void placeBlock(int x, int y, Block block, int rotation){
-        BuildPlan req = getRequest(x, y);
-        if(req != null){
-            player.unit().plans().remove(req);
-        }
-        player.unit().addBuild(new BuildPlan(x, y, rotation, block, block.nextConfig()));
     }
 
     public void breakBlock(int x, int y){
@@ -1154,49 +1143,25 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             diagonal = !diagonal;
         }
 
-        if(block instanceof PowerNode){
+        if(block != null && block.swapDiagonalPlacement){
             diagonal = !diagonal;
         }
 
         if(diagonal){
-            points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
+            var start = world.build(startX, startY);
+            var end = world.build(endX, endY);
+            if(block != null && start instanceof ChainedBuilding && end instanceof ChainedBuilding
+                    && block.canReplace(end.block) && block.canReplace(start.block)){
+                points = Placement.upgradeLine(startX, startY, endX, endY);
+            }else{
+                points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
+            }
         }else{
             points = Placement.normalizeLine(startX, startY, endX, endY);
         }
 
-        if(block instanceof PowerNode node){
-            var base = tmpPoints2;
-            var result = tmpPoints.clear();
-
-            base.selectFrom(points, p -> p == points.first() || p == points.peek() || Build.validPlace(block, player.team(), p.x, p.y, rotation, false));
-            boolean addedLast = false;
-
-            outer:
-            for(int i = 0; i < base.size;){
-                var point = base.get(i);
-                result.add(point);
-                if(i == base.size - 1) addedLast = true;
-
-                //find the furthest node that overlaps this one
-                for(int j = base.size - 1; j > i; j--){
-                    var other = base.get(j);
-                    boolean over = node.overlaps(world.tile(point.x, point.y), world.tile(other.x, other.y));
-
-                    if(over){
-                        //add node to list and start searching for node that overlaps the next one
-                        i = j;
-                        continue outer;
-                    }
-                }
-
-                //if it got here, that means nothing was found. try to proceed to the next node anyway
-                i ++;
-            }
-
-            if(!addedLast) result.add(base.peek());
-
-            points.clear();
-            points.addAll(result);
+        if(block != null){
+            block.changePlacementPath(points, rotation);
         }
 
         float angle = Angles.angle(startX, startY, endX, endY);

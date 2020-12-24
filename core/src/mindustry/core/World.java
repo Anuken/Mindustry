@@ -186,14 +186,14 @@ public class World{
 
     /**
      * Call to signify the beginning of map loading.
-     * BuildinghangeEvents will not be fired until endMapLoad().
+     * TileEvents will not be fired until endMapLoad().
      */
     public void beginMapLoad(){
         generating = true;
     }
 
     /**
-     * Call to signify the end of map loading. Updates tile occlusions and sets up physics for the world.
+     * Call to signify the end of map loading. Updates tile proximities and sets up physics for the world.
      * A WorldLoadEvent will be fire.
      */
     public void endMapLoad(){
@@ -302,9 +302,7 @@ public class World{
         entries.removeAll(e -> e.value < 30);
 
         Block[] floors = new Block[entries.size];
-        int[] floorCounts = new int[entries.size];
         for(int i = 0; i < entries.size; i++){
-            floorCounts[i] = entries.get(i).value;
             floors[i] = entries.get(i).key;
         }
 
@@ -544,7 +542,7 @@ public class World{
 
             int circleDst = (int)(rawDst - (length - circleBlend));
             if(circleDst > 0){
-                dark = Math.max(circleDst / 1f, dark);
+                dark = Math.max(circleDst, dark);
             }
         }
 

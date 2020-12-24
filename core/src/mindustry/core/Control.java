@@ -341,7 +341,7 @@ public class Control implements ApplicationListener, Loadable{
                         state.rules.waves = true;
 
                         //reset win wave??
-                        state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null && sector.preset.captureWave > 0 ? sector.preset.captureWave : state.rules.winWave > state.wave ? state.rules.winWave : 40;
+                        state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null && sector.preset.captureWave > 0 ? sector.preset.captureWave : state.rules.winWave > state.wave ? state.rules.winWave : 30;
 
                         //if there's still an enemy base left, fix it
                         if(state.rules.attackMode){
@@ -351,7 +351,7 @@ public class Control implements ApplicationListener, Loadable{
                                 if(tile != null){
                                     tile.setBlock(content.block(plan.block), state.rules.waveTeam, plan.rotation);
                                     if(plan.config != null && tile.build != null){
-                                        tile.build.configure(plan.config);
+                                        tile.build.configureAny(plan.config);
                                     }
                                 }
                             }
@@ -424,7 +424,7 @@ public class Control implements ApplicationListener, Loadable{
         net.dispose();
         Musics.dispose();
         Sounds.dispose();
-        ui.editor.dispose();
+        if(ui != null && ui.editor != null) ui.editor.dispose();
     }
 
     @Override

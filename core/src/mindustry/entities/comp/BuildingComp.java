@@ -201,7 +201,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         if(self() instanceof ConstructBuild entity){
             //update block to reflect the fact that something was being constructed
-            if(entity.cblock != null && entity.cblock.synthetic()){
+            if(entity.cblock != null && entity.cblock.synthetic() && entity.wasConstructing){
                 block = entity.cblock;
             }else{
                 //otherwise this was a deconstruction that was interrupted, don't want to rebuild that
@@ -575,7 +575,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(next.team == team && next.block.hasLiquids && liquids.get(liquid) > 0f){
             float ofract = next.liquids.get(liquid) / next.block.liquidCapacity;
             float fract = liquids.get(liquid) / block.liquidCapacity * block.liquidPressure;
-            float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (block.liquidCapacity), liquids.get(liquid));
+            float flow = Math.min(Mathf.clamp((fract - ofract)) * (block.liquidCapacity), liquids.get(liquid));
             flow = Math.min(flow, next.block.liquidCapacity - next.liquids.get(liquid));
 
             if(flow > 0f && ofract <= fract && next.acceptLiquid(self(), liquid)){
@@ -1154,7 +1154,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return false;
     }
 
-
     public float handleDamage(float amount){
         return amount;
     }
@@ -1166,13 +1165,17 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Handle a bullet collision.
      * @return whether the bullet should be removed. */
     public boolean collision(Bullet other){
-        damage(other.damage() * other.type().tileDamageMultiplier);
+        damage(other.damage() * other.type().buildingDamageMultiplier);
 
         return true;
     }
 
     public boolean canPickup(){
         return true;
+    }
+
+    public void pickedUp(){
+
     }
 
     public void removeFromProximity(){

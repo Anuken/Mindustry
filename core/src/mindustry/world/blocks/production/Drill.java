@@ -42,7 +42,7 @@ public class Drill extends Block{
     protected int returnCount;
 
     /** Whether to draw the item this drill is mining. */
-    public boolean drawMineItem = false;
+    public boolean drawMineItem = true;
     /** Effect played when an item is produced. This is colored. */
     public Effect drillEffect = Fx.mine;
     /** Speed the drill bit rotates at. */
@@ -57,6 +57,7 @@ public class Drill extends Block{
     public @Load("@-rim") TextureRegion rimRegion;
     public @Load("@-rotator") TextureRegion rotatorRegion;
     public @Load("@-top") TextureRegion topRegion;
+    public @Load(value = "@-item", fallback = "drill-item-@size") TextureRegion itemRegion;
 
     public Drill(String name){
         super(name);
@@ -76,11 +77,11 @@ public class Drill extends Block{
         Tile tile = req.tile();
         if(tile == null) return;
 
-        countOre(req.tile());
-        if(returnItem == null) return;
+        countOre(tile);
+        if(returnItem == null || !drawMineItem) return;
 
         Draw.color(returnItem.color);
-        Draw.rect("drill-top", req.drawx(), req.drawy());
+        Draw.rect(itemRegion, req.drawx(), req.drawy());
         Draw.color();
     }
 
@@ -124,6 +125,12 @@ public class Drill extends Block{
             Draw.rect(returnItem.icon(Cicon.small), dx, dy - 1);
             Draw.reset();
             Draw.rect(returnItem.icon(Cicon.small), dx, dy);
+
+            if(drawMineItem){
+                Draw.color(returnItem.color);
+                Draw.rect(itemRegion, tile.worldx() + offset, tile.worldy() + offset);
+                Draw.color();
+            }
         }else{
             Tile to = tile.getLinkedTilesAs(this, tempTiles).find(t -> t.drop() != null && t.drop().hardness > tier);
             Item item = to == null ? null : to.drop();
@@ -168,7 +175,7 @@ public class Drill extends Block{
         }
 
         itemArray.sort((item1, item2) -> {
-            int type = Boolean.compare(item1 != Items.sand, item2 != Items.sand);
+            int type = Boolean.compare(!item1.lowPriority, !item2.lowPriority);
             if(type != 0) return type;
             int amounts = Integer.compare(oreCount.get(item1, 0), oreCount.get(item2, 0));
             if(amounts != 0) return amounts;
@@ -304,7 +311,7 @@ public class Drill extends Block{
 
             if(dominantItem != null && drawMineItem){
                 Draw.color(dominantItem.color);
-                Draw.rect("drill-top", x, y);
+                Draw.rect(itemRegion, x, y);
                 Draw.color();
             }
         }

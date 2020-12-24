@@ -1,6 +1,7 @@
 package mindustry.graphics;
 
 import arc.*;
+import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
@@ -225,11 +226,18 @@ public class Shaders{
         }
     }
 
-    public static class SurfaceShader extends LoadShader{
-
+    public static class SurfaceShader extends Shader{
         public SurfaceShader(String frag){
-            super(frag, "screenspace");
+            super(getShaderFi("screenspace.vert"), getShaderFi(frag + ".frag"));
+            loadNoise();
+        }
 
+        public SurfaceShader(String vertRaw, String fragRaw){
+            super(vertRaw, fragRaw);
+            loadNoise();
+        }
+
+        public void loadNoise(){
             Core.assets.load("sprites/noise.png", Texture.class).loaded = t -> {
                 ((Texture)t).setFilter(TextureFilter.linear);
                 ((Texture)t).setWrap(TextureWrap.repeat);
@@ -252,9 +260,12 @@ public class Shaders{
     }
 
     public static class LoadShader extends Shader{
-
         public LoadShader(String frag, String vert){
-            super(Core.files.internal("shaders/" + vert + ".vert"), Core.files.internal("shaders/" + frag + ".frag"));
+            super(getShaderFi(vert + ".vert"), getShaderFi(frag + ".frag"));
         }
+    }
+
+    public static Fi getShaderFi(String file){
+        return Core.files.internal("shaders/" + file);
     }
 }

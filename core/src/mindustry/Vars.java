@@ -17,6 +17,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.io.*;
+import mindustry.logic.*;
 import mindustry.maps.Map;
 import mindustry.maps.*;
 import mindustry.mod.*;
@@ -67,6 +68,8 @@ public class Vars implements Loadable{
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
     public static final Seq<ServerGroup> defaultServers = Seq.with();
+    /** maximum size of any block, do not change unless you know what you're doing */
+    public static final int maxBlockSize = 16;
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
     /** max chat message length */
@@ -193,6 +196,7 @@ public class Vars implements Loadable{
     public static BeControl becontrol;
     public static AsyncCore asyncCore;
     public static BaseRegistry bases;
+    public static GlobalConstants constants;
 
     public static Universe universe;
     public static World world;
@@ -266,6 +270,7 @@ public class Vars implements Loadable{
         indexer = new BlockIndexer();
         pathfinder = new Pathfinder();
         bases = new BaseRegistry();
+        constants = new GlobalConstants();
 
         state = new GameState();
 

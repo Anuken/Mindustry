@@ -21,7 +21,7 @@ public class Accelerator extends Block{
     public @Load("launch-arrow") TextureRegion arrowRegion;
 
     public Block launching = Blocks.coreNucleus;
-    public int[] capacities = new int[content.items().size];
+    public int[] capacities;
 
     public Accelerator(String name){
         super(name);
@@ -35,6 +35,7 @@ public class Accelerator extends Block{
     @Override
     public void init(){
         itemCapacity = 0;
+        capacities = new int[content.items().size];
         for(ItemStack stack : launching.requirements){
             capacities[stack.item.id] = stack.amount;
             itemCapacity += stack.amount;
@@ -43,38 +44,54 @@ public class Accelerator extends Block{
         super.init();
     }
 
+    @Override
+    public boolean outputsItems(){
+        return false;
+    }
+    
     public class AcceleratorBuild extends Building{
+        public float heat, statusLerp;
 
+        @Override
+        public void updateTile(){
+            super.updateTile();
+            heat = Mathf.lerpDelta(heat, consValid() ? 1f : 0f, 0.05f);
+            statusLerp = Mathf.lerpDelta(statusLerp, power.status, 0.05f);
+        }
+        
         @Override
         public void draw(){
             super.draw();
 
             for(int l = 0; l < 4; l++){
                 float length = 7f + l * 5f;
-                Draw.color(team.color, Pal.darkMetal, Mathf.absin(Time.time + l*50f, 10f, 1f));
+                Draw.color(Tmp.c1.set(Pal.darkMetal).lerp(team.color, statusLerp), Pal.darkMetal, Mathf.absin(Time.time + l*50f, 10f, 1f));
 
                 for(int i = 0; i < 4; i++){
                     float rot = i*90f + 45f;
                     Draw.rect(arrowRegion, x + Angles.trnsx(rot, length), y + Angles.trnsy(rot, length), rot + 180f);
                 }
             }
+            
+            if(heat < 0.0001f) return;
 
             float rad = size * tilesize / 2f * 0.74f;
             float scl = 2f;
 
             Draw.z(Layer.bullet - 0.0001f);
-            Lines.stroke(1.75f, Pal.accent);
+            Lines.stroke(1.75f * heat, Pal.accent);
             Lines.square(x, y, rad * 1.22f, 45f);
 
-            Lines.stroke(3f, Pal.accent);
+            Lines.stroke(3f * heat, Pal.accent);
             Lines.square(x, y, rad, Time.time / scl);
             Lines.square(x, y, rad, -Time.time / scl);
 
             Draw.color(team.color);
+            Draw.alpha(Mathf.clamp(heat * 3f));
 
             for(int i = 0; i < 4; i++){
                 float rot = i*90f + 45f + (-Time.time /3f)%360f;
-                float length = 26f;
+                float length = 26f * heat;
                 Draw.rect(arrowRegion, x + Angles.trnsx(rot, length), y + Angles.trnsy(rot, length), rot + 180f);
             }
 
