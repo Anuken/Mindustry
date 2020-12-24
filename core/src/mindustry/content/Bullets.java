@@ -185,7 +185,7 @@ public class Bullets implements ContentList{
             fragBullets = 5;
         }};
 
-        fragGlassFrag = new BasicBulletType(3f, 5, "bullet"){{
+        fragGlassFrag = new BasicBulletType(3f, 15, "bullet"){{
             width = 5f;
             height = 12f;
             shrinkY = 1f;
@@ -195,7 +195,7 @@ public class Bullets implements ContentList{
             despawnEffect = Fx.none;
         }};
 
-        fragPlasticFrag = new BasicBulletType(2.5f, 10, "bullet"){{
+        fragPlasticFrag = new BasicBulletType(2.5f, 25, "bullet"){{
             width = 10f;
             height = 12f;
             shrinkY = 1f;
@@ -205,7 +205,7 @@ public class Bullets implements ContentList{
             despawnEffect = Fx.none;
         }};
 
-        fragGlass = new FlakBulletType(4f, 3){{
+        fragGlass = new FlakBulletType(4f, 8){{
             ammoMultiplier = 3f;
             shootEffect = Fx.shootSmall;
             reloadMultiplier = 0.8f;
@@ -220,7 +220,7 @@ public class Bullets implements ContentList{
             collidesGround = true;
         }};
 
-        fragPlastic = new FlakBulletType(4f, 6){{
+        fragPlastic = new FlakBulletType(4f, 19){{
             splashDamageRadius = 40f;
             splashDamage = 25f;
             fragBullet = fragPlasticFrag;
@@ -237,14 +237,14 @@ public class Bullets implements ContentList{
             shootEffect = Fx.shootBig;
             ammoMultiplier = 4f;
             splashDamage = 18f;
-            splashDamageRadius = 55f;
+            splashDamageRadius = 155f;
             collidesGround = true;
 
             status = StatusEffects.blasted;
             statusDuration = 60f;
         }};
 
-        fragSurge = new FlakBulletType(4.5f, 13){{
+        fragSurge = new FlakBulletType(4.5f, 32){{
             ammoMultiplier = 4f;
             splashDamage = 50f;
             splashDamageRadius = 40f;
@@ -255,7 +255,7 @@ public class Bullets implements ContentList{
             explodeRange = 20f;
         }};
 
-        missileExplosive = new MissileBulletType(3.7f, 10){{
+        missileExplosive = new MissileBulletType(3.7f, 20){{
             width = 8f;
             height = 8f;
             shrinkY = 0f;
@@ -270,7 +270,7 @@ public class Bullets implements ContentList{
             statusDuration = 60f;
         }};
 
-        missileIncendiary = new MissileBulletType(3.7f, 12){{
+        missileIncendiary = new MissileBulletType(3.7f, 24){{
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             width = 7f;
@@ -285,7 +285,7 @@ public class Bullets implements ContentList{
             status = StatusEffects.burning;
         }};
 
-        missileSurge = new MissileBulletType(3.7f, 18){{
+        missileSurge = new MissileBulletType(3.7f, 36){{
             width = 8f;
             height = 8f;
             shrinkY = 0f;
@@ -413,7 +413,7 @@ public class Bullets implements ContentList{
             }
         };
 
-        basicFlame = new BulletType(3.35f, 16f){{
+        basicFlame = new BulletType(3.35f, 12f){{
             ammoMultiplier = 3f;
             hitSize = 7f;
             lifetime = 18f;
@@ -428,7 +428,7 @@ public class Bullets implements ContentList{
             hittable = false;
         }};
 
-        pyraFlame = new BulletType(3.35f, 25f){{
+        pyraFlame = new BulletType(3.35f, 18f){{
             ammoMultiplier = 4f;
             hitSize = 7f;
             lifetime = 18f;
@@ -452,7 +452,7 @@ public class Bullets implements ContentList{
         }};
 
         slagShot = new LiquidBulletType(Liquids.slag){{
-            damage = 4;
+            damage = 8;
             drag = 0.01f;
         }};
 
@@ -469,7 +469,7 @@ public class Bullets implements ContentList{
             drag = 0.001f;
             ammoMultiplier = 0.4f;
             statusDuration = 60f * 4f;
-            damage = 0.2f;
+            damage = 0.4f;
         }};
 
         heavyCryoShot = new LiquidBulletType(Liquids.cryofluid){{
@@ -481,7 +481,7 @@ public class Bullets implements ContentList{
             drag = 0.001f;
             ammoMultiplier = 0.4f;
             statusDuration = 60f * 4f;
-            damage = 0.2f;
+            damage = 0.4f;
         }};
 
         heavySlagShot = new LiquidBulletType(Liquids.slag){{
@@ -490,7 +490,7 @@ public class Bullets implements ContentList{
             knockback = 1.3f;
             puddleSize = 8f;
             orbSize = 4f;
-            damage = 4.75f;
+            damage = 12f;
             drag = 0.001f;
             ammoMultiplier = 0.4f;
             statusDuration = 60f * 4f;
@@ -505,7 +505,7 @@ public class Bullets implements ContentList{
             drag = 0.001f;
             ammoMultiplier = 0.4f;
             statusDuration = 60f * 4f;
-            damage = 0.2f;
+            damage = 0.4f;
         }};
 
         driverBolt = new MassDriverBolt();

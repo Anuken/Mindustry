@@ -34,7 +34,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
     Liquid liquid;
 
     public float getFlammability(){
-        return liquid.flammability * amount;
+        return liquid.flammability * amount * 0;
     }
 
     @Override

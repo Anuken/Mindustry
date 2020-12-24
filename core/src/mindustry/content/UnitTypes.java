@@ -1320,7 +1320,7 @@ public class UnitTypes implements ContentList{
             health = 6000;
             speed = 0.5f;
             rotateSpeed = 2f;
-            accel = 0.05f;
+            accel = 1f;
             drag = 0.001f;
             lowAltitude = false;
             flying = true;
@@ -1391,7 +1391,7 @@ public class UnitTypes implements ContentList{
             health = 24000;
             speed = 0.1f;
             rotateSpeed = 1f;
-            accel = 0.1f;
+            accel = 1f;
             drag = 0f;
             flying = true;
             engineOffset = 46f;

@@ -29,14 +29,14 @@ public class StatusEffects implements ContentList{
                 trans(tarred, ((unit, time, newTime, result) -> {
                     unit.damagePierce(8f);
                     Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
-                    result.set(this, Math.min(time + newTime, 300f));
+                    result.set(this, Math.min(time + newTime, 1800f));
                 }));
             });
         }};
 
         freezing = new StatusEffect("freezing"){{
             color = Color.valueOf("6ecdec");
-            speedMultiplier = 0.6f;
+            speedMultiplier = 0.3f;
             healthMultiplier = 0.8f;
             effect = Fx.freezing;
 
@@ -68,7 +68,7 @@ public class StatusEffects implements ContentList{
 
             init(() -> {
                 trans(shocked, ((unit, time, newTime, result) -> {
-                    unit.damagePierce(14f);
+                    unit.damagePierce(24f);
                     if(unit.team == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
