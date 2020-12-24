@@ -1270,7 +1270,7 @@ public class UnitTypes implements ContentList{
             armor = 3f;
             speed = 2.5f;
             accel = 0.06f;
-            drag = 0.017f;
+            drag = 0.001f;
             lowAltitude = true;
             flying = true;
             engineOffset = 10.5f;
@@ -1321,7 +1321,7 @@ public class UnitTypes implements ContentList{
             speed = 0.5f;
             rotateSpeed = 2f;
             accel = 0.05f;
-            drag = 0.017f;
+            drag = 0.001f;
             lowAltitude = false;
             flying = true;
             circleTarget = true;
@@ -1388,11 +1388,11 @@ public class UnitTypes implements ContentList{
         oct = new UnitType("oct"){{
             defaultController = SuicideAI::new;
             armor = 16f;
-            health = 14000;
+            health = 24000;
             speed = 0.1f;
             rotateSpeed = 1f;
-            accel = 0.04f;
-            drag = 0.018f;
+            accel = 0.1f;
+            drag = 0f;
             flying = true;
             engineOffset = 46f;
             engineSize = 7.8f;
