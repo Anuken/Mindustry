@@ -180,7 +180,7 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
-        public boolean unloadable(){
+        public boolean canUnload(){
             return state != stateLoad;
         }
 
