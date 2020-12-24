@@ -23,6 +23,7 @@ import mindustry.mod.Mods.*;
 import mindustry.ui.*;
 
 import java.io.*;
+import java.net.URISyntaxException;
 
 import static mindustry.Vars.*;
 
@@ -35,6 +36,25 @@ public class ModsDialog extends BaseDialog{
         addCloseButton();
 
         buttons.button("@mods.guide", Icon.link, () -> Core.app.openURI(modGuideURL)).size(210, 64f);
+        
+        buttons.button("@mods.reload", Icon.refresh, () -> {
+            
+            try {
+            
+            String jarPath = getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath().replaceFirst("/", "").replaceAll("/", "\\" + File.separator).toString();
+            
+            Runtime rt = Runtime.getRuntime();
+            String[] commandAndArguments = {"java","-jar", jarPath};
+            Process p = rt.exec(commandAndArguments);
+            
+            } catch (IOException i) {
+                i.printStackTrace();
+            } catch (URISyntaxException u) {
+                u.printStackTrace();
+            };
+            
+            Core.app.exit();
+        }).size(210, 64f);
 
         shown(this::setup);
 
