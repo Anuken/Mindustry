@@ -14,8 +14,6 @@ import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.state;
-
 public class SuicideAI extends GroundAI{
     static boolean blockedByBlock;
 
@@ -45,12 +43,36 @@ public class SuicideAI extends GroundAI{
                 unit.aimLook(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
             }
 
-            if(target != null) {
-                moveToTarget = true;
-                //move towards target directly
-                unit.moveAt(vec.set(target).sub(unit).limit(unit.speed()));
-            }else{
-                moveTo(getClosestSpawner(), state.rules.dropZoneRadius + 120f);
+            //do not move toward walls or transport blocks
+            if(!(target instanceof Building build && (
+                build.block.group == BlockGroup.walls ||
+                build.block.group == BlockGroup.liquids ||
+                build.block.group == BlockGroup.transportation
+            ))){
+                blockedByBlock = false;
+
+                //raycast for target
+                boolean blocked = Vars.world.raycast(unit.tileX(), unit.tileY(), target.tileX(), target.tileY(), (x, y) -> {
+                    Tile tile = Vars.world.tile(x, y);
+                    if(tile != null && tile.build == target) return false;
+                    if(tile != null && tile.build != null && tile.build.team != unit.team()){
+                        blockedByBlock = true;
+                        return true;
+                    }else{
+                        return tile == null || tile.solid();
+                    }
+                });
+
+                //shoot when there's an enemy block in the way
+                if(blockedByBlock){
+                    shoot = true;
+                }
+
+                if(!blocked){
+                    moveToTarget = true;
+                    //move towards target directly
+                    unit.moveAt(vec.set(target).sub(unit).limit(unit.speed()));
+                }
             }
         }
 
@@ -62,7 +84,7 @@ public class SuicideAI extends GroundAI{
                     pathfind(Pathfinder.fieldRally);
                 }
             }else if(command() == UnitCommand.attack && core != null){
-                pathfind(Pathfinder.fieldRally);
+                pathfind(Pathfinder.fieldCore);
             }
 
             if(unit.moving()) unit.lookAt(unit.vel().angle());
@@ -79,7 +101,7 @@ public class SuicideAI extends GroundAI{
             return Units.closestTargetTile(unit.team, x, y, range, t -> ground &&
                     (t.block instanceof CoreBlock)); //target core blocks
         }else{
-            return Units.closestTarget(unit.team, x, y, 1400f, u -> u.checkTarget(air, ground), t -> ground); //do not target conveyors/conduits
+            return Units.closestTarget(unit.team, x, y, 700f, u -> u.checkTarget(air, ground), t -> ground); //do not target conveyors/conduits
         }
     }
 }
