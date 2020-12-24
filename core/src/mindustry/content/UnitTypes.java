@@ -800,7 +800,7 @@ public class UnitTypes implements ContentList{
             legExtension = -20;
             legBaseOffset = 8f;
             landShake = 1f;
-            legSpeed = 0.1f;
+            legSpeed = 0.2f;
             legLengthScl = 0.93f;
             rippleScale = 3f;
             legSpeed = 0.19f;
