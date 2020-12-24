@@ -149,7 +149,7 @@ public class UnitTypes implements ContentList{
         }};
 
         scepter = new UnitType("scepter"){{
-            speed = 0.35f;
+            speed = 0.3f;
             hitSize = 20f;
             rotateSpeed = 2.1f;
             health = 9000;
@@ -210,7 +210,7 @@ public class UnitTypes implements ContentList{
         }};
 
         reign = new UnitType("reign"){{
-            speed = 0.35f;
+            speed = 0.2f;
             hitSize = 26f;
             rotateSpeed = 1.65f;
             health = 24000;
@@ -279,7 +279,7 @@ public class UnitTypes implements ContentList{
             health = 120f;
             buildSpeed = 0.8f;
             armor = 1f;
-            commandLimit = 8;
+            commandLimit = 16;
             defaultController = SuicideAI::new;
             abilities.add(new RepairFieldAbility(10f, 60f * 4, 60f));
             ammoType = AmmoTypes.power;
@@ -315,7 +315,7 @@ public class UnitTypes implements ContentList{
             defaultController = SuicideAI::new;
             mineTier = 2;
             mineSpeed = 5f;
-            commandLimit = 9;
+            commandLimit = 16;
 
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 5, 60f));
             ammoType = AmmoTypes.power;
@@ -370,7 +370,7 @@ public class UnitTypes implements ContentList{
             armor = 9f;
             landShake = 2f;
             defaultController = SuicideAI::new;
-            commandLimit = 10;
+            commandLimit = 16;
             mechFrontSway = 0.55f;
             ammoType = AmmoTypes.power;
 
@@ -415,7 +415,7 @@ public class UnitTypes implements ContentList{
             mechStepShake = 0.15f;
             ammoType = AmmoTypes.powerHigh;
 
-            speed = 0.35f;
+            speed = 0.2f;
             boostMultiplier = 2.1f;
             engineOffset = 12f;
             engineSize = 6f;
@@ -427,7 +427,7 @@ public class UnitTypes implements ContentList{
             landShake = 4f;
             immunities = ObjectSet.with(StatusEffects.burning);
 
-            commandLimit = 8;
+            commandLimit = 16;
 
             weapons.add(new Weapon("vela-weapon"){{
                 mirror = false;
@@ -481,7 +481,7 @@ public class UnitTypes implements ContentList{
             landShake = 1.5f;
             rotateSpeed = 1.5f;
             defaultController = SuicideAI::new;
-            commandLimit = 8;
+            commandLimit = 16;
 
             legCount = 4;
             legLength = 14f;
@@ -494,7 +494,7 @@ public class UnitTypes implements ContentList{
             ammoType = AmmoTypes.powerHigh;
             groundLayer = Layer.legUnit;
 
-            speed = 0.3f;
+            speed = 0.1f;
 
             mineTier = 2;
             mineSpeed = 7f;
@@ -552,7 +552,7 @@ public class UnitTypes implements ContentList{
 
         crawler = new UnitType("crawler"){{
             defaultController = SuicideAI::new;
-            speed = 1f;
+            speed = 2f;
             hitSize = 8f;
             health = 180;
             mechSideSway = 0.25f;
@@ -689,7 +689,7 @@ public class UnitTypes implements ContentList{
         arkyid = new UnitType("arkyid"){{
             defaultController = SuicideAI::new;
             drag = 0.1f;
-            speed = 0.5f;
+            speed = 0.4f;
             hitSize = 21f;
             health = 8000;
             armor = 6f;
@@ -793,7 +793,7 @@ public class UnitTypes implements ContentList{
         toxopid = new UnitType("toxopid"){{
             defaultController = SuicideAI::new;
             drag = 0.1f;
-            speed = 0.5f;
+            speed = 0.2f;
             hitSize = 21f;
             health = 22000;
             armor = 13f;
@@ -916,15 +916,15 @@ public class UnitTypes implements ContentList{
 
         flare = new UnitType("flare"){{
             defaultController = SuicideAI::new;
-            speed = 3f;
+            speed = 5f;
             accel = 0.08f;
             drag = 0.01f;
             flying = true;
-            health = 75;
+            health = 25;
             engineOffset = 5.5f;
             range = 140f;
             targetAir = false;
-            commandLimit = 4;
+            commandLimit = 16;
             circleTarget = true;
 
             weapons.add(new Weapon(){{
@@ -947,7 +947,7 @@ public class UnitTypes implements ContentList{
         horizon = new UnitType("horizon"){{
             defaultController = SuicideAI::new;
             health = 340;
-            speed = 1.7f;
+            speed = 1f;
             accel = 0.08f;
             drag = 0.016f;
             flying = true;
@@ -958,7 +958,7 @@ public class UnitTypes implements ContentList{
             faceTarget = false;
             armor = 3f;
             targetFlag = BlockFlag.factory;
-            commandLimit = 5;
+            commandLimit = 16;
             circleTarget = true;
 
             weapons.add(new Weapon(){{
@@ -987,7 +987,7 @@ public class UnitTypes implements ContentList{
         zenith = new UnitType("zenith"){{
             defaultController = SuicideAI::new;
             health = 700;
-            speed = 1.8f;
+            speed = 1.5f;
             accel = 0.04f;
             drag = 0.016f;
             flying = true;
@@ -1032,7 +1032,7 @@ public class UnitTypes implements ContentList{
 
         antumbra = new UnitType("antumbra"){{
             defaultController = SuicideAI::new;
-            speed = 0.8f;
+            speed = 0.6f;
             accel = 0.04f;
             drag = 0.04f;
             rotateSpeed = 1.9f;
@@ -1107,7 +1107,7 @@ public class UnitTypes implements ContentList{
 
         eclipse = new UnitType("eclipse"){{
             defaultController = SuicideAI::new;
-            speed = 0.52f;
+            speed = 0.2f;
             accel = 0.04f;
             drag = 0.04f;
             rotateSpeed = 1f;
@@ -1193,7 +1193,7 @@ public class UnitTypes implements ContentList{
             flying = true;
             drag = 0.06f;
             accel = 0.12f;
-            speed = 1.5f;
+            speed = 2f;
             health = 100;
             engineSize = 1.8f;
             engineOffset = 5.7f;
@@ -1318,7 +1318,7 @@ public class UnitTypes implements ContentList{
             defaultController = SuicideAI::new;
             armor = 8f;
             health = 6000;
-            speed = 1.4f;
+            speed = 0.5f;
             rotateSpeed = 2f;
             accel = 0.05f;
             drag = 0.017f;
@@ -1388,8 +1388,8 @@ public class UnitTypes implements ContentList{
         oct = new UnitType("oct"){{
             defaultController = SuicideAI::new;
             armor = 16f;
-            health = 24000;
-            speed = 0.8f;
+            health = 14000;
+            speed = 0.1f;
             rotateSpeed = 1f;
             accel = 0.04f;
             drag = 0.018f;
@@ -1401,13 +1401,13 @@ public class UnitTypes implements ContentList{
             payloadCapacity = (5.3f * 5.3f) * tilePayload;
             buildSpeed = 4f;
             drawShields = false;
-            commandLimit = 6;
+            commandLimit = 32;
             lowAltitude = true;
 
             ammoCapacity = 1300;
             ammoResupplyAmount = 20;
 
-            abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8), new RepairFieldAbility(130f, 60f * 2, 140f));
+            abilities.add(new ForceFieldAbility(140f, 4f, 27000f, 60f * 14), new RepairFieldAbility(130f, 60f * 2, 140f));
 
             weapons.add(
                     new Weapon(){{
@@ -1814,7 +1814,7 @@ public class UnitTypes implements ContentList{
             health = 150f;
             engineOffset = 6f;
             hitSize = 8f;
-            commandLimit = 3;
+            commandLimit = 16;
             alwaysUnlocked = true;
 
             weapons.add(new Weapon("small-basic-weapon"){{
@@ -1853,7 +1853,7 @@ public class UnitTypes implements ContentList{
             hitSize = 9f;
             rotateShooting = false;
             lowAltitude = true;
-            commandLimit = 4;
+            commandLimit = 16;
 
             weapons.add(new Weapon("small-mount-weapon"){{
                 top = false;
@@ -1893,7 +1893,7 @@ public class UnitTypes implements ContentList{
             health = 220f;
             engineOffset = 6f;
             hitSize = 11f;
-            commandLimit = 5;
+            commandLimit = 16;
 
             weapons.add(new Weapon("small-mount-weapon"){{
                 top = false;
