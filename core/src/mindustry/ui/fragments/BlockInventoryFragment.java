@@ -121,6 +121,10 @@ public class BlockInventoryFragment extends Fragment{
                     }
                     if(dirty) rebuild(false);
                 }
+
+                if(table.getChildren().isEmpty()){
+                    hide();
+                }
             }
         });
 
