@@ -113,13 +113,13 @@ public class OverlayRenderer{
                 if(dst < state.rules.enemyCoreBuildRadius * 2.2f){
                     Draw.color(Color.darkGray);
                     Lines.circle(core.x, core.y - 2, state.rules.enemyCoreBuildRadius);
-                    Draw.color(Pal.accent, core.team.color, adsin);
+                    Draw.color(Pal.accent, core.team.color, absin);
                     Lines.circle(core.x, core.y, state.rules.enemyCoreBuildRadius);
                 }
             });
 
             Draw.color(Pal.accent);
-            Draw.alpha(adsin);
+            Draw.alpha(absin);
             Lines.circle(player.x, player.y, 208.2f);
         }
 
