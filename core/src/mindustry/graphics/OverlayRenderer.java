@@ -120,7 +120,7 @@ public class OverlayRenderer{
 
             Draw.color(Pal.accent);
             Draw.alpha(absin);
-            Lines.circle(player.x, player.y, 208.2f);
+            Lines.circle(player.x, player.y, buildingRange);
         }
 
         Lines.stroke(2f);
