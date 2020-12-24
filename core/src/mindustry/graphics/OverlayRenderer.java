@@ -107,7 +107,7 @@ public class OverlayRenderer{
         Lines.stroke(buildFade * 2f);
 
         if(buildFade > 0.005f){
-            float absin = 0.5f + Mathf.absin(Time.time(), 10f, 0.5f);
+            float absin = 0.5f + Mathf.absin(Time.time, 10f, 0.5f);
             state.teams.eachEnemyCore(player.team(), core -> {
                 float dst = core.dst(player);
                 if(dst < state.rules.enemyCoreBuildRadius * 2.2f){
