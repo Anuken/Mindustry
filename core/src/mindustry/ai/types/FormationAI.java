@@ -27,7 +27,7 @@ public class FormationAI extends AIController implements FormationMember{
     @Override
     public void updateUnit(){
 
-        if(leader == null || leader.dead){
+        if(leader == null || leader.dead || !unit.within(leader.x, leader.y, 10*formation.pattern.spacing)){
             unit.resetController();
             return;
         }
@@ -49,7 +49,7 @@ public class FormationAI extends AIController implements FormationMember{
         Vec2 realtarget = vec.set(target).add(leader.vel.x, leader.vel.y);
 
         float speed = unit.realSpeed() * unit.floorSpeedMultiplier();
-        unit.approach(Mathf.arrive(unit.x, unit.y, realtarget.x, realtarget.y, unit.vel, 0f, 0.01f, speed, 1f));
+        unit.approach(Mathf.arrive(unit.x, unit.y, realtarget.x, realtarget.y, unit.vel, 0f, 0.01f, speed, unit.type.accel));
 
         if(unit.canMine() && leader.canMine()){
             if(leader.mineTile != null && unit.validMine(leader.mineTile)){
