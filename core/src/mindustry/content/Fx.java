@@ -58,7 +58,7 @@ public class Fx{
         alpha(e.fout());
         rect(block ? ((BlockUnitc)select).tile().block.icon(Cicon.full) : select.type.icon(Cicon.full), select.x, select.y, block ? 0f : select.rotation - 90f);
         alpha(1f);
-        Lines.stroke(e.fslope() * 1f);
+        Lines.stroke(e.fslope());
         Lines.square(select.x, select.y, e.fout() * select.hitSize * 2f, 45);
         Lines.stroke(e.fslope() * 2f);
         Lines.square(select.x, select.y, e.fout() * select.hitSize * 3f, 45f);
@@ -96,7 +96,7 @@ public class Fx{
         x = Tmp.v1.x;
         y = Tmp.v1.y;
 
-        Fill.square(x, y, 1f * size, 45f);
+        Fill.square(x, y, size, 45f);
     }),
 
     itemTransfer = new Effect(12f, e -> {
@@ -127,7 +127,7 @@ public class Fx{
 
     pointHit = new Effect(8f, e -> {
         color(Color.white, e.color, e.fin());
-        stroke(e.fout() * 1f + 0.2f);
+        stroke(e.fout() + 0.2f);
         Lines.circle(e.x, e.y, e.fin() * 6f);
     }),
 
@@ -560,7 +560,7 @@ public class Fx{
         });
 
         color(Pal.lighterOrange);
-        stroke(1f * e.fout());
+        stroke(e.fout());
 
         randLenVectors(e.id + 1, 4, 1f + 23f * e.finpow(), (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
@@ -582,7 +582,7 @@ public class Fx{
         });
 
         color(Pal.plastaniumBack);
-        stroke(1f * e.fout());
+        stroke(e.fout());
 
         randLenVectors(e.id + 1, 4, 1f + 25f * e.finpow(), (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
@@ -604,7 +604,7 @@ public class Fx{
         });
 
         color(Pal.plastaniumBack);
-        stroke(1f * e.fout());
+        stroke(e.fout());
 
         randLenVectors(e.id + 1, 4, 1f + 30f * e.finpow(), (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
@@ -626,7 +626,7 @@ public class Fx{
         });
 
         color(Pal.missileYellowBack);
-        stroke(1f * e.fout());
+        stroke(e.fout());
 
         randLenVectors(e.id + 1, 4, 1f + 23f * e.finpow(), (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
@@ -648,7 +648,7 @@ public class Fx{
         });
 
         color(Pal.sapBulletBack);
-        stroke(1f * e.fout());
+        stroke(e.fout());
 
         randLenVectors(e.id + 1, 8, 1f + 60f * e.finpow(), (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
@@ -670,7 +670,7 @@ public class Fx{
         });
 
         color(Pal.missileYellowBack);
-        stroke(1f * e.fout());
+        stroke(e.fout());
 
         randLenVectors(e.id + 1, 6, 1f + 29f * e.finpow(), (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 4f);
@@ -713,7 +713,7 @@ public class Fx{
         });
 
         color(Pal.bulletYellow);
-        stroke(1f * e.fout());
+        stroke(e.fout());
 
         randLenVectors(e.id + 1, 4, 1f + 23f * e.finpow(), (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
@@ -792,14 +792,14 @@ public class Fx{
         color(Liquids.water.color);
         alpha(Mathf.clamp(e.fin() * 2f));
 
-        Fill.circle(e.x, e.y, e.fout() * 1f);
+        Fill.circle(e.x, e.y, e.fout());
     }),
 
     muddy = new Effect(80f, e -> {
         color(Color.valueOf("432722"));
         alpha(Mathf.clamp(e.fin() * 2f));
 
-        Fill.circle(e.x, e.y, e.fout() * 1f);
+        Fill.circle(e.x, e.y, e.fout());
     }),
 
     sapped = new Effect(40f, e -> {
@@ -820,7 +820,7 @@ public class Fx{
         color(Liquids.oil.color);
 
         randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fout() * 1f);
+            Fill.circle(e.x + x, e.y + y, e.fout());
         });
     }),
 
@@ -885,7 +885,7 @@ public class Fx{
 
         randLenVectors(e.id, 6, 2f + 19f * e.finpow(), (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 3f + 0.5f);
-            Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout() * 1f);
+            Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout());
         });
 
         color(Pal.lighterOrange, Pal.lightOrange, Color.gray, e.fin());
@@ -929,7 +929,7 @@ public class Fx{
 
         randLenVectors(e.id, 6, 2f + 19f * e.finpow(), (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 3f + 0.5f);
-            Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout() * 1f);
+            Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout());
         });
 
         color(Pal.lighterOrange, Pal.lightOrange, Color.gray, e.fin());
@@ -945,7 +945,7 @@ public class Fx{
 
         randLenVectors(e.id, 6, 4f + 30f * e.finpow(), (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 3f);
-            Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout() * 1f);
+            Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout());
         });
     }),
 
@@ -1311,7 +1311,7 @@ public class Fx{
     plasticburn = new Effect(40, e -> {
         randLenVectors(e.id, 5, 3f + e.fin() * 5f, (x, y) -> {
             color(Color.valueOf("e9ead3"), Color.gray, e.fin());
-            Fill.circle(e.x + x, e.y + y, e.fout() * 1f);
+            Fill.circle(e.x + x, e.y + y, e.fout());
         });
     }),
 
@@ -1339,14 +1339,14 @@ public class Fx{
     pulverizeSmall = new Effect(30, e -> {
         randLenVectors(e.id, 3, e.fin() * 5f, (x, y) -> {
             color(Pal.stoneGray);
-            Fill.square(e.x + x, e.y + y, e.fout() * 1f + 0.5f, 45);
+            Fill.square(e.x + x, e.y + y, e.fout() + 0.5f, 45);
         });
     }),
 
     pulverizeMedium = new Effect(30, e -> {
         randLenVectors(e.id, 5, 3f + e.fin() * 8f, (x, y) -> {
             color(Pal.stoneGray);
-            Fill.square(e.x + x, e.y + y, e.fout() * 1f + 0.5f, 45);
+            Fill.square(e.x + x, e.y + y, e.fout() + 0.5f, 45);
         });
     }),
 
@@ -1548,7 +1548,7 @@ public class Fx{
 
     overdriveWave = new Effect(50, e -> {
         color(e.color);
-        stroke(e.fout() * 1f);
+        stroke(e.fout());
         Lines.circle(e.x, e.y, e.finpow() * e.rotation);
     }),
 
@@ -1593,7 +1593,7 @@ public class Fx{
         });
 
         color(Pal.shield, e.fout());
-        stroke(1f * e.fout());
+        stroke(e.fout());
         Lines.circle(e.x, e.y, radius);
     }),
 

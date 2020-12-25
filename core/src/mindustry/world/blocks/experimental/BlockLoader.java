@@ -21,7 +21,7 @@ public class BlockLoader extends PayloadAcceptor{
 
     public BlockLoader(String name){
         super(name);
-
+ 
         hasItems = true;
         itemCapacity = 25;
         //liquidCapacity = 25;
@@ -29,6 +29,11 @@ public class BlockLoader extends PayloadAcceptor{
         outputsPayload = true;
         size = 3;
         rotate = true;
+    }
+
+    @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region, inRegion, outRegion, topRegion};
     }
 
     @Override
@@ -72,7 +77,7 @@ public class BlockLoader extends PayloadAcceptor{
             //draw input
             for(int i = 0; i < 4; i++){
                 if(blends(i) && i != rotation){
-                    Draw.rect(inRegion, x, y, i * 90);
+                    Draw.rect(inRegion, x, y, (i * 90) - 180);
                 }
             }
 

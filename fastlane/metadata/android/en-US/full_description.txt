@@ -1,6 +1,6 @@
 Create elaborate supply chains of conveyor belts to feed ammo into your turrets, produce materials to use for building, and defend your structures from waves of enemies. Play with your friends in cross-platform multiplayer co-op games, or challenge them in team-based PvP matches.
 
-Feature include:
+Features include:
 - 24 built-in maps
 - A campaign, complete with a tech tree and unlockable areas
 - 4 powerful wave bosses to defeat
