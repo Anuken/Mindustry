@@ -21,7 +21,7 @@ public class BlockLoader extends PayloadAcceptor{
 
     public BlockLoader(String name){
         super(name);
-
+ 
         hasItems = true;
         itemCapacity = 25;
         //liquidCapacity = 25;
