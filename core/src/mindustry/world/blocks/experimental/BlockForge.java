@@ -23,8 +23,7 @@ import static mindustry.Vars.*;
 
 public class BlockForge extends PayloadAcceptor{
     public float buildSpeed = 0.4f;
-    public int minBlockSize = 1;
-    public int maxBlockSize = 2;
+    public int minBlockSize = 1, maxBlockSize = 2;
 
     public BlockForge(String name){
         super(name);
