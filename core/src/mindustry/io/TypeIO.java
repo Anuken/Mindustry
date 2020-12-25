@@ -317,7 +317,11 @@ public class TypeIO{
             return player;
         }else if(type == 1){ //formation controller
             int id = read.i();
-            return prev instanceof FormationAI ? prev : new FormationAI(Groups.unit.getByID(id), null);
+            if(prev instanceof FormationAI f){
+                f.leader = Groups.unit.getByID(id);
+                return f;
+            }
+            return new FormationAI(Groups.unit.getByID(id), null);
         }else if(type == 3){
             int pos = read.i();
             if(prev instanceof LogicAI pai){
