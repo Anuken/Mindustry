@@ -27,7 +27,6 @@ public class BlockLoader extends PayloadAcceptor{
         //liquidCapacity = 25;
         update = true;
         outputsPayload = true;
-        size = 3;
         rotate = true;
     }
 
