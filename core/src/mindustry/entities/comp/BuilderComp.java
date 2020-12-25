@@ -226,7 +226,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         Tile tile = world.tile(plan.x, plan.y);
         var core = team.core();
 
-        if(tile == null || (!within(tile, buildingRange) && !state.isEditor())){
+        if(tile == null || (!state.rules.infiniteResources && !within(tile, buildingRange) && !state.isEditor())){
             return;
         }
 
