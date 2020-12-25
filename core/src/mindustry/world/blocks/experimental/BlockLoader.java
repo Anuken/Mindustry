@@ -21,12 +21,13 @@ public class BlockLoader extends PayloadAcceptor{
 
     public BlockLoader(String name){
         super(name);
-
+ 
         hasItems = true;
         itemCapacity = 25;
         //liquidCapacity = 25;
         update = true;
         outputsPayload = true;
+        size = 3;
         rotate = true;
     }
 
