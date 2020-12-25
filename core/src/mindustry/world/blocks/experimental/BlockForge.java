@@ -28,6 +28,7 @@ public class BlockForge extends PayloadAcceptor{
     public BlockForge(String name){
         super(name);
 
+        size = 3;
         update = true;
         outputsPayload = true;
         hasItems = true;
