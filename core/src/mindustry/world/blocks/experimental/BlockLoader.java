@@ -100,7 +100,7 @@ public class BlockLoader extends PayloadAcceptor{
 
                 //load up items
                 if(payload.block().hasItems && items.any()){
-                    if(consValid() && timer(timerLoad, loadTime / efficiency())){
+                    if(consValid() && efficiency() > 0.01f && timer(timerLoad, loadTime / efficiency())){
                         //load up items a set amount of times
                         for(int j = 0; j < itemsLoaded && items.any(); j++){
 
