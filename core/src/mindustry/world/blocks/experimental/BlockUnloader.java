@@ -31,7 +31,7 @@ public class BlockUnloader extends BlockLoader{
 
                 //load up items
                 if(payload.block().hasItems && !full()){
-                    if(consValid() && timer(timerLoad, loadTime)){
+                    if(consValid() && timer(timerLoad, loadTime / efficiency())){
                         //load up items a set amount of times
                         for(int j = 0; j < itemsLoaded && !full(); j++){
                             for(int i = 0; i < items.length(); i++){
