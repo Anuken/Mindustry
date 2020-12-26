@@ -102,6 +102,11 @@ public class DesktopLauncher extends ClientLauncher{
                 Log.err("Failed to load Steam native libraries.");
                 logSteamError(e);
             }
+            
+            // Reset previous version settings
+            if(Version.build < 123){
+                Core.settings.put("publichost", false);
+            }
         }
     }
 
