@@ -89,4 +89,9 @@ public class UnitPayload implements Payload{
             deactiveTime = Math.max(deactiveTime - Time.delta/deactiveDuration, 0f);
         }
     }
+
+    @Override
+    public TextureRegion icon(Cicon icon){
+        return unit.type.icon(icon);
+    }
 }

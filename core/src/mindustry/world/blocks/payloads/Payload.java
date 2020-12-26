@@ -1,9 +1,11 @@
 package mindustry.world.blocks.payloads;
 
+import arc.graphics.g2d.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -32,6 +34,9 @@ public interface Payload{
 
     /** writes the payload for saving. */
     void write(Writes write);
+
+    /** @return icon describing the contents. */
+    TextureRegion icon(Cicon icon);
 
     static void write(@Nullable Payload payload, Writes write){
         if(payload == null){

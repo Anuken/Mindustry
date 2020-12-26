@@ -18,6 +18,9 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
+import mindustry.entities.abilities.Ability;
+import mindustry.entities.abilities.ForceFieldAbility;
+import mindustry.entities.abilities.ShieldRegenFieldAbility;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -661,17 +664,17 @@ public class HudFragment extends Fragment{
                 Draw.color(color);
 
                 Fill.quad(
-                x, y,
-                x + stroke, y,
-                x + width, y + bh,
-                x + width - stroke, y + bh
+                        x, y,
+                        x + stroke, y,
+                        x + width, y + bh,
+                        x + width - stroke, y + bh
                 );
 
                 Fill.quad(
-                x + width, y + bh,
-                x + width - stroke, y + bh,
-                x, y + height,
-                x + stroke, y + height
+                        x + width, y + bh,
+                        x + width - stroke, y + bh,
+                        x, y + height,
+                        x + stroke, y + height
                 );
 
                 Draw.reset();
@@ -684,34 +687,34 @@ public class HudFragment extends Fragment{
         }
 
         table.stack(
-        new Element(){
-            @Override
-            public void draw(){
-                Draw.color(Pal.darkerGray);
-                Fill.poly(x + width/2f, y + height/2f, 6, height / Mathf.sqrt3);
-                Draw.reset();
-                Drawf.shadow(x + width/2f, y + height/2f, height * 1.13f);
-            }
-        },
-        new Table(t -> {
-            float bw = 40f;
-            float pad = -20;
-            t.margin(0);
-            t.clicked(() -> {
-                if(!player.dead() && mobile){
-                    Call.unitClear(player);
-                    control.input.controlledType = null;
-                }
-            });
+                new Element(){
+                    @Override
+                    public void draw(){
+                        Draw.color(Pal.darkerGray);
+                        Fill.poly(x + width/2f, y + height/2f, 6, height / Mathf.sqrt3);
+                        Draw.reset();
+                        Drawf.shadow(x + width/2f, y + height/2f, height * 1.13f);
+                    }
+                },
+                new Table(t -> {
+                    float bw = 40f;
+                    float pad = -20;
+                    t.margin(0);
+                    t.clicked(() -> {
+                        if(!player.dead() && mobile){
+                            Call.unitClear(player);
+                            control.input.controlledType = null;
+                        }
+                    });
 
-            t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
-            t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
-            t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> {
-                b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type.ammoType.color : Pal.health);
-            });
+                    t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
+                    t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
+                    t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> {
+                        b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type.ammoType.color : Pal.health);
+                    });
 
-            t.getChildren().get(1).toFront();
-        })).size(120f, 80).padRight(4);
+                    t.getChildren().get(1).toFront();
+                })).size(120f, 80).padRight(4);
 
         table.labelWrap(() -> {
             builder.setLength(0);
@@ -754,6 +757,16 @@ public class HudFragment extends Fragment{
 
             return builder;
         }).growX().pad(8f);
+
+        table.row();
+
+        table.table().update(t -> {
+            if(player.unit() instanceof Payloadc payload){
+                payload.contentInfo(t, 8 * 2, 280f);
+            }else{
+                t.clear();
+            }
+        }).growX().visible(() -> player.unit() instanceof Payloadc p && p.payloadUsed() > 0).colspan(2);
 
         return table;
     }

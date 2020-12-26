@@ -147,6 +147,13 @@ public class UnitType extends UnlockableContent{
         return weapons.size > 0;
     }
 
+    public boolean hasForceField(){
+        for(Ability ability : abilities){
+            if (ability instanceof ForceFieldAbility) return true;
+        }
+        return false;
+    }
+
     public void update(Unit unit){
 
     }
@@ -170,6 +177,24 @@ public class UnitType extends UnlockableContent{
             if(state.rules.unitAmmo){
                 bars.add(new Bar(ammoType.icon + " " + Core.bundle.get("stat.ammo"), ammoType.barColor, () -> unit.ammo / ammoCapacity));
                 bars.row();
+            }
+
+            for(Ability ability : unit.abilities){
+                if(ability instanceof ForceFieldAbility field){
+                    bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> unit.shield / field.max));
+                    bars.row();
+                    break;
+                }
+            }
+
+            if(unit instanceof Payloadc payload){
+                bars.add(new Bar("stat.payloadcapacity", Pal.items, () -> payload.payloadUsed() / unit.type().payloadCapacity));
+                bars.row();
+
+                bars.table().update(t -> {
+                    payload.contentInfo(t, 8 * 2, 270);
+                }).growX().left();
+
             }
         }).growX();
 
