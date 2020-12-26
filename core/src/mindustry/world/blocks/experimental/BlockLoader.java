@@ -18,6 +18,7 @@ public class BlockLoader extends PayloadAcceptor{
     public float loadTime = 2f;
     public int itemsLoaded = 5;
     public float liquidsLoaded = 5f;
+    public int maxBlockSize = 2;
 
     public BlockLoader(String name){
         super(name);
@@ -60,8 +61,8 @@ public class BlockLoader extends PayloadAcceptor{
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             return super.acceptPayload(source, payload) &&
-                (payload instanceof BuildPayload) &&
-                ((((BuildPayload)payload).build.block.hasItems && ((BuildPayload)payload).block().unloadable && ((BuildPayload)payload).block().itemCapacity >= 10)/* ||
+                (payload instanceof BuildPayload build) &&
+                ((build.build.block.hasItems && build.block().unloadable && build.block().itemCapacity >= 10 && build.block().size <= maxBlockSize)/* ||
                 ((BlockPayload)payload).entity.block().hasLiquids && ((BlockPayload)payload).block().liquidCapacity >= 10f)*/);
         }
 
