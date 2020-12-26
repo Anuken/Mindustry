@@ -266,6 +266,7 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public void handleStack(Item item, int amount, Teamc source){
+            if(amount <= 0) return;
             if(items.empty()) poofIn();
             super.handleStack(item, amount, source);
             lastItem = item;
