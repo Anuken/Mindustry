@@ -103,10 +103,8 @@ public class DesktopLauncher extends ClientLauncher{
                 logSteamError(e);
             }
             
-            // Reset previous version settings
-            if(Version.build < 123){
-                Core.settings.put("publichost", false);
-            }
+            // Reset public host settings
+            Core.settings.put("publichost", false);
         }
     }
 
