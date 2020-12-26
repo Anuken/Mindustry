@@ -312,12 +312,7 @@ public class ModsDialog extends BaseDialog{
                         }).growX().right().padRight(-8f).padTop(-8f);
                     }, Styles.clearPartialt, () -> showMod(mod)).size(w, h).growX().pad(4f);
                     table.row();
-                }, bar -> {
-                    if(mobile && !Core.graphics.isPortrait()){
-                        //hide search bar on mobile, takes up too much space
-                        bar.get().clear();
-                    }
-                }).margin(10f).top();
+                }, !mobile || Core.graphics.isPortrait()).margin(10f).top();
         }else{
             cont.table(Styles.black6, t -> t.add("@mods.none")).height(80f);
         }
