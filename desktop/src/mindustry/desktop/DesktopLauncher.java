@@ -104,7 +104,7 @@ public class DesktopLauncher extends ClientLauncher{
             }
             
             // Reset public host settings
-            Core.settings.put("publichost", false);
+            Core.settings.put("steampublic3", false);
         }
     }
 
