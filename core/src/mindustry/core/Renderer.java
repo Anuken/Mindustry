@@ -30,7 +30,7 @@ public class Renderer implements ApplicationListener{
     public @Nullable Bloom bloom;
     public FrameBuffer effectBuffer = new FrameBuffer();
     public float laserOpacity = 1f;
-    public boolean animateShields;
+    public boolean animateShields, drawWeather = true;
     /** minZoom = zooming out, maxZoom = zooming in */
     public float minZoom = 1.5f, maxZoom = 6f;
 
@@ -351,6 +351,7 @@ public class Renderer implements ApplicationListener{
 
         FrameBuffer buffer = new FrameBuffer(w, h);
 
+        drawWeather = false;
         float vpW = camera.width, vpH = camera.height, px = camera.position.x, py = camera.position.y;
         disableUI = true;
         camera.width = w;
@@ -376,6 +377,7 @@ public class Renderer implements ApplicationListener{
         PixmapIO.writePNG(file, fullPixmap);
         fullPixmap.dispose();
         ui.showInfoFade(Core.bundle.format("screenshot", file.toString()));
+        drawWeather = true;
 
         buffer.dispose();
     }
