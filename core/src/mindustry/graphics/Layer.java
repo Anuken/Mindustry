@@ -65,6 +65,9 @@ public class Layer{
     //overlaied UI, like block config guides
     overlayUI = 120,
 
+    //build beam effects
+    buildBeam = 122,
+
     //shield effects
     shields = 125,
 

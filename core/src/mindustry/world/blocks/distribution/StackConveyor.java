@@ -201,7 +201,7 @@ public class StackConveyor extends Block implements Autotiler{
             if(cooldown > 0f) return;
 
             // get current item
-            if(lastItem == null){
+            if(lastItem == null || !items.has(lastItem)){
                 lastItem = items.first();
             }
 
