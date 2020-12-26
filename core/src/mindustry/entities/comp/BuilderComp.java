@@ -69,12 +69,9 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         }
 
         Building core = core();
-        BuildPlan current = buildPlan();
 
         //nothing to build.
-        if(current == null) return;
-
-        Tile tile = current.tile();
+        if(buildPlan() == null) return;
 
         //find the next build request
         if(plans.size > 1){
@@ -86,6 +83,9 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
                 total++;
             }
         }
+
+        BuildPlan current = buildPlan();
+        Tile tile = current.tile();
 
         lastActive = current;
         buildAlpha = 1f;
