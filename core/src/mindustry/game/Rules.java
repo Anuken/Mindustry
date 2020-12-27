@@ -28,7 +28,7 @@ public class Rules{
     public boolean pvp;
     /** Whether to pause the wave timer until all enemies are destroyed. */
     public boolean waitEnemies = false;
-    /** Determinates if gamemode is attack mode */
+    /** Determinates if gamemode is attack mode. */
     public boolean attackMode = false;
     /** Whether this is the editor gamemode. */
     public boolean editor = false;
@@ -36,7 +36,7 @@ public class Rules{
     public boolean canGameOver = true;
     /** Whether reactors can explode and damage other blocks. */
     public boolean reactorExplosions = true;
-    /** Whether schematics are allowed */
+    /** Whether schematics are allowed. */
     public boolean schematicsAllowed = true;
     /** Whether friendly explosions can occur and set fire/damage other blocks. */
     public boolean damageExplosions = true;
@@ -58,7 +58,7 @@ public class Rules{
     public float buildCostMultiplier = 1f;
     /** Multiplier for building speed. */
     public float buildSpeedMultiplier = 1f;
-    /** Multiplier for percentage of materials refunded when deconstructing */
+    /** Multiplier for percentage of materials refunded when deconstructing. */
     public float deconstructRefundMultiplier = 0.5f;
     /** No-build zone around enemy core radius. */
     public float enemyCoreBuildRadius = 400f;
@@ -70,17 +70,17 @@ public class Rules{
     public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
     public int unitCap = 0;
-    /** Sector for saves that have them.*/
+    /** Sector for saves that have them. */
     public @Nullable Sector sector;
     /** Spawn layout. */
     public Seq<SpawnGroup> spawns = new Seq<>();
-    /** Starting items put in cores */
+    /** Starting items put in cores. */
     public Seq<ItemStack> loadout = ItemStack.list(Items.copper, 100);
     /** Weather events that occur here. */
     public Seq<WeatherEntry> weather = new Seq<>(1);
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
-    /** Reveals blocks normally hidden by build visibility */
+    /** Reveals blocks normally hidden by build visibility. */
     public ObjectSet<Block> revealedBlocks = new ObjectSet<>();
     /** Unlocked content names. Only used in multiplayer when the campaign is enabled. */
     public ObjectSet<String> researched = new ObjectSet<>();
@@ -91,20 +91,20 @@ public class Rules{
     public boolean enemyLights = true;
     /** Ambient light color, used when lighting is enabled. */
     public Color ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
-    /** team of the player by default */
+    /** team of the player by default. */
     public Team defaultTeam = Team.sharded;
-    /** team of the enemy in waves/sectors */
+    /** team of the enemy in waves/sectors. */
     public Team waveTeam = Team.crux;
     /** name of the custom mode that this ruleset describes, or null. */
     public @Nullable String modeName;
-    /** special tags for additional info */
+    /** special tags for additional info. */
     public StringMap tags = new StringMap();
 
     /** A team-specific ruleset. */
     public static class TeamRule{
         /** Whether to use building AI. */
         public boolean ai;
-        /** TODO Tier of blocks/designs that the AI uses for building. [0, 1]*/
+        /** TODO Tier of blocks/designs that the AI uses for building. [0, 1] */
         public float aiTier = 1f;
         /** Whether, when AI is enabled, ships should be spawned from the core. */
         public boolean aiCoreSpawn = true;
@@ -121,7 +121,7 @@ public class Rules{
         return JsonIO.copy(this);
     }
 
-    /** Returns the gamemode that best fits these rules.*/
+    /** Returns the gamemode that best fits these rules. */
     public Gamemode mode(){
         if(pvp){
             return Gamemode.pvp;
