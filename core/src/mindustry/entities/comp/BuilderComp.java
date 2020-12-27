@@ -35,12 +35,25 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
     @SyncLocal Queue<BuildPlan> plans = new Queue<>(1);
     @SyncLocal boolean updateBuilding = true;
 
+    private transient BuildPlan lastActive;
+    private transient int lastSize;
+    private transient float buildAlpha = 0f;
+
     public boolean canBuild(){
         return type.buildSpeed > 0;
     }
 
     @Override
     public void update(){
+        if(!headless){
+            //visual activity update
+            if(lastActive != null && buildAlpha <= 0.01f){
+                lastActive = null;
+            }
+
+            buildAlpha = Mathf.lerpDelta(buildAlpha, activelyBuilding() ? 1f : 0f, 0.15f);
+        }
+
         if(!updateBuilding || !canBuild()) return;
 
         float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange;
@@ -64,7 +77,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         if(plans.size > 1){
             int total = 0;
             BuildPlan req;
-            while((dst((req = buildPlan()).tile()) > finalPlaceDst || shouldSkip(req, core)) && total < plans.size){
+            while((!within((req = buildPlan()).tile(), finalPlaceDst) || shouldSkip(req, core)) && total < plans.size){
                 plans.removeFirst();
                 plans.addLast(req);
                 total++;
@@ -72,10 +85,13 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         }
 
         BuildPlan current = buildPlan();
+        Tile tile = current.tile();
 
-        if(!within(current.tile(), finalPlaceDst)) return;
+        lastActive = current;
+        buildAlpha = 1f;
+        if(current.breaking) lastSize = tile.block().size;
 
-        Tile tile = world.tile(current.x, current.y);
+        if(!within(tile, finalPlaceDst)) return;
 
         if(!(tile.build instanceof ConstructBuild cb)){
             if(!current.initialized && !current.breaking && Build.validPlace(current.block, team, current.x, current.y, current.rotation)){
@@ -204,7 +220,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
     boolean activelyBuilding(){
         //not actively building when not near the build plan
         if(isBuilding()){
-            if(!within(buildPlan(), state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange)){
+            if(!state.isEditor() && !within(buildPlan(), state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange)){
                 return false;
             }
         }
@@ -218,30 +234,31 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
     }
 
     public void draw(){
-        if(!activelyBuilding()) return;
+        boolean active = activelyBuilding();
+        if(!active && lastActive == null) return;
 
         Draw.z(Layer.flyingUnit);
 
-        BuildPlan plan = buildPlan();
+        BuildPlan plan = active ? buildPlan() : lastActive;
         Tile tile = world.tile(plan.x, plan.y);
         var core = team.core();
 
-        if(tile == null || (!within(tile, buildingRange) && !state.isEditor())){
+        if(tile == null || !within(plan, state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange)){
             return;
         }
 
         //draw remote plans.
-        if(core != null && !isLocal() && !(tile.block() instanceof ConstructBlock)){
+        if(core != null && active && !isLocal() && !(tile.block() instanceof ConstructBlock)){
             Draw.z(Layer.plans - 1f);
             drawPlan(plan, 0.5f);
             Draw.z(Layer.flyingUnit);
         }
 
-        int size = plan.breaking ? tile.block().size : plan.block.size;
+        int size = plan.breaking ? active ? tile.block().size : lastSize : plan.block.size;
         float tx = plan.drawx(), ty = plan.drawy();
 
-        Lines.stroke(1f, Pal.accent);
-        float focusLen = 3.8f + Mathf.absin(Time.time, 1.1f, 0.6f);
+        Lines.stroke(1f, plan.breaking ? Pal.remove : Pal.accent);
+        float focusLen = type.buildBeamOffset + Mathf.absin(Time.time, 3f, 0.6f);
         float px = x + Angles.trnsx(rotation, focusLen);
         float py = y + Angles.trnsy(rotation, focusLen);
 
@@ -255,16 +272,35 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
 
         Arrays.sort(vecs, Structs.comparingFloat(vec -> -Angles.angleDist(angleTo(vec), ang)));
 
+        Vec2 close = Geometry.findClosest(x, y, vecs);
+
         float x1 = vecs[0].x, y1 = vecs[0].y,
+        x2 = close.x, y2 = close.y,
         x3 = vecs[1].x, y3 = vecs[1].y;
 
-        Draw.alpha(1f);
+        Draw.z(Layer.buildBeam);
 
-        Lines.line(px, py, x1, y1);
-        Lines.line(px, py, x3, y3);
+        Draw.alpha(buildAlpha);
 
-        Fill.circle(px, py, 1.6f + Mathf.absin(Time.time, 0.8f, 1.5f));
+        if(!active && !(tile.build instanceof ConstructBuild)){
+            Fill.square(plan.drawx(), plan.drawy(), size * tilesize/2f);
+        }
 
-        Draw.color();
+        if(renderer.animateShields){
+            if(close != vecs[0] && close != vecs[1]){
+                Fill.tri(px, py, x1, y1, x2, y2);
+                Fill.tri(px, py, x3, y3, x2, y2);
+            }else{
+                Fill.tri(px, py, x1, y1, x3, y3);
+            }
+        }else{
+            Lines.line(px, py, x1, y1);
+            Lines.line(px, py, x3, y3);
+        }
+
+        Fill.square(px, py, 1.8f + Mathf.absin(Time.time, 2.2f, 1.1f), rotation + 45);
+
+        Draw.reset();
+        Draw.z(Layer.flyingUnit);
     }
 }

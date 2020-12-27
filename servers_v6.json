@@ -17,7 +17,7 @@
   },
   {
 	"name": "io",
-	"address": ["mindustry.io", "mindustry.io:1000", "mindustry.io:2000", "mindustry.io:3000"]
+	"address": ["mindustry.io", "mindustry.io:1000", "mindustry.io:2000", "mindustry.io:3000", "mindustry.io:4000"]
   },
   {
     "name": "ECAN",
@@ -53,7 +53,7 @@
   },
   {
     "name": "ALEX",
-    "address": ["alexmindustry.ddns.net:6568"]
+    "address": ["alexmindustryhub.ddns.net:6568", "alexmindustry.ddns.net:6568", "alexmindustry.ddns.net:6569", "alexmindustryattac.ddns.net:2293"]
   },
   {
     "name": "Minty [subzero]",

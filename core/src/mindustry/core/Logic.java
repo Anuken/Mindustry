@@ -275,15 +275,20 @@ public class Logic implements ApplicationListener{
     public static void sectorCapture(){
         //the sector has been conquered - waves get disabled
         state.rules.waves = false;
-        //disable attack mode
-        state.rules.attackMode = false;
 
-        if(state.rules.sector == null) return;
+        if(state.rules.sector == null){
+            //disable attack mode
+            state.rules.attackMode = false;
+            return;
+        }
 
         state.rules.sector.info.wasCaptured = true;
 
         //fire capture event
         Events.fire(new SectorCaptureEvent(state.rules.sector));
+
+        //disable attack mode
+        state.rules.attackMode = false;
 
         //save, just in case
         if(!headless && !net.client()){

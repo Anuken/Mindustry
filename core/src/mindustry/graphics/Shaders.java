@@ -17,6 +17,7 @@ import static mindustry.Vars.*;
 public class Shaders{
     public static BlockBuild blockbuild;
     public static @Nullable ShieldShader shield;
+    public static BuildBeamShader buildBeam;
     public static UnitBuild build;
     public static DarknessShader darkness;
     public static LightShader light;
@@ -38,6 +39,7 @@ public class Shaders{
             shield = null;
             t.printStackTrace();
         }
+        buildBeam = new BuildBeamShader();
         build = new UnitBuild();
         darkness = new DarknessShader();
         light = new LightShader();
@@ -161,7 +163,6 @@ public class Shaders{
     }
 
     public static class BlockBuild extends LoadShader{
-        public Color color = new Color();
         public float progress;
         public TextureRegion region = new TextureRegion();
 
@@ -172,7 +173,6 @@ public class Shaders{
         @Override
         public void apply(){
             setUniformf("u_progress", progress);
-            setUniformf("u_color", color);
             setUniformf("u_uv", region.u, region.v);
             setUniformf("u_uv2", region.u2, region.v2);
             setUniformf("u_time", Time.time);
@@ -184,6 +184,24 @@ public class Shaders{
 
         public ShieldShader(){
             super("shield", "screenspace");
+        }
+
+        @Override
+        public void apply(){
+            setUniformf("u_dp", Scl.scl(1f));
+            setUniformf("u_time", Time.time / Scl.scl(1f));
+            setUniformf("u_offset",
+                Core.camera.position.x - Core.camera.width / 2,
+                Core.camera.position.y - Core.camera.height / 2);
+            setUniformf("u_texsize", Core.camera.width, Core.camera.height);
+            setUniformf("u_invsize", 1f/Core.camera.width, 1f/Core.camera.height);
+        }
+    }
+
+    public static class BuildBeamShader extends LoadShader{
+
+        public BuildBeamShader(){
+            super("buildbeam", "screenspace");
         }
 
         @Override

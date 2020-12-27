@@ -1,5 +1,6 @@
 package mindustry.world.blocks.experimental;
 
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
@@ -18,8 +19,11 @@ import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
 
+import static mindustry.Vars.*;
+
 public class BlockForge extends PayloadAcceptor{
     public float buildSpeed = 0.4f;
+    public int minBlockSize = 1, maxBlockSize = 2;
 
     public BlockForge(String name){
         super(name);
@@ -54,7 +58,7 @@ public class BlockForge extends PayloadAcceptor{
         Draw.rect(region, req.drawx(), req.drawy());
         Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
     }
-
+    
     public class BlockForgeBuild extends PayloadAcceptorBuild<BuildPayload>{
         public @Nullable Block recipe;
         public float progress, time, heat;
@@ -103,7 +107,7 @@ public class BlockForge extends PayloadAcceptor{
 
         @Override
         public void buildConfiguration(Table table){
-            Seq<Block> blocks = Vars.content.blocks().select(b -> b.isVisible() && b.size <= 2);
+            Seq<Block> blocks = Vars.content.blocks().select(b -> b.isVisible() && b.size >= minBlockSize && b.size <= maxBlockSize);
 
             ItemSelection.buildTable(table, blocks, () -> recipe, this::configure);
         }
@@ -123,6 +127,19 @@ public class BlockForge extends PayloadAcceptor{
             }
 
             drawPayload();
+        }
+        
+        @Override
+        public void drawSelect(){
+            if(recipe != null){
+                float dx = x - size * tilesize/2f, dy = y + size * tilesize/2f;
+                TextureRegion icon = recipe.icon(Cicon.medium);
+                Draw.mixcol(Color.darkGray, 1f);
+                //Fixes size because modded content icons are not scaled
+                Draw.rect(icon, dx - 0.7f, dy - 1f, Draw.scl * Draw.xscl * 24f, Draw.scl * Draw.yscl * 24f);
+                Draw.reset();
+                Draw.rect(icon, dx, dy, Draw.scl * Draw.xscl * 24f, Draw.scl * Draw.yscl * 24f);
+            }
         }
 
         @Override

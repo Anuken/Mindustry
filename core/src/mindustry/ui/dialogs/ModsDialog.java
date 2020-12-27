@@ -37,6 +37,9 @@ public class ModsDialog extends BaseDialog{
         buttons.button("@mods.guide", Icon.link, () -> Core.app.openURI(modGuideURL)).size(210, 64f);
 
         shown(this::setup);
+        if(mobile){
+            onResize(this::setup);
+        }
 
         hidden(() -> {
             if(mods.requiresReload()){
@@ -228,14 +231,12 @@ public class ModsDialog extends BaseDialog{
         cont.row();
 
         if(!mods.list().isEmpty()){
-            cont.pane(table -> {
-                table.margin(10f).top();
-
-                boolean anyDisabled = false;
-                for(LoadedMod mod : mods.list()){
-
-                    if(!mod.enabled() && !anyDisabled && mods.list().size > 0){
-                        anyDisabled = true;
+            boolean[] anyDisabled = {false};
+            SearchBar.add(cont, mods.list(),
+                mod -> mod.meta.displayName(),
+                (table, mod) -> {
+                    if(!mod.enabled() && !anyDisabled[0] && mods.list().size > 0){
+                        anyDisabled[0] = true;
                         table.row();
                         table.image().growX().height(4f).pad(6f).color(Pal.gray);
                         table.row();
@@ -309,20 +310,14 @@ public class ModsDialog extends BaseDialog{
                                 }).size(50f);
                             }
                         }).growX().right().padRight(-8f).padTop(-8f);
-
-
                     }, Styles.clearPartialt, () -> showMod(mod)).size(w, h).growX().pad(4f);
                     table.row();
-                }
-            });
-
+                }, !mobile || Core.graphics.isPortrait()).margin(10f).top();
         }else{
             cont.table(Styles.black6, t -> t.add("@mods.none")).height(80f);
         }
 
         cont.row();
-
-
     }
 
     private void reload(){
