@@ -10,6 +10,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
+import mindustry.ai.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -109,6 +110,16 @@ public class MinimapRenderer implements Disposable{
                     drawLabel(x + rx, y + ry, player.name, player.team().color);
                 }
             }
+        }
+
+        if(withLabels && control.input.block != null){
+            indexer.eachBlock(player.team(), player.x, player.y, Math.max(world.width(), world.height()) * tilesize * 2, b -> b.block == control.input.block, b -> {
+
+                float rx = b.x / (world.width() * tilesize) * w;
+                float ry = b.y / (world.height() * tilesize) * h;
+
+                drawLabel(x + rx, y + ry, Fonts.getUnicodeStr(b.block.name), Color.white);
+            });
         }
 
         Draw.reset();
