@@ -115,11 +115,13 @@ public class MinimapRenderer implements Disposable{
         if(withLabels && control.input.block != null){
             indexer.eachBlock(player.team(), player.x, player.y, Math.max(world.width(), world.height()) * tilesize * 2, b -> b.block == control.input.block, b -> {
 
-                float rx = b.x / (world.width() * tilesize) * w;
-                float ry = b.y / (world.height() * tilesize) * h;
+                float rx = (b.x + (tilesize / 2f)) / (world.width() * tilesize) * w;
+                float ry = (b.y + (tilesize / 2f)) / (world.height() * tilesize) * h;
 
-                float scale = b.block.size * tilesize * scaling / 1.5f;
+                float scale = b.block.size * tilesize * scaling / 1.6f; // for some reason 1.6 is the magic number?
+//                Draw.alpha(0.75f);
                 Draw.rect(b.block.icon(Cicon.full), x + rx, y + ry, scale, scale, 0);
+//                Draw.alpha(1.00f);
             });
         }
 
