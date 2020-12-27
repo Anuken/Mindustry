@@ -84,8 +84,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }else{
             if(block.hasPower){
                 //reinit power graph
-                power.graph = new PowerGraph();
-                power.graph.add(self());
+                new PowerGraph().add(self());
             }
         }
         this.rotation = rotation;
