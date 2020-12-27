@@ -2146,21 +2146,21 @@ public class Blocks implements ContentList{
         //region experimental
 
         blockForge = new BlockForge("block-forge"){{
-            requirements(Category.production, BuildVisibility.debugOnly, with(Items.thorium, 100));
+            requirements(Category.crafting, BuildVisibility.debugOnly, with(Items.thorium, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
         blockLoader = new BlockLoader("block-loader"){{
-            requirements(Category.production, BuildVisibility.debugOnly, with(Items.thorium, 100));
+            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.thorium, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
         blockUnloader = new BlockUnloader("block-unloader"){{
-            requirements(Category.production, BuildVisibility.debugOnly, with(Items.thorium, 100));
+            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.thorium, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;

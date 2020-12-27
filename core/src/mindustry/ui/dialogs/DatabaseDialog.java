@@ -40,7 +40,7 @@ public class DatabaseDialog extends BaseDialog{
         for(int j = 0; j < allContent.length; j++){
             ContentType type = ContentType.all[j];
 
-            Seq<Content> array = allContent[j].select(c -> c instanceof UnlockableContent && !((UnlockableContent)c).isHidden());
+            Seq<Content> array = allContent[j].select(c -> c instanceof UnlockableContent u && (!u.isHidden() || u.node() != null));
             if(array.size == 0) continue;
 
             table.add("@content." + type.name() + ".name").growX().left().color(Pal.accent);
