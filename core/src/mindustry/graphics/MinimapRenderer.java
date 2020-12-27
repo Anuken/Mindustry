@@ -118,7 +118,8 @@ public class MinimapRenderer implements Disposable{
                 float rx = b.x / (world.width() * tilesize) * w;
                 float ry = b.y / (world.height() * tilesize) * h;
 
-                drawLabel(x + rx, y + ry, Fonts.getUnicodeStr(b.block.name), Color.white);
+                float scale = b.block.size * tilesize * scaling / 1.5f;
+                Draw.rect(b.block.icon(Cicon.full), x + rx + (tilesize / 2f), y + ry + (tilesize / 2f), scale, scale, 0);
             });
         }
 
