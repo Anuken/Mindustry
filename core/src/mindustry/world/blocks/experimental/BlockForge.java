@@ -36,7 +36,10 @@ public class BlockForge extends PayloadAcceptor{
         hasPower = true;
         rotate = true;
 
-        config(Block.class, (BlockForgeBuild tile, Block block) -> tile.recipe = block);
+        config(Block.class, (BlockForgeBuild tile, Block block) -> {
+            if(tile.recipe != block) tile.progress = 0f;
+            tile.recipe = block;
+        });
 
         consumes.add(new ConsumeItemDynamic((BlockForgeBuild e) -> e.recipe != null ? e.recipe.requirements : ItemStack.empty));
     }
@@ -95,8 +98,6 @@ public class BlockForge extends PayloadAcceptor{
                     payVector.setZero();
                     progress = 0f;
                 }
-            }else{
-                progress = 0;
             }
 
             heat = Mathf.lerpDelta(heat, Mathf.num(produce), 0.3f);
