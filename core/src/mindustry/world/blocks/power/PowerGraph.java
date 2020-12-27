@@ -12,17 +12,6 @@ public class PowerGraph{
     private static final Seq<Building> outArray1 = new Seq<>();
     private static final Seq<Building> outArray2 = new Seq<>();
     private static final IntSet closedSet = new IntSet();
-    private static final PowerGraph nullGraph = new PowerGraph(){
-        @Override
-        public void add(Building build){
-            throw new RuntimeException("cannot add to null graph");
-        }
-
-        @Override
-        public void addGraph(PowerGraph graph){
-            throw new RuntimeException("cannot add to null graph");
-        }
-    };
 
     private final Seq<Building> producers = new Seq<>(false);
     private final Seq<Building> consumers = new Seq<>(false);
