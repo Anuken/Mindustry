@@ -1,5 +1,6 @@
 package mindustry.world.blocks.experimental;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.entities.units.*;
@@ -46,7 +47,7 @@ public class BlockLoader extends PayloadAcceptor{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, ((BlockLoaderBuild)entity)::fraction));
+        bars.add("progress", (BlockLoaderBuild entity) -> new Bar(() -> Core.bundle.format("bar.items", entity.payload == null ? 0 : entity.payload.build.items.total()), () -> Pal.items, entity::fraction));
     }
 
     @Override
