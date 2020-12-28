@@ -246,7 +246,7 @@ public class SectorDamage{
         //first, calculate the total health of blocks in the path
 
         //radius around the path that gets counted
-        int radius = 8;
+        int radius = 7;
         IntSet counted = new IntSet();
 
         for(Tile t : sparse2){
