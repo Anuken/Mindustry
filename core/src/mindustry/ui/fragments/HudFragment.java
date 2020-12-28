@@ -18,9 +18,6 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
-import mindustry.entities.abilities.Ability;
-import mindustry.entities.abilities.ForceFieldAbility;
-import mindustry.entities.abilities.ShieldRegenFieldAbility;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -760,9 +757,13 @@ public class HudFragment extends Fragment{
 
         table.row();
 
+        var count = new float[]{-1};
         table.table().update(t -> {
             if(player.unit() instanceof Payloadc payload){
-                payload.contentInfo(t, 8 * 2, 280f);
+                if(count[0] != payload.payloadUsed()){
+                    payload.contentInfo(t, 8 * 2, 275f);
+                    count[0] = payload.payloadUsed();
+                }
             }else{
                 t.clear();
             }
