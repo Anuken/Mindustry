@@ -55,11 +55,6 @@ public class BlockUnloader extends BlockLoader{
         }
 
         @Override
-        public float fraction(){
-            return payload == null ? 0f : 1f - payload.build.items.total() / (float)payload.build.block.itemCapacity;
-        }
-
-        @Override
         public boolean shouldExport(){
             return payload != null && (payload.block().hasItems && payload.build.items.empty());
         }
