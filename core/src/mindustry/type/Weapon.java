@@ -30,9 +30,9 @@ public class Weapon{
     public boolean top = true;
     /** whether to hold the bullet in place while firing */
     public boolean continuous;
-    /** rotation speed of weapon when rotation is enabled, in degrees/t*/
+    /** rotation speed of weapon when rotation is enabled, in degrees/t */
     public float rotateSpeed = 20f;
-    /** rotation speed of weapon when rotation is enabled, in degrees/t*/
+    /** The half-radius of the cone in which the weapon is allowed to rotate. <=0 to disable */
     public float rotateLimit = 0f;
     /** weapon reload in frames */
     public float reload;
