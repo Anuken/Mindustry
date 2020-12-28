@@ -126,6 +126,10 @@ public class PayloadAcceptor extends Block{
 
             updatePayload();
 
+            if(payRotation != rotdeg()){
+                if(!moveInPayload()) return;
+            }
+
             payVector.trns(rotdeg(), payVector.len() + delta() * payloadSpeed);
             payRotation = rotdeg();
 

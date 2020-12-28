@@ -195,7 +195,7 @@ public class UnitFactory extends UnitBlock{
 
             Draw.z(Layer.blockOver);
 
-            payRotation = rotdeg();
+            // payRotation = rotdeg();
             drawPayload();
 
             Draw.z(Layer.blockOver + 0.1f);

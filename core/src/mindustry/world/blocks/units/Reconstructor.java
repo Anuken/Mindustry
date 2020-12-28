@@ -144,7 +144,7 @@ public class Reconstructor extends UnitBlock{
                 });
             }else{
                 Draw.z(Layer.blockOver);
-                payRotation = rotdeg();
+                // payRotation = rotdeg();
 
                 drawPayload();
             }
