@@ -1,6 +1,7 @@
 package mindustry.world.blocks.campaign;
 
 import arc.*;
+import arc.audio.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.*;
@@ -28,6 +29,7 @@ public class LaunchPad extends Block{
     public final int timerLaunch = timers++;
     /** Time inbetween launches. */
     public float launchTime;
+    public Sound launchSound = Sounds.artillery;
 
     public @Load("@-light") TextureRegion lightRegion;
     public @Load("launchpod") TextureRegion podRegion;
@@ -119,6 +121,7 @@ public class LaunchPad extends Block{
 
             //launch when full and base conditions are met
             if(items.total() >= itemCapacity && efficiency() >= 1f && timer(timerLaunch, launchTime / timeScale)){
+                launchSound.at(x, y, Mathf.random(0.9f, 1.1f));
                 LaunchPayload entity = LaunchPayload.create();
                 items.each((item, amount) -> entity.stacks.add(new ItemStack(item, amount)));
                 entity.set(this);
