@@ -629,8 +629,8 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
-    public void update(){
-        super.update();
+    public void updateState(){
+        super.updateState();
 
         if(state.isMenu()){
             selectRequests.clear();
@@ -639,6 +639,11 @@ public class MobileInput extends InputHandler implements GestureListener{
             manualShooting = false;
             payloadTarget = null;
         }
+    }
+
+    @Override
+    public void update(){
+        super.update();
 
         if(player.dead()){
             mode = none;

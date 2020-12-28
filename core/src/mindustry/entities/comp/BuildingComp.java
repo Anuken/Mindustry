@@ -755,9 +755,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void powerGraphRemoved(){
-        if(power == null){
-            return;
-        }
+        if(power == null) return;
 
         power.graph.remove(self());
         for(int i = 0; i < power.links.size; i++){
