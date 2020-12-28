@@ -53,6 +53,7 @@ public class BlockLoader extends PayloadAcceptor{
     @Override
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(region, req.drawx(), req.drawy());
+        Draw.rect(inRegion, req.drawx(), req.drawy(), req.rotation * 90);
         Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
         Draw.rect(topRegion, req.drawx(), req.drawy());
     }
@@ -77,11 +78,14 @@ public class BlockLoader extends PayloadAcceptor{
             Draw.rect(region, x, y);
 
             //draw input
+            boolean fallback = true;
             for(int i = 0; i < 4; i++){
                 if(blends(i) && i != rotation){
                     Draw.rect(inRegion, x, y, (i * 90) - 180);
+                    fallback = false;
                 }
             }
+            if(fallback) Draw.rect(inRegion, x, y, rotation * 90);
 
             Draw.rect(outRegion, x, y, rotdeg());
 
