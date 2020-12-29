@@ -55,8 +55,8 @@ public class BlockForge extends PayloadAcceptor{
         super.setBars();
 
         bars.add("progress", (BlockForgeBuild entity) -> new Bar(() ->
-        Core.bundle.formatFloat("bar.progress",
-        entity.recipe == null ? 0f : (entity.progress / entity.recipe.buildCost) * 100f, 1),
+        Core.bundle.format("bar.progress",
+        (int)(entity.recipe == null ? 0f : (entity.progress / entity.recipe.buildCost) * 100)),
         () -> Pal.ammo,
         () -> entity.recipe == null ? 0f : (entity.progress / entity.recipe.buildCost)));
     }

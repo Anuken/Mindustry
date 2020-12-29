@@ -48,8 +48,8 @@ public class ConstructBlock extends Block{
     public void setBars(){
         super.setBars();
         bars.add("progress", (ConstructBuild entity) -> new Bar(() ->
-        Core.bundle.formatFloat("bar.progress",
-        entity.progress * 100f, 1),
+        Core.bundle.format("bar.progress",
+        (int)(entity.progress * 100)),
         () -> Pal.ammo,
         () -> entity.progress));
     }
