@@ -64,6 +64,11 @@ public class RailBulletType extends BulletType{
     }
 
     @Override
+    public boolean testCollision(Bullet bullet, Building tile){
+        return bullet.team != tile.team;
+    }
+
+    @Override
     public void hitEntity(Bullet b, Hitboxc entity, float initialHealth){
         handle(b, entity, initialHealth);
     }

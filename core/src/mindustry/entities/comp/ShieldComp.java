@@ -50,6 +50,7 @@ abstract class ShieldComp implements Healthc, Posc{
 
         float shieldDamage = Math.min(Math.max(shield, 0), amount);
         shield -= shieldDamage;
+        hitTime = 1f;
         amount -= shieldDamage;
 
         if(amount > 0){
