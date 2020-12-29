@@ -18,6 +18,7 @@ public class EventType{
         impactPower,
         thoriumReactorOverheat,
         fireExtinguish,
+        acceleratorUse,
         newGame,
         tutorialComplete,
         flameAmmo,
@@ -63,6 +64,8 @@ public class EventType{
     public static class CoreItemDeliverEvent{}
     /** Called when the player opens info for a specific block.*/
     public static class BlockInfoEvent{}
+    /** Called *after* all content has been initialized. */
+    public static class ContentInitEvent{}
     /** Called when the client game is first loaded. */
     public static class ClientLoadEvent{}
     /** Called when a game begins and the world is loaded. */
@@ -277,11 +280,13 @@ public class EventType{
     public static class BlockBuildBeginEvent{
         public final Tile tile;
         public final Team team;
+        public final @Nullable Unit unit;
         public final boolean breaking;
 
-        public BlockBuildBeginEvent(Tile tile, Team team, boolean breaking){
+        public BlockBuildBeginEvent(Tile tile, Team team, Unit unit, boolean breaking){
             this.tile = tile;
             this.team = team;
+            this.unit = unit;
             this.breaking = breaking;
         }
     }
@@ -309,10 +314,10 @@ public class EventType{
     public static class BuildSelectEvent{
         public final Tile tile;
         public final Team team;
-        public final Builderc builder;
+        public final Unit builder;
         public final boolean breaking;
 
-        public BuildSelectEvent(Tile tile, Team team, Builderc builder, boolean breaking){
+        public BuildSelectEvent(Tile tile, Team team, Unit builder, boolean breaking){
             this.tile = tile;
             this.team = team;
             this.builder = builder;

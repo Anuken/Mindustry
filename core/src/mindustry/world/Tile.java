@@ -103,11 +103,26 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return -1;
     }
 
-    /** Convenience method that returns the building of this tile with a cast.
-     * Method name is shortened to prevent conflict. */
-    @SuppressWarnings("unchecked")
-    public <T extends Building> T bc(){
-        return (T)build;
+    /**
+     * Returns the flammability of the  Used for fire calculations.
+     * Takes flammability of floor liquid into account.
+     */
+    public float getFlammability(){
+        if(!block.hasItems){
+            if(floor.liquidDrop != null && !block.solid){
+                return floor.liquidDrop.flammability;
+            }
+            return 0;
+        }else if(build != null){
+            float result = build.items.sum((item, amount) -> item.flammability * amount);
+
+            if(block.hasLiquids){
+                result += build.liquids.sum((liquid, amount) -> liquid.flammability * amount / 3f);
+            }
+
+            return result;
+        }
+        return 0;
     }
 
     public float worldx(){
@@ -424,6 +439,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     public Rect getHitbox(Rect rect){
         return rect.setCentered(drawx(), drawy(), block.size * tilesize, block.size * tilesize);
+    }
+
+    public Rect getBounds(Rect rect){
+        return rect.set(x * tilesize - tilesize/2f, y * tilesize - tilesize/2f, tilesize, tilesize);
     }
 
     @Override

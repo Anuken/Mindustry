@@ -6,15 +6,18 @@ import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
+import mindustry.game.Objectives.*;
 import mindustry.game.*;
 import mindustry.game.Saves.*;
 import mindustry.gen.*;
@@ -22,8 +25,10 @@ import mindustry.input.*;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;
 import mindustry.maps.Map;
+import mindustry.maps.*;
 import mindustry.net.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 
@@ -124,10 +129,18 @@ public class Control implements ApplicationListener, Loadable{
             }
         }));
 
-        Events.on(UnlockEvent.class, e -> ui.hudfrag.showUnlock(e.content));
-
         Events.on(UnlockEvent.class, e -> {
+            ui.hudfrag.showUnlock(e.content);
+
             checkAutoUnlocks();
+
+            if(e.content instanceof SectorPreset){
+                for(TechNode node : TechTree.all){
+                    if(!node.content.unlocked() && node.objectives.contains(o -> o instanceof SectorComplete sec && sec.preset == e.content) && !node.objectives.contains(o -> !o.complete())){
+                        ui.hudfrag.showToast(new TextureRegionDrawable(node.content.icon(Cicon.large)), bundle.get("available"));
+                    }
+                }
+            }
         });
 
         Events.on(SectorCaptureEvent.class, e -> {
@@ -311,17 +324,45 @@ public class Control implements ApplicationListener, Loadable{
                             return;
                         }
 
+                        //set spawn for sector damage to use
+                        Tile spawn = world.tile(sector.info.spawnPosition);
+                        spawn.setBlock(Blocks.coreShard, state.rules.defaultTeam);
+
+                        //add extra damage.
+                        SectorDamage.apply(1f);
+
                         //reset wave so things are more fair
                         state.wave = 1;
+                        //set up default wave time
+                        state.wavetime = state.rules.waveSpacing * 2f;
+                        //reset captured state
+                        sector.info.wasCaptured = false;
+                        //re-enable waves
+                        state.rules.waves = true;
 
                         //reset win wave??
-                        state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null ? sector.preset.captureWave : 40;
+                        state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null && sector.preset.captureWave > 0 ? sector.preset.captureWave : state.rules.winWave > state.wave ? state.rules.winWave : 30;
+
+                        //if there's still an enemy base left, fix it
+                        if(state.rules.attackMode){
+                            //replace all broken blocks
+                            for(var plan : state.rules.waveTeam.data().blocks){
+                                Tile tile = world.tile(plan.x, plan.y);
+                                if(tile != null){
+                                    tile.setBlock(content.block(plan.block), state.rules.waveTeam, plan.rotation);
+                                    if(plan.config != null && tile.build != null){
+                                        tile.build.configureAny(plan.config);
+                                    }
+                                }
+                            }
+                            state.rules.waveTeam.data().blocks.clear();
+                        }
 
                         //kill all units, since they should be dead anyway
                         Groups.unit.clear();
                         Groups.fire.clear();
+                        Groups.puddle.clear();
 
-                        Tile spawn = world.tile(sector.info.spawnPosition);
                         Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
                         //set up camera/player locations
@@ -383,7 +424,7 @@ public class Control implements ApplicationListener, Loadable{
         net.dispose();
         Musics.dispose();
         Sounds.dispose();
-        ui.editor.dispose();
+        if(ui != null && ui.editor != null) ui.editor.dispose();
     }
 
     @Override
@@ -465,6 +506,13 @@ public class Control implements ApplicationListener, Loadable{
             }
             settings.put("fullscreen", !full);
         }
+
+        if(Float.isNaN(Vars.player.x) || Float.isNaN(Vars.player.y)){
+            player.set(0, 0);
+            if(!player.dead()) player.unit().kill();
+        }
+        if(Float.isNaN(camera.position.x)) camera.position.x = world.unitWidth()/2f;
+        if(Float.isNaN(camera.position.y)) camera.position.y = world.unitHeight()/2f;
 
         if(state.isGame()){
             input.update();

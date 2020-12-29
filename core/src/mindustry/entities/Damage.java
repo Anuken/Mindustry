@@ -2,7 +2,6 @@ package mindustry.entities;
 
 import arc.*;
 import arc.func.*;
-import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -24,7 +23,7 @@ public class Damage{
     private static Tile furthest;
     private static Rect rect = new Rect();
     private static Rect hitrect = new Rect();
-    private static Vec2 tr = new Vec2();
+    private static Vec2 tr = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2();
     private static Seq<Unit> units = new Seq<>();
     private static GridBits bits = new GridBits(30, 30);
     private static IntQueue propagation = new IntQueue();
@@ -33,15 +32,22 @@ public class Damage{
     private static Unit tmpUnit;
 
     /** Creates a dynamic explosion based on specified parameters. */
-    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color, boolean damage){
+    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage){
+        dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, true, null);
+    }
+
+    /** Creates a dynamic explosion based on specified parameters. */
+    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam){
         if(damage){
             for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
                 int branches = 5 + Mathf.clamp((int)(power / 30), 1, 20);
                 Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3, x, y, Mathf.random(360f), branches + Mathf.range(2)));
             }
 
-            for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
-                Time.run(i / 2f, () -> Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), Bullets.fireball.damage, 1, 1));
+            if(fire){
+                for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
+                    Time.run(i / 2f, () -> Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), Bullets.fireball.damage, 1, 1));
+                }
             }
 
             int waves = Mathf.clamp((int)(explosiveness / 4), 0, 30);
@@ -49,7 +55,7 @@ public class Damage{
             for(int i = 0; i < waves; i++){
                 int f = i;
                 Time.run(i * 2f, () -> {
-                    Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f);
+                    Damage.damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f, false);
                     Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
                 });
             }
@@ -114,28 +120,35 @@ public class Damage{
 
         collidedBlocks.clear();
         tr.trns(angle, length);
+
         Intc2 collider = (cx, cy) -> {
             Building tile = world.build(cx, cy);
             boolean collide = tile != null && collidedBlocks.add(tile.pos());
 
             if(hitter.damage > 0){
+                float health = !collide ? 0 : tile.health;
+
                 if(collide && tile.team != team && tile.collide(hitter)){
                     tile.collision(hitter);
                     hitter.type.hit(hitter, tile.x, tile.y);
                 }
 
                 //try to heal the tile
-                if(collide && hitter.type.collides(hitter, tile)){
-                    hitter.type.hitTile(hitter, tile, tile.health, false);
+                if(collide && hitter.type.testCollision(hitter, tile)){
+                    hitter.type.hitTile(hitter, tile, health, false);
                 }
             }
         };
 
         if(hitter.type.collidesGround){
-            world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
+            seg1.set(x, y);
+            seg2.set(seg1).add(tr);
+            world.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
                 collider.get(cx, cy);
-                if(large){
-                    for(Point2 p : Geometry.d4){
+
+                for(Point2 p : Geometry.d4){
+                    Tile other = world.tile(p.x + cx, p.y + cy);
+                    if(other != null && (large || Intersector.intersectSegmentRectangle(seg1, seg2, other.getBounds(Tmp.r1)))){
                         collider.get(cx + p.x, cy + p.y);
                     }
                 }
@@ -378,9 +391,9 @@ public class Damage{
                 if(scaledDamage <= 0 || tile == null) continue;
 
                 //apply damage to entity if needed
-                if(tile.build != null && tile.team() != team){
-                    int health = (int)tile.build.health();
-                    if(tile.build.health() > 0){
+                if(tile.build != null && tile.build.team != team){
+                    int health = (int)(tile.build.health / (tile.block().size * tile.block().size));
+                    if(tile.build.health > 0){
                         tile.build.damage(scaledDamage);
                         scaledDamage -= health;
 

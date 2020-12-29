@@ -114,6 +114,7 @@ public abstract class LStatement{
         t.actions(Actions.alpha(0), Actions.fadeIn(0.3f, Interp.fade));
 
         t.top().pane(inner -> {
+            inner.marginRight(24f);
             inner.top();
             hideCons.get(inner, hide);
         }).top();

@@ -17,6 +17,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.io.*;
+import mindustry.logic.*;
 import mindustry.maps.Map;
 import mindustry.maps.*;
 import mindustry.mod.*;
@@ -56,7 +57,7 @@ public class Vars implements Loadable{
     /** URL for sending crash reports to */
     public static final String crashReportURL = "http://192.99.169.18/report";
     /** URL the links to the wiki's modding guide.*/
-    public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/";
+    public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/1-modding/";
     /** URL to the JSON file containing all the global, public servers. Not queried in BE. */
     public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers.json";
     /** URL to the JSON file containing all the BE servers. Only queried in BE. */
@@ -67,6 +68,8 @@ public class Vars implements Loadable{
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
     public static final Seq<ServerGroup> defaultServers = Seq.with();
+    /** maximum size of any block, do not change unless you know what you're doing */
+    public static final int maxBlockSize = 16;
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
     /** max chat message length */
@@ -88,7 +91,7 @@ public class Vars implements Loadable{
     /** duration of time between turns in ticks */
     public static final float turnDuration = 2 * Time.toMinutes;
     /** chance of an invasion per turn, 1 = 100% */
-    public static final float baseInvasionChance = 1f / 50f;
+    public static final float baseInvasionChance = 1f / 100f;
     /** how many turns have to pass before invasions start */
     public static final int invasionGracePeriod = 20;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
@@ -193,6 +196,7 @@ public class Vars implements Loadable{
     public static BeControl becontrol;
     public static AsyncCore asyncCore;
     public static BaseRegistry bases;
+    public static GlobalConstants constants;
 
     public static Universe universe;
     public static World world;
@@ -266,6 +270,7 @@ public class Vars implements Loadable{
         indexer = new BlockIndexer();
         pathfinder = new Pathfinder();
         bases = new BaseRegistry();
+        constants = new GlobalConstants();
 
         state = new GameState();
 

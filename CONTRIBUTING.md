@@ -15,9 +15,6 @@ If you are submitting a new block, make sure it has a name and description, and 
 If you are interested in adding a large mechanic/feature or changing large amounts of code, first contact me (Anuken) via [Discord](https://discord.gg/mindustry) (preferred method) or via e-mail (*anukendev@gmail.com*).  
 For most changes, this should not be necessary. I just want to know if you're doing something big so I can offer advice and/or make sure you're not wasting your time on it.
 
-### Do not include packed sprites in your pull request.
-When making a pull request that changes or adds new sprites, do not add the modified atlas & `spritesX.png` files to your final pull request. These are a frequent source of conflicts.
-
 
 ## Style Guidelines
 

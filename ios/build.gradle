@@ -22,6 +22,8 @@ task deploy{
     dependsOn createIPA
 }
 
+//must pack before deployment, as iOS does never has the latest sprites.
+copyAssets.dependsOn ":tools:pack"
 launchIPhoneSimulator.dependsOn build
 launchIPadSimulator.dependsOn build
 launchIOSDevice.dependsOn build

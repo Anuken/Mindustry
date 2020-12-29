@@ -1,7 +1,5 @@
 package mindustry.ai;
 
-import arc.*;
-import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -17,6 +15,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
+import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -35,7 +34,7 @@ public class BaseAI{
     private static int correct = 0, incorrect = 0;
 
     private int lastX, lastY, lastW, lastH;
-    private boolean triedWalls;
+    private boolean triedWalls, foundPath;
 
     TeamData data;
     Interval timer = new Interval(4);
@@ -54,11 +53,12 @@ public class BaseAI{
     public void update(){
         if(data.team.rules().aiCoreSpawn && timer.get(timerSpawn, 60 * 2.5f) && data.hasCore()){
             CoreBlock block = (CoreBlock)data.core().block;
+            int coreUnits = Groups.unit.count(u -> u.team == data.team && u.type == block.unitType);
 
-            //create AI core unit
-            if(!state.isEditor() && !Groups.unit.contains(u -> u.team() == data.team && u.type == block.unitType)){
+            //create AI core unit(s)
+            if(!state.isEditor() && coreUnits < data.cores.size){
                 Unit unit = block.unitType.create(data.team);
-                unit.set(data.core());
+                unit.set(data.cores.random());
                 unit.add();
                 Fx.spawn.at(unit);
             }
@@ -112,6 +112,9 @@ public class BaseAI{
                     }
 
                     calcPath.add(calcTile.pos());
+                    for(Point2 p : Geometry.d8){
+                        calcPath.add(Point2.pack(p.x + calcTile.x, p.y + calcTile.y));
+                    }
 
                     //found the end.
                     if(calcTile.build instanceof CoreBuild b && b.team == state.rules.defaultTeam){
@@ -123,6 +126,7 @@ public class BaseAI{
                         calcPath.clear();
                         calcTile = null;
                         totalCalcs ++;
+                        foundPath = true;
 
                         break;
                     }
@@ -133,7 +137,7 @@ public class BaseAI{
         }
 
         //only schedule when there's something to build.
-        if(totalCalcs > 0 && data.blocks.isEmpty() && timer.get(timerStep, Mathf.lerp(20f, 4f, data.team.rules().aiTier))){
+        if(foundPath && data.blocks.isEmpty() && timer.get(timerStep, Mathf.lerp(20f, 4f, data.team.rules().aiTier))){
             if(!triedWalls){
                 tryWalls();
                 triedWalls = true;
@@ -271,6 +275,10 @@ public class BaseAI{
                     }
 
                     Tile o = world.tile(tile.x + p.x, tile.y + p.y);
+                    if(o != null && (o.block() instanceof PayloadAcceptor || o.block() instanceof PayloadConveyor)){
+                        break;
+                    }
+
                     if(o != null && o.team() == data.team && !(o.block() instanceof Wall)){
                         any = true;
                         break;

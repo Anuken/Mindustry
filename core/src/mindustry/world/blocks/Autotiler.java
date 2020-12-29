@@ -219,9 +219,8 @@ public interface Autotiler{
     /**
      * Check if a position is facing the secondary position at a rotation
      *
-     * @param tile The origin tile that is or is not facing the destinated `otherblock`
+     * @param tile The origin tile that is or is not facing the `otherblock`
      * @param rotation The rotation of the tile on (x, y)
-     *
      * @param otherx The x coordinate of position 2
      * @param othery The y coordinate of position 2
      * @return whether this tile is looking at the other tile.

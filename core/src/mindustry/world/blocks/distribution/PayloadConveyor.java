@@ -204,7 +204,7 @@ public class PayloadConveyor extends Block{
         }
 
         public float time(){
-            return Time.time();
+            return Time.time;
         }
 
         @Override
@@ -232,6 +232,12 @@ public class PayloadConveyor extends Block{
             this.animation = 0;
 
             updatePayload();
+        }
+
+        @Override
+        public void onRemoved(){
+            super.onRemoved();
+            if(item != null) item.dump();
         }
 
         @Override

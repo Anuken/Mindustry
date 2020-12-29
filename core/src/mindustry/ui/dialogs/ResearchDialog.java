@@ -64,8 +64,8 @@ public class ResearchDialog extends BaseDialog{
                                 ItemSeq cached = sector.items();
                                 cache.put(sector, cached);
                                 cached.each((item, amount) -> {
-                                    values[item.id] += amount;
-                                    total += amount;
+                                    values[item.id] += Math.max(amount, 0);
+                                    total += Math.max(amount, 0);
                                 });
                             }
                         }
@@ -172,16 +172,6 @@ public class ResearchDialog extends BaseDialog{
         });
     }
 
-    @Override
-    public Dialog show(){
-        if(net.client()){
-            ui.showInfo("@research.multiplayer");
-            return this;
-        }
-
-        return super.show();
-    }
-
     void treeLayout(){
         float spacing = 20f;
         LayoutNode node = new LayoutNode(root, null);
@@ -255,18 +245,6 @@ public class ResearchDialog extends BaseDialog{
 
     boolean selectable(TechNode node){
         return node.content.unlocked() || !node.objectives.contains(i -> !i.complete());
-    }
-
-    public void showToast(String info){
-        Table table = new Table();
-        table.actions(Actions.fadeOut(0.5f, Interp.fade), Actions.remove());
-        table.top().add(info);
-        table.name = "toast";
-        table.update(() -> {
-            table.toFront();
-            table.setPosition(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() - 21, Align.top);
-        });
-        Core.scene.add(table);
     }
 
     boolean locked(TechNode node){
@@ -451,7 +429,14 @@ public class ResearchDialog extends BaseDialog{
 
         void unlock(TechNode node){
             node.content.unlock();
-            showToast(Core.bundle.format("researched", node.content.localizedName));
+
+            //unlock parent nodes in multiplayer.
+            TechNode parent = node.parent;
+            while(parent != null){
+                parent.content.unlock();
+                parent = parent.parent;
+            }
+
             checkNodes(root);
             hoverNode = null;
             treeLayout();
