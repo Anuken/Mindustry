@@ -66,8 +66,11 @@ public class UnitFactory extends UnitBlock{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("progress", (UnitFactoryBuild e) -> new Bar("bar.progress", Pal.ammo, e::fraction));
-
+        bars.add("progress", (UnitFactoryBuild entity) -> new Bar(() ->
+        Core.bundle.formatFloat("bar.progress",
+        entity.fraction() * 100f, 1),
+        () -> Pal.ammo,
+        () -> entity.fraction()));
         bars.add("units", (UnitFactoryBuild e) ->
         new Bar(
             () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :

@@ -1,5 +1,6 @@
 package mindustry.world.blocks.experimental;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -53,7 +54,11 @@ public class BlockForge extends PayloadAcceptor{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", (BlockForgeBuild entity) -> new Bar("bar.progress", Pal.ammo, () -> entity.recipe == null ? 0f : (entity.progress / entity.recipe.buildCost)));
+        bars.add("progress", (BlockForgeBuild entity) -> new Bar(() ->
+        Core.bundle.formatFloat("bar.progress",
+        entity.recipe == null ? 0f : (entity.progress / entity.recipe.buildCost) * 100f, 1),
+        () -> Pal.ammo,
+        () -> entity.recipe == null ? 0f : (entity.progress / entity.recipe.buildCost)));
     }
 
     @Override

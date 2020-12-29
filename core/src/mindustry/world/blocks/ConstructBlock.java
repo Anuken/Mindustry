@@ -3,6 +3,7 @@ package mindustry.world.blocks;
 import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
@@ -41,6 +42,16 @@ public class ConstructBlock extends Block{
         solidifes = true;
         consBlocks[size - 1] = this;
         sync = true;
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+        bars.add("progress", (ConstructBuild entity) -> new Bar(() ->
+        Core.bundle.formatFloat("bar.progress",
+        entity.progress * 100f, 1),
+        () -> Pal.ammo,
+        () -> entity.progress));
     }
 
     /** Returns a ConstructBlock by size. */

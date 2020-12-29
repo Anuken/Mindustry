@@ -46,7 +46,11 @@ public class Reconstructor extends UnitBlock{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", (ReconstructorBuild entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
+        bars.add("progress", (ReconstructorBuild entity) -> new Bar(() ->
+        Core.bundle.formatFloat("bar.progress",
+        entity.fraction() * 100f, 1),
+        () -> Pal.ammo,
+        () -> entity.fraction()));
         bars.add("units", (ReconstructorBuild e) ->
         new Bar(
             () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :
