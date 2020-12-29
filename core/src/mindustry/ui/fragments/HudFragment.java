@@ -69,7 +69,7 @@ public class HudFragment extends Fragment{
             }
         });
 
-        Events.on(SectorCaptureEvent.class, e ->{
+        Events.on(SectorCaptureEvent.class, e -> {
             showToast(Core.bundle.format("sector.captured", e.sector.isBeingPlayed() ? "" : e.sector.name() + " "));
         });
 
