@@ -54,7 +54,7 @@ public enum Stat{
     maxUnits(StatCat.crafting),
     linkRange(StatCat.crafting),
     instructions(StatCat.crafting),
-    outputBlockSize(StatCat.crafting),
+    outputSize(StatCat.crafting),
 
     weapons(StatCat.function),
     bullet(StatCat.function),
