@@ -10,7 +10,6 @@ import java.util.*;
 public enum StatUnit{
     blocks,
     blocksSquared,
-    blocksSquaredRange,
     powerSecond,
     liquidSecond,
     itemsSecond,
