@@ -48,6 +48,13 @@ public class BlockForge extends PayloadAcceptor{
     public TextureRegion[] icons(){
         return new TextureRegion[]{region, outRegion};
     }
+    
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.outputSize, "@x@ ~ @x@", minBlockSize, minBlockSize, maxBlockSize, maxBlockSize);
+    }
 
     @Override
     public void setBars(){
