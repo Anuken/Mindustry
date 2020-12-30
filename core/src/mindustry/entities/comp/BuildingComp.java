@@ -358,6 +358,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
     }
 
+    public BlockStatus status(){
+        return cons.status();
+    }
+
     /** Call when nothing is happening to the entity. This increments the internal sleep timer. */
     public void sleep(){
         sleepTime += Time.delta;
@@ -812,7 +816,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             Draw.z(Layer.power + 1);
             Draw.color(Pal.gray);
             Fill.square(brcx, brcy, 2.5f, 45);
-            Draw.color(cons.status().color);
+            Draw.color(status().color);
             Fill.square(brcx, brcy, 1.5f, 45);
             Draw.color();
         }
