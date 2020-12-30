@@ -95,14 +95,13 @@ public class PowerTestFixture{
             // Simulate the "changed" method. Calling it through reflections would require half the game to be initialized.
             tile.build = block.newBuilding().init(tile, Team.sharded, false, 0);
             if(block.hasPower){
-                tile.build.power.graph = new PowerGraph(){
+                new PowerGraph(){
                     //assume there's always something consuming power
                     @Override
                     public float getUsageFraction(){
                         return 1f;
                     }
-                };
-                tile.build.power.graph.add(tile.build);
+                }.add(tile.build);
             }
 
             // Assign incredibly high health so the block does not get destroyed on e.g. burning Blast Compound

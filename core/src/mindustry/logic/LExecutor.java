@@ -44,6 +44,7 @@ public class LExecutor{
 
     public LInstruction[] instructions = {};
     public Var[] vars = {};
+    public int[] binds;
 
     public LongSeq graphicsBuffer = new LongSeq();
     public StringBuilder textBuffer = new StringBuilder();
@@ -182,9 +183,6 @@ public class LExecutor{
     public static class UnitBindI implements LInstruction{
         public int type;
 
-        //iteration index
-        private int index;
-
         public UnitBindI(int type){
             this.type = type;
         }
@@ -195,17 +193,21 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
+            if(exec.binds == null || exec.binds.length != content.units().size){
+                exec.binds = new int[content.units().size];
+            }
+
             //binding to `null` was previously possible, but was too powerful and exploitable
             if(exec.obj(type) instanceof UnitType type){
                 Seq<Unit> seq = exec.team.data().unitCache(type);
 
                 if(seq != null && seq.any()){
-                    index %= seq.size;
-                    if(index < seq.size){
+                    exec.binds[type.id] %= seq.size;
+                    if(exec.binds[type.id] < seq.size){
                         //bind to the next unit
-                        exec.setconst(varUnit, seq.get(index));
+                        exec.setconst(varUnit, seq.get(exec.binds[type.id]));
                     }
-                    index++;
+                    exec.binds[type.id] ++;
                 }else{
                     //no units of this type found
                     exec.setconst(varUnit, null);

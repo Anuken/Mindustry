@@ -47,7 +47,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                 }
 
                 if(type.buildingDamageMultiplier != 1){
-                    sep(bt, Core.bundle.format("bullet.buildingdamage", type.buildingDamageMultiplier * 100));
+                    sep(bt, Core.bundle.format("bullet.buildingdamage", (int)(type.buildingDamageMultiplier * 100)));
                 }
 
                 if(type.splashDamage > 0){
