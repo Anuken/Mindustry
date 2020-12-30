@@ -2055,6 +2055,7 @@ public class Blocks implements ContentList{
 
         //TODO remove
         launchPadLarge = new LaunchPad("launch-pad-large"){{
+            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
             size = 4;
             itemCapacity = 300;
             launchTime = 60f * 35;
@@ -2146,21 +2147,21 @@ public class Blocks implements ContentList{
         //region experimental
 
         blockForge = new BlockForge("block-forge"){{
-            requirements(Category.production, BuildVisibility.debugOnly, with(Items.thorium, 100));
+            requirements(Category.crafting, BuildVisibility.debugOnly, with(Items.thorium, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
         blockLoader = new BlockLoader("block-loader"){{
-            requirements(Category.production, BuildVisibility.debugOnly, with(Items.thorium, 100));
+            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.thorium, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
         blockUnloader = new BlockUnloader("block-unloader"){{
-            requirements(Category.production, BuildVisibility.debugOnly, with(Items.thorium, 100));
+            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.thorium, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;

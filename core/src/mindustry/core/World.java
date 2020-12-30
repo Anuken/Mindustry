@@ -268,7 +268,7 @@ public class World{
     }
 
     private void setSectorRules(Sector sector){
-        state.map = new Map(StringMap.of("name", sector.planet.localizedName + "; Sector " + sector.id));
+        state.map = new Map(StringMap.of("name", sector.preset == null ? sector.planet.localizedName + "; Sector " + sector.id : sector.preset.localizedName));
         state.rules.sector = sector;
 
         state.rules.weather.clear();
