@@ -1,0 +1,6 @@
+[This is a truncated changelog, see Github for full notes]
+- Various minor bugfixes
+- Increased power source output again
+- Improved building beam visuals
+- Improved peformance of maps with many adjacent power nodes/batteries
+- Disabled weather in editor
