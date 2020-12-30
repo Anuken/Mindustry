@@ -58,5 +58,8 @@
   {
     "name": "Minty [subzero]",
     "address": ["minty-server.ddns.net"]
+  },
+  {
+    "address": "hexpvp.ddns.net"
   }
 ]
