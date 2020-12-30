@@ -388,7 +388,7 @@ public class Logic implements ApplicationListener{
                 Time.update();
 
                 //weather is serverside
-                if(!net.client()){
+                if(!net.client() && !state.isEditor()){
                     updateWeather();
 
                     for(TeamData data : state.teams.getActive()){
