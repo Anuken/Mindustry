@@ -45,8 +45,8 @@ public class Battery extends PowerDistributor{
 
         @Override
         public BlockStatus status(){
-            if(power.status == 0f) return BlockStatus.noInput;
-            if(power.status == 1f) return BlockStatus.active;
+            if(Mathf.equal(power.status, 0f, 0.01f)) return BlockStatus.noInput;
+            if(Mathf.equal(power.status, 1f, 0.01f)) return BlockStatus.active;
             return BlockStatus.noOutput;
         }
     }
