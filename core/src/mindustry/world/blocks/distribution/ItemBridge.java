@@ -70,6 +70,10 @@ public class ItemBridge extends Block{
     }
 
     public void drawBridge(BuildPlan req, float ox, float oy, float flip){
+        float opacity = Core.settings.getInt("bridgeopacity") / 100f;
+        if(Mathf.zero(opacity)) return;
+        Draw.alpha(opacity);
+
         Lines.stroke(8f);
 
         Tmp.v1.set(ox, oy).sub(req.drawx(), req.drawy()).setLength(tilesize/2f);
@@ -84,6 +88,8 @@ public class ItemBridge extends Block{
 
         Draw.rect(arrowRegion, (req.drawx() + ox) / 2f, (req.drawy() + oy) / 2f,
         Angles.angle(req.drawx(), req.drawy(), ox, oy) + flip);
+
+        Draw.reset();
     }
 
     @Override
