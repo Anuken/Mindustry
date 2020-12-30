@@ -121,7 +121,7 @@ public class RepairPoint extends Block{
 
         @Override
         public BlockStatus status(){
-            return efficiency() == 0f ? BlockStatus.noInput : cons.status();
+            return Mathf.equal(efficiency(), 0f, 0.01f) ? BlockStatus.noInput : cons.status();
         }
     }
 }
