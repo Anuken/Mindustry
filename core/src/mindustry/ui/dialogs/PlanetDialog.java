@@ -44,7 +44,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public final PlanetRenderer planets = renderer.planets;
     public final LaunchLoadoutDialog loadouts = new LaunchLoadoutDialog();
 
-    public int launchRange;
     public float zoom = 1f, selectAlpha = 1f;
     public @Nullable Sector selected, hovered, launchSector;
     public Mode mode = look;
