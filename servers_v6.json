@@ -60,6 +60,7 @@
     "address": ["minty-server.ddns.net"]
   },
   {
-    "address": "hexpvp.ddns.net"
+    "address": "hexpvp.ddns.net",
+    "name": "HexPvP"
   }
 ]
