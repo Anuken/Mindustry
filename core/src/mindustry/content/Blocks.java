@@ -2044,15 +2044,16 @@ public class Blocks implements ContentList{
             consumes.power(4f);
         }};
 
-        //TODO remove
+        /**
         launchPadLarge = new LaunchPad("launch-pad-large"){{
-            //requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
             size = 4;
             itemCapacity = 300;
             launchTime = 60f * 35;
             hasPower = true;
             consumes.power(6f);
         }};
+        */
 
         //endregion campaign
         //region logic
