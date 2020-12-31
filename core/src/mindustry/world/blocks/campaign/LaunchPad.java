@@ -32,7 +32,7 @@ public class LaunchPad extends Block{
     public Sound launchSound = Sounds.none;
 
     public @Load("@-light") TextureRegion lightRegion;
-    public @Load("launchpod") TextureRegion podRegion;
+    public @Load(value = "@-pod", fallback = "launchpod") TextureRegion podRegion;
     public Color lightColor = Color.valueOf("eab678");
 
     public LaunchPad(String name){
@@ -125,6 +125,7 @@ public class LaunchPad extends Block{
                 LaunchPayload entity = LaunchPayload.create();
                 items.each((item, amount) -> entity.stacks.add(new ItemStack(item, amount)));
                 entity.set(this);
+                entity.setRegion(podRegion);
                 entity.lifetime(120f);
                 entity.team(team);
                 entity.add();
@@ -175,6 +176,7 @@ public class LaunchPad extends Block{
 
         Seq<ItemStack> stacks = new Seq<>();
         transient Interval in = new Interval();
+        private TextureRegion region;
 
         @Override
         public void draw(){
@@ -221,6 +223,10 @@ public class LaunchPad extends Block{
 
         float cy(){
             return y + fin(Interp.pow5In) * (100f + Mathf.randomSeedRange(id() + 2, 30f));
+        }
+
+        public void setRegion(TextureRegion region){
+            this.region = region;
         }
 
         @Override
