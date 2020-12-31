@@ -52,6 +52,10 @@ public class LaunchPad extends Block{
         bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
     }
 
+    public TextureRegion podRegion(){
+        return podRegion;
+    }
+
     public class LaunchPadBuild extends Building{
 
         @Override
@@ -102,6 +106,7 @@ public class LaunchPad extends Block{
                 LaunchPayload entity = LaunchPayload.create();
                 items.each((item, amount) -> entity.stacks.add(new ItemStack(item, amount)));
                 entity.set(this);
+                entity.setRegion(podRegion);
                 entity.lifetime(120f);
                 entity.team(team);
                 entity.add();
@@ -152,6 +157,7 @@ public class LaunchPad extends Block{
 
         Seq<ItemStack> stacks = new Seq<>();
         transient Interval in = new Interval();
+        private TextureRegion region;
 
         @Override
         public void draw(){
@@ -177,7 +183,6 @@ public class LaunchPad extends Block{
 
             Draw.z(Layer.weather - 1);
 
-            TextureRegion region = Core.atlas.find("launchpod");
             float rw = region.width * Draw.scl * scale, rh = region.height * Draw.scl * scale;
 
             Draw.alpha(alpha);
@@ -198,6 +203,10 @@ public class LaunchPad extends Block{
 
         float cy(){
             return y + fin(Interp.pow5In) * (100f + Mathf.randomSeedRange(id() + 2, 30f));
+        }
+
+        public void setRegion(TextureRegion region){
+            this.region = region;
         }
 
         @Override
