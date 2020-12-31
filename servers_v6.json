@@ -58,5 +58,8 @@
   {
     "name": "Minty [subzero]",
     "address": ["minty-server.ddns.net"]
+  },
+  {
+    "address": ["shizashizashiza.ml:6567"]
   }
 ]
