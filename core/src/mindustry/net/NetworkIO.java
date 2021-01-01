@@ -3,6 +3,7 @@ package mindustry.net;
 import arc.Core;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -80,6 +81,7 @@ public class NetworkIO{
 
         buffer.put((byte)state.rules.mode().ordinal());
         buffer.putInt(netServer.admins.getPlayerLimit());
+        buffer.putInt(Core.settings.getInt("port", port));
 
         writeString(buffer, description, 100);
         if(state.rules.modeName != null){
@@ -99,8 +101,10 @@ public class NetworkIO{
         int limit = buffer.getInt();
         String description = readString(buffer);
         String modeName = readString(buffer);
+        int hostPort = buffer.getInt();
+        hostPort = hostPort != 0 ? hostPort : Vars.port;
 
-        return new Host(ping, host, hostAddress, map, wave, players, version, vertype, gamemode, limit, description, modeName.isEmpty() ? null : modeName);
+        return new Host(ping, host, hostAddress, hostPort, map, wave, players, version, vertype, gamemode, limit, description, modeName.isEmpty() ? null : modeName);
     }
 
     private static void writeString(ByteBuffer buffer, String string, int maxlen){
