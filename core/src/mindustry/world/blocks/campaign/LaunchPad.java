@@ -125,7 +125,6 @@ public class LaunchPad extends Block{
                 LaunchPayload entity = LaunchPayload.create();
                 items.each((item, amount) -> entity.stacks.add(new ItemStack(item, amount)));
                 entity.set(this);
-                entity.setRegion(podRegion);
                 entity.lifetime(120f);
                 entity.team(team);
                 entity.add();
@@ -176,7 +175,6 @@ public class LaunchPad extends Block{
 
         Seq<ItemStack> stacks = new Seq<>();
         transient Interval in = new Interval();
-        private TextureRegion region;
 
         @Override
         public void draw(){
@@ -184,6 +182,7 @@ public class LaunchPad extends Block{
             float scale = (1f - alpha) * 1.3f + 1f;
             float cx = cx(), cy = cy();
             float rotation = fin() * (130f + Mathf.randomSeedRange(id(), 50f));
+            Block block = blockOn();
 
             Draw.z(Layer.effect + 0.001f);
 
@@ -202,6 +201,7 @@ public class LaunchPad extends Block{
 
             Draw.z(Layer.weather - 1);
 
+            TextureRegion region = block.podRegion;
             float rw = region.width * Draw.scl * scale, rh = region.height * Draw.scl * scale;
 
             Draw.alpha(alpha);
@@ -222,10 +222,6 @@ public class LaunchPad extends Block{
 
         float cy(){
             return y + fin(Interp.pow5In) * (100f + Mathf.randomSeedRange(id() + 2, 30f));
-        }
-
-        public void setRegion(TextureRegion region){
-            this.region = region;
         }
 
         @Override
