@@ -24,8 +24,8 @@ import static arc.util.Time.*;
 import static mindustry.Vars.*;
 
 public class CustomRulesDialog extends BaseDialog{
-    private Table main;
     Rules rules;
+    private Table main;
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
     private BaseDialog banDialog;
@@ -134,15 +134,15 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.waves", b -> rules.waves = b, () -> rules.waves);
         check("@rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer);
         check("@rules.waitForWaveToEnd", b -> rules.waitEnemies = b, () -> rules.waitEnemies);
-        number("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true);
+        number("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true, 1, Float.MAX_VALUE);
         number("@rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
 
         title("@rules.title.resourcesbuilding");
         check("@rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
-        check("@rules.schematic", b-> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
+        check("@rules.schematic", b -> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
         number("@rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
-        number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier);
+        number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, 0.00001f, 10000f);
         number("@rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
         number("@rules.blockhealthmultiplier", f -> rules.blockHealthMultiplier = f, () -> rules.blockHealthMultiplier);
         number("@rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
@@ -162,17 +162,18 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
         number("@rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
-        number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier);
+        number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0.00001f, 100f);
 
         title("@rules.title.enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
-        check("@rules.buildai", b -> rules.waveTeam.rules().ai = b, () -> rules.waveTeam.rules().ai);
+        check("@rules.buildai", b -> rules.teams.get(rules.waveTeam).ai = rules.teams.get(rules.waveTeam).infiniteResources = b, () -> rules.teams.get(rules.waveTeam).ai);
         number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
 
         title("@rules.title.environment");
         check("@rules.explosions", b -> rules.damageExplosions = b, () -> rules.damageExplosions);
         check("@rules.fire", b -> rules.fire = b, () -> rules.fire);
         check("@rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
+        check("@rules.enemyLights", b -> rules.enemyLights = b, () -> rules.enemyLights);
 
         main.button(b -> {
             b.left();
@@ -185,15 +186,25 @@ public class CustomRulesDialog extends BaseDialog{
         }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f).row();
 
         main.button("@rules.weather", this::weatherDialog).width(250f).left().row();
-
-        //TODO add weather patterns
     }
 
     void number(String text, Floatc cons, Floatp prov){
-        number(text, false, cons, prov, () -> true);
+        number(text, false, cons, prov, () -> true, 0, Float.MAX_VALUE);
+    }
+
+    void number(String text, Floatc cons, Floatp prov, float min, float max){
+        number(text, false, cons, prov, () -> true, min, max);
     }
 
     void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition){
+        number(text, integer, cons, prov, condition, 0, Float.MAX_VALUE);
+    }
+
+    void number(String text, Floatc cons, Floatp prov, Boolp condition){
+        number(text, false, cons, prov, condition, 0, Float.MAX_VALUE);
+    }
+
+    void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition, float min, float max){
         main.table(t -> {
             t.left();
             t.add(text).left().padRight(5)
@@ -201,7 +212,7 @@ public class CustomRulesDialog extends BaseDialog{
             t.field((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseFloat(s)))
             .padRight(100f)
             .update(a -> a.setDisabled(!condition.get()))
-            .valid(Strings::canParsePositiveFloat).width(120f).left().addInputDialog();
+            .valid(f -> Strings.canParsePositiveFloat(f) && Strings.parseFloat(f) >= min && Strings.parseFloat(f) <= max).width(120f).left().addInputDialog();
         }).padTop(0);
         main.row();
     }
@@ -273,18 +284,22 @@ public class CustomRulesDialog extends BaseDialog{
                             f.defaults().padRight(4).left();
 
                             f.add("@rules.weather.duration");
-                            field(f, entry.minDuration / toMinutes, v -> entry.minDuration = v * toMinutes);
+                            field(f, entry.minDuration / toMinutes, v -> entry.minDuration = v * toMinutes).disabled(v -> entry.always);
                             f.add("@waves.to");
-                            field(f, entry.maxDuration / toMinutes, v -> entry.maxDuration = v * toMinutes);
+                            field(f, entry.maxDuration / toMinutes, v -> entry.maxDuration = v * toMinutes).disabled(v -> entry.always);
                             f.add("@unit.minutes");
 
                             f.row();
 
                             f.add("@rules.weather.frequency");
-                            field(f, entry.minFrequency / toMinutes, v -> entry.minFrequency = v * toMinutes);
+                            field(f, entry.minFrequency / toMinutes, v -> entry.minFrequency = v * toMinutes).disabled(v -> entry.always);
                             f.add("@waves.to");
-                            field(f, entry.maxFrequency / toMinutes, v -> entry.maxFrequency = v * toMinutes);
+                            field(f, entry.maxFrequency / toMinutes, v -> entry.maxFrequency = v * toMinutes).disabled(v -> entry.always);
                             f.add("@unit.minutes");
+
+                            f.row();
+
+                            f.check("@rules.weather.always", val -> entry.always = val).checked(cc -> entry.always).padBottom(4);
 
                             //intensity can't currently be customized
 
@@ -303,8 +318,8 @@ public class CustomRulesDialog extends BaseDialog{
         dialog.addCloseButton();
 
         dialog.buttons.button("@add", Icon.add, () -> {
-            BaseDialog addd = new BaseDialog("@add");
-            addd.cont.pane(t -> {
+            BaseDialog add = new BaseDialog("@add");
+            add.cont.pane(t -> {
                 t.background(Tex.button);
                 int i = 0;
                 for(Weather weather : content.<Weather>getBy(ContentType.weather)){
@@ -313,13 +328,13 @@ public class CustomRulesDialog extends BaseDialog{
                         rules.weather.add(new WeatherEntry(weather));
                         rebuild[0].run();
 
-                        addd.hide();
+                        add.hide();
                     }).size(140f, 50f);
                     if(++i % 2 == 0) t.row();
                 }
             });
-            addd.addCloseButton();
-            addd.show();
+            add.addCloseButton();
+            add.show();
         }).width(170f);
 
         //reset cooldown to random number

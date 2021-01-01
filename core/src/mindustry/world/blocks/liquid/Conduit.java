@@ -16,6 +16,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.distribution.*;
 
 import static mindustry.Vars.*;
 
@@ -27,7 +28,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "conduit-bottom-#") TextureRegion[] botRegions;
 
-    public float leakResistance = 1.5f;
+    public boolean leaks = true;
 
     public Conduit(String name){
         super(name);
@@ -73,7 +74,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         return new TextureRegion[]{Core.atlas.find("conduit-bottom"), topRegions[0]};
     }
 
-    public class ConduitBuild extends LiquidBuild{
+    public class ConduitBuild extends LiquidBuild implements ChainedBuilding{
         public float smoothLiquid;
         public int blendbits, xscl, yscl, blending;
 
@@ -88,25 +89,22 @@ public class Conduit extends LiquidBlock implements Autotiler{
                 if((blending & (1 << i)) != 0){
                     int dir = r - i;
                     float rot = i == 0 ? rotation : (dir)*90;
-                    drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, rot, i != 0 ? 1 : 2);
+                    drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, rot, i != 0 ? SliceMode.bottom : SliceMode.top);
                 }
             }
 
             Draw.z(Layer.block);
 
             Draw.scl(xscl, yscl);
-            drawAt(x, y, blendbits, rotation, 0);
+            drawAt(x, y, blendbits, rotation, SliceMode.none);
             Draw.reset();
         }
 
-        protected void drawAt(float x, float y, int bits, float rotation, int slice){
+        protected void drawAt(float x, float y, int bits, float rotation, SliceMode slice){
             Draw.color(botColor);
             Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
 
-            Draw.color(liquids.current().color);
-            Draw.alpha(smoothLiquid);
-            Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
-            Draw.color();
+            Drawf.liquid(sliced(botRegions[bits], slice), x, y, smoothLiquid, liquids.current().color, rotation);
 
             Draw.rect(sliced(topRegions[bits], slice), x, y, rotation);
         }
@@ -123,9 +121,9 @@ public class Conduit extends LiquidBlock implements Autotiler{
         }
 
         @Override
-        public boolean acceptLiquid(Building source, Liquid liquid, float amount){
+        public boolean acceptLiquid(Building source, Liquid liquid){
             noSleep();
-            return liquids.get(liquid) + amount < liquidCapacity && (liquids.current() == liquid || liquids.currentAmount() < 0.2f)
+            return (liquids.current() == liquid || liquids.currentAmount() < 0.2f)
                 && ((source.relativeTo(tile.x, tile.y) + 2) % 4 != rotation);
         }
 
@@ -134,11 +132,21 @@ public class Conduit extends LiquidBlock implements Autotiler{
             smoothLiquid = Mathf.lerpDelta(smoothLiquid, liquids.currentAmount() / liquidCapacity, 0.05f);
 
             if(liquids.total() > 0.001f && timer(timerFlow, 1)){
-                moveLiquidForward(leakResistance, liquids.current());
+                moveLiquidForward(leaks, liquids.current());
                 noSleep();
             }else{
                 sleep();
             }
+        }
+
+        @Nullable
+        @Override
+        public Building next(){
+            Tile next = tile.nearby(rotation);
+            if(next != null && next.build instanceof ConduitBuild){
+                return next.build;
+            }
+            return null;
         }
     }
 }

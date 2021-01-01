@@ -6,11 +6,19 @@ import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.input.*;
+import arc.scene.style.*;
 import arc.scene.ui.TextButton.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import arc.util.serialization.*;
+import mindustry.*;
+import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.ui.*;
 
@@ -19,6 +27,8 @@ import java.io.*;
 import static mindustry.Vars.*;
 
 public class ModsDialog extends BaseDialog{
+    private String searchtxt = "";
+    private @Nullable Seq<ModListing> modList;
 
     public ModsDialog(){
         super("@mods");
@@ -27,6 +37,9 @@ public class ModsDialog extends BaseDialog{
         buttons.button("@mods.guide", Icon.link, () -> Core.app.openURI(modGuideURL)).size(210, 64f);
 
         shown(this::setup);
+        if(mobile){
+            onResize(this::setup);
+        }
 
         hidden(() -> {
             if(mods.requiresReload()){
@@ -48,6 +61,30 @@ public class ModsDialog extends BaseDialog{
             ui.showErrorMessage("@feature.unsupported");
         }else{
             ui.showException(error);
+        }
+    }
+
+    void getModList(Cons<Seq<ModListing>> listener){
+        if(modList == null){
+            Core.net.httpGet("https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", response -> {
+                String strResult = response.getResultAsString();
+                var status = response.getStatus();
+
+                Core.app.post(() -> {
+                    if(status != HttpStatus.OK){
+                        ui.showErrorMessage(Core.bundle.format("connectfail", status));
+                    }else{
+                        modList = new Json().fromJson(Seq.class, ModListing.class, strResult);
+
+                        //potentially sort mods by game version compatibility, or other criteria
+                        //modList.sort(Structs.comparingBool(m -> !Version.isAtLeast(m.minGameVersion)));
+
+                        listener.get(modList);
+                    }
+                });
+            }, error -> Core.app.post(() -> ui.showException(error)));
+        }else{
+            listener.get(modList);
         }
     }
 
@@ -103,24 +140,87 @@ public class ModsDialog extends BaseDialog{
                     t.button("@mod.import.github", Icon.github, bstyle, () -> {
                         dialog.hide();
 
-                        ui.showTextInput("@mod.import.github", "", 64, Core.settings.getString("lastmod", "Anuken/ExampleMod"), text -> {
+                        ui.showTextInput("@mod.import.github", "", 64, Core.settings.getString("lastmod", ""), text -> {
                             Core.settings.put("lastmod", text);
 
                             ui.loadfrag.show();
-                            // Try to download the 6.0 branch first, but if it doesnt exist try master.
-                            githubImport("6.0", text, e1 -> {
-                                githubImport("master", text, e2 -> {
-                                    ui.showErrorMessage(Core.bundle.format("connectfail", e2));
-                                    ui.loadfrag.hide();
-                                });
-                            });
+                            githubImportMod(text);
                         });
                     }).margin(12f);
-                });
 
+                    t.row();
+
+                    t.button("@mod.featured.dialog.title", Icon.star, bstyle, () -> {
+                        Runnable[] rebuildBrowser = {null};
+                        dialog.hide();
+                        BaseDialog browser = new BaseDialog("$mod.featured.dialog.title");
+                        browser.cont.table(table -> {
+                            table.left();
+                            table.image(Icon.zoom);
+                            table.field(searchtxt, res -> {
+                                searchtxt = res;
+                                rebuildBrowser[0].run();
+                            }).growX().get();
+                        }).fillX().padBottom(4);
+
+                        browser.cont.row();
+
+                        browser.cont.pane(tablebrow -> {
+                            tablebrow.margin(10f).top();
+                            rebuildBrowser[0] = () -> {
+                                tablebrow.clear();
+                                tablebrow.add("@loading");
+
+                                getModList(listings -> {
+                                    tablebrow.clear();
+
+                                    for(ModListing mod : listings){
+                                        if(mod.hasJava || !searchtxt.isEmpty() && !mod.repo.contains(searchtxt) || (Vars.ios && mod.hasScripts)) continue;
+
+                                        tablebrow.button(btn -> {
+                                            btn.top().left();
+                                            btn.margin(12f);
+                                            btn.table(con -> {
+                                                con.left();
+                                                con.add("[accent]" + mod.name + "[white]\n[lightgray]Author:[] " + mod.author + "\n[lightgray]\uE809 " + mod.stars +
+                                                (Version.isAtLeast(mod.minGameVersion) ? "" : "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
+                                                .width(388f).wrap().growX().pad(0f, 6f, 0f, 6f).left().labelAlign(Align.left);
+                                                con.add().growX().pad(0f, 6f, 0f, 6f);
+                                            }).fillY().growX().pad(0f, 6f, 0f, 6f);
+                                        }, Styles.modsb, () -> {
+                                            var sel = new BaseDialog(mod.name);
+                                            sel.cont.add(mod.description).width(mobile ? 400f : 500f).wrap().pad(4f).labelAlign(Align.center, Align.left);
+                                            sel.buttons.defaults().size(150f, 54f).pad(2f);
+                                            sel.setFillParent(false);
+                                            sel.buttons.button("@back", Icon.left, () -> {
+                                                sel.clear();
+                                                sel.hide();
+                                            });
+                                            sel.buttons.button("@mods.browser.add", Icon.download, () -> {
+                                                sel.hide();
+                                                githubImportMod(mod.repo);
+                                            });
+                                            sel.buttons.button("@mods.github.open", Icon.link, () -> {
+                                                Core.app.openURI("https://github.com/" + mod.repo);
+                                            });
+                                            sel.keyDown(KeyCode.escape, sel::hide);
+                                            sel.keyDown(KeyCode.back, sel::hide);
+                                            sel.show();
+                                        }).width(480f).growX().left().fillY();
+                                        tablebrow.row();
+                                    }
+                                });
+                            };
+                            rebuildBrowser[0].run();
+                        });
+                        browser.addCloseButton();
+                        browser.show();
+                    }).margin(12f);
+                });
                 dialog.addCloseButton();
 
                 dialog.show();
+
             }).margin(margin);
 
             if(!mobile){
@@ -131,14 +231,12 @@ public class ModsDialog extends BaseDialog{
         cont.row();
 
         if(!mods.list().isEmpty()){
-            cont.pane(table -> {
-                table.margin(10f).top();
-
-                boolean anyDisabled = false;
-                for(LoadedMod mod : mods.list()){
-
-                    if(!mod.enabled() && !anyDisabled && mods.list().size > 0){
-                        anyDisabled = true;
+            boolean[] anyDisabled = {false};
+            SearchBar.add(cont, mods.list(),
+                mod -> mod.meta.displayName(),
+                (table, mod) -> {
+                    if(!mod.enabled() && !anyDisabled[0] && mods.list().size > 0){
+                        anyDisabled[0] = true;
                         table.row();
                         table.image().growX().height(4f).pad(6f).color(Pal.gray);
                         table.row();
@@ -212,20 +310,14 @@ public class ModsDialog extends BaseDialog{
                                 }).size(50f);
                             }
                         }).growX().right().padRight(-8f).padTop(-8f);
-
-
                     }, Styles.clearPartialt, () -> showMod(mod)).size(w, h).growX().pad(4f);
                     table.row();
-                }
-            });
-
+                }, !mobile || Core.graphics.isPortrait()).margin(10f).top();
         }else{
             cont.table(Styles.black6, t -> t.add("@mods.none")).height(80f);
         }
 
         cont.row();
-
-
     }
 
     private void reload(){
@@ -260,54 +352,86 @@ public class ModsDialog extends BaseDialog{
                 desc.add("@editor.description").padRight(10).color(Color.gray).top();
                 desc.row();
                 desc.add(mod.meta.description).growX().wrap().padTop(2);
+                desc.row();
             }
 
-            //TODO add this when mods work properly
-            /*
-            Array<UnlockableContent> all = Array.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent).as(UnlockableContent.class);
+        }).width(400f);
+
+        //TODO maybe enable later
+        if(false){
+            Seq<UnlockableContent> all = Seq.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent).as();
             if(all.any()){
-                desc.add("@mod.content").padRight(10).color(Color.gray).top();
-                desc.row();
-                desc.pane(cs -> {
+                dialog.cont.row();
+                dialog.cont.pane(cs -> {
                     int i = 0;
                     for(UnlockableContent c : all){
-                        cs.addImageButton(new TextureRegionDrawable(c.icon(Cicon.medium)), () -> {
+                        cs.button(new TextureRegionDrawable(c.icon(Cicon.medium)), Styles.cleari, Cicon.medium.size, () -> {
                             ui.content.show(c);
+                        }).size(50f).with(im -> {
+                            var click = im.getClickListener();
+                            im.update(() -> im.getImage().color.lerp(!click.isOver() ? Color.lightGray : Color.white, 0.4f * Time.delta));
                         });
 
                         if(++i % 8 == 0) cs.row();
                     }
                 }).growX().minHeight(60f);
-            }*/
-        }).width(400f);
+            }
+        }
+
+
 
         dialog.show();
     }
 
-    private void githubImport(String branch, String repo, Cons<HttpStatus> err){
-        Core.net.httpGet("http://api.github.com/repos/" + repo + "/zipball/" + branch, loc -> {
-            Core.net.httpGet(loc.getHeader("Location"), result -> {
-                if(result.getStatus() != HttpStatus.OK){
-                    err.get(result.getStatus());
-                }else{
-                    try{
-                        Fi file = tmpDirectory.child(repo.replace("/", "") + ".zip");
-                        Streams.copy(result.getResultAsStream(), file.write(false));
-                        mods.importMod(file);
-                        file.delete();
-                        Core.app.post(() -> {
-                            try{
-                                setup();
-                                ui.loadfrag.hide();
-                            }catch(Throwable e){
-                                ui.showException(e);
-                            }
-                        });
-                    }catch(Throwable e){
-                        modError(e);
-                    }
+    private void handleMod(String repo, HttpResponse result){
+        try{
+            Fi file = tmpDirectory.child(repo.replace("/", "") + ".zip");
+            Streams.copy(result.getResultAsStream(), file.write(false));
+            mods.importMod(file);
+            file.delete();
+            Core.app.post(() -> {
+                try{
+                    setup();
+                    ui.loadfrag.hide();
+                }catch(Throwable e){
+                    ui.showException(e);
                 }
-             }, t2 -> Core.app.post(() -> modError(t2)));
+            });
+        }catch(Throwable e){
+            modError(e);
+        }
+    }
+
+    private void githubImportMod(String name){
+        //try several branches
+        //TODO use only the main branch as specified in meta
+        githubImportBranch("6.0", name, e1 -> {
+            githubImportBranch("master", name, e2 -> {
+                githubImportBranch("main", name, e3 -> {
+                    ui.showErrorMessage(Core.bundle.format("connectfail", e2));
+                    ui.loadfrag.hide();
+                });
+            });
+        });
+    }
+
+    private void githubImportBranch(String branch, String repo, Cons<HttpStatus> err){
+        Core.net.httpGet("https://api.github.com/repos/" + repo + "/zipball/" + branch, loc -> {
+            if(loc.getStatus() == HttpStatus.OK){
+                if(loc.getHeader("Location") != null){
+                    Core.net.httpGet(loc.getHeader("Location"), result -> {
+                        if(result.getStatus() != HttpStatus.OK){
+                            err.get(result.getStatus());
+                        }else{
+                            handleMod(repo, result);
+                        }
+                    }, t2 -> Core.app.post(() -> modError(t2)));
+                }else{
+                    handleMod(repo, loc);
+                }
+            }else{
+                err.get(loc.getStatus());
+            }
          }, t2 -> Core.app.post(() -> modError(t2)));
     }
 }

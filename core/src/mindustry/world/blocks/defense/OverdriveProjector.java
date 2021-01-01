@@ -8,6 +8,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -31,6 +32,7 @@ public class OverdriveProjector extends Block{
         super(name);
         solid = true;
         update = true;
+        group = BlockGroup.projectors;
         hasPower = true;
         hasItems = true;
         canOverdrive = false;
@@ -50,28 +52,35 @@ public class OverdriveProjector extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.speedIncrease, (int)(100f * speedBoost), StatUnit.percent);
-        stats.add(BlockStat.range, range / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.productionTime, useTime / 60f, StatUnit.seconds);
+        stats.add(Stat.speedIncrease, (int)(100f * speedBoost), StatUnit.percent);
+        stats.add(Stat.range, range / tilesize, StatUnit.blocks);
+        stats.add(Stat.productionTime, useTime / 60f, StatUnit.seconds);
 
         if(hasBoost){
-            stats.add(BlockStat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
-            stats.add(BlockStat.boostEffect, (int)((speedBoost + speedBoostPhase) * 100f), StatUnit.percent);
+            stats.add(Stat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
+            stats.add(Stat.boostEffect, (int)((speedBoost + speedBoostPhase) * 100f), StatUnit.percent);
         }
     }
 
-    public class OverdriveBuild extends Building{
+    public class OverdriveBuild extends Building implements Ranged{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
+        float smoothEfficiency;
+
+        @Override
+        public float range(){
+            return range;
+        }
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, 50f * efficiency(), baseColor, 0.7f * efficiency());
+            Drawf.light(team, x, y, 50f * smoothEfficiency, baseColor, 0.7f * smoothEfficiency);
         }
 
         @Override
         public void updateTile(){
+            smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency(), 0.08f);
             heat = Mathf.lerpDelta(heat, consValid() ? 1f : 0f, 0.08f);
             charge += heat * Time.delta;
 
@@ -105,10 +114,10 @@ public class OverdriveProjector extends Block{
         public void draw(){
             super.draw();
 
-            float f = 1f - (Time.time() / 100f) % 1f;
+            float f = 1f - (Time.time / 100f) % 1f;
 
             Draw.color(baseColor, phaseColor, phaseHeat);
-            Draw.alpha(heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
+            Draw.alpha(heat * Mathf.absin(Time.time, 10f, 1f) * 0.5f);
             Draw.rect(topRegion, x, y);
             Draw.alpha(1f);
             Lines.stroke((2f * f + 0.1f) * heat);

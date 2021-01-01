@@ -10,4 +10,14 @@ public interface ControlBlock{
     default boolean isControlled(){
         return unit().isPlayer();
     }
+
+    /** @return whether this block can be controlled at all. */
+    default boolean canControl(){
+        return true;
+    }
+
+    /** @return whether targets should automatically be selected (on mobile) */
+    default boolean shouldAutoTarget(){
+        return true;
+    }
 }

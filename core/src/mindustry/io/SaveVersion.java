@@ -40,7 +40,6 @@ public abstract class SaveVersion extends SaveFileReader{
             map.get("mapname"),
             map.getInt("wave"),
             JsonIO.read(Rules.class, map.get("rules", "{}")),
-            JsonIO.read(SectorInfo.class, map.get("secinfo", "{}")),
             map
         );
     }
@@ -73,7 +72,8 @@ public abstract class SaveVersion extends SaveFileReader{
     public void writeMeta(DataOutput stream, StringMap tags) throws IOException{
         //prepare campaign data for writing
         if(state.isCampaign()){
-            state.secinfo.prepare();
+            state.rules.sector.info.prepare();
+            state.rules.sector.saveInfo();
         }
 
         //flush tech node progress
@@ -89,7 +89,6 @@ public abstract class SaveVersion extends SaveFileReader{
             "wave", state.wave,
             "wavetime", state.wavetime,
             "stats", JsonIO.write(state.stats),
-            "secinfo", state.isCampaign() ? JsonIO.write(state.secinfo) : "{}",
             "rules", JsonIO.write(state.rules),
             "mods", JsonIO.write(mods.getModStrings().toArray(String.class)),
             "width", world.width(),
@@ -106,16 +105,10 @@ public abstract class SaveVersion extends SaveFileReader{
 
         state.wave = map.getInt("wave");
         state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
-        state.stats = JsonIO.read(Stats.class, map.get("stats", "{}"));
-        state.secinfo = JsonIO.read(SectorInfo.class, map.get("secinfo", "{}"));
+        state.stats = JsonIO.read(GameStats.class, map.get("stats", "{}"));
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
-        if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
+        if(state.rules.spawns.isEmpty()) state.rules.spawns = waves.get();
         lastReadBuild = map.getInt("build", -1);
-
-        //load time spent on sector into state
-        if(state.rules.sector != null){
-            state.secinfo.internalTimeSpent = state.rules.sector.getStoredTimeSpent();
-        }
 
         if(!headless){
             Tmp.v1.tryFromString(map.get("viewpos"));
@@ -257,7 +250,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
                 if(hadEntity){
                     if(isCenter){ //only read entity for center blocks
-                        if(block.hasEntity()){
+                        if(block.hasBuilding()){
                             try{
                                 readChunk(stream, true, in -> {
                                     byte revision = in.readByte();
@@ -270,6 +263,8 @@ public abstract class SaveVersion extends SaveFileReader{
                             //skip the entity region, as the entity and its IO code are now gone
                             skipChunk(stream, true);
                         }
+
+                        context.onReadBuilding();
                     }
                 }else if(hadData){
                     tile.setBlock(block);
@@ -291,7 +286,8 @@ public abstract class SaveVersion extends SaveFileReader{
 
     public void writeEntities(DataOutput stream) throws IOException{
         //write team data with entities.
-        Seq<TeamData> data = state.teams.getActive();
+        Seq<TeamData> data = state.teams.getActive().copy();
+        if(!data.contains(Team.sharded.data())) data.add(Team.sharded.data());
         stream.writeInt(data.size);
         for(TeamData team : data){
             stream.writeInt(team.team.id);
@@ -318,12 +314,23 @@ public abstract class SaveVersion extends SaveFileReader{
 
     public void readEntities(DataInput stream) throws IOException{
         int teamc = stream.readInt();
+
         for(int i = 0; i < teamc; i++){
             Team team = Team.get(stream.readInt());
             TeamData data = team.data();
             int blocks = stream.readInt();
+            data.blocks.clear();
+            data.blocks.ensureCapacity(Math.min(blocks, 1000));
+            var reads = Reads.get(stream);
+            var set = new IntSet();
+
             for(int j = 0; j < blocks; j++){
-                data.blocks.addLast(new BlockPlan(stream.readShort(), stream.readShort(), stream.readShort(), content.block(stream.readShort()).id, TypeIO.readObject(Reads.get(stream))));
+                short x = stream.readShort(), y = stream.readShort(), rot = stream.readShort(), bid = stream.readShort();
+                var obj = TypeIO.readObject(reads);
+                //cannot have two in the same position
+                if(set.add(Point2.pack(x, y))){
+                    data.blocks.addLast(new BlockPlan(x, y, rot, content.block(bid).id, obj));
+                }
             }
         }
 

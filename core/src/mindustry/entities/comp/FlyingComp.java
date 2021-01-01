@@ -1,14 +1,16 @@
 package mindustry.entities.comp;
 
+import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.environment.*;
 
-import static mindustry.Vars.net;
+import static mindustry.Vars.*;
 
 @Component
 abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
@@ -44,13 +46,13 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     }
 
     void wobble(){
-        x += Mathf.sin(Time.time() + id() * 99, 25f, 0.05f) * Time.delta * elevation;
-        y += Mathf.cos(Time.time() + id() * 99, 25f, 0.05f) * Time.delta * elevation;
+        x += Mathf.sin(Time.time + (id() % 10) * 12, 25f, 0.05f) * Time.delta * elevation;
+        y += Mathf.cos(Time.time + (id() % 10) * 12, 25f, 0.05f) * Time.delta * elevation;
     }
 
     void moveAt(Vec2 vector, float acceleration){
-        Vec2 t = tmp1.set(vector).scl(floorSpeedMultiplier()); //target vector
-        tmp2.set(t).sub(vel).limit(acceleration * vector.len() * Time.delta); //delta vector
+        Vec2 t = tmp1.set(vector); //target vector
+        tmp2.set(t).sub(vel).limit(acceleration * vector.len() * Time.delta * floorSpeedMultiplier()); //delta vector
         vel.add(tmp2);
     }
 
@@ -66,22 +68,26 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
         if(isFlying() != wasFlying){
             if(wasFlying){
                 if(tileOn() != null){
-                    Fx.unitLand.at(x, y, floorOn().isLiquid ? 1f : 0.5f, floorOn().mapColor);
+                    Fx.unitLand.at(x, y, floorOn().isLiquid ? 1f : 0.5f, tileOn().floor().mapColor);
                 }
             }
 
             wasFlying = isFlying();
         }
 
-        if(!hovering && isGrounded() && floor.isLiquid){
+        if(!hovering && isGrounded()){
             if((splashTimer += Mathf.dst(deltaX(), deltaY())) >= (7f + hitSize()/8f)){
                 floor.walkEffect.at(x, y, hitSize() / 8f, floor.mapColor);
                 splashTimer = 0f;
+
+                if(!(this instanceof WaterMovec)){
+                    floor.walkSound.at(x, y, Mathf.random(floor.walkSoundPitchMin, floor.walkSoundPitchMax), floor.walkSoundVolume);
+                }
             }
         }
 
         if(canDrown() && floor.isLiquid && floor.drownTime > 0){
-            drownTime += Time.delta * 1f / floor.drownTime;
+            drownTime += Time.delta / floor.drownTime;
             drownTime = Mathf.clamp(drownTime);
             if(Mathf.chanceDelta(0.05f)){
                 floor.drownUpdateEffect.at(x, y, 1f, floor.mapColor);
@@ -90,7 +96,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
             //TODO is the netClient check necessary?
             if(drownTime >= 0.999f && !net.client()){
                 kill();
-                //TODO drown event!
+                Events.fire(new UnitDrownEvent(self()));
             }
         }else{
             drownTime = Mathf.lerpDelta(drownTime, 0f, 0.03f);

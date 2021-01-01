@@ -1,9 +1,9 @@
 package mindustry.ui.dialogs;
 
-import arc.Core;
-import arc.scene.ui.TextButton;
-import arc.util.Time;
-import mindustry.game.Saves.SaveSlot;
+import arc.*;
+import arc.scene.ui.*;
+import arc.util.*;
+import mindustry.game.Saves.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;

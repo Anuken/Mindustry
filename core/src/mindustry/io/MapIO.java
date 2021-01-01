@@ -80,18 +80,11 @@ public class MapIO{
                 @Override
                 public void setBlock(Block type){
                     super.setBlock(type);
-                    int c = colorFor(Blocks.air, block(), Blocks.air, team());
+
+                    int c = colorFor(block(), Blocks.air, Blocks.air, team());
                     if(c != black){
                         walls.draw(x, floors.getHeight() - 1 - y, c);
                         floors.draw(x, floors.getHeight() - 1 - y + 1, shade);
-                    }
-                }
-
-                @Override
-                public void setTeam(Team team){
-                    super.setTeam(team);
-                    if(block instanceof CoreBlock){
-                        map.teams.add(team.id);
                     }
                 }
             };
@@ -108,6 +101,27 @@ public class MapIO{
                 }
 
                 @Override
+                public void onReadBuilding(){
+                    //read team colors
+                    if(tile.build != null){
+                        int c = tile.build.team.color.rgba8888();
+                        int size = tile.block().size;
+                        int offsetx = -(size - 1) / 2;
+                        int offsety = -(size - 1) / 2;
+                        for(int dx = 0; dx < size; dx++){
+                            for(int dy = 0; dy < size; dy++){
+                                int drawx = tile.x + dx + offsetx, drawy = tile.y + dy + offsety;
+                                walls.draw(drawx, floors.getHeight() - 1 - drawy, c);
+                            }
+                        }
+
+                        if(tile.build.block instanceof CoreBlock){
+                            map.teams.add(tile.build.team.id);
+                        }
+                    }
+                }
+
+                @Override
                 public Tile tile(int index){
                     tile.x = (short)(index % map.width);
                     tile.y = (short)(index / map.width);
@@ -119,7 +133,7 @@ public class MapIO{
                     if(overlayID != 0){
                         floors.draw(x, floors.getHeight() - 1 - y, colorFor(Blocks.air, Blocks.air, content.block(overlayID), Team.derelict));
                     }else{
-                        floors.draw(x, floors.getHeight() - 1 - y, colorFor(content.block(floorID), Blocks.air, Blocks.air, Team.derelict));
+                        floors.draw(x, floors.getHeight() - 1 - y, colorFor(Blocks.air, content.block(floorID), Blocks.air, Team.derelict));
                     }
                     if(content.block(overlayID) == Blocks.spawn){
                         map.spawns ++;
@@ -141,17 +155,17 @@ public class MapIO{
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
                 Tile tile = tiles.getn(x, y);
-                pixmap.draw(x, pixmap.getHeight() - 1 - y, colorFor(tile.floor(), tile.block(), tile.overlay(), tile.team()));
+                pixmap.draw(x, pixmap.getHeight() - 1 - y, colorFor(tile.block(), tile.floor(), tile.overlay(), tile.team()));
             }
         }
         return pixmap;
     }
 
-    public static int colorFor(Block floor, Block wall, Block ore, Team team){
+    public static int colorFor(Block wall, Block floor, Block overlay, Team team){
         if(wall.synthetic()){
             return team.color.rgba();
         }
-        return (wall.solid ? wall.mapColor : ore == Blocks.air ? floor.mapColor : ore.mapColor).rgba();
+        return (wall.solid ? wall.mapColor : !overlay.useColor ? floor.mapColor : overlay.mapColor).rgba();
     }
 
     public static Pixmap writeImage(Tiles tiles){

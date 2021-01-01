@@ -85,22 +85,29 @@ public class HostDialog extends BaseDialog{
                 player.admin(true);
 
                 if(steam){
-                    Core.app.post(() -> Core.settings.getBoolOnce("steampublic2", () -> {
+                    Core.app.post(() -> Core.settings.getBoolOnce("steampublic3", () -> {
                         ui.showCustomConfirm("@setting.publichost.name", "@public.confirm", "@yes", "@no", () -> {
-                            Core.settings.put("publichost", true);
-                            platform.updateLobby();
+                            ui.showCustomConfirm("@setting.publichost.name", "@public.confirm.really", "@no", "@yes", () -> {
+                                Core.settings.put("publichost", true);
+                                platform.updateLobby();
+                            }, () -> {
+                                Core.settings.put("publichost", false);
+                                platform.updateLobby();
+                            });
                         }, () -> {
                             Core.settings.put("publichost", false);
                             platform.updateLobby();
                         });
                     }));
+
+                    if(Version.modifier.contains("beta") || Version.modifier.contains("alpha")){
+                        Core.settings.put("publichost", false);
+                        platform.updateLobby();
+                        Core.settings.getBoolOnce("betapublic", () -> ui.showInfo("@public.beta"));
+                    }
                 }
 
-                if(Version.modifier.contains("beta")){
-                    Core.settings.put("publichost", false);
-                    platform.updateLobby();
-                    Core.settings.getBoolOnce("betapublic", () -> ui.showInfo("@public.beta"));
-                }
+
             }catch(IOException e){
                 ui.showException("@server.error", e);
             }

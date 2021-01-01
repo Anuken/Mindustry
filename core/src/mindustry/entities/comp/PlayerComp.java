@@ -6,7 +6,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -29,11 +28,11 @@ import static mindustry.Vars.*;
 @EntityDef(value = {Playerc.class}, serialize = false)
 @Component(base = true)
 abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Drawc{
-    static final float deathDelay = 30f;
+    static final float deathDelay = 60f;
 
     @Import float x, y;
 
-    @NonNull @ReadOnly Unit unit = Nulls.unit;
+    @ReadOnly Unit unit = Nulls.unit;
     transient private Unit lastReadUnit = Nulls.unit;
     transient @Nullable NetConnection con;
 
@@ -49,11 +48,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     transient float textFadeTime;
 
     public boolean isBuilder(){
-        return unit instanceof Builderc;
-    }
-
-    public boolean isMiner(){
-        return unit instanceof Minerc;
+        return unit.canBuild();
     }
 
     public @Nullable CoreBuild closestCore(){
@@ -79,8 +74,9 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         team = state.rules.defaultTeam;
         admin = typing = false;
         textFadeTime = 0f;
+        x = y = 0f;
         if(!dead()){
-            unit.controller(unit.type().createController());
+            unit.controller(unit.type.createController());
             unit = Nulls.unit;
         }
     }
@@ -92,7 +88,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Replace
     public float clipSize(){
-        return unit.isNull() ? 20 : unit.type().hitSize * 2f;
+        return unit.isNull() ? 20 : unit.type.hitSize * 2f;
     }
 
     @Override
@@ -124,13 +120,13 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             deathTimer = 0;
 
             //update some basic state to sync things
-            if(unit.type().canBoost){
+            if(unit.type.canBoost){
                 Tile tile = unit.tileOn();
                 unit.elevation = Mathf.approachDelta(unit.elevation, (tile != null && tile.solid()) || boosting ? 1f : 0f, 0.08f);
             }
         }else if(core != null){
             //have a small delay before death to prevent the camera from jumping around too quickly
-            //(this is not for balance)
+            //(this is not for balance, it just looks better this way)
             deathTimer += Time.delta;
             if(deathTimer >= deathDelay){
                 //request spawn - this happens serverside only
@@ -164,21 +160,13 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return unit;
     }
 
-    public Minerc miner(){
-        return !(unit instanceof Minerc) ? Nulls.miner : (Minerc)unit;
-    }
-
-    public Builderc builder(){
-        return !(unit instanceof Builderc) ? Nulls.builder : (Builderc)unit;
-    }
-
     public void unit(Unit unit){
         if(unit == null) throw new IllegalArgumentException("Unit cannot be null. Use clearUnit() instead.");
         if(this.unit == unit) return;
 
         if(this.unit != Nulls.unit){
             //un-control the old unit
-            this.unit.controller(this.unit.type().createController());
+            this.unit.controller(this.unit.type.createController());
         }
         this.unit = unit;
         if(unit != Nulls.unit){
@@ -188,6 +176,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             //this player just became remote, snap the interpolation so it doesn't go wild
             if(unit.isRemote()){
                 unit.snapInterpolation();
+            }
+
+            //reset selected block when switching units
+            if(!headless && isLocal()){
+                control.input.block = null;
             }
         }
 
@@ -250,7 +243,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         }
 
         if(Core.settings.getBool("playerchat") && ((textFadeTime > 0 && lastText != null) || typing)){
-            String text = textFadeTime <= 0 || lastText == null ? "[lightgray]" + Strings.animated(Time.time(), 4, 15f, ".") : lastText;
+            String text = textFadeTime <= 0 || lastText == null ? "[lightgray]" + Strings.animated(Time.time, 4, 15f, ".") : lastText;
             float width = 100f;
             float visualFadeTime = 1f - Mathf.curve(1f - textFadeTime, 0.9f);
             font.setColor(1f, 1f, 1f, textFadeTime <= 0 || lastText == null ? 1f : visualFadeTime);

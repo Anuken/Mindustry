@@ -10,6 +10,7 @@ import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.production.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -17,7 +18,7 @@ public class UnitBlock extends PayloadAcceptor{
 
     public UnitBlock(String name){
         super(name);
-
+        group = BlockGroup.units;
         outputsPayload = true;
         rotate = true;
         update = true;
@@ -26,8 +27,8 @@ public class UnitBlock extends PayloadAcceptor{
 
     @Remote(called = Loc.server)
     public static void unitBlockSpawn(Tile tile){
-        if(!(tile.build instanceof UnitBuild)) return;
-        tile.<UnitBuild>bc().spawned();
+        if(!(tile.build instanceof UnitBuild build)) return;
+        build.spawned();
     }
 
     public class UnitBuild extends PayloadAcceptorBuild<UnitPayload>{

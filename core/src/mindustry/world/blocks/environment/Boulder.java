@@ -1,11 +1,9 @@
 package mindustry.world.blocks.environment;
 
-import arc.Core;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Mathf;
-import mindustry.world.Block;
-import mindustry.world.Tile;
+import arc.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import mindustry.world.*;
 
 public class Boulder extends Block{
     protected int variants;
@@ -14,6 +12,8 @@ public class Boulder extends Block{
         super(name);
         breakable = true;
         alwaysReplace = true;
+        
+        deconstructThreshold = 0.35f;
     }
 
     @Override

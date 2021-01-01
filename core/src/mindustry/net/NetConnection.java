@@ -1,7 +1,6 @@
 package mindustry.net;
 
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;

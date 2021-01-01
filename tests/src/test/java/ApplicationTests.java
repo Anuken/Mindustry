@@ -36,7 +36,7 @@ public class ApplicationTests{
         try{
             boolean[] begins = {false};
             Throwable[] exceptionThrown = {null};
-            Log.setUseColors(false);
+            Log.useColors = false;
 
             ApplicationCore core = new ApplicationCore(){
                 @Override
@@ -58,6 +58,7 @@ public class ApplicationTests{
                     add(netServer = new NetServer());
 
                     content.init();
+
                 }
 
                 @Override
@@ -69,7 +70,7 @@ public class ApplicationTests{
                 }
             };
 
-            new HeadlessApplication(core, null, throwable -> exceptionThrown[0] = throwable);
+            new HeadlessApplication(core, throwable -> exceptionThrown[0] = throwable);
 
             while(!begins[0]){
                 if(exceptionThrown[0] != null){
@@ -77,6 +78,10 @@ public class ApplicationTests{
                 }
                 Thread.sleep(10);
             }
+
+
+            Block block = content.getByName(ContentType.block, "build2");
+            assertEquals("build2", block == null ? null : block.name, "2x2 construct block doesn't exist?");
         }catch(Throwable r){
             fail(r);
         }
@@ -145,7 +150,7 @@ public class ApplicationTests{
         tile.build.items.add(Items.coal, 5);
         tile.build.items.add(Items.titanium, 50);
         assertEquals(tile.build.items.total(), 55);
-        tile.build.items.remove(Items.phasefabric, 10);
+        tile.build.items.remove(Items.phaseFabric, 10);
         tile.build.items.remove(Items.titanium, 10);
         assertEquals(tile.build.items.total(), 45);
     }
@@ -235,10 +240,10 @@ public class ApplicationTests{
         world.loadMap(testMap);
         state.set(State.playing);
 
-        world.tile(0, 0).setBlock(Blocks.liquidSource);
+        world.tile(0, 0).setBlock(Blocks.liquidSource, Team.sharded);
         world.tile(0, 0).build.configureAny(Liquids.water);
 
-        world.tile(2, 1).setBlock(Blocks.liquidTank);
+        world.tile(2, 1).setBlock(Blocks.liquidTank, Team.sharded);
 
         updateBlocks(10);
 
@@ -253,14 +258,14 @@ public class ApplicationTests{
 
         Tile source = world.rawTile(0, 0), tank = world.rawTile(1, 4), junction = world.rawTile(0, 1), conduit = world.rawTile(0, 2);
 
-        source.setBlock(Blocks.liquidSource);
+        source.setBlock(Blocks.liquidSource, Team.sharded);
         source.build.configureAny(Liquids.water);
 
-        junction.setBlock(Blocks.liquidJunction);
+        junction.setBlock(Blocks.liquidJunction, Team.sharded);
 
-        conduit.setBlock(Blocks.conduit, Team.derelict, 1);
+        conduit.setBlock(Blocks.conduit, Team.sharded, 1);
 
-        tank.setBlock(Blocks.liquidTank);
+        tank.setBlock(Blocks.liquidTank, Team.sharded);
 
         updateBlocks(10);
 
@@ -364,13 +369,13 @@ public class ApplicationTests{
         world.loadMap(testMap);
         state.set(State.playing);
         int length = 128;
-        world.tile(0, 0).setBlock(Blocks.itemSource);
+        world.tile(0, 0).setBlock(Blocks.itemSource, Team.sharded);
         world.tile(0, 0).build.configureAny(Items.copper);
 
         Seq<Building> entities = Seq.with(world.tile(0, 0).build);
 
         for(int i = 0; i < length; i++){
-            world.tile(i + 1, 0).setBlock(Blocks.conveyor, Team.derelict, 0);
+            world.tile(i + 1, 0).setBlock(Blocks.conveyor, Team.sharded, 0);
             entities.add(world.tile(i + 1, 0).build);
         }
 
@@ -388,7 +393,7 @@ public class ApplicationTests{
                     return true;
                 }
             };
-        }});
+        }}, Team.sharded);
 
         entities.each(Building::updateProximity);
 
@@ -422,6 +427,24 @@ public class ApplicationTests{
 
         assertEquals(250, world.width());
         assertEquals(300, world.height());
+    }
+
+    @Test
+    void load108Save(){
+        resetWorld();
+        SaveIO.load(Core.files.internal("108.msav"));
+
+        assertEquals(256, world.width());
+        assertEquals(256, world.height());
+    }
+
+    @Test
+    void load114Save(){
+        resetWorld();
+        SaveIO.load(Core.files.internal("114.msav"));
+
+        assertEquals(500, world.width());
+        assertEquals(500, world.height());
     }
 
     @Test
@@ -478,8 +501,8 @@ public class ApplicationTests{
     void buildingOverlap(){
         initBuilding();
 
-        Builderc d1 = (Builderc)UnitTypes.poly.create(Team.sharded);
-        Builderc d2 = (Builderc)UnitTypes.poly.create(Team.sharded);
+        Unit d1 = UnitTypes.poly.create(Team.sharded);
+        Unit d2 = UnitTypes.poly.create(Team.sharded);
 
         //infinite build range
         state.rules.editor = true;
@@ -505,8 +528,8 @@ public class ApplicationTests{
     void buildingDestruction(){
         initBuilding();
 
-        Builderc d1 = (Builderc)UnitTypes.poly.create(Team.sharded);
-        Builderc d2 = (Builderc)UnitTypes.poly.create(Team.sharded);
+        Builderc d1 = UnitTypes.poly.create(Team.sharded);
+        Builderc d2 = UnitTypes.poly.create(Team.sharded);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
@@ -545,7 +568,7 @@ public class ApplicationTests{
 
     @Test
     void allBlockTest(){
-        Tiles tiles = world.resize(256*3 + 20, 10);
+        Tiles tiles = world.resize(256 * 3 + 20, 10);
 
         world.beginMapLoad();
         for(int x = 0; x < tiles.width; x++){
@@ -594,8 +617,9 @@ public class ApplicationTests{
     }
 
     void depositTest(Block block, Item item){
-        Unit unit = UnitTypes.mono.create(Team.derelict);
+        Unit unit = UnitTypes.mono.create(Team.sharded);
         Tile tile = new Tile(0, 0, Blocks.air, Blocks.air, block);
+        tile.setTeam(Team.sharded);
         int capacity = tile.block().itemCapacity;
 
         assertNotNull(tile.build, "Tile should have an entity, but does not: " + tile);

@@ -3,7 +3,7 @@ package mindustry.world.blocks.experimental;
 import mindustry.gen.*;
 import mindustry.type.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class BlockUnloader extends BlockLoader{
 
@@ -31,13 +31,13 @@ public class BlockUnloader extends BlockLoader{
 
                 //load up items
                 if(payload.block().hasItems && !full()){
-                    if(timer(timerLoad, loadTime)){
+                    if(efficiency() > 0.01f && timer(timerLoad, loadTime / efficiency())){
                         //load up items a set amount of times
                         for(int j = 0; j < itemsLoaded && !full(); j++){
                             for(int i = 0; i < items.length(); i++){
-                                if(payload.entity.items.get(i) > 0){
+                                if(payload.build.items.get(i) > 0){
                                     Item item = content.item(i);
-                                    payload.entity.items.remove(item, 1);
+                                    payload.build.items.remove(item, 1);
                                     items.add(item, 1);
                                     break;
                                 }
@@ -55,13 +55,8 @@ public class BlockUnloader extends BlockLoader{
         }
 
         @Override
-        public float fraction(){
-            return payload == null ? 0f : 1f - payload.entity.items.total() / (float)payload.entity.block.itemCapacity;
-        }
-
-        @Override
         public boolean shouldExport(){
-            return payload != null && (payload.block().hasItems && payload.entity.items.empty());
+            return payload != null && (payload.block().hasItems && payload.build.items.empty());
         }
     }
 }

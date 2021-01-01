@@ -36,7 +36,7 @@ public class DesktopLauncher extends ClientLauncher{
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
                 title = "Mindustry";
                 maximized = true;
-                stencil = 8;
+                stencil = 1;
                 width = 900;
                 height = 700;
                 setWindowIcon(FileType.internal, "icons/icon_64.png");
@@ -125,9 +125,11 @@ public class DesktopLauncher extends ClientLauncher{
         boolean[] isShutdown = {false};
 
         Events.on(ClientLoadEvent.class, event -> {
-            player.name(SVars.net.friends.getPersonaName());
             Core.settings.defaults("name", SVars.net.friends.getPersonaName());
-            Core.settings.put("name", player.name);
+            if(player.name.isEmpty()){
+                player.name = SVars.net.friends.getPersonaName();
+                Core.settings.put("name", player.name);
+            }
             //update callbacks
             Core.app.addListener(new ApplicationListener(){
                 @Override
@@ -167,7 +169,7 @@ public class DesktopLauncher extends ClientLauncher{
     static void handleCrash(Throwable e){
         Cons<Runnable> dialog = Runnable::run;
         boolean badGPU = false;
-        String finalMessage = Strings.getFinalMesage(e);
+        String finalMessage = Strings.getFinalMessage(e);
         String total = Strings.getCauses(e).toString();
 
         if(total.contains("Couldn't create window") || total.contains("OpenGL 2.0 or higher") || total.toLowerCase().contains("pixel format") || total.contains("GLEW")|| total.contains("unsupported combination of formats")){
@@ -227,7 +229,9 @@ public class DesktopLauncher extends ClientLauncher{
 
     @Override
     public void updateLobby(){
-        SVars.net.updateLobby();
+        if(SVars.net != null){
+            SVars.net.updateLobby();
+        }
     }
 
     @Override
@@ -244,7 +248,7 @@ public class DesktopLauncher extends ClientLauncher{
 
         if(inGame){
             //TODO implement nice name for sector
-            gameMapWithWave = Strings.capitalize(state.map.name());
+            gameMapWithWave = Strings.capitalize(Strings.stripColors(state.map.name()));
 
             if(state.rules.waves){
                 gameMapWithWave += " | Wave " + state.wave;

@@ -2,8 +2,6 @@ package mindustry.type;
 
 import arc.func.*;
 import arc.graphics.g2d.*;
-import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -11,18 +9,24 @@ import mindustry.maps.generators.*;
 import mindustry.ui.*;
 
 public class SectorPreset extends UnlockableContent{
-    public @NonNull FileMapGenerator generator;
-    public @NonNull Planet planet;
-    public @NonNull Sector sector;
+    public FileMapGenerator generator;
+    public Planet planet;
+    public Sector sector;
 
     public int captureWave = 0;
     public Cons<Rules> rules = rules -> rules.winWave = captureWave;
+    public boolean useAI = true;
+    /** Difficulty, 0-10. */
+    public float difficulty;
+    public boolean addStartingItems = false;
 
     public SectorPreset(String name, Planet planet, int sector){
         super(name);
-        this.generator = new FileMapGenerator(name);
+        this.generator = new FileMapGenerator(name, this);
         this.planet = planet;
+        sector %= planet.sectors.size;
         this.sector = planet.sectors.get(sector);
+        inlineDescription = false;
 
         planet.preset(sector, this);
     }
@@ -34,12 +38,7 @@ public class SectorPreset extends UnlockableContent{
 
     @Override
     public boolean isHidden(){
-        return true;
-    }
-
-    //neither of these are implemented, as zones are not displayed in a normal fashion... yet
-    @Override
-    public void displayInfo(Table table){
+        return description == null;
     }
 
     @Override

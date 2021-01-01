@@ -1,8 +1,8 @@
 package mindustry.world.blocks.power;
 
-import arc.func.Boolf;
+import arc.func.*;
 import mindustry.gen.*;
-import mindustry.world.consumers.ConsumePower;
+import mindustry.world.consumers.*;
 
 /** A power consumer that only activates sometimes. */
 public class ConditionalConsumePower extends ConsumePower{

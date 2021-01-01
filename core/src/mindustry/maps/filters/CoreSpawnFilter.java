@@ -5,7 +5,7 @@ import arc.util.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
 
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 /** Selects X spawns from the core spawn pool.*/
 public class CoreSpawnFilter extends GenerateFilter{

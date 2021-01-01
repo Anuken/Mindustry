@@ -182,9 +182,14 @@ class Image{
     void draw(TextureRegion region, int x, int y, boolean flipx, boolean flipy){
         GenRegion.validate(region);
 
+        draw(ImagePacker.get(region), x, y, flipx, flipy);
+    }
+
+    void draw(Image region, int x, int y, boolean flipx, boolean flipy){
+
         int ofx = 0, ofy = 0;
 
-        graphics.drawImage(ImagePacker.get(region).image,
+        graphics.drawImage(region.image,
         x, y,
         x + region.width,
         y + region.height,

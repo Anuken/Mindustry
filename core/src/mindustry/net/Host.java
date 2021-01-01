@@ -1,6 +1,6 @@
 package mindustry.net;
 
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.game.*;
 

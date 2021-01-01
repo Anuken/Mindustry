@@ -6,6 +6,8 @@ import mindustry.gen.*;
 public enum RadarSort{
     distance((pos, other) -> -pos.dst2(other)),
     health((pos, other) -> other.health()),
+    shield((pos, other) -> other.shield()),
+    armor((pos, other) -> other.armor()),
     maxHealth((pos, other) -> other.maxHealth());
 
     public final RadarSortFunc func;
@@ -17,6 +19,6 @@ public enum RadarSort{
     }
 
     public interface RadarSortFunc{
-        float get(Position pos, Healthc other);
+        float get(Position pos, Unit other);
     }
 }

@@ -5,7 +5,7 @@ import arc.math.*;
 import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;

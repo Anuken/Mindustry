@@ -1,8 +1,8 @@
 package mindustry.content;
 
-import arc.graphics.Color;
-import mindustry.ctype.ContentList;
-import mindustry.type.Liquid;
+import arc.graphics.*;
+import mindustry.ctype.*;
+import mindustry.type.*;
 
 public class Liquids implements ContentList{
     public static Liquid water, slag, oil, cryofluid;
@@ -12,13 +12,13 @@ public class Liquids implements ContentList{
 
         water = new Liquid("water", Color.valueOf("596ab8")){{
             heatCapacity = 0.4f;
-            effect = StatusEffects.wet;
             alwaysUnlocked = true;
+            effect = StatusEffects.wet;
         }};
 
         slag = new Liquid("slag", Color.valueOf("ffa166")){{
             temperature = 1f;
-            viscosity = 0.8f;
+            viscosity = 0.7f;
             effect = StatusEffects.melting;
             lightColor = Color.valueOf("f0511d").a(0.4f);
         }};

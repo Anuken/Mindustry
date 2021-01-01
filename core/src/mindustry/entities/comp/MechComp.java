@@ -25,7 +25,7 @@ abstract class MechComp implements Posc, Flyingc, Hitboxc, Unitc, Mechc, Elevati
     @Override
     public void update(){
         //trigger animation only when walking manually
-        if(walked){
+        if(walked || net.client()){
             float len = deltaLen();
             baseRotation = Angles.moveToward(baseRotation, deltaAngle(), type().baseRotateSpeed * Mathf.clamp(len / type().speed / Time.delta) * Time.delta);
             walkTime += len;
@@ -39,7 +39,7 @@ abstract class MechComp implements Posc, Flyingc, Hitboxc, Unitc, Mechc, Elevati
 
         float lastExtend = walkExtension;
 
-        if(extendScl < lastExtend && base % 2f > 1f){
+        if(extendScl < lastExtend && base % 2f > 1f && !isFlying()){
             int side = -Mathf.sign(extend);
             float width = hitSize / 2f * side, length = type.mechStride * 1.35f;
 
@@ -79,6 +79,14 @@ abstract class MechComp implements Posc, Flyingc, Hitboxc, Unitc, Mechc, Elevati
     @Override
     public void moveAt(Vec2 vector, float acceleration){
         if(!vector.isZero()){
+            //mark walking state when moving in a controlled manner
+            walked = true;
+        }
+    }
+
+    @Override
+    public void approach(Vec2 vector){
+        if(!vector.isZero(0.09f)){
             //mark walking state when moving in a controlled manner
             walked = true;
         }

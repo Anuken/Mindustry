@@ -1,6 +1,7 @@
 package mindustry.graphics;
 
 import arc.*;
+import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
@@ -8,7 +9,6 @@ import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.type.*;
 
@@ -17,10 +17,11 @@ import static mindustry.Vars.*;
 public class Shaders{
     public static BlockBuild blockbuild;
     public static @Nullable ShieldShader shield;
+    public static BuildBeamShader buildBeam;
     public static UnitBuild build;
     public static DarknessShader darkness;
     public static LightShader light;
-    public static SurfaceShader water, mud, tar, slag;
+    public static SurfaceShader water, mud, tar, slag, space;
     public static PlanetShader planet;
     public static PlanetGridShader planetGrid;
     public static AtmosphereShader atmosphere;
@@ -38,6 +39,7 @@ public class Shaders{
             shield = null;
             t.printStackTrace();
         }
+        buildBeam = new BuildBeamShader();
         build = new UnitBuild();
         darkness = new DarknessShader();
         light = new LightShader();
@@ -45,6 +47,7 @@ public class Shaders{
         mud = new SurfaceShader("mud");
         tar = new SurfaceShader("tar");
         slag = new SurfaceShader("slag");
+        space = new SpaceShader("space");
         planet = new PlanetShader();
         planetGrid = new PlanetGridShader();
         atmosphere = new AtmosphereShader();
@@ -66,13 +69,13 @@ public class Shaders{
         public void apply(){
             setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
 
-            setUniformf("u_time", Time.globalTime() / 10f);
+            setUniformf("u_time", Time.globalTime / 10f);
             setUniformf("u_campos", camera.position);
             setUniformf("u_rcampos", Tmp.v31.set(camera.position).sub(planet.position));
             setUniformf("u_light", planet.getLightNormal());
             setUniformf("u_color", planet.atmosphereColor.r, planet.atmosphereColor.g, planet.atmosphereColor.b);
-            setUniformf("u_innerRadius", planet.radius + 0.02f);
-            setUniformf("u_outerRadius", planet.radius * 1.3f);
+            setUniformf("u_innerRadius", planet.radius + planet.atmosphereRadIn);
+            setUniformf("u_outerRadius", planet.radius + planet.atmosphereRadOut);
 
             setUniformMatrix4("u_model", planet.getTransform(mat).val);
             setUniformMatrix4("u_projection", camera.combined.val);
@@ -155,12 +158,11 @@ public class Shaders{
             setUniformf("u_progress", progress);
             setUniformf("u_uv", region.u, region.v);
             setUniformf("u_uv2", region.u2, region.v2);
-            setUniformf("u_texsize", region.texture.getWidth(), region.texture.height);
+            setUniformf("u_texsize", region.texture.width, region.texture.height);
         }
     }
 
     public static class BlockBuild extends LoadShader{
-        public Color color = new Color();
         public float progress;
         public TextureRegion region = new TextureRegion();
 
@@ -171,11 +173,10 @@ public class Shaders{
         @Override
         public void apply(){
             setUniformf("u_progress", progress);
-            setUniformf("u_color", color);
             setUniformf("u_uv", region.u, region.v);
             setUniformf("u_uv2", region.u2, region.v2);
-            setUniformf("u_time", Time.time());
-            setUniformf("u_texsize", region.texture.getWidth(), region.texture.height);
+            setUniformf("u_time", Time.time);
+            setUniformf("u_texsize", region.texture.width, region.texture.height);
         }
     }
 
@@ -188,7 +189,25 @@ public class Shaders{
         @Override
         public void apply(){
             setUniformf("u_dp", Scl.scl(1f));
-            setUniformf("u_time", Time.time() / Scl.scl(1f));
+            setUniformf("u_time", Time.time / Scl.scl(1f));
+            setUniformf("u_offset",
+                Core.camera.position.x - Core.camera.width / 2,
+                Core.camera.position.y - Core.camera.height / 2);
+            setUniformf("u_texsize", Core.camera.width, Core.camera.height);
+            setUniformf("u_invsize", 1f/Core.camera.width, 1f/Core.camera.height);
+        }
+    }
+
+    public static class BuildBeamShader extends LoadShader{
+
+        public BuildBeamShader(){
+            super("buildbeam", "screenspace");
+        }
+
+        @Override
+        public void apply(){
+            setUniformf("u_dp", Scl.scl(1f));
+            setUniformf("u_time", Time.time / Scl.scl(1f));
             setUniformf("u_offset",
             Core.camera.position.x - Core.camera.width / 2,
             Core.camera.position.y - Core.camera.height / 2);
@@ -197,11 +216,46 @@ public class Shaders{
         }
     }
 
-    public static class SurfaceShader extends LoadShader{
+    //seed: 8kmfuix03fw
+    public static class SpaceShader extends SurfaceShader{
+        Texture texture;
 
+        public SpaceShader(String frag){
+            super(frag);
+
+            Core.assets.load("sprites/space.png", Texture.class).loaded = t -> {
+                texture = (Texture)t;
+                texture.setFilter(TextureFilter.linear);
+                texture.setWrap(TextureWrap.mirroredRepeat);
+            };
+        }
+
+        @Override
+        public void apply(){
+            setUniformf("u_campos", Core.camera.position.x, Core.camera.position.y);
+            setUniformf("u_ccampos", Core.camera.position);
+            setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
+            setUniformf("u_time", Time.time);
+
+            texture.bind(1);
+            renderer.effectBuffer.getTexture().bind(0);
+
+            setUniformi("u_stars", 1);
+        }
+    }
+
+    public static class SurfaceShader extends Shader{
         public SurfaceShader(String frag){
-            super(frag, "screenspace");
+            super(getShaderFi("screenspace.vert"), getShaderFi(frag + ".frag"));
+            loadNoise();
+        }
 
+        public SurfaceShader(String vertRaw, String fragRaw){
+            super(vertRaw, fragRaw);
+            loadNoise();
+        }
+
+        public void loadNoise(){
             Core.assets.load("sprites/noise.png", Texture.class).loaded = t -> {
                 ((Texture)t).setFilter(TextureFilter.linear);
                 ((Texture)t).setWrap(TextureWrap.repeat);
@@ -212,7 +266,7 @@ public class Shaders{
         public void apply(){
             setUniformf("u_campos", Core.camera.position.x - Core.camera.width / 2, Core.camera.position.y - Core.camera.height / 2);
             setUniformf("u_resolution", Core.camera.width, Core.camera.height);
-            setUniformf("u_time", Time.time());
+            setUniformf("u_time", Time.time);
 
             if(hasUniform("u_noise")){
                 Core.assets.get("sprites/noise.png", Texture.class).bind(1);
@@ -224,9 +278,12 @@ public class Shaders{
     }
 
     public static class LoadShader extends Shader{
-
         public LoadShader(String frag, String vert){
-            super(Core.files.internal("shaders/" + vert + ".vert").readString(), Core.files.internal("shaders/" + frag + ".frag").readString());
+            super(getShaderFi(vert + ".vert"), getShaderFi(frag + ".frag"));
         }
+    }
+
+    public static Fi getShaderFi(String file){
+        return Core.files.internal("shaders/" + file);
     }
 }

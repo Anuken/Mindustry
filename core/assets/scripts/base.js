@@ -1,28 +1,46 @@
 "use strict";
 
-const log = function(context, obj){
-    Vars.mods.getScripts().log(context, String(obj))
+function log(context, obj){
+    Vars.mods.scripts.log(context, String(obj))
 }
 
-const readString = path => Vars.mods.getScripts().readString(path)
-const readBytes = path => Vars.mods.getScripts().readBytes(path)
-const loadMusic = path => Vars.mods.getScripts().loadMusic(path)
-const loadSound = path => Vars.mods.getScripts().loadSound(path)
+const readString = path => Vars.mods.scripts.readString(path)
+const readBytes = path => Vars.mods.scripts.readBytes(path)
+const loadMusic = path => Vars.mods.scripts.loadMusic(path)
+const loadSound = path => Vars.mods.scripts.loadSound(path)
 
-var scriptName = "base.js"
-var modName = "none"
+const readFile = (purpose, ext, cons) => Vars.mods.scripts.readFile(purpose, ext, cons);
+const readBinFile = (purpose, ext, cons) => Vars.mods.scripts.readBinFile(purpose, ext, cons);
+const writeFile = (purpose, ext, str) => Vars.mods.scripts.writeFile(purpose, ext, str);
+const writeBinFile = (purpose, ext, bytes) => Vars.mods.scripts.writeBinFile(purpose, ext, bytes);
+
+let scriptName = "base.js"
+let modName = "none"
 
 const print = text => log(modName + "/" + scriptName, text);
 
-const extendContent = function(classType, name, params){
-    return new JavaAdapter(classType, params, name)
+//js 'extend(Base, ..., {})' = java 'new Base(...) {}'
+function extend(/*Base, ..., def*/){
+    const Base = arguments[0]
+    const def = arguments[arguments.length - 1]
+    //swap order from Base, def, ... to Base, ..., def
+    const args = [Base, def].concat(Array.from(arguments).splice(1, arguments.length - 2))
+
+    //forward constructor arguments to new JavaAdapter
+    const instance = JavaAdapter.apply(null, args)
+    //JavaAdapter only overrides functions; set fields too
+    for(var i in def){
+        if(typeof(def[i]) != "function"){
+            instance[i] = def[i]
+        }
+    }
+    return instance
 }
 
-const extend = function(classType, params){
-    return new JavaAdapter(classType, params)
-}
+//For backwards compatibility, use extend instead
+const extendContent = extend;
 
-//these are not sctrictly necessary, but are kept for edge cases
+//these are not strictly necessary, but are kept for edge cases
 const run = method => new java.lang.Runnable(){run: method}
 const boolf = method => new Boolf(){get: method}
 const boolp = method => new Boolp(){get: method}
@@ -32,5 +50,5 @@ const cons = method => new Cons(){get: method}
 const prov = method => new Prov(){get: method}
 const func = method => new Func(){get: method}
 
-const newEffect = (lifetime, renderer) => new Effects.Effect(lifetime, new Effects.EffectRenderer({render: renderer}))
+const newEffect = (lifetime, renderer) => new Effect.Effect(lifetime, new Effect.EffectRenderer({render: renderer}))
 Call = Packages.mindustry.gen.Call

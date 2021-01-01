@@ -3,7 +3,6 @@ package mindustry.entities.bullet;
 import arc.audio.*;
 import arc.graphics.*;
 import arc.math.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -14,6 +13,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
@@ -25,6 +25,7 @@ public abstract class BulletType extends Content{
     public float drawSize = 40f;
     public float drag = 0f;
     public boolean pierce, pierceBuilding;
+    public int pierceCap = -1;
     public Effect hitEffect, despawnEffect;
 
     /** Effect created when shooting. */
@@ -40,7 +41,7 @@ public abstract class BulletType extends Content{
     /** Multiplied by turret reload speed to get final shoot speed. */
     public float reloadMultiplier = 1f;
     /** Multiplier of how much base damage is done to tiles. */
-    public float tileDamageMultiplier = 1f;
+    public float buildingDamageMultiplier = 1f;
     /** Recoil from shooter entities. */
     public float recoil;
     /** Whether to kill the shooter when this is shot. For suicide bombers. */
@@ -71,15 +72,25 @@ public abstract class BulletType extends Content{
     public boolean hittable = true;
     /** Whether this bullet can be reflected. */
     public boolean reflectable = true;
+    /** Whether this projectile can be absorbed by shields. */
+    public boolean absorbable = true;
+    /** Whether to move the bullet back depending on delta to fix some delta-time realted issues.
+     * Do not change unless you know what you're doing. */
+    public boolean backMove = true;
     /** Bullet range override. */
-    public float range = -1f;
+    public float maxRange = -1f;
+    /** % of block health healed **/
+    public float healPercent = 0f;
+    /** whether to make fire on impact */
+    public boolean makeFire = false;
 
     //additional effects
 
     public float fragCone = 360f;
+    public float fragAngle = 0f;
     public int fragBullets = 9;
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
-    public BulletType fragBullet = null;
+    public @Nullable BulletType fragBullet = null;
     public Color hitColor = Color.white;
 
     public Color trailColor = Pal.missileYellowBack;
@@ -95,12 +106,18 @@ public abstract class BulletType extends Content{
     public float incendChance = 1f;
     public float homingPower = 0f;
     public float homingRange = 50f;
+    /** Use a negative value to disable homing delay. */
+    public float homingDelay = -1f;
 
     public Color lightningColor = Pal.surge;
     public int lightning;
     public int lightningLength = 5, lightningLengthRand = 0;
     /** Use a negative value to use default bullet damage. */
     public float lightningDamage = -1;
+    public float lightningCone = 360f;
+    public float lightningAngle = 0f;
+    /** The bullet created at lightning points. */
+    public @Nullable BulletType lightningType = null;
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
@@ -126,17 +143,37 @@ public abstract class BulletType extends Content{
         this(1f, 1f);
     }
 
+    /** @return estimated damage per shot. this can be very inaccurate. */
+    public float estimateDPS(){
+        float sum = damage + splashDamage*0.75f;
+        if(fragBullet != null && fragBullet != this){
+            sum += fragBullet.estimateDPS() * fragBullets / 2f;
+        }
+        return sum;
+    }
+
     /** Returns maximum distance the bullet this bullet type has can travel. */
     public float range(){
-        return Math.max(speed * lifetime * (1f - drag), range);
+        return Math.max(speed * lifetime * (1f - drag), maxRange);
     }
 
-    public boolean collides(Bullet bullet, Building tile){
-        return true;
+    public boolean testCollision(Bullet bullet, Building tile){
+        return healPercent <= 0.001f || tile.team != bullet.team || tile.healthf() < 1f;
     }
 
-    public void hitTile(Bullet b, Building tile, float initialHealth){
-        hit(b);
+    /** If direct is false, this is an indirect hit and the tile was already damaged.
+     * TODO this is a mess. */
+    public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
+        if(makeFire && build.team != b.team){
+            Fires.create(build.tile);
+        }
+
+        if(healPercent > 0f && build.team == b.team && !(build.block instanceof ConstructBlock)){
+            Fx.healBlockFull.at(build.x, build.y, build.block.size, Pal.heal);
+            build.heal(healPercent / 100f * build.maxHealth());
+        }else if(build.team != b.team && direct){
+            hit(b);
+        }
     }
 
     public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
@@ -156,7 +193,7 @@ public abstract class BulletType extends Content{
         if(fragBullet != null){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
-                float a = b.rotation() + Mathf.range(fragCone/2);
+                float a = b.rotation() + Mathf.range(fragCone/2) + fragAngle;
                 fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }
         }
@@ -172,16 +209,29 @@ public abstract class BulletType extends Content{
             Damage.createIncend(x, y, incendSpread, incendAmount);
         }
 
-        if(splashDamageRadius > 0){
+        if(splashDamageRadius > 0 && !b.absorbed){
             Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
 
             if(status != StatusEffects.none){
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
             }
+
+            if(healPercent > 0f){
+                indexer.eachBlock(b.team, x, y, splashDamageRadius, Building::damaged, other -> {
+                    Fx.healBlockFull.at(other.x, other.y, other.block.size, Pal.heal);
+                    other.heal(healPercent / 100f * other.maxHealth());
+                });
+            }
+
+            if(makeFire){
+                indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> {
+                    Fires.create(other.tile);
+                });
+            }
         }
 
         for(int i = 0; i < lightning; i++){
-            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, Mathf.random(360f), lightningLength + Mathf.random(lightningLengthRand));
+            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone/2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
         }
     }
 
@@ -204,17 +254,18 @@ public abstract class BulletType extends Content{
     }
 
     public void init(Bullet b){
-        if(killShooter && b.owner() instanceof Healthc){
-            ((Healthc)b.owner()).kill();
+
+        if(killShooter && b.owner() instanceof Healthc h){
+            h.kill();
         }
 
         if(instantDisappear){
-            b.time(lifetime);
+            b.time = lifetime;
         }
     }
 
     public void update(Bullet b){
-        if(homingPower > 0.0001f){
+        if(homingPower > 0.0001f && b.time >= homingDelay){
             Teamc target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
             if(target != null){
                 b.vel.setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), homingPower));
@@ -222,13 +273,26 @@ public abstract class BulletType extends Content{
         }
 
         if(weaveMag > 0){
-            b.vel.rotate(Mathf.sin(Mathf.randomSeed(b.id, 10f) + b.time, weaveScale, weaveMag) * Time.delta);
+            float scl = Mathf.randomSeed(id, 0.9f, 1.1f);
+            b.vel.rotate(Mathf.sin(b.time + Mathf.PI * weaveScale/2f * scl, weaveScale * scl, weaveMag) * Time.delta);
         }
 
         if(trailChance > 0){
             if(Mathf.chanceDelta(trailChance)){
                 trailEffect.at(b.x, b.y, trailParam, trailColor);
             }
+        }
+    }
+
+    @Override
+    public void init(){
+        if(pierceCap >= 1){
+            pierce = true;
+            //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
+        }
+
+        if(lightningType == null){
+            lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
         }
     }
 
@@ -254,11 +318,11 @@ public abstract class BulletType extends Content{
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle){
-        return create(parent.owner(), parent.team, x, y, angle);
+        return create(parent.owner, parent.team, x, y, angle);
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl, float lifeScale){
-        return create(parent.owner(), parent.team, x, y, angle, velocityScl, lifeScale);
+        return create(parent.owner, parent.team, x, y, angle, velocityScl, lifeScale);
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){
@@ -271,15 +335,19 @@ public abstract class BulletType extends Content{
         bullet.owner = owner;
         bullet.team = team;
         bullet.vel.trns(angle, speed * velocityScl);
-        bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
+        if(backMove){
+            bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
+        }else{
+            bullet.set(x, y);
+        }
         bullet.lifetime = lifetime * lifetimeScl;
         bullet.data = data;
         bullet.drag = drag;
         bullet.hitSize = hitSize;
-        bullet.damage = damage < 0 ? this.damage : damage;
+        bullet.damage = (damage < 0 ? this.damage : damage) * bullet.damageMultiplier();
         bullet.add();
 
-        if(keepVelocity && owner instanceof Velc) bullet.vel.add(((Velc)owner).vel().x, ((Velc)owner).vel().y);
+        if(keepVelocity && owner instanceof Velc v) bullet.vel.add(v.vel().x, v.vel().y);
         return bullet;
     }
 
@@ -289,6 +357,7 @@ public abstract class BulletType extends Content{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void createBullet(BulletType type, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
+        if(type == null) return;
         type.create(null, team, x, y, angle, damage, velocityScl, lifetimeScl, null);
     }
 }

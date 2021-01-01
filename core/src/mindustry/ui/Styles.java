@@ -1,7 +1,6 @@
 package mindustry.ui;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
@@ -16,6 +15,7 @@ import arc.scene.ui.ScrollPane.*;
 import arc.scene.ui.Slider.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.TextField.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
@@ -23,10 +23,11 @@ import static mindustry.gen.Tex.*;
 
 @StyleDefaults
 public class Styles{
+    //TODO all these names are inconsistent and not descriptive
     public static Drawable black, black9, black8, black6, black3, black5, none, flatDown, flatOver;
-    public static ButtonStyle defaultb, waveb;
-    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, infot, clearPartialt, clearTogglet, clearToggleMenut, togglet, transt, fullTogglet, logict;
-    public static ImageButtonStyle defaulti, nodei, righti, emptyi, emptytogglei, selecti, logici, geni, colori, cleari, clearFulli, clearPartiali, clearPartial2i, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
+    public static ButtonStyle defaultb, waveb, modsb;
+    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, nonet, infot, clearPartialt, clearTogglet, clearToggleMenut, togglet, transt, fullTogglet, logict;
+    public static ImageButtonStyle defaulti, nodei, righti, emptyi, emptytogglei, selecti, logici, geni, colori, accenti, cleari, clearFulli, clearPartiali, clearPartial2i, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
     public static ScrollPaneStyle defaultPane, horizontalPane, smallPane;
     public static KeybindDialogStyle defaultKeybindDialog;
     public static SliderStyle defaultSlider, vSlider;
@@ -51,6 +52,12 @@ public class Styles{
             up = button;
             over = buttonOver;
             disabled = buttonDisabled;
+        }};
+
+        modsb = new ButtonStyle(){{
+            down = flatOver;
+            up = underline;
+            over = underlineWhite;
         }};
         
         waveb = new ButtonStyle(){{
@@ -84,6 +91,13 @@ public class Styles{
             disabledFontColor = Color.gray;
             up = buttonOver;
             over = buttonDown;
+        }};
+        nonet = new TextButtonStyle(){{
+            font = Fonts.outline;
+            fontColor = Color.lightGray;
+            overFontColor = Pal.accent;
+            disabledFontColor = Color.gray;
+            up = none;
         }};
         cleart = new TextButtonStyle(){{
             over = flatOver;
@@ -211,6 +225,11 @@ public class Styles{
         colori = new ImageButtonStyle(){{
             //imageDownColor = Pal.accent;
             imageUpColor = Color.white;
+        }};
+        accenti = new ImageButtonStyle(){{
+            //imageDownColor = Pal.accent;
+            imageUpColor = Color.lightGray;
+            imageDownColor = Color.white;
         }};
         cleari = new ImageButtonStyle(){{
             down = flatOver;

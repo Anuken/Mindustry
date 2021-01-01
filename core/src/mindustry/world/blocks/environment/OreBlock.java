@@ -1,15 +1,15 @@
 package mindustry.world.blocks.environment;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 /**An overlay ore for a specific item type.*/
 public class OreBlock extends OverlayFloor{
@@ -20,6 +20,7 @@ public class OreBlock extends OverlayFloor{
         this.itemDrop = ore;
         this.variants = 3;
         this.mapColor.set(ore.color);
+        this.useColor = true;
     }
 
     /** For mod use only!*/

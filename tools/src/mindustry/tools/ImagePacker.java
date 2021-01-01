@@ -28,10 +28,10 @@ public class ImagePacker{
         Vars.headless = true;
         ArcNativesLoader.load();
 
-        Log.setLogger(new NoopLogHandler());
+        Log.logger = new NoopLogHandler();
         Vars.content = new ContentLoader();
         Vars.content.createBaseContent();
-        Log.setLogger(new DefaultLogHandler());
+        Log.logger = new DefaultLogHandler();
 
         Fi.get("../../../assets-raw/sprites_out").walk(path -> {
             if(!path.extEquals("png")) return;

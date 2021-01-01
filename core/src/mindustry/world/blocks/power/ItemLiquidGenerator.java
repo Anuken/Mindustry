@@ -72,7 +72,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
         super.setStats();
 
         if(hasItems){
-            stats.add(BlockStat.productionTime, itemDuration / 60f, StatUnit.seconds);
+            stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
     }
 
@@ -98,7 +98,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
             //Power amount is delta'd by PowerGraph class already.
             float calculationDelta = delta();
 
-            heat = Mathf.lerpDelta(heat, generateTime >= 0.001f ? 1f : 0f, 0.05f);
+            heat = Mathf.lerpDelta(heat, generateTime >= 0.001f && enabled ? 1f : 0f, 0.05f);
 
             if(!consValid()){
                 productionEfficiency = 0.0f;
@@ -159,16 +159,13 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
             if(hasItems){
                 Draw.color(heatColor);
-                Draw.alpha(heat * 0.4f + Mathf.absin(Time.time(), 8f, 0.6f) * heat);
+                Draw.alpha(heat * 0.4f + Mathf.absin(Time.time, 8f, 0.6f) * heat);
                 Draw.rect(topRegion, x, y);
                 Draw.reset();
             }
 
             if(hasLiquids){
-                Draw.color(liquids.current().color);
-                Draw.alpha(liquids.currentAmount() / liquidCapacity);
-                Draw.rect(liquidRegion, x, y);
-                Draw.color();
+                Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
             }
         }
 

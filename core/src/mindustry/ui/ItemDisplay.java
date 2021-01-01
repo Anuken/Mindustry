@@ -1,8 +1,7 @@
 package mindustry.ui;
 
-import arc.scene.ui.layout.Table;
-import mindustry.type.Item;
-import mindustry.type.ItemStack;
+import arc.scene.ui.layout.*;
+import mindustry.type.*;
 
 /** An item image with text. */
 public class ItemDisplay extends Table{

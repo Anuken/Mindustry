@@ -11,7 +11,7 @@ public class ClearFilter extends GenerateFilter{
 
     @Override
     public FilterOption[] options(){
-        return Structs.arr(new BlockOption("block", () -> block, b -> block = b, wallsOnly));
+        return Structs.arr(new BlockOption("block", () -> block, b -> block = b, b -> oresOnly.get(b) || wallsOnly.get(b)));
     }
 
     @Override
@@ -19,6 +19,10 @@ public class ClearFilter extends GenerateFilter{
 
         if(in.block == block){
             in.block = Blocks.air;
+        }
+
+        if(in.overlay == block){
+            in.overlay = Blocks.air;
         }
     }
 }

@@ -55,7 +55,7 @@ public class ImpactReactor extends PowerGenerator{
         super.setStats();
 
         if(hasItems){
-            stats.add(BlockStat.productionTime, itemDuration / 60f, StatUnit.seconds);
+            stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
     }
 
@@ -92,16 +92,21 @@ public class ImpactReactor extends PowerGenerator{
         }
 
         @Override
+        public float ambientVolume(){
+            return warmup;
+        }
+
+        @Override
         public void draw(){
             Draw.rect(bottomRegion, x, y);
 
             for(int i = 0; i < plasmaRegions.length; i++){
-                float r = size * tilesize - 3f + Mathf.absin(Time.time(), 2f + i * 1f, 5f - i * 0.5f);
+                float r = size * tilesize - 3f + Mathf.absin(Time.time, 2f + i * 1f, 5f - i * 0.5f);
 
                 Draw.color(plasma1, plasma2, (float)i / plasmaRegions.length);
-                Draw.alpha((0.3f + Mathf.absin(Time.time(), 2f + i * 2f, 0.3f + i * 0.05f)) * warmup);
+                Draw.alpha((0.3f + Mathf.absin(Time.time, 2f + i * 2f, 0.3f + i * 0.05f)) * warmup);
                 Draw.blend(Blending.additive);
-                Draw.rect(plasmaRegions[i], x, y, r, r, Time.time() * (12 + i * 6f) * warmup);
+                Draw.rect(plasmaRegions[i], x, y, r, r, Time.time * (12 + i * 6f) * warmup);
                 Draw.blend();
             }
 

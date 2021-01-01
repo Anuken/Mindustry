@@ -2,11 +2,10 @@ package mindustry.game;
 
 import arc.*;
 import arc.assets.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
+import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.async.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
@@ -78,7 +77,6 @@ public class Saves{
     }
 
     public void update(){
-
         if(current != null && state.isGame()
         && !(state.isPaused() && Core.scene.hasDialog())){
             if(lastTimestamp != 0){
@@ -87,15 +85,15 @@ public class Saves{
             lastTimestamp = Time.millis();
         }
 
-        if(state.isGame() && !state.gameOver && current != null && current.isAutosave() && !state.rules.tutorial){
+        if(state.isGame() && !state.gameOver && current != null && current.isAutosave()){
             time += Time.delta;
             if(time > Core.settings.getInt("saveinterval") * 60){
                 saving = true;
 
                 try{
                     current.save();
-                }catch(Throwable e){
-                    e.printStackTrace();
+                }catch(Throwable t){
+                    Log.err(t);
                 }
 
                 Time.runTask(3f, () -> saving = false);
@@ -219,7 +217,7 @@ public class Saves{
                     previewFile().writePNG(renderer.minimap.getPixmap());
                     requestedPreview = false;
                 }catch(Throwable t){
-                    t.printStackTrace();
+                    Log.err(t);
                 }
             });
         }
@@ -336,6 +334,9 @@ public class Saves{
         }
 
         public void delete(){
+            if(SaveIO.backupFileFor(file).exists()){
+                SaveIO.backupFileFor(file).delete();
+            }
             file.delete();
             saves.remove(this, true);
             if(this == current){

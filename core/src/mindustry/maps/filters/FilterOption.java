@@ -20,9 +20,10 @@ public abstract class FilterOption{
     public static final Boolf<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full));
     public static final Boolf<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full)) && b.inEditor;
     public static final Boolf<Block> floorsOptional = b -> b == Blocks.air || ((b instanceof Floor && !(b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full)));
-    public static final Boolf<Block> wallsOptional = b -> b == Blocks.air || ((!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full)));
+    public static final Boolf<Block> wallsOptional = b -> (b == Blocks.air || ((!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full)))) && b.inEditor;
     public static final Boolf<Block> wallsOresOptional = b -> b == Blocks.air || (((!b.synthetic() && !(b instanceof Floor)) || (b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full))) && b.inEditor;
-    public static final Boolf<Block> oresOnly = b -> b instanceof OverlayFloor && !headless && Core.atlas.isFound(b.icon(mindustry.ui.Cicon.full));
+    public static final Boolf<Block> oresOnly = b -> b instanceof OverlayFloor && !headless && Core.atlas.isFound(b.icon(Cicon.full));
+    public static final Boolf<Block> oresFloorsOptional = b -> (b instanceof Floor) && !headless && Core.atlas.isFound(b.icon(Cicon.full));
     public static final Boolf<Block> anyOptional = b -> (floorsOnly.get(b) || wallsOnly.get(b) || oresOnly.get(b) || b == Blocks.air) && b.inEditor;
 
     public abstract void build(Table table);
@@ -89,14 +90,14 @@ public abstract class FilterOption{
         @Override
         public void build(Table table){
             table.button(b -> b.image(supplier.get().icon(Cicon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable())
-                .setRegion(supplier.get() == Blocks.air ? Icon.block.getRegion() : supplier.get().icon(Cicon.small))).size(8 * 3), () -> {
+                .setRegion(supplier.get() == Blocks.air ? Icon.none.getRegion() : supplier.get().icon(Cicon.small))).size(8 * 3), () -> {
                 BaseDialog dialog = new BaseDialog("");
                 dialog.setFillParent(false);
                 int i = 0;
                 for(Block block : Vars.content.blocks()){
                     if(!filter.get(block)) continue;
 
-                    dialog.cont.image(block == Blocks.air ? Icon.block.getRegion() : block.icon(Cicon.medium)).size(8 * 4).pad(3).get().clicked(() -> {
+                    dialog.cont.image(block == Blocks.air ? Icon.none.getRegion() : block.icon(Cicon.medium)).size(8 * 4).pad(3).get().clicked(() -> {
                         consumer.get(block);
                         dialog.hide();
                         changed.run();

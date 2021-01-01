@@ -6,10 +6,10 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.ui.Cicon;
+import mindustry.ui.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class BoosterListValue implements StatValue{
     protected float reload, maxUsed, multiplier;

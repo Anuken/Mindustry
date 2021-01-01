@@ -3,7 +3,6 @@ package mindustry.maps.filters;
 import arc.util.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
-import mindustry.world.blocks.environment.*;
 
 public class DistortFilter extends GenerateFilter{
     float scl = 40, mag = 5;
@@ -27,6 +26,6 @@ public class DistortFilter extends GenerateFilter{
 
         in.floor = tile.floor();
         if(!tile.block().synthetic() && !in.block.synthetic()) in.block = tile.block();
-        if(!((Floor)in.floor).isLiquid) in.ore = tile.overlay();
+        in.overlay = tile.overlay();
     }
 }

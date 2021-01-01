@@ -3,6 +3,7 @@ package mindustry.world.blocks.liquid;
 import arc.graphics.g2d.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -32,10 +33,7 @@ public class LiquidBlock extends Block{
             Draw.rect(bottomRegion, x, y, rotation);
 
             if(liquids.total() > 0.001f){
-                Draw.color(liquids.current().color);
-                Draw.alpha(liquids.total() / liquidCapacity);
-                Draw.rect(liquidRegion, x, y, rotation);
-                Draw.color();
+                Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
             }
 
             Draw.rect(topRegion, x, y, rotation);

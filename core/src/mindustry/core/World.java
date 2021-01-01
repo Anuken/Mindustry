@@ -6,7 +6,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.struct.ObjectIntMap.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
@@ -31,7 +30,7 @@ import static mindustry.Vars.*;
 public class World{
     public final Context context = new Context();
 
-    public @NonNull Tiles tiles = new Tiles(0, 0);
+    public Tiles tiles = new Tiles(0, 0);
 
     private boolean generating, invalidMap;
     private ObjectMap<Map, Runnable> customMapLoaders = new ObjectMap<>();
@@ -66,6 +65,11 @@ public class World{
         return tile == null || tile.block().solid;
     }
 
+    public boolean wallSolidFull(int x, int y){
+        Tile tile = tile(x, y);
+        return tile == null || (tile.block().solid && tile.block().fillsTile);
+    }
+
     public boolean isAccessible(int x, int y){
         return !wallSolid(x, y - 1) || !wallSolid(x, y + 1) || !wallSolid(x - 1, y) || !wallSolid(x + 1, y);
     }
@@ -86,13 +90,11 @@ public class World{
         return height()*tilesize;
     }
 
-    @NonNull
     public Floor floor(int x, int y){
         Tile tile = tile(x, y);
         return tile == null ? Blocks.air.asFloor() : tile.floor();
     }
 
-    @NonNull
     public Floor floorWorld(float x, float y){
         Tile tile = tileWorld(x, y);
         return tile == null ? Blocks.air.asFloor() : tile.floor();
@@ -132,7 +134,6 @@ public class World{
         return tile.build;
     }
 
-    @NonNull
     public Tile rawTile(int x, int y){
         return tiles.getn(x, y);
     }
@@ -147,7 +148,17 @@ public class World{
         return build(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
-    public int toTile(float coord){
+    /** Convert from world to logic tile coordinates. Whole numbers are at centers of tiles. */
+    public static float conv(float coord){
+        return coord / tilesize;
+    }
+
+    /** Convert from tile to world coordinates. */
+    public static float unconv(float coord){
+        return coord * tilesize;
+    }
+
+    public static int toTile(float coord){
         return Math.round(coord / tilesize);
     }
 
@@ -175,22 +186,22 @@ public class World{
 
     /**
      * Call to signify the beginning of map loading.
-     * BuildinghangeEvents will not be fired until endMapLoad().
+     * TileEvents will not be fired until endMapLoad().
      */
     public void beginMapLoad(){
         generating = true;
     }
 
     /**
-     * Call to signify the end of map loading. Updates tile occlusions and sets up physics for the world.
+     * Call to signify the end of map loading. Updates tile proximities and sets up physics for the world.
      * A WorldLoadEvent will be fire.
      */
     public void endMapLoad(){
 
         for(Tile tile : tiles){
             //remove legacy blocks; they need to stop existing
-            if(tile.block() instanceof LegacyBlock){
-                tile.remove();
+            if(tile.block() instanceof LegacyBlock l){
+                l.removeSelf(tile);
                 continue;
             }
 
@@ -252,12 +263,12 @@ public class World{
         setSectorRules(sector);
 
         if(state.rules.defaultTeam.core() != null){
-            sector.setSpawnPosition(state.rules.defaultTeam.core().pos());
+            sector.info.spawnPosition = state.rules.defaultTeam.core().pos();
         }
     }
 
     private void setSectorRules(Sector sector){
-        state.map = new Map(StringMap.of("name", sector.planet.localizedName + "; Sector " + sector.id));
+        state.map = new Map(StringMap.of("name", sector.preset == null ? sector.planet.localizedName + "; Sector " + sector.id : sector.preset.localizedName));
         state.rules.sector = sector;
 
         state.rules.weather.clear();
@@ -265,8 +276,6 @@ public class World{
         //apply weather based on terrain
         ObjectIntMap<Block> floorc = new ObjectIntMap<>();
         ObjectSet<UnlockableContent> content = new ObjectSet<>();
-
-        float waterFloors = 0, totalFloors = 0;
 
         for(Tile tile : world.tiles){
             if(world.getDarkness(tile.x, tile.y) >= 3){
@@ -279,10 +288,6 @@ public class World{
             if(liquid != null) content.add(liquid);
 
             if(!tile.block().isStatic()){
-                totalFloors ++;
-                if(liquid == Liquids.water){
-                    waterFloors += tile.floor().isDeep() ? 1f : 0.7f;
-                }
                 floorc.increment(tile.floor());
                 if(tile.overlay() != Blocks.air){
                     floorc.increment(tile.overlay());
@@ -297,16 +302,14 @@ public class World{
         entries.removeAll(e -> e.value < 30);
 
         Block[] floors = new Block[entries.size];
-        int[] floorCounts = new int[entries.size];
         for(int i = 0; i < entries.size; i++){
-            floorCounts[i] = entries.get(i).value;
             floors[i] = entries.get(i).key;
         }
 
         //TODO bad code
         boolean hasSnow = floors[0].name.contains("ice") || floors[0].name.contains("snow");
-        boolean hasRain = !hasSnow && floors[0].name.contains("water");
-        boolean hasDesert = !hasSnow && !hasRain && floors[0].name.contains("sand");
+        boolean hasRain = !hasSnow && content.contains(Liquids.water) && !floors[0].name.contains("sand");
+        boolean hasDesert = !hasSnow && !hasRain && floors[0] == Blocks.sand;
         boolean hasSpores = floors[0].name.contains("spore") || floors[0].name.contains("moss") || floors[0].name.contains("tainted");
 
         if(hasSnow){
@@ -315,6 +318,7 @@ public class World{
 
         if(hasRain){
             state.rules.weather.add(new WeatherEntry(Weathers.rain));
+            state.rules.weather.add(new WeatherEntry(Weathers.fog));
         }
 
         if(hasDesert){
@@ -325,9 +329,9 @@ public class World{
             state.rules.weather.add(new WeatherEntry(Weathers.sporestorm));
         }
 
-        state.secinfo.resources = content.asArray();
-        state.secinfo.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
-
+        sector.info.resources = content.asArray();
+        sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
+        sector.saveInfo();
     }
 
     public Context filterContext(Map map){
@@ -439,7 +443,6 @@ public class World{
         int err = dx - dy;
         int e2;
         while(true){
-
             if(cons.accept(x0, y0)) return true;
             if(x0 == x1 && y0 == y1) return false;
 
@@ -539,7 +542,7 @@ public class World{
 
             int circleDst = (int)(rawDst - (length - circleBlend));
             if(circleDst > 0){
-                dark = Math.max(circleDst / 1f, dark);
+                dark = Math.max(circleDst, dark);
             }
         }
 
@@ -610,6 +613,7 @@ public class World{
                 GenerateInput input = new GenerateInput();
 
                 for(GenerateFilter filter : filters){
+                    filter.randomize();
                     input.begin(filter, width(), height(), (x, y) -> tiles.getn(x, y));
                     filter.apply(tiles, input);
                 }

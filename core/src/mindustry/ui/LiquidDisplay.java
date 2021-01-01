@@ -1,12 +1,11 @@
 package mindustry.ui;
 
-import arc.graphics.Color;
-import arc.scene.ui.Image;
-import arc.scene.ui.layout.Stack;
-import arc.scene.ui.layout.Table;
-import arc.util.Strings;
-import mindustry.type.Liquid;
-import mindustry.world.meta.StatUnit;
+import arc.graphics.*;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
+import arc.util.*;
+import mindustry.type.*;
+import mindustry.world.meta.*;
 
 /** An ItemDisplay, but for liquids. */
 public class LiquidDisplay extends Table{

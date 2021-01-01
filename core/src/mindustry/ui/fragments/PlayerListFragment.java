@@ -6,6 +6,7 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -20,11 +21,13 @@ public class PlayerListFragment extends Fragment{
     private boolean visible = false;
     private Interval timer = new Interval();
     private TextField sField;
-    private boolean found = false;
+    private Seq<Player> players = new Seq<>();
 
     @Override
     public void build(Group parent){
+        content.name = "players";
         parent.fill(cont -> {
+            cont.name = "playerlist";
             cont.visible(() -> visible);
             cont.update(() -> {
                 if(!(net.active() && state.isGame())){
@@ -36,7 +39,7 @@ public class PlayerListFragment extends Fragment{
                     rebuild();
                     content.pack();
                     content.act(Core.graphics.getDeltaTime());
-                    //TODO hack
+                    //hacky
                     Core.scene.act(0f);
                 }
             });
@@ -47,6 +50,7 @@ public class PlayerListFragment extends Fragment{
                 sField = pane.field(null, text -> {
                     rebuild();
                 }).grow().pad(8).get();
+                sField.name = "search";
                 sField.setMaxLength(maxNameLength);
                 sField.setMessageText(Core.bundle.format("players.search"));
 
@@ -56,6 +60,7 @@ public class PlayerListFragment extends Fragment{
 
                 pane.table(menu -> {
                     menu.defaults().growX().height(50f).fillY();
+                    menu.name = "menu";
 
                     menu.button("@server.bans", ui.bans::show).disabled(b -> net.client());
                     menu.button("@server.admins", ui.admins::show).disabled(b -> net.client());
@@ -72,10 +77,14 @@ public class PlayerListFragment extends Fragment{
         content.clear();
 
         float h = 74f;
-        found = false;
+        boolean found = false;
 
-        Groups.player.sort(Structs.comparing(Player::team));
-        Groups.player.each(user -> {
+        players.clear();
+        Groups.player.copy(players);
+
+        players.sort(Structs.comps(Structs.comparing(Player::team), Structs.comparingBool(p -> !p.admin)));
+
+        for(var user : players){
             found = true;
             NetConnection connection = user.con;
 
@@ -99,6 +108,7 @@ public class PlayerListFragment extends Fragment{
             };
             table.margin(8);
             table.add(new Image(user.icon()).setScaling(Scaling.bounded)).grow();
+            table.name = user.name();
 
             button.add(table).size(h);
             button.labelWrap("[#" + user.color().toString().toUpperCase() + "]" + user.name()).width(170f).pad(10);
@@ -115,13 +125,9 @@ public class PlayerListFragment extends Fragment{
                     t.defaults().size(bs);
 
                     t.button(Icon.hammer, Styles.clearPartiali,
-                    () -> {
-                        ui.showConfirm("@confirm", Core.bundle.format("confirmban",  user.name()), () -> Call.adminRequest(user, AdminAction.ban));
-                    });
+                    () -> ui.showConfirm("@confirm", Core.bundle.format("confirmban",  user.name()), () -> Call.adminRequest(user, AdminAction.ban)));
                     t.button(Icon.cancel, Styles.clearPartiali,
-                    () -> {
-                        ui.showConfirm("@confirm", Core.bundle.format("confirmkick",  user.name()), () -> Call.adminRequest(user, AdminAction.kick));
-                    });
+                    () -> ui.showConfirm("@confirm", Core.bundle.format("confirmkick",  user.name()), () -> Call.adminRequest(user, AdminAction.kick)));
 
                     t.row();
 
@@ -158,7 +164,7 @@ public class PlayerListFragment extends Fragment{
             content.row();
             content.image().height(4f).color(state.rules.pvp ? user.team().color : Pal.gray).growX();
             content.row();
-        });
+        }
 
         if(!found){
             content.add(Core.bundle.format("players.notfound")).padBottom(6).width(350f).maxHeight(h + 14);

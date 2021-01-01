@@ -2,9 +2,9 @@ package mindustry.net;
 
 import arc.*;
 import arc.Net.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.func.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
@@ -19,21 +19,21 @@ import java.text.*;
 import java.util.*;
 
 import static arc.Core.*;
-import static mindustry.Vars.mods;
 import static mindustry.Vars.net;
+import static mindustry.Vars.*;
 
 public class CrashSender{
 
     public static String createReport(String error){
-        String report = "Oh no, Mindustry crashed!\n";
-        if(mods.list().size == 0){
-            report += "Please report this at https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md\n\n";
+        String report = "Mindustry has crashed. How unfortunate.\n";
+        if(mods.list().size == 0 && Version.build != -1){
+            report += "Report this at " + Vars.reportIssueURL + "\n\n";
         }
         return report + "Version: " + Version.combined() + (Vars.headless ? " (Server)" : "") + "\n"
             + "OS: " + System.getProperty("os.name") + " x" + (OS.is64Bit ? "64" : "32") + "\n"
             + "Java Version: " + System.getProperty("java.version") + "\n"
             + "Java Architecture: " + System.getProperty("sun.arch.data.model") + "\n"
-            + mods.list().size + " Mods: " + mods.list().toString(", ", mod -> mod.name + ":" + mod.meta.version)
+            + mods.list().size + " Mods" + (mods.list().isEmpty() ? "" : ": " + mods.list().toString(", ", mod -> mod.name + ":" + mod.meta.version))
             + "\n\n" + error;
     }
 

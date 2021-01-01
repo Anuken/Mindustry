@@ -22,6 +22,6 @@ abstract class EffectStateComp implements Posc, Drawc, Timedc, Rotc, Childc{
 
     @Replace
     public float clipSize(){
-        return effect.size;
+        return effect.clip;
     }
 }

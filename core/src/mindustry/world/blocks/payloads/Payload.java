@@ -1,9 +1,11 @@
 package mindustry.world.blocks.payloads;
 
-import arc.util.ArcAnnotate.*;
+import arc.graphics.g2d.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -25,13 +27,16 @@ public interface Payload{
         return false;
     }
 
-    /** @return whether this payload fits on a standard 3x3 conveyor. */
-    default boolean fits(){
-        return size() / tilesize <= 2.5f;
+    /** @return whether this payload fits in a given size. 2.5 is the max for a standard 3x3 conveyor. */
+    default boolean fits(float s){
+        return size() / tilesize <= s;
     }
 
     /** writes the payload for saving. */
     void write(Writes write);
+
+    /** @return icon describing the contents. */
+    TextureRegion icon(Cicon icon);
 
     static void write(@Nullable Payload payload, Writes write){
         if(payload == null){
@@ -51,12 +56,13 @@ public interface Payload{
         byte type = read.b();
         if(type == payloadBlock){
             Block block = content.block(read.s());
-            BlockPayload payload = new BlockPayload(block, Team.derelict);
+            BuildPayload payload = new BuildPayload(block, Team.derelict);
             byte version = read.b();
-            payload.entity.readAll(read, version);
+            payload.build.readAll(read, version);
             return (T)payload;
         }else if(type == payloadUnit){
             byte id = read.b();
+            if(EntityMapping.map(id) == null) throw new RuntimeException("No type with ID " + id + " found.");
             Unit unit = (Unit)EntityMapping.map(id).get();
             unit.read(read);
             return (T)new UnitPayload(unit);

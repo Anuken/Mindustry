@@ -1,31 +1,25 @@
 package mindustry.async;
 
-import arc.box2d.*;
-import arc.box2d.BodyDef.*;
+import arc.math.*;
 import arc.math.geom.*;
+import arc.math.geom.QuadTree.*;
 import arc.struct.*;
+import mindustry.*;
+import mindustry.async.PhysicsProcess.PhysicsWorld.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
 public class PhysicsProcess implements AsyncProcess{
-    private Physics physics;
+    private static final int
+        layers = 3,
+        layerGround = 0,
+        layerLegs = 1,
+        layerFlying = 2;
+
+    private PhysicsWorld physics;
     private Seq<PhysicRef> refs = new Seq<>(false);
-    private BodyDef def;
-
-    private EntityGroup<? extends Physicsc> group;
-    private Filter flying = new Filter(){{
-        maskBits = categoryBits = 2;
-    }}, ground = new Filter(){{
-        maskBits = categoryBits = 1;
-    }};
-
-    public PhysicsProcess(){
-        def = new BodyDef();
-        def.type = BodyType.dynamicBody;
-
-        //currently only enabled for units
-        group = Groups.unit;
-    }
+    //currently only enabled for units
+    private EntityGroup<Unit> group = Groups.unit;
 
     @Override
     public void begin(){
@@ -34,47 +28,39 @@ public class PhysicsProcess implements AsyncProcess{
         //remove stale entities
         refs.removeAll(ref -> {
             if(!ref.entity.isAdded()){
-                physics.destroyBody(ref.body);
+                physics.remove(ref.body);
                 ref.entity.physref(null);
                 return true;
             }
             return false;
         });
 
-        //find entities without bodies and assign them
-        for(Physicsc entity : group){
-            boolean grounded = entity.isGrounded();
-            int bits = grounded ? ground.maskBits : flying.maskBits;
+        //find Unit without bodies and assign them
+        for(Unit entity : group){
 
             if(entity.physref() == null){
-                //add bodies to entities that have none
-                FixtureDef fd = new FixtureDef();
-                fd.shape = new CircleShape(entity.hitSize() / 2f);
-                fd.density = 5f;
-                fd.restitution = 0.0f;
-                fd.filter.maskBits = fd.filter.categoryBits = (grounded ? ground : flying).maskBits;
-
-                def.position.set(entity);
-
-                Body body = physics.createBody(def);
-                body.createFixture(fd);
+                PhysicsBody body = new PhysicsBody();
+                body.x = entity.x();
+                body.y = entity.y();
+                body.mass = entity.mass();
+                body.radius = entity.hitSize() / 2f;
 
                 PhysicRef ref = new PhysicRef(entity, body);
                 refs.add(ref);
 
                 entity.physref(ref);
+
+                physics.add(body);
             }
 
             //save last position
             PhysicRef ref = entity.physref();
 
-            if(ref.body.getFixtureList().any() && ref.body.getFixtureList().first().getFilterData().categoryBits != bits){
-                //set correct filter
-                ref.body.getFixtureList().first().setFilterData(grounded ? ground : flying);
-            }
-
-            ref.velocity.set(entity.deltaX(), entity.deltaY());
-            ref.position.set(entity);
+            ref.body.layer =
+                entity.type.allowLegStep ? layerLegs :
+                entity.isGrounded() ? layerGround : layerFlying;
+            ref.x = entity.x();
+            ref.y = entity.y();
         }
     }
 
@@ -85,26 +71,11 @@ public class PhysicsProcess implements AsyncProcess{
         //get last position vectors before step
         for(PhysicRef ref : refs){
             //force set target position
-            ref.body.setPosition(ref.position.x, ref.position.y);
-
-            //save last position for delta
-            ref.lastPosition.set(ref.body.getPosition());
-
-            //write velocity
-            ref.body.setLinearVelocity(ref.velocity);
-
-            ref.lastVelocity.set(ref.velocity);
+            ref.body.x = ref.x;
+            ref.body.y = ref.y;
         }
 
-        physics.step(1f/45f, 5, 8);
-
-        //get delta vectors
-        for(PhysicRef ref : refs){
-            //get delta vector
-            ref.delta.set(ref.body.getPosition()).sub(ref.lastPosition);
-
-            ref.velocity.set(ref.body.getLinearVelocity());
-        }
+        physics.update();
     }
 
     @Override
@@ -115,13 +86,8 @@ public class PhysicsProcess implements AsyncProcess{
         for(PhysicRef ref : refs){
             Physicsc entity = ref.entity;
 
-            entity.move(ref.delta.x, ref.delta.y);
-
-            //save last position
-            ref.position.set(entity);
-
-            //add delta velocity - this doesn't work very well yet
-            //entity.vel().add(ref.velocity).sub(ref.lastVelocity);
+            //move by delta
+            entity.move(ref.body.x - ref.x, ref.body.y - ref.y);
         }
     }
 
@@ -129,7 +95,6 @@ public class PhysicsProcess implements AsyncProcess{
     public void reset(){
         if(physics != null){
             refs.clear();
-            physics.dispose();
             physics = null;
         }
     }
@@ -138,17 +103,95 @@ public class PhysicsProcess implements AsyncProcess{
     public void init(){
         reset();
 
-        physics = new Physics(new Vec2(), true);
+        physics = new PhysicsWorld(Vars.world.getQuadBounds(new Rect()));
     }
 
     public static class PhysicRef{
         public Physicsc entity;
-        public Body body;
-        public Vec2 lastPosition = new Vec2(), delta = new Vec2(), velocity = new Vec2(), lastVelocity = new Vec2(), position = new Vec2();
+        public PhysicsBody body;
+        public float x, y;
 
-        public PhysicRef(Physicsc entity, Body body){
+        public PhysicRef(Physicsc entity, PhysicsBody body){
             this.entity = entity;
             this.body = body;
+        }
+    }
+
+    //world for simulating physics in a different thread
+    public static class PhysicsWorld{
+        //how much to soften movement by
+        private static final float scl = 1.25f;
+
+        private final QuadTree<PhysicsBody>[] trees = new QuadTree[layers];
+        private final Seq<PhysicsBody> bodies = new Seq<>(false, 16, PhysicsBody.class);
+        private final Seq<PhysicsBody> seq = new Seq<>(PhysicsBody.class);
+        private final Rect rect = new Rect();
+        private final Vec2 vec = new Vec2();
+
+        public PhysicsWorld(Rect bounds){
+            for(int i = 0; i < layers; i++){
+                trees[i] = new QuadTree<>(new Rect(bounds));
+            }
+        }
+
+        public void add(PhysicsBody body){
+            bodies.add(body);
+        }
+
+        public void remove(PhysicsBody body){
+            bodies.remove(body);
+        }
+
+        public void update(){
+            for(int i = 0; i < layers; i++){
+                trees[i].clear();
+            }
+
+            for(int i = 0; i < bodies.size; i++){
+                PhysicsBody body = bodies.items[i];
+                body.collided = false;
+                trees[body.layer].insert(body);
+            }
+
+            for(int i = 0; i < bodies.size; i++){
+                PhysicsBody body = bodies.items[i];
+                body.hitbox(rect);
+
+                seq.size = 0;
+                trees[body.layer].intersect(rect, seq);
+
+                for(int j = 0; j < seq.size; j++){
+                    PhysicsBody other = seq.items[j];
+
+                    if(other == body || other.collided) continue;
+
+                    float rs = body.radius + other.radius;
+                    float dst = Mathf.dst(body.x, body.y, other.x, other.y);
+
+                    if(dst < rs){
+                        vec.set(body.x - other.x, body.y - other.y).setLength(rs - dst);
+                        float ms = body.mass + other.mass;
+                        float m1 = other.mass / ms, m2 = body.mass / ms;
+
+                        body.x += vec.x * m1 / scl;
+                        body.y += vec.y * m1 / scl;
+                        other.x -= vec.x * m2 / scl;
+                        other.y -= vec.y * m2 / scl;
+                    }
+                }
+                body.collided = true;
+            }
+        }
+
+        public static class PhysicsBody implements QuadTreeObject{
+            public float x, y, radius, mass;
+            public int layer = 0;
+            public boolean collided = false;
+
+            @Override
+            public void hitbox(Rect out){
+                out.setCentered(x, y, radius * 2, radius * 2);
+            }
         }
     }
 }

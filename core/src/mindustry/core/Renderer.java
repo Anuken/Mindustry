@@ -27,10 +27,14 @@ public class Renderer implements ApplicationListener{
     public final Pixelator pixelator = new Pixelator();
     public PlanetRenderer planets;
 
+    public @Nullable Bloom bloom;
     public FrameBuffer effectBuffer = new FrameBuffer();
     public float laserOpacity = 1f;
+    public boolean animateShields, drawWeather = true;
+    /** minZoom = zooming out, maxZoom = zooming in */
+    public float minZoom = 1.5f, maxZoom = 6f;
 
-    private Bloom bloom;
+    //TODO unused
     private FxProcessor fx = new FxProcessor();
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
     private float targetscale = Scl.scl(4);
@@ -53,7 +57,7 @@ public class Renderer implements ApplicationListener{
     public void init(){
         planets = new PlanetRenderer();
 
-        if(settings.getBool("bloom")){
+        if(settings.getBool("bloom", !ios)){
             setupBloom();
         }
     }
@@ -63,8 +67,11 @@ public class Renderer implements ApplicationListener{
         Color.white.set(1f, 1f, 1f, 1f);
         Gl.clear(Gl.stencilBufferBit);
 
-        camerascale = Mathf.lerpDelta(camerascale, targetscale, 0.1f);
-        laserOpacity = Core.settings.getInt("lasersopacity") / 100f;
+        float dest = Mathf.round(targetscale, 0.5f);
+        camerascale = Mathf.lerpDelta(camerascale, dest, 0.1f);
+        if(Mathf.equal(camerascale, dest, 0.001f)) camerascale = dest;
+        laserOpacity = settings.getInt("lasersopacity") / 100f;
+        animateShields = settings.getBool("animatedshields");
 
         if(landTime > 0){
             landTime -= Time.delta;
@@ -108,7 +115,10 @@ public class Renderer implements ApplicationListener{
         minimap.dispose();
         effectBuffer.dispose();
         blocks.dispose();
-        planets.dispose();
+        if(planets != null){
+            planets.dispose();
+            planets = null;
+        }
         if(bloom != null){
             bloom.dispose();
             bloom = null;
@@ -118,10 +128,6 @@ public class Renderer implements ApplicationListener{
 
     @Override
     public void resize(int width, int height){
-        if(settings.getBool("bloom")){
-            setupBloom();
-        }
-
         fx.resize(width, height);
     }
 
@@ -140,9 +146,9 @@ public class Renderer implements ApplicationListener{
             }
             bloom = new Bloom(true);
         }catch(Throwable e){
-            e.printStackTrace();
             settings.put("bloom", false);
             ui.showErrorMessage("@error.bloom");
+            Log.err(e);
         }
     }
 
@@ -200,7 +206,7 @@ public class Renderer implements ApplicationListener{
         graphics.clear(clearColor);
         Draw.reset();
 
-        if(Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")){
+        if(Core.settings.getBool("animatedwater") || animateShields){
             effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
@@ -216,8 +222,6 @@ public class Renderer implements ApplicationListener{
         if(pixelator.enabled()){
             pixelator.register();
         }
-
-        //TODO fx
 
         Draw.draw(Layer.background, this::drawBackground);
         Draw.draw(Layer.floor, blocks.floor::drawFloor);
@@ -239,16 +243,22 @@ public class Renderer implements ApplicationListener{
         }
 
         if(bloom != null){
+            bloom.resize(graphics.getWidth() / 4, graphics.getHeight() / 4);
             Draw.draw(Layer.bullet - 0.01f, bloom::capture);
             Draw.draw(Layer.effect + 0.01f, bloom::render);
         }
 
         Draw.draw(Layer.plans, overlays::drawBottom);
 
-        if(settings.getBool("animatedshields") && Shaders.shield != null){
+        if(animateShields && Shaders.shield != null){
             Draw.drawRange(Layer.shields, 1f, () -> effectBuffer.begin(Color.clear), () -> {
                 effectBuffer.end();
                 effectBuffer.blit(Shaders.shield);
+            });
+
+            Draw.drawRange(Layer.buildBeam, 1f, () -> effectBuffer.begin(Color.clear), () -> {
+                effectBuffer.end();
+                effectBuffer.blit(Shaders.buildBeam);
             });
         }
 
@@ -301,12 +311,19 @@ public class Renderer implements ApplicationListener{
     }
 
     public void clampScale(){
-        float s = Scl.scl(1f);
-        targetscale = Mathf.clamp(targetscale, minScale(), Math.round(s * 6));
+        targetscale = Mathf.clamp(targetscale, minScale(), maxScale());
+    }
+
+    public float getDisplayScale(){
+        return camerascale;
     }
 
     public float minScale(){
-        return Scl.scl(1.5f);
+        return Scl.scl(minZoom);
+    }
+
+    public float maxScale(){
+        return Mathf.round(Scl.scl(maxZoom));
     }
 
     public float getScale(){
@@ -334,6 +351,7 @@ public class Renderer implements ApplicationListener{
 
         FrameBuffer buffer = new FrameBuffer(w, h);
 
+        drawWeather = false;
         float vpW = camera.width, vpH = camera.height, px = camera.position.x, py = camera.position.y;
         disableUI = true;
         camera.width = w;
@@ -359,8 +377,8 @@ public class Renderer implements ApplicationListener{
         PixmapIO.writePNG(file, fullPixmap);
         fullPixmap.dispose();
         ui.showInfoFade(Core.bundle.format("screenshot", file.toString()));
+        drawWeather = true;
 
         buffer.dispose();
     }
-
 }

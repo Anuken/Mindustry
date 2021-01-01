@@ -1,0 +1,9 @@
+- Added basic descriptions & details to new blocks/units
+- Balancing
+- Improved casing ejection effects in turrets/units
+- Logic: Added draw sub-instruction to render an icon of an item/unit/block
+- Campaign: Reduced research costs
+- Campaign: Added info indicating maximum simulated waves survived
+- Campaign: Fixed many issues related to base attack simulations
+- Campaign: Less extreme waves
+- Campaign: Slightly easier bosses

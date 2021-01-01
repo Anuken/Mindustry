@@ -1,8 +1,8 @@
 package mindustry.world.meta.values;
 
-import arc.scene.ui.layout.Table;
-import arc.util.Strings;
-import mindustry.world.meta.StatValue;
+import arc.scene.ui.layout.*;
+import arc.util.*;
+import mindustry.world.meta.*;
 
 public class StringValue implements StatValue{
     private final String value;

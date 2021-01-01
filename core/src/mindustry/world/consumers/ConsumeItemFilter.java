@@ -1,9 +1,8 @@
 package mindustry.world.consumers;
 
-import arc.struct.*;
 import arc.func.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
+import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -13,8 +12,7 @@ import mindustry.world.meta.values.*;
 import static mindustry.Vars.*;
 
 public class ConsumeItemFilter extends Consume{
-    public final @NonNull
-    Boolf<Item> filter;
+    public final Boolf<Item> filter;
 
     public ConsumeItemFilter(Boolf<Item> item){
         this.filter = item;
@@ -72,7 +70,7 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public void display(BlockStats stats){
-        stats.add(booster ? BlockStat.booster : BlockStat.input, new ItemFilterValue(filter));
+    public void display(Stats stats){
+        stats.add(booster ? Stat.booster : Stat.input, new ItemFilterValue(filter));
     }
 }

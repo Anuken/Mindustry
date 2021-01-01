@@ -75,7 +75,7 @@ public class JsonIO{
 
         //TODO this is terrible
 
-        json.setSerializer(Sector.class, new Serializer<Sector>(){
+        json.setSerializer(Sector.class, new Serializer<>(){
             @Override
             public void write(Json json, Sector object, Class knownType){
                 json.writeValue(object.planet.name + "-" + object.id);
@@ -83,12 +83,13 @@ public class JsonIO{
 
             @Override
             public Sector read(Json json, JsonValue jsonData, Class type){
-                String[] split = jsonData.asString().split("-");
-                return Vars.content.<Planet>getByName(ContentType.planet, split[0]).sectors.get(Integer.parseInt(split[1]));
+                String name = jsonData.asString();
+                int idx = name.lastIndexOf('-');
+                return Vars.content.<Planet>getByName(ContentType.planet, name.substring(0, idx)).sectors.get(Integer.parseInt(name.substring(idx + 1)));
             }
         });
 
-        json.setSerializer(SectorPreset.class, new Serializer<SectorPreset>(){
+        json.setSerializer(SectorPreset.class, new Serializer<>(){
             @Override
             public void write(Json json, SectorPreset object, Class knownType){
                 json.writeValue(object.name);
@@ -100,7 +101,7 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(Liquid.class, new Serializer<Liquid>(){
+        json.setSerializer(Liquid.class, new Serializer<>(){
             @Override
             public void write(Json json, Liquid object, Class knownType){
                 json.writeValue(object.name);
@@ -109,12 +110,12 @@ public class JsonIO{
             @Override
             public Liquid read(Json json, JsonValue jsonData, Class type){
                 if(jsonData.asString() == null) return Liquids.water;
-                Liquid i =  Vars.content.getByName(ContentType.liquid, jsonData.asString());
+                Liquid i = Vars.content.getByName(ContentType.liquid, jsonData.asString());
                 return i == null ? Liquids.water : i;
             }
         });
 
-        json.setSerializer(Item.class, new Serializer<Item>(){
+        json.setSerializer(Item.class, new Serializer<>(){
             @Override
             public void write(Json json, Item object, Class knownType){
                 json.writeValue(object.name);
@@ -123,12 +124,12 @@ public class JsonIO{
             @Override
             public Item read(Json json, JsonValue jsonData, Class type){
                 if(jsonData.asString() == null) return Items.copper;
-                Item i =  Vars.content.getByName(ContentType.item, jsonData.asString());
+                Item i = Vars.content.getByName(ContentType.item, jsonData.asString());
                 return i == null ? Items.copper : i;
             }
         });
 
-        json.setSerializer(Team.class, new Serializer<Team>(){
+        json.setSerializer(Team.class, new Serializer<>(){
             @Override
             public void write(Json json, Team object, Class knownType){
                 json.writeValue(object.id);
@@ -140,7 +141,7 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(Block.class, new Serializer<Block>(){
+        json.setSerializer(Block.class, new Serializer<>(){
             @Override
             public void write(Json json, Block object, Class knownType){
                 json.writeValue(object.name);
@@ -153,7 +154,7 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(Weather.class, new Serializer<Weather>(){
+        json.setSerializer(Weather.class, new Serializer<>(){
             @Override
             public void write(Json json, Weather object, Class knownType){
                 json.writeValue(object.name);
@@ -165,7 +166,19 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(ItemStack.class, new Serializer<ItemStack>(){
+        json.setSerializer(UnitType.class, new Serializer<>(){
+            @Override
+            public void write(Json json, UnitType object, Class knownType){
+                json.writeValue(object.name);
+            }
+
+            @Override
+            public UnitType read(Json json, JsonValue jsonData, Class type){
+                return Vars.content.getByName(ContentType.unit, jsonData.asString());
+            }
+        });
+
+        json.setSerializer(ItemStack.class, new Serializer<>(){
             @Override
             public void write(Json json, ItemStack object, Class knownType){
                 json.writeObjectStart();
@@ -180,7 +193,7 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(UnlockableContent.class, new Serializer<UnlockableContent>(){
+        json.setSerializer(UnlockableContent.class, new Serializer<>(){
             @Override
             public void write(Json json, UnlockableContent object, Class knownType){
                 json.writeValue(object.name);

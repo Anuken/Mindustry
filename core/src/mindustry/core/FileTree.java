@@ -2,8 +2,8 @@ package mindustry.core;
 
 import arc.*;
 import arc.assets.loaders.*;
-import arc.struct.*;
 import arc.files.*;
+import arc.struct.*;
 
 /** Handles files in a modded context. */
 public class FileTree implements FileHandleResolver{

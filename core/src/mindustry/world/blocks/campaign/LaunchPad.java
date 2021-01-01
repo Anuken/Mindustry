@@ -1,6 +1,9 @@
 package mindustry.world.blocks.campaign;
 
 import arc.*;
+import arc.audio.*;
+import arc.Graphics.*;
+import arc.Graphics.Cursor.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -17,6 +20,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -25,6 +29,7 @@ public class LaunchPad extends Block{
     public final int timerLaunch = timers++;
     /** Time inbetween launches. */
     public float launchTime;
+    public Sound launchSound = Sounds.none;
 
     public @Load("@-light") TextureRegion lightRegion;
     public @Load("launchpod") TextureRegion podRegion;
@@ -36,13 +41,14 @@ public class LaunchPad extends Block{
         solid = true;
         update = true;
         configurable = true;
+        drawDisabled = false;
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.launchTime, launchTime / 60f, StatUnit.seconds);
+        stats.add(Stat.launchTime, launchTime / 60f, StatUnit.seconds);
     }
 
     @Override
@@ -52,7 +58,23 @@ public class LaunchPad extends Block{
         bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
     }
 
+    @Override
+    public boolean outputsItems(){
+        return false;
+    }
+
     public class LaunchPadBuild extends Building{
+
+        @Override
+        public Cursor getCursor(){
+            return !state.isCampaign() || net.client() ? SystemCursor.arrow : super.getCursor();
+        }
+
+        //cannot be disabled
+        @Override
+        public float efficiency(){
+            return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
+        }
 
         @Override
         public void draw(){
@@ -99,6 +121,7 @@ public class LaunchPad extends Block{
 
             //launch when full and base conditions are met
             if(items.total() >= itemCapacity && efficiency() >= 1f && timer(timerLaunch, launchTime / timeScale)){
+                launchSound.at(x, y);
                 LaunchPayload entity = LaunchPayload.create();
                 items.each((item, amount) -> entity.stacks.add(new ItemStack(item, amount)));
                 entity.set(this);
@@ -115,22 +138,31 @@ public class LaunchPad extends Block{
         public void display(Table table){
             super.display(table);
 
+            if(!state.isCampaign()) return;
+
             table.row();
             table.label(() -> {
-                Sector dest = state.secinfo.getRealDestination();
+                Sector dest = state.rules.sector == null ? null : state.rules.sector.info.getRealDestination();
 
                 return Core.bundle.format("launch.destination",
                     dest == null ? Core.bundle.get("sectors.nonelaunch") :
-                    dest.preset == null ?
-                        "[accent]Sector " + dest.id :
-                        "[accent]" + dest.preset.localizedName);
-            }).pad(4);
+                    "[accent]" + dest.name());
+            }).pad(4).wrap().width(200f).left();
         }
 
         @Override
         public void buildConfiguration(Table table){
+            if(!state.isCampaign() || net.client()){
+                deselect();
+                return;
+            }
+
             table.button(Icon.upOpen, Styles.clearTransi, () -> {
-                ui.planet.showSelect(state.rules.sector, other -> state.secinfo.destination = other);
+                ui.planet.showSelect(state.rules.sector, other -> {
+                    if(state.isCampaign()){
+                        state.rules.sector.info.destination = other;
+                    }
+                });
                 deselect();
             }).size(40f);
         }
@@ -203,22 +235,24 @@ public class LaunchPad extends Block{
         public void remove(){
             if(!state.isCampaign()) return;
 
-            Sector destsec = state.secinfo.getRealDestination();
+            Sector destsec = state.rules.sector.info.getRealDestination();
 
             //actually launch the items upon removal
             if(team() == state.rules.defaultTeam){
                 if(destsec != null && (destsec != state.rules.sector || net.client())){
-                    ItemSeq dest = destsec.getExtraItems();
+                    ItemSeq dest = new ItemSeq();
 
                     for(ItemStack stack : stacks){
                         dest.add(stack);
 
                         //update export
-                        state.secinfo.handleItemExport(stack);
+                        state.rules.sector.info.handleItemExport(stack);
                         Events.fire(new LaunchItemEvent(stack));
                     }
 
-                    destsec.setExtraItems(dest);
+                    if(!net.client()){
+                        destsec.addItems(dest);
+                    }
                 }
             }
         }

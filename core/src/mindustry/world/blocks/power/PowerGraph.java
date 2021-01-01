@@ -13,13 +13,13 @@ public class PowerGraph{
     private static final Seq<Building> outArray2 = new Seq<>();
     private static final IntSet closedSet = new IntSet();
 
-    private final ObjectSet<Building> producers = new ObjectSet<>();
-    private final ObjectSet<Building> consumers = new ObjectSet<>();
-    private final ObjectSet<Building> batteries = new ObjectSet<>();
-    private final ObjectSet<Building> all = new ObjectSet<>();
+    private final Seq<Building> producers = new Seq<>(false);
+    private final Seq<Building> consumers = new Seq<>(false);
+    private final Seq<Building> batteries = new Seq<>(false);
+    private final Seq<Building> all = new Seq<>(false);
 
     private final WindowedMean powerBalance = new WindowedMean(60);
-    private float lastPowerProduced, lastPowerNeeded, lastUsageFraction, lastPowerStored;
+    private float lastPowerProduced, lastPowerNeeded, lastPowerStored;
     private float lastScaledPowerIn, lastScaledPowerOut, lastCapacity;
 
     private long lastFrameUpdated = -1;
@@ -201,7 +201,7 @@ public class PowerGraph{
                 tile.power.status = 1f;
             }
 
-            lastPowerNeeded = lastPowerProduced = lastUsageFraction = 1f;
+            lastPowerNeeded = lastPowerProduced = 1f;
             return;
         }
 
@@ -209,7 +209,6 @@ public class PowerGraph{
 
         float powerNeeded = getPowerNeeded();
         float powerProduced = getPowerProduced();
-        float rawProduced = powerProduced;
 
         lastPowerNeeded = powerNeeded;
         lastPowerProduced = powerProduced;
@@ -236,12 +235,6 @@ public class PowerGraph{
 
             distributePower(powerNeeded, powerProduced);
         }
-
-        //overproducing: 10 / 20 = 0.5
-        //underproducing: 20 / 10 = 2 -> clamp -> 1.0
-        //nothing being produced: 20 / 0 -> 1.0
-        //nothing being consumed: 0 / 20 -> 0.0
-        lastUsageFraction = Mathf.zero(rawProduced) ? 1f : Mathf.clamp(powerNeeded / rawProduced);
     }
 
     public void addGraph(PowerGraph graph){
@@ -250,20 +243,24 @@ public class PowerGraph{
         }
     }
 
-    public void add(Building tile){
-        if(tile == null || tile.power == null) return;
-        tile.power.graph = this;
-        all.add(tile);
+    public void add(Building build){
+        if(build == null || build.power == null) return;
 
-        if(tile.block.outputsPower && tile.block.consumesPower && !tile.block.consumes.getPower().buffered){
-            producers.add(tile);
-            consumers.add(tile);
-        }else if(tile.block.outputsPower && tile.block.consumesPower){
-            batteries.add(tile);
-        }else if(tile.block.outputsPower){
-            producers.add(tile);
-        }else if(tile.block.consumesPower){
-            consumers.add(tile);
+        if(build.power.graph != this || !build.power.init){
+            build.power.graph = this;
+            build.power.init = true;
+            all.add(build);
+
+            if(build.block.outputsPower && build.block.consumesPower && !build.block.consumes.getPower().buffered){
+                producers.add(build);
+                consumers.add(build);
+            }else if(build.block.outputsPower && build.block.consumesPower){
+                batteries.add(build);
+            }else if(build.block.outputsPower){
+                producers.add(build);
+            }else if(build.block.consumesPower){
+                consumers.add(build);
+            }
         }
     }
 
@@ -284,10 +281,10 @@ public class PowerGraph{
     }
 
     private void removeSingle(Building tile){
-        all.remove(tile);
-        producers.remove(tile);
-        consumers.remove(tile);
-        batteries.remove(tile);
+        all.remove(tile, true);
+        producers.remove(tile, true);
+        consumers.remove(tile, true);
+        batteries.remove(tile, true);
     }
 
     public void remove(Building tile){

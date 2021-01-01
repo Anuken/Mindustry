@@ -5,11 +5,11 @@ public enum SStat{
     attacksWon,
     pvpsWon,
     timesLaunched,
-    zoneMechsUsed,
     blocksDestroyed,
     itemsLaunched,
     reactorsOverheated,
     maxUnitActive,
+    unitTypesBuilt,
     unitsBuilt,
     bossesDefeated,
     maxPlayersServer,
@@ -17,6 +17,9 @@ public enum SStat{
     mapsPublished,
     maxWavesSurvived,
     blocksBuilt,
+    maxProduction,
+    sectorsControlled,
+    schematicsCreated,
     ;
 
     public int get(){
@@ -25,17 +28,21 @@ public enum SStat{
 
     public void max(int amount){
         if(amount > get()){
-            add(amount - get());
+            set(amount);
         }
     }
 
-    public void add(int amount){
-        SVars.stats.stats.setStatI(name(), get() + amount);
+    public void set(int amount){
+        SVars.stats.stats.setStatI(name(), amount);
         SVars.stats.onUpdate();
 
         for(SAchievement a : SAchievement.all){
             a.checkCompletion();
         }
+    }
+
+    public void add(int amount){
+        set(get() + amount);
     }
 
     public void add(){

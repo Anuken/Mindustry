@@ -16,7 +16,9 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
+import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
@@ -40,7 +42,7 @@ public class Drill extends Block{
     protected int returnCount;
 
     /** Whether to draw the item this drill is mining. */
-    public boolean drawMineItem = false;
+    public boolean drawMineItem = true;
     /** Effect played when an item is produced. This is colored. */
     public Effect drillEffect = Fx.mine;
     /** Speed the drill bit rotates at. */
@@ -55,6 +57,7 @@ public class Drill extends Block{
     public @Load("@-rim") TextureRegion rimRegion;
     public @Load("@-rotator") TextureRegion rotatorRegion;
     public @Load("@-top") TextureRegion topRegion;
+    public @Load(value = "@-item", fallback = "drill-item-@size") TextureRegion itemRegion;
 
     public Drill(String name){
         super(name);
@@ -64,8 +67,8 @@ public class Drill extends Block{
         hasLiquids = true;
         liquidCapacity = 5f;
         hasItems = true;
-        idleSound = Sounds.drill;
-        idleSoundVolume = 0.003f;
+        ambientSound = Sounds.drill;
+        ambientSoundVolume = 0.018f;
     }
 
     @Override
@@ -74,11 +77,11 @@ public class Drill extends Block{
         Tile tile = req.tile();
         if(tile == null) return;
 
-        countOre(req.tile());
-        if(returnItem == null) return;
+        countOre(tile);
+        if(returnItem == null || !drawMineItem) return;
 
         Draw.color(returnItem.color);
-        Draw.rect("drill-top", req.drawx(), req.drawy());
+        Draw.rect(itemRegion, req.drawx(), req.drawy());
         Draw.color();
     }
 
@@ -122,6 +125,12 @@ public class Drill extends Block{
             Draw.rect(returnItem.icon(Cicon.small), dx, dy - 1);
             Draw.reset();
             Draw.rect(returnItem.icon(Cicon.small), dx, dy);
+
+            if(drawMineItem){
+                Draw.color(returnItem.color);
+                Draw.rect(itemRegion, tile.worldx() + offset, tile.worldy() + offset);
+                Draw.color();
+            }
         }else{
             Tile to = tile.getLinkedTilesAs(this, tempTiles).find(t -> t.drop() != null && t.drop().hardness > tier);
             Item item = to == null ? null : to.drop();
@@ -135,29 +144,11 @@ public class Drill extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.drillTier, table -> {
-            Seq<Block> list = content.blocks().select(b -> b.isFloor() && b.asFloor().itemDrop != null && b.asFloor().itemDrop.hardness <= tier);
+        stats.add(Stat.drillTier, new BlockFilterValue(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= tier));
 
-            table.table(l -> {
-                l.left();
-
-                for(int i = 0; i < list.size; i++){
-                    Block item = list.get(i);
-
-                    l.image(item.icon(Cicon.small)).size(8 * 3).padRight(2).padLeft(2).padTop(3).padBottom(3);
-                    l.add(item.localizedName).left().padLeft(1).padRight(4);
-                    if(i % 5 == 4){
-                        l.row();
-                    }
-                }
-            });
-
-
-        });
-
-        stats.add(BlockStat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
+        stats.add(Stat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
         if(liquidBoostIntensity != 1){
-            stats.add(BlockStat.boostEffect, liquidBoostIntensity * liquidBoostIntensity, StatUnit.timesSpeed);
+            stats.add(Stat.boostEffect, liquidBoostIntensity * liquidBoostIntensity, StatUnit.timesSpeed);
         }
     }
 
@@ -184,7 +175,7 @@ public class Drill extends Block{
         }
 
         itemArray.sort((item1, item2) -> {
-            int type = Boolean.compare(item1 != Items.sand, item2 != Items.sand);
+            int type = Boolean.compare(!item1.lowPriority, !item2.lowPriority);
             if(type != 0) return type;
             int amounts = Integer.compare(oreCount.get(item1, 0), oreCount.get(item2, 0));
             if(amounts != 0) return amounts;
@@ -221,8 +212,13 @@ public class Drill extends Block{
         }
 
         @Override
-        public boolean shouldIdleSound(){
-            return efficiency() > 0.01f;
+        public boolean shouldAmbientSound(){
+            return efficiency() > 0.01f && items.total() < itemCapacity;
+        }
+
+        @Override
+        public float ambientVolume(){
+            return efficiency() * (size * size) / 4f;
         }
 
         @Override
@@ -270,7 +266,7 @@ public class Drill extends Block{
                 progress += delta() * dominantItems * speed * warmup;
 
                 if(Mathf.chanceDelta(updateEffectChance * warmup))
-                    updateEffect.at(getX() + Mathf.range(size * 2f), getY() + Mathf.range(size * 2f));
+                    updateEffect.at(x + Mathf.range(size * 2f), y + Mathf.range(size * 2f));
             }else{
                 lastDrillSpeed = 0f;
                 warmup = Mathf.lerpDelta(warmup, 0f, warmupSpeed);
@@ -285,7 +281,7 @@ public class Drill extends Block{
                 index ++;
                 progress %= delay;
 
-                drillEffect.at(getX() + Mathf.range(size), getY() + Mathf.range(size), dominantItem.color);
+                drillEffect.at(x + Mathf.range(size), y + Mathf.range(size), dominantItem.color);
             }
         }
 
@@ -302,7 +298,7 @@ public class Drill extends Block{
 
             if(drawRim){
                 Draw.color(heatColor);
-                Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Time.time(), 3f, s)));
+                Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Time.time, 3f, s)));
                 Draw.blend(Blending.additive);
                 Draw.rect(rimRegion, x, y);
                 Draw.blend();
@@ -315,7 +311,7 @@ public class Drill extends Block{
 
             if(dominantItem != null && drawMineItem){
                 Draw.color(dominantItem.color);
-                Draw.rect("drill-top", x, y);
+                Draw.rect(itemRegion, x, y);
                 Draw.color();
             }
         }

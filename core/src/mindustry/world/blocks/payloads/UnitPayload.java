@@ -7,8 +7,8 @@ import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
-import mindustry.entities.*;
 import mindustry.entities.EntityCollisions.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -43,7 +43,7 @@ public class UnitPayload implements Payload{
 
     @Override
     public boolean dump(){
-        if(!Units.canCreate(unit.team, unit.type())){
+        if(!Units.canCreate(unit.team, unit.type)){
             deactiveTime = 1f;
             return false;
         }
@@ -74,7 +74,7 @@ public class UnitPayload implements Payload{
     @Override
     public void draw(){
         Drawf.shadow(unit.x, unit.y, 20);
-        Draw.rect(unit.type().icon(Cicon.full), unit.x, unit.y, unit.rotation - 90);
+        Draw.rect(unit.type.icon(Cicon.full), unit.x, unit.y, unit.rotation - 90);
 
         //draw warning
         if(deactiveTime > 0){
@@ -88,5 +88,10 @@ public class UnitPayload implements Payload{
 
             deactiveTime = Math.max(deactiveTime - Time.delta/deactiveDuration, 0f);
         }
+    }
+
+    @Override
+    public TextureRegion icon(Cicon icon){
+        return unit.type.icon(icon);
     }
 }

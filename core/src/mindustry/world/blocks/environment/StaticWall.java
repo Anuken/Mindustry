@@ -8,7 +8,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class StaticWall extends Boulder{
     public @Load("@-large") TextureRegion large;

@@ -1,20 +1,21 @@
 package mindustry.core;
 
+import arc.*;
 import arc.files.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.util.ArcAnnotate.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.game.EventType.*;
 import mindustry.entities.bullet.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-import static arc.Core.files;
-import static mindustry.Vars.mods;
+import static arc.Core.*;
+import static mindustry.Vars.*;
 
 /**
  * Loads all game content.
@@ -97,6 +98,8 @@ public class ContentLoader{
     /** Calls Content#init() on everything. Use only after all modules have been created.*/
     public void init(){
         initialize(Content::init);
+        if(constants != null) constants.init();
+        Events.fire(new ContentInitEvent());
     }
 
     /** Calls Content#load() on everything. Use only after all modules have been created on the client.*/
@@ -161,8 +164,8 @@ public class ContentLoader{
     public void removeLast(){
         if(lastAdded != null && contentMap[lastAdded.getContentType().ordinal()].peek() == lastAdded){
             contentMap[lastAdded.getContentType().ordinal()].pop();
-            if(lastAdded instanceof MappableContent){
-                contentNameMap[lastAdded.getContentType().ordinal()].remove(((MappableContent)lastAdded).name);
+            if(lastAdded instanceof MappableContent c){
+                contentNameMap[lastAdded.getContentType().ordinal()].remove(c.name);
             }
         }
     }

@@ -5,7 +5,7 @@ import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.ArcAnnotate.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -19,14 +19,14 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
 /** A block in the process of construction. */
 public class ConstructBlock extends Block{
-    public static final int maxSize = 16;
-    private static final ConstructBlock[] consBlocks = new ConstructBlock[maxSize];
+    private static final ConstructBlock[] consBlocks = new ConstructBlock[maxBlockSize];
 
     private static long lastTime = 0;
     private static int pitchSeq = 0;
@@ -40,11 +40,12 @@ public class ConstructBlock extends Block{
         consumesTap = true;
         solidifes = true;
         consBlocks[size - 1] = this;
+        sync = true;
     }
 
-    /** Returns a BuildBlock by size. */
+    /** Returns a ConstructBlock by size. */
     public static ConstructBlock get(int size){
-        if(size > maxSize) throw new IllegalArgumentException("No. Don't place ConstructBlock of size greater than " + maxSize);
+        if(size > maxBlockSize) throw new IllegalArgumentException("No. Don't place ConstructBlock of size greater than " + maxBlockSize);
         return consBlocks[size - 1];
     }
 
@@ -58,10 +59,11 @@ public class ConstructBlock extends Block{
     }
 
     @Remote(called = Loc.server)
-    public static void constructFinish(Tile tile, Block block, Unit builder, byte rotation, Team team, Object config){
+    public static void constructFinish(Tile tile, Block block, @Nullable Unit builder, byte rotation, Team team, Object config){
         if(tile == null) return;
 
         float healthf = tile.build == null ? 1f : tile.build.healthf();
+        Seq<Building> prev = tile.build instanceof ConstructBuild ? ((ConstructBuild)tile.build).prevBuild : null;
 
         tile.setBlock(block, team, rotation);
 
@@ -71,6 +73,14 @@ public class ConstructBlock extends Block{
             if(config != null){
                 tile.build.configured(builder, config);
             }
+
+            if(prev != null && prev.size > 0){
+                tile.build.overwrote(prev);
+            }
+
+            if(builder != null && builder.isPlayer()){
+                tile.build.lastAccessed = builder.getPlayer().name;
+            }
         }
 
         //last builder was this local client player, call placed()
@@ -79,6 +89,7 @@ public class ConstructBlock extends Block{
         }
 
         Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
+        if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
     }
 
     static boolean shouldPlay(){
@@ -112,7 +123,6 @@ public class ConstructBlock extends Block{
         }
 
         Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
-        if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
     }
 
     @Override
@@ -126,6 +136,7 @@ public class ConstructBlock extends Block{
          * If there is no recipe for this block, as is the case with rocks, 'previous' is used.
          */
         public @Nullable Block cblock;
+        public @Nullable Seq<Building> prevBuild;
 
         public float progress = 0;
         public float buildCost;
@@ -134,7 +145,12 @@ public class ConstructBlock extends Block{
          * If a non-recipe block is being deconstructed, this is the block that is being deconstructed.
          */
         public Block previous;
-        public Object lastConfig;
+        public @Nullable Object lastConfig;
+        public boolean wasConstructing, activeDeconstruct;
+        public float constructColor;
+
+        @Nullable
+        public Unit lastBuilder;
 
         private float[] accumulator;
         private float[] totalAccumulator;
@@ -161,12 +177,12 @@ public class ConstructBlock extends Block{
 
         @Override
         public void tapped(){
-            //if the target is constructible, begin constructing
+            //if the target is constructable, begin constructing
             if(cblock != null){
                 if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
                     control.input.isBuilding = true;
                 }
-                player.builder().addBuild(new BuildPlan(tile.x, tile.y, rotation, cblock, lastConfig), false);
+                player.unit().addBuild(new BuildPlan(tile.x, tile.y, rotation, cblock, lastConfig), false);
             }
         }
 
@@ -174,9 +190,15 @@ public class ConstructBlock extends Block{
         public void onDestroyed(){
             Fx.blockExplosionSmoke.at(tile);
 
-            if(!tile.floor().solid && !tile.floor().isLiquid){
+            if(!tile.floor().solid && tile.floor().hasSurface()){
                 Effect.rubble(x, y, size);
             }
+        }
+
+        @Override
+        public void updateTile(){
+            constructColor = Mathf.lerpDelta(constructColor, activeDeconstruct ? 1f : 0f, 0.2f);
+            activeDeconstruct = false;
         }
 
         @Override
@@ -186,7 +208,7 @@ public class ConstructBlock extends Block{
             }
 
             Draw.draw(Layer.blockBuilding, () -> {
-                Shaders.blockbuild.color = Pal.accent;
+                Draw.color(Pal.accent, Pal.remove, constructColor);
 
                 Block target = cblock == null ? previous : cblock;
 
@@ -199,13 +221,21 @@ public class ConstructBlock extends Block{
                         Draw.flush();
                     }
                 }
+
+                Draw.color();
             });
         }
 
         public void construct(Unit builder, @Nullable Building core, float amount, Object config){
+            wasConstructing = true;
+            activeDeconstruct = false;
             if(cblock == null){
                 kill();
                 return;
+            }
+
+            if(builder.isPlayer()){
+                lastBuilder = builder;
             }
 
             lastConfig = config;
@@ -227,12 +257,19 @@ public class ConstructBlock extends Block{
             progress = Mathf.clamp(progress + maxProgress);
 
             if(progress >= 1f || state.rules.infiniteResources){
-                constructed(tile, cblock, builder, (byte)rotation, builder.team, config);
+                if(lastBuilder == null) lastBuilder = builder;
+                constructed(tile, cblock, lastBuilder, (byte)rotation, builder.team, config);
             }
         }
 
         public void deconstruct(Unit builder, @Nullable Building core, float amount){
+            wasConstructing = false;
+            activeDeconstruct = true;
             float deconstructMultiplier = state.rules.deconstructRefundMultiplier;
+
+            if(builder.isPlayer()){
+                lastBuilder = builder;
+            }
 
             if(cblock != null){
                 ItemStack[] requirements = cblock.requirements;
@@ -251,9 +288,10 @@ public class ConstructBlock extends Block{
                     int accumulated = (int)(accumulator[i]); //get amount
 
                     if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
-                        if(core != null){
-                            int accepting = core.acceptStack(requirements[i].item, accumulated, builder);
-                            core.handleStack(requirements[i].item, accepting, builder);
+                        if(core != null && requirements[i].item.unlockedNow()){ //only accept items that are unlocked
+                            int accepting = Math.min(accumulated, ((CoreBuild)core).storageCapacity - core.items.get(requirements[i].item));
+                            //transfer items directly, as this is not production.
+                            core.items.add(requirements[i].item, accepting);
                             accumulator[i] -= accepting;
                         }else{
                             accumulator[i] -= accumulated;
@@ -264,8 +302,9 @@ public class ConstructBlock extends Block{
 
             progress = Mathf.clamp(progress - amount);
 
-            if(progress <= 0 || state.rules.infiniteResources){
-                Call.deconstructFinish(tile, this.cblock == null ? previous : this.cblock, builder);
+            if(progress <= (previous == null ? 0 : previous.deconstructThreshold) || state.rules.infiniteResources){
+                if(lastBuilder == null) lastBuilder = builder;
+                Call.deconstructFinish(tile, this.cblock == null ? previous : this.cblock, lastBuilder);
             }
         }
 
@@ -305,6 +344,8 @@ public class ConstructBlock extends Block{
         }
 
         public void setConstruct(Block previous, Block block){
+            this.constructColor = 0f;
+            this.wasConstructing = true;
             this.cblock = block;
             this.previous = previous;
             this.accumulator = new float[block.requirements.length];
@@ -314,6 +355,9 @@ public class ConstructBlock extends Block{
 
         public void setDeconstruct(Block previous){
             if(previous == null) return;
+
+            this.constructColor = 1f;
+            this.wasConstructing = false;
             this.previous = previous;
             this.progress = 1f;
             if(previous.buildCost >= 0.01f){

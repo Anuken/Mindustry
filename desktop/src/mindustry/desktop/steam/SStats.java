@@ -1,15 +1,17 @@
 package mindustry.desktop.steam;
 
 import arc.*;
+import arc.struct.*;
 import arc.util.*;
 import com.codedisaster.steamworks.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
-import mindustry.game.Stats.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.*;
+import mindustry.world.blocks.distribution.*;
 
 import static mindustry.Vars.*;
 import static mindustry.desktop.steam.SAchievement.*;
@@ -19,21 +21,26 @@ public class SStats implements SteamUserStatsCallback{
     public final SteamUserStats stats = new SteamUserStats(this);
 
     private boolean updated = false;
-    //private ObjectSet<String> mechs = new ObjectSet<>();
     private int statSavePeriod = 4; //in minutes
+
+    private ObjectSet<String> blocksBuilt = new ObjectSet<>(), unitsBuilt = new ObjectSet<>();
+    private ObjectSet<UnitType> t5s = new ObjectSet<>();
+    private IntSet checked = new IntSet();
 
     public SStats(){
         stats.requestCurrentStats();
 
         Events.on(ClientLoadEvent.class, e -> {
-            //mechs = Core.settings.getObject("mechs", ObjectSet.class, ObjectSet::new);
+            unitsBuilt = Core.settings.getJson("units-built" , ObjectSet.class, String.class, ObjectSet::new);
+            blocksBuilt = Core.settings.getJson("blocks-built" , ObjectSet.class, String.class, ObjectSet::new);
+            t5s = ObjectSet.with(UnitTypes.omura, UnitTypes.reign, UnitTypes.toxopid, UnitTypes.eclipse, UnitTypes.oct, UnitTypes.corvus);
 
             Core.app.addListener(new ApplicationListener(){
                 Interval i = new Interval();
 
                 @Override
                 public void update(){
-                    if(i.get(60f / 4f)){
+                    if(i.get(60f)){
                         checkUpdate();
                     }
                 }
@@ -53,15 +60,10 @@ public class SStats implements SteamUserStatsCallback{
 
     void checkUpdate(){
         if(campaign()){
-            SStat.maxUnitActive.max(Groups.unit.count(t -> t.team() == player.team()));
+            SStat.maxUnitActive.max(Groups.unit.count(t -> t.team == player.team()));
 
-            //TODO
-            //if(Groups.unit.count(u -> u.type() == UnitTypes.phantom && u.team() == player.team()) >= 10){
-           //     active10Phantoms.complete();
-            //}
-
-            if(Groups.unit.count(u -> u.type() == UnitTypes.crawler && u.team() == player.team()) >= 50){
-                active50Crawlers.complete();
+            if(Groups.unit.count(u -> u.type == UnitTypes.poly && u.team == player.team()) >= 10){
+                 active10Polys.complete();
             }
 
             for(Building entity : player.team().cores()){
@@ -74,24 +76,33 @@ public class SStats implements SteamUserStatsCallback{
     }
 
     private void registerEvents(){
+
         Events.on(UnitDestroyEvent.class, e -> {
-            if(ncustom()){
-                if(e.unit.team() != Vars.player.team()){
+            if(campaign()){
+                if(e.unit.team != Vars.player.team()){
                     SStat.unitsDestroyed.add();
 
-                    if(e.unit instanceof Unit && ((Unit)e.unit).isBoss()){
+                    if(e.unit.isBoss()){
                         SStat.bossesDefeated.add();
                     }
                 }
             }
         });
 
-        //TODO achievement invalid
-        //Events.on(ZoneConfigureCompleteEvent.class, e -> {
-            //if(!content.sectors().contains(z -> !z.canConfigure())){
-            //    configAllZones.complete();
-            //}
-        //});
+        Events.on(TurnEvent.class, e -> {
+            float total = 0;
+            for(Planet planet : content.planets()){
+                for(Sector sec : planet.sectors){
+                    if(sec.hasBase()){
+                        for(var v : sec.info.production.values()){
+                            if(v.mean > 0) total += v.mean * 60;
+                        }
+                    }
+                }
+            }
+
+            SStat.maxProduction.max(Math.round(total));
+        });
 
         Events.run(Trigger.newGame, () -> Core.app.post(() -> {
             if(campaign() && player.core() != null && player.core().items.total() >= 10 * 1000){
@@ -113,25 +124,61 @@ public class SStats implements SteamUserStatsCallback{
                     chainRouters.complete();
                 }
 
-                //TODO implement
-                //if(e.tile.block() == Blocks.daggerFactory){
-                //    buildDaggerFactory.complete();
-                //}
+                if(e.tile.block() == Blocks.groundFactory){
+                    buildGroundFactory.complete();
+                }
 
-                if(e.tile.block() == Blocks.meltdown || e.tile.block() == Blocks.spectre){
-                    if(e.tile.block() == Blocks.meltdown && !Core.settings.getBool("meltdownp", false)){
-                        Core.settings.put("meltdownp", true);
-                    }
-
-                    if(e.tile.block() == Blocks.spectre && !Core.settings.getBool("spectrep", false)){
-                        Core.settings.put("spectrep", true);
-                    }
-
-                    if(Core.settings.getBool("meltdownp", false) && Core.settings.getBool("spectrep", false)){
+                if(blocksBuilt.add(e.tile.block().name)){
+                    if(blocksBuilt.contains("meltdown") && blocksBuilt.contains("spectre") && blocksBuilt.contains("foreshadow")){
                         buildMeltdownSpectre.complete();
+                    }
+
+                    save();
+                }
+
+                if(e.tile.block() instanceof Conveyor){
+                    checked.clear();
+                    check: {
+                        Tile current = e.tile;
+                        for(int i = 0; i < 4; i++){
+                            checked.add(current.pos());
+                            if(current.build == null) break check;
+                            Tile next = current.nearby(current.build.rotation);
+                            if(next != null && next.block() instanceof Conveyor){
+                                current = next;
+                            }else{
+                                break check;
+                            }
+                        }
+
+                        if(current == e.tile && checked.size == 4){
+                            circleConveyor.complete();
+                        }
                     }
                 }
             }
+        });
+
+        Events.on(UnitCreateEvent.class, e -> {
+            if(campaign()){
+                if(unitsBuilt.add(e.unit.type.name)){
+                    SStat.unitTypesBuilt.set(content.units().count(u -> unitsBuilt.contains(u.name) && !u.isHidden()));
+                }
+
+                if(t5s.contains(e.unit.type)){
+                    buildT5.complete();
+                }
+            }
+        });
+
+        Events.on(UnitControlEvent.class, e -> {
+            if(e.unit instanceof BlockUnitc block && block.tile().block == Blocks.router){
+                becomeRouter.complete();
+            }
+        });
+
+        Events.on(SchematicCreateEvent.class, e -> {
+            SStat.schematicsCreated.add();
         });
 
         Events.on(BlockDestroyEvent.class, e -> {
@@ -147,17 +194,19 @@ public class SStats implements SteamUserStatsCallback{
         Events.on(UnlockEvent.class, e -> {
             if(e.content == Items.thorium) obtainThorium.complete();
             if(e.content == Items.titanium) obtainTitanium.complete();
-
-            if(!content.sectors().contains(SectorPreset::locked)){
-                unlockAllZones.complete();
-            }
         });
 
         Events.run(Trigger.openWiki, openWiki::complete);
 
         Events.run(Trigger.exclusionDeath, dieExclusion::complete);
 
-        Events.run(Trigger.drown, drown::complete);
+        Events.on(UnitDrownEvent.class, e -> {
+            if(campaign() && e.unit.isPlayer()){
+                drown.complete();
+            }
+        });
+
+        trigger(Trigger.acceleratorUse, useAccelerator);
 
         trigger(Trigger.impactPower, powerupImpactReactor);
 
@@ -179,7 +228,17 @@ public class SStats implements SteamUserStatsCallback{
 
         trigger(Trigger.phaseDeflectHit, killEnemyPhaseWall);
 
-        trigger(Trigger.itemLaunch, launchItemPad);
+        Events.on(LaunchItemEvent.class, e -> {
+            if(campaign()){
+                launchItemPad.complete();
+            }
+        });
+
+        Events.on(PickupEvent.class, e -> {
+            if(e.carrier.isPlayer() && campaign() && e.unit != null && t5s.contains(e.unit.type)){
+                pickupT5.complete();
+            }
+        });
 
         Events.on(UnitCreateEvent.class, e -> {
             if(campaign() && e.unit.team() == player.team()){
@@ -187,20 +246,7 @@ public class SStats implements SteamUserStatsCallback{
             }
         });
 
-        Events.on(LoseEvent.class, e -> {
-            if(campaign()){
-                //TODO implement
-                //if(state.getSector().metCondition() && (state.wave - state.getSector().conditionWave) / state.getSector().launchPeriod >= 1){
-                //    skipLaunching2Death.complete();
-                //}
-            }
-        });
-
-        Events.on(LaunchEvent.class, e -> {
-            if(state.rules.tutorial){
-                completeTutorial.complete();
-            }
-
+        Events.on(SectorLaunchEvent.class, e -> {
             SStat.timesLaunched.add();
         });
 
@@ -209,7 +255,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(WaveEvent.class, e -> {
-            if(ncustom()){
+            if(campaign()){
                 SStat.maxWavesSurvived.max(Vars.state.wave);
 
                 if(state.stats.buildingsBuilt == 0 && state.wave >= 10){
@@ -224,43 +270,54 @@ public class SStats implements SteamUserStatsCallback{
             }
         });
 
-        Events.on(ResearchEvent.class, e -> {
-            if(e.content == Blocks.router) researchRouter.complete();
+        Runnable checkUnlocks = () -> {
+            if(Blocks.router.unlocked()) researchRouter.complete();
 
             if(!TechTree.all.contains(t -> t.content.locked())){
                 researchAll.complete();
             }
-        });
+        };
+
+        //check unlocked stuff on load as well
+        Events.on(ResearchEvent.class, e -> checkUnlocks.run());
+        Events.on(ClientLoadEvent.class, e -> checkUnlocks.run());
 
         Events.on(WinEvent.class, e -> {
-            if(state.hasSector()){
-                if(Vars.state.wave <= 5 && state.rules.attackMode){
-                    defeatAttack5Waves.complete();
-                }
-
-                if(Vars.state.rules.attackMode){
-                    SStat.attacksWon.add();
-                }
-
-                RankResult result = state.stats.calculateRank(state.getSector(), state.launched);
-                if(result.rank == Rank.S) earnSRank.complete();
-                if(result.rank == Rank.SS) earnSSRank.complete();
-            }
-
             if(state.rules.pvp){
                 SStat.pvpsWon.add();
             }
         });
 
-        //TODO dead achievement
-        /*
-        Events.on(MechChangeEvent.class, e -> {
-            if(campaign()){
-                if(mechs.add(e.mech.name)){
-                    SStat.zoneMechsUsed.max(mechs.size);
+        Events.on(SectorCaptureEvent.class, e -> {
+            if(e.sector.isBeingPlayed() || net.client()){
+                if(Vars.state.wave <= 5 && state.rules.attackMode){
+                    defeatAttack5Waves.complete();
+                }
+
+                if(state.stats.buildingsDestroyed == 0){
+                    captureNoBlocksBroken.complete();
                 }
             }
-        });*/
+
+            if(Vars.state.rules.attackMode){
+                SStat.attacksWon.add();
+            }
+
+            if(!e.sector.isBeingPlayed() && !net.client()){
+                captureBackground.complete();
+            }
+
+            if(!e.sector.planet.sectors.contains(s -> !s.hasBase())){
+                captureAllSectors.complete();
+            }
+
+            SStat.sectorsControlled.set(e.sector.planet.sectors.count(Sector::hasBase));
+        });
+    }
+
+    private void save(){
+        Core.settings.putJson("units-built" , String.class, unitsBuilt);
+        Core.settings.putJson("blocks-built" , String.class, blocksBuilt);
     }
 
     private void trigger(Trigger trigger, SAchievement ach){
@@ -269,10 +326,6 @@ public class SStats implements SteamUserStatsCallback{
                 ach.complete();
             }
         });
-    }
-
-    private boolean ncustom(){
-        return campaign();
     }
 
     private boolean campaign(){

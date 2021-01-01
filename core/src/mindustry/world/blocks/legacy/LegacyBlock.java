@@ -8,4 +8,9 @@ public class LegacyBlock extends Block{
     public LegacyBlock(String name){
         super(name);
     }
+
+    /** Removes this block from the world, or replaces it with something else. */
+    public void removeSelf(Tile tile){
+        tile.remove();
+    }
 }

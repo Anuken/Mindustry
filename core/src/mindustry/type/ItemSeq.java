@@ -21,6 +21,19 @@ public class ItemSeq implements Iterable<ItemStack>, Serializable{
         stacks.each(this::add);
     }
 
+    public void checkNegative(){
+        for(int i = 0; i < values.length; i++){
+            if(values[i] < 0) values[i] = 0;
+        }
+    }
+
+    public ItemSeq copy(){
+        ItemSeq out = new ItemSeq();
+        out.total = total;
+        System.arraycopy(values, 0, out.values, 0, values.length);
+        return out;
+    }
+
     public void each(ItemConsumer cons){
         for(int i = 0; i < values.length; i++){
             if(values[i] != 0){
@@ -42,8 +55,27 @@ public class ItemSeq implements Iterable<ItemStack>, Serializable{
         return out;
     }
 
+    public void min(int number){
+        for(Item item : Vars.content.items()){
+            set(item, Math.min(get(item), number));
+        }
+    }
+
     public boolean has(Item item){
         return values[item.id] > 0;
+    }
+
+    public boolean has(ItemSeq seq){
+        for(int i = 0; i < values.length; i++){
+            if(seq.values[i] > values[i]){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean has(Item item, int amount){
+        return values[item.id] >= amount;
     }
 
     public int get(Item item){
@@ -98,14 +130,16 @@ public class ItemSeq implements Iterable<ItemStack>, Serializable{
 
     @Override
     public void read(Json json, JsonValue jsonData){
+        total = 0;
         for(Item item : Vars.content.items()){
             values[item.id] = jsonData.getInt(item.name, 0);
+            total += values[item.id];
         }
     }
 
     @Override
     public String toString(){
-        return JsonIO.write(this);
+        return JsonIO.print(JsonIO.write(this));
     }
 
     @Override

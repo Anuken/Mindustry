@@ -9,6 +9,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -30,6 +31,7 @@ public class MendProjector extends Block{
         super(name);
         solid = true;
         update = true;
+        group = BlockGroup.projectors;
         hasPower = true;
         hasItems = true;
     }
@@ -43,11 +45,11 @@ public class MendProjector extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
-        stats.add(BlockStat.range, range / tilesize, StatUnit.blocks);
+        stats.add(Stat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
+        stats.add(Stat.range, range / tilesize, StatUnit.blocks);
 
-        stats.add(BlockStat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
+        stats.add(Stat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
+        stats.add(Stat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
     }
 
     @Override
@@ -55,13 +57,20 @@ public class MendProjector extends Block{
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.accent);
     }
 
-    public class MendBuild extends Building{
+    public class MendBuild extends Building implements Ranged{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
+        float smoothEfficiency;
+
+        @Override
+        public float range(){
+            return range;
+        }
 
         @Override
         public void updateTile(){
+            smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency(), 0.08f);
             heat = Mathf.lerpDelta(heat, consValid() || cheating() ? 1f : 0f, 0.08f);
             charge += heat * delta();
 
@@ -95,22 +104,21 @@ public class MendProjector extends Block{
         public void draw(){
             super.draw();
 
-            float f = 1f - (Time.time() / 100f) % 1f;
+            float f = 1f - (Time.time / 100f) % 1f;
 
             Draw.color(baseColor, phaseColor, phaseHeat);
-            Draw.alpha(heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
+            Draw.alpha(heat * Mathf.absin(Time.time, 10f, 1f) * 0.5f);
             Draw.rect(topRegion, x, y);
-
             Draw.alpha(1f);
             Lines.stroke((2f * f + 0.2f) * heat);
-            Lines.square(x, y, ((1f - f) * 8f) * size / 2f);
+            Lines.square(x, y, Math.min(1f + (1f - f) * size * tilesize / 2f, size * tilesize/2f));
 
             Draw.reset();
         }
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, 50f * efficiency(), baseColor, 0.7f * efficiency());
+            Drawf.light(team, x, y, 50f * smoothEfficiency, baseColor, 0.7f * smoothEfficiency);
         }
 
         @Override

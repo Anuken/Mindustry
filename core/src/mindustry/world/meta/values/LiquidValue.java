@@ -1,9 +1,9 @@
 package mindustry.world.meta.values;
 
-import arc.scene.ui.layout.Table;
-import mindustry.type.Liquid;
-import mindustry.ui.LiquidDisplay;
-import mindustry.world.meta.StatValue;
+import arc.scene.ui.layout.*;
+import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.world.meta.*;
 
 public class LiquidValue implements StatValue{
     private final Liquid liquid;

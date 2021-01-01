@@ -1,7 +1,7 @@
 package mindustry.world.meta.values;
 
-import arc.scene.ui.layout.Table;
-import mindustry.world.meta.StatValue;
+import arc.scene.ui.layout.*;
+import mindustry.world.meta.*;
 
 public class BooleanValue implements StatValue{
     private final boolean value;

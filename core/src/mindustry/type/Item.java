@@ -1,16 +1,15 @@
 package mindustry.type;
 
-import arc.struct.*;
 import arc.graphics.*;
-import arc.scene.ui.layout.*;
+import arc.struct.*;
 import mindustry.ctype.*;
-import mindustry.ui.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.meta.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class Item extends UnlockableContent{
-    public final Color color;
+    public Color color;
 
     /** how explosive this item is. */
     public float explosiveness = 0f;
@@ -25,6 +24,8 @@ public class Item extends UnlockableContent{
      * 1 cost = 1 tick added to build time
      */
     public float cost = 1f;
+    /** if true, this item is of lowest priority to drills. */
+    public boolean lowPriority;
 
     public Item(String name, Color color){
         super(name);
@@ -36,8 +37,10 @@ public class Item extends UnlockableContent{
     }
 
     @Override
-    public void displayInfo(Table table){
-        ContentDisplay.displayItem(table, this);
+    public void setStats(){
+        stats.addPercent(Stat.explosiveness, explosiveness);
+        stats.addPercent(Stat.flammability, flammability);
+        stats.addPercent(Stat.radioactivity, radioactivity);
     }
 
     @Override
