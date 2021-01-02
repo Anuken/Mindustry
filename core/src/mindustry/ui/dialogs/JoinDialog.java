@@ -584,7 +584,11 @@ public class JoinDialog extends BaseDialog{
         }
 
         String displayIP(){
-            return ip + (port != Vars.port ? ":" + port : "");
+            if(ip.chars().filter(c -> c == ':').count() > 1){
+                return port != Vars.port ? "[" + ip + "]:" + port : ip;
+            }else{
+                return ip + (port != Vars.port ? ":" + port : "");
+            }
         }
 
         public Server(){
