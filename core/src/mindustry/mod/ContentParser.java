@@ -2,7 +2,6 @@ package mindustry.mod;
 
 import arc.*;
 import arc.assets.*;
-import arc.assets.loaders.*;
 import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
@@ -10,7 +9,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.mock.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
@@ -29,7 +27,6 @@ import mindustry.gen.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
 import mindustry.world.consumers.*;
@@ -37,7 +34,8 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 import java.lang.reflect.*;
-import java.util.*;
+
+import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class ContentParser{
@@ -250,8 +248,8 @@ public class ContentParser{
 
                 readFields(block, value, true);
 
-                if(block.size > ConstructBlock.maxSize){
-                    throw new IllegalArgumentException("Blocks cannot be larger than " + ConstructBlock.maxSize);
+                if(block.size > maxBlockSize){
+                    throw new IllegalArgumentException("Blocks cannot be larger than " + maxBlockSize);
                 }
 
                 //make block visible by default if there are requirements and no visibility set
@@ -310,7 +308,7 @@ public class ContentParser{
                 }
 
                 if(value.has("controller")){
-                    unit.defaultController = make(resolve(value.getString("controller"), "mindustry.ai.type"));
+                    unit.defaultController = make(resolve(value.getString("controller"), "mindustry.ai.types"));
                 }
 
                 //read extra default waves

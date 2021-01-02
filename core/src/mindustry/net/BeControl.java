@@ -23,7 +23,7 @@ import static mindustry.Vars.*;
 
 /** Handles control of bleeding edge builds. */
 public class BeControl{
-    private static final int updateInterval = 60 * 1;
+    private static final int updateInterval = 60;
 
     private AsyncExecutor executor = new AsyncExecutor(1);
     private boolean checkUpdates = true;
@@ -49,6 +49,8 @@ public class BeControl{
             try{
                 Fi dest = Fi.get(System.getProperty("becopy"));
                 Fi self = Fi.get(BeControl.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+                
+                for(Fi file : self.parent().findAll(f -> !f.equals(self))) file.delete();
 
                 self.copyTo(dest);
             }catch(Throwable e){

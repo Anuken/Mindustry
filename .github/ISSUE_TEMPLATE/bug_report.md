@@ -21,7 +21,7 @@ assignees: ''
 
 If you remove the line above without reading it properly and understanding what it means, I will reap your soul. Even if you're playing on someone's server, you can still save the game to a slot.
 
-**Crash report**: *The contents of relevant crash report files. REQUIRED if you are reporting a crash.*
+**(Crash) logs**: *Either crash reports from the crash folder, or the file you get when you go into Settings -> Game Data -> Export Crash logs. REQUIRED if you are reporting a crash.*
 
 ---
 

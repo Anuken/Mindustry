@@ -242,7 +242,7 @@ public class MassDriver extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            //mass drivers that ouput only cannot accept items
+            //mass drivers that output only cannot accept items
             return items.total() < itemCapacity && linkValid();
         }
 
@@ -302,8 +302,7 @@ public class MassDriver extends Block{
 
         protected boolean shooterValid(Tile other){
             if(other == null) return true;
-            if(!(other.block() instanceof MassDriver)) return false;
-            MassDriverBuild entity = other.bc();
+            if(!(other.build instanceof MassDriverBuild entity)) return false;
             return entity.link == tile.pos() && tile.dst(other) <= range;
         }
 

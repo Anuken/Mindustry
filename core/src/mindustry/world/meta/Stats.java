@@ -55,22 +55,22 @@ public class Stats{
     }
 
     public void add(Stat stat, Attribute attr){
-        add(stat, attr, false, 1f);
+        add(stat, attr, false, 1f, false);
     }
 
     public void add(Stat stat, Attribute attr, float scale){
-        add(stat, attr, false, scale);
+        add(stat, attr, false, scale, false);
     }
 
     public void add(Stat stat, Attribute attr, boolean floating){
-        add(stat, attr, floating, 1f);
+        add(stat, attr, floating, 1f, false);
     }
 
-    public void add(Stat stat, Attribute attr, boolean floating, float scale){
+    public void add(Stat stat, Attribute attr, boolean floating, float scale, boolean startZero){
         for(var block : Vars.content.blocks()
             .select(block -> block instanceof Floor f && f.attributes.get(attr) != 0 && !(f.isLiquid && !floating))
             .<Floor>as().with(s -> s.sort(f -> f.attributes.get(attr)))){
-            add(stat, new FloorEfficiencyValue(block, block.attributes.get(attr) * scale));
+            add(stat, new FloorEfficiencyValue(block, block.attributes.get(attr) * scale, startZero));
         }
     }
 

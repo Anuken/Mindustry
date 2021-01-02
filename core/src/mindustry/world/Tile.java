@@ -125,13 +125,6 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return 0;
     }
 
-    /** Convenience method that returns the building of this tile with a cast.
-     * Method name is shortened to prevent conflict. */
-    @SuppressWarnings("unchecked")
-    public <T extends Building> T bc(){
-        return (T)build;
-    }
-
     public float worldx(){
         return x * tilesize;
     }
@@ -446,6 +439,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     public Rect getHitbox(Rect rect){
         return rect.setCentered(drawx(), drawy(), block.size * tilesize, block.size * tilesize);
+    }
+
+    public Rect getBounds(Rect rect){
+        return rect.set(x * tilesize - tilesize/2f, y * tilesize - tilesize/2f, tilesize, tilesize);
     }
 
     @Override

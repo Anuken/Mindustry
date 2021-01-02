@@ -91,7 +91,7 @@ public class Conveyor extends Block implements Autotiler{
             Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? Blocks.junction : this;
     }
 
-    public class ConveyorBuild extends Building{
+    public class ConveyorBuild extends Building implements ChainedBuilding{
         //parallel array data
         public Item[] ids = new Item[capacity];
         public float[] xs = new float[capacity];
@@ -255,7 +255,7 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         public boolean pass(Item item){
-            if(next != null && next.team == team && next.acceptItem(this, item)){
+            if(item != null && next != null && next.team == team && next.acceptItem(this, item)){
                 next.handleItem(this, item);
                 return true;
             }
@@ -390,6 +390,12 @@ public class Conveyor extends Block implements Autotiler{
             }
 
             len--;
+        }
+
+        @Nullable
+        @Override
+        public Building next(){
+            return nextc;
         }
     }
 }

@@ -34,7 +34,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
     public void createGenerator(InputType inputType){
         Vars.state = new GameState();
         Vars.state.rules = new Rules();
-        generator = new ItemLiquidGenerator(inputType != InputType.liquids, inputType != InputType.items, "fakegen"){
+        generator = new ItemLiquidGenerator(inputType != InputType.liquids, inputType != InputType.items, "fakegen" + System.nanoTime()){
             {
                 powerProduction = 0.1f;
                 itemDuration = fakeItemDuration;
@@ -54,7 +54,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         };
 
         tile = createFakeTile(0, 0, generator);
-        entity = tile.bc();
+        entity = (ItemLiquidGeneratorBuild)tile.build;
     }
 
     /** Tests the consumption and efficiency when being supplied with liquids. */

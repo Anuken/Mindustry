@@ -23,24 +23,27 @@ public abstract class GenerateFilter{
             //buffer of tiles used, each tile packed into a long struct
             long[] buffer = new long[tiles.width * tiles.height];
 
-            //save to buffer
             for(int i = 0; i < tiles.width * tiles.height; i++){
                 Tile tile = tiles.geti(i);
-                buffer[i] = PackTile.get(tile.blockID(), tile.floorID(), tile.overlayID());
+
+                in.apply(tile.x, tile.y, tile.block(), tile.floor(), tile.overlay());
+                apply();
+
+                buffer[i] = PackTile.get(in.block.id, in.floor.id, in.overlay.id);
             }
 
+            //write to buffer
             for(int i = 0; i < tiles.width * tiles.height; i++){
                 Tile tile = tiles.geti(i);
                 long b = buffer[i];
 
-                in.apply(tile.x, tile.y, Vars.content.block(PackTile.block(b)), Vars.content.block(PackTile.floor(b)), Vars.content.block(PackTile.overlay(b)));
-                apply();
+                Block block = Vars.content.block(PackTile.block(b)), floor = Vars.content.block(PackTile.floor(b)), overlay = Vars.content.block(PackTile.overlay(b));
 
-                tile.setFloor(in.floor.asFloor());
-                tile.setOverlay(!in.floor.asFloor().hasSurface() && in.overlay.asFloor().needsSurface ? Blocks.air : in.overlay);
+                tile.setFloor(floor.asFloor());
+                tile.setOverlay(!floor.asFloor().hasSurface() && overlay.asFloor().needsSurface ? Blocks.air : overlay);
 
-                if(!tile.block().synthetic() && !in.block.synthetic()){
-                    tile.setBlock(in.block);
+                if(!tile.block().synthetic() && !block.synthetic()){
+                    tile.setBlock(block);
                 }
             }
         }else{

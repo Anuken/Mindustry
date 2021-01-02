@@ -69,6 +69,7 @@ public enum Binding implements KeyBind{
     chat_history_prev(KeyCode.up),
     chat_history_next(KeyCode.down),
     chat_scroll(new Axis(KeyCode.scroll)),
+    chat_mode(KeyCode.tab),
     console(KeyCode.f8),
     ;
 

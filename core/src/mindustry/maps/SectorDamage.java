@@ -73,6 +73,11 @@ public class SectorDamage{
                     enemyHealth += info.bossHealth;
                 }
 
+                if(i == waveBegin){
+                    enemyDps += info.curEnemyDps;
+                    enemyHealth += info.curEnemyHealth;
+                }
+
                 //happens due to certain regressions
                 if(enemyHealth < 0 || enemyDps < 0) continue;
 
@@ -241,7 +246,7 @@ public class SectorDamage{
         //first, calculate the total health of blocks in the path
 
         //radius around the path that gets counted
-        int radius = 8;
+        int radius = 7;
         IntSet counted = new IntSet();
 
         for(Tile t : sparse2){
@@ -255,8 +260,8 @@ public class SectorDamage{
 
                         if(tile.build != null && tile.team() == state.rules.defaultTeam && counted.add(tile.pos())){
                             //health is divided by block size, because multiblocks are counted multiple times.
-                            sumHealth += tile.build.health / tile.block().size;
-                            totalPathBuild += 1f / tile.block().size;
+                            sumHealth += tile.build.health / (tile.block().size * tile.block().size);
+                            totalPathBuild += 1f / (tile.block().size * tile.block().size);
                         }
                     }
                 }
@@ -280,7 +285,7 @@ public class SectorDamage{
 
                     if(build.block instanceof ForceProjector f){
                         sumHealth += f.shieldHealth * e;
-                        sumRps += 1f * e;
+                        sumRps += e;
                     }
                 }
             }
@@ -293,18 +298,19 @@ public class SectorDamage{
             //skip player
             if(unit.isPlayer()) continue;
 
-            if(unit.team == state.rules.defaultTeam){
-                //scale health based on armor - yes, this is inaccurate, but better than nothing
-                float healthMult = 1f + Mathf.clamp(unit.armor / 20f);
+            //scale health based on armor - yes, this is inaccurate, but better than nothing
+            float healthMult = 1f + Mathf.clamp(unit.armor / 20f);
 
+            if(unit.team == state.rules.defaultTeam){
                 sumHealth += unit.health*healthMult + unit.shield;
                 sumDps += unit.type.dpsEstimate;
                 if(unit.abilities.find(a -> a instanceof RepairFieldAbility) instanceof RepairFieldAbility h){
                     sumRps += h.amount / h.reload * 60f;
                 }
             }else{
-                curEnemyDps += unit.type.dpsEstimate;
-                curEnemyHealth += unit.health;
+                float bossMult = unit.isBoss() ? 3f : 1f;
+                curEnemyDps += unit.type.dpsEstimate * unit.damageMultiplier() * bossMult;
+                curEnemyHealth += unit.health * healthMult * unit.healthMultiplier() * bossMult + unit.shield;
             }
         }
 
@@ -315,12 +321,6 @@ public class SectorDamage{
 
         for(int wave = state.wave; wave < state.wave + 10; wave ++){
             float sumWaveDps = 0f, sumWaveHealth = 0f;
-
-            //first wave has to take into account current dps
-            if(wave == state.wave){
-                sumWaveDps += curEnemyDps;
-                sumWaveHealth += curEnemyHealth;
-            }
 
             for(SpawnGroup group : state.rules.spawns){
                 float healthMult = 1f + Mathf.clamp(group.type.armor / 20f);
@@ -340,7 +340,7 @@ public class SectorDamage{
         }
 
         if(bossGroup != null){
-            float bossMult = 1.1f;
+            float bossMult = 1.2f;
             //calculate first boss appearaance
             for(int wave = state.wave; wave < state.wave + 60; wave++){
                 int spawned = bossGroup.getSpawned(wave - 1);
@@ -368,6 +368,11 @@ public class SectorDamage{
         //players tend to have longer range units/turrets, so assume DPS is higher
         info.sumDps = sumDps * 1.05f;
         info.sumRps = sumRps;
+
+        float cmult = 1.5f;
+
+        info.curEnemyDps = curEnemyDps*cmult;
+        info.curEnemyHealth = curEnemyHealth*cmult;
 
         info.wavesSurvived = getWavesSurvived(info);
     }
@@ -404,7 +409,7 @@ public class SectorDamage{
                             if(wx >= 0 && wy >= 0 && wx < world.width() && wy < world.height() && Mathf.within(dx, dy, radius)){
                                 Tile other = world.rawTile(wx, wy);
                                 if(!(other.block() instanceof CoreBlock)){
-                                    s += other.team() == state.rules.defaultTeam ? other.build.health / other.block().size : 0f;
+                                    s += other.team() == state.rules.defaultTeam ? other.build.health / (other.block().size * other.block().size) : 0f;
                                 }
                             }
                         }

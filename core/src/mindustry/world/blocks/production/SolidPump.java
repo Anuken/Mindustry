@@ -56,7 +56,7 @@ public class SolidPump extends Pump{
         stats.remove(Stat.output);
         stats.add(Stat.output, result, 60f * pumpAmount, true);
         if(attribute != null){
-            stats.add(baseEfficiency > 0.0001f ? Stat.affinities : Stat.tiles, attribute);
+            stats.add(baseEfficiency > 0.0001f ? Stat.affinities : Stat.tiles, attribute, floating, 1f, baseEfficiency <= 0.001f);
         }
     }
 

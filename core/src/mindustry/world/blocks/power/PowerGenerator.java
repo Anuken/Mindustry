@@ -1,6 +1,7 @@
 package mindustry.world.blocks.power;
 
 import arc.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -49,6 +50,11 @@ public class PowerGenerator extends PowerDistributor{
         public float generateTime;
         /** The efficiency of the producer. An efficiency of 1.0 means 100% */
         public float productionEfficiency = 0.0f;
+
+        @Override
+        public float ambientVolume(){
+            return Mathf.clamp(productionEfficiency);
+        }
 
         @Override
         public float getPowerProduction(){

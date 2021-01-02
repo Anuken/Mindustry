@@ -20,7 +20,6 @@ import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -38,6 +37,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Import Team team;
     @Import int id;
     @Import @Nullable Tile mineTile;
+    @Import Vec2 vel;
 
     private UnitController controller;
     UnitType type;
@@ -49,6 +49,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
+    }
+
+    public void approach(Vec2 vector){
+        vel.approachDelta(vector, type.accel * realSpeed() * floorSpeedMultiplier());
     }
 
     public void aimLook(Position pos){
@@ -105,6 +109,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Replace
     public float clipSize(){
+        if(isBuilding()){
+            return state.rules.infiniteResources ? Float.MAX_VALUE : Math.max(type.clipSize, type.region.width) + buildingRange + tilesize*4f;
+        }
         return Math.max(type.region.width * 2f, type.clipSize);
     }
 
@@ -129,6 +136,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case mineY -> mining() ? mineTile.y : -1;
             case flag -> flag;
             case controlled -> controller instanceof LogicAI || controller instanceof Player ? 1 : 0;
+            case commanded -> controller instanceof FormationAI ? 1 : 0;
             case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
             default -> 0;
         };
@@ -397,6 +405,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     /** Actually destroys the unit, removing it and creating explosions. **/
     public void destroy(){
+        if(!isAdded()) return;
+
         float explosiveness = 2f + item().explosiveness * stack().amount * 1.53f;
         float flammability = item().flammability * stack().amount / 1.9f;
 

@@ -44,6 +44,7 @@ public class LExecutor{
 
     public LInstruction[] instructions = {};
     public Var[] vars = {};
+    public int[] binds;
 
     public LongSeq graphicsBuffer = new LongSeq();
     public StringBuilder textBuffer = new StringBuilder();
@@ -97,28 +98,33 @@ public class LExecutor{
 
     //region utility
 
+    public Var var(int index){
+        //global constants have variable IDs < 0, and they are fetched from the global constants object after being negated
+        return index < 0 ? constants.get(-index) : vars[index];
+    }
+
     public @Nullable Building building(int index){
-        Object o = vars[index].objval;
-        return vars[index].isobj && o instanceof Building building ? building : null;
+        Object o = var(index).objval;
+        return var(index).isobj && o instanceof Building building ? building : null;
     }
 
     public @Nullable Object obj(int index){
-        Object o = vars[index].objval;
-        return vars[index].isobj ? o : null;
+        Object o = var(index).objval;
+        return var(index).isobj ? o : null;
     }
 
     public boolean bool(int index){
-        Var v = vars[index];
+        Var v = var(index);
         return v.isobj ? v.objval != null : Math.abs(v.numval) >= 0.00001;
     }
 
     public double num(int index){
-        Var v = vars[index];
+        Var v = var(index);
         return v.isobj ? v.objval != null ? 1 : 0 : Double.isNaN(v.numval) || Double.isInfinite(v.numval) ? 0 : v.numval;
     }
 
     public float numf(int index){
-        Var v = vars[index];
+        Var v = var(index);
         return v.isobj ? v.objval != null ? 1 : 0 : Double.isNaN(v.numval) || Double.isInfinite(v.numval) ? 0 : (float)v.numval;
     }
 
@@ -131,7 +137,7 @@ public class LExecutor{
     }
 
     public void setnum(int index, double value){
-        Var v = vars[index];
+        Var v = var(index);
         if(v.constant) return;
         v.numval = Double.isNaN(value) || Double.isInfinite(value) ? 0 : value;
         v.objval = null;
@@ -139,20 +145,21 @@ public class LExecutor{
     }
 
     public void setobj(int index, Object value){
-        Var v = vars[index];
+        Var v = var(index);
         if(v.constant) return;
         v.objval = value;
         v.isobj = true;
     }
 
     public void setconst(int index, Object value){
-        Var v = vars[index];
+        Var v = var(index);
         v.objval = value;
         v.isobj = true;
     }
 
     //endregion
 
+    /** A logic variable. */
     public static class Var{
         public final String name;
 
@@ -176,9 +183,6 @@ public class LExecutor{
     public static class UnitBindI implements LInstruction{
         public int type;
 
-        //iteration index
-        private int index;
-
         public UnitBindI(int type){
             this.type = type;
         }
@@ -189,17 +193,21 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
+            if(exec.binds == null || exec.binds.length != content.units().size){
+                exec.binds = new int[content.units().size];
+            }
+
             //binding to `null` was previously possible, but was too powerful and exploitable
             if(exec.obj(type) instanceof UnitType type){
                 Seq<Unit> seq = exec.team.data().unitCache(type);
 
                 if(seq != null && seq.any()){
-                    index %= seq.size;
-                    if(index < seq.size){
+                    exec.binds[type.id] %= seq.size;
+                    if(exec.binds[type.id] < seq.size){
                         //bind to the next unit
-                        exec.setconst(varUnit, seq.get(index));
+                        exec.setconst(varUnit, seq.get(exec.binds[type.id]));
                     }
-                    index++;
+                    exec.binds[type.id] ++;
                 }else{
                     //no units of this type found
                     exec.setconst(varUnit, null);
@@ -735,8 +743,8 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            Var v = exec.vars[to];
-            Var f = exec.vars[from];
+            Var v = exec.var(to);
+            Var f = exec.var(from);
 
             //TODO error out when the from-value is a constant
             if(!v.constant){
@@ -769,10 +777,10 @@ public class LExecutor{
             if(op.unary){
                 exec.setnum(dest, op.function1.get(exec.num(a)));
             }else{
-                Var va = exec.vars[a];
-                Var vb = exec.vars[b];
+                Var va = exec.var(a);
+                Var vb = exec.var(b);
 
-                if(op.objFunction2 != null && (va.isobj || vb.isobj)){
+                if(op.objFunction2 != null && va.isobj && vb.isobj){
                     //use object function if provided, and one of the variables is an object
                     exec.setnum(dest, op.objFunction2.get(exec.obj(a), exec.obj(b)));
                 }else{
@@ -788,7 +796,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            exec.vars[varCounter].numval = exec.instructions.length;
+            exec.var(varCounter).numval = exec.instructions.length;
         }
     }
 
@@ -876,7 +884,7 @@ public class LExecutor{
             if(exec.textBuffer.length() >= maxTextBuffer) return;
 
             //this should avoid any garbage allocation
-            Var v = exec.vars[value];
+            Var v = exec.var(value);
             if(v.isobj && value != 0){
                 String strValue =
                     v.objval == null ? "null" :
@@ -940,8 +948,8 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             if(address != -1){
-                Var va = exec.vars[value];
-                Var vb = exec.vars[compare];
+                Var va = exec.var(value);
+                Var vb = exec.var(compare);
                 boolean cmp;
 
                 if(op.objFunction != null && (va.isobj || vb.isobj)){
@@ -952,7 +960,7 @@ public class LExecutor{
                 }
 
                 if(cmp){
-                    exec.vars[varCounter].numval = address;
+                    exec.var(varCounter).numval = address;
                 }
             }
         }

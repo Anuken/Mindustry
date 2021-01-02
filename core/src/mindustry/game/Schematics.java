@@ -68,13 +68,12 @@ public class Schematics implements Loadable{
             shadowBuffer.dispose();
             if(errorTexture != null){
                 errorTexture.dispose();
+                errorTexture = null;
             }
         });
 
         Events.on(ClientLoadEvent.class, event -> {
-            Pixmap pixmap = Core.atlas.getPixmap("error").crop();
-            errorTexture = new Texture(pixmap);
-            pixmap.dispose();
+            errorTexture = new Texture("sprites/error.png");
         });
     }
 
@@ -264,10 +263,10 @@ public class Schematics implements Loadable{
             requests.each(req -> {
                 req.animScale = 1f;
                 req.worldContext = false;
-                req.block.drawRequestRegion(req, requests::each);
+                req.block.drawRequestRegion(req, requests);
             });
 
-            requests.each(req -> req.block.drawRequestConfigTop(req, requests::each));
+            requests.each(req -> req.block.drawRequestConfigTop(req, requests));
 
             Draw.flush();
             Draw.trans().idt();

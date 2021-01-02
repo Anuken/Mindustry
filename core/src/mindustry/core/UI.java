@@ -92,6 +92,12 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene = new Scene();
         Core.input.addProcessor(Core.scene);
 
+        int[] insets = Core.graphics.getSafeInsets();
+        Core.scene.marginLeft = insets[0];
+        Core.scene.marginRight = insets[1];
+        Core.scene.marginTop = insets[2];
+        Core.scene.marginBottom = insets[3];
+
         Tex.load();
         Icon.load();
         Styles.load();
