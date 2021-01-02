@@ -565,12 +565,17 @@ public class JoinDialog extends BaseDialog{
         void setIP(String ip){
             try{
                 boolean isIpv6 = ip.chars().filter(c -> c == ':').count() > 1;
-                if(isIpv6){
-                    this.ip = ip.contains("]:") ? ip.substring(ip.indexOf("[") + 1, ip.indexOf("]")) : ip;
-                    this.port = ip.contains("]:") ? Strings.parseInt(ip.substring(ip.indexOf("]:") + 2, ip.length())) : Vars.port;
+                if(isIpv6 && ip.lastIndexOf("]:") != -1 && ip.lastIndexOf("]:") != ip.length() - 1){
+                    int idx = ip.indexOf("]:");
+                    this.ip = ip.substring(1, idx);
+                    this.port = Integer.parseInt(ip.substring(idx + 2, ip.length()));
+                }else if(!isIpv6 && ip.lastIndexOf(':') != -1 && ip.lastIndexOf(':') != ip.length() - 1){
+                    int idx = ip.lastIndexOf(':');
+                    this.ip = ip.substring(0, idx);
+                    this.port = Integer.parseInt(ip.substring(idx + 1));
                 }else{
-                    this.ip = ip.contains(":") ? ip.split(":")[0] : ip;
-                    this.port = ip.contains(":") ? Strings.parseInt(ip.split(":")[1]) : Vars.port;
+                    this.ip = ip;
+                    this.port = Vars.port;
                 }
             }catch(Exception e){
                 this.ip = ip;
