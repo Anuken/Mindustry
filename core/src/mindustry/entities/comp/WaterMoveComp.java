@@ -39,7 +39,7 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     @Override
     @Replace
     public int pathType(){
-        return Pathfinder.costWater;
+        return Pathfinder.costNaval;
     }
 
     @Override

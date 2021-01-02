@@ -387,13 +387,15 @@ public class LStatements{
     public static class RadarStatement extends LStatement{
         public RadarTarget target1 = RadarTarget.enemy, target2 = RadarTarget.any, target3 = RadarTarget.any;
         public RadarSort sort = RadarSort.distance;
-        public String radar = "turret1", sortOrder = "1", output = "result";
+        public String radar = "0", sortOrder = "1", output = "result";
 
         @Override
         public void build(Table table){
             table.defaults().left();
 
             if(buildFrom()){
+                radar = "turret1";
+
                 table.add(" from ");
 
                 fields(table, radar, v -> radar = v);

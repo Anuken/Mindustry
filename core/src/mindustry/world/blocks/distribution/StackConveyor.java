@@ -167,6 +167,16 @@ public class StackConveyor extends Block implements Autotiler{
                 }
             }
 
+            //cannot load when facing
+            if(state == stateLoad){
+                for(Building near : proximity){
+                    if(near instanceof StackConveyorBuild && near.front() == this){
+                        state = stateMove;
+                        break;
+                    }
+                }
+            }
+
             //update other conveyor state when this conveyor's state changes
             if(state != lastState){
                 proxUpdating = true;

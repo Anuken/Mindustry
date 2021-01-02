@@ -2,6 +2,7 @@ package mindustry.entities.comp;
 
 import arc.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -12,6 +13,7 @@ import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
@@ -142,5 +144,20 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         }
 
         return false;
+    }
+
+    void contentInfo(Table table, float itemSize, float width){
+        table.clear();
+        table.top().left();
+
+        float pad = 0;
+        float items = payloads.size;
+        if(itemSize * items + pad * items > width){
+            pad = (width - (itemSize) * items) / items;
+        }
+
+        for (Payload p : payloads){
+            table.image(p.icon(Cicon.small)).size(itemSize).padRight(pad);
+        }
     }
 }
