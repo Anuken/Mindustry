@@ -563,18 +563,16 @@ public class JoinDialog extends BaseDialog{
         transient Host lastHost;
 
         void setIP(String ip){
-
-            //parse ip:port, if unsuccessful, use default values
-            if(ip.lastIndexOf(':') != -1 && ip.lastIndexOf(':') != ip.length() - 1){
-                try{
-                    int idx = ip.lastIndexOf(':');
-                    this.ip = ip.substring(0, idx);
-                    this.port = Integer.parseInt(ip.substring(idx + 1));
-                }catch(Exception e){
-                    this.ip = ip;
-                    this.port = Vars.port;
+            try{
+                boolean isIpv6 = ip.chars().filter(c -> c == ':').count() > 1;
+                if(isIpv6){
+                    this.ip = ip.contains("]:") ? ip.substring(ip.indexOf("[") + 1, ip.indexOf("]")) : ip;
+                    this.port = ip.contains("]:") ? Strings.parseInt(ip.substring(ip.indexOf("]:") + 2, ip.length())) : Vars.port;
+                }else{
+                    this.ip = ip.contains(":") ? ip.split(":")[0] : ip;
+                    this.port = ip.contains(":") ? Strings.parseInt(ip.split(":")[1]) : Vars.port;
                 }
-            }else{
+            }catch(Exception e){
                 this.ip = ip;
                 this.port = Vars.port;
             }
