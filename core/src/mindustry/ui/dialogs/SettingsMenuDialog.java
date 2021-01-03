@@ -173,8 +173,8 @@ public class SettingsMenuDialog extends SettingsDialog{
                     platform.shareFile(file);
                 }else{
                     DateTimeFormatter saveDate = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
-                    String defaultName = "Mindustry_save_" + saveDate.format(LocalDateTime.now());
-
+                    String defaultName = saveDate.format(LocalDateTime.now());
+                    defaultName += "_mindustry_save";
                     platform.showFileChooser(false, defaultName, "@save", "zip", file -> {
                         try{
                             exportData(file);
