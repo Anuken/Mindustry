@@ -376,7 +376,6 @@ public class TypeIO{
     public static Amendments readAmendments(Reads read){
         int length = read.i();
         String string = new String(read.b(new byte[length]), charset);
-        Log.info(string);
         return JsonIO.read(Amendments.class, string);
     }
 
