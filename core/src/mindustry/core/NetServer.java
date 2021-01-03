@@ -474,6 +474,12 @@ public class NetServer implements ApplicationListener{
                 player.getInfo().lastSyncTime = Time.millis();
                 Call.worldDataBegin(player.con);
                 netServer.sendWorldData(player);
+
+                Amendments a = new Amendments();
+                world.tiles.eachTile(tile -> {
+                    if(tile.build != null && tile.build.lastAccessed != null && !tile.build.lastAccessed.isEmpty()) a.builders.put(tile.build.pos(), tile.build.lastAccessed);
+                });
+                Call.setAmendments(a);
             }
         });
     }

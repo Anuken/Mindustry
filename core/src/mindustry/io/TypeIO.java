@@ -17,6 +17,7 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
+import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
@@ -363,6 +364,20 @@ public class TypeIO{
         int length = read.i();
         String string = new String(read.b(new byte[length]), charset);
         return JsonIO.read(Rules.class, string);
+    }
+
+    public static void writeAmendments(Writes write, Amendments amendments){
+        String string = JsonIO.write(amendments);
+        byte[] bytes = string.getBytes(charset);
+        write.i(bytes.length);
+        write.b(bytes);
+    }
+
+    public static Amendments readAmendments(Reads read){
+        int length = read.i();
+        String string = new String(read.b(new byte[length]), charset);
+        Log.info(string);
+        return JsonIO.read(Amendments.class, string);
     }
 
     public static void writeVec2(Writes write, Vec2 v){
