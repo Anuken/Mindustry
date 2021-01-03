@@ -17,6 +17,8 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
+import static mindustry.Vars.*;
+
 /** An entity that holds a payload. */
 @Component
 abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
@@ -137,7 +139,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
             payload.place(on, rot);
 
             if(getControllerName() != null){
-                payload.build.lastAccessed = getControllerName();
+                state.amendments.lastAccessed.put(payload.build.pos(), getControllerName());
             }
 
             Fx.unitDrop.at(tile);

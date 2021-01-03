@@ -22,6 +22,8 @@ public class GameState{
     public Map map = emptyMap;
     /** The current game rules. */
     public Rules rules = new Rules();
+    /** The current game amendments. */
+    public Amendments amendments = new Amendments();
     /** Statistics for this save/game. Displayed after game over. */
     public GameStats stats = new GameStats();
     /** Global attributes of the environment, calculated by weather. */

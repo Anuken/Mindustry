@@ -449,7 +449,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public @Nullable String getControllerName(){
         if(isPlayer()) return getPlayer().name;
-        if(controller instanceof LogicAI ai && ai.controller != null) return ai.controller.lastAccessed;
+        if(controller instanceof LogicAI ai && ai.controller != null) return state.amendments.lastAccessed.get(ai.controller.pos());
         if(controller instanceof FormationAI ai && ai.leader != null && ai.leader.isPlayer()) return ai.leader.getPlayer().name;
         return null;
     }

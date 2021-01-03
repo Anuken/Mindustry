@@ -500,7 +500,7 @@ public class NetServer implements ApplicationListener{
 
         debug("Packed @ bytes of world data.", stream.size());
 
-        Call.setAmendments(Amendments.get());
+        Call.setAmendments(state.amendments);
     }
 
     public void addPacketHandler(String type, Cons2<Player, String> handler){
