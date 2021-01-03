@@ -22,7 +22,7 @@ public class LoadoutDialog extends BaseDialog{
     private Boolf<Item> validator = i -> true;
     private Table items;
     private int capacity;
-    private ItemSeq total;
+    private @Nullable ItemSeq total;
 
     public LoadoutDialog(){
         super("@configure");
