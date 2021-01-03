@@ -319,7 +319,7 @@ public class CoreBlock extends StorageBlock{
         }
 
         public boolean incinerate(){
-            return state.isCampaign();
+            return state.isCampaign() || state.rules.coreIncinerates;
         }
 
         @Override
