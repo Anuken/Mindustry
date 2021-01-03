@@ -118,9 +118,10 @@ public interface Platform{
      * @param open Whether to open or save files
      * @param extension File extension to filter
      * @param title The title of the native dialog
+     * @param defaultName The default file name
      */
-    default void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
-        new FileChooser(title, file -> file.extEquals(extension), open, file -> {
+    default void showFileChooser(boolean open, String defaultName, String title, String extension, Cons<Fi> cons){
+        new FileChooser(title, defaultName, file -> file.extEquals(extension), open, file -> {
             if(!open){
                 cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
             }else{
@@ -129,6 +130,23 @@ public interface Platform{
         }).show();
     }
 
+    /**
+     * Show a file chooser.
+     * @param cons Selection listener
+     * @param open Whether to open or save files
+     * @param extension File extension to filter
+     * @param title The title of the native dialog
+     */
+    default void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
+        showFileChooser(open, "", open ? "@open": "@save", extension, cons);
+    }
+
+    /**
+     * Show a file chooser.
+     * @param cons Selection listener
+     * @param open Whether to open or save files
+     * @param extension File extension to filter
+     */
     default void showFileChooser(boolean open, String extension, Cons<Fi> cons){
         showFileChooser(open, open ? "@open": "@save", extension, cons);
     }
