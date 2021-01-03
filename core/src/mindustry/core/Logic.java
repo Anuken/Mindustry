@@ -118,6 +118,10 @@ public class Logic implements ApplicationListener{
                 }
             }
 
+            //clear amendments
+            //todo, check if this is the right place to do it
+            state.amendments.reset();
+
             //save settings
             Core.settings.manualSave();
         });

@@ -12,4 +12,9 @@ public class Amendments{
     public IntMap<String> lastAccessed = new IntMap<>();
     /** The last building here before deconstruction. */
     public IntMap<String> lastBuilding = new IntMap<>();
+
+    public void reset(){
+        lastAccessed.clear();
+        lastBuilding.clear();
+    }
 }
