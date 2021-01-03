@@ -464,7 +464,7 @@ public class PlacementFragment extends Fragment{
             }
 
             //if the tile has a drop, display the drop
-            if(hoverTile.drop() != null){
+            if(hoverTile.drop() != null || Core.input.keyDown(Binding.pick)){
                 return hoverTile;
             }
         }

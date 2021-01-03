@@ -93,7 +93,7 @@ public class Build{
 
         build.setConstruct(previous.size == sub.size ? previous : Blocks.air, result);
         build.prevBuild = prevBuild;
-        if(unit != null && unit.getControllerName() != null) state.amendments.lastAccessed.put(tile.build.pos(), unit.getControllerName());;
+        if(unit != null && unit.getControllerName() != null) state.amendments.lastAccessed.put(tile.build.pos(), unit.getControllerName());
 
         result.placeBegan(tile, previous);
 
