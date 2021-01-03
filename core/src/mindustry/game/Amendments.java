@@ -10,4 +10,6 @@ import arc.struct.*;
 public class Amendments{
     /** Name of the last player who changed that pos. */
     public IntMap<String> lastAccessed = new IntMap<>();
+    /** The last building here before deconstruction. */
+    public IntMap<String> lastBuilding = new IntMap<>();
 }

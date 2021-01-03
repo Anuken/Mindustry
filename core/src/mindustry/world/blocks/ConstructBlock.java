@@ -54,6 +54,7 @@ public class ConstructBlock extends Block{
         Team team = tile.team();
         Fx.breakBlock.at(tile.drawx(), tile.drawy(), block.size);
         Events.fire(new BlockBuildEndEvent(tile, builder, team, true, null));
+        state.amendments.lastBuilding.put(tile.pos(), block.name);
         tile.remove();
         if(shouldPlay()) Sounds.breaks.at(tile, calcPitch(false));
     }
