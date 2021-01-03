@@ -26,6 +26,7 @@ import mindustry.ui.*;
 
 import java.io.*;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -171,11 +172,8 @@ public class SettingsMenuDialog extends SettingsDialog{
                     }
                     platform.shareFile(file);
                 }else{
-                    DateTimeFormatter formatter = DateTimeFormatter
-                            .ofPattern("yyyy-MM-dd_kk-mm-ss")
-                            .withLocale(Locale.getDefault())
-                            .withZone(ZoneId.systemDefault());
-                    String defaultName = formatter.format(Instant.now());
+                    DateTimeFormatter saveDate = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+                    String defaultName = "Mindustry_save_" + saveDate.format(LocalDateTime.now());
 
                     platform.showFileChooser(false, defaultName, "@save", "zip", file -> {
                         try{
