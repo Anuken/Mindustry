@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
-import arc.struct.IntMap.*;
 import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
@@ -27,7 +26,6 @@ import mindustry.world.*;
 import mindustry.world.modules.*;
 
 import java.io.*;
-import java.util.*;
 import java.util.zip.*;
 
 import static mindustry.Vars.*;
@@ -362,11 +360,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.both)
     public static void setAmendments(Amendments amendments){
-        for(Iterator<Entry<String>> it = amendments.builders.iterator(); it.hasNext();){
-            Entry entry = it.next();
-
-            world.build(entry.key).lastAccessed = (String)entry.value;
-        }
+        amendments.implement();
     }
 
     @Remote(variants = Variant.both)
