@@ -57,6 +57,8 @@ public class Logic implements ApplicationListener{
         //when loading a 'damaged' sector, propagate the damage
         Events.on(SaveLoadEvent.class, e -> {
             if(state.isCampaign()){
+                state.rules.coreIncinerates = true;
+
                 SectorInfo info = state.rules.sector.info;
                 info.write();
 
@@ -107,6 +109,7 @@ public class Logic implements ApplicationListener{
                 if(!(state.getSector().preset != null && !state.getSector().preset.useAI)){
                     state.rules.waveTeam.rules().ai = true;
                 }
+                state.rules.coreIncinerates = true;
                 state.rules.waveTeam.rules().aiTier = state.getSector().threat * 0.8f;
                 state.rules.waveTeam.rules().infiniteResources = true;
 
