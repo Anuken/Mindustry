@@ -100,6 +100,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build == null || build.items == null) return;
         build.items.set(item, amount);
     }
+    
+    @Remote(called = Loc.server, unreliable = true)
+    public static void clearItems(Building build){
+        if(build == null || build.items == null) return;
+        build.items.clear();
+    }
 
     @Remote(called = Loc.server, unreliable = true)
     public static void transferItemTo(@Nullable Unit unit, Item item, int amount, float x, float y, Building build){
