@@ -69,6 +69,7 @@ public class Build{
         if(tile.team() == team && tile.block == result && tile.build != null && tile.block.quickRotate){
             if(unit != null && unit.getControllerName() != null) tile.build.lastAccessed = unit.getControllerName();
             tile.build.rotation = Mathf.mod(rotation, 4);
+            ConstructBlock.rotateFinish(tile);
             tile.build.updateProximity();
             tile.build.noSleep();
             return;
