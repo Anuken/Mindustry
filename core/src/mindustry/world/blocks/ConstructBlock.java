@@ -78,8 +78,8 @@ public class ConstructBlock extends Block{
                 tile.build.overwrote(prev);
             }
 
-            if(builder != null && builder.isPlayer()){
-                tile.build.lastAccessed = builder.getPlayer().name;
+            if(builder != null && builder.getControllerName() != null){
+                tile.build.lastAccessed = builder.getControllerName();
             }
         }
 
