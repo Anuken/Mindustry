@@ -92,6 +92,11 @@ public class ConstructBlock extends Block{
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
     }
 
+    public static void rotateFinish(Tile tile){
+        Fx.placeBlock.at(tile.drawx(), tile.drawy(), tile.block().size);
+        if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
+    }
+
     static boolean shouldPlay(){
         if(Time.timeSinceMillis(lastPlayed) >= 32){
             lastPlayed = Time.millis();
