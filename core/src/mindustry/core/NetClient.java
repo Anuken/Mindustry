@@ -360,7 +360,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.both)
     public static void setAmendments(Amendments amendments){
-        amendments.implement();
+        amendments.set();
     }
 
     @Remote(variants = Variant.both)
