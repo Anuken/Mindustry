@@ -46,6 +46,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     transient Seq<Ability> abilities = new Seq<>(0);
     private transient float resupplyTime = Mathf.random(10f);
+    private transient boolean wasPlayer;
 
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
@@ -423,7 +424,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         Events.fire(new UnitDestroyEvent(self()));
 
-        if(explosiveness > 7f && isLocal()){
+        if(explosiveness > 7f && (isLocal() || wasPlayer)){
             Events.fire(Trigger.suicideBomb);
         }
 
@@ -481,6 +482,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void killed(){
+        wasPlayer = isLocal();
         health = 0;
         dead = true;
 
