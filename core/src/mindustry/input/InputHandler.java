@@ -305,6 +305,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         build.rotation = Mathf.mod(build.rotation + Mathf.sign(direction), 4);
         build.updateProximity();
         build.noSleep();
+        Fx.rotateBlock.at(build.x, build.y, build.block.size);
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)

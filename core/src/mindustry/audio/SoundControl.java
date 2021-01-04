@@ -130,7 +130,11 @@ public class SoundControl{
                 Core.audio.soundBus.play();
                 setupFilters();
             }else{
-                Core.audio.soundBus.stop();
+                for(Sound sound : Core.assets.getAll(Sound.class, new Seq<>())){
+                    if(sound.bus == Core.audio.soundBus){
+                        sound.stop();
+                    }
+                }
             }
         }
 

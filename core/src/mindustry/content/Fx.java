@@ -1564,6 +1564,12 @@ public class Fx{
         Fill.square(e.x, e.y, e.rotation * tilesize / 2f);
     }),
 
+    rotateBlock = new Effect(30, e -> {
+        color(Pal.accent);
+        alpha(e.fout() * 1);
+        Fill.square(e.x, e.y, e.rotation * tilesize / 2f);
+    }),
+
     overdriveBlockFull = new Effect(60, e -> {
         color(e.color);
         alpha(e.fslope() * 0.4f);

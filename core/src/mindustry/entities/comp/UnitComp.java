@@ -273,7 +273,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         team.data().updateCount(type, 1);
 
         //check if over unit cap
-        if(count() > cap() && !spawnedByCore && !dead){
+        if(count() > cap() && !spawnedByCore && !dead && !state.rules.editor){
             Call.unitCapDeath(self());
             team.data().updateCount(type, -1);
         }

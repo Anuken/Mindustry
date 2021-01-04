@@ -71,6 +71,7 @@ public class Build{
             tile.build.rotation = Mathf.mod(rotation, 4);
             tile.build.updateProximity();
             tile.build.noSleep();
+            Fx.rotateBlock.at(tile.build.x, tile.build.y, tile.build.block.size);
             return;
         }
 

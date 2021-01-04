@@ -970,8 +970,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         if(block.hasLiquids){
-            flammability += liquids.sum((liquid, amount) -> liquid.explosiveness * amount / 2f);
-            explosiveness += liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
+            flammability += liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
+            explosiveness += liquids.sum((liquid, amount) -> liquid.explosiveness * amount / 2f);
         }
 
         if(block.consumes.hasPower() && block.consumes.getPower().buffered){
