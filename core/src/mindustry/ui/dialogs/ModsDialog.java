@@ -175,7 +175,7 @@ public class ModsDialog extends BaseDialog{
                                     tablebrow.clear();
 
                                     for(ModListing mod : listings){
-                                        if(mod.hasJava || !searchtxt.isEmpty() && !mod.repo.contains(searchtxt) || (Vars.ios && mod.hasScripts)) continue;
+                                        if(mod.hasJava || !searchtxt.isEmpty() && !mod.repo.toLowerCase().contains(searchtxt.toLowerCase()) || (Vars.ios && mod.hasScripts)) continue;
 
                                         tablebrow.button(btn -> {
                                             btn.top().left();
