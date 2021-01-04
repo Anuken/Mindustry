@@ -233,7 +233,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public int getMaximumAccepted(Item item){
-            return incinerate() ? storageCapacity * 2 : storageCapacity;
+            return state.rules.coreIncinerates ? storageCapacity * 2 : storageCapacity;
         }
 
         @Override
@@ -318,10 +318,6 @@ public class CoreBlock extends StorageBlock{
             return tile instanceof StorageBuild b && (b.linkedCore == core || b.linkedCore == null);
         }
 
-        public boolean incinerate(){
-            return state.isCampaign();
-        }
-
         @Override
         public float handleDamage(float amount){
             if(player != null && team == player.team()){
@@ -386,7 +382,7 @@ public class CoreBlock extends StorageBlock{
                 }else{
                     super.handleItem(source, item);
                 }
-            }else if(incinerate()){
+            }else if(state.rules.coreIncinerates){
                 if(items.get(item) >= storageCapacity){
                     //create item incineration effect at random intervals
                     if(!noEffect){
