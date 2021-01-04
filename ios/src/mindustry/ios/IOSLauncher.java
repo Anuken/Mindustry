@@ -255,6 +255,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
         }catch(Throwable t){
             //attempt to log the exception
             CrashSender.log(t);
+            Log.err(t);
             //rethrow the exception so it actually crashes
             throw t;
         }

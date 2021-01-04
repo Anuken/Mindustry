@@ -20,6 +20,9 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class Renderer implements ApplicationListener{
+    /** These are global variables, for headless access. Cached. */
+    public static float laserOpacity = 0.5f, bridgeOpacity = 0.75f;
+
     public final BlockRenderer blocks = new BlockRenderer();
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
@@ -29,7 +32,6 @@ public class Renderer implements ApplicationListener{
 
     public @Nullable Bloom bloom;
     public FrameBuffer effectBuffer = new FrameBuffer();
-    public float laserOpacity = 1f;
     public boolean animateShields, drawWeather = true;
     /** minZoom = zooming out, maxZoom = zooming in */
     public float minZoom = 1.5f, maxZoom = 6f;
@@ -71,6 +73,7 @@ public class Renderer implements ApplicationListener{
         camerascale = Mathf.lerpDelta(camerascale, dest, 0.1f);
         if(Mathf.equal(camerascale, dest, 0.001f)) camerascale = dest;
         laserOpacity = settings.getInt("lasersopacity") / 100f;
+        bridgeOpacity = settings.getInt("bridgeopacity") / 100f;
         animateShields = settings.getBool("animatedshields");
 
         if(landTime > 0){

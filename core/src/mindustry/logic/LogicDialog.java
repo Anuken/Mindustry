@@ -3,6 +3,7 @@ package mindustry.logic;
 import arc.*;
 import arc.func.*;
 import arc.scene.ui.TextButton.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
@@ -90,16 +91,20 @@ public class LogicDialog extends BaseDialog{
         onResize(() -> canvas.rebuild());
     }
 
-    public void show(String code, Cons<String> consumer){
+    public void show(String code, Cons<String> modified){
         canvas.statements.clearChildren();
         canvas.rebuild();
         try{
             canvas.load(code);
         }catch(Throwable t){
-            t.printStackTrace();
+            Log.err(t);
             canvas.load("");
         }
-        this.consumer = consumer;
+        this.consumer = result -> {
+            if(!result.equals(code)){
+                modified.get(result);
+            }
+        };
 
         show();
     }

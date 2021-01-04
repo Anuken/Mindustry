@@ -10,6 +10,7 @@ import arc.struct.IntSet.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -70,6 +71,9 @@ public class ItemBridge extends Block{
     }
 
     public void drawBridge(BuildPlan req, float ox, float oy, float flip){
+        if(Mathf.zero(Renderer.bridgeOpacity)) return;
+        Draw.alpha(Renderer.bridgeOpacity);
+
         Lines.stroke(8f);
 
         Tmp.v1.set(ox, oy).sub(req.drawx(), req.drawy()).setLength(tilesize/2f);
@@ -84,6 +88,8 @@ public class ItemBridge extends Block{
 
         Draw.rect(arrowRegion, (req.drawx() + ox) / 2f, (req.drawy() + oy) / 2f,
         Angles.angle(req.drawx(), req.drawy(), ox, oy) + flip);
+
+        Draw.reset();
     }
 
     @Override
@@ -321,13 +327,12 @@ public class ItemBridge extends Block{
             Tile other = world.tile(link);
             if(!linkValid(tile, other)) return;
 
-            float opacity = Core.settings.getInt("bridgeopacity") / 100f;
-            if(Mathf.zero(opacity)) return;
+            if(Mathf.zero(Renderer.bridgeOpacity)) return;
 
             int i = relativeTo(other.x, other.y);
 
             Draw.color(Color.white, Color.black, Mathf.absin(Time.time, 6f, 0.07f));
-            Draw.alpha(Math.max(uptime, 0.25f) * opacity);
+            Draw.alpha(Math.max(uptime, 0.25f) * Renderer.bridgeOpacity);
 
             Draw.rect(endRegion, x, y, i * 90 + 90);
             Draw.rect(endRegion, other.drawx(), other.drawy(), i * 90 + 270);
@@ -350,7 +355,7 @@ public class ItemBridge extends Block{
             Draw.color();
 
             for(int a = 0; a < arrows; a++){
-                Draw.alpha(Mathf.absin(a / (float)arrows - time / 100f, 0.1f, 1f) * uptime * opacity);
+                Draw.alpha(Mathf.absin(a / (float)arrows - time / 100f, 0.1f, 1f) * uptime * Renderer.bridgeOpacity);
                 Draw.rect(arrowRegion,
                 x + Geometry.d4(i).x * (tilesize / 2f + a * 4f + time % 4f),
                 y + Geometry.d4(i).y * (tilesize / 2f + a * 4f + time % 4f), i * 90f);
