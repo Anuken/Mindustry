@@ -182,7 +182,6 @@ public class LaunchPad extends Block{
             float scale = (1f - alpha) * 1.3f + 1f;
             float cx = cx(), cy = cy();
             float rotation = fin() * (130f + Mathf.randomSeedRange(id(), 50f));
-            Block block = blockOn();
 
             Draw.z(Layer.effect + 0.001f);
 
@@ -201,7 +200,7 @@ public class LaunchPad extends Block{
 
             Draw.z(Layer.weather - 1);
 
-            TextureRegion region = block.podRegion;
+            TextureRegion region = ((mindustry.world.blocks.campaign.LaunchPad)blockOn()).podRegion;
             float rw = region.width * Draw.scl * scale, rh = region.height * Draw.scl * scale;
 
             Draw.alpha(alpha);
