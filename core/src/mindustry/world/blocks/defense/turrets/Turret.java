@@ -210,7 +210,7 @@ public class Turret extends ReloadTurret{
         }
 
         public void targetPosition(Posc pos){
-            if(!hasAmmo() || target == null) return;
+            if(!hasAmmo() || pos == null) return;
             BulletType bullet = peekAmmo();
             float speed = bullet.speed;
             //slow bullets never intersect
@@ -218,7 +218,7 @@ public class Turret extends ReloadTurret{
 
             targetPos.set(Predict.intercept(this, pos, speed));
             if(targetPos.isZero()){
-                targetPos.set(target);
+                targetPos.set(pos);
             }
         }
 
