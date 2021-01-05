@@ -182,9 +182,8 @@ public class UnitTypes implements ContentList{
                     height = 20f;
                     lifetime = 25f;
                     shootEffect = Fx.shootBig;
-                    lightning = 3;
-                    lightningLength = 4;
-                    lightningLengthRand = 4;
+                    lightning = 2;
+                    lightningLength = 6;
                     lightningColor = Pal.surge;
                     //standard bullet damage is far too much for lightning
                     lightningDamage = 30;
