@@ -48,7 +48,7 @@ public class CoreBlock extends StorageBlock{
         update = true;
         hasItems = true;
         priority = TargetPriority.core;
-        flags = EnumSet.of(BlockFlag.core, BlockFlag.unitModifier, BlockFlag.storage);
+        flags = EnumSet.of(BlockFlag.core, BlockFlag.unitModifier);
         unitCapModifier = 10;
         loopSound = Sounds.respawning;
         loopSoundVolume = 1f;
@@ -303,9 +303,10 @@ public class CoreBlock extends StorageBlock{
                     Draw.rect("block-select", b.x + offset * p.x, b.y + offset * p.y, i * 90);
                 }
             };
-            for(Tile other : indexer.getAllied(team, BlockFlag.storage)){
-                if(other.build != null && other.build.items == items) outline.get(other.build);
-            }
+            team.cores().each(core -> {
+                outline.get(core);
+                core.proximity.each(storage -> storage.items == items, outline);
+            });
             Draw.reset();
         }
 
