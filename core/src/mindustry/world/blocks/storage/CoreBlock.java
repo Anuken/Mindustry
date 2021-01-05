@@ -296,17 +296,17 @@ public class CoreBlock extends StorageBlock{
         @Override
         public void drawSelect(){
             Lines.stroke(1f, Pal.accent);
-            Cons<Building> outline = t -> {
+            Cons<Building> outline = b -> {
                 for(int i = 0; i < 4; i++){
                     Point2 p = Geometry.d8edge[i];
-                    float offset = -Math.max(t.block.size - 1, 0) / 2f * tilesize;
-                    Draw.rect("block-select", t.x + offset * p.x, t.y + offset * p.y, i * 90);
+                    float offset = -Math.max(b.block.size - 1, 0) / 2f * tilesize;
+                    Draw.rect("block-select", b.x + offset * p.x, b.y + offset * p.y, i * 90);
                 }
             };
-            if(proximity.contains(e -> owns(e) && e.items == items)){
-                outline.get(this);
-            }
-            proximity.each(e -> owns(e) && e.items == items, outline);
+            team.cores().each(core -> {
+                outline.get(core);
+                core.proximity.each(storage -> storage.items == items, outline);
+            });
             Draw.reset();
         }
 
