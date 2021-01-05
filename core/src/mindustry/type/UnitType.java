@@ -90,6 +90,7 @@ public class UnitType extends UnlockableContent{
     public float clipSize = -1;
     public boolean canDrown = true;
     public float engineOffset = 5f, engineSize = 2.5f;
+    public boolean engineTrail = false;
     public float strafePenalty = 0.5f;
     public float hitSize = 6f;
     public float itemOffsetY = 3f;
@@ -566,8 +567,8 @@ public class UnitType extends UnlockableContent{
         float scale = unit.elevation;
         float offset = engineOffset/2f + engineOffset/2f*scale;
 
-        if(unit instanceof Trailc){
-            Trail trail = ((Trailc)unit).trail();
+        if(engineTrail){
+            Trail trail = ((Unitc)unit).trail();
             trail.draw(unit.team.color, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * scale) * trailScl);
         }
 
