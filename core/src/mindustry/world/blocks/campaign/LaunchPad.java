@@ -32,7 +32,7 @@ public class LaunchPad extends Block{
     public Sound launchSound = Sounds.none;
 
     public @Load("@-light") TextureRegion lightRegion;
-    public @Load("launchpod") TextureRegion podRegion;
+    public @Load(value = "@-pod", fallback = "launchpod") TextureRegion podRegion;
     public Color lightColor = Color.valueOf("eab678");
 
     public LaunchPad(String name){
@@ -200,7 +200,7 @@ public class LaunchPad extends Block{
 
             Draw.z(Layer.weather - 1);
 
-            TextureRegion region = Core.atlas.find("launchpod");
+            TextureRegion region = blockOn() instanceof mindustry.world.blocks.campaign.LaunchPad p ? p.podRegion : Core.atlas.find("launchpod");
             float rw = region.width * Draw.scl * scale, rh = region.height * Draw.scl * scale;
 
             Draw.alpha(alpha);
