@@ -109,9 +109,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void transferItemTo(@Nullable Unit unit, Item item, int amount, float x, float y, Building build){
-        if(build == null || build.items == null) return;
+        if(build == null || build.items == null || unit == null || unit.stack.amount <= 0) return;
 
-        if(unit != null && unit.item() == item) unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
+        unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
 
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
             Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
@@ -154,7 +154,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void transferInventory(Player player, Building build){
         if(player == null || build == null || !player.within(build, buildingRange) || build.items == null || player.dead()) return;
 
-        if(net.server() && (player.unit().stack.amount <= 0 || !Units.canInteract(player, build) ||
+        if(net.server() && ((player.unit().stack.amount <= 0 && player.unit().formation == null) || !Units.canInteract(player, build) ||
         !netServer.admins.allowAction(player, ActionType.depositItem, build.tile, action -> {
             action.itemAmount = player.unit().stack.amount;
             action.item = player.unit().item();
@@ -167,10 +167,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Item item = unit.item();
             int accepted = build.acceptStack(item, unit.stack.amount, unit);
 
-            Call.transferItemTo(unit, item, accepted, unit.x, unit.y, build);
+            if(accepted > 0){
+                Call.transferItemTo(unit, item, accepted, unit.x, unit.y, build);
 
-            if(unit == player.unit()){
-                Events.fire(new DepositEvent(build, player, item, accepted));
+                if(unit == player.unit()){
+                    Events.fire(new DepositEvent(build, player, item, accepted));
+                }
             }
         });
     }
@@ -282,13 +284,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void dropItem(Player player, float angle){
         if(player == null) return;
 
-        if(net.server() && player.unit().stack.amount <= 0){
+        if(net.server() && player.unit().stack.amount <= 0 && player.unit().formation == null){
             throw new ValidateException(player, "Player cannot drop an item.");
         }
 
         player.unit().eachGroup(unit -> {
-            Fx.dropItem.at(unit.x, unit.y, angle, Color.white, unit.item());
-            unit.clearItem();
+            if(unit.stack.amount > 0){
+                Fx.dropItem.at(unit.x, unit.y, angle, Color.white, unit.item());
+                unit.clearItem();
+            }
         });
     }
 
@@ -930,7 +934,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean canTapPlayer(float x, float y){
-        return player.within(x, y, playerSelectRange) && player.unit().stack.amount > 0;
+        return player.within(x, y, playerSelectRange) && (player.unit().stack.amount > 0 || player.unit().formation != null);
     }
 
     /** Tries to begin mining a tile, returns true if successful. */
@@ -1073,16 +1077,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void tryDropItems(@Nullable Building build, float x, float y){
-        if(!droppingItem || player.unit().stack.amount <= 0 || canTapPlayer(x, y) || state.isPaused() ){
+        if(!droppingItem || (player.unit().stack.amount <= 0 && player.unit().formation == null) || canTapPlayer(x, y) || state.isPaused() ){
             droppingItem = false;
             return;
         }
 
         droppingItem = false;
 
-        ItemStack stack = player.unit().stack;
-
-        if(build != null && build.acceptStack(stack.item, stack.amount, player.unit()) > 0 && build.interactable(player.team()) && build.block.hasItems && player.unit().stack().amount > 0 && build.interactable(player.team())){
+        if(build != null && build.interactable(player.team()) && build.block.hasItems && (player.unit().stack().amount > 0 || player.unit().formation != null)){
             Call.transferInventory(player, build);
         }else{
             Call.dropItem(player.angleTo(x, y));
