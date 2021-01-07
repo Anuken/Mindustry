@@ -1045,7 +1045,7 @@ public class ServerControl implements ApplicationListener{
                 }catch(BindException b){
                     err("Command input socket already in use. Is another instance of the server running?");
                 }catch(IOException e){
-                    if(!e.getMessage().equals("Socket closed")){
+                    if(!e.getMessage().equals("Socket closed") && !e.getMessage().equals("Connection reset")){
                         err("Terminating socket server.");
                         err(e);
                     }
