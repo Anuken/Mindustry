@@ -1,5 +1,0 @@
-[Ini adalah log perubahan yang terpotong, lihat Github untuk catatan lengkapnya]
-- Memperbaiki 2 crash yang jarang terjadi
-- Unit yang dibuat bergantung pada bahan produksinya di pohon teknologi
-- Distributor sekarang dapat menimpa pengantar
-- Memperbarui terjemahan
