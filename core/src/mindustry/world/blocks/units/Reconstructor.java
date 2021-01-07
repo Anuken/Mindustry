@@ -179,7 +179,7 @@ public class Reconstructor extends UnitBlock{
                             Effect.shake(2f, 3f, this);
                             Fx.producesmoke.at(this);
                             consume();
-                            Events.fire(new UnitCreateEvent(payload.unit));
+                            Events.fire(new UnitCreateEvent(payload.unit, this));
                         }
                     }
                 }
