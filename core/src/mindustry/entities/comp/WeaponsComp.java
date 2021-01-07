@@ -117,7 +117,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
             float shootAngle = weapon.rotate ? weaponRotation + 90 : Angles.angle(shootX, shootY, mount.aimX, mount.aimY) + (this.rotation - angleTo(mount.aimX, mount.aimY));
 
             //point defenses have a special AI
-            if(mount instanceof PointDefenseMount) {
+            if(mount instanceof PointDefenseMount){
                 PointDefenseMount pmount = (PointDefenseMount)mount;
                 PointDefense pweapon = (PointDefense)mount.weapon;
 
