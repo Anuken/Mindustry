@@ -285,6 +285,7 @@ public class UnitType extends UnlockableContent{
         if(range < 0){
             range = Float.MAX_VALUE;
             for(Weapon weapon : weapons){
+                if(weapon instanceof PointDefense) continue;
                 range = Math.min(range, weapon.bullet.range() + hitSize / 2f);
                 maxRange = Math.max(maxRange, weapon.bullet.range() + hitSize / 2f);
             }

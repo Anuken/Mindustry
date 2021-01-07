@@ -42,7 +42,9 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     void setupWeapons(UnitType def){
         mounts = new WeaponMount[def.weapons.size];
         for(int i = 0; i < mounts.length; i++){
-            mounts[i] = new WeaponMount(def.weapons.get(i));
+            mounts[i] = def.weapons.get(i) instanceof PointDefense ?
+                new PointDefenseMount(def.weapons.get(i)) :
+                new WeaponMount(def.weapons.get(i));
         }
     }
 
@@ -113,6 +115,48 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
             float shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX, weapon.shootY),
                 shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX, weapon.shootY);
             float shootAngle = weapon.rotate ? weaponRotation + 90 : Angles.angle(shootX, shootY, mount.aimX, mount.aimY) + (this.rotation - angleTo(mount.aimX, mount.aimY));
+
+            //point defenses have a special AI
+            if(mount instanceof PointDefenseMount) {
+                PointDefenseMount pmount = (PointDefenseMount)mount;
+                PointDefense pweapon = (PointDefense)mount.weapon;
+
+                //retarget
+                pmount.timerTarget += Time.delta;
+                if(pmount.timerTarget > pweapon.retargetTime){
+                    float range = pweapon.range;
+                    pmount.target = Groups.bullet.intersect(mountX - range, mountY - range, range*2, range*2).min(b -> b.team != team() && b.type().hittable, b -> b.dst2(this));
+                }
+    
+                //pooled bullets
+                if(pmount.target != null && !pmount.target.isAdded()){
+                    pmount.target = null;
+                }
+    
+                //look at pmount.target
+                if(pmount.target != null && pmount.target.within(this, pweapon.range) && pmount.target.team != team() && pmount.target.type() != null && pmount.target.type().hittable){
+                    float dest = pmount.target.angleTo(mountX, mountY) - this.rotation + 180;
+                    pmount.rotation = Angles.moveToward(pmount.rotation, dest, pweapon.rotateSpeed * Time.delta);
+
+                    //shoot when possible
+                    if(Angles.within(pmount.rotation, dest, pweapon.shootCone) && pmount.reload <= 0){
+                        if(pmount.target.damage() > pweapon.bulletDamage){
+                            pmount.target.damage(pmount.target.damage() - pweapon.bulletDamage);
+                        }else{
+                            pmount.target.remove();
+                        }
+    
+                        Tmp.v1.trns(weaponRotation + 90, pweapon.shootLength);
+    
+                        pweapon.beamEffect.at(mountX + Tmp.v1.x, mountY + Tmp.v1.y, weaponRotation + 90, pweapon.color, new Vec2().set(pmount.target));
+                        pweapon.ejectEffect.at(mountX + Tmp.v1.x, mountY + Tmp.v1.y, weaponRotation + 90, pweapon.color);
+                        pweapon.hitEffect.at(pmount.target.x, pmount.target.y, pweapon.color);
+                        pweapon.shootSound.at(mountX + Tmp.v1.x, mountY + Tmp.v1.y, Mathf.random(0.9f, 1.1f));
+                        pmount.reload = pweapon.reload;
+                    }
+                }
+                continue;
+            }
 
             //update continuous state
             if(weapon.continuous && mount.bullet != null){
