@@ -49,10 +49,14 @@
   },
   {
     "name": "ALEX",
-    "address": ["alexmindustryhub.ddns.net:6568", "alexmindustry.ddns.net:6568", "alexmindustry.ddns.net:6569", "alexmindustryattac.ddns.net:25800"]
+    "address": ["alexmindustryhub.ddns.net:6568", "alexmindustry.ddns.net:6568", "alexmindustry.ddns.net:6569", "alexmindustryattac.ddns.net:25800","alexmindustryturbo.ddns.net:25854"]
   },
   {
     "name": "Minty [subzero]",
     "address": ["minty-server.ddns.net"]
+  },
+  {
+    "name": "Minigames",
+    "address": ["shizashizashiza.ml"]
   }
 ]
