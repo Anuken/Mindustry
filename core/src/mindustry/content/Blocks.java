@@ -1595,7 +1595,7 @@ public class Blocks implements ContentList{
             shots = 4;
             burstSpacing = 5;
             inaccuracy = 10f;
-            range = 190f;
+            range = 200f;
             xRand = 6f;
             size = 2;
             health = 300 * size * size;
