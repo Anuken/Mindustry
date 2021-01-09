@@ -334,6 +334,7 @@ public abstract class BulletType extends Content{
         bullet.type = this;
         bullet.owner = owner;
         bullet.team = team;
+        bullet.time = 0f;
         bullet.vel.trns(angle, speed * velocityScl);
         if(backMove){
             bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);

@@ -182,11 +182,11 @@ public class UnitType extends UnlockableContent{
 
                 var count = new float[]{-1};
                 bars.table().update(t -> {
-                    if(count[0] != payload.payloadUsed()) {
+                    if(count[0] != payload.payloadUsed()){
                         payload.contentInfo(t, 8 * 2, 270);
                         count[0] = payload.payloadUsed();
                     }
-                }).growX().left();
+                }).growX().left().height(0f).pad(0f);
             }
         }).growX();
 

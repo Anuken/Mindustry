@@ -123,7 +123,7 @@ public class AIController implements UnitController{
                     targets[i] = findTarget(mountX, mountY, weapon.bullet.range(), weapon.bullet.collidesAir, weapon.bullet.collidesGround);
                 }
 
-                if(Units.invalidateTarget(targets[i], unit.team, mountX, mountY, weapon.bullet.range())){
+                if(checkTarget(targets[i], mountX, mountY, weapon.bullet.range())){
                     targets[i] = null;
                 }
             }
@@ -147,6 +147,10 @@ public class AIController implements UnitController{
                 unit.aimY = mount.aimY;
             }
         }
+    }
+
+    protected boolean checkTarget(Teamc target, float x, float y, float range){
+        return Units.invalidateTarget(target, unit.team, x, y, range);
     }
 
     protected boolean shouldShoot(){
