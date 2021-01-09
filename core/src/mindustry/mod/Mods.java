@@ -853,6 +853,18 @@ public class Mods implements Loadable{
             if(author != null) author = Strings.stripColors(author);
             if(description != null) description = Strings.stripColors(description);
         }
+        
+        @Override
+        public String toString() {
+            return "ModMeta{" +
+                    "name='" + name + '\'' +
+                    ", author='" + author + '\'' +
+                    ", version='" + version + '\'' +
+                    ", main='" + main + '\'' +
+                    ", minGameVersion='" + minGameVersion + '\'' +
+                    ", hidden=" + hidden +
+                    '}';
+        }
     }
 
     public enum ModState{
