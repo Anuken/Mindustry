@@ -105,7 +105,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public float range(){
-        return type.range;
+        return type.maxRange;
     }
 
     @Replace
