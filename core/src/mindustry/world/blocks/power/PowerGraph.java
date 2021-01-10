@@ -64,6 +64,15 @@ public class PowerGraph{
         return lastPowerStored;
     }
 
+    public void transferPower(float amount){
+        if(amount > 0){
+            chargeBatteries(amount);
+        }else{
+            useBatteries(amount);
+        }
+        energyDelta += amount;
+    }
+
     public float getSatisfaction(){
         if(Mathf.zero(lastPowerProduced)){
             return 0f;
@@ -144,9 +153,6 @@ public class PowerGraph{
                 battery.power.status *= (1f-consumedPowerPercentage);
             }
         }
-
-        energyDelta -= used;
-
         return used;
     }
 
@@ -165,9 +171,6 @@ public class PowerGraph{
                 }
             }
         }
-
-        energyDelta += Math.min(excess, capacity);
-
         return Math.min(excess, capacity);
     }
 
@@ -227,6 +230,7 @@ public class PowerGraph{
         lastPowerStored = getBatteryStored();
 
         powerBalance.add((lastPowerProduced - lastPowerNeeded + energyDelta) / Time.delta);
+        energyDelta = 0f;
 
         if(!(consumers.size == 0 && producers.size == 0 && batteries.size == 0)){
 
@@ -242,8 +246,6 @@ public class PowerGraph{
 
             distributePower(powerNeeded, powerProduced);
         }
-
-        energyDelta = 0f;
     }
 
     public void addGraph(PowerGraph graph){
