@@ -142,7 +142,7 @@ public class BlockInventoryFragment extends Fragment{
 
                 container.add(i);
 
-                Boolp canPick = () -> !state.isPaused() && player.within(tile, itemTransferRange);
+                Boolp canPick = () -> !state.isPaused() && player.within(tile, itemTransferRange) && player.acceptsItem(item);
 
                 HandCursorListener l = new HandCursorListener();
                 l.enabled = canPick;
@@ -160,11 +160,13 @@ public class BlockInventoryFragment extends Fragment{
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                         if(!canPick.get() || tile == null || !tile.isValid() || tile.items == null || !tile.items.has(item)) return false;
                         int amount = Math.min(1, player.unit().maxAccepted(item));
-                        Call.requestItem(player, tile, item, amount);
-                        lastItem = item;
-                        holding = true;
-                        holdTime = 0f;
-                        if(net.client()) Events.fire(new WithdrawEvent(tile, player, item, amount));
+                        if(amount > 0) {
+                            Call.requestItem(player, tile, item, amount);
+                            lastItem = item;
+                            holding = true;
+                            holdTime = 0f;
+                            if (net.client()) Events.fire(new WithdrawEvent(tile, player, item, amount));
+                        }
                         return true;
                     }
 

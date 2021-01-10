@@ -18,6 +18,7 @@ import mindustry.graphics.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
@@ -89,6 +90,26 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     @Replace
     public float clipSize(){
         return unit.isNull() ? 20 : unit.type.hitSize * 2f;
+    }
+
+    public boolean hasItems(){
+        if(unit == null) return false;
+
+        boolean[] found = new boolean[]{false};
+        unit.eachGroup(unit -> {
+            if(unit.stack.amount > 0) found[0] = true;
+        });
+        return found[0];
+    }
+
+    public boolean acceptsItem(Item item){
+        if(unit == null) return false;
+
+        boolean[] found = new boolean[]{false};
+        unit.eachGroup(unit -> {
+            if(unit.acceptsItem(item)) found[0] = true;
+        });
+        return found[0];
     }
 
     @Override

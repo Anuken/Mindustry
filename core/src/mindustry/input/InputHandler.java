@@ -109,7 +109,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void transferItemTo(@Nullable Unit unit, Item item, int amount, float x, float y, Building build){
-        if(build == null || build.items == null || unit == null || unit.stack.amount <= 0) return;
+        if(build == null || build.items == null) return;
 
         unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
 
@@ -154,7 +154,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void transferInventory(Player player, Building build){
         if(player == null || build == null || !player.within(build, buildingRange) || build.items == null || player.dead()) return;
 
-        if(net.server() && ((player.unit().stack.amount <= 0 && player.unit().formation == null) || !Units.canInteract(player, build) ||
+        if(net.server() && (!player.hasItems() || !Units.canInteract(player, build) ||
         !netServer.admins.allowAction(player, ActionType.depositItem, build.tile, action -> {
             action.itemAmount = player.unit().stack.amount;
             action.item = player.unit().item();
@@ -284,7 +284,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void dropItem(Player player, float angle){
         if(player == null) return;
 
-        if(net.server() && player.unit().stack.amount <= 0 && player.unit().formation == null){
+        if(net.server() && !player.hasItems()){
             throw new ValidateException(player, "Player cannot drop an item.");
         }
 
@@ -934,7 +934,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean canTapPlayer(float x, float y){
-        return player.within(x, y, playerSelectRange) && (player.unit().stack.amount > 0 || player.unit().formation != null);
+        return player.within(x, y, playerSelectRange) && player.hasItems();
     }
 
     /** Tries to begin mining a tile, returns true if successful. */
@@ -1077,14 +1077,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void tryDropItems(@Nullable Building build, float x, float y){
-        if(!droppingItem || (player.unit().stack.amount <= 0 && player.unit().formation == null) || canTapPlayer(x, y) || state.isPaused() ){
+        if(!droppingItem || !player.hasItems() || canTapPlayer(x, y) || state.isPaused() ){
             droppingItem = false;
             return;
         }
 
         droppingItem = false;
 
-        if(build != null && build.interactable(player.team()) && build.block.hasItems && (player.unit().stack().amount > 0 || player.unit().formation != null)){
+        if(build != null && build.interactable(player.team()) && build.block.hasItems && player.hasItems()){
             Call.transferInventory(player, build);
         }else{
             Call.dropItem(player.angleTo(x, y));

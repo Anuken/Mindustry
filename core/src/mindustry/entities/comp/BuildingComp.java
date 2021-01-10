@@ -432,6 +432,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
+    public boolean canAcceptItems(Player player){
+        boolean[] found = new boolean[]{false};
+        player.unit().eachGroup(unit -> {
+            if(acceptStack(unit.item(), unit.stack.amount, unit) > 0) found[0] = true;
+        });
+        return found[0];
+    }
+
     public int getMaximumAccepted(Item item){
         return block.itemCapacity;
     }

@@ -165,13 +165,15 @@ public class OverlayRenderer{
         if(input.isDroppingItem()){
             Vec2 v = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
             float size = 8;
-            Draw.rect(player.unit().item().icon(Cicon.medium), v.x, v.y, size, size);
+            if(player.unit().formation == null){
+                Draw.rect(player.unit().item().icon(Cicon.medium), v.x, v.y, size, size);
+            }
             Draw.color(Pal.accent);
             Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time, 5f, 1f));
             Draw.reset();
 
             Building tile = world.buildWorld(v.x, v.y);
-            if(input.canDropItem() && tile != null && tile.interactable(player.team()) && (tile.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 || player.unit().formation != null) && player.within(tile, itemTransferRange)){
+            if(input.canDropItem() && tile != null && tile.interactable(player.team()) && tile.canAcceptItems(player) && player.within(tile, itemTransferRange)){
                 Lines.stroke(3f, Pal.gray);
                 Lines.square(tile.x, tile.y, tile.block.size * tilesize / 2f + 3 + Mathf.absin(Time.time, 5f, 1f));
                 Lines.stroke(1f, Pal.place);
