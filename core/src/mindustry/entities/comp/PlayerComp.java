@@ -59,9 +59,9 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         CoreBuild result = null;
         var dist = 0f;
         for(CoreBuild core : team.cores()){
-            if(result == null || core.block.size > result.block.size || (result.block.size == core.block.size && core.dst(x, y) < dist)){
+            if(result == null || core.block.size > result.block.size || (result.block.size == core.block.size && dst(core) < dist)){
                 result = core;
-                dist = core.dst(x, y);
+                dist = dst(core);
             }
         }
         return result;
