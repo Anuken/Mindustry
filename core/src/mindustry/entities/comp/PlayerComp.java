@@ -55,11 +55,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return state.teams.closestCore(x, y, team);
     }
 
-    public @Nullable CoreBuild closestBestCore(){
+    public @Nullable CoreBuild respawnCore(){
         CoreBuild result = null;
         var dist = 0f;
         for(CoreBuild core : team.cores()){
-            if(result == null || core.block.canReplace(result.block) || (result.block == core.block && core.dst(player.x, player.y) < dist)){
+            if(result == null || core.block.size > result.block.size || (result.block.size == core.block.size && core.dst(player.x, player.y) < dist)){
                 result = core;
                 dist = core.dst(player.x, player.y);
             }
@@ -135,7 +135,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
                 unit.elevation = Mathf.approachDelta(unit.elevation, (tile != null && tile.solid()) || boosting ? 1f : 0f, 0.08f);
             }
         }else{
-            CoreBuild core = closestBestCore();
+            CoreBuild core = respawnCore();
             if(core != null){
                 //have a small delay before death to prevent the camera from jumping around too quickly
                 //(this is not for balance, it just looks better this way)
