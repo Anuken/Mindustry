@@ -68,7 +68,7 @@ public class PowerGraph{
         if(amount > 0){
             chargeBatteries(amount);
         }else{
-            useBatteries(amount);
+            useBatteries(-amount);
         }
         energyDelta += amount;
     }
