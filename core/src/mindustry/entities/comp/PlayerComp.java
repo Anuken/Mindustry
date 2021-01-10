@@ -55,6 +55,18 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return state.teams.closestCore(x, y, team);
     }
 
+    public @Nullable CoreBuild closestBestCore(){
+        CoreBuild result = null;
+        var dist = 0f;
+        for(CoreBuild core : team.cores()){
+            if(result == null || core.block.canReplace(result.block) || (result.block == core.block && core.dst(player.x, player.y) < dist)){
+                result = core;
+                dist = core.dst(player.x, player.y);
+            }
+        }
+        return result;
+    }
+
     public @Nullable CoreBuild core(){
         return team.core();
     }
@@ -112,7 +124,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             clearUnit();
         }
 
-        CoreBuild core = closestCore();
+        CoreBuild core = closestBestCore();
 
         if(!dead()){
             set(unit);
