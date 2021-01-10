@@ -21,6 +21,8 @@ public class PowerGraph{
     private final WindowedMean powerBalance = new WindowedMean(60);
     private float lastPowerProduced, lastPowerNeeded, lastPowerStored;
     private float lastScaledPowerIn, lastScaledPowerOut, lastCapacity;
+    //diodes workaround for correct energy production info
+    private float energyDelta = 0f;
 
     private long lastFrameUpdated = -1;
     private final int graphID;
@@ -142,6 +144,9 @@ public class PowerGraph{
                 battery.power.status *= (1f-consumedPowerPercentage);
             }
         }
+
+        energyDelta -= used;
+
         return used;
     }
 
@@ -160,6 +165,9 @@ public class PowerGraph{
                 }
             }
         }
+
+        energyDelta += Math.min(excess, capacity);
+
         return Math.min(excess, capacity);
     }
 
@@ -218,7 +226,7 @@ public class PowerGraph{
         lastCapacity = getTotalBatteryCapacity();
         lastPowerStored = getBatteryStored();
 
-        powerBalance.add((lastPowerProduced - lastPowerNeeded) / Time.delta);
+        powerBalance.add((lastPowerProduced - lastPowerNeeded + energyDelta) / Time.delta);
 
         if(!(consumers.size == 0 && producers.size == 0 && batteries.size == 0)){
 
@@ -234,6 +242,8 @@ public class PowerGraph{
 
             distributePower(powerNeeded, powerProduced);
         }
+
+        energyDelta = 0f;
     }
 
     public void addGraph(PowerGraph graph){
