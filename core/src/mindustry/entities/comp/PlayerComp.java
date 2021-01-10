@@ -124,8 +124,6 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             clearUnit();
         }
 
-        CoreBuild core = closestBestCore();
-
         if(!dead()){
             set(unit);
             unit.team(team);
@@ -136,19 +134,21 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
                 Tile tile = unit.tileOn();
                 unit.elevation = Mathf.approachDelta(unit.elevation, (tile != null && tile.solid()) || boosting ? 1f : 0f, 0.08f);
             }
-        }else if(core != null){
-            //have a small delay before death to prevent the camera from jumping around too quickly
-            //(this is not for balance, it just looks better this way)
-            deathTimer += Time.delta;
-            if(deathTimer >= deathDelay){
-                //request spawn - this happens serverside only
-                core.requestSpawn(self());
-                deathTimer = 0;
+        }else{
+            CoreBuild core = closestBestCore();
+            if(core != null){
+                //have a small delay before death to prevent the camera from jumping around too quickly
+                //(this is not for balance, it just looks better this way)
+                deathTimer += Time.delta;
+                if(deathTimer >= deathDelay){
+                    //request spawn - this happens serverside only
+                    core.requestSpawn(self());
+                    deathTimer = 0;
+                }
             }
         }
 
         textFadeTime -= Time.delta / (60 * 5);
-
     }
 
     @Override
