@@ -375,6 +375,8 @@ public class Block extends UnlockableContent{
         if(hasItems && configurable){
             bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
         }
+        
+        if(flags.contains(BlockFlag.unitModifier)) stats.add(Stat.maxUnits, (unitCapModifier < 0 ? "-" : "+") + Math.abs(unitCapModifier));
     }
 
     public boolean canReplace(Block other){
