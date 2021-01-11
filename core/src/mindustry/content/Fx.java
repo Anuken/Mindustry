@@ -896,7 +896,7 @@ public class Fx{
         });
     }),
 
-    dynamicExplosion = new Effect(30, e -> {
+    dynamicExplosion = new Effect(30, 100f, e -> {
         float intensity = e.rotation;
 
         e.scaled(5 + intensity * 2, i -> {

@@ -46,6 +46,7 @@ public class TractorBeamTurret extends BaseTurret{
 
         //disabled due to version mismatch problems
         acceptCoolant = false;
+        expanded = true;
     }
 
     @Override
