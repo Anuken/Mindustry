@@ -73,7 +73,7 @@ public class TractorBeamTurret extends BaseTurret{
 
             //retarget
             if(timer(timerTarget, retargetTime)){
-                target = Units.closestEnemy(team, x, y, range, u -> u.checkTarget(targetAir, targetGround));
+                target = Units.closestEnemy(team, x, y, range, Flyingc::isFlying);
             }
 
             //consume coolant
@@ -96,7 +96,7 @@ public class TractorBeamTurret extends BaseTurret{
             any = false;
 
             //look at target
-            if(target != null && target.within(this, range) && target.team() != team && target.type.flying && efficiency() > 0.02f){
+            if(target != null && target.within(this, range) && target.team() != team && target.isFlying() && efficiency() > 0.02f){
                 if(!headless){
                     control.sound.loop(shootSound, this, shootSoundVolume);
                 }
