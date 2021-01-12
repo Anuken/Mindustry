@@ -56,6 +56,10 @@
     "address": ["minty-server.ddns.net"]
   },
   {
+    "name": "Universium",
+    "address": ["mindustry.universium.one"]
+  },
+  {
     "name": "Minigames",
     "address": ["shizashizashiza.ml"]
   }
