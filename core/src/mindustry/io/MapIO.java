@@ -11,6 +11,7 @@ import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.maps.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.*;
 
 import java.io.*;
@@ -203,6 +204,11 @@ public class MapIO{
                         break;
                     }
                 }
+            }
+
+            //default to stone floor
+            if(tile.floor() == Blocks.air){
+                tile.setFloorUnder((Floor)Blocks.stone);
             }
         }
     }
