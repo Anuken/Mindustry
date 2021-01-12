@@ -200,7 +200,7 @@ public class MapIO{
                 for(Point2 p : Geometry.d4){
                     Tile other = tiles.get(tile.x + p.x, tile.y + p.y);
                     if(other != null && other.floor() != Blocks.air){
-                        tile.setFloor(other.floor());
+                        tile.setFloorUnder(other.floor());
                         break;
                     }
                 }

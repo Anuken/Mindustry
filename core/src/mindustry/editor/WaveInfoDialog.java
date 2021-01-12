@@ -190,7 +190,7 @@ public class WaveInfoDialog extends BaseDialog{
                                 group.end = never;
                                 updateWaves();
                             }
-                        }).width(100f).get().setMessageText(Core.bundle.get("waves.never"));
+                        }).width(100f).get().setMessageText("∞");
                     });
                     t.row();
                     t.table(p -> {
