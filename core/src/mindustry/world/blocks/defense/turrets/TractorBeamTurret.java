@@ -24,8 +24,9 @@ public class TractorBeamTurret extends BaseTurret{
     public @Load("block-@size") TextureRegion baseRegion;
     public @Load("@-laser") TextureRegion laser;
     public @Load("@-laser-end") TextureRegion laserEnd;
-
+    
     public float shootCone = 6f;
+    public float shootLength = 5f;
     public float laserWidth = 0.6f;
     public float force = 0.3f;
     public float scaledForce = 0f;
@@ -141,12 +142,11 @@ public class TractorBeamTurret extends BaseTurret{
             if(any){
                 Draw.z(Layer.bullet);
                 float ang = angleTo(lastX, lastY);
-                float len = 5f;
 
                 Draw.mixcol(laserColor, Mathf.absin(4f, 0.6f));
 
                 Drawf.laser(team, laser, laserEnd,
-                x + Angles.trnsx(ang, len), y + Angles.trnsy(ang, len),
+                x + Angles.trnsx(ang, shootLength), y + Angles.trnsy(ang, shootLength),
                 lastX, lastY, strength * efficiency() * laserWidth);
 
                 Draw.mixcol();
