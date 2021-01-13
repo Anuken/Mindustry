@@ -15,6 +15,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -36,6 +37,7 @@ public class Renderer implements ApplicationListener{
     /** minZoom = zooming out, maxZoom = zooming in */
     public float minZoom = 1.5f, maxZoom = 6f;
 
+    private @Nullable CoreBuild landCore;
     //TODO unused
     private FxProcessor fx = new FxProcessor();
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
@@ -62,6 +64,10 @@ public class Renderer implements ApplicationListener{
         if(settings.getBool("bloom", !ios)){
             setupBloom();
         }
+
+        Events.on(WorldLoadEvent.class, e -> {
+            landCore = player.bestCore();
+        });
     }
 
     @Override
@@ -284,25 +290,25 @@ public class Renderer implements ApplicationListener{
     }
 
     private void drawLanding(){
-        if(landTime > 0 && player.closestCore() != null){
+        CoreBuild entity = landCore == null ? player.bestCore() : landCore;
+        if(landTime > 0 && entity != null){
             float fract = landTime / Fx.coreLand.lifetime;
-            Building entity = player.closestCore();
 
             TextureRegion reg = entity.block.icon(Cicon.full);
             float scl = Scl.scl(4f) / camerascale;
             float s = reg.width * Draw.scl * scl * 4f * fract;
 
             Draw.color(Pal.lightTrail);
-            Draw.rect("circle-shadow", entity.getX(), entity.getY(), s, s);
+            Draw.rect("circle-shadow", entity.x, entity.y, s, s);
 
             Angles.randLenVectors(1, (1f- fract), 100, 1000f * scl * (1f-fract), (x, y, fin, fout) -> {
                 Lines.stroke(scl * fin);
-                Lines.lineAngle(entity.getX() + x, entity.getY() + y, Mathf.angle(x, y), (fin * 20 + 1f) * scl);
+                Lines.lineAngle(entity.x + x, entity.y + y, Mathf.angle(x, y), (fin * 20 + 1f) * scl);
             });
 
             Draw.color();
             Draw.mixcol(Color.white, fract);
-            Draw.rect(reg, entity.getX(), entity.getY(), reg.width * Draw.scl * scl, reg.height * Draw.scl * scl, fract * 135f);
+            Draw.rect(reg, entity.x, entity.y, reg.width * Draw.scl * scl, reg.height * Draw.scl * scl, fract * 135f);
 
             Draw.reset();
         }
