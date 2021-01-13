@@ -363,13 +363,11 @@ public class SectorDamage{
         info.waveDpsBase = reg.intercept;
         info.waveDpsSlope = reg.slope;
 
-        //enemy units like to aim for a lot of non-essential things, so increase resulting health slightly
-        info.sumHealth = sumHealth * 1.05f;
-        //players tend to have longer range units/turrets, so assume DPS is higher
-        info.sumDps = sumDps * 1.05f;
+        info.sumHealth = sumHealth * 0.9f;
+        info.sumDps = sumDps;
         info.sumRps = sumRps;
 
-        float cmult = 1.5f;
+        float cmult = 1.6f;
 
         info.curEnemyDps = curEnemyDps*cmult;
         info.curEnemyHealth = curEnemyHealth*cmult;
@@ -524,7 +522,7 @@ public class SectorDamage{
     static float cost(Tile tile){
         return 1f +
             (tile.block().isStatic() && tile.solid() ? 200f : 0f) +
-            (tile.build != null ? tile.build.health / 40f : 0f) +
+            (tile.build != null ? tile.build.health / (tile.build.block.size * tile.build.block.size) / 20f : 0f) +
             (tile.floor().isLiquid ? 10f : 0f);
     }
 }
