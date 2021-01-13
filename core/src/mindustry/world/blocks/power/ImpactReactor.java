@@ -72,7 +72,7 @@ public class ImpactReactor extends PowerGenerator{
             if(consValid() && power.status >= 0.99f){
                 boolean prevOut = getPowerProduction() <= consumes.getPower().requestedPower(this);
 
-                warmup = Mathf.lerpDelta(warmup, 1f, warmupSpeed);
+                warmup = Mathf.lerpDelta(warmup, 1f, warmupSpeed * timeScale());
                 if(Mathf.equal(warmup, 1f, 0.001f)){
                     warmup = 1f;
                 }
