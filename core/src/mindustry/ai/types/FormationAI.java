@@ -3,9 +3,11 @@ package mindustry.ai.types;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.ai.formations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 public class FormationAI extends AIController implements FormationMember{
@@ -46,10 +48,17 @@ public class FormationAI extends AIController implements FormationMember{
             unit.lookAt(unit.vel.angle());
         }
 
-        Vec2 realtarget = vec.set(target).add(leader.vel);
+        Vec2 next = vec.set(target).add(leader.vel);
+        if(unit.isGrounded() && !unit.within(leader, 4 * formation.pattern.spacing)){
+            if(unit instanceof WaterMovec){
+                next = vec.set(Astar.pathfind(unit.tileOn(), leader.tileOn(), FormationAI::navalPathfindCost, t -> !t.solid() && t.floor().isLiquid).first());
+            }else{
+                next = vec.set(Astar.pathfind(unit.tileOn(), leader.tileOn(), FormationAI::pathfindCost, t -> !(t.solid())).first());
+            }
+        }
 
         float speed = unit.realSpeed() * unit.floorSpeedMultiplier() * Time.delta;
-        unit.approach(Mathf.arrive(unit.x, unit.y, realtarget.x, realtarget.y, unit.vel, speed, 0f, speed, 1f).scl(1f / Time.delta));
+        unit.approach(Mathf.arrive(unit.x, unit.y, next.x, next.y, unit.vel, speed, 0f, speed, 1f).scl(1f / Time.delta));
 
         if(unit.canMine() && leader.canMine()){
             if(leader.mineTile != null && unit.validMine(leader.mineTile)){
@@ -96,5 +105,13 @@ public class FormationAI extends AIController implements FormationMember{
     @Override
     public Vec3 formationPos(){
         return target;
+    }
+
+    private static float pathfindCost(Tile tile){
+        return 1f + (tile.floor().isLiquid ? 10f : 0f);
+    }
+
+    private static float navalPathfindCost(Tile tile){
+        return 1f;
     }
 }
