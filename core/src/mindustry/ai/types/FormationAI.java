@@ -50,11 +50,7 @@ public class FormationAI extends AIController implements FormationMember{
 
         Vec2 next = vec.set(target).add(leader.vel);
         if(unit.isGrounded() && !unit.within(leader, 4 * formation.pattern.spacing)){
-            if(unit instanceof WaterMovec){
-                next = vec.set(Astar.pathfind(unit.tileOn(), leader.tileOn(), FormationAI::navalPathfindCost, t -> !t.solid() && t.floor().isLiquid).first());
-            }else{
-                next = vec.set(Astar.pathfind(unit.tileOn(), leader.tileOn(), FormationAI::pathfindCost, t -> !(t.solid())).first());
-            }
+            next = vec.set(Astar.pathfind(unit.tileOn(), leader.tileOn(), FormationAI::pathfindCost, t -> unit.canPass(t.x, t.y)).first());
         }
 
         float speed = unit.realSpeed() * unit.floorSpeedMultiplier() * Time.delta;
@@ -109,9 +105,5 @@ public class FormationAI extends AIController implements FormationMember{
 
     private static float pathfindCost(Tile tile){
         return 1f + (tile.floor().isLiquid ? 10f : 0f);
-    }
-
-    private static float navalPathfindCost(Tile tile){
-        return 1f;
     }
 }
