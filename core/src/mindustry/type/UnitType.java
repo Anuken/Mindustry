@@ -46,12 +46,13 @@ public class UnitType extends UnlockableContent{
     public float health = 200f, range = -1, armor = 0f, maxRange = -1f;
     public float crashDamageMultiplier = 1f;
     public boolean targetAir = true, targetGround = true;
-    public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
+    public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false, circleTarget = false;
     public boolean canBoost = false;
     public boolean destructibleWreck = true;
     public float groundLayer = Layer.groundUnit;
     public float payloadCapacity = 8;
     public float aimDst = -1f;
+    public float buildBeamOffset = 3.8f;
     public int commandLimit = 8;
     public float visualElevation = -1f;
     public boolean allowLegStep = false;
@@ -106,7 +107,7 @@ public class UnitType extends UnlockableContent{
 
     public Seq<Weapon> weapons = new Seq<>();
     public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion,
-        occlusionRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion;
+        softShadowRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion;
     public TextureRegion[] wreckRegions;
 
     protected @Nullable ItemStack[] cachedRequirements;
@@ -169,6 +170,23 @@ public class UnitType extends UnlockableContent{
             if(state.rules.unitAmmo){
                 bars.add(new Bar(ammoType.icon + " " + Core.bundle.get("stat.ammo"), ammoType.barColor, () -> unit.ammo / ammoCapacity));
                 bars.row();
+            }
+
+            for(Ability ability : unit.abilities){
+                ability.displayBars(unit, bars);
+            }
+
+            if(unit instanceof Payloadc payload){
+                bars.add(new Bar("stat.payloadcapacity", Pal.items, () -> payload.payloadUsed() / unit.type().payloadCapacity));
+                bars.row();
+
+                var count = new float[]{-1};
+                bars.table().update(t -> {
+                    if(count[0] != payload.payloadUsed()){
+                        payload.contentInfo(t, 8 * 2, 270);
+                        count[0] = payload.payloadUsed();
+                    }
+                }).growX().left().height(0f).pad(0f);
             }
         }).growX();
 
@@ -351,7 +369,7 @@ public class UnitType extends UnlockableContent{
         legBaseRegion = Core.atlas.find(name + "-leg-base", name + "-leg");
         baseRegion = Core.atlas.find(name + "-base");
         cellRegion = Core.atlas.find(name + "-cell", Core.atlas.find("power-cell"));
-        occlusionRegion = Core.atlas.find("circle-shadow");
+        softShadowRegion = Core.atlas.find("circle-shadow");
         outlineRegion = Core.atlas.find(name + "-outline");
         shadowRegion = icon(Cicon.full);
 
@@ -439,7 +457,7 @@ public class UnitType extends UnlockableContent{
             drawPayload((Unit & Payloadc)unit);
         }
 
-        drawOcclusion(unit);
+        drawSoftShadow(unit);
 
         Draw.z(z - outlineSpace);
 
@@ -501,11 +519,11 @@ public class UnitType extends UnlockableContent{
         Draw.color();
     }
 
-    public void drawOcclusion(Unit unit){
+    public void drawSoftShadow(Unit unit){
         Draw.color(0, 0, 0, 0.4f);
         float rad = 1.6f;
         float size = Math.max(region.width, region.height) * Draw.scl;
-        Draw.rect(occlusionRegion, unit, size * rad, size * rad);
+        Draw.rect(softShadowRegion, unit, size * rad, size * rad);
         Draw.color();
     }
 
@@ -580,8 +598,8 @@ public class UnitType extends UnlockableContent{
             float wx = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
                 wy = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil);
 
-            if(weapon.occlusion > 0){
-                Drawf.shadow(wx, wy, weapon.occlusion);
+            if(weapon.shadow > 0){
+                Drawf.shadow(wx, wy, weapon.shadow);
             }
 
             if(weapon.outlineRegion.found()){

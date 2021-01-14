@@ -246,7 +246,7 @@ public class SectorDamage{
         //first, calculate the total health of blocks in the path
 
         //radius around the path that gets counted
-        int radius = 8;
+        int radius = 7;
         IntSet counted = new IntSet();
 
         for(Tile t : sparse2){
@@ -260,8 +260,8 @@ public class SectorDamage{
 
                         if(tile.build != null && tile.team() == state.rules.defaultTeam && counted.add(tile.pos())){
                             //health is divided by block size, because multiblocks are counted multiple times.
-                            sumHealth += tile.build.health / tile.block().size;
-                            totalPathBuild += 1f / tile.block().size;
+                            sumHealth += tile.build.health / (tile.block().size * tile.block().size);
+                            totalPathBuild += 1f / (tile.block().size * tile.block().size);
                         }
                     }
                 }
@@ -285,7 +285,7 @@ public class SectorDamage{
 
                     if(build.block instanceof ForceProjector f){
                         sumHealth += f.shieldHealth * e;
-                        sumRps += 1f * e;
+                        sumRps += e;
                     }
                 }
             }
@@ -363,13 +363,11 @@ public class SectorDamage{
         info.waveDpsBase = reg.intercept;
         info.waveDpsSlope = reg.slope;
 
-        //enemy units like to aim for a lot of non-essential things, so increase resulting health slightly
-        info.sumHealth = sumHealth * 1.05f;
-        //players tend to have longer range units/turrets, so assume DPS is higher
-        info.sumDps = sumDps * 1.05f;
+        info.sumHealth = sumHealth * 0.9f;
+        info.sumDps = sumDps;
         info.sumRps = sumRps;
 
-        float cmult = 1.5f;
+        float cmult = 1.6f;
 
         info.curEnemyDps = curEnemyDps*cmult;
         info.curEnemyHealth = curEnemyHealth*cmult;
@@ -409,7 +407,7 @@ public class SectorDamage{
                             if(wx >= 0 && wy >= 0 && wx < world.width() && wy < world.height() && Mathf.within(dx, dy, radius)){
                                 Tile other = world.rawTile(wx, wy);
                                 if(!(other.block() instanceof CoreBlock)){
-                                    s += other.team() == state.rules.defaultTeam ? other.build.health / other.block().size : 0f;
+                                    s += other.team() == state.rules.defaultTeam ? other.build.health / (other.block().size * other.block().size) : 0f;
                                 }
                             }
                         }
@@ -524,7 +522,7 @@ public class SectorDamage{
     static float cost(Tile tile){
         return 1f +
             (tile.block().isStatic() && tile.solid() ? 200f : 0f) +
-            (tile.build != null ? tile.build.health / 40f : 0f) +
+            (tile.build != null ? tile.build.health / (tile.build.block.size * tile.build.block.size) / 20f : 0f) +
             (tile.floor().isLiquid ? 10f : 0f);
     }
 }

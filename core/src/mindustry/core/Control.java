@@ -74,7 +74,7 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(WorldLoadEvent.class, event -> {
             if(Mathf.zero(player.x) && Mathf.zero(player.y)){
-                Building core = state.teams.closestCore(0, 0, player.team());
+                Building core = player.bestCore();
                 if(core != null){
                     player.set(core);
                     camera.position.set(core);
@@ -335,8 +335,6 @@ public class Control implements ApplicationListener, Loadable{
                         state.wave = 1;
                         //set up default wave time
                         state.wavetime = state.rules.waveSpacing * 2f;
-                        //slightly increase wave spacing as a handicap
-                        state.rules.waveSpacing += 60f * 10;
                         //reset captured state
                         sector.info.wasCaptured = false;
                         //re-enable waves
@@ -353,7 +351,7 @@ public class Control implements ApplicationListener, Loadable{
                                 if(tile != null){
                                     tile.setBlock(content.block(plan.block), state.rules.waveTeam, plan.rotation);
                                     if(plan.config != null && tile.build != null){
-                                        tile.build.configure(plan.config);
+                                        tile.build.configureAny(plan.config);
                                     }
                                 }
                             }
@@ -426,7 +424,7 @@ public class Control implements ApplicationListener, Loadable{
         net.dispose();
         Musics.dispose();
         Sounds.dispose();
-        ui.editor.dispose();
+        if(ui != null && ui.editor != null) ui.editor.dispose();
     }
 
     @Override

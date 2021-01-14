@@ -1,6 +1,5 @@
 package mindustry.entities.bullet;
 
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.gen.*;
 import mindustry.content.*;

@@ -46,6 +46,19 @@ public class Version{
         }
     }
 
+    /** @return whether the version is greater than the specified version string, e.g. "120.1"*/
+    public static boolean isAtLeast(String str){
+        if(build <= 0 || str == null || str.isEmpty()) return true;
+
+        int dot = str.indexOf('.');
+        if(dot != -1){
+            int major = Strings.parseInt(str.substring(0, dot), 0), minor = Strings.parseInt(str.substring(dot + 1), 0);
+            return build > major || (build == major && revision >= minor);
+        }else{
+            return build >= Strings.parseInt(str, 0);
+        }
+    }
+
     public static String buildString(){
         return build < 0 ? "custom" : build + (revision == 0 ? "" : "." + revision);
     }

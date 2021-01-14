@@ -6,7 +6,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -54,6 +53,7 @@ public class CoreBlock extends StorageBlock{
         loopSound = Sounds.respawning;
         loopSoundVolume = 1f;
         group = BlockGroup.none;
+        drawDisabled = false;
     }
 
     @Remote(called = Loc.server)
@@ -234,7 +234,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public int getMaximumAccepted(Item item){
-            return incinerate() ? storageCapacity * 2 : storageCapacity;
+            return state.rules.coreIncinerates ? storageCapacity * 2 : storageCapacity;
         }
 
         @Override
@@ -297,17 +297,17 @@ public class CoreBlock extends StorageBlock{
         @Override
         public void drawSelect(){
             Lines.stroke(1f, Pal.accent);
-            Cons<Building> outline = t -> {
+            Cons<Building> outline = b -> {
                 for(int i = 0; i < 4; i++){
                     Point2 p = Geometry.d8edge[i];
-                    float offset = -Math.max(t.block.size - 1, 0) / 2f * tilesize;
-                    Draw.rect("block-select", t.x + offset * p.x, t.y + offset * p.y, i * 90);
+                    float offset = -Math.max(b.block.size - 1, 0) / 2f * tilesize;
+                    Draw.rect("block-select", b.x + offset * p.x, b.y + offset * p.y, i * 90);
                 }
             };
-            if(proximity.contains(e -> owns(e) && e.items == items)){
-                outline.get(this);
-            }
-            proximity.each(e -> owns(e) && e.items == items, outline);
+            team.cores().each(core -> {
+                outline.get(core);
+                core.proximity.each(storage -> storage.items == items, outline);
+            });
             Draw.reset();
         }
 
@@ -317,10 +317,6 @@ public class CoreBlock extends StorageBlock{
 
         public boolean owns(Building core, Building tile){
             return tile instanceof StorageBuild b && (b.linkedCore == core || b.linkedCore == null);
-        }
-
-        public boolean incinerate(){
-            return state.isCampaign();
         }
 
         @Override
@@ -387,6 +383,9 @@ public class CoreBlock extends StorageBlock{
                 }else{
                     super.handleItem(source, item);
                 }
+            }else if(state.rules.coreIncinerates && items.get(item) >= storageCapacity && !noEffect){
+                //create item incineration effect at random intervals
+                incinerateEffect(this, source);
             }
         }
     }

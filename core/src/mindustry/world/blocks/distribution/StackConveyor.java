@@ -29,7 +29,7 @@ public class StackConveyor extends Block implements Autotiler{
 
     public float speed = 0f;
     public boolean splitOut = true;
-    /** (minimum) amount of loading docks needed to fill a line */
+    /** (minimum) amount of loading docks needed to fill a line. */
     public float recharge = 2f;
     public Effect loadEffect = Fx.plasticburn;
     public Effect unloadEffect = Fx.plasticburn;
@@ -46,7 +46,6 @@ public class StackConveyor extends Block implements Autotiler{
 
         ambientSound = Sounds.conveyor;
         ambientSoundVolume = 0.004f;
-        unloadable = false;
     }
 
     @Override
@@ -168,6 +167,16 @@ public class StackConveyor extends Block implements Autotiler{
                 }
             }
 
+            //cannot load when facing
+            if(state == stateLoad){
+                for(Building near : proximity){
+                    if(near instanceof StackConveyorBuild && near.front() == this){
+                        state = stateMove;
+                        break;
+                    }
+                }
+            }
+
             //update other conveyor state when this conveyor's state changes
             if(state != lastState){
                 proxUpdating = true;
@@ -181,21 +190,33 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
+        public boolean canUnload(){
+            return state != stateLoad;
+        }
+
+        @Override
+        public float efficiency(){
+            return 1f;
+        }
+
+        @Override
         public void updateTile(){
             // reel in crater
             if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed * edelta(), 0f, recharge);
 
-            if(link == -1){
-                return;
-            }
+            // indicates empty state
+            if(link == -1) return;
 
             // crater needs to be centered
             if(cooldown > 0f) return;
 
             // get current item
-            if(lastItem == null){
+            if(lastItem == null || !items.has(lastItem)){
                 lastItem = items.first();
             }
+
+            // do not continue if disabled, will still allow one to be reeled in to prevent visual stacking
+            if(!enabled) return;
 
             if(state == stateUnload){ //unload
                 while(lastItem != null && (!splitOut ? moveForward(lastItem) : dump(lastItem))){
@@ -255,6 +276,7 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public void handleStack(Item item, int amount, Teamc source){
+            if(amount <= 0) return;
             if(items.empty()) poofIn();
             super.handleStack(item, amount, source);
             lastItem = item;
@@ -267,6 +289,11 @@ public class StackConveyor extends Block implements Autotiler{
             }finally{
                 if(items.empty()) poofOut();
             }
+        }
+
+        @Override
+        public void itemTaken(Item item){
+            if(items.empty()) poofOut();
         }
 
         @Override

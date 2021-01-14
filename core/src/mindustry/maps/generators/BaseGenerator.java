@@ -27,12 +27,10 @@ public class BaseGenerator{
     private static final int range = 160;
 
     private Tiles tiles;
-    private Team team;
     private Seq<Tile> cores;
 
     public void generate(Tiles tiles, Seq<Tile> cores, Tile spawn, Team team, Sector sector, float difficulty){
         this.tiles = tiles;
-        this.team = team;
         this.cores = cores;
 
         //don't generate bases when there are no loaded schematics

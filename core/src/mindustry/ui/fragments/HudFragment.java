@@ -69,7 +69,7 @@ public class HudFragment extends Fragment{
             }
         });
 
-        Events.on(SectorCaptureEvent.class, e ->{
+        Events.on(SectorCaptureEvent.class, e -> {
             showToast(Core.bundle.format("sector.captured", e.sector.isBeingPlayed() ? "" : e.sector.name() + " "));
         });
 
@@ -224,7 +224,7 @@ public class HudFragment extends Fragment{
                     int i = 0;
                     for(Team team : Team.baseTeams){
                         ImageButton button = teams.button(Tex.whiteui, Styles.clearTogglePartiali, 40f, () -> Call.setPlayerTeamEditor(player, team))
-                            .size(50f).margin(6f).get();
+                        .size(50f).margin(6f).get();
                         button.getImageCell().grow();
                         button.getStyle().imageUpColor = team.color;
                         button.update(() -> button.setChecked(player.team() == team));
@@ -252,11 +252,10 @@ public class HudFragment extends Fragment{
 
                 if(android){
                     info.label(() -> memnative.get((int)(Core.app.getJavaHeap() / 1024 / 1024), (int)(Core.app.getNativeHeap() / 1024 / 1024))).left().style(Styles.outlineLabel).name("memory2");
-                    info.row();
                 }else{
                     info.label(() -> mem.get((int)(Core.app.getJavaHeap() / 1024 / 1024))).left().style(Styles.outlineLabel).name("memory");
-                    info.row();
                 }
+                info.row();
 
                 info.label(() -> ping.get(netClient.getPing())).visible(net::client).left().style(Styles.outlineLabel).name("ping");
 
@@ -343,39 +342,39 @@ public class HudFragment extends Fragment{
 
         //TODO DEBUG: rate table
         if(false)
-        parent.fill(t -> {
-            t.name = "rates";
-            t.bottom().left();
-            t.table(Styles.black6, c -> {
-                Bits used = new Bits(content.items().size);
+            parent.fill(t -> {
+                t.name = "rates";
+                t.bottom().left();
+                t.table(Styles.black6, c -> {
+                    Bits used = new Bits(content.items().size);
 
-                Runnable rebuild = () -> {
-                    c.clearChildren();
+                    Runnable rebuild = () -> {
+                        c.clearChildren();
 
-                    for(Item item : content.items()){
-                        if(state.rules.sector != null && state.rules.sector.info.getExport(item) >= 1){
-                            c.image(item.icon(Cicon.small));
-                            c.label(() -> (int)state.rules.sector.info.getExport(item) + " /s").color(Color.lightGray);
-                            c.row();
+                        for(Item item : content.items()){
+                            if(state.rules.sector != null && state.rules.sector.info.getExport(item) >= 1){
+                                c.image(item.icon(Cicon.small));
+                                c.label(() -> (int)state.rules.sector.info.getExport(item) + " /s").color(Color.lightGray);
+                                c.row();
+                            }
                         }
-                    }
-                };
+                    };
 
-                c.update(() -> {
-                    boolean wrong = false;
-                    for(Item item : content.items()){
-                        boolean has = state.rules.sector != null && state.rules.sector.info.getExport(item) >= 1;
-                        if(used.get(item.id) != has){
-                            used.set(item.id, has);
-                            wrong = true;
+                    c.update(() -> {
+                        boolean wrong = false;
+                        for(Item item : content.items()){
+                            boolean has = state.rules.sector != null && state.rules.sector.info.getExport(item) >= 1;
+                            if(used.get(item.id) != has){
+                                used.set(item.id, has);
+                                wrong = true;
+                            }
                         }
-                    }
-                    if(wrong){
-                        rebuild.run();
-                    }
-                });
-            }).visible(() -> state.isCampaign() && content.items().contains(i -> state.rules.sector != null && state.rules.sector.info.getExport(i) > 0));
-        });
+                        if(wrong){
+                            rebuild.run();
+                        }
+                    });
+                }).visible(() -> state.isCampaign() && content.items().contains(i -> state.rules.sector != null && state.rules.sector.info.getExport(i) > 0));
+            });
 
         blockfrag.build(parent);
     }
@@ -755,6 +754,21 @@ public class HudFragment extends Fragment{
 
             return builder;
         }).growX().pad(8f);
+
+        table.row();
+
+        var count = new float[]{-1};
+        table.table().update(t -> {
+            if(player.unit() instanceof Payloadc payload){
+                if(count[0] != payload.payloadUsed()){
+                    payload.contentInfo(t, 8 * 2, 275f);
+                    count[0] = payload.payloadUsed();
+                }
+            }else{
+                count[0] = -1;
+                t.clear();
+            }
+        }).growX().visible(() -> player.unit() instanceof Payloadc p && p.payloadUsed() > 0).colspan(2);
 
         return table;
     }

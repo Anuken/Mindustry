@@ -258,6 +258,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             player.clearUnit();
             Groups.unit.clear();
             Groups.build.clear();
+            Groups.weather.clear();
             logic.play();
 
             if(player.team().core() == null){

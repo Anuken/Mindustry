@@ -62,7 +62,9 @@ public class LAssembler{
         int index = 0;
         for(String line : lines){
             //comments
-            if(line.startsWith("#") || line.isEmpty()) continue;
+            int commentIdx = line.indexOf('#');
+            if(commentIdx != -1) line = line.substring(0, commentIdx).trim();
+            if(line.isEmpty()) continue;
             //remove trailing semicolons in case someone adds them in for no reason
             if(line.endsWith(";")) line = line.substring(0, line.length() - 1);
 
