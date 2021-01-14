@@ -91,68 +91,87 @@ public class SettingsMenuDialog extends SettingsDialog{
             t.defaults().size(280f, 60f).left();
             TextButtonStyle style = Styles.cleart;
 
-            t.button("@settings.cleardata", Icon.trash, style, () -> ui.showConfirm("@confirm", "@settings.clearall.confirm", () -> {
-                ObjectMap<String, Object> map = new ObjectMap<>();
-                for(String value : Core.settings.keys()){
-                    if(value.contains("usid") || value.contains("uuid")){
-                        map.put(value, Core.settings.get(value, null));
-                    }
-                }
-                Core.settings.clear();
-                Core.settings.putAll(map);
+            t.button("@settings.clear", Icon.trash, style, () -> {
+                BaseDialog clearDialog = new BaseDialog("@settings.clear");
+                SettingsTable clear = new SettingsTable();
 
-                for(Fi file : dataDirectory.list()){
-                    file.deleteDirectory();
-                }
+                clear.checkPref("clearsaves", false);
+                clear.checkPref("clearresearch", false);
+                clear.checkPref("clearcampaignsaves", false);
+                clear.checkPref("clearsettings", false);
+                clear.checkPref("clearmods", false);
+                clear.checkPref("clearmaps", false);
+                clear.checkPref("clearschematics", false);
+                clearDialog.cont.add(clear);
 
-                Core.app.exit();
-            })).marginLeft(4);
-
-            t.row();
-
-            t.button("@settings.clearsaves", Icon.trash, style, () -> {
-                ui.showConfirm("@confirm", "@settings.clearsaves.confirm", () -> {
-                    control.saves.deleteAll();
-                });
-            }).marginLeft(4);
-
-            t.row();
-
-            t.button("@settings.clearresearch", Icon.trash, style, () -> {
-                ui.showConfirm("@confirm", "@settings.clearresearch.confirm", () -> {
-                    universe.clearLoadoutInfo();
-                    for(TechNode node : TechTree.all){
-                        node.reset();
-                    }
-                    content.each(c -> {
-                        if(c instanceof UnlockableContent u){
-                            u.clearUnlock();
+                Runnable confirmed = () -> {
+                    ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
+                        if(Core.settings.getBool("clearsaves")){
+                            control.saves.deleteAll();
                         }
-                    });
-                    settings.remove("unlocks");
-                });
-            }).marginLeft(4);
 
-            t.row();
+                        if(Core.settings.getBool("clearresearch")){
+                            universe.clearLoadoutInfo();
+                            for(TechNode node : TechTree.all){
+                                node.reset();
+                            }
+                            content.each(c -> {
+                                if(c instanceof UnlockableContent u){
+                                    u.clearUnlock();
+                                }
+                            });
+                            settings.remove("unlocks");
+                        }
 
-            t.button("@settings.clearcampaignsaves", Icon.trash, style, () -> {
-                ui.showConfirm("@confirm", "@settings.clearcampaignsaves.confirm", () -> {
-                    for(var planet : content.planets()){
-                        for(var sec : planet.sectors){
-                            sec.clearInfo();
-                            if(sec.save != null){
-                                sec.save.delete();
-                                sec.save = null;
+                        if(Core.settings.getBool("clearcampaignsaves")){
+                            for(var planet : content.planets()){
+                                for(var sec : planet.sectors){
+                                    sec.clearInfo();
+                                    if(sec.save != null){
+                                        sec.save.delete();
+                                        sec.save = null;
+                                    }
+                                }
+                            }
+                    
+                            for(var slot : control.saves.getSaveSlots().copy()){
+                                if(slot.isSector()){
+                                    slot.delete();
+                                }
                             }
                         }
-                    }
-                    
-                    for(var slot : control.saves.getSaveSlots().copy()){
-                        if(slot.isSector()){
-                            slot.delete();
+
+                        if(Core.settings.getBool("clearmods")) {
+                            mods.list().copy().each(mod -> mods.removeMod(mod));
                         }
-                    }
-                });
+
+                        if(Core.settings.getBool("clearmaps")) {
+                            maps.all().copy().each(map -> maps.removeMap(map));
+                        }
+
+                        if(Core.settings.getBool("clearschematics")) {
+                            schematics.all().copy().each(schematic -> schematics.remove(schematic));
+                        }
+
+                        //clear settings must be last
+                        if(Core.settings.getBool("clearsettings")){
+                            ObjectMap<String, Object> map = new ObjectMap<>();
+                            for(String value : Core.settings.keys()){
+                                if(value.contains("usid") || value.contains("uuid")){
+                                    map.put(value, Core.settings.get(value, null));
+                                }
+                            }
+                            Core.settings.clear();
+                            Core.settings.putAll(map);
+                        }
+                        Core.app.exit();
+                    });
+                };
+
+                clearDialog.addCloseButton();
+                clearDialog.buttons.button("@ok", () -> confirmed.run());
+                clearDialog.keyDown(KeyCode.enter, () -> confirmed.run());
+                clearDialog.show();
             }).marginLeft(4);
 
             t.row();
