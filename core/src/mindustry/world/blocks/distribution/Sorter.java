@@ -33,7 +33,11 @@ public class Sorter extends Block{
 
     @Override
     public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
-        drawRequestConfigCenter(req, req.config, "center");
+        if(req.config == null){
+            Draw.rect("cross", req.drawx(), req.drawy());
+        }else{
+            drawRequestConfigCenter(req, req.config, "center");
+        }
     }
 
     @Override
