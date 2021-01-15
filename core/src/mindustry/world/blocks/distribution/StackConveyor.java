@@ -268,6 +268,12 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
+        public int acceptStack(Item item, int amount, Teamc source){
+            if(items.any() && !items.has(item)) return 0;
+            return super.acceptStack(item, amount, source);
+        }
+
+        @Override
         public void handleItem(Building source, Item item){
             if(items.empty()) poofIn();
             super.handleItem(source, item);
@@ -301,7 +307,7 @@ public class StackConveyor extends Block implements Autotiler{
             if(this == source) return true;                 // player threw items
             if(cooldown > recharge - 1f) return false;      // still cooling down
             return !((state != stateLoad)                   // not a loading dock
-            ||  (items.total() > 0 && !items.has(item))     // incompatible items
+            ||  (items.any() && !items.has(item))     // incompatible items
             ||  (items.total() >= getMaximumAccepted(item)) // filled to capacity
             ||  (front()  == source));
         }
