@@ -265,6 +265,7 @@ public class BaseAI{
         if(spawn == null) return;
 
         for(int wx = lastX; wx <= lastX + lastW; wx++){
+            outer:
             for(int wy = lastY; wy <= lastY + lastH; wy++){
                 Tile tile = world.tile(wx, wy);
 
@@ -279,7 +280,7 @@ public class BaseAI{
 
                     Tile o = world.tile(tile.x + p.x, tile.y + p.y);
                     if(o != null && (o.block() instanceof PayloadAcceptor || o.block() instanceof PayloadConveyor)){
-                        break;
+                        continue outer;
                     }
 
                     if(o != null && o.team() == data.team && !(o.block() instanceof Wall)){

@@ -201,21 +201,21 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public void updateTile(){
-            // reel in crater
+            //reel in crater
             if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed * edelta(), 0f, recharge);
 
-            // indicates empty state
+            //indicates empty state
             if(link == -1) return;
 
-            // crater needs to be centered
+            //crater needs to be centered
             if(cooldown > 0f) return;
 
-            // get current item
+            //get current item
             if(lastItem == null || !items.has(lastItem)){
                 lastItem = items.first();
             }
 
-            // do not continue if disabled, will still allow one to be reeled in to prevent visual stacking
+            //do not continue if disabled, will still allow one to be reeled in to prevent visual stacking
             if(!enabled) return;
 
             if(state == stateUnload){ //unload
@@ -225,12 +225,12 @@ public class StackConveyor extends Block implements Autotiler{
             }else{ //transfer
                 if(state != stateLoad || (items.total() >= getMaximumAccepted(lastItem))){
                     if(front() instanceof StackConveyorBuild e && e.team == team){
-                        // sleep if its occupied
+                        //sleep if its occupied
                         if(e.link == -1){
                             e.items.add(items);
                             e.lastItem = lastItem;
                             e.link = tile.pos();
-                            // ▲ to | from ▼
+                            //▲ to | from ▼
                             link = -1;
                             items.clear();
 
@@ -254,7 +254,7 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public boolean shouldAmbientSound(){
-            return false; // has no moving parts;
+            return false; //has no moving parts;
         }
 
         protected void poofIn(){
@@ -304,11 +304,11 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            if(this == source) return true;                 // player threw items
-            if(cooldown > recharge - 1f) return false;      // still cooling down
-            return !((state != stateLoad)                   // not a loading dock
-            ||  (items.any() && !items.has(item))     // incompatible items
-            ||  (items.total() >= getMaximumAccepted(item)) // filled to capacity
+            if(this == source) return true; //player threw items
+            if(cooldown > recharge - 1f) return false; //still cooling down
+            return !((state != stateLoad) //not a loading dock
+            ||  (items.any() && !items.has(item)) //incompatible items
+            ||  (items.total() >= getMaximumAccepted(item)) //filled to capacity
             ||  (front()  == source));
         }
 
