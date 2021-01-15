@@ -63,7 +63,7 @@ public class ConstructBlock extends Block{
         if(tile == null) return;
 
         float healthf = tile.build == null ? 1f : tile.build.healthf();
-        Seq<Building> prev = tile.build instanceof ConstructBuild ? ((ConstructBuild)tile.build).prevBuild : null;
+        Seq<Building> prev = tile.build instanceof ConstructBuild co ? co.prevBuild : null;
 
         tile.setBlock(block, team, rotation);
 

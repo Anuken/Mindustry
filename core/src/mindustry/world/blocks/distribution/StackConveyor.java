@@ -92,8 +92,8 @@ public class StackConveyor extends Block implements Autotiler{
     @Override
     public boolean rotatedOutput(int x, int y){
         Building tile = world.build(x, y);
-        if(tile instanceof StackConveyorBuild){
-            return ((StackConveyorBuild)tile).state != stateUnload;
+        if(tile instanceof StackConveyorBuild s){
+            return s.state != stateUnload;
         }
         return super.rotatedOutput(x, y);
     }

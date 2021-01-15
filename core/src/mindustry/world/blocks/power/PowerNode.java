@@ -246,9 +246,9 @@ public class PowerNode extends PowerBlock{
     public boolean linkValid(Building tile, Building link, boolean checkMaxNodes){
         if(tile == link || link == null || !link.block.hasPower || tile.team != link.team) return false;
 
-        if(overlaps(tile, link, laserRange * tilesize) || (link.block instanceof PowerNode && overlaps(link, tile, ((PowerNode)link.block).laserRange * tilesize))){
-            if(checkMaxNodes && link.block instanceof PowerNode){
-                return link.power.links.size < ((PowerNode)link.block).maxNodes || link.power.links.contains(tile.pos());
+        if(overlaps(tile, link, laserRange * tilesize) || (link.block instanceof PowerNode node && overlaps(link, tile, node.laserRange * tilesize))){
+            if(checkMaxNodes && link.block instanceof PowerNode node){
+                return link.power.links.size < node.maxNodes || link.power.links.contains(tile.pos());
             }
             return true;
         }
