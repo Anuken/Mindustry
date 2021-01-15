@@ -3,6 +3,7 @@ package mindustry.input;
 import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -160,14 +161,17 @@ public class DesktopInput extends InputHandler{
                     drawArrow(block, cursorX, cursorY, rotation);
                 }
                 Draw.color();
+                boolean valid = validPlace(cursorX, cursorY, block, rotation);
                 drawRequest(cursorX, cursorY, block, rotation);
-                block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
+                block.drawPlace(cursorX, cursorY, rotation, valid);
 
-                if(block.saveConfig && block.lastConfig != null){
+                if(block.saveConfig){
+                    Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
                     brequest.set(cursorX, cursorY, rotation, block);
                     brequest.config = block.lastConfig;
                     block.drawRequestConfig(brequest, allRequests());
                     brequest.config = null;
+                    Draw.reset();
                 }
             }
         }

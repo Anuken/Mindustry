@@ -426,9 +426,7 @@ public class Block extends UnlockableContent{
         TextureRegion reg = getRequestRegion(req, list);
         Draw.rect(reg, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
 
-        if(req.config != null){
-            drawRequestConfig(req, list);
-        }
+        drawRequestConfig(req, list);
     }
 
     public TextureRegion getRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
@@ -439,13 +437,23 @@ public class Block extends UnlockableContent{
 
     }
 
-    public void drawRequestConfigCenter(BuildPlan req, Object content, String region){
-        Color color = content instanceof Item ? ((Item)content).color : content instanceof Liquid ? ((Liquid)content).color : null;
+    public void drawRequestConfigCenter(BuildPlan req, Object content, String region, boolean cross){
+        if(content == null){
+            if(cross){
+                Draw.rect("cross", req.drawx(), req.drawy());
+            }
+            return;
+        }
+        Color color = content instanceof Item i ? i.color : content instanceof Liquid l ? l.color : null;
         if(color == null) return;
 
         Draw.color(color);
         Draw.rect(region, req.drawx(), req.drawy());
         Draw.color();
+    }
+
+    public void drawRequestConfigCenter(BuildPlan req, Object content, String region){
+        drawRequestConfigCenter(req, content, region, false);
     }
 
     public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
