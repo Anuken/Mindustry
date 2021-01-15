@@ -52,7 +52,7 @@ public class Unloader extends Block{
 
         @Override
         public void updateTile(){
-            if(timer(timerUnload, speed / timeScale())){
+            if(timer(timerUnload, speed / timeScale)){
                 if(rotations == null || rotations.length != proximity.size){
                     rotations = new int[proximity.size];
                 }

@@ -81,7 +81,7 @@ public class NuclearReactor extends PowerGenerator{
             if(fuel > 0 && enabled){
                 heat += fullness * heating * Math.min(delta(), 4f);
 
-                if(timer(timerFuel, itemDuration / timeScale())){
+                if(timer(timerFuel, itemDuration / timeScale)){
                     consume();
                 }
             }else{
