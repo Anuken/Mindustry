@@ -34,6 +34,10 @@ public abstract class BulletType extends Content{
     public Effect smokeEffect = Fx.shootSmallSmoke;
     /** Sound made when hitting something or getting removed.*/
     public Sound hitSound = Sounds.none;
+    /** Pitch of the sound made when hitting something*/
+    public float hitSoundPitch = 1;
+    /** Volume of the sound made when hitting something*/
+    public float hitSoundVolume = 1;
     /** Extra inaccuracy when firing. */
     public float inaccuracy = 0f;
     /** How many bullets get created per ammo item/liquid. */
@@ -186,7 +190,7 @@ public abstract class BulletType extends Content{
 
     public void hit(Bullet b, float x, float y){
         hitEffect.at(x, y, b.rotation(), hitColor);
-        hitSound.at(b);
+        hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
 
         Effect.shake(hitShake, hitShake, b);
 
