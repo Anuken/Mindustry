@@ -362,7 +362,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Base efficiency. If this entity has non-buffered power, returns the power %, otherwise returns 1. */
     public float efficiency(){
         //disabled -> 0 efficiency
-        if(!enabled) return 0;
+        if(!enabled && block.drawDisabled) return 0;
         return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
     }
 
