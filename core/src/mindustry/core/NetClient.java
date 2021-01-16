@@ -634,19 +634,28 @@ public class NetClient implements ApplicationListener{
     }
 
     String getUsid(String ip){
-        //consistently use the latter part of an IP, if possible
+        String hostname = null;//get hostname+port if possible
         if(ip.contains("/")){
+            hostname = ip.substring(0, ip.indexOf("/")) + ip.substring(ip.indexOf(":"));
             ip = ip.substring(ip.indexOf("/") + 1);
         }
 
-        if(Core.settings.getString("usid-" + ip, null) != null){
-            return Core.settings.getString("usid-" + ip, null);
-        }else{
+        //get usidByIp for fallback or same server with multiple hostname
+        String usidByIp = Core.settings.getString("usid-" + ip, null);
+        if(usidByIp == null){
             byte[] bytes = new byte[8];
             new Rand().nextBytes(bytes);
-            String result = new String(Base64Coder.encode(bytes));
-            Core.settings.put("usid-" + ip, result);
-            return result;
+            usidByIp = new String(Base64Coder.encode(bytes));
+            Core.settings.put("usid-" + ip, usidByIp);
         }
+        if(hostname == null) return usidByIp;
+
+        //use usidByName if exist
+        String usidByName = Core.settings.getString("usid-" + hostname, null);
+        if(usidByName == null){
+            usidByName = usidByIp;
+            Core.settings.put("usid-" + hostname, usidByName);
+        }
+        return usidByName;
     }
 }
