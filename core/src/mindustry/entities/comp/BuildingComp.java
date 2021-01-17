@@ -780,7 +780,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
     
     public boolean conductsTo(Building other){
-        return true;
+        return !block.insulated;
     }
 
     public Seq<Building> getPowerConnections(Seq<Building> out){
@@ -789,7 +789,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         for(Building other : proximity){
             if(other != null && other.power != null
-            && !(block.consumesPower && other.block.consumesPower && !block.outputsPower && !other.block.outputsPower)
+            && !block.insulated && !(block.consumesPower && other.block.consumesPower && !block.outputsPower && !other.block.outputsPower)
             && other.conductsTo(self()) && !power.links.contains(other.pos())){
                 out.add(other);
             }
