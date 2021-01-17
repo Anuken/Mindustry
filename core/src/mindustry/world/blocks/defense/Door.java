@@ -69,8 +69,8 @@ public class Door extends Wall{
             super.onProximityRemoved();
 
             for(Building b : proximity){
-                if(b instanceof DoorBuild){
-                    ((DoorBuild)b).updateChained();
+                if(b instanceof DoorBuild d){
+                    d.updateChained();
                 }
             }
         }
@@ -113,8 +113,8 @@ public class Door extends Wall{
             this.chained = set;
 
             for(Building b : proximity){
-                if(b instanceof DoorBuild){
-                    ((DoorBuild)b).flow(set);
+                if(b instanceof DoorBuild d){
+                    d.flow(set);
                 }
             }
         }
