@@ -98,6 +98,7 @@ public abstract class BulletType extends Content{
     public Color hitColor = Color.white;
 
     public Color trailColor = Pal.missileYellowBack;
+    public boolean teamTrail = false;
     public float trailChance = -0.0001f;
     public Effect trailEffect = Fx.missileTrail;
     public float trailParam =  2f;
@@ -283,7 +284,7 @@ public abstract class BulletType extends Content{
 
         if(trailChance > 0){
             if(Mathf.chanceDelta(trailChance)){
-                trailEffect.at(b.x, b.y, trailParam, trailColor);
+                trailEffect.at(b.x, b.y, trailParam, teamTrail ? b.team.color : trailColor);
             }
         }
     }
