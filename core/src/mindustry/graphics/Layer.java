@@ -23,12 +23,6 @@ public class Layer{
     //stuff under blocks, like connections of conveyors/conduits
     blockUnder = 29.5f,
 
-    //base block layer for conveyors
-    conveyorBase = 29.6f,
-
-    //conveyor item layer
-    conveyorItem = 29.7f,
-
     //base block layer - most blocks go here
     block = 30,
 

@@ -127,11 +127,11 @@ public class Conveyor extends Block implements Autotiler{
                 }
             }
 
-            Draw.z(Layer.conveyorBase);
+            Draw.z(Layer.block - 0.2f);
 
             Draw.rect(regions[blendbits][frame], x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
 
-            Draw.z(Layer.conveyorItem);
+            Draw.z(Layer.block - 0.1f);
 
             for(int i = 0; i < len; i++){
                 Item item = ids[i];
