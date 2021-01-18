@@ -39,7 +39,7 @@ public class WeaponListValue implements StatValue{
                 if(weapon.inaccuracy > 0){
                     sep(w, "[lightgray]" + Stat.inaccuracy.localized() + ": [white]" + (int)weapon.inaccuracy + " " + StatUnit.degrees.localized());
                 }
-                sep(w, "[lightgray]" + Stat.reload.localized() + ": " + (weapon.mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / weapon.reload * weapon.shots, 1));
+                sep(w, "[lightgray]" + Stat.reload.localized() + ": " + (weapon.mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / weapon.reload * weapon.shots, 2));
 
                 var bullet = new AmmoListValue<UnitType>(OrderedMap.of(unit, weapon.bullet));
                 bullet.display(w);
