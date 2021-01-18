@@ -789,8 +789,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         for(Building other : proximity){
             if(other != null && other.power != null
-            && !block.insulated && !(block.consumesPower && other.block.consumesPower && !block.outputsPower && !other.block.outputsPower)
-            && other.conductsTo(self()) && !power.links.contains(other.pos())){
+            && !(block.consumesPower && other.block.consumesPower && !block.outputsPower && !other.block.outputsPower)
+            && conductsTo(other) && other.conductsTo(self()) && !power.links.contains(other.pos())){
                 out.add(other);
             }
         }
