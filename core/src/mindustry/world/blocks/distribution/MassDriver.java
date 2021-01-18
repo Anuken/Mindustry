@@ -16,6 +16,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
@@ -89,12 +90,25 @@ public class MassDriver extends Block{
         }
     }
 
-    public class MassDriverBuild extends Building{
+    public class MassDriverBuild extends Building implements ControlBlock{
         public int link = -1;
         public float rotation = 90;
         public float reload = 0f;
         public DriverState state = DriverState.idle;
         public OrderedSet<Tile> waitingShooters = new OrderedSet<>();
+        public BlockUnitc unit = Nulls.blockUnit;
+        public float soul = 0;
+
+        @Override
+        public void created(){
+            unit = (BlockUnitc)UnitTypes.block.create(team);
+            unit.tile(this);
+        }
+
+        @Override
+        public Unit unit(){
+            return (Unit)unit;
+        }
 
         public Tile currentShooter(){
             return waitingShooters.isEmpty() ? null : waitingShooters.first();
@@ -105,8 +119,19 @@ public class MassDriver extends Block{
             Building link = world.build(this.link);
             boolean hasLink = linkValid();
 
+            if(unit != null){
+                unit.health(health);
+                unit.ammo(unit.type().ammoCapacity * soul / Fx.unitSpirit.lifetime);
+                unit.team(team);
+                unit.set(x, y);
+            }
+
+            soul = isControlled() ? Mathf.clamp(soul + delta(), 0, Fx.unitSpirit.lifetime) : 0;
+
             if(hasLink){
                 this.link = link.pos();
+
+                if(isControlled() && soul == Fx.unitSpirit.lifetime) Call.unitControl(player, (Unit)((MassDriverBuild)link).unit);
             }
 
             //reload regardless of state
