@@ -32,6 +32,11 @@ public interface Payload{
         return size() / tilesize <= s;
     }
 
+    /** @return rotation of this payload. */
+    default float rotation(){
+        return 0f;
+    }
+
     /** writes the payload for saving. */
     void write(Writes write);
 

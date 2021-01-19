@@ -374,13 +374,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             crosshairScale = Mathf.lerpDelta(crosshairScale, 1f, 0.2f);
 
-            Draw.color(Pal.remove);
-            Lines.stroke(1f);
-
-            float radius = Interp.swingIn.apply(crosshairScale);
-
-            Lines.poly(target.getX(), target.getY(), 4, 7f * radius, Time.time * 1.5f);
-            Lines.spikes(target.getX(), target.getY(), 3f * radius, 6f * radius, 4, Time.time * 1.5f);
+            Drawf.target(target.getX(), target.getY(), 7f * Interp.swingIn.apply(crosshairScale), Pal.remove);
         }
 
         Draw.reset();
@@ -652,7 +646,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //zoom camera
-        if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
+        if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 

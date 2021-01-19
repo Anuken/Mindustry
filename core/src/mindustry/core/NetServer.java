@@ -182,7 +182,7 @@ public class NetServer implements ApplicationListener{
                     return;
                 }
 
-                if(Groups.player.contains(player -> player.uuid().equals(packet.uuid) || player.usid().equals(packet.usid))){
+                if(Groups.player.contains(player -> player.uuid().equals(packet.uuid) || player.usid().equals(packet.usid) || player.ip().equals(con.address))){
                     con.kick(KickReason.idInUse);
                     return;
                 }

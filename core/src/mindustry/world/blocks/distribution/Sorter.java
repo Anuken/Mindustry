@@ -81,13 +81,10 @@ public class Sorter extends Block{
 
         @Override
         public void handleItem(Building source, Item item){
-            Building to = getTileTarget(item, source, true);
-
-            to.handleItem(this, item);
+            getTileTarget(item, source, true).handleItem(this, item);
         }
 
         public boolean isSame(Building other){
-            // comment code below to allow sorter/gate chaining
             return other != null && other.block.instantTransfer;
         }
 

@@ -33,7 +33,7 @@ public class Renderer implements ApplicationListener{
 
     public @Nullable Bloom bloom;
     public FrameBuffer effectBuffer = new FrameBuffer();
-    public boolean animateShields, drawWeather = true;
+    public boolean animateShields, drawWeather = true, drawStatus;
     /** minZoom = zooming out, maxZoom = zooming in */
     public float minZoom = 1.5f, maxZoom = 6f;
 
@@ -81,6 +81,7 @@ public class Renderer implements ApplicationListener{
         laserOpacity = settings.getInt("lasersopacity") / 100f;
         bridgeOpacity = settings.getInt("bridgeopacity") / 100f;
         animateShields = settings.getBool("animatedshields");
+        drawStatus = Core.settings.getBool("blockstatus");
 
         if(landTime > 0){
             landTime -= Time.delta;

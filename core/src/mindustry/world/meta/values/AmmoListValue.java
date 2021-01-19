@@ -59,11 +59,11 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                 }
 
                 if(!Mathf.equal(type.reloadMultiplier, 1f)){
-                    sep(bt, Core.bundle.format("bullet.reload", Strings.fixed(type.reloadMultiplier, 1)));
+                    sep(bt, Core.bundle.format("bullet.reload", Strings.autoFixed(type.reloadMultiplier, 2)));
                 }
 
                 if(type.knockback > 0){
-                    sep(bt, Core.bundle.format("bullet.knockback", Strings.fixed(type.knockback, 1)));
+                    sep(bt, Core.bundle.format("bullet.knockback", Strings.autoFixed(type.knockback, 2)));
                 }
 
                 if(type.healPercent > 0f){
