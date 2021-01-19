@@ -243,14 +243,14 @@ public class MapView extends Element implements GestureListener{
 
         image.setImageSize(editor.width(), editor.height());
 
-        if(!ScissorStack.push(rect.set(x, y, width, height))){
+        if(!ScissorStack.push(rect.set(x, y + Core.scene.marginBottom, width, height))){
             return;
         }
 
         Draw.color(Pal.remove);
         Lines.stroke(2f);
         Lines.rect(centerx - sclwidth / 2 - 1, centery - sclheight / 2 - 1, sclwidth + 2, sclheight + 2);
-        editor.renderer.draw(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
+        editor.renderer.draw(centerx - sclwidth / 2, centery - sclheight / 2 + Core.scene.marginBottom, sclwidth, sclheight);
         Draw.reset();
 
         if(grid){

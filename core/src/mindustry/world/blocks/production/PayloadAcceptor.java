@@ -14,7 +14,7 @@ import mindustry.world.blocks.payloads.*;
 import static mindustry.Vars.*;
 
 public class PayloadAcceptor extends Block{
-    public float payloadSpeed = 0.5f;
+    public float payloadSpeed = 0.5f, payloadRotateSpeed = 5f;
 
     public @Load(value = "@-top", fallback = "factory-top-@size") TextureRegion topRegion;
     public @Load(value = "@-out", fallback = "factory-out-@size") TextureRegion outRegion;
@@ -55,6 +55,7 @@ public class PayloadAcceptor extends Block{
         public @Nullable T payload;
         public Vec2 payVector = new Vec2();
         public float payRotation;
+        public boolean carried;
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
@@ -65,7 +66,7 @@ public class PayloadAcceptor extends Block{
         public void handlePayload(Building source, Payload payload){
             this.payload = (T)payload;
             this.payVector.set(source).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
-            this.payRotation = source.angleTo(this);
+            this.payRotation = payload.rotation();
 
             updatePayload();
         }
@@ -73,6 +74,16 @@ public class PayloadAcceptor extends Block{
         @Override
         public Payload getPayload(){
             return payload;
+        }
+
+        @Override
+        public void pickedUp(){
+            carried = true;
+        }
+
+        @Override
+        public void drawTeamTop(){
+            carried = false;
         }
 
         @Override
@@ -85,7 +96,7 @@ public class PayloadAcceptor extends Block{
         @Override
         public void onRemoved(){
             super.onRemoved();
-            if(payload != null) payload.dump();
+            if(payload != null && !carried) payload.dump();
         }
 
         public boolean blends(int direction){
@@ -104,7 +115,7 @@ public class PayloadAcceptor extends Block{
 
             updatePayload();
 
-            payRotation = Mathf.slerpDelta(payRotation, rotate ? rotdeg() : 90f, 0.3f);
+            payRotation = Angles.moveToward(payRotation, rotate ? rotdeg() : 90f, payloadRotateSpeed * edelta());
             payVector.approach(Vec2.ZERO, payloadSpeed * delta());
 
             return hasArrived();
@@ -115,10 +126,12 @@ public class PayloadAcceptor extends Block{
 
             updatePayload();
 
-            payVector.trns(rotdeg(), payVector.len() + delta() * payloadSpeed);
-            payRotation = rotdeg();
+            Vec2 dest = Tmp.v1.trns(rotdeg(), size* tilesize/2f);
 
-            if(payVector.len() >= size * tilesize/2f){
+            payRotation = Angles.moveToward(payRotation, rotdeg(), payloadRotateSpeed * edelta());
+            payVector.approach(dest, payloadSpeed * delta());
+
+            if(payVector.within(dest, 0.001f)){
                 payVector.clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
 
                 Building front = front();
@@ -144,7 +157,7 @@ public class PayloadAcceptor extends Block{
 
         public void drawPayload(){
             if(payload != null){
-                payload.set(x + payVector.x, y + payVector.y, payRotation);
+                updatePayload();
 
                 Draw.z(Layer.blockOver);
                 payload.draw();

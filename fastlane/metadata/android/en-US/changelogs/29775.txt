@@ -1,0 +1,2 @@
+[This is a truncated changelog, see Github for full notes]
+- Fixed a common crash related to planet selection

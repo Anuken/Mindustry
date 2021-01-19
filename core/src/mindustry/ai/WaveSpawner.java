@@ -55,6 +55,12 @@ public class WaveSpawner{
     public void spawnEnemies(){
         spawning = true;
 
+        eachGroundSpawn((spawnX, spawnY, doShockwave) -> {
+            if(doShockwave){
+                doShockwave(spawnX, spawnY);
+            }
+        });
+
         for(SpawnGroup group : state.rules.spawns){
             if(group.type == null) continue;
 
@@ -86,18 +92,12 @@ public class WaveSpawner{
             }
         }
 
-        eachGroundSpawn((spawnX, spawnY, doShockwave) -> {
-            if(doShockwave){
-                doShockwave(spawnX, spawnY);
-            }
-        });
-
         Time.runTask(121f, () -> spawning = false);
     }
 
     public void doShockwave(float x, float y){
-        Time.run(20f, () -> Fx.spawnShockwave.at(x, y, state.rules.dropZoneRadius));
-        Time.run(40f, () -> Damage.damage(state.rules.waveTeam, x, y, state.rules.dropZoneRadius, 99999999f, true));
+        Fx.spawnShockwave.at(x, y, state.rules.dropZoneRadius);
+        Damage.damage(state.rules.waveTeam, x, y, state.rules.dropZoneRadius, 99999999f, true);
     }
 
     public void eachGroundSpawn(Intc2 cons){

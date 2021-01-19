@@ -81,7 +81,7 @@ public class Cultivator extends GenericCrafter{
                 float life = 1f - (((Time.time + offset) / 50f) % recurrence);
 
                 if(life > 0){
-                    Lines.stroke(warmup * (life * 1f + 0.2f));
+                    Lines.stroke(warmup * (life + 0.2f));
                     Lines.poly(x + x, y + y, 8, (1f - life) * 3f);
                 }
             }

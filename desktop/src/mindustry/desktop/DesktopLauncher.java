@@ -125,9 +125,11 @@ public class DesktopLauncher extends ClientLauncher{
         boolean[] isShutdown = {false};
 
         Events.on(ClientLoadEvent.class, event -> {
-            player.name(SVars.net.friends.getPersonaName());
             Core.settings.defaults("name", SVars.net.friends.getPersonaName());
-            Core.settings.put("name", player.name);
+            if(player.name.isEmpty()){
+                player.name = SVars.net.friends.getPersonaName();
+                Core.settings.put("name", player.name);
+            }
             //update callbacks
             Core.app.addListener(new ApplicationListener(){
                 @Override

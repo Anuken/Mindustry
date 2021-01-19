@@ -63,6 +63,8 @@ public class SectorInfo{
     public int spawnPosition;
     /** How long the player has been playing elsewhere. */
     public float secondsPassed;
+    /** How many minutes this sector has been captured. */
+    public float minutesCaptured;
     /** Display name. */
     public @Nullable String name;
     /** Displayed icon. */
@@ -130,7 +132,7 @@ public class SectorInfo{
         }
 
         //if there are infinite waves and no win wave, add a win wave.
-        if(waves && winWave <= 0 && !attack){
+        if(winWave <= 0 && !attack){
             winWave = 30;
         }
 
@@ -229,8 +231,9 @@ public class SectorInfo{
 
                 //cap production/export by production
                 production.get(item).mean = Math.min(production.get(item).mean, rawProduction.get(item).mean);
+
                 if(export.containsKey(item)){
-                    export.get(item).mean = Math.min(export.get(item).mean, rawProduction.get(item).mean);
+                    export.get(item).mean = Math.min(export.get(item).mean, Math.max(rawProduction.get(item).mean, -production.get(item).mean));
                 }
             }
 

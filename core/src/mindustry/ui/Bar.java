@@ -82,6 +82,10 @@ public class Bar extends Element{
             lastValue = computed;
         }
 
+        if(Float.isNaN(lastValue)) lastValue = 0;
+        if(Float.isInfinite(lastValue)) lastValue = 1f;
+        if(Float.isNaN(value)) value = 0;
+        if(Float.isInfinite(value)) value = 1f;
         if(Float.isNaN(computed)) computed = 0;
         if(Float.isInfinite(computed)) computed = 1f;
 

@@ -2,6 +2,7 @@ package mindustry.entities.comp;
 
 import arc.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -12,6 +13,7 @@ import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
@@ -58,6 +60,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     }
 
     void pickup(Building tile){
+        tile.pickedUp();
         tile.tile.remove();
         payloads.add(new BuildPayload(tile));
         Fx.unitPickup.at(tile);
@@ -117,6 +120,8 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         u.rotation(rotation);
         //reset the ID to a new value to make sure it's synced
         u.id = EntityGroup.nextId();
+        //decrement count to prevent double increment
+        if(!u.isAdded()) u.team.data().updateCount(u.type, -1);
         u.add();
 
         return true;
@@ -131,7 +136,9 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
             int rot = (int)((rotation + 45f) / 90f) % 4;
             payload.place(on, rot);
 
-            if(isPlayer()) payload.build.lastAccessed = getPlayer().name;
+            if(getControllerName() != null){
+                payload.build.lastAccessed = getControllerName();
+            }
 
             Fx.unitDrop.at(tile);
             Fx.placeBlock.at(on.drawx(), on.drawy(), on.block().size);
@@ -139,5 +146,20 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         }
 
         return false;
+    }
+
+    void contentInfo(Table table, float itemSize, float width){
+        table.clear();
+        table.top().left();
+
+        float pad = 0;
+        float items = payloads.size;
+        if(itemSize * items + pad * items > width){
+            pad = (width - (itemSize) * items) / items;
+        }
+
+        for(Payload p : payloads){
+            table.image(p.icon(Cicon.small)).size(itemSize).padRight(pad);
+        }
     }
 }

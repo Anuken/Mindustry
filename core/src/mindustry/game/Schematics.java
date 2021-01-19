@@ -263,10 +263,10 @@ public class Schematics implements Loadable{
             requests.each(req -> {
                 req.animScale = 1f;
                 req.worldContext = false;
-                req.block.drawRequestRegion(req, requests::each);
+                req.block.drawRequestRegion(req, requests);
             });
 
-            requests.each(req -> req.block.drawRequestConfigTop(req, requests::each));
+            requests.each(req -> req.block.drawRequestConfigTop(req, requests));
 
             Draw.flush();
             Draw.trans().idt();

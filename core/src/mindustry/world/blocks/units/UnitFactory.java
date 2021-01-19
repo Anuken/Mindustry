@@ -12,6 +12,7 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
@@ -228,6 +229,7 @@ public class UnitFactory extends UnitBlock{
                     payload = new UnitPayload(plan.unit.create(team));
                     payVector.setZero();
                     consume();
+                    Events.fire(new UnitCreateEvent(payload.unit, this));
                 }
 
                 progress = Mathf.clamp(progress, 0, plan.time);

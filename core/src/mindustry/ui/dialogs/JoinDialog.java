@@ -299,7 +299,7 @@ public class JoinDialog extends BaseDialog{
                 pad = 6;
             }
 
-            Cell cell = ((Table)pane.parent).getCell(button);
+            var cell = ((Table)pane.parent).getCell(button);
 
             if(!Mathf.equal(cell.minWidth(), pw)){
                 cell.width(pw);
@@ -541,12 +541,14 @@ public class JoinDialog extends BaseDialog{
                         Log.info("Fetched @ community servers.", defaultServers.size);
                     }catch(Throwable e){
                         Log.err("Failed to parse community servers.");
+                        Log.err(e);
                     }
                 });
             }catch(Throwable e){
                 Log.err("Failed to fetch community servers.");
+                Log.err(e);
             }
-        }, t -> {});
+        }, Log::err);
     }
 
     private void saveServers(){
@@ -561,25 +563,32 @@ public class JoinDialog extends BaseDialog{
         transient Host lastHost;
 
         void setIP(String ip){
-
-            //parse ip:port, if unsuccessful, use default values
-            if(ip.lastIndexOf(':') != -1 && ip.lastIndexOf(':') != ip.length() - 1){
-                try{
+            try{
+                boolean isIpv6 = Strings.count(ip, ':') > 1;
+                if(isIpv6 && ip.lastIndexOf("]:") != -1 && ip.lastIndexOf("]:") != ip.length() - 1){
+                    int idx = ip.indexOf("]:");
+                    this.ip = ip.substring(1, idx);
+                    this.port = Integer.parseInt(ip.substring(idx + 2, ip.length()));
+                }else if(!isIpv6 && ip.lastIndexOf(':') != -1 && ip.lastIndexOf(':') != ip.length() - 1){
                     int idx = ip.lastIndexOf(':');
                     this.ip = ip.substring(0, idx);
                     this.port = Integer.parseInt(ip.substring(idx + 1));
-                }catch(Exception e){
+                }else{
                     this.ip = ip;
                     this.port = Vars.port;
                 }
-            }else{
+            }catch(Exception e){
                 this.ip = ip;
                 this.port = Vars.port;
             }
         }
 
         String displayIP(){
-            return ip + (port != Vars.port ? ":" + port : "");
+            if(Strings.count(ip, ':') > 1){
+                return port != Vars.port ? "[" + ip + "]:" + port : ip;
+            }else{
+                return ip + (port != Vars.port ? ":" + port : "");
+            }
         }
 
         public Server(){

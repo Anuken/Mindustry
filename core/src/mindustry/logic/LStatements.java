@@ -528,7 +528,9 @@ public class LStatements{
 
                             stack.clearChildren();
                             stack.addChild(tables[selected]);
-                            t.pack();
+
+                            t.parent.parent.pack();
+                            t.parent.parent.invalidateHierarchy();
                         }).size(80f, 50f).growX().checked(selected == fi).group(group);
                     }
                     t.row();
@@ -816,6 +818,10 @@ public class LStatements{
 
     @RegisterStatement("uradar")
     public static class UnitRadarStatement extends RadarStatement{
+
+        public UnitRadarStatement(){
+            radar = "0";
+        }
 
         @Override
         public boolean buildFrom(){

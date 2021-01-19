@@ -647,6 +647,14 @@ public class Mods implements Loadable{
                 meta.hidden = true;
             }
 
+            //disallow putting a description after the version
+            if(meta.version != null){
+                int line = meta.version.indexOf('\n');
+                if(line != -1){
+                    meta.version = meta.version.substring(0, line);
+                }
+            }
+
             if(!headless){
                 Log.info("Loaded mod '@' in @ms", meta.name, Time.elapsed());
             }
@@ -844,6 +852,18 @@ public class Mods implements Loadable{
             if(displayName != null) displayName = Strings.stripColors(displayName);
             if(author != null) author = Strings.stripColors(author);
             if(description != null) description = Strings.stripColors(description);
+        }
+        
+        @Override
+        public String toString() {
+            return "ModMeta{" +
+                    "name='" + name + '\'' +
+                    ", author='" + author + '\'' +
+                    ", version='" + version + '\'' +
+                    ", main='" + main + '\'' +
+                    ", minGameVersion='" + minGameVersion + '\'' +
+                    ", hidden=" + hidden +
+                    '}';
         }
     }
 

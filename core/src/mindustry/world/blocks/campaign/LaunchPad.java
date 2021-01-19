@@ -1,6 +1,7 @@
 package mindustry.world.blocks.campaign;
 
 import arc.*;
+import arc.audio.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.*;
@@ -28,9 +29,10 @@ public class LaunchPad extends Block{
     public final int timerLaunch = timers++;
     /** Time inbetween launches. */
     public float launchTime;
+    public Sound launchSound = Sounds.none;
 
     public @Load("@-light") TextureRegion lightRegion;
-    public @Load("launchpod") TextureRegion podRegion;
+    public @Load(value = "@-pod", fallback = "launchpod") TextureRegion podRegion;
     public Color lightColor = Color.valueOf("eab678");
 
     public LaunchPad(String name){
@@ -72,6 +74,11 @@ public class LaunchPad extends Block{
         @Override
         public float efficiency(){
             return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
+        }
+
+        @Override
+        public boolean shouldConsume(){
+            return true;
         }
 
         @Override
@@ -119,6 +126,7 @@ public class LaunchPad extends Block{
 
             //launch when full and base conditions are met
             if(items.total() >= itemCapacity && efficiency() >= 1f && timer(timerLaunch, launchTime / timeScale)){
+                launchSound.at(x, y);
                 LaunchPayload entity = LaunchPayload.create();
                 items.each((item, amount) -> entity.stacks.add(new ItemStack(item, amount)));
                 entity.set(this);
@@ -197,7 +205,7 @@ public class LaunchPad extends Block{
 
             Draw.z(Layer.weather - 1);
 
-            TextureRegion region = Core.atlas.find("launchpod");
+            TextureRegion region = blockOn() instanceof mindustry.world.blocks.campaign.LaunchPad p ? p.podRegion : Core.atlas.find("launchpod");
             float rw = region.width * Draw.scl * scale, rh = region.height * Draw.scl * scale;
 
             Draw.alpha(alpha);

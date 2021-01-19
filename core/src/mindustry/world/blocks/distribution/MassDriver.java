@@ -175,11 +175,14 @@ public class MassDriver extends Block{
                         Angles.near(rotation, targetRotation, 2f) && Angles.near(other.rotation, targetRotation + 180f, 2f)){
                             //actually fire
                             fire(other);
-                            //remove waiting shooters, it's done firing
-                            other.waitingShooters.remove(tile);
-                            //set both states to idle
+                            float timeToArrive = Math.min(bulletLifetime, dst(other) / bulletSpeed);
+                            Time.run(timeToArrive, () -> {
+                                //remove waiting shooters, it's done firing
+                                other.waitingShooters.remove(tile);
+                                other.state = DriverState.idle;
+                            });
+                            //driver is immediately idle
                             state = DriverState.idle;
-                            other.state = DriverState.idle;
                         }
                     }
                 }
@@ -302,8 +305,7 @@ public class MassDriver extends Block{
 
         protected boolean shooterValid(Tile other){
             if(other == null) return true;
-            if(!(other.block() instanceof MassDriver)) return false;
-            MassDriverBuild entity = other.bc();
+            if(!(other.build instanceof MassDriverBuild entity)) return false;
             return entity.link == tile.pos() && tile.dst(other) <= range;
         }
 

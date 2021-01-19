@@ -28,7 +28,7 @@ public class LightningBulletType extends BulletType{
 
     @Override
     public float estimateDPS(){
-        return super.estimateDPS() * Math.max(lightningLength / 4f, 1);
+        return super.estimateDPS() * Math.max(lightningLength / 10f, 1);
     }
 
     @Override

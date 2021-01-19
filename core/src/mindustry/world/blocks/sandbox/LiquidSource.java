@@ -41,7 +41,7 @@ public class LiquidSource extends Block{
 
     @Override
     public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
-        drawRequestConfigCenter(req, req.config, "center");
+        drawRequestConfigCenter(req, req.config, "center", true);
     }
 
     public class LiquidSourceBuild extends Building{

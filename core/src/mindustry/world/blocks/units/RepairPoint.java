@@ -118,5 +118,10 @@ public class RepairPoint extends Block{
         public boolean shouldConsume(){
             return target != null && enabled;
         }
+
+        @Override
+        public BlockStatus status(){
+            return Mathf.equal(efficiency(), 0f, 0.01f) ? BlockStatus.noInput : cons.status();
+        }
     }
 }

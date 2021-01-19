@@ -45,7 +45,7 @@ public class ImpactReactor extends PowerGenerator{
 
         bars.add("poweroutput", (GeneratorBuild entity) -> new Bar(() ->
         Core.bundle.format("bar.poweroutput",
-        Strings.fixed(Math.max(entity.getPowerProduction() - consumes.getPower().usage, 0) * 60 * entity.timeScale(), 1)),
+        Strings.fixed(Math.max(entity.getPowerProduction() - consumes.getPower().usage, 0) * 60 * entity.timeScale, 1)),
         () -> Pal.powerBar,
         () -> entity.productionEfficiency));
     }
@@ -72,7 +72,7 @@ public class ImpactReactor extends PowerGenerator{
             if(consValid() && power.status >= 0.99f){
                 boolean prevOut = getPowerProduction() <= consumes.getPower().requestedPower(this);
 
-                warmup = Mathf.lerpDelta(warmup, 1f, warmupSpeed);
+                warmup = Mathf.lerpDelta(warmup, 1f, warmupSpeed * timeScale);
                 if(Mathf.equal(warmup, 1f, 0.001f)){
                     warmup = 1f;
                 }
@@ -81,7 +81,7 @@ public class ImpactReactor extends PowerGenerator{
                     Events.fire(Trigger.impactPower);
                 }
 
-                if(timer(timerUse, itemDuration / timeScale())){
+                if(timer(timerUse, itemDuration / timeScale)){
                     consume();
                 }
             }else{

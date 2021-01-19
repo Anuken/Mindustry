@@ -130,7 +130,7 @@ public class SoundControl{
                 Core.audio.soundBus.play();
                 setupFilters();
             }else{
-                Core.audio.soundBus.stop();
+                Core.audio.soundBus.replay();
             }
         }
 

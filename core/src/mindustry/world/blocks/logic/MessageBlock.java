@@ -29,6 +29,7 @@ public class MessageBlock extends Block{
         solid = true;
         destructible = true;
         group = BlockGroup.logic;
+        drawDisabled = false;
 
         config(String.class, (MessageBuild tile, String text) -> {
             if(text.length() > maxTextLength){
