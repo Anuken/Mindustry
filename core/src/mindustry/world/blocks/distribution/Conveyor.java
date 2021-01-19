@@ -131,7 +131,8 @@ public class Conveyor extends Block implements Autotiler{
 
     /** Whether this block can be placed on this tile. */
     public boolean thisPlaceableOn(Tile tile){
-        return ((tile.block().group == group && tile.block().size <= size) || tile.block().alwaysReplace) && !tile.floor().isDeep();
+        if(tile == null) return false;
+        return canReplace(tile.block()) && !tile.floor().isDeep();
     }
 
     public class ConveyorBuild extends Building implements ChainedBuilding{

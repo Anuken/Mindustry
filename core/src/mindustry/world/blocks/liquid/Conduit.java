@@ -99,12 +99,13 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     /** Whether this block can be placed on this tile. */
     public boolean thisPlaceableOn(Tile tile) {
+        if (tile == null) return false;
         boolean sidePlacableOn = false;
         for(int i = 0;i < 4;i ++) {
             sidePlacableOn = !frontTile(tile.x, tile.y, i).floor().isDeep();
             if(sidePlacableOn) break;
         }
-        return ((tile.block().group == group && tile.block().size <= size) || tile.block().alwaysReplace) && (!tile.floor().isDeep() || (sidePlacableOn && floating));
+        return canReplace(tile.block()) && (!tile.floor().isDeep() || (sidePlacableOn && floating));
     }
 
     @Override
