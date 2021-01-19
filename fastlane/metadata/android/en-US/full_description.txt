@@ -1,6 +1,5 @@
 Create elaborate supply chains of conveyor belts to feed ammo into your turrets, produce materials to use for building, and defend your structures from waves of enemies. Play with your friends in cross-platform multiplayer co-op games, or challenge them in team-based PvP matches.
 
-
 <h2>Gameplay Features</h2>
  
 - Use production blocks to create a wide variety of advanced materials
