@@ -19,6 +19,11 @@ import mindustry.net.Net;
 import mindustry.type.*;
 import mindustry.world.*;
 import org.junit.jupiter.api.*;
+import rhino.*;
+import rhino.json.*;
+import rhino.json.JsonParser.*;
+
+import java.io.*;
 
 import static mindustry.Vars.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -635,5 +640,18 @@ public class ApplicationTests{
 
         tile.build.handleStack(item, 1, unit);
         assertEquals(capacity, tile.build.items.get(item));
+    }
+
+    @Test
+    void serverListJson(){
+        String[] files = {"servers.json", "servers_be.json", "servers_v6.json"};
+
+        for(String file : files){
+            try{
+                new JsonParser(Context.enter(), new TopLevel()).parseValue(Core.files.absolute(new File("./../../" + file).getAbsolutePath()).readString("UTF-8"));
+            }catch(ParseException e){
+                assertEquals("no exception", e.toString());
+            }
+        }
     }
 }
