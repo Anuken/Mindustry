@@ -16,6 +16,10 @@
     "address": ["routerchain.ddns.net", "pandorum.su:8000"]
   },
   {
+    "name": "BE6.RUN",
+    "address": ["be6.run", "mindustrycn.top"]
+  },
+  {
 	"name": "io",
 	"address": ["mindustry.io", "mindustry.io:1000", "mindustry.io:2000", "mindustry.io:3000", "mindustry.io:4000"]
   },
