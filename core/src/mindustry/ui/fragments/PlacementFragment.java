@@ -190,7 +190,7 @@ public class PlacementFragment extends Fragment{
             return true;
         }
 
-        if(Core.input.keyTap(Binding.info)){
+        if(Core.input.keyTap(Binding.block_info)){
             Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block;
             if(displayBlock != null){
                 ui.content.show(displayBlock);
