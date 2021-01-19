@@ -10,9 +10,11 @@ import arc.struct.IntSet.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -28,7 +30,12 @@ public class ItemBridge extends Block{
     public @Load("@-end") TextureRegion endRegion;
     public @Load("@-bridge") TextureRegion bridgeRegion;
     public @Load("@-arrow") TextureRegion arrowRegion;
-    public int lastPlaced = -1;
+
+    //for autolink
+    @Nullable
+    public ItemBridgeBuild lastBuild;
+    @Nullable
+    public BuildPlan lastPlan;
 
     public ItemBridge(String name){
         super(name);
@@ -53,27 +60,36 @@ public class ItemBridge extends Block{
     public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
         otherReq = null;
         list.each(other -> {
-            if(other.block == this && req != other && req.config instanceof Point2 && ((Point2)req.config).equals(other.x - req.x, other.y - req.y)){
+            if(other.block == this && req != other && req.config instanceof Point2 p && p.equals(other.x - req.x, other.y - req.y)){
                 otherReq = other;
             }
         });
 
-        if(otherReq == null) return;
+        if(otherReq != null){
+            drawBridge(req, otherReq.drawx(), otherReq.drawy(), 0);
+        }
+    }
+
+    public void drawBridge(BuildPlan req, float ox, float oy, float flip){
+        if(Mathf.zero(Renderer.bridgeOpacity)) return;
+        Draw.alpha(Renderer.bridgeOpacity);
 
         Lines.stroke(8f);
 
-        Tmp.v1.set(otherReq.drawx(), otherReq.drawy()).sub(req.drawx(), req.drawy()).setLength(tilesize/2f);
+        Tmp.v1.set(ox, oy).sub(req.drawx(), req.drawy()).setLength(tilesize/2f);
 
         Lines.line(
         bridgeRegion,
         req.drawx() + Tmp.v1.x,
         req.drawy() + Tmp.v1.y,
-        otherReq.drawx() - Tmp.v1.x,
-        otherReq.drawy() - Tmp.v1.y, false
+        ox - Tmp.v1.x,
+        oy - Tmp.v1.y, false
         );
 
-        Draw.rect(arrowRegion, (req.drawx() + otherReq.drawx()) / 2f, (req.drawy() + otherReq.drawy()) / 2f,
-            Angles.angle(req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy()));
+        Draw.rect(arrowRegion, (req.drawx() + ox) / 2f, (req.drawy() + oy) / 2f,
+        Angles.angle(req.drawx(), req.drawy(), ox, oy) + flip);
+
+        Draw.reset();
     }
 
     @Override
@@ -109,25 +125,43 @@ public class ItemBridge extends Block{
     }
 
     public boolean linkValid(Tile tile, Tile other, boolean checkDouble){
-        if(other == null || tile == null) return false;
-        if(tile.x == other.x){
-            if(Math.abs(tile.y - other.y) > range) return false;
-        }else if(tile.y == other.y){
-            if(Math.abs(tile.x - other.x) > range) return false;
-        }else{
-            return false;
-        }
+        if(other == null || tile == null || !positionsValid(tile.x, tile.y, other.x, other.y)) return false;
 
         return ((other.block() == tile.block() && tile.block() == this) || (!(tile.block() instanceof ItemBridge) && other.block() == this))
             && (other.team() == tile.team() || tile.block() != this)
-            && (!checkDouble || other.<ItemBridgeBuild>bc().link != tile.pos());
+            && (!checkDouble || ((ItemBridgeBuild)other.build).link != tile.pos());
+    }
+
+    public boolean positionsValid(int x1, int y1, int x2, int y2){
+        if(x1 == x2){
+            return Math.abs(y1 - y2) <= range;
+        }else if(y1 == y2){
+            return Math.abs(x1 - x2) <= range;
+        }else{
+            return false;
+        }
     }
 
     public Tile findLink(int x, int y){
-        if(world.tiles.in(x, y) && linkValid(world.tile(x, y), world.tile(lastPlaced)) && lastPlaced != Point2.pack(x, y)){
-            return world.tile(lastPlaced);
+        Tile tile = world.tile(x, y);
+        if(tile != null && lastBuild != null && linkValid(tile, lastBuild.tile) && lastBuild.tile != tile){
+            return lastBuild.tile;
         }
         return null;
+    }
+
+    @Override
+    public void onNewPlan(BuildPlan plan){
+        if(lastPlan != null && lastPlan.config == null && positionsValid(lastPlan.x, lastPlan.y, plan.x, plan.y)){
+            lastPlan.config = new Point2(plan.x - lastPlan.x, plan.y - lastPlan.y);
+        }
+
+        lastPlan = plan;
+    }
+
+    @Override
+    public void changePlacementPath(Seq<Point2> points, int rotation){
+        Placement.calculateNodes(points, this, rotation, (point, other) -> Math.max(Math.abs(point.x - other.x), Math.abs(point.y - other.y)) <= range);
     }
 
     public class ItemBridgeBuild extends Building{
@@ -149,7 +183,7 @@ public class ItemBridge extends Block{
                 link.build.configure(tile.pos());
             }
 
-            lastPlaced = tile.pos();
+            lastBuild = this;
         }
 
         @Override
@@ -238,7 +272,7 @@ public class ItemBridge extends Block{
             while(it.hasNext){
                 int i = it.next();
                 Tile other = world.tile(i);
-                if(!linkValid(tile, other, false) || other.<ItemBridgeBuild>bc().link != tile.pos()){
+                if(!linkValid(tile, other, false) || ((ItemBridgeBuild)other.build).link != tile.pos()){
                     it.remove();
                 }
             }
@@ -293,13 +327,12 @@ public class ItemBridge extends Block{
             Tile other = world.tile(link);
             if(!linkValid(tile, other)) return;
 
-            float opacity = Core.settings.getInt("bridgeopacity") / 100f;
-            if(Mathf.zero(opacity)) return;
+            if(Mathf.zero(Renderer.bridgeOpacity)) return;
 
             int i = relativeTo(other.x, other.y);
 
             Draw.color(Color.white, Color.black, Mathf.absin(Time.time, 6f, 0.07f));
-            Draw.alpha(Math.max(uptime, 0.25f) * opacity);
+            Draw.alpha(Math.max(uptime, 0.25f) * Renderer.bridgeOpacity);
 
             Draw.rect(endRegion, x, y, i * 90 + 90);
             Draw.rect(endRegion, other.drawx(), other.drawy(), i * 90 + 270);
@@ -322,7 +355,7 @@ public class ItemBridge extends Block{
             Draw.color();
 
             for(int a = 0; a < arrows; a++){
-                Draw.alpha(Mathf.absin(a / (float)arrows - time / 100f, 0.1f, 1f) * uptime * opacity);
+                Draw.alpha(Mathf.absin(a / (float)arrows - time / 100f, 0.1f, 1f) * uptime * Renderer.bridgeOpacity);
                 Draw.rect(arrowRegion,
                 x + Geometry.d4(i).x * (tilesize / 2f + a * 4f + time % 4f),
                 y + Geometry.d4(i).y * (tilesize / 2f + a * 4f + time % 4f), i * 90f);

@@ -57,4 +57,9 @@ public class BuildPayload implements Payload{
         Drawf.shadow(build.x, build.y, build.block.size * tilesize * 2f);
         Draw.rect(build.block.icon(Cicon.full), build.x, build.y);
     }
+
+    @Override
+    public TextureRegion icon(Cicon icon){
+        return block().icon(icon);
+    }
 }

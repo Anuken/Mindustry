@@ -12,7 +12,7 @@ public class FlyingAI extends AIController{
     @Override
     public void updateMovement(){
         if(target != null && unit.hasWeapons() && command() == UnitCommand.attack){
-            if(unit.type.weapons.first().rotate){
+            if(!unit.type.circleTarget){
                 moveTo(target, unit.range() * 0.8f);
                 unit.lookAt(target);
             }else{

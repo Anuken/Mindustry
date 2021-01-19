@@ -107,7 +107,7 @@ public class RemoteReadGenerator{
             }
 
             readBlock.nextControlFlow("catch (java.lang.Exception e)");
-            readBlock.addStatement("throw new java.lang.RuntimeException(\"Failed to to read remote method '" + entry.element.getSimpleName() + "'!\", e)");
+            readBlock.addStatement("throw new java.lang.RuntimeException(\"Failed to read remote method '" + entry.element.getSimpleName() + "'!\", e)");
             readBlock.endControlFlow();
         }
 

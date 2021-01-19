@@ -3,6 +3,7 @@ package mindustry.input;
 import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -123,7 +124,7 @@ public class DesktopInput extends InputHandler{
                 drawArrow(sreq.block, sreq.x, sreq.y, sreq.rotation, valid);
             }
 
-            sreq.block.drawRequest(sreq, allRequests(), valid);
+            sreq.block.drawPlan(sreq, allRequests(), valid);
 
             drawSelected(sreq.x, sreq.y, sreq.block, getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null ? Pal.remove : Pal.accent);
         }
@@ -154,21 +155,24 @@ public class DesktopInput extends InputHandler{
                     }
                     drawRequest(lineRequests.get(i));
                 }
+                lineRequests.each(this::drawOverRequest);
             }else if(isPlacing()){
                 if(block.rotate){
                     drawArrow(block, cursorX, cursorY, rotation);
                 }
                 Draw.color();
+                boolean valid = validPlace(cursorX, cursorY, block, rotation);
                 drawRequest(cursorX, cursorY, block, rotation);
-                block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
+                block.drawPlace(cursorX, cursorY, rotation, valid);
 
-                if(block.saveConfig && block.lastConfig != null){
+                if(block.saveConfig){
+                    Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
                     brequest.set(cursorX, cursorY, rotation, block);
                     brequest.config = block.lastConfig;
                     block.drawRequestConfig(brequest, allRequests());
                     brequest.config = null;
+                    Draw.reset();
                 }
-
             }
         }
 
@@ -247,7 +251,7 @@ public class DesktopInput extends InputHandler{
 
         //zoom camera
         if((!Core.scene.hasScroll() || Core.input.keyDown(Binding.diagonal_placement)) && !ui.chatfrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0
-            && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
+            && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
@@ -604,7 +608,6 @@ public class DesktopInput extends InputHandler{
 
     protected void updateMovement(Unit unit){
         boolean omni = unit.type.omniMovement;
-        boolean ground = unit.isGrounded();
 
         float speed = unit.realSpeed();
         float xa = Core.input.axis(Binding.move_x);

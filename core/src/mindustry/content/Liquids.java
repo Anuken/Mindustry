@@ -18,7 +18,7 @@ public class Liquids implements ContentList{
 
         slag = new Liquid("slag", Color.valueOf("ffa166")){{
             temperature = 1f;
-            viscosity = 0.8f;
+            viscosity = 0.7f;
             effect = StatusEffects.melting;
             lightColor = Color.valueOf("f0511d").a(0.4f);
         }};

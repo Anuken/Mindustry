@@ -80,7 +80,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
 
                 if(core != null && within(core, mineTransferRange) && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
                     //add item to inventory before it is transferred
-                    if(item() == item) addItem(item);
+                    if(item() == item && !net.client()) addItem(item);
                     Call.transferItemTo(self(), item, 1,
                     mineTile.worldx() + Mathf.range(tilesize / 2f),
                     mineTile.worldy() + Mathf.range(tilesize / 2f), core);

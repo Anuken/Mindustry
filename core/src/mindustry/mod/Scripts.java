@@ -80,6 +80,10 @@ public class Scripts implements Disposable{
 
     //region utility mod functions
 
+    public float[] newFloats(int capacity){
+        return new float[capacity];
+    }
+
     public String readString(String path){
         return Vars.tree.get(path, true).readString();
     }

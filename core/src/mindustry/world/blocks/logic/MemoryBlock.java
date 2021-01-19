@@ -13,6 +13,7 @@ public class MemoryBlock extends Block{
         destructible = true;
         solid = true;
         group = BlockGroup.logic;
+        drawDisabled = false;
     }
 
     @Override

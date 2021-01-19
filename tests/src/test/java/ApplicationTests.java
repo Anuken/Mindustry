@@ -5,6 +5,8 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.serialization.*;
+import arc.util.serialization.JsonValue.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -58,6 +60,7 @@ public class ApplicationTests{
                     add(netServer = new NetServer());
 
                     content.init();
+
                 }
 
                 @Override
@@ -77,6 +80,10 @@ public class ApplicationTests{
                 }
                 Thread.sleep(10);
             }
+
+
+            Block block = content.getByName(ContentType.block, "build2");
+            assertEquals("build2", block == null ? null : block.name, "2x2 construct block doesn't exist?");
         }catch(Throwable r){
             fail(r);
         }
@@ -87,6 +94,21 @@ public class ApplicationTests{
         Time.setDeltaProvider(() -> 1f);
         logic.reset();
         state.set(State.menu);
+    }
+
+    @Test
+    void serverListJson(){
+        String[] files = {"servers.json", "servers_be.json", "servers_v6.json"};
+
+        for(String file : files){
+            try{
+                String str = Core.files.absolute("./../../" + file).readString();
+                assertEquals(ValueType.array, new JsonReader().parse(str).type());
+                assertTrue(Jval.read(str).isArray());
+            }catch(Exception e){
+                fail("Failed to parse " + file, e);
+            }
+        }
     }
 
     @Test
@@ -496,8 +518,8 @@ public class ApplicationTests{
     void buildingOverlap(){
         initBuilding();
 
-        Builderc d1 = (Builderc)UnitTypes.poly.create(Team.sharded);
-        Builderc d2 = (Builderc)UnitTypes.poly.create(Team.sharded);
+        Unit d1 = UnitTypes.poly.create(Team.sharded);
+        Unit d2 = UnitTypes.poly.create(Team.sharded);
 
         //infinite build range
         state.rules.editor = true;
@@ -523,8 +545,8 @@ public class ApplicationTests{
     void buildingDestruction(){
         initBuilding();
 
-        Builderc d1 = (Builderc)UnitTypes.poly.create(Team.sharded);
-        Builderc d2 = (Builderc)UnitTypes.poly.create(Team.sharded);
+        Builderc d1 = UnitTypes.poly.create(Team.sharded);
+        Builderc d2 = UnitTypes.poly.create(Team.sharded);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);

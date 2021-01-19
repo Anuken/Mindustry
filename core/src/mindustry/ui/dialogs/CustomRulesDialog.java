@@ -140,9 +140,10 @@ public class CustomRulesDialog extends BaseDialog{
         title("@rules.title.resourcesbuilding");
         check("@rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
-        check("@rules.schematic", b-> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
+        check("@rules.schematic", b -> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
+        check("@rules.coreincinerates", b -> rules.coreIncinerates = b, () -> rules.coreIncinerates);
         number("@rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
-        number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, 0.00001f, 10000f);
+        number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, 0.001f, 50f);
         number("@rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
         number("@rules.blockhealthmultiplier", f -> rules.blockHealthMultiplier = f, () -> rules.blockHealthMultiplier);
         number("@rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
@@ -162,7 +163,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
         number("@rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
-        number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0.00001f, 100f);
+        number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0.001f, 50f);
 
         title("@rules.title.enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
@@ -284,18 +285,22 @@ public class CustomRulesDialog extends BaseDialog{
                             f.defaults().padRight(4).left();
 
                             f.add("@rules.weather.duration");
-                            field(f, entry.minDuration / toMinutes, v -> entry.minDuration = v * toMinutes);
+                            field(f, entry.minDuration / toMinutes, v -> entry.minDuration = v * toMinutes).disabled(v -> entry.always);
                             f.add("@waves.to");
-                            field(f, entry.maxDuration / toMinutes, v -> entry.maxDuration = v * toMinutes);
+                            field(f, entry.maxDuration / toMinutes, v -> entry.maxDuration = v * toMinutes).disabled(v -> entry.always);
                             f.add("@unit.minutes");
 
                             f.row();
 
                             f.add("@rules.weather.frequency");
-                            field(f, entry.minFrequency / toMinutes, v -> entry.minFrequency = v * toMinutes);
+                            field(f, entry.minFrequency / toMinutes, v -> entry.minFrequency = v * toMinutes).disabled(v -> entry.always);
                             f.add("@waves.to");
-                            field(f, entry.maxFrequency / toMinutes, v -> entry.maxFrequency = v * toMinutes);
+                            field(f, entry.maxFrequency / toMinutes, v -> entry.maxFrequency = v * toMinutes).disabled(v -> entry.always);
                             f.add("@unit.minutes");
+
+                            f.row();
+
+                            f.check("@rules.weather.always", val -> entry.always = val).checked(cc -> entry.always).padBottom(4);
 
                             //intensity can't currently be customized
 
@@ -314,8 +319,8 @@ public class CustomRulesDialog extends BaseDialog{
         dialog.addCloseButton();
 
         dialog.buttons.button("@add", Icon.add, () -> {
-            BaseDialog addd = new BaseDialog("@add");
-            addd.cont.pane(t -> {
+            BaseDialog add = new BaseDialog("@add");
+            add.cont.pane(t -> {
                 t.background(Tex.button);
                 int i = 0;
                 for(Weather weather : content.<Weather>getBy(ContentType.weather)){
@@ -324,13 +329,13 @@ public class CustomRulesDialog extends BaseDialog{
                         rules.weather.add(new WeatherEntry(weather));
                         rebuild[0].run();
 
-                        addd.hide();
+                        add.hide();
                     }).size(140f, 50f);
                     if(++i % 2 == 0) t.row();
                 }
             });
-            addd.addCloseButton();
-            addd.show();
+            add.addCloseButton();
+            add.show();
         }).width(170f);
 
         //reset cooldown to random number

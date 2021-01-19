@@ -91,18 +91,23 @@ public class MinimapRenderer implements Disposable{
         rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
 
         for(Unit unit : units){
-            float rx = !withLabels ? (unit.x() - rect.x) / rect.width * w : unit.x() / (world.width() * tilesize) * w;
-            float ry = !withLabels ? (unit.y() - rect.y) / rect.width * h : unit.y() / (world.height() * tilesize) * h;
+            float rx = !withLabels ? (unit.x - rect.x) / rect.width * w : unit.x / (world.width() * tilesize) * w;
+            float ry = !withLabels ? (unit.y - rect.y) / rect.width * h : unit.y / (world.height() * tilesize) * h;
 
             Draw.mixcol(unit.team().color, 1f);
             float scale = Scl.scl(1f) / 2f * scaling * 32f;
             Draw.rect(unit.type.icon(Cicon.full), x + rx, y + ry, scale, scale, unit.rotation() - 90);
             Draw.reset();
+        }
 
-            //only disable player names in multiplayer
-            if(withLabels && unit.isPlayer() && net.active()){
-                Player pl = unit.getPlayer();
-                drawLabel(x + rx, y + ry, pl.name, unit.team().color);
+        if(withLabels && net.active()){
+            for(Player player : Groups.player){
+                if(!player.dead()){
+                    float rx = player.x / (world.width() * tilesize) * w;
+                    float ry = player.y / (world.height() * tilesize) * h;
+
+                    drawLabel(x + rx, y + ry, player.name, player.team().color);
+                }
             }
         }
 

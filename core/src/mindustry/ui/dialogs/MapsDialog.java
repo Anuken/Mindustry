@@ -72,7 +72,6 @@ public class MapsDialog extends BaseDialog{
 
                         Map map = MapIO.createMap(file, true);
 
-
                         //when you attempt to import a save, it will have no name, so generate one
                         String name = map.tags.get("name", () -> {
                             String result = "unknown";

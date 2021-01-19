@@ -3,6 +3,7 @@ package mindustry.entities.units;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
@@ -59,6 +60,16 @@ public class BuildPlan implements Position{
 
     public BuildPlan(){
 
+    }
+
+    public boolean isRotation(Team team){
+        if(breaking) return false;
+        Tile tile = tile();
+        return tile != null && tile.team() == team && tile.block() == block && tile.build != null && tile.build.rotation != rotation;
+    }
+
+    public boolean samePos(BuildPlan other){
+        return x == other.x && y == other.y;
     }
 
     /** Transforms the internal position of this config using the specified function, and return the result. */
@@ -154,14 +165,15 @@ public class BuildPlan implements Position{
 
     @Override
     public String toString(){
-        return "BuildRequest{" +
+        return "BuildPlan{" +
         "x=" + x +
         ", y=" + y +
         ", rotation=" + rotation +
-        ", recipe=" + block +
+        ", block=" + block +
         ", breaking=" + breaking +
         ", progress=" + progress +
         ", initialized=" + initialized +
+        ", config=" + config +
         '}';
     }
 }

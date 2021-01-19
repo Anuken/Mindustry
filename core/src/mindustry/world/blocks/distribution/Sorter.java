@@ -33,7 +33,7 @@ public class Sorter extends Block{
 
     @Override
     public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
-        drawRequestConfigCenter(req, req.config, "center");
+        drawRequestConfigCenter(req, req.config, "center", true);
     }
 
     @Override
@@ -43,7 +43,8 @@ public class Sorter extends Block{
 
     @Override
     public int minimapColor(Tile tile){
-        return tile.<SorterBuild>bc().sortItem == null ? 0 : tile.<SorterBuild>bc().sortItem.color.rgba();
+        var build = (SorterBuild)tile.build;
+        return build == null || build.sortItem == null ? 0 : build.sortItem.color.rgba();
     }
 
     public class SorterBuild extends Building{
@@ -80,13 +81,10 @@ public class Sorter extends Block{
 
         @Override
         public void handleItem(Building source, Item item){
-            Building to = getTileTarget(item, source, true);
-
-            to.handleItem(this, item);
+            getTileTarget(item, source, true).handleItem(this, item);
         }
 
         public boolean isSame(Building other){
-            // comment code below to allow sorter/gate chaining
             return other != null && other.block.instantTransfer;
         }
 

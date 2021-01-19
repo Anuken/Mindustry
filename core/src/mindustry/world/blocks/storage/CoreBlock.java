@@ -34,8 +34,6 @@ public class CoreBlock extends StorageBlock{
 
     public final int timerResupply = timers++;
 
-    public int launchRange = 1;
-
     public int ammoAmount = 5;
     public float resupplyRate = 10f;
     public float resupplyRange = 60f;
@@ -53,13 +51,13 @@ public class CoreBlock extends StorageBlock{
         loopSound = Sounds.respawning;
         loopSoundVolume = 1f;
         group = BlockGroup.none;
+        drawDisabled = false;
     }
 
     @Remote(called = Loc.server)
     public static void playerSpawn(Tile tile, Player player){
-        if(player == null || tile == null) return;
+        if(player == null || tile == null || !(tile.build instanceof CoreBuild entity)) return;
 
-        CoreBuild entity = tile.bc();
         CoreBlock block = (CoreBlock)tile.block();
         Fx.spawn.at(entity);
 
@@ -114,7 +112,7 @@ public class CoreBlock extends StorageBlock{
         if(tile == null) return false;
         CoreBuild core = team.core();
         //must have all requirements
-        if(core == null || (!state.rules.infiniteResources && !core.items.has(requirements))) return false;
+        if(core == null || (!state.rules.infiniteResources && !core.items.has(requirements, state.rules.buildCostMultiplier))) return false;
         return tile.block() instanceof CoreBlock && size > tile.block().size;
     }
 
@@ -234,7 +232,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public int getMaximumAccepted(Item item){
-            return incinerate() ? storageCapacity * 2 : storageCapacity;
+            return state.rules.coreIncinerates ? storageCapacity * 2 : storageCapacity;
         }
 
         @Override
@@ -246,17 +244,18 @@ public class CoreBlock extends StorageBlock{
             }
             state.teams.registerCore(this);
 
-            storageCapacity = itemCapacity + proximity().sum(e -> isContainer(e) && owns(e) ? e.block.itemCapacity : 0);
-            proximity.each(e -> isContainer(e) && owns(e), t -> {
+            storageCapacity = itemCapacity + proximity().sum(e -> owns(e) ? e.block.itemCapacity : 0);
+            proximity.each(e -> owns(e), t -> {
                 t.items = items;
                 ((StorageBuild)t).linkedCore = this;
             });
 
             for(Building other : state.teams.cores(team)){
                 if(other.tile() == tile) continue;
-                storageCapacity += other.block.itemCapacity + other.proximity().sum(e -> isContainer(e) && owns(other, e) ? e.block.itemCapacity : 0);
+                storageCapacity += other.block.itemCapacity + other.proximity().sum(e -> owns(other, e) ? e.block.itemCapacity : 0);
             }
 
+            //Team.sharded.core().items.set(Items.surgeAlloy, 12000)
             if(!world.isGenerating()){
                 for(Item item : content.items()){
                     items.set(item, Math.min(items.get(item), storageCapacity));
@@ -296,35 +295,26 @@ public class CoreBlock extends StorageBlock{
         @Override
         public void drawSelect(){
             Lines.stroke(1f, Pal.accent);
-            Cons<Building> outline = t -> {
+            Cons<Building> outline = b -> {
                 for(int i = 0; i < 4; i++){
                     Point2 p = Geometry.d8edge[i];
-                    float offset = -Math.max(t.block.size - 1, 0) / 2f * tilesize;
-                    Draw.rect("block-select", t.x + offset * p.x, t.y + offset * p.y, i * 90);
+                    float offset = -Math.max(b.block.size - 1, 0) / 2f * tilesize;
+                    Draw.rect("block-select", b.x + offset * p.x, b.y + offset * p.y, i * 90);
                 }
             };
-            if(proximity.contains(e -> isContainer(e) && e.items == items)){
-                outline.get(this);
-            }
-            proximity.each(e -> isContainer(e) && e.items == items, outline);
+            team.cores().each(core -> {
+                outline.get(core);
+                core.proximity.each(storage -> storage.items == items, outline);
+            });
             Draw.reset();
         }
 
-
-        public boolean isContainer(Building tile){
-            return tile instanceof StorageBuild && (((StorageBuild)tile).linkedCore == this || ((StorageBuild)tile).linkedCore == null);
-        }
-
         public boolean owns(Building tile){
-            return tile instanceof StorageBuild && (((StorageBuild)tile).linkedCore == this || ((StorageBuild)tile).linkedCore == null);
+            return owns(this, tile);
         }
 
         public boolean owns(Building core, Building tile){
-            return tile instanceof StorageBuild && (((StorageBuild)tile).linkedCore == core || ((StorageBuild)tile).linkedCore == null);
-        }
-
-        public boolean incinerate(){
-            return state.isCampaign();
+            return tile instanceof StorageBuild b && (b.linkedCore == core || b.linkedCore == null);
         }
 
         @Override
@@ -340,7 +330,7 @@ public class CoreBlock extends StorageBlock{
             int total = proximity.count(e -> e.items != null && e.items == items);
             float fract = 1f / total / state.teams.cores(team).size;
 
-            proximity.each(e -> isContainer(e) && e.items == items && owns(e), t -> {
+            proximity.each(e -> owns(e) && e.items == items && owns(e), t -> {
                 StorageBuild ent = (StorageBuild)t;
                 ent.linkedCore = null;
                 ent.items = new ItemModule();
@@ -391,6 +381,10 @@ public class CoreBlock extends StorageBlock{
                 }else{
                     super.handleItem(source, item);
                 }
+            }else if(state.rules.coreIncinerates && items.get(item) >= storageCapacity && !noEffect){
+                //create item incineration effect at random intervals
+                incinerateEffect(this, source);
+                noEffect = false;
             }
         }
     }
