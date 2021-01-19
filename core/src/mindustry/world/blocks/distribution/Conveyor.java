@@ -146,6 +146,12 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
+        public void drawCracks(){
+            Draw.z(Layer.block - 0.15f);
+            super.drawCracks();
+        }
+
+        @Override
         public void overwrote(Seq<Building> builds){
             if(builds.first() instanceof ConveyorBuild build){
                 ids = build.ids.clone();

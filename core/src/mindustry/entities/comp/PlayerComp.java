@@ -197,6 +197,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return unit.isNull() || !unit.isValid();
     }
 
+    String ip(){
+        return con == null ? "localhost" : con.address;
+    }
+
     String uuid(){
         return con == null ? "[LOCAL]" : con.uuid;
     }
