@@ -374,7 +374,7 @@ public class DesktopInput extends InputHandler{
         int cursorY = tileY(Core.input.mouseY());
         int rawCursorX = World.toTile(Core.input.mouseWorld().x), rawCursorY = World.toTile(Core.input.mouseWorld().y);
 
-        // automatically pause building if the current build queue is empty
+        //automatically pause building if the current build queue is empty
         if(Core.settings.getBool("buildautopause") && isBuilding && !player.unit().isBuilding()){
             isBuilding = false;
             buildWasAutoPaused = true;
