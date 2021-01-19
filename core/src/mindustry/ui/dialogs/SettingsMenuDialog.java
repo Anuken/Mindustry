@@ -25,11 +25,8 @@ import mindustry.input.*;
 import mindustry.ui.*;
 
 import java.io.*;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.zip.*;
 
 import static arc.Core.*;
@@ -172,8 +169,9 @@ public class SettingsMenuDialog extends SettingsDialog{
                     }
                     platform.shareFile(file);
                 }else{
-                    DateTimeFormatter saveDate = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
-                    String defaultName = saveDate.format(LocalDateTime.now());
+                    SimpleDateFormat saveDate = new SimpleDateFormat("yyyy-MM-dd_kk-mm-ss");
+                    Date now = new Date();
+                    String defaultName = saveDate.format(now);
                     defaultName += "_mindustry_save";
                     platform.showFileChooser(false, defaultName, "@save", "zip", file -> {
                         try{
