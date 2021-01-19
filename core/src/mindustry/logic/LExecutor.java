@@ -44,6 +44,7 @@ public class LExecutor{
 
     public LInstruction[] instructions = {};
     public Var[] vars = {};
+    public int[] binds;
 
     public LongSeq graphicsBuffer = new LongSeq();
     public StringBuilder textBuffer = new StringBuilder();
@@ -182,9 +183,6 @@ public class LExecutor{
     public static class UnitBindI implements LInstruction{
         public int type;
 
-        //iteration index
-        private int index;
-
         public UnitBindI(int type){
             this.type = type;
         }
@@ -195,17 +193,21 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
+            if(exec.binds == null || exec.binds.length != content.units().size){
+                exec.binds = new int[content.units().size];
+            }
+
             //binding to `null` was previously possible, but was too powerful and exploitable
             if(exec.obj(type) instanceof UnitType type){
                 Seq<Unit> seq = exec.team.data().unitCache(type);
 
                 if(seq != null && seq.any()){
-                    index %= seq.size;
-                    if(index < seq.size){
+                    exec.binds[type.id] %= seq.size;
+                    if(exec.binds[type.id] < seq.size){
                         //bind to the next unit
-                        exec.setconst(varUnit, seq.get(index));
+                        exec.setconst(varUnit, seq.get(exec.binds[type.id]));
                     }
-                    index++;
+                    exec.binds[type.id] ++;
                 }else{
                     //no units of this type found
                     exec.setconst(varUnit, null);
@@ -567,7 +569,7 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem){
+            if(from instanceof MemoryBuild mem && from.team == exec.team){
 
                 exec.setnum(output, address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
             }
@@ -591,7 +593,7 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem){
+            if(from instanceof MemoryBuild mem && from.team == exec.team){
 
                 if(address >= 0 && address < mem.memory.length){
                     mem.memory[address] = exec.num(value);
@@ -618,7 +620,7 @@ public class LExecutor{
             Object target = exec.obj(from);
             Object sense = exec.obj(type);
 
-            //TODO should remote enemy buildings be senseable?
+            //note that remote units/buildings can be sensed as well
             if(target instanceof Senseable se){
                 if(sense instanceof Content){
                     exec.setnum(to, se.sense(((Content)sense)));
@@ -778,7 +780,7 @@ public class LExecutor{
                 Var va = exec.var(a);
                 Var vb = exec.var(b);
 
-                if(op.objFunction2 != null && (va.isobj || vb.isobj)){
+                if(op.objFunction2 != null && va.isobj && vb.isobj){
                     //use object function if provided, and one of the variables is an object
                     exec.setnum(dest, op.objFunction2.get(exec.obj(a), exec.obj(b)));
                 }else{
@@ -855,8 +857,7 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless) return;
 
-            Building build = exec.building(target);
-            if(build instanceof LogicDisplayBuild d){
+            if(exec.building(target) instanceof LogicDisplayBuild d && d.team == exec.team){
                 if(d.commands.size + exec.graphicsBuffer.size < maxDisplayBuffer){
                     for(int i = 0; i < exec.graphicsBuffer.size; i++){
                         d.commands.addLast(exec.graphicsBuffer.items[i]);
@@ -918,8 +919,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
-            Building build = exec.building(target);
-            if(build instanceof MessageBuild d){
+            if(exec.building(target) instanceof MessageBuild d && d.team == exec.team){
 
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
@@ -950,7 +950,7 @@ public class LExecutor{
                 Var vb = exec.var(compare);
                 boolean cmp;
 
-                if(op.objFunction != null && (va.isobj || vb.isobj)){
+                if(op.objFunction != null && va.isobj && vb.isobj){
                     //use object function if provided, and one of the variables is an object
                     cmp = op.objFunction.get(exec.obj(value), exec.obj(compare));
                 }else{

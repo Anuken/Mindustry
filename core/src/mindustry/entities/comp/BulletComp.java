@@ -110,7 +110,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
         type.hitEntity(self(), other, health);
 
-        if(owner instanceof WallBuild && player != null && team != player.team() && other instanceof Unit unit && unit.dead){
+        if(owner instanceof WallBuild && player != null && team == player.team() && other instanceof Unit unit && unit.dead){
             Events.fire(Trigger.phaseDeflectHit);
         }
     }
@@ -125,7 +125,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
                 Building tile = world.build(x, y);
                 if(tile == null || !isAdded()) return false;
 
-                if(tile.collide(self()) && type.collides(self(), tile) && !tile.dead() && (type.collidesTeam || tile.team != team) && !(type.pierceBuilding && collided.contains(tile.id))){
+                if(tile.collide(self()) && type.testCollision(self(), tile) && !tile.dead() && (type.collidesTeam || tile.team != team) && !(type.pierceBuilding && collided.contains(tile.id))){
                     boolean remove = false;
 
                     float health = tile.health;

@@ -91,7 +91,7 @@ public class Conveyor extends Block implements Autotiler{
             Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? Blocks.junction : this;
     }
 
-    public class ConveyorBuild extends Building{
+    public class ConveyorBuild extends Building implements ChainedBuilding{
         //parallel array data
         public Item[] ids = new Item[capacity];
         public float[] xs = new float[capacity];
@@ -114,7 +114,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void draw(){
-            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time * speed * 8f * timeScale())) % 4) : 0;
+            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time * speed * 8f * timeScale)) % 4) : 0;
 
             //draw extra conveyors facing this one for non-square tiling purposes
             Draw.z(Layer.blockUnder);
@@ -127,11 +127,11 @@ public class Conveyor extends Block implements Autotiler{
                 }
             }
 
-            Draw.z(Layer.block);
+            Draw.z(Layer.block - 0.2f);
 
             Draw.rect(regions[blendbits][frame], x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
 
-            Draw.z(Layer.blockOver);
+            Draw.z(Layer.block - 0.1f);
 
             for(int i = 0; i < len; i++){
                 Item item = ids[i];
@@ -143,6 +143,12 @@ public class Conveyor extends Block implements Autotiler{
                     (tile.y * tilesize + tr1.y * ys[i] + tr2.y),
                     itemSize, itemSize);
             }
+        }
+
+        @Override
+        public void drawCracks(){
+            Draw.z(Layer.block - 0.15f);
+            super.drawCracks();
         }
 
         @Override
@@ -390,6 +396,12 @@ public class Conveyor extends Block implements Autotiler{
             }
 
             len--;
+        }
+
+        @Nullable
+        @Override
+        public Building next(){
+            return nextc;
         }
     }
 }

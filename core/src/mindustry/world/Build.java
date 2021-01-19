@@ -45,7 +45,10 @@ public class Build{
         build.setDeconstruct(previous);
         build.prevBuild = prevBuild;
         tile.build.health = tile.build.maxHealth * prevPercent;
-        if(unit != null && unit.isPlayer()) tile.build.lastAccessed = unit.getPlayer().name;
+
+        if(unit != null && unit.getControllerName() != null){
+            tile.build.lastAccessed = unit.getControllerName();
+        }
 
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, unit, true)));
     }
@@ -64,10 +67,11 @@ public class Build{
 
         //auto-rotate the block to the correct orientation and bail out
         if(tile.team() == team && tile.block == result && tile.build != null && tile.block.quickRotate){
-            if(unit != null && unit.isPlayer()) tile.build.lastAccessed = unit.getPlayer().name;
+            if(unit != null && unit.getControllerName() != null) tile.build.lastAccessed = unit.getControllerName();
             tile.build.rotation = Mathf.mod(rotation, 4);
             tile.build.updateProximity();
             tile.build.noSleep();
+            Fx.rotateBlock.at(tile.build.x, tile.build.y, tile.build.block.size);
             return;
         }
 
@@ -90,7 +94,7 @@ public class Build{
 
         build.setConstruct(previous.size == sub.size ? previous : Blocks.air, result);
         build.prevBuild = prevBuild;
-        if(unit != null && unit.isPlayer()) build.lastAccessed = unit.getPlayer().name;
+        if(unit != null && unit.getControllerName() != null) build.lastAccessed = unit.getControllerName();
 
         result.placeBegan(tile, previous);
 

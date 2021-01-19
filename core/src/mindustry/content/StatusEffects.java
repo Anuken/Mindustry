@@ -25,10 +25,10 @@ public class StatusEffects implements ContentList{
             effect = Fx.burning;
 
             init(() -> {
-                opposite(wet,freezing);
+                opposite(wet, freezing);
                 trans(tarred, ((unit, time, newTime, result) -> {
                     unit.damagePierce(8f);
-                    Fx.burning.at(unit.x() + Mathf.range(unit.bounds() / 2f), unit.y() + Mathf.range(unit.bounds() / 2f));
+                    Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
                     result.set(this, Math.min(time + newTime, 300f));
                 }));
             });
@@ -93,8 +93,12 @@ public class StatusEffects implements ContentList{
             effect = Fx.melting;
 
             init(() -> {
-                trans(tarred, ((unit, time, newTime, result) -> result.set(this, Math.min(time + newTime / 2f, 140f))));
                 opposite(wet, freezing);
+                trans(tarred, ((unit, time, newTime, result) -> {
+                    unit.damagePierce(8f);
+                    Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
+                    result.set(this, Math.min(time + newTime, 200f));
+                }));
             });
         }};
 
@@ -119,7 +123,7 @@ public class StatusEffects implements ContentList{
             effect = Fx.oily;
 
             init(() -> {
-                trans(melting, ((unit, time, newTime, result) -> result.set(burning, newTime + time)));
+                trans(melting, ((unit, time, newTime, result) -> result.set(melting, newTime + time)));
                 trans(burning, ((unit, time, newTime, result) -> result.set(burning, newTime + time)));
             });
         }};

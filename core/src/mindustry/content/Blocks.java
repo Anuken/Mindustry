@@ -876,7 +876,7 @@ public class Blocks implements ContentList{
             size = 4;
         }};
 
-        thruster = new Wall("thruster"){{
+        thruster = new Thruster("thruster"){{
             health = 55 * 16 * wallHealthMultiplier;
             size = 4;
         }};
@@ -983,15 +983,15 @@ public class Blocks implements ContentList{
         junction = new Junction("junction"){{
             requirements(Category.distribution, with(Items.copper, 2), true);
             speed = 26;
-            capacity = 12;
+            capacity = 6;
             health = 30;
             buildCostMultiplier = 6f;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
-            requirements(Category.distribution, with(Items.lead, 4, Items.copper, 4));
+            requirements(Category.distribution, with(Items.lead, 6, Items.copper, 6));
             range = 4;
-            speed = 70f;
+            speed = 74f;
             bufferCapacity = 14;
         }};
 
@@ -1265,7 +1265,7 @@ public class Blocks implements ContentList{
             tier = 2;
             drillTime = 600;
             size = 2;
-            drawMineItem = true;
+
             consumes.liquid(Liquids.water, 0.05f).boost();
         }};
 
@@ -1274,7 +1274,7 @@ public class Blocks implements ContentList{
             tier = 3;
             drillTime = 400;
             size = 2;
-            drawMineItem = true;
+
             consumes.liquid(Liquids.water, 0.06f).boost();
         }};
 
@@ -1595,7 +1595,7 @@ public class Blocks implements ContentList{
             shots = 4;
             burstSpacing = 5;
             inaccuracy = 10f;
-            range = 190f;
+            range = 200f;
             xRand = 6f;
             size = 2;
             health = 300 * size * size;
@@ -1763,7 +1763,7 @@ public class Blocks implements ContentList{
                 despawnEffect = Fx.instBomb;
                 trailSpacing = 20f;
                 damage = 1350;
-                tileDamageMultiplier = 0.3f;
+                buildingDamageMultiplier = 0.3f;
                 speed = brange;
                 hitShake = 6f;
                 ammoMultiplier = 1f;
@@ -1772,7 +1772,7 @@ public class Blocks implements ContentList{
 
             maxAmmo = 40;
             ammoPerShot = 4;
-            rotateSpeed = 2.5f;
+            rotateSpeed = 2f;
             reloadTime = 200f;
             ammoUseEffect = Fx.casing3Double;
             recoilAmount = 5f;
@@ -1785,7 +1785,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.railgun;
             unitSort = (u, x, y) -> -u.maxHealth;
 
-            coolantMultiplier = 0.2f;
+            coolantMultiplier = 0.4f;
 
             health = 150 * size * size;
             coolantUsage = 1f;
@@ -1992,6 +1992,7 @@ public class Blocks implements ContentList{
 
         powerSource = new PowerSource("power-source"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, with());
+            powerProduction = 1000000f / 60f;
             alwaysUnlocked = true;
         }};
 
@@ -2054,6 +2055,7 @@ public class Blocks implements ContentList{
 
         //TODO remove
         launchPadLarge = new LaunchPad("launch-pad-large"){{
+            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
             size = 4;
             itemCapacity = 300;
             launchTime = 60f * 35;
@@ -2145,21 +2147,21 @@ public class Blocks implements ContentList{
         //region experimental
 
         blockForge = new BlockForge("block-forge"){{
-            requirements(Category.production, BuildVisibility.debugOnly, with(Items.thorium, 100));
+            requirements(Category.crafting, BuildVisibility.debugOnly, with(Items.thorium, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
         blockLoader = new BlockLoader("block-loader"){{
-            requirements(Category.production, BuildVisibility.debugOnly, with(Items.thorium, 100));
+            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.thorium, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
         blockUnloader = new BlockUnloader("block-unloader"){{
-            requirements(Category.production, BuildVisibility.debugOnly, with(Items.thorium, 100));
+            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.thorium, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;

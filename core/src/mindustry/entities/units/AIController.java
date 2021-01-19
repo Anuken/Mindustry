@@ -88,7 +88,7 @@ public class AIController implements UnitController{
         if(tile == null) return;
         Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathTarget));
 
-        if(tile == targetTile || (costType == Pathfinder.costWater && !targetTile.floor().isLiquid)) return;
+        if(tile == targetTile || (costType == Pathfinder.costNaval && !targetTile.floor().isLiquid)) return;
 
         unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.speed()));
     }
@@ -123,7 +123,7 @@ public class AIController implements UnitController{
                     targets[i] = findTarget(mountX, mountY, weapon.bullet.range(), weapon.bullet.collidesAir, weapon.bullet.collidesGround);
                 }
 
-                if(Units.invalidateTarget(targets[i], unit.team, mountX, mountY, weapon.bullet.range())){
+                if(checkTarget(targets[i], mountX, mountY, weapon.bullet.range())){
                     targets[i] = null;
                 }
             }
@@ -147,6 +147,10 @@ public class AIController implements UnitController{
                 unit.aimY = mount.aimY;
             }
         }
+    }
+
+    protected boolean checkTarget(Teamc target, float x, float y, float range){
+        return Units.invalidateTarget(target, unit.team, x, y, range);
     }
 
     protected boolean shouldShoot(){

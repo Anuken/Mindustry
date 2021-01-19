@@ -378,6 +378,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return block.destructible || block.breakable || block.update;
     }
 
+    /** @return whether the floor on this tile deals damage or can be drowned on. */
+    public boolean dangerous(){
+        return !block.solid && (floor.isDeep() || floor.damageTaken > 0);
+    }
+
     /**
      * Iterates through the list of all tiles linked to this multiblock, or just itself if it's not a multiblock.
      * The result contains all linked tiles, including this tile itself.
@@ -439,6 +444,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     public Rect getHitbox(Rect rect){
         return rect.setCentered(drawx(), drawy(), block.size * tilesize, block.size * tilesize);
+    }
+
+    public Rect getBounds(Rect rect){
+        return rect.set(x * tilesize - tilesize/2f, y * tilesize - tilesize/2f, tilesize, tilesize);
     }
 
     @Override

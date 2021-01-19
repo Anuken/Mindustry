@@ -31,7 +31,7 @@ public class BlockUnloader extends BlockLoader{
 
                 //load up items
                 if(payload.block().hasItems && !full()){
-                    if(timer(timerLoad, loadTime)){
+                    if(efficiency() > 0.01f && timer(timerLoad, loadTime / efficiency())){
                         //load up items a set amount of times
                         for(int j = 0; j < itemsLoaded && !full(); j++){
                             for(int i = 0; i < items.length(); i++){
@@ -52,11 +52,6 @@ public class BlockUnloader extends BlockLoader{
 
         public boolean full(){
             return items.total() >= itemCapacity;
-        }
-
-        @Override
-        public float fraction(){
-            return payload == null ? 0f : 1f - payload.build.items.total() / (float)payload.build.block.itemCapacity;
         }
 
         @Override

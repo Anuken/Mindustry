@@ -819,6 +819,10 @@ public class LStatements{
     @RegisterStatement("uradar")
     public static class UnitRadarStatement extends RadarStatement{
 
+        public UnitRadarStatement(){
+            radar = "0";
+        }
+
         @Override
         public boolean buildFrom(){
             //do not build the "from" section

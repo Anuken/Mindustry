@@ -55,6 +55,7 @@ public class PayloadAcceptor extends Block{
         public @Nullable T payload;
         public Vec2 payVector = new Vec2();
         public float payRotation;
+        public boolean carried;
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
@@ -76,6 +77,16 @@ public class PayloadAcceptor extends Block{
         }
 
         @Override
+        public void pickedUp(){
+            carried = true;
+        }
+
+        @Override
+        public void drawTeamTop(){
+            carried = false;
+        }
+
+        @Override
         public Payload takePayload(){
             T t = payload;
             payload = null;
@@ -85,7 +96,7 @@ public class PayloadAcceptor extends Block{
         @Override
         public void onRemoved(){
             super.onRemoved();
-            if(payload != null) payload.dump();
+            if(payload != null && !carried) payload.dump();
         }
 
         public boolean blends(int direction){

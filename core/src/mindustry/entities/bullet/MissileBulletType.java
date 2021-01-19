@@ -15,7 +15,7 @@ public class MissileBulletType extends BasicBulletType{
         height = 8f;
         hitSound = Sounds.explosion;
         trailChance = 0.2f;
-        lifetime = 49f;
+        lifetime = 52f;
     }
 
     public MissileBulletType(float speed, float damage){

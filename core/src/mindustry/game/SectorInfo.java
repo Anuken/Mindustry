@@ -63,6 +63,8 @@ public class SectorInfo{
     public int spawnPosition;
     /** How long the player has been playing elsewhere. */
     public float secondsPassed;
+    /** How many minutes this sector has been captured. */
+    public float minutesCaptured;
     /** Display name. */
     public @Nullable String name;
     /** Displayed icon. */

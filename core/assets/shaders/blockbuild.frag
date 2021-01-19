@@ -1,6 +1,5 @@
 uniform sampler2D u_texture;
 
-uniform vec4 u_color;
 uniform vec2 u_texsize;
 uniform vec2 u_uv;
 uniform vec2 u_uv2;
@@ -38,11 +37,11 @@ void main(){
 	float dst = (abs(center.x - coords.x) + abs(center.y - coords.y))/2.0;
 
 	if((mod(u_time / 1.5 + value, 20.0) < 15.0 && cont(t, v))){
-        gl_FragColor = u_color;
+        gl_FragColor = v_color;
     }else if(dst > (1.0-u_progress) * (center.x)){
         gl_FragColor = color;
-    }else if((dst + 1.0 > (1.0-u_progress) * (center.x))  && color.a > 0.1){
-        gl_FragColor = u_color;
+    }else if((dst + 1.0 > (1.0-u_progress) * (center.x)) && color.a > 0.1){
+        gl_FragColor = v_color;
     }else{
         gl_FragColor = vec4(0.0);
     }

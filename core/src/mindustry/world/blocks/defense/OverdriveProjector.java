@@ -1,5 +1,6 @@
 package mindustry.world.blocks.defense;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -9,6 +10,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -62,6 +64,12 @@ public class OverdriveProjector extends Block{
         }
     }
 
+    @Override
+    public void setBars(){
+        super.setBars();
+        bars.add("boost", (OverdriveBuild entity) -> new Bar(() -> Core.bundle.format("bar.boost", (int)(entity.realBoost() * 100)), () -> Pal.accent, () -> entity.realBoost() / (hasBoost ? speedBoost + speedBoostPhase : speedBoost)));
+    }
+
     public class OverdriveBuild extends Building implements Ranged{
         float heat;
         float charge = Mathf.random(reload);
@@ -88,17 +96,20 @@ public class OverdriveProjector extends Block{
                 phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
             }
 
+            if(charge >= reload){
+                float realRange = range + phaseHeat * phaseRangeBoost;
+
+                charge = 0f;
+                indexer.eachBlock(this, realRange, other -> true, other -> other.applyBoost(realBoost(), reload + 1f));
+            }
+
             if(timer(timerUse, useTime) && efficiency() > 0 && consValid()){
                 consume();
             }
+        }
 
-            if(charge >= reload){
-                float realRange = range + phaseHeat * phaseRangeBoost;
-                float realBoost = (speedBoost + phaseHeat * speedBoostPhase) * efficiency();
-
-                charge = 0f;
-                indexer.eachBlock(this, realRange, other -> true, other -> other.applyBoost(realBoost, reload + 1f));
-            }
+        public float realBoost(){
+            return consValid() ? (speedBoost + phaseHeat * speedBoostPhase) * efficiency() : 0f;
         }
 
         @Override

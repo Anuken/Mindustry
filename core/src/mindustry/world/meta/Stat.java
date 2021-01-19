@@ -30,6 +30,7 @@ public enum Stat{
     lightningDamage,
     abilities,
     canBoost,
+    maxUnits,
 
     itemCapacity(StatCat.items),
     itemsMoved(StatCat.items),
@@ -51,7 +52,6 @@ public enum Stat{
     productionTime(StatCat.crafting),
     drillTier(StatCat.crafting),
     drillSpeed(StatCat.crafting),
-    maxUnits(StatCat.crafting),
     linkRange(StatCat.crafting),
     instructions(StatCat.crafting),
 
@@ -70,6 +70,7 @@ public enum Stat{
     targetsGround(StatCat.function),
     damage(StatCat.function),
     ammo(StatCat.function),
+    ammoUse(StatCat.function),
     shieldHealth(StatCat.function),
     cooldownTime(StatCat.function),
 

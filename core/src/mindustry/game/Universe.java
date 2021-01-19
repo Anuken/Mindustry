@@ -148,6 +148,13 @@ public class Universe{
             for(Sector sector : planet.sectors){
                 if(sector.hasSave() && sector.hasBase()){
 
+                    //if it is being attacked, capture time is 0; otherwise, increment the timer
+                    if(sector.isAttacked()){
+                        sector.info.minutesCaptured = 0;
+                    }else{
+                        sector.info.minutesCaptured += turnDuration / 60 / 60;
+                    }
+
                     //increment seconds passed for this sector by the time that just passed with this turn
                     if(!sector.isBeingPlayed()){
 
@@ -216,9 +223,11 @@ public class Universe{
                     }
 
                     //queue random invasions
-                    if(!sector.isAttacked() && turn > invasionGracePeriod && sector.info.hasSpawns){
+                    if(!sector.isAttacked() && sector.info.minutesCaptured > invasionGracePeriod && sector.info.hasSpawns){
+                        int count = sector.near().count(Sector::hasEnemyBase);
+
                         //invasion chance depends on # of nearby bases
-                        if(Mathf.chance(baseInvasionChance * Math.min(sector.near().count(Sector::hasEnemyBase), 1))){
+                        if(count > 0 && Mathf.chance(baseInvasionChance * (0.8f + (count - 1) * 0.3f))){
                             int waveMax = Math.max(sector.info.winWave, sector.isBeingPlayed() ? state.wave : sector.info.wave + sector.info.wavesPassed) + Mathf.random(2, 4) * 5;
 
                             //assign invasion-related things
