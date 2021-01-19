@@ -142,13 +142,12 @@ public class Reconstructor extends UnitBlock{
             if(constructing() && hasArrived()){
                 Draw.draw(Layer.blockOver, () -> {
                     Draw.alpha(1f - progress/ constructTime);
-                    Draw.rect(payload.unit.type.icon(Cicon.full), x, y, rotdeg() - 90);
+                    Draw.rect(payload.unit.type.icon(Cicon.full), x, y, payload.rotation() - 90);
                     Draw.reset();
-                    Drawf.construct(this, upgrade(payload.unit.type), rotdeg() - 90f, progress / constructTime, speedScl, time);
+                    Drawf.construct(this, upgrade(payload.unit.type), payload.rotation() - 90f, progress / constructTime, speedScl, time);
                 });
             }else{
                 Draw.z(Layer.blockOver);
-                payRotation = rotdeg();
 
                 drawPayload();
             }

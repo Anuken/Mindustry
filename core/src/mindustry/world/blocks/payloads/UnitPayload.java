@@ -35,7 +35,12 @@ public class UnitPayload implements Payload{
     @Override
     public void set(float x, float y, float rotation){
         unit.set(x, y);
-        unit.rotation(rotation);
+        unit.rotation = rotation;
+    }
+
+    @Override
+    public float rotation(){
+        return unit.rotation;
     }
 
     @Override
