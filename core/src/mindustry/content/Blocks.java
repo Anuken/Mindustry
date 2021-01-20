@@ -1312,7 +1312,7 @@ public class Blocks implements ContentList{
         }};
 
         waterExtractor = new SolidPump("water-extractor"){{
-            requirements(Category.production, with(Items.copper, 25, Items.graphite, 25, Items.lead, 20));
+            requirements(Category.production, with(Items.copper, 30, Items.graphite, 30, Items.lead, 30));
             result = Liquids.water;
             pumpAmount = 0.11f;
             size = 2;
