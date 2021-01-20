@@ -354,7 +354,6 @@ public class SettingsMenuDialog extends SettingsDialog{
             return s + "%";
         });
         graphics.sliderPref("bridgeopacity", 100, 0, 100, 5, s -> s + "%");
-        graphics.sliderPref("teamoutlineopacity", 75, 0, 100, s -> s + "%");
 
         if(!mobile){
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
@@ -404,6 +403,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("fps", false);
         graphics.checkPref("playerindicators", true);
         graphics.checkPref("indicators", true);
+        graphics.checkPref("teamoutline", true);
         graphics.checkPref("showweather", true);
         graphics.checkPref("animatedwater", true);
         if(Shaders.shield != null){
