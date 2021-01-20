@@ -63,6 +63,8 @@ public class SectorInfo{
     public int spawnPosition;
     /** How long the player has been playing elsewhere. */
     public float secondsPassed;
+    /** How many minutes this sector has been captured. */
+    public float minutesCaptured;
     /** Display name. */
     public @Nullable String name;
     /** Displayed icon. */
@@ -73,7 +75,7 @@ public class SectorInfo{
     public boolean shown = false;
 
     /** Special variables for simulation. */
-    public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope, bossHealth, bossDps;
+    public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope, bossHealth, bossDps, curEnemyHealth, curEnemyDps;
     /** Wave where first boss shows up. */
     public int bossWave = -1;
 
@@ -130,7 +132,7 @@ public class SectorInfo{
         }
 
         //if there are infinite waves and no win wave, add a win wave.
-        if(waves && winWave <= 0 && !attack){
+        if(winWave <= 0 && !attack){
             winWave = 30;
         }
 
@@ -227,7 +229,12 @@ public class SectorInfo{
                 updateDelta(item, production, coreDeltas);
                 updateDelta(item, rawProduction, productionDeltas);
 
+                //cap production/export by production
                 production.get(item).mean = Math.min(production.get(item).mean, rawProduction.get(item).mean);
+
+                if(export.containsKey(item)){
+                    export.get(item).mean = Math.min(export.get(item).mean, Math.max(rawProduction.get(item).mean, -production.get(item).mean));
+                }
             }
 
             Arrays.fill(coreDeltas, 0);

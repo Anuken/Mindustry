@@ -27,6 +27,8 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
+    private static final int maxByteLen = 1024 * 500;
+
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
     public float range = 8 * 10;
@@ -66,7 +68,7 @@ public class LogicBlock extends Block{
         });
     }
 
-    static String getLinkName(Block block){
+    public static String getLinkName(Block block){
         String name = block.name;
         if(name.contains("-")){
             String[] split = name.split("-");
@@ -80,11 +82,11 @@ public class LogicBlock extends Block{
         return name;
     }
 
-    static byte[] compress(String code, Seq<LogicLink> links){
+    public static byte[] compress(String code, Seq<LogicLink> links){
         return compress(code.getBytes(charset), links);
     }
 
-    static byte[] compress(byte[] bytes, Seq<LogicLink> links){
+    public static byte[] compress(byte[] bytes, Seq<LogicLink> links){
         try{
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             DataOutputStream stream = new DataOutputStream(new DeflaterOutputStream(baos));
@@ -137,6 +139,9 @@ public class LogicBlock extends Block{
                 stream.read();
 
                 int bytelen = stream.readInt();
+
+                if(bytelen > maxByteLen) throw new RuntimeException("Malformed logic data! Length: " + bytelen);
+
                 byte[] bytes = new byte[bytelen];
                 stream.readFully(bytes);
 
@@ -189,6 +194,7 @@ public class LogicBlock extends Block{
         public LExecutor executor = new LExecutor();
         public float accumulator = 0;
         public Seq<LogicLink> links = new Seq<>();
+        public boolean checkedDuplicates = false;
 
         public void readCompressed(byte[] data, boolean relative){
             DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
@@ -197,6 +203,7 @@ public class LogicBlock extends Block{
                 int version = stream.read();
 
                 int bytelen = stream.readInt();
+                if(bytelen > maxByteLen) throw new RuntimeException("Malformed logic data! Length: " + bytelen);
                 byte[] bytes = new byte[bytelen];
                 stream.readFully(bytes);
 
@@ -310,16 +317,6 @@ public class LogicBlock extends Block{
                     asm.putConst("@links", executor.links.length);
                     asm.putConst("@ipt", instructionsPerTick);
 
-                    //store any older variables
-                    for(Var var : executor.vars){
-                        if(!var.constant){
-                            BVar dest = asm.getVar(var.name);
-                            if(dest != null && !dest.constant){
-                                dest.value = var.isobj ? var.objval : var.numval;
-                            }
-                        }
-                    }
-
                     //inject any extra variables
                     if(assemble != null){
                         assemble.get(asm);
@@ -355,6 +352,21 @@ public class LogicBlock extends Block{
         public void updateTile(){
             executor.team = team;
 
+            if(!checkedDuplicates){
+                checkedDuplicates = true;
+                var removal = new IntSet();
+                var removeLinks = new Seq<LogicLink>();
+                for(var link : links){
+                    var build = world.build(link.x, link.y);
+                    if(build != null){
+                        if(!removal.add(build.id)){
+                            removeLinks.add(link);
+                        }
+                    }
+                }
+                links.removeAll(removeLinks);
+            }
+
             //check for previously invalid links to add after configuration
             boolean changed = false;
 
@@ -364,7 +376,7 @@ public class LogicBlock extends Block{
                 if(!l.active) continue;
 
                 boolean valid = validLink(world.build(l.x, l.y));
-                if(valid != l.valid ){
+                if(valid != l.valid){
                     changed = true;
                     l.valid = valid;
                     if(valid){
@@ -454,9 +466,7 @@ public class LogicBlock extends Block{
         @Override
         public void buildConfiguration(Table table){
             table.button(Icon.pencil, Styles.clearTransi, () -> {
-                Vars.ui.logic.show(code, code -> {
-                    configure(compress(code, relativeConnections()));
-                });
+                Vars.ui.logic.show(code, code -> configure(compress(code, relativeConnections())));
             }).size(40);
         }
 
@@ -519,7 +529,6 @@ public class LogicBlock extends Block{
                 read.b(bytes);
                 readCompressed(bytes, false);
             }else{
-
                 code = read.str();
                 links.clear();
                 short total = read.s();
@@ -556,19 +565,6 @@ public class LogicBlock extends Block{
                     }
                 }
             });
-        }
-    }
-
-    public static class LogicConfig{
-        public String code;
-        public IntSeq connections;
-
-        public LogicConfig(String code, IntSeq connections){
-            this.code = code;
-            this.connections = connections;
-        }
-
-        public LogicConfig(){
         }
     }
 }

@@ -152,10 +152,6 @@ public class Sector{
         return res % 2 == 0 ? res : res + 1;
     }
 
-    public void addItem(Item item, int amount){
-        removeItem(item, -amount);
-    }
-
     public void removeItems(ItemSeq items){
         ItemSeq copy = items.copy();
         copy.each((i, a) -> copy.set(i, -a));
@@ -169,7 +165,6 @@ public class Sector{
     }
 
     public void addItems(ItemSeq items){
-        if(net.client()) return;
 
         if(isBeingPlayed()){
             if(state.rules.defaultTeam.core() != null){

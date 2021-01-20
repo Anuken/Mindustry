@@ -34,10 +34,14 @@ public class ConsumeItems extends Consume{
 
     @Override
     public void build(Building tile, Table table){
-        for(ItemStack stack : items){
-            table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
+        table.table(c -> {
+            int i = 0;
+            for(ItemStack stack : items){
+                c.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
                 () -> tile.items != null && tile.items.has(stack.item, stack.amount))).padRight(8);
-        }
+                if(++i % 4 == 0) table.row();
+            }
+        }).left();
     }
 
     @Override

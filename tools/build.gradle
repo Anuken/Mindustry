@@ -328,7 +328,7 @@ task tileImages(){
     }
 }
 
-task pack(dependsOn: classes){
+task pack(dependsOn: [classes, configurations.runtimeClasspath]){
 
     doLast{
         //cleanup old sprites
@@ -363,7 +363,7 @@ task pack(dependsOn: classes){
         long ms = System.currentTimeMillis()
 
         //antialias everything except UI elements
-        fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
+        fileTree(dir: new File(rootDir, 'core/assets-raw/sprites_out/').absolutePath, include: "**/*.png").visit{ file ->
             if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-")) || file.toString().contains(".9.png")) return
 
             executor.submit{
@@ -383,7 +383,7 @@ task pack(dependsOn: classes){
         println("\n\nPacking normal 4096 sprites...\n\n")
 
         //pack normal sprites
-        TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites.atlas")
+        TexturePacker.process(new File(rootDir, "core/assets-raw/sprites_out/").absolutePath, new File(rootDir, "core/assets/sprites/").absolutePath, "sprites.atlas")
 
         println("\n\nPacking fallback 2048 sprites...\n\n")
 
@@ -393,7 +393,7 @@ task pack(dependsOn: classes){
         }
 
         //pack fallback 2048x2048 sprites
-        TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/fallback/", "sprites.atlas")
+        TexturePacker.process(new File(rootDir, "core/assets-raw/sprites_out/").absolutePath, new File(rootDir, "core/assets/sprites/fallback/").absolutePath, "sprites.atlas")
     }
 }
 
@@ -428,4 +428,11 @@ task icongen(dependsOn: classes, type: JavaExec){
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = "../core/assets-raw"
+}
+
+task updateScripts(dependsOn: classes, type: JavaExec){
+    main = "mindustry.tools.ScriptMainGenerator"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = "../"
 }

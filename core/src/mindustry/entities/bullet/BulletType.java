@@ -34,6 +34,10 @@ public abstract class BulletType extends Content{
     public Effect smokeEffect = Fx.shootSmallSmoke;
     /** Sound made when hitting something or getting removed.*/
     public Sound hitSound = Sounds.none;
+    /** Pitch of the sound made when hitting something*/
+    public float hitSoundPitch = 1;
+    /** Volume of the sound made when hitting something*/
+    public float hitSoundVolume = 1;
     /** Extra inaccuracy when firing. */
     public float inaccuracy = 0f;
     /** How many bullets get created per ammo item/liquid. */
@@ -41,7 +45,7 @@ public abstract class BulletType extends Content{
     /** Multiplied by turret reload speed to get final shoot speed. */
     public float reloadMultiplier = 1f;
     /** Multiplier of how much base damage is done to tiles. */
-    public float tileDamageMultiplier = 1f;
+    public float buildingDamageMultiplier = 1f;
     /** Recoil from shooter entities. */
     public float recoil;
     /** Whether to kill the shooter when this is shot. For suicide bombers. */
@@ -157,7 +161,7 @@ public abstract class BulletType extends Content{
         return Math.max(speed * lifetime * (1f - drag), maxRange);
     }
 
-    public boolean collides(Bullet bullet, Building tile){
+    public boolean testCollision(Bullet bullet, Building tile){
         return healPercent <= 0.001f || tile.team != bullet.team || tile.healthf() < 1f;
     }
 
@@ -186,7 +190,7 @@ public abstract class BulletType extends Content{
 
     public void hit(Bullet b, float x, float y){
         hitEffect.at(x, y, b.rotation(), hitColor);
-        hitSound.at(b);
+        hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
 
         Effect.shake(hitShake, hitShake, b);
 
@@ -273,8 +277,7 @@ public abstract class BulletType extends Content{
         }
 
         if(weaveMag > 0){
-            float scl = Mathf.randomSeed(id, 0.9f, 1.1f);
-            b.vel.rotate(Mathf.sin(b.time + Mathf.PI * weaveScale/2f * scl, weaveScale * scl, weaveMag) * Time.delta);
+            b.vel.rotate(Mathf.sin(b.time + Mathf.PI * weaveScale/2f, weaveScale, weaveMag * (Mathf.randomSeed(b.id, 0, 1) == 1 ? -1 : 1)) * Time.delta);
         }
 
         if(trailChance > 0){
@@ -334,6 +337,7 @@ public abstract class BulletType extends Content{
         bullet.type = this;
         bullet.owner = owner;
         bullet.team = team;
+        bullet.time = 0f;
         bullet.vel.trns(angle, speed * velocityScl);
         if(backMove){
             bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
@@ -347,7 +351,7 @@ public abstract class BulletType extends Content{
         bullet.damage = (damage < 0 ? this.damage : damage) * bullet.damageMultiplier();
         bullet.add();
 
-        if(keepVelocity && owner instanceof Velc) bullet.vel.add(((Velc)owner).vel().x, ((Velc)owner).vel().y);
+        if(keepVelocity && owner instanceof Velc v) bullet.vel.add(v.vel().x, v.vel().y);
         return bullet;
     }
 
@@ -357,6 +361,7 @@ public abstract class BulletType extends Content{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void createBullet(BulletType type, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
+        if(type == null) return;
         type.create(null, team, x, y, angle, damage, velocityScl, lifetimeScl, null);
     }
 }

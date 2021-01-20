@@ -6,10 +6,12 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.ui.*;
 
 public class ForceFieldAbility extends Ability{
     /** Shield radius. */
@@ -92,6 +94,11 @@ public class ForceFieldAbility extends Ability{
                 Lines.poly(unit.x, unit.y, 6, radius);
             }
         }
+    }
+
+    @Override
+    public void displayBars(Unit unit, Table bars){
+        bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> unit.shield / max)).row();
     }
 
     public void checkRadius(Unit unit){

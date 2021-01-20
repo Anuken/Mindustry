@@ -1,0 +1,8 @@
+[This is a truncated changelog, see Github for full notes]
+- Added disclaimer for community servers
+- Added hints concerning core upgrades and numbered sectors
+- Decreased spore storm opacity
+- Made items stay inside reconstructors when rebuilding (Contributed by @Quezler)
+- Made early game procedural sectors slightly easier
+- Fixed some blocks having duplicate research dependencies
+- Fixed legacy research not being cleared after first import

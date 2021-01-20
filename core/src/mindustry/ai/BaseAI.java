@@ -1,7 +1,5 @@
 package mindustry.ai;
 
-import arc.*;
-import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -34,9 +32,10 @@ public class BaseAI{
     private static final Seq<Tile> tmpTiles = new Seq<>();
 
     private static int correct = 0, incorrect = 0;
+    private static boolean anyDrills;
 
     private int lastX, lastY, lastW, lastH;
-    private boolean triedWalls;
+    private boolean triedWalls, foundPath;
 
     TeamData data;
     Interval timer = new Interval(4);
@@ -114,6 +113,9 @@ public class BaseAI{
                     }
 
                     calcPath.add(calcTile.pos());
+                    for(Point2 p : Geometry.d8){
+                        calcPath.add(Point2.pack(p.x + calcTile.x, p.y + calcTile.y));
+                    }
 
                     //found the end.
                     if(calcTile.build instanceof CoreBuild b && b.team == state.rules.defaultTeam){
@@ -125,6 +127,7 @@ public class BaseAI{
                         calcPath.clear();
                         calcTile = null;
                         totalCalcs ++;
+                        foundPath = true;
 
                         break;
                     }
@@ -135,7 +138,7 @@ public class BaseAI{
         }
 
         //only schedule when there's something to build.
-        if(totalCalcs > 0 && data.blocks.isEmpty() && timer.get(timerStep, Mathf.lerp(20f, 4f, data.team.rules().aiTier))){
+        if(foundPath && data.blocks.isEmpty() && timer.get(timerStep, Mathf.lerp(20f, 4f, data.team.rules().aiTier))){
             if(!triedWalls){
                 tryWalls();
                 triedWalls = true;
@@ -198,7 +201,7 @@ public class BaseAI{
         int cx = x - (int)rotator.x;
         int cy = y - (int)rotator.y;
 
-        //chekc valid placeability
+        //check valid placeability
         for(Stile tile : result.tiles){
             int realX = tile.x + cx, realY = tile.y + cy;
             if(!Build.validPlace(tile.block, data.team, realX, realY, tile.rotation)){
@@ -215,16 +218,18 @@ public class BaseAI{
 
         //make sure at least X% of resource requirements are met
         correct = incorrect = 0;
+        anyDrills = false;
 
         if(part.required instanceof Item){
             for(Stile tile : result.tiles){
                 if(tile.block instanceof Drill){
+                    anyDrills = true;
 
                     tile.block.iterateTaken(tile.x + cx, tile.y + cy, (ex, ey) -> {
                         Tile res = world.rawTile(ex, ey);
                         if(res.drop() == part.required){
                             correct ++;
-                        }else{
+                        }else if(res.drop() != null){
                             incorrect ++;
                         }
                     });
@@ -233,7 +238,7 @@ public class BaseAI{
         }
 
         //fail if not enough fit requirements
-        if((float)correct / incorrect < correctPercent){
+        if(anyDrills && (incorrect != 0 || correct == 0)){
             return false;
         }
 
@@ -260,6 +265,7 @@ public class BaseAI{
         if(spawn == null) return;
 
         for(int wx = lastX; wx <= lastX + lastW; wx++){
+            outer:
             for(int wy = lastY; wy <= lastY + lastH; wy++){
                 Tile tile = world.tile(wx, wy);
 
@@ -274,7 +280,7 @@ public class BaseAI{
 
                     Tile o = world.tile(tile.x + p.x, tile.y + p.y);
                     if(o != null && (o.block() instanceof PayloadAcceptor || o.block() instanceof PayloadConveyor)){
-                        break;
+                        continue outer;
                     }
 
                     if(o != null && o.team() == data.team && !(o.block() instanceof Wall)){

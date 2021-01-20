@@ -24,7 +24,7 @@ public class SectorDamage{
     public static final int maxRetWave = 40, maxWavesSimulated = 50;
 
     //direct damage is for testing only
-    private static final boolean direct = false, rubble = true;
+    private static final boolean rubble = true;
 
     /** @return calculated capture progress of the enemy */
     public static float getDamage(SectorInfo info){
@@ -71,6 +71,11 @@ public class SectorDamage{
                 if(info.bossWave == i){
                     enemyDps += info.bossDps;
                     enemyHealth += info.bossHealth;
+                }
+
+                if(i == waveBegin){
+                    enemyDps += info.curEnemyDps;
+                    enemyHealth += info.curEnemyHealth;
                 }
 
                 //happens due to certain regressions
@@ -220,7 +225,6 @@ public class SectorDamage{
 
         //create sparse tile array for fast range query
         int sparseSkip = 5, sparseSkip2 = 3;
-        //TODO if this is slow, use a quadtree
         Seq<Tile> sparse = new Seq<>(path.size / sparseSkip + 1);
         Seq<Tile> sparse2 = new Seq<>(path.size / sparseSkip2 + 1);
 
@@ -241,7 +245,7 @@ public class SectorDamage{
         //first, calculate the total health of blocks in the path
 
         //radius around the path that gets counted
-        int radius = 8;
+        int radius = 7;
         IntSet counted = new IntSet();
 
         for(Tile t : sparse2){
@@ -255,8 +259,8 @@ public class SectorDamage{
 
                         if(tile.build != null && tile.team() == state.rules.defaultTeam && counted.add(tile.pos())){
                             //health is divided by block size, because multiblocks are counted multiple times.
-                            sumHealth += tile.build.health / tile.block().size;
-                            totalPathBuild += 1f / tile.block().size;
+                            sumHealth += tile.build.health / (tile.block().size * tile.block().size);
+                            totalPathBuild += 1f / (tile.block().size * tile.block().size);
                         }
                     }
                 }
@@ -280,7 +284,7 @@ public class SectorDamage{
 
                     if(build.block instanceof ForceProjector f){
                         sumHealth += f.shieldHealth * e;
-                        sumRps += 1f * e;
+                        sumRps += e;
                     }
                 }
             }
@@ -293,18 +297,19 @@ public class SectorDamage{
             //skip player
             if(unit.isPlayer()) continue;
 
-            if(unit.team == state.rules.defaultTeam){
-                //scale health based on armor - yes, this is inaccurate, but better than nothing
-                float healthMult = 1f + Mathf.clamp(unit.armor / 20f);
+            //scale health based on armor - yes, this is inaccurate, but better than nothing
+            float healthMult = 1f + Mathf.clamp(unit.armor / 20f);
 
+            if(unit.team == state.rules.defaultTeam){
                 sumHealth += unit.health*healthMult + unit.shield;
                 sumDps += unit.type.dpsEstimate;
                 if(unit.abilities.find(a -> a instanceof RepairFieldAbility) instanceof RepairFieldAbility h){
                     sumRps += h.amount / h.reload * 60f;
                 }
             }else{
-                curEnemyDps += unit.type.dpsEstimate;
-                curEnemyHealth += unit.health;
+                float bossMult = unit.isBoss() ? 3f : 1f;
+                curEnemyDps += unit.type.dpsEstimate * unit.damageMultiplier() * bossMult;
+                curEnemyHealth += unit.health * healthMult * unit.healthMultiplier() * bossMult + unit.shield;
             }
         }
 
@@ -315,12 +320,6 @@ public class SectorDamage{
 
         for(int wave = state.wave; wave < state.wave + 10; wave ++){
             float sumWaveDps = 0f, sumWaveHealth = 0f;
-
-            //first wave has to take into account current dps
-            if(wave == state.wave){
-                sumWaveDps += curEnemyDps;
-                sumWaveHealth += curEnemyHealth;
-            }
 
             for(SpawnGroup group : state.rules.spawns){
                 float healthMult = 1f + Mathf.clamp(group.type.armor / 20f);
@@ -340,7 +339,7 @@ public class SectorDamage{
         }
 
         if(bossGroup != null){
-            float bossMult = 1.1f;
+            float bossMult = 1.2f;
             //calculate first boss appearaance
             for(int wave = state.wave; wave < state.wave + 60; wave++){
                 int spawned = bossGroup.getSpawned(wave - 1);
@@ -363,11 +362,14 @@ public class SectorDamage{
         info.waveDpsBase = reg.intercept;
         info.waveDpsSlope = reg.slope;
 
-        //enemy units like to aim for a lot of non-essential things, so increase resulting health slightly
-        info.sumHealth = sumHealth * 1.05f;
-        //players tend to have longer range units/turrets, so assume DPS is higher
-        info.sumDps = sumDps * 1.05f;
+        info.sumHealth = sumHealth * 0.9f;
+        info.sumDps = sumDps;
         info.sumRps = sumRps;
+
+        float cmult = 1.6f;
+
+        info.curEnemyDps = curEnemyDps*cmult;
+        info.curEnemyHealth = curEnemyHealth*cmult;
 
         info.wavesSurvived = getWavesSurvived(info);
     }
@@ -404,7 +406,7 @@ public class SectorDamage{
                             if(wx >= 0 && wy >= 0 && wx < world.width() && wy < world.height() && Mathf.within(dx, dy, radius)){
                                 Tile other = world.rawTile(wx, wy);
                                 if(!(other.block() instanceof CoreBlock)){
-                                    s += other.team() == state.rules.defaultTeam ? other.build.health / other.block().size : 0f;
+                                    s += other.team() == state.rules.defaultTeam ? other.build.health / (other.block().size * other.block().size) : 0f;
                                 }
                             }
                         }
@@ -482,23 +484,21 @@ public class SectorDamage{
                         if(other.build != null && other.team() != state.rules.waveTeam){
                             resultDamage -= other.build.health();
 
-                            if(direct){
-                                other.build.damage(currDamage);
-                            }else{ //indirect damage happens at game load time
-                                other.build.health -= currDamage;
-                                //don't kill the core!
-                                if(other.block() instanceof CoreBlock) other.build.health = Math.max(other.build.health, 1f);
+                            other.build.health -= currDamage;
+                            //don't kill the core!
+                            if(other.block() instanceof CoreBlock) other.build.health = Math.max(other.build.health, 1f);
 
-                                //remove the block when destroyed
-                                if(other.build.health < 0){
-                                    //rubble
-                                    if(rubble && !other.floor().solid && !other.floor().isLiquid && Mathf.chance(0.4)){
-                                        Effect.rubble(other.build.x, other.build.y, other.block().size);
-                                    }
-
-                                    other.build.addPlan(false);
-                                    other.remove();
+                            //remove the block when destroyed
+                            if(other.build.health < 0){
+                                //rubble
+                                if(rubble && !other.floor().solid && !other.floor().isLiquid && Mathf.chance(0.4)){
+                                    Effect.rubble(other.build.x, other.build.y, other.block().size);
                                 }
+
+                                other.build.addPlan(false);
+                                other.remove();
+                            }else{
+                                indexer.notifyTileDamaged(other.build);
                             }
 
                         }else if(other.solid() && !other.synthetic()){ //skip damage propagation through solid blocks
@@ -519,7 +519,7 @@ public class SectorDamage{
     static float cost(Tile tile){
         return 1f +
             (tile.block().isStatic() && tile.solid() ? 200f : 0f) +
-            (tile.build != null ? tile.build.health / 40f : 0f) +
+            (tile.build != null ? tile.build.health / (tile.build.block.size * tile.build.block.size) / 20f : 0f) +
             (tile.floor().isLiquid ? 10f : 0f);
     }
 }

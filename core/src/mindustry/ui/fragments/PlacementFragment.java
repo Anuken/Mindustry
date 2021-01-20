@@ -99,7 +99,7 @@ public class PlacementFragment extends Fragment{
 
         if(Core.input.keyTap(Binding.pick) && player.isBuilder()){ //mouse eyedropper select
             Building tile = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-            Block tryRecipe = tile == null ? null : tile.block instanceof ConstructBlock ? ((ConstructBuild)tile).cblock : tile.block;
+            Block tryRecipe = tile == null ? null : tile instanceof ConstructBuild c ? c.cblock : tile.block;
             Object tryConfig = tile == null ? null : tile.config();
 
             for(BuildPlan req : player.unit().plans()){
@@ -145,7 +145,7 @@ public class PlacementFragment extends Fragment{
                             break;
                         }
                     }
-                }else if(blockSelectEnd || Time.timeSinceMillis(blockSelectSeqMillis) > 750){ //1st number of combo, select category
+                }else if(blockSelectEnd || Time.timeSinceMillis(blockSelectSeqMillis) > 400){ //1st number of combo, select category
                     //select only visible categories
                     if(!getUnlockedByCategory(Category.all[i]).isEmpty()){
                         currentCategory = Category.all[i];

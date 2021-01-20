@@ -39,7 +39,6 @@ public class BlockRenderer implements Disposable{
     private Seq<Building> outArray2 = new Seq<>();
     private Seq<Tile> shadowEvents = new Seq<>();
     private IntSet procEntities = new IntSet(), procLinks = new IntSet(), procLights = new IntSet();
-    private boolean displayStatus = false;
 
     public BlockRenderer(){
 
@@ -129,7 +128,7 @@ public class BlockRenderer implements Disposable{
                 if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset, block.y * tilesize + b.offset))) continue;
 
                 Draw.alpha(0.33f * brokenFade);
-                Draw.mixcol(Color.white, 0.2f + Mathf.absin(Time.globalTime(), 6f, 0.2f));
+                Draw.mixcol(Color.white, 0.2f + Mathf.absin(Time.globalTime, 6f, 0.2f));
                 Draw.rect(b.icon(Cicon.full), block.x * tilesize + b.offset, block.y * tilesize + b.offset, b.rotate ? block.rotation * 90 : 0f);
             }
             Draw.reset();
@@ -177,7 +176,6 @@ public class BlockRenderer implements Disposable{
 
     /** Process all blocks to draw. */
     public void processBlocks(){
-        displayStatus = Core.settings.getBool("blockstatus");
 
         int avgx = (int)(camera.position.x / tilesize);
         int avgy = (int)(camera.position.y / tilesize);
@@ -275,7 +273,7 @@ public class BlockRenderer implements Disposable{
                         Draw.z(Layer.block);
                     }
 
-                    if(displayStatus && block.consumes.any()){
+                    if(renderer.drawStatus && block.consumes.any()){
                         entity.drawStatus();
                     }
                 }

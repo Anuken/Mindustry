@@ -81,7 +81,7 @@ public class NuclearReactor extends PowerGenerator{
             if(fuel > 0 && enabled){
                 heat += fullness * heating * Math.min(delta(), 4f);
 
-                if(timer(timerFuel, itemDuration / timeScale())){
+                if(timer(timerFuel, itemDuration / timeScale)){
                     consume();
                 }
             }else{
@@ -100,7 +100,7 @@ public class NuclearReactor extends PowerGenerator{
                 float smoke = 1.0f + (heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
                 if(Mathf.chance(smoke / 20.0 * delta())){
                     Fx.reactorsmoke.at(x + Mathf.range(size * tilesize / 2f),
-                    y + Mathf.random(size * tilesize / 2f));
+                    y + Mathf.range(size * tilesize / 2f));
                 }
             }
 

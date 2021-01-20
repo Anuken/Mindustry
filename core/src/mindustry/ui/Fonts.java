@@ -16,7 +16,6 @@ import arc.graphics.g2d.*;
 import arc.graphics.g2d.Font.*;
 import arc.graphics.g2d.PixmapPacker.*;
 import arc.graphics.g2d.TextureAtlas.*;
-import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;
@@ -67,7 +66,7 @@ public class Fonts{
     }
 
     public static int cursorScale(){
-        return Math.max(1, Mathf.round(Scl.scl(1f)));
+        return 1;
     }
 
     public static void loadFonts(){

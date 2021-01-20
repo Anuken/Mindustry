@@ -59,6 +59,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return team.core();
     }
 
+    /** @return largest/closest core, with largest cores getting priority */
+    @Nullable
+    public CoreBuild bestCore(){
+        return team.cores().min(Structs.comps(Structs.comparingInt(c -> -c.block.size), Structs.comparingFloat(c -> c.dst(x, y))));
+    }
+
     public TextureRegion icon(){
         //display default icon for dead players
         if(dead()) return core() == null ? UnitTypes.alpha.icon(Cicon.full) : ((CoreBlock)core().block).unitType.icon(Cicon.full);
@@ -112,7 +118,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             clearUnit();
         }
 
-        CoreBuild core = closestCore();
+        CoreBuild core;
 
         if(!dead()){
             set(unit);
@@ -124,7 +130,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
                 Tile tile = unit.tileOn();
                 unit.elevation = Mathf.approachDelta(unit.elevation, (tile != null && tile.solid()) || boosting ? 1f : 0f, 0.08f);
             }
-        }else if(core != null){
+        }else if((core = bestCore()) != null){
             //have a small delay before death to prevent the camera from jumping around too quickly
             //(this is not for balance, it just looks better this way)
             deathTimer += Time.delta;
@@ -191,6 +197,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return unit.isNull() || !unit.isValid();
     }
 
+    String ip(){
+        return con == null ? "localhost" : con.address;
+    }
+
     String uuid(){
         return con == null ? "[LOCAL]" : con.uuid;
     }
@@ -243,7 +253,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         }
 
         if(Core.settings.getBool("playerchat") && ((textFadeTime > 0 && lastText != null) || typing)){
-            String text = textFadeTime <= 0 || lastText == null ? "[lightgray]" + Strings.animated(Time.time(), 4, 15f, ".") : lastText;
+            String text = textFadeTime <= 0 || lastText == null ? "[lightgray]" + Strings.animated(Time.time, 4, 15f, ".") : lastText;
             float width = 100f;
             float visualFadeTime = 1f - Mathf.curve(1f - textFadeTime, 0.9f);
             font.setColor(1f, 1f, 1f, textFadeTime <= 0 || lastText == null ? 1f : visualFadeTime);

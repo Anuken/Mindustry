@@ -15,6 +15,7 @@ import static mindustry.Vars.*;
 public class LiquidBulletType extends BulletType{
     public Liquid liquid;
     public float puddleSize = 6f;
+    public float orbSize = 3f;
 
     public LiquidBulletType(@Nullable Liquid liquid){
         super(3.5f, 0);
@@ -64,7 +65,7 @@ public class LiquidBulletType extends BulletType{
     public void draw(Bullet b){
         Draw.color(liquid.color, Color.white, b.fout() / 100f);
 
-        Fill.circle(b.x, b.y, puddleSize / 2);
+        Fill.circle(b.x, b.y, orbSize);
     }
 
     @Override

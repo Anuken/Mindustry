@@ -45,7 +45,7 @@ public class ImpactReactor extends PowerGenerator{
 
         bars.add("poweroutput", (GeneratorBuild entity) -> new Bar(() ->
         Core.bundle.format("bar.poweroutput",
-        Strings.fixed(Math.max(entity.getPowerProduction() - consumes.getPower().usage, 0) * 60 * entity.timeScale(), 1)),
+        Strings.fixed(Math.max(entity.getPowerProduction() - consumes.getPower().usage, 0) * 60 * entity.timeScale, 1)),
         () -> Pal.powerBar,
         () -> entity.productionEfficiency));
     }
@@ -72,7 +72,7 @@ public class ImpactReactor extends PowerGenerator{
             if(consValid() && power.status >= 0.99f){
                 boolean prevOut = getPowerProduction() <= consumes.getPower().requestedPower(this);
 
-                warmup = Mathf.lerpDelta(warmup, 1f, warmupSpeed);
+                warmup = Mathf.lerpDelta(warmup, 1f, warmupSpeed * timeScale);
                 if(Mathf.equal(warmup, 1f, 0.001f)){
                     warmup = 1f;
                 }
@@ -81,7 +81,7 @@ public class ImpactReactor extends PowerGenerator{
                     Events.fire(Trigger.impactPower);
                 }
 
-                if(timer(timerUse, itemDuration / timeScale())){
+                if(timer(timerUse, itemDuration / timeScale)){
                     consume();
                 }
             }else{
@@ -101,12 +101,12 @@ public class ImpactReactor extends PowerGenerator{
             Draw.rect(bottomRegion, x, y);
 
             for(int i = 0; i < plasmaRegions.length; i++){
-                float r = size * tilesize - 3f + Mathf.absin(Time.time(), 2f + i * 1f, 5f - i * 0.5f);
+                float r = size * tilesize - 3f + Mathf.absin(Time.time, 2f + i * 1f, 5f - i * 0.5f);
 
                 Draw.color(plasma1, plasma2, (float)i / plasmaRegions.length);
-                Draw.alpha((0.3f + Mathf.absin(Time.time(), 2f + i * 2f, 0.3f + i * 0.05f)) * warmup);
+                Draw.alpha((0.3f + Mathf.absin(Time.time, 2f + i * 2f, 0.3f + i * 0.05f)) * warmup);
                 Draw.blend(Blending.additive);
-                Draw.rect(plasmaRegions[i], x, y, r, r, Time.time() * (12 + i * 6f) * warmup);
+                Draw.rect(plasmaRegions[i], x, y, r, r, Time.time * (12 + i * 6f) * warmup);
                 Draw.blend();
             }
 

@@ -65,7 +65,7 @@ public class MassDriver extends Block{
         if(selected == null || !(selected.block instanceof MassDriver) || !(selected.within(x * tilesize, y * tilesize, range))) return;
 
         //if so, draw a dotted line towards it while it is in range
-        float sin = Mathf.absin(Time.time(), 6f, 1f);
+        float sin = Mathf.absin(Time.time, 6f, 1f);
         Tmp.v1.set(x * tilesize + offset, y * tilesize + offset).sub(selected.x, selected.y).limit((size / 2f + 1) * tilesize + sin + 0.5f);
         float x2 = x * tilesize - Tmp.v1.x, y2 = y * tilesize - Tmp.v1.y,
             x1 = selected.x + Tmp.v1.x, y1 = selected.y + Tmp.v1.y;
@@ -175,11 +175,14 @@ public class MassDriver extends Block{
                         Angles.near(rotation, targetRotation, 2f) && Angles.near(other.rotation, targetRotation + 180f, 2f)){
                             //actually fire
                             fire(other);
-                            //remove waiting shooters, it's done firing
-                            other.waitingShooters.remove(tile);
-                            //set both states to idle
+                            float timeToArrive = Math.min(bulletLifetime, dst(other) / bulletSpeed);
+                            Time.run(timeToArrive, () -> {
+                                //remove waiting shooters, it's done firing
+                                other.waitingShooters.remove(tile);
+                                other.state = DriverState.idle;
+                            });
+                            //driver is immediately idle
                             state = DriverState.idle;
-                            other.state = DriverState.idle;
                         }
                     }
                 }
@@ -202,7 +205,7 @@ public class MassDriver extends Block{
 
         @Override
         public void drawConfigure(){
-            float sin = Mathf.absin(Time.time(), 6f, 1f);
+            float sin = Mathf.absin(Time.time, 6f, 1f);
 
             Draw.color(Pal.accent);
             Lines.stroke(1f);
@@ -242,7 +245,7 @@ public class MassDriver extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            //mass drivers that ouput only cannot accept items
+            //mass drivers that output only cannot accept items
             return items.total() < itemCapacity && linkValid();
         }
 
@@ -302,8 +305,7 @@ public class MassDriver extends Block{
 
         protected boolean shooterValid(Tile other){
             if(other == null) return true;
-            if(!(other.block() instanceof MassDriver)) return false;
-            MassDriverBuild entity = other.bc();
+            if(!(other.build instanceof MassDriverBuild entity)) return false;
             return entity.link == tile.pos() && tile.dst(other) <= range;
         }
 
