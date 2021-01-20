@@ -2,6 +2,7 @@ package mindustry.ui.fragments;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.input.KeyCode;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
@@ -35,7 +36,7 @@ public class PlayerListFragment extends Fragment{
                     return;
                 }
 
-                if(visible && timer.get(20)){
+                if(visible && timer.get(20) && !Core.input.keyDown(KeyCode.mouseLeft)){
                     rebuild();
                     content.pack();
                     content.act(Core.graphics.getDeltaTime());
