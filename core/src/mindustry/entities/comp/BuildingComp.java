@@ -894,7 +894,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         Draw.rect("block-border", x - block.size * tilesize / 2f + 4, y - block.size * tilesize / 2f + 4);
 
         Draw.alpha(Renderer.teamOutlineOpacity);
-        Draw.z(Layer.blockUnder - 1f);
+        Draw.z(Layer.blockUnder - 0.2f);
 
         Fill.square(x, y, tilesize * block.size / 2f + 2);
 
