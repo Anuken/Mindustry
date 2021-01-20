@@ -235,9 +235,9 @@ public class Bullets implements ContentList{
 
         fragExplosive = new FlakBulletType(4f, 5){{
             shootEffect = Fx.shootBig;
-            ammoMultiplier = 4f;
-            splashDamage = 18f;
-            splashDamageRadius = 55f;
+            ammoMultiplier = 5f;
+            splashDamage = 26f;
+            splashDamageRadius = 60f;
             collidesGround = true;
 
             status = StatusEffects.blasted;
@@ -245,9 +245,9 @@ public class Bullets implements ContentList{
         }};
 
         fragSurge = new FlakBulletType(4.5f, 13){{
-            ammoMultiplier = 4f;
+            ammoMultiplier = 5f;
             splashDamage = 50f;
-            splashDamageRadius = 40f;
+            splashDamageRadius = 38f;
             lightning = 2;
             lightningLength = 7;
             shootEffect = Fx.shootBig;

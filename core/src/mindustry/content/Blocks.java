@@ -1838,6 +1838,7 @@ public class Blocks implements ContentList{
             shootType = new ContinuousLaserBulletType(70){{
                 length = 200f;
                 hitEffect = Fx.hitMeltdown;
+                hitColor = Pal.meltdownHit;
                 drawSize = 420f;
 
                 incendChance = 0.4f;
