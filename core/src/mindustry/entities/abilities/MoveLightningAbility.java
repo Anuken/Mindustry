@@ -25,14 +25,14 @@ public class MoveLightningAbility extends Ability{
     //Shifts where the lightning spawns along the Y axis
     public float offset = 0f;
     //Jittering heat sprite like the shield on v5 Javelin
-    public TextureRegion heatRegion = Core.atlas.find("error");
+    public String heatRegion = "error";
     
     public Effect shootEffect = Fx.sparkShoot;
     public Sound shootSound = Sounds.spark;
     
     MoveLightningAbility(){}
     
-    public MoveLightningAbility(float damage, int length, float chance, float offset, float minSpeed, float maxSpeed, Color color, TextureRegion heatRegion){
+    public MoveLightningAbility(float damage, int length, float chance, float offset, float minSpeed, float maxSpeed, Color color, String heatRegion){
         this.damage = damage;
         this.length = length;
         this.chance = chance;
@@ -43,17 +43,6 @@ public class MoveLightningAbility extends Ability{
         this.heatRegion = heatRegion;
     }
     
-    public MoveLightningAbility(float damage, int length, float chance, float offset, float minSpeed, float maxSpeed, Color color, String heatName){
-        this.damage = damage;
-        this.length = length;
-        this.chance = chance;
-        this.offset = offset;
-        this.minSpeed = minSpeed;
-        this.maxSpeed = maxSpeed;
-        this.color = color;
-        this.heatRegion = Core.atlas.find(heatName);
-    }
-    
     public MoveLightningAbility(float damage, int length, float chance, float offset, float minSpeed, float maxSpeed, Color color){
         this.damage = damage;
         this.length = length;
@@ -62,7 +51,6 @@ public class MoveLightningAbility extends Ability{
         this.minSpeed = minSpeed;
         this.maxSpeed = maxSpeed;
         this.color = color;
-        this.heatRegion = Core.atlas.find("error");
     }
     
     @Override
@@ -79,11 +67,12 @@ public class MoveLightningAbility extends Ability{
     @Override
     public void draw(Unit unit){
         float scl = Mathf.clamp((unit.vel().len() - minSpeed) / (maxSpeed - minSpeed));
-        if(heatRegion != Core.atlas.find("error") && scl > 0.00001f){
+        TextureRegion region = Core.atlas.find(heatRegion);
+        if(Core.atlas.isFound(region) && scl > 0.00001f){
             Draw.color(color);
             Draw.alpha(scl / 2f);
             Draw.blend(Blending.additive);
-            Draw.rect(heatRegion, unit.x + Mathf.range(scl / 2f), unit.y + Mathf.range(scl / 2f), unit.rotation - 90);
+            Draw.rect(region, unit.x + Mathf.range(scl / 2f), unit.y + Mathf.range(scl / 2f), unit.rotation - 90);
             Draw.blend();
         }
     }
