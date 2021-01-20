@@ -61,18 +61,33 @@ public class DesktopInput extends InputHandler{
         group.fill(t -> {
             t.bottom();
             t.visible(() -> {
-                t.color.a = Mathf.lerpDelta(t.color.a, !isBuilding && !buildWasAutoPaused || player.unit().isBuilding() ? 1f : 0f, 0.15f);
+                t.color.a = Mathf.lerpDelta(t.color.a, player.unit().isBuilding() ? 1f : 0f, 0.15f);
 
                 return ui.hudfrag.shown && Core.settings.getBool("hints") && selectRequests.isEmpty() && t.color.a > 0.01f;
             });
             t.touchable(() -> t.color.a < 0.1f ? Touchable.disabled : Touchable.childrenOnly);
             t.table(Styles.black6, b -> {
                 b.defaults().left();
-                b.label(() -> Core.bundle.format(!isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
+                b.label(() -> Core.bundle.format(isBuilding ? "pausebuilding" : "resumebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
                 b.label(() -> Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
                 b.label(() -> Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematic_select).key.toString())).style(Styles.outlineLabel);
+            }).margin(10f);
+        });
+
+        //build enable hint
+        group.fill(t -> {
+            t.bottom();
+            t.visible(() -> {
+                t.color.a = Mathf.lerpDelta(t.color.a, !isBuilding && !buildWasAutoPaused && !player.unit().isBuilding() ? 1f : 0f, 0.15f);
+
+                return ui.hudfrag.shown && Core.settings.getBool("hints") && selectRequests.isEmpty() && t.color.a > 0.01f;
+            });
+            t.touchable(() -> t.color.a < 0.1f ? Touchable.disabled : Touchable.childrenOnly);
+            t.table(Styles.black6, b -> {
+                b.defaults().left();
+                b.label(() -> Core.bundle.format("enablebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
             }).margin(10f);
         });
 
