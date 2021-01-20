@@ -3,6 +3,8 @@ package mindustry.world.blocks.defense;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.Time;
+import arc.util.Tmp;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -37,7 +39,7 @@ public class ShockMine extends Block{
         @Override
         public void draw(){
             super.draw();
-            Draw.color(team.color);
+            Draw.color(Tmp.c1.set(Color.black).lerp(team.color, healthf() + Mathf.absin(Time.time, Math.max(healthf() * 5f, 1f), 1f - healthf())));
             Draw.alpha(0.22f);
             Fill.rect(x, y, 2f, 2f);
             Draw.color();
@@ -45,12 +47,17 @@ public class ShockMine extends Block{
 
         @Override
         public void unitOn(Unit unit){
-            if(enabled && unit.team != team && timer(timerDamage, cooldown)){
+            if(health - tileDamage > 1 && enabled && unit.team != team && timer(timerDamage, cooldown)){
                 for(int i = 0; i < tendrils; i++){
                     Lightning.create(team, lightningColor, damage, x, y, Mathf.random(360f), length);
                 }
                 damage(tileDamage);
             }
+        }
+
+        @Override
+        public void drawCracks() {
+            //no
         }
     }
 }
