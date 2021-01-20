@@ -72,7 +72,7 @@ public class Mods implements Loadable{
 
     /** Imports an external mod file.*/
     public void importMod(Fi file) throws IOException{
-        Fi dest = modDirectory.child(file.name());
+        Fi dest = modDirectory.child(file.name() + (file.extension().isEmpty() ? ".zip" : ""));
         if(dest.exists()){
             throw new IOException("A file with the same name already exists in the mod folder!");
         }
