@@ -285,7 +285,6 @@ public class BaseAI{
 
                     if(o != null && o.team() == data.team && !(o.block() instanceof Wall)){
                         any = true;
-                        break;
                     }
                 }
 
