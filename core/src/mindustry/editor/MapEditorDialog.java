@@ -665,7 +665,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     private void tryExit(){
         if(saved){
-            this::hide.run();
+            hide.run();
         }else{
             ui.showConfirm("@confirm", "@editor.unsaved", this::hide);
         }
