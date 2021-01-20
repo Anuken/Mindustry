@@ -13,8 +13,12 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.Floor;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
+
+import java.lang.reflect.Field;
+import java.util.concurrent.CompletableFuture;
 
 import static mindustry.Vars.*;
 
@@ -41,16 +45,10 @@ public class Pathfinder implements Runnable{
 
     public static final Seq<PathCost> costTypes = Seq.with(
         //ground
-        (team, tile) -> (PathTile.team(tile) == team.id || PathTile.team(tile) == 0) && PathTile.solid(tile) ? impassable : 1 +
-            PathTile.health(tile) * 5 +
-            (PathTile.nearSolid(tile) ? 2 : 0) +
-            (PathTile.nearLiquid(tile) ? 6 : 0) +
-            (PathTile.deep(tile) ? 6000 : 0) +
-            (PathTile.damages(tile) ? 30 : 0),
+        (team, tile) -> ((PathTile.isWalkable(tile)) ? 1 : 1500),
 
         //legs
-        (team, tile) -> PathTile.legSolid(tile) ? impassable : 1 +
-            (PathTile.solid(tile) ? 5 : 0),
+        (team, tile) -> ((PathTile.isWalkable(tile)) ? 1 : 1000),
 
         //water
         (team, tile) -> PathTile.solid(tile) || !PathTile.liquid(tile) ? 200 : 2 +
@@ -77,6 +75,19 @@ public class Pathfinder implements Runnable{
 
         Events.on(WorldLoadEvent.class, event -> {
             stop();
+
+            /*
+            String target = state.map.description();
+            Block desiredBlock = Blocks.snow;
+
+            try {
+                Field field = Blocks.class.getDeclaredField(target);
+                desiredBlock = (Block)field.get(null);
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {}
+            walkableBlock = (Floor) desiredBlock;
+            Log.info("<.io> loaded map: " + state.map.name() + ", walkable block for this map: " + walkableBlock.name);
+             */
+
 
             //reset and update internal tile array
             tiles = new int[world.width()][world.height()];
@@ -130,7 +141,9 @@ public class Pathfinder implements Runnable{
             nearGround,
             nearSolid,
             tile.floor().isDeep(),
-            tile.floor().damageTaken > 0.00001f
+            tile.floor().damageTaken > 0.00001f,
+                tile.floor() == Blocks.darkPanel5,
+                tile.floor() == Blocks.darkPanel4
         );
     }
 
@@ -518,5 +531,9 @@ public class Pathfinder implements Runnable{
         boolean deep;
         //whether the floor damages
         boolean damages;
+        //whether the floor is walkable on (tower defense)
+        boolean isWalkable;
+        //whether the floor is acceptable (tower defense)
+        boolean isAcceptable;
     }
 }

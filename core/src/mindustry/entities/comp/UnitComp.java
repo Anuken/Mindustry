@@ -241,7 +241,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public void setType(UnitType type){
         this.type = type;
-        this.maxHealth = type.health;
+        this.maxHealth = type.health * (team != Team.sharded ? state.multiplier : 1);
         this.drag = type.drag;
         this.armor = type.armor;
         this.hitSize = type.hitSize;
@@ -429,9 +429,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //if this unit crash landed (was flying), damage stuff in a radius
+        //actually dont
+        /*
         if(type.flying && !spawnedByCore){
             Damage.damage(team,x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f, true, false, true);
         }
+         */
 
         if(!headless){
             for(int i = 0; i < type.wreckRegions.length; i++){

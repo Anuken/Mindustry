@@ -177,6 +177,13 @@ public class Units{
         }
     }
 
+    /** Returns the closest target enemy. tile entities. */
+    public static Teamc closestTargetTile(Team team, float x, float y, float range, Boolf<Building> tilePred){
+        if(team == Team.derelict) return null;
+
+        return findEnemyTile(team, x, y, range, tilePred);
+    }
+
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
     public static Teamc bestTarget(Team team, float x, float y, float range, Boolf<Unit> unitPred, Boolf<Building> tilePred, Sortf sort){
         if(team == Team.derelict) return null;

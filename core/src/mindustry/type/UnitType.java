@@ -39,6 +39,7 @@ public class UnitType extends UnlockableContent{
 
     /** If true, the unit is always at elevation 1. */
     public boolean flying;
+    public boolean swimming;
     public Prov<? extends Unit> constructor;
     public Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
@@ -53,7 +54,7 @@ public class UnitType extends UnlockableContent{
     public float payloadCapacity = 8;
     public float aimDst = -1f;
     public float buildBeamOffset = 3.8f;
-    public int commandLimit = 8;
+    public int commandLimit = 16;
     public float visualElevation = -1f;
     public boolean allowLegStep = false;
     public boolean hovering = false;

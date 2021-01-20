@@ -1,13 +1,17 @@
 package mindustry.ai.types;
 
+import arc.Core;
+import arc.util.Timer;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.liquid.*;
+import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.*;
 
 public class SuicideAI extends GroundAI{
@@ -28,9 +32,11 @@ public class SuicideAI extends GroundAI{
 
         boolean rotate = false, shoot = false, moveToTarget = false;
 
-        if(!Units.invalidateTarget(target, unit, unit.range()) && unit.hasWeapons()){
+        if(!Units.invalidateTarget(target, unit, (unit.team == Team.sharded ? 1400f : 40f)) && unit.hasWeapons()){
             rotate = true;
-            shoot = unit.within(target, unit.type.weapons.first().bullet.range() +
+
+            // range: 10f
+            shoot = unit.within(target, (unit.team == Team.sharded ? unit.type.weapons.first().bullet.range() : 10f) +
                 (target instanceof Building b ? b.block.size * Vars.tilesize / 2f : ((Hitboxc)target).hitSize() / 2f));
 
             if(unit.type.hasWeapons()){
@@ -85,11 +91,17 @@ public class SuicideAI extends GroundAI{
         }
 
         unit.controlWeapons(rotate, shoot);
+        if(shoot && unit.team != Team.sharded)
+            Timer.schedule(() -> {Core.app.post(unit::kill); }, 0.5f);
     }
 
     @Override
     protected Teamc target(float x, float y, float range, boolean air, boolean ground){
-        return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground &&
-            !(t.block instanceof Conveyor || t.block instanceof Conduit)); //do not target conveyors/conduits
+        if(unit.team != Team.sharded) {
+            return Units.closestTargetTile(unit.team, x, y, range, t -> ground &&
+                    (t.block instanceof CoreBlock)); //target core blocks
+        }else{
+            return Units.closestTarget(unit.team, x, y, 700f, u -> u.checkTarget(air, ground), t -> ground); //do not target conveyors/conduits
+        }
     }
 }

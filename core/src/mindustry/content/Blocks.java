@@ -887,7 +887,7 @@ public class Blocks implements ContentList{
             size = 1;
             reload = 200f;
             range = 40f;
-            healPercent = 4f;
+            healPercent = 1f;
             phaseBoost = 4f;
             phaseRangeBoost = 20f;
             health = 80;
@@ -900,7 +900,7 @@ public class Blocks implements ContentList{
             size = 2;
             reload = 250f;
             range = 85f;
-            healPercent = 11f;
+            healPercent = 2f;
             phaseBoost = 15f;
             health = 80 * size * size;
             consumes.item(Items.phaseFabric).boost();
@@ -1577,7 +1577,7 @@ public class Blocks implements ContentList{
             force = 8f;
             scaledForce = 7f;
             range = 230f;
-            damage = 0.3f;
+            damage = 4f;
             health = 160 * size * size;
             rotateSpeed = 10;
 
@@ -1636,7 +1636,7 @@ public class Blocks implements ContentList{
             consumes.powerCond(8f, (PointDefenseBuild b) -> b.target != null);
             size = 2;
             shootLength = 5f;
-            bulletDamage = 25f;
+            bulletDamage = 5f;
             reloadTime = 9f;
         }};
 
@@ -1684,14 +1684,14 @@ public class Blocks implements ContentList{
             ammo(
             Items.titanium, new ShrapnelBulletType(){{
                 length = brange;
-                damage = 66f;
+                damage = 55f;
                 ammoMultiplier = 4f;
                 width = 17f;
                 reloadMultiplier = 1.3f;
             }},
             Items.thorium, new ShrapnelBulletType(){{
                 length = brange;
-                damage = 105f;
+                damage = 88f;
                 ammoMultiplier = 5f;
                 toColor = Pal.thoriumPink;
                 shootEffect = smokeEffect = Fx.thoriumShoot;

@@ -76,7 +76,17 @@ public class WaveSpawner{
                         unit.add();
                     }
                 });
-            }else{
+            }else if(group.type.swimming){
+                float spread = margin / 1.5f;
+
+                eachNavalSpawn((spawnX, spawnY) -> {
+                    for(int i = 0; i < spawned; i++){
+                        Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
+                        unit.set(spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
+                        unit.add();
+                    }
+                });
+            }else {
                 float spread = tilesize * 2;
 
                 eachGroundSpawn((spawnX, spawnY, doShockwave) -> {
@@ -104,13 +114,23 @@ public class WaveSpawner{
         eachGroundSpawn((x, y, shock) -> cons.get(World.toTile(x), World.toTile(y)));
     }
 
+    private void eachNavalSpawn(Floatc2 cons){
+        if(state.hasSpawns()){
+            for(Tile spawn : spawns){
+                if(spawn.floor().isLiquid)
+                    cons.get(spawn.getX(), spawn.getY());
+            }
+        }
+    }
+
     private void eachGroundSpawn(SpawnConsumer cons){
         if(state.hasSpawns()){
             for(Tile spawn : spawns){
-                cons.accept(spawn.worldx(), spawn.worldy(), true);
+                if(!spawn.floor().isLiquid)
+                    cons.accept(spawn.worldx(), spawn.worldy(), true);
             }
         }
-
+        /*
         if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam) && !state.teams.playerCores().isEmpty()){
             Building firstCore = state.teams.playerCores().first();
             for(Building core : state.rules.waveTeam.cores()){
@@ -144,9 +164,11 @@ public class WaveSpawner{
                 }
             }
         }
+         */
     }
 
     private void eachFlyerSpawn(Floatc2 cons){
+        /*
         for(Tile tile : spawns){
             float angle = Angles.angle(world.width() / 2, world.height() / 2, tile.x, tile.y);
 
@@ -159,6 +181,12 @@ public class WaveSpawner{
         if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam)){
             for(Building core : state.teams.get(state.rules.waveTeam).cores){
                 cons.get(core.x, core.y);
+            }
+        }
+         */
+        if(state.hasSpawns()){
+            for(Tile spawn : spawns){
+                cons.get(spawn.getX(), spawn.getY());
             }
         }
     }

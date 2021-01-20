@@ -125,6 +125,8 @@ public class Build{
 
         if(tile == null) return false;
 
+        if(tile.floor() == Blocks.darkPanel5 || tile.floor() == Blocks.darkPanel4) return false;
+
         //campaign darkness check
         if(world.getDarkness(x, y) >= 3){
             return false;
