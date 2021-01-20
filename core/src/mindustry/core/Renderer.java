@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 public class Renderer implements ApplicationListener{
     /** These are global variables, for headless access. Cached. */
-    public static float laserOpacity = 0.5f, bridgeOpacity = 0.75f;
+    public static float laserOpacity = 0.5f, bridgeOpacity = 0.75f, teamOutlineOpacity = 0.75f;
 
     public final BlockRenderer blocks = new BlockRenderer();
     public final MinimapRenderer minimap = new MinimapRenderer();
@@ -80,6 +80,7 @@ public class Renderer implements ApplicationListener{
         if(Mathf.equal(camerascale, dest, 0.001f)) camerascale = dest;
         laserOpacity = settings.getInt("lasersopacity") / 100f;
         bridgeOpacity = settings.getInt("bridgeopacity") / 100f;
+        teamOutlineOpacity = settings.getInt("teamoutlineopacity") / 100f;
         animateShields = settings.getBool("animatedshields");
         drawStatus = Core.settings.getBool("blockstatus");
 
