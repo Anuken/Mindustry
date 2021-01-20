@@ -86,7 +86,6 @@ public class DesktopInput extends InputHandler{
             });
             t.touchable(() -> t.color.a < 0.1f ? Touchable.disabled : Touchable.childrenOnly);
             t.table(Styles.black6, b -> {
-                b.defaults().left();
                 b.label(() -> Core.bundle.format("enablebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
             }).margin(10f);
         });
