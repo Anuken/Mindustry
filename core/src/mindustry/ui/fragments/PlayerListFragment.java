@@ -2,7 +2,7 @@ package mindustry.ui.fragments;
 
 import arc.*;
 import arc.graphics.g2d.*;
-import arc.input.KeyCode;
+import arc.input.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
