@@ -189,6 +189,7 @@ public abstract class BulletType extends Content{
     }
 
     public void hit(Bullet b, float x, float y){
+        b.hit = true;
         hitEffect.at(x, y, b.rotation(), hitColor);
         hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
 
@@ -245,7 +246,7 @@ public abstract class BulletType extends Content{
 
         Effect.shake(despawnShake, despawnShake, b);
 
-        if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
+        if(!b.hit && (fragBullet != null || splashDamageRadius > 0 || lightning > 0)){
             hit(b);
         }
     }

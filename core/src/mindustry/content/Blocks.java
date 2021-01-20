@@ -1537,7 +1537,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.laser;
 
             shootType = new LaserBulletType(140){{
-                colors = new Color[]{Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.white};
+                colors = new Color[]{Pal.lancerLaser.cpy().a(0.4f), Pal.lancerLaser, Color.white};
                 hitEffect = Fx.hitLancer;
                 despawnEffect = Fx.none;
                 hitSize = 4;
