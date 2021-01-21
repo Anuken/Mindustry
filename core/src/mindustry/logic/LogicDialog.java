@@ -45,7 +45,7 @@ public class LogicDialog extends BaseDialog{
                         }
                     }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null);
                     t.row();
-                    t.button("@schematic.copy", Icon.copy, style, () -> {
+                    t.button("@schematic.copy", Icon.export, style, () -> {
                         dialog.hide();
                         Core.app.setClipboardText(canvas.save());
                     }).marginLeft(12f);
