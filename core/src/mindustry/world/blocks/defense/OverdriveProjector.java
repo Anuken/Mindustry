@@ -44,7 +44,6 @@ public class OverdriveProjector extends Block{
     public boolean outputsItems(){
         return false;
     }
-    
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         //inner circle
