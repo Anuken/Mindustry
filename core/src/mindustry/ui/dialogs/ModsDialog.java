@@ -178,7 +178,7 @@ public class ModsDialog extends BaseDialog{
                                 searchtxt = res;
                                 rebuildBrowser[0].run();
                             }).growX().get();
-                            table.button(Icon.list, clearPartiali, 32f, () -> {
+                            table.button(Icon.list, Styles.clearPartiali, 32f, () -> {
                                 orderDate = !orderDate;
                                 rebuildBrowser[0].run();
                             }).update(b -> b.getStyle().imageUp = (orderDate? Icon.list : Icon.star)).size(40f).get().addListener(new Tooltip(tip -> tip.label(() -> orderDate? "$mods.browser.sortdate" : "$mods.browser.sortstars").left()));
