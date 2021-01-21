@@ -43,16 +43,6 @@ public class LightBlock extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            return switch(sensor){
-                case red -> Tmp.c1.set(color).r;
-                case green -> Tmp.c1.set(color).g;
-                case blue -> Tmp.c1.set(color).b;
-                default -> super.sense(sensor);
-            };
-        }
-
-        @Override
         public void draw(){
             super.draw();
             Draw.blend(Blending.additive);
