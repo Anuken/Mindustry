@@ -56,7 +56,6 @@ public class MendProjector extends Block{
             stats.add(Stat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
         }
     }
-    
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         //inner circle
