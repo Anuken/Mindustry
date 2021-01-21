@@ -181,7 +181,8 @@ public class ModsDialog extends BaseDialog{
                             table.button(Icon.list, Styles.clearPartiali, 32f, () -> {
                                 orderDate = !orderDate;
                                 rebuildBrowser[0].run();
-                            }).update(b -> b.getStyle().imageUp = (orderDate? Icon.list : Icon.star)).size(40f).get().addListener(new Tooltip(tip -> tip.label(() -> orderDate? "$mods.browser.sortdate" : "$mods.browser.sortstars").left()));
+                            }).update(b -> b.getStyle().imageUp = (orderDate ? Icon.list : Icon.star)).size(40f).get()
+                                .addListener(new Tooltip(tip -> tip.label(() -> orderDate ? "@mods.browser.sortdate" : "@mods.browser.sortstars").left()));
                         }).fillX().padBottom(4);
 
                         browser.cont.row();
@@ -194,11 +195,11 @@ public class ModsDialog extends BaseDialog{
 
                                 getModList(rlistings -> {
                                     tablebrow.clear();
-                                    
+
                                     Seq<ModListing> listings = rlistings;
                                     if(!orderDate){
                                         listings = rlistings.copy();
-                                        listings.sort((m1, m2) -> Integer.compare(m2.stars, m1.stars));
+                                        listings.sortComparing(m1 -> -m1.stars);
                                     }
 
                                     for(ModListing mod : listings){
