@@ -8,6 +8,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.scene.style.*;
+import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
 import arc.struct.*;
 import arc.util.*;
