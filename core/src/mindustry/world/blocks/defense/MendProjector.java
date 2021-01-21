@@ -126,9 +126,9 @@ public class MendProjector extends Block{
             
             if(!cons().optionalValid() && hasBoost && boosterUnlocked()){
                 indexer.eachBlock(this, range + phaseRangeBoost, other -> true, other -> {
-                  if(!Mathf.within(x, y, other.x, other.y, range)){
-                      Drawf.selected(other, phaseColor.cpy().a(Mathf.absin(4f, 1f)));
-                  }
+                    if(!Mathf.within(x, y, other.x, other.y, range)){
+                        Drawf.selected(other, phaseColor.cpy().a(Mathf.absin(4f, 1f)));
+                    }
                 });
                 
                 float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
