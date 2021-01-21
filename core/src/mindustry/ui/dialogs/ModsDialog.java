@@ -180,7 +180,7 @@ public class ModsDialog extends BaseDialog{
                             table.button(Icon.list, Styles.defaulti, 32f, () -> {
                                 orderDate = !orderDate;
                                 rebuildBrowser[0].run();
-                            }).update(b -> b.getStyle().imageUp = (orderDate? Icon.list : Icon.star)).size(40f).get().addListener(new Tooltip(tip -> tip.label(() -> orderDate? "$mod.featured.sortdate" : "$mod.featured.sortstars").left()));
+                            }).update(b -> b.getStyle().imageUp = (orderDate? Icon.list : Icon.star)).size(40f).get().addListener(new Tooltip(tip -> tip.label(() -> orderDate? "$mods.browser.sortdate" : "$mods.browser.sortstars").left()));
                         }).fillX().padBottom(4);
 
                         browser.cont.row();
