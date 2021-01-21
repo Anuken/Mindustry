@@ -43,7 +43,6 @@ public class MendProjector extends Block{
     public boolean outputsItems(){
         return false;
     }
-    
     @Override
     public void setStats(){
         super.setStats();
