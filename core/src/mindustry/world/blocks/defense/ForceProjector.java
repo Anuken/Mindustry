@@ -240,7 +240,6 @@ public class ForceProjector extends Block{
                 float radius = realRadius();
 
                 Draw.z(Layer.shields);
-                
                 Draw.color(team.color.cpy().lerp(phaseColor, phaseHeat), Color.white, Mathf.clamp(hit));
 
                 if(Core.settings.getBool("animatedshields")){
