@@ -62,5 +62,13 @@
   {
     "name": "Minigames",
     "address": ["shizashizashiza.ml"]
+  },
+  {
+    "name": "Korea",
+    "address": ["mindustry.kr"]
+  },
+  {
+    "name": "NikoCHIO",
+    "address": ["nikochio.ddns.net"]
   }
 ]
