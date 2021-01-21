@@ -31,6 +31,7 @@ import static mindustry.Vars.*;
 public class ModsDialog extends BaseDialog{
     private String searchtxt = "";
     private @Nullable Seq<ModListing> modList;
+    private boolean orderDate = true;
 
     public ModsDialog(){
         super("@mods");
@@ -176,6 +177,10 @@ public class ModsDialog extends BaseDialog{
                                 searchtxt = res;
                                 rebuildBrowser[0].run();
                             }).growX().get();
+                            table.button(Icon.list, Styles.defaulti, 32f, () -> {
+                                orderDate = !orderDate;
+                                rebuildBrowser[0].run();
+                            }).update(b -> b.getStyle().imageUp = (orderDate? Icon.list : Icon.star)).size(40f).get().addListener(new Tooltip(tip -> tip.label(() -> orderDate? "$mod.featured.sortdate" : "$mod.featured.sortstars").left()));
                         }).fillX().padBottom(4);
 
                         browser.cont.row();
@@ -186,8 +191,14 @@ public class ModsDialog extends BaseDialog{
                                 tablebrow.clear();
                                 tablebrow.add("@loading");
 
-                                getModList(listings -> {
+                                getModList(rlistings -> {
                                     tablebrow.clear();
+                                    
+                                    Seq<ModListing> listings = rlistings;
+                                    if(!orderDate){
+                                        listings = rlistings.copy();
+                                        listings.sort((m1, m2) -> Integer.compare(m2.stars, m1.stars));
+                                    }
 
                                     for(ModListing mod : listings){
                                         if(mod.hasJava || !searchtxt.isEmpty() && !mod.repo.toLowerCase().contains(searchtxt.toLowerCase()) || (Vars.ios && mod.hasScripts)) continue;
