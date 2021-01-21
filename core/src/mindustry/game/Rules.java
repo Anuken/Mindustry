@@ -46,8 +46,6 @@ public class Rules{
     public boolean unitAmmo = false;
     /** How fast unit pads build units. */
     public float unitBuildSpeedMultiplier = 1f;
-    /** How much health units start with. */
-    public float unitHealthMultiplier = 1f;
     /** How much damage any other units deal. */
     public float unitDamageMultiplier = 1f;
     /** How much health blocks start with. */

@@ -226,7 +226,7 @@ public class PowerNode extends PowerBlock{
             for(Point2 point : (Point2[])req.config){
                 otherReq = null;
                 list.each(other -> {
-                    if((other.x == req.x + point.x && other.y == req.y + point.y) && other != req){
+                    if((other.x == req.x + point.x && other.y == req.y + point.y) && other != req && other.block != null && other.block.hasPower){
                         otherReq = other;
                     }
                 });

@@ -31,7 +31,6 @@ public enum Gamemode{
         rules.buildCostMultiplier = 1f;
         rules.buildSpeedMultiplier = 1f;
         rules.unitBuildSpeedMultiplier = 2f;
-        rules.unitHealthMultiplier = 3f;
         rules.attackMode = true;
     }, map -> map.teams.size > 1),
     editor(true, rules -> {

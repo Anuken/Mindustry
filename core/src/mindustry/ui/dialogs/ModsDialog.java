@@ -221,13 +221,13 @@ public class ModsDialog extends BaseDialog{
                                             sel.keyDown(KeyCode.escape, sel::hide);
                                             sel.keyDown(KeyCode.back, sel::hide);
                                             sel.show();
-                                        }).width(480f).growX().left().fillY();
+                                        }).width(460f).growX().left().fillY();
                                         tablebrow.row();
                                     }
                                 });
                             };
                             rebuildBrowser[0].run();
-                        });
+                        }).get().setScrollingDisabled(true, false);
                         browser.addCloseButton();
                         browser.show();
                     }).margin(12f);
@@ -241,6 +241,7 @@ public class ModsDialog extends BaseDialog{
             if(!mobile){
                 buttons.button("@mods.openfolder", Icon.link, style, () -> Core.app.openFolder(modDirectory.absolutePath())).margin(margin);
             }
+            Styles.clearPartiali
         }).width(w);
 
         cont.row();

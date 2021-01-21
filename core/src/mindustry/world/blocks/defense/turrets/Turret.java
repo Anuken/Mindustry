@@ -111,7 +111,7 @@ public class Turret extends ReloadTurret{
         super.setStats();
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
-        stats.add(Stat.reload, 60f / reloadTime * (alternate ? 1 : shots), StatUnit.none);
+        stats.add(Stat.reload, 60f / (reloadTime + 1) * (alternate ? 1 : shots), StatUnit.none);
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
