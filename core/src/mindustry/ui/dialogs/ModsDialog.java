@@ -241,7 +241,6 @@ public class ModsDialog extends BaseDialog{
             if(!mobile){
                 buttons.button("@mods.openfolder", Icon.link, style, () -> Core.app.openFolder(modDirectory.absolutePath())).margin(margin);
             }
-            Styles.clearPartiali
         }).width(w);
 
         cont.row();
