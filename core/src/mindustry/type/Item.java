@@ -43,7 +43,7 @@ public class Item extends UnlockableContent{
         stats.addPercent(Stat.explosiveness, explosiveness);
         stats.addPercent(Stat.flammability, flammability);
         stats.addPercent(Stat.radioactivity, radioactivity);
-        stats.addPercent(Stat.discharge, charge);
+        stats.addPercent(Stat.charge, charge);
     }
 
     @Override
