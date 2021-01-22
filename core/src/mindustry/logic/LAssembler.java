@@ -61,9 +61,6 @@ public class LAssembler{
         String[] lines = data.split("\n");
         int index = 0;
         for(String line : lines){
-            //comments
-            int commentIdx = line.indexOf('#');
-            if(commentIdx != -1) line = line.substring(0, commentIdx).trim();
             if(line.isEmpty()) continue;
             //remove trailing semicolons in case someone adds them in for no reason
             if(line.endsWith(";")) line = line.substring(0, line.length() - 1);
@@ -83,7 +80,9 @@ public class LAssembler{
 
                     for(int i = 0; i < line.length() + 1; i++){
                         char c = i == line.length() ? ' ' : line.charAt(i);
-                        if(c == '"'){
+                        if(c == '#' && !inString){
+                            break;
+                        }else if(c == '"'){
                             inString = !inString;
                         }else if(c == ' ' && !inString){
                             tokens.add(line.substring(lastIdx, Math.min(i, lastIdx + maxTokenLength)));
@@ -95,6 +94,9 @@ public class LAssembler{
                 }else{
                     arr = new String[]{line};
                 }
+
+                //nothing found
+                if(arr.length == 0) continue;
 
                 String type = arr[0];
 
@@ -131,10 +133,7 @@ public class LAssembler{
                     String first = arr[0];
                     if(customParsers.containsKey(first)){
                         statements.add(customParsers.get(first).get(arr));
-                    }else{
-                        //unparseable statement
-                        statements.add(new InvalidStatement());
-                    }
+                    } //unparseable statement, skip
                 }
             }catch(Exception parseFailed){
                 parseFailed.printStackTrace();
