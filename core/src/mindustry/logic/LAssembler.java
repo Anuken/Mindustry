@@ -71,6 +71,7 @@ public class LAssembler{
 
             try{
                 String[] arr;
+                if(line.startsWith("#")) continue;
 
                 //yes, I am aware that this can be split with regex, but that's slow and even more incomprehensible
                 if(line.contains(" ")){
@@ -133,7 +134,10 @@ public class LAssembler{
                     String first = arr[0];
                     if(customParsers.containsKey(first)){
                         statements.add(customParsers.get(first).get(arr));
-                    } //unparseable statement, skip
+                    }else{
+                        //unparseable statement
+                        statements.add(new InvalidStatement());
+                    }
                 }
             }catch(Exception parseFailed){
                 parseFailed.printStackTrace();
