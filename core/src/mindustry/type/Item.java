@@ -18,7 +18,7 @@ public class Item extends UnlockableContent{
     /** how radioactive this item is. 0=none, 1=chernobyl ground zero */
     public float radioactivity;
     /** how electrically potent this item is. */
-    public float discharge = 0f;
+    public float charge = 0f;
     /** drill hardness of the item */
     public int hardness = 0;
     /**
@@ -43,7 +43,7 @@ public class Item extends UnlockableContent{
         stats.addPercent(Stat.explosiveness, explosiveness);
         stats.addPercent(Stat.flammability, flammability);
         stats.addPercent(Stat.radioactivity, radioactivity);
-        stats.addPercent(Stat.discharge, discharge);
+        stats.addPercent(Stat.discharge, charge);
     }
 
     @Override

@@ -15,7 +15,7 @@ public enum Stat{
     explosiveness,
     flammability,
     radioactivity,
-    discharge,
+    charge,
     heatCapacity,
     viscosity,
     temperature,
