@@ -33,6 +33,7 @@ public enum LAccess{
     team,
     type,
     flag,
+    controlling,
     controlled,
     commanded,
     name,

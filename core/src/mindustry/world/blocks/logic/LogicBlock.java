@@ -486,6 +486,12 @@ public class LogicBlock extends Block{
         }
 
         @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.controlling) return Groups.unit.count(u -> u.controller() instanceof LogicAI ai && ai.controller == this);
+            return super.sense(sensor);
+        }
+
+        @Override
         public byte version(){
             return 1;
         }
