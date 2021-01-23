@@ -292,6 +292,7 @@ public class UnitType extends UnlockableContent{
 
         if(maxRange < 0){
             maxRange = 0f;
+            maxRange = Math.max(maxRange, range);
 
             for(Weapon weapon : weapons){
                 maxRange = Math.max(maxRange, weapon.bullet.range() + hitSize / 2f);
