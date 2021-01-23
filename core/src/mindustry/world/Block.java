@@ -145,6 +145,8 @@ public class Block extends UnlockableContent{
     public boolean conveyorPlacement;
     /** Whether to swap the diagonal placement modes. */
     public boolean swapDiagonalPlacement;
+    /** Build queue priority in schematics. */
+    public int schematicPriority = 0;
     /**
      * The color of this block when displayed on the minimap or map preview.
      * Do not set manually! This is overridden when loading for most blocks.
