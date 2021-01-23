@@ -43,6 +43,7 @@ public class PowerNode extends PowerBlock{
         outputsPower = false;
         canOverdrive = false;
         swapDiagonalPlacement = true;
+        schematicPriority = -10;
         drawDisabled = false;
 
         config(Integer.class, (entity, value) -> {
