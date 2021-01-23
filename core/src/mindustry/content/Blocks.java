@@ -788,6 +788,7 @@ public class Blocks implements ContentList{
             health = 130 * wallHealthMultiplier;
             insulated = true;
             absorbLasers = true;
+            schematicPriority = 10;
         }};
 
         plastaniumWallLarge = new Wall("plastanium-wall-large"){{
