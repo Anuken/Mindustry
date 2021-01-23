@@ -22,6 +22,7 @@ public class PowerDiode extends Block{
         insulated = true;
         group = BlockGroup.power;
         noUpdateDisabled = true;
+        schematicPriority = 10;
     }
 
     @Override
