@@ -61,6 +61,10 @@ abstract class StatusComp implements Posc, Flyingc{
         statuses.add(entry);
     }
 
+    void clearStatuses(){
+        statuses.clear();
+    }
+
     /** Removes a status effect. */
     void unapply(StatusEffect effect){
         statuses.remove(e -> {

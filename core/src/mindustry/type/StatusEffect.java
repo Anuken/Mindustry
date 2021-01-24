@@ -63,6 +63,7 @@ public class StatusEffect extends MappableContent{
 
     protected void trans(StatusEffect effect, TransitionHandler handler){
         transitions.put(effect, handler);
+        effect.transitions.put(this, handler);
     }
 
     protected void opposite(StatusEffect... effect){
