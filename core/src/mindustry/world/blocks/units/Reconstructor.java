@@ -106,6 +106,7 @@ public class Reconstructor extends UnitBlock{
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             return this.payload == null
+                && this.enabled
                 && relativeTo(source) != rotation
                 && payload instanceof UnitPayload
                 && hasUpgrade(((UnitPayload)payload).unit.type);
