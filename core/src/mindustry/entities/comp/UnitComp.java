@@ -130,6 +130,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case y -> World.conv(y);
             case team -> team.id;
             case shooting -> isShooting() ? 1 : 0;
+            case range -> range() / tilesize;
             case shootX -> World.conv(aimX());
             case shootY -> World.conv(aimY());
             case mining -> mining() ? 1 : 0;
