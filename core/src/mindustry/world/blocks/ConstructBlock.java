@@ -120,6 +120,7 @@ public class ConstructBlock extends Block{
         Call.constructFinish(tile, block, builder, rotation, team, config);
         if(tile.build != null){
             tile.build.placed();
+
         }
 
         Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
