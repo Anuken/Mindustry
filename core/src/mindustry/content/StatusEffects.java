@@ -161,10 +161,12 @@ public class StatusEffects implements ContentList{
 
         shocked = new StatusEffect("shocked"){{
             color = Pal.lancerLaser;
+            reactive = true;
         }};
 
         blasted = new StatusEffect("blasted"){{
             color = Color.valueOf("ff795e");
+            reactive = true;
         }};
 
         corroded = new StatusEffect("corroded"){{

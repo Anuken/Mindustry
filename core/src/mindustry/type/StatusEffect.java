@@ -25,6 +25,8 @@ public class StatusEffect extends MappableContent{
     public float effectChance = 0.15f;
     /** If true, the effect never disappears. */
     public boolean permanent;
+    /** If true, this effect will only react with other effects and cannot be applied. */
+    public boolean reactive;
     /** Tint color of effect. */
     public Color color = Color.white.cpy();
     /** Effect that happens randomly on top of the affected unit. */
