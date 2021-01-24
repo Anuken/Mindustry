@@ -8,6 +8,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.scene.style.*;
+import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
 import arc.struct.*;
 import arc.util.*;
@@ -23,12 +24,15 @@ import mindustry.mod.Mods.*;
 import mindustry.ui.*;
 
 import java.io.*;
+import java.text.*;
+import java.util.*;
 
 import static mindustry.Vars.*;
 
 public class ModsDialog extends BaseDialog{
     private String searchtxt = "";
     private @Nullable Seq<ModListing> modList;
+    private boolean orderDate = true;
 
     public ModsDialog(){
         super("@mods");
@@ -74,12 +78,25 @@ public class ModsDialog extends BaseDialog{
                     if(status != HttpStatus.OK){
                         ui.showErrorMessage(Core.bundle.format("connectfail", status));
                     }else{
-                        modList = new Json().fromJson(Seq.class, ModListing.class, strResult);
+                        try{
+                            modList = new Json().fromJson(Seq.class, ModListing.class, strResult);
 
-                        //potentially sort mods by game version compatibility, or other criteria
-                        //modList.sort(Structs.comparingBool(m -> !Version.isAtLeast(m.minGameVersion)));
+                            var d = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                            Func<String, Date> parser = text -> {
+                                try{
+                                    return d.parse(text);
+                                }catch(Exception e){
+                                    throw new RuntimeException(e);
+                                }
+                            };
 
-                        listener.get(modList);
+                            modList.sortComparing(m -> parser.get(m.lastUpdated)).reverse();
+                            listener.get(modList);
+                        }catch(Exception e){
+                            e.printStackTrace();
+                            ui.showException(e);
+                        }
+
                     }
                 });
             }, error -> Core.app.post(() -> ui.showException(error)));
@@ -161,6 +178,11 @@ public class ModsDialog extends BaseDialog{
                                 searchtxt = res;
                                 rebuildBrowser[0].run();
                             }).growX().get();
+                            table.button(Icon.list, Styles.clearPartiali, 32f, () -> {
+                                orderDate = !orderDate;
+                                rebuildBrowser[0].run();
+                            }).update(b -> b.getStyle().imageUp = (orderDate ? Icon.list : Icon.star)).size(40f).get()
+                                .addListener(new Tooltip(tip -> tip.label(() -> orderDate ? "@mods.browser.sortdate" : "@mods.browser.sortstars").left()));
                         }).fillX().padBottom(4);
 
                         browser.cont.row();
@@ -171,8 +193,14 @@ public class ModsDialog extends BaseDialog{
                                 tablebrow.clear();
                                 tablebrow.add("@loading");
 
-                                getModList(listings -> {
+                                getModList(rlistings -> {
                                     tablebrow.clear();
+
+                                    Seq<ModListing> listings = rlistings;
+                                    if(!orderDate){
+                                        listings = rlistings.copy();
+                                        listings.sortComparing(m1 -> -m1.stars);
+                                    }
 
                                     for(ModListing mod : listings){
                                         if(mod.hasJava || !searchtxt.isEmpty() && !mod.repo.toLowerCase().contains(searchtxt.toLowerCase()) || (Vars.ios && mod.hasScripts)) continue;
@@ -206,13 +234,13 @@ public class ModsDialog extends BaseDialog{
                                             sel.keyDown(KeyCode.escape, sel::hide);
                                             sel.keyDown(KeyCode.back, sel::hide);
                                             sel.show();
-                                        }).width(480f).growX().left().fillY();
+                                        }).width(460f).growX().left().fillY();
                                         tablebrow.row();
                                     }
                                 });
                             };
                             rebuildBrowser[0].run();
-                        });
+                        }).get().setScrollingDisabled(true, false);
                         browser.addCloseButton();
                         browser.show();
                     }).margin(12f);

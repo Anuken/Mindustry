@@ -23,12 +23,12 @@
 [*] Coordinate resource distribution between sectors via launch pads
 [*] Research new blocks to fuel progress
 [*] Invite your friends to complete missions together
-[*] 120+ technology blocks to master
+[*] 130+ technology blocks to master
 [*] 33 different types of drones, mechs and ships
 [*] 50+ achievements to complete
 [/list]
 
-[h2][h2]Gamemodes[/h2][/h2]
+[h2]Gamemodes[/h2]
 
 [list]
 [*] [b]Survival[/b]: Build turrets to defend from enemies in tower-defense based gameplay. Survive as long as possible, optionally launching your core to use your collected resources for research. Prepare your base for intermittent attacks from airborne bosses.
@@ -42,7 +42,7 @@
 [h2]Custom Games & Cross-Platform Multiplayer[/h2]
 
 [list]
-[*] 16 built in maps for custom games, in addition to campaign
+[*] 18 built in maps for custom games, in addition to campaign
 [*] Play co-op, PvP or sandbox
 [*] Join a public dedicated server, or invite friends to your own private session
 [*] Customizable game rules: Change block costs, enemy stats, starting items, wave timing and more

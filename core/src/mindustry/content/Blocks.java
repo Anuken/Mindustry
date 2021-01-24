@@ -788,6 +788,7 @@ public class Blocks implements ContentList{
             health = 130 * wallHealthMultiplier;
             insulated = true;
             absorbLasers = true;
+            schematicPriority = 10;
         }};
 
         plastaniumWallLarge = new Wall("plastanium-wall-large"){{
@@ -1312,7 +1313,7 @@ public class Blocks implements ContentList{
         }};
 
         waterExtractor = new SolidPump("water-extractor"){{
-            requirements(Category.production, with(Items.copper, 25, Items.graphite, 25, Items.lead, 20));
+            requirements(Category.production, with(Items.copper, 30, Items.graphite, 30, Items.lead, 30));
             result = Liquids.water;
             pumpAmount = 0.11f;
             size = 2;
@@ -1537,7 +1538,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.laser;
 
             shootType = new LaserBulletType(140){{
-                colors = new Color[]{Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.white};
+                colors = new Color[]{Pal.lancerLaser.cpy().a(0.4f), Pal.lancerLaser, Color.white};
                 hitEffect = Fx.hitLancer;
                 despawnEffect = Fx.none;
                 hitSize = 4;
@@ -1595,7 +1596,7 @@ public class Blocks implements ContentList{
             shots = 4;
             burstSpacing = 5;
             inaccuracy = 10f;
-            range = 190f;
+            range = 200f;
             xRand = 6f;
             size = 2;
             health = 300 * size * size;
@@ -1838,6 +1839,7 @@ public class Blocks implements ContentList{
             shootType = new ContinuousLaserBulletType(70){{
                 length = 200f;
                 hitEffect = Fx.hitMeltdown;
+                hitColor = Pal.meltdownHit;
                 drawSize = 420f;
 
                 incendChance = 0.4f;
@@ -1992,7 +1994,7 @@ public class Blocks implements ContentList{
 
         powerSource = new PowerSource("power-source"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, with());
-            powerProduction = 100000f / 60f;
+            powerProduction = 1000000f / 60f;
             alwaysUnlocked = true;
         }};
 

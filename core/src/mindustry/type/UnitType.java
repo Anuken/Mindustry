@@ -182,11 +182,11 @@ public class UnitType extends UnlockableContent{
 
                 var count = new float[]{-1};
                 bars.table().update(t -> {
-                    if(count[0] != payload.payloadUsed()) {
+                    if(count[0] != payload.payloadUsed()){
                         payload.contentInfo(t, 8 * 2, 270);
                         count[0] = payload.payloadUsed();
                     }
-                }).growX().left();
+                }).growX().left().height(0f).pad(0f);
             }
         }).growX();
 
@@ -292,6 +292,7 @@ public class UnitType extends UnlockableContent{
 
         if(maxRange < 0){
             maxRange = 0f;
+            maxRange = Math.max(maxRange, range);
 
             for(Weapon weapon : weapons){
                 maxRange = Math.max(maxRange, weapon.bullet.range() + hitSize / 2f);

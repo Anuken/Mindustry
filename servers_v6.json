@@ -16,6 +16,10 @@
     "address": ["routerchain.ddns.net", "pandorum.su:8000"]
   },
   {
+    "name": "BE6.RUN",
+    "address": ["be6.run", "mindustrycn.top"]
+  },
+  {
 	"name": "io",
 	"address": ["mindustry.io", "mindustry.io:1000", "mindustry.io:2000", "mindustry.io:3000", "mindustry.io:4000"]
   },
@@ -49,10 +53,22 @@
   },
   {
     "name": "ALEX",
-    "address": ["alexmindustryhub.ddns.net:6568", "alexmindustry.ddns.net:6568", "alexmindustry.ddns.net:6569", "alexmindustryattac.ddns.net:25800"]
+    "address": ["alexmindustryhub.ddns.net:6568", "alexmindustry.ddns.net:6568", "alexmindustry.ddns.net:6569", "alexmindustryattac.ddns.net:25800","alexmindustryturbo.ddns.net:25854","alexmindustryhex.ddns.net:25587"]
   },
   {
     "name": "Minty [subzero]",
     "address": ["minty-server.ddns.net"]
+  },
+  {
+    "name": "Minigames",
+    "address": ["shizashizashiza.ml"]
+  },
+  {
+    "name": "Korea",
+    "address": ["mindustry.kr"]
+  },
+  {
+    "name": "NikoCHIO",
+    "address": ["nikochio.ddns.net"]
   }
 ]

@@ -77,6 +77,11 @@ public class LaunchPad extends Block{
         }
 
         @Override
+        public boolean shouldConsume(){
+            return true;
+        }
+
+        @Override
         public void draw(){
             super.draw();
 

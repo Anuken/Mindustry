@@ -158,7 +158,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
             pad = (width - (itemSize) * items) / items;
         }
 
-        for (Payload p : payloads){
+        for(Payload p : payloads){
             table.image(p.icon(Cicon.small)).size(itemSize).padRight(pad);
         }
     }

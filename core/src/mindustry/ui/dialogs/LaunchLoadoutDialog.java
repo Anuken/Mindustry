@@ -86,7 +86,10 @@ public class LaunchLoadoutDialog extends BaseDialog{
             ItemSeq stacks = universe.getLaunchResources();
             Seq<ItemStack> out = stacks.toSeq();
 
-            loadout.show(selected.findCore().itemCapacity, out, UnlockableContent::unlocked, out::clear, () -> {}, () -> {
+            ItemSeq realItems = sitems.copy();
+            selected.requirements().each(realItems::remove);
+
+            loadout.show(selected.findCore().itemCapacity, realItems, out, UnlockableContent::unlocked, out::clear, () -> {}, () -> {
                 universe.updateLaunchResources(new ItemSeq(out));
                 update.run();
                 rebuildItems.run();

@@ -131,6 +131,11 @@ public class LogicAI extends AIController{
         unit.approach(vec);
     }
 
+    @Override
+    protected boolean checkTarget(Teamc target, float x, float y, float range){
+        return false;
+    }
+
     //always retarget
     @Override
     protected boolean retarget(){

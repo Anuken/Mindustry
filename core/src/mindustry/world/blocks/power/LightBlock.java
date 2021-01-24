@@ -9,6 +9,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -31,6 +32,15 @@ public class LightBlock extends Block{
     public class LightBuild extends Building{
         public int color = Pal.accent.rgba();
         public float smoothTime = 1f;
+
+        @Override
+        public void control(LAccess type, double p1, double p2, double p3, double p4){
+            if(type == LAccess.color){
+                color = Color.rgba8888((float)p1, (float)p2, (float)p3, 1f);
+            }
+
+            super.control(type, p1, p2, p3, p4);
+        }
 
         @Override
         public void draw(){

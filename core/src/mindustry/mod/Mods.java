@@ -72,7 +72,7 @@ public class Mods implements Loadable{
 
     /** Imports an external mod file.*/
     public void importMod(Fi file) throws IOException{
-        Fi dest = modDirectory.child(file.name());
+        Fi dest = modDirectory.child(file.name() + (file.extension().isEmpty() ? ".zip" : ""));
         if(dest.exists()){
             throw new IOException("A file with the same name already exists in the mod folder!");
         }
@@ -720,11 +720,7 @@ public class Mods implements Loadable{
         public boolean isSupported(){
             if(isOutdated()) return false;
 
-            int major = getMinMajor(), minor = getMinMinor();
-
-            if(Version.build <= 0) return true;
-
-            return Version.build >= major && Version.revision >= minor;
+            return Version.isAtLeast(meta.minGameVersion);
         }
 
         /** @return whether this mod is outdated, e.g. not compatible with v6. */
@@ -734,33 +730,9 @@ public class Mods implements Loadable{
         }
 
         public int getMinMajor(){
-            int major = 0;
-
             String ver = meta.minGameVersion == null ? "0" : meta.minGameVersion;
-
-            if(ver.contains(".")){
-                String[] split = ver.split("\\.");
-                if(split.length == 2){
-                    major = Strings.parseInt(split[0], 0);
-                }
-            }else{
-                major = Strings.parseInt(ver, 0);
-            }
-
-            return major;
-        }
-
-        public int getMinMinor(){
-            String ver = meta.minGameVersion == null ? "0" : meta.minGameVersion;
-
-            if(ver.contains(".")){
-                String[] split = ver.split("\\.");
-                if(split.length == 2){
-                    return Strings.parseInt(split[1], 0);
-                }
-            }
-
-            return 0;
+            int dot = ver.indexOf(".");
+            return dot != -1 ? Strings.parseInt(ver.substring(0, dot), 0) : Strings.parseInt(ver, 0);
         }
 
         @Override
@@ -852,6 +824,18 @@ public class Mods implements Loadable{
             if(displayName != null) displayName = Strings.stripColors(displayName);
             if(author != null) author = Strings.stripColors(author);
             if(description != null) description = Strings.stripColors(description);
+        }
+        
+        @Override
+        public String toString() {
+            return "ModMeta{" +
+                    "name='" + name + '\'' +
+                    ", author='" + author + '\'' +
+                    ", version='" + version + '\'' +
+                    ", main='" + main + '\'' +
+                    ", minGameVersion='" + minGameVersion + '\'' +
+                    ", hidden=" + hidden +
+                    '}';
         }
     }
 

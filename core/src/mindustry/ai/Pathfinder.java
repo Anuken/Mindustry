@@ -292,7 +292,7 @@ public class Pathfinder implements Runnable{
             }
         }
 
-        if(current == null || tl == impassable) return tile;
+        if(current == null || tl == impassable || (path.cost == costTypes.items[costGround] && current.dangerous() && !tile.dangerous())) return tile;
 
         return current;
     }
