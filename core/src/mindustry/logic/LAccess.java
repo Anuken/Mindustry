@@ -26,6 +26,7 @@ public enum LAccess{
     y,
     shootX,
     shootY,
+    range, 
     shooting,
     mineX,
     mineY,
