@@ -13,7 +13,6 @@ import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -73,7 +72,7 @@ public class WaveSpawner{
                     for(int i = 0; i < spawned; i++){
                         Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
                         unit.set(spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
-                        unit.add();
+                        spawnEffect(unit);
                     }
                 });
             }else{
@@ -178,8 +177,10 @@ public class WaveSpawner{
     }
 
     private void spawnEffect(Unit unit){
-        Call.spawnEffect(unit.x, unit.y, unit.type);
-        Time.run(30f, unit::add);
+        Call.spawnEffect(unit.x, unit.y, unit);
+        unit.rotation = unit.angleTo(world.width()/2f * tilesize, world.height()/2f * tilesize);
+        unit.apply(StatusEffects.unmoving, 30f);
+        unit.add();
     }
 
     private interface SpawnConsumer{
@@ -187,8 +188,8 @@ public class WaveSpawner{
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void spawnEffect(float x, float y, UnitType type){
-        Fx.unitSpawn.at(x, y, 0f, type);
+    public static void spawnEffect(float x, float y, Unit u){
+        Fx.unitSpawn.at(x, y, 0f, u);
 
         Time.run(30f, () -> Fx.spawn.at(x, y));
     }
