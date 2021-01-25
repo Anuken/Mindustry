@@ -39,9 +39,9 @@ public class Damage{
     /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam){
         if(damage){
-            for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
-                int branches = 5 + Mathf.clamp((int)(power / 30), 1, 20);
-                Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3, x, y, Mathf.random(360f), branches + Mathf.range(2)));
+            for(int i = 0; i < Mathf.clamp(power / 700, 0, 8); i++){
+                int length = 5 + Mathf.clamp((int)(power / 500), 1, 20);
+                Time.run(i * 0.8f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3, x, y, Mathf.random(360f), length + Mathf.range(2)));
             }
 
             if(fire){
