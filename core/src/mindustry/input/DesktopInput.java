@@ -69,11 +69,11 @@ public class DesktopInput extends InputHandler{
             t.table(Styles.black6, b -> {
                 b.defaults().left();
                 b.label(() -> ((!isBuilding || !wasBuilding) && !Core.settings.getBool("buildautopause") && !player.unit().isBuilding() ?
-                        Core.bundle.format("enablebuilding", Core.keybinds.get(Binding.pause_building).key.toString()) :
-                        Core.bundle.format(isBuilding ? "pausebuilding" : "resumebuilding", Core.keybinds.get(Binding.pause_building).key.toString()) +
-                        "\n" + Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString()) +
-                        "\n" + Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematic_select).key.toString())
-                    )).style(Styles.outlineLabel);
+                    Core.bundle.format("enablebuilding", Core.keybinds.get(Binding.pause_building).key.toString()) :
+                    Core.bundle.format(isBuilding ? "pausebuilding" : "resumebuilding", Core.keybinds.get(Binding.pause_building).key.toString()) +
+                    "\n" + Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString()) +
+                    "\n" + Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematic_select).key.toString())
+                )).style(Styles.outlineLabel);
             }).margin(10f);
         });
 
