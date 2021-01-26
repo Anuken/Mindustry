@@ -91,7 +91,7 @@ public class WaveSpawner{
             }
         }
 
-        Time.runTask(121f, () -> spawning = false);
+        Time.run(121f, () -> spawning = false);
     }
 
     public void doShockwave(float x, float y){
@@ -166,6 +166,7 @@ public class WaveSpawner{
     }
 
     private void reset(){
+        spawning = false;
         spawns.clear();
 
         for(Tile tile : world.tiles){
