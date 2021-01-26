@@ -67,7 +67,6 @@ public class ItemTurret extends Turret{
     }
 
     public class ItemTurretBuild extends TurretBuild{
-
         @Override
         public void onProximityAdded(){
             super.onProximityAdded();
@@ -109,36 +108,76 @@ public class ItemTurret extends Turret{
             }
         }
 
-        //currently can't remove items from turrets.
+        public void convertItemToAmmo(){
+            while(ammo.size > 0 ? ammo.peek().amount <= ammoPerShot : true && items.total() > 0){
+                Item item = items.first();
+                boolean found = false;
+
+                if(item == null) break;
+                for(int i = 0; i < ammo.size; i++){
+                    ItemEntry entry = (ItemEntry)ammo.get(i);
+
+                    //if found, put it to the right
+                    if(entry.item == item){
+                        entry.amount += entry.type().ammoMultiplier;
+                        ammo.swap(i, ammo.size - 1);
+                        items.remove(item, 1);
+                        found = true;
+                        break;
+                    }
+                }
+
+                //must not be found
+                if(!found){
+                    ammo.add(new ItemEntry(item, (int)ammoTypes.get(item).ammoMultiplier));
+                    items.remove(item, 1);
+                }
+            }
+
+            updateTotal();
+        }
+
+        /** @return  whether the turret has ammo. */
+        @Override
+        public boolean hasAmmo(){
+            //add ammo if none left
+            convertItemToAmmo();
+            return super.hasAmmo();
+        }
+
         @Override
         public int removeStack(Item item, int amount){
-            return 0;
+            int result = super.removeStack(item, amount);
+            updateTotal();
+            return result;
+        }
+
+        @Override
+        public void itemTaken(Item item){
+            updateTotal();
         }
 
         @Override
         public void handleItem(Building source, Item item){
-
             if(item == Items.pyratite){
                 Events.fire(Trigger.flameAmmo);
             }
 
-            BulletType type = ammoTypes.get(item);
-            totalAmmo += type.ammoMultiplier;
+            items.add(item, 1);
+            updateTotal();
+        }
 
-            //find ammo entry by type
-            for(int i = 0; i < ammo.size; i++){
-                ItemEntry entry = (ItemEntry)ammo.get(i);
+        public void updateTotal(){
+            totalAmmo = 0;
 
-                //if found, put it to the right
-                if(entry.item == item){
-                    entry.amount += type.ammoMultiplier;
-                    ammo.swap(i, ammo.size - 1);
-                    return;
-                }
+            for(Item i : content.items()){
+                BulletType entry = ammoTypes.get(i);
+                totalAmmo += entry == null ? 0 : entry.ammoMultiplier * items.get(i);
             }
 
-            //must not be found
-            ammo.add(new ItemEntry(item, (int)type.ammoMultiplier));
+            for(AmmoEntry entry : ammo){
+                totalAmmo += ((ItemEntry)entry).amount;
+            }
         }
 
         @Override
