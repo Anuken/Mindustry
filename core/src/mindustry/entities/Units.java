@@ -93,7 +93,7 @@ public class Units{
      * @return whether the target is invalid
      */
     public static boolean invalidateTarget(Posc target, Team team, float x, float y, float range){
-        return target == null || (range != Float.MAX_VALUE && !target.within(x, y, range)) || (target instanceof Teamc && ((Teamc)target).team() == team) || (target instanceof Healthc && !((Healthc)target).isValid());
+        return target == null || (range != Float.MAX_VALUE && !target.within(x, y, range)) || (target instanceof Teamc && ((Teamc)target).team() == team) || (target instanceof Healthc && !((Healthc)target).isValid()) || ((target instanceof Unitc u) && !u.targetable(team));
     }
 
     /** See {@link #invalidateTarget(Posc, Team, float, float, float)} */
@@ -197,7 +197,7 @@ public class Units{
         cdist = 0f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(e.dead() || !predicate.get(e) || e.team == Team.derelict) return;
+            if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.targetable(team)) return;
 
             float dst2 = e.dst2(x, y);
             if(dst2 < range*range && (result == null || dst2 < cdist)){
@@ -217,7 +217,7 @@ public class Units{
         cdist = 0f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(e.dead() || !predicate.get(e) || !e.within(x, y, range)) return;
+            if(e.dead() || !predicate.get(e) || !e.within(x, y, range) || !e.targetable(team)) return;
 
             float cost = sort.cost(e, x, y);
             if(result == null || cost < cdist){
@@ -235,7 +235,7 @@ public class Units{
         cdist = 0f;
 
         for(Unit e : Groups.unit){
-            if(!predicate.get(e) || e.team() != team) continue;
+            if(!predicate.get(e) || e.team() != team || !e.targetable(team)) continue;
 
             float dist = e.dst2(x, y);
             if(result == null || dist < cdist){
@@ -253,7 +253,7 @@ public class Units{
         cdist = 0f;
 
         nearby(team, x, y, range, e -> {
-            if(!predicate.get(e)) return;
+            if(!predicate.get(e) || !e.targetable(team)) return;
 
             float dist = e.dst2(x, y);
             if(result == null || dist < cdist){
@@ -272,7 +272,7 @@ public class Units{
         cdist = 0f;
 
         nearby(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(!predicate.get(e)) return;
+            if(!predicate.get(e) || !e.targetable(team)) return;
 
             float dist = e.dst2(x, y);
             if(result == null || dist < cdist){
