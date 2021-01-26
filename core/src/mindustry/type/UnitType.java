@@ -153,7 +153,7 @@ public class UnitType extends UnlockableContent{
 
     public void landed(Unit unit){}
     
-    public boolean targetable(Unit unit){
+    public boolean targetable(Unit unit, Team targeter){
         return true;
     }
 
