@@ -365,7 +365,22 @@ public class Vars implements Loadable{
             //try loading external bundle
             Fi handle = Core.files.local("bundle");
 
-            Locale locale = Locale.ENGLISH;
+            Locale locale;
+            String loc = settings.getString("locale");
+            if(loc.equals("default")){
+                locale = Locale.getDefault();
+            }else{
+                Locale lastLocale;
+                if(loc.contains("_")){
+                    String[] split = loc.split("_");
+                    lastLocale = new Locale(split[0], split[1]);
+                }else{
+                    lastLocale = new Locale(loc);
+                }
+
+                locale = lastLocale;
+            }
+            
             Core.bundle = I18NBundle.createBundle(handle, locale);
 
             Log.info("NOTE: external translation bundle has been loaded.");
