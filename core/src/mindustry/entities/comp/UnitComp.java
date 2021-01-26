@@ -177,6 +177,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //cannot shoot while boosting
         return !(type.canBoost && isFlying());
     }
+    
+    public boolean targetable(Team targeter){
+        return type.targetable(self(), targeter);
+    }
 
     @Override
     public int itemCapacity(){
