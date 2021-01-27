@@ -24,8 +24,6 @@ public class CustomGameDialog extends BaseDialog{
     }
 
     void setup(){
-        clearChildren();
-        add(titleTable);
         row();
         stack(cont, buttons).grow();
         buttons.bottom();
