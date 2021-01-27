@@ -375,7 +375,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean breakable(){
-        return block.destructible || block.breakable || block.update;
+        return block.destructible || block.breakable || block.update || state.rules.revealedBlocks.contains(block);
     }
 
     /** @return whether the floor on this tile deals damage or can be drowned on. */
