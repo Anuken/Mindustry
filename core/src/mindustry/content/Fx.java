@@ -26,23 +26,23 @@ public class Fx{
     none = new Effect(0, 0f, e -> {}),
 
     unitSpawn = new Effect(30f, e -> {
-        if(!(e.data instanceof Unit unit)) return;
+        if(!(e.data instanceof UnitType unit)) return;
 
         float scl = 1f + e.fout() * 2f;
 
-        TextureRegion region = unit.type.icon(Cicon.full);
+        TextureRegion region = unit.icon(Cicon.full);
 
         alpha(e.fout());
         mixcol(Color.white, e.fin());
 
-        rect(region, unit.x, unit.y, 180f);
+        rect(region, e.x, e.y, 180f);
 
         reset();
 
         alpha(e.fin());
 
-        rect(region, unit.x, unit.y,
-            region.width * Draw.scl * scl, region.height * Draw.scl * scl, unit.rotation - 90);
+        rect(region, e.x, e.y,
+            region.width * Draw.scl * scl, region.height * Draw.scl * scl, e.rotation - 90);
 
     }),
 
