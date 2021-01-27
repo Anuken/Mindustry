@@ -752,7 +752,7 @@ public class Fx{
         randLenVectors(e.id, 3, 2f + e.fin() * 7f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, 0.1f + e.fout() * 1.4f);
         });
-    }),
+    }).layer(Layer.highEffect),
 
     fire = new Effect(50f, e -> {
         color(Pal.lightFlame, Pal.darkFlame, e.fin());
@@ -804,7 +804,7 @@ public class Fx{
         randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 1.2f);
         });
-    }),
+    }).layer(Layer.highEffect),
 
     melting = new Effect(40f, e -> {
         color(Liquids.slag.color, Color.white, e.fout() / 5f + Mathf.randomSeedRange(e.id, 0.12f));
@@ -812,21 +812,21 @@ public class Fx{
         randLenVectors(e.id, 2, 1f + e.fin() * 3f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, .2f + e.fout() * 1.2f);
         });
-    }),
+    }).layer(Layer.highEffect),
 
     wet = new Effect(80f, e -> {
         color(Liquids.water.color);
         alpha(Mathf.clamp(e.fin() * 2f));
 
         Fill.circle(e.x, e.y, e.fout());
-    }),
+    }).layer(Layer.highEffect),
 
     muddy = new Effect(80f, e -> {
         color(Color.valueOf("432722"));
         alpha(Mathf.clamp(e.fin() * 2f));
 
         Fill.circle(e.x, e.y, e.fout());
-    }),
+    }).layer(Layer.highEffect),
 
     sapped = new Effect(40f, e -> {
         color(Pal.sap);
@@ -834,7 +834,7 @@ public class Fx{
         randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
             Fill.square(e.x + x, e.y + y, e.fslope() * 1.1f, 45f);
         });
-    }),
+    }).layer(Layer.highEffect),
 
     sporeSlowed = new Effect(40f, e -> {
         color(Pal.spore);
@@ -856,13 +856,13 @@ public class Fx{
         randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
             Fill.square(e.x + x, e.y + y, e.fout() * 2.3f + 0.5f);
         });
-    }),
+    }).layer(Layer.highEffect),
 
     overclocked = new Effect(50f, e -> {
         color(Pal.accent);
 
         Fill.square(e.x, e.y, e.fslope() * 2f, 45f);
-    }),
+    }).layer(Layer.highEffect),
 
     dropItem = new Effect(20f, e -> {
         float length = 20f * e.finpow();
