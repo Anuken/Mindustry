@@ -256,6 +256,8 @@ public class Renderer implements ApplicationListener{
             bloom.resize(graphics.getWidth() / 4, graphics.getHeight() / 4);
             Draw.draw(Layer.bullet - 0.01f, bloom::capture);
             Draw.draw(Layer.effect + 0.01f, bloom::render);
+            Draw.draw(Layer.air - 0.01f, bloom::capture);
+            Draw.draw(Layer.sky + 0.01f, bloom::render);
         }
 
         Draw.draw(Layer.plans, overlays::drawBottom);

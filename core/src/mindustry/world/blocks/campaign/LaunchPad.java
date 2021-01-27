@@ -188,7 +188,7 @@ public class LaunchPad extends Block{
             float cx = cx(), cy = cy();
             float rotation = fin() * (130f + Mathf.randomSeedRange(id(), 50f));
 
-            Draw.z(Layer.effect + 0.001f);
+            Draw.z(Layer.sky - 0.001f);
 
             Draw.color(Pal.engine);
 

@@ -71,17 +71,23 @@ public class Layer{
     //shield effects
     shields = 125,
 
+    //high bloom *bloom begin*
+    air = 130,
+
+    //high bloom *bloom end*
+    sky = 140,
+
     //weather effects, e.g. rain and snow TODO draw before overlay UI?
-    weather = 130,
+    weather = 145,
 
     //light rendering *shaders used*
-    light = 140,
+    light = 150,
 
     //names of players in the game
-    playerName = 150,
+    playerName = 160,
 
     //space effects, currently only the land and launch effects
-    space = 160,
+    space = 170,
 
     //the end of all layers
     end = 200,
