@@ -72,10 +72,10 @@ public class Layer{
     shields = 125,
 
     //high bloom *bloom begin*
-    air = 130,
+    highBullet = 130,
 
     //high bloom *bloom end*
-    sky = 140,
+    highEffect = 140,
 
     //weather effects, e.g. rain and snow TODO draw before overlay UI?
     weather = 145,
