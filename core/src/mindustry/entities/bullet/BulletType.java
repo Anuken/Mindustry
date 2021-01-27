@@ -23,6 +23,7 @@ public abstract class BulletType extends Content{
     public float damage;
     public float hitSize = 4;
     public float drawSize = 40f;
+    public float drawLayer = Layer.bullet;
     public float drag = 0f;
     public boolean pierce, pierceBuilding;
     public int pierceCap = -1;
