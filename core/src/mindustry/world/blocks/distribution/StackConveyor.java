@@ -109,6 +109,8 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public void draw(){
+            Draw.z(Layer.block - 0.2f);
+
             Draw.rect(regions[state], x, y, rotdeg());
 
             for(int i = 0; i < 4; i++){
@@ -117,7 +119,7 @@ public class StackConveyor extends Block implements Autotiler{
                 }
             }
 
-            Draw.z(Layer.blockOver);
+            Draw.z(Layer.block - 0.1f);
 
             Tile from = world.tile(link);
 
@@ -143,6 +145,12 @@ public class StackConveyor extends Block implements Autotiler{
             float size = itemSize * Mathf.lerp(Math.min((float)items.total() / itemCapacity, 1), 1f, 0.4f);
             Drawf.shadow(Tmp.v1.x, Tmp.v1.y, size * 1.2f);
             Draw.rect(lastItem.icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
+        }
+
+        @Override
+        public void drawCracks(){
+            Draw.z(Layer.block - 0.15f);
+            super.drawCracks();
         }
 
         @Override
