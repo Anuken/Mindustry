@@ -291,15 +291,8 @@ public class PowerGraph{
         }
     }
 
-    private void removeSingle(Building tile){
-        all.remove(tile, true);
-        producers.remove(tile, true);
-        consumers.remove(tile, true);
-        batteries.remove(tile, true);
-    }
-
     public void remove(Building tile){
-        removeSingle(tile);
+
         //begin by clearing the closed set
         closedSet.clear();
 
@@ -317,8 +310,6 @@ public class PowerGraph{
             while(queue.size > 0){
                 //get child from queue
                 Building child = queue.removeFirst();
-                //remove it from this graph
-                removeSingle(child);
                 //add it to the new branch graph
                 graph.add(child);
                 //go through connections
