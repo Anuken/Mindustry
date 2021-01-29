@@ -598,12 +598,12 @@ public class MobileInput extends InputHandler implements GestureListener{
             //add to selection queue if it's a valid BREAK position
             selectRequests.add(new BuildPlan(linked.x, linked.y));
         }else{
-            if(!canTapPlayer(worldx, worldy) && !tileTapped(linked.build)){
-                tryBeginMine(cursor);
+            if(!tryStopMine() && !canTapPlayer(worldx, worldy)){
+                tileTapped(linked.build);
             }
 
             //control units.
-            if(count == 2){
+            if(count == 2 && !tryBeginMine(cursor)){
                 //reset payload target
                 payloadTarget = null;
                 //apply command on double tap when own unit is tapped

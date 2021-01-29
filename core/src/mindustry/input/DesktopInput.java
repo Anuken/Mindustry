@@ -45,6 +45,10 @@ public class DesktopInput extends InputHandler{
     public boolean deleting = false, shouldShoot = false, panning = false;
     /** Mouse pan speed. */
     public float panScale = 0.005f, panSpeed = 4.5f, panBoostSpeed = 11f;
+    /** Delta time between consecutive clicks. */
+    public long selectMillis = 0;
+    /** Previously selected tile. */
+    public Tile prevSelected;
 
     @Override
     public void buildUI(Group group){
@@ -486,15 +490,18 @@ public class DesktopInput extends InputHandler{
                 sreq = req;
             }else if(req != null && req.breaking){
                 deleting = true;
+            }else if(selected == prevSelected && Time.timeSinceMillis(selectMillis) < 500){
+                tryBeginMine(selected);
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && !tileTapped(selected.build) && !player.unit().activelyBuilding() && !droppingItem &&
-                    !tryBeginMine(selected) && player.unit().mineTile == null && !Core.scene.hasKeyboard()){
+                if(!tryStopMine() && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && !tileTapped(selected.build) && !player.unit().activelyBuilding() && !droppingItem && !Core.scene.hasKeyboard()){
                     player.shooting = shouldShoot;
                 }
             }else if(!Core.scene.hasKeyboard()){ //if it's out of bounds, shooting is just fine
                 player.shooting = shouldShoot;
             }
+            selectMillis = Time.millis();
+            prevSelected = selected;
         }else if(Core.input.keyTap(Binding.deselect) && isPlacing()){
             block = null;
             mode = none;
