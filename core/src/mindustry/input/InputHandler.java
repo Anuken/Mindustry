@@ -68,6 +68,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public Seq<BuildPlan> lineRequests = new Seq<>();
     public Seq<BuildPlan> selectRequests = new Seq<>();
 
+    public InputHandler(){
+        Events.on(UnitDestroyEvent.class, e -> {
+            if(e.unit != null && e.unit.isPlayer() && e.unit.getPlayer().isLocal() && e.unit.type.weapons.contains(w -> w.bullet.killShooter)){
+                player.shooting = false;
+            }
+        });
+    }
+
     //methods to override
 
     @Remote(called = Loc.server, unreliable = true)

@@ -23,7 +23,7 @@ import java.util.regex.*;
 public class Scripts implements Disposable{
     private final Seq<String> blacklist = Seq.with(".net.", "java.net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
         "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
-        ".awt", "socket", "classloader", "oracle", "invoke", "java.util.function", "java.util.stream", "org.");
+        ".awt", "socket", "classloader", "oracle", "invoke", "java.util.function", "java.util.stream", "org.", "arc.net");
     private final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.", "mindustry.logic.", "mindustry.async.", "saveio", "systemcursor");
     private final Context context;
     private final Scriptable scope;
