@@ -80,9 +80,9 @@ public class Block extends UnlockableContent{
     public boolean breakable;
     /** whether to add this block to brokenblocks */
     public boolean rebuildable = true;
-    /** whether this water can only be placed on water */
+    /** whether this block can only be placed on water */
     public boolean requiresWater = false;
-    /** whether this water can be placed on any liquids, anywhere */
+    /** whether this block can be placed on any liquids, anywhere */
     public boolean placeableLiquid = false;
     /** whether this floor can be placed on. */
     public boolean placeableOn = true;
@@ -145,6 +145,8 @@ public class Block extends UnlockableContent{
     public boolean conveyorPlacement;
     /** Whether to swap the diagonal placement modes. */
     public boolean swapDiagonalPlacement;
+    /** Build queue priority in schematics. */
+    public int schematicPriority = 0;
     /**
      * The color of this block when displayed on the minimap or map preview.
      * Do not set manually! This is overridden when loading for most blocks.
@@ -375,6 +377,8 @@ public class Block extends UnlockableContent{
         if(hasItems && configurable){
             bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
         }
+        
+        if(flags.contains(BlockFlag.unitModifier)) stats.add(Stat.maxUnits, (unitCapModifier < 0 ? "-" : "+") + Math.abs(unitCapModifier));
     }
 
     public boolean canReplace(Block other){
@@ -424,9 +428,7 @@ public class Block extends UnlockableContent{
         TextureRegion reg = getRequestRegion(req, list);
         Draw.rect(reg, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
 
-        if(req.config != null){
-            drawRequestConfig(req, list);
-        }
+        drawRequestConfig(req, list);
     }
 
     public TextureRegion getRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
@@ -437,13 +439,23 @@ public class Block extends UnlockableContent{
 
     }
 
-    public void drawRequestConfigCenter(BuildPlan req, Object content, String region){
-        Color color = content instanceof Item ? ((Item)content).color : content instanceof Liquid ? ((Liquid)content).color : null;
+    public void drawRequestConfigCenter(BuildPlan req, Object content, String region, boolean cross){
+        if(content == null){
+            if(cross){
+                Draw.rect("cross", req.drawx(), req.drawy());
+            }
+            return;
+        }
+        Color color = content instanceof Item i ? i.color : content instanceof Liquid l ? l.color : null;
         if(color == null) return;
 
         Draw.color(color);
         Draw.rect(region, req.drawx(), req.drawy());
         Draw.color();
+    }
+
+    public void drawRequestConfigCenter(BuildPlan req, Object content, String region){
+        drawRequestConfigCenter(req, content, region, false);
     }
 
     public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){

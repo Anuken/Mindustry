@@ -351,10 +351,22 @@ public class EventType{
         }
     }
 
+    /** Called when a unit is created in a reconstructor or factory. */
     public static class UnitCreateEvent{
         public final Unit unit;
+        public final Building spawner;
 
-        public UnitCreateEvent(Unit unit){
+        public UnitCreateEvent(Unit unit, Building spawner){
+            this.unit = unit;
+            this.spawner = spawner;
+        }
+    }
+
+    /** Called when a unit is dumped from any payload block. */
+    public static class UnitUnloadEvent{
+        public final Unit unit;
+
+        public UnitUnloadEvent(Unit unit){
             this.unit = unit;
         }
     }

@@ -12,6 +12,7 @@ import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
@@ -45,7 +46,7 @@ public class ImpactReactor extends PowerGenerator{
 
         bars.add("poweroutput", (GeneratorBuild entity) -> new Bar(() ->
         Core.bundle.format("bar.poweroutput",
-        Strings.fixed(Math.max(entity.getPowerProduction() - consumes.getPower().usage, 0) * 60 * entity.timeScale(), 1)),
+        Strings.fixed(Math.max(entity.getPowerProduction() - consumes.getPower().usage, 0) * 60 * entity.timeScale, 1)),
         () -> Pal.powerBar,
         () -> entity.productionEfficiency));
     }
@@ -72,7 +73,7 @@ public class ImpactReactor extends PowerGenerator{
             if(consValid() && power.status >= 0.99f){
                 boolean prevOut = getPowerProduction() <= consumes.getPower().requestedPower(this);
 
-                warmup = Mathf.lerpDelta(warmup, 1f, warmupSpeed);
+                warmup = Mathf.lerpDelta(warmup, 1f, warmupSpeed * timeScale);
                 if(Mathf.equal(warmup, 1f, 0.001f)){
                     warmup = 1f;
                 }
@@ -81,7 +82,7 @@ public class ImpactReactor extends PowerGenerator{
                     Events.fire(Trigger.impactPower);
                 }
 
-                if(timer(timerUse, itemDuration / timeScale())){
+                if(timer(timerUse, itemDuration / timeScale)){
                     consume();
                 }
             }else{
@@ -120,6 +121,12 @@ public class ImpactReactor extends PowerGenerator{
         @Override
         public void drawLight(){
             Drawf.light(team, x, y, (110f + Mathf.absin(5, 5f)) * warmup, Tmp.c1.set(plasma2).lerp(plasma1, Mathf.absin(7f, 0.2f)), 0.8f * warmup);
+        }
+        
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.heat) return warmup;
+            return super.sense(sensor);
         }
 
         @Override

@@ -54,6 +54,7 @@ public class Turret extends ReloadTurret{
     public float coolantUsage = 0.2f;
     public float shootCone = 8f;
     public float shootShake = 0f;
+    public float shootLength = -1;
     public float xRand = 0f;
     /** Currently used for artillery only. */
     public float minRange = 0f;
@@ -110,7 +111,7 @@ public class Turret extends ReloadTurret{
         super.setStats();
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
-        stats.add(Stat.reload, 60f / reloadTime * (alternate ? 1 : shots), StatUnit.none);
+        stats.add(Stat.reload, 60f / (reloadTime + 1) * (alternate ? 1 : shots), StatUnit.none);
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
@@ -122,6 +123,8 @@ public class Turret extends ReloadTurret{
             hasLiquids = true;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, coolantUsage)).update(false).boost();
         }
+        
+        if(shootLength < 0) shootLength = size * tilesize / 2f;
 
         super.init();
     }
@@ -210,7 +213,7 @@ public class Turret extends ReloadTurret{
         }
 
         public void targetPosition(Posc pos){
-            if(!hasAmmo() || target == null) return;
+            if(!hasAmmo() || pos == null) return;
             BulletType bullet = peekAmmo();
             float speed = bullet.speed;
             //slow bullets never intersect
@@ -218,7 +221,7 @@ public class Turret extends ReloadTurret{
 
             targetPos.set(Predict.intercept(this, pos, speed));
             if(targetPos.isZero()){
-                targetPos.set(target);
+                targetPos.set(pos);
             }
         }
 
@@ -371,14 +374,14 @@ public class Turret extends ReloadTurret{
             if(chargeTime > 0){
                 useAmmo();
 
-                tr.trns(rotation, size * tilesize / 2f);
+                tr.trns(rotation, shootLength);
                 chargeBeginEffect.at(x + tr.x, y + tr.y, rotation);
                 chargeSound.at(x + tr.x, y + tr.y, 1);
 
                 for(int i = 0; i < chargeEffects; i++){
                     Time.run(Mathf.random(chargeMaxDelay), () -> {
                         if(!isValid()) return;
-                        tr.trns(rotation, size * tilesize / 2f);
+                        tr.trns(rotation, shootLength);
                         chargeEffect.at(x + tr.x, y + tr.y, rotation);
                     });
                 }
@@ -387,7 +390,7 @@ public class Turret extends ReloadTurret{
 
                 Time.run(chargeTime, () -> {
                     if(!isValid()) return;
-                    tr.trns(rotation, size * tilesize / 2f);
+                    tr.trns(rotation, shootLength);
                     recoil = recoilAmount;
                     heat = 1f;
                     bullet(type, rotation + Mathf.range(inaccuracy));
@@ -403,7 +406,7 @@ public class Turret extends ReloadTurret{
 
                         recoil = recoilAmount;
 
-                        tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
+                        tr.trns(rotation, shootLength, Mathf.range(xRand));
                         bullet(type, rotation + Mathf.range(inaccuracy));
                         effects();
                         useAmmo();
@@ -418,10 +421,10 @@ public class Turret extends ReloadTurret{
                 if(alternate){
                     float i = (shotCounter % shots) - (shots-1)/2f;
 
-                    tr.trns(rotation - 90, spread * i + Mathf.range(xRand), size * tilesize / 2f);
+                    tr.trns(rotation - 90, spread * i + Mathf.range(xRand), shootLength);
                     bullet(type, rotation + Mathf.range(inaccuracy));
                 }else{
-                    tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
+                    tr.trns(rotation, shootLength, Mathf.range(xRand));
 
                     for(int i = 0; i < shots; i++){
                         bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - (int)(shots / 2f)) * spread);

@@ -35,6 +35,7 @@ public class LogicDisplay extends Block{
         update = true;
         solid = true;
         group = BlockGroup.logic;
+        drawDisabled = false;
     }
 
     @Override

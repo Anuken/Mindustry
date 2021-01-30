@@ -155,7 +155,7 @@ public class NetServer implements ApplicationListener{
                 if(!extraMods.isEmpty()){
                     result.append("Unnecessary mods:[lightgray]\n").append("> ").append(extraMods.toString("\n> "));
                 }
-                con.kick(result.toString());
+                con.kick(result.toString(), 0);
             }
 
             if(!admins.isWhitelisted(packet.uuid, packet.usid)){

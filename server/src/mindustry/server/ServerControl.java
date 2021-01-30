@@ -502,7 +502,7 @@ public class ServerControl implements ApplicationListener{
             }
 
             for(Item item : content.items()){
-                state.teams.cores(team).first().items.set(item, state.teams.cores(team).first().block.itemCapacity);
+                state.teams.cores(team).first().items.set(item, state.teams.cores(team).first().storageCapacity);
             }
 
             info("Core filled.");
@@ -1045,7 +1045,7 @@ public class ServerControl implements ApplicationListener{
                 }catch(BindException b){
                     err("Command input socket already in use. Is another instance of the server running?");
                 }catch(IOException e){
-                    if(!e.getMessage().equals("Socket closed")){
+                    if(!e.getMessage().equals("Socket closed") && !e.getMessage().equals("Connection reset")){
                         err("Terminating socket server.");
                         err(e);
                     }

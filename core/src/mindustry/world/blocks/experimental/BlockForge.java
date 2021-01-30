@@ -18,6 +18,7 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -55,6 +56,14 @@ public class BlockForge extends PayloadAcceptor{
 
         bars.add("progress", (BlockForgeBuild entity) -> new Bar("bar.progress", Pal.ammo, () -> entity.recipe == null ? 0f : (entity.progress / entity.recipe.buildCost)));
     }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.output, "@x@ ~ @x@", minBlockSize, minBlockSize, maxBlockSize, maxBlockSize);
+    }
+
 
     @Override
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){

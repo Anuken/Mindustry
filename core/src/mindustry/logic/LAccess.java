@@ -26,6 +26,7 @@ public enum LAccess{
     y,
     shootX,
     shootY,
+    range, 
     shooting,
     mineX,
     mineY,
@@ -44,7 +45,8 @@ public enum LAccess{
     enabled("to"), //"to" is standard for single parameter access
     shoot("x", "y", "shoot"),
     shootp(true, "unit", "shoot"),
-    configure(true, 30, "to");
+    configure(true, 30, "to"),
+    color("r", "g", "b");
 
     public final String[] params;
     public final boolean isObj;

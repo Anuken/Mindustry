@@ -9,9 +9,8 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.io.*;
 
-public class Weapon{
+public class Weapon implements Cloneable{
     /** displayed weapon region */
     public String name = "";
     /** bullet shot */
@@ -98,9 +97,11 @@ public class Weapon{
     }
 
     public Weapon copy(){
-        Weapon out = new Weapon();
-        JsonIO.json().copyFields(this, out);
-        return out;
+        try{
+            return (Weapon)clone();
+        }catch(CloneNotSupportedException suck){
+            throw new RuntimeException("very good language design", suck);
+        }
     }
 
     public void load(){

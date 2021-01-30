@@ -55,10 +55,16 @@ abstract class StatusComp implements Posc, Flyingc{
             }
         }
 
-        //otherwise, no opposites found, add direct effect
-        StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
-        entry.set(effect, duration);
-        statuses.add(entry);
+        if(!effect.reactive){
+            //otherwise, no opposites found, add direct effect
+            StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
+            entry.set(effect, duration);
+            statuses.add(entry);
+        }
+    }
+
+    void clearStatuses(){
+        statuses.clear();
     }
 
     /** Removes a status effect. */

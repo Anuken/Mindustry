@@ -80,6 +80,7 @@ abstract class CommanderComp implements Entityc, Posc{
 
     void command(Formation formation, Seq<Unit> units){
         clearCommand();
+        units.shuffle();
 
         float spacing = hitSize * 0.8f;
         minFormationSpeed = type.speed;

@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -108,7 +109,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
                 plans.removeFirst();
                 return;
             }
-        }else if((tile.team() != team && tile.team() != Team.derelict) || (!current.breaking && cb.cblock != current.block)){
+        }else if((tile.team() != team && tile.team() != Team.derelict) || (!current.breaking && (cb.cblock != current.block || cb.tile != current.tile()))){
             plans.removeFirst();
             return;
         }
@@ -136,10 +137,17 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
 
     /** Draw all current build plans. Does not draw the beam effect, only the positions. */
     void drawBuildPlans(){
+        Boolf<BuildPlan> skip = plan -> plan.progress > 0.01f || (buildPlan() == plan && plan.initialized && (within(plan.x * tilesize, plan.y * tilesize, buildingRange) || state.isEditor()));
 
-        for(BuildPlan plan : plans){
-            if(plan.progress > 0.01f || (buildPlan() == plan && plan.initialized && (within(plan.x * tilesize, plan.y * tilesize, buildingRange) || state.isEditor()))) continue;
-            drawPlan(plan, 1f);
+        for(int i = 0; i < 2; i++){
+            for(BuildPlan plan : plans){
+                if(skip.get(plan)) continue;
+                if(i == 0){
+                    drawPlan(plan, 1f);
+                }else{
+                    drawPlanTop(plan, 1f);
+                }
+            }
         }
 
         Draw.reset();
@@ -153,7 +161,11 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
             request.block.drawPlan(request, control.input.allRequests(),
             Build.validPlace(request.block, team, request.x, request.y, request.rotation) || control.input.requestMatches(request),
             alpha);
+        }
+    }
 
+    void drawPlanTop(BuildPlan request, float alpha){
+        if(!request.breaking){
             Draw.reset();
             Draw.mixcol(Color.white, 0.24f + Mathf.absin(Time.globalTime, 6f, 0.28f));
             Draw.alpha(alpha);
@@ -251,6 +263,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         if(core != null && active && !isLocal() && !(tile.block() instanceof ConstructBlock)){
             Draw.z(Layer.plans - 1f);
             drawPlan(plan, 0.5f);
+            drawPlanTop(plan, 0.5f);
             Draw.z(Layer.flyingUnit);
         }
 

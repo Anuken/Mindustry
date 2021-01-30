@@ -46,8 +46,6 @@ public class Rules{
     public boolean unitAmmo = false;
     /** How fast unit pads build units. */
     public float unitBuildSpeedMultiplier = 1f;
-    /** How much health units start with. */
-    public float unitHealthMultiplier = 1f;
     /** How much damage any other units deal. */
     public float unitDamageMultiplier = 1f;
     /** How much health blocks start with. */
@@ -97,6 +95,8 @@ public class Rules{
     public Team waveTeam = Team.crux;
     /** name of the custom mode that this ruleset describes, or null. */
     public @Nullable String modeName;
+    /** Whether cores incinerate items when full, just like in the campaign. */
+    public boolean coreIncinerates = false;
     /** special tags for additional info. */
     public StringMap tags = new StringMap();
 

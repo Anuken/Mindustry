@@ -30,7 +30,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     Object data;
     BulletType type;
     float fdata;
-    transient boolean absorbed;
+    transient boolean absorbed, hit;
 
     @Override
     public void getCollisions(Cons<QuadTree> consumer){

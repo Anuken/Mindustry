@@ -3,6 +3,7 @@ package mindustry.logic;
 import arc.*;
 import arc.func.*;
 import arc.scene.ui.TextButton.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
@@ -34,6 +35,11 @@ public class LogicDialog extends BaseDialog{
                 p.table(Tex.button, t -> {
                     TextButtonStyle style = Styles.cleart;
                     t.defaults().size(280f, 60f).left();
+
+                    t.button("@schematic.copy", Icon.copy, style, () -> {
+                        dialog.hide();
+                        Core.app.setClipboardText(canvas.save());
+                    }).marginLeft(12f);
                     t.row();
                     t.button("@schematic.copy.import", Icon.download, style, () -> {
                         dialog.hide();
@@ -43,11 +49,6 @@ public class LogicDialog extends BaseDialog{
                             ui.showException(e);
                         }
                     }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null);
-                    t.row();
-                    t.button("@schematic.copy", Icon.copy, style, () -> {
-                        dialog.hide();
-                        Core.app.setClipboardText(canvas.save());
-                    }).marginLeft(12f);
                 });
             });
 
@@ -90,16 +91,20 @@ public class LogicDialog extends BaseDialog{
         onResize(() -> canvas.rebuild());
     }
 
-    public void show(String code, Cons<String> consumer){
+    public void show(String code, Cons<String> modified){
         canvas.statements.clearChildren();
         canvas.rebuild();
         try{
             canvas.load(code);
         }catch(Throwable t){
-            t.printStackTrace();
+            Log.err(t);
             canvas.load("");
         }
-        this.consumer = consumer;
+        this.consumer = result -> {
+            if(!result.equals(code)){
+                modified.get(result);
+            }
+        };
 
         show();
     }

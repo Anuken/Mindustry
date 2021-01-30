@@ -22,6 +22,7 @@ public class PowerDiode extends Block{
         insulated = true;
         group = BlockGroup.power;
         noUpdateDisabled = true;
+        schematicPriority = 10;
     }
 
     @Override
@@ -71,8 +72,8 @@ public class PowerDiode extends Block{
                 // prevent sending more than the front can handle
                 amount = Mathf.clamp(amount, 0, frontGraph.getTotalBatteryCapacity() * (1 - frontStored));
 
-                backGraph.useBatteries(amount);
-                frontGraph.chargeBatteries(amount);
+                backGraph.transferPower(-amount);
+                frontGraph.transferPower(amount);
             }
         }
     }

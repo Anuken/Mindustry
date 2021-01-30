@@ -41,7 +41,7 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
 
     @Override
     public boolean valid(Building entity){
-        return entity != null && entity.liquids != null && entity.liquids.get(liquid) >= use(entity);
+        return entity != null && entity.liquids != null && entity.liquids.get(liquid) >= amount * entity.edelta();
     }
 
     @Override

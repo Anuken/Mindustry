@@ -46,10 +46,10 @@ public class FormationAI extends AIController implements FormationMember{
             unit.lookAt(unit.vel.angle());
         }
 
-        Vec2 realtarget = vec.set(target).add(leader.vel.x, leader.vel.y);
+        Vec2 realtarget = vec.set(target).add(leader.vel);
 
-        float speed = unit.realSpeed() * unit.floorSpeedMultiplier();
-        unit.approach(Mathf.arrive(unit.x, unit.y, realtarget.x, realtarget.y, unit.vel, 0f, 0.01f, speed, 1f));
+        float speed = unit.realSpeed() * unit.floorSpeedMultiplier() * Time.delta;
+        unit.approach(Mathf.arrive(unit.x, unit.y, realtarget.x, realtarget.y, unit.vel, speed, 0f, speed, 1f).scl(1f / Time.delta));
 
         if(unit.canMine() && leader.canMine()){
             if(leader.mineTile != null && unit.validMine(leader.mineTile)){

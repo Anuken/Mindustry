@@ -526,16 +526,15 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
-    //TODO move?
-
     public static String formatAmount(int number){
-        if(number >= 1_000_000_000){
+        int mag = Math.abs(number);
+        if(mag >= 1_000_000_000){
             return Strings.fixed(number / 1_000_000_000f, 1) + "[gray]" + Core.bundle.get("unit.billions") + "[]";
-        }else if(number >= 1_000_000){
+        }else if(mag >= 1_000_000){
             return Strings.fixed(number / 1_000_000f, 1) + "[gray]" + Core.bundle.get("unit.millions") + "[]";
-        }else if(number >= 10_000){
+        }else if(mag >= 10_000){
             return number / 1000 + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
-        }else if(number >= 1000){
+        }else if(mag >= 1000){
             return Strings.fixed(number / 1000f, 1) + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
         }else{
             return number + "";

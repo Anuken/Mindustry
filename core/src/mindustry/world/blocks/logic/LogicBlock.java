@@ -317,17 +317,6 @@ public class LogicBlock extends Block{
                     asm.putConst("@links", executor.links.length);
                     asm.putConst("@ipt", instructionsPerTick);
 
-                    //store any older variables
-                    for(Var var : executor.vars){
-                        boolean unit = var.name.equals("@unit");
-                        if(!var.constant || unit){
-                            BVar dest = asm.getVar(var.name);
-                            if(dest != null && (!dest.constant || unit)){
-                                dest.value = var.isobj ? var.objval : var.numval;
-                            }
-                        }
-                    }
-
                     //inject any extra variables
                     if(assemble != null){
                         assemble.get(asm);
@@ -477,9 +466,7 @@ public class LogicBlock extends Block{
         @Override
         public void buildConfiguration(Table table){
             table.button(Icon.pencil, Styles.clearTransi, () -> {
-                Vars.ui.logic.show(code, code -> {
-                    configure(compress(code, relativeConnections()));
-                });
+                Vars.ui.logic.show(code, code -> configure(compress(code, relativeConnections())));
             }).size(40);
         }
 
@@ -542,7 +529,6 @@ public class LogicBlock extends Block{
                 read.b(bytes);
                 readCompressed(bytes, false);
             }else{
-
                 code = read.str();
                 links.clear();
                 short total = read.s();
@@ -579,19 +565,6 @@ public class LogicBlock extends Block{
                     }
                 }
             });
-        }
-    }
-
-    public static class LogicConfig{
-        public String code;
-        public IntSeq connections;
-
-        public LogicConfig(String code, IntSeq connections){
-            this.code = code;
-            this.connections = connections;
-        }
-
-        public LogicConfig(){
         }
     }
 }

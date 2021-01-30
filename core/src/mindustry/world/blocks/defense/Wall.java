@@ -37,6 +37,7 @@ public class Wall extends Block{
         group = BlockGroup.walls;
         buildCostMultiplier = 6f;
         canOverdrive = false;
+        drawDisabled = false;
     }
 
     @Override

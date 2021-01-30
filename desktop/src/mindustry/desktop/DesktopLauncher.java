@@ -109,7 +109,7 @@ public class DesktopLauncher extends ClientLauncher{
         steamError = e;
         loadError = true;
         Log.err(e);
-        try(OutputStream s = new FileOutputStream(new File("steam-error-log-" + System.nanoTime() + ".txt"))){
+        try(OutputStream s = new FileOutputStream("steam-error-log-" + System.nanoTime() + ".txt")){
             String log = Strings.neatError(e);
             s.write(log.getBytes());
         }catch(Exception e2){

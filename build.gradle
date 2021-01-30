@@ -410,3 +410,12 @@ task deployAll{
     dependsOn "server:deploy"
     dependsOn "android:deploy"
 }
+
+task resolveDependencies{
+    doLast{
+        rootProject.allprojects{ project ->
+            Set<Configuration> configurations = project.buildscript.configurations + project.configurations
+            configurations.findAll{c -> c.canBeResolved}.forEach{c -> c.resolve()}
+        }
+    }
+}

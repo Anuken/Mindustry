@@ -44,7 +44,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public final PlanetRenderer planets = renderer.planets;
     public final LaunchLoadoutDialog loadouts = new LaunchLoadoutDialog();
 
-    public int launchRange;
     public float zoom = 1f, selectAlpha = 1f;
     public @Nullable Sector selected, hovered, launchSector;
     public Mode mode = look;
@@ -511,7 +510,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             hoverLabel.touchable = Touchable.disabled;
 
             Vec3 pos = planets.cam.project(Tmp.v31.set(hovered.tile.v).setLength(PlanetRenderer.outlineRad).rotate(Vec3.Y, -planets.planet.getRotation()).add(planets.planet.position));
-            hoverLabel.setPosition(pos.x, pos.y - Core.scene.marginBottom, Align.center);
+            hoverLabel.setPosition(pos.x - Core.scene.marginLeft, pos.y - Core.scene.marginBottom, Align.center);
 
             hoverLabel.getText().setLength(0);
             if(hovered != null){

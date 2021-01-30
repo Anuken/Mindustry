@@ -569,7 +569,7 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem){
+            if(from instanceof MemoryBuild mem && from.team == exec.team){
 
                 exec.setnum(output, address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
             }
@@ -593,7 +593,7 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem){
+            if(from instanceof MemoryBuild mem && from.team == exec.team){
 
                 if(address >= 0 && address < mem.memory.length){
                     mem.memory[address] = exec.num(value);
@@ -620,7 +620,7 @@ public class LExecutor{
             Object target = exec.obj(from);
             Object sense = exec.obj(type);
 
-            //TODO should remote enemy buildings be senseable?
+            //note that remote units/buildings can be sensed as well
             if(target instanceof Senseable se){
                 if(sense instanceof Content){
                     exec.setnum(to, se.sense(((Content)sense)));
@@ -857,8 +857,7 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless) return;
 
-            Building build = exec.building(target);
-            if(build instanceof LogicDisplayBuild d){
+            if(exec.building(target) instanceof LogicDisplayBuild d && d.team == exec.team){
                 if(d.commands.size + exec.graphicsBuffer.size < maxDisplayBuffer){
                     for(int i = 0; i < exec.graphicsBuffer.size; i++){
                         d.commands.addLast(exec.graphicsBuffer.items[i]);
@@ -889,6 +888,7 @@ public class LExecutor{
                 String strValue =
                     v.objval == null ? "null" :
                     v.objval instanceof String s ? s :
+                    v.objval == Blocks.stoneWall ? "solid" : //special alias
                     v.objval instanceof MappableContent content ? content.name :
                     v.objval instanceof Content ? "[content]" :
                     v.objval instanceof Building build ? build.block.name :
@@ -920,8 +920,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
-            Building build = exec.building(target);
-            if(build instanceof MessageBuild d){
+            if(exec.building(target) instanceof MessageBuild d && d.team == exec.team){
 
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
@@ -952,7 +951,7 @@ public class LExecutor{
                 Var vb = exec.var(compare);
                 boolean cmp;
 
-                if(op.objFunction != null && (va.isobj || vb.isobj)){
+                if(op.objFunction != null && va.isobj && vb.isobj){
                     //use object function if provided, and one of the variables is an object
                     cmp = op.objFunction.get(exec.obj(value), exec.obj(compare));
                 }else{
