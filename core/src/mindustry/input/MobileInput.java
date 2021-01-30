@@ -602,7 +602,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 tileTapped(linked.build);
             }
 
-            //control units.
+            //control units
             if(count == 2 && !tryBeginMine(cursor)){
                 //reset payload target
                 payloadTarget = null;
