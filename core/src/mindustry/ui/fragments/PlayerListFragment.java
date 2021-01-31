@@ -62,9 +62,9 @@ public class PlayerListFragment extends Fragment{
                     menu.defaults().growX().height(50f).fillY();
                     menu.name = "menu";
 
-                    menu.button("@server.bans", ui.bans::show).disabled(b -> net.client());
-                    menu.button("@server.admins", ui.admins::show).disabled(b -> net.client());
-                    menu.button("@close", this::toggle);
+                    menu.button("@server.bans", ui.bans::show).disabled(b -> net.client()).get().getLabel().setWrap(false);
+                    menu.button("@server.admins", ui.admins::show).disabled(b -> net.client()).get().getLabel().setWrap(false);
+                    menu.button("@close", this::toggle).get().getLabel().setWrap(false);
                 }).margin(0f).pad(10f).growX();
 
             }).touchable(Touchable.enabled).margin(14f);
