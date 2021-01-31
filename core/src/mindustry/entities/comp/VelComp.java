@@ -22,7 +22,7 @@ abstract class VelComp implements Posc{
     @Override
     public void update(){
         move(vel.x * Time.delta, vel.y * Time.delta);
-        vel.scl(Mathf.clamp(1f - drag * Time.delta));
+        vel.scl(1f - drag * Time.delta);
     }
 
     /** @return function to use for check solid state. if null, no checking is done. */
