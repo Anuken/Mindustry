@@ -310,7 +310,7 @@ public class MapGenerateDialog extends BaseDialog{
                 selection.hide();
             });
         }).get().setScrollingDisabled(true, false);
-        F
+
         selection.addCloseButton();
         selection.show();
     }
