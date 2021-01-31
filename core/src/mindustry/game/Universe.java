@@ -123,6 +123,7 @@ public class Universe{
     }
 
     /** @return the last selected loadout for this specific core type. */
+    @Nullable
     public Schematic getLoadout(CoreBlock core){
         //for tools - schem
         if(schematics == null) return Loadouts.basicShard;
@@ -134,7 +135,7 @@ public class Universe{
         Seq<Schematic> all = schematics.getLoadouts(core);
         Schematic schem = all.find(s -> s.file != null && s.file.nameWithoutExtension().equals(file));
 
-        return schem == null ? all.first() : schem;
+        return schem == null ? all.any() ? all.first() : null : schem;
     }
 
     /** Runs possible events. Resets event counter. */

@@ -888,6 +888,7 @@ public class LExecutor{
                 String strValue =
                     v.objval == null ? "null" :
                     v.objval instanceof String s ? s :
+                    v.objval == Blocks.stoneWall ? "solid" : //special alias
                     v.objval instanceof MappableContent content ? content.name :
                     v.objval instanceof Content ? "[content]" :
                     v.objval instanceof Building build ? build.block.name :

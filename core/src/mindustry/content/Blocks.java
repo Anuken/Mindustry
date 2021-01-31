@@ -1662,6 +1662,7 @@ public class Blocks implements ContentList{
             shootEffect = Fx.shootLiquid;
             range = 190f;
             health = 250 * size * size;
+            flags = EnumSet.of(BlockFlag.turret, BlockFlag.extinguisher);
         }};
 
         fuse = new ItemTurret("fuse"){{

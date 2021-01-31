@@ -35,6 +35,11 @@ public class LogicDialog extends BaseDialog{
                 p.table(Tex.button, t -> {
                     TextButtonStyle style = Styles.cleart;
                     t.defaults().size(280f, 60f).left();
+
+                    t.button("@schematic.copy", Icon.copy, style, () -> {
+                        dialog.hide();
+                        Core.app.setClipboardText(canvas.save());
+                    }).marginLeft(12f);
                     t.row();
                     t.button("@schematic.copy.import", Icon.download, style, () -> {
                         dialog.hide();
@@ -44,11 +49,6 @@ public class LogicDialog extends BaseDialog{
                             ui.showException(e);
                         }
                     }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null);
-                    t.row();
-                    t.button("@schematic.copy", Icon.copy, style, () -> {
-                        dialog.hide();
-                        Core.app.setClipboardText(canvas.save());
-                    }).marginLeft(12f);
                 });
             });
 

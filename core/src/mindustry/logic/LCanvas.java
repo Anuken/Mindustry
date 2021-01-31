@@ -283,13 +283,13 @@ public class LCanvas extends Table{
                 t.add().growX();
 
                 t.button(Icon.copy, Styles.logici, () -> {
-                }).padRight(6).get().tapped(this::copy);
+                }).size(24f).padRight(6).get().tapped(this::copy);
 
                 t.button(Icon.cancel, Styles.logici, () -> {
                     remove();
                     dragging = null;
                     statements.layout();
-                });
+                }).size(24f);
 
                 t.addListener(new InputListener(){
                     float lastx, lasty;

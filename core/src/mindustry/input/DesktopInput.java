@@ -204,7 +204,6 @@ public class DesktopInput extends InputHandler{
             if(input.keyDown(Binding.mouse_move)){
                 panCam = true;
             }
-            panning = false;
 
             Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(camSpeed));
         }else if(!player.dead() && !panning){

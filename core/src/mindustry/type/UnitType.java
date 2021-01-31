@@ -299,6 +299,10 @@ public class UnitType extends UnlockableContent{
             }
         }
 
+        if(weapons.isEmpty()){
+            range = maxRange = 0f;
+        }
+
         if(mechStride < 0){
             mechStride = 4f + (hitSize -8f)/2.1f;
         }
