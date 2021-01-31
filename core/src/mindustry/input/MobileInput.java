@@ -603,7 +603,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
 
             //control units
-            if(count == 2 && !tryBeginMine(cursor)){
+            if(count == 2){
                 //reset payload target
                 payloadTarget = null;
                 //apply command on double tap when own unit is tapped
@@ -614,6 +614,8 @@ public class MobileInput extends InputHandler implements GestureListener{
                     Unit on = selectedUnit();
                     if(on != null){
                         Call.unitControl(player, on);
+                    }else{
+                        tryBeginMine(cursor);
                     }
                 }
             }
