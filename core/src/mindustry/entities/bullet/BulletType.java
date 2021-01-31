@@ -92,6 +92,7 @@ public abstract class BulletType extends Content{
 
     public float fragCone = 360f;
     public float fragAngle = 0f;
+    public float fragSpread = 0f;
     public int fragBullets = 9;
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
     public @Nullable BulletType fragBullet = null;
@@ -198,7 +199,7 @@ public abstract class BulletType extends Content{
         if(fragBullet != null){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
-                float a = b.rotation() + Mathf.range(fragCone/2) + fragAngle;
+                float a = b.rotation() + Mathf.range(fragCone/2f) + fragAngle + ((i - (int)(fragBullets / 2f)) * fragSpread - (fragBullets % 2 == 0 ? fragSpread/2f : 0));
                 fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }
         }
