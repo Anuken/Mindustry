@@ -263,7 +263,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             if(player.team().core() == null){
                 player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
-                player.unit(UnitTypes.alpha.spawn(player.team(), player.x, player.y));
+                var unit = UnitTypes.alpha.spawn(player.team(), player.x, player.y);
+                unit.spawnedByCore = true;
+                player.unit(unit);
             }
         });
     }
