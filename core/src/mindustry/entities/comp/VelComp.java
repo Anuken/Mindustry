@@ -1,6 +1,5 @@
 package mindustry.entities.comp;
 
-import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
@@ -22,7 +21,7 @@ abstract class VelComp implements Posc{
     @Override
     public void update(){
         move(vel.x * Time.delta, vel.y * Time.delta);
-        vel.scl(Mathf.clamp(1f - drag * Time.delta));
+        vel.scl(Math.max(1f - drag * Time.delta, 0));
     }
 
     /** @return function to use for check solid state. if null, no checking is done. */
