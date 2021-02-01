@@ -445,9 +445,14 @@ public class NetClient implements ApplicationListener{
 
             for(int i = 0; i < amount; i++){
                 int pos = input.readInt();
+                short block = input.readShort();
                 Tile tile = world.tile(pos);
                 if(tile == null || tile.build == null){
                     Log.warn("Missing entity at @. Skipping block snapshot.", tile);
+                    break;
+                }
+                if(tile.build.block.id != block){
+                    Log.warn("Block ID mismatch at @: @ != @. Skipping block snapshot.", tile, tile.build.block.id, block);
                     break;
                 }
                 tile.build.readAll(Reads.get(input), tile.build.version());

@@ -51,6 +51,9 @@ public class SStats implements SteamUserStatsCallback{
                     stats.storeStats();
                 }
             }, statSavePeriod * 60, statSavePeriod * 60);
+
+            if(Items.thorium.unlocked()) obtainThorium.complete();
+            if(Items.titanium.unlocked()) obtainTitanium.complete();
         });
     }
 
