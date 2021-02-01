@@ -347,6 +347,7 @@ public class Mods implements Loadable{
                 }
             }
         }
+        Events.fire(new FileTreeInitEvent());
 
         //add new keys to each bundle
         I18NBundle bundle = Core.bundle;
