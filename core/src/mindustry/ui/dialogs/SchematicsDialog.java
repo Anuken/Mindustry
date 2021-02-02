@@ -405,6 +405,10 @@ public class SchematicsDialog extends BaseDialog{
                     }
                 });
             }
+            if(!schem.description().isEmpty()){
+                cont.row();
+                cont.add("[lightgray]" + schem.description()).wrap().width(500f).padTop(20);
+            }
 
             show();
         }
