@@ -13,7 +13,7 @@
   },
   {
     "name": "C.A.M.S.",
-    "address": ["routerchain.ddns.net", "pandorum.su:8000"]
+    "address": ["routerchain.ddns.net", "pandorum.su:8000", "nikochio.ddns.net"]
   },
   {
     "name": "BE6.RUN",
@@ -62,10 +62,6 @@
   {
     "name": "Korea",
     "address": ["mindustry.kr"]
-  },
-  {
-    "name": "NikoCHIO",
-    "address": ["nikochio.ddns.net"]
   },
   {
     "name": "HexPvP",
