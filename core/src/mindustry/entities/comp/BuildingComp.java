@@ -1311,6 +1311,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case health -> health;
             case maxHealth -> maxHealth;
             case efficiency -> efficiency();
+            case timescale -> timeScale;
             case range -> this instanceof Ranged r ? r.range() / tilesize : 0;
             case rotation -> rotation;
             case totalItems -> items == null ? 0 : items.total();
