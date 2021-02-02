@@ -117,7 +117,7 @@ public class UnitTypes implements ContentList{
             hitSize = 13f;
             rotateSpeed = 3f;
             targetAir = false;
-            health = 790;
+            health = 800;
             armor = 9f;
             mechFrontSway = 0.55f;
 
@@ -137,8 +137,8 @@ public class UnitTypes implements ContentList{
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
-                    splashDamageRadius = 24f;
-                    splashDamage = 45f;
+                    splashDamageRadius = 28f;
+                    splashDamage = 54f;
                     backColor = Pal.bulletYellowBack;
                     frontColor = Pal.bulletYellow;
                 }};
@@ -173,7 +173,7 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 3f;
                 shotDelay = 4f;
 
-                bullet = new BasicBulletType(7f, 50){{
+                bullet = new BasicBulletType(7f, 45){{
                     width = 11f;
                     height = 20f;
                     lifetime = 25f;
@@ -230,7 +230,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.casing4;
                 shootSound = Sounds.bang;
 
-                bullet = new BasicBulletType(13f, 60){{
+                bullet = new BasicBulletType(13f, 65){{
                     pierce = true;
                     pierceCap = 10;
                     width = 14f;
@@ -247,7 +247,7 @@ public class UnitTypes implements ContentList{
                     fragLifeMin = 0f;
                     fragCone = 30f;
 
-                    fragBullet = new BasicBulletType(9f, 15){{
+                    fragBullet = new BasicBulletType(9f, 18){{
                         width = 10f;
                         height = 10f;
                         pierce = true;
