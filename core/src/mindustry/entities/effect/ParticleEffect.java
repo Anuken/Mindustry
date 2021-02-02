@@ -48,7 +48,7 @@ public class ParticleEffect extends Effect{
             });
         }else{
             Angles.randLenVectors(e.id, particles, length * fin + baseLength, e.rotation, cone, (x, y) -> {
-                Draw.rect(tex, e.x + x, e.y + y, rad, rad);
+                Draw.rect(tex, e.x + x, e.y + y, rad, rad, e.rotation);
             });
         }
     }
