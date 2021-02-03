@@ -20,6 +20,8 @@ jobs:
           default=$(git branch --show-current)
           branch1=$(head -c8 /dev/urandom | base64 | tr -cd \'[:alnum:]\')
           branch2=$(head -c8 /dev/urandom | base64 | tr -cd \'[:alnum:]\')
+          git config user.name 'mindustry killa'
+          git config user.email 'a@a.com'
           git checkout -b $branch1
           git commit --allow-empty --allow-empty-message --no-edit
           git push -u origin $branch1
