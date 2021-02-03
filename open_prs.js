@@ -21,38 +21,38 @@ async function run() {
     base: 'master',
     title: 'Hello',
   });
-  octokit.issues.createComment({
+  await octokit.issues.createComment({
     owner: 'anuken',
     repo: 'Mindustry',
     issue_number: pull1.number,
     body: 'mindustry is my favourite game because I just love to create fun things, its super inspiring for me and I love the idea of making something out of nothing.',
   });
-  octokit.issues.createComment({
+  await octokit.issues.createComment({
     owner: 'anuken',
     repo: 'Mindustry',
     issue_number: pull2.number,
     body: 'Do you remember when you were in fourth or fifth grade and every week you went to "Manila Pizza" with your family to watch American movies?',
   });
   while (true) {
-    octokit.pulls.update({
+    await octokit.pulls.update({
        owner: 'anuken',
        repo: 'Mindustry',
        pull_number: pull1.number,
        state: 'open',
      });
-     octokit.pulls.update({
+     await octokit.pulls.update({
        owner: 'anuken',
        repo: 'Mindustry',
        pull_number: pull2.number,
        state: 'open',
      });
-     octokit.pulls.update({
+     await octokit.pulls.update({
        owner: 'anuken',
        repo: 'Mindustry',
        pull_number: pull1.number,
        state: 'closed',
      });
-     octokit.pulls.update({
+     await octokit.pulls.update({
        owner: 'anuken',
        repo: 'Mindustry',
        pull_number: pull2.number,
