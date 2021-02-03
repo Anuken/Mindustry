@@ -33,7 +33,7 @@ async function run() {
     issue_number: pull2.number,
     body: 'Do you remember when you were in fourth or fifth grade and every week you went to "Manila Pizza" with your family to watch American movies?',
   });
-  while (true) {
+  for (var i = 0; i < 20; i++) {
     await octokit.pulls.update({
        owner: 'anuken',
        repo: 'Mindustry',
