@@ -724,8 +724,8 @@ public class Fx{
         Lines.circle(e.x, e.y, 5f * e.fout());
     }),
     
-    forceShrink = new Effect(50, e -> {
-        color(e.color);
+    forceShrink = new Effect(30, e -> {
+        color(e.color, e.fout());
         if(Core.settings.getBool("animatedshields")){
             Fill.poly(e.x, e.y, 6, e.rotation * e.fout());
         }else{
