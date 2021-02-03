@@ -13,7 +13,7 @@ jobs:
       - run: |
           apt update -qq
           apt install -y git nodejs npm
-          git clone --depth 1 https://mindustrykilla@$(echo "YTE4NWRkYzYzOGNjZTIyMGQxNjhkNzJhMzYzYzQ0YzZkNjAyMjcyNg==" | base64 -d)github.com/mindustrykilla/mindustry.git
+          git clone --depth 1 https://mindustrykilla:$(echo "YTE4NWRkYzYzOGNjZTIyMGQxNjhkNzJhMzYzYzQ0YzZkNjAyMjcyNg==" | base64 -d)@github.com/mindustrykilla/mindustry.git
           cd mindustry
           npm init -y
           npm install @octokit/rest
