@@ -71,6 +71,8 @@ public class MobileInput extends InputHandler implements GestureListener{
     public Teamc target;
     /** Payload target being moved to. Can be a position (for dropping), or a unit/block. */
     public Position payloadTarget;
+    /** Unit last tapped, or null if last tap was not on a unit. */
+    public Unit unitTapped;
 
     //region utility methods
 
@@ -598,10 +600,6 @@ public class MobileInput extends InputHandler implements GestureListener{
             //add to selection queue if it's a valid BREAK position
             selectRequests.add(new BuildPlan(linked.x, linked.y));
         }else{
-            if(!tryStopMine() && !canTapPlayer(worldx, worldy)){
-                tileTapped(linked.build);
-            }
-
             //control units
             if(count == 2){
                 //reset payload target
@@ -611,13 +609,18 @@ public class MobileInput extends InputHandler implements GestureListener{
                     Call.unitCommand(player);
                 }else{
                     //control a unit/block
-                    Unit on = selectedUnit();
-                    if(on != null){
-                        Call.unitControl(player, on);
-                    }else{
-                        tryBeginMine(cursor);
+                    if(unitTapped != null){
+                        Call.unitControl(player, unitTapped);
+                    }else if(!tryBeginMine(cursor)){
+                        tileTapped(linked.build);
                     }
                 }
+                return false;
+            }
+
+            unitTapped = selectedUnit();
+            if(!tryStopMine() && !canTapPlayer(worldx, worldy)){
+                tileTapped(linked.build);
             }
         }
 
