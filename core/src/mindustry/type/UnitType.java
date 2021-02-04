@@ -95,7 +95,7 @@ public class UnitType extends UnlockableContent{
     public float hitSize = 6f;
     public float itemOffsetY = 3f;
     public float lightRadius = 60f, lightOpacity = 0.6f;
-    public Color lightColor = Pal.powerLight;
+    public Color lightColor;
     public boolean drawCell = true, drawItems = true, drawShields = true;
     public int trailLength = 3;
     public float trailX = 4f, trailY = -3f, trailScl = 1f;
@@ -673,7 +673,7 @@ public class UnitType extends UnlockableContent{
 
     public void drawLight(Unit unit){
         if(lightRadius > 0){
-            Drawf.light(unit.team, unit.x, unit.y, lightRadius, lightColor, lightOpacity);
+            Drawf.light(unit.team, unit.x, unit.y, lightRadius, lightColor == null ? unit.team.color : lightColor, lightOpacity);
         }
     }
 

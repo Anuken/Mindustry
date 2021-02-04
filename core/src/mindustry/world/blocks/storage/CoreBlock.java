@@ -222,7 +222,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, 30f + 20f * size, Pal.accent, 0.65f + Mathf.absin(20f, 0.1f));
+            Drawf.light(team, x, y, 30f + 20f * size, team.color, 0.65f + Mathf.absin(20f, 0.1f));
         }
 
         @Override
@@ -294,7 +294,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void drawSelect(){
-            Lines.stroke(1f, Pal.accent);
+            Lines.stroke(1f, team.color);
             Cons<Building> outline = b -> {
                 for(int i = 0; i < 4; i++){
                     Point2 p = Geometry.d8edge[i];
