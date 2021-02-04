@@ -12,7 +12,6 @@ buildscript{
         mavenCentral()
         google()
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        jcenter()
         maven{ url 'https://jitpack.io' }
     }
 
@@ -184,7 +183,6 @@ allprojects{
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
         maven{ url 'https://jitpack.io' }
-        jcenter()
     }
 
     task clearCache{

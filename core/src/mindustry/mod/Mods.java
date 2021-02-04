@@ -836,6 +836,7 @@ public class Mods implements Loadable{
                     ", main='" + main + '\'' +
                     ", minGameVersion='" + minGameVersion + '\'' +
                     ", hidden=" + hidden +
+                    ", repo=" + repo +
                     '}';
         }
     }
