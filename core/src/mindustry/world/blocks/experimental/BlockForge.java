@@ -47,7 +47,7 @@ public class BlockForge extends PayloadAcceptor{
 
     @Override
     public TextureRegion[] icons(){
-        return new TextureRegion[]{region, outRegion};
+        return new TextureRegion[]{region, outRegion, topRegion};
     }
 
     @Override
@@ -69,6 +69,7 @@ public class BlockForge extends PayloadAcceptor{
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(region, req.drawx(), req.drawy());
         Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
+        Draw.rect(topRegion, req.drawx(), req.drawy());
     }
     
     public class BlockForgeBuild extends PayloadAcceptorBuild<BuildPayload>{
@@ -136,7 +137,11 @@ public class BlockForge extends PayloadAcceptor{
                 Draw.draw(Layer.blockOver, () -> Drawf.construct(this, recipe, 0, progress / recipe.buildCost, heat, time));
             }
 
+            Draw.z(Layer.blockOver);
             drawPayload();
+
+            Draw.z(Layer.blockOver + 0.1f);
+            Draw.rect(topRegion, x, y);
         }
         
         @Override
