@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -122,6 +123,27 @@ public class RepairPoint extends Block{
         @Override
         public BlockStatus status(){
             return Mathf.equal(efficiency(), 0f, 0.01f) ? BlockStatus.noInput : cons.status();
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            
+            write.f(rotation);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+
+            if(revision >= 1){
+                rotation = read.f();
+            }
+        }
+
+        @Override
+        public byte version(){
+            return 1;
         }
     }
 }
