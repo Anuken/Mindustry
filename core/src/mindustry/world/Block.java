@@ -428,10 +428,9 @@ public class Block extends UnlockableContent{
         TextureRegion reg = getRequestRegion(req, list);
         Draw.rect(reg, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
 
-        if(req.worldContext && teamRegion.found()){
-            Team team = player != null ? player.team() : Team.sharded;
-            if(teamRegions[team.id] == teamRegion) Draw.color(team.color);
-            Draw.rect(teamRegions[team.id], req.drawx(), req.drawy());
+        if(req.worldContext && player != null && teamRegion.found()){
+            if(teamRegions[player.team().id] == teamRegion) Draw.color(player.team().color);
+            Draw.rect(teamRegions[player.team().id], req.drawx(), req.drawy());
             Draw.color();
         }
 
