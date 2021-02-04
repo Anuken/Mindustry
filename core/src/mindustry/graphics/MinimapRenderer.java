@@ -96,7 +96,8 @@ public class MinimapRenderer implements Disposable{
 
             Draw.mixcol(unit.team().color, 1f);
             float scale = Scl.scl(1f) / 2f * scaling * 32f;
-            Draw.rect(unit.type.icon(Cicon.full), x + rx, y + ry, scale, scale, unit.rotation() - 90);
+            var region = unit.type.icon(Cicon.full);
+            Draw.rect(region, x + rx, y + ry, scale, scale * (float)region.height / region.width, unit.rotation() - 90);
             Draw.reset();
         }
 
