@@ -20,6 +20,7 @@ configurations{ natives }
 repositories{
     mavenCentral()
     maven{ url "https://maven.google.com" }
+    jcenter() //remove later once google fixes the dependency
 }
 
 dependencies{
