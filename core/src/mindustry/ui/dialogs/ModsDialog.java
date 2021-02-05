@@ -79,7 +79,9 @@ public class ModsDialog extends BaseDialog{
                         ui.showErrorMessage(Core.bundle.format("connectfail", status));
                     }else{
                         try{
-                            modList = new Json().fromJson(Seq.class, ModListing.class, strResult);
+                            var j = new Json();
+                            j.setIgnoreUnknownFields(true);
+                            modList = j.fromJson(Seq.class, ModListing.class, strResult);
 
                             var d = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                             Func<String, Date> parser = text -> {
@@ -224,7 +226,9 @@ public class ModsDialog extends BaseDialog{
                                                 sel.clear();
                                                 sel.hide();
                                             });
-                                            sel.buttons.button("@mods.browser.add", Icon.download, () -> {
+
+                                            var found = mods.list().find(l -> mod.repo != null && mod.repo.equals(l.getRepo()));
+                                            sel.buttons.button(found == null ? "@mods.browser.add" : "@mods.browser.reinstall", Icon.download, () -> {
                                                 sel.hide();
                                                 githubImportMod(mod.repo);
                                             });
@@ -349,7 +353,7 @@ public class ModsDialog extends BaseDialog{
     }
 
     private void reload(){
-        ui.showInfo("@mods.reloadexit", () -> Core.app.exit());
+        ui.showInfoOnHidden("@mods.reloadexit", () -> Core.app.exit());
     }
 
     private void showMod(LoadedMod mod){
@@ -359,6 +363,10 @@ public class ModsDialog extends BaseDialog{
 
         if(!mobile){
             dialog.buttons.button("@mods.openfolder", Icon.link, () -> Core.app.openFolder(mod.file.absolutePath()));
+        }
+
+        if(mod.getRepo() != null){
+            dialog.buttons.button("@mods.github.open", Icon.link, () -> Core.app.openURI("https://github.com/" + mod.getRepo()));
         }
 
         //TODO improve this menu later
@@ -406,8 +414,6 @@ public class ModsDialog extends BaseDialog{
             }
         }
 
-
-
         dialog.show();
     }
 
@@ -415,7 +421,8 @@ public class ModsDialog extends BaseDialog{
         try{
             Fi file = tmpDirectory.child(repo.replace("/", "") + ".zip");
             Streams.copy(result.getResultAsStream(), file.write(false));
-            mods.importMod(file);
+            var mod = mods.importMod(file);
+            mod.setRepo(repo);
             file.delete();
             Core.app.post(() -> {
                 try{
@@ -431,15 +438,28 @@ public class ModsDialog extends BaseDialog{
     }
 
     private void githubImportMod(String name){
-        //try several branches
-        //TODO use only the main branch as specified in meta
-        githubImportBranch("6.0", name, e1 -> {
-            githubImportBranch("master", name, e2 -> {
-                githubImportBranch("main", name, e3 -> {
-                    ui.showErrorMessage(Core.bundle.format("connectfail", e2));
-                    ui.loadfrag.hide();
-                });
-            });
+        Core.net.httpGet("https://api.github.com/repos/" + name, res -> {
+            if(checkError(res)){
+                String mainBranch = Jval.read(res.getResultAsString()).getString("default_branch");
+
+                githubImportBranch(mainBranch, name, this::showStatus);
+            }
+        }, t -> Core.app.post(() -> modError(t)));
+    }
+
+    private boolean checkError(HttpResponse res){
+        if(res.getStatus() == HttpStatus.OK){
+            return true;
+        }else{
+            showStatus(res.getStatus());
+            return false;
+        }
+    }
+
+    private void showStatus(HttpStatus status){
+        Core.app.post(() -> {
+            ui.showErrorMessage(Core.bundle.format("connectfail", Strings.capitalize(status.toString().toLowerCase())));
+            ui.loadfrag.hide();
         });
     }
 

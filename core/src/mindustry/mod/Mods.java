@@ -65,23 +65,39 @@ public class Mods implements Loadable{
         });
     }
 
+    /** @return the loaded mod found by name, or null if not found. */
+    public @Nullable LoadedMod getMod(String name){
+        return mods.find(m -> m.name.equals(name));
+    }
+
     /** @return the loaded mod found by class, or null if not found. */
     public @Nullable LoadedMod getMod(Class<? extends Mod> type){
         return mods.find(m -> m.enabled() && m.main != null && m.main.getClass() == type);
     }
 
-    /** Imports an external mod file.*/
-    public void importMod(Fi file) throws IOException{
-        Fi dest = modDirectory.child(file.name() + (file.extension().isEmpty() ? ".zip" : ""));
-        if(dest.exists()){
-            throw new IOException("A file with the same name already exists in the mod folder!");
+    /** Imports an external mod file. Folders are not supported here. */
+    public LoadedMod importMod(Fi file) throws IOException{
+        String baseName = file.nameWithoutExtension();
+        String finalName = baseName;
+        //find a name to prevent any name conflicts
+        int count = 1;
+        while(modDirectory.child(finalName + ".zip").exists()){
+            finalName = baseName + "" + count++;
         }
+
+        Fi dest = modDirectory.child(finalName + ".zip");
 
         file.copyTo(dest);
         try{
-            mods.add(loadMod(dest));
+            var loaded = loadMod(dest, true);
+            mods.add(loaded);
             requiresReload = true;
             sortMods();
+            //try to load the mod's icon so it displays on import
+            Core.app.post(() -> {
+                loadIcon(loaded);
+            });
+            return loaded;
         }catch(IOException e){
             dest.delete();
             throw e;
@@ -113,13 +129,18 @@ public class Mods implements Loadable{
 
     private void loadIcons(){
         for(LoadedMod mod : mods){
-            //try to load icon for each mod that can have one
-            if(mod.root.child("icon.png").exists()){
-                try{
-                    mod.iconTexture = new Texture(mod.root.child("icon.png"));
-                }catch(Throwable t){
-                    Log.err("Failed to load icon for mod '" + mod.name + "'.", t);
-                }
+            loadIcon(mod);
+        }
+    }
+
+    private void loadIcon(LoadedMod mod){
+        //try to load icon for each mod that can have one
+        if(mod.root.child("icon.png").exists()){
+            try{
+                mod.iconTexture = new Texture(mod.root.child("icon.png"));
+                mod.iconTexture.setFilter(TextureFilter.linear);
+            }catch(Throwable t){
+                Log.err("Failed to load icon for mod '" + mod.name + "'.", t);
             }
         }
     }
@@ -586,8 +607,14 @@ public class Mods implements Loadable{
     }
 
     /** Loads a mod file+meta, but does not add it to the list.
-     * Note that directories can be loaded as mods.*/
+     * Note that directories can be loaded as mods. */
     private LoadedMod loadMod(Fi sourceFile) throws Exception{
+        return loadMod(sourceFile, false);
+    }
+
+    /** Loads a mod file+meta, but does not add it to the list.
+     * Note that directories can be loaded as mods. */
+    private LoadedMod loadMod(Fi sourceFile, boolean overwrite) throws Exception{
         Time.mark();
 
         ZipFi rootZip = null;
@@ -615,8 +642,25 @@ public class Mods implements Loadable{
             String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
             String baseName = meta.name.toLowerCase().replace(" ", "-");
 
-            if(mods.contains(m -> m.name.equals(baseName))){
-                throw new IllegalArgumentException("A mod with the name '" + baseName + "' is already imported.");
+            var other = mods.find(m -> m.name.equals(baseName));
+
+            if(other != null){
+                if(overwrite && !other.hasSteamID()){
+                    //close zip file
+                    if(other.root instanceof ZipFi){
+                        other.root.delete();
+                    }
+                    //delete the old mod directory
+                    if(other.file.isDirectory()){
+                        other.file.deleteDirectory();
+                    }else{
+                        other.file.delete();
+                    }
+                    //unload
+                    mods.remove(other);
+                }else{
+                    throw new IllegalArgumentException("A mod with the name '" + baseName + "' is already imported.");
+                }
             }
 
             Mod mainMod;
@@ -699,6 +743,15 @@ public class Mods implements Loadable{
             this.main = main;
             this.meta = meta;
             this.name = meta.name.toLowerCase().replace(" ", "-");
+        }
+
+        @Nullable
+        public String getRepo(){
+            return Core.settings.getString("mod-" + name + "-repo", meta.repo);
+        }
+
+        public void setRepo(String repo){
+            Core.settings.put("mod-" + name + "-repo", repo);
         }
 
         public boolean enabled(){
