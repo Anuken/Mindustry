@@ -42,6 +42,10 @@ public class ModsDialog extends BaseDialog{
 
         buttons.button("@mods.guide", Icon.link, () -> Core.app.openURI(modGuideURL)).size(210, 64f);
 
+        if(!mobile){
+            buttons.button("@mods.openfolder", Icon.link, () -> Core.app.openFolder(modDirectory.absolutePath()));
+        }
+
         shown(this::setup);
         if(mobile){
             onResize(this::setup);
@@ -169,92 +173,14 @@ public class ModsDialog extends BaseDialog{
                         dialog.hide();
 
                         ui.showTextInput("@mod.import.github", "", 64, Core.settings.getString("lastmod", ""), text -> {
+                            //clean up the text in case somebody inputs a URL or adds random spaces
+                            text = text.trim().replace(" ", "");
+                            if(text.startsWith("https://github.com/")) text = text.substring("https://github.com/".length());
+
                             Core.settings.put("lastmod", text);
-
-                            githubImportMod(text);
+                            //there's no good way to know if it's a java mod here, so assume it's not
+                            githubImportMod(text, false);
                         });
-                    }).margin(12f);
-
-                    t.row();
-
-                    t.button("@mod.featured.dialog.title", Icon.star, bstyle, () -> {
-                        Runnable[] rebuildBrowser = {null};
-                        dialog.hide();
-                        BaseDialog browser = new BaseDialog("$mod.featured.dialog.title");
-                        browser.cont.table(table -> {
-                            table.left();
-                            table.image(Icon.zoom);
-                            table.field(searchtxt, res -> {
-                                searchtxt = res;
-                                rebuildBrowser[0].run();
-                            }).growX().get();
-                            table.button(Icon.list, Styles.clearPartiali, 32f, () -> {
-                                orderDate = !orderDate;
-                                rebuildBrowser[0].run();
-                            }).update(b -> b.getStyle().imageUp = (orderDate ? Icon.list : Icon.star)).size(40f).get()
-                                .addListener(new Tooltip(tip -> tip.label(() -> orderDate ? "@mods.browser.sortdate" : "@mods.browser.sortstars").left()));
-                        }).fillX().padBottom(4);
-
-                        browser.cont.row();
-
-                        browser.cont.pane(tablebrow -> {
-                            tablebrow.margin(10f).top();
-                            rebuildBrowser[0] = () -> {
-                                tablebrow.clear();
-                                tablebrow.add("@loading");
-
-                                getModList(rlistings -> {
-                                    tablebrow.clear();
-
-                                    Seq<ModListing> listings = rlistings;
-                                    if(!orderDate){
-                                        listings = rlistings.copy();
-                                        listings.sortComparing(m1 -> -m1.stars);
-                                    }
-
-                                    for(ModListing mod : listings){
-                                        if((mod.hasJava && Vars.ios) || !searchtxt.isEmpty() && !mod.repo.toLowerCase().contains(searchtxt.toLowerCase()) || (Vars.ios && mod.hasScripts)) continue;
-
-                                        tablebrow.button(btn -> {
-                                            btn.top().left();
-                                            btn.margin(12f);
-                                            btn.table(con -> {
-                                                con.left();
-                                                con.add("[accent]" + mod.name + "[white]\n[lightgray]Author:[] " + mod.author + "\n[lightgray]\uE809 " + mod.stars +
-                                                (Version.isAtLeast(mod.minGameVersion) ? "" : "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
-                                                .width(388f).wrap().growX().pad(0f, 6f, 0f, 6f).left().labelAlign(Align.left);
-                                                con.add().growX().pad(0f, 6f, 0f, 6f);
-                                            }).fillY().growX().pad(0f, 6f, 0f, 6f);
-                                        }, Styles.modsb, () -> {
-                                            var sel = new BaseDialog(mod.name);
-                                            sel.cont.add(mod.description).width(mobile ? 400f : 500f).wrap().pad(4f).labelAlign(Align.center, Align.left);
-                                            sel.buttons.defaults().size(150f, 54f).pad(2f);
-                                            sel.setFillParent(false);
-                                            sel.buttons.button("@back", Icon.left, () -> {
-                                                sel.clear();
-                                                sel.hide();
-                                            });
-
-                                            var found = mods.list().find(l -> mod.repo != null && mod.repo.equals(l.getRepo()));
-                                            sel.buttons.button(found == null ? "@mods.browser.add" : "@mods.browser.reinstall", Icon.download, () -> {
-                                                sel.hide();
-                                                githubImportMod(mod.repo);
-                                            });
-                                            sel.buttons.button("@mods.github.open", Icon.link, () -> {
-                                                Core.app.openURI("https://github.com/" + mod.repo);
-                                            });
-                                            sel.keyDown(KeyCode.escape, sel::hide);
-                                            sel.keyDown(KeyCode.back, sel::hide);
-                                            sel.show();
-                                        }).width(460f).growX().left().fillY();
-                                        tablebrow.row();
-                                    }
-                                });
-                            };
-                            rebuildBrowser[0].run();
-                        }).get().setScrollingDisabled(true, false);
-                        browser.addCloseButton();
-                        browser.show();
                     }).margin(12f);
                 });
                 dialog.addCloseButton();
@@ -263,9 +189,7 @@ public class ModsDialog extends BaseDialog{
 
             }).margin(margin);
 
-            if(!mobile){
-                buttons.button("@mods.openfolder", Icon.link, style, () -> Core.app.openFolder(modDirectory.absolutePath())).margin(margin);
-            }
+            buttons.button("@mods.browser", Icon.menu, style, this::showModBrowser).margin(margin);
         }).width(w);
 
         cont.row();
@@ -377,7 +301,7 @@ public class ModsDialog extends BaseDialog{
             boolean showImport = !mod.hasSteamID();
             dialog.buttons.button("@mods.github.open", Icon.link, () -> Core.app.openURI("https://github.com/" + mod.getRepo()));
             if(mobile && showImport) dialog.buttons.row();
-            if(showImport) dialog.buttons.button("@mods.browser.reinstall", Icon.download, () -> githubImportMod(mod.getRepo()));
+            if(showImport) dialog.buttons.button("@mods.browser.reinstall", Icon.download, () -> githubImportMod(mod.getRepo(), mod.isJava()));
         }
 
         //TODO improve this menu later
@@ -432,6 +356,92 @@ public class ModsDialog extends BaseDialog{
         dialog.show();
     }
 
+    private void showModBrowser(){
+        Runnable[] rebuildBrowser = {null};
+        BaseDialog browser = new BaseDialog("@mods.browser");
+        browser.cont.table(table -> {
+            table.left();
+            table.image(Icon.zoom);
+            table.field(searchtxt, res -> {
+                searchtxt = res;
+                rebuildBrowser[0].run();
+            }).growX().get();
+            table.button(Icon.list, Styles.clearPartiali, 32f, () -> {
+                orderDate = !orderDate;
+                rebuildBrowser[0].run();
+            }).update(b -> b.getStyle().imageUp = (orderDate ? Icon.list : Icon.star)).size(40f).get()
+            .addListener(new Tooltip(tip -> tip.label(() -> orderDate ? "@mods.browser.sortdate" : "@mods.browser.sortstars").left()));
+        }).fillX().padBottom(4);
+
+        browser.cont.row();
+
+        browser.cont.pane(tablebrow -> {
+            tablebrow.margin(10f).top();
+            rebuildBrowser[0] = () -> {
+                tablebrow.clear();
+                tablebrow.add("@loading");
+
+                getModList(rlistings -> {
+                    tablebrow.clear();
+
+                    Seq<ModListing> listings = rlistings;
+                    if(!orderDate){
+                        listings = rlistings.copy();
+                        listings.sortComparing(m1 -> -m1.stars);
+                    }
+
+                    for(ModListing mod : listings){
+                        if((mod.hasJava && Vars.ios) || !searchtxt.isEmpty() && !mod.repo.toLowerCase().contains(searchtxt.toLowerCase()) || (Vars.ios && mod.hasScripts)) continue;
+
+                        tablebrow.button(btn -> {
+                            btn.top().left();
+                            btn.margin(12f);
+                            btn.table(con -> {
+                                con.left();
+                                con.add("[accent]" + mod.name + "[white]\n[lightgray]Author:[] " + trimText(mod.author) + "\n[lightgray]\uE809 " + mod.stars +
+                                (Version.isAtLeast(mod.minGameVersion) ? "" : "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
+                                .width(388f).wrap().growX().pad(0f, 6f, 0f, 6f).left().labelAlign(Align.left);
+                                con.add().growX().pad(0f, 6f, 0f, 6f);
+                            }).fillY().growX().pad(0f, 6f, 0f, 6f);
+                        }, Styles.modsb, () -> {
+                            var sel = new BaseDialog(mod.name);
+                            sel.cont.add(mod.description).width(mobile ? 400f : 500f).wrap().pad(4f).labelAlign(Align.center, Align.left);
+                            sel.buttons.defaults().size(150f, 54f).pad(2f);
+                            sel.setFillParent(false);
+                            sel.buttons.button("@back", Icon.left, () -> {
+                                sel.clear();
+                                sel.hide();
+                            });
+
+                            var found = mods.list().find(l -> mod.repo != null && mod.repo.equals(l.getRepo()));
+                            sel.buttons.button(found == null ? "@mods.browser.add" : "@mods.browser.reinstall", Icon.download, () -> {
+                                sel.hide();
+                                githubImportMod(mod.repo, mod.hasJava);
+                            });
+                            sel.buttons.button("@mods.github.open", Icon.link, () -> {
+                                Core.app.openURI("https://github.com/" + mod.repo);
+                            });
+                            sel.keyDown(KeyCode.escape, sel::hide);
+                            sel.keyDown(KeyCode.back, sel::hide);
+                            sel.show();
+                        }).width(460f).growX().left().fillY();
+                        tablebrow.row();
+                    }
+                });
+            };
+            rebuildBrowser[0].run();
+        }).get().setScrollingDisabled(true, false);
+        browser.addCloseButton();
+        browser.show();
+    }
+
+    private String trimText(String text){
+        if(text.contains("\n")){
+            return text.substring(0, text.indexOf("\n"));
+        }
+        return text;
+    }
+
     private void handleMod(String repo, HttpResponse result){
         try{
             Fi file = tmpDirectory.child(repo.replace("/", "") + ".zip");
@@ -452,15 +462,58 @@ public class ModsDialog extends BaseDialog{
         }
     }
 
-    private void githubImportMod(String name){
-        ui.loadfrag.show();
-        Core.net.httpGet("https://api.github.com/repos/" + name, res -> {
-            if(checkError(res)){
-                String mainBranch = Jval.read(res.getResultAsString()).getString("default_branch");
+    private void importFail(Throwable t){
+        Core.app.post(() -> modError(t));
+    }
 
-                githubImportBranch(mainBranch, name, this::showStatus);
+    private void githubImportMod(String repo, boolean isJava){
+        ui.loadfrag.show();
+
+        if(isJava){
+            githubImportJavaMod(repo);
+        }else{
+            Core.net.httpGet(ghApi + "/repos/" + repo, res -> {
+                if(checkError(res)){
+                    var json = Jval.read(res.getResultAsString());
+                    String mainBranch = json.getString("default_branch");
+                    String language = json.getString("language", "<none>");
+
+                    //this is a crude heuristic for class mods; only required for direct github import
+                    //TODO make a more reliable way to distinguish java mod repos
+                    if(language.equals("Java") || language.equals("Kotlin")){
+                        githubImportJavaMod(repo);
+                    }else{
+                        githubImportBranch(mainBranch, repo, this::showStatus);
+                    }
+                }
+            }, this::importFail);
+        }
+    }
+
+    private void githubImportJavaMod(String repo){
+        //grab latest release
+        Core.net.httpGet(ghApi + "/repos/" + repo + "/releases/latest", res -> {
+            if(checkError(res)){
+                var json = Jval.read(res.getResultAsString());
+                var assets = json.get("assets").asArray();
+
+                //prioritize dexed jar, as that's what Sonnicon's mod template outputs
+                var dexedAsset = assets.find(j -> j.getString("name").startsWith("dexed") && j.getString("name").endsWith(".jar"));
+                var asset = dexedAsset == null ? assets.find(j -> j.getString("name").endsWith(".jar")) : dexedAsset;
+
+                if(asset != null){
+                    //grab actual file
+                    var url = asset.getString("browser_download_url");
+                    Core.net.httpGet(url, result -> {
+                        if(checkError(result)){
+                            handleMod(repo, result);
+                        }
+                    }, this::importFail);
+                }else{
+                    throw new ArcRuntimeException("No JAR file found in releases. Make sure you have a valid jar file in the mod's latest Github Release.");
+                }
             }
-        }, t -> Core.app.post(() -> modError(t)));
+        }, this::importFail);
     }
 
     private boolean checkError(HttpResponse res){
@@ -480,7 +533,7 @@ public class ModsDialog extends BaseDialog{
     }
 
     private void githubImportBranch(String branch, String repo, Cons<HttpStatus> err){
-        Core.net.httpGet("https://api.github.com/repos/" + repo + "/zipball/" + branch, loc -> {
+        Core.net.httpGet(ghApi + "/repos/" + repo + "/zipball/" + branch, loc -> {
             if(loc.getStatus() == HttpStatus.OK){
                 if(loc.getHeader("Location") != null){
                     Core.net.httpGet(loc.getHeader("Location"), result -> {
@@ -489,13 +542,13 @@ public class ModsDialog extends BaseDialog{
                         }else{
                             handleMod(repo, result);
                         }
-                    }, t2 -> Core.app.post(() -> modError(t2)));
+                    }, this::importFail);
                 }else{
                     handleMod(repo, loc);
                 }
             }else{
                 err.get(loc.getStatus());
             }
-         }, t2 -> Core.app.post(() -> modError(t2)));
+         }, this::importFail);
     }
 }

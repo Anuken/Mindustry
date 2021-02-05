@@ -335,6 +335,25 @@ project(":core"){
         annotationProcessor 'com.github.Anuken:jabel:34e4c172e65b3928cd9eabe1993654ea79c409cd'
 
     }
+
+    afterEvaluate{
+        task mergedJavadoc(type: Javadoc){
+            def blacklist = [project(":android"), project(":ios"), project(":desktop"), project(":server"), project(":annotations")]
+
+            source rootProject.subprojects.collect{ project ->
+                if(!blacklist.contains(project) && project.hasProperty("sourceSets")){
+                    return project.sourceSets.main.allJava
+                }
+            }
+
+            classpath = files(rootProject.subprojects.collect { project ->
+                if(!blacklist.contains(project) && project.hasProperty("sourceSets")){
+                    return project.sourceSets.main.compileClasspath
+                }
+            })
+            destinationDir = new File(buildDir, 'javadoc')
+        }
+    }
 }
 
 project(":server"){

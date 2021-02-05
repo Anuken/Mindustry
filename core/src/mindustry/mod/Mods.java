@@ -667,16 +667,22 @@ public class Mods implements Loadable{
             Mod mainMod;
 
             Fi mainFile = zip;
-            String[] path = (mainClass.replace('.', '/') + ".class").split("/");
-            for(String str : path){
-                if(!str.isEmpty()){
-                    mainFile = mainFile.child(str);
+            if(android){
+                mainFile = mainFile.child("classes.dex");
+            }else{
+                String[] path = (mainClass.replace('.', '/') + ".class").split("/");
+                for(String str : path){
+                    if(!str.isEmpty()){
+                        mainFile = mainFile.child(str);
+                    }
                 }
             }
 
             //make sure the main class exists before loading it; if it doesn't just don't put it there
-            if(mainFile.exists() && Core.settings.getBool("mod-" + baseName + "-enabled", true) && Version.isAtLeast(meta.minGameVersion) && meta.getMinMajor() >= 105){
-                //mobile versions don't support class mods
+            //if the mod is explicitly marked as java, try loading it anyway
+            if((mainFile.exists() || meta.java) &&
+                Core.settings.getBool("mod-" + baseName + "-enabled", true) && Version.isAtLeast(meta.minGameVersion) && meta.getMinMajor() >= 105){
+
                 if(ios){
                     throw new IllegalArgumentException("Java class mods are not supported on iOS.");
                 }
@@ -744,6 +750,11 @@ public class Mods implements Loadable{
             this.main = main;
             this.meta = meta;
             this.name = meta.name.toLowerCase().replace(" ", "-");
+        }
+
+        /** @return whether this is a java class mod. */
+        public boolean isJava(){
+            return meta.java || main != null;
         }
 
         @Nullable
@@ -867,6 +878,8 @@ public class Mods implements Loadable{
         public Seq<String> dependencies = Seq.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;
+        /** If true, this mod should be loaded as a Java class mod. This is technically optional, but highly recommended. */
+        public boolean java;
 
         public String displayName(){
             return displayName == null ? Strings.stripColors(name) : displayName;
