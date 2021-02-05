@@ -10,6 +10,7 @@ import arc.input.*;
 import arc.scene.style.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -36,9 +37,38 @@ public class ModsDialog extends BaseDialog{
     private boolean orderDate = true;
     private BaseDialog currentContent;
 
+    private BaseDialog browser;
+    private Table browserTable;
+
     public ModsDialog(){
         super("@mods");
         addCloseButton();
+
+        browser = new BaseDialog("@mods.browser");
+
+        browser.cont.table(table -> {
+            table.left();
+            table.image(Icon.zoom);
+            table.field(searchtxt, res -> {
+                searchtxt = res;
+                rebuildBrowser();
+            }).growX().get();
+            table.button(Icon.list, Styles.clearPartiali, 32f, () -> {
+                orderDate = !orderDate;
+                rebuildBrowser();
+            }).update(b -> b.getStyle().imageUp = (orderDate ? Icon.list : Icon.star)).size(40f).get()
+            .addListener(new Tooltip(tip -> tip.label(() -> orderDate ? "@mods.browser.sortdate" : "@mods.browser.sortstars").left()));
+        }).fillX().padBottom(4);
+
+        browser.cont.row();
+        browser.cont.pane(tablebrow -> {
+            tablebrow.margin(10f).top();
+            browserTable = tablebrow;
+            rebuildBrowser();
+        }).get().setScrollingDisabled(true, false);
+        browser.addCloseButton();
+
+        browser.onResize(this::rebuildBrowser);
 
         buttons.button("@mods.guide", Icon.link, () -> Core.app.openURI(modGuideURL)).size(210, 64f);
 
@@ -226,7 +256,7 @@ public class ModsDialog extends BaseDialog{
                             title.table(text -> {
                                 boolean hideDisabled = !mod.isSupported() || mod.hasUnmetDependencies() || mod.hasContentErrors();
 
-                                text.add("" + mod.meta.displayName() + "\n[lightgray]v" + mod.meta.version + (mod.enabled() || hideDisabled ? "" : "\n" + Core.bundle.get("mod.disabled") + ""))
+                                text.add("" + Strings.stripColors(mod.meta.displayName()) + "\n[lightgray]v" + Strings.stripColors(trimText(mod.meta.version)) + (mod.enabled() || hideDisabled ? "" : "\n" + Core.bundle.get("mod.disabled") + ""))
                                     .wrap().top().width(300f).growX().left();
 
                                 text.row();
@@ -357,82 +387,70 @@ public class ModsDialog extends BaseDialog{
     }
 
     private void showModBrowser(){
-        Runnable[] rebuildBrowser = {null};
-        BaseDialog browser = new BaseDialog("@mods.browser");
-        browser.cont.table(table -> {
-            table.left();
-            table.image(Icon.zoom);
-            table.field(searchtxt, res -> {
-                searchtxt = res;
-                rebuildBrowser[0].run();
-            }).growX().get();
-            table.button(Icon.list, Styles.clearPartiali, 32f, () -> {
-                orderDate = !orderDate;
-                rebuildBrowser[0].run();
-            }).update(b -> b.getStyle().imageUp = (orderDate ? Icon.list : Icon.star)).size(40f).get()
-            .addListener(new Tooltip(tip -> tip.label(() -> orderDate ? "@mods.browser.sortdate" : "@mods.browser.sortstars").left()));
-        }).fillX().padBottom(4);
-
-        browser.cont.row();
-
-        browser.cont.pane(tablebrow -> {
-            tablebrow.margin(10f).top();
-            rebuildBrowser[0] = () -> {
-                tablebrow.clear();
-                tablebrow.add("@loading");
-
-                getModList(rlistings -> {
-                    tablebrow.clear();
-
-                    Seq<ModListing> listings = rlistings;
-                    if(!orderDate){
-                        listings = rlistings.copy();
-                        listings.sortComparing(m1 -> -m1.stars);
-                    }
-
-                    for(ModListing mod : listings){
-                        if((mod.hasJava && Vars.ios) || !searchtxt.isEmpty() && !mod.repo.toLowerCase().contains(searchtxt.toLowerCase()) || (Vars.ios && mod.hasScripts)) continue;
-
-                        tablebrow.button(btn -> {
-                            btn.top().left();
-                            btn.margin(12f);
-                            btn.table(con -> {
-                                con.left();
-                                con.add("[accent]" + mod.name + "[white]\n[lightgray]Author:[] " + trimText(mod.author) + "\n[lightgray]\uE809 " + mod.stars +
-                                (Version.isAtLeast(mod.minGameVersion) ? "" : "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
-                                .width(388f).wrap().growX().pad(0f, 6f, 0f, 6f).left().labelAlign(Align.left);
-                                con.add().growX().pad(0f, 6f, 0f, 6f);
-                            }).fillY().growX().pad(0f, 6f, 0f, 6f);
-                        }, Styles.modsb, () -> {
-                            var sel = new BaseDialog(mod.name);
-                            sel.cont.add(mod.description).width(mobile ? 400f : 500f).wrap().pad(4f).labelAlign(Align.center, Align.left);
-                            sel.buttons.defaults().size(150f, 54f).pad(2f);
-                            sel.setFillParent(false);
-                            sel.buttons.button("@back", Icon.left, () -> {
-                                sel.clear();
-                                sel.hide();
-                            });
-
-                            var found = mods.list().find(l -> mod.repo != null && mod.repo.equals(l.getRepo()));
-                            sel.buttons.button(found == null ? "@mods.browser.add" : "@mods.browser.reinstall", Icon.download, () -> {
-                                sel.hide();
-                                githubImportMod(mod.repo, mod.hasJava);
-                            });
-                            sel.buttons.button("@mods.github.open", Icon.link, () -> {
-                                Core.app.openURI("https://github.com/" + mod.repo);
-                            });
-                            sel.keyDown(KeyCode.escape, sel::hide);
-                            sel.keyDown(KeyCode.back, sel::hide);
-                            sel.show();
-                        }).width(460f).growX().left().fillY();
-                        tablebrow.row();
-                    }
-                });
-            };
-            rebuildBrowser[0].run();
-        }).get().setScrollingDisabled(true, false);
-        browser.addCloseButton();
+        rebuildBrowser();
         browser.show();
+    }
+
+    private void rebuildBrowser(){
+        ObjectSet<String> installed = mods.list().map(m -> m.getRepo()).asSet();
+
+        browserTable.clear();
+        browserTable.add("@loading");
+
+        int cols = Math.max(Core.graphics.getWidth() / 475, 1);
+
+        getModList(rlistings -> {
+            browserTable.clear();
+            int i = 0;
+
+            Seq<ModListing> listings = rlistings;
+            if(!orderDate){
+                listings = rlistings.copy();
+                listings.sortComparing(m1 -> -m1.stars);
+            }
+
+            for(ModListing mod : listings){
+                if((mod.hasJava && Vars.ios) || !searchtxt.isEmpty() && !mod.repo.toLowerCase().contains(searchtxt.toLowerCase()) || (Vars.ios && mod.hasScripts)) continue;
+
+                browserTable.button(btn -> {
+                    btn.top().left();
+                    btn.margin(12f);
+                    btn.table(con -> {
+                        con.left();
+                        con.add(
+                        "[accent]" + mod.name.replace("\n", "") +
+                        (installed.contains(mod.repo) ? " [scarlet][[Installed]" : "") +
+                        "[white]\n[lightgray]Author:[] " + trimText(mod.author) +
+                        "\n[lightgray]\uE809 " + mod.stars +
+                        (Version.isAtLeast(mod.minGameVersion) ? "" : "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
+                        .width(388f).wrap().growX().pad(0f, 6f, 0f, 6f).left().labelAlign(Align.left);
+                        con.add().growX().pad(0f, 6f, 0f, 6f);
+                    }).fillY().growX().pad(0f, 6f, 0f, 6f);
+                }, Styles.modsb, () -> {
+                    var sel = new BaseDialog(mod.name);
+                    sel.cont.add(mod.description).width(mobile ? 400f : 500f).wrap().pad(4f).labelAlign(Align.center, Align.left);
+                    sel.buttons.defaults().size(150f, 54f).pad(2f);
+                    sel.setFillParent(false);
+                    sel.buttons.button("@back", Icon.left, () -> {
+                        sel.clear();
+                        sel.hide();
+                    });
+
+                    var found = mods.list().find(l -> mod.repo != null && mod.repo.equals(l.getRepo()));
+                    sel.buttons.button(found == null ? "@mods.browser.add" : "@mods.browser.reinstall", Icon.download, () -> {
+                        sel.hide();
+                        githubImportMod(mod.repo, mod.hasJava);
+                    });
+                    sel.buttons.button("@mods.github.open", Icon.link, () -> {
+                        Core.app.openURI("https://github.com/" + mod.repo);
+                    });
+                    sel.keyDown(KeyCode.escape, sel::hide);
+                    sel.keyDown(KeyCode.back, sel::hide);
+                    sel.show();
+                }).width(460f).growX().left().fillY();
+                if(++i % cols == 0) browserTable.row();
+            }
+        });
     }
 
     private String trimText(String text){

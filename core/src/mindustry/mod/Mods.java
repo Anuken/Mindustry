@@ -882,7 +882,7 @@ public class Mods implements Loadable{
         public boolean java;
 
         public String displayName(){
-            return displayName == null ? Strings.stripColors(name) : displayName;
+            return displayName == null ? name : displayName;
         }
 
         //removes all colors
