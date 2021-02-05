@@ -645,6 +645,7 @@ public class Mods implements Loadable{
             var other = mods.find(m -> m.name.equals(baseName));
 
             if(other != null){
+                //steam mods can't really be deleted, they need to be unsubscribed
                 if(overwrite && !other.hasSteamID()){
                     //close zip file
                     if(other.root instanceof ZipFi){
@@ -674,7 +675,7 @@ public class Mods implements Loadable{
             }
 
             //make sure the main class exists before loading it; if it doesn't just don't put it there
-            if(mainFile.exists() && Core.settings.getBool("mod-" + baseName + "-enabled", true)){
+            if(mainFile.exists() && Core.settings.getBool("mod-" + baseName + "-enabled", true) && Version.isAtLeast(meta.minGameVersion) && meta.getMinMajor() >= 105){
                 //mobile versions don't support class mods
                 if(ios){
                     throw new IllegalArgumentException("Java class mods are not supported on iOS.");
@@ -784,9 +785,7 @@ public class Mods implements Loadable{
         }
 
         public int getMinMajor(){
-            String ver = meta.minGameVersion == null ? "0" : meta.minGameVersion;
-            int dot = ver.indexOf(".");
-            return dot != -1 ? Strings.parseInt(ver.substring(0, dot), 0) : Strings.parseInt(ver, 0);
+            return meta.getMinMajor();
         }
 
         @Override
@@ -870,7 +869,7 @@ public class Mods implements Loadable{
         public boolean hidden;
 
         public String displayName(){
-            return displayName == null ? name : displayName;
+            return displayName == null ? Strings.stripColors(name) : displayName;
         }
 
         //removes all colors
@@ -878,6 +877,12 @@ public class Mods implements Loadable{
             if(displayName != null) displayName = Strings.stripColors(displayName);
             if(author != null) author = Strings.stripColors(author);
             if(description != null) description = Strings.stripColors(description);
+        }
+
+        public int getMinMajor(){
+            String ver = minGameVersion == null ? "0" : minGameVersion;
+            int dot = ver.indexOf(".");
+            return dot != -1 ? Strings.parseInt(ver.substring(0, dot), 0) : Strings.parseInt(ver, 0);
         }
         
         @Override

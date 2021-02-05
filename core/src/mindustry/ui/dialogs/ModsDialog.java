@@ -8,8 +8,8 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.scene.style.*;
-import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
+import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -17,6 +17,7 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.mod.*;
@@ -33,6 +34,7 @@ public class ModsDialog extends BaseDialog{
     private String searchtxt = "";
     private @Nullable Seq<ModListing> modList;
     private boolean orderDate = true;
+    private BaseDialog currentContent;
 
     public ModsDialog(){
         super("@mods");
@@ -44,6 +46,13 @@ public class ModsDialog extends BaseDialog{
         if(mobile){
             onResize(this::setup);
         }
+
+        Events.on(ResizeEvent.class, event -> {
+            if(currentContent != null){
+                currentContent.hide();
+                currentContent = null;
+            }
+        });
 
         hidden(() -> {
             if(mods.requiresReload()){
@@ -162,7 +171,6 @@ public class ModsDialog extends BaseDialog{
                         ui.showTextInput("@mod.import.github", "", 64, Core.settings.getString("lastmod", ""), text -> {
                             Core.settings.put("lastmod", text);
 
-                            ui.loadfrag.show();
                             githubImportMod(text);
                         });
                     }).margin(12f);
@@ -205,7 +213,7 @@ public class ModsDialog extends BaseDialog{
                                     }
 
                                     for(ModListing mod : listings){
-                                        if(mod.hasJava || !searchtxt.isEmpty() && !mod.repo.toLowerCase().contains(searchtxt.toLowerCase()) || (Vars.ios && mod.hasScripts)) continue;
+                                        if((mod.hasJava && Vars.ios) || !searchtxt.isEmpty() && !mod.repo.toLowerCase().contains(searchtxt.toLowerCase()) || (Vars.ios && mod.hasScripts)) continue;
 
                                         tablebrow.button(btn -> {
                                             btn.top().left();
@@ -366,7 +374,10 @@ public class ModsDialog extends BaseDialog{
         }
 
         if(mod.getRepo() != null){
+            boolean showImport = !mod.hasSteamID();
             dialog.buttons.button("@mods.github.open", Icon.link, () -> Core.app.openURI("https://github.com/" + mod.getRepo()));
+            if(mobile && showImport) dialog.buttons.row();
+            if(showImport) dialog.buttons.button("@mods.browser.reinstall", Icon.download, () -> githubImportMod(mod.getRepo()));
         }
 
         //TODO improve this menu later
@@ -393,12 +404,12 @@ public class ModsDialog extends BaseDialog{
 
         }).width(400f);
 
-        //TODO maybe enable later
-        if(false){
-            Seq<UnlockableContent> all = Seq.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent).as();
-            if(all.any()){
-                dialog.cont.row();
-                dialog.cont.pane(cs -> {
+        Seq<UnlockableContent> all = Seq.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent).as();
+        if(all.any()){
+            dialog.cont.row();
+            dialog.cont.button( "@mods.viewcontent", Icon.book, () -> {
+                BaseDialog d = new BaseDialog(mod.meta.displayName());
+                d.cont.pane(cs -> {
                     int i = 0;
                     for(UnlockableContent c : all){
                         cs.button(new TextureRegionDrawable(c.icon(Cicon.medium)), Styles.cleari, Cicon.medium.size, () -> {
@@ -406,12 +417,16 @@ public class ModsDialog extends BaseDialog{
                         }).size(50f).with(im -> {
                             var click = im.getClickListener();
                             im.update(() -> im.getImage().color.lerp(!click.isOver() ? Color.lightGray : Color.white, 0.4f * Time.delta));
-                        });
 
-                        if(++i % 8 == 0) cs.row();
+                        }).tooltip(c.localizedName);
+
+                        if(++i % Math.min(Core.graphics.getWidth() / 70, 14) == 0) cs.row();
                     }
-                }).growX().minHeight(60f);
-            }
+                }).grow();
+                d.addCloseButton();
+                d.show();
+                currentContent = d;
+            }).size(300, 50).pad(4);
         }
 
         dialog.show();
@@ -438,6 +453,7 @@ public class ModsDialog extends BaseDialog{
     }
 
     private void githubImportMod(String name){
+        ui.loadfrag.show();
         Core.net.httpGet("https://api.github.com/repos/" + name, res -> {
             if(checkError(res)){
                 String mainBranch = Jval.read(res.getResultAsString()).getString("default_branch");
