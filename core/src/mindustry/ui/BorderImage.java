@@ -7,7 +7,7 @@ import arc.scene.ui.layout.*;
 import mindustry.graphics.*;
 
 public class BorderImage extends Image{
-    public float thickness = 4f;
+    public float thickness = 4f, pad = 0f;
     public Color borderColor = Pal.gray;
 
     public BorderImage(){
@@ -40,7 +40,7 @@ public class BorderImage extends Image{
         Draw.color(borderColor);
         Draw.alpha(parentAlpha);
         Lines.stroke(Scl.scl(thickness));
-        Lines.rect(x + imageX, y + imageY, imageWidth * scaleX, imageHeight * scaleY);
+        Lines.rect(x + imageX - pad, y + imageY - pad, imageWidth * scaleX + pad*2, imageHeight * scaleY + pad*2);
         Draw.reset();
     }
 }

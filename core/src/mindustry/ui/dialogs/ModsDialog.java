@@ -5,6 +5,7 @@ import arc.Net.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.scene.style.*;
@@ -21,6 +22,7 @@ import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.ui.*;
@@ -32,6 +34,8 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class ModsDialog extends BaseDialog{
+    private ObjectMap<String, TextureRegion> textureCache = new ObjectMap<>();
+
     private String searchtxt = "";
     private @Nullable Seq<ModListing> modList;
     private boolean orderDate = true;
@@ -43,6 +47,15 @@ public class ModsDialog extends BaseDialog{
     public ModsDialog(){
         super("@mods");
         addCloseButton();
+
+        Events.on(DisposeEvent.class, e -> {
+            textureCache.each((key, val) -> {
+                if(val.texture.width == val.width){
+                    val.texture.dispose();
+                }
+            });
+            textureCache.clear();
+        });
 
         browser = new BaseDialog("@mods.browser");
 
@@ -122,9 +135,7 @@ public class ModsDialog extends BaseDialog{
                         ui.showErrorMessage(Core.bundle.format("connectfail", status));
                     }else{
                         try{
-                            var j = new Json();
-                            j.setIgnoreUnknownFields(true);
-                            modList = j.fromJson(Seq.class, ModListing.class, strResult);
+                            modList = JsonIO.json.fromJson(Seq.class, ModListing.class, strResult);
 
                             var d = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                             Func<String, Date> parser = text -> {
@@ -397,7 +408,7 @@ public class ModsDialog extends BaseDialog{
         browserTable.clear();
         browserTable.add("@loading");
 
-        int cols = Math.max(Core.graphics.getWidth() / 475, 1);
+        int cols = Math.max(Core.graphics.getWidth() / 482, 1);
 
         getModList(rlistings -> {
             browserTable.clear();
@@ -412,23 +423,65 @@ public class ModsDialog extends BaseDialog{
             for(ModListing mod : listings){
                 if((mod.hasJava && Vars.ios) || !searchtxt.isEmpty() && !mod.repo.toLowerCase().contains(searchtxt.toLowerCase()) || (Vars.ios && mod.hasScripts)) continue;
 
-                browserTable.button(btn -> {
-                    btn.top().left();
-                    btn.margin(12f);
-                    btn.table(con -> {
-                        con.left();
-                        con.add(
-                        "[accent]" + mod.name.replace("\n", "") +
-                        (installed.contains(mod.repo) ? " [scarlet][[Installed]" : "") +
-                        "[white]\n[lightgray]Author:[] " + trimText(mod.author) +
-                        "\n[lightgray]\uE809 " + mod.stars +
-                        (Version.isAtLeast(mod.minGameVersion) ? "" : "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
-                        .width(388f).wrap().growX().pad(0f, 6f, 0f, 6f).left().labelAlign(Align.left);
-                        con.add().growX().pad(0f, 6f, 0f, 6f);
-                    }).fillY().growX().pad(0f, 6f, 0f, 6f);
-                }, Styles.modsb, () -> {
+                float s = 64f;
+
+                browserTable.button(con -> {
+                    con.margin(0f);
+                    con.left();
+
+                    String repo = mod.repo;
+                    con.add(new BorderImage(){
+                        TextureRegion last;
+
+                        {
+                            border(installed.contains(repo) ? Pal.accent : Color.lightGray);
+                            setDrawable(Tex.nomap);
+                            pad = Scl.scl(4f);
+                        }
+
+                        @Override
+                        public void draw(){
+                            super.draw();
+
+                            //textures are only requested when the rendering happens; this assists with culling
+                            if(!textureCache.containsKey(repo)){
+                                textureCache.put(repo, last = Tex.nomap.getRegion());
+                                Core.net.httpGet("https://raw.githubusercontent.com/Anuken/MindustryMods/master/icons/" + repo.replace("/", "_"), res -> {
+                                    if(res.getStatus() == HttpStatus.OK){
+                                        Pixmap pix = new Pixmap(res.getResult());
+                                        Core.app.post(() -> {
+                                            try{
+                                                var tex = new Texture(pix);
+                                                tex.setFilter(TextureFilter.linear);
+                                                textureCache.put(repo, new TextureRegion(tex));
+                                                pix.dispose();
+                                            }catch(Exception e){
+                                                Log.err(e);
+                                            }
+                                        });
+                                    }
+                                }, err -> {});
+                            }
+
+                            var next = textureCache.get(repo);
+                            if(last != next){
+                                last = next;
+                                setDrawable(next);
+                            }
+                        }
+                    }).size(s).pad(4f * 2f);
+
+                    con.add(
+                    "[accent]" + mod.name.replace("\n", "") +
+                    (installed.contains(mod.repo) ? "\n[lightgray]" + Core.bundle.get("mod.installed") : "") +
+                    //"[white]\n[lightgray]Author:[] " + trimText(mod.author) +
+                    "\n[lightgray]\uE809 " + mod.stars +
+                    (Version.isAtLeast(mod.minGameVersion) ? "" : "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
+                    .width(358f).wrap().grow().pad(4f, 2f, 4f, 6f).top().left().labelAlign(Align.topLeft);
+
+                }, Styles.clearPartialt, () -> {
                     var sel = new BaseDialog(mod.name);
-                    sel.cont.add(mod.description).width(mobile ? 400f : 500f).wrap().pad(4f).labelAlign(Align.center, Align.left);
+                    sel.cont.add(mod.description + "\n\n[accent]" + Core.bundle.get("editor.author") + "[lightgray] " + mod.author).width(mobile ? 400f : 500f).wrap().pad(4f).labelAlign(Align.center, Align.left);
                     sel.buttons.defaults().size(150f, 54f).pad(2f);
                     sel.setFillParent(false);
                     sel.buttons.button("@back", Icon.left, () -> {
@@ -447,7 +500,8 @@ public class ModsDialog extends BaseDialog{
                     sel.keyDown(KeyCode.escape, sel::hide);
                     sel.keyDown(KeyCode.back, sel::hide);
                     sel.show();
-                }).width(460f).growX().left().fillY();
+                }).width(460f).pad(4).growX().left().height(s + 8*2f).fillY();
+
                 if(++i % cols == 0) browserTable.row();
             }
         });
@@ -485,11 +539,13 @@ public class ModsDialog extends BaseDialog{
     }
 
     private void githubImportMod(String repo, boolean isJava){
-        ui.loadfrag.show();
-
         if(isJava){
-            githubImportJavaMod(repo);
+            ui.showConfirm("@warning", "@mod.jarwarn", () -> {
+                ui.loadfrag.show();
+                githubImportJavaMod(repo);
+            });
         }else{
+            ui.loadfrag.show();
             Core.net.httpGet(ghApi + "/repos/" + repo, res -> {
                 if(checkError(res)){
                     var json = Jval.read(res.getResultAsString());

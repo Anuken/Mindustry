@@ -435,7 +435,7 @@ public class UnitTypes implements ContentList{
 
                 firstShotDelay = Fx.greenLaserChargeSmall.lifetime - 1f;
 
-                reload = 160f;
+                reload = 155f;
                 recoil = 0f;
                 chargeSound = Sounds.lasercharge2;
                 shootSound = Sounds.beam;
@@ -443,7 +443,7 @@ public class UnitTypes implements ContentList{
                 cooldownTime = 200f;
 
                 bullet = new ContinuousLaserBulletType(){{
-                    damage = 23f;
+                    damage = 24f;
                     length = 160f;
                     hitEffect = Fx.hitMeltHeal;
                     drawSize = 420f;
@@ -454,7 +454,7 @@ public class UnitTypes implements ContentList{
 
                     shootEffect = Fx.greenLaserChargeSmall;
 
-                    incendChance = 0.075f;
+                    incendChance = 0.08f;
                     incendSpread = 5f;
                     incendAmount = 1;
 

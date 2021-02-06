@@ -345,7 +345,7 @@ public class Vars implements Loadable{
     }
 
     public static void loadSettings(){
-        settings.setJson(JsonIO.json());
+        settings.setJson(JsonIO.json);
         settings.setAppName(appName);
 
         if(steam || (Version.modifier != null && Version.modifier.contains("steam"))){

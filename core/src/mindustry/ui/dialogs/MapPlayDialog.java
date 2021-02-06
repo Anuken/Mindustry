@@ -66,7 +66,7 @@ public class MapPlayDialog extends BaseDialog{
 
         cont.add(selmode);
         cont.row();
-        cont.button("@customize", Icon.settings, () -> dialog.show(rules, () -> rules = map.applyRules(selectedGamemode))).width(230);
+        cont.button("@customize", Icon.settings, () -> dialog.show(rules, () -> rules = map.applyRules(selectedGamemode))).height(50f).width(230);
         cont.row();
         cont.add(new BorderImage(map.safeTexture(), 3f)).size(mobile && !Core.graphics.isPortrait() ? 150f : 250f).get().setScaling(Scaling.fit);
         //only maps with survival are valid for high scores
