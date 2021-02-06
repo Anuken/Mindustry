@@ -4,6 +4,10 @@
     "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl"]
   },
   {
+    "name": "G-Mod Polska",
+    "address": ["185.86.230.110:25793"]
+  },
+  {
     "name": "{AA}",
     "address": ["aamindustry.play.ai", "aamindustry.play.ai:6571", "aamindustry.play.ai:6572", "aamindustry.play.ai:6573", "aamindustry.play.ai:6574"]
   },
