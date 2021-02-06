@@ -338,7 +338,10 @@ project(":core"){
 
     afterEvaluate{
         task mergedJavadoc(type: Javadoc){
-            def blacklist = [project(":android"), project(":ios"), project(":desktop"), project(":server"), project(":annotations")]
+            def blacklist = [project(":ios"), project(":desktop"), project(":server"), project(":annotations")]
+            if(findProject(":android") != null){
+                blacklist += project(":android")
+            }
 
             source rootProject.subprojects.collect{ project ->
                 if(!blacklist.contains(project) && project.hasProperty("sourceSets")){
