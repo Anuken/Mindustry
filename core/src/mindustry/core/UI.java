@@ -214,6 +214,13 @@ public class UI implements ApplicationListener, Loadable{
     @Override
     public void resize(int width, int height){
         if(Core.scene == null) return;
+
+        int[] insets = Core.graphics.getSafeInsets();
+        Core.scene.marginLeft = insets[0];
+        Core.scene.marginRight = insets[1];
+        Core.scene.marginTop = insets[2];
+        Core.scene.marginBottom = insets[3];
+
         Core.scene.resize(width, height);
         Events.fire(new ResizeEvent());
     }
