@@ -396,7 +396,6 @@ public class NetClient implements ApplicationListener{
             netClient.byteStream.setBytes(net.decompressSnapshot(data, dataLen));
             DataInputStream input = netClient.dataStream;
 
-            //go through each entity
             for(int j = 0; j < amount; j++){
                 int id = input.readInt();
                 byte typeID = input.readByte();
