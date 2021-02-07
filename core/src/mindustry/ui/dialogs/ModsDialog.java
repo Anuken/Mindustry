@@ -408,7 +408,7 @@ public class ModsDialog extends BaseDialog{
         browserTable.clear();
         browserTable.add("@loading");
 
-        int cols = (int)Math.max(Core.graphics.getWidth() / Scl.scl(482), 1);
+        int cols = (int)Math.max(Core.graphics.getWidth() / Scl.scl(480), 1);
 
         getModList(rlistings -> {
             browserTable.clear();
@@ -500,7 +500,7 @@ public class ModsDialog extends BaseDialog{
                     sel.keyDown(KeyCode.escape, sel::hide);
                     sel.keyDown(KeyCode.back, sel::hide);
                     sel.show();
-                }).width(460f).pad(4).growX().left().height(s + 8*2f).fillY();
+                }).width(438f).pad(4).growX().left().height(s + 8*2f).fillY();
 
                 if(++i % cols == 0) browserTable.row();
             }
