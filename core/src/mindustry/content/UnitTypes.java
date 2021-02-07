@@ -418,7 +418,7 @@ public class UnitTypes implements ContentList{
             engineSize = 6f;
             lowAltitude = true;
 
-            health = 7000f;
+            health = 7200f;
             armor = 7f;
             canBoost = true;
             landShake = 4f;
@@ -444,7 +444,7 @@ public class UnitTypes implements ContentList{
 
                 bullet = new ContinuousLaserBulletType(){{
                     damage = 24f;
-                    length = 160f;
+                    length = 164f;
                     hitEffect = Fx.hitMeltHeal;
                     drawSize = 420f;
                     lifetime = 160f;
@@ -1590,7 +1590,7 @@ public class UnitTypes implements ContentList{
         }};
 
         sei = new UnitType("sei"){{
-            health = 10000;
+            health = 10200;
             armor = 12f;
 
             speed = 0.73f;
