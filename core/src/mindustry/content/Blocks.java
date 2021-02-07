@@ -797,6 +797,7 @@ public class Blocks implements ContentList{
             size = 2;
             insulated = true;
             absorbLasers = true;
+            schematicPriority = 10;
         }};
 
         thoriumWall = new Wall("thorium-wall"){{
