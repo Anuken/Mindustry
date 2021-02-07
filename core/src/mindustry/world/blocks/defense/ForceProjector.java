@@ -117,6 +117,8 @@ public class ForceProjector extends Block{
 
         @Override
         public void onRemoved(){
+            float radius = realRadius();
+            if(!broken && radius > 1f) Fx.forceShrink.at(x, y, radius, team.color);
             super.onRemoved();
             drawer.remove();
         }
