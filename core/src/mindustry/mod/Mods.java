@@ -681,7 +681,7 @@ public class Mods implements Loadable{
             //make sure the main class exists before loading it; if it doesn't just don't put it there
             //if the mod is explicitly marked as java, try loading it anyway
             if((mainFile.exists() || meta.java) &&
-                Core.settings.getBool("mod-" + baseName + "-enabled", true) && Version.isAtLeast(meta.minGameVersion) && meta.getMinMajor() >= 105){
+                Core.settings.getBool("mod-" + baseName + "-enabled", true) && Version.isAtLeast(meta.minGameVersion) && (meta.getMinMajor() >= 105 || headless)){
 
                 if(ios){
                     throw new IllegalArgumentException("Java class mods are not supported on iOS.");

@@ -385,7 +385,7 @@ public class ModsDialog extends BaseDialog{
 
                         }).tooltip(c.localizedName);
 
-                        if(++i % Math.min(Core.graphics.getWidth() / 70, 14) == 0) cs.row();
+                        if(++i % Math.min(Core.graphics.getWidth() / Scl.scl(70), 14) == 0) cs.row();
                     }
                 }).grow();
                 d.addCloseButton();
@@ -408,7 +408,7 @@ public class ModsDialog extends BaseDialog{
         browserTable.clear();
         browserTable.add("@loading");
 
-        int cols = Math.max(Core.graphics.getWidth() / 482, 1);
+        int cols = (int)Math.max(Core.graphics.getWidth() / Scl.scl(482), 1);
 
         getModList(rlistings -> {
             browserTable.clear();
