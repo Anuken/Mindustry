@@ -481,9 +481,9 @@ public class ModsDialog extends BaseDialog{
 
                 }, Styles.clearPartialt, () -> {
                     var sel = new BaseDialog(mod.name);
-                    sel.cont.add(mod.description + "\n\n[accent]" + Core.bundle.get("editor.author") + "[lightgray] " + mod.author).width(mobile ? 400f : 500f).wrap().pad(4f).labelAlign(Align.center, Align.left);
+                    sel.cont.pane(p -> p.add(mod.description + "\n\n[accent]" + Core.bundle.get("editor.author") + "[lightgray] " + mod.author)
+                        .width(mobile ? 400f : 500f).wrap().pad(4f).labelAlign(Align.center, Align.left)).grow();
                     sel.buttons.defaults().size(150f, 54f).pad(2f);
-                    sel.setFillParent(false);
                     sel.buttons.button("@back", Icon.left, () -> {
                         sel.clear();
                         sel.hide();
