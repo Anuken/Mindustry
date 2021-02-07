@@ -318,6 +318,11 @@ project(":core"){
         }
     }
 
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
     dependencies{
         compileJava.dependsOn(preGen)
 
@@ -438,10 +443,4 @@ task resolveDependencies{
             configurations.findAll{c -> c.canBeResolved}.forEach{c -> c.resolve()}
         }
     }
-}
-
-apply plugin: "java-library"
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
 }
