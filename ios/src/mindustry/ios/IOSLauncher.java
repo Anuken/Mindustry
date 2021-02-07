@@ -27,6 +27,8 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 import static org.robovm.apple.foundation.NSPathUtilities.getDocumentsDirectory;
 
+//warnings for deprecated functions related to multi-scene windows are not applicable here
+@SuppressWarnings("deprecation")
 public class IOSLauncher extends IOSApplication.Delegate{
     private boolean forced;
 
@@ -198,19 +200,15 @@ public class IOSLauncher extends IOSApplication.Delegate{
             openURL(((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())));
         }
 
-        Events.on(ClientLoadEvent.class, e -> {
-            Core.app.post(() -> Core.app.post(() -> {
-                Core.scene.table(Styles.black9, t -> {
-                    t.visible(() -> {
-                        if(!forced) return false;
-                        t.toFront();
-                        UIInterfaceOrientation o = UIApplication.getSharedApplication().getStatusBarOrientation();
-                        return forced && (o == UIInterfaceOrientation.Portrait || o == UIInterfaceOrientation.PortraitUpsideDown);
-                    });
-                    t.add("Rotate the device to landscape orientation to use the editor.").wrap().grow();
-                });
-            }));
-        });
+        Events.on(ClientLoadEvent.class, e -> Core.app.post(() -> Core.app.post(() -> Core.scene.table(Styles.black9, t -> {
+            t.visible(() -> {
+                if(!forced) return false;
+                t.toFront();
+                UIInterfaceOrientation o = UIApplication.getSharedApplication().getStatusBarOrientation();
+                return forced && (o == UIInterfaceOrientation.Portrait || o == UIInterfaceOrientation.PortraitUpsideDown);
+            });
+            t.add("Rotate the device to landscape orientation to use the editor.").wrap().grow();
+        }))));
 
         return b;
     }
