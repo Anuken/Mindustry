@@ -410,11 +410,6 @@ project(":annotations"){
     }
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
 task deployAll{
     task cleanDeployOutput{
         doFirst{
@@ -443,4 +438,10 @@ task resolveDependencies{
             configurations.findAll{c -> c.canBeResolved}.forEach{c -> c.resolve()}
         }
     }
+}
+
+apply plugin: "java-library"
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
 }
