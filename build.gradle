@@ -444,7 +444,3 @@ task resolveDependencies{
         }
     }
 }
-
-artifacts {
-    archives sourcesJar
-}
