@@ -23,7 +23,6 @@ public class Pathfinder implements Runnable{
     private static final int updateFPS = 60;
     private static final int updateInterval = 1000 / updateFPS;
     private static final int impassable = -1;
-    private static final int fieldTimeout = 1000 * 60 * 2;
 
     public static final int
         fieldCore = 0,
@@ -192,31 +191,6 @@ public class Pathfinder implements Runnable{
                     //total update time no longer than maxUpdate
                     for(Flowfield data : threadList){
                         updateFrontier(data, maxUpdate / threadList.size);
-
-                        //TODO implement timeouts... or don't
-                        /*
-                        //remove flowfields that have 'timed out' so they can be garbage collected and no longer waste space
-                        if(data.refreshRate > 0 && Time.timeSinceMillis(data.lastUpdateTime) > fieldTimeout){
-                            //make sure it doesn't get removed twice
-                            data.lastUpdateTime = Time.millis();
-
-                            Team team = data.team;
-
-                            Core.app.post(() -> {
-                                //remove its used state
-                                if(fieldMap[team.id] != null){
-                                    fieldMap[team.id].remove(data.target);
-                                    fieldMapUsed[team.id].remove(data.target);
-                                }
-                                //remove from main thread list
-                                mainList.remove(data);
-                            });
-
-                            queue.post(() -> {
-                                //remove from this thread list with a delay
-                                threadList.remove(data);
-                            });
-                        }*/
                     }
                 }
 

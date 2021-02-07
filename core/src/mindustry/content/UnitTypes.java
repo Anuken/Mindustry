@@ -150,7 +150,7 @@ public class UnitTypes implements ContentList{
             hitSize = 20f;
             rotateSpeed = 2.1f;
             health = 9000;
-            armor = 11f;
+            armor = 10f;
             canDrown = false;
             mechFrontSway = 1f;
 
@@ -419,7 +419,7 @@ public class UnitTypes implements ContentList{
             lowAltitude = true;
 
             health = 7200f;
-            armor = 7f;
+            armor = 8f;
             canBoost = true;
             landShake = 4f;
             immunities = ObjectSet.with(StatusEffects.burning);
@@ -443,8 +443,8 @@ public class UnitTypes implements ContentList{
                 cooldownTime = 200f;
 
                 bullet = new ContinuousLaserBulletType(){{
-                    damage = 24f;
-                    length = 164f;
+                    damage = 26f;
+                    length = 170f;
                     hitEffect = Fx.hitMeltHeal;
                     drawSize = 420f;
                     lifetime = 160f;

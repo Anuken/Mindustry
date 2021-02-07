@@ -38,10 +38,7 @@ public class Renderer implements ApplicationListener{
 
     private @Nullable CoreBuild landCore;
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
-    private float targetscale = Scl.scl(4);
-    private float camerascale = targetscale;
-    private float landscale = 0f, landTime, weatherAlpha;
-    private float minZoomScl = Scl.scl(0.01f);
+    private float targetscale = Scl.scl(4), camerascale = targetscale, landscale, landTime, weatherAlpha, minZoomScl = Scl.scl(0.01f);
     private float shakeIntensity, shaketime;
 
     public Renderer(){
