@@ -27,6 +27,7 @@ public enum LogicOp{
     xor("xor", (a, b) -> (long)a ^ (long)b),
     not("flip", a -> ~(long)(a)),
 
+    isNull("isNull", v -> v == 0 ? 1 : 0), //this lambda is not actually used
     max("max", Math::max),
     min("min", Math::min),
     atan2("atan2", (x, y) -> Mathf.atan2((float)x, (float)y) * Mathf.radDeg),

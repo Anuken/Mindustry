@@ -1,5 +1,6 @@
 package mindustry.logic;
 
+import arc.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -98,6 +99,10 @@ public class LExecutor{
 
     //region utility
 
+    private static boolean invalid(double d){
+        return Double.isNaN(d) || Double.isInfinite(d);
+    }
+
     public Var var(int index){
         //global constants have variable IDs < 0, and they are fetched from the global constants object after being negated
         return index < 0 ? constants.get(-index) : vars[index];
@@ -120,12 +125,12 @@ public class LExecutor{
 
     public double num(int index){
         Var v = var(index);
-        return v.isobj ? v.objval != null ? 1 : 0 : Double.isNaN(v.numval) || Double.isInfinite(v.numval) ? 0 : v.numval;
+        return v.isobj ? v.objval != null ? 1 : 0 : invalid(v.numval) ? 0 : v.numval;
     }
 
     public float numf(int index){
         Var v = var(index);
-        return v.isobj ? v.objval != null ? 1 : 0 : Double.isNaN(v.numval) || Double.isInfinite(v.numval) ? 0 : (float)v.numval;
+        return v.isobj ? v.objval != null ? 1 : 0 : invalid(v.numval) ? 0 : (float)v.numval;
     }
 
     public int numi(int index){
@@ -139,9 +144,14 @@ public class LExecutor{
     public void setnum(int index, double value){
         Var v = var(index);
         if(v.constant) return;
-        v.numval = Double.isNaN(value) || Double.isInfinite(value) ? 0 : value;
-        v.objval = null;
-        v.isobj = false;
+        if(invalid(value)){
+            v.objval = null;
+            v.isobj = true;
+        }else{
+            v.numval = value;
+            v.objval = null;
+            v.isobj = false;
+        }
     }
 
     public void setobj(int index, Object value){
@@ -622,21 +632,21 @@ public class LExecutor{
 
             //note that remote units/buildings can be sensed as well
             if(target instanceof Senseable se){
-                if(sense instanceof Content){
-                    exec.setnum(to, se.sense(((Content)sense)));
-                }else if(sense instanceof LAccess){
-                    Object objOut = se.senseObject((LAccess)sense);
+                if(sense instanceof Content co){
+                    exec.setnum(to, se.sense(co));
+                }else if(sense instanceof LAccess la){
+                    Object objOut = se.senseObject(la);
 
                     if(objOut == Senseable.noSensed){
                         //numeric output
-                        exec.setnum(to, se.sense((LAccess)sense));
+                        exec.setnum(to, se.sense(la));
                     }else{
                         //object output
                         exec.setobj(to, objOut);
                     }
                 }
             }else{
-                exec.setnum(to, 0);
+                exec.setobj(to, null);
             }
         }
     }
@@ -752,7 +762,7 @@ public class LExecutor{
                     v.objval = f.objval;
                     v.isobj = true;
                 }else{
-                    v.numval = Double.isNaN(f.numval) || Double.isInfinite(f.numval) ? 0 : f.numval;
+                    v.numval = invalid(f.numval) ? 0 : f.numval;
                     v.isobj = false;
                 }
             }
@@ -774,7 +784,10 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(op.unary){
+            if(op == LogicOp.isNull){
+                var v = exec.var(a);
+                exec.setnum(dest, v.isobj && v.objval == null ? 1 : 0);
+            }else if(op.unary){
                 exec.setnum(dest, op.function1.get(exec.num(a)));
             }else{
                 Var va = exec.var(a);
@@ -964,6 +977,38 @@ public class LExecutor{
             }
         }
     }
+
+    public static class WaitI implements LInstruction{
+        public int value;
+
+        public float curTime;
+        public double wait;
+        public long frameId;
+
+        public WaitI(int value){
+            this.value = value;
+        }
+
+        public WaitI(){
+
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(curTime >= exec.num(value)){
+                curTime = 0f;
+            }else{
+                //skip back to self.
+                exec.var(varCounter).numval --;
+            }
+
+            if(Core.graphics.getFrameId() != frameId){
+                curTime += Time.delta / 60f;
+                frameId = Core.graphics.getFrameId();
+            }
+        }
+    }
+
 
     //endregion
 }
