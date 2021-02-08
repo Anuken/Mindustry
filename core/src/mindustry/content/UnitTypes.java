@@ -1590,7 +1590,7 @@ public class UnitTypes implements ContentList{
         }};
 
         sei = new UnitType("sei"){{
-            health = 10200;
+            health = 10500;
             armor = 12f;
 
             speed = 0.73f;

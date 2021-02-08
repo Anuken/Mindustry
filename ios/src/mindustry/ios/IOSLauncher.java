@@ -27,7 +27,7 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 import static org.robovm.apple.foundation.NSPathUtilities.getDocumentsDirectory;
 
-//warnings for deprecated functions related to multi-scene windows are not applicable here
+//warnings for deprecated functions related to multi-window applications are not applicable here
 @SuppressWarnings("deprecation")
 public class IOSLauncher extends IOSApplication.Delegate{
     private boolean forced;

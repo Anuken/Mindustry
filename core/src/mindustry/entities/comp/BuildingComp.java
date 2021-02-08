@@ -558,7 +558,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 if(ofract < fract) transferLiquid(other, (fract - ofract) * block.liquidCapacity / scaling, liquid);
             }
         }
-
     }
 
     public boolean canDumpLiquid(Building to, Liquid liquid){
