@@ -75,6 +75,7 @@ public class NetClient implements ApplicationListener{
 
             ConnectPacket c = new ConnectPacket();
             c.name = player.name;
+            c.locale = Core.settings.getString("locale");
             c.mods = mods.getModStrings();
             c.mobile = mobile;
             c.versionType = Version.type;
