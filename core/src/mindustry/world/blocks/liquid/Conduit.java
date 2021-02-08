@@ -77,6 +77,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public class ConduitBuild extends LiquidBuild implements ChainedBuilding{
         public float smoothLiquid;
         public int blendbits, xscl, yscl, blending;
+        public FluidLine line = new FluidLine(this);
 
         @Override
         public void draw(){
@@ -107,6 +108,16 @@ public class Conduit extends LiquidBlock implements Autotiler{
             Drawf.liquid(sliced(botRegions[bits], slice), x, y, smoothLiquid, liquids.current().color, rotation);
 
             Draw.rect(sliced(topRegions[bits], slice), x, y, rotation);
+        }
+
+        @Override
+        public void onProximityAdded(){
+            super.onProximityAdded();
+        }
+
+        @Override
+        public void onProximityRemoved(){
+            super.onProximityRemoved();
         }
 
         @Override
