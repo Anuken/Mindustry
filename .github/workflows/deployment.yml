@@ -50,6 +50,7 @@ jobs:
         echo versionName=6-fdroid-${RELEASE_VERSION:1}$'\n'versionCode=${RELEASE_VERSION:1} > version_fdroid.txt
         git add .
         git commit -m "Updating to build ${RELEASE_VERSION:1}"
+        git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/Anuken/MindustryBuilds
         cd ../Mindustry
     - name: Upload client artifacts
       uses: svenstaro/upload-release-action@v2

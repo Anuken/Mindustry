@@ -77,7 +77,6 @@ public class ModsDialog extends BaseDialog{
         browser.cont.pane(tablebrow -> {
             tablebrow.margin(10f).top();
             browserTable = tablebrow;
-            rebuildBrowser();
         }).get().setScrollingDisabled(true, false);
         browser.addCloseButton();
 
@@ -155,7 +154,7 @@ public class ModsDialog extends BaseDialog{
 
                     }
                 });
-            }, error -> Core.app.post(() -> ui.showException(error)));
+            }, error -> Core.app.post(() -> modError(error)));
         }else{
             listener.get(modList);
         }
@@ -508,6 +507,7 @@ public class ModsDialog extends BaseDialog{
     }
 
     private String trimText(String text){
+        if(text == null) return "";
         if(text.contains("\n")){
             return text.substring(0, text.indexOf("\n"));
         }

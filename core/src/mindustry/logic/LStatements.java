@@ -637,6 +637,28 @@ public class LStatements{
         }
     }
 
+    //TODO untested
+    //@RegisterStatement("wait")
+    public static class WaitStatement extends LStatement{
+        public String value = "0.5";
+
+        @Override
+        public void build(Table table){
+            field(table, value, str -> value = str);
+            table.add(" sec");
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicOperations;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new WaitI(builder.var(value));
+        }
+    }
+
     @RegisterStatement("end")
     public static class EndStatement extends LStatement{
         @Override

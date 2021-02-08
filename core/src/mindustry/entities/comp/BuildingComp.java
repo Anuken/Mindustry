@@ -1326,7 +1326,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case enabled -> enabled ? 1 : 0;
             case controlled -> this instanceof ControlBlock c ? c.isControlled() ? 1 : 0 : 0;
             case payloadCount -> getPayload() != null ? 1 : 0;
-            default -> 0;
+            default -> Float.NaN; //gets converted to null in logic
         };
     }
 
@@ -1339,14 +1339,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case payloadType -> getPayload() instanceof UnitPayload p1 ? p1.unit.type : getPayload() instanceof BuildPayload p2 ? p2.block() : null;
             default -> noSensed;
         };
-
     }
 
     @Override
     public double sense(Content content){
-        if(content instanceof Item && items != null) return items.get((Item)content);
-        if(content instanceof Liquid && liquids != null) return liquids.get((Liquid)content);
-        return 0;
+        if(content instanceof Item i && items != null) return items.get(i);
+        if(content instanceof Liquid l && liquids != null) return liquids.get(l);
+        return Float.NaN; //invalid sense
     }
 
     @Override

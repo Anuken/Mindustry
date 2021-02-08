@@ -225,6 +225,7 @@ public class UnitType extends UnlockableContent{
         Unit inst = constructor.get();
 
         stats.add(Stat.health, health);
+        stats.add(Stat.armor, armor);
         stats.add(Stat.speed, speed);
         stats.add(Stat.itemCapacity, itemCapacity);
         stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);

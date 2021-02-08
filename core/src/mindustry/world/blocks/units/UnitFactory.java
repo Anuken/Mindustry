@@ -100,6 +100,7 @@ public class UnitFactory extends UnitBlock{
                 if(plan.unit.unlockedNow()){
                     table.image(plan.unit.icon(Cicon.small)).size(8 * 3).padRight(2).right();
                     table.add(plan.unit.localizedName).left();
+                    table.add(Strings.autoFixed(plan.time / 60f, 1) + " " + Core.bundle.get("unit.seconds")).color(Color.lightGray).padLeft(12).left();
                     table.row();
                 }
             }
