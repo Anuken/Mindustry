@@ -781,7 +781,7 @@ public class LExecutor{
                 Var vb = exec.var(b);
 
                 if(op.objFunction2 != null && va.isobj && vb.isobj){
-                    //use object function if provided, and one of the variables is an object
+                    //use object function if both are objects
                     exec.setnum(dest, op.objFunction2.get(exec.obj(a), exec.obj(b)));
                 }else{
                     //otherwise use the numeric function
@@ -952,7 +952,7 @@ public class LExecutor{
                 boolean cmp;
 
                 if(op.objFunction != null && va.isobj && vb.isobj){
-                    //use object function if provided, and one of the variables is an object
+                    //use object function if both are objects
                     cmp = op.objFunction.get(exec.obj(value), exec.obj(compare));
                 }else{
                     cmp = op.function.get(exec.num(value), exec.num(compare));
