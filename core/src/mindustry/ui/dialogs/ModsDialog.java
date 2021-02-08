@@ -154,7 +154,7 @@ public class ModsDialog extends BaseDialog{
 
                     }
                 });
-            }, error -> Core.app.post(() -> ui.showException(error)));
+            }, error -> Core.app.post(() -> modError(error)));
         }else{
             listener.get(modList);
         }
@@ -405,7 +405,7 @@ public class ModsDialog extends BaseDialog{
         ObjectSet<String> installed = mods.list().map(m -> m.getRepo()).asSet();
 
         browserTable.clear();
-        browserTable.add("@loading");
+        browserTable.add("@loading");1
 
         int cols = (int)Math.max(Core.graphics.getWidth() / Scl.scl(480), 1);
 
