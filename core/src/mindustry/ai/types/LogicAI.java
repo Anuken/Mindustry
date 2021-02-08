@@ -15,9 +15,9 @@ import static mindustry.Vars.*;
 
 public class LogicAI extends AIController{
     /** Minimum delay between item transfers. */
-    public static final float transferDelay = 60f * 2f;
+    public static final float transferDelay = 2 * Time.toSeconds;
     /** Time after which the unit resets its controlled and reverts to a normal unit. */
-    public static final float logicControlTimeout = 10f * 60f;
+    public static final float logicControlTimeout = 10 * Time.toSeconds;
 
     public LUnitControl control = LUnitControl.stop;
     public float moveX, moveY, moveRad;
