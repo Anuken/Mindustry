@@ -405,7 +405,7 @@ public class ModsDialog extends BaseDialog{
         ObjectSet<String> installed = mods.list().map(m -> m.getRepo()).asSet();
 
         browserTable.clear();
-        browserTable.add("@loading");1
+        browserTable.add("@loading");
 
         int cols = (int)Math.max(Core.graphics.getWidth() / Scl.scl(480), 1);
 
