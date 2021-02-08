@@ -54,7 +54,7 @@ public class SectorInfo{
     /** Waves this sector can survive if under attack. Based on wave in info. <0 means uncalculated. */
     public int wavesSurvived = -1;
     /** Time between waves. */
-    public float waveSpacing = 60 * 60 * 2;
+    public float waveSpacing = 2 * Time.toMinutes;
     /** Damage dealt to sector. */
     public float damage;
     /** How many waves have passed while the player was away. */
