@@ -195,6 +195,10 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
+            if(packet.locale == null){
+                packet.locale = "en_US";
+            }
+
             String ip = con.address;
 
             admins.updatePlayerJoined(uuid, ip, packet.name);
@@ -215,6 +219,7 @@ public class NetServer implements ApplicationListener{
             player.con.uuid = uuid;
             player.con.mobile = packet.mobile;
             player.name = packet.name;
+            player.locale = packet.locale;
             player.color.set(packet.color).a(1f);
 
             //save admin ID but don't overwrite it
