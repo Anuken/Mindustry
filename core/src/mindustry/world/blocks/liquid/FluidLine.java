@@ -10,4 +10,8 @@ public class FluidLine{
     public FluidLine(Building start){
         builds.add(start);
     }
+    
+    public void flow(Building start){
+
+    }
 }
