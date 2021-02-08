@@ -28,6 +28,8 @@ public class LAssembler{
         putConst("@unit", null);
         //reference to self
         putConst("@this", null);
+        //global tick
+        putConst("@tick", 0);
     }
 
     public static LAssembler assemble(String data, int maxInstructions){

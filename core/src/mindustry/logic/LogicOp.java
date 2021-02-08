@@ -19,6 +19,7 @@ public enum LogicOp{
     lessThanEq("<=", (a, b) -> a <= b ? 1 : 0),
     greaterThan(">", (a, b) -> a > b ? 1 : 0),
     greaterThanEq(">=", (a, b) -> a >= b ? 1 : 0),
+    strictEqual("===", (a, b) -> 0), //this lambda is not actually used
 
     shl("<<", (a, b) -> (long)a << (long)b),
     shr(">>", (a, b) -> (long)a >> (long)b),
@@ -27,7 +28,6 @@ public enum LogicOp{
     xor("xor", (a, b) -> (long)a ^ (long)b),
     not("flip", a -> ~(long)(a)),
 
-    isNull("isNull", v -> v == 0 ? 1 : 0), //this lambda is not actually used
     max("max", Math::max),
     min("min", Math::min),
     atan2("atan2", (x, y) -> Mathf.atan2((float)x, (float)y) * Mathf.radDeg),

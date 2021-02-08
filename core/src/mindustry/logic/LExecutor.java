@@ -36,7 +36,8 @@ public class LExecutor{
     varCounter = 0,
     varTime = 1,
     varUnit = 2,
-    varThis = 3;
+    varThis = 3,
+    varTick = 4;
 
     public static final int
     maxGraphicsBuffer = 256,
@@ -61,6 +62,7 @@ public class LExecutor{
     public void runOnce(){
         //set time
         vars[varTime].numval = Time.millis();
+        vars[varTick].numval = Time.time;
 
         //reset to start
         if(vars[varCounter].numval >= instructions.length || vars[varCounter].numval < 0){
@@ -784,9 +786,9 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(op == LogicOp.isNull){
-                var v = exec.var(a);
-                exec.setnum(dest, v.isobj && v.objval == null ? 1 : 0);
+            if(op == LogicOp.strictEqual){
+                Var v = exec.var(a), v2 = exec.var(b);
+                exec.setnum(dest, v.isobj == v2.isobj && ((v.isobj && v.objval == v2.objval) || (!v.isobj && v.numval == v2.numval)) ? 1 : 0);
             }else if(op.unary){
                 exec.setnum(dest, op.function1.get(exec.num(a)));
             }else{
