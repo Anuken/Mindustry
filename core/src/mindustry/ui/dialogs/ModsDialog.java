@@ -38,7 +38,7 @@ public class ModsDialog extends BaseDialog{
 
     private String searchtxt = "";
     private @Nullable Seq<ModListing> modList;
-    private boolean orderDate = true;
+    private boolean orderDate = false;
     private BaseDialog currentContent;
 
     private BaseDialog browser;
@@ -384,7 +384,7 @@ public class ModsDialog extends BaseDialog{
 
                         }).tooltip(c.localizedName);
 
-                        if(++i % Math.min(Core.graphics.getWidth() / Scl.scl(70), 14) == 0) cs.row();
+                        if(++i % Math.min(Core.graphics.getWidth() / Scl.scl(110), 14) == 0) cs.row();
                     }
                 }).grow();
                 d.addCloseButton();

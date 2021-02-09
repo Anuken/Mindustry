@@ -531,7 +531,7 @@ public class LStatements{
 
                             t.parent.parent.pack();
                             t.parent.parent.invalidateHierarchy();
-                        }).size(80f, 50f).growX().checked(selected == fi).group(group);
+                        }).height(50f).growX().checked(selected == fi).group(group);
                     }
                     t.row();
                     t.add(stack).colspan(3).width(240f).left();
@@ -610,11 +610,17 @@ public class LStatements{
 
                 //"function"-type operations have the name at the left and arguments on the right
                 if(op.func){
-                    opButton(table);
-
-                    field(table, a, str -> a = str);
-
-                    field(table, b, str -> b = str);
+                    if(LCanvas.useRows()){
+                        table.left();
+                        table.row();
+                        table.table(c -> {
+                            c.color.set(color());
+                            c.left();
+                            funcs(c);
+                        }).colspan(2).left();
+                    }else{
+                        funcs(table);
+                    }
                 }else{
                     field(table, a, str -> a = str);
 
@@ -625,6 +631,14 @@ public class LStatements{
             }
         }
 
+        void funcs(Table table){
+            opButton(table);
+
+            field(table, a, str -> a = str);
+
+            field(table, b, str -> b = str);
+        }
+
         void opButton(Table table){
             table.button(b -> {
                 b.label(() -> op.symbol);
@@ -632,7 +646,7 @@ public class LStatements{
                     op = o;
                     rebuild(table);
                 }));
-            }, Styles.logict, () -> {}).size(65f, 40f).pad(4f).color(table.color);
+            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
         }
 
         @Override
