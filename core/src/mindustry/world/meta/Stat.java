@@ -7,6 +7,7 @@ import java.util.*;
 /** Describes one type of stat for content. */
 public enum Stat{
     health,
+    armor,
     size,
     displaySize,
     buildTime,

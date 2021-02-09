@@ -50,8 +50,8 @@ public class Vars implements Loadable{
     public static final Charset charset = Charset.forName("UTF-8");
     /** main application name, capitalized */
     public static final String appName = "Mindustry";
-    /** URL for itch.io donations. */
-    public static final String donationURL = "https://anuke.itch.io/mindustry/purchase";
+    /** Github API URL. */
+    public static final String ghApi = "https://api.github.com";
     /** URL for discord invite. */
     public static final String discordURL = "https://discord.gg/mindustry";
     /** URL for sending crash reports to */
@@ -345,7 +345,7 @@ public class Vars implements Loadable{
     }
 
     public static void loadSettings(){
-        settings.setJson(JsonIO.json());
+        settings.setJson(JsonIO.json);
         settings.setAppName(appName);
 
         if(steam || (Version.modifier != null && Version.modifier.contains("steam"))){

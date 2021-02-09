@@ -64,7 +64,7 @@ public class LogicBlock extends Block{
                 entity.links.add(out);
             }
 
-            entity.updateCode();
+            entity.updateCode(entity.code, true, null);
         });
     }
 
@@ -277,15 +277,11 @@ public class LogicBlock extends Block{
             return bname + outnum;
         }
 
-        public void updateCode(){
-            updateCode(code);
-        }
-
         public void updateCode(String str){
-            updateCodeVars(str, null);
+            updateCode(str, false, null);
         }
 
-        public void updateCodeVars(String str, Cons<LAssembler> assemble){
+        public void updateCode(String str, boolean keep, Cons<LAssembler> assemble){
             if(str != null){
                 code = str;
 
@@ -316,6 +312,19 @@ public class LogicBlock extends Block{
                     asm.putConst("@maph", world.height());
                     asm.putConst("@links", executor.links.length);
                     asm.putConst("@ipt", instructionsPerTick);
+
+                    if(keep){
+                        //store any older variables
+                        for(Var var : executor.vars){
+                            boolean unit = var.name.equals("@unit");
+                            if(!var.constant || unit){
+                                BVar dest = asm.getVar(var.name);
+                                if(dest != null && (!dest.constant || unit)){
+                                    dest.value = var.isobj ? var.objval : var.numval;
+                                }
+                            }
+                        }
+                    }
 
                     //inject any extra variables
                     if(assemble != null){
@@ -397,7 +406,7 @@ public class LogicBlock extends Block{
             }
 
             if(changed){
-                updateCode();
+                updateCode(code, true, null);
             }
 
             if(enabled){
@@ -555,7 +564,7 @@ public class LogicBlock extends Block{
             //skip memory, it isn't used anymore
             read.skip(memory * 8);
 
-            updateCodeVars(code, asm -> {
+            updateCode(code, false, asm -> {
 
                 //load up the variables that were stored
                 for(int i = 0; i < varcount; i++){

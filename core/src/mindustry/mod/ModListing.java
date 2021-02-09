@@ -4,6 +4,7 @@ package mindustry.mod;
 public class ModListing{
     public String repo, name, author, lastUpdated, description, minGameVersion;
     public boolean hasScripts, hasJava;
+    public String[] contentTypes = {};
     public int stars;
 
     @Override

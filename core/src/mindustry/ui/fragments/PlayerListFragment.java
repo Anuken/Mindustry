@@ -67,7 +67,7 @@ public class PlayerListFragment extends Fragment{
                     menu.button("@close", this::toggle);
                 }).margin(0f).pad(10f).growX();
 
-            }).touchable(Touchable.enabled).margin(14f);
+            }).touchable(Touchable.enabled).margin(14f).minWidth(360f);
         });
 
         rebuild();

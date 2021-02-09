@@ -531,7 +531,7 @@ public class LStatements{
 
                             t.parent.parent.pack();
                             t.parent.parent.invalidateHierarchy();
-                        }).size(80f, 50f).growX().checked(selected == fi).group(group);
+                        }).height(50f).growX().checked(selected == fi).group(group);
                     }
                     t.row();
                     t.add(stack).colspan(3).width(240f).left();
@@ -608,12 +608,35 @@ public class LStatements{
             }else{
                 row(table);
 
-                field(table, a, str -> a = str);
+                //"function"-type operations have the name at the left and arguments on the right
+                if(op.func){
+                    if(LCanvas.useRows()){
+                        table.left();
+                        table.row();
+                        table.table(c -> {
+                            c.color.set(color());
+                            c.left();
+                            funcs(c);
+                        }).colspan(2).left();
+                    }else{
+                        funcs(table);
+                    }
+                }else{
+                    field(table, a, str -> a = str);
 
-                opButton(table);
+                    opButton(table);
 
-                field(table, b, str -> b = str);
+                    field(table, b, str -> b = str);
+                }
             }
+        }
+
+        void funcs(Table table){
+            opButton(table);
+
+            field(table, a, str -> a = str);
+
+            field(table, b, str -> b = str);
         }
 
         void opButton(Table table){
@@ -623,7 +646,7 @@ public class LStatements{
                     op = o;
                     rebuild(table);
                 }));
-            }, Styles.logict, () -> {}).size(60f, 40f).pad(4f).color(table.color);
+            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
         }
 
         @Override
@@ -634,6 +657,28 @@ public class LStatements{
         @Override
         public Color color(){
             return Pal.logicOperations;
+        }
+    }
+
+    //TODO untested
+    //@RegisterStatement("wait")
+    public static class WaitStatement extends LStatement{
+        public String value = "0.5";
+
+        @Override
+        public void build(Table table){
+            field(table, value, str -> value = str);
+            table.add(" sec");
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicOperations;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new WaitI(builder.var(value));
         }
     }
 

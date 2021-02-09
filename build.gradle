@@ -12,7 +12,6 @@ buildscript{
         mavenCentral()
         google()
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        jcenter()
         maven{ url 'https://jitpack.io' }
     }
 
@@ -184,7 +183,6 @@ allprojects{
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
         maven{ url 'https://jitpack.io' }
-        jcenter()
     }
 
     task clearCache{
@@ -320,6 +318,11 @@ project(":core"){
         }
     }
 
+    task sourcesJar(type: Jar, dependsOn: classes){
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
     dependencies{
         compileJava.dependsOn(preGen)
 
@@ -336,6 +339,28 @@ project(":core"){
         annotationProcessor project(":annotations")
         annotationProcessor 'com.github.Anuken:jabel:34e4c172e65b3928cd9eabe1993654ea79c409cd'
 
+    }
+
+    afterEvaluate{
+        task mergedJavadoc(type: Javadoc){
+            def blacklist = [project(":ios"), project(":desktop"), project(":server"), project(":annotations")]
+            if(findProject(":android") != null){
+                blacklist += project(":android")
+            }
+
+            source rootProject.subprojects.collect{ project ->
+                if(!blacklist.contains(project) && project.hasProperty("sourceSets")){
+                    return project.sourceSets.main.allJava
+                }
+            }
+
+            classpath = files(rootProject.subprojects.collect { project ->
+                if(!blacklist.contains(project) && project.hasProperty("sourceSets")){
+                    return project.sourceSets.main.compileClasspath
+                }
+            })
+            destinationDir = new File(buildDir, 'javadoc')
+        }
     }
 }
 

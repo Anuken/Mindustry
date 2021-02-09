@@ -4,7 +4,6 @@ buildscript{
         mavenCentral()
         google()
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        jcenter()
     }
 
     dependencies{
@@ -20,8 +19,8 @@ configurations{ natives }
 
 repositories{
     mavenCentral()
-    jcenter()
     maven{ url "https://maven.google.com" }
+    jcenter() //remove later once google fixes the dependency
 }
 
 dependencies{

@@ -16,6 +16,7 @@ public class ParticleEffect extends Effect{
 
     //region only
     public float sizeFrom = 2f, sizeTo = 0f;
+    public float offset = 0;
     public String region = "circle";
 
     //line only
@@ -48,7 +49,7 @@ public class ParticleEffect extends Effect{
             });
         }else{
             Angles.randLenVectors(e.id, particles, length * fin + baseLength, e.rotation, cone, (x, y) -> {
-                Draw.rect(tex, e.x + x, e.y + y, rad, rad);
+                Draw.rect(tex, e.x + x, e.y + y, rad, rad, e.rotation + offset);
             });
         }
     }

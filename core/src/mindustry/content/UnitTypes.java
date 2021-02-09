@@ -117,7 +117,7 @@ public class UnitTypes implements ContentList{
             hitSize = 13f;
             rotateSpeed = 3f;
             targetAir = false;
-            health = 790;
+            health = 800;
             armor = 9f;
             mechFrontSway = 0.55f;
 
@@ -137,8 +137,8 @@ public class UnitTypes implements ContentList{
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
-                    splashDamageRadius = 24f;
-                    splashDamage = 45f;
+                    splashDamageRadius = 28f;
+                    splashDamage = 54f;
                     backColor = Pal.bulletYellowBack;
                     frontColor = Pal.bulletYellow;
                 }};
@@ -150,7 +150,7 @@ public class UnitTypes implements ContentList{
             hitSize = 20f;
             rotateSpeed = 2.1f;
             health = 9000;
-            armor = 11f;
+            armor = 10f;
             canDrown = false;
             mechFrontSway = 1f;
 
@@ -173,7 +173,7 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 3f;
                 shotDelay = 4f;
 
-                bullet = new BasicBulletType(7f, 50){{
+                bullet = new BasicBulletType(7f, 45){{
                     width = 11f;
                     height = 20f;
                     lifetime = 25f;
@@ -182,7 +182,7 @@ public class UnitTypes implements ContentList{
                     lightningLength = 6;
                     lightningColor = Pal.surge;
                     //standard bullet damage is far too much for lightning
-                    lightningDamage = 20;
+                    lightningDamage = 19;
                 }};
             }},
 
@@ -230,7 +230,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.casing4;
                 shootSound = Sounds.bang;
 
-                bullet = new BasicBulletType(13f, 60){{
+                bullet = new BasicBulletType(13f, 65){{
                     pierce = true;
                     pierceCap = 10;
                     width = 14f;
@@ -247,7 +247,7 @@ public class UnitTypes implements ContentList{
                     fragLifeMin = 0f;
                     fragCone = 30f;
 
-                    fragBullet = new BasicBulletType(9f, 15){{
+                    fragBullet = new BasicBulletType(9f, 18){{
                         width = 10f;
                         height = 10f;
                         pierce = true;
@@ -418,8 +418,8 @@ public class UnitTypes implements ContentList{
             engineSize = 6f;
             lowAltitude = true;
 
-            health = 7000f;
-            armor = 7f;
+            health = 7200f;
+            armor = 8f;
             canBoost = true;
             landShake = 4f;
             immunities = ObjectSet.with(StatusEffects.burning);
@@ -435,7 +435,7 @@ public class UnitTypes implements ContentList{
 
                 firstShotDelay = Fx.greenLaserChargeSmall.lifetime - 1f;
 
-                reload = 160f;
+                reload = 155f;
                 recoil = 0f;
                 chargeSound = Sounds.lasercharge2;
                 shootSound = Sounds.beam;
@@ -443,8 +443,8 @@ public class UnitTypes implements ContentList{
                 cooldownTime = 200f;
 
                 bullet = new ContinuousLaserBulletType(){{
-                    damage = 23f;
-                    length = 160f;
+                    damage = 26f;
+                    length = 170f;
                     hitEffect = Fx.hitMeltHeal;
                     drawSize = 420f;
                     lifetime = 160f;
@@ -454,7 +454,7 @@ public class UnitTypes implements ContentList{
 
                     shootEffect = Fx.greenLaserChargeSmall;
 
-                    incendChance = 0.075f;
+                    incendChance = 0.08f;
                     incendSpread = 5f;
                     incendAmount = 1;
 
@@ -1590,7 +1590,7 @@ public class UnitTypes implements ContentList{
         }};
 
         sei = new UnitType("sei"){{
-            health = 10000;
+            health = 10500;
             armor = 12f;
 
             speed = 0.73f;

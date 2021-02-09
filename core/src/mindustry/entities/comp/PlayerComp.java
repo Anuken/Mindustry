@@ -43,6 +43,8 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     String name = "noname";
     Color color = new Color();
 
+    //locale should not be synced.
+    transient String locale = "en";
     transient float deathTimer;
     transient String lastText = "";
     transient float textFadeTime;

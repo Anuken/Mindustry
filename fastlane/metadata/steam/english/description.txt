@@ -42,7 +42,7 @@
 [h2]Custom Games & Cross-Platform Multiplayer[/h2]
 
 [list]
-[*] 18 built in maps for custom games, in addition to campaign
+[*] 16 built in maps for custom games, in addition to campaign
 [*] Play co-op, PvP or sandbox
 [*] Join a public dedicated server, or invite friends to your own private session
 [*] Customizable game rules: Change block costs, enemy stats, starting items, wave timing and more

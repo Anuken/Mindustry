@@ -62,10 +62,10 @@ public abstract class LStatement{
         showSelectTable(b, (t, hide) -> {
             ButtonGroup<Button> group = new ButtonGroup<>();
             int i = 0;
-            t.defaults().size(56f, 40f);
+            t.defaults().size(60f, 38f);
 
             for(T p : values){
-                sizer.get(t.button(p.toString(), Styles.clearTogglet, () -> {
+                sizer.get(t.button(p.toString(), Styles.logicTogglet, () -> {
                     getter.get(p);
                     hide.run();
                 }).checked(current == p).group(group));
@@ -80,7 +80,18 @@ public abstract class LStatement{
     }
 
     protected void showSelectTable(Button b, Cons2<Table, Runnable> hideCons){
-        Table t = new Table(Tex.button);
+        Table t = new Table(Tex.paneSolid){
+            @Override
+            public float getPrefHeight(){
+                return Math.min(super.getPrefHeight(), Core.graphics.getHeight());
+            }
+
+            @Override
+            public float getPrefWidth(){
+                return Math.min(super.getPrefWidth(), Core.graphics.getWidth());
+            }
+        };
+        t.margin(4);
 
         //triggers events behind the element to simulate deselection
         Element hitter = new Element();
@@ -110,14 +121,15 @@ public abstract class LStatement{
             if(t.getWidth() > Core.scene.getWidth()) t.setWidth(Core.graphics.getWidth());
             if(t.getHeight() > Core.scene.getHeight()) t.setHeight(Core.graphics.getHeight());
             t.keepInStage();
+            t.invalidateHierarchy();
+            t.pack();
         });
         t.actions(Actions.alpha(0), Actions.fadeIn(0.3f, Interp.fade));
 
         t.top().pane(inner -> {
-            inner.marginRight(24f);
             inner.top();
             hideCons.get(inner, hide);
-        }).top();
+        }).pad(0f).top().get().setScrollingDisabled(true, false);
 
         t.pack();
     }
