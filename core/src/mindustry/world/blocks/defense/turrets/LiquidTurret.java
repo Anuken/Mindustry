@@ -30,7 +30,7 @@ public class LiquidTurret extends Turret{
     }
 
     /** Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...] */
-    protected void ammo(Object... objects){
+    public void ammo(Object... objects){
         ammoTypes = OrderedMap.of(objects);
     }
 
