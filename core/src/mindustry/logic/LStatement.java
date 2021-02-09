@@ -15,6 +15,8 @@ import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 
+import static mindustry.logic.LCanvas.*;
+
 /**
  * A statement is an intermediate representation of an instruction, to be used mostly in UI.
  * Contains all relevant variable information. */
@@ -38,13 +40,18 @@ public abstract class LStatement{
 
     //protected methods are only for internal UI layout utilities
 
+    protected void param(Cell<Label> label){
+        String text = name() + "." + label.get().getText().toString().trim();
+        tooltip(label, text);
+    }
+
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
         return table.field(value, Styles.nodeField, setter)
             .size(144f, 40f).pad(2f).color(table.color).maxTextLength(LAssembler.maxTokenLength).addInputDialog();
     }
 
     protected Cell<TextField> fields(Table table, String desc, String value, Cons<String> setter){
-        table.add(desc).padLeft(10).left();
+        table.add(desc).padLeft(10).left().self(this::param);;
         return field(table, value, setter).width(85f).padRight(10).left();
     }
 
@@ -58,7 +65,7 @@ public abstract class LStatement{
         }
     }
 
-    protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer){
+    protected <T extends Enum<T>> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer){
         showSelectTable(b, (t, hide) -> {
             ButtonGroup<Button> group = new ButtonGroup<>();
             int i = 0;
@@ -68,14 +75,14 @@ public abstract class LStatement{
                 sizer.get(t.button(p.toString(), Styles.logicTogglet, () -> {
                     getter.get(p);
                     hide.run();
-                }).checked(current == p).group(group));
+                }).self(c -> tooltip(c, "lenum." + p.name())).checked(current == p).group(group));
 
                 if(++i % cols == 0) t.row();
             }
         });
     }
 
-    protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter){
+    protected <T extends Enum<T>> void showSelect(Button b, T[] values, T current, Cons<T> getter){
         showSelect(b, values, current, getter, 4, c -> {});
     }
 
@@ -151,4 +158,5 @@ public abstract class LStatement{
     public String name(){
         return Strings.insertSpaces(getClass().getSimpleName().replace("Statement", ""));
     }
+
 }

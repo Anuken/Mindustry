@@ -966,7 +966,9 @@ public class LExecutor{
                 Var vb = exec.var(compare);
                 boolean cmp;
 
-                if(op.objFunction != null && va.isobj && vb.isobj){
+                if(op == ConditionOp.strictEqual){
+                    cmp = va.isobj == vb.isobj && ((va.isobj && va.objval == vb.objval) || (!va.isobj && va.numval == vb.numval));
+                }else if(op.objFunction != null && va.isobj && vb.isobj){
                     //use object function if both are objects
                     cmp = op.objFunction.get(exec.obj(value), exec.obj(compare));
                 }else{
