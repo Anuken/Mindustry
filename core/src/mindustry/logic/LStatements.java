@@ -608,11 +608,20 @@ public class LStatements{
             }else{
                 row(table);
 
-                field(table, a, str -> a = str);
+                //"function"-type operations have the name at the left and arguments on the right
+                if(op.func){
+                    opButton(table);
 
-                opButton(table);
+                    field(table, a, str -> a = str);
 
-                field(table, b, str -> b = str);
+                    field(table, b, str -> b = str);
+                }else{
+                    field(table, a, str -> a = str);
+
+                    opButton(table);
+
+                    field(table, b, str -> b = str);
+                }
             }
         }
 
@@ -623,7 +632,7 @@ public class LStatements{
                     op = o;
                     rebuild(table);
                 }));
-            }, Styles.logict, () -> {}).size(60f, 40f).pad(4f).color(table.color);
+            }, Styles.logict, () -> {}).size(65f, 40f).pad(4f).color(table.color);
         }
 
         @Override

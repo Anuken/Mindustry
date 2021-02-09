@@ -13,6 +13,11 @@ public class LAssembler{
     public static ObjectMap<String, Func<String[], LStatement>> customParsers = new ObjectMap<>();
     public static final int maxTokenLength = 36;
 
+    private static final StringMap opNameChanges = StringMap.of(
+    "atan2", "angle",
+    "dst", "len"
+    );
+
     private int lastVar;
     /** Maps names to variable IDs. */
     public ObjectMap<String, BVar> vars = new ObjectMap<>();
@@ -125,6 +130,11 @@ public class LAssembler{
                         arr[3] = arr[2];
                         arr[2] = res;
                     }
+                }
+
+                //fix up changed operaiton names
+                if(type.equals("op")){
+                    arr[1] = opNameChanges.get(arr[1], arr[1]);
                 }
 
                 LStatement st = LogicIO.read(arr);
