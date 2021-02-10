@@ -214,10 +214,10 @@ public class Damage{
      */
     public static Healthc linecast(Bullet hitter, float x, float y, float angle, float length){
         tr.trns(angle, length);
+        
+        tmpBuilding = null;
 
         if(hitter.type.collidesGround){
-            tmpBuilding = null;
-
             world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
                 if(tile != null && tile.team != hitter.team){
@@ -226,8 +226,6 @@ public class Damage{
                 }
                 return false;
             });
-
-            if(tmpBuilding != null) return tmpBuilding;
         }
 
         rect.setPosition(x, y).setSize(tr.x, tr.y);
@@ -271,6 +269,14 @@ public class Damage{
 
         Units.nearbyEnemies(hitter.team, rect, cons);
 
+        if(tmpBuilding != null && tmpUnit != null){
+            float bDst = Mathf.dst2(x, y, tmpBuilding.getX(), tmpBuilding.getY());
+            float uDst = Mathf.dst2(x, y, tmpUnit.getX(), tmpUnit.getY());
+            if(uDst <= bDst) return tmpUnit;
+            if(bDst > uDst) return tmpBuilding;
+        }else if(tmpBuilding != null && tmpUnit == null){
+            return tmpBuilding;
+        }
         return tmpUnit;
     }
 
