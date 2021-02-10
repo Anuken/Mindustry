@@ -322,6 +322,10 @@ project(":core"){
         classifier = 'sources'
         from sourceSets.main.allSource
     }
+    
+    artifacts {
+        archives sourcesJar
+    }
 
     dependencies{
         compileJava.dependsOn(preGen)
