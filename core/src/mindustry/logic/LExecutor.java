@@ -338,17 +338,19 @@ public class LExecutor{
         @Nullable
         public static LogicAI checkLogicAI(LExecutor exec, Object unitObj){
             if(unitObj instanceof Unit unit && exec.obj(varUnit) == unit && unit.team == exec.team && !unit.isPlayer() && !(unit.controller() instanceof FormationAI)){
-                if(!(unit.controller() instanceof LogicAI)){
-                    unit.controller(new LogicAI());
-                    ((LogicAI)unit.controller()).controller = exec.building(varThis);
+                if(unit.controller() instanceof LogicAI la){
+                    return la;
+                }else{
+                    var la = new LogicAI();
+                    la.controller = exec.building(varThis);
 
+                    unit.controller(la);
                     //clear old state
                     unit.mineTile = null;
                     unit.clearBuilding();
 
-                    return (LogicAI)unit.controller();
+                    return la;
                 }
-                return (LogicAI)unit.controller();
             }
             return null;
         }
