@@ -20,6 +20,7 @@ public enum LAccess{
     health,
     maxHealth,
     heat,
+    broken,
     efficiency,
     timescale,
     rotation,

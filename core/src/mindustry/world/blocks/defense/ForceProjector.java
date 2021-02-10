@@ -174,6 +174,13 @@ public class ForceProjector extends Block{
             }
         }
 
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.heat) return buildup;
+            if(sensor == LAccess.broken) return broken ? 1 : 0;
+            return super.sense(sensor);
+        }
+
         public float realRadius(){
             return (radius + phaseHeat * phaseRadiusBoost) * radscl;
         }
