@@ -270,13 +270,13 @@ public class Damage{
         Units.nearbyEnemies(hitter.team, rect, cons);
 
         if(tmpBuilding != null && tmpUnit != null){
-            float bDst = Mathf.dst2(x, y, tmpBuilding.getX(), tmpBuilding.getY());
-            float uDst = Mathf.dst2(x, y, tmpUnit.getX(), tmpUnit.getY());
-            if(uDst <= bDst) return tmpUnit;
-            if(bDst > uDst) return tmpBuilding;
-        }else if(tmpBuilding != null && tmpUnit == null){
+            if(Mathf.dst2(x, y, tmpUnit.getX(), tmpUnit.getY()) <= Mathf.dst2(x, y, tmpBuilding.getX(), tmpBuilding.getY())){
+                return tmpUnit;
+            }
+        }else if(tmpBuilding != null){
             return tmpBuilding;
         }
+
         return tmpUnit;
     }
 
