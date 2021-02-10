@@ -11,7 +11,10 @@ public class FluidLine{
         builds.add(start);
     }
     
-    public void flow(Building start){
+    public void forward(Building start){
+        while(true){
+            Building next = start.front();
 
+        }
     }
 }
