@@ -44,7 +44,7 @@ public class UnitType extends UnlockableContent{
     public Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
     public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, fallSpeed = 0.018f;
-    public float health = 200f, range = -1, armor = 0f, maxRange = -1f;
+    public float health = 200f, range = -1, armor = 0f, maxRange = -1f, sensorRange = 0f;
     public float crashDamageMultiplier = 1f;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false, circleTarget = false;
@@ -299,10 +299,14 @@ public class UnitType extends UnlockableContent{
             for(Weapon weapon : weapons){
                 maxRange = Math.max(maxRange, weapon.bullet.range() + hitSize / 2f);
             }
+
+            sensorRange = maxRange - hitSize / 2f;
+        }else{
+            sensorRange = maxRange;
         }
 
         if(weapons.isEmpty()){
-            range = maxRange = miningRange;
+            sensorRange = range = maxRange = miningRange;
         }
 
         if(mechStride < 0){
