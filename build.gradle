@@ -323,7 +323,7 @@ project(":core"){
         from sourceSets.main.allSource
     }
     
-    artifacts {
+    artifacts{
         archives sourcesJar
     }
 
