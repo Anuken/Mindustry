@@ -95,7 +95,7 @@ public class RepairPoint extends Block{
         @Override
         public void updateTile(){
             boolean targetIsBeingRepaired = false;
-            if(target != null && (target.dead() || target.dst(tile) > repairRadius || target.health() >= target.maxHealth())){
+            if(target != null && (target.dead() || target.dst(tile) - target.hitSize/2f > repairRadius || target.health() >= target.maxHealth())){
                 target = null;
             }else if(target != null && consValid()){
                 target.heal(repairSpeed * Time.delta * strength * efficiency());
