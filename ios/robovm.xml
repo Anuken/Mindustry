@@ -2,7 +2,6 @@
     <executableName>${app.executable}</executableName>
     <mainClass>${app.mainclass}</mainClass>
     <os>ios</os>
-    <arch>thumbv7</arch>
     <target>ios</target>
     <iosInfoPList>Info.plist.xml</iosInfoPList>
     <resources>

@@ -8,7 +8,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 
 @Component
-abstract class HitboxComp implements Posc, QuadTreeObject{
+abstract class HitboxComp implements Posc, Sized, QuadTreeObject{
     @Import float x, y;
 
     transient float lastX, lastY, deltaX, deltaY, hitSize;
@@ -26,6 +26,11 @@ abstract class HitboxComp implements Posc, QuadTreeObject{
     @Override
     public void afterRead(){
         updateLastPosition();
+    }
+
+    @Override
+    public float hitSize(){
+        return hitSize;
     }
 
     void getCollisions(Cons<QuadTree> consumer){
