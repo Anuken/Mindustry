@@ -31,64 +31,66 @@ public class BindingsGenerator{
 
         for(Class<?> type : classes){
             String name = type.getCanonicalName();
-            result.append("jclass ").append(name).append("* of ")
-                .append(type.getSuperclass() == null ? "JVMObject" : type.getSuperclass().getSimpleName()).append(":\n");
-
-            for(Field field : type.getFields()){
-                if(Modifier.isPublic(field.getModifiers())){
-                    result.append("  proc `").append(field.getName()).append("`*");
-                    result.append(": ").append(str(field.getType()));
-                    result.append(" {.prop");
-                    if(Modifier.isStatic(field.getModifiers())) result.append(", `static`");
-                    if(Modifier.isStatic(field.getModifiers())) result.append(", `final`");
-                    result.append(".}\n");
-                }
-            }
 
             Seq<Executable> exec = new Seq<>();
 
             exec.addAll(type.getDeclaredMethods());
             exec.addAll(type.getDeclaredConstructors());
 
+            exec.removeAll(e -> !Modifier.isPublic(e.getModifiers()));
+
+            Seq<Field> fields = Seq.select(type.getDeclaredFields(), f -> Modifier.isPublic(f.getModifiers()));
+
+            result.append("jclass ").append(name).append(" of `")
+                .append(type.getSuperclass() == null ? "JVMObject" : type.getSuperclass().getSimpleName()).append("`").append(exec.size + fields.size > 0 ? ":" : "").append("\n");
+
+            for(Field field : fields){
+                result.append("  proc `").append(field.getName()).append("`*");
+                result.append(": ").append(str(field.getType()));
+                result.append(" {.prop");
+                if(Modifier.isStatic(field.getModifiers())) result.append(", `static`");
+                if(Modifier.isStatic(field.getModifiers())) result.append(", `final`");
+                result.append(".}\n");
+            }
+
             for(Executable method : exec){
-                if(Modifier.isPublic(method.getModifiers())){
-                    String mname = method.getName().equals("<init>") || method.getName().equals(type.getCanonicalName()) ? "new" : method.getName();
-                    result.append("  proc `").append(mname).append("`*");
+                String mname = method.getName().equals("<init>") || method.getName().equals(type.getCanonicalName()) ? "new" : method.getName();
+                result.append("  proc `").append(mname).append("`");
 
-                    if(method.getParameterCount() > 0){
-                        result.append("(");
+                if(method.getParameterCount() > 0){
+                    result.append("(");
 
-                        for(int i = 0; i < method.getParameterCount(); i++){
-                            Class p = method.getParameterTypes()[i];
+                    for(int i = 0; i < method.getParameterCount(); i++){
+                        Class p = method.getParameterTypes()[i];
 
-                            result.append(method.getParameters()[i].getName()).append(": ").append(str(p));
+                        result.append(method.getParameters()[i].getName()).append(": ").append(str(p));
 
-                            if(i != method.getParameterCount() - 1){
-                                result.append(", ");
-                            }
-                        }
-
-                        result.append(")");
-                    }
-
-                    if(method instanceof Method){
-                        Method m = (Method)method;
-                        if(!m.getReturnType().equals(void.class)){
-                            result.append(": ").append(str(m.getReturnType()));
+                        if(i != method.getParameterCount() - 1){
+                            result.append(", ");
                         }
                     }
 
-                    //result.append(" {.");
-                    //if(Modifier.isStatic(field.getModifiers())) result.append(", `static`");
-                    //if(Modifier.isStatic(field.getModifiers())) result.append(", `final`");
-                    //result.append(".}\n");
-                    result.append("\n");
+                    result.append(")");
                 }
+
+                if(method instanceof Method){
+                    Method m = (Method)method;
+                    if(!m.getReturnType().equals(void.class)){
+                        result.append(": ").append(str(m.getReturnType()));
+                    }
+                }
+
+                //result.append(" {.");
+                //if(Modifier.isStatic(field.getModifiers())) result.append(", `static`");
+                //if(Modifier.isStatic(field.getModifiers())) result.append(", `final`");
+                //result.append(".}\n");
+                result.append("\n");
             }
             result.append("\n");
         }
 
-        Fi.get(OS.userhome).child("mindustry.nim").writeString(result.toString());
+        Fi.get("/home/anuke/Projects/Nimdustry-java/mindustry_bindings.nim").writeString(result.toString());
+        //Fi.get(OS.userhome).child("mindustry.nim").writeString(result.toString());
         Log.info(result);
     }
 
