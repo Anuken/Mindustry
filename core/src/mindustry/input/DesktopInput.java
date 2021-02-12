@@ -3,6 +3,7 @@ package mindustry.input;
 import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -41,7 +42,7 @@ public class DesktopInput extends InputHandler{
     /** Selected build request for movement. */
     public @Nullable BuildPlan sreq;
     /** Whether player is currently deleting removal requests. */
-    public boolean deleting = false, shouldShoot = false, panning = false;
+    public boolean deleting = false, wasBuilding = true, shouldShoot = false, panning = false;
     /** Mouse pan speed. */
     public float panScale = 0.005f, panSpeed = 4.5f, panBoostSpeed = 11f;
 
@@ -160,14 +161,17 @@ public class DesktopInput extends InputHandler{
                     drawArrow(block, cursorX, cursorY, rotation);
                 }
                 Draw.color();
+                boolean valid = validPlace(cursorX, cursorY, block, rotation);
                 drawRequest(cursorX, cursorY, block, rotation);
-                block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
+                block.drawPlace(cursorX, cursorY, rotation, valid);
 
-                if(block.saveConfig && block.lastConfig != null){
+                if(block.saveConfig){
+                    Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
                     brequest.set(cursorX, cursorY, rotation, block);
                     brequest.config = block.lastConfig;
                     block.drawRequestConfig(brequest, allRequests());
                     brequest.config = null;
+                    Draw.reset();
                 }
             }
         }
@@ -200,7 +204,6 @@ public class DesktopInput extends InputHandler{
             if(input.keyDown(Binding.mouse_move)){
                 panCam = true;
             }
-            panning = false;
 
             Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(camSpeed));
         }else if(!player.dead() && !panning){
@@ -247,7 +250,7 @@ public class DesktopInput extends InputHandler{
 
         //zoom camera
         if((!Core.scene.hasScroll() || Core.input.keyDown(Binding.diagonal_placement)) && !ui.chatfrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0
-            && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
+            && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
@@ -370,7 +373,7 @@ public class DesktopInput extends InputHandler{
         int cursorY = tileY(Core.input.mouseY());
         int rawCursorX = World.toTile(Core.input.mouseWorld().x), rawCursorY = World.toTile(Core.input.mouseWorld().y);
 
-        // automatically pause building if the current build queue is empty
+        //automatically pause building if the current build queue is empty
         if(Core.settings.getBool("buildautopause") && isBuilding && !player.unit().isBuilding()){
             isBuilding = false;
             buildWasAutoPaused = true;
@@ -451,6 +454,7 @@ public class DesktopInput extends InputHandler{
             buildWasAutoPaused = false;
 
             if(isBuilding){
+                wasBuilding = player.unit().isBuilding();
                 player.shooting = false;
             }
         }
@@ -558,6 +562,7 @@ public class DesktopInput extends InputHandler{
             }
 
             mode = none;
+            wasBuilding = true;
         }
 
         if(Core.input.keyTap(Binding.toggle_block_status)){

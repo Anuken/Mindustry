@@ -83,7 +83,7 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
-        Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof Conveyor || req.block instanceof Junction));
+        Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof Conveyor || req.block instanceof Junction));
         return cont.get(Geometry.d4(req.rotation)) &&
             cont.get(Geometry.d4(req.rotation - 2)) &&
             req.tile() != null &&
@@ -114,7 +114,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void draw(){
-            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time * speed * 8f * timeScale())) % 4) : 0;
+            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time * speed * 8f * timeScale)) % 4) : 0;
 
             //draw extra conveyors facing this one for non-square tiling purposes
             Draw.z(Layer.blockUnder);
@@ -127,11 +127,11 @@ public class Conveyor extends Block implements Autotiler{
                 }
             }
 
-            Draw.z(Layer.block);
+            Draw.z(Layer.block - 0.2f);
 
             Draw.rect(regions[blendbits][frame], x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
 
-            Draw.z(Layer.blockOver);
+            Draw.z(Layer.block - 0.1f);
 
             for(int i = 0; i < len; i++){
                 Item item = ids[i];
@@ -143,6 +143,12 @@ public class Conveyor extends Block implements Autotiler{
                     (tile.y * tilesize + tr1.y * ys[i] + tr2.y),
                     itemSize, itemSize);
             }
+        }
+
+        @Override
+        public void drawCracks(){
+            Draw.z(Layer.block - 0.15f);
+            super.drawCracks();
         }
 
         @Override

@@ -68,6 +68,8 @@ public class EventType{
     public static class ContentInitEvent{}
     /** Called when the client game is first loaded. */
     public static class ClientLoadEvent{}
+    /** Called *after* all the modded files have been added into Vars.tree */
+    public static class FileTreeInitEvent{}
     /** Called when a game begins and the world is loaded. */
     public static class WorldLoadEvent{}
 
@@ -351,10 +353,22 @@ public class EventType{
         }
     }
 
+    /** Called when a unit is created in a reconstructor or factory. */
     public static class UnitCreateEvent{
         public final Unit unit;
+        public final Building spawner;
 
-        public UnitCreateEvent(Unit unit){
+        public UnitCreateEvent(Unit unit, Building spawner){
+            this.unit = unit;
+            this.spawner = spawner;
+        }
+    }
+
+    /** Called when a unit is dumped from any payload block. */
+    public static class UnitUnloadEvent{
+        public final Unit unit;
+
+        public UnitUnloadEvent(Unit unit){
             this.unit = unit;
         }
     }

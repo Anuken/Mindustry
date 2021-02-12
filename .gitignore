@@ -43,6 +43,7 @@ ios/robovm.properties
 packr-out/
 config/
 *.gif
+/tests/out
 
 /core/assets/basepartnames
 version.properties

@@ -136,7 +136,9 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
             int rot = (int)((rotation + 45f) / 90f) % 4;
             payload.place(on, rot);
 
-            if(isPlayer()) payload.build.lastAccessed = getPlayer().name;
+            if(getControllerName() != null){
+                payload.build.lastAccessed = getControllerName();
+            }
 
             Fx.unitDrop.at(tile);
             Fx.placeBlock.at(on.drawx(), on.drawy(), on.block().size);
@@ -156,7 +158,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
             pad = (width - (itemSize) * items) / items;
         }
 
-        for (Payload p : payloads){
+        for(Payload p : payloads){
             table.image(p.icon(Cicon.small)).size(itemSize).padRight(pad);
         }
     }

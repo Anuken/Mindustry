@@ -1,0 +1,6 @@
+[This is a truncated changelog, see Github for full notes]
+- Fixed mod list being fetched on startup, leading to potentially annoying error messages
+- Fixed crash when a mod without a version is viewed
+- Un-blacklisted arc.Net
+- Added unit armor stats to database
+- Added unit production time to unit factory database

@@ -39,9 +39,9 @@ public class Damage{
     /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam){
         if(damage){
-            for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
-                int branches = 5 + Mathf.clamp((int)(power / 30), 1, 20);
-                Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3, x, y, Mathf.random(360f), branches + Mathf.range(2)));
+            for(int i = 0; i < Mathf.clamp(power / 700, 0, 8); i++){
+                int length = 5 + Mathf.clamp((int)(power / 500), 1, 20);
+                Time.run(i * 0.8f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3, x, y, Mathf.random(360f), length + Mathf.range(2)));
             }
 
             if(fire){
@@ -116,7 +116,15 @@ public class Damage{
      * Only enemies of the specified team are damaged.
      */
     public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
-        length = findLaserLength(hitter, length);
+        collideLine(hitter, team, effect, x, y, angle, length, large, true);
+    }
+
+    /**
+     * Damages entities in a line.
+     * Only enemies of the specified team are damaged.
+     */
+    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser){
+        if(laser) length = findLaserLength(hitter, length);
 
         collidedBlocks.clear();
         tr.trns(angle, length);
@@ -206,10 +214,10 @@ public class Damage{
      */
     public static Healthc linecast(Bullet hitter, float x, float y, float angle, float length){
         tr.trns(angle, length);
+        
+        tmpBuilding = null;
 
         if(hitter.type.collidesGround){
-            tmpBuilding = null;
-
             world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
                 if(tile != null && tile.team != hitter.team){
@@ -218,8 +226,6 @@ public class Damage{
                 }
                 return false;
             });
-
-            if(tmpBuilding != null) return tmpBuilding;
         }
 
         rect.setPosition(x, y).setSize(tr.x, tr.y);
@@ -262,6 +268,14 @@ public class Damage{
         };
 
         Units.nearbyEnemies(hitter.team, rect, cons);
+
+        if(tmpBuilding != null && tmpUnit != null){
+            if(Mathf.dst2(x, y, tmpUnit.getX(), tmpUnit.getY()) <= Mathf.dst2(x, y, tmpBuilding.getX(), tmpBuilding.getY())){
+                return tmpUnit;
+            }
+        }else if(tmpBuilding != null){
+            return tmpBuilding;
+        }
 
         return tmpUnit;
     }

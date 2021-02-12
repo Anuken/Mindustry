@@ -34,6 +34,10 @@ public abstract class BulletType extends Content{
     public Effect smokeEffect = Fx.shootSmallSmoke;
     /** Sound made when hitting something or getting removed.*/
     public Sound hitSound = Sounds.none;
+    /** Pitch of the sound made when hitting something*/
+    public float hitSoundPitch = 1;
+    /** Volume of the sound made when hitting something*/
+    public float hitSoundVolume = 1;
     /** Extra inaccuracy when firing. */
     public float inaccuracy = 0f;
     /** How many bullets get created per ammo item/liquid. */
@@ -185,8 +189,9 @@ public abstract class BulletType extends Content{
     }
 
     public void hit(Bullet b, float x, float y){
+        b.hit = true;
         hitEffect.at(x, y, b.rotation(), hitColor);
-        hitSound.at(b);
+        hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
 
         Effect.shake(hitShake, hitShake, b);
 
@@ -241,7 +246,7 @@ public abstract class BulletType extends Content{
 
         Effect.shake(despawnShake, despawnShake, b);
 
-        if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
+        if(!b.hit && (fragBullet != null || splashDamageRadius > 0 || lightning > 0)){
             hit(b);
         }
     }
@@ -268,13 +273,12 @@ public abstract class BulletType extends Content{
         if(homingPower > 0.0001f && b.time >= homingDelay){
             Teamc target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
             if(target != null){
-                b.vel.setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), homingPower));
+                b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), homingPower * Time.delta * 50f));
             }
         }
 
         if(weaveMag > 0){
-            float scl = Mathf.randomSeed(id, 0.9f, 1.1f);
-            b.vel.rotate(Mathf.sin(b.time + Mathf.PI * weaveScale/2f * scl, weaveScale * scl, weaveMag) * Time.delta);
+            b.vel.rotate(Mathf.sin(b.time + Mathf.PI * weaveScale/2f, weaveScale, weaveMag * (Mathf.randomSeed(b.id, 0, 1) == 1 ? -1 : 1)) * Time.delta);
         }
 
         if(trailChance > 0){
@@ -334,6 +338,7 @@ public abstract class BulletType extends Content{
         bullet.type = this;
         bullet.owner = owner;
         bullet.team = team;
+        bullet.time = 0f;
         bullet.vel.trns(angle, speed * velocityScl);
         if(backMove){
             bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);

@@ -41,6 +41,13 @@ public class LCanvas extends Table{
         return Core.graphics.getWidth() < Scl.scl(900f) * 1.2f;
     }
 
+    public static void tooltip(Cell<?> cell, String key){
+        String lkey = key.toLowerCase().replace(" ", "");
+        if(Core.settings.getBool("logichints", true) && Core.bundle.has(lkey)){
+            cell.get().addListener(new Tooltip(t -> t.background(Styles.black8).margin(4f).add("[lightgray]" + Core.bundle.get(lkey)).style(Styles.outlineLabel)));
+        }
+    }
+
     public void rebuild(){
         targetWidth = useRows() ? 400f : 900f;
         float s = pane != null ? pane.getScrollPercentY() : 0f;
@@ -283,13 +290,13 @@ public class LCanvas extends Table{
                 t.add().growX();
 
                 t.button(Icon.copy, Styles.logici, () -> {
-                }).padRight(6).get().tapped(this::copy);
+                }).size(24f).padRight(6).get().tapped(this::copy);
 
                 t.button(Icon.cancel, Styles.logici, () -> {
                     remove();
                     dragging = null;
                     statements.layout();
-                });
+                }).size(24f);
 
                 t.addListener(new InputListener(){
                     float lastx, lasty;

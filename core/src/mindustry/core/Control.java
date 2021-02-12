@@ -74,7 +74,7 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(WorldLoadEvent.class, event -> {
             if(Mathf.zero(player.x) && Mathf.zero(player.y)){
-                Building core = state.teams.closestCore(0, 0, player.team());
+                Building core = player.bestCore();
                 if(core != null){
                     player.set(core);
                     camera.position.set(core);

@@ -109,7 +109,7 @@ public class DesktopLauncher extends ClientLauncher{
         steamError = e;
         loadError = true;
         Log.err(e);
-        try(OutputStream s = new FileOutputStream(new File("steam-error-log-" + System.nanoTime() + ".txt"))){
+        try(OutputStream s = new FileOutputStream("steam-error-log-" + System.nanoTime() + ".txt")){
             String log = Strings.neatError(e);
             s.write(log.getBytes());
         }catch(Exception e2){
@@ -130,6 +130,7 @@ public class DesktopLauncher extends ClientLauncher{
                 player.name = SVars.net.friends.getPersonaName();
                 Core.settings.put("name", player.name);
             }
+            steamPlayerName = SVars.net.friends.getPersonaName();
             //update callbacks
             Core.app.addListener(new ApplicationListener(){
                 @Override

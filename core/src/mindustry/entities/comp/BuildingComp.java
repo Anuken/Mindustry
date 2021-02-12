@@ -43,7 +43,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Buildingc.class}, isFinal = false, genio = false, serialize = false)
 @Component(base = true)
-abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable, Controllable{
+abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable, Controllable, Sized{
     //region vars and initialization
     static final float timeToSleep = 60f * 1, timeToUncontrol = 60f * 6;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
@@ -147,7 +147,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         write.f(health);
         write.b(rotation | 0b10000000);
         write.b(team.id);
-        write.b(0); //extra padding for later use
+        write.b(1); //version
+        write.b(enabled ? 1 : 0);
         if(items != null) items.write(write);
         if(power != null) power.write(write);
         if(liquids != null) liquids.write(write);
@@ -162,7 +163,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         rotation = rot & 0b01111111;
         boolean legacy = true;
         if((rot & 0b10000000) != 0){
-            read.b(); //padding
+            byte ver = read.b(); //version of entity save
+            if(ver == 1){
+                byte on = read.b();
+                this.enabled = on == 1;
+                if(!this.enabled){
+                    enabledControlTime = timeToUncontrol;
+                }
+            }
             legacy = false;
         }
 
@@ -528,6 +536,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void dumpLiquid(Liquid liquid){
+        dumpLiquid(liquid, 2f);
+    }
+
+    public void dumpLiquid(Liquid liquid, float scaling){
         int dump = this.cdump;
 
         if(liquids.get(liquid) <= 0.0001f) return;
@@ -543,10 +555,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 float ofract = other.liquids.get(liquid) / other.block.liquidCapacity;
                 float fract = liquids.get(liquid) / block.liquidCapacity;
 
-                if(ofract < fract) transferLiquid(other, (fract - ofract) * block.liquidCapacity / 2f, liquid);
+                if(ofract < fract) transferLiquid(other, (fract - ofract) * block.liquidCapacity / scaling, liquid);
             }
         }
-
     }
 
     public boolean canDumpLiquid(Building to, Liquid liquid){
@@ -770,6 +781,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
         power.links.clear();
     }
+    
+    public boolean conductsTo(Building other){
+        return !block.insulated;
+    }
 
     public Seq<Building> getPowerConnections(Seq<Building> out){
         out.clear();
@@ -777,15 +792,16 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         for(Building other : proximity){
             if(other != null && other.power != null
+            && other.team == team
             && !(block.consumesPower && other.block.consumesPower && !block.outputsPower && !other.block.outputsPower)
-            && !power.links.contains(other.pos())){
+            && conductsTo(other) && other.conductsTo(self()) && !power.links.contains(other.pos())){
                 out.add(other);
             }
         }
 
         for(int i = 0; i < power.links.size; i++){
             Tile link = world.tile(power.links.get(i));
-            if(link != null && link.build != null && link.build.power != null) out.add(link.build);
+            if(link != null && link.build != null && link.build.power != null && link.build.team == team) out.add(link.build);
         }
         return out;
     }
@@ -810,14 +826,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void drawStatus(){
         if(block.enableDrawStatus && block.consumes.any()){
-            float brcx = tile.drawx() + (block.size * tilesize / 2f) - (tilesize / 2f);
-            float brcy = tile.drawy() - (block.size * tilesize / 2f) + (tilesize / 2f);
+            float multiplier = block.size > 1 ? 1 : 0.64f;
+            float brcx = x + (block.size * tilesize / 2f) - (tilesize * multiplier / 2f);
+            float brcy = y - (block.size * tilesize / 2f) + (tilesize * multiplier / 2f);
 
             Draw.z(Layer.power + 1);
             Draw.color(Pal.gray);
-            Fill.square(brcx, brcy, 2.5f, 45);
+            Fill.square(brcx, brcy, 2.5f * multiplier, 45);
             Draw.color(status().color);
-            Fill.square(brcx, brcy, 1.5f, 45);
+            Fill.square(brcx, brcy, 1.5f * multiplier, 45);
             Draw.color();
         }
     }
@@ -898,7 +915,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             tempTiles.clear();
             Geometry.circle(tileX(), tileY(), range, (x, y) -> {
                 Building other = world.build(x, y);
-                if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, self()) && !PowerNode.insulated(other, self())
+                if(other != null && other.block instanceof PowerNode node && node.linkValid(other, self()) && !PowerNode.insulated(other, self())
                     && !other.proximity().contains(this.<Building>self()) &&
                 !(block.outputsPower && proximity.contains(p -> p.power != null && p.power.graph == other.power.graph))){
                     tempTiles.add(other.tile);
@@ -966,12 +983,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 int amount = items.get(item);
                 explosiveness += item.explosiveness * amount;
                 flammability += item.flammability * amount;
+                power += item.charge * amount * 100f;
             }
         }
 
         if(block.hasLiquids){
-            flammability += liquids.sum((liquid, amount) -> liquid.explosiveness * amount / 2f);
-            explosiveness += liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
+            flammability += liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
+            explosiveness += liquids.sum((liquid, amount) -> liquid.explosiveness * amount / 2f);
         }
 
         if(block.consumes.hasPower() && block.consumes.getPower().buffered){
@@ -1260,6 +1278,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return tile.build == self() && !dead();
     }
 
+    @Override
+    public float hitSize(){
+        return tile.block().size * tilesize;
+    }
+
     @Replace
     @Override
     public void kill(){
@@ -1293,6 +1316,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case health -> health;
             case maxHealth -> maxHealth;
             case efficiency -> efficiency();
+            case timescale -> timeScale;
+            case range -> this instanceof Ranged r ? r.range() / tilesize : 0;
             case rotation -> rotation;
             case totalItems -> items == null ? 0 : items.total();
             case totalLiquids -> liquids == null ? 0 : liquids.total();
@@ -1307,7 +1332,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case enabled -> enabled ? 1 : 0;
             case controlled -> this instanceof ControlBlock c ? c.isControlled() ? 1 : 0 : 0;
             case payloadCount -> getPayload() != null ? 1 : 0;
-            default -> 0;
+            default -> Float.NaN; //gets converted to null in logic
         };
     }
 
@@ -1320,14 +1345,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case payloadType -> getPayload() instanceof UnitPayload p1 ? p1.unit.type : getPayload() instanceof BuildPayload p2 ? p2.block() : null;
             default -> noSensed;
         };
-
     }
 
     @Override
     public double sense(Content content){
-        if(content instanceof Item && items != null) return items.get((Item)content);
-        if(content instanceof Liquid && liquids != null) return liquids.get((Liquid)content);
-        return 0;
+        if(content instanceof Item i && items != null) return items.get(i);
+        if(content instanceof Liquid l && liquids != null) return liquids.get(l);
+        return Float.NaN; //invalid sense
     }
 
     @Override
@@ -1376,7 +1400,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             timeScale = 1f;
         }
 
-        if(block.autoResetEnabled){
+        if(!enabled && block.autoResetEnabled){
+            noSleep();
             enabledControlTime -= Time.delta;
 
             if(enabledControlTime <= 0){

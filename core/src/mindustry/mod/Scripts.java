@@ -57,7 +57,7 @@ public class Scripts implements Disposable{
     public String runConsole(String text){
         try{
             Object o = context.evaluateString(scope, text, "console.js", 1, null);
-            if(o instanceof NativeJavaObject) o = ((NativeJavaObject)o).unwrap();
+            if(o instanceof NativeJavaObject n) o = n.unwrap();
             if(o instanceof Undefined) o = "undefined";
             return String.valueOf(o);
         }catch(Throwable t){
@@ -79,6 +79,10 @@ public class Scripts implements Disposable{
     }
 
     //region utility mod functions
+
+    public float[] newFloats(int capacity){
+        return new float[capacity];
+    }
 
     public String readString(String path){
         return Vars.tree.get(path, true).readString();

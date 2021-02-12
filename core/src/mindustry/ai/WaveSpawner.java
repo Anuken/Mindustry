@@ -73,7 +73,7 @@ public class WaveSpawner{
                     for(int i = 0; i < spawned; i++){
                         Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
                         unit.set(spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
-                        unit.add();
+                        spawnEffect(unit);
                     }
                 });
             }else{
@@ -92,7 +92,7 @@ public class WaveSpawner{
             }
         }
 
-        Time.runTask(121f, () -> spawning = false);
+        Time.run(121f, () -> spawning = false);
     }
 
     public void doShockwave(float x, float y){
@@ -148,8 +148,7 @@ public class WaveSpawner{
 
     private void eachFlyerSpawn(Floatc2 cons){
         for(Tile tile : spawns){
-            float angle = Angles.angle(world.width() / 2, world.height() / 2, tile.x, tile.y);
-
+            float angle = Angles.angle(world.width() / 2f, world.height() / 2f, tile.x, tile.y);
             float trns = Math.max(world.width(), world.height()) * Mathf.sqrt2 * tilesize;
             float spawnX = Mathf.clamp(world.width() * tilesize / 2f + Angles.trnsx(angle, trns), -margin, world.width() * tilesize + margin);
             float spawnY = Mathf.clamp(world.height() * tilesize / 2f + Angles.trnsy(angle, trns), -margin, world.height() * tilesize + margin);
@@ -168,6 +167,7 @@ public class WaveSpawner{
     }
 
     private void reset(){
+        spawning = false;
         spawns.clear();
 
         for(Tile tile : world.tiles){
@@ -178,8 +178,11 @@ public class WaveSpawner{
     }
 
     private void spawnEffect(Unit unit){
-        Call.spawnEffect(unit.x, unit.y, unit.type);
-        Time.run(30f, unit::add);
+        unit.rotation = unit.angleTo(world.width()/2f * tilesize, world.height()/2f * tilesize);
+        unit.apply(StatusEffects.unmoving, 30f);
+        unit.add();
+
+        Call.spawnEffect(unit.x, unit.y, unit.rotation, unit.type);
     }
 
     private interface SpawnConsumer{
@@ -187,8 +190,8 @@ public class WaveSpawner{
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void spawnEffect(float x, float y, UnitType type){
-        Fx.unitSpawn.at(x, y, 0f, type);
+    public static void spawnEffect(float x, float y, float rotation, UnitType u){
+        Fx.unitSpawn.at(x, y, rotation, u);
 
         Time.run(30f, () -> Fx.spawn.at(x, y));
     }

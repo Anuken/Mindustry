@@ -1,8 +1,6 @@
 package mindustry.content;
 
-import arc.*;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.struct.*;
 import mindustry.*;
 import mindustry.ctype.*;
@@ -97,36 +95,9 @@ public class Blocks implements ContentList{
     public void load(){
         //region environment
 
-        air = new Floor("air"){
-            {
-                alwaysReplace = true;
-                hasShadow = false;
-                useColor = false;
-                wall = this;
-            }
+        air = new AirBlock("air");
 
-            @Override public void drawBase(Tile tile){}
-            @Override public void load(){}
-            @Override public void init(){}
-            @Override public boolean isHidden(){ return true; }
-
-            @Override
-            public TextureRegion[] variantRegions(){
-                if(variantRegions == null){
-                    variantRegions = new TextureRegion[]{Core.atlas.find("clear")};
-                }
-                return variantRegions;
-            }
-        };
-
-        spawn = new OverlayFloor("spawn"){
-            {
-                variants = 0;
-                needsSurface = false;
-            }
-            @Override
-            public void drawBase(Tile tile){}
-        };
+        spawn = new SpawnBlock("spawn");
 
         cliff = new Cliff("cliff"){{
             inEditor = false;
@@ -788,6 +759,7 @@ public class Blocks implements ContentList{
             health = 130 * wallHealthMultiplier;
             insulated = true;
             absorbLasers = true;
+            schematicPriority = 10;
         }};
 
         plastaniumWallLarge = new Wall("plastanium-wall-large"){{
@@ -796,6 +768,7 @@ public class Blocks implements ContentList{
             size = 2;
             insulated = true;
             absorbLasers = true;
+            schematicPriority = 10;
         }};
 
         thoriumWall = new Wall("thorium-wall"){{
@@ -1312,7 +1285,7 @@ public class Blocks implements ContentList{
         }};
 
         waterExtractor = new SolidPump("water-extractor"){{
-            requirements(Category.production, with(Items.copper, 25, Items.graphite, 25, Items.lead, 20));
+            requirements(Category.production, with(Items.copper, 30, Items.graphite, 30, Items.lead, 30));
             result = Liquids.water;
             pumpAmount = 0.11f;
             size = 2;
@@ -1398,6 +1371,7 @@ public class Blocks implements ContentList{
             size = 3;
             itemCapacity = 1000;
             flags = EnumSet.of(BlockFlag.storage);
+            group = BlockGroup.transportation;
         }};
 
         container = new StorageBlock("container"){{
@@ -1405,6 +1379,7 @@ public class Blocks implements ContentList{
             size = 2;
             itemCapacity = 300;
             flags = EnumSet.of(BlockFlag.storage);
+            group = BlockGroup.transportation;
         }};
 
         unloader = new Unloader("unloader"){{
@@ -1537,7 +1512,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.laser;
 
             shootType = new LaserBulletType(140){{
-                colors = new Color[]{Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.white};
+                colors = new Color[]{Pal.lancerLaser.cpy().a(0.4f), Pal.lancerLaser, Color.white};
                 hitEffect = Fx.hitLancer;
                 despawnEffect = Fx.none;
                 hitSize = 4;
@@ -1595,7 +1570,7 @@ public class Blocks implements ContentList{
             shots = 4;
             burstSpacing = 5;
             inaccuracy = 10f;
-            range = 190f;
+            range = 200f;
             xRand = 6f;
             size = 2;
             health = 300 * size * size;
@@ -1661,6 +1636,7 @@ public class Blocks implements ContentList{
             shootEffect = Fx.shootLiquid;
             range = 190f;
             health = 250 * size * size;
+            flags = EnumSet.of(BlockFlag.turret, BlockFlag.extinguisher);
         }};
 
         fuse = new ItemTurret("fuse"){{
@@ -1838,6 +1814,7 @@ public class Blocks implements ContentList{
             shootType = new ContinuousLaserBulletType(70){{
                 length = 200f;
                 hitEffect = Fx.hitMeltdown;
+                hitColor = Pal.meltdownHit;
                 drawSize = 420f;
 
                 incendChance = 0.4f;
@@ -1992,7 +1969,7 @@ public class Blocks implements ContentList{
 
         powerSource = new PowerSource("power-source"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, with());
-            powerProduction = 100000f / 60f;
+            powerProduction = 1000000f / 60f;
             alwaysUnlocked = true;
         }};
 
@@ -2070,6 +2047,7 @@ public class Blocks implements ContentList{
             hasPower = true;
             consumes.power(10f);
             buildCostMultiplier = 0.5f;
+            health = size * size * 80;
         }};
 
         //endregion campaign

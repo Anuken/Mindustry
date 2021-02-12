@@ -63,7 +63,7 @@ public class ConstructBlock extends Block{
         if(tile == null) return;
 
         float healthf = tile.build == null ? 1f : tile.build.healthf();
-        Seq<Building> prev = tile.build instanceof ConstructBuild ? ((ConstructBuild)tile.build).prevBuild : null;
+        Seq<Building> prev = tile.build instanceof ConstructBuild co ? co.prevBuild : null;
 
         tile.setBlock(block, team, rotation);
 
@@ -78,8 +78,8 @@ public class ConstructBlock extends Block{
                 tile.build.overwrote(prev);
             }
 
-            if(builder != null && builder.isPlayer()){
-                tile.build.lastAccessed = builder.getPlayer().name;
+            if(builder != null && builder.getControllerName() != null){
+                tile.build.lastAccessed = builder.getControllerName();
             }
         }
 
