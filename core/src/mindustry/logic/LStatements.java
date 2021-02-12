@@ -917,7 +917,7 @@ public class LStatements{
                     table.add(" group ").left().self(this::param);;
                     table.button(b -> {
                         b.label(() -> flag.name());
-                        b.clicked(() -> showSelect(b, BlockFlag.all, flag, t -> flag = t, 2, cell -> cell.size(110, 50)));
+                        b.clicked(() -> showSelect(b, BlockFlag.allLogic, flag, t -> flag = t, 2, cell -> cell.size(110, 50)));
                     }, Styles.logict, () -> {}).size(110, 40).color(table.color).left().padLeft(2);
                     row(table);
 
