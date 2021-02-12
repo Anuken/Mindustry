@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
  * weapon equipped, ammo used, and status effects.
  * Each spawn group can have multiple sub-groups spawned in different areas of the map.
  */
-public class SpawnGroup implements Serializable{
+public class SpawnGroup implements JsonSerializable{
     public static final int never = Integer.MAX_VALUE;
 
     /** The unit type spawned */

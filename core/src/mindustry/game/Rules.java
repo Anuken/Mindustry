@@ -137,7 +137,7 @@ public class Rules{
     }
 
     /** A simple map for storing TeamRules in an efficient way without hashing. */
-    public static class TeamRules implements Serializable{
+    public static class TeamRules implements JsonSerializable{
         final TeamRule[] values = new TeamRule[Team.all.length];
 
         public TeamRule get(Team team){

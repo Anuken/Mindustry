@@ -6,7 +6,7 @@ import mindustry.world.meta.*;
 
 import java.util.*;
 
-public class Attributes implements Serializable{
+public class Attributes implements JsonSerializable{
     private final float[] arr = new float[Attribute.all.length];
 
     public void clear(){

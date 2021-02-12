@@ -10,6 +10,8 @@ import static mindustry.tools.ScriptMainGenerator.*;
 
 //experimental
 public class BindingsGenerator{
+    //list of touchy class names that lead to conflicts; all typedefs and procs containing these are ignored
+    static Seq<String> ignored = Seq.with(".Entry", ".MapIterator");
 
     public static void main(String[] args) throws Exception{
 
@@ -18,19 +20,28 @@ public class BindingsGenerator{
             getClasses("mindustry"),
             getClasses("arc")
         );
-        classes.sort(Structs.comparing(Class::getName));
 
         classes.removeAll(type -> type.isSynthetic() || type.isAnonymousClass() || type.getCanonicalName() == null || Modifier.isPrivate(type.getModifiers())
         || blacklist.contains(s -> type.getName().startsWith(s)));
 
+        classes.add(Enum.class);
+
         classes.distinct();
-        classes.sortComparing(Class::getName);
+
+        classes = sorted(classes);
+        classes.removeAll(BindingsGenerator::ignore);
 
         StringBuilder result = new StringBuilder();
         result.append("import jnim, jnim/java/lang\n\n{.experimental: \"codeReordering\".}\n\n");
 
         for(Class<?> type : classes){
-            String name = type.getCanonicalName();
+            result.append("jclassDef ").append(type.getCanonicalName()).append(" of `")
+            .append(repr(type.getSuperclass())).append("`\n");
+        }
+
+        result.append("\n");
+
+        for(Class<?> type : classes){
 
             Seq<Executable> exec = new Seq<>();
 
@@ -38,14 +49,15 @@ public class BindingsGenerator{
             exec.addAll(type.getDeclaredConstructors());
 
             exec.removeAll(e -> !Modifier.isPublic(e.getModifiers()));
+            exec.removeAll(e -> Structs.contains(e.getParameterTypes(), BindingsGenerator::ignore));
 
             Seq<Field> fields = Seq.select(type.getDeclaredFields(), f -> Modifier.isPublic(f.getModifiers()));
 
-            result.append("jclass ").append(name).append(" of `")
-                .append(type.getSuperclass() == null ? "JVMObject" : type.getSuperclass().getSimpleName()).append("`").append(exec.size + fields.size > 0 ? ":" : "").append("\n");
+            result.append("jclassImpl ").append(type.getCanonicalName()).append(" of `")
+                .append(repr(type.getSuperclass())).append("`").append(exec.size + fields.size > 0 ? ":" : "").append("\n");
 
             for(Field field : fields){
-                result.append("  proc `").append(field.getName()).append("`*");
+                result.append("  proc `").append(field.getName()).append("`");
                 result.append(": ").append(str(field.getType()));
                 result.append(" {.prop");
                 if(Modifier.isStatic(field.getModifiers())) result.append(", `static`");
@@ -54,7 +66,7 @@ public class BindingsGenerator{
             }
 
             for(Executable method : exec){
-                String mname = method.getName().equals("<init>") || method.getName().equals(type.getCanonicalName()) ? "new" : method.getName();
+                String mname = method.getName().equals("<init>") || method.getName().equals(type.getName()) ? "new" : method.getName();
                 result.append("  proc `").append(mname).append("`");
 
                 if(method.getParameterCount() > 0){
@@ -92,6 +104,39 @@ public class BindingsGenerator{
         Fi.get("/home/anuke/Projects/Nimdustry-java/mindustry_bindings.nim").writeString(result.toString());
         //Fi.get(OS.userhome).child("mindustry.nim").writeString(result.toString());
         Log.info(result);
+    }
+
+    static boolean ignore(Class<?> type){
+        if(type == null) return false;
+        return ignored.contains(s -> type.getCanonicalName().contains(s)) || ignore(type.getSuperclass());
+    }
+
+    static Seq<Class<?>> sorted(Seq<Class<?>> classes){
+        ObjectSet<Class<?>> visited = new ObjectSet<>();
+        Seq<Class<?>> result = new Seq<>();
+        for(Class<?> c : classes){
+            if(!visited.contains(c)){
+                topoSort(c, result, visited);
+            }
+        }
+        return result;
+    }
+
+    static void topoSort(Class<?> c, Seq<Class<?>> stack, ObjectSet<Class<?>> visited){
+        visited.add(c);
+        for(Class<?> sup : c.getInterfaces()){
+            if(!visited.contains(sup)){
+                topoSort(sup, stack, visited);
+            }
+        }
+        if(c.getSuperclass() != null && !c.getSuperclass().equals(Object.class) && !visited.contains(c.getSuperclass())){
+            topoSort(c.getSuperclass(), stack, visited);
+        }
+        stack.add(c);
+    }
+
+    static String repr(Class type){
+        return type == null ? "JVMObject" : type.getSimpleName();
     }
 
     static String str(Class type){
