@@ -71,8 +71,7 @@ public class ScriptMainGenerator{
         new Fi("core/assets/scripts/global.js").writeString(result.toString());
     }
 
-
-    private static Seq<Class> getClasses(String packageName) throws Exception{
+    public static Seq<Class> getClasses(String packageName) throws Exception{
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         Seq<File> dirs = new Seq<>();
 
@@ -87,7 +86,7 @@ public class ScriptMainGenerator{
         return classes;
     }
 
-    private static Seq<Class> findClasses(File directory, String packageName) throws Exception{
+    public static Seq<Class> findClasses(File directory, String packageName) throws Exception{
         Seq<Class> classes = new Seq<>();
         if(!directory.exists()) return classes;
 
