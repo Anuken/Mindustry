@@ -180,8 +180,12 @@ public class ForceProjector extends Block{
 
         @Override
         public double sense(LAccess sensor){
-            if(sensor == LAccess.heat) return buildup;
-            return super.sense(sensor);
+            return switch (sensor) {
+                case heat -> buildup;
+                case forceFieldHealth -> broken ? 0 : (shieldHealth + phaseShieldBoost * phaseHeat) - buildup;
+                case maxForceFieldHealth -> shieldHealth + phaseShieldBoost * phaseHeat;
+                default -> super.sense(sensor);
+            };
         }
 
         @Override
