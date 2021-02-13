@@ -86,5 +86,9 @@
   {
     "name": "Mindustry PLAY",
     "address": ["92.63.100.160"]
+  },
+  {
+    "name": "WORLD25 SERVER",
+    "address": ["de18.falixnodes.net:31073"]
   }
 ]
