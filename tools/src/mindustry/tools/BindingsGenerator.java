@@ -1,6 +1,8 @@
 package mindustry.tools;
 
+import arc.*;
 import arc.files.*;
+import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 
@@ -12,21 +14,29 @@ import java.util.*;
 
 import static mindustry.tools.ScriptMainGenerator.*;
 
-//experimental
+//experimental binding generator - used for Nim, but can be used for other languages as well, theoretically
 public class BindingsGenerator{
     //list of touchy class names that lead to conflicts or should not be referenced; all typedefs and procs containing these are ignored
     static Seq<String> ignored = Seq.with(".Entry", ".MapIterator", "arc.freetype.FreeType.Glyph", "FrameBufferBuilder", "Spliterator",
         "java.util.function", "java.util.stream", "ArrayList", "Constable", "Optional", "java.lang.reflect", "rhino.Context", "arc.graphics.GL20", "arc.graphics.GL30");
+
     static ObjectSet<Class<?>> classSet = new ObjectSet<>();
     static ObjectSet<String> keywords = ObjectSet.with("object", "string");
 
     public static void main(String[] args) throws Exception{
 
-        //37800
-        Seq<String> blacklist = Seq.with("mindustry.tools", "arc.backend", "arc.maps", "arc.util.serialization.Xml", "arc.fx", "arc.net", "arc.Net", "arc.freetype");
+        Seq<String> blacklist = Seq.with(
+            "mindustry.tools",
+            "arc.backend", 
+            "arc.maps", 
+            "arc.util.serialization.Xml", 
+            "arc.fx", 
+            "arc.net", "arc.Net",
+            "arc.freetype"
+        );
         Seq<Class<?>> classes = Seq.withArrays(
-            getClasses("mindustry"),
-            getClasses("arc")
+            getClasses("mindustry")
+            //getClasses("arc")
         );
 
         classes.removeAll(type -> type.isSynthetic() || type.isAnonymousClass() || type.getCanonicalName() == null || Modifier.isPrivate(type.getModifiers())
@@ -35,7 +45,8 @@ public class BindingsGenerator{
         classes.addAll(Enum.class, FloatBuffer.class, IntBuffer.class, ByteBuffer.class, StringBuilder.class,
             Comparator.class, Comparable.class, Reader.class, Writer.class, PrintStream.class, PrintWriter.class, File.class, Charset.class,
             ClassLoader.class, DoubleBuffer.class, CharBuffer.class, Locale.class,
-            LongBuffer.class, DataInputStream.class, DataOutputStream.class);
+            LongBuffer.class, DataInputStream.class, DataOutputStream.class, Events.class, Cons.class
+        );
         classes.distinct();
 
         classes = sorted(classes);
@@ -51,38 +62,14 @@ public class BindingsGenerator{
         });
 
         classSet = classes.asSet();
-        classSet.addAll(Object.class, Number.class, Integer.class, Double.class, Short.class, Float.class, Byte.class, Long.class, String.class, Boolean.class, Throwable.class, Exception.class);
-        classSet.addAll(int.class, float.class, long.class, char.class, byte.class, boolean.class, double.class, short.class);
-
-        /*
-        //Cons<Class<?>> logger = c -> {
-            //if(!c.isPrimitive() && !c.isArray() && !ignore(c) && Modifier.isPublic(c.getModifiers()) && classSet.add(c)){
-            //    Log.info(c);
-            //}
-        //};
-
-        for(Class<?> type : classes){
-            for(Field f : type.getDeclaredFields()){
-                if(Modifier.isPublic(f.getModifiers())){
-                    logger.get(f.getType());
-                }
-            }
-
-            for(Method f : type.getDeclaredMethods()){
-                if(Modifier.isPublic(f.getModifiers())){
-                    logger.get(f.getReturnType());
-                    for(Class<?> c : f.getParameterTypes()){
-                        logger.get(c);
-                    }
-                }
-            }
-        }*/
+        classSet.addAll(Object.class, Number.class, Integer.class, Double.class, Short.class, Float.class, Byte.class, Long.class, String.class, Boolean.class, Throwable.class, Exception.class, Class.class);
+        classSet.addAll(void.class, int.class, float.class, long.class, char.class, byte.class, boolean.class, double.class, short.class);
 
         StringBuilder result = new StringBuilder();
-        result.append("import jnim, jnim/java/lang\n\n{.experimental: \"codeReordering\".}\n{.push hint[ConvFromXtoItselfNotNeeded]: off.}\n\n");
+        result.append("import jnim, jnim/java/lang\n\n{.push hint[ConvFromXtoItselfNotNeeded]: off.}\n\n");
 
         for(Class<?> type : classes){
-            result.append("jclassDef ").append(type.getCanonicalName()).append(" of `")
+            result.append("jclassDef ").append(type.getName()).append(" of `")
             .append(repr(type.getSuperclass())).append("`\n");
         }
 
@@ -107,12 +94,13 @@ public class BindingsGenerator{
                 !keywords.contains(f.getName()) &&
                 !ignore(f.getType()) && Modifier.isPublic(f.getType().getModifiers()) &&
                 !(f.getType().isArray() &&
-                f.getType().getComponentType().isArray())
+                f.getType().getComponentType().isArray()) &&
+                classSet.contains(f.getType())
             );
 
             if(exec.size + fields.size <= 0) continue;
 
-            result.append("jclassImpl ").append(type.getCanonicalName()).append(" of `")
+            result.append("jclassImpl ").append(type.getName()).append(" of `")
                 .append(repr(type.getSuperclass())).append("`").append(":").append("\n");
 
             for(Field field : fields){
@@ -174,7 +162,7 @@ public class BindingsGenerator{
                 }
 
                 if(Modifier.isStatic(method.getModifiers())){
-                    //result.append(" {.`static`.}");
+                    result.append(" {.`static`.}");
                 }
                 result.append("\n");
             }
@@ -182,6 +170,7 @@ public class BindingsGenerator{
         }
         result.append("{.pop.}\n");
 
+        //change directory as needed later
         Fi.get("/home/anuke/Projects/Nimdustry-java/mindustry_bindings.nim").writeString(result.toString());
         Log.info("Done. Classes found: @", classes.size);
     }
@@ -221,14 +210,15 @@ public class BindingsGenerator{
     }
 
     static String repr(Class type){
-        if(type == null || type.equals(Object.class)) return "JVMObject";
+        if(type == null) return "JVMObject";
+        if(type.equals(Object.class)) return "Object";
         if(type.equals(String.class)) return "string";
         if(!Modifier.isPublic(type.getModifiers())) return "Object";
         return type.getSimpleName();
     }
 
     static String str(Class type){
-        if(type.equals(Object.class)) return "JVMObject";
+        if(type.equals(Object.class)) return "Object";
         if(type.equals(String.class)) return "string";
         if(type.isArray()) return "seq[" + str(type.getComponentType()) + "]";
         if(type.isPrimitive()) return "j" + type.getSimpleName();
