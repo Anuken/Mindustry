@@ -153,6 +153,7 @@ public class Build{
                 (type == check.block() && check.build != null && rotation == check.build.rotation && type.rotate) || //same block, same rotation
                 !check.interactable(team) || //cannot interact
                 !check.floor().placeableOn || //solid wall
+                (!checkVisible && !check.block().alwaysReplace) || //replacing a block that should be replaced (e.g. payload placement)
                     !((type.canReplace(check.block()) || //can replace type
                         //controversial change: allow rebuilding damaged blocks
                         //this could be buggy and abuse-able, so I'm not enabling it yet
