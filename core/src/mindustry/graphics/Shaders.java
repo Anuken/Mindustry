@@ -142,6 +142,10 @@ public class Shaders{
         }
     }
 
+    /** @deprecated transition class for mods; use UnitBuildShader instead. */
+    @Deprecated
+    public static class UnitBuild extends UnitBuildShader{}
+
     public static class UnitBuildShader extends LoadShader{
         public float progress, time;
         public Color color = new Color();
