@@ -5,24 +5,19 @@ import arc.struct.*;
 import mindustry.net.Packets.*;
 
 public class Registrator{
-    private static final ClassEntry[] classes = {
-    new ClassEntry(StreamBegin.class, StreamBegin::new),
-    new ClassEntry(StreamChunk.class, StreamChunk::new),
-    new ClassEntry(WorldStream.class, WorldStream::new),
-    new ClassEntry(ConnectPacket.class, ConnectPacket::new),
-    new ClassEntry(InvokePacket.class, InvokePacket::new)
-    };
+    private static final Seq<ClassEntry> classes = new Seq<>(127);
     private static final ObjectIntMap<Class<?>> ids = new ObjectIntMap<>();
 
     static{
-        if(classes.length > 127) throw new RuntimeException("Can't have more than 127 registered classes!");
-        for(int i = 0; i < classes.length; i++){
-            ids.put(classes[i].type, i);
-        }
+        put(new ClassEntry(StreamBegin.class, StreamBegin::new));
+        put(new ClassEntry(StreamChunk.class, StreamChunk::new));
+        put(new ClassEntry(WorldStream.class, WorldStream::new));
+        put(new ClassEntry(ConnectPacket.class, ConnectPacket::new));
+        put(new ClassEntry(InvokePacket.class, InvokePacket::new));
     }
 
     public static ClassEntry getByID(byte id){
-        return classes[id];
+        return classes.get(id);
     }
 
     public static byte getID(Class<?> type){
@@ -30,7 +25,14 @@ public class Registrator{
     }
 
     public static ClassEntry[] getClasses(){
-        return classes;
+        return classes.toArray();
+    }
+
+    public static void put(ClassEntry entry){
+        classes.add(entry);
+        ids.put(entry.type, classes.size);
+
+        if(classes.size > 127) throw new RuntimeException("Can't have more than 127 registered classes!");
     }
 
     public static class ClassEntry{
