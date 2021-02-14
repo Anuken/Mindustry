@@ -179,6 +179,12 @@ public class ForceProjector extends Block{
         }
 
         @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.heat) return buildup;
+            return super.sense(sensor);
+        }
+
+        @Override
         public void draw(){
             super.draw();
 

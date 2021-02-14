@@ -1,8 +1,6 @@
 package mindustry.content;
 
-import arc.*;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.struct.*;
 import mindustry.*;
 import mindustry.ctype.*;
@@ -97,36 +95,9 @@ public class Blocks implements ContentList{
     public void load(){
         //region environment
 
-        air = new Floor("air"){
-            {
-                alwaysReplace = true;
-                hasShadow = false;
-                useColor = false;
-                wall = this;
-            }
+        air = new AirBlock("air");
 
-            @Override public void drawBase(Tile tile){}
-            @Override public void load(){}
-            @Override public void init(){}
-            @Override public boolean isHidden(){ return true; }
-
-            @Override
-            public TextureRegion[] variantRegions(){
-                if(variantRegions == null){
-                    variantRegions = new TextureRegion[]{Core.atlas.find("clear")};
-                }
-                return variantRegions;
-            }
-        };
-
-        spawn = new OverlayFloor("spawn"){
-            {
-                variants = 0;
-                needsSurface = false;
-            }
-            @Override
-            public void drawBase(Tile tile){}
-        };
+        spawn = new SpawnBlock("spawn");
 
         cliff = new Cliff("cliff"){{
             inEditor = false;
@@ -2076,6 +2047,7 @@ public class Blocks implements ContentList{
             hasPower = true;
             consumes.power(10f);
             buildCostMultiplier = 0.5f;
+            health = size * size * 80;
         }};
 
         //endregion campaign

@@ -10,6 +10,7 @@ import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
 import static mindustry.Vars.*;
+import static mindustry.logic.LCanvas.*;
 
 public class LogicDialog extends BaseDialog{
     public LCanvas canvas;
@@ -72,7 +73,7 @@ public class LogicDialog extends BaseDialog{
                     t.button(example.name(), style, () -> {
                         canvas.add(prov.get());
                         dialog.hide();
-                    }).size(140f, 50f);
+                    }).size(140f, 50f).self(c -> tooltip(c, "lst." + example.name()));
                     if(++i % 2 == 0) t.row();
                 }
             });
