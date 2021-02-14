@@ -89,6 +89,6 @@
   },
   {
     "name": "WORLD25",
-    "address": ["de18.falixnodes.net:31073,de18.falixnodes.net:16406"]
+    "address": ["de18.falixnodes.net:31073", "de18.falixnodes.net:16406"]
   }
 ]
