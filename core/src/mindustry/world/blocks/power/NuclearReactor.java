@@ -48,7 +48,7 @@ public class NuclearReactor extends PowerGenerator{
         hasItems = true;
         hasLiquids = true;
         rebuildable = false;
-        flags = EnumSet.of(BlockFlag.reactor);
+        flags = EnumSet.of(BlockFlag.reactor, BlockFlag.generator);
     }
 
     @Override

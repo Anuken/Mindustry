@@ -116,7 +116,15 @@ public class Damage{
      * Only enemies of the specified team are damaged.
      */
     public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
-        length = findLaserLength(hitter, length);
+        collideLine(hitter, team, effect, x, y, angle, length, large, true);
+    }
+
+    /**
+     * Damages entities in a line.
+     * Only enemies of the specified team are damaged.
+     */
+    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser){
+        if(laser) length = findLaserLength(hitter, length);
 
         collidedBlocks.clear();
         tr.trns(angle, length);
@@ -206,10 +214,10 @@ public class Damage{
      */
     public static Healthc linecast(Bullet hitter, float x, float y, float angle, float length){
         tr.trns(angle, length);
+        
+        tmpBuilding = null;
 
         if(hitter.type.collidesGround){
-            tmpBuilding = null;
-
             world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
                 if(tile != null && tile.team != hitter.team){
@@ -218,8 +226,6 @@ public class Damage{
                 }
                 return false;
             });
-
-            if(tmpBuilding != null) return tmpBuilding;
         }
 
         rect.setPosition(x, y).setSize(tr.x, tr.y);
@@ -262,6 +268,14 @@ public class Damage{
         };
 
         Units.nearbyEnemies(hitter.team, rect, cons);
+
+        if(tmpBuilding != null && tmpUnit != null){
+            if(Mathf.dst2(x, y, tmpUnit.getX(), tmpUnit.getY()) <= Mathf.dst2(x, y, tmpBuilding.getX(), tmpBuilding.getY())){
+                return tmpUnit;
+            }
+        }else if(tmpBuilding != null){
+            return tmpBuilding;
+        }
 
         return tmpUnit;
     }

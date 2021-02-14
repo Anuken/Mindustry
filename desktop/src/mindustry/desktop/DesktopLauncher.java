@@ -130,6 +130,7 @@ public class DesktopLauncher extends ClientLauncher{
                 player.name = SVars.net.friends.getPersonaName();
                 Core.settings.put("name", player.name);
             }
+            steamPlayerName = SVars.net.friends.getPersonaName();
             //update callbacks
             Core.app.addListener(new ApplicationListener(){
                 @Override

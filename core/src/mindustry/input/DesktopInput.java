@@ -42,7 +42,7 @@ public class DesktopInput extends InputHandler{
     /** Selected build request for movement. */
     public @Nullable BuildPlan sreq;
     /** Whether player is currently deleting removal requests. */
-    public boolean deleting = false, shouldShoot = false, panning = false;
+    public boolean deleting = false, wasBuilding = true, shouldShoot = false, panning = false;
     /** Mouse pan speed. */
     public float panScale = 0.005f, panSpeed = 4.5f, panBoostSpeed = 11f;
 
@@ -454,6 +454,7 @@ public class DesktopInput extends InputHandler{
             buildWasAutoPaused = false;
 
             if(isBuilding){
+                wasBuilding = player.unit().isBuilding();
                 player.shooting = false;
             }
         }
@@ -561,6 +562,7 @@ public class DesktopInput extends InputHandler{
             }
 
             mode = none;
+            wasBuilding = true;
         }
 
         if(Core.input.keyTap(Binding.toggle_block_status)){

@@ -15,6 +15,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
+import static mindustry.logic.LCanvas.*;
 import static mindustry.world.blocks.logic.LogicDisplay.*;
 
 public class LStatements{
@@ -355,7 +356,7 @@ public class LStatements{
                 }, 2, cell -> cell.size(100, 50)));
             }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
-            table.add(" of ");
+            table.add(" of ").self(this::param);
 
             field(table, target, v -> target = v);
 
@@ -394,7 +395,7 @@ public class LStatements{
             table.defaults().left();
 
             if(buildFrom()){
-                table.add(" from ");
+                table.add(" from ").self(this::param);
 
                 fields(table, radar, v -> radar = v);
 
@@ -405,7 +406,7 @@ public class LStatements{
                 int fi = i;
                 Prov<RadarTarget> get = () -> (fi == 0 ? target1 : fi == 1 ? target2 : target3);
 
-                table.add(i == 0 ? " target " : " and ");
+                table.add(i == 0 ? " target " : " and ").self(this::param);
 
                 table.button(b -> {
                     b.label(() -> get.get().name());
@@ -419,13 +420,13 @@ public class LStatements{
                 }
             }
 
-            table.add(" order ");
+            table.add(" order ").self(this::param);
 
             fields(table, sortOrder, v -> sortOrder = v);
 
             table.row();
 
-            table.add(" sort ");
+            table.add(" sort ").self(this::param);
 
             table.button(b -> {
                 b.label(() -> sort.name());
@@ -434,7 +435,7 @@ public class LStatements{
                 }, 2, cell -> cell.size(100, 50)));
             }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
-            table.add(" output ");
+            table.add(" output ").self(this::param);
 
             fields(table, output, v -> output = v);
         }
@@ -511,7 +512,7 @@ public class LStatements{
                                 i.button(sensor.name(), Styles.cleart, () -> {
                                     stype("@" + sensor.name());
                                     hide.run();
-                                }).size(240f, 40f).row();
+                                }).size(240f, 40f).self(c -> tooltip(c, "lenum." + sensor.name())).row();
                             }
                         })
                     };
@@ -531,14 +532,14 @@ public class LStatements{
 
                             t.parent.parent.pack();
                             t.parent.parent.invalidateHierarchy();
-                        }).size(80f, 50f).growX().checked(selected == fi).group(group);
+                        }).height(50f).growX().checked(selected == fi).group(group);
                     }
                     t.row();
                     t.add(stack).colspan(3).width(240f).left();
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
 
-            table.add(" in ");
+            table.add(" in ").self(this::param);
 
             field(table, from, str -> from = str);
         }
@@ -608,12 +609,35 @@ public class LStatements{
             }else{
                 row(table);
 
-                field(table, a, str -> a = str);
+                //"function"-type operations have the name at the left and arguments on the right
+                if(op.func){
+                    if(LCanvas.useRows()){
+                        table.left();
+                        table.row();
+                        table.table(c -> {
+                            c.color.set(color());
+                            c.left();
+                            funcs(c);
+                        }).colspan(2).left();
+                    }else{
+                        funcs(table);
+                    }
+                }else{
+                    field(table, a, str -> a = str);
 
-                opButton(table);
+                    opButton(table);
 
-                field(table, b, str -> b = str);
+                    field(table, b, str -> b = str);
+                }
             }
+        }
+
+        void funcs(Table table){
+            opButton(table);
+
+            field(table, a, str -> a = str);
+
+            field(table, b, str -> b = str);
         }
 
         void opButton(Table table){
@@ -623,7 +647,7 @@ public class LStatements{
                     op = o;
                     rebuild(table);
                 }));
-            }, Styles.logict, () -> {}).size(60f, 40f).pad(4f).color(table.color);
+            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
         }
 
         @Override
@@ -634,6 +658,28 @@ public class LStatements{
         @Override
         public Color color(){
             return Pal.logicOperations;
+        }
+    }
+
+    //TODO untested
+    //@RegisterStatement("wait")
+    public static class WaitStatement extends LStatement{
+        public String value = "0.5";
+
+        @Override
+        public void build(Table table){
+            field(table, value, str -> value = str);
+            table.add(" sec");
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicOperations;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new WaitI(builder.var(value));
         }
     }
 
@@ -855,7 +901,7 @@ public class LStatements{
         void rebuild(Table table){
             table.clearChildren();
 
-            table.add(" find ").left();
+            table.add(" find ").left().self(this::param);;
 
             table.button(b -> {
                 b.label(() -> locate.name());
@@ -868,14 +914,14 @@ public class LStatements{
             switch(locate){
                 case building -> {
                     row(table);
-                    table.add(" type ").left();
+                    table.add(" group ").left().self(this::param);;
                     table.button(b -> {
                         b.label(() -> flag.name());
-                        b.clicked(() -> showSelect(b, BlockFlag.all, flag, t -> flag = t, 2, cell -> cell.size(110, 50)));
+                        b.clicked(() -> showSelect(b, BlockFlag.allLogic, flag, t -> flag = t, 2, cell -> cell.size(110, 50)));
                     }, Styles.logict, () -> {}).size(110, 40).color(table.color).left().padLeft(2);
                     row(table);
 
-                    table.add(" enemy ").left();
+                    table.add(" enemy ").left().self(this::param);;
 
                     fields(table, enemy, str -> enemy = str);
 
@@ -883,7 +929,7 @@ public class LStatements{
                 }
 
                 case ore -> {
-                    table.add(" ore ").left();
+                    table.add(" ore ").left().self(this::param);
                     table.table(ts -> {
                         ts.color.set(table.color);
 
@@ -920,19 +966,19 @@ public class LStatements{
                 }
             }
 
-            table.add(" outX ").left();
+            table.add(" outX ").left().self(this::param);
             fields(table, outX, str -> outX = str);
 
-            table.add(" outY ").left();
+            table.add(" outY ").left().self(this::param);
             fields(table, outY, str -> outY = str);
 
             row(table);
 
-            table.add(" found ").left();
+            table.add(" found ").left().self(this::param);
             fields(table, outFound, str -> outFound = str);
 
             if(locate != LLocate.ore){
-                table.add(" building ").left();
+                table.add(" building ").left().self(this::param);
                 fields(table, outBuild, str -> outBuild = str);
             }
 

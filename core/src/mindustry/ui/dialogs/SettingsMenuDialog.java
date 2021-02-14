@@ -320,6 +320,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
         game.checkPref("hints", true);
+        game.checkPref("logichints", true);
 
         if(!mobile){
             game.checkPref("backgroundpause", true);
@@ -409,11 +410,11 @@ public class SettingsMenuDialog extends SettingsDialog{
             graphics.checkPref("animatedshields", !mobile);
         }
 
-        if(!ios){
+        //if(!ios){
             graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
-        }else{
-            Core.settings.put("bloom", false);
-        }
+        //}else{
+        //    Core.settings.put("bloom", false);
+        //}
 
         graphics.checkPref("pixelate", false, val -> {
             if(val){

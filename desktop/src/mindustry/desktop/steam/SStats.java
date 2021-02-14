@@ -51,6 +51,12 @@ public class SStats implements SteamUserStatsCallback{
                     stats.storeStats();
                 }
             }, statSavePeriod * 60, statSavePeriod * 60);
+
+            if(Items.thorium.unlocked()) obtainThorium.complete();
+            if(Items.titanium.unlocked()) obtainTitanium.complete();
+            if(!content.sectors().contains(s -> s.locked())){
+                unlockAllZones.complete();
+            }
         });
     }
 
@@ -194,6 +200,9 @@ public class SStats implements SteamUserStatsCallback{
         Events.on(UnlockEvent.class, e -> {
             if(e.content == Items.thorium) obtainThorium.complete();
             if(e.content == Items.titanium) obtainTitanium.complete();
+            if(e.content instanceof SectorPreset && !content.sectors().contains(s -> s.locked())){
+                unlockAllZones.complete();
+            }
         });
 
         Events.run(Trigger.openWiki, openWiki::complete);

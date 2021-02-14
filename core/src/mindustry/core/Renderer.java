@@ -2,7 +2,6 @@ package mindustry.core;
 
 import arc.*;
 import arc.files.*;
-import arc.fx.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
@@ -38,13 +37,8 @@ public class Renderer implements ApplicationListener{
     public float minZoom = 1.5f, maxZoom = 6f;
 
     private @Nullable CoreBuild landCore;
-    //TODO unused
-    private FxProcessor fx = new FxProcessor();
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
-    private float targetscale = Scl.scl(4);
-    private float camerascale = targetscale;
-    private float landscale = 0f, landTime, weatherAlpha;
-    private float minZoomScl = Scl.scl(0.01f);
+    private float targetscale = Scl.scl(4), camerascale = targetscale, landscale, landTime, weatherAlpha, minZoomScl = Scl.scl(0.01f);
     private float shakeIntensity, shaketime;
 
     public Renderer(){
@@ -137,11 +131,6 @@ public class Renderer implements ApplicationListener{
     }
 
     @Override
-    public void resize(int width, int height){
-        fx.resize(width, height);
-    }
-
-    @Override
     public void resume(){
         if(settings.getBool("bloom") && bloom != null){
             bloom.resume();
@@ -173,23 +162,6 @@ public class Renderer implements ApplicationListener{
                 bloom = null;
             }
         }
-    }
-
-    void beginFx(){
-        if(!fx.hasEnabledEffects()) return;
-
-        Draw.flush();
-        fx.clear();
-        fx.begin();
-    }
-
-    void endFx(){
-        if(!fx.hasEnabledEffects()) return;
-
-        Draw.flush();
-        fx.end();
-        fx.applyEffects();
-        fx.render(0, 0, fx.getWidth(), fx.getHeight());
     }
 
     void updateShake(float scale){
