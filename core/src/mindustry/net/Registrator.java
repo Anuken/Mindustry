@@ -30,7 +30,7 @@ public class Registrator{
 
     public static void put(ClassEntry entry){
         classes.add(entry);
-        ids.put(entry.type, classes.size);
+        ids.put(entry.type, classes.size - 1);
 
         if(classes.size > 127) throw new RuntimeException("Can't have more than 127 registered classes!");
     }
