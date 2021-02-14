@@ -17,7 +17,6 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
-import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
@@ -527,12 +526,23 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return block.consumes.itemFilters.get(item.id) && items.get(item) < getMaximumAccepted(item);
     }
 
+    public float acceptLiquid(Building source, Liquid liquid, float amount){
+        if(acceptLiquid(source, liquid)){
+            float accepted = Math.min(amount, block.liquidCapacity - liquids.get(liquid));
+            liquids.add(liquid, accepted);
+            return accepted;
+        }
+        return 0;
+    }
+
     public boolean acceptLiquid(Building source, Liquid liquid){
         return block.hasLiquids && block.consumes.liquidfilters.get(liquid.id);
     }
 
+    @Deprecated
     public void handleLiquid(Building source, Liquid liquid, float amount){
-        liquids.add(liquid, amount);
+        //TODO unused, remove
+        //liquids.add(liquid, amount);
     }
 
     public void dumpLiquid(Liquid liquid){
@@ -565,15 +575,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void transferLiquid(Building next, float amount, Liquid liquid){
-        float flow = Math.min(next.block.liquidCapacity - next.liquids.get(liquid), amount);
-
-        if(next.acceptLiquid(self(), liquid)){
-            next.handleLiquid(self(), liquid, flow);
-            liquids.remove(liquid, flow);
-        }
+        liquids.remove(liquid, next.acceptLiquid(self(), liquid, amount));
     }
 
+    //TODO
+    @Deprecated
     public float moveLiquidForward(boolean leaks, Liquid liquid){
+        throw new RuntimeException("do not call moveLiquidForward");
+        /*
         Tile next = tile.nearby(rotation);
 
         if(next == null) return 0;
@@ -585,17 +594,22 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             Puddles.deposit(next, tile, liquid, leakAmount);
             liquids.remove(liquid, leakAmount);
         }
-        return 0;
+        return 0;*/
     }
 
+    //TODO
+    @Deprecated
     public float moveLiquid(Building next, Liquid liquid){
+        throw new RuntimeException("do not call moveLiquid");
+        /*
+
         if(next == null) return 0;
 
         next = next.getLiquidDestination(self(), liquid);
 
         if(next.team == team && next.block.hasLiquids && liquids.get(liquid) > 0f){
             float ofract = next.liquids.get(liquid) / next.block.liquidCapacity;
-            float fract = liquids.get(liquid) / block.liquidCapacity * block.liquidPressure;
+            float fract = liquids.get(liquid) / block.liquidCapacity;
             float flow = Math.min(Mathf.clamp((fract - ofract)) * (block.liquidCapacity), liquids.get(liquid));
             flow = Math.min(flow, next.block.liquidCapacity - next.liquids.get(liquid));
 
@@ -622,9 +636,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 }
             }
         }
-        return 0;
+        return 0;*/
     }
 
+    @Deprecated
     public Building getLiquidDestination(Building from, Liquid liquid){
         return self();
     }

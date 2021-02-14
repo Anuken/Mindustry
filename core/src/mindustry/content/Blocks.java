@@ -1061,14 +1061,12 @@ public class Blocks implements ContentList{
         pulseConduit = new Conduit("pulse-conduit"){{
             requirements(Category.liquid, with(Items.titanium, 2, Items.metaglass, 1));
             liquidCapacity = 16f;
-            liquidPressure = 1.025f;
             health = 90;
         }};
 
         platedConduit = new ArmoredConduit("plated-conduit"){{
             requirements(Category.liquid, with(Items.thorium, 2, Items.metaglass, 1, Items.plastanium, 1));
             liquidCapacity = 16f;
-            liquidPressure = 1.025f;
             health = 220;
         }};
 

@@ -49,7 +49,6 @@ public class Block extends UnlockableContent{
 
     public int itemCapacity = 10;
     public float liquidCapacity = 10f;
-    public float liquidPressure = 1f;
 
     public final BlockBars bars = new BlockBars();
     public final Consumers consumes = new Consumers();

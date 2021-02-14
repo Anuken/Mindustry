@@ -37,6 +37,9 @@ public class Conduit extends LiquidBlock implements Autotiler{
         floating = true;
         conveyorPlacement = true;
         noUpdateDisabled = true;
+        canOverdrive = false;
+        destructible = true;
+        update = false;
     }
 
     @Override
@@ -77,10 +80,18 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public class ConduitBuild extends LiquidBuild implements ChainedBuilding{
         public float smoothLiquid;
         public int blendbits, xscl, yscl, blending;
-        public FluidLine line = new FluidLine(this);
+        public FluidLine line = new FluidLine();
 
         @Override
         public void draw(){
+            //TODO debugging
+            if(true){
+                float hue = Mathf.randomSeed(line.hashCode(), 0, 360f);
+                Draw.mixcol(Tmp.c1.fromHsv(hue, 1, 1), 1f);
+                Draw.rect("conduit-top-0", x, y, rotdeg());
+                Draw.reset();
+                return;
+            }
             float rotation = rotdeg();
             int r = this.rotation;
 
@@ -111,18 +122,38 @@ public class Conduit extends LiquidBlock implements Autotiler{
         }
 
         @Override
+        public float acceptLiquid(Building source, Liquid liquid, float amount){
+            return line.acceptLiquid(liquid, amount);
+        }
+
+        @Override
         public void onProximityAdded(){
             super.onProximityAdded();
+            line.forward(this);
+            line.backward(this);
         }
 
         @Override
         public void onProximityRemoved(){
             super.onProximityRemoved();
+            line.remove();
+            //TODO reflow
+            for(int i = 0; i < 4; i++){
+                if(nearby(i) instanceof ConduitBuild cond){
+                    if(front() == cond){
+                        new FluidLine().forward(cond);
+                    }else if(cond.front() == this){
+                        new FluidLine().backward(cond);
+                    }
+                }
+            }
         }
 
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
+
+            //TODO reflow after rotate
 
             int[] bits = buildBlending(tile, rotation, null, true);
             blendbits = bits[0];
