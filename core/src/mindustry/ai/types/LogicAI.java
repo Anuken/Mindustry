@@ -119,6 +119,9 @@ public class LogicAI extends AIController{
 
         vec.set(target).sub(unit);
 
+        //do not move when infinite vectors are used.
+        if(vec.isNaN() || vec.isInfinite()) return;
+
         float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / smooth, -1f, 1f);
 
         vec.setLength(unit.realSpeed() * length);
