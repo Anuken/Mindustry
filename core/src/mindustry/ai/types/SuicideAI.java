@@ -1,5 +1,6 @@
 package mindustry.ai.types;
 
+import arc.math.geom.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.entities.*;
@@ -47,14 +48,17 @@ public class SuicideAI extends GroundAI{
 
                 //raycast for target
                 boolean blocked = Vars.world.raycast(unit.tileX(), unit.tileY(), target.tileX(), target.tileY(), (x, y) -> {
-                    Tile tile = Vars.world.tile(x, y);
-                    if(tile != null && tile.build == target) return false;
-                    if(tile != null && tile.build != null && tile.build.team != unit.team()){
-                        blockedByBlock = true;
-                        return true;
-                    }else{
-                        return tile == null || tile.solid();
+                    for(Point2 p : Geometry.d4c){
+                        Tile tile = Vars.world.tile(x + p.x, y + p.y);
+                        if(tile != null && tile.build == target) return false;
+                        if(tile != null && tile.build != null && tile.build.team != unit.team()){
+                            blockedByBlock = true;
+                            return true;
+                        }else{
+                            return tile == null || tile.solid();
+                        }
                     }
+                    return false;
                 });
 
                 //shoot when there's an enemy block in the way
