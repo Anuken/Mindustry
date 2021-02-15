@@ -53,7 +53,7 @@ public class BuilderAI extends AIController{
             if((retreatTimer += Time.delta) >= retreatDelay){
                 if(enemy != null){
                     var core = unit.closestCore();
-                    if(!unit.within(core, retreatDst)){
+                    if(core != null && !unit.within(core, retreatDst)){
                         moveTo(core, retreatDst);
                     }
                 }

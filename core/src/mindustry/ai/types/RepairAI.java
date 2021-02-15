@@ -45,7 +45,7 @@ public class RepairAI extends AIController{
                 //fly away from enemy when not doing anything
                 if(avoid != null){
                     var core = unit.closestCore();
-                    if(!unit.within(core, retreatDst)){
+                    if(core != null && !unit.within(core, retreatDst)){
                         moveTo(core, retreatDst);
                     }
                 }
