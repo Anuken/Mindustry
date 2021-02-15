@@ -76,7 +76,7 @@ public class Units{
         if((team == state.rules.waveTeam && !state.rules.pvp) || (state.isCampaign() && team == state.rules.waveTeam)){
             return Integer.MAX_VALUE;
         }
-        return state.rules.unitCap + indexer.getExtraUnits(team);
+        return state.rules.unitCapVariable ? (int) state.rules.unitCap + indexer.getExtraUnits(team) : (int) state.rules.unitCap;
     }
 
     /** @return whether this player can interact with a specific tile. if either of these are null, returns true.*/

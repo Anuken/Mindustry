@@ -161,6 +161,8 @@ public class CustomRulesDialog extends BaseDialog{
 
         title("@rules.title.unit");
         check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
+        check("@rules.unitcapvariable", b -> rules.unitCapVariable = b, () -> rules.unitCapVariable);
+        number("@rules.unitcap", f -> rules.unitCap = f, () -> rules.unitCap);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
         number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0.001f, 50f);
 
