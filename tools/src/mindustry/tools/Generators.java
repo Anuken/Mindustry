@@ -4,7 +4,6 @@ import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Pixmap.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -44,7 +43,7 @@ public class Generators{
                     if(!fi.extEquals("png")) return;
 
                     Pixmap pix = new Pixmap(fi);
-                    pix.setBlending(PixmapBlending.sourceOver);
+                    pix.setBlending(Pixmap.Blending.sourceOver);
                     pix.each((x, y) -> {
                         int value = pix.getPixel(x, y);
                         pix.draw(x, y, paletteMap.get(value, value));
