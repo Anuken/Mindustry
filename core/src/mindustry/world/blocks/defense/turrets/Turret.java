@@ -98,7 +98,7 @@ public class Turret extends ReloadTurret{
         solid = true;
         group = BlockGroup.turrets;
         flags = EnumSet.of(BlockFlag.turret);
-        outlinedIcon = 1;
+        outlineIcon = true;
         liquidCapacity = 20f;
     }
 

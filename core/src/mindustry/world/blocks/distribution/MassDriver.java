@@ -42,7 +42,7 @@ public class MassDriver extends Block{
         configurable = true;
         hasItems = true;
         hasPower = true;
-        outlinedIcon = 1;
+        outlineIcon = true;
         sync = true;
 
         //point2 is relative

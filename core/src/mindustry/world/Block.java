@@ -160,7 +160,9 @@ public class Block extends UnlockableContent{
     public boolean canOverdrive = true;
     /** Outlined icon color.*/
     public Color outlineColor = Color.valueOf("404049");
-    /** Which icon region has an outline added, if any. */
+    /** Whether an icon region has an outline added. */
+    public boolean outlineIcon = false;
+    /** Which of the icon regions gets the outline added. */
     public int outlinedIcon = -1;
     /** Whether this block has a shadow under it. */
     public boolean hasShadow = true;
@@ -766,9 +768,9 @@ public class Block extends UnlockableContent{
 
         Pixmap last = null;
 
-        if(outlinedIcon >= 0){
+        if(outlineIcon){
             final int radius = 4;
-            PixmapRegion region = Core.atlas.getPixmap(getGeneratedIcons()[outlinedIcon]);
+            PixmapRegion region = Core.atlas.getPixmap(getGeneratedIcons()[outlinedIcon >= 0 ? outlinedIcon : getGeneratedIcons().length -1]);
             Pixmap out = new Pixmap(region.width, region.height);
             Color color = new Color();
             for(int x = 0; x < region.width; x++){

@@ -26,7 +26,7 @@ public class BaseTurret extends Block{
 
         update = true;
         solid = true;
-        outlinedIcon = 1;
+        outlineIcon = true;
     }
 
     @Override
