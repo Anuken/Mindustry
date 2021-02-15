@@ -66,10 +66,10 @@ public class Rules{
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
     public float waveSpacing = 2 * Time.toMinutes;
-    /** Base unit cap. Can still be increased by blocks. */
-    public float unitCap = 0;
     /** Wave after which the player 'wins'. Used in sectors. Use a value <= 0 to disable. */
     public int winWave = 0;
+    /** Base unit cap. Can still be increased by blocks. */
+    public int unitCap = 0;
     /** Sector for saves that have them. */
     public @Nullable Sector sector;
     /** Spawn layout. */
