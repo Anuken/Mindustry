@@ -380,8 +380,8 @@ public class Damage{
             //why? because otherwise the building would absorb everything in one cell, which means much less damage than a nearby explosion.
             //this needs to be compensated
             if(in != null && in.team != team && in.block.size > 1 && in.health > damage){
-                //deal the damage of an entire side * 2, to be equivalent with the maximum "standard" side damage + 1
-                in.damage(damage * (in.block.size * 2));
+                //deal the damage of an entire side + 1, to be equivalent with maximum 'standard' damage
+                in.damage(damage * (in.block.size + 1));
                 //no need to continue with the explosion
                 return;
             }

@@ -1366,8 +1366,8 @@ public class UnitTypes implements ContentList{
                     collides = false;
 
                     healPercent = 15f;
-                    splashDamage = 230f;
-                    splashDamageRadius = 81f;
+                    splashDamage = 220f;
+                    splashDamageRadius = 80f;
                 }};
             }});
         }};
