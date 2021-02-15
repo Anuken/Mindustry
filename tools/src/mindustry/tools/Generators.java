@@ -245,9 +245,9 @@ public class Generators{
 
                 try{
                     Image last = null;
-                    if(block.outlineIcon){
+                    if(block.outlinedIcon >= 0){
                         int radius = 4;
-                        GenRegion region = (GenRegion)regions[regions.length - 1];
+                        GenRegion region = (GenRegion)regions[block.outlinedIcon];
                         Image base = ImagePacker.get(region);
                         Image out = last = new Image(region.width, region.height);
                         for(int x = 0; x < out.width; x++){
