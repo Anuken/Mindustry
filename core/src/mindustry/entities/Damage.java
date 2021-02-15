@@ -6,7 +6,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
@@ -25,11 +24,10 @@ public class Damage{
     private static Rect hitrect = new Rect();
     private static Vec2 tr = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2();
     private static Seq<Unit> units = new Seq<>();
-    private static GridBits bits = new GridBits(30, 30);
-    private static IntQueue propagation = new IntQueue();
     private static IntSet collidedBlocks = new IntSet();
     private static Building tmpBuilding;
     private static Unit tmpUnit;
+    private static IntFloatMap damages = new IntFloatMap();
 
     /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage){
@@ -365,64 +363,85 @@ public class Damage{
 
         if(ground){
             if(!complete){
-                int trad = (int)(radius / tilesize);
-                Tile tile = world.tileWorld(x, y);
-                if(tile != null){
-                    tileDamage(team, tile.x, tile.y, trad, damage);
-                }
+                //increase damage slightly to compensate for new algorithm
+                tileDamage(team, World.toTile(x), World.toTile(y), radius / tilesize, damage * 1.1f);
             }else{
                 completeDamage(team, x, y, radius, damage);
             }
         }
     }
 
-    public static void tileDamage(Team team, int startx, int starty, int baseRadius, float baseDamage){
-        //tile damage is posted, so that destroying a block that causes a chain explosion will run in the next frame
-        //this prevents recursive damage calls from messing up temporary variables
+    public static void tileDamage(Team team, int x, int y, float baseRadius, float damage){
+
         Core.app.post(() -> {
 
-            bits.clear();
-            propagation.clear();
-            int bitOffset = bits.width() / 2;
+            var in = world.build(x, y);
+            //spawned inside a multiblock. this means that damage needs to be dealt directly.
+            //why? because otherwise the building would absorb everything in one cell, which means much less damage than a nearby explosion.
+            //this needs to be compensated
+            if(in != null && in.team != team && in.block.size > 1 && in.health > damage){
+                //deal the damage of an entire side * 2, to be equivalent with the maximum "standard" side damage + 1
+                in.damage(damage * (in.block.size * 2));
+                //no need to continue with the explosion
+                return;
+            }
 
-            propagation.addFirst(PropCell.get((byte)0, (byte)0, (short)baseDamage));
-            //clamp radius to fit bits
-            int radius = Math.min(baseRadius, bits.width() / 2);
+            //cap radius to prevent lag
+            float radius = Math.min(baseRadius, 30), rad2 = radius * radius;
+            int rays = Mathf.ceil(radius * 2 * Mathf.pi);
+            double spacing = Math.PI * 2.0 / rays;
+            damages.clear();
 
-            while(!propagation.isEmpty()){
-                int prop = propagation.removeLast();
-                int x = PropCell.x(prop);
-                int y = PropCell.y(prop);
-                int damage = PropCell.damage(prop);
-                //manhattan distance used for calculating falloff, results in a diamond pattern
-                int dst = Math.abs(x) + Math.abs(y);
+            //raycast from each angle
+            for(int i = 0; i <= rays; i++){
+                float dealt = 0f;
+                int startX = x;
+                int startY = y;
+                int endX = x + (int)(Math.cos(spacing * i) * radius), endY = y + (int)(Math.sin(spacing * i) * radius);
 
-                int scaledDamage = (int)(damage * (1f - (float)dst / radius));
+                int xDist = Math.abs(endX - startX);
+                int yDist = -Math.abs(endY - startY);
+                int xStep = (startX < endX ? +1 : -1);
+                int yStep = (startY < endY ? +1 : -1);
+                int error = xDist + yDist;
 
-                bits.set(bitOffset + x, bitOffset + y);
-                Tile tile = world.tile(startx + x, starty + y);
+                while(startX != endX || startY != endY){
+                    var build = world.build(startX, startY);
+                    if(build != null && build.team != team){
+                        //damage dealt at circle edge
+                        float edgeScale = 0.6f;
+                        float mult = (1f-(Mathf.dst2(startX, startY, x, y) / rad2) + edgeScale) / (1f + edgeScale);
+                        float next = damage * mult - dealt;
+                        //register damage dealt
+                        int p = Point2.pack(startX, startY);
+                        damages.put(p, Math.max(damages.get(p), next));
+                        //register as hit
+                        dealt += build.health;
 
-                if(scaledDamage <= 0 || tile == null) continue;
-
-                //apply damage to entity if needed
-                if(tile.build != null && tile.build.team != team){
-                    int health = (int)(tile.build.health / (tile.block().size * tile.block().size));
-                    if(tile.build.health > 0){
-                        tile.build.damage(scaledDamage);
-                        scaledDamage -= health;
-
-                        if(scaledDamage <= 0) continue;
+                        if(next - dealt <= 0){
+                            break;
+                        }
                     }
-                }
 
-                for(Point2 p : Geometry.d4){
-                    if(!bits.get(bitOffset + x + p.x, bitOffset + y + p.y)){
-                        propagation.addFirst(PropCell.get((byte)(x + p.x), (byte)(y + p.y), (short)scaledDamage));
+                    if(2 * error - yDist > xDist - 2 * error){
+                        error += yDist;
+                        startX += xStep;
+                    }else{
+                        error += xDist;
+                        startY += yStep;
                     }
                 }
             }
-        });
 
+            //apply damage
+            for(var e : damages){
+                int cx = Point2.x(e.key), cy = Point2.y(e.key);
+                var build = world.build(cx, cy);
+                if(build != null){
+                    build.damage(e.value);
+                }
+            }
+        });
     }
 
     private static void completeDamage(Team team, float x, float y, float radius, float damage){
@@ -442,12 +461,5 @@ public class Damage{
         float falloff = 0.4f;
         float scaled = Mathf.lerp(1f - dist / radius, 1f, falloff);
         return damage * scaled;
-    }
-
-    @Struct
-    static class PropCellStruct{
-        byte x;
-        byte y;
-        short damage;
     }
 }

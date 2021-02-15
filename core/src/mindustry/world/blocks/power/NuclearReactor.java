@@ -33,8 +33,8 @@ public class NuclearReactor extends PowerGenerator{
     public float itemDuration = 120; //time to consume 1 fuel
     public float heating = 0.01f; //heating per frame * fullness
     public float smokeThreshold = 0.3f; //threshold at which block starts smoking
-    public int explosionRadius = 40;
-    public int explosionDamage = 1350;
+    public int explosionRadius = 20;
+    public int explosionDamage = 1250;
     public float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
     public float coolantPower = 0.5f;
 
