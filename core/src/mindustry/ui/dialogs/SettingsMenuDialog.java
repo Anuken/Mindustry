@@ -146,7 +146,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                             }
                         }
                     }
-                    
+
                     for(var slot : control.saves.getSaveSlots().copy()){
                         if(slot.isSector()){
                             slot.delete();
@@ -501,13 +501,13 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     @Override
     public void addCloseButton(){
-        buttons.button("@back", Icon.leftOpen, () -> {
+        buttons.button("@back", Icon.left, () -> {
             if(prefs.getChildren().first() != menu){
                 back();
             }else{
                 hide();
             }
-        }).size(230f, 64f);
+        }).size(210f, 64f);
 
         keyDown(key -> {
             if(key == KeyCode.escape || key == KeyCode.back){
