@@ -63,6 +63,12 @@ public class LiquidTurret extends Turret{
         super.init();
     }
 
+    @Override
+    public TextureRegion[] icons(){
+        if(topRegion.found()) return new TextureRegion[]{baseRegion, region, topRegion};
+        return super.icons();
+    }
+
     public class LiquidTurretBuild extends TurretBuild{
         @Override
         public void draw(){
