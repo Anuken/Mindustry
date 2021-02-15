@@ -45,25 +45,33 @@ public class DesktopInput extends InputHandler{
     /** Mouse pan speed. */
     public float panScale = 0.005f, panSpeed = 4.5f, panBoostSpeed = 11f;
 
+    boolean showHint(){
+        return ui.hudfrag.shown && Core.settings.getBool("hints") && selectRequests.isEmpty() &&
+            (!isBuilding && !Core.settings.getBool("buildautopause") || player.unit().isBuilding() || !player.dead() && !player.unit().spawnedByCore());
+    }
+
     @Override
     public void buildUI(Group group){
         //building and respawn hints
         group.fill(t -> {
-            t.visible(() -> ui.hudfrag.shown && Core.settings.getBool("hints") && selectRequests.isEmpty() && (!isBuilding && !Core.settings.getBool("buildautopause") || player.unit().isBuilding() || !player.dead() && !player.unit().spawnedByCore()));
+            t.color.a = 0f;
+            t.visible(() -> (t.color.a = Mathf.lerpDelta(t.color.a, Mathf.num(showHint()), 0.15f)) > 0.001f);
             t.bottom();
             t.table(Styles.black6, b -> {
+                StringBuilder str = new StringBuilder();
                 b.defaults().left();
                 b.label(() -> {
-                    String str = "";
+                    if(!showHint()) return str;
+                    str.setLength(0);
                     if(!isBuilding && !Core.settings.getBool("buildautopause") && !player.unit().isBuilding()){
-                        str += Core.bundle.format("enablebuilding", Core.keybinds.get(Binding.pause_building).key.toString());
+                        str.append(Core.bundle.format("enablebuilding", Core.keybinds.get(Binding.pause_building).key.toString()));
                     }else if(player.unit().isBuilding()){
-                        str += Core.bundle.format(isBuilding ? "pausebuilding" : "resumebuilding", Core.keybinds.get(Binding.pause_building).key.toString()) +
-                            "\n" + Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString()) +
-                            "\n" + Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematic_select).key.toString());
+                        str.append(Core.bundle.format(isBuilding ? "pausebuilding" : "resumebuilding", Core.keybinds.get(Binding.pause_building).key.toString()))
+                            .append("\n").append(Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString()))
+                            .append("\n").append(Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematic_select).key.toString()));
                     }
                     if(!player.dead() && !player.unit().spawnedByCore()){
-                        str += (!str.isEmpty() ? "\n" : "") + Core.bundle.format("respawn", Core.keybinds.get(Binding.respawn).key.toString());
+                        str.append(str.length() != 0 ? "\n" : "").append(Core.bundle.format("respawn", Core.keybinds.get(Binding.respawn).key.toString()));
                     }
                     return str;
                 }).style(Styles.outlineLabel);
