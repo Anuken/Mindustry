@@ -273,6 +273,10 @@ public class Generators{
                             }
                         }
 
+                        for(int i = block.outlinedIcon; i < regions.length; i++){
+                            out.draw(ImagePacker.get(regions[i]));
+                        }
+
                         region.path.delete();
 
                         out.save(block.name);
