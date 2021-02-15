@@ -160,7 +160,7 @@ public class Block extends UnlockableContent{
     public boolean canOverdrive = true;
     /** Outlined icon color.*/
     public Color outlineColor = Color.valueOf("404049");
-    /** Whether an icon region has an outline added. */
+    /** Whether any icon region has an outline added. */
     public boolean outlineIcon = false;
     /** Which of the icon regions gets the outline added. */
     public int outlinedIcon = -1;
