@@ -273,6 +273,7 @@ public class Generators{
                             }
                         }
 
+                        //prevents the regions above from being ignored/invisible/etc
                         for(int i = block.outlinedIcon + 1; i < regions.length; i++){
                             out.draw(ImagePacker.get(regions[i]));
                         }
