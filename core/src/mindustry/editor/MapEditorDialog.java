@@ -158,7 +158,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 platform.publish(map);
             }).padTop(-3).size(swidth * 2f + 10, 60f).update(b ->
                 b.setText(editor.tags.containsKey("steamid") ?
-                    editor.tags.get("author").equals(steamPlayerName) ? "@workshop.listing" : "@view.workshop" :
+                    editor.tags.get("author", "").equals(steamPlayerName) ? "@workshop.listing" : "@view.workshop" :
                 "@editor.publish.workshop"));
 
             menu.cont.row();
