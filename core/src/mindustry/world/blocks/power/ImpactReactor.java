@@ -24,8 +24,8 @@ public class ImpactReactor extends PowerGenerator{
 
     public float warmupSpeed = 0.001f;
     public float itemDuration = 60f;
-    public int explosionRadius = 50;
-    public int explosionDamage = 2000;
+    public int explosionRadius = 23;
+    public int explosionDamage = 1900;
 
     public Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
 
