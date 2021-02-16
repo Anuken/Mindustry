@@ -1,11 +1,52 @@
 Baue komplexe Produktionsketten aus Förderbändern, um deine Geschütztürme mit Munition zu versorgen. Stelle Materialien her, um deine Fabrik zu vergrößern und sie vor Gegnerwellen zu schützen. Spiele mit deinen Freunden in plattformübergreifenden Partien oder fordere sie zum Kampf heraus.
 
-Dieses Tower-Defense-Spiel bietet:
-- 24 Karten
-- Eine Kampagne, die ins Spiel einführt und einen Forschungsbaum enthält
-- 4 mächtige Bosse
-- Transportsysteme für Materialien, Flüssigkeiten und Strom
-- 19 verschiedene Einheiten, die du kommandieren kannst
-- Mehrspielerpartien im lokalen Netzwerk oder über einen Server
+<h2>Spiel</h2>
+ 
+- Benutze Blöcke, um eine große Vielfalt an Ressourcen herzustellen
+- Beschütze deine Basis vor Gegnerwellen
+- Spiele mit deinen Freunden in plattformübergreifenden Mehrspielermodi, oder fordere sie zu einem Team-basiertem PvP-Spiel hinaus
+- Verteile Flüssigkeiten und bekämpfe die ständige Bedrohung von Feuerausbrüchen oder gegnerische Luftangriffe
+- Nutze deine Produktionsblöcke voll aus, indem du Schmiermittle und Kühlung besorgst
+- Stelle eine große Vielfalt an Einheiten her, um deine Basis zu beschützen und zu verwalten
 
-Mithilfe eines eingebauten Editors können eigene Karten und Gegnerwellen erstellt werden. Die Spielregeln kannst du flexibel nach deinen Wünschen anpassen.
+
+<h2>Kampagne</h2>
+
+- Erorbere den Planeten Serpulo, indem du mehr als 250 generierte Sektoren und 16 handgemachte Karten durchspielst
+- Erorbere dein Gebiet und stelle Fabriken auf, um Ressources zu besorgen, während du in anderen Sektron weitermachst
+- Beschütze deine Sektoren vor regelmäsigen gegnerischen Angriffen
+- Koordiniere Ressourcesverteilung zwischen Sektoren mit Launchpads
+- Erforsche neue Blöcke, um deinen Fortschitt foranzutreiben
+- Lade deine Freunde ein, um zusammen zu spielen
+- 130+ Blöcke
+- 33 verschiedene Einheite
+
+
+<h2>Spielmodi</h2>
+
+- <b>Überleben</b>: Baue Geschütze um deine Basis zu beschützen. Überlebe so lange wie möglich und starte deine Ressourcen, um mit ihnen zu forschen. Bereite deine Basis auf gegnerische Bossangriffe vor.
+- <b>Angriff</b>: Baue Fabriken für Einheiten, die den gegnerischen Kern zerstören und währenddessen deinen beschützen. Erstelle eine Mischung aus defensive und offensive Einheiten, um dich zu unterstüzen. Aktiviere wahlweise eine KI, sodass der Gegner auch bauen kann.
+- <b>PvP</b>: Kämpfe mit bis zu vier Teams um den Sieg und zerstöre die gegnerischen Kerne. Baue Einheiten oder greife die Gegner direkt an.
+- <b>Sandkasten</b>: Spiele mit unendlichen Ressources und ohne Gegnergefahr. Benutze besondere Ressourcenquellen um Sachen auszuprobieren, oder erstelle Gegner auf Nachfrage.
+
+
+<h2>Benutzerdefinierte Spiele &amp; plattformübergreifender Multiplayer</h2>
+
+- 16 eingebaute Karten für eigene Spiele
+- Spielt gemeinsam, gegeneinander oder im Sandkasten
+- Trete einem öffentlichem Server bei, oder lade deine Freude zu deinem Spiel ein
+- Anpassbare Spielregeln: Verändere Blockkosten, Gegnerstärke, Anfangsitems, Wellen und vieles mehr
+- Mix &amp; match gamemodes: Combine PvP and PvE gamemodes together
+
+
+<h2>Eigener Karten-Editor</h2>
+
+- Male Terrain
+- Editiere und sehe eine Vorschau deiner Karte im Spiel
+- Konfigurierbare Werkzeuge: Verändere, wie die Werkzeuge funktionieren
+- Nützliches Generationssystem für Karten, mit vielen verschiedenen Filtern für das Bearbeiten vom Terrain
+- Wende Rauschen, Verzerren, Glätte, Erosion, Symmetrie, Erzgeneration und Zufälligkeit an
+- Lasse Erze, Flüsse und andere Ressourcen automatisch generieren
+- Konfiguriere die gegnerische Wellen
+- Verändere die Karten-Regeln
+- Benutze 80+ verschiedene Umgebungsblöcke
