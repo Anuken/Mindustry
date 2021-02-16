@@ -119,6 +119,7 @@ public class FloorRenderer implements Disposable{
             return;
         }
 
+        Draw.flush();
         cbatch.setProjection(Core.camera.mat);
         cbatch.beginDraw();
 
