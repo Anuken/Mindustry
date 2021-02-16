@@ -145,6 +145,7 @@ public class PowerNode extends PowerBlock{
 
         getPotentialLinks(tile, other -> {
             Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
+
             insulators(tile.x, tile.y, other.tileX(), other.tileY(), cause -> {
                 Drawf.square(cause.x, cause.y, cause.block.size * tilesize / 2f + 2f, Pal.plastanium);
             });

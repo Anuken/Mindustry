@@ -162,7 +162,6 @@ public class AndroidLauncher extends AndroidApplication{
         }, new AndroidApplicationConfiguration(){{
             useImmersiveMode = true;
             hideStatusBar = true;
-            stencil = 8;
         }});
         checkFiles(getIntent());
 

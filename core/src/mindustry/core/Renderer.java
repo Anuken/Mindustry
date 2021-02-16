@@ -67,7 +67,6 @@ public class Renderer implements ApplicationListener{
     @Override
     public void update(){
         Color.white.set(1f, 1f, 1f, 1f);
-        Gl.clear(Gl.stencilBufferBit);
 
         float dest = Mathf.round(targetscale, 0.5f);
         camerascale = Mathf.lerpDelta(camerascale, dest, 0.1f);
