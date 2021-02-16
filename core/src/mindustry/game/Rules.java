@@ -44,6 +44,8 @@ public class Rules{
     public boolean fire = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
+    /** Whether cores add to unit limit */
+    public boolean unitCapVariable = true;
     /** How fast unit pads build units. */
     public float unitBuildSpeedMultiplier = 1f;
     /** How much damage any other units deal. */
