@@ -62,7 +62,7 @@ public class Vars implements Loadable{
     public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/1-modding/";
     /** URL to the JSON file containing all the BE servers. Only queried in BE. */
     public static final String serverJsonBeURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_be.json";
-    /** URL to the JSON file containing all the BE servers.  */
+    /** URL to the JSON file containing all the stable servers.  */
     public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_v6.json";
     /** URL of the github issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
