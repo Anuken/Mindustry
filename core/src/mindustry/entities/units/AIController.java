@@ -167,7 +167,7 @@ public class AIController implements UnitController{
     }
 
     protected boolean retarget(){
-        return timer.get(timerTarget, 40);
+        return timer.get(timerTarget, target == null ? 40 : 90);
     }
 
     protected Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
