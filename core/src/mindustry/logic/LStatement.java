@@ -75,7 +75,7 @@ public abstract class LStatement{
                 sizer.get(t.button(p.toString(), Styles.logicTogglet, () -> {
                     getter.get(p);
                     hide.run();
-                }).self(c -> tooltip(c, "lenum." + p.name())).checked(current == p).group(group));
+                }).self(c -> tooltip(c, p)).checked(current == p).group(group));
 
                 if(++i % cols == 0) t.row();
             }

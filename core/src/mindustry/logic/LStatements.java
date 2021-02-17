@@ -512,7 +512,7 @@ public class LStatements{
                                 i.button(sensor.name(), Styles.cleart, () -> {
                                     stype("@" + sensor.name());
                                     hide.run();
-                                }).size(240f, 40f).self(c -> tooltip(c, "lenum." + sensor.name())).row();
+                                }).size(240f, 40f).self(c -> tooltip(c, sensor)).row();
                             }
                         })
                     };
