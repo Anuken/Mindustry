@@ -363,8 +363,7 @@ public class Damage{
 
         if(ground){
             if(!complete){
-                //increase damage slightly to compensate for new algorithm
-                tileDamage(team, World.toTile(x), World.toTile(y), radius / tilesize, damage * 1.1f);
+                tileDamage(team, World.toTile(x), World.toTile(y), radius / tilesize, damage);
             }else{
                 completeDamage(team, x, y, radius, damage);
             }
@@ -381,7 +380,7 @@ public class Damage{
             //this needs to be compensated
             if(in != null && in.team != team && in.block.size > 1 && in.health > damage){
                 //deal the damage of an entire side + 1, to be equivalent with maximum 'standard' damage
-                in.damage(damage * (in.block.size + 1));
+                in.damage(damage * Math.min((in.block.size + 1), baseRadius * 0.44f));
                 //no need to continue with the explosion
                 return;
             }
