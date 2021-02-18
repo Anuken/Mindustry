@@ -335,7 +335,11 @@ public class Block extends UnlockableContent{
         super.setStats();
 
         stats.add(Stat.size, "@x@", size, size);
-        stats.add(Stat.health, health, StatUnit.none);
+
+        if(synthetic()){
+            stats.add(Stat.health, health, StatUnit.none);
+        }
+
         if(canBeBuilt()){
             stats.add(Stat.buildTime, buildCost / 60, StatUnit.seconds);
             stats.add(Stat.buildCost, new ItemListValue(false, requirements));
