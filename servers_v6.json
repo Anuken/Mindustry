@@ -87,4 +87,8 @@
     "name": "Nydus",
     "address": ["v6.mindustry.nydus.app:6566"]
   }
+  {
+    "name": "THEDIMAS",
+    "address": ["fifr3.quackhost.uk:26160", "frfr1.quackhost.uk:20566", "frfr1.quackhost.uk:20594", "frfr1.quackhost.uk:20752", "frfr1.quackhost.uk:20745"]
+  }
 ]
