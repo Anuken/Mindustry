@@ -63,7 +63,7 @@ public class Bullets implements ContentList{
             lifetime = 80f;
             width = height = 11f;
             collidesTiles = false;
-            splashDamageRadius = 25f;
+            splashDamageRadius = 25f * 0.75f;
             splashDamage = 33f;
         }};
 
@@ -84,7 +84,7 @@ public class Bullets implements ContentList{
             lifetime = 80f;
             width = height = 13f;
             collidesTiles = false;
-            splashDamageRadius = 35f;
+            splashDamageRadius = 35f * 0.75f;
             splashDamage = 45f;
             fragBullet = artilleryPlasticFrag;
             fragBullets = 10;
@@ -98,7 +98,7 @@ public class Bullets implements ContentList{
             lifetime = 80f;
             width = height = 11f;
             collidesTiles = false;
-            splashDamageRadius = 25f;
+            splashDamageRadius = 25f * 0.75f;
             splashDamage = 33f;
             reloadMultiplier = 1.2f;
             ammoMultiplier = 3f;
@@ -112,7 +112,7 @@ public class Bullets implements ContentList{
             lifetime = 80f;
             width = height = 13f;
             collidesTiles = false;
-            splashDamageRadius = 25f;
+            splashDamageRadius = 25f * 0.75f;
             splashDamage = 35f;
             status = StatusEffects.burning;
             frontColor = Pal.lightishOrange;
@@ -128,7 +128,7 @@ public class Bullets implements ContentList{
             width = height = 14f;
             collidesTiles = false;
             ammoMultiplier = 4f;
-            splashDamageRadius = 45f;
+            splashDamageRadius = 45f * 0.75f;
             splashDamage = 50f;
             backColor = Pal.missileYellowBack;
             frontColor = Pal.missileYellow;
