@@ -3,6 +3,7 @@ package mindustry.entities;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
@@ -126,7 +127,7 @@ public class EntityCollisions{
 
     public static boolean legsSolid(int x, int y){
         Tile tile = world.tile(x, y);
-        return tile == null || tile.staticDarkness() >= 2 || tile.floor().solid;
+        return tile == null || tile.staticDarkness() >= 2 || (tile.floor().solid && tile.block() == Blocks.air);
     }
 
     public static boolean waterSolid(int x, int y){
@@ -190,14 +191,10 @@ public class EntityCollisions{
             yInvExit = y2 - (y1 + h1);
         }
 
-        float xEntry, yEntry;
-        float xExit, yExit;
-
-        xEntry = xInvEntry / vx1;
-        xExit = xInvExit / vx1;
-
-        yEntry = yInvEntry / vy1;
-        yExit = yInvExit / vy1;
+        float xEntry = xInvEntry / vx1;
+        float xExit = xInvExit / vx1;
+        float yEntry = yInvEntry / vy1;
+        float yExit = yInvExit / vy1;
 
         float entryTime = Math.max(xEntry, yEntry);
         float exitTime = Math.min(xExit, yExit);

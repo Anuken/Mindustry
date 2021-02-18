@@ -246,7 +246,7 @@ public class Generators{
                     Image last = null;
                     if(block.outlineIcon){
                         int radius = 4;
-                        GenRegion region = (GenRegion)regions[regions.length - 1];
+                        GenRegion region = (GenRegion)regions[block.outlinedIcon >= 0 ? block.outlinedIcon : regions.length -1];
                         Image base = ImagePacker.get(region);
                         Image out = last = new Image(region.width, region.height);
                         for(int x = 0; x < out.width; x++){
@@ -269,6 +269,14 @@ public class Generators{
                                         out.draw(x, y, block.outlineColor);
                                     }
                                 }
+                            }
+                        }
+
+                        //do not run for legacy ones
+                        if(block.outlinedIcon >= 0){
+                            //prevents the regions above from being ignored/invisible/etc
+                            for(int i = block.outlinedIcon + 1; i < regions.length; i++){
+                                out.draw(ImagePacker.get(regions[i]));
                             }
                         }
 

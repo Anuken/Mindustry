@@ -21,7 +21,7 @@ public class StatusEffects implements ContentList{
 
         burning = new StatusEffect("burning"){{
             color = Pal.lightFlame;
-            damage = 0.12f; //over 8 seconds, this would be 60 damage
+            damage = 0.12f; //over 8 seconds, this would be ~60 damage
             effect = Fx.burning;
 
             init(() -> {
@@ -29,7 +29,7 @@ public class StatusEffects implements ContentList{
                 trans(tarred, ((unit, time, newTime, result) -> {
                     unit.damagePierce(8f);
                     Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
-                    result.set(this, Math.min(time + newTime, 300f));
+                    result.set(burning, Math.min(time + newTime, 300f));
                 }));
             });
         }};
@@ -45,7 +45,7 @@ public class StatusEffects implements ContentList{
 
                 trans(blasted, ((unit, time, newTime, result) -> {
                     unit.damagePierce(18f);
-                    result.set(this, time);
+                    result.set(freezing, time);
                 }));
             });
         }};
@@ -72,7 +72,7 @@ public class StatusEffects implements ContentList{
                     if(unit.team == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
-                    result.set(this, time);
+                    result.set(wet, time);
                 }));
                 opposite(burning);
             });
@@ -97,7 +97,7 @@ public class StatusEffects implements ContentList{
                 trans(tarred, ((unit, time, newTime, result) -> {
                     unit.damagePierce(8f);
                     Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
-                    result.set(this, Math.min(time + newTime, 200f));
+                    result.set(melting, Math.min(time + newTime, 200f));
                 }));
             });
         }};
@@ -161,10 +161,12 @@ public class StatusEffects implements ContentList{
 
         shocked = new StatusEffect("shocked"){{
             color = Pal.lancerLaser;
+            reactive = true;
         }};
 
         blasted = new StatusEffect("blasted"){{
             color = Color.valueOf("ff795e");
+            reactive = true;
         }};
 
         corroded = new StatusEffect("corroded"){{

@@ -130,7 +130,7 @@ public class PowerTests extends PowerTestFixture{
 
             assertEquals(1.0f, consumerTile.build.power.status, Mathf.FLOAT_ROUNDING_ERROR);
 
-            powerGraph.remove(producerTile.build);
+            powerGraph.removeList(producerTile.build);
             powerGraph.add(consumerTile.build);
             powerGraph.update();
 

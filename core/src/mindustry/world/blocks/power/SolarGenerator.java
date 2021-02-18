@@ -10,7 +10,7 @@ public class SolarGenerator extends PowerGenerator{
 
     public SolarGenerator(String name){
         super(name);
-        //remove the BlockFlag.producer flag to make this a lower priority target than other generators.
+        //remove the BlockFlag.generator flag to make this a lower priority target than other generators.
         flags = EnumSet.of();
     }
 

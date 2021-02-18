@@ -44,10 +44,10 @@ public class Rules{
     public boolean fire = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
+    /** Whether cores add to unit limit */
+    public boolean unitCapVariable = true;
     /** How fast unit pads build units. */
     public float unitBuildSpeedMultiplier = 1f;
-    /** How much health units start with. */
-    public float unitHealthMultiplier = 1f;
     /** How much damage any other units deal. */
     public float unitDamageMultiplier = 1f;
     /** How much health blocks start with. */
@@ -65,7 +65,7 @@ public class Rules{
     /** Radius around enemy wave drop zones.*/
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
-    public float waveSpacing = 60 * 60 * 2;
+    public float waveSpacing = 2 * Time.toMinutes;
     /** Wave after which the player 'wins'. Used in sectors. Use a value <= 0 to disable. */
     public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
@@ -139,7 +139,7 @@ public class Rules{
     }
 
     /** A simple map for storing TeamRules in an efficient way without hashing. */
-    public static class TeamRules implements Serializable{
+    public static class TeamRules implements JsonSerializable{
         final TeamRule[] values = new TeamRule[Team.all.length];
 
         public TeamRule get(Team team){

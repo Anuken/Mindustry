@@ -78,6 +78,7 @@ public class Turret extends ReloadTurret{
 
     public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
     public @Load("@-heat") TextureRegion heatRegion;
+    public float elevation = -1f;
 
     public Cons<TurretBuild> drawer = tile -> Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
     public Cons<TurretBuild> heatDrawer = tile -> {
@@ -111,7 +112,7 @@ public class Turret extends ReloadTurret{
         super.setStats();
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
-        stats.add(Stat.reload, 60f / reloadTime * (alternate ? 1 : shots), StatUnit.none);
+        stats.add(Stat.reload, 60f / (reloadTime + 1) * (alternate ? 1 : shots), StatUnit.none);
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
@@ -125,6 +126,7 @@ public class Turret extends ReloadTurret{
         }
         
         if(shootLength < 0) shootLength = size * tilesize / 2f;
+        if(elevation < 0) elevation = size / 2f;
 
         super.init();
     }
@@ -234,7 +236,7 @@ public class Turret extends ReloadTurret{
 
             tr2.trns(rotation, -recoil);
 
-            Drawf.shadow(region, x + tr2.x - (size / 2f), y + tr2.y - (size / 2f), rotation - 90);
+            Drawf.shadow(region, x + tr2.x - elevation, y + tr2.y - elevation, rotation - 90);
             drawer.get(this);
 
             if(heatRegion != Core.atlas.find("error")){

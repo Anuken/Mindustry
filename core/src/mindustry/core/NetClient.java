@@ -75,6 +75,7 @@ public class NetClient implements ApplicationListener{
 
             ConnectPacket c = new ConnectPacket();
             c.name = player.name;
+            c.locale = Core.settings.getString("locale");
             c.mods = mods.getModStrings();
             c.mobile = mobile;
             c.versionType = Version.type;
@@ -396,7 +397,6 @@ public class NetClient implements ApplicationListener{
             netClient.byteStream.setBytes(net.decompressSnapshot(data, dataLen));
             DataInputStream input = netClient.dataStream;
 
-            //go through each entity
             for(int j = 0; j < amount; j++){
                 int id = input.readInt();
                 byte typeID = input.readByte();
@@ -445,9 +445,14 @@ public class NetClient implements ApplicationListener{
 
             for(int i = 0; i < amount; i++){
                 int pos = input.readInt();
+                short block = input.readShort();
                 Tile tile = world.tile(pos);
                 if(tile == null || tile.build == null){
                     Log.warn("Missing entity at @. Skipping block snapshot.", tile);
+                    break;
+                }
+                if(tile.build.block.id != block){
+                    Log.warn("Block ID mismatch at @: @ != @. Skipping block snapshot.", tile, tile.build.block.id, block);
                     break;
                 }
                 tile.build.readAll(Reads.get(input), tile.build.version());
@@ -476,7 +481,7 @@ public class NetClient implements ApplicationListener{
             netClient.byteStream.setBytes(net.decompressSnapshot(coreData, coreDataLen));
             DataInputStream input = netClient.dataStream;
 
-            byte cores = input.readByte();
+            int cores = input.readInt();
             for(int i = 0; i < cores; i++){
                 int pos = input.readInt();
                 Tile tile = world.tile(pos);

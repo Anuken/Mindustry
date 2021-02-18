@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -105,6 +106,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
         int cols = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
         ButtonGroup<Button> group = new ButtonGroup<>();
         selected = universe.getLoadout(core);
+        if(selected == null) selected = schematics.getLoadouts().get((CoreBlock)Blocks.coreShard).first();
 
         cont.add(Core.bundle.format("launch.from", sector.name())).row();
 

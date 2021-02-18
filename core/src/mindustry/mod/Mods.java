@@ -65,23 +65,39 @@ public class Mods implements Loadable{
         });
     }
 
+    /** @return the loaded mod found by name, or null if not found. */
+    public @Nullable LoadedMod getMod(String name){
+        return mods.find(m -> m.name.equals(name));
+    }
+
     /** @return the loaded mod found by class, or null if not found. */
     public @Nullable LoadedMod getMod(Class<? extends Mod> type){
         return mods.find(m -> m.enabled() && m.main != null && m.main.getClass() == type);
     }
 
-    /** Imports an external mod file.*/
-    public void importMod(Fi file) throws IOException{
-        Fi dest = modDirectory.child(file.name() + (file.extension().isEmpty() ? ".zip" : ""));
-        if(dest.exists()){
-            throw new IOException("A file with the same name already exists in the mod folder!");
+    /** Imports an external mod file. Folders are not supported here. */
+    public LoadedMod importMod(Fi file) throws IOException{
+        String baseName = file.nameWithoutExtension();
+        String finalName = baseName;
+        //find a name to prevent any name conflicts
+        int count = 1;
+        while(modDirectory.child(finalName + ".zip").exists()){
+            finalName = baseName + "" + count++;
         }
+
+        Fi dest = modDirectory.child(finalName + ".zip");
 
         file.copyTo(dest);
         try{
-            mods.add(loadMod(dest));
+            var loaded = loadMod(dest, true);
+            mods.add(loaded);
             requiresReload = true;
             sortMods();
+            //try to load the mod's icon so it displays on import
+            Core.app.post(() -> {
+                loadIcon(loaded);
+            });
+            return loaded;
         }catch(IOException e){
             dest.delete();
             throw e;
@@ -113,13 +129,18 @@ public class Mods implements Loadable{
 
     private void loadIcons(){
         for(LoadedMod mod : mods){
-            //try to load icon for each mod that can have one
-            if(mod.root.child("icon.png").exists()){
-                try{
-                    mod.iconTexture = new Texture(mod.root.child("icon.png"));
-                }catch(Throwable t){
-                    Log.err("Failed to load icon for mod '" + mod.name + "'.", t);
-                }
+            loadIcon(mod);
+        }
+    }
+
+    private void loadIcon(LoadedMod mod){
+        //try to load icon for each mod that can have one
+        if(mod.root.child("icon.png").exists()){
+            try{
+                mod.iconTexture = new Texture(mod.root.child("icon.png"));
+                mod.iconTexture.setFilter(TextureFilter.linear);
+            }catch(Throwable t){
+                Log.err("Failed to load icon for mod '" + mod.name + "'.", t);
             }
         }
     }
@@ -347,6 +368,7 @@ public class Mods implements Loadable{
                 }
             }
         }
+        Events.fire(new FileTreeInitEvent());
 
         //add new keys to each bundle
         I18NBundle bundle = Core.bundle;
@@ -585,8 +607,14 @@ public class Mods implements Loadable{
     }
 
     /** Loads a mod file+meta, but does not add it to the list.
-     * Note that directories can be loaded as mods.*/
+     * Note that directories can be loaded as mods. */
     private LoadedMod loadMod(Fi sourceFile) throws Exception{
+        return loadMod(sourceFile, false);
+    }
+
+    /** Loads a mod file+meta, but does not add it to the list.
+     * Note that directories can be loaded as mods. */
+    private LoadedMod loadMod(Fi sourceFile, boolean overwrite) throws Exception{
         Time.mark();
 
         ZipFi rootZip = null;
@@ -614,23 +642,47 @@ public class Mods implements Loadable{
             String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
             String baseName = meta.name.toLowerCase().replace(" ", "-");
 
-            if(mods.contains(m -> m.name.equals(baseName))){
-                throw new IllegalArgumentException("A mod with the name '" + baseName + "' is already imported.");
+            var other = mods.find(m -> m.name.equals(baseName));
+
+            if(other != null){
+                //steam mods can't really be deleted, they need to be unsubscribed
+                if(overwrite && !other.hasSteamID()){
+                    //close zip file
+                    if(other.root instanceof ZipFi){
+                        other.root.delete();
+                    }
+                    //delete the old mod directory
+                    if(other.file.isDirectory()){
+                        other.file.deleteDirectory();
+                    }else{
+                        other.file.delete();
+                    }
+                    //unload
+                    mods.remove(other);
+                }else{
+                    throw new IllegalArgumentException("A mod with the name '" + baseName + "' is already imported.");
+                }
             }
 
             Mod mainMod;
 
             Fi mainFile = zip;
-            String[] path = (mainClass.replace('.', '/') + ".class").split("/");
-            for(String str : path){
-                if(!str.isEmpty()){
-                    mainFile = mainFile.child(str);
+            if(android){
+                mainFile = mainFile.child("classes.dex");
+            }else{
+                String[] path = (mainClass.replace('.', '/') + ".class").split("/");
+                for(String str : path){
+                    if(!str.isEmpty()){
+                        mainFile = mainFile.child(str);
+                    }
                 }
             }
 
             //make sure the main class exists before loading it; if it doesn't just don't put it there
-            if(mainFile.exists() && Core.settings.getBool("mod-" + baseName + "-enabled", true)){
-                //mobile versions don't support class mods
+            //if the mod is explicitly marked as java, try loading it anyway
+            if((mainFile.exists() || meta.java) &&
+                Core.settings.getBool("mod-" + baseName + "-enabled", true) && Version.isAtLeast(meta.minGameVersion) && (meta.getMinMajor() >= 105 || headless)){
+
                 if(ios){
                     throw new IllegalArgumentException("Java class mods are not supported on iOS.");
                 }
@@ -700,6 +752,20 @@ public class Mods implements Loadable{
             this.name = meta.name.toLowerCase().replace(" ", "-");
         }
 
+        /** @return whether this is a java class mod. */
+        public boolean isJava(){
+            return meta.java || main != null;
+        }
+
+        @Nullable
+        public String getRepo(){
+            return Core.settings.getString("mod-" + name + "-repo", meta.repo);
+        }
+
+        public void setRepo(String repo){
+            Core.settings.put("mod-" + name + "-repo", repo);
+        }
+
         public boolean enabled(){
             return state == ModState.enabled || state == ModState.contentErrors;
         }
@@ -730,9 +796,7 @@ public class Mods implements Loadable{
         }
 
         public int getMinMajor(){
-            String ver = meta.minGameVersion == null ? "0" : meta.minGameVersion;
-            int dot = ver.indexOf(".");
-            return dot != -1 ? Strings.parseInt(ver.substring(0, dot), 0) : Strings.parseInt(ver, 0);
+            return meta.getMinMajor();
         }
 
         @Override
@@ -814,6 +878,8 @@ public class Mods implements Loadable{
         public Seq<String> dependencies = Seq.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;
+        /** If true, this mod should be loaded as a Java class mod. This is technically optional, but highly recommended. */
+        public boolean java;
 
         public String displayName(){
             return displayName == null ? name : displayName;
@@ -825,6 +891,12 @@ public class Mods implements Loadable{
             if(author != null) author = Strings.stripColors(author);
             if(description != null) description = Strings.stripColors(description);
         }
+
+        public int getMinMajor(){
+            String ver = minGameVersion == null ? "0" : minGameVersion;
+            int dot = ver.indexOf(".");
+            return dot != -1 ? Strings.parseInt(ver.substring(0, dot), 0) : Strings.parseInt(ver, 0);
+        }
         
         @Override
         public String toString() {
@@ -835,6 +907,7 @@ public class Mods implements Loadable{
                     ", main='" + main + '\'' +
                     ", minGameVersion='" + minGameVersion + '\'' +
                     ", hidden=" + hidden +
+                    ", repo=" + repo +
                     '}';
         }
     }

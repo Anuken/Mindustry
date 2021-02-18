@@ -200,7 +200,7 @@ public class Logic implements ApplicationListener{
     }
 
     public void skipWave(){
-        state.wavetime = 0;
+        runWave();
     }
 
     public void runWave(){

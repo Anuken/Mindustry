@@ -224,7 +224,7 @@ public class PowerGraph{
         lastPowerNeeded = powerNeeded;
         lastPowerProduced = powerProduced;
 
-        lastScaledPowerIn = powerProduced / Time.delta;
+        lastScaledPowerIn = (powerProduced + energyDelta) / Time.delta;
         lastScaledPowerOut = powerNeeded / Time.delta;
         lastCapacity = getTotalBatteryCapacity();
         lastPowerStored = getBatteryStored();
@@ -249,6 +249,8 @@ public class PowerGraph{
     }
 
     public void addGraph(PowerGraph graph){
+        if(graph == this) return;
+
         for(Building tile : graph.all){
             add(tile);
         }
@@ -283,25 +285,24 @@ public class PowerGraph{
             Building child = queue.removeFirst();
             add(child);
             for(Building next : child.getPowerConnections(outArray2)){
-                if(!closedSet.contains(next.pos())){
+                if(closedSet.add(next.pos())){
                     queue.addLast(next);
-                    closedSet.add(next.pos());
                 }
             }
         }
     }
 
-    private void removeSingle(Building tile){
-        all.remove(tile, true);
-        producers.remove(tile, true);
-        consumers.remove(tile, true);
-        batteries.remove(tile, true);
+    /** Used for unit tests only. */
+    public void removeList(Building build){
+        all.remove(build);
+        producers.remove(build);
+        consumers.remove(build);
+        batteries.remove(build);
     }
 
+    /** Note that this does not actually remove the building from the graph;
+     * it creates *new* graphs that contain the correct buildings. */
     public void remove(Building tile){
-        removeSingle(tile);
-        //begin by clearing the closed set
-        closedSet.clear();
 
         //go through all the connections of this tile
         for(Building other : tile.getPowerConnections(outArray1)){
@@ -317,17 +318,15 @@ public class PowerGraph{
             while(queue.size > 0){
                 //get child from queue
                 Building child = queue.removeFirst();
-                //remove it from this graph
-                removeSingle(child);
                 //add it to the new branch graph
                 graph.add(child);
                 //go through connections
                 for(Building next : child.getPowerConnections(outArray2)){
                     //make sure it hasn't looped back, and that the new graph being assigned hasn't already been assigned
                     //also skip closed tiles
-                    if(next != tile && next.power.graph != graph && !closedSet.contains(next.pos())){
+                    if(next != tile && next.power.graph != graph){
+                        graph.add(next);
                         queue.addLast(next);
-                        closedSet.add(next.pos());
                     }
                 }
             }

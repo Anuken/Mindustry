@@ -43,6 +43,7 @@ public class PowerNode extends PowerBlock{
         outputsPower = false;
         canOverdrive = false;
         swapDiagonalPlacement = true;
+        schematicPriority = -10;
         drawDisabled = false;
 
         config(Integer.class, (entity, value) -> {
@@ -221,12 +222,15 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
-        if(req.config instanceof Point2[]){
+        if(req.config instanceof Point2[] ps){
             setupColor(1f);
-            for(Point2 point : (Point2[])req.config){
+            for(Point2 point : ps){
+                int px = req.x + point.x, py = req.y + point.y;
                 otherReq = null;
                 list.each(other -> {
-                    if((other.x == req.x + point.x && other.y == req.y + point.y) && other != req){
+                    if(other.block != null
+                        && (px >= other.x - ((other.block.size-1)/2) && py >= other.y - ((other.block.size-1)/2) && px <= other.x + other.block.size/2 && py <= other.y + other.block.size/2)
+                        && other != req && other.block.hasPower){
                         otherReq = other;
                     }
                 });

@@ -38,6 +38,8 @@ public class Vars implements Loadable{
     public static boolean loadedLogger = false, loadedFileLogger = false;
     /** Whether to enable various experimental features (e.g. cliffs) */
     public static boolean experimental = false;
+    /** Name of current Steam player. */
+    public static String steamPlayerName = "";
     /** Maximum extra padding around deployment schematics. */
     public static final int maxLoadoutSchematicPad = 5;
     /** Maximum schematic size.*/
@@ -50,20 +52,18 @@ public class Vars implements Loadable{
     public static final Charset charset = Charset.forName("UTF-8");
     /** main application name, capitalized */
     public static final String appName = "Mindustry";
-    /** URL for itch.io donations. */
-    public static final String donationURL = "https://anuke.itch.io/mindustry/purchase";
+    /** Github API URL. */
+    public static final String ghApi = "https://api.github.com";
     /** URL for discord invite. */
     public static final String discordURL = "https://discord.gg/mindustry";
-    /** URL for sending crash reports to */
+    /** URL for sending crash reports to. Currently offline. */
     public static final String crashReportURL = "http://192.99.169.18/report";
     /** URL the links to the wiki's modding guide.*/
     public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/1-modding/";
-    /** URL to the JSON file containing all the global, public servers. Not queried in BE. */
-    public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers.json";
     /** URL to the JSON file containing all the BE servers. Only queried in BE. */
     public static final String serverJsonBeURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_be.json";
-    /** URL to the JSON file containing all the BE servers. Only queried in the V6 alpha (will be removed once it's out). */
-    public static final String serverJsonV6URL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_v6.json";
+    /** URL to the JSON file containing all the stable servers.  */
+    public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_v6.json";
     /** URL of the github issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
@@ -345,7 +345,7 @@ public class Vars implements Loadable{
     }
 
     public static void loadSettings(){
-        settings.setJson(JsonIO.json());
+        settings.setJson(JsonIO.json);
         settings.setAppName(appName);
 
         if(steam || (Version.modifier != null && Version.modifier.contains("steam"))){

@@ -637,20 +637,12 @@ public class HudFragment extends Fragment{
 
                 if(Float.isNaN(value) || Float.isInfinite(value)) value = 1f;
 
-                drawInner(Pal.darkishGray);
-
-                Draw.beginStencil();
-
-                Fill.crect(x, y, width, height * value);
-
-                Draw.beginStenciled();
-
-                drawInner(Tmp.c1.set(color).lerp(Color.white, blink));
-
-                Draw.endStencil();
+                drawInner(Pal.darkishGray, 1f);
+                drawInner(Tmp.c1.set(color).lerp(Color.white, blink), value);
             }
 
-            void drawInner(Color color){
+            void drawInner(Color color, float fract){
+                if(fract < 0) return;
                 if(flip){
                     x += width;
                     width = -width;
@@ -660,19 +652,26 @@ public class HudFragment extends Fragment{
                 float bh = height/2f;
                 Draw.color(color);
 
+                float f1 = Math.min(fract * 2f, 1f), f2 = (fract - 0.5f) * 2f;
+
+                float bo = -(1f - f1) * (width - stroke);
+
                 Fill.quad(
                 x, y,
                 x + stroke, y,
-                x + width, y + bh,
-                x + width - stroke, y + bh
+                x + width + bo, y + bh * f1,
+                x + width - stroke + bo, y + bh * f1
                 );
 
-                Fill.quad(
-                x + width, y + bh,
-                x + width - stroke, y + bh,
-                x, y + height,
-                x + stroke, y + height
-                );
+                if(f2 > 0){
+                    float bx = x + (width - stroke) * (1f - f2);
+                    Fill.quad(
+                    x + width, y + bh,
+                    x + width - stroke, y + bh,
+                    bx, y + height * fract,
+                    bx + stroke, y + height * fract
+                    );
+                }
 
                 Draw.reset();
 

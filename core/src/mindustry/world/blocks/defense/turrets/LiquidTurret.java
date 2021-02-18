@@ -27,10 +27,11 @@ public class LiquidTurret extends Turret{
         hasLiquids = true;
         loopSound = Sounds.spray;
         shootSound = Sounds.none;
+        outlinedIcon = 1;
     }
 
     /** Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...] */
-    protected void ammo(Object... objects){
+    public void ammo(Object... objects){
         ammoTypes = OrderedMap.of(objects);
     }
 
@@ -61,6 +62,12 @@ public class LiquidTurret extends Turret{
         });
 
         super.init();
+    }
+
+    @Override
+    public TextureRegion[] icons(){
+        if(topRegion.found()) return new TextureRegion[]{baseRegion, region, topRegion};
+        return super.icons();
     }
 
     public class LiquidTurretBuild extends TurretBuild{

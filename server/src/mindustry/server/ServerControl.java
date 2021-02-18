@@ -238,8 +238,8 @@ public class ServerControl implements ApplicationListener{
         Events.on(PlayEvent.class, e -> {
 
             try{
-                JsonValue value = JsonIO.json().fromJson(null, Core.settings.getString("globalrules"));
-                JsonIO.json().readFields(state.rules, value);
+                JsonValue value = JsonIO.json.fromJson(null, Core.settings.getString("globalrules"));
+                JsonIO.json.readFields(state.rules, value);
             }catch(Throwable t){
                 err("Error applying custom rules, proceeding without them.", t);
             }
@@ -433,7 +433,7 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("rules", "[remove/add] [name] [value...]", "List, remove or add global rules. These will apply regardless of map.", arg -> {
             String rules = Core.settings.getString("globalrules");
-            JsonValue base = JsonIO.json().fromJson(null, rules);
+            JsonValue base = JsonIO.json.fromJson(null, rules);
 
             if(arg.length == 0){
                 info("Rules:\n@", JsonIO.print(rules));
@@ -467,7 +467,7 @@ public class ServerControl implements ApplicationListener{
                         JsonValue parent = new JsonValue(ValueType.object);
                         parent.addChild(value);
 
-                        JsonIO.json().readField(state.rules, value.name, parent);
+                        JsonIO.json.readField(state.rules, value.name, parent);
                         if(base.has(value.name)){
                             base.remove(value.name);
                         }
@@ -502,7 +502,7 @@ public class ServerControl implements ApplicationListener{
             }
 
             for(Item item : content.items()){
-                state.teams.cores(team).first().items.set(item, state.teams.cores(team).first().block.itemCapacity);
+                state.teams.cores(team).first().items.set(item, state.teams.cores(team).first().storageCapacity);
             }
 
             info("Core filled.");

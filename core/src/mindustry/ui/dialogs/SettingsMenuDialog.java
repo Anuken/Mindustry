@@ -146,7 +146,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                             }
                         }
                     }
-                    
+
                     for(var slot : control.saves.getSaveSlots().copy()){
                         if(slot.isSector()){
                             slot.delete();
@@ -320,6 +320,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
         game.checkPref("hints", true);
+        game.checkPref("logichints", true);
 
         if(!mobile){
             game.checkPref("backgroundpause", true);
@@ -409,11 +410,11 @@ public class SettingsMenuDialog extends SettingsDialog{
             graphics.checkPref("animatedshields", !mobile);
         }
 
-        if(!ios){
+        //if(!ios){
             graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
-        }else{
-            Core.settings.put("bloom", false);
-        }
+        //}else{
+        //    Core.settings.put("bloom", false);
+        //}
 
         graphics.checkPref("pixelate", false, val -> {
             if(val){
@@ -452,11 +453,24 @@ public class SettingsMenuDialog extends SettingsDialog{
         files.addAll(schematicDirectory.list());
         String base = Core.settings.getDataDirectory().path();
 
+        //add directories
+        for(Fi other : files.copy()){
+            Fi parent = other.parent();
+            while(!files.contains(parent) && !parent.equals(settings.getDataDirectory())){
+                files.add(parent);
+            }
+        }
+
         try(OutputStream fos = file.write(false, 2048); ZipOutputStream zos = new ZipOutputStream(fos)){
             for(Fi add : files){
-                if(add.isDirectory()) continue;
-                zos.putNextEntry(new ZipEntry(add.path().substring(base.length())));
-                Streams.copy(add.read(), zos);
+                String path = add.path().substring(base.length());
+                if(add.isDirectory()) path += "/";
+                //fix trailing / in path
+                path = path.startsWith("/") ? path.substring(1) : path;
+                zos.putNextEntry(new ZipEntry(path));
+                if(!add.isDirectory()){
+                    Streams.copy(add.read(), zos);
+                }
                 zos.closeEntry();
             }
         }
@@ -500,13 +514,13 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     @Override
     public void addCloseButton(){
-        buttons.button("@back", Icon.leftOpen, () -> {
+        buttons.button("@back", Icon.left, () -> {
             if(prefs.getChildren().first() != menu){
                 back();
             }else{
                 hide();
             }
-        }).size(230f, 64f);
+        }).size(210f, 64f);
 
         keyDown(key -> {
             if(key == KeyCode.escape || key == KeyCode.back){

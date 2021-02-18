@@ -13,9 +13,12 @@ import mindustry.world.blocks.ConstructBlock.*;
 import static mindustry.Vars.*;
 
 public class BuilderAI extends AIController{
-    float buildRadius = 1500;
+    public static float buildRadius = 1500, retreatDst = 110f, fleeRange = 370f, retreatDelay = Time.toSeconds * 2f;
+
     boolean found = false;
     @Nullable Unit following;
+    @Nullable Teamc enemy;
+    float retreatTimer;
 
     @Override
     public void updateMovement(){
@@ -27,6 +30,7 @@ public class BuilderAI extends AIController{
         unit.updateBuilding = true;
 
         if(following != null){
+            retreatTimer = 0f;
             //try to follow and mimic someone
 
             //validate follower
@@ -39,9 +43,25 @@ public class BuilderAI extends AIController{
             //set to follower's first build plan, whatever that is
             unit.plans.clear();
             unit.plans.addFirst(following.buildPlan());
+        }else if(unit.buildPlan() == null){
+            //not following anyone or building
+            if(timer.get(timerTarget4, 40)){
+                enemy = target(unit.x, unit.y, fleeRange, true, true);
+            }
+
+            //fly away from enemy when not doing anything, but only after a delay
+            if((retreatTimer += Time.delta) >= retreatDelay){
+                if(enemy != null){
+                    var core = unit.closestCore();
+                    if(core != null && !unit.within(core, retreatDst)){
+                        moveTo(core, retreatDst);
+                    }
+                }
+            }
         }
 
         if(unit.buildPlan() != null){
+            retreatTimer = 0f;
             //approach request if building
             BuildPlan req = unit.buildPlan();
 

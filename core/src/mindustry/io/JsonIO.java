@@ -13,8 +13,9 @@ import java.io.*;
 
 @SuppressWarnings("unchecked")
 public class JsonIO{
-    private static CustomJson jsonBase = new CustomJson();
-    private static Json json = new Json(){
+    private static final CustomJson jsonBase = new CustomJson();
+
+    public static final Json json = new Json(){
         { apply(this); }
 
         @Override
@@ -38,10 +39,6 @@ public class JsonIO{
             return super.convertToString(object);
         }
     };
-
-    public static Json json(){
-        return json;
-    }
 
     public static String write(Object object){
         return json.toJson(object, object.getClass());
@@ -69,7 +66,6 @@ public class JsonIO{
     }
 
     static void apply(Json json){
-        json.setIgnoreUnknownFields(true);
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
 

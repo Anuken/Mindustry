@@ -117,6 +117,8 @@ public class ForceProjector extends Block{
 
         @Override
         public void onRemoved(){
+            float radius = realRadius();
+            if(!broken && radius > 1f) Fx.forceShrink.at(x, y, radius, team.color);
             super.onRemoved();
             drawer.remove();
         }
@@ -174,6 +176,12 @@ public class ForceProjector extends Block{
 
         public float realRadius(){
             return (radius + phaseHeat * phaseRadiusBoost) * radscl;
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.heat) return buildup;
+            return super.sense(sensor);
         }
 
         @Override

@@ -4,6 +4,7 @@ import arc.*;
 import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.math.geom.Geometry.*;
 import arc.struct.*;
 import arc.struct.ObjectIntMap.*;
 import arc.util.*;
@@ -552,10 +553,6 @@ public class World{
         }
 
         return dark;
-    }
-
-    public interface Raycaster{
-        boolean accept(int x, int y);
     }
 
     private class Context implements WorldContext{
