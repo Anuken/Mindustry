@@ -14,6 +14,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.net.*;
+import mindustry.world.*;
 
 import java.io.*;
 import java.lang.reflect.*;
@@ -70,6 +71,40 @@ public class ScriptMainGenerator{
         }
 
         new Fi("core/assets/scripts/global.js").writeString(result.toString());
+
+        //map simple name to type
+        Seq<String> packages = Seq.with(
+        "mindustry.entities.effect",
+        "mindustry.entities.bullet",
+        "mindustry.ai.types",
+        "mindustry.type.weather",
+        "mindustry.game.Objectives",
+        "mindustry.world.blocks",
+        "mindustry.world.draw"
+        );
+
+        String classTemplate = "package mindustry.mod;\n" +
+        "\n" +
+        "import arc.struct.*;\n" +
+        "/** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */\n" +
+        "public class ClassMap{\n" +
+        "    public static final ObjectMap<String, Class<?>> classes = new ObjectMap<>();\n" +
+        "    \n" +
+        "    static{\n$CLASSES$" +
+        "    }\n" +
+        "}\n";
+
+        StringBuilder cdef = new StringBuilder();
+
+        Seq<Class<?>> mapped = classes.select(c -> Modifier.isPublic(c.getModifiers()) && packages.contains(c.getCanonicalName()::startsWith))
+        .and(Block.class); //special case
+
+        for(Class<?> c : mapped){
+            cdef.append("        classes.put(\"").append(c.getSimpleName()).append("\", ").append(c.getCanonicalName()).append(".class);\n");
+        }
+
+        new Fi("core/src/mindustry/mod/ClassMap.java").writeString(classTemplate.replace("$CLASSES$", cdef.toString()));
+        Log.info("Generated @ class mappings.", mapped.size);
     }
 
     public static Seq<Class> getClasses(String packageName) throws Exception{
@@ -103,7 +138,9 @@ public class ScriptMainGenerator{
                     String className = entry.getName().replace('/', '.');
                     className = className.substring(0, className.length() - ".class".length());
                     if(className.startsWith(packageName)){
-                        classes.add(Class.forName(className, false, Thread.currentThread().getContextClassLoader()));
+                        Class res = Class.forName(className, false, Thread.currentThread().getContextClassLoader());
+                        classes.add(res);
+                        //classes.addAll(res.getDeclaredClasses()); //????
                     }
                 }
             }
