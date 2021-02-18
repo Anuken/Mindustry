@@ -138,7 +138,7 @@ public class UnitTypes implements ContentList{
                     collides = true;
                     collidesTiles = true;
                     splashDamageRadius = 28f;
-                    splashDamage = 52f;
+                    splashDamage = 54f;
                     backColor = Pal.bulletYellowBack;
                     frontColor = Pal.bulletYellow;
                 }};
@@ -1537,7 +1537,7 @@ public class UnitTypes implements ContentList{
                     width = 15f;
                     collidesTiles = false;
                     ammoMultiplier = 4f;
-                    splashDamageRadius = 50f;
+                    splashDamageRadius = 40f;
                     splashDamage = 80f;
                     backColor = Pal.missileYellowBack;
                     frontColor = Pal.missileYellow;
