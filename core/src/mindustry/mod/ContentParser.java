@@ -125,7 +125,7 @@ public class ContentParser{
     LoadedMod currentMod;
     private Content currentContent;
 
-    private Json parser = new Json(){
+    public Json parser = new Json(){
         @Override
         public <T> T readValue(Class<T> type, Class elementType, JsonValue jsonData, Class keyType){
             T t = internalRead(type, elementType, jsonData, keyType);
@@ -181,7 +181,7 @@ public class ContentParser{
         }
     };
 
-    private ObjectMap<ContentType, TypeParser<?>> parsers = ObjectMap.of(
+    public ObjectMap<ContentType, TypeParser<?>> parsers = ObjectMap.of(
         ContentType.block, (TypeParser<Block>)(mod, name, value) -> {
             readBundle(ContentType.block, name, value);
 
