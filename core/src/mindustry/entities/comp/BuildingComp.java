@@ -911,7 +911,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(net.client()) return;
 
         if(block.consumesPower || block.outputsPower){
-            int range = 10;
+            int range = 12;
             tempTiles.clear();
             Geometry.circle(tileX(), tileY(), range, (x, y) -> {
                 Building other = world.build(x, y);
