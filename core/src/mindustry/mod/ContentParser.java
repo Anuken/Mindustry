@@ -275,15 +275,6 @@ public class ContentParser{
                 if(value.has("requirements")){
                     JsonValue rec = value.remove("requirements");
 
-                    //intermediate class for parsing
-                    class UnitReq{
-                        public Block block;
-                        public ItemStack[] requirements = {};
-                        @Nullable
-                        public UnitType previous;
-                        public float time = 60f * 10f;
-                    }
-
                     UnitReq req = parser.readValue(UnitReq.class, rec);
 
                     if(req.block instanceof Reconstructor r){
@@ -730,6 +721,15 @@ public class ContentParser{
 
     private interface TypeParser<T extends Content>{
         T parse(String mod, String name, JsonValue value) throws Exception;
+    }
+
+    //intermediate class for parsing
+    static class UnitReq{
+        public Block block;
+        public ItemStack[] requirements = {};
+        @Nullable
+        public UnitType previous;
+        public float time = 60f * 10f;
     }
 
 }
