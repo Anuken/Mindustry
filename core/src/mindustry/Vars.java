@@ -32,6 +32,8 @@ import java.util.*;
 import static arc.Core.*;
 
 public class Vars implements Loadable{
+    /** Whether the game failed to launch last time. */
+    public static boolean failedToLaunch = false;
     /** Whether to load locales.*/
     public static boolean loadLocales = true;
     /** Whether the logger is loaded. */
@@ -172,6 +174,8 @@ public class Vars implements Loadable{
     public static Fi schematicDirectory;
     /** data subdirectory used for bleeding edge build versions */
     public static Fi bebuildDirectory;
+    /** file used to store launch ID */
+    public static Fi launchIDFile;
     /** empty map, indicates no current map */
     public static Map emptyMap;
     /** map file extension */
@@ -282,6 +286,27 @@ public class Vars implements Loadable{
 
         mods.load();
         maps.load();
+    }
+
+    /** Checks if a launch failure occurred.
+     * If this is the case, failedToLaunch is set to true. */
+    public static void checkLaunch(){
+        settings.setAppName(appName);
+        launchIDFile = settings.getDataDirectory().child("launchid.dat");
+
+        if(launchIDFile.exists()){
+            failedToLaunch = true;
+        }else{
+            failedToLaunch = false;
+            launchIDFile.writeString("go away");
+        }
+    }
+
+    /** Cleans up after a successful launch. */
+    public static void finishLaunch(){
+        if(launchIDFile != null){
+            launchIDFile.delete();
+        }
     }
 
     public static void loadLogger(){

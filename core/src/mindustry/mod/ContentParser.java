@@ -406,6 +406,12 @@ public class ContentParser{
             this.currentMod = mod;
             this.currentContent = cont;
             run.run();
+
+            //check nulls after parsing
+            if(cont != null){
+                toBeParsed.remove(cont);
+                checkNullFields(cont);
+            }
         });
     }
 
