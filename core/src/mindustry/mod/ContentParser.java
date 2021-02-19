@@ -704,10 +704,9 @@ public class ContentParser{
     <T> Class<T> resolve(String base, Class<T> def){
         //no base class specified
         if(base.isEmpty() && def != null) return def;
-        if(!base.isEmpty() && Character.isLowerCase(base.charAt(0))) base = Strings.capitalize(base);
 
         //return mapped class if found in the global map
-        var out = ClassMap.classes.get(base);
+        var out = ClassMap.classes.get(!base.isEmpty() && Character.isLowerCase(base.charAt(0)) ? Strings.capitalize(base) : base);
         if(out != null) return (Class<T>)out;
 
         //try to resolve it as a raw class name if it's allowed
