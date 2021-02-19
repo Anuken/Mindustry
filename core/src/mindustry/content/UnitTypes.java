@@ -240,8 +240,8 @@ public class UnitTypes implements ContentList{
                     fragVelocityMin = 0.4f;
 
                     hitEffect = Fx.blastExplosion;
-                    splashDamage = 18f;
-                    splashDamageRadius = 30f;
+                    splashDamage = 16f;
+                    splashDamageRadius = 13f;
 
                     fragBullets = 2;
                     fragLifeMin = 0f;
@@ -257,7 +257,7 @@ public class UnitTypes implements ContentList{
                         lifetime = 20f;
                         hitEffect = Fx.flakExplosion;
                         splashDamage = 15f;
-                        splashDamageRadius = 15f;
+                        splashDamageRadius = 10f;
                     }};
                 }};
             }}
@@ -769,7 +769,7 @@ public class UnitTypes implements ContentList{
                     width = height = 19f;
                     collidesTiles = true;
                     ammoMultiplier = 4f;
-                    splashDamageRadius = 80f;
+                    splashDamageRadius = 70f;
                     splashDamage = 65f;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
