@@ -21,7 +21,7 @@ public class Accelerator extends Block{
     public @Load("launch-arrow") TextureRegion arrowRegion;
 
     public Block launching = Blocks.coreNucleus;
-    public int[] capacities;
+    public int[] capacities = {};
 
     public Accelerator(String name){
         super(name);
