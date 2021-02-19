@@ -20,10 +20,9 @@ import static mindustry.Vars.*;
 
 public interface Platform{
 
-    /** Dynamically loads a jar file. */
-    default Class<?> loadJar(Fi jar, String mainClass) throws Exception{
-        URLClassLoader classLoader = new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, getClass().getClassLoader());
-        return Class.forName(mainClass, true, classLoader);
+    /** Dynamically creates a class loader for a jar file. */
+    default ClassLoader loadJar(Fi jar, String mainClass) throws Exception{
+        return new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, getClass().getClassLoader());
     }
 
     /** Steam: Update lobby visibility.*/

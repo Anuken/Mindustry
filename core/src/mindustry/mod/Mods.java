@@ -92,6 +92,8 @@ public class Mods implements Loadable{
             var loaded = loadMod(dest, true);
             mods.add(loaded);
             requiresReload = true;
+            //enable the mod on import
+            Core.settings.put("mod-" + loaded.name + "-enabled", true);
             sortMods();
             //try to load the mod's icon so it displays on import
             Core.app.post(() -> {
@@ -664,9 +666,10 @@ public class Mods implements Loadable{
                 }
             }
 
+            ClassLoader loader = null;
             Mod mainMod;
-
             Fi mainFile = zip;
+
             if(android){
                 mainFile = mainFile.child("classes.dex");
             }else{
@@ -687,7 +690,8 @@ public class Mods implements Loadable{
                     throw new IllegalArgumentException("Java class mods are not supported on iOS.");
                 }
 
-                Class<?> main = platform.loadJar(sourceFile, mainClass);
+                loader = platform.loadJar(sourceFile, mainClass);
+                Class<?> main = Class.forName(mainClass, true, loader);
                 metas.put(main, meta);
                 mainMod = (Mod)main.getDeclaredConstructor().newInstance();
             }else{
@@ -710,7 +714,7 @@ public class Mods implements Loadable{
             if(!headless){
                 Log.info("Loaded mod '@' in @ms", meta.name, Time.elapsed());
             }
-            return new LoadedMod(sourceFile, zip, mainMod, meta);
+            return new LoadedMod(sourceFile, zip, mainMod, loader, meta);
 
         }catch(Exception e){
             //delete root zip file so it can be closed on windows
@@ -743,10 +747,13 @@ public class Mods implements Loadable{
         public ModState state = ModState.enabled;
         /** Icon texture. Should be disposed. */
         public @Nullable Texture iconTexture;
+        /** Class loader for JAR mods. Null if the mod isn't loaded or this isn't a jar mod. */
+        public @Nullable ClassLoader loader;
 
-        public LoadedMod(Fi file, Fi root, Mod main, ModMeta meta){
+        public LoadedMod(Fi file, Fi root, Mod main, ClassLoader loader, ModMeta meta){
             this.root = root;
             this.file = file;
+            this.loader = loader;
             this.main = main;
             this.meta = meta;
             this.name = meta.name.toLowerCase().replace(" ", "-");
