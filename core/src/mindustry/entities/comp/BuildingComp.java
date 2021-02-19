@@ -1312,6 +1312,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return switch(sensor){
             case x -> World.conv(x);
             case y -> World.conv(y);
+            //case dead -> !isValid(); //TODO 126
             case team -> team.id;
             case health -> health;
             case maxHealth -> maxHealth;
