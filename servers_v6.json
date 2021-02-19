@@ -61,7 +61,7 @@
   },
   {
     "name": "CxZx",
-    "address": ["frfr1.quackhost.uk:20060", "frfr1.quackhost.uk:20185"]
+    "address": ["frfr1.quackhost.uk:20060", "frfr1.quackhost.uk:20185", "defr2.forcehost.net:1069"]
   },
   {
     "name": "Korea",
@@ -77,7 +77,7 @@
   },
   {
     "name": "md.obvilionnetwork.ru",
-    "address": ["obvilionnetwork.ru:7001", "obvilionnetwork.ru:7002"]
+    "address": ["obvilionnetwork.ru", "obvilionnetwork.ru:7001", "obvilionnetwork.ru:7002", "obvilionnetwork.ru:7003"]
   },
   {
     "name": "Mindustry PLAY",
