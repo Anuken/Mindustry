@@ -4,7 +4,7 @@ Baue komplexe Produktionsketten aus Förderbändern, um deine Geschütztürme mi
  
 - Benutze Produktionsblöcke, um eine große Vielfalt an Ressourcen herzustellen
 - Beschütze deine Basis vor Gegnerwellen
-- Spiele mit deinen Freunden in plattformübergreifenden Partien, oder fordere sie zu einem Team-basiertem PvP-Match hinaus
+- Spiele platformübergreifend mit deinen Freunden, oder fordere sie zu einem Team-basiertem PvP-Match hinaus
 - Transportiere Flüssigkeiten und bekämpfe die ständige Bedrohung von Feuerausbrüchen oder gegnerische Luftangriffe
 - Nutze deine Produktionsblöcke voll aus, indem du Schmiermittle und Kühlung besorgst
 - Stelle eine Vielfalt an Einheiten her, welche je nach Typ Angriffe und Verteidigung oder Abläufe in der Basis unterstützen können
