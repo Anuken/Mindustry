@@ -705,6 +705,14 @@ public class ContentParser{
             try{
                 return (Class<T>)Class.forName(base);
             }catch(Exception ignored){
+                //try to load from a mod's class loader
+                for(LoadedMod mod : mods.mods){
+                    if(mod.loader != null){
+                        try{
+                            return (Class<T>)Class.forName(base, true, mod.loader);
+                        }catch(Exception ignore){}
+                    }
+                }
             }
         }
 

@@ -72,9 +72,8 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
-            public Class<?> loadJar(Fi jar, String mainClass) throws Exception{
-                DexClassLoader loader = new DexClassLoader(jar.file().getPath(), getFilesDir().getPath(), null, getClassLoader());
-                return Class.forName(mainClass, true, loader);
+            public ClassLoader loadJar(Fi jar, String mainClass) throws Exception{
+                return new DexClassLoader(jar.file().getPath(), getFilesDir().getPath(), null, getClassLoader());
             }
 
             @Override
