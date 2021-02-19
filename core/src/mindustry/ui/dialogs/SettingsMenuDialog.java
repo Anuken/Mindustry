@@ -327,6 +327,10 @@ public class SettingsMenuDialog extends SettingsDialog{
             game.checkPref("buildautopause", false);
         }
 
+        if(!ios){
+            game.checkPref("modcrashdisable", true);
+        }
+
         if(steam){
             game.sliderPref("playerlimit", 16, 2, 32, i -> {
                 platform.updateLobby();

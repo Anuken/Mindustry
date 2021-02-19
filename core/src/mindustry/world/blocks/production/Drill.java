@@ -38,7 +38,7 @@ public class Drill extends Block{
     public float warmupSpeed = 0.02f;
 
     //return variables for countOre
-    protected Item returnItem;
+    protected @Nullable Item returnItem;
     protected int returnCount;
 
     /** Whether to draw the item this drill is mining. */

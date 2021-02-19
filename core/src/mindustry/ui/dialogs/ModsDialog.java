@@ -106,11 +106,6 @@ public class ModsDialog extends BaseDialog{
             }
         });
 
-        shown(() -> Core.app.post(() -> {
-            Core.settings.getBoolOnce("modsalpha", () -> {
-                ui.showText("@mods", "@mods.alphainfo");
-            });
-        }));
     }
 
     void modError(Throwable error){
