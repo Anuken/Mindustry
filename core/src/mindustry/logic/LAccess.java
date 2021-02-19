@@ -27,6 +27,7 @@ public enum LAccess{
     y,
     shootX,
     shootY,
+    //dead, //TODO 126
     range, 
     shooting,
     mineX,
