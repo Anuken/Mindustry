@@ -29,6 +29,7 @@ public enum LAccess{
     shootY,
     range, 
     shooting,
+    boosting,
     mineX,
     mineY,
     mining,
