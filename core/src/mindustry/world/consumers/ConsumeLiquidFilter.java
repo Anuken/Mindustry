@@ -28,7 +28,8 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     public void build(Building build, Table table){
         Seq<Liquid> list = content.liquids().select(l -> !l.isHidden() && filter.get(l));
         MultiReqImage image = new MultiReqImage();
-        list.each(liquid -> image.add(new ReqImage(liquid.icon(Cicon.medium), () -> build.liquids != null && build.liquids.get(liquid) >= Math.max(use(build), amount * build.delta()))));
+        list.each(liquid -> image.add(new ReqImage(liquid.icon(Cicon.medium), () ->
+            build.liquids != null && build.liquids.current() == liquid && build.liquids.get(liquid) >= Math.max(use(build), amount * build.delta()))));
 
         table.add(image).size(8 * 4);
     }

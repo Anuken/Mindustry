@@ -100,7 +100,7 @@ public class Placement{
             i ++;
         }
 
-        if(!addedLast) result.add(base.peek());
+        if(!addedLast && !base.isEmpty()) result.add(base.peek());
 
         points.clear();
         points.addAll(result);

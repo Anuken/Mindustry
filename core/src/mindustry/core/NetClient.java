@@ -481,7 +481,7 @@ public class NetClient implements ApplicationListener{
             netClient.byteStream.setBytes(net.decompressSnapshot(coreData, coreDataLen));
             DataInputStream input = netClient.dataStream;
 
-            byte cores = input.readByte();
+            int cores = input.readInt();
             for(int i = 0; i < cores; i++){
                 int pos = input.readInt();
                 Tile tile = world.tile(pos);

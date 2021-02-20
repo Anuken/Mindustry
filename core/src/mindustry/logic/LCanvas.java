@@ -13,6 +13,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -29,9 +30,25 @@ public class LCanvas extends Table{
     StatementElem hovered;
     float targetWidth;
     int jumpCount = 0;
+    Seq<Tooltip> tooltips = new Seq<>();
 
     public LCanvas(){
         canvas = this;
+
+        Core.scene.addListener(new InputListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                //hide tooltips on tap
+                for(var t : tooltips){
+                    t.container.toFront();
+                }
+                Core.app.post(() -> {
+                    tooltips.each(Tooltip::hide);
+                    tooltips.clear();
+                });
+                return super.touchDown(event, x, y, pointer, button);
+            }
+        });
 
         rebuild();
     }
@@ -44,7 +61,37 @@ public class LCanvas extends Table{
     public static void tooltip(Cell<?> cell, String key){
         String lkey = key.toLowerCase().replace(" ", "");
         if(Core.settings.getBool("logichints", true) && Core.bundle.has(lkey)){
-            cell.get().addListener(new Tooltip(t -> t.background(Styles.black8).margin(4f).add("[lightgray]" + Core.bundle.get(lkey)).style(Styles.outlineLabel)));
+            var tip = new Tooltip(t -> t.background(Styles.black8).margin(4f).add("[lightgray]" + Core.bundle.get(lkey)).style(Styles.outlineLabel));
+
+            //mobile devices need long-press tooltips
+            if(Vars.mobile){
+                cell.get().addListener(new ElementGestureListener(20, 0.4f, 0.43f, 0.15f){
+                    @Override
+                    public boolean longPress(Element element, float x, float y){
+                        tip.show(element, x, y);
+                        canvas.tooltips.add(tip);
+                        //prevent touch down for other listeners
+                        for(var list : cell.get().getListeners()){
+                            if(list instanceof ClickListener cl){
+                                cl.cancel();
+                            }
+                        }
+                        return true;
+                    }
+                });
+            }else{
+                cell.get().addListener(tip);
+            }
+
+        }
+    }
+
+    public static void tooltip(Cell<?> cell, Enum<?> key){
+        String cl = key.getClass().getSimpleName().toLowerCase() + "." + key.name().toLowerCase();
+        if(Core.bundle.has(cl)){
+            tooltip(cell, cl);
+        }else{
+            tooltip(cell, "lenum." + key.name());
         }
     }
 
