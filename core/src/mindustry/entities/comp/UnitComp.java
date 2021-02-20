@@ -128,6 +128,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case ammoCapacity -> type.ammoCapacity;
             case x -> World.conv(x);
             case y -> World.conv(y);
+            //case dead -> dead || !isAdded(); //TODO 126
             case team -> team.id;
             case shooting -> isShooting() ? 1 : 0;
             case range -> range() / tilesize;
@@ -140,7 +141,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case controlled -> controller instanceof LogicAI || controller instanceof Player ? 1 : 0;
             case commanded -> controller instanceof FormationAI ? 1 : 0;
             case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
-            default -> 0;
+            default -> Float.NaN;
         };
     }
 
@@ -162,7 +163,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public double sense(Content content){
         if(content == stack().item) return stack().amount;
-        return 0;
+        return Float.NaN;
     }
 
     @Override

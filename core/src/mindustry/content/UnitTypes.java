@@ -240,8 +240,8 @@ public class UnitTypes implements ContentList{
                     fragVelocityMin = 0.4f;
 
                     hitEffect = Fx.blastExplosion;
-                    splashDamage = 18f;
-                    splashDamageRadius = 30f;
+                    splashDamage = 16f;
+                    splashDamageRadius = 13f;
 
                     fragBullets = 2;
                     fragLifeMin = 0f;
@@ -257,7 +257,7 @@ public class UnitTypes implements ContentList{
                         lifetime = 20f;
                         hitEffect = Fx.flakExplosion;
                         splashDamage = 15f;
-                        splashDamageRadius = 15f;
+                        splashDamageRadius = 10f;
                     }};
                 }};
             }}
@@ -565,9 +565,9 @@ public class UnitTypes implements ContentList{
                     hitEffect = Fx.pulverize;
                     lifetime = 10f;
                     speed = 1f;
-                    splashDamageRadius = 70f;
+                    splashDamageRadius = 58f;
                     instantDisappear = true;
-                    splashDamage = 80f;
+                    splashDamage = 85f;
                     killShooter = true;
                     hittable = false;
                     collidesAir = true;
@@ -769,7 +769,7 @@ public class UnitTypes implements ContentList{
                     width = height = 19f;
                     collidesTiles = true;
                     ammoMultiplier = 4f;
-                    splashDamageRadius = 95f;
+                    splashDamageRadius = 70f;
                     splashDamage = 65f;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
@@ -867,7 +867,7 @@ public class UnitTypes implements ContentList{
                     width = height = 25f;
                     collidesTiles = collides = true;
                     ammoMultiplier = 4f;
-                    splashDamageRadius = 90f;
+                    splashDamageRadius = 80f;
                     splashDamage = 75f;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
@@ -888,7 +888,7 @@ public class UnitTypes implements ContentList{
                         lifetime = 90f;
                         width = height = 20f;
                         collidesTiles = false;
-                        splashDamageRadius = 80f;
+                        splashDamageRadius = 70f;
                         splashDamage = 40f;
                         backColor = Pal.sapBulletBack;
                         frontColor = lightningColor = Pal.sapBullet;
@@ -1366,8 +1366,8 @@ public class UnitTypes implements ContentList{
                     collides = false;
 
                     healPercent = 15f;
-                    splashDamage = 230f;
-                    splashDamageRadius = 120f;
+                    splashDamage = 220f;
+                    splashDamageRadius = 80f;
                 }};
             }});
         }};
@@ -1537,7 +1537,7 @@ public class UnitTypes implements ContentList{
                     width = 15f;
                     collidesTiles = false;
                     ammoMultiplier = 4f;
-                    splashDamageRadius = 60f;
+                    splashDamageRadius = 40f;
                     splashDamage = 80f;
                     backColor = Pal.missileYellowBack;
                     frontColor = Pal.missileYellow;

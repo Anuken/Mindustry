@@ -83,6 +83,7 @@ public class UnitPayload implements Payload{
     public void draw(){
         Drawf.shadow(unit.x, unit.y, 20);
         Draw.rect(unit.type.icon(Cicon.full), unit.x, unit.y, unit.rotation - 90);
+        unit.type.drawCell(unit);
 
         //draw warning
         if(deactiveTime > 0){

@@ -24,7 +24,7 @@ import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 public class UnitFactory extends UnitBlock{
-    public int[] capacities;
+    public int[] capacities = {};
 
     public Seq<UnitPlan> plans = new Seq<>(4);
 

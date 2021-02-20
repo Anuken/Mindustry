@@ -15,7 +15,7 @@ import static mindustry.Vars.*;
 
 public class AIController implements UnitController{
     protected static final Vec2 vec = new Vec2();
-    protected static final int timerTarget = 0, timerTarget2 = 1, timerTarget3 = 2;
+    protected static final int timerTarget = 0, timerTarget2 = 1, timerTarget3 = 2, timerTarget4 = 3;
 
     protected Unit unit;
     protected Interval timer = new Interval(4);
@@ -167,7 +167,7 @@ public class AIController implements UnitController{
     }
 
     protected boolean retarget(){
-        return timer.get(timerTarget, 40);
+        return timer.get(timerTarget, target == null ? 40 : 90);
     }
 
     protected Teamc findTarget(float x, float y, float range, boolean air, boolean ground){

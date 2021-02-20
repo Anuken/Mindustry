@@ -852,7 +852,7 @@ public class NetServer implements ApplicationListener{
         syncStream.reset();
         int sum = state.teams.present.sum(t -> t.cores.size);
 
-        dataStream.writeByte(sum);
+        dataStream.writeInt(sum);
 
         for(TeamData data : state.teams.present){
             for(CoreBuild entity : data.cores){

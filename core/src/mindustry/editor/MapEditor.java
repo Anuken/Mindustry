@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.content.*;
 import mindustry.editor.DrawOperation.*;
+import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
@@ -259,7 +260,7 @@ public class MapEditor{
         clearOp();
 
         Tiles previous = world.tiles;
-        int offsetX = -(width - width()) / 2, offsetY = -(height - height()) / 2;
+        int offsetX = (width() - width) / 2, offsetY = (height() - height) / 2;
         loading = true;
 
         Tiles tiles = world.resize(width, height);
@@ -275,7 +276,17 @@ public class MapEditor{
                     if(tile.build != null && tile.isCenter()){
                         tile.build.x = x * tilesize + tile.block().offset;
                         tile.build.y = y * tilesize + tile.block().offset;
+
+                        //shift links to account for map resize
+                        Object config = tile.build.config();
+                        if(config != null){
+                            Object out = BuildPlan.pointConfig(tile.block(), config, p -> p.sub(offsetX, offsetY));
+                            if(out != config){
+                                tile.build.configureAny(out);
+                            }
+                        }
                     }
+
                 }else{
                     tiles.set(x, y, new EditorTile(x, y, Blocks.stone.id, (short)0, (short)0));
                 }

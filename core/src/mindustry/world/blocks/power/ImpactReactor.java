@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -23,8 +24,8 @@ public class ImpactReactor extends PowerGenerator{
 
     public float warmupSpeed = 0.001f;
     public float itemDuration = 60f;
-    public int explosionRadius = 50;
-    public int explosionDamage = 2000;
+    public int explosionRadius = 23;
+    public int explosionDamage = 1900;
 
     public Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
 
@@ -38,6 +39,7 @@ public class ImpactReactor extends PowerGenerator{
         liquidCapacity = 30f;
         hasItems = true;
         outputsPower = consumesPower = true;
+        flags = EnumSet.of(BlockFlag.reactor, BlockFlag.generator);
     }
 
     @Override

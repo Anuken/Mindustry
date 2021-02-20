@@ -27,7 +27,7 @@ public class UnitBlock extends PayloadAcceptor{
 
     @Remote(called = Loc.server)
     public static void unitBlockSpawn(Tile tile){
-        if(!(tile.build instanceof UnitBuild build)) return;
+        if(tile == null || !(tile.build instanceof UnitBuild build)) return;
         build.spawned();
     }
 

@@ -24,7 +24,7 @@ import static mindustry.Vars.*;
 public class Reconstructor extends UnitBlock{
     public float constructTime = 60 * 2;
     public Seq<UnitType[]> upgrades = new Seq<>();
-    public int[] capacities;
+    public int[] capacities = {};
 
     public Reconstructor(String name){
         super(name);

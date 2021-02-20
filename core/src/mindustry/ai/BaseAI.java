@@ -209,6 +209,16 @@ public class BaseAI{
             }
             Tile wtile = world.tile(realX, realY);
 
+            if(tile.block instanceof PayloadConveyor || tile.block instanceof PayloadAcceptor){
+                //near a building
+                for(Point2 point : Edges.getEdges(tile.block.size)){
+                    var t = world.build(tile.x + point.x, tile.y + point.y);
+                    if(t != null){
+                        return false;
+                    }
+                }
+            }
+
             //may intersect AI path
             tmpTiles.clear();
             if(tile.block.solid && wtile != null && wtile.getLinkedTilesAs(tile.block, tmpTiles).contains(t -> path.contains(t.pos()))){
