@@ -304,7 +304,7 @@ public class ModsDialog extends BaseDialog{
 
                             if(steam && !mod.hasSteamID()){
                                 right.row();
-                                right.button(Icon.download, Styles.clearTransi, () -> {
+                                right.button(Icon.export, Styles.clearTransi, () -> {
                                     platform.publish(mod);
                                 }).size(50f);
                             }
