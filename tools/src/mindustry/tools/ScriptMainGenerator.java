@@ -76,6 +76,7 @@ public class ScriptMainGenerator{
         Seq<String> packages = Seq.with(
         "mindustry.entities.effect",
         "mindustry.entities.bullet",
+        "mindustry.entities.abilities",
         "mindustry.ai.types",
         "mindustry.type.weather",
         "mindustry.game.Objectives",

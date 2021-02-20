@@ -14,6 +14,13 @@ public class ClassMap{
         classes.put("MinerAI", mindustry.ai.types.MinerAI.class);
         classes.put("RepairAI", mindustry.ai.types.RepairAI.class);
         classes.put("SuicideAI", mindustry.ai.types.SuicideAI.class);
+        classes.put("Ability", mindustry.entities.abilities.Ability.class);
+        classes.put("ForceFieldAbility", mindustry.entities.abilities.ForceFieldAbility.class);
+        classes.put("MoveLightningAbility", mindustry.entities.abilities.MoveLightningAbility.class);
+        classes.put("RepairFieldAbility", mindustry.entities.abilities.RepairFieldAbility.class);
+        classes.put("ShieldRegenFieldAbility", mindustry.entities.abilities.ShieldRegenFieldAbility.class);
+        classes.put("StatusFieldAbility", mindustry.entities.abilities.StatusFieldAbility.class);
+        classes.put("UnitSpawnAbility", mindustry.entities.abilities.UnitSpawnAbility.class);
         classes.put("ArtilleryBulletType", mindustry.entities.bullet.ArtilleryBulletType.class);
         classes.put("BasicBulletType", mindustry.entities.bullet.BasicBulletType.class);
         classes.put("BombBulletType", mindustry.entities.bullet.BombBulletType.class);
