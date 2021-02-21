@@ -30,6 +30,7 @@ public enum LAccess{
     //dead, //TODO 126
     range, 
     shooting,
+    boosting,
     mineX,
     mineY,
     mining,
