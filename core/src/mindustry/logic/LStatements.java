@@ -829,7 +829,11 @@ public class LStatements{
             table.button(b -> {
                 b.label(() -> type.name());
                 b.clicked(() -> showSelect(b, LUnitControl.all, type, t -> {
-                    type = t;
+                    if(t == LUnitControl.build && !Vars.state.rules.logicUnitBuild){
+                        Vars.ui.showInfo("@logic.nounitbuild");
+                    }else{
+                        type = t;
+                    }
                     rebuild(table);
                 }, 2, cell -> cell.size(120, 50)));
             }, Styles.logict, () -> {}).size(120, 40).color(table.color).left().padLeft(2);

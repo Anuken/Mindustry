@@ -447,7 +447,7 @@ public class LExecutor{
                         }
                     }
                     case build -> {
-                        if(unit.canBuild() && exec.obj(p3) instanceof Block block){
+                        if(state.rules.logicUnitBuild && unit.canBuild() && exec.obj(p3) instanceof Block block){
                             int x = World.toTile(x1 - block.offset/tilesize), y = World.toTile(y1 - block.offset/tilesize);
                             int rot = exec.numi(p4);
 
@@ -458,12 +458,14 @@ public class LExecutor{
                                 ai.plan.stuck = false;
                             }
 
+                            var conf = exec.obj(p5);
                             ai.plan.set(x, y, rot, block);
-                            ai.plan.config = exec.obj(p5) instanceof Content c ? c : null;
+                            ai.plan.config = conf instanceof Content c ? c : conf instanceof Building b ? b : null;
 
                             unit.clearBuilding();
+                            Tile tile = ai.plan.tile();
 
-                            if(ai.plan.tile() != null){
+                            if(tile != null && !(tile.block() == block && tile.build != null && tile.build.rotation == rot)){
                                 unit.updateBuilding = true;
                                 unit.addBuild(ai.plan);
                             }
