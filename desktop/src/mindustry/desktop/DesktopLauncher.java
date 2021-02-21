@@ -64,8 +64,7 @@ public class DesktopLauncher extends ClientLauncher{
 
         if(useSteam){
             //delete leftover dlls
-            Fi file = new Fi(".");
-            for(Fi other : file.parent().list()){
+            for(Fi other : new Fi(".").parent().list()){
                 if(other.name().contains("steam") && (other.extension().equals("dll") || other.extension().equals("so") || other.extension().equals("dylib"))){
                     other.delete();
                 }
