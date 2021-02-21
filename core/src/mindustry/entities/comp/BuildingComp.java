@@ -1337,7 +1337,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();
             case powerNetCapacity -> power == null ? 0 : power.graph.getLastCapacity();
             case enabled -> enabled ? 1 : 0;
-            case controlled -> this instanceof ControlBlock c ? c.isControlled() ? 1 : 0 : 0;
+            case controlled -> this instanceof ControlBlock c && c.isControlled() ? 2 : 0;
             case payloadCount -> getPayload() != null ? 1 : 0;
             default -> Float.NaN; //gets converted to null in logic
         };

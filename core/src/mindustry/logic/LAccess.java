@@ -38,12 +38,12 @@ public enum LAccess{
     type,
     flag,
     controlled,
+    controller,
     commanded,
     name,
     config,
     payloadCount,
     payloadType,
-    controller,
 
     //values with parameters are considered controllable
     enabled("to"), //"to" is standard for single parameter access

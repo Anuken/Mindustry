@@ -19,6 +19,12 @@ public class GlobalConstants{
         put("true", 1);
         put("null", null);
 
+        //special enums
+
+        put("@contProcessor", 1);
+        put("@contPlayer", 2);
+        put("@contFormation", 3);
+
         //store base content
 
         for(Item item : Vars.content.items()){
