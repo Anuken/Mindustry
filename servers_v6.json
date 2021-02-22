@@ -1,8 +1,4 @@
-[ 
-  {
-    "name": "RCR",
-    "address": ["rcr.fvds.ru"]
-  },
+[
   {
     "name": "mindustry.pl",
     "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl"]
@@ -68,8 +64,8 @@
     "address": ["mindustry.kr"]
   },
   {
-    "name": "HexPvP",
-    "address": ["hexpvp.ddns.net"]
+    "name": "hexpvp.ml",
+    "address": ["hexpvp.ml"]
   },
   {
     "name": "Omega",
