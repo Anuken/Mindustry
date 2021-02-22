@@ -403,6 +403,11 @@ public class Block extends UnlockableContent{
 
     }
 
+    /** Mutates the given list of requests used during line placement. */
+    public void handlePlacementLine(Seq<BuildPlan> plans){
+
+    }
+
     public Object nextConfig(){
         if(saveConfig && lastConfig != null){
             return lastConfig;

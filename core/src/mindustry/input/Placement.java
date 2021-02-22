@@ -12,16 +12,16 @@ import mindustry.world.blocks.distribution.*;
 import static mindustry.Vars.*;
 
 public class Placement{
-    private final static Seq<Point2> tmpPoints = new Seq<>(), tmpPoints2 = new Seq<>();
+    private static final Seq<Point2> tmpPoints = new Seq<>(), tmpPoints2 = new Seq<>();
     private static final NormalizeResult result = new NormalizeResult();
     private static final NormalizeDrawResult drawResult = new NormalizeDrawResult();
-    private static Bresenham2 bres = new Bresenham2();
-    private static Seq<Point2> points = new Seq<>();
+    private static final Bresenham2 bres = new Bresenham2();
+    private static final Seq<Point2> points = new Seq<>();
 
     //for pathfinding
-    private static IntFloatMap costs = new IntFloatMap();
-    private static IntIntMap parents = new IntIntMap();
-    private static IntSet closed = new IntSet();
+    private static final IntFloatMap costs = new IntFloatMap();
+    private static final IntIntMap parents = new IntIntMap();
+    private static final IntSet closed = new IntSet();
 
     /** Normalize a diagonal line into points. */
     public static Seq<Point2> pathfindLine(boolean conveyors, int startX, int startY, int endX, int endY){
