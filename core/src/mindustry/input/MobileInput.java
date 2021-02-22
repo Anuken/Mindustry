@@ -619,8 +619,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
 
             unitTapped = selectedUnit();
-            if(!tryStopMine() && !canTapPlayer(worldx, worldy)){
-                tileTapped(linked.build);
+            if(!tryStopMine() && !canTapPlayer(worldx, worldy) && !tileTapped(linked.build) && mode == none && !Core.settings.getBool("doubletapmine")){
+                tryBeginMine(cursor);
             }
         }
 

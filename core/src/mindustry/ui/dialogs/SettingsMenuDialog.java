@@ -146,7 +146,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                             }
                         }
                     }
-                    
+
                     for(var slot : control.saves.getSaveSlots().copy()){
                         if(slot.isSector()){
                             slot.delete();
@@ -325,6 +325,8 @@ public class SettingsMenuDialog extends SettingsDialog{
             game.checkPref("backgroundpause", true);
             game.checkPref("buildautopause", false);
         }
+
+        game.checkPref("doubletapmine", false);
 
         if(steam){
             game.sliderPref("playerlimit", 16, 2, 32, i -> {
