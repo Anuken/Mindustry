@@ -1299,7 +1299,7 @@ public class Blocks implements ContentList{
         cultivator = new Cultivator("cultivator"){{
             requirements(Category.production, with(Items.copper, 25, Items.lead, 25, Items.silicon, 10));
             outputItem = new ItemStack(Items.sporePod, 1);
-            craftTime = 140;
+            craftTime = 145;
             size = 2;
             hasLiquids = true;
             hasPower = true;
