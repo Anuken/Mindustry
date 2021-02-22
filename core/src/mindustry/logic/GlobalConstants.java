@@ -21,9 +21,9 @@ public class GlobalConstants{
 
         //special enums
 
-        put("@contProcessor", 1);
-        put("@contPlayer", 2);
-        put("@contFormation", 3);
+        put("@ctrlProcessor", 1);
+        put("@ctrlPlayer", 2);
+        put("@ctrlFormation", 3);
 
         //store base content
 
