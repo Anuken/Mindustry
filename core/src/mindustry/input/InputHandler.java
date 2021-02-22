@@ -30,11 +30,10 @@ import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.fragments.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.payloads.*;
-import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 
@@ -771,7 +770,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.reset();
         Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
         Draw.alpha(1f);
-        request.block.drawRequestConfigTop(request, selectRequests);
+        request.block.drawRequestConfigTop(request, cons -> {
+            selectRequests.each(cons);
+            lineRequests.each(cons);
+        });
         Draw.reset();
     }
 
@@ -859,7 +861,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             req.animScale = 1f;
             lineRequests.add(req);
         });
-        block.handlePlacementLine(lineRequests);
 
         if(Core.settings.getBool("blockreplace")){
             lineRequests.each(req -> {
@@ -868,6 +869,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     req.block = replace;
                 }
             });
+
+            block.handlePlacementLine(lineRequests);
         }
     }
 
