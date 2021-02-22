@@ -495,7 +495,7 @@ public class DesktopInput extends InputHandler{
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
                 if(!tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && !tileTapped(selected.build) && !player.unit().activelyBuilding() && !droppingItem
-                    && (Core.settings.getBool("doubletapmine") ? true : !tryBeginMine(selected) && player.unit().mineTile == null) && !Core.scene.hasKeyboard()){
+                    && (Core.settings.getBool("doubletapmine") ? !tryStopMine(selected) : !tryBeginMine(selected)) && !Core.scene.hasKeyboard()){
                     player.shooting = shouldShoot;
                 }
             }else if(!Core.scene.hasKeyboard()){ //if it's out of bounds, shooting is just fine

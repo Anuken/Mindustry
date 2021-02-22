@@ -608,7 +608,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 if(!player.dead() && Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 0.6f + 8f) && player.unit().type.commandLimit > 0){
                     Call.unitCommand(player);
                 }else{
-                    //control a unit/block
+                    //control a unit/block detected in first tap of double-tap
                     if(unitTapped != null){
                         Call.unitControl(player, unitTapped);
                     }else if(!tryBeginMine(cursor)){
@@ -619,7 +619,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
 
             unitTapped = selectedUnit();
-            if(!tryStopMine() && !canTapPlayer(worldx, worldy) && !tileTapped(linked.build) && mode == none && !Core.settings.getBool("doubletapmine")){
+            //prevent mining if placing/breaking blocks
+            if(!tryStopMine(null) && !canTapPlayer(worldx, worldy) && !tileTapped(linked.build) && mode == none && !Core.settings.getBool("doubletapmine")){
                 tryBeginMine(cursor);
             }
         }
