@@ -1,8 +1,4 @@
-[ 
-  {
-    "name": "RCR",
-    "address": ["rcr.fvds.ru"]
-  },
+[
   {
     "name": "mindustry.pl",
     "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl"]
