@@ -196,7 +196,7 @@ public class NetServer implements ApplicationListener{
             }
 
             if(packet.locale == null){
-                packet.locale = "en_US";
+                packet.locale = "en";
             }
 
             String ip = con.address;

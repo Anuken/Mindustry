@@ -73,9 +73,14 @@ public class NetClient implements ApplicationListener{
                 disconnectQuietly();
             });
 
+            String locale = Core.settings.getString("locale");
+            if(locale.equals("default")){
+                locale = Locale.getDefault().toString();
+            }
+
             ConnectPacket c = new ConnectPacket();
             c.name = player.name;
-            c.locale = Core.settings.getString("locale");
+            c.locale = locale;
             c.mods = mods.getModStrings();
             c.mobile = mobile;
             c.versionType = Version.type;
