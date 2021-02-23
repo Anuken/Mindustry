@@ -248,7 +248,7 @@ public class Units{
         return result;
     }
 
-    /** Returns the closest ally of this team. Filter by predicate. */
+    /** Returns the closest ally of this team in a range. Filter by predicate. */
     public static Unit closest(Team team, float x, float y, float range, Boolf<Unit> predicate){
         result = null;
         cdist = 0f;
@@ -262,6 +262,24 @@ public class Units{
                 cdist = dist;
             }
         });
+
+        return result;
+    }
+
+    /** Returns the closest ally of this team using a custom comparison function. Filter by predicate. */
+    public static Unit closest(Team team, float x, float y, Boolf<Unit> predicate, Sortf sort){
+        result = null;
+        cdist = 0f;
+
+        for(Unit e : Groups.unit){
+            if(!predicate.get(e) || e.team() != team) continue;
+
+            float cost = sort.cost(e, x, y);
+            if(result == null || cost < cdist){
+                result = e;
+                cdist = cost;
+            }
+        }
 
         return result;
     }
