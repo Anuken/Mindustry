@@ -1606,12 +1606,12 @@ public class Blocks implements ContentList{
             requirements(Category.turret, with(Items.silicon, 130, Items.thorium, 80, Items.phaseFabric, 40));
 
             health = 250 * size * size;
-            range = 160f;
+            range = 180f;
             hasPower = true;
             consumes.powerCond(8f, (PointDefenseBuild b) -> b.target != null);
             size = 2;
             shootLength = 5f;
-            bulletDamage = 25f;
+            bulletDamage = 30f;
             reloadTime = 9f;
         }};
 
