@@ -27,7 +27,7 @@ public class PowerNode extends PowerBlock{
     protected static BuildPlan otherReq;
 
     protected final static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
-    protected final static Seq<Point2> tmpPoints = new Seq<>(), tmpPoints2 = new Seq<>();
+    protected static int returnInt = 0;
 
     public @Load("laser") TextureRegion laser;
     public @Load("laser-end") TextureRegion laserEnd;
@@ -144,6 +144,9 @@ public class PowerNode extends PowerBlock{
         Drawf.circles(x * tilesize + offset, y * tilesize + offset, laserRange * tilesize);
 
         getPotentialLinks(tile, other -> {
+            Draw.color(laserColor1, Renderer.laserOpacity * 0.5f);
+            drawLaser(tile.team(), x * tilesize + offset, y * tilesize + offset, other.x, other.y, size, other.block.size);
+
             Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
 
             insulators(tile.x, tile.y, other.tileX(), other.tileY(), cause -> {
@@ -214,9 +217,13 @@ public class PowerNode extends PowerBlock{
             return Float.compare(a.dst2(tile), b.dst2(tile));
         });
 
+        returnInt = 0;
+
         tempTileEnts.each(valid, t -> {
-            graphs.add(t.power.graph);
-            others.get(t);
+            if(returnInt ++ < maxNodes){
+                graphs.add(t.power.graph);
+                others.get(t);
+            }
         });
     }
 
