@@ -20,6 +20,10 @@
     "address": ["routerchain.ddns.net", "nikochio.ddns.net"]
   },
   {
+    "name": "C.A.M.S. (IPv6)",
+    "address": ["2a02:2168:a0b:4074::3"]
+  },
+  {
     "name": "BE6.RUN",
     "address": ["be6.run", "mindustrycn.top"]
   },
