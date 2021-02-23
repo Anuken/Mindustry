@@ -12,6 +12,7 @@ import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -69,6 +70,17 @@ public class Conveyor extends Block implements Autotiler{
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return (otherblock.outputsItems() || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
             && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
+    }
+
+    //stack conveyors should be bridged over, not replaced
+    @Override
+    public boolean canReplace(Block other){
+        return super.canReplace(other) && !(other instanceof StackConveyor);
+    }
+
+    @Override
+    public void handlePlacementLine(Seq<BuildPlan> plans){
+        Placement.calculateBridges(plans, (ItemBridge)Blocks.itemBridge);
     }
 
     @Override

@@ -160,8 +160,10 @@ public class Block extends UnlockableContent{
     public boolean canOverdrive = true;
     /** Outlined icon color.*/
     public Color outlineColor = Color.valueOf("404049");
-    /** Whether the icon region has an outline added. */
+    /** Whether any icon region has an outline added. */
     public boolean outlineIcon = false;
+    /** Which of the icon regions gets the outline added. */
+    public int outlinedIcon = -1;
     /** Whether this block has a shadow under it. */
     public boolean hasShadow = true;
     /** Sounds made when this block breaks.*/
@@ -333,7 +335,11 @@ public class Block extends UnlockableContent{
         super.setStats();
 
         stats.add(Stat.size, "@x@", size, size);
-        stats.add(Stat.health, health, StatUnit.none);
+
+        if(synthetic()){
+            stats.add(Stat.health, health, StatUnit.none);
+        }
+
         if(canBeBuilt()){
             stats.add(Stat.buildTime, buildCost / 60, StatUnit.seconds);
             stats.add(Stat.buildCost, new ItemListValue(false, requirements));
@@ -397,6 +403,11 @@ public class Block extends UnlockableContent{
 
     }
 
+    /** Mutates the given list of requests used during line placement. */
+    public void handlePlacementLine(Seq<BuildPlan> plans){
+
+    }
+
     public Object nextConfig(){
         if(saveConfig && lastConfig != null){
             return lastConfig;
@@ -427,6 +438,12 @@ public class Block extends UnlockableContent{
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         TextureRegion reg = getRequestRegion(req, list);
         Draw.rect(reg, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
+
+        if(req.worldContext && player != null && teamRegion != null && teamRegion.found()){
+            if(teamRegions[player.team().id] == teamRegion) Draw.color(player.team().color);
+            Draw.rect(teamRegions[player.team().id], req.drawx(), req.drawy());
+            Draw.color();
+        }
 
         drawRequestConfig(req, list);
     }
@@ -762,7 +779,7 @@ public class Block extends UnlockableContent{
 
         if(outlineIcon){
             final int radius = 4;
-            PixmapRegion region = Core.atlas.getPixmap(getGeneratedIcons()[getGeneratedIcons().length-1]);
+            PixmapRegion region = Core.atlas.getPixmap(getGeneratedIcons()[outlinedIcon >= 0 ? outlinedIcon : getGeneratedIcons().length -1]);
             Pixmap out = new Pixmap(region.width, region.height);
             Color color = new Color();
             for(int x = 0; x < region.width; x++){

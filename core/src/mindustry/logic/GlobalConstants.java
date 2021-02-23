@@ -19,6 +19,12 @@ public class GlobalConstants{
         put("true", 1);
         put("null", null);
 
+        //special enums
+
+        put("@ctrlProcessor", 1);
+        put("@ctrlPlayer", 2);
+        put("@ctrlFormation", 3);
+
         //store base content
 
         for(Item item : Vars.content.items()){

@@ -36,7 +36,6 @@ public class DesktopLauncher extends ClientLauncher{
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
                 title = "Mindustry";
                 maximized = true;
-                stencil = 1;
                 width = 900;
                 height = 700;
                 setWindowIcon(FileType.internal, "icons/icon_64.png");
@@ -65,8 +64,7 @@ public class DesktopLauncher extends ClientLauncher{
 
         if(useSteam){
             //delete leftover dlls
-            Fi file = new Fi(".");
-            for(Fi other : file.parent().list()){
+            for(Fi other : new Fi(".").parent().list()){
                 if(other.name().contains("steam") && (other.extension().equals("dll") || other.extension().equals("so") || other.extension().equals("dylib"))){
                     other.delete();
                 }
@@ -130,6 +128,7 @@ public class DesktopLauncher extends ClientLauncher{
                 player.name = SVars.net.friends.getPersonaName();
                 Core.settings.put("name", player.name);
             }
+            steamPlayerName = SVars.net.friends.getPersonaName();
             //update callbacks
             Core.app.addListener(new ApplicationListener(){
                 @Override

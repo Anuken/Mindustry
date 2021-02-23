@@ -1,8 +1,6 @@
 package mindustry.content;
 
-import arc.*;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.struct.*;
 import mindustry.*;
 import mindustry.ctype.*;
@@ -97,36 +95,9 @@ public class Blocks implements ContentList{
     public void load(){
         //region environment
 
-        air = new Floor("air"){
-            {
-                alwaysReplace = true;
-                hasShadow = false;
-                useColor = false;
-                wall = this;
-            }
+        air = new AirBlock("air");
 
-            @Override public void drawBase(Tile tile){}
-            @Override public void load(){}
-            @Override public void init(){}
-            @Override public boolean isHidden(){ return true; }
-
-            @Override
-            public TextureRegion[] variantRegions(){
-                if(variantRegions == null){
-                    variantRegions = new TextureRegion[]{Core.atlas.find("clear")};
-                }
-                return variantRegions;
-            }
-        };
-
-        spawn = new OverlayFloor("spawn"){
-            {
-                variants = 0;
-                needsSurface = false;
-            }
-            @Override
-            public void drawBase(Tile tile){}
-        };
+        spawn = new SpawnBlock("spawn");
 
         cliff = new Cliff("cliff"){{
             inEditor = false;
@@ -797,6 +768,7 @@ public class Blocks implements ContentList{
             size = 2;
             insulated = true;
             absorbLasers = true;
+            schematicPriority = 10;
         }};
 
         thoriumWall = new Wall("thorium-wall"){{
@@ -1313,7 +1285,7 @@ public class Blocks implements ContentList{
         }};
 
         waterExtractor = new SolidPump("water-extractor"){{
-            requirements(Category.production, with(Items.copper, 30, Items.graphite, 30, Items.lead, 30));
+            requirements(Category.production, with(Items.metaglass, 30, Items.graphite, 30, Items.lead, 30));
             result = Liquids.water;
             pumpAmount = 0.11f;
             size = 2;
@@ -1399,6 +1371,7 @@ public class Blocks implements ContentList{
             size = 3;
             itemCapacity = 1000;
             flags = EnumSet.of(BlockFlag.storage);
+            group = BlockGroup.transportation;
         }};
 
         container = new StorageBlock("container"){{
@@ -1406,6 +1379,7 @@ public class Blocks implements ContentList{
             size = 2;
             itemCapacity = 300;
             flags = EnumSet.of(BlockFlag.storage);
+            group = BlockGroup.transportation;
         }};
 
         unloader = new Unloader("unloader"){{
@@ -2073,6 +2047,7 @@ public class Blocks implements ContentList{
             hasPower = true;
             consumes.power(10f);
             buildCostMultiplier = 0.5f;
+            health = size * size * 80;
         }};
 
         //endregion campaign

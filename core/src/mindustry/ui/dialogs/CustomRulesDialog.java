@@ -161,6 +161,8 @@ public class CustomRulesDialog extends BaseDialog{
 
         title("@rules.title.unit");
         check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
+        check("@rules.unitcapvariable", b -> rules.unitCapVariable = b, () -> rules.unitCapVariable);
+        number("@rules.unitcap", true, f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
         number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0.001f, 50f);
 
@@ -202,6 +204,17 @@ public class CustomRulesDialog extends BaseDialog{
 
     void number(String text, Floatc cons, Floatp prov, Boolp condition){
         number(text, false, cons, prov, condition, 0, Float.MAX_VALUE);
+    }
+
+    void number(String text, boolean integer, Intc cons, Intp prov, int min, int max){
+        main.table(t -> {
+            t.left();
+            t.add(text).left().padRight(5);
+            t.field((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseInt(s)))
+                    .padRight(100f)
+                    .valid(f -> Strings.parseInt(f) >= min && Strings.parseInt(f) <= max).width(120f).left().addInputDialog();
+        }).padTop(0);
+        main.row();
     }
 
     void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition, float min, float max){

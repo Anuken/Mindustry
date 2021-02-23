@@ -1,10 +1,14 @@
 package mindustry.world.blocks.environment;
 
+import arc.util.*;
 import mindustry.world.*;
 
-//do not use in mods!
+/**
+ * Do not use in mods. This class provides no new functionality, and is only used for the Mindustry sprite generator.
+ * Use the standard Floor class instead.
+ * */
 public class ShallowLiquid extends Floor{
-    public Floor liquidBase, floorBase;
+    public @Nullable Floor liquidBase, floorBase;
     public float liquidOpacity = 0.35f;
 
     public ShallowLiquid(String name){

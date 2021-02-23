@@ -1,11 +1,16 @@
 package mindustry.ai.types;
 
+import arc.util.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.ConstructBlock.*;
 
 public class RepairAI extends AIController{
+    public static float retreatDst = 160f, fleeRange = 310f, retreatDelay = Time.toSeconds * 3f;
+
+    @Nullable Teamc avoid;
+    float retreatTimer;
 
     @Override
     protected void updateMovement(){
@@ -28,6 +33,25 @@ public class RepairAI extends AIController{
             }
 
             unit.lookAt(target);
+        }
+
+        //not repairing
+        if(!(target instanceof Building)){
+            if(timer.get(timerTarget4, 40)){
+                avoid = target(unit.x, unit.y, fleeRange, true, true);
+            }
+
+            if((retreatTimer += Time.delta) >= retreatDelay){
+                //fly away from enemy when not doing anything
+                if(avoid != null){
+                    var core = unit.closestCore();
+                    if(core != null && !unit.within(core, retreatDst)){
+                        moveTo(core, retreatDst);
+                    }
+                }
+            }
+        }else{
+            retreatTimer = 0f;
         }
     }
 

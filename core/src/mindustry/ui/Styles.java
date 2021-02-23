@@ -24,9 +24,9 @@ import static mindustry.gen.Tex.*;
 @StyleDefaults
 public class Styles{
     //TODO all these names are inconsistent and not descriptive
-    public static Drawable black, black9, black8, black6, black3, black5, none, flatDown, flatOver;
+    public static Drawable black, black9, black8, black6, black3, black5, none, flatDown, flatOver, accentDrawable;
     public static ButtonStyle defaultb, waveb, modsb;
-    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, nonet, infot, clearPartialt, clearTogglet, clearToggleMenut, togglet, transt, fullTogglet, logict;
+    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, nonet, infot, clearPartialt, clearTogglet, logicTogglet, clearToggleMenut, togglet, transt, fullTogglet, logict;
     public static ImageButtonStyle defaulti, nodei, righti, emptyi, emptytogglei, selecti, logici, geni, colori, accenti, cleari, clearFulli, clearPartiali, clearPartial2i, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
     public static ScrollPaneStyle defaultPane, horizontalPane, smallPane;
     public static KeybindDialogStyle defaultKeybindDialog;
@@ -46,6 +46,7 @@ public class Styles{
         none = whiteui.tint(0f, 0f, 0f, 0f);
         flatDown = createFlatDown();
         flatOver = whiteui.tint(Color.valueOf("454545"));
+        accentDrawable = whiteui.tint(Pal.accent);
 
         defaultb = new ButtonStyle(){{
             down = buttonDown;
@@ -146,6 +147,16 @@ public class Styles{
             fontColor = Color.white;
             checked = flatDown;
             down = flatDown;
+            up = black;
+            over = flatOver;
+            disabled = black;
+            disabledFontColor = Color.gray;
+        }};
+        logicTogglet = new TextButtonStyle(){{
+            font = Fonts.outline;
+            fontColor = Color.white;
+            checked = accentDrawable;
+            down = accentDrawable;
             up = black;
             over = flatOver;
             disabled = black;

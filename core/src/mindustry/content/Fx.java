@@ -723,6 +723,19 @@ public class Fx{
         stroke(2f * e.fout());
         Lines.circle(e.x, e.y, 5f * e.fout());
     }),
+    
+    forceShrink = new Effect(20, e -> {
+        color(e.color, e.fout());
+        if(renderer.animateShields){
+            Fill.poly(e.x, e.y, 6, e.rotation * e.fout());
+        }else{
+            stroke(1.5f);
+            Draw.alpha(0.09f);
+            Fill.poly(e.x, e.y, 6, e.rotation * e.fout());
+            Draw.alpha(1f);
+            Lines.poly(e.x, e.y, 6, e.rotation * e.fout());
+        }
+    }).layer(Layer.shields),
 
     flakExplosionBig = new Effect(30, e -> {
         color(Pal.bulletYellowBack);
@@ -1592,6 +1605,12 @@ public class Fx{
 
     rotateBlock = new Effect(30, e -> {
         color(Pal.accent);
+        alpha(e.fout() * 1);
+        Fill.square(e.x, e.y, e.rotation * tilesize / 2f);
+    }),
+
+    lightBlock = new Effect(60, e -> {
+        color(e.color);
         alpha(e.fout() * 1);
         Fill.square(e.x, e.y, e.rotation * tilesize / 2f);
     }),

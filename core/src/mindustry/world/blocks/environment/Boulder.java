@@ -6,7 +6,7 @@ import arc.math.*;
 import mindustry.world.*;
 
 public class Boulder extends Block{
-    protected int variants;
+    public int variants;
 
     public Boulder(String name){
         super(name);

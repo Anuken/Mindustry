@@ -274,9 +274,7 @@ public class Net{
     public void handleServerReceived(NetConnection connection, Object object){
 
         if(serverListeners.get(object.getClass()) != null){
-            if(serverListeners.get(object.getClass()) != null){
-                serverListeners.get(object.getClass()).get(connection, object);
-            }
+            serverListeners.get(object.getClass()).get(connection, object);
             Pools.free(object);
         }else{
             Log.err("Unhandled packet type: '@'!", object.getClass());

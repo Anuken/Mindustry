@@ -54,7 +54,7 @@ public class LoadRenderer implements Disposable{
         bars = new Bar[]{
             new Bar("s_proc#", OS.cores / 16f, OS.cores < 4),
             new Bar("c_aprog", () -> assets != null, () -> assets.getProgress(), () -> false),
-            new Bar("g_vtype", graphics.getGLVersion().type == Type.GLES ? 0.5f : 1f, graphics.getGLVersion().type == Type.GLES),
+            new Bar("g_vtype", graphics.getGLVersion().type == GlType.GLES ? 0.5f : 1f, graphics.getGLVersion().type == GlType.GLES),
             new Bar("s_mem#", () -> true, () -> Core.app.getJavaHeap() / 1024f / 1024f / 200f, () -> Core.app.getJavaHeap() > 1024 * 1024 * 110),
             new Bar("v_ver#", () -> Version.build != 0, () -> Version.build == -1 ? 0.3f : (Version.build - 103f) / 10f, () -> !Version.modifier.equals("release")),
             new Bar("s_osv", OS.isWindows ? 0.35f : OS.isLinux ? 0.9f : OS.isMac ? 0.5f : 0.2f, OS.isMac),

@@ -32,7 +32,7 @@ import static mindustry.Vars.*;
 @Component(base = true)
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Commanderc, Displayable, Senseable, Ranged, Minerc, Builderc{
 
-    @Import boolean hovering, dead;
+    @Import boolean hovering, dead, disarmed;
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo, minFormationSpeed;
     @Import Team team;
     @Import int id;
@@ -128,8 +128,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case ammoCapacity -> type.ammoCapacity;
             case x -> World.conv(x);
             case y -> World.conv(y);
+            case dead -> dead || !isAdded() ? 1 : 0;
             case team -> team.id;
             case shooting -> isShooting() ? 1 : 0;
+            case boosting -> type.canBoost && isFlying() ? 1 : 0;
             case range -> range() / tilesize;
             case shootX -> World.conv(aimX());
             case shootY -> World.conv(aimY());
@@ -137,10 +139,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case mineX -> mining() ? mineTile.x : -1;
             case mineY -> mining() ? mineTile.y : -1;
             case flag -> flag;
-            case controlled -> controller instanceof LogicAI || controller instanceof Player ? 1 : 0;
+            case controlled -> controller instanceof LogicAI ? 1 : controller instanceof Player ? 2 : controller instanceof FormationAI ? 3 : 0;
             case commanded -> controller instanceof FormationAI ? 1 : 0;
             case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
-            default -> 0;
+            default -> Float.NaN;
         };
     }
 
@@ -150,6 +152,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case type -> type;
             case name -> controller instanceof Player p ? p.name : null;
             case firstItem -> stack().amount == 0 ? null : item();
+            case controller -> controller instanceof LogicAI log ? log.controller : controller instanceof FormationAI form ? form.leader : this;
             case payloadType -> self() instanceof Payloadc pay ?
                 (pay.payloads().isEmpty() ? null :
                 pay.payloads().peek() instanceof UnitPayload p1 ? p1.unit.type :
@@ -162,7 +165,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public double sense(Content content){
         if(content == stack().item) return stack().amount;
-        return 0;
+        return Float.NaN;
     }
 
     @Override
@@ -175,7 +178,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Replace
     public boolean canShoot(){
         //cannot shoot while boosting
-        return !(type.canBoost && isFlying());
+        return !disarmed && !(type.canBoost && isFlying());
     }
 
     @Override

@@ -16,6 +16,7 @@ import static mindustry.Vars.*;
 @Component
 abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     @Import float x, y, rotation, reloadMultiplier;
+    @Import boolean disarmed;
     @Import Vec2 vel;
     @Import UnitType type;
 
@@ -81,7 +82,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     }
 
     boolean canShoot(){
-        return true;
+        return !disarmed;
     }
 
     @Override
