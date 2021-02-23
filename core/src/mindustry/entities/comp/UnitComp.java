@@ -32,7 +32,7 @@ import static mindustry.Vars.*;
 @Component(base = true)
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Commanderc, Displayable, Senseable, Ranged, Minerc, Builderc{
 
-    @Import boolean hovering, dead;
+    @Import boolean hovering, dead, disarmed;
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo, minFormationSpeed;
     @Import Team team;
     @Import int id;
@@ -178,7 +178,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Replace
     public boolean canShoot(){
         //cannot shoot while boosting
-        return !(type.canBoost && isFlying());
+        return !disarmed && !(type.canBoost && isFlying());
     }
 
     @Override
