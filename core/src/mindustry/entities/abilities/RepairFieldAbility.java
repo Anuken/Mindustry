@@ -31,9 +31,9 @@ public class RepairFieldAbility extends Ability{
             Units.nearby(unit.team, unit.x, unit.y, range, other -> {
                 if(other.damaged()){
                     healEffect.at(other);
+                    other.heal(amount);
                     wasHealed = true;
                 }
-                other.heal(amount);
             });
 
             if(wasHealed){
