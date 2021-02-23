@@ -20,6 +20,7 @@ abstract class StatusComp implements Posc, Flyingc{
     private transient Bits applied = new Bits(content.getBy(ContentType.status).size);
 
     @ReadOnly transient float speedMultiplier = 1, damageMultiplier = 1, healthMultiplier = 1, reloadMultiplier = 1;
+    @ReadOnly transient boolean disarmed = false;
 
     @Import UnitType type;
 
@@ -111,6 +112,7 @@ abstract class StatusComp implements Posc, Flyingc{
 
         applied.clear();
         speedMultiplier = damageMultiplier = healthMultiplier = reloadMultiplier = 1f;
+        disarmed = false;
 
         if(statuses.isEmpty()) return;
 
@@ -132,6 +134,9 @@ abstract class StatusComp implements Posc, Flyingc{
                 healthMultiplier *= entry.effect.healthMultiplier;
                 damageMultiplier *= entry.effect.damageMultiplier;
                 reloadMultiplier *= entry.effect.reloadMultiplier;
+
+                disarmed |= entry.effect.disarm;
+
                 entry.effect.update(self(), entry.time);
             }
         }
