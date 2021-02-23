@@ -404,6 +404,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         }
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("smoothcamera", true);
+        graphics.checkPref("laserbuild", true);
         graphics.checkPref("position", false);
         graphics.checkPref("fps", false);
         graphics.checkPref("playerindicators", true);

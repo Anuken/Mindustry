@@ -144,6 +144,11 @@ public class PowerNode extends PowerBlock{
         Drawf.circles(x * tilesize + offset, y * tilesize + offset, laserRange * tilesize);
 
         getPotentialLinks(tile, other -> {
+        	if(Core.settings.getBool("laserbuild")){
+    	    	Draw.color(laserColor2);
+	            Draw.alpha(renderer == null ? 0.5f : renderer.laserOpacity);
+            	drawLaser(tile.team(), x * tilesize + offset, y * tilesize + offset, other.x, other.y, size, other.block.size);
+            }
             Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
 
             insulators(tile.x, tile.y, other.tileX(), other.tileY(), cause -> {
