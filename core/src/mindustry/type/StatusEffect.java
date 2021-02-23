@@ -20,7 +20,7 @@ public class StatusEffect extends MappableContent{
     /** Unit reload multiplier. */
     public float reloadMultiplier = 1f;
     /** Unit weapon(s) disabled. */
-    public boolean disarms = false;
+    public boolean disarm = false;
     /** Damage per frame. */
     public float damage;
     /** Chance of effect appearing. */

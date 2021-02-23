@@ -176,7 +176,7 @@ public class StatusEffects implements ContentList{
 
         disarmed = new StatusEffect("disarmed"){{
             color = Color.valueOf("e9ead3");
-            disarms = true;
+            disarm = true;
         }};
     }
 }

@@ -135,7 +135,7 @@ abstract class StatusComp implements Posc, Flyingc{
                 damageMultiplier *= entry.effect.damageMultiplier;
                 reloadMultiplier *= entry.effect.reloadMultiplier;
 
-                disarmed |= entry.effect.disarms;
+                disarmed |= entry.effect.disarm;
 
                 entry.effect.update(self(), entry.time);
             }
