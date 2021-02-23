@@ -954,7 +954,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Tries to stop mining, returns true if mining was stopped. */
     boolean tryStopMine(Tile tile){
         //if tile is specified, check if that tile is being mined
-        if(tile == null && player.unit().mining() || player.unit().mineTile == tile){
+        if(tile == null ? player.unit().mining() : player.unit().mineTile == tile){
             player.unit().mineTile = null;
             return true;
         }
