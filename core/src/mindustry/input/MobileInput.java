@@ -620,7 +620,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             unitTapped = selectedUnit();
             //prevent mining if placing/breaking blocks
-            if(!tryStopMine(null) && !canTapPlayer(worldx, worldy) && !tileTapped(linked.build) && mode == none && !Core.settings.getBool("doubletapmine")){
+            if(!tryStopMine() && !canTapPlayer(worldx, worldy) && !tileTapped(linked.build) && mode == none && !Core.settings.getBool("doubletapmine")){
                 tryBeginMine(cursor);
             }
         }
