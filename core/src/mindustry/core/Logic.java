@@ -14,6 +14,7 @@ import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock.CoreBuild;
 
 import java.util.*;
 
@@ -173,7 +174,7 @@ public class Logic implements ApplicationListener{
         //add starting items
         if(!state.isCampaign()){
             //less efficient than looping through teamdata but is consistent
-            Groups.build.each(build -> build instanceof CoreBlock.CoreBuild, core -> {
+            Groups.build.each(build -> build instanceof CoreBuild, core -> {
                 //clear items so only one core on the team gets items
                 core.items.clear();
                 for(ItemStack stack : state.rules.loadout){
