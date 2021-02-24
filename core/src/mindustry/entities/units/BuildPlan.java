@@ -63,7 +63,7 @@ public class BuildPlan implements Position{
     }
 
     public boolean placeable(Team team){
-        return Build.validPlace(block, team, x, y, rotation);
+        return Build.validPlace(block, team, x, y, -1);
     }
 
     public boolean isRotation(Team team){
