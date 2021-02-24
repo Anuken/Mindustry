@@ -1339,6 +1339,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case enabled -> enabled ? 1 : 0;
             case controlled -> this instanceof ControlBlock c && c.isControlled() ? 2 : 0;
             case payloadCount -> getPayload() != null ? 1 : 0;
+            case size -> block.size;
             default -> Float.NaN; //gets converted to null in logic
         };
     }
