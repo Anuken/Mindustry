@@ -544,7 +544,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void useSchematic(Schematic schem){
-        selectRequests.addAll(schematics.toRequests(schem, player.tileX(), player.tileY()));
+        selectRequests.addAll(schematics.toRequests(schem, Core.camera.position.x, Core.camera.position.y));
     }
 
     protected void showSchematicSave(){
