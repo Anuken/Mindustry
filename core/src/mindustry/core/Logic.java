@@ -174,12 +174,21 @@ public class Logic implements ApplicationListener{
         //add starting items
         if(!state.isCampaign()){
             //less efficient than looping through teamdata but is consistent
-            Groups.build.each(build -> build instanceof CoreBuild, core -> {
-                //clear items so only one core on the team gets items
-                core.items.clear();
-                for(ItemStack stack : state.rules.loadout){
-                    core.items.add(stack.item, stack.amount);
+            Groups.build.each(build -> build instanceof CoreBuild, new Cons<Building> {
+                int id = -1;
+                
+                public void get(Building core) {
+                    if (id == core.team.id) {
+                        return;
+                    }
+                    
+                    id = core.team.id;
+                    core.items.clear();
+                    for(ItemStack stack : state.rules.loadout){
+                        core.items.add(stack.item, stack.amount);
+                    }
                 }
+                
             });
             
             
