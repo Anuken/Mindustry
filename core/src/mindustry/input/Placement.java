@@ -114,6 +114,9 @@ public class Placement{
             return;
         }
 
+        Boolf<BuildPlan> placeable = plan -> (plan.placeable(player.team())) ||
+            (plan.tile() != null && plan.tile().block() == plan.block); //don't count the same block as inaccessible
+
         var result = plans1.clear();
         var team = player.team();
 
@@ -123,7 +126,7 @@ public class Placement{
             result.add(cur);
 
             //gap found
-            if(i < plans.size - 1 && cur.placeable(team) && !plans.get(i + 1).placeable(team)){
+            if(i < plans.size - 1 && placeable.get(cur) && !placeable.get(plans.get(i + 1))){
 
                 //find the closest valid position within range
                 for(int j = i + 1; j < plans.size; j++){
