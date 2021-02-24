@@ -424,7 +424,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     @Override
     public void useSchematic(Schematic schem){
         selectRequests.clear();
-        selectRequests.addAll(schematics.toRequests(schem, player.tileX(), player.tileY()));
+        selectRequests.addAll(schematics.toRequests(schem, (int)(Core.camera.position.x / tilesize), (int)(Core.camera.position.y / tilesize)));
         lastSchematic = schem;
     }
 
