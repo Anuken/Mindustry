@@ -391,7 +391,7 @@ public class Schematics implements Loadable{
 
                 if(tile != null && !counted.contains(tile.pos())
                     && (realBlock.isVisible() || realBlock instanceof CoreBlock)){
-                    Object config = tile.config();
+                    Object config = tile instanceof ConstructBuild cons ? cons.lastConfig : tile.config();
 
                     tiles.add(new Stile(realBlock, tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
                     counted.add(tile.pos());
