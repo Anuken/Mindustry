@@ -130,8 +130,9 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                     }
                 }
             }else{
-                //heat decreases when not firing
+                //heat and recoil decreases when not firing
                 mount.heat = Math.max(mount.heat - Time.delta * reloadMultiplier / mount.weapon.cooldownTime, 0);
+                mount.recoil = Math.max(mount.recoil - Time.delta * reloadMultiplier / mount.weapon.restitutionTime, 0);
 
                 if(mount.sound != null){
                     mount.sound.update(x, y, false);
@@ -210,6 +211,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                 vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
                 Effect.shake(weapon.shake, weapon.shake, x, y);
                 mount.heat = 1f;
+                mount.recoil = 1f;
                 if(!weapon.continuous){
                     weapon.shootSound.at(x, y, Mathf.random(weapon.soundPitchMin, weapon.soundPitchMax));
                 }
@@ -218,6 +220,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
             vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
             Effect.shake(weapon.shake, weapon.shake, x, y);
             mount.heat = 1f;
+            mount.recoil = 1f;
         }
 
         weapon.ejectEffect.at(mountX, mountY, rotation * side);
