@@ -71,6 +71,8 @@ public class MobileInput extends InputHandler implements GestureListener{
     public Teamc target;
     /** Payload target being moved to. Can be a position (for dropping), or a unit/block. */
     public Position payloadTarget;
+    /** Unit last tapped, or null if last tap was not on a unit. */
+    public Unit unitTapped;
 
     //region utility methods
 
@@ -599,11 +601,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             //add to selection queue if it's a valid BREAK position
             selectRequests.add(new BuildPlan(linked.x, linked.y));
         }else{
-            if(!canTapPlayer(worldx, worldy) && !tileTapped(linked.build)){
-                tryBeginMine(cursor);
-            }
-
-            //control units.
+            //control units
             if(count == 2){
                 //reset payload target
                 payloadTarget = null;
@@ -611,12 +609,20 @@ public class MobileInput extends InputHandler implements GestureListener{
                 if(!player.dead() && Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 0.6f + 8f) && player.unit().type.commandLimit > 0){
                     Call.unitCommand(player);
                 }else{
-                    //control a unit/block
-                    Unit on = selectedUnit();
-                    if(on != null){
-                        Call.unitControl(player, on);
+                    //control a unit/block detected on first tap of double-tap
+                    if(unitTapped != null){
+                        Call.unitControl(player, unitTapped);
+                    }else if(!tryBeginMine(cursor)){
+                        tileTapped(linked.build);
                     }
                 }
+                return false;
+            }
+
+            unitTapped = selectedUnit();
+            //prevent mining if placing/breaking blocks
+            if(!tryStopMine() && !canTapPlayer(worldx, worldy) && !tileTapped(linked.build) && mode == none && !Core.settings.getBool("doubletapmine")){
+                tryBeginMine(cursor);
             }
         }
 

@@ -327,6 +327,8 @@ public class SettingsMenuDialog extends SettingsDialog{
             game.checkPref("buildautopause", false);
         }
 
+        game.checkPref("doubletapmine", false);
+      
         if(!ios){
             game.checkPref("modcrashdisable", true);
         }
