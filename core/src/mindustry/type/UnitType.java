@@ -301,6 +301,13 @@ public class UnitType extends UnlockableContent{
             }
         }
 
+        //set up default recoil time
+        for(Weapon weapon : weapons){
+            if(weapon.restitutionTime < 0f){
+                weapon.restitutionTime = weapon.reload;
+            }
+        }
+
         if(weapons.isEmpty()){
             range = maxRange = miningRange;
         }

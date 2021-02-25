@@ -44,7 +44,7 @@ public class Weapon implements Cloneable{
     /** visual weapon knockback. */
     public float recoil = 1.5f;
     /** ticks recoil takes to return to normal position */
-    public float restitutionTime = reload;
+    public float restitutionTime = -1;
     /** projectile/effect offsets from center of weapon */
     public float shootX = 0f, shootY = 3f;
     /** offsets of weapon position on unit */
