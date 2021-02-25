@@ -15,6 +15,7 @@ import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.CoreBuild;
+import arc.func.Cons;
 
 import java.util.*;
 
