@@ -178,15 +178,14 @@ public class Logic implements ApplicationListener{
 				int id = -1;
 
 				public void get(Building core) {
-					if (id == core.team.id) {
-						return;
-					}
+				if (id == core.team.id) {
+					return;
+				}
 
-					id = core.team.id;
-					core.items.clear();
-					for(ItemStack stack : state.rules.loadout){
-						core.items.add(stack.item, stack.amount);
-					}
+				id = core.team.id;
+				core.items.clear();
+				for(ItemStack stack : state.rules.loadout){
+					core.items.add(stack.item, stack.amount);
 				}
 			}
                 
