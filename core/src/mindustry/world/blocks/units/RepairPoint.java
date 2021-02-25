@@ -38,6 +38,7 @@ public class RepairPoint extends Block{
         flags = EnumSet.of(BlockFlag.repair);
         hasPower = true;
         outlineIcon = true;
+        expanded = true;
     }
 
     @Override
