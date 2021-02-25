@@ -151,7 +151,9 @@ public class ItemBridge extends Block{
         for(int i = 0; i < plans.size - 1; i++){
             var cur = plans.get(i);
             var next = plans.get(i + 1);
-            cur.config = new Point2(next.x - cur.x, next.y - cur.y);
+            if(positionsValid(cur.x, cur.y, next.x, next.y)){
+                cur.config = new Point2(next.x - cur.x, next.y - cur.y);
+            }
         }
     }
 
