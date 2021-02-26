@@ -463,8 +463,10 @@ public class JoinDialog extends BaseDialog{
             net.reset();
             Vars.netClient.beginConnecting();
             net.connect(lastIp = ip, lastPort = port, () -> {
-                hide();
-                add.hide();
+                if(net.client()){
+                    hide();
+                    add.hide();
+                }
             });
         });
     }

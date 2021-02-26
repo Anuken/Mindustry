@@ -66,6 +66,13 @@ public class NetClient implements ApplicationListener{
 
             reset();
 
+            //connection after reset
+            if(!net.client()){
+                Log.info("Connection canceled.");
+                disconnectQuietly();
+                return;
+            }
+
             ui.loadfrag.hide();
             ui.loadfrag.show("@connecting.data");
 
