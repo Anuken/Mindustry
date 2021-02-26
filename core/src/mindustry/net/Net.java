@@ -337,7 +337,7 @@ public class Net{
          */
         void discoverServers(Cons<Host> callback, Runnable done);
 
-        /** Ping a host. If an error occured, failed() should be called with the exception. */
+        /** Ping a host. If an error occurred, failed() should be called with the exception. */
         void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> failed);
 
         /** Host a server at specified port. */
