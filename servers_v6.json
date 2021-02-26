@@ -64,6 +64,10 @@
     "address": ["frfr1.quackhost.uk:20060", "frfr1.quackhost.uk:20185", "defr2.forcehost.net:1069"]
   },
   {
+    "name": "THEDIMAS",
+    "address": ["fifr3.quackhost.uk:26160"]
+  },
+  {
     "name": "Korea",
     "address": ["mindustry.kr"]
   },
