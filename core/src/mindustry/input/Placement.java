@@ -119,7 +119,7 @@ public class Placement{
 
         var result = plans1.clear();
         var team = player.team();
-        var rotated = plans.first().tile() != null && plans.first().tile().absoluteRelativeTo(plans.peek().x, plans.peek().y) == (plans.first().rotation + 2) % 4;
+        var rotated = plans.first().tile() != null && plans.first().tile().absoluteRelativeTo(plans.peek().x, plans.peek().y) == Mathf.mod(plans.first().rotation + 2, 4);
 
         outer:
         for(int i = 0; i < plans.size;){
