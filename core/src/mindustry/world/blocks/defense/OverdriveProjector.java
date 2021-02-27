@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -132,6 +133,10 @@ public class OverdriveProjector extends Block{
             Draw.rect(topRegion, x, y);
             Draw.alpha(1f);
             Lines.stroke((2f * f + 0.1f) * heat);
+            float hype = 1.414f * size * tilesize / 2f; // hypotenuse
+            for(int i = 0; i < 4; i++){
+                Lines.lineAngleCenter(x + Geometry.d8edge(i).x * hype * (1f - f), y + Geometry.d8edge(i).y * hype * (1f - f), 135f + 90f * i, hype * Math.abs(f - 0.5f) * 2f);
+                if(f <= 0.5f) Lines.lineAngleCenter(x + Geometry.d4(i).x * size * tilesize / 2f, 
             Lines.square(x, y, Math.min(1f + (1f - f) * size * tilesize / 2f, size * tilesize/2f));
 
             Draw.reset();
