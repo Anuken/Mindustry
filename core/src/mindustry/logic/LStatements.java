@@ -603,7 +603,7 @@ public class LStatements{
             table.add(" = ");
 
             if(op.unary){
-                opButton(table);
+                opButton(table, table);
 
                 field(table, a, str -> a = str);
             }else{
@@ -617,35 +617,35 @@ public class LStatements{
                         table.table(c -> {
                             c.color.set(color());
                             c.left();
-                            funcs(c);
+                            funcs(c, table);
                         }).colspan(2).left();
                     }else{
-                        funcs(table);
+                        funcs(table, table);
                     }
                 }else{
                     field(table, a, str -> a = str);
 
-                    opButton(table);
+                    opButton(table, table);
 
                     field(table, b, str -> b = str);
                 }
             }
         }
 
-        void funcs(Table table){
-            opButton(table);
+        void funcs(Table table, Table parent){
+            opButton(table, parent);
 
             field(table, a, str -> a = str);
 
             field(table, b, str -> b = str);
         }
 
-        void opButton(Table table){
+        void opButton(Table table, Table parent){
             table.button(b -> {
                 b.label(() -> op.symbol);
                 b.clicked(() -> showSelect(b, LogicOp.all, op, o -> {
                     op = o;
-                    rebuild(table);
+                    rebuild(parent);
                 }));
             }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
         }
