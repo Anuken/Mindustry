@@ -34,7 +34,7 @@ public class MapEditor{
     public Team drawTeam = Team.sharded;
 
     // static so you can copy between maps
-    public static CopyData copyData = new CopyData();
+    public Copy copyData = new Copy();
 
     public boolean isLoading(){
         return loading;

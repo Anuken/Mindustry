@@ -528,6 +528,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.row();
 
+                addTool.get(EditorTool.copy);
+
+                tools.row();
+
                 tools.table(Tex.underline, t -> t.add("@editor.teams"))
                 .colspan(3).height(40).width(size * 3f + 3f).padBottom(3);
 
@@ -604,6 +608,17 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }
             }
         }else{
+            // rip mobile
+            if(Core.input.keyTap(KeyCode.j)) {
+                editor.copyData.rotR();
+            } else if(Core.input.keyTap(KeyCode.h)) {
+                editor.copyData.rotL();
+            } else if(Core.input.keyTap(KeyCode.x)) {
+                editor.copyData.flipX(true);
+            } else if(Core.input.keyTap(KeyCode.z)) {
+                editor.copyData.flipY(true);
+            }
+
             for(EditorTool tool : EditorTool.all){
                 if(Core.input.keyTap(tool.key)){
                     view.setTool(tool);

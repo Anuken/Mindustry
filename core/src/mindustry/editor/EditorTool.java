@@ -231,16 +231,7 @@ public enum EditorTool{
             }
         }
     },
-    copy(KeyCode.c) {
-        {
-            draggable = true;
-        }
-
-        @Override
-        public void touched(MapEditor editor, int x, int y){
-            //editor.copyData.paste();
-        }
-    };
+    copy(KeyCode.c);
 
     public static final EditorTool[] all = values();
 

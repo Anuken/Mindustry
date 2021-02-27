@@ -73,10 +73,15 @@ public class MapView extends Element implements GestureListener{
                 if(!mobile && button != KeyCode.mouseLeft && button != KeyCode.mouseMiddle && button != KeyCode.mouseRight){
                     return true;
                 }
-                
+
                 if(button == KeyCode.mouseRight){
-                    lastTool = tool;
-                    tool = EditorTool.eraser;
+                    if(tool == EditorTool.copy){
+                        Point2 p = project(x, y);
+                        editor.copyData.setOrigin(p.x, p.y);
+                    }else{
+                        lastTool = tool;
+                        tool = EditorTool.eraser;
+                    }
                 }
 
                 if(button == KeyCode.mouseMiddle){
@@ -113,9 +118,22 @@ public class MapView extends Element implements GestureListener{
 
                 Point2 p = project(x, y);
 
-                if(tool == EditorTool.line){
-                    ui.editor.resetSaved();
-                    tool.touchedLine(editor, startx, starty, p.x, p.y);
+                switch(tool) {
+                    case line:
+                        ui.editor.resetSaved();
+                        tool.touchedLine(editor, startx, starty, p.x, p.y);
+                        break;
+                    case copy:
+                        switch(button) {
+                            case mouseRight:
+                                editor.copyData.copy();
+                                break;
+                            case mouseLeft:
+                                if(!editor.copyData.contains(p.x, p.y)) {
+                                    editor.copyData.paste();
+                                }
+                                break;
+                        }
                 }
 
                 editor.flushOp();
@@ -137,6 +155,21 @@ public class MapView extends Element implements GestureListener{
                 if(drawing && tool.draggable && !(p.x == lastx && p.y == lasty)){
                     ui.editor.resetSaved();
                     Bresenham2.line(lastx, lasty, p.x, p.y, (cx, cy) -> tool.touched(editor, cx, cy));
+                }
+
+
+                if(tool == EditorTool.copy) {
+                    Copy c = editor.copyData;
+                    switch(event.keyCode) {
+                        case mouseRight:
+                            c.adjust(p.x, p.y);
+                            break;
+                        case mouseLeft:
+                            if (c.contains(lastx, lasty)) {
+                                c.move(p.x - lastx, p.y - lasty);
+                            }
+                            break;
+                    }
                 }
 
                 if(tool == EditorTool.line && tool.mode == 1){
@@ -204,13 +237,6 @@ public class MapView extends Element implements GestureListener{
 
     private void clampZoom(){
         zoom = Mathf.clamp(zoom, 0.2f, 20f);
-    }
-
-    void drawSelection(CopyData.Selection selection) {
-        Vec2 min = unproject(selection.x, selection.y);
-        Vec2 max = unproject(selection.x + selection.w, selection.y + selection.h);
-
-        Lines.rect(min.x, min.y, max.x - min.x, max.y - min.y);
     }
 
     Point2 project(float x, float y){
@@ -286,16 +312,21 @@ public class MapView extends Element implements GestureListener{
         Draw.color(Pal.accent);
         Lines.stroke(Scl.scl(2f));
 
-        if(tool == EditorTool.copy) {
+        if(tool == EditorTool.copy && !editor.copyData.empty()) {
+            Copy c = editor.copyData;
 
-        }
+            Vec2 min = unproject(c.dx, c.dy).add(x, y);
+            // because we just have to save that one allocation (i guess)
+            // unproject returns pointer to same vec so min === max
+            float sx = min.x, sy = min.y;
+            unproject(c.dx - c.w, c.dy - c.h).add(x, y);
 
-        if((!editor.drawBlock.isMultiblock() || tool == EditorTool.eraser) && tool != EditorTool.fill){
+            Lines.rect(sx, sy, sx - min.x, sy - min.y);
+        } else if((!editor.drawBlock.isMultiblock() || tool == EditorTool.eraser) && tool != EditorTool.fill){
             if(tool == EditorTool.line && drawing){
                 Vec2 v1 = unproject(startx, starty).add(x, y);
                 float sx = v1.x, sy = v1.y;
                 Vec2 v2 = unproject(lastx, lasty).add(x, y);
-
                 Lines.poly(brushPolygons[index], sx, sy, scaling);
                 Lines.poly(brushPolygons[index], v2.x, v2.y, scaling);
             }
