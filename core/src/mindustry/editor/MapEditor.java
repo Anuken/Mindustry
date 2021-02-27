@@ -32,6 +32,9 @@ public class MapEditor{
     public Block drawBlock = Blocks.stone;
     public Team drawTeam = Team.sharded;
 
+    // static so you can copy between maps
+    public static CopyData copyData = new CopyData();
+
     public boolean isLoading(){
         return loading;
     }

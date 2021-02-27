@@ -230,6 +230,16 @@ public enum EditorTool{
                 editor.drawBlocks(x, y, tile -> Mathf.chance(chance));
             }
         }
+    },
+    copy(KeyCode.c) {
+        {
+            draggable = true;
+        }
+
+        @Override
+        public void touched(MapEditor editor, int x, int y){
+            //editor.copyData.paste();
+        }
     };
 
     public static final EditorTool[] all = values();

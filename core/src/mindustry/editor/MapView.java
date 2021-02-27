@@ -206,6 +206,13 @@ public class MapView extends Element implements GestureListener{
         zoom = Mathf.clamp(zoom, 0.2f, 20f);
     }
 
+    void drawSelection(CopyData.Selection selection) {
+        Vec2 min = unproject(selection.x, selection.y);
+        Vec2 max = unproject(selection.x + selection.w, selection.y + selection.h);
+
+        Lines.rect(min.x, min.y, max.x - min.x, max.y - min.y);
+    }
+
     Point2 project(float x, float y){
         float ratio = 1f / ((float)editor.width() / editor.height());
         float size = Math.min(width, height);
@@ -278,6 +285,10 @@ public class MapView extends Element implements GestureListener{
 
         Draw.color(Pal.accent);
         Lines.stroke(Scl.scl(2f));
+
+        if(tool == EditorTool.copy) {
+
+        }
 
         if((!editor.drawBlock.isMultiblock() || tool == EditorTool.eraser) && tool != EditorTool.fill){
             if(tool == EditorTool.line && drawing){
