@@ -118,18 +118,18 @@ public class MapView extends Element implements GestureListener{
 
                 Point2 p = project(x, y);
 
-                switch(tool) {
+                switch(tool){
                     case line:
                         ui.editor.resetSaved();
                         tool.touchedLine(editor, startx, starty, p.x, p.y);
                         break;
                     case copy:
-                        switch(button) {
+                        switch(button){
                             case mouseRight:
                                 editor.copyData.copy();
                                 break;
                             case mouseLeft:
-                                if(!editor.copyData.contains(p.x, p.y)) {
+                                if(!editor.copyData.contains(p.x, p.y)){
                                     editor.copyData.paste();
                                 }
                                 break;
@@ -158,14 +158,14 @@ public class MapView extends Element implements GestureListener{
                 }
 
 
-                if(tool == EditorTool.copy) {
+                if(tool == EditorTool.copy){
                     Copy c = editor.copyData;
-                    switch(event.keyCode) {
+                    switch(event.keyCode){
                         case mouseRight:
                             c.adjust(p.x, p.y);
                             break;
                         case mouseLeft:
-                            if (c.contains(lastx, lasty)) {
+                            if(c.contains(lastx, lasty)){
                                 c.move(p.x - lastx, p.y - lasty);
                             }
                             break;
@@ -293,8 +293,8 @@ public class MapView extends Element implements GestureListener{
 
             Lines.stroke(3f);
             Draw.color(Pal.accent);
-            Lines.line(centerx - sclwidth/2f, centery, centerx + sclwidth/2f, centery);
-            Lines.line(centerx, centery - sclheight/2f, centerx, centery + sclheight/2f);
+            Lines.line(centerx - sclwidth / 2f, centery, centerx + sclwidth / 2f, centery);
+            Lines.line(centerx, centery - sclheight / 2f, centerx, centery + sclheight / 2f);
 
             Draw.reset();
         }
@@ -312,7 +312,7 @@ public class MapView extends Element implements GestureListener{
         Draw.color(Pal.accent);
         Lines.stroke(Scl.scl(2f));
 
-        if(tool == EditorTool.copy && !editor.copyData.empty()) {
+        if(tool == EditorTool.copy && !editor.copyData.empty()){
             Copy c = editor.copyData;
 
             Vec2 min = unproject(c.dx, c.dy).add(x, y);
@@ -322,7 +322,7 @@ public class MapView extends Element implements GestureListener{
             unproject(c.dx - c.w, c.dy - c.h).add(x, y);
 
             Lines.rect(sx, sy, sx - min.x, sy - min.y);
-        } else if((!editor.drawBlock.isMultiblock() || tool == EditorTool.eraser) && tool != EditorTool.fill){
+        }else if((!editor.drawBlock.isMultiblock() || tool == EditorTool.eraser) && tool != EditorTool.fill){
             if(tool == EditorTool.line && drawing){
                 Vec2 v1 = unproject(startx, starty).add(x, y);
                 float sx = v1.x, sy = v1.y;
@@ -337,7 +337,7 @@ public class MapView extends Element implements GestureListener{
 
                 //pencil square outline
                 if(tool == EditorTool.pencil && tool.mode == 1){
-                    Lines.square(v.x + scaling/2f, v.y + scaling/2f, scaling * (editor.brushSize + 0.5f));
+                    Lines.square(v.x + scaling / 2f, v.y + scaling / 2f, scaling * (editor.brushSize + 0.5f));
                 }else{
                     Lines.poly(brushPolygons[index], v.x, v.y, scaling);
                 }

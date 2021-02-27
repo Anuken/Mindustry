@@ -21,7 +21,6 @@ public enum EditorTool{
         }
     },
     line(KeyCode.l, "replace", "orthogonal"){
-
         @Override
         public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2){
             //straight
@@ -167,7 +166,7 @@ public enum EditorTool{
                 stack.add(Point2.pack(x, y));
 
                 try{
-                    while(stack.size > 0 && stack.size < width*height){
+                    while(stack.size > 0 && stack.size < width * height){
                         int popped = stack.pop();
                         x = Point2.x(popped);
                         y = Point2.y(popped);
@@ -239,11 +238,11 @@ public enum EditorTool{
     public final String[] altModes;
     /** Key to activate this tool. */
     public KeyCode key = KeyCode.unset;
-    /** The current alternate placement mode. -1 is the standard mode, no changes.*/
+    /** The current alternate placement mode. -1 is the standard mode, no changes. */
     public int mode = -1;
-    /** Whether this tool causes canvas changes when touched.*/
+    /** Whether this tool causes canvas changes when touched. */
     public boolean edit;
-    /** Whether this tool should be dragged across the canvas when the mouse moves.*/
+    /** Whether this tool should be dragged across the canvas when the mouse moves. */
     public boolean draggable;
 
     EditorTool(){
@@ -264,7 +263,9 @@ public enum EditorTool{
         this.key = code;
     }
 
-    public void touched(MapEditor editor, int x, int y){}
+    public void touched(MapEditor editor, int x, int y){
+    }
 
-    public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2){}
+    public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2){
+    }
 }

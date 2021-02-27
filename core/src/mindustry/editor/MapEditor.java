@@ -55,7 +55,7 @@ public class MapEditor{
         loading = true;
         tags.putAll(map.tags);
         if(map.file.parent().parent().name().equals("1127400") && steam){
-            tags.put("steamid",  map.file.parent().name());
+            tags.put("steamid", map.file.parent().name());
         }
         load(() -> MapIO.loadMap(map, context));
         renderer.resize(width(), height());

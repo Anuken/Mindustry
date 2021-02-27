@@ -119,7 +119,7 @@ public class Copy{
         y += dy;
 
         // can happen
-        if(x < 0 || y < 0) {
+        if(x < 0 || y < 0){
             a.build.block = null;
             return;
         }
@@ -216,27 +216,27 @@ public class Copy{
     /**
      * data container used for transporting copy data
      */
-    private static class CTile {
+    private static class CTile{
         Block overlay;
         Floor floor;
         Build build = new Build();
 
 
-        void copy(Tile t) {
+        void copy(Tile t){
             floor = t.floor();
             overlay = t.overlay();
             build.block = t.block();
-            if(!t.isCenter()) {
+            if(!t.isCenter()){
                 build.block = null;
-            } else if(t.build != null) {
+            }else if(t.build != null){
                 build.team = t.build.team();
                 build.config = t.build.config();
                 build.rotation = t.build.rotation();
             }
         }
 
-        void paste(Tile t) {
-            if(build.block != null) {
+        void paste(Tile t){
+            if(build.block != null){
                 t.setBlock(build.block, build.team, build.rotation);
                 if(t.build != null){
                     t.build.configure(build.config);
@@ -246,7 +246,7 @@ public class Copy{
             t.setFloor(floor);
         }
 
-        private static class Build {
+        private static class Build{
             Block block;
             int rotation;
             Object config;
