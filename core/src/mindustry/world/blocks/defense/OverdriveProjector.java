@@ -136,7 +136,7 @@ public class OverdriveProjector extends Block{
             float hype = 1.414f * size * tilesize / 2f; // hypotenuse
             for(int i = 0; i < 4; i++){
                 Lines.lineAngleCenter(x + Geometry.d8edge(i).x * size * tilesize / 2f * (1f - f), y + Geometry.d8edge(i).y * size * tilesize / 2f * (1f - f), 135f + 90f * i, hype * (0.5f - Math.abs(f - 0.5f)) * 2f);
-                if(f < 0.5f) Lines.lineAngleCenter(x + Geometry.d4(i).x * size * tilesize / 2f, y + Geometry.d4(i).y * size * tilesize / 2f, 90f + 90f * i, (0.5f - f) * 2f * size * tilesize);
+                if(f < 0.5f) Lines.lineAngleCenter(x + Geometry.d4(i).x * size * tilesize / 2f - Geometry.d4(i).x * f, y + Geometry.d4(i).y * size * tilesize / 2f - Geometry.d4(i).y * f, 90f + 90f * i, (0.5f - f) * 2f * size * tilesize);
             }
             //Lines.square(x, y, Math.min(1f + (1f - f) * size * tilesize / 2f, size * tilesize/2f));
 
