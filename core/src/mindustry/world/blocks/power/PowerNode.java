@@ -74,6 +74,7 @@ public class PowerNode extends PowerBlock{
                 }
 
                 if(other.team == entity.team){
+
                     if(!other.power.links.contains(entity.pos())){
                         other.power.links.add(entity.pos());
                     }

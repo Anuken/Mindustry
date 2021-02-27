@@ -116,13 +116,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             t.button("@editor.export", Icon.upload, () -> createDialog("@editor.export",
             "@editor.exportfile", "@editor.exportfile.description", Icon.file,
-            (Runnable)() -> platform.export(editor.tags.get("name", "unknown"), mapExtension, file -> MapIO.writeMap(file, editor.createMap(file))),
+                (Runnable)() -> platform.export(editor.tags.get("name", "unknown"), mapExtension, file -> MapIO.writeMap(file, editor.createMap(file))),
             "@editor.exportimage", "@editor.exportimage.description", Icon.fileImage,
-            (Runnable)() -> platform.export(editor.tags.get("name", "unknown"), "png", file -> {
-                Pixmap out = MapIO.writeImage(editor.tiles());
-                file.writePNG(out);
-                out.dispose();
-            })));
+                (Runnable)() -> platform.export(editor.tags.get("name", "unknown"), "png", file -> {
+                    Pixmap out = MapIO.writeImage(editor.tiles());
+                    file.writePNG(out);
+                    out.dispose();
+                })));
         });
 
         menu.cont.row();
@@ -157,9 +157,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 platform.publish(map);
             }).padTop(-3).size(swidth * 2f + 10, 60f).update(b ->
-            b.setText(editor.tags.containsKey("steamid") ?
-            editor.tags.get("author", "").equals(steamPlayerName) ? "@workshop.listing" : "@view.workshop" :
-            "@editor.publish.workshop"));
+                b.setText(editor.tags.containsKey("steamid") ?
+                    editor.tags.get("author", "").equals(steamPlayerName) ? "@workshop.listing" : "@view.workshop" :
+                "@editor.publish.workshop"));
 
             menu.cont.row();
         }
@@ -252,9 +252,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
             state.rules = Gamemode.editor.apply(lastSavedRules.copy());
             state.rules.sector = null;
             state.map = new Map(StringMap.of(
-            "name", "Editor Playtesting",
-            "width", editor.width(),
-            "height", editor.height()
+                "name", "Editor Playtesting",
+                "width", editor.width(),
+                "height", editor.height()
             ));
             world.endMapLoad();
             player.set(world.width() * tilesize / 2f, world.height() * tilesize / 2f);
@@ -733,8 +733,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
             TextureRegion region = block.icon(Cicon.medium);
 
             if(!Core.atlas.isFound(region) || !block.inEditor
-            || block.buildVisibility == BuildVisibility.debugOnly
-            || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.toLowerCase()))
+                || block.buildVisibility == BuildVisibility.debugOnly
+                || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.toLowerCase()))
             ) continue;
 
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearTogglei);
