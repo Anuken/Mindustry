@@ -196,10 +196,23 @@ public class PowerNode extends PowerBlock{
         Boolf<Building> valid = other -> other != null && other.tile() != tile && other.power != null &&
             (other.block.outputsPower || other.block.consumesPower || other.block instanceof PowerNode) &&
             overlaps(tile.x * tilesize + offset, tile.y * tilesize + offset, other.tile(), laserRange * tilesize) && other.team == player.team()
-            && !other.proximity.contains(e -> e.tile == tile) && !graphs.contains(other.power.graph);
+            && !graphs.contains(other.power.graph) &&
+            !Structs.contains(Edges.getEdges(size), p -> { //do not link to adjacent buildings
+                var t = world.tile(tile.x + p.x, tile.y + p.y);
+                return t != null && t.build == other;
+            });
 
         tempTileEnts.clear();
         graphs.clear();
+
+        //add conducting graphs to prevent double link
+        for(var p : Edges.getEdges(size)){
+            Tile other = tile.nearby(p);
+            if(other != null && other.team() == player.team() && other.build != null && other.build.power != null){
+                graphs.add(other.build.power.graph);
+            }
+        }
+
         if(tile.build != null && tile.build.power != null){
             graphs.add(tile.build.power.graph);
         }
