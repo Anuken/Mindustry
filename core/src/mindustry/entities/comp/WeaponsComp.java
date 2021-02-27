@@ -16,6 +16,7 @@ import static mindustry.Vars.*;
 @Component
 abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     @Import float x, y, rotation, reloadMultiplier;
+    @Import boolean disarmed;
     @Import Vec2 vel;
     @Import UnitType type;
 
@@ -81,7 +82,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     }
 
     boolean canShoot(){
-        return true;
+        return !disarmed;
     }
 
     @Override
@@ -139,7 +140,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
             //flip weapon shoot side for alternating weapons at half reload
             if(weapon.otherSide != -1 && weapon.alternate && mount.side == weapon.flipSprite &&
-                mount.reload + Time.delta > weapon.reload/2f && mount.reload <= weapon.reload/2f){
+                mount.reload + Time.delta * reloadMultiplier > weapon.reload/2f && mount.reload <= weapon.reload/2f){
                 mounts[weapon.otherSide].side = !mounts[weapon.otherSide].side;
                 mount.side = !mount.side;
             }

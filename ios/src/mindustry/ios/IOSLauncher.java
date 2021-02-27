@@ -16,7 +16,6 @@ import mindustry.net.*;
 import mindustry.ui.*;
 import org.robovm.apple.coregraphics.*;
 import org.robovm.apple.foundation.*;
-import org.robovm.apple.glkit.*;
 import org.robovm.apple.uikit.*;
 import org.robovm.objc.block.*;
 
@@ -25,8 +24,10 @@ import java.util.*;
 import java.util.zip.*;
 
 import static mindustry.Vars.*;
-import static org.robovm.apple.foundation.NSPathUtilities.getDocumentsDirectory;
+import static org.robovm.apple.foundation.NSPathUtilities.*;
 
+//warnings for deprecated functions related to multi-window applications are not applicable here
+@SuppressWarnings("deprecation")
 public class IOSLauncher extends IOSApplication.Delegate{
     private boolean forced;
 
@@ -173,9 +174,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 forced = false;
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
-        }, new IOSApplicationConfiguration(){{
-            stencilFormat = GLKViewDrawableStencilFormat._8;
-        }});
+        }, new IOSApplicationConfiguration());
     }
 
     @Override
@@ -198,19 +197,15 @@ public class IOSLauncher extends IOSApplication.Delegate{
             openURL(((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())));
         }
 
-        Events.on(ClientLoadEvent.class, e -> {
-            Core.app.post(() -> Core.app.post(() -> {
-                Core.scene.table(Styles.black9, t -> {
-                    t.visible(() -> {
-                        if(!forced) return false;
-                        t.toFront();
-                        UIInterfaceOrientation o = UIApplication.getSharedApplication().getStatusBarOrientation();
-                        return forced && (o == UIInterfaceOrientation.Portrait || o == UIInterfaceOrientation.PortraitUpsideDown);
-                    });
-                    t.add("Rotate the device to landscape orientation to use the editor.").wrap().grow();
-                });
-            }));
-        });
+        Events.on(ClientLoadEvent.class, e -> Core.app.post(() -> Core.app.post(() -> Core.scene.table(Styles.black9, t -> {
+            t.visible(() -> {
+                if(!forced) return false;
+                t.toFront();
+                UIInterfaceOrientation o = UIApplication.getSharedApplication().getStatusBarOrientation();
+                return forced && (o == UIInterfaceOrientation.Portrait || o == UIInterfaceOrientation.PortraitUpsideDown);
+            });
+            t.add("Rotate the device to landscape orientation to use the editor.").wrap().grow();
+        }))));
 
         return b;
     }
@@ -255,6 +250,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
         }catch(Throwable t){
             //attempt to log the exception
             CrashSender.log(t);
+            Log.err(t);
             //rethrow the exception so it actually crashes
             throw t;
         }

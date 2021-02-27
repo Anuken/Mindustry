@@ -2,6 +2,7 @@ package mindustry.ui.fragments;
 
 import arc.*;
 import arc.Input.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -27,6 +28,7 @@ public class ChatFragment extends Table{
     private boolean shown = false;
     private TextField chatfield;
     private Label fieldlabel = new Label(">");
+    private ChatMode mode = ChatMode.normal;
     private Font font;
     private GlyphLayout layout = new GlyphLayout();
     private float offsetx = Scl.scl(4), offsety = Scl.scl(4), fontoffsetx = Scl.scl(2), chatspace = Scl.scl(50);
@@ -75,6 +77,9 @@ public class ChatFragment extends Table{
                 if(input.keyTap(Binding.chat_history_next) && historyPos > 0){
                     historyPos--;
                     updateChat();
+                }
+                if(input.keyTap(Binding.chat_mode)){
+                    nextMode();
                 }
                 scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size - messagesShown));
             }
@@ -200,7 +205,7 @@ public class ChatFragment extends Table{
             }
         }else{
             //sending chat has a delay; workaround for issue #1943
-            Time.run(2f, () ->{
+            Time.runTask(2f, () ->{
                 scene.setKeyboardFocus(null);
                 shown = false;
                 scrollPos = 0;
@@ -216,14 +221,35 @@ public class ChatFragment extends Table{
     }
 
     public void updateChat(){
-        chatfield.setText(history.get(historyPos));
-        chatfield.setCursorPosition(chatfield.getText().length());
+        chatfield.setText(mode.normalizedPrefix() + history.get(historyPos));
+        updateCursor();
+    }
+
+    public void nextMode(){
+        ChatMode prev = mode;
+
+        do{
+            mode = mode.next();
+        }while(!mode.isValid());
+
+        if(chatfield.getText().startsWith(prev.normalizedPrefix())){
+            chatfield.setText(mode.normalizedPrefix() + chatfield.getText().substring(prev.normalizedPrefix().length()));
+        }else{
+            chatfield.setText(mode.normalizedPrefix());
+        }
+
+        updateCursor();
     }
 
     public void clearChatInput(){
         historyPos = 0;
         history.set(0, "");
-        chatfield.setText("");
+        chatfield.setText(mode.normalizedPrefix());
+        updateCursor();
+    }
+
+    public void updateCursor(){
+        chatfield.setCursorPosition(chatfield.getText().length());
     }
 
     public boolean shown(){
@@ -256,4 +282,36 @@ public class ChatFragment extends Table{
         }
     }
 
+    private enum ChatMode{
+        normal(""),
+        team("/t"),
+        admin("/a", player::admin)
+        ;
+
+        public String prefix;
+        public Boolp valid;
+        public static final ChatMode[] all = values();
+
+        ChatMode(String prefix){
+            this.prefix = prefix;
+            this.valid = () -> true;
+        }
+
+        ChatMode(String prefix, Boolp valid){
+            this.prefix = prefix;
+            this.valid = valid;
+        }
+
+        public ChatMode next(){
+            return all[(ordinal() + 1) % all.length];
+        }
+
+        public String normalizedPrefix(){
+            return prefix.isEmpty() ? "" : prefix + " ";
+        }
+
+        public boolean isValid(){
+            return valid.get();
+        }
+    }
 }

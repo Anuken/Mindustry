@@ -108,7 +108,7 @@ public class UI implements ApplicationListener, Loadable{
         Dialog.setHideAction(() -> sequence(fadeOut(0.1f)));
 
         Tooltips.getInstance().animations = false;
-        Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black5).margin(4f).add(text));
+        Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black6).margin(4f).add(text));
 
         Core.settings.setErrorHandler(e -> {
             Log.err(e);
@@ -214,6 +214,13 @@ public class UI implements ApplicationListener, Loadable{
     @Override
     public void resize(int width, int height){
         if(Core.scene == null) return;
+
+        int[] insets = Core.graphics.getSafeInsets();
+        Core.scene.marginLeft = insets[0];
+        Core.scene.marginRight = insets[1];
+        Core.scene.marginTop = insets[2];
+        Core.scene.marginBottom = insets[3];
+
         Core.scene.resize(width, height);
         Events.fire(new ResizeEvent());
     }
@@ -359,6 +366,16 @@ public class UI implements ApplicationListener, Loadable{
                 hide();
                 listener.run();
             }).size(110, 50).pad(4);
+            closeOnBack();
+        }}.show();
+    }
+
+    public void showInfoOnHidden(String info, Runnable listener){
+        new Dialog(""){{
+            getCell(cont).growX();
+            cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons.button("@ok", this::hide).size(110, 50).pad(4);
+            hidden(listener);
             closeOnBack();
         }}.show();
     }
@@ -526,16 +543,15 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
-    //TODO move?
-
     public static String formatAmount(int number){
-        if(number >= 1_000_000_000){
+        int mag = Math.abs(number);
+        if(mag >= 1_000_000_000){
             return Strings.fixed(number / 1_000_000_000f, 1) + "[gray]" + Core.bundle.get("unit.billions") + "[]";
-        }else if(number >= 1_000_000){
+        }else if(mag >= 1_000_000){
             return Strings.fixed(number / 1_000_000f, 1) + "[gray]" + Core.bundle.get("unit.millions") + "[]";
-        }else if(number >= 10_000){
+        }else if(mag >= 10_000){
             return number / 1000 + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
-        }else if(number >= 1000){
+        }else if(mag >= 1000){
             return Strings.fixed(number / 1000f, 1) + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
         }else{
             return number + "";

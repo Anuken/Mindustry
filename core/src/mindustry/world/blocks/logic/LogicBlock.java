@@ -64,11 +64,11 @@ public class LogicBlock extends Block{
                 entity.links.add(out);
             }
 
-            entity.updateCode();
+            entity.updateCode(entity.code, true, null);
         });
     }
 
-    static String getLinkName(Block block){
+    public static String getLinkName(Block block){
         String name = block.name;
         if(name.contains("-")){
             String[] split = name.split("-");
@@ -82,11 +82,11 @@ public class LogicBlock extends Block{
         return name;
     }
 
-    static byte[] compress(String code, Seq<LogicLink> links){
+    public static byte[] compress(String code, Seq<LogicLink> links){
         return compress(code.getBytes(charset), links);
     }
 
-    static byte[] compress(byte[] bytes, Seq<LogicLink> links){
+    public static byte[] compress(byte[] bytes, Seq<LogicLink> links){
         try{
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             DataOutputStream stream = new DataOutputStream(new DeflaterOutputStream(baos));
@@ -194,6 +194,7 @@ public class LogicBlock extends Block{
         public LExecutor executor = new LExecutor();
         public float accumulator = 0;
         public Seq<LogicLink> links = new Seq<>();
+        public boolean checkedDuplicates = false;
 
         public void readCompressed(byte[] data, boolean relative){
             DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
@@ -276,15 +277,11 @@ public class LogicBlock extends Block{
             return bname + outnum;
         }
 
-        public void updateCode(){
-            updateCode(code);
-        }
-
         public void updateCode(String str){
-            updateCodeVars(str, null);
+            updateCode(str, false, null);
         }
 
-        public void updateCodeVars(String str, Cons<LAssembler> assemble){
+        public void updateCode(String str, boolean keep, Cons<LAssembler> assemble){
             if(str != null){
                 code = str;
 
@@ -316,13 +313,15 @@ public class LogicBlock extends Block{
                     asm.putConst("@links", executor.links.length);
                     asm.putConst("@ipt", instructionsPerTick);
 
-                    //store any older variables
-                    for(Var var : executor.vars){
-                        boolean unit = var.name.equals("@unit");
-                        if(!var.constant || unit){
-                            BVar dest = asm.getVar(var.name);
-                            if(dest != null && (!dest.constant || unit)){
-                                dest.value = var.isobj ? var.objval : var.numval;
+                    if(keep){
+                        //store any older variables
+                        for(Var var : executor.vars){
+                            boolean unit = var.name.equals("@unit");
+                            if(!var.constant || unit){
+                                BVar dest = asm.getVar(var.name);
+                                if(dest != null && (!dest.constant || unit)){
+                                    dest.value = var.isobj ? var.objval : var.numval;
+                                }
                             }
                         }
                     }
@@ -362,6 +361,21 @@ public class LogicBlock extends Block{
         public void updateTile(){
             executor.team = team;
 
+            if(!checkedDuplicates){
+                checkedDuplicates = true;
+                var removal = new IntSet();
+                var removeLinks = new Seq<LogicLink>();
+                for(var link : links){
+                    var build = world.build(link.x, link.y);
+                    if(build != null){
+                        if(!removal.add(build.id)){
+                            removeLinks.add(link);
+                        }
+                    }
+                }
+                links.removeAll(removeLinks);
+            }
+
             //check for previously invalid links to add after configuration
             boolean changed = false;
 
@@ -371,7 +385,7 @@ public class LogicBlock extends Block{
                 if(!l.active) continue;
 
                 boolean valid = validLink(world.build(l.x, l.y));
-                if(valid != l.valid ){
+                if(valid != l.valid){
                     changed = true;
                     l.valid = valid;
                     if(valid){
@@ -392,7 +406,7 @@ public class LogicBlock extends Block{
             }
 
             if(changed){
-                updateCode();
+                updateCode(code, true, null);
             }
 
             if(enabled){
@@ -461,9 +475,7 @@ public class LogicBlock extends Block{
         @Override
         public void buildConfiguration(Table table){
             table.button(Icon.pencil, Styles.clearTransi, () -> {
-                Vars.ui.logic.show(code, code -> {
-                    configure(compress(code, relativeConnections()));
-                });
+                Vars.ui.logic.show(code, code -> configure(compress(code, relativeConnections())));
             }).size(40);
         }
 
@@ -526,7 +538,6 @@ public class LogicBlock extends Block{
                 read.b(bytes);
                 readCompressed(bytes, false);
             }else{
-
                 code = read.str();
                 links.clear();
                 short total = read.s();
@@ -553,7 +564,7 @@ public class LogicBlock extends Block{
             //skip memory, it isn't used anymore
             read.skip(memory * 8);
 
-            updateCodeVars(code, asm -> {
+            updateCode(code, false, asm -> {
 
                 //load up the variables that were stored
                 for(int i = 0; i < varcount; i++){
@@ -563,19 +574,6 @@ public class LogicBlock extends Block{
                     }
                 }
             });
-        }
-    }
-
-    public static class LogicConfig{
-        public String code;
-        public IntSeq connections;
-
-        public LogicConfig(String code, IntSeq connections){
-            this.code = code;
-            this.connections = connections;
-        }
-
-        public LogicConfig(){
         }
     }
 }

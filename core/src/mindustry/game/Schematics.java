@@ -27,6 +27,7 @@ import mindustry.input.Placement.*;
 import mindustry.io.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.power.*;
@@ -263,10 +264,10 @@ public class Schematics implements Loadable{
             requests.each(req -> {
                 req.animScale = 1f;
                 req.worldContext = false;
-                req.block.drawRequestRegion(req, requests::each);
+                req.block.drawRequestRegion(req, requests);
             });
 
-            requests.each(req -> req.block.drawRequestConfigTop(req, requests::each));
+            requests.each(req -> req.block.drawRequestConfigTop(req, requests));
 
             Draw.flush();
             Draw.trans().idt();
@@ -285,7 +286,7 @@ public class Schematics implements Loadable{
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
     public Seq<BuildPlan> toRequests(Schematic schem, int x, int y){
         return schem.tiles.map(t -> new BuildPlan(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block, t.config).original(t.x, t.y, schem.width, schem.height))
-            .removeAll(s -> (!s.block.isVisible() && !(s.block instanceof CoreBlock)) || !s.block.unlockedNow());
+            .removeAll(s -> (!s.block.isVisible() && !(s.block instanceof CoreBlock)) || !s.block.unlockedNow()).sort(Structs.comparingInt(s -> -s.block.schematicPriority));
     }
 
     /** @return all the valid loadouts for a specific core type. */
@@ -357,10 +358,11 @@ public class Schematics implements Loadable{
         for(int cx = x; cx <= x2; cx++){
             for(int cy = y; cy <= y2; cy++){
                 Building linked = world.build(cx, cy);
+                Block realBlock = linked == null ? null : linked instanceof ConstructBuild cons ? cons.cblock : linked.block;
 
-                if(linked != null && (linked.block.isVisible() || linked.block() instanceof CoreBlock) && !(linked.block instanceof ConstructBlock)){
-                    int top = linked.block.size/2;
-                    int bot = linked.block.size % 2 == 1 ? -linked.block.size/2 : -(linked.block.size - 1)/2;
+                if(linked != null && (realBlock.isVisible() || realBlock instanceof CoreBlock)){
+                    int top = realBlock.size/2;
+                    int bot = realBlock.size % 2 == 1 ? -realBlock.size/2 : -(realBlock.size - 1)/2;
                     minx = Math.min(linked.tileX() + bot, minx);
                     miny = Math.min(linked.tileY() + bot, miny);
                     maxx = Math.max(linked.tileX() + top, maxx);
@@ -385,12 +387,13 @@ public class Schematics implements Loadable{
         for(int cx = ox; cx <= ox2; cx++){
             for(int cy = oy; cy <= oy2; cy++){
                 Building tile = world.build(cx, cy);
+                Block realBlock = tile == null ? null : tile instanceof ConstructBuild cons ? cons.cblock : tile.block;
 
-                if(tile != null && !counted.contains(tile.pos()) && !(tile.block instanceof ConstructBlock)
-                    && (tile.block.isVisible() || tile.block instanceof CoreBlock)){
-                    Object config = tile.config();
+                if(tile != null && !counted.contains(tile.pos())
+                    && (realBlock.isVisible() || realBlock instanceof CoreBlock)){
+                    Object config = tile instanceof ConstructBuild cons ? cons.lastConfig : tile.config();
 
-                    tiles.add(new Stile(tile.block, tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
+                    tiles.add(new Stile(realBlock, tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
                     counted.add(tile.pos());
                 }
             }

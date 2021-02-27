@@ -28,4 +28,7 @@ public enum BlockFlag{
     extinguisher;
 
     public final static BlockFlag[] all = values();
+
+    /** Values for logic only. Filters out some internal flags. */
+    public final static BlockFlag[] allLogic = {core, storage, generator, turret, factory, repair, rally, battery, resupply, reactor};
 }

@@ -9,9 +9,8 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.io.*;
 
-public class Weapon{
+public class Weapon implements Cloneable{
     /** displayed weapon region */
     public String name = "";
     /** bullet shot */
@@ -50,8 +49,8 @@ public class Weapon{
     public float x = 5f, y = 0f;
     /** random spread on the X axis */
     public float xRand = 0f;
-    /** radius of occlusion drawn under the weapon; <0 to disable */
-    public float occlusion = -1f;
+    /** radius of shadow drawn under the weapon; <0 to disable */
+    public float shadow = -1f;
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;
     /** delay in ticks between shots */
@@ -98,9 +97,11 @@ public class Weapon{
     }
 
     public Weapon copy(){
-        Weapon out = new Weapon();
-        JsonIO.json().copyFields(this, out);
-        return out;
+        try{
+            return (Weapon)clone();
+        }catch(CloneNotSupportedException suck){
+            throw new RuntimeException("very good language design", suck);
+        }
     }
 
     public void load(){

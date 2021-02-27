@@ -40,7 +40,7 @@ public class DatabaseDialog extends BaseDialog{
         for(int j = 0; j < allContent.length; j++){
             ContentType type = ContentType.all[j];
 
-            Seq<Content> array = allContent[j].select(c -> c instanceof UnlockableContent && !((UnlockableContent)c).isHidden());
+            Seq<Content> array = allContent[j].select(c -> c instanceof UnlockableContent u && (!u.isHidden() || u.node() != null));
             if(array.size == 0) continue;
 
             table.add("@content." + type.name() + ".name").growX().left().color(Pal.accent);
@@ -60,9 +60,9 @@ public class DatabaseDialog extends BaseDialog{
                     list.add(image).size(8 * 4).pad(3);
                     ClickListener listener = new ClickListener();
                     image.addListener(listener);
-                    if(!Vars.mobile && unlocked(unlock)){
+                    if(!mobile && unlocked(unlock)){
                         image.addListener(new HandCursorListener());
-                        image.update(() -> image.color.lerp(!listener.isOver() ? Color.lightGray : Color.white, 0.4f * Time.delta));
+                        image.update(() -> image.color.lerp(!listener.isOver() ? Color.lightGray : Color.white, Mathf.clamp(0.4f * Time.delta)));
                     }
 
                     if(unlocked(unlock)){
@@ -71,7 +71,7 @@ public class DatabaseDialog extends BaseDialog{
                                 Core.app.setClipboardText((char)Fonts.getUnicode(unlock.name) + "");
                                 ui.showInfoFade("@copied");
                             }else{
-                                Vars.ui.content.show(unlock);
+                                ui.content.show(unlock);
                             }
                         });
                         image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName)));

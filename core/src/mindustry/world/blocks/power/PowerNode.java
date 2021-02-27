@@ -14,6 +14,7 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -25,7 +26,8 @@ public class PowerNode extends PowerBlock{
     protected static boolean returnValue = false;
     protected static BuildPlan otherReq;
 
-    protected final ObjectSet<PowerGraph> graphs = new ObjectSet<>();
+    protected final static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
+    protected static int returnInt = 0;
 
     public @Load("laser") TextureRegion laser;
     public @Load("laser-end") TextureRegion laserEnd;
@@ -40,6 +42,9 @@ public class PowerNode extends PowerBlock{
         consumesPower = false;
         outputsPower = false;
         canOverdrive = false;
+        swapDiagonalPlacement = true;
+        schematicPriority = -10;
+        drawDisabled = false;
 
         config(Integer.class, (entity, value) -> {
             PowerModule power = entity.power;
@@ -103,7 +108,7 @@ public class PowerNode extends PowerBlock{
         super.setBars();
         bars.add("power", entity -> new Bar(() ->
         Core.bundle.format("bar.powerbalance",
-            ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + Strings.fixed(entity.power.graph.getPowerBalance() * 60, 1))),
+            ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + UI.formatAmount((int)(entity.power.graph.getPowerBalance() * 60)))),
             () -> Pal.powerBar,
             () -> Mathf.clamp(entity.power.graph.getLastPowerProduced() / entity.power.graph.getLastPowerNeeded())));
 
@@ -139,6 +144,9 @@ public class PowerNode extends PowerBlock{
         Drawf.circles(x * tilesize + offset, y * tilesize + offset, laserRange * tilesize);
 
         getPotentialLinks(tile, other -> {
+            Draw.color(laserColor1, Renderer.laserOpacity * 0.5f);
+            drawLaser(tile.team(), x * tilesize + offset, y * tilesize + offset, other.x, other.y, size, other.block.size);
+
             Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
 
             insulators(tile.x, tile.y, other.tileX(), other.tileY(), cause -> {
@@ -149,17 +157,20 @@ public class PowerNode extends PowerBlock{
         Draw.reset();
     }
 
-    protected void setupColor(float satisfaction){
-        float fract = 1f - satisfaction;
+    @Override
+    public void changePlacementPath(Seq<Point2> points, int rotation){
+        Placement.calculateNodes(points, this, rotation, (point, other) -> overlaps(world.tile(point.x, point.y), world.tile(other.x, other.y)));
+    }
 
-        Draw.color(laserColor1, laserColor2, fract * 0.86f + Mathf.absin(3f, 0.1f));
-        Draw.alpha(renderer == null ? 0.5f : renderer.laserOpacity);
+    protected void setupColor(float satisfaction){
+        Draw.color(laserColor1, laserColor2, (1f - satisfaction) * 0.86f + Mathf.absin(3f, 0.1f));
+        Draw.alpha(Renderer.laserOpacity);
     }
 
     protected void drawLaser(Team team, float x1, float y1, float x2, float y2, int size1, int size2){
-        float angle1 = Angles.angle(x1, y1, x2, y2);
-        float vx = Mathf.cosDeg(angle1), vy = Mathf.sinDeg(angle1);
-        float len1 = size1 * tilesize / 2f - 1.5f, len2 = size2 * tilesize / 2f - 1.5f;
+        float angle1 = Angles.angle(x1, y1, x2, y2),
+            vx = Mathf.cosDeg(angle1), vy = Mathf.sinDeg(angle1),
+            len1 = size1 * tilesize / 2f - 1.5f, len2 = size2 * tilesize / 2f - 1.5f;
 
         Drawf.laser(team, laser, laserEnd, x1 + vx*len1, y1 + vy*len1, x2 - vx*len2, y2 - vy*len2, 0.25f);
     }
@@ -206,20 +217,27 @@ public class PowerNode extends PowerBlock{
             return Float.compare(a.dst2(tile), b.dst2(tile));
         });
 
+        returnInt = 0;
+
         tempTileEnts.each(valid, t -> {
-            graphs.add(t.power.graph);
-            others.get(t);
+            if(returnInt ++ < maxNodes){
+                graphs.add(t.power.graph);
+                others.get(t);
+            }
         });
     }
 
     @Override
     public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
-        if(req.config instanceof Point2[]){
+        if(req.config instanceof Point2[] ps){
             setupColor(1f);
-            for(Point2 point : (Point2[])req.config){
+            for(Point2 point : ps){
+                int px = req.x + point.x, py = req.y + point.y;
                 otherReq = null;
                 list.each(other -> {
-                    if((other.x == req.x + point.x && other.y == req.y + point.y) && other != req){
+                    if(other.block != null
+                        && (px >= other.x - ((other.block.size-1)/2) && py >= other.y - ((other.block.size-1)/2) && px <= other.x + other.block.size/2 && py <= other.y + other.block.size/2)
+                        && other != req && other.block.hasPower){
                         otherReq = other;
                     }
                 });
@@ -239,9 +257,9 @@ public class PowerNode extends PowerBlock{
     public boolean linkValid(Building tile, Building link, boolean checkMaxNodes){
         if(tile == link || link == null || !link.block.hasPower || tile.team != link.team) return false;
 
-        if(overlaps(tile, link, laserRange * tilesize) || (link.block instanceof PowerNode && overlaps(link, tile, ((PowerNode)link.block).laserRange * tilesize))){
-            if(checkMaxNodes && link.block instanceof PowerNode){
-                return link.power.links.size < ((PowerNode)link.block).maxNodes || link.power.links.contains(tile.pos());
+        if(overlaps(tile, link, laserRange * tilesize) || (link.block instanceof PowerNode node && overlaps(link, tile, node.laserRange * tilesize))){
+            if(checkMaxNodes && link.block instanceof PowerNode node){
+                return link.power.links.size < node.maxNodes || link.power.links.contains(tile.pos());
             }
             return true;
         }
@@ -312,8 +330,7 @@ public class PowerNode extends PowerBlock{
         public void dropped(){
             power.links.clear();
             //create new power graph to manually unlink (this may be redundant)
-            power.graph = new PowerGraph();
-            power.graph.add(this);
+            new PowerGraph().add(this);
         }
 
         @Override
@@ -386,7 +403,7 @@ public class PowerNode extends PowerBlock{
         public void draw(){
             super.draw();
 
-            if(Mathf.zero(renderer.laserOpacity)) return;
+            if(Mathf.zero(Renderer.laserOpacity)) return;
 
             Draw.z(Layer.power);
             setupColor(power.graph.getSatisfaction());

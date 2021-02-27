@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.comp.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
@@ -75,7 +76,7 @@ public class Units{
         if((team == state.rules.waveTeam && !state.rules.pvp) || (state.isCampaign() && team == state.rules.waveTeam)){
             return Integer.MAX_VALUE;
         }
-        return state.rules.unitCap + indexer.getExtraUnits(team);
+        return Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + indexer.getExtraUnits(team) : state.rules.unitCap);
     }
 
     /** @return whether this player can interact with a specific tile. if either of these are null, returns true.*/
@@ -93,7 +94,7 @@ public class Units{
      * @return whether the target is invalid
      */
     public static boolean invalidateTarget(Posc target, Team team, float x, float y, float range){
-        return target == null || (range != Float.MAX_VALUE && !target.within(x, y, range)) || (target instanceof Teamc && ((Teamc)target).team() == team) || (target instanceof Healthc && !((Healthc)target).isValid());
+        return target == null || (range != Float.MAX_VALUE && !target.within(x, y, range + (target instanceof Sized hb ? hb.hitSize()/2f : 0f))) || (target instanceof Teamc t && t.team() == team) || (target instanceof Healthc h && !h.isValid());
     }
 
     /** See {@link #invalidateTarget(Posc, Team, float, float, float)} */
@@ -217,7 +218,7 @@ public class Units{
         cdist = 0f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(e.dead() || !predicate.get(e) || !e.within(x, y, range)) return;
+            if(e.dead() || !predicate.get(e) || !e.within(x, y, range + e.hitSize/2f)) return;
 
             float cost = sort.cost(e, x, y);
             if(result == null || cost < cdist){
@@ -292,7 +293,7 @@ public class Units{
     /** Iterates over all units in a circle around this position. */
     public static void nearby(Team team, float x, float y, float radius, Cons<Unit> cons){
         nearby(team, x - radius, y - radius, radius*2f, radius*2f, unit -> {
-            if(unit.within(x, y, radius)){
+            if(unit.within(x, y, radius + unit.hitSize/2f)){
                 cons.get(unit);
             }
         });

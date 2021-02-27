@@ -24,7 +24,7 @@ import static mindustry.Vars.*;
 public class Reconstructor extends UnitBlock{
     public float constructTime = 60 * 2;
     public Seq<UnitType[]> upgrades = new Seq<>();
-    public int[] capacities;
+    public int[] capacities = {};
 
     public Reconstructor(String name){
         super(name);
@@ -33,13 +33,14 @@ public class Reconstructor extends UnitBlock{
     @Override
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(region, req.drawx(), req.drawy());
+        Draw.rect(inRegion, req.drawx(), req.drawy(), req.rotation * 90);
         Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
         Draw.rect(topRegion, req.drawx(), req.drawy());
     }
 
     @Override
     public TextureRegion[] icons(){
-        return new TextureRegion[]{region, outRegion, topRegion};
+        return new TextureRegion[]{region, inRegion, outRegion, topRegion};
     }
 
     @Override
@@ -105,9 +106,10 @@ public class Reconstructor extends UnitBlock{
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             return this.payload == null
+                && (this.enabled || source == this)
                 && relativeTo(source) != rotation
-                && payload instanceof UnitPayload
-                && hasUpgrade(((UnitPayload)payload).unit.type);
+                && payload instanceof UnitPayload pay
+                && hasUpgrade(pay.unit.type);
         }
 
         @Override
@@ -127,24 +129,26 @@ public class Reconstructor extends UnitBlock{
             Draw.rect(region, x, y);
 
             //draw input
+            boolean fallback = true;
             for(int i = 0; i < 4; i++){
                 if(blends(i) && i != rotation){
-                    Draw.rect(inRegion, x, y, i * 90);
+                    Draw.rect(inRegion, x, y, (i * 90) - 180);
+                    fallback = false;
                 }
             }
+            if(fallback) Draw.rect(inRegion, x, y, rotation * 90);
 
             Draw.rect(outRegion, x, y, rotdeg());
 
             if(constructing() && hasArrived()){
                 Draw.draw(Layer.blockOver, () -> {
                     Draw.alpha(1f - progress/ constructTime);
-                    Draw.rect(payload.unit.type.icon(Cicon.full), x, y, rotdeg() - 90);
+                    Draw.rect(payload.unit.type.icon(Cicon.full), x, y, payload.rotation() - 90);
                     Draw.reset();
-                    Drawf.construct(this, upgrade(payload.unit.type), rotdeg() - 90f, progress / constructTime, speedScl, time);
+                    Drawf.construct(this, upgrade(payload.unit.type), payload.rotation() - 90f, progress / constructTime, speedScl, time);
                 });
             }else{
                 Draw.z(Layer.blockOver);
-                payRotation = rotdeg();
 
                 drawPayload();
             }
@@ -175,7 +179,7 @@ public class Reconstructor extends UnitBlock{
                             Effect.shake(2f, 3f, this);
                             Fx.producesmoke.at(this);
                             consume();
-                            Events.fire(new UnitCreateEvent(payload.unit));
+                            Events.fire(new UnitCreateEvent(payload.unit, this));
                         }
                     }
                 }

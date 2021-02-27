@@ -20,6 +20,7 @@ public enum StatUnit{
     minutes,
     perSecond,
     perMinute,
+    perShot(false),
     timesSpeed(false),
     percent(false),
     shieldHealth,

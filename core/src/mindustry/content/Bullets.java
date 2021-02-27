@@ -63,7 +63,7 @@ public class Bullets implements ContentList{
             lifetime = 80f;
             width = height = 11f;
             collidesTiles = false;
-            splashDamageRadius = 25f;
+            splashDamageRadius = 25f * 0.75f;
             splashDamage = 33f;
         }};
 
@@ -84,7 +84,7 @@ public class Bullets implements ContentList{
             lifetime = 80f;
             width = height = 13f;
             collidesTiles = false;
-            splashDamageRadius = 35f;
+            splashDamageRadius = 35f * 0.75f;
             splashDamage = 45f;
             fragBullet = artilleryPlasticFrag;
             fragBullets = 10;
@@ -98,7 +98,7 @@ public class Bullets implements ContentList{
             lifetime = 80f;
             width = height = 11f;
             collidesTiles = false;
-            splashDamageRadius = 25f;
+            splashDamageRadius = 25f * 0.75f;
             splashDamage = 33f;
             reloadMultiplier = 1.2f;
             ammoMultiplier = 3f;
@@ -112,7 +112,7 @@ public class Bullets implements ContentList{
             lifetime = 80f;
             width = height = 13f;
             collidesTiles = false;
-            splashDamageRadius = 25f;
+            splashDamageRadius = 25f * 0.75f;
             splashDamage = 35f;
             status = StatusEffects.burning;
             frontColor = Pal.lightishOrange;
@@ -128,7 +128,7 @@ public class Bullets implements ContentList{
             width = height = 14f;
             collidesTiles = false;
             ammoMultiplier = 4f;
-            splashDamageRadius = 45f;
+            splashDamageRadius = 45f * 0.75f;
             splashDamage = 50f;
             backColor = Pal.missileYellowBack;
             frontColor = Pal.missileYellow;
@@ -155,7 +155,7 @@ public class Bullets implements ContentList{
             width = 6f;
             height = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 27f;
+            splashDamage = 27f * 1.5f;
             splashDamageRadius = 15f;
         }};
 
@@ -167,22 +167,22 @@ public class Bullets implements ContentList{
             width = 6f;
             height = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 22f;
+            splashDamage = 22f * 1.5f;
             splashDamageRadius = 24f;
         }};
 
         flakGlass = new FlakBulletType(4f, 3){{
-            lifetime = 70f;
+            lifetime = 60f;
             ammoMultiplier = 5f;
             shootEffect = Fx.shootSmall;
             reloadMultiplier = 0.8f;
             width = 6f;
             height = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 22f;
+            splashDamage = 22f * 1.5f;
             splashDamageRadius = 20f;
             fragBullet = flakGlassFrag;
-            fragBullets = 5;
+            fragBullets = 6;
         }};
 
         fragGlassFrag = new BasicBulletType(3f, 5, "bullet"){{
@@ -206,26 +206,25 @@ public class Bullets implements ContentList{
         }};
 
         fragGlass = new FlakBulletType(4f, 3){{
-            lifetime = 70f;
             ammoMultiplier = 3f;
             shootEffect = Fx.shootSmall;
             reloadMultiplier = 0.8f;
             width = 6f;
             height = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 18f;
+            splashDamage = 18f * 1.5f;
             splashDamageRadius = 16f;
             fragBullet = fragGlassFrag;
-            fragBullets = 3;
+            fragBullets = 4;
             explodeRange = 20f;
             collidesGround = true;
         }};
 
         fragPlastic = new FlakBulletType(4f, 6){{
             splashDamageRadius = 40f;
-            splashDamage = 25f;
+            splashDamage = 25f * 1.5f;
             fragBullet = fragPlasticFrag;
-            fragBullets = 5;
+            fragBullets = 6;
             hitEffect = Fx.plasticExplosion;
             frontColor = Pal.plastaniumFront;
             backColor = Pal.plastaniumBack;
@@ -236,9 +235,9 @@ public class Bullets implements ContentList{
 
         fragExplosive = new FlakBulletType(4f, 5){{
             shootEffect = Fx.shootBig;
-            ammoMultiplier = 4f;
-            splashDamage = 18f;
-            splashDamageRadius = 55f;
+            ammoMultiplier = 5f;
+            splashDamage = 26f * 1.5f;
+            splashDamageRadius = 60f;
             collidesGround = true;
 
             status = StatusEffects.blasted;
@@ -246,9 +245,9 @@ public class Bullets implements ContentList{
         }};
 
         fragSurge = new FlakBulletType(4.5f, 13){{
-            ammoMultiplier = 4f;
-            splashDamage = 50f;
-            splashDamageRadius = 40f;
+            ammoMultiplier = 5f;
+            splashDamage = 50f * 1.5f;
+            splashDamageRadius = 38f;
             lightning = 2;
             lightningLength = 7;
             shootEffect = Fx.shootBig;
@@ -262,7 +261,7 @@ public class Bullets implements ContentList{
             shrinkY = 0f;
             drag = -0.01f;
             splashDamageRadius = 30f;
-            splashDamage = 30f;
+            splashDamage = 30f * 1.5f;
             ammoMultiplier = 4f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
@@ -280,7 +279,7 @@ public class Bullets implements ContentList{
             drag = -0.01f;
             homingPower = 0.08f;
             splashDamageRadius = 20f;
-            splashDamage = 20f;
+            splashDamage = 20f * 1.5f;
             makeFire = true;
             hitEffect = Fx.blastExplosion;
             status = StatusEffects.burning;
@@ -292,7 +291,7 @@ public class Bullets implements ContentList{
             shrinkY = 0f;
             drag = -0.01f;
             splashDamageRadius = 25f;
-            splashDamage = 25f;
+            splashDamage = 25f * 1.5f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
             lightningDamage = 10;
@@ -445,19 +444,20 @@ public class Bullets implements ContentList{
 
         waterShot = new LiquidBulletType(Liquids.water){{
             knockback = 0.7f;
+            drag = 0.01f;
         }};
 
         cryoShot = new LiquidBulletType(Liquids.cryofluid){{
-
+            drag = 0.01f;
         }};
 
         slagShot = new LiquidBulletType(Liquids.slag){{
             damage = 4;
-            drag = 0.03f;
+            drag = 0.01f;
         }};
 
         oilShot = new LiquidBulletType(Liquids.oil){{
-            drag = 0.03f;
+            drag = 0.01f;
         }};
 
         heavyWaterShot = new LiquidBulletType(Liquids.water){{
@@ -465,6 +465,7 @@ public class Bullets implements ContentList{
             speed = 4f;
             knockback = 1.7f;
             puddleSize = 8f;
+            orbSize = 4f;
             drag = 0.001f;
             ammoMultiplier = 0.4f;
             statusDuration = 60f * 4f;
@@ -476,6 +477,7 @@ public class Bullets implements ContentList{
             speed = 4f;
             knockback = 1.3f;
             puddleSize = 8f;
+            orbSize = 4f;
             drag = 0.001f;
             ammoMultiplier = 0.4f;
             statusDuration = 60f * 4f;
@@ -487,6 +489,7 @@ public class Bullets implements ContentList{
             speed = 4f;
             knockback = 1.3f;
             puddleSize = 8f;
+            orbSize = 4f;
             damage = 4.75f;
             drag = 0.001f;
             ammoMultiplier = 0.4f;
@@ -498,6 +501,7 @@ public class Bullets implements ContentList{
             speed = 4f;
             knockback = 1.3f;
             puddleSize = 8f;
+            orbSize = 4f;
             drag = 0.001f;
             ammoMultiplier = 0.4f;
             statusDuration = 60f * 4f;

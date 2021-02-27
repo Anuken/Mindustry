@@ -1,11 +1,15 @@
 [
   {
+    "name": "RCR",
+    "address": ["rcr.fvds.ru"]
+  },
+  {
     "name": "mindustry.pl",
-    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "91.134.217.10:6006"]
+    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl"]
   },
   {
     "name": "{AA}",
-    "address": ["aamindustry.play.ai", "aamindustry.play.ai:6571", "aamindustry.play.ai:6572", "aamindustry.play.ai:6573"]
+    "address": ["aamindustry.play.ai", "aamindustry.play.ai:6571", "aamindustry.play.ai:6572", "aamindustry.play.ai:6573", "aamindustry.play.ai:6574"]
   },
    {
     "name": "Atanner",
@@ -13,11 +17,15 @@
   },
   {
     "name": "C.A.M.S.",
-    "address": ["routerchain.ddns.net", "pandorum.su:8000"]
+    "address": ["routerchain.ddns.net", "nikochio.ddns.net"]
   },
   {
-	"name": "io",
-	"address": ["mindustry.io", "mindustry.io:1000", "mindustry.io:2000", "mindustry.io:3000"]
+    "name": "BE6.RUN",
+    "address": ["be6.run", "mindustrycn.top"]
+  },
+  {
+    "name": "io",
+    "address": ["mindustry.io", "mindustry.io:1000", "mindustry.io:2000", "mindustry.io:3000", "mindustry.io:4000"]
   },
   {
     "name": "ECAN",
@@ -25,7 +33,7 @@
   },
   {
     "name": "Chaotic Neutral",
-    "address": ["Chaotic-Neutral.ddns.net:5555", "Chaotic-Neutral.ddns.net:6666", "Chaotic-Neutral.ddns.net:7777"]
+    "address": ["Chaotic-Neutral.ddns.net:1111", "Chaotic-Neutral.ddns.net:5555", "Chaotic-Neutral.ddns.net:6666", "Chaotic-Neutral.ddns.net:7777"]
   },
   {
     "name": "Ranked",
@@ -36,23 +44,51 @@
     "address": ["twsmindustry.24x7.hk:6701", "twsmindustry.24x7.hk:6702"]
   },
   {
-    "address": "cheginde.ddns.net"
-    
-  },
-  {
     "name": "mindustry.ddns.net",
     "address": ["mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
-  },
-  {
-    "name": "Gearblock",
-    "address": ["attack.gearblock.app"]
   },
   {
     "name": "Surrealment",
     "address": ["md.surrealment.com"]
   },
   {
-     "name": "MindustryBR",
-     "address": ["mindustryptbr.ddns.net", "mindustryptbr.ddns.net:4444", "mindustryptbr.myddns.me:6666", "mindustryptbr.myddns.me:5555"]
+    "name": "ALEX",
+    "address": ["alexmindustryhub.ddns.net:6568", "alexmindustry.ddns.net:6568", "alexmindustry.ddns.net:6569", "alexmindustryattac.ddns.net:25800","alexmindustryturbo.ddns.net:25854","alexmindustryhex.ddns.net:25587"]
+  },
+  {
+    "name": "Minty [subzero]",
+    "address": ["minty-server.ddns.net"]
+  },
+  {
+    "name": "CxZx",
+    "address": ["frfr1.quackhost.uk:20060", "frfr1.quackhost.uk:20185", "defr2.forcehost.net:1069"]
+  },
+  {
+    "name": "Korea",
+    "address": ["mindustry.kr"]
+  },
+  {
+    "name": "hexpvp.ml",
+    "address": ["hexpvp.ml"]
+  },
+  {
+    "name": "Omega",
+    "address": ["185.86.230.102:25906", "185.86.230.104:25985", "185.86.230.101:25641", "185.86.230.104:25677"] 
+  },
+  {
+    "name": "md.obvilionnetwork.ru",
+    "address": ["obvilionnetwork.ru", "obvilionnetwork.ru:7001", "obvilionnetwork.ru:7002", "obvilionnetwork.ru:7003"]
+  },
+  {
+    "name": "Mindustry PLAY",
+    "address": ["92.63.100.160"]
+  },
+  {
+    "name": "Nydus",
+    "address": ["v6.mindustry.nydus.app:6566"]
+  },
+  {
+    "name": "Darkdustry",
+    "address": ["mindurka.ru"]
   }
 ]

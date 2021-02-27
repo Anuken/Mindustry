@@ -25,6 +25,7 @@ public class SStats implements SteamUserStatsCallback{
 
     private ObjectSet<String> blocksBuilt = new ObjectSet<>(), unitsBuilt = new ObjectSet<>();
     private ObjectSet<UnitType> t5s = new ObjectSet<>();
+    private IntSet checked = new IntSet();
 
     public SStats(){
         stats.requestCurrentStats();
@@ -50,6 +51,12 @@ public class SStats implements SteamUserStatsCallback{
                     stats.storeStats();
                 }
             }, statSavePeriod * 60, statSavePeriod * 60);
+
+            if(Items.thorium.unlocked()) obtainThorium.complete();
+            if(Items.titanium.unlocked()) obtainTitanium.complete();
+            if(!content.sectors().contains(s -> s.locked())){
+                unlockAllZones.complete();
+            }
         });
     }
 
@@ -136,9 +143,11 @@ public class SStats implements SteamUserStatsCallback{
                 }
 
                 if(e.tile.block() instanceof Conveyor){
+                    checked.clear();
                     check: {
                         Tile current = e.tile;
                         for(int i = 0; i < 4; i++){
+                            checked.add(current.pos());
                             if(current.build == null) break check;
                             Tile next = current.nearby(current.build.rotation);
                             if(next != null && next.block() instanceof Conveyor){
@@ -148,7 +157,7 @@ public class SStats implements SteamUserStatsCallback{
                             }
                         }
 
-                        if(current == e.tile){
+                        if(current == e.tile && checked.size == 4){
                             circleConveyor.complete();
                         }
                     }
@@ -191,6 +200,9 @@ public class SStats implements SteamUserStatsCallback{
         Events.on(UnlockEvent.class, e -> {
             if(e.content == Items.thorium) obtainThorium.complete();
             if(e.content == Items.titanium) obtainTitanium.complete();
+            if(e.content instanceof SectorPreset && !content.sectors().contains(s -> s.locked())){
+                unlockAllZones.complete();
+            }
         });
 
         Events.run(Trigger.openWiki, openWiki::complete);

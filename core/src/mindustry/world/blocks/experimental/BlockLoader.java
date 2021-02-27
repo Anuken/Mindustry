@@ -1,5 +1,6 @@
 package mindustry.world.blocks.experimental;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.entities.units.*;
@@ -18,10 +19,11 @@ public class BlockLoader extends PayloadAcceptor{
     public float loadTime = 2f;
     public int itemsLoaded = 5;
     public float liquidsLoaded = 5f;
+    public int maxBlockSize = 2;
 
     public BlockLoader(String name){
         super(name);
-
+ 
         hasItems = true;
         itemCapacity = 25;
         //liquidCapacity = 25;
@@ -29,6 +31,11 @@ public class BlockLoader extends PayloadAcceptor{
         outputsPayload = true;
         size = 3;
         rotate = true;
+    }
+
+    @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region, inRegion, outRegion, topRegion};
     }
 
     @Override
@@ -40,12 +47,13 @@ public class BlockLoader extends PayloadAcceptor{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, ((BlockLoaderBuild)entity)::fraction));
+        bars.add("progress", (BlockLoaderBuild entity) -> new Bar(() -> Core.bundle.format("bar.items", entity.payload == null ? 0 : entity.payload.build.items.total()), () -> Pal.items, entity::fraction));
     }
 
     @Override
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(region, req.drawx(), req.drawy());
+        Draw.rect(inRegion, req.drawx(), req.drawy(), req.rotation * 90);
         Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
         Draw.rect(topRegion, req.drawx(), req.drawy());
     }
@@ -55,8 +63,8 @@ public class BlockLoader extends PayloadAcceptor{
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             return super.acceptPayload(source, payload) &&
-                (payload instanceof BuildPayload) &&
-                ((((BuildPayload)payload).build.block.hasItems && ((BuildPayload)payload).block().unloadable && ((BuildPayload)payload).block().itemCapacity >= 10)/* ||
+                (payload instanceof BuildPayload build) &&
+                ((build.build.block.hasItems && build.block().unloadable && build.block().itemCapacity >= 10 && build.block().size <= maxBlockSize)/* ||
                 ((BlockPayload)payload).entity.block().hasLiquids && ((BlockPayload)payload).block().liquidCapacity >= 10f)*/);
         }
 
@@ -70,11 +78,14 @@ public class BlockLoader extends PayloadAcceptor{
             Draw.rect(region, x, y);
 
             //draw input
+            boolean fallback = true;
             for(int i = 0; i < 4; i++){
                 if(blends(i) && i != rotation){
-                    Draw.rect(inRegion, x, y, i * 90);
+                    Draw.rect(inRegion, x, y, (i * 90) - 180);
+                    fallback = false;
                 }
             }
+            if(fallback) Draw.rect(inRegion, x, y, rotation * 90);
 
             Draw.rect(outRegion, x, y, rotdeg());
 
@@ -94,7 +105,7 @@ public class BlockLoader extends PayloadAcceptor{
 
                 //load up items
                 if(payload.block().hasItems && items.any()){
-                    if(timer(timerLoad, loadTime)){
+                    if(efficiency() > 0.01f && timer(timerLoad, loadTime / efficiency())){
                         //load up items a set amount of times
                         for(int j = 0; j < itemsLoaded && items.any(); j++){
 

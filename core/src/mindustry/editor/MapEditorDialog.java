@@ -156,7 +156,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }
 
                 platform.publish(map);
-            }).padTop(-3).size(swidth * 2f + 10, 60f).update(b -> b.setText(editor.tags.containsKey("steamid") ? editor.tags.get("author").equals(player.name) ? "@workshop.listing" : "@view.workshop" : "@editor.publish.workshop"));
+            }).padTop(-3).size(swidth * 2f + 10, 60f).update(b ->
+                b.setText(editor.tags.containsKey("steamid") ?
+                    editor.tags.get("author", "").equals(steamPlayerName) ? "@workshop.listing" : "@view.workshop" :
+                "@editor.publish.workshop"));
 
             menu.cont.row();
         }
@@ -258,11 +261,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
             player.clearUnit();
             Groups.unit.clear();
             Groups.build.clear();
+            Groups.weather.clear();
             logic.play();
 
             if(player.team().core() == null){
                 player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
-                player.unit(UnitTypes.alpha.spawn(player.team(), player.x, player.y));
+                var unit = UnitTypes.alpha.spawn(player.team(), player.x, player.y);
+                unit.spawnedByCore = true;
+                player.unit(unit);
             }
         });
     }

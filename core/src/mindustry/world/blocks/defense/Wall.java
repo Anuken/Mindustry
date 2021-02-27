@@ -37,6 +37,7 @@ public class Wall extends Block{
         group = BlockGroup.walls;
         buildCostMultiplier = 6f;
         canOverdrive = false;
+        drawDisabled = false;
     }
 
     @Override
@@ -67,12 +68,6 @@ public class Wall extends Block{
     @Override
     public TextureRegion[] icons(){
         return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
-    }
-
-    @Override
-    public boolean canReplace(Block other){
-        if(other.alwaysReplace) return true;
-        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && other != this && size >= other.size;
     }
 
     public class WallBuild extends Building{

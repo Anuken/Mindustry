@@ -2,7 +2,6 @@ package mindustry.core;
 
 import arc.*;
 import arc.files.*;
-import arc.fx.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
@@ -15,11 +14,15 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class Renderer implements ApplicationListener{
+    /** These are global variables, for headless access. Cached. */
+    public static float laserOpacity = 0.5f, bridgeOpacity = 0.75f;
+
     public final BlockRenderer blocks = new BlockRenderer();
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
@@ -29,15 +32,13 @@ public class Renderer implements ApplicationListener{
 
     public @Nullable Bloom bloom;
     public FrameBuffer effectBuffer = new FrameBuffer();
-    public float laserOpacity = 1f;
+    public boolean animateShields, drawWeather = true, drawStatus;
+    /** minZoom = zooming out, maxZoom = zooming in */
+    public float minZoom = 1.5f, maxZoom = 6f;
 
-    //TODO unused
-    private FxProcessor fx = new FxProcessor();
+    private @Nullable CoreBuild landCore;
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
-    private float targetscale = Scl.scl(4);
-    private float camerascale = targetscale;
-    private float landscale = 0f, landTime, weatherAlpha;
-    private float minZoomScl = Scl.scl(0.01f);
+    private float targetscale = Scl.scl(4), camerascale = targetscale, landscale, landTime, weatherAlpha, minZoomScl = Scl.scl(0.01f);
     private float shakeIntensity, shaketime;
 
     public Renderer(){
@@ -57,17 +58,23 @@ public class Renderer implements ApplicationListener{
         if(settings.getBool("bloom", !ios)){
             setupBloom();
         }
+
+        Events.on(WorldLoadEvent.class, e -> {
+            landCore = player.bestCore();
+        });
     }
 
     @Override
     public void update(){
         Color.white.set(1f, 1f, 1f, 1f);
-        Gl.clear(Gl.stencilBufferBit);
 
         float dest = Mathf.round(targetscale, 0.5f);
         camerascale = Mathf.lerpDelta(camerascale, dest, 0.1f);
-        if(Mathf.within(camerascale, dest, 0.001f)) camerascale = dest;
-        laserOpacity = Core.settings.getInt("lasersopacity") / 100f;
+        if(Mathf.equal(camerascale, dest, 0.001f)) camerascale = dest;
+        laserOpacity = settings.getInt("lasersopacity") / 100f;
+        bridgeOpacity = settings.getInt("bridgeopacity") / 100f;
+        animateShields = settings.getBool("animatedshields");
+        drawStatus = Core.settings.getBool("blockstatus");
 
         if(landTime > 0){
             landTime -= Time.delta;
@@ -111,17 +118,15 @@ public class Renderer implements ApplicationListener{
         minimap.dispose();
         effectBuffer.dispose();
         blocks.dispose();
-        planets.dispose();
+        if(planets != null){
+            planets.dispose();
+            planets = null;
+        }
         if(bloom != null){
             bloom.dispose();
             bloom = null;
         }
         Events.fire(new DisposeEvent());
-    }
-
-    @Override
-    public void resize(int width, int height){
-        fx.resize(width, height);
     }
 
     @Override
@@ -158,23 +163,6 @@ public class Renderer implements ApplicationListener{
         }
     }
 
-    void beginFx(){
-        if(!fx.hasEnabledEffects()) return;
-
-        Draw.flush();
-        fx.clear();
-        fx.begin();
-    }
-
-    void endFx(){
-        if(!fx.hasEnabledEffects()) return;
-
-        Draw.flush();
-        fx.end();
-        fx.applyEffects();
-        fx.render(0, 0, fx.getWidth(), fx.getHeight());
-    }
-
     void updateShake(float scale){
         if(shaketime > 0){
             float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * scale;
@@ -199,7 +187,7 @@ public class Renderer implements ApplicationListener{
         graphics.clear(clearColor);
         Draw.reset();
 
-        if(Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")){
+        if(Core.settings.getBool("animatedwater") || animateShields){
             effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
@@ -219,7 +207,7 @@ public class Renderer implements ApplicationListener{
         Draw.draw(Layer.background, this::drawBackground);
         Draw.draw(Layer.floor, blocks.floor::drawFloor);
         Draw.draw(Layer.block - 1, blocks::drawShadows);
-        Draw.draw(Layer.block, () -> {
+        Draw.draw(Layer.block - 0.09f, () -> {
             blocks.floor.beginDraw();
             blocks.floor.drawLayer(CacheLayer.walls);
             blocks.floor.endDraw();
@@ -243,10 +231,15 @@ public class Renderer implements ApplicationListener{
 
         Draw.draw(Layer.plans, overlays::drawBottom);
 
-        if(settings.getBool("animatedshields") && Shaders.shield != null){
+        if(animateShields && Shaders.shield != null){
             Draw.drawRange(Layer.shields, 1f, () -> effectBuffer.begin(Color.clear), () -> {
                 effectBuffer.end();
                 effectBuffer.blit(Shaders.shield);
+            });
+
+            Draw.drawRange(Layer.buildBeam, 1f, () -> effectBuffer.begin(Color.clear), () -> {
+                effectBuffer.end();
+                effectBuffer.blit(Shaders.buildBeam);
             });
         }
 
@@ -269,25 +262,25 @@ public class Renderer implements ApplicationListener{
     }
 
     private void drawLanding(){
-        if(landTime > 0 && player.closestCore() != null){
+        CoreBuild entity = landCore == null ? player.bestCore() : landCore;
+        if(landTime > 0 && entity != null){
             float fract = landTime / Fx.coreLand.lifetime;
-            Building entity = player.closestCore();
 
             TextureRegion reg = entity.block.icon(Cicon.full);
             float scl = Scl.scl(4f) / camerascale;
             float s = reg.width * Draw.scl * scl * 4f * fract;
 
             Draw.color(Pal.lightTrail);
-            Draw.rect("circle-shadow", entity.getX(), entity.getY(), s, s);
+            Draw.rect("circle-shadow", entity.x, entity.y, s, s);
 
             Angles.randLenVectors(1, (1f- fract), 100, 1000f * scl * (1f-fract), (x, y, fin, fout) -> {
                 Lines.stroke(scl * fin);
-                Lines.lineAngle(entity.getX() + x, entity.getY() + y, Mathf.angle(x, y), (fin * 20 + 1f) * scl);
+                Lines.lineAngle(entity.x + x, entity.y + y, Mathf.angle(x, y), (fin * 20 + 1f) * scl);
             });
 
             Draw.color();
             Draw.mixcol(Color.white, fract);
-            Draw.rect(reg, entity.getX(), entity.getY(), reg.width * Draw.scl * scl, reg.height * Draw.scl * scl, fract * 135f);
+            Draw.rect(reg, entity.x, entity.y, reg.width * Draw.scl * scl, reg.height * Draw.scl * scl, fract * 135f);
 
             Draw.reset();
         }
@@ -299,8 +292,7 @@ public class Renderer implements ApplicationListener{
     }
 
     public void clampScale(){
-        float s = Scl.scl(1f);
-        targetscale = Mathf.clamp(targetscale, minScale(), Math.round(s * 6));
+        targetscale = Mathf.clamp(targetscale, minScale(), maxScale());
     }
 
     public float getDisplayScale(){
@@ -308,7 +300,11 @@ public class Renderer implements ApplicationListener{
     }
 
     public float minScale(){
-        return Scl.scl(1.5f);
+        return Scl.scl(minZoom);
+    }
+
+    public float maxScale(){
+        return Mathf.round(Scl.scl(maxZoom));
     }
 
     public float getScale(){
@@ -336,6 +332,7 @@ public class Renderer implements ApplicationListener{
 
         FrameBuffer buffer = new FrameBuffer(w, h);
 
+        drawWeather = false;
         float vpW = camera.width, vpH = camera.height, px = camera.position.x, py = camera.position.y;
         disableUI = true;
         camera.width = w;
@@ -361,6 +358,7 @@ public class Renderer implements ApplicationListener{
         PixmapIO.writePNG(file, fullPixmap);
         fullPixmap.dispose();
         ui.showInfoFade(Core.bundle.format("screenshot", file.toString()));
+        drawWeather = true;
 
         buffer.dispose();
     }

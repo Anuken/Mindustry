@@ -10,6 +10,7 @@ import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -38,13 +39,15 @@ abstract class FireComp implements Timedc, Posc, Firec, Syncc{
             control.sound.loop(Sounds.fire, this, 0.07f);
         }
 
-        time = Mathf.clamp(time + Time.delta, 0, lifetime());
+        //faster updates -> disappears more quickly
+        float speedMultiplier = 1f + Math.max(state.envAttrs.get(Attribute.water) * 10f, 0);
+        time = Mathf.clamp(time + Time.delta * speedMultiplier, 0, lifetime);
 
         if(Vars.net.client()){
             return;
         }
 
-        if(time >= lifetime() || tile == null){
+        if(time >= lifetime || tile == null){
             remove();
             return;
         }

@@ -6,12 +6,6 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
-//TODO this class is bad for multiple reasons, remove/replace it.
-//- effects unreliable
-//- not really hitscan but works like it
-//- buggy trails
-//- looks bad
-//- generally unreliable
 public class RailBulletType extends BulletType{
     public Effect pierceEffect = Fx.hitBulletSmall, updateEffect = Fx.none;
     /** Multiplier of damage decreased per health pierced. */
@@ -29,6 +23,7 @@ public class RailBulletType extends BulletType{
         despawnEffect = Fx.none;
         collides = false;
         lifetime = 1f;
+        speed = 0.01f;
     }
 
     @Override
@@ -37,7 +32,7 @@ public class RailBulletType extends BulletType{
     }
 
     void handle(Bullet b, Posc pos, float initialHealth){
-        float sub = initialHealth*pierceDamageFactor;
+        float sub = Math.max(initialHealth*pierceDamageFactor, 0);
 
         if(b.damage <= 0){
             b.fdata = Math.min(b.fdata, b.dst(pos));
@@ -59,13 +54,18 @@ public class RailBulletType extends BulletType{
         super.init(b);
 
         b.fdata = length;
-        Damage.collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), length, false);
+        Damage.collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), length, false, false);
         float resultLen = b.fdata;
 
         Vec2 nor = Tmp.v1.set(b.vel).nor();
         for(float i = 0; i <= resultLen; i += updateEffectSeg){
             updateEffect.at(b.x + nor.x * i, b.y + nor.y * i, b.rotation());
         }
+    }
+
+    @Override
+    public boolean testCollision(Bullet bullet, Building tile){
+        return bullet.team != tile.team;
     }
 
     @Override

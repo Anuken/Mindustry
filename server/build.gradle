@@ -42,6 +42,9 @@ task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     exclude("zones/**")
     exclude("icons/**")
     exclude("bundles/**")
+    exclude("cubemaps/**")
+    exclude("cursors/**")
+    exclude("shaders/**")
 
     manifest{
         attributes 'Main-Class': project.mainClassName

@@ -20,7 +20,6 @@ import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -33,7 +32,7 @@ import static mindustry.Vars.*;
 @Component(base = true)
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Commanderc, Displayable, Senseable, Ranged, Minerc, Builderc{
 
-    @Import boolean hovering, dead;
+    @Import boolean hovering, dead, disarmed;
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo, minFormationSpeed;
     @Import Team team;
     @Import int id;
@@ -47,13 +46,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     transient Seq<Ability> abilities = new Seq<>(0);
     private transient float resupplyTime = Mathf.random(10f);
+    private transient boolean wasPlayer;
 
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
     }
 
     public void approach(Vec2 vector){
-        vel.approachDelta(vector, type.accel * realSpeed() * floorSpeedMultiplier());
+        vel.approachDelta(vector, type.accel * realSpeed());
     }
 
     public void aimLook(Position pos){
@@ -82,7 +82,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     /** @return speed with boost multipliers factored in. */
     public float realSpeed(){
-        return Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation) * speed();
+        return Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation) * speed() * floorSpeedMultiplier();
     }
 
     /** Iterates through this unit and everything it is controlling. */
@@ -105,11 +105,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public float range(){
-        return type.range;
+        return type.maxRange;
     }
 
     @Replace
     public float clipSize(){
+        if(isBuilding()){
+            return state.rules.infiniteResources ? Float.MAX_VALUE : Math.max(type.clipSize, type.region.width) + buildingRange + tilesize*4f;
+        }
         return Math.max(type.region.width * 2f, type.clipSize);
     }
 
@@ -125,17 +128,22 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case ammoCapacity -> type.ammoCapacity;
             case x -> World.conv(x);
             case y -> World.conv(y);
+            case dead -> dead || !isAdded() ? 1 : 0;
             case team -> team.id;
             case shooting -> isShooting() ? 1 : 0;
+            case boosting -> type.canBoost && isFlying() ? 1 : 0;
+            case range -> range() / tilesize;
             case shootX -> World.conv(aimX());
             case shootY -> World.conv(aimY());
             case mining -> mining() ? 1 : 0;
             case mineX -> mining() ? mineTile.x : -1;
             case mineY -> mining() ? mineTile.y : -1;
             case flag -> flag;
-            case controlled -> controller instanceof LogicAI || controller instanceof Player ? 1 : 0;
+            case controlled -> !isValid() ? 0 : controller instanceof LogicAI ? 1 : controller instanceof Player ? 2 : controller instanceof FormationAI ? 3 : 0;
+            case commanded -> controller instanceof FormationAI && isValid() ? 1 : 0;
             case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
-            default -> 0;
+            case size -> hitSize / tilesize;
+            default -> Float.NaN;
         };
     }
 
@@ -145,6 +153,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case type -> type;
             case name -> controller instanceof Player p ? p.name : null;
             case firstItem -> stack().amount == 0 ? null : item();
+            case controller -> !isValid() ? null : controller instanceof LogicAI log ? log.controller : controller instanceof FormationAI form ? form.leader : this;
             case payloadType -> self() instanceof Payloadc pay ?
                 (pay.payloads().isEmpty() ? null :
                 pay.payloads().peek() instanceof UnitPayload p1 ? p1.unit.type :
@@ -157,7 +166,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public double sense(Content content){
         if(content == stack().item) return stack().amount;
-        return 0;
+        return Float.NaN;
     }
 
     @Override
@@ -170,7 +179,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Replace
     public boolean canShoot(){
         //cannot shoot while boosting
-        return !(type.canBoost && isFlying());
+        return !disarmed && !(type.canBoost && isFlying());
     }
 
     @Override
@@ -269,7 +278,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         team.data().updateCount(type, 1);
 
         //check if over unit cap
-        if(count() > cap() && !spawnedByCore && !dead){
+        if(count() > cap() && !spawnedByCore && !dead && !state.rules.editor){
             Call.unitCapDeath(self());
             team.data().updateCount(type, -1);
         }
@@ -402,11 +411,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     /** Actually destroys the unit, removing it and creating explosions. **/
     public void destroy(){
+        if(!isAdded()) return;
+
         float explosiveness = 2f + item().explosiveness * stack().amount * 1.53f;
         float flammability = item().flammability * stack().amount / 1.9f;
+        float power = item().charge * stack().amount * 150f;
 
         if(!spawnedByCore){
-            Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, state.rules.damageExplosions, item().flammability > 1, team);
+            Damage.dynamicExplosion(x, y, flammability, explosiveness, power, bounds() / 2f, state.rules.damageExplosions, item().flammability > 1, team);
         }
 
         float shake = hitSize / 3f;
@@ -418,7 +430,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         Events.fire(new UnitDestroyEvent(self()));
 
-        if(explosiveness > 7f && isLocal()){
+        if(explosiveness > 7f && (isLocal() || wasPlayer)){
             Events.fire(Trigger.suicideBomb);
         }
 
@@ -438,6 +450,15 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         remove();
+    }
+
+    /** @return name of direct or indirect player controller. */
+    @Override
+    public @Nullable String getControllerName(){
+        if(isPlayer()) return getPlayer().name;
+        if(controller instanceof LogicAI ai && ai.controller != null) return ai.controller.lastAccessed;
+        if(controller instanceof FormationAI ai && ai.leader != null && ai.leader.isPlayer()) return ai.leader.getPlayer().name;
+        return null;
     }
 
     @Override
@@ -467,6 +488,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void killed(){
+        wasPlayer = isLocal();
         health = 0;
         dead = true;
 

@@ -43,6 +43,8 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     String name = "noname";
     Color color = new Color();
 
+    //locale should not be synced.
+    transient String locale = "en";
     transient float deathTimer;
     transient String lastText = "";
     transient float textFadeTime;
@@ -57,6 +59,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     public @Nullable CoreBuild core(){
         return team.core();
+    }
+
+    /** @return largest/closest core, with largest cores getting priority */
+    @Nullable
+    public CoreBuild bestCore(){
+        return team.cores().min(Structs.comps(Structs.comparingInt(c -> -c.block.size), Structs.comparingFloat(c -> c.dst(x, y))));
     }
 
     public TextureRegion icon(){
@@ -112,7 +120,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             clearUnit();
         }
 
-        CoreBuild core = closestCore();
+        CoreBuild core;
 
         if(!dead()){
             set(unit);
@@ -124,7 +132,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
                 Tile tile = unit.tileOn();
                 unit.elevation = Mathf.approachDelta(unit.elevation, (tile != null && tile.solid()) || boosting ? 1f : 0f, 0.08f);
             }
-        }else if(core != null){
+        }else if((core = bestCore()) != null){
             //have a small delay before death to prevent the camera from jumping around too quickly
             //(this is not for balance, it just looks better this way)
             deathTimer += Time.delta;
@@ -189,6 +197,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     boolean dead(){
         return unit.isNull() || !unit.isValid();
+    }
+
+    String ip(){
+        return con == null ? "localhost" : con.address;
     }
 
     String uuid(){

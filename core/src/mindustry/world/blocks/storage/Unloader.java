@@ -52,7 +52,7 @@ public class Unloader extends Block{
 
         @Override
         public void updateTile(){
-            if(timer(timerUnload, speed / timeScale())){
+            if(timer(timerUnload, speed / timeScale)){
                 if(rotations == null || rotations.length != proximity.size){
                     rotations = new int[proximity.size];
                 }
@@ -61,7 +61,7 @@ public class Unloader extends Block{
                     int pos = (offset + i) % proximity.size;
                     var other = proximity.get(pos);
 
-                    if(other.interactable(team) && other.block.unloadable && other.block.hasItems
+                    if(other.interactable(team) && other.block.unloadable && other.canUnload() && other.block.hasItems
                     && ((sortItem == null && other.items.total() > 0) || (sortItem != null && other.items.has(sortItem)))){
                         //make sure the item can't be dumped back into this block
                         dumpingTo = other;

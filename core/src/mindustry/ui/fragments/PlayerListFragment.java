@@ -21,7 +21,6 @@ public class PlayerListFragment extends Fragment{
     private boolean visible = false;
     private Interval timer = new Interval();
     private TextField sField;
-    private boolean found = false;
     private Seq<Player> players = new Seq<>();
 
     @Override
@@ -68,7 +67,7 @@ public class PlayerListFragment extends Fragment{
                     menu.button("@close", this::toggle);
                 }).margin(0f).pad(10f).growX();
 
-            }).touchable(Touchable.enabled).margin(14f);
+            }).touchable(Touchable.enabled).margin(14f).minWidth(360f);
         });
 
         rebuild();
@@ -78,7 +77,7 @@ public class PlayerListFragment extends Fragment{
         content.clear();
 
         float h = 74f;
-        found = false;
+        boolean found = false;
 
         players.clear();
         Groups.player.copy(players);

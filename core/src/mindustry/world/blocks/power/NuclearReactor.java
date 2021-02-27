@@ -30,12 +30,17 @@ public class NuclearReactor extends PowerGenerator{
     public Color lightColor = Color.valueOf("7f19ea");
     public Color coolColor = new Color(1, 1, 1, 0f);
     public Color hotColor = Color.valueOf("ff9575a3");
-    public float itemDuration = 120; //time to consume 1 fuel
-    public float heating = 0.01f; //heating per frame * fullness
-    public float smokeThreshold = 0.3f; //threshold at which block starts smoking
-    public int explosionRadius = 40;
-    public int explosionDamage = 1350;
-    public float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
+    /** ticks to consume 1 fuel */
+    public float itemDuration = 120;
+    /** heating per frame * fullness */
+    public float heating = 0.01f;
+    /** threshold at which block starts smoking */
+    public float smokeThreshold = 0.3f;
+    /** heat threshold at which lights start flashing */
+    public float flashThreshold = 0.46f;
+    public int explosionRadius = 19;
+    public int explosionDamage = 1250;
+    /** heat removed per unit of coolant */
     public float coolantPower = 0.5f;
 
     public @Load("@-top") TextureRegion topRegion;
@@ -48,7 +53,7 @@ public class NuclearReactor extends PowerGenerator{
         hasItems = true;
         hasLiquids = true;
         rebuildable = false;
-        flags = EnumSet.of(BlockFlag.reactor);
+        flags = EnumSet.of(BlockFlag.reactor, BlockFlag.generator);
     }
 
     @Override
@@ -81,7 +86,7 @@ public class NuclearReactor extends PowerGenerator{
             if(fuel > 0 && enabled){
                 heat += fullness * heating * Math.min(delta(), 4f);
 
-                if(timer(timerFuel, itemDuration / timeScale())){
+                if(timer(timerFuel, itemDuration / timeScale)){
                     consume();
                 }
             }else{
@@ -100,7 +105,7 @@ public class NuclearReactor extends PowerGenerator{
                 float smoke = 1.0f + (heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
                 if(Mathf.chance(smoke / 20.0 * delta())){
                     Fx.reactorsmoke.at(x + Mathf.range(size * tilesize / 2f),
-                    y + Mathf.random(size * tilesize / 2f));
+                    y + Mathf.range(size * tilesize / 2f));
                 }
             }
 

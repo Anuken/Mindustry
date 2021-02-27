@@ -5,6 +5,8 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.serialization.*;
+import arc.util.serialization.JsonValue.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -92,6 +94,21 @@ public class ApplicationTests{
         Time.setDeltaProvider(() -> 1f);
         logic.reset();
         state.set(State.menu);
+    }
+
+    @Test
+    void serverListJson(){
+        String[] files = {"servers.json", "servers_be.json", "servers_v6.json"};
+
+        for(String file : files){
+            try{
+                String str = Core.files.absolute("./../../" + file).readString();
+                assertEquals(ValueType.array, new JsonReader().parse(str).type());
+                assertTrue(Jval.read(str).isArray());
+            }catch(Exception e){
+                fail("Failed to parse " + file, e);
+            }
+        }
     }
 
     @Test

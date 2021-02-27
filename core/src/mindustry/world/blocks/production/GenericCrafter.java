@@ -3,6 +3,7 @@ package mindustry.world.blocks.production;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -13,8 +14,8 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 public class GenericCrafter extends Block{
-    public ItemStack outputItem;
-    public LiquidStack outputLiquid;
+    public @Nullable ItemStack outputItem;
+    public @Nullable LiquidStack outputLiquid;
 
     public float craftTime = 80;
     public Effect craftEffect = Fx.none;
@@ -118,7 +119,7 @@ public class GenericCrafter extends Block{
                 }
 
                 craftEffect.at(x, y);
-                progress = 0f;
+                progress %= 1f;
             }
 
             if(outputItem != null && timer(timerDump, dumpTime)){

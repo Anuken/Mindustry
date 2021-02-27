@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -12,6 +13,7 @@ import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
@@ -22,8 +24,8 @@ public class ImpactReactor extends PowerGenerator{
 
     public float warmupSpeed = 0.001f;
     public float itemDuration = 60f;
-    public int explosionRadius = 50;
-    public int explosionDamage = 2000;
+    public int explosionRadius = 23;
+    public int explosionDamage = 1900;
 
     public Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
 
@@ -37,6 +39,7 @@ public class ImpactReactor extends PowerGenerator{
         liquidCapacity = 30f;
         hasItems = true;
         outputsPower = consumesPower = true;
+        flags = EnumSet.of(BlockFlag.reactor, BlockFlag.generator);
     }
 
     @Override
@@ -45,7 +48,7 @@ public class ImpactReactor extends PowerGenerator{
 
         bars.add("poweroutput", (GeneratorBuild entity) -> new Bar(() ->
         Core.bundle.format("bar.poweroutput",
-        Strings.fixed(Math.max(entity.getPowerProduction() - consumes.getPower().usage, 0) * 60 * entity.timeScale(), 1)),
+        Strings.fixed(Math.max(entity.getPowerProduction() - consumes.getPower().usage, 0) * 60 * entity.timeScale, 1)),
         () -> Pal.powerBar,
         () -> entity.productionEfficiency));
     }
@@ -72,7 +75,7 @@ public class ImpactReactor extends PowerGenerator{
             if(consValid() && power.status >= 0.99f){
                 boolean prevOut = getPowerProduction() <= consumes.getPower().requestedPower(this);
 
-                warmup = Mathf.lerpDelta(warmup, 1f, warmupSpeed);
+                warmup = Mathf.lerpDelta(warmup, 1f, warmupSpeed * timeScale);
                 if(Mathf.equal(warmup, 1f, 0.001f)){
                     warmup = 1f;
                 }
@@ -81,7 +84,7 @@ public class ImpactReactor extends PowerGenerator{
                     Events.fire(Trigger.impactPower);
                 }
 
-                if(timer(timerUse, itemDuration / timeScale())){
+                if(timer(timerUse, itemDuration / timeScale)){
                     consume();
                 }
             }else{
@@ -120,6 +123,12 @@ public class ImpactReactor extends PowerGenerator{
         @Override
         public void drawLight(){
             Drawf.light(team, x, y, (110f + Mathf.absin(5, 5f)) * warmup, Tmp.c1.set(plasma2).lerp(plasma1, Mathf.absin(7f, 0.2f)), 0.8f * warmup);
+        }
+        
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.heat) return warmup;
+            return super.sense(sensor);
         }
 
         @Override

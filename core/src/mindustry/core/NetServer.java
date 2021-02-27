@@ -155,7 +155,7 @@ public class NetServer implements ApplicationListener{
                 if(!extraMods.isEmpty()){
                     result.append("Unnecessary mods:[lightgray]\n").append("> ").append(extraMods.toString("\n> "));
                 }
-                con.kick(result.toString());
+                con.kick(result.toString(), 0);
             }
 
             if(!admins.isWhitelisted(packet.uuid, packet.usid)){
@@ -195,6 +195,10 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
+            if(packet.locale == null){
+                packet.locale = "en";
+            }
+
             String ip = con.address;
 
             admins.updatePlayerJoined(uuid, ip, packet.name);
@@ -215,6 +219,7 @@ public class NetServer implements ApplicationListener{
             player.con.uuid = uuid;
             player.con.mobile = packet.mobile;
             player.name = packet.name;
+            player.locale = packet.locale;
             player.color.set(packet.color).a(1f);
 
             //save admin ID but don't overwrite it
@@ -284,7 +289,7 @@ public class NetServer implements ApplicationListener{
             }
 
             StringBuilder result = new StringBuilder();
-            result.append(Strings.format("[orange]-- Commands Page[lightgray] @[gray]/[lightgray]@[orange] --\n\n", (page+1), pages));
+            result.append(Strings.format("[orange]-- Commands Page[lightgray] @[gray]/[lightgray]@[orange] --\n\n", (page + 1), pages));
 
             for(int i = commandsPerPage * page; i < Math.min(commandsPerPage * (page + 1), clientCommands.getCommandList().size); i++){
                 Command command = clientCommands.getCommandList().get(i);
@@ -347,8 +352,8 @@ public class NetServer implements ApplicationListener{
 
             boolean checkPass(){
                 if(votes >= votesRequired()){
-                    Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] @[orange] will be banned from the server for @ minutes.", target.name, (kickDuration/60)));
-                    target.getInfo().lastKicked = Time.millis() + kickDuration*1000;
+                    Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] @[orange] will be banned from the server for @ minutes.", target.name, (kickDuration / 60)));
+                    target.getInfo().lastKicked = Time.millis() + kickDuration * 1000;
                     Groups.player.each(p -> p.uuid().equals(target.uuid()), p -> p.kick(KickReason.vote));
                     map[0] = null;
                     task.cancel();
@@ -452,12 +457,12 @@ public class NetServer implements ApplicationListener{
                     return;
                 }
 
-                if(!arg[0].toLowerCase().equals("y") && !arg[0].toLowerCase().equals("n")){
+                if(!arg[0].equalsIgnoreCase("y") && !arg[0].equalsIgnoreCase("n")){
                     player.sendMessage("[scarlet]Vote either 'y' (yes) or 'n' (no).");
                     return;
                 }
 
-                int sign = arg[0].toLowerCase().equals("y") ? 1 : -1;
+                int sign = arg[0].equalsIgnoreCase("y") ? 1 : -1;
                 currentlyKicking[0].vote(player, sign);
             }
         });
@@ -824,6 +829,7 @@ public class NetServer implements ApplicationListener{
             sent ++;
 
             dataStream.writeInt(entity.pos());
+            dataStream.writeShort(entity.block.id);
             entity.writeAll(Writes.get(dataStream));
 
             if(syncStream.size() > maxSnapshotSize){
@@ -844,13 +850,15 @@ public class NetServer implements ApplicationListener{
 
     public void writeEntitySnapshot(Player player) throws IOException{
         syncStream.reset();
-        Seq<CoreBuild> cores = state.teams.cores(player.team());
+        int sum = state.teams.present.sum(t -> t.cores.size);
 
-        dataStream.writeByte(cores.size);
+        dataStream.writeInt(sum);
 
-        for(CoreBuild entity : cores){
-            dataStream.writeInt(entity.tile.pos());
-            entity.items.write(Writes.get(dataStream));
+        for(TeamData data : state.teams.present){
+            for(CoreBuild entity : data.cores){
+                dataStream.writeInt(entity.tile.pos());
+                entity.items.write(Writes.get(dataStream));
+            }
         }
 
         dataStream.close();

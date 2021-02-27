@@ -12,7 +12,7 @@ import mindustry.graphics.*;
 import static mindustry.Vars.*;
 
 public class StatusEffects implements ContentList{
-    public static StatusEffect none, burning, freezing, unmoving, slow, wet, muddy, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss, sporeSlowed;
+    public static StatusEffect none, burning, freezing, unmoving, slow, wet, muddy, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss, sporeSlowed, disarmed;
 
     @Override
     public void load(){
@@ -21,15 +21,15 @@ public class StatusEffects implements ContentList{
 
         burning = new StatusEffect("burning"){{
             color = Pal.lightFlame;
-            damage = 0.12f; //over 8 seconds, this would be 60 damage
+            damage = 0.12f; //over 8 seconds, this would be ~60 damage
             effect = Fx.burning;
 
             init(() -> {
-                opposite(wet,freezing);
+                opposite(wet, freezing);
                 trans(tarred, ((unit, time, newTime, result) -> {
                     unit.damagePierce(8f);
-                    Fx.burning.at(unit.x() + Mathf.range(unit.bounds() / 2f), unit.y() + Mathf.range(unit.bounds() / 2f));
-                    result.set(this, Math.min(time + newTime, 300f));
+                    Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
+                    result.set(burning, Math.min(time + newTime, 300f));
                 }));
             });
         }};
@@ -45,7 +45,7 @@ public class StatusEffects implements ContentList{
 
                 trans(blasted, ((unit, time, newTime, result) -> {
                     unit.damagePierce(18f);
-                    result.set(this, time);
+                    result.set(freezing, time);
                 }));
             });
         }};
@@ -72,7 +72,7 @@ public class StatusEffects implements ContentList{
                     if(unit.team == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
-                    result.set(this, time);
+                    result.set(wet, time);
                 }));
                 opposite(burning);
             });
@@ -93,8 +93,12 @@ public class StatusEffects implements ContentList{
             effect = Fx.melting;
 
             init(() -> {
-                trans(tarred, ((unit, time, newTime, result) -> result.set(this, Math.min(time + newTime / 2f, 140f))));
                 opposite(wet, freezing);
+                trans(tarred, ((unit, time, newTime, result) -> {
+                    unit.damagePierce(8f);
+                    Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
+                    result.set(melting, Math.min(time + newTime, 200f));
+                }));
             });
         }};
 
@@ -119,7 +123,7 @@ public class StatusEffects implements ContentList{
             effect = Fx.oily;
 
             init(() -> {
-                trans(melting, ((unit, time, newTime, result) -> result.set(burning, newTime + time)));
+                trans(melting, ((unit, time, newTime, result) -> result.set(melting, newTime + time)));
                 trans(burning, ((unit, time, newTime, result) -> result.set(burning, newTime + time)));
             });
         }};
@@ -157,15 +161,22 @@ public class StatusEffects implements ContentList{
 
         shocked = new StatusEffect("shocked"){{
             color = Pal.lancerLaser;
+            reactive = true;
         }};
 
         blasted = new StatusEffect("blasted"){{
             color = Color.valueOf("ff795e");
+            reactive = true;
         }};
 
         corroded = new StatusEffect("corroded"){{
             color = Pal.plastanium;
             damage = 0.1f;
+        }};
+
+        disarmed = new StatusEffect("disarmed"){{
+            color = Color.valueOf("e9ead3");
+            disarm = true;
         }};
     }
 }

@@ -37,8 +37,9 @@ public class PhysicsProcess implements AsyncProcess{
 
         //find Unit without bodies and assign them
         for(Unit entity : group){
+            if(entity.type == null) continue;
 
-            if(entity.physref() == null){
+            if(entity.physref == null){
                 PhysicsBody body = new PhysicsBody();
                 body.x = entity.x();
                 body.y = entity.y();
@@ -48,13 +49,13 @@ public class PhysicsProcess implements AsyncProcess{
                 PhysicRef ref = new PhysicRef(entity, body);
                 refs.add(ref);
 
-                entity.physref(ref);
+                entity.physref = ref;
 
                 physics.add(body);
             }
 
             //save last position
-            PhysicRef ref = entity.physref();
+            PhysicRef ref = entity.physref;
 
             ref.body.layer =
                 entity.type.allowLegStep ? layerLegs :

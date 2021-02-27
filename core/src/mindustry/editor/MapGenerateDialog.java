@@ -285,29 +285,31 @@ public class MapGenerateDialog extends BaseDialog{
 
     void showAdd(){
         BaseDialog selection = new BaseDialog("@add");
-        selection.setFillParent(false);
-        selection.cont.defaults().size(210f, 60f);
-        int i = 0;
-        for(Prov<GenerateFilter> gen : filterTypes){
-            GenerateFilter filter = gen.get();
+        selection.cont.pane(p -> {
+            p.marginRight(14);
+            p.defaults().size(210f, 60f);
+            int i = 0;
+            for(Prov<GenerateFilter> gen : filterTypes){
+                GenerateFilter filter = gen.get();
 
-            if((filter.isPost() && applied)) continue;
+                if((filter.isPost() && applied)) continue;
 
-            selection.cont.button(filter.name(), () -> {
-                filters.add(filter);
+                p.button(filter.name(), () -> {
+                    filters.add(filter);
+                    rebuildFilters();
+                    update();
+                    selection.hide();
+                });
+                if(++i % 2 == 0) p.row();
+            }
+
+            p.button("@filter.defaultores", () -> {
+                maps.addDefaultOres(filters);
                 rebuildFilters();
                 update();
                 selection.hide();
             });
-            if(++i % 2 == 0) selection.cont.row();
-        }
-
-        selection.cont.button("@filter.defaultores", () -> {
-            maps.addDefaultOres(filters);
-            rebuildFilters();
-            update();
-            selection.hide();
-        });
+        }).get().setScrollingDisabled(true, false);
 
         selection.addCloseButton();
         selection.show();

@@ -4,6 +4,7 @@ import arc.*;
 import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.math.geom.Geometry.*;
 import arc.struct.*;
 import arc.struct.ObjectIntMap.*;
 import arc.util.*;
@@ -186,14 +187,14 @@ public class World{
 
     /**
      * Call to signify the beginning of map loading.
-     * BuildinghangeEvents will not be fired until endMapLoad().
+     * TileEvents will not be fired until endMapLoad().
      */
     public void beginMapLoad(){
         generating = true;
     }
 
     /**
-     * Call to signify the end of map loading. Updates tile occlusions and sets up physics for the world.
+     * Call to signify the end of map loading. Updates tile proximities and sets up physics for the world.
      * A WorldLoadEvent will be fire.
      */
     public void endMapLoad(){
@@ -268,7 +269,7 @@ public class World{
     }
 
     private void setSectorRules(Sector sector){
-        state.map = new Map(StringMap.of("name", sector.planet.localizedName + "; Sector " + sector.id));
+        state.map = new Map(StringMap.of("name", sector.preset == null ? sector.planet.localizedName + "; Sector " + sector.id : sector.preset.localizedName));
         state.rules.sector = sector;
 
         state.rules.weather.clear();
@@ -302,9 +303,7 @@ public class World{
         entries.removeAll(e -> e.value < 30);
 
         Block[] floors = new Block[entries.size];
-        int[] floorCounts = new int[entries.size];
         for(int i = 0; i < entries.size; i++){
-            floorCounts[i] = entries.get(i).value;
             floors[i] = entries.get(i).key;
         }
 
@@ -544,7 +543,7 @@ public class World{
 
             int circleDst = (int)(rawDst - (length - circleBlend));
             if(circleDst > 0){
-                dark = Math.max(circleDst / 1f, dark);
+                dark = Math.max(circleDst, dark);
             }
         }
 
@@ -554,10 +553,6 @@ public class World{
         }
 
         return dark;
-    }
-
-    public interface Raycaster{
-        boolean accept(int x, int y);
     }
 
     private class Context implements WorldContext{
