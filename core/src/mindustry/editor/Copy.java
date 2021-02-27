@@ -245,9 +245,7 @@ public class Copy{
         return Mathf.clamp(y, 0, world.height() - 1);
     }
 
-    /**
-     * data container used for transporting copy data
-     */
+    /** Data container used for transporting copy data. */
     private static class CTile{
         Block overlay;
         Floor floor;
