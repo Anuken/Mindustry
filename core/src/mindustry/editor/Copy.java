@@ -4,16 +4,17 @@ import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.game.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.power.*;
 
 import static mindustry.Vars.world;
 
 /**
  * Class that holds data about selected tiles. It handles rotation of selection, clamping copying and pasting.
  */
-
 public class Copy{
 
     int
@@ -77,63 +78,92 @@ public class Copy{
 
         // we don't want garbage blocks, but also don't want to remove new blocks
         loop(stx, sty, edx, edy, (x, y) -> world.tile(x, y).remove());
-        // final paste
+        // paste everything but config
         loop(stx, sty, edx, edy, (x, y) -> main[y - dy][x - dx].paste(world.tile(x, y)));
+        // final paste, because of power nodes issues
+        loop(stx, sty, edx, edy, (x, y) -> main[y - dy][x - dx].pasteConfig(world.tile(x, y)));
     }
 
     public void rotR(){
-        flipX(false);
-        flipD(false);
-
-        rotate(-1);
+        flipX();
+        flipD();
     }
 
     public void rotL(){
-        flipY(false);
-        flipD(false);
-
-        rotate(1);
+        flipY();
+        flipD();
     }
 
-    public void flipX(boolean alone){
+    public void flipX(){
         loop(w / 2, h, (x, y) -> swap(x, y, w - x - 1, y));
 
-        if(alone) rotate(2);
+        config(p -> p.x = -p.x, 2);
 
+        loop(w, h, (x, y) -> flipConnections(x, y, -1, 0));
         loop(w, h, (x, y) -> flipMultiBlock(x, y, -1, 0));
     }
 
 
-    public void flipY(boolean alone){
+    public void flipY(){
         loop(w, h / 2, (x, y) -> swap(x, y, x, h - y - 1));
 
-        if(alone) rotate(2);
+        config(p -> p.y = -p.y, 2);
 
+        loop(w, h, (x, y) -> flipConnections(x, y, 0, -1));
         loop(w, h, (x, y) -> flipMultiBlock(x, y, 0, -1));
     }
 
     public void flipMultiBlock(int x, int y, int dx, int dy){
         CTile a = main[y][x];
-        if(a.build.block == null || a.build.block.size % 2 == 1) return; //no need
-        x += dx;
-        y += dy;
+        if(a.doNotFlip()) return;
+
 
         // can happen
-        if(x < 0 || y < 0){
+        if(x == 0 || y == 0){
             a.build.block = null;
             return;
         }
 
-        CTile b = main[y][x];
+        CTile b = main[y + dy][x + dx];
         CTile.Build tmp = a.build;
         a.build = b.build;
         b.build = tmp;
     }
 
-    public void flipD(boolean alone){
-        loop(w, h, (x, y) -> swap(x, y, y, x, main, rotated));
+    public void flipConnections(int x, int y, int dx, int dy){
+        CTile a = main[y][x];
+        boolean noFlip = a.doNotFlip();
 
-        if(alone) rotate(-1); // for completion sake
+        // this is driving me crazy, reason is that if both blocks have to be flipped or both not
+        // do nothing, if a is flipped, go opposite of flip, if reverse go in direction of flip
+        if(a.build.config instanceof Point2 p){
+            if (!containsRaw(y+p.y, x+p.x)) return;
+            CTile t = main[y+p.y][x+p.x];
+            boolean oNoFlip = t.doNotFlip();
+            if(oNoFlip && !noFlip) {
+                p.sub(dx, dy);
+            } else if(!oNoFlip && noFlip) {
+                p.add(dx, dy);
+            }
+        }else if(a.build.config instanceof Point2[] points){
+            for(Point2 p : points){
+                if (!containsRaw(y+p.y, x+p.x)) continue;
+                CTile t = main[y+p.y][x+p.x];
+                boolean oNoFlip = t.doNotFlip();
+                if(oNoFlip && !noFlip) {
+                    p.sub(dx, dy);
+                } else if(!oNoFlip && noFlip){
+                    p.add(dx, dy);
+                }
+            }
+        }
+    }
+
+
+    public void flipD(){
+        config(p -> p.set(p.y, p.x), 1);
+
+        loop(w, h, (x, y) -> swap(x, y, y, x, main, rotated));
 
         int t = w;
         w = h;
@@ -144,17 +174,15 @@ public class Copy{
         rotated = u;
     }
 
-    private void rotate(int shift){
+    private void config(Cons<Point2> con, int shift){
         loop(w, h, t -> {
             t.build.rotation += shift;
 
             if(t.build.config instanceof Point2 p){
-                p.rotate(shift);
-            }else if(t.build.config instanceof Point2[] p){
-                for(Object o : p){
-                    if(o instanceof Point2 n){
-                        n.rotate(shift);
-                    }
+                con.get(p);
+            }else if(t.build.config instanceof Point2[] ps){
+                for(Point2 p : ps){
+                    con.get(p);
                 }
             }
         });
@@ -205,6 +233,10 @@ public class Copy{
         return dx <= x && dy <= y && dx + w >= x && dy + h >= y;
     }
 
+    private boolean containsRaw(int x, int y){
+        return 0 <= x && 0 <= y && w > x && h > y;
+    }
+
     private int clampW(int x){
         return Mathf.clamp(x, 0, world.width() - 1);
     }
@@ -238,12 +270,19 @@ public class Copy{
         void paste(Tile t){
             if(build.block != null){
                 t.setBlock(build.block, build.team, build.rotation);
-                if(t.build != null){
-                    t.build.configure(build.config);
-                }
             }
             t.setOverlay(overlay);
             t.setFloor(floor);
+        }
+
+        boolean doNotFlip() {
+            return build.block == null || build.block.size % 2 == 1;
+        }
+
+        void pasteConfig(Tile t) {
+            if(t.build != null){
+                t.build.configure(build.config);
+            }
         }
 
         private static class Build{

@@ -212,7 +212,7 @@ configure(project(":annotations")){
 //compile with java 8 compatibility for everything except the annotation project
 configure(subprojects - project(":annotations")){
     tasks.withType(JavaCompile){
-        if(JavaVersion.current() != JavaVersion.VERSION_1_4){
+        if(JavaVersion.current() != JavaVersion.VERSION_1_8){
             options.compilerArgs.addAll(['--release', '8', '--enable-preview'])
         }
 

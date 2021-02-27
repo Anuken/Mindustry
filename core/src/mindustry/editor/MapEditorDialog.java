@@ -615,9 +615,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }else if(Core.input.keyTap(KeyCode.h)){
                 editor.copyData.rotL();
             }else if(Core.input.keyTap(KeyCode.x)){
-                editor.copyData.flipX(true);
+                editor.copyData.flipX();
             }else if(Core.input.keyTap(KeyCode.z)){
-                editor.copyData.flipY(true);
+                editor.copyData.flipY();
             }
 
             for(EditorTool tool : EditorTool.all){
