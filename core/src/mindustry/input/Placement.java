@@ -119,6 +119,7 @@ public class Placement{
 
         var result = plans1.clear();
         var team = player.team();
+        var rotated = plans.first().tile() != null && plans.first().tile().absoluteRelativeTo(plans.peek().x, plans.peek().y) == Mathf.mod(plans.first().rotation + 2, 4);
 
         outer:
         for(int i = 0; i < plans.size;){
@@ -144,7 +145,11 @@ public class Placement{
                         //found a link, assign bridges
                         cur.block = bridge;
                         other.block = bridge;
-                        cur.config = new Point2(other.x - cur.x, other.y - cur.y);
+                        if(rotated){
+                            other.config = new Point2(cur.x - other.x,  cur.y - other.y);
+                        }else{
+                            cur.config = new Point2(other.x - cur.x, other.y - cur.y);
+                        }
 
                         i = j;
                         continue outer;
