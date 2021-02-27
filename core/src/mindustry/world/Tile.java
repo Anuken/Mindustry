@@ -58,7 +58,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return Point2.pack(x, y);
     }
 
-    /** Returns true if these tiles touch on any axis. */
+    /** Returns true if these tiles are right next to eachother. */
     public boolean adjacentTo(Tile tile){
         return relativeTo(tile) != -1;
     }
