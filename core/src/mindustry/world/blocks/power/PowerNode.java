@@ -144,9 +144,10 @@ public class PowerNode extends PowerBlock{
         Drawf.circles(x * tilesize + offset, y * tilesize + offset, laserRange * tilesize);
 
         getPotentialLinks(tile, other -> {
-            if(tile.adjacentTo(other.tile)) return; //power gets transferred via direct contact
-            Draw.color(laserColor1, Renderer.laserOpacity * 0.5f);
-            drawLaser(tile.team(), x * tilesize + offset, y * tilesize + offset, other.x, other.y, size, other.block.size);
+            if(!tile.adjacentTo(other.tile)){ //power gets transferred via direct contact
+                Draw.color(laserColor1, Renderer.laserOpacity * 0.5f);
+                drawLaser(tile.team(), x * tilesize + offset, y * tilesize + offset, other.x, other.y, size, other.block.size);
+            }
 
             Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
 
