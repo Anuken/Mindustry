@@ -134,7 +134,7 @@ public class OverdriveProjector extends Block{
             Draw.alpha(1f);
             Lines.stroke((2f * f + 0.1f) * heat);
             //float hype = 1.414f * size * tilesize / 2f; // hypotenuse
-            float r = Mathf.clamp(2f - f * 2f) * size * tilesize / 2f - f;
+            float r = Math.max(0f, Mathf.clamp(2f - f * 2f) * size * tilesize / 2f - f - 0.2f);
             float w = Mathf.clamp(0.5f - f) * size * tilesize;
             Lines.beginLine();
             for(int i = 0; i < 4; i++){
