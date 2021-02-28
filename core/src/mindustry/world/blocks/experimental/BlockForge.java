@@ -105,7 +105,7 @@ public class BlockForge extends PayloadAcceptor{
                     consume();
                     payload = new BuildPayload(recipe, team);
                     payVector.setZero();
-                    progress = 0f;
+                    progress %= 1f;
                 }
             }
 
