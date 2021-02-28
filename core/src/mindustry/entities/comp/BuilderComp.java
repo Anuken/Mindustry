@@ -26,10 +26,11 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class BuilderComp implements Posc, Teamc, Rotc{
+abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
     static final Vec2[] vecs = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
 
     @Import float x, y, rotation;
+    @Import boolean disarmed;
     @Import UnitType type;
     @Import Team team;
 
@@ -41,7 +42,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
     private transient float buildAlpha = 0f;
 
     public boolean canBuild(){
-        return type.buildSpeed > 0;
+        return !disarmed && type.buildSpeed > 0;
     }
 
     @Override
