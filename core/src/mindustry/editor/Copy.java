@@ -289,8 +289,9 @@ public class Copy{
             if(build.block != null){
                 t.setBlock(build.block, build.team, build.rotation);
             }
-            t.setOverlay(overlay);
+
             t.setFloor(floor);
+            t.setOverlay(overlay);
         }
 
         boolean doNotFlip() {
