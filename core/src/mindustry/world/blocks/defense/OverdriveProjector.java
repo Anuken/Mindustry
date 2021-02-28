@@ -127,10 +127,10 @@ public class OverdriveProjector extends Block{
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
 
-            if(boosterUnlocked() && phaseHeat < 0.99f){
+            if(boosterUnlocked()){
                 Drawf.dashCircle(x, y, range + phaseRangeBoost, phaseColor, boostAlpha * (1f - Mathf.curve(phaseHeat, 0.9f, 1f)));
     
-                indexer.eachBlock(this, range + phaseRangeBoost, other -> Mathf.dst(x, y, other.x, other.y) > range, other -> Drawf.selected(other, Tmp.c1.set(phaseColor).a(Mathf.absin(4f, boostAlpha))));
+                indexer.eachBlock(this, range + phaseRangeBoost, other -> Mathf.dst(x, y, other.x, other.y) > range, other -> Drawf.selected(other, Tmp.c1.set(phaseColor).a(Mathf.absin(4f, boostAlpha * (1f - Mathf.curve(phaseHeat, 0.9f, 1f))))));
             }
 
             indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));

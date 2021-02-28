@@ -178,11 +178,9 @@ public class ForceProjector extends Block{
 
         @Override
         public void drawSelect(){
-            if(radscl < 0.99f){
-                Drawf.hexagon(x, y, radius, team.color, boostAlpha * (1f - Mathf.curve(radscl, 0.9f, 1f)));
-            }
-
-            if(boosterUnlocked() && phaseHeat < 0.99f){
+            Drawf.hexagon(x, y, radius, team.color, boostAlpha * (1f - Mathf.curve(radscl, 0.9f, 1f)));
+            
+            if(boosterUnlocked()){
                 Drawf.hexagon(x, y, radius + phaseRadiusBoost, team.color, boostAlpha * (1f - Mathf.curve(phaseHeat * radscl, 0.9f, 1f)));
             }
         }
