@@ -21,6 +21,7 @@ import mindustry.core.GameState.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.io.*;
 import mindustry.maps.*;
 import mindustry.ui.*;
@@ -609,14 +610,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }
             }
         }else{
-            // rip mobile
-            if(Core.input.keyTap(KeyCode.j)){
-                editor.copyData.rotR();
-            }else if(Core.input.keyTap(KeyCode.h)){
-                editor.copyData.rotL();
-            }else if(Core.input.keyTap(KeyCode.x)){
+            if(Core.input.keyTap(Binding.editor_copy_flip_x)){
                 editor.copyData.flipX();
-            }else if(Core.input.keyTap(KeyCode.z)){
+            }else if(Core.input.keyTap(Binding.editor_copy_flip_y)){
                 editor.copyData.flipY();
             }
 

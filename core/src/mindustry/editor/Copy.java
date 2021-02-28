@@ -18,9 +18,12 @@ import static mindustry.Vars.world;
 public class Copy{
 
     int
+    sx, sy,
     px, py, // selection origin
     dx, dy, // selection offset
     w, h;   // size of selection
+
+    boolean selected;
 
     private CTile[][] main, rotated; // to make rotation faster differently composed space is pre-allocated
     private final Seq<CTile> pool = new Seq<>(); // to reuse tiles
@@ -224,9 +227,26 @@ public class Copy{
         }
     }
 
-    public void move(int dx, int dy){
-        this.dx += dx;
-        this.dy += dy;
+    public void center(int x, int y) {
+        select(dx + w / 2, dy + h / 2);
+        move(x, y);
+        deselect();
+    }
+
+    public void select(int x, int y) {
+        selected = true;
+        sx = x - dx;
+        sy = y - dy;
+    }
+
+    public void deselect() {
+        selected = false;
+    }
+
+    public void move(int x, int y){
+        if(!selected) return;
+        dx += x - (sx + dx);
+        dy += y - (sy + dy);
     }
 
     public boolean contains(int x, int y){

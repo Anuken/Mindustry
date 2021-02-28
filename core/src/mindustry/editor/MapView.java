@@ -54,7 +54,14 @@ public class MapView extends Element implements GestureListener{
             public boolean mouseMoved(InputEvent event, float x, float y){
                 mousex = x;
                 mousey = y;
+
                 requestScroll();
+
+                // quick-paste
+                if(copy() && Core.input.ctrl()) {
+                    Point2 p = project(x, y);
+                    editor.copyData.center(p.x, p.y);
+                }
 
                 return false;
             }
@@ -74,14 +81,19 @@ public class MapView extends Element implements GestureListener{
                     return true;
                 }
 
+                Point2 p = project(x, y);
+
                 if(button == KeyCode.mouseRight){
                     if(tool == EditorTool.copy){
-                        Point2 p = project(x, y);
                         editor.copyData.setOrigin(p.x, p.y);
                     }else{
                         lastTool = tool;
                         tool = EditorTool.eraser;
                     }
+                }
+
+                if(button == KeyCode.mouseLeft && tool == EditorTool.copy && editor.copyData.contains(p.x, p.y)) {
+                    editor.copyData.select(p.x, p.y);
                 }
 
                 if(button == KeyCode.mouseMiddle){
@@ -92,7 +104,6 @@ public class MapView extends Element implements GestureListener{
                 mousex = x;
                 mousey = y;
 
-                Point2 p = project(x, y);
                 lastx = p.x;
                 lasty = p.y;
                 startx = p.x;
@@ -124,13 +135,16 @@ public class MapView extends Element implements GestureListener{
                         tool.touchedLine(editor, startx, starty, p.x, p.y);
                         break;
                     case copy:
+                        Copy c = editor.copyData;
                         switch(button){
                             case mouseRight:
-                                editor.copyData.copy();
+                                c.copy();
                                 break;
                             case mouseLeft:
-                                if(!editor.copyData.contains(p.x, p.y)){
-                                    editor.copyData.paste();
+                                if(!c.selected || Core.input.ctrl()) { // ctrl for quick-paste
+                                    c.paste();
+                                } else {
+                                    c.deselect();
                                 }
                                 break;
                         }
@@ -165,9 +179,7 @@ public class MapView extends Element implements GestureListener{
                             c.adjust(p.x, p.y);
                             break;
                         case mouseLeft:
-                            if(c.contains(lastx, lasty)){
-                                c.move(p.x - lastx, p.y - lasty);
-                            }
+                            c.move(p.x, p.y);
                             break;
                     }
                 }
@@ -186,6 +198,10 @@ public class MapView extends Element implements GestureListener{
                 }
             }
         });
+    }
+
+    public boolean copy() {
+        return tool == EditorTool.copy && !editor.copyData.empty();
     }
 
     public EditorTool getTool(){
@@ -231,7 +247,21 @@ public class MapView extends Element implements GestureListener{
 
         if(Core.scene.getScrollFocus() != this) return;
 
-        zoom += Core.input.axis(KeyCode.scroll) / 10f * zoom;
+        float scroll = Core.input.axis(KeyCode.scroll);
+        if(scroll == 0) {
+            return;
+        }
+
+        if(copy()) {
+            if(scroll > 0) {
+                editor.copyData.rotL();
+            } else {
+                editor.copyData.rotR();
+            }
+            return;
+        }
+
+        zoom += scroll / 10f * zoom;
         clampZoom();
     }
 
