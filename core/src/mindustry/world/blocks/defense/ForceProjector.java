@@ -183,7 +183,7 @@ public class ForceProjector extends Block{
             }
 
             if(boosterUnlocked() && phaseHeat < 0.99f){
-                Drawf.hexagon(x, y, radius + phaseRadiusBoost, team.color, boostAlpha * (1f - Mathf.curve(phaseHeat, 0.9f, 1f)));
+                Drawf.hexagon(x, y, radius + phaseRadiusBoost, team.color, boostAlpha * (1f - Mathf.curve(phaseHeat * radscl, 0.9f, 1f)));
             }
         }
 
