@@ -178,7 +178,7 @@ public class ForceProjector extends Block{
 
         @Override
         public void drawSelect(){
-            Drawf.hexagon(x, y, radius, team.color, boostAlpha * (1f - Mathf.curve(radscl, 0.9f, 1f)));
+            Drawf.hexagon(x, y, radius, team.color, boostAlpha * (1f - Mathf.curve(radscl, 0.9f, 1f)) * (1f - Mathf.curve(phaseHeat, 0.9f, 1f)));
             
             if(boosterUnlocked()){
                 Drawf.hexagon(x, y, radius + phaseRadiusBoost, team.color, boostAlpha * (1f - Mathf.curve(phaseHeat * radscl, 0.9f, 1f)));
