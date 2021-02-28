@@ -35,6 +35,7 @@ public class PowerNode extends PowerBlock{
     public int maxNodes = 3;
     public Color laserColor1 = Color.white;
     public Color laserColor2 = Pal.powerLight;
+    public Color laserColor3 = Color.valueOf("fb9567");
 
     public PowerNode(String name){
         super(name);
@@ -162,8 +163,12 @@ public class PowerNode extends PowerBlock{
         Placement.calculateNodes(points, this, rotation, (point, other) -> overlaps(world.tile(point.x, point.y), world.tile(other.x, other.y)));
     }
 
-    protected void setupColor(float satisfaction){
-        Draw.color(laserColor1, laserColor2, (1f - satisfaction) * 0.86f + Mathf.absin(3f, 0.1f));
+    protected void setupColor(float satisfaction, float batteryUsed){
+        if(Mathf.zero(batteryUsed)){
+            Draw.color(laserColor1, laserColor2, (1f - satisfaction) * 0.86f + Mathf.absin(3f, 0.1f));
+        }else{
+            Draw.color(laserColor1, laserColor3, Mathf.clamp(batteryUsed * 500f + 0.5f) * 0.86f + Mathf.absin(3f, 0.1f));
+        }
         Draw.alpha(Renderer.laserOpacity);
     }
 
@@ -243,7 +248,7 @@ public class PowerNode extends PowerBlock{
     @Override
     public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
         if(req.config instanceof Point2[] ps){
-            setupColor(1f);
+            setupColor(1f, 0f);
             for(Point2 point : ps){
                 int px = req.x + point.x, py = req.y + point.y;
                 otherReq = null;
@@ -419,7 +424,7 @@ public class PowerNode extends PowerBlock{
             if(Mathf.zero(Renderer.laserOpacity)) return;
 
             Draw.z(Layer.power);
-            setupColor(power.graph.getSatisfaction());
+            setupColor(power.graph.getSatisfaction(), power.graph.getBatteryUsedFraction());
 
             for(int i = 0; i < power.links.size; i++){
                 Building link = world.build(power.links.get(i));
