@@ -35,7 +35,7 @@ public class UnitBlock extends PayloadAcceptor{
         public float progress, time, speedScl;
 
         public void spawned(){
-            progress = 0f;
+            progress %= 1f;
             payload = null;
         }
 

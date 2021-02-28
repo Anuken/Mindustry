@@ -134,7 +134,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
                     Item item = items.take();
                     productionEfficiency = getItemEfficiency(item);
                     explosiveness = item.explosiveness;
-                    generateTime = 1f;
+                    generateTime %= 1f;
                 }
 
                 if(generateTime > 0f){
