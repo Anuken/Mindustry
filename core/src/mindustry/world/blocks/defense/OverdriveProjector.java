@@ -27,8 +27,8 @@ public class OverdriveProjector extends Block{
     public float useTime = 400f;
     public float phaseRangeBoost = 20f;
     public boolean hasBoost = true;
-    public Color baseColor = Color.valueOf("feb380");
-    public Color phaseColor = Color.valueOf("ffd59e");
+    public Color baseColor = Pal.overdrive;
+    public Color phaseColor = Pal.phaseBoost;
 
     public OverdriveProjector(String name){
         super(name);
@@ -47,9 +47,18 @@ public class OverdriveProjector extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
+        float realX = x * tilesize + offset;
+        float realY = y * tilesize + offset;
 
-        indexer.eachBlock(player.team(), x * tilesize + offset, y * tilesize + offset, range, other -> other.block.canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
+        Drawf.dashCircle(realX, realY, range, baseColor);
+
+        if(boosterUnlocked()){
+            Drawf.dashCircle(realX, realY, range + phaseRangeBoost, phaseColor, boostAlpha);
+
+            indexer.eachBlock(player.team(), realX, realY, range + phaseRangeBoost, other -> Mathf.dst(realX, realY, other.x, other.y) > range, other -> Drawf.selected(other, Tmp.c1.set(phaseColor).a(Mathf.absin(4f, boostAlpha))));
+        }
+
+        indexer.eachBlock(player.team(), realX, realY, range, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
     }
 
     @Override
@@ -117,6 +126,12 @@ public class OverdriveProjector extends Block{
         @Override
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
+
+            if(boosterUnlocked() && phaseHeat < 0.99f){
+                Drawf.dashCircle(x, y, range + phaseRangeBoost, phaseColor, boostAlpha * (1f - Mathf.curve(phaseHeat, 0.9f, 1f)));
+    
+                indexer.eachBlock(this, range + phaseRangeBoost, other -> Mathf.dst(x, y, other.x, other.y) > range, other -> Drawf.selected(other, Tmp.c1.set(phaseColor).a(Mathf.absin(4f, boostAlpha))));
+            }
 
             indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
 

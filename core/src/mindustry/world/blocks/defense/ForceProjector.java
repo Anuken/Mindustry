@@ -82,13 +82,11 @@ public class ForceProjector extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
-        Draw.color(Pal.gray);
-        Lines.stroke(3f);
-        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
-        Draw.color(player.team().color);
-        Lines.stroke(1f);
-        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
-        Draw.color();
+        Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius, player.team().color);
+
+        if(boosterUnlocked()){
+            Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius + phaseRadiusBoost, player.team().color, boostAlpha);
+        }
     }
 
     public class ForceBuild extends Building implements Ranged{
@@ -176,6 +174,17 @@ public class ForceProjector extends Block{
 
         public float realRadius(){
             return (radius + phaseHeat * phaseRadiusBoost) * radscl;
+        }
+
+        @Override
+        public void drawSelect(){
+            if(radscl < 0.99f){
+                Drawf.hexagon(x, y, radius, team.color, boostAlpha * (1f - Mathf.curve(radscl, 0.9f, 1f)));
+            }
+
+            if(boosterUnlocked() && phaseHeat < 0.99f){
+                Drawf.hexagon(x, y, radius + phaseRadiusBoost, team.color, boostAlpha * (1f - Mathf.curve(phaseHeat, 0.9f, 1f)));
+            }
         }
 
         @Override

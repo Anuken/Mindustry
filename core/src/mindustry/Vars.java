@@ -104,6 +104,8 @@ public class Vars implements Loadable{
     public static final int tilesize = 8;
     /** size of one tile payload (^2) */
     public static final float tilePayload = tilesize * tilesize;
+    /** alpha value of boost ranges */
+    public static float boostAlpha = 0.5f;
     /** tile used in certain situations, instead of null */
     public static Tile emptyTile;
     /** for map generator dialog */
