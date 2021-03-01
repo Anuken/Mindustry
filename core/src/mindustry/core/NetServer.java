@@ -725,6 +725,7 @@ public class NetServer implements ApplicationListener{
             //no verification is done, so admins can hypothetically spam waves
             //not a real issue, because server owners may want to do just that
             logic.skipWave();
+            info("&lc@ has skipped the wave.", player.name);
         }else if(action == AdminAction.ban){
             netServer.admins.banPlayerIP(other.con.address);
             netServer.admins.banPlayerID(other.con.uuid);
