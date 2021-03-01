@@ -54,6 +54,8 @@ public class MendProjector extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+        
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
 
         indexer.eachBlock(player.team(), x * tilesize + offset, y * tilesize + offset, range, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
