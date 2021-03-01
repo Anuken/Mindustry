@@ -35,6 +35,8 @@ public class SolidPump extends Pump{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        drawPotentialLinks(x, y);
+
         if(attribute != null){
             drawPlaceText(Core.bundle.formatFloat("bar.efficiency", Math.max(sumAttribute(attribute, x, y) / size / size + baseEfficiency, 0f) * 100 * percentSolid(x, y), 1), x, y, valid);
         }

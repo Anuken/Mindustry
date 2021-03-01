@@ -56,6 +56,8 @@ public class MendProjector extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         float realX = x * tilesize + offset;
         float realY = y * tilesize + offset;
+      
+        super.drawPlace(x, y, rotation, valid);
 
         Drawf.dashCircle(realX, realY, range, baseColor);
 

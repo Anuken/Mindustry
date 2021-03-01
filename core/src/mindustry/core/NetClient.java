@@ -633,7 +633,7 @@ public class NetClient implements ApplicationListener{
             lastSent++,
             uid,
             player.dead(),
-            unit.x, unit.y,
+            player.dead() ? player.x : unit.x, player.dead() ? player.y : unit.y,
             player.unit().aimX(), player.unit().aimY(),
             unit.rotation,
             unit instanceof Mechc m ? m.baseRotation() : 0,

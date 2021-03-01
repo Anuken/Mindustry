@@ -26,6 +26,7 @@ import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
@@ -255,6 +256,26 @@ public class Block extends UnlockableContent{
 
     /** Drawn when you are placing a block. */
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        drawPotentialLinks(x, y);
+    }
+
+    public void drawPotentialLinks(int x, int y){
+        if((consumesPower || outputsPower) && hasPower){
+            Tile tile = world.tile(x, y);
+            if(tile != null){
+                PowerNode.getNodeLinks(tile, this, player.team(), other -> {
+                    PowerNode node = (PowerNode)other.block;
+                    Draw.color(node.laserColor1, Renderer.laserOpacity * 0.5f);
+                    node.drawLaser(tile.team(), x * tilesize + offset, y * tilesize + offset, other.x, other.y, size, other.block.size);
+
+                    Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
+
+                    PowerNode.insulators(other.tileX(), other.tileY(), tile.x, tile.y, cause -> {
+                        Drawf.square(cause.x, cause.y, cause.block.size * tilesize / 2f + 2f, Pal.plastanium);
+                    });
+                });
+            }
+        }
     }
 
     public float drawPlaceText(String text, int x, int y, boolean valid){

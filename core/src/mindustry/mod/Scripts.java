@@ -18,6 +18,7 @@ import rhino.module.provider.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 import java.util.regex.*;
 
 public class Scripts implements Disposable{
@@ -32,7 +33,7 @@ public class Scripts implements Disposable{
     LoadedMod currentMod = null;
 
     public static boolean allowClass(String type){
-        return !blacklist.contains(type.toLowerCase()::contains) || whitelist.contains(type.toLowerCase()::contains);
+        return !blacklist.contains(t -> type.toLowerCase(Locale.ROOT).contains(t)) || whitelist.contains(t -> type.toLowerCase(Locale.ROOT).contains(t));
     }
 
     public Scripts(){

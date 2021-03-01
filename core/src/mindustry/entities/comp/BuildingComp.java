@@ -910,24 +910,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void placed(){
         if(net.client()) return;
 
-        if(block.consumesPower || block.outputsPower){
-            int range = 12;
-            tempTiles.clear();
-            Geometry.circle(tileX(), tileY(), range, (x, y) -> {
-                Building other = world.build(x, y);
-                if(other != null && other.block instanceof PowerNode node && node.linkValid(other, self()) && !PowerNode.insulated(other, self())
-                    && !other.proximity().contains(this.<Building>self()) &&
-                !(block.outputsPower && proximity.contains(p -> p.power != null && p.power.graph == other.power.graph))){
-                    tempTiles.add(other.tile);
+        if((block.consumesPower || block.outputsPower) && block.hasPower){
+            PowerNode.getNodeLinks(tile, block, team, other -> {
+                if(!other.power.links.contains(pos())){
+                    other.configureAny(pos());
                 }
             });
-            tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
-            if(!tempTiles.isEmpty()){
-                Tile toLink = tempTiles.first();
-                if(!toLink.build.power.links.contains(pos())){
-                    toLink.build.configureAny(pos());
-                }
-            }
         }
     }
 
