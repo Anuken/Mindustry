@@ -131,7 +131,7 @@ public class LiquidTurret extends Turret{
         public BulletType useAmmo(){
             if(cheating()) return ammoTypes.get(liquids.current());
             BulletType type = ammoTypes.get(liquids.current());
-            liquids.remove(liquids.current(), 1f / type.ammoMultiplier);
+            liquids.remove(liquids.current(), 1f / ammoMultiplier(type));
             return type;
         }
 
@@ -142,7 +142,7 @@ public class LiquidTurret extends Turret{
 
         @Override
         public boolean hasAmmo(){
-            return ammoTypes.get(liquids.current()) != null && liquids.total() >= 1f / ammoTypes.get(liquids.current()).ammoMultiplier;
+            return ammoTypes.get(liquids.current()) != null && liquids.total() >= 1f / ammoMultiplier(ammoTypes.get(liquids.current()));
         }
 
         @Override
@@ -154,7 +154,7 @@ public class LiquidTurret extends Turret{
         public boolean acceptLiquid(Building source, Liquid liquid){
             return ammoTypes.get(liquid) != null
                 && (liquids.current() == liquid || (ammoTypes.containsKey(liquid)
-                && (!ammoTypes.containsKey(liquids.current()) || liquids.get(liquids.current()) <= 1f / ammoTypes.get(liquids.current()).ammoMultiplier + 0.001f)));
+                && (!ammoTypes.containsKey(liquids.current()) || liquids.get(liquids.current()) <= 1f / ammoMultiplier(ammoTypes.get(liquids.current())) + 0.001f)));
         }
     }
 }

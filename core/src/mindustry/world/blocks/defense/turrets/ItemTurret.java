@@ -99,7 +99,9 @@ public class ItemTurret extends Turret{
 
             if(type == null) return 0;
 
-            return Math.min((int)((maxAmmo - totalAmmo) / ammoTypes.get(item).ammoMultiplier), amount);
+            //should always accept ammo if it has none
+            int acceptAmount = Math.min((int)((maxAmmo - totalAmmo) / ammoMultiplier(ammoTypes.get(item))), amount);
+            return !hasAmmo() && acceptAmount == 0 ? 1 : acceptAmount;
         }
 
         @Override
@@ -123,7 +125,8 @@ public class ItemTurret extends Turret{
             }
 
             BulletType type = ammoTypes.get(item);
-            totalAmmo += type.ammoMultiplier;
+            float amountAdded = Math.min(maxAmmo - totalAmmo, ammoMultiplier(type));
+            totalAmmo += amountAdded;
 
             //find ammo entry by type
             for(int i = 0; i < ammo.size; i++){
@@ -131,19 +134,19 @@ public class ItemTurret extends Turret{
 
                 //if found, put it to the right
                 if(entry.item == item){
-                    entry.amount += type.ammoMultiplier;
+                    entry.amount += amountAdded;
                     ammo.swap(i, ammo.size - 1);
                     return;
                 }
             }
 
             //must not be found
-            ammo.add(new ItemEntry(item, (int)type.ammoMultiplier));
+            ammo.add(new ItemEntry(item, (int)amountAdded));
         }
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return ammoTypes.get(item) != null && totalAmmo + ammoTypes.get(item).ammoMultiplier <= maxAmmo;
+            return ammoTypes.get(item) != null && (!hasAmmo() || totalAmmo + ammoMultiplier(ammoTypes.get(item)) <= maxAmmo);
         }
 
         @Override

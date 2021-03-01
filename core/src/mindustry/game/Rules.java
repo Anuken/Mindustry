@@ -56,6 +56,8 @@ public class Rules{
     public float blockHealthMultiplier = 1f;
     /** How much damage blocks (turrets) deal. */
     public float blockDamageMultiplier = 1f;
+    /** Multiplier for block ammo. */
+    public float blockAmmoMultiplier = 1f;
     /** Multiplier for buildings resource cost. */
     public float buildCostMultiplier = 1f;
     /** Multiplier for building speed. */

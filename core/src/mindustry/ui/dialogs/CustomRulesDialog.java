@@ -147,6 +147,7 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
         number("@rules.blockhealthmultiplier", f -> rules.blockHealthMultiplier = f, () -> rules.blockHealthMultiplier);
         number("@rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
+        number("@rules.blockammomultiplier", f -> rules.blockAmmoMultiplier = f, () -> rules.blockAmmoMultiplier, 1, 100);
 
         main.button("@configure",
             () -> loadoutDialog.show(Blocks.coreShard.itemCapacity, rules.loadout,

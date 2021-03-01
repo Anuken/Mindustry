@@ -331,6 +331,10 @@ public class Turret extends ReloadTurret{
             return !charging;
         }
 
+        public float ammoMultiplier(BulletType type){
+            return type.ammoMultiplier * state.rules.blockAmmoMultiplier;
+        }
+
         /** Consume ammo and return a type. */
         public BulletType useAmmo(){
             if(cheating()) return peekAmmo();
