@@ -41,6 +41,8 @@ public class BaseTurret extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.placing);
     }
 

@@ -57,6 +57,8 @@ public class MassDriver extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
         Drawf.dashCircle(x * tilesize, y * tilesize, range, Pal.accent);
 
         //check if a mass driver is selected while placing this driver

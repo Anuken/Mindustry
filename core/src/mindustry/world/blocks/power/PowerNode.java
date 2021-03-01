@@ -263,7 +263,8 @@ public class PowerNode extends PowerBlock{
         //add conducting graphs to prevent double link
         for(var p : Edges.getEdges(block.size)){
             Tile other = tile.nearby(p);
-            if(other != null && other.team() == team && other.build != null && other.build.power != null){
+            if(other != null && other.team() == team && other.build != null && other.build.power != null
+                && !(block.consumesPower && other.block().consumesPower && !block.outputsPower && !other.block().outputsPower)){
                 graphs.add(other.build.power.graph);
             }
         }

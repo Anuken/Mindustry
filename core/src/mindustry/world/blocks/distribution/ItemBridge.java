@@ -90,6 +90,8 @@ public class ItemBridge extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
         Tile link = findLink(x, y);
 
         Lines.stroke(2f, Pal.placing);

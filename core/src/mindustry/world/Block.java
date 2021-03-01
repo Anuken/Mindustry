@@ -256,6 +256,10 @@ public class Block extends UnlockableContent{
 
     /** Drawn when you are placing a block. */
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        drawPotentialLinks(x, y);
+    }
+
+    public void drawPotentialLinks(int x, int y){
         if((consumesPower || outputsPower) && hasPower){
             Tile tile = world.tile(x, y);
             if(tile != null){
