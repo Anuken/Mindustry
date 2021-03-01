@@ -175,6 +175,11 @@ public class PowerNode extends PowerBlock{
         Drawf.laser(team, laser, laserEnd, x1 + vx*len1, y1 + vy*len1, x2 - vx*len2, y2 - vy*len2, 0.25f);
     }
 
+    protected boolean overlaps(float srcx, float srcy, Tile other, Block otherBlock, float range){
+        return Intersector.overlaps(Tmp.cr1.set(srcx, srcy, range), Tmp.r1.setCentered(other.worldx() + otherBlock.offset, other.worldy() + otherBlock.offset,
+            otherBlock.size * tilesize, otherBlock.size * tilesize));
+    }
+
     protected boolean overlaps(float srcx, float srcy, Tile other, float range){
         return Intersector.overlaps(Tmp.cr1.set(srcx, srcy, range), other.getHitbox(Tmp.r1));
     }
@@ -242,10 +247,10 @@ public class PowerNode extends PowerBlock{
 
     //TODO code duplication w/ method above?
     /** Iterates through linked nodes of a block at a tile. All returned buildings are power nodes. */
-    public static void getNodeLinks(Tile tile, Block block, Cons<Building> others){
+    public static void getNodeLinks(Tile tile, Block block, Team team, Cons<Building> others){
         Boolf<Building> valid = other -> other != null && other.tile() != tile && other.block instanceof PowerNode node &&
         other.power.links.size < node.maxNodes &&
-        node.overlaps(tile.x * tilesize + block.offset, tile.y * tilesize + block.offset, other.tile(), node.laserRange * tilesize) && other.team == player.team()
+        node.overlaps(other.x - block.offset, other.y - block.offset, tile, block, node.laserRange * tilesize) && other.team == team
         && !graphs.contains(other.power.graph) &&
         !Structs.contains(Edges.getEdges(block.size), p -> { //do not link to adjacent buildings
             var t = world.tile(tile.x + p.x, tile.y + p.y);
@@ -258,7 +263,7 @@ public class PowerNode extends PowerBlock{
         //add conducting graphs to prevent double link
         for(var p : Edges.getEdges(block.size)){
             Tile other = tile.nearby(p);
-            if(other != null && other.team() == player.team() && other.build != null && other.build.power != null){
+            if(other != null && other.team() == team && other.build != null && other.build.power != null){
                 graphs.add(other.build.power.graph);
             }
         }

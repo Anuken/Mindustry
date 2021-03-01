@@ -911,7 +911,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(net.client()) return;
 
         if((block.consumesPower || block.outputsPower) && block.hasPower){
-            PowerNode.getNodeLinks(tile, block, other -> {
+            PowerNode.getNodeLinks(tile, block, team, other -> {
                 if(!other.power.links.contains(pos())){
                     other.configureAny(pos());
                 }

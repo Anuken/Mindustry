@@ -259,7 +259,7 @@ public class Block extends UnlockableContent{
         if((consumesPower || outputsPower) && hasPower){
             Tile tile = world.tile(x, y);
             if(tile != null){
-                PowerNode.getNodeLinks(tile, this, other -> {
+                PowerNode.getNodeLinks(tile, this, player.team(), other -> {
                     PowerNode node = (PowerNode)other.block;
                     Draw.color(node.laserColor1, Renderer.laserOpacity * 0.5f);
                     node.drawLaser(tile.team(), x * tilesize + offset, y * tilesize + offset, other.x, other.y, size, other.block.size);
