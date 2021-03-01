@@ -90,5 +90,9 @@
   {
     "name": "Darkdustry",
     "address": ["mindurka.ru"]
+  },
+  {
+    "name": "Unjown"
+    "address": ["braindustryserver.ddns.net:25647"]
   }
 ]
