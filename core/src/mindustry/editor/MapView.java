@@ -57,9 +57,8 @@ public class MapView extends Element implements GestureListener{
 
                 requestScroll();
 
-                // quick-paste
-                if(copy() && Core.input.ctrl()) {
-                    Point2 p = project(x, y);
+                if(copy() && !Core.input.keyDown(KeyCode.mouseRight) && quickPaste()) {
+                    Point2 p = project(mousex, mousey);
                     editor.copyData.center(p.x, p.y);
                 }
 
@@ -141,7 +140,7 @@ public class MapView extends Element implements GestureListener{
                                 c.copy();
                                 break;
                             case mouseLeft:
-                                if(!c.selected || Core.input.ctrl()) { // ctrl for quick-paste
+                                if(!c.selected || quickPaste()) {
                                     c.paste();
                                 } else {
                                     c.deselect();
@@ -228,7 +227,7 @@ public class MapView extends Element implements GestureListener{
     public void act(float delta){
         super.act(delta);
 
-        if(Core.scene.getKeyboardFocus() == null || !(Core.scene.getKeyboardFocus() instanceof TextField) && !Core.input.keyDown(KeyCode.controlLeft)){
+        if(Core.scene.getKeyboardFocus() == null || !(Core.scene.getKeyboardFocus() instanceof TextField)){
             float ax = Core.input.axis(Binding.move_x);
             float ay = Core.input.axis(Binding.move_y);
             offsetx -= ax * 15f / zoom;
@@ -252,7 +251,7 @@ public class MapView extends Element implements GestureListener{
             return;
         }
 
-        if(copy()) {
+        if(copy() && !quickPaste()) {
             if(scroll > 0) {
                 editor.copyData.rotL();
             } else {
@@ -263,6 +262,11 @@ public class MapView extends Element implements GestureListener{
 
         zoom += scroll / 10f * zoom;
         clampZoom();
+    }
+
+    /** valid only if tool == copy */
+    private boolean quickPaste() {
+        return Core.input.ctrl() || tool.mode == 0;
     }
 
     private void clampZoom(){
@@ -342,7 +346,7 @@ public class MapView extends Element implements GestureListener{
         Draw.color(Pal.accent);
         Lines.stroke(Scl.scl(2f));
 
-        if(tool == EditorTool.copy && !editor.copyData.empty()){
+        if(copy()){
             Copy c = editor.copyData;
 
             Vec2 min = unproject(c.dx, c.dy).add(x, y);

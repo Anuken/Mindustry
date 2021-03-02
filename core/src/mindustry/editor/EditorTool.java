@@ -230,7 +230,7 @@ public enum EditorTool{
             }
         }
     },
-    copy(KeyCode.c);
+    copy(KeyCode.c, "quickpaste");
 
     public static final EditorTool[] all = values();
 
