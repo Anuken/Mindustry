@@ -164,10 +164,10 @@ public class PowerNode extends PowerBlock{
     }
 
     protected void setupColor(float satisfaction, float batteryUsed){
-        if(Mathf.zero(batteryUsed)){
-            Draw.color(laserColor1, laserColor2, (1f - satisfaction) * 0.86f + Mathf.absin(3f, 0.1f));
+        if(!Mathf.zero(batteryUsed)){
+            Draw.color(laserColor1, laserColor2, Mathf.clamp(batteryUsed * 500f + 0.5f) * 0.86f + Mathf.absin(3f, 0.1f));
         }else{
-            Draw.color(laserColor1, laserColor3, Mathf.clamp(batteryUsed * 500f + 0.5f) * 0.86f + Mathf.absin(3f, 0.1f));
+            Draw.color(laserColor1, laserColor3, (1f - satisfaction) * 0.86f + Mathf.absin(3f, 0.1f));
         }
         Draw.alpha(Renderer.laserOpacity);
     }
