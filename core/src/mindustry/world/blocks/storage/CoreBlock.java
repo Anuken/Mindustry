@@ -52,6 +52,7 @@ public class CoreBlock extends StorageBlock{
         loopSoundVolume = 1f;
         group = BlockGroup.none;
         drawDisabled = false;
+        canOverdrive = false;
     }
 
     @Remote(called = Loc.server)

@@ -291,6 +291,7 @@ public class ContentParser{
 
                 if(value.has("controller")){
                     unit.defaultController = supply(resolve(value.getString("controller"), FlyingAI.class));
+                    value.remove("controller");
                 }
 
                 //read extra default waves
