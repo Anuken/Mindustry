@@ -35,7 +35,7 @@ public class PowerNode extends PowerBlock{
     public int maxNodes = 3;
     public Color laserColor1 = Color.white;
     public Color laserColor2 = Pal.powerLight;
-    public Color laserColor3 = Color.valueOf("fb9567");
+    public Color laserColor3 = Color.valueOf("fbaa67");
 
     public PowerNode(String name){
         super(name);
