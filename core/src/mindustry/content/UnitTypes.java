@@ -71,7 +71,6 @@ public class UnitTypes implements ContentList{
             speed = 0.5f;
             hitSize = 8f;
             health = 140;
-            crashDurability = 0f;
             weapons.add(new Weapon("large-weapon"){{
                 reload = 14f;
                 x = 4f;
@@ -278,7 +277,6 @@ public class UnitTypes implements ContentList{
             buildSpeed = 0.8f;
             armor = 1f;
             commandLimit = 8;
-            crashDurability = 0f;
 
             abilities.add(new RepairFieldAbility(10f, 60f * 4, 60f));
             ammoType = AmmoTypes.power;
@@ -557,7 +555,6 @@ public class UnitTypes implements ContentList{
             health = 180;
             mechSideSway = 0.25f;
             range = 40f;
-            crashDurability = 0f;
 
             weapons.add(new Weapon(){{
                 reload = 24f;
@@ -921,7 +918,6 @@ public class UnitTypes implements ContentList{
             targetAir = false;
             commandLimit = 4;
             circleTarget = true;
-            crashDurability = 0f;
 
             weapons.add(new Weapon(){{
                 y = 0f;
@@ -1190,7 +1186,6 @@ public class UnitTypes implements ContentList{
             engineOffset = 5.7f;
             range = 50f;
             isCounted = false;
-            crashDurability = 0f;
 
             ammoType = AmmoTypes.powerLow;
 
@@ -1414,7 +1409,6 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 3.3f;
             trailLength = 20;
             rotateShooting = false;
-            crashDurability = 0f;
 
             armor = 2f;
 
