@@ -186,7 +186,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
                     //decrement count to prevent double increment
                     if(!u.isAdded()) u.team.data().updateCount(u.type, -1);
                     //take damage from the landing
-                    u.health = u.maxHealth * u.type.crashDurability;
+                    u.health -= u.maxHealth * (1 - u.type.crashDurability);
                     u.add();
                 }
             }
