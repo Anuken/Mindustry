@@ -125,7 +125,7 @@ public class Copy{
         loop(w, h, (x, y) -> flipConnections(x, y, -1, 0));
         loop(w, h, (x, y) -> flipMultiBlock(x, y, -1, 0));
 
-        if(alone) {
+        if(alone){
             outlines();
         }
     }
@@ -139,18 +139,18 @@ public class Copy{
         loop(w, h, (x, y) -> flipConnections(x, y, 0, -1));
         loop(w, h, (x, y) -> flipMultiBlock(x, y, 0, -1));
 
-        if(alone) {
+        if(alone){
             outlines();
         }
     }
 
-    private void outlines() {
-        if (w * h > lineLimit) return;
+    private void outlines(){
+        if(w * h > lineLimit) return;
 
         clearLines();
 
         loop(w, h, (x, y) -> {
-            for(Template t : templates) {
+            for(Template t : templates){
                 tmp.set(x, y).add(t.offset);
 
                 if(!containsRaw(tmp.x, tmp.y)) continue;
@@ -162,12 +162,12 @@ public class Copy{
         });
     }
 
-    void clearLines() {
+    void clearLines(){
         linePool.addAll(lines);
         lines.clear();
     }
 
-    private void addLinePoint(int x, int y, Point2 o) {
+    private void addLinePoint(int x, int y, Point2 o){
         Point2 p = linePool.pop(Point2::new);
         tmp.set(x, y).add(o);
         p.set(tmp);
@@ -198,22 +198,22 @@ public class Copy{
         // this is driving me crazy, reason is that if both blocks have to be flipped or both not
         // do nothing, if a is flipped, go opposite of flip, if reverse go in direction of flip
         if(a.build.config instanceof Point2 p){
-            if (!containsRaw(y+p.y, x+p.x)) return;
-            CTile t = main[y+p.y][x+p.x];
+            if(!containsRaw(y + p.y, x + p.x)) return;
+            CTile t = main[y + p.y][x + p.x];
             boolean oNoFlip = t.doNotFlip();
-            if(oNoFlip && !noFlip) {
+            if(oNoFlip && !noFlip){
                 p.sub(dx, dy);
-            } else if(!oNoFlip && noFlip) {
+            }else if(!oNoFlip && noFlip){
                 p.add(dx, dy);
             }
         }else if(a.build.config instanceof Point2[] points){
             for(Point2 p : points){
-                if (!containsRaw(y+p.y, x+p.x)) continue;
-                CTile t = main[y+p.y][x+p.x];
+                if(!containsRaw(y + p.y, x + p.x)) continue;
+                CTile t = main[y + p.y][x + p.x];
                 boolean oNoFlip = t.doNotFlip();
-                if(oNoFlip && !noFlip) {
+                if(oNoFlip && !noFlip){
                     p.sub(dx, dy);
-                } else if(!oNoFlip && noFlip){
+                }else if(!oNoFlip && noFlip){
                     p.add(dx, dy);
                 }
             }
@@ -287,12 +287,12 @@ public class Copy{
         }
     }
 
-    public void center(int x, int y) {
+    public void center(int x, int y){
         select(dx + w / 2, dy + h / 2);
         move(x, y);
     }
 
-    public void select(int x, int y) {
+    public void select(int x, int y){
         sx = x - dx;
         sy = y - dy;
     }
@@ -301,7 +301,7 @@ public class Copy{
         dx += x - (sx + dx);
         dy += y - (sy + dy);
 
-        if(empty()) {
+        if(empty()){
             ox = dx;
             oy = dy;
         }
@@ -329,11 +329,11 @@ public class Copy{
         Floor floor;
         Build build = new Build();
 
-        boolean equal(CTile o) {
+        boolean equal(CTile o){
             return top().equals(o.top());
         }
 
-        Block top() {
+        Block top(){
             return build.trueBlock.solid || build.trueBlock.breakable ? build.trueBlock : !overlay.useColor ? floor : overlay;
         }
 
@@ -360,11 +360,11 @@ public class Copy{
             t.setOverlay(overlay);
         }
 
-        boolean doNotFlip() {
+        boolean doNotFlip(){
             return build.block == null || build.block.size % 2 == 1;
         }
 
-        void pasteConfig(Tile t) {
+        void pasteConfig(Tile t){
             if(t.build != null){
                 t.build.configure(build.config);
             }
@@ -378,9 +378,10 @@ public class Copy{
         }
     }
 
-    static class Template {
+    static class Template{
         Point2 offset, a, b;
-        Template(int ox,int oy, int ax, int ay, int bx, int by) {
+
+        Template(int ox, int oy, int ax, int ay, int bx, int by){
             offset = new Point2(ox, oy);
             a = new Point2(ax, ay);
             b = new Point2(bx, by);

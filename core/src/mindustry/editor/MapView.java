@@ -89,7 +89,7 @@ public class MapView extends Element implements GestureListener{
                     }
                 }
 
-                if(button == KeyCode.mouseLeft && tool == EditorTool.copy) {
+                if(button == KeyCode.mouseLeft && tool == EditorTool.copy){
                     editor.copyData.select(p.x, p.y);
                 }
 
@@ -176,7 +176,7 @@ public class MapView extends Element implements GestureListener{
         });
     }
 
-    public boolean copy() {
+    public boolean copy(){
         return (tool == EditorTool.copy || lastTool == EditorTool.copy) && !editor.copyData.empty();
     }
 
@@ -224,12 +224,12 @@ public class MapView extends Element implements GestureListener{
         if(Core.scene.getScrollFocus() != this) return;
 
         float scroll = Core.input.axis(KeyCode.scroll);
-        if(scroll == 0) {
+        if(scroll == 0){
             return;
         }
 
-        if(copy() && Core.input.ctrl()) {
-            if(scroll > 0) {
+        if(copy() && Core.input.ctrl()){
+            if(scroll > 0){
                 editor.copyData.rotL();
             } else {
                 editor.copyData.rotR();
@@ -323,7 +323,7 @@ public class MapView extends Element implements GestureListener{
         if(tool == EditorTool.copy){
             Copy c = editor.copyData;
 
-            if(!c.empty()) {
+            if(!c.empty()){
                 for(int i = 0; i < c.lines.size; i += 2){
                     point.set(c.dx, c.dy).add(c.lines.get(i));
                     Vec2 a = unproject(point.x, point.y).add(x, y);
@@ -378,7 +378,7 @@ public class MapView extends Element implements GestureListener{
         ScissorStack.pop();
     }
 
-    private void drawRect(int dx, int dy, int w, int h, Color col) {
+    private void drawRect(int dx, int dy, int w, int h, Color col){
         Vec2 min = unproject(dx, dy).add(x, y);
         // because we just have to save that one allocation (i guess)
         // unproject returns pointer to same vec so min === max
