@@ -26,6 +26,7 @@ public class MapView extends Element implements GestureListener{
     private boolean grid = false;
     private GridImage image = new GridImage(0, 0);
     private Vec2 vec = new Vec2();
+    private Point2 point = new Point2();
     private Rect rect = new Rect();
     private Vec2[][] brushPolygons = new Vec2[MapEditor.brushSizes.length][0];
 
@@ -57,11 +58,6 @@ public class MapView extends Element implements GestureListener{
 
                 requestScroll();
 
-                if(copy() && !Core.input.keyDown(KeyCode.mouseRight) && quickPaste()) {
-                    Point2 p = project(mousex, mousey);
-                    editor.copyData.center(p.x, p.y);
-                }
-
                 return false;
             }
 
@@ -85,13 +81,15 @@ public class MapView extends Element implements GestureListener{
                 if(button == KeyCode.mouseRight){
                     if(tool == EditorTool.copy){
                         editor.copyData.setOrigin(p.x, p.y);
+                        editor.copyData.clearLines();
+                        editor.copyData.clear();
                     }else{
                         lastTool = tool;
                         tool = EditorTool.eraser;
                     }
                 }
 
-                if(button == KeyCode.mouseLeft && tool == EditorTool.copy && editor.copyData.contains(p.x, p.y)) {
+                if(button == KeyCode.mouseLeft && tool == EditorTool.copy) {
                     editor.copyData.select(p.x, p.y);
                 }
 
@@ -128,25 +126,9 @@ public class MapView extends Element implements GestureListener{
 
                 Point2 p = project(x, y);
 
-                switch(tool){
-                    case line:
-                        ui.editor.resetSaved();
-                        tool.touchedLine(editor, startx, starty, p.x, p.y);
-                        break;
-                    case copy:
-                        Copy c = editor.copyData;
-                        switch(button){
-                            case mouseRight:
-                                c.copy();
-                                break;
-                            case mouseLeft:
-                                if(!c.selected || quickPaste()) {
-                                    c.paste();
-                                } else {
-                                    c.deselect();
-                                }
-                                break;
-                        }
+                if(tool == EditorTool.line){
+                    ui.editor.resetSaved();
+                    tool.touchedLine(editor, startx, starty, p.x, p.y);
                 }
 
                 editor.flushOp();
@@ -170,16 +152,11 @@ public class MapView extends Element implements GestureListener{
                     Bresenham2.line(lastx, lasty, p.x, p.y, (cx, cy) -> tool.touched(editor, cx, cy));
                 }
 
-
                 if(tool == EditorTool.copy){
                     Copy c = editor.copyData;
                     switch(event.keyCode){
-                        case mouseRight:
-                            c.adjust(p.x, p.y);
-                            break;
-                        case mouseLeft:
-                            c.move(p.x, p.y);
-                            break;
+                        case mouseRight -> c.adjust(p.x, p.y);
+                        case mouseLeft -> c.move(p.x, p.y);
                     }
                 }
 
@@ -200,7 +177,7 @@ public class MapView extends Element implements GestureListener{
     }
 
     public boolean copy() {
-        return tool == EditorTool.copy && !editor.copyData.empty();
+        return (tool == EditorTool.copy || lastTool == EditorTool.copy) && !editor.copyData.empty();
     }
 
     public EditorTool getTool(){
@@ -251,7 +228,7 @@ public class MapView extends Element implements GestureListener{
             return;
         }
 
-        if(copy() && !quickPaste()) {
+        if(copy() && Core.input.ctrl()) {
             if(scroll > 0) {
                 editor.copyData.rotL();
             } else {
@@ -264,10 +241,7 @@ public class MapView extends Element implements GestureListener{
         clampZoom();
     }
 
-    /** valid only if tool == copy */
-    private boolean quickPaste() {
-        return Core.input.ctrl() || tool.mode == 0;
-    }
+
 
     private void clampZoom(){
         zoom = Mathf.clamp(zoom, 0.2f, 20f);
@@ -346,16 +320,24 @@ public class MapView extends Element implements GestureListener{
         Draw.color(Pal.accent);
         Lines.stroke(Scl.scl(2f));
 
-        if(copy()){
+        if(tool == EditorTool.copy){
             Copy c = editor.copyData;
 
-            Vec2 min = unproject(c.dx, c.dy).add(x, y);
-            // because we just have to save that one allocation (i guess)
-            // unproject returns pointer to same vec so min === max
-            float sx = min.x, sy = min.y;
-            unproject(c.dx - c.w, c.dy - c.h).add(x, y);
+            if(!c.empty()) {
+                for(int i = 0; i < c.lines.size; i += 2){
+                    point.set(c.dx, c.dy).add(c.lines.get(i));
+                    Vec2 a = unproject(point.x, point.y).add(x, y);
+                    float ax = a.x, ay = a.y;
+                    point.set(c.dx, c.dy).add(c.lines.get(i + 1));
+                    Vec2 b = unproject(point.x, point.y).add(x, y);
+                    Lines.line(ax, ay, b.x, b.y);
+                }
+                drawRect(c.ox, c.oy, c.fw, c.fh, Color.black);
+            } else {
+                drawRect(c.dx, c.dy, c.fw, c.fh, Pal.accent);
+            }
 
-            Lines.rect(sx, sy, sx - min.x, sy - min.y);
+            drawRect(c.dx, c.dy, c.w, c.h, Pal.accent);
         }else if((!editor.drawBlock.isMultiblock() || tool == EditorTool.eraser) && tool != EditorTool.fill){
             if(tool == EditorTool.line && drawing){
                 Vec2 v1 = unproject(startx, starty).add(x, y);
@@ -394,6 +376,17 @@ public class MapView extends Element implements GestureListener{
         Draw.reset();
 
         ScissorStack.pop();
+    }
+
+    private void drawRect(int dx, int dy, int w, int h, Color col) {
+        Vec2 min = unproject(dx, dy).add(x, y);
+        // because we just have to save that one allocation (i guess)
+        // unproject returns pointer to same vec so min === max
+        float sx = min.x, sy = min.y;
+        unproject(dx - w, dy - h).add(x, y);
+
+        Draw.color(col);
+        Lines.rect(sx, sy, sx - min.x, sy - min.y);
     }
 
     private boolean active(){

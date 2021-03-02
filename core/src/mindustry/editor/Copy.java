@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -18,15 +19,25 @@ import static mindustry.Vars.world;
 public class Copy{
 
     int
-    sx, sy,
+    ox, oy, // original position
+    sx, sy, // drag handle
     px, py, // selection origin
     dx, dy, // selection offset
+    fw, fh, // fake width height
     w, h;   // size of selection
 
-    boolean selected;
+    private final Point2 tmp = new Point2();
 
     private CTile[][] main, rotated; // to make rotation faster differently composed space is pre-allocated
     private final Seq<CTile> pool = new Seq<>(); // to reuse tiles
+
+    public Seq<Point2> lines = new Seq<>(), linePool = new Seq<>();
+    final int lineLimit = 100000;
+
+    private final Template[] templates = {
+    new Template(0, 1, 0, 1, 1, 1),
+    new Template(1, 0, 1, 0, 1, 1),
+    };
 
     public Copy(){
         clear(); // to init the min and rotated
@@ -44,10 +55,10 @@ public class Copy{
         y = clampH(y);
 
         // + 1 because it loops nicer then
-        w = Math.abs(px - x) + 1;
-        h = Math.abs(py - y) + 1;
-        dx = Math.min(px, x);
-        dy = Math.min(py, y);
+        fw = Math.abs(px - x) + 1;
+        fh = Math.abs(py - y) + 1;
+        dx = ox = Math.min(px, x);
+        dy = oy = Math.min(py, y);
     }
 
     public boolean empty(){
@@ -55,12 +66,14 @@ public class Copy{
     }
 
     public void clear(){
-        w = 0;
-        h = 0;
+        fw = 0;
+        fh = 0;
         resize();
     }
 
     public void copy(){
+        ox = dx;
+        oy = dy;
         resize();
 
         loop(w, h, (x, y) -> {
@@ -69,6 +82,9 @@ public class Copy{
             t.copy(world.tile(x + dx, y + dy));
             main[y][x] = t;
         });
+
+
+        outlines();
     }
 
     public void paste(){
@@ -88,32 +104,74 @@ public class Copy{
     }
 
     public void rotR(){
-        flipX();
+        flipX(false);
         flipD();
+
+        outlines();
     }
 
     public void rotL(){
-        flipY();
+        flipY(false);
         flipD();
+
+        outlines();
     }
 
-    public void flipX(){
+    public void flipX(boolean alone){
         loop(w / 2, h, (x, y) -> swap(x, y, w - x - 1, y));
 
         config(p -> p.x = -p.x, 2);
 
         loop(w, h, (x, y) -> flipConnections(x, y, -1, 0));
         loop(w, h, (x, y) -> flipMultiBlock(x, y, -1, 0));
+
+        if(alone) {
+            outlines();
+        }
     }
 
 
-    public void flipY(){
+    public void flipY(boolean alone){
         loop(w, h / 2, (x, y) -> swap(x, y, x, h - y - 1));
 
         config(p -> p.y = -p.y, 2);
 
         loop(w, h, (x, y) -> flipConnections(x, y, 0, -1));
         loop(w, h, (x, y) -> flipMultiBlock(x, y, 0, -1));
+
+        if(alone) {
+            outlines();
+        }
+    }
+
+    private void outlines() {
+        if (w * h > lineLimit) return;
+
+        clearLines();
+
+        loop(w, h, (x, y) -> {
+            for(Template t : templates) {
+                tmp.set(x, y).add(t.offset);
+
+                if(!containsRaw(tmp.x, tmp.y)) continue;
+                if(main[y][x].equal(main[tmp.y][tmp.x])) continue;
+
+                addLinePoint(x, y, t.a);
+                addLinePoint(x, y, t.b);
+            }
+        });
+    }
+
+    void clearLines() {
+        linePool.addAll(lines);
+        lines.clear();
+    }
+
+    private void addLinePoint(int x, int y, Point2 o) {
+        Point2 p = linePool.pop(Point2::new);
+        tmp.set(x, y).add(o);
+        p.set(tmp);
+        lines.add(p);
     }
 
     public void flipMultiBlock(int x, int y, int dx, int dy){
@@ -192,6 +250,8 @@ public class Copy{
     }
 
     private void resize(){
+        w = fw;
+        h = fh;
         // collect garbage
         if(main != null && main.length != 0) loop(main[0].length, main.length, t -> pool.add(t));
 
@@ -230,23 +290,21 @@ public class Copy{
     public void center(int x, int y) {
         select(dx + w / 2, dy + h / 2);
         move(x, y);
-        deselect();
     }
 
     public void select(int x, int y) {
-        selected = true;
         sx = x - dx;
         sy = y - dy;
     }
 
-    public void deselect() {
-        selected = false;
-    }
-
     public void move(int x, int y){
-        if(!selected) return;
         dx += x - (sx + dx);
         dy += y - (sy + dy);
+
+        if(empty()) {
+            ox = dx;
+            oy = dy;
+        }
     }
 
     public boolean contains(int x, int y){
@@ -271,11 +329,19 @@ public class Copy{
         Floor floor;
         Build build = new Build();
 
+        boolean equal(CTile o) {
+            return top().equals(o.top());
+        }
+
+        Block top() {
+            return build.trueBlock.solid || build.trueBlock.breakable ? build.trueBlock : !overlay.useColor ? floor : overlay;
+        }
 
         void copy(Tile t){
             floor = t.floor();
             overlay = t.overlay();
             build.block = t.block();
+            build.trueBlock = build.block;
             if(!t.isCenter()){
                 build.block = null;
             }else if(t.build != null){
@@ -305,10 +371,19 @@ public class Copy{
         }
 
         private static class Build{
-            Block block;
+            Block block, trueBlock;
             int rotation;
             Object config;
             Team team;
+        }
+    }
+
+    static class Template {
+        Point2 offset, a, b;
+        Template(int ox,int oy, int ax, int ay, int bx, int by) {
+            offset = new Point2(ox, oy);
+            a = new Point2(ax, ay);
+            b = new Point2(bx, by);
         }
     }
 

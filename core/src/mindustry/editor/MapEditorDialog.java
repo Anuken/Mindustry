@@ -601,8 +601,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     private void doInput(){
-
+        Copy c = editor.copyData;
         if(Core.input.ctrl()){
+            if(view.tool == EditorTool.copy){
+
+                if(Core.input.keyTap(Binding.editor_copy)){
+                    c.copy();
+                }else if(Core.input.keyTap(Binding.editor_paste)){
+                    c.paste();
+                }
+            }
             //alt mode select
             for(int i = 0; i < view.getTool().altModes.length; i++){
                 if(i + 1 < KeyCode.numbers.length && Core.input.keyTap(KeyCode.numbers[i + 1])){
@@ -611,11 +619,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
         }else{
             if(Core.input.keyTap(Binding.editor_copy_flip_x)){
-                editor.copyData.flipX();
+                c.flipX(true);
             }else if(Core.input.keyTap(Binding.editor_copy_flip_y)){
-                editor.copyData.flipY();
+                c.flipY(true);
             }
-
             for(EditorTool tool : EditorTool.all){
                 if(Core.input.keyTap(tool.key)){
                     view.setTool(tool);
