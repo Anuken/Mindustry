@@ -126,7 +126,7 @@ public class Door extends Wall{
 
         @Override
         public Cursor getCursor(){
-            return player.team() == team ? SystemCursor.hand : SystemCursor.arrow;
+            return interactable(player.team()) ? SystemCursor.hand : SystemCursor.arrow;
         }
 
         @Override
