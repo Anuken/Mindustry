@@ -322,9 +322,8 @@ public class UnitTypes implements ContentList{
                 x = 5f;
                 shake = 2.2f;
                 y = 0.5f;
-                shootY = 5f;
-
                 shootY = 2.5f;
+
                 reload = 38f;
                 shots = 3;
                 inaccuracy = 35;
@@ -359,7 +358,6 @@ public class UnitTypes implements ContentList{
 
         quasar = new UnitType("quasar"){{
             mineTier = 3;
-            hitSize = 12f;
             boostMultiplier = 2f;
             health = 650f;
             buildSpeed = 1.7f;
@@ -471,7 +469,6 @@ public class UnitTypes implements ContentList{
         }};
 
         corvus = new UnitType("corvus"){{
-            mineTier = 1;
             hitSize = 29f;
             health = 18000f;
             armor = 9f;
