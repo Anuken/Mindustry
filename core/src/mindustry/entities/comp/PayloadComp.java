@@ -162,4 +162,34 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
             table.image(p.icon(Cicon.small)).size(itemSize).padRight(pad);
         }
     }
+
+    @Override
+    public void destroy(){
+        //if this unit was carrying other units, spawn them but at reduced health
+        payloads.each(payload -> {
+            if(payload instanceof UnitPayload p){
+                Unit u = p.unit;
+
+                //drop all units, let ground units die on walls
+                Fx.unitDrop.at(this);
+
+                if(Vars.net.client()){
+                    //clear removed state of unit so it can be synced
+                    Vars.netClient.clearRemovedEntity(p.unit.id);
+                }else{
+                    //clients do not drop payloads
+                    u.set(this);
+                    u.trns(Tmp.v1.rnd(Mathf.random(2f)));
+                    u.rotation(rotation);
+                    //reset the ID to a new value to make sure it's synced
+                    u.id = EntityGroup.nextId();
+                    //decrement count to prevent double increment
+                    if(!u.isAdded()) u.team.data().updateCount(u.type, -1);
+                    //take damage from the landing
+                    u.health = u.maxHealth * u.type.crashDurability;
+                    u.add();
+                }
+            }
+        });
+    }
 }
