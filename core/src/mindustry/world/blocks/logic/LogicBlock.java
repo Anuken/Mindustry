@@ -39,6 +39,7 @@ public class LogicBlock extends Block{
         solid = true;
         configurable = true;
         group = BlockGroup.logic;
+        schematicPriority = 5;
 
         config(byte[].class, (LogicBuild build, byte[] data) -> build.readCompressed(data, true));
 
