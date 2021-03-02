@@ -2067,6 +2067,8 @@ public class Blocks implements ContentList{
             instructionsPerTick = 2;
 
             size = 1;
+            
+            schematicPriority = 10;
         }};
 
         logicProcessor = new LogicBlock("logic-processor"){{
@@ -2077,6 +2079,8 @@ public class Blocks implements ContentList{
             range = 8 * 22;
 
             size = 2;
+            
+            schematicPriority = 10;
         }};
 
         hyperProcessor = new LogicBlock("hyper-processor"){{
@@ -2090,6 +2094,8 @@ public class Blocks implements ContentList{
             range = 8 * 42;
 
             size = 3;
+            
+            schematicPriority = 10;
         }};
 
         memoryCell = new MemoryBlock("memory-cell"){{
