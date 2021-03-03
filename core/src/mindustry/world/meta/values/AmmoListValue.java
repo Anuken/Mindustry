@@ -12,6 +12,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -30,11 +31,12 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
 
         for(T t : map.keys()){
             boolean unit = t instanceof UnitType;
+            boolean powerT = t instanceof PowerTurret;
 
             BulletType type = map.get(t);
 
-            //no point in displaying unit icon twice
-            if(!unit){
+            //no point in displaying unit icon twice, there is no icon to display for power turrets
+            if(!unit && !powerT){
                 table.image(icon(t)).size(3 * 8).padRight(4).right().top();
                 table.add(t.localizedName).padRight(10).left().top();
             }
@@ -43,7 +45,11 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                 bt.left().defaults().padRight(3).left();
 
                 if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
-                    bt.add(Core.bundle.format("bullet.damage", type.damage));
+                    if(type instanceof ContinuousLaserBulletType){
+                        bt.add(Core.bundle.format("bullet.damageContinous", type.damage * 60f / 5f));
+                    }else{
+                        bt.add(Core.bundle.format("bullet.damage", type.damage));
+                    }
                 }
 
                 if(type.buildingDamageMultiplier != 1){

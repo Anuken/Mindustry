@@ -1,12 +1,16 @@
 package mindustry.world.blocks.defense.turrets;
 
+import arc.struct.*;
 import mindustry.entities.bullet.*;
 import mindustry.logic.*;
 import mindustry.world.meta.*;
+import mindustry.world.meta.values.*;
 
 public class PowerTurret extends Turret{
     public BulletType shootType;
     public float powerUse = 1f;
+        
+    protected ObjectMap<PowerTurret, BulletType> bullet = new ObjectMap<>();
 
     public PowerTurret(String name){
         super(name);
@@ -16,12 +20,13 @@ public class PowerTurret extends Turret{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(Stat.damage, shootType.damage, StatUnit.none);
+        stats.add(Stat.ammo, new AmmoListValue<>(bullet));
     }
 
     @Override
     public void init(){
         consumes.powerCond(powerUse, TurretBuild::isActive);
+        bullet = OrderedMap.of(this, shootType);
         super.init();
     }
 
