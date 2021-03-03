@@ -584,12 +584,15 @@ public class Administration{
     public static class TraceInfo{
         public String ip, uuid;
         public boolean modded, mobile;
+        public int timesJoined, timesKicked;
 
-        public TraceInfo(String ip, String uuid, boolean modded, boolean mobile){
+        public TraceInfo(String ip, String uuid, boolean modded, boolean mobile, int timesJoined, int timesKicked){
             this.ip = ip;
             this.uuid = uuid;
             this.modded = modded;
             this.mobile = mobile;
+            this.timesJoined = timesJoined;
+            this.timesKicked = timesKicked;
         }
     }
 
