@@ -572,10 +572,12 @@ public class TypeIO{
         writeString(write, trace.uuid);
         write.b(trace.modded ? (byte)1 : 0);
         write.b(trace.mobile ? (byte)1 : 0);
+        write.i(trace.timesJoined);
+        write.i(trace.timesKicked);
     }
 
     public static TraceInfo readTraceInfo(Reads read){
-        return new TraceInfo(readString(read), readString(read), read.b() == 1, read.b() == 1);
+        return new TraceInfo(readString(read), readString(read), read.b() == 1, read.b() == 1, read.i(), read.i());
     }
 
     public static void writeStringData(DataOutput buffer, String string) throws IOException{

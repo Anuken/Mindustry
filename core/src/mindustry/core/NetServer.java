@@ -735,7 +735,8 @@ public class NetServer implements ApplicationListener{
             other.kick(KickReason.kick);
             info("&lc@ has kicked @.", player.name, other.name);
         }else if(action == AdminAction.trace){
-            TraceInfo info = new TraceInfo(other.con.address, other.uuid(), other.con.modclient, other.con.mobile);
+            PlayerInfo stats = netServer.admins.getInfo(other.uuid());
+            TraceInfo info = new TraceInfo(other.con.address, other.uuid(), other.con.modclient, other.con.mobile, stats.timesJoined, stats.timesKicked);
             if(player.con != null){
                 Call.traceInfo(player.con, other, info);
             }else{
