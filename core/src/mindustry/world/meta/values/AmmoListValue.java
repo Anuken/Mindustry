@@ -46,7 +46,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
 
                 if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
                     if(type instanceof ContinuousLaserBulletType){
-                        bt.add(Core.bundle.format("bullet.damage.continous", type.damage * 60f / 5f));
+                        bt.add(Core.bundle.format("bullet.damage.continuous", type.damage * 60f / 5f));
                     }else{
                         bt.add(Core.bundle.format("bullet.damage", type.damage));
                     }
