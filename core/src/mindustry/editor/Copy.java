@@ -198,7 +198,7 @@ public class Copy{
         // this is driving me crazy, reason is that if both blocks have to be flipped or both not
         // do nothing, if a is flipped, go opposite of flip, if reverse go in direction of flip
         if(a.build.config instanceof Point2 p){
-            if(!containsRaw(y + p.y, x + p.x)) return;
+            if(!containsRaw(x + p.x, y + p.y)) return;
             CTile t = main[y + p.y][x + p.x];
             boolean oNoFlip = t.doNotFlip();
             if(oNoFlip && !noFlip){
@@ -208,7 +208,7 @@ public class Copy{
             }
         }else if(a.build.config instanceof Point2[] points){
             for(Point2 p : points){
-                if(!containsRaw(y + p.y, x + p.x)) continue;
+                if(!containsRaw(x + p.x, y + p.y)) continue;
                 CTile t = main[y + p.y][x + p.x];
                 boolean oNoFlip = t.doNotFlip();
                 if(oNoFlip && !noFlip){
