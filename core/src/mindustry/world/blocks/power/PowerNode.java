@@ -307,7 +307,7 @@ public class PowerNode extends PowerBlock{
                     }
                 });
 
-                if(otherReq == null || otherReq.block == null) return;
+                if(otherReq == null || otherReq.block == null) continue;
 
                 drawLaser(player == null ? Team.sharded : player.team(), req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy(), size, otherReq.block.size);
             }
