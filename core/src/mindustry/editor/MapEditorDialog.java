@@ -414,7 +414,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 Table[] lastTable = {null};
 
                 Cons<EditorTool> addTool = tool -> {
-
                     ImageButton button = new ImageButton(ui.getIcon(tool.name()), Styles.clearTogglei);
                     button.clicked(() -> {
                         view.setTool(tool);
@@ -489,6 +488,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     tools.stack(button, mode);
                 };
 
+                Color transparent = new Color(0, 0, 0, 0);
+                CopyToolAdder copyTool = (icon, func, cond) -> {
+                    ImageButton flip = tools.button(icon, Styles.cleari, func).get();
+                    flip.setDisabled(cond);
+                    flip.update(() -> flip.getImage().setColor(flip.isDisabled() ? transparent : Color.white));
+                };
+
                 tools.defaults().size(size, size);
 
                 tools.button(Icon.menu, Styles.cleari, menu::show);
@@ -523,6 +529,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 addTool.get(EditorTool.spray);
 
                 ImageButton rotate = tools.button(Icon.right, Styles.cleari, () -> editor.rotation = (editor.rotation + 1) % 4).get();
+                rotate.updateVisibility();
                 rotate.getImage().update(() -> {
                     rotate.getImage().setRotation(editor.rotation * 90);
                     rotate.getImage().setOrigin(Align.center);
@@ -531,6 +538,18 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 tools.row();
 
                 addTool.get(EditorTool.copy);
+
+                Boolp con1 = () -> view.tool != EditorTool.copy;
+                copyTool.add(Icon.upload, () -> editor.copyData.copy(), con1);
+                copyTool.add(Icon.download, () -> editor.copyData.paste(), con1);
+
+                tools.row();
+
+                Boolp con2 = () -> !view.copy();
+                copyTool.add(Icon.flipX, () -> editor.copyData.flipX(true), con2);
+                copyTool.add(Icon.flipY, () -> editor.copyData.flipY(true), con2);
+                copyTool.add(Icon.rotate, () -> editor.copyData.rotL(), con2);
+
 
                 tools.row();
 
@@ -757,5 +776,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
         if(i == 0){
             blockSelection.add("@none").color(Color.lightGray).padLeft(80f).padTop(10f);
         }
+    }
+
+    interface CopyToolAdder {
+        void add(TextureRegionDrawable t, Runnable r, Boolp c);
     }
 }

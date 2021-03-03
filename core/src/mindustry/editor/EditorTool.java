@@ -230,7 +230,9 @@ public enum EditorTool{
             }
         }
     },
-    copy(KeyCode.c, "controls");
+    copy(KeyCode.c, "controls"),
+    flip,
+    rotate;
 
     public static final EditorTool[] all = values();
 
