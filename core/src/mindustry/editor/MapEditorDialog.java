@@ -537,18 +537,21 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.row();
 
+                Copy c = editor.copyData;
                 addTool.get(EditorTool.copy);
-
-                Boolp con1 = () -> view.tool != EditorTool.copy;
-                copyTool.add(Icon.upload, () -> editor.copyData.copy(), con1);
-                copyTool.add(Icon.download, () -> editor.copyData.paste(), con1);
+                Boolp con1 = () -> view.tool != EditorTool.copy || (c.fh == 0 || c.fw == 0) ;
+                copyTool.add(Icon.upload, c::copy, con1);
+                copyTool.add(Icon.download, () -> {
+                    c.paste();
+                    editor.flushOp();
+                }, con1);
 
                 tools.row();
 
                 Boolp con2 = () -> !view.copy();
-                copyTool.add(Icon.flipX, () -> editor.copyData.flipX(true), con2);
-                copyTool.add(Icon.flipY, () -> editor.copyData.flipY(true), con2);
-                copyTool.add(Icon.rotate, () -> editor.copyData.rotL(), con2);
+                copyTool.add(Icon.flipX, () -> c.flipX(true), con2);
+                copyTool.add(Icon.flipY, () -> c.flipY(true), con2);
+                copyTool.add(Icon.rotate, c::rotR, con2);
 
 
                 tools.row();
@@ -623,11 +626,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
         Copy c = editor.copyData;
         if(Core.input.ctrl()){
             if(view.tool == EditorTool.copy){
-
                 if(Core.input.keyTap(Binding.editor_copy)){
                     c.copy();
                 }else if(Core.input.keyTap(Binding.editor_paste)){
                     c.paste();
+                    editor.flushOp();
                 }
             }
             //alt mode select
