@@ -93,12 +93,6 @@ public class Turret extends ReloadTurret{
 
     public Turret(String name){
         super(name);
-        priority = TargetPriority.turret;
-        update = true;
-        solid = true;
-        group = BlockGroup.turrets;
-        flags = EnumSet.of(BlockFlag.turret);
-        outlineIcon = true;
         liquidCapacity = 20f;
     }
 

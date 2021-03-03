@@ -20,7 +20,8 @@ public class StorageBlock extends Block{
         solid = true;
         update = false;
         destructible = true;
-        group = BlockGroup.storage;
+        group = BlockGroup.transportation;
+        flags = EnumSet.of(BlockFlag.storage);
     }
 
     @Override
