@@ -10,7 +10,6 @@ import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
-import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -736,7 +735,7 @@ public class NetServer implements ApplicationListener{
             other.kick(KickReason.kick);
             info("&lc@ has kicked @.", player.name, other.name);
         }else if(action == AdminAction.trace){
-            PlayerInfo stats = Vars.netServer.admins.getInfo(other.uuid());
+            PlayerInfo stats = netServer.admins.getInfo(other.uuid());
             TraceInfo info = new TraceInfo(other.con.address, other.uuid(), other.con.modclient, other.con.mobile, stats.timesJoined, stats.timesKicked);
             if(player.con != null){
                 Call.traceInfo(player.con, other, info);
