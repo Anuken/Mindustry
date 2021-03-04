@@ -403,30 +403,58 @@ public class Blocks implements ContentList{
 
         metalFloor = new Floor("metal-floor"){{
             variants = 0;
+            isHard = true;
         }};
 
         metalFloorDamaged = new Floor("metal-floor-damaged"){{
             variants = 3;
+            isHard = true;
         }};
 
         metalFloor2 = new Floor("metal-floor-2"){{
             variants = 0;
+            isHard = true;
         }};
 
         metalFloor3 = new Floor("metal-floor-3"){{
             variants = 0;
+            isHard = true;
         }};
 
         metalFloor5 = new Floor("metal-floor-5"){{
             variants = 0;
+            isHard = true;
         }};
 
-        darkPanel1 = new Floor("dark-panel-1"){{ variants = 0; }};
-        darkPanel2 = new Floor("dark-panel-2"){{ variants = 0; }};
-        darkPanel3 = new Floor("dark-panel-3"){{ variants = 0; }};
-        darkPanel4 = new Floor("dark-panel-4"){{ variants = 0; }};
-        darkPanel5 = new Floor("dark-panel-5"){{ variants = 0; }};
-        darkPanel6 = new Floor("dark-panel-6"){{ variants = 0; }};
+        darkPanel1 = new Floor("dark-panel-1"){{
+            variants = 0;
+            isHard = true;
+        }};
+        
+        darkPanel2 = new Floor("dark-panel-2"){{
+            variants = 0;
+            isHard = true;
+        }};
+        
+        darkPanel3 = new Floor("dark-panel-3"){{
+            variants = 0;
+            isHard = true;
+        }};
+        
+        darkPanel4 = new Floor("dark-panel-4"){{
+            variants = 0;
+            isHard = true;
+        }};
+        
+        darkPanel5 = new Floor("dark-panel-5"){{
+            variants = 0;
+            isHard = true;
+        }};
+
+        darkPanel6 = new Floor("dark-panel-6"){{
+            variants = 0;
+            isHard = true;
+        }};
 
         darkMetal = new StaticWall("dark-metal");
 

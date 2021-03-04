@@ -52,6 +52,8 @@ public class Floor extends Block{
     public float liquidMultiplier = 1f;
     /** item that drops from this block, used for drills */
     public @Nullable Item itemDrop = null;
+    /** Has unitLand effect when walking on this floor. */
+    public boolean isHard = false;
     /** whether this block can be drowned in */
     public boolean isLiquid;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
