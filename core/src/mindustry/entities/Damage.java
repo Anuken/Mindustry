@@ -314,6 +314,25 @@ public class Damage{
         damage(team, x, y, radius, damage, false, air, ground);
     }
 
+    /** Knockback all enemy units in a range. */
+    public static void knockback(Team team, float x, float y, float radius, float knockback, boolean air, boolean ground){
+        Cons<Unit> cons = entity -> {
+            if(entity.team == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
+                return;
+            }
+
+            float dst = tr.set(entity).sub(x, y).len();
+            entity.impulse(tr.nor().scl((1f - dst / radius) * knockback * 80f));
+        };
+
+        rect.setSize(radius * 2).setCenter(x, y);
+        if(team != null){
+            Units.nearbyEnemies(team, rect, cons);
+        }else{
+            Units.nearby(rect, cons);
+        }
+    }
+
     /** Applies a status effect to all enemy units in a range. */
     public static void status(Team team, float x, float y, float radius, StatusEffect effect, float duration, boolean air, boolean ground){
         Cons<Unit> cons = entity -> {
