@@ -63,7 +63,7 @@ public class RemoteProcess extends BaseProcessor{
             classes = new Seq<>();
 
             Seq<Smethod> orderedElements = elements.copy();
-            orderedElements.sortComparing(Object::toString);
+            orderedElements.sort((a, b) -> -a.toString().compareTo(b.toString()));
 
             //create methods
             for(Smethod element : orderedElements){
