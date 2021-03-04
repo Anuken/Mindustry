@@ -86,7 +86,7 @@ public class NetClient implements ApplicationListener{
                 locale = Locale.getDefault().toString();
             }
 
-            ConnectPacket c = new ConnectPacket();
+            var c = new ConnectPacket();
             c.name = player.name;
             c.locale = locale;
             c.mods = mods.getModStrings();
@@ -188,6 +188,10 @@ public class NetClient implements ApplicationListener{
     //called when a server receives a chat message from a player
     @Remote(called = Loc.server, targets = Loc.client)
     public static void sendChatMessage(Player player, String message){
+
+        //do not receive chat messages from clients that are too young or not registered
+        if(Time.timeSinceMillis(player.con.connectTime) < 500 || !player.con.hasConnected || !player.isAdded()) return;
+
         if(message.length() > maxTextLength){
             throw new ValidateException(player, "Player has sent a message above the text limit.");
         }
@@ -198,7 +202,7 @@ public class NetClient implements ApplicationListener{
         CommandResponse response = netServer.clientCommands.handleMessage(message, player);
         if(response.type == ResponseType.noCommand){ //no command to handle
             message = netServer.admins.filterMessage(player, message);
-            //supress chat message if it's filtered out
+            //suppress chat message if it's filtered out
             if(message == null){
                 return;
             }

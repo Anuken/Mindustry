@@ -19,6 +19,8 @@ public abstract class NetConnection{
     public @Nullable Player player;
     public boolean kicked = false;
 
+    /** When this connection was established. */
+    public long connectTime = Time.millis();
     /** ID of last received client snapshot. */
     public int lastReceivedClientSnapshot = -1;
     /** Timestamp of last received snapshot. */

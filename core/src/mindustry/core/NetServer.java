@@ -93,9 +93,13 @@ public class NetServer implements ApplicationListener{
         });
 
         net.handleServer(ConnectPacket.class, (con, packet) -> {
+            if(con.kicked) return;
+
             if(con.address.startsWith("steam:")){
                 packet.uuid = con.address.substring("steam:".length());
             }
+
+            con.connectTime = Time.millis();
 
             String uuid = packet.uuid;
             byte[] buuid = Base64Coder.decode(uuid);
@@ -249,7 +253,8 @@ public class NetServer implements ApplicationListener{
         });
 
         net.handleServer(InvokePacket.class, (con, packet) -> {
-            if(con.player == null) return;
+            if(con.player == null || con.kicked) return;
+
             try{
                 RemoteReadServer.readPacket(packet.reader(), packet.type, con.player);
             }catch(ValidateException e){
@@ -748,6 +753,8 @@ public class NetServer implements ApplicationListener{
 
     @Remote(targets = Loc.client)
     public static void connectConfirm(Player player){
+        if(player.con.kicked) return;
+
         player.add();
 
         if(player.con == null || player.con.hasConnected) return;
