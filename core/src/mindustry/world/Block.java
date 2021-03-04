@@ -625,6 +625,14 @@ public class Block extends UnlockableContent{
         return cacheLayer == CacheLayer.walls;
     }
 
+    public void setupRequirements(Category cat, ItemStack[] stacks){
+        requirements(cat, stacks);
+    }
+
+    public void setupRequirements(Category cat, BuildVisibility visible, ItemStack[] stacks){
+        requirements(cat, visible, stacks);
+    }
+
     public void requirements(Category cat, ItemStack[] stacks, boolean unlocked){
         requirements(cat, BuildVisibility.shown, stacks);
         this.alwaysUnlocked = unlocked;
