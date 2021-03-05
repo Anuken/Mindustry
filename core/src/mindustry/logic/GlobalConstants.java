@@ -9,6 +9,8 @@ import mindustry.world.*;
 
 /** Stores global constants for logic processors. */
 public class GlobalConstants{
+    public static final int ctrlProcessor = 1, ctrlPlayer = 2, ctrlFormation = 3;
+
     private ObjectIntMap<String> namesToIds = new ObjectIntMap<>();
     private Seq<Var> vars = new Seq<>(Var.class);
 
@@ -21,9 +23,9 @@ public class GlobalConstants{
 
         //special enums
 
-        put("@ctrlProcessor", 1);
-        put("@ctrlPlayer", 2);
-        put("@ctrlFormation", 3);
+        put("@ctrlProcessor", ctrlProcessor);
+        put("@ctrlPlayer", ctrlPlayer);
+        put("@ctrlFormation", ctrlFormation);
 
         //store base content
 
