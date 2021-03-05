@@ -2027,7 +2027,7 @@ public class Blocks implements ContentList{
 
         //TODO remove
         launchPadLarge = new LaunchPad("launch-pad-large"){{
-            requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
+            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
             size = 4;
             itemCapacity = 300;
             launchTime = 60f * 35;
