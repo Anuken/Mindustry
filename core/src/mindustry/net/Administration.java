@@ -363,7 +363,6 @@ public class Administration{
         return getCreateInfo(uuid).banned;
     }
 
-
     public boolean isAdmin(String id, String usid){
         PlayerInfo info = getCreateInfo(id);
         return info.admin && usid.equals(info.adminUsid);
