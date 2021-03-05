@@ -279,7 +279,7 @@ public class ModsDialog extends BaseDialog{
                                     text.labelWrap("@mod.erroredcontent").growX();
                                     text.row();
                                 }else if(mod.meta.hidden){
-                                    text.labelWrap("@mod.multiplayercompatable").growX();
+                                    text.labelWrap("@mod.multiplayer.compatible").growX();
                                     text.row();
                                 }
                             }).top().growX();
