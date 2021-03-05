@@ -405,13 +405,14 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 1.6f;
             canDrown = false;
             mechFrontSway = 1f;
+            buildSpeed = 3f;
 
             mechStepParticles = true;
             mechStepShake = 0.15f;
             ammoType = AmmoTypes.powerHigh;
 
-            speed = 0.36f;
-            boostMultiplier = 2.1f;
+            speed = 0.38f;
+            boostMultiplier = 2.2f;
             engineOffset = 12f;
             engineSize = 6f;
             lowAltitude = true;

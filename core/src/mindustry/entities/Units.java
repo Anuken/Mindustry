@@ -266,20 +266,20 @@ public class Units{
         return result;
     }
 
-    /** Returns the closest ally of this team using a custom comparison function. Filter by predicate. */
-    public static Unit closest(Team team, float x, float y, Boolf<Unit> predicate, Sortf sort){
+    /** Returns the closest ally of this team in a range. Filter by predicate. */
+    public static Unit closest(Team team, float x, float y, float range, Boolf<Unit> predicate, Sortf sort){
         result = null;
         cdist = 0f;
 
-        for(Unit e : Groups.unit){
-            if(!predicate.get(e) || e.team() != team) continue;
+        nearby(team, x, y, range, e -> {
+            if(!predicate.get(e)) return;
 
-            float cost = sort.cost(e, x, y);
-            if(result == null || cost < cdist){
+            float dist = sort.cost(e, x, y);
+            if(result == null || dist < cdist){
                 result = e;
-                cdist = cost;
+                cdist = dist;
             }
-        }
+        });
 
         return result;
     }
