@@ -1370,6 +1370,8 @@ public class UnitTypes implements ContentList{
         }};
 
         oct = new UnitType("oct"){{
+            defaultController = DefenderAI::new;
+
             armor = 16f;
             health = 24000;
             speed = 0.8f;
