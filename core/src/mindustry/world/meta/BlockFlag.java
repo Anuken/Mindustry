@@ -14,8 +14,6 @@ public enum BlockFlag{
     factory,
     /** Repair point. */
     repair,
-    /** Rally point. */
-    rally,
     /** Block that stored power for resupply. */
     battery,
     /** Block used for resupply. */
