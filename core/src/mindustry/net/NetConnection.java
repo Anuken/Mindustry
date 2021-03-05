@@ -49,7 +49,7 @@ public abstract class NetConnection{
 
         Call.kick(this, reason);
 
-        Time.runTask(2f, this::close);
+        close();
 
         netServer.admins.save();
         kicked = true;
@@ -70,7 +70,7 @@ public abstract class NetConnection{
 
         Call.kick(this, reason);
 
-        Time.runTask(2f, this::close);
+        close();
 
         netServer.admins.save();
         kicked = true;
