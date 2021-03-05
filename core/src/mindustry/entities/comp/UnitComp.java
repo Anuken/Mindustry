@@ -164,7 +164,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 pay.payloads().peek() instanceof BuildPayload p2 ? p2.block() : null) : null;
             default -> noSensed;
         };
-
     }
 
     @Override

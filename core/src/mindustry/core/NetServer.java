@@ -35,8 +35,8 @@ import static mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
     /** note that snapshots are compressed, so the max snapshot size here is above the typical UDP safe limit */
-    private static final int maxSnapshotSize = 800, timerBlockSync = 0;
-    private static final float serverSyncTime = 12, blockSyncTime = 60 * 6;
+    private static final int maxSnapshotSize = 800, timerBlockSync = 0, serverSyncTime = 200;
+    private static final float blockSyncTime = 60 * 6;
     private static final FloatBuffer fbuffer = FloatBuffer.allocate(20);
     private static final Vec2 vector = new Vec2();
     private static final Rect viewport = new Rect();
@@ -967,9 +967,11 @@ public class NetServer implements ApplicationListener{
                     return;
                 }
 
-                NetConnection connection = player.con;
+                var connection = player.con;
 
-                if(!player.timer(0, serverSyncTime) || !connection.hasConnected) return;
+                if(Time.timeSinceMillis(connection.syncTime) < serverSyncTime || !connection.hasConnected) return;
+
+                connection.syncTime = Time.millis();
 
                 try{
                     writeEntitySnapshot(player);
