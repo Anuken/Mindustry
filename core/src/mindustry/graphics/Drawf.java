@@ -111,6 +111,12 @@ public class Drawf{
         Draw.rect(region, x, y);
         Draw.color();
     }
+    
+    public static void shadow(TextureRegion region, float x, float y, float width, float height, float rotation){
+        Draw.color(Pal.shadow);
+        Draw.rect(region, x, y, width, height, rotation);
+        Draw.color();
+    }
 
     public static void liquid(TextureRegion region, float x, float y, float alpha, Color color, float rotation){
         Draw.color(color, alpha);
