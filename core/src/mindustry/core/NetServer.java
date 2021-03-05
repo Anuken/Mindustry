@@ -84,7 +84,8 @@ public class NetServer implements ApplicationListener{
             Events.fire(new ConnectionEvent(con));
 
             if(admins.isIPBanned(connect.addressTCP) || admins.isSubnetBanned(connect.addressTCP)){
-                con.kick(KickReason.banned);
+                if (admins.ShouldCloseCon()) con.close();
+                else con.kick(KickReason.banned);
             }
         });
 
@@ -255,7 +256,7 @@ public class NetServer implements ApplicationListener{
         });
 
         net.handleServer(InvokePacket.class, (con, packet) -> {
-            if(con.player == null || con.kicked) return;
+            if(con.player == null || con.kicked || admins.isIPBanned(con.address)) return;
 
             try{
                 RemoteReadServer.readPacket(packet.reader(), packet.type, con.player);
