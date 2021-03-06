@@ -92,6 +92,16 @@ public class ContentParser{
             readFields(result, data);
             return result;
         });
+        put(Weather.class, (type, data) -> {
+            if(data.isString()){
+                return field(Weathers.class, data);
+            }
+            var bc = resolve(data.getString("type", ""), ParticleWeather.class);
+            data.remove("type");
+            Weather result = make(bc);
+            readFields(result, data);
+            return result;
+        });
         put(DrawBlock.class, (type, data) -> {
             if(data.isString()){
                 //try to instantiate
