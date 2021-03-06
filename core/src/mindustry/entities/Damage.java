@@ -314,25 +314,6 @@ public class Damage{
         damage(team, x, y, radius, damage, false, air, ground);
     }
 
-    /** Knockback all enemy units in a range. */
-    public static void knockback(Team team, float x, float y, float radius, float knockback, boolean air, boolean ground){
-        Cons<Unit> cons = entity -> {
-            if(entity.team == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
-                return;
-            }
-
-            float dst = tr.set(entity).sub(x, y).len();
-            entity.impulse(tr.nor().scl((1f - dst / radius) * knockback * 80f));
-        };
-
-        rect.setSize(radius * 2).setCenter(x, y);
-        if(team != null){
-            Units.nearbyEnemies(team, rect, cons);
-        }else{
-            Units.nearby(rect, cons);
-        }
-    }
-
     /** Applies a status effect to all enemy units in a range. */
     public static void status(Team team, float x, float y, float radius, StatusEffect effect, float duration, boolean air, boolean ground){
         Cons<Unit> cons = entity -> {
@@ -358,15 +339,22 @@ public class Damage{
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground){
+        damage(team, x, y, radius, damage, 0, complete, air, ground);
+    }
+
+    /** Damage and knockback all entities and blocks in a radius that are enemies of the team. */
+    public static void damage(Team team, float x, float y, float radius, float damage, float knockback, boolean complete, boolean air, boolean ground){
         Cons<Unit> cons = entity -> {
             if(entity.team == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
                 return;
             }
             float amount = calculateDamage(x, y, entity.getX(), entity.getY(), radius, damage);
             entity.damage(amount);
-            //TODO better velocity displacement
-            float dst = tr.set(entity.getX() - x, entity.getY() - y).len();
-            entity.vel.add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
+
+            if(knockback > 0){
+                float dst = tr.set(entity).sub(x, y).len();
+                entity.impulse(tr.nor().scl((1f - dst / radius) * knockback * 80f));
+            }
 
             if(complete && damage >= 9999999f && entity.isPlayer()){
                 Events.fire(Trigger.exclusionDeath);

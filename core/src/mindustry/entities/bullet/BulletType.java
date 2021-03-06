@@ -215,11 +215,7 @@ public abstract class BulletType extends Content{
         }
 
         if(splashDamageRadius > 0 && !b.absorbed){
-            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
-
-            if(knockback > 0f){
-                Damage.knockback(b.team, x, y, splashDamageRadius, knockback, collidesAir, collidesGround);
-            }
+            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), knockback, false, collidesAir, collidesGround);
 
             if(status != StatusEffects.none){
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
