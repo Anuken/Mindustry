@@ -15,6 +15,7 @@ public class MassDriverBolt extends BulletType{
     public MassDriverBolt(){
         super(1f, 50);
         collidesTiles = false;
+        collidesGround = false;
         lifetime = 1f;
         despawnEffect = Fx.smeltsmoke;
         hitEffect = Fx.hitBulletBig;
