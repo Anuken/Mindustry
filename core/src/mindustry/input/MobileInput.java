@@ -722,7 +722,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             //When in line mode, pan when near screen edges automatically
             if(Core.input.isTouched(0)){
-               autoPan();
+                autoPan();
             }
 
             int lx = tileX(Core.input.mouseX()), ly = tileY(Core.input.mouseY());
