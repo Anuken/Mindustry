@@ -33,7 +33,7 @@ import static mindustry.Vars.*;
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Commanderc, Displayable, Senseable, Ranged, Minerc, Builderc{
 
     @Import boolean hovering, dead, disarmed;
-    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo, minFormationSpeed;
+    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo, minFormationSpeed, dragMultiplier;
     @Import Team team;
     @Import int id;
     @Import @Nullable Tile mineTile;
