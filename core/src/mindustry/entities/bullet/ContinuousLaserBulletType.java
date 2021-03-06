@@ -55,7 +55,7 @@ public class ContinuousLaserBulletType extends BulletType{
 
     @Override
     public float range(){
-        return length;
+        return Math.max(length, maxRange);
     }
 
     @Override
