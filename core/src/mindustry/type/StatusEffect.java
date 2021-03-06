@@ -21,6 +21,8 @@ public class StatusEffect extends MappableContent{
     public float reloadMultiplier = 1f;
     /** Unit build speed multiplier. */
     public float buildSpeedMultiplier = 1f;
+    /** Unit drag multiplier */
+    public float dragMultiplier = 1f;
     /** Unit weapon(s) disabled. */
     public boolean disarm = false;
     /** Damage per frame. */
