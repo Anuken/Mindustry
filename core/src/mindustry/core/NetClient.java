@@ -209,7 +209,7 @@ public class NetClient implements ApplicationListener{
 
             //special case; graphical server needs to see its message
             if(!headless){
-                sendMessage(message, colorizeName(player.id(), player.name), player);
+                sendMessage(message, colorizeName(player.id, player.name), player);
             }
 
             //server console logging
