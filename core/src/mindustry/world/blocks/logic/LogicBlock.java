@@ -1,5 +1,6 @@
 package mindustry.world.blocks.logic;
 
+import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
@@ -13,6 +14,7 @@ import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
+import mindustry.io.TypeIO.*;
 import mindustry.logic.*;
 import mindustry.logic.LAssembler.*;
 import mindustry.logic.LExecutor.*;
@@ -195,7 +197,7 @@ public class LogicBlock extends Block{
         public LExecutor executor = new LExecutor();
         public float accumulator = 0;
         public Seq<LogicLink> links = new Seq<>();
-        public boolean checkedDuplicates = false;
+        public boolean checkedDuplicates = false, unboxed = false;
 
         public void readCompressed(byte[] data, boolean relative){
             DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
@@ -237,13 +239,28 @@ public class LogicBlock extends Block{
                             }
                         }
 
-                        links.add(new LogicLink(x, y, name, validLink(world.build(x, y))));
+                        links.add(new LogicLink(x, y, name, false));
                     }
                 }
 
                 updateCode(new String(bytes, charset));
             }catch(IOException e){
                 Log.err(e);
+            }
+        }
+
+        @Override
+        public void onProximityAdded(){
+            super.onProximityAdded();
+
+            //unbox buildings after reading
+            if(!unboxed){
+                for(var v : executor.vars){
+                    if(v.objval instanceof BuildingBox b){
+                        v.objval = world.build(b.pos);
+                    }
+                }
+                unboxed = true;
             }
         }
 
@@ -300,6 +317,7 @@ public class LogicBlock extends Block{
                     //store link objects
                     executor.links = new Building[links.count(l -> l.valid && l.active)];
                     executor.linkIds.clear();
+
                     int index = 0;
                     for(LogicLink link : links){
                         if(link.active && link.valid){
@@ -378,30 +396,35 @@ public class LogicBlock extends Block{
             }
 
             //check for previously invalid links to add after configuration
-            boolean changed = false;
+            boolean changed = false, updates = true;
 
-            for(int i = 0; i < links.size; i++){
-                LogicLink l = links.get(i);
+            while(updates){
+                updates = false;
 
-                if(!l.active) continue;
+                for(int i = 0; i < links.size; i++){
+                    LogicLink l = links.get(i);
 
-                boolean valid = validLink(world.build(l.x, l.y));
-                if(valid != l.valid){
-                    changed = true;
-                    l.valid = valid;
-                    if(valid){
-                        Building lbuild = world.build(l.x, l.y);
+                    if(!l.active) continue;
 
-                        //this prevents conflicts
-                        l.name = "";
-                        //finds a new matching name after toggling
-                        l.name = findLinkName(lbuild.block);
+                    boolean valid = validLink(world.build(l.x, l.y));
+                    if(valid != l.valid){
+                        changed = true;
+                        l.valid = valid;
+                        if(valid){
+                            Building lbuild = world.build(l.x, l.y);
 
-                        //remove redundant links
-                        links.removeAll(o -> world.build(o.x, o.y) == lbuild && o != l);
+                            //this prevents conflicts
+                            l.name = "";
+                            //finds a new matching name after toggling
+                            l.name = findLinkName(lbuild.block);
 
-                        //break to prevent concurrent modification
-                        break;
+                            //remove redundant links
+                            links.removeAll(o -> world.build(o.x, o.y) == lbuild && o != l);
+
+                            //break to prevent concurrent modification
+                            updates = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -555,7 +578,7 @@ public class LogicBlock extends Block{
 
             for(int i = 0; i < varcount; i++){
                 String name = read.str();
-                Object value = TypeIO.readObject(read);
+                Object value = TypeIO.readObjectBoxed(read, true);
 
                 names[i] = name;
                 values[i] = value;
