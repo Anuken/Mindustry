@@ -21,16 +21,16 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
     private final ObjectMap<T, BulletType> map;
     
     private final Seq<Table> fragTables = new Seq<>();
-    private final boolean showIcon;
+    private final boolean isFrag;
 
     public AmmoListValue(ObjectMap<T, BulletType> map){
         this.map = map;
-        this.showIcon = true;
+        this.isFrag = false;
     }
 
-    public AmmoListValue(ObjectMap<T, BulletType> map, boolean showIcon){
+    public AmmoListValue(ObjectMap<T, BulletType> map, boolean isFrag){
         this.map = map;
-        this.showIcon = showIcon;
+        this.isFrag = isFrag;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
             BulletType type = map.get(t);
 
             //no point in displaying unit icon twice
-            if(!unit && showIcon){
+            if(!unit && !isFrag){
                 table.image(icon(t)).size(3 * 8).padRight(4).right().top();
                 table.add(t.localizedName).padRight(10).left().top();
             }
@@ -64,11 +64,11 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                     sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
                 }
 
-                if(!unit && !Mathf.equal(type.ammoMultiplier, 1f) && !(type instanceof LiquidBulletType)){
+                if(!unit && !Mathf.equal(type.ammoMultiplier, 1f) && !(type instanceof LiquidBulletType) && !isFrag){
                     sep(bt, Core.bundle.format("bullet.multiplier", (int)type.ammoMultiplier));
                 }
 
-                if(!Mathf.equal(type.reloadMultiplier, 1f)){
+                if(!Mathf.equal(type.reloadMultiplier, 1f) && !isFrag){
                     sep(bt, Core.bundle.format("bullet.reload", Strings.autoFixed(type.reloadMultiplier, 2)));
                 }
 
@@ -109,9 +109,11 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                 }
 
                 if(type.fragBullet != null){
+                    sep(bt, Core.bundle.format("bullet.fragbullets", type.fragBullets));
+
                     ObjectMap<T, BulletType> fragMap = new ObjectMap<>();
                     fragMap = OrderedMap.of(t, type.fragBullet);
-                    StatValue fragStatValue = new AmmoListValue<>(fragMap, false);
+                    StatValue fragStatValue = new AmmoListValue<>(fragMap, true);
 
                     fragTables.add(new Table());
                     Table fragStatTable = new Table();
