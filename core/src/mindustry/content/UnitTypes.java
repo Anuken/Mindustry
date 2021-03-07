@@ -292,7 +292,7 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.lasershoot;
 
                 bullet = new LaserBoltBulletType(5.2f, 14){{
-                    lifetime = 37f;
+                    lifetime = 32f;
                     healPercent = 5f;
                     collidesTeam = true;
                     backColor = Pal.heal;
