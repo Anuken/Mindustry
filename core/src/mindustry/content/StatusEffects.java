@@ -26,7 +26,7 @@ public class StatusEffects implements ContentList{
 
             init(() -> {
                 opposite(wet, freezing);
-                trans(tarred, ((unit, time, newTime, result) -> {
+                affinity(tarred, ((unit, time, newTime, result) -> {
                     unit.damagePierce(8f);
                     Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
                     result.set(burning, Math.min(time + newTime, 300f));
@@ -43,7 +43,7 @@ public class StatusEffects implements ContentList{
             init(() -> {
                 opposite(melting, burning);
 
-                trans(blasted, ((unit, time, newTime, result) -> {
+                affinity(blasted, ((unit, time, newTime, result) -> {
                     unit.damagePierce(18f);
                     result.set(freezing, time);
                 }));
@@ -67,7 +67,7 @@ public class StatusEffects implements ContentList{
             effectChance = 0.09f;
 
             init(() -> {
-                trans(shocked, ((unit, time, newTime, result) -> {
+                affinity(shocked, ((unit, time, newTime, result) -> {
                     unit.damagePierce(14f);
                     if(unit.team == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
@@ -94,7 +94,7 @@ public class StatusEffects implements ContentList{
 
             init(() -> {
                 opposite(wet, freezing);
-                trans(tarred, ((unit, time, newTime, result) -> {
+                affinity(tarred, ((unit, time, newTime, result) -> {
                     unit.damagePierce(8f);
                     Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
                     result.set(melting, Math.min(time + newTime, 200f));
@@ -123,8 +123,8 @@ public class StatusEffects implements ContentList{
             effect = Fx.oily;
 
             init(() -> {
-                trans(melting, ((unit, time, newTime, result) -> result.set(melting, newTime + time)));
-                trans(burning, ((unit, time, newTime, result) -> result.set(burning, newTime + time)));
+                affinity(melting, ((unit, time, newTime, result) -> result.set(melting, newTime + time)));
+                affinity(burning, ((unit, time, newTime, result) -> result.set(burning, newTime + time)));
             });
         }};
 

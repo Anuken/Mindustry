@@ -1,6 +1,7 @@
 package mindustry.type;
 
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -9,8 +10,12 @@ import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.world.meta.*;
+import mindustry.ui.*;
 
-public class StatusEffect extends MappableContent{
+import static mindustry.Vars.*;
+
+public class StatusEffect extends UnlockableContent{
     /** Damage dealt by the unit with the effect. */
     public float damageMultiplier = 1f;
     /** Unit health multiplier. */
@@ -35,6 +40,9 @@ public class StatusEffect extends MappableContent{
     public Color color = Color.white.cpy();
     /** Effect that happens randomly on top of the affected unit. */
     public Effect effect = Fx.none;
+
+    public ObjectSet<StatusEffect> affinities = new ObjectSet<>();
+    public ObjectSet<StatusEffect> opposites = new ObjectSet<>();
     /** Transition handler map. */
     protected ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
     /** Called on init. */
@@ -51,6 +59,51 @@ public class StatusEffect extends MappableContent{
 
     public void init(Runnable run){
         this.initblock = run;
+    }
+
+    @Override
+    public boolean isHidden(){
+        return localizedName.equals(name);
+    }
+
+    @Override
+    public void setStats(){
+        if(damageMultiplier != 1){
+            stats.addPercent(Stat.damageMultiplier, damageMultiplier);
+        }
+
+        if(healthMultiplier != 1){
+            stats.addPercent(Stat.healthMultiplier, healthMultiplier);
+        }
+
+        if(speedMultiplier != 1){
+            stats.addPercent(Stat.speedMultiplier, speedMultiplier);
+        }
+
+        if(reloadMultiplier != 1){
+            stats.addPercent(Stat.reloadMultiplier, reloadMultiplier);
+        }
+
+        if(buildSpeedMultiplier != 1){
+            stats.addPercent(Stat.buildSpeedMultiplier, buildSpeedMultiplier);
+        }
+
+        if(damage > 0){
+            stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
+        }
+
+        for(StatusEffect e : affinities){
+            stats.add(Stat.affinities, e.toString(), StatUnit.none);
+        }
+
+        for(StatusEffect e : opposites){
+            stats.add(Stat.opposites, e.toString(), StatUnit.none);
+        }
+    }
+
+    @Override
+    public TextureRegion icon(Cicon c){
+        return Icon.effect.getRegion();
     }
 
     /** Runs every tick on the affected unit while time is greater than 0. */
@@ -72,8 +125,16 @@ public class StatusEffect extends MappableContent{
         effect.transitions.put(this, handler);
     }
 
+    protected void affinity(StatusEffect effect, TransitionHandler handler){
+        affinities.add(effect);
+        effect.affinities.add(this);
+        trans(effect, handler);
+    }
+
     protected void opposite(StatusEffect... effect){
+        opposites.addAll(effect);
         for(StatusEffect sup : effect){
+            sup.opposites.add(this);
             trans(sup, (unit, time, newTime, result) -> {
                 time -= newTime * 0.5f;
                 if(time > 0){
@@ -106,6 +167,11 @@ public class StatusEffect extends MappableContent{
         }
 
         return result.set(to, newTime);
+    }
+
+    @Override
+    public String toString(){
+        return localizedName;
     }
 
     @Override
