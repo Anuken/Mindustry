@@ -13,8 +13,6 @@ import mindustry.gen.*;
 import mindustry.world.meta.*;
 import mindustry.ui.*;
 
-import static mindustry.Vars.*;
-
 public class StatusEffect extends UnlockableContent{
     /** Damage dealt by the unit with the effect. */
     public float damageMultiplier = 1f;
