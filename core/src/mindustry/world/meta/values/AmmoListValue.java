@@ -10,6 +10,7 @@ import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
@@ -18,9 +19,18 @@ import static mindustry.Vars.*;
 
 public class AmmoListValue<T extends UnlockableContent> implements StatValue{
     private final ObjectMap<T, BulletType> map;
+    
+    private final Seq<Table> fragTables = new Seq<>();
+    private final boolean showIcon;
 
     public AmmoListValue(ObjectMap<T, BulletType> map){
         this.map = map;
+        this.showIcon = true;
+    }
+
+    public AmmoListValue(ObjectMap<T, BulletType> map, boolean showIcon){
+        this.map = map;
+        this.showIcon = showIcon;
     }
 
     @Override
@@ -34,7 +44,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
             BulletType type = map.get(t);
 
             //no point in displaying unit icon twice
-            if(!unit){
+            if(!unit && showIcon){
                 table.image(icon(t)).size(3 * 8).padRight(4).right().top();
                 table.add(t.localizedName).padRight(10).left().top();
             }
@@ -99,7 +109,17 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                 }
 
                 if(type.fragBullet != null){
-                    sep(bt, "@bullet.frag");
+                    ObjectMap<T, BulletType> fragMap = new ObjectMap<>();
+                    fragMap = OrderedMap.of(t, type.fragBullet);
+                    StatValue fragStatValue = new AmmoListValue<>(fragMap, false);
+
+                    fragTables.add(new Table());
+                    Table fragStatTable = new Table();
+                    fragStatValue.display(fragStatTable);
+                    section("@bullet.frag.stats", fragTables.peek(), fragStatTable);
+
+                    bt.row();
+                    bt.add(fragTables.peek()).pad(0);
                 }
             }).padTop(unit ? 0 : -9).left().get().background(unit ? null : Tex.underline);
 
@@ -110,6 +130,25 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
     void sep(Table table, String text){
         table.row();
         table.add(text);
+    }
+
+    void section(String label, Table fTable, Table table){
+        Collapser coll = new Collapser(table, Core.settings.getBool("collapsed-" + label, false));
+        coll.setDuration(0.1f);
+
+        fTable.table(name -> {
+            name.add(label).pad(10).growX().left().color(Pal.accent);
+
+            name.button(Icon.downOpen, Styles.emptyi, () -> {
+                coll.toggle(false);
+                Core.settings.put("collapsed-" + label, coll.isCollapsed());
+            }).update(i -> i.getStyle().imageUp = (!coll.isCollapsed() ? Icon.upOpen : Icon.downOpen)).size(40f).right().padRight(10f);
+        }).growX();
+        fTable.row();
+        fTable.image().growX().pad(5).padLeft(10).padRight(10).height(3).color(Pal.accent);
+        fTable.row();
+        fTable.add(coll);
+        fTable.row();
     }
 
     TextureRegion icon(T t){
