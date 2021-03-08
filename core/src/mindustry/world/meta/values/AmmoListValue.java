@@ -123,7 +123,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                     bt.row();
                     bt.add(fragTables.peek()).pad(0);
                 }
-            }).padTop(unit ? 0 : -9).left().get().background(unit ? null : Tex.underline);
+            }).padTop(unit || isFrag ? 0 : -9).left().get().background(unit || isFrag ? null : Tex.underline);
 
             table.row();
         }
@@ -139,7 +139,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
         coll.setDuration(0.1f);
 
         fTable.table(name -> {
-            name.add(label).pad(10).growX().left().color(Pal.accent);
+            name.add(label).pad(10).growX().left().color(Pal.stat);
 
             name.button(Icon.downOpen, Styles.emptyi, () -> {
                 coll.toggle(false);
@@ -147,7 +147,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
             }).update(i -> i.getStyle().imageUp = (!coll.isCollapsed() ? Icon.upOpen : Icon.downOpen)).size(40f).right().padRight(10f);
         }).growX();
         fTable.row();
-        fTable.image().growX().pad(5).padLeft(10).padRight(10).height(3).color(Pal.accent);
+        fTable.image().growX().pad(5).padLeft(10).padRight(10).height(3).color(Pal.stat);
         fTable.row();
         fTable.add(coll);
         fTable.row();
