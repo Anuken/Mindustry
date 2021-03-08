@@ -160,7 +160,7 @@ public class Packets{
         public int version;
         public String versionType;
         public Seq<String> mods;
-        public String name, uuid, usid;
+        public String name, locale, uuid, usid;
         public boolean mobile;
         public int color;
 
@@ -169,6 +169,7 @@ public class Packets{
             buffer.putInt(Version.build);
             TypeIO.writeString(buffer, versionType);
             TypeIO.writeString(buffer, name);
+            TypeIO.writeString(buffer, locale);
             TypeIO.writeString(buffer, usid);
 
             byte[] b = Base64Coder.decode(uuid);
@@ -190,6 +191,7 @@ public class Packets{
             version = buffer.getInt();
             versionType = TypeIO.readString(buffer);
             name = TypeIO.readString(buffer);
+            locale = TypeIO.readString(buffer);
             usid = TypeIO.readString(buffer);
             byte[] idbytes = new byte[16];
             buffer.get(idbytes);

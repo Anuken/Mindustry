@@ -26,17 +26,23 @@ public class Fx{
     none = new Effect(0, 0f, e -> {}),
 
     unitSpawn = new Effect(30f, e -> {
-        if(!(e.data instanceof UnitType)) return;
-
-        alpha(e.fin());
+        if(!(e.data instanceof UnitType unit)) return;
 
         float scl = 1f + e.fout() * 2f;
 
-        UnitType unit = e.data();
         TextureRegion region = unit.icon(Cicon.full);
 
+        alpha(e.fout());
+        mixcol(Color.white, e.fin());
+
+        rect(region, e.x, e.y, 180f);
+
+        reset();
+
+        alpha(e.fin());
+
         rect(region, e.x, e.y,
-            region.width * Draw.scl * scl, region.height * Draw.scl * scl, 180f);
+            region.width * Draw.scl * scl, region.height * Draw.scl * scl, e.rotation - 90);
 
     }),
 
@@ -418,12 +424,32 @@ public class Fx{
             Fill.circle(e.x + x, e.y + y, e.fout() * 2f);
         });
     }),
+    
+    hitLaserBlast = new Effect(12, e -> {
+        color(e.color);
+        stroke(e.fout() * 1.5f);
+
+        randLenVectors(e.id, 8, e.finpow() * 17f, e.rotation, 360f, (x, y) -> {
+            float ang = Mathf.angle(x, y);
+            lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1f);
+        });
+    }),
 
     hitLancer = new Effect(12, e -> {
         color(Color.white);
         stroke(e.fout() * 1.5f);
 
         randLenVectors(e.id, 8, e.finpow() * 17f, e.rotation, 360f, (x, y) -> {
+            float ang = Mathf.angle(x, y);
+            lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1f);
+        });
+    }),
+
+    hitBeam = new Effect(12, e -> {
+        color(e.color);
+        stroke(e.fout() * 2f);
+
+        randLenVectors(e.id, 6, e.finpow() * 18f, e.rotation, 360f, (x, y) -> {
             float ang = Mathf.angle(x, y);
             lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1f);
         });
@@ -697,6 +723,19 @@ public class Fx{
         stroke(2f * e.fout());
         Lines.circle(e.x, e.y, 5f * e.fout());
     }),
+    
+    forceShrink = new Effect(20, e -> {
+        color(e.color, e.fout());
+        if(renderer.animateShields){
+            Fill.poly(e.x, e.y, 6, e.rotation * e.fout());
+        }else{
+            stroke(1.5f);
+            Draw.alpha(0.09f);
+            Fill.poly(e.x, e.y, 6, e.rotation * e.fout());
+            Draw.alpha(1f);
+            Lines.poly(e.x, e.y, 6, e.rotation * e.fout());
+        }
+    }).layer(Layer.shields),
 
     flakExplosionBig = new Effect(30, e -> {
         color(Pal.bulletYellowBack);
@@ -896,7 +935,7 @@ public class Fx{
         });
     }),
 
-    dynamicExplosion = new Effect(30, e -> {
+    dynamicExplosion = new Effect(30, 100f, e -> {
         float intensity = e.rotation;
 
         e.scaled(5 + intensity * 2, i -> {
@@ -1561,6 +1600,18 @@ public class Fx{
     healBlockFull = new Effect(20, e -> {
         color(e.color);
         alpha(e.fout());
+        Fill.square(e.x, e.y, e.rotation * tilesize / 2f);
+    }),
+
+    rotateBlock = new Effect(30, e -> {
+        color(Pal.accent);
+        alpha(e.fout() * 1);
+        Fill.square(e.x, e.y, e.rotation * tilesize / 2f);
+    }),
+
+    lightBlock = new Effect(60, e -> {
+        color(e.color);
+        alpha(e.fout() * 1);
         Fill.square(e.x, e.y, e.rotation * tilesize / 2f);
     }),
 

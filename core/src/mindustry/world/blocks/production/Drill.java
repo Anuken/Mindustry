@@ -38,7 +38,7 @@ public class Drill extends Block{
     public float warmupSpeed = 0.02f;
 
     //return variables for countOre
-    protected Item returnItem;
+    protected @Nullable Item returnItem;
     protected int returnCount;
 
     /** Whether to draw the item this drill is mining. */
@@ -90,7 +90,7 @@ public class Drill extends Block{
         super.setBars();
 
         bars.add("drillspeed", (DrillBuild e) ->
-             new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(e.lastDrillSpeed * 60 * e.timeScale(), 2)), () -> Pal.ammo, () -> e.warmup));
+             new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(e.lastDrillSpeed * 60 * e.timeScale, 2)), () -> Pal.ammo, () -> e.warmup));
     }
 
     public Item getDrop(Tile tile){
@@ -113,6 +113,8 @@ public class Drill extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
         Tile tile = world.tile(x, y);
         if(tile == null) return;
 

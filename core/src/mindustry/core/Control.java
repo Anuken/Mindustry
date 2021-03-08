@@ -59,6 +59,15 @@ public class Control implements ApplicationListener, Loadable{
         saves = new Saves();
         sound = new SoundControl();
 
+        //show dialog saying that mod loading was skipped.
+        Events.on(ClientLoadEvent.class, e -> {
+            if(Vars.mods.skipModLoading() && Vars.mods.list().any()){
+                Time.runTask(4f, () -> {
+                    ui.showInfo("@mods.initfailed");
+                });
+            }
+        });
+
         Events.on(StateChangeEvent.class, event -> {
             if((event.from == State.playing && event.to == State.menu) || (event.from == State.menu && event.to != State.menu)){
                 Time.runTask(5f, platform::updateRPC);
@@ -74,7 +83,7 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(WorldLoadEvent.class, event -> {
             if(Mathf.zero(player.x) && Mathf.zero(player.y)){
-                Building core = state.teams.closestCore(0, 0, player.team());
+                Building core = player.bestCore();
                 if(core != null){
                     player.set(core);
                     camera.position.set(core);

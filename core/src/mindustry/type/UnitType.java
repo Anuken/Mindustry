@@ -11,6 +11,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -182,17 +183,17 @@ public class UnitType extends UnlockableContent{
 
                 var count = new float[]{-1};
                 bars.table().update(t -> {
-                    if(count[0] != payload.payloadUsed()) {
+                    if(count[0] != payload.payloadUsed()){
                         payload.contentInfo(t, 8 * 2, 270);
                         count[0] = payload.payloadUsed();
                     }
-                }).growX().left();
+                }).growX().left().height(0f).pad(0f);
             }
         }).growX();
 
         if(unit.controller() instanceof LogicAI){
             table.row();
-            table.add(Blocks.microProcessor.emoji() + " " + Core.bundle.get("units.processorcontrol")).growX().left();
+            table.add(Blocks.microProcessor.emoji() + " " + Core.bundle.get("units.processorcontrol")).growX().wrap().left();
             table.row();
             table.label(() -> Iconc.settings + " " + (long)unit.flag + "").color(Color.lightGray).growX().wrap().left();
         }
@@ -224,6 +225,7 @@ public class UnitType extends UnlockableContent{
         Unit inst = constructor.get();
 
         stats.add(Stat.health, health);
+        stats.add(Stat.armor, armor);
         stats.add(Stat.speed, speed);
         stats.add(Stat.itemCapacity, itemCapacity);
         stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
@@ -292,10 +294,15 @@ public class UnitType extends UnlockableContent{
 
         if(maxRange < 0){
             maxRange = 0f;
+            maxRange = Math.max(maxRange, range);
 
             for(Weapon weapon : weapons){
                 maxRange = Math.max(maxRange, weapon.bullet.range() + hitSize / 2f);
             }
+        }
+
+        if(weapons.isEmpty()){
+            range = maxRange = miningRange;
         }
 
         if(mechStride < 0){

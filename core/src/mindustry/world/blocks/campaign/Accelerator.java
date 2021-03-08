@@ -21,7 +21,7 @@ public class Accelerator extends Block{
     public @Load("launch-arrow") TextureRegion arrowRegion;
 
     public Block launching = Blocks.coreNucleus;
-    public int[] capacities;
+    public int[] capacities = {};
 
     public Accelerator(String name){
         super(name);
@@ -48,7 +48,7 @@ public class Accelerator extends Block{
     public boolean outputsItems(){
         return false;
     }
-    
+
     public class AcceleratorBuild extends Building{
         public float heat, statusLerp;
 
@@ -58,7 +58,7 @@ public class Accelerator extends Block{
             heat = Mathf.lerpDelta(heat, consValid() ? 1f : 0f, 0.05f);
             statusLerp = Mathf.lerpDelta(statusLerp, power.status, 0.05f);
         }
-        
+
         @Override
         public void draw(){
             super.draw();
@@ -72,7 +72,7 @@ public class Accelerator extends Block{
                     Draw.rect(arrowRegion, x + Angles.trnsx(rot, length), y + Angles.trnsy(rot, length), rot + 180f);
                 }
             }
-            
+
             if(heat < 0.0001f) return;
 
             float rad = size * tilesize / 2f * 0.74f;

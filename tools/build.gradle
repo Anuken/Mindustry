@@ -436,3 +436,10 @@ task updateScripts(dependsOn: classes, type: JavaExec){
     standardInput = System.in
     workingDir = "../"
 }
+
+task genBindings(dependsOn: classes, type: JavaExec){
+    main = "mindustry.tools.BindingsGenerator"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = "../"
+}

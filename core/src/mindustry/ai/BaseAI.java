@@ -209,6 +209,16 @@ public class BaseAI{
             }
             Tile wtile = world.tile(realX, realY);
 
+            if(tile.block instanceof PayloadConveyor || tile.block instanceof PayloadAcceptor){
+                //near a building
+                for(Point2 point : Edges.getEdges(tile.block.size)){
+                    var t = world.build(tile.x + point.x, tile.y + point.y);
+                    if(t != null){
+                        return false;
+                    }
+                }
+            }
+
             //may intersect AI path
             tmpTiles.clear();
             if(tile.block.solid && wtile != null && wtile.getLinkedTilesAs(tile.block, tmpTiles).contains(t -> path.contains(t.pos()))){
@@ -265,6 +275,7 @@ public class BaseAI{
         if(spawn == null) return;
 
         for(int wx = lastX; wx <= lastX + lastW; wx++){
+            outer:
             for(int wy = lastY; wy <= lastY + lastH; wy++){
                 Tile tile = world.tile(wx, wy);
 
@@ -279,12 +290,11 @@ public class BaseAI{
 
                     Tile o = world.tile(tile.x + p.x, tile.y + p.y);
                     if(o != null && (o.block() instanceof PayloadAcceptor || o.block() instanceof PayloadConveyor)){
-                        break;
+                        continue outer;
                     }
 
                     if(o != null && o.team() == data.team && !(o.block() instanceof Wall)){
                         any = true;
-                        break;
                     }
                 }
 

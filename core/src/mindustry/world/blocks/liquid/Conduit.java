@@ -13,6 +13,7 @@ import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -67,6 +68,11 @@ public class Conduit extends LiquidBlock implements Autotiler{
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return otherblock.hasLiquids && (otherblock.outputsLiquid || (lookingAt(tile, rotation, otherx, othery, otherblock))) && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
+    }
+
+    @Override
+    public void handlePlacementLine(Seq<BuildPlan> plans){
+        Placement.calculateBridges(plans, (ItemBridge)Blocks.bridgeConduit);
     }
 
     @Override

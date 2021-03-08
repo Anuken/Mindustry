@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -25,10 +26,10 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class BuilderComp implements Posc, Teamc, Rotc{
+abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
     static final Vec2[] vecs = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
 
-    @Import float x, y, rotation;
+    @Import float x, y, rotation, buildSpeedMultiplier;
     @Import UnitType type;
     @Import Team team;
 
@@ -40,7 +41,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
     private transient float buildAlpha = 0f;
 
     public boolean canBuild(){
-        return type.buildSpeed > 0;
+        return type.buildSpeed > 0 && buildSpeedMultiplier > 0;
     }
 
     @Override
@@ -125,9 +126,9 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
 
         //otherwise, update it.
         if(current.breaking){
-            entity.deconstruct(self(), core, 1f / entity.buildCost * Time.delta * type.buildSpeed * state.rules.buildSpeedMultiplier);
+            entity.deconstruct(self(), core, 1f / entity.buildCost * Time.delta * type.buildSpeed * buildSpeedMultiplier * state.rules.buildSpeedMultiplier);
         }else{
-            entity.construct(self(), core, 1f / entity.buildCost * Time.delta * type.buildSpeed * state.rules.buildSpeedMultiplier, current.config);
+            entity.construct(self(), core, 1f / entity.buildCost * Time.delta * type.buildSpeed * buildSpeedMultiplier * state.rules.buildSpeedMultiplier, current.config);
         }
 
         current.stuck = Mathf.equal(current.progress, entity.progress);
@@ -136,10 +137,17 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
 
     /** Draw all current build plans. Does not draw the beam effect, only the positions. */
     void drawBuildPlans(){
+        Boolf<BuildPlan> skip = plan -> plan.progress > 0.01f || (buildPlan() == plan && plan.initialized && (within(plan.x * tilesize, plan.y * tilesize, buildingRange) || state.isEditor()));
 
-        for(BuildPlan plan : plans){
-            if(plan.progress > 0.01f || (buildPlan() == plan && plan.initialized && (within(plan.x * tilesize, plan.y * tilesize, buildingRange) || state.isEditor()))) continue;
-            drawPlan(plan, 1f);
+        for(int i = 0; i < 2; i++){
+            for(BuildPlan plan : plans){
+                if(skip.get(plan)) continue;
+                if(i == 0){
+                    drawPlan(plan, 1f);
+                }else{
+                    drawPlanTop(plan, 1f);
+                }
+            }
         }
 
         Draw.reset();
@@ -153,7 +161,11 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
             request.block.drawPlan(request, control.input.allRequests(),
             Build.validPlace(request.block, team, request.x, request.y, request.rotation) || control.input.requestMatches(request),
             alpha);
+        }
+    }
 
+    void drawPlanTop(BuildPlan request, float alpha){
+        if(!request.breaking){
             Draw.reset();
             Draw.mixcol(Color.white, 0.24f + Mathf.absin(Time.globalTime, 6f, 0.28f));
             Draw.alpha(alpha);
@@ -251,6 +263,7 @@ abstract class BuilderComp implements Posc, Teamc, Rotc{
         if(core != null && active && !isLocal() && !(tile.block() instanceof ConstructBlock)){
             Draw.z(Layer.plans - 1f);
             drawPlan(plan, 0.5f);
+            drawPlanTop(plan, 0.5f);
             Draw.z(Layer.flyingUnit);
         }
 

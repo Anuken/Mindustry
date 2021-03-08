@@ -15,7 +15,7 @@ import static mindustry.Vars.*;
 
 public class AIController implements UnitController{
     protected static final Vec2 vec = new Vec2();
-    protected static final int timerTarget = 0, timerTarget2 = 1, timerTarget3 = 2;
+    protected static final int timerTarget = 0, timerTarget2 = 1, timerTarget3 = 2, timerTarget4 = 3;
 
     protected Unit unit;
     protected Interval timer = new Interval(4);
@@ -123,7 +123,7 @@ public class AIController implements UnitController{
                     targets[i] = findTarget(mountX, mountY, weapon.bullet.range(), weapon.bullet.collidesAir, weapon.bullet.collidesGround);
                 }
 
-                if(Units.invalidateTarget(targets[i], unit.team, mountX, mountY, weapon.bullet.range())){
+                if(checkTarget(targets[i], mountX, mountY, weapon.bullet.range())){
                     targets[i] = null;
                 }
             }
@@ -149,6 +149,10 @@ public class AIController implements UnitController{
         }
     }
 
+    protected boolean checkTarget(Teamc target, float x, float y, float range){
+        return Units.invalidateTarget(target, unit.team, x, y, range);
+    }
+
     protected boolean shouldShoot(){
         return true;
     }
@@ -163,7 +167,7 @@ public class AIController implements UnitController{
     }
 
     protected boolean retarget(){
-        return timer.get(timerTarget, 40);
+        return timer.get(timerTarget, target == null ? 40 : 90);
     }
 
     protected Teamc findTarget(float x, float y, float range, boolean air, boolean ground){

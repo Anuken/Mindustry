@@ -62,7 +62,7 @@ public class Map implements Comparable<Map>, Publishable{
     }
 
     public int getHightScore(){
-        return Core.settings.getInt("hiscore" + file.nameWithoutExtension(), 0);
+        return Core.settings.getInt("hiscore" + file.nameWithoutExtension() + tags.get("steamid", ""), 0);
     }
 
     public Texture safeTexture(){
@@ -78,7 +78,7 @@ public class Map implements Comparable<Map>, Publishable{
     }
 
     public void setHighScore(int score){
-        Core.settings.put("hiscore" + file.nameWithoutExtension(), score);
+        Core.settings.put("hiscore" + file.nameWithoutExtension() + tags.get("steamid", ""), score);
     }
 
     /** Returns the result of applying this map's rules to the specified gamemode.*/

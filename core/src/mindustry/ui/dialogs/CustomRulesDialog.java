@@ -141,8 +141,9 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
         check("@rules.schematic", b -> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
+        check("@rules.coreincinerates", b -> rules.coreIncinerates = b, () -> rules.coreIncinerates);
         number("@rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
-        number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, 0.00001f, 10000f);
+        number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, 0.001f, 50f);
         number("@rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
         number("@rules.blockhealthmultiplier", f -> rules.blockHealthMultiplier = f, () -> rules.blockHealthMultiplier);
         number("@rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
@@ -160,9 +161,10 @@ public class CustomRulesDialog extends BaseDialog{
 
         title("@rules.title.unit");
         check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
-        number("@rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
+        check("@rules.unitcapvariable", b -> rules.unitCapVariable = b, () -> rules.unitCapVariable);
+        number("@rules.unitcap", true, f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
-        number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0.00001f, 100f);
+        number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0.001f, 50f);
 
         title("@rules.title.enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
@@ -202,6 +204,17 @@ public class CustomRulesDialog extends BaseDialog{
 
     void number(String text, Floatc cons, Floatp prov, Boolp condition){
         number(text, false, cons, prov, condition, 0, Float.MAX_VALUE);
+    }
+
+    void number(String text, boolean integer, Intc cons, Intp prov, int min, int max){
+        main.table(t -> {
+            t.left();
+            t.add(text).left().padRight(5);
+            t.field((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseInt(s)))
+                    .padRight(100f)
+                    .valid(f -> Strings.parseInt(f) >= min && Strings.parseInt(f) <= max).width(120f).left().addInputDialog();
+        }).padTop(0);
+        main.row();
     }
 
     void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition, float min, float max){

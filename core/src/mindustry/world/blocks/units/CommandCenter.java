@@ -31,6 +31,7 @@ public class CommandCenter extends Block{
         destructible = true;
         solid = true;
         configurable = true;
+        drawDisabled = false;
 
         config(UnitCommand.class, (CommandBuild build, UnitCommand command) -> {
             build.team.data().command = command;

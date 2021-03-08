@@ -34,6 +34,12 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void setup(){
+        String dataDir = OS.env("MINDUSTRY_DATA_DIR");
+        if(dataDir != null){
+            Core.settings.setDataDirectory(files.absolute(dataDir));
+        }
+
+        checkLaunch();
         loadLogger();
 
         loader = new LoadRenderer();
@@ -145,7 +151,12 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 finished = true;
                 Events.fire(new ClientLoadEvent());
                 super.resize(graphics.getWidth(), graphics.getHeight());
-                app.post(() -> app.post(() -> app.post(() -> app.post(() -> super.resize(graphics.getWidth(), graphics.getHeight())))));
+                app.post(() -> app.post(() -> app.post(() -> app.post(() -> {
+                    super.resize(graphics.getWidth(), graphics.getHeight());
+
+                    //mark initialization as complete
+                    finishLaunch();
+                }))));
             }
         }else{
             asyncCore.begin();
@@ -169,6 +180,12 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
     }
 
     @Override
+    public void exit(){
+        //on graceful exit, finish the launch normally.
+        Vars.finishLaunch();
+    }
+
+    @Override
     public void init(){
         setup();
     }
@@ -182,6 +199,11 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void pause(){
+        //when the user tabs out on mobile, the exit() event doesn't fire reliably - in that case, just assume they're about to kill the app
+        //this isn't 100% reliable but it should work for most cases
+        if(mobile){
+            Vars.finishLaunch();
+        }
         if(finished){
             super.pause();
         }

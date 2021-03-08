@@ -12,6 +12,7 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
@@ -23,7 +24,7 @@ import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 public class UnitFactory extends UnitBlock{
-    public int[] capacities;
+    public int[] capacities = {};
 
     public Seq<UnitPlan> plans = new Seq<>(4);
 
@@ -99,6 +100,7 @@ public class UnitFactory extends UnitBlock{
                 if(plan.unit.unlockedNow()){
                     table.image(plan.unit.icon(Cicon.small)).size(8 * 3).padRight(2).right();
                     table.add(plan.unit.localizedName).left();
+                    table.add(Strings.autoFixed(plan.time / 60f, 1) + " " + Core.bundle.get("unit.seconds")).color(Color.lightGray).padLeft(12).left();
                     table.row();
                 }
             }
@@ -223,11 +225,12 @@ public class UnitFactory extends UnitBlock{
                 UnitPlan plan = plans.get(currentPlan);
 
                 if(progress >= plan.time && consValid()){
-                    progress = 0f;
+                    progress %= 1f;
 
                     payload = new UnitPayload(plan.unit.create(team));
                     payVector.setZero();
                     consume();
+                    Events.fire(new UnitCreateEvent(payload.unit, this));
                 }
 
                 progress = Mathf.clamp(progress, 0, plan.time);

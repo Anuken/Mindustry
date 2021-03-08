@@ -1,14 +1,17 @@
 package mindustry.world.blocks.defense;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -45,7 +48,11 @@ public class OverdriveProjector extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.accent);
+        super.drawPlace(x, y, rotation, valid);
+
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
+
+        indexer.eachBlock(player.team(), x * tilesize + offset, y * tilesize + offset, range, other -> other.block.canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
     }
 
     @Override
@@ -60,6 +67,12 @@ public class OverdriveProjector extends Block{
             stats.add(Stat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
             stats.add(Stat.boostEffect, (int)((speedBoost + speedBoostPhase) * 100f), StatUnit.percent);
         }
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+        bars.add("boost", (OverdriveBuild entity) -> new Bar(() -> Core.bundle.format("bar.boost", (int)(entity.realBoost() * 100)), () -> Pal.accent, () -> entity.realBoost() / (hasBoost ? speedBoost + speedBoostPhase : speedBoost)));
     }
 
     public class OverdriveBuild extends Building implements Ranged{
@@ -88,17 +101,20 @@ public class OverdriveProjector extends Block{
                 phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
             }
 
+            if(charge >= reload){
+                float realRange = range + phaseHeat * phaseRangeBoost;
+
+                charge = 0f;
+                indexer.eachBlock(this, realRange, other -> true, other -> other.applyBoost(realBoost(), reload + 1f));
+            }
+
             if(timer(timerUse, useTime) && efficiency() > 0 && consValid()){
                 consume();
             }
+        }
 
-            if(charge >= reload){
-                float realRange = range + phaseHeat * phaseRangeBoost;
-                float realBoost = (speedBoost + phaseHeat * speedBoostPhase) * efficiency();
-
-                charge = 0f;
-                indexer.eachBlock(this, realRange, other -> true, other -> other.applyBoost(realBoost, reload + 1f));
-            }
+        public float realBoost(){
+            return consValid() ? (speedBoost + phaseHeat * speedBoostPhase) * efficiency() : 0f;
         }
 
         @Override
@@ -121,7 +137,14 @@ public class OverdriveProjector extends Block{
             Draw.rect(topRegion, x, y);
             Draw.alpha(1f);
             Lines.stroke((2f * f + 0.1f) * heat);
-            Lines.square(x, y, Math.min(1f + (1f - f) * size * tilesize / 2f, size * tilesize/2f));
+
+            float r = Math.max(0f, Mathf.clamp(2f - f * 2f) * size * tilesize / 2f - f - 0.2f), w = Mathf.clamp(0.5f - f) * size * tilesize;
+            Lines.beginLine();
+            for(int i = 0; i < 4; i++){
+                Lines.linePoint(x + Geometry.d4(i).x * r + Geometry.d4(i).y * w, y + Geometry.d4(i).y * r - Geometry.d4(i).x * w);
+                if(f < 0.5f) Lines.linePoint(x + Geometry.d4(i).x * r - Geometry.d4(i).y * w, y + Geometry.d4(i).y * r + Geometry.d4(i).x * w);
+            }
+            Lines.endLine(true);
 
             Draw.reset();
         }

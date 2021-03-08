@@ -15,10 +15,12 @@ import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
+import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.game.*;
@@ -26,6 +28,7 @@ import mindustry.game.Objectives.*;
 import mindustry.gen.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
+import mindustry.type.weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
@@ -42,14 +45,14 @@ public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class);
-    ObjectMap<String, AssetDescriptor> sounds = new ObjectMap<>();
+    ObjectMap<String, AssetDescriptor<?>> sounds = new ObjectMap<>();
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
         put(Effect.class, (type, data) -> {
             if(data.isString()){
                 return field(Fx.class, data);
             }
-            Class<? extends Effect> bc = data.has("type") ? resolve(data.getString("type"), "mindustry.entities.effect") : ParticleEffect.class;
+            Class<? extends Effect> bc = resolve(data.getString("type", ""), ParticleEffect.class);
             data.remove("type");
             Effect result = make(bc);
             readFields(result, data);
@@ -83,9 +86,20 @@ public class ContentParser{
             if(data.isString()){
                 return field(Bullets.class, data);
             }
-            Class<? extends BulletType> bc = data.has("type") ? resolve(data.getString("type"), "mindustry.entities.bullet") : BasicBulletType.class;
+            var bc = resolve(data.getString("type", ""), BasicBulletType.class);
             data.remove("type");
             BulletType result = make(bc);
+            readFields(result, data);
+            return result;
+        });
+        put(DrawBlock.class, (type, data) -> {
+            if(data.isString()){
+                //try to instantiate
+                return make(resolve(data.asString()));
+            }
+            var bc = resolve(data.getString("type", ""), DrawBlock.class);
+            data.remove("type");
+            var result = make(bc);
             readFields(result, data);
             return result;
         });
@@ -104,9 +118,16 @@ public class ContentParser{
             return sound;
         });
         put(Objectives.Objective.class, (type, data) -> {
-            Class<? extends Objectives.Objective> oc = data.has("type") ? resolve(data.getString("type"), "mindustry.game.Objectives") : SectorComplete.class;
+            var oc = resolve(data.getString("type", ""), SectorComplete.class);
             data.remove("type");
             Objectives.Objective obj = make(oc);
+            readFields(obj, data);
+            return obj;
+        });
+        put(Ability.class, (type, data) -> {
+            Class<? extends Ability> oc = resolve(data.getString("type", ""));
+            data.remove("type");
+            Ability obj = make(oc);
             readFields(obj, data);
             return obj;
         });
@@ -118,12 +139,13 @@ public class ContentParser{
         });
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
-     * This is done to accomodate binding of content names first.*/
+     * This is done to accommodate binding of content names first.*/
     private Seq<Runnable> reads = new Seq<>();
     private Seq<Runnable> postreads = new Seq<>();
     private ObjectSet<Object> toBeParsed = new ObjectSet<>();
+
     LoadedMod currentMod;
-    private Content currentContent;
+    Content currentContent;
 
     private Json parser = new Json(){
         @Override
@@ -160,11 +182,6 @@ public class ContentParser{
                     }
                 }
 
-                //try to load DrawBlock by instantiating it
-                if(type == DrawBlock.class && jsonData.isString()){
-                    return Reflect.make("mindustry.world.draw." + Strings.capitalize(jsonData.asString()));
-                }
-
                 if(Content.class.isAssignableFrom(type)){
                     ContentType ctype = contentTypes.getThrow(type, () -> new IllegalArgumentException("No content type for class: " + type.getSimpleName()));
                     String prefix = currentMod != null ? currentMod.name + "-" : "";
@@ -194,30 +211,7 @@ public class ContentParser{
                     throw new IllegalArgumentException("When defining properties for an existing block, you must not re-declare its type. The original type will be used. Block: " + name);
                 }
             }else{
-                //TODO generate dynamically instead of doing.. this
-                Class<? extends Block> type;
-
-                try{
-                    type = resolve(getType(value),
-                    "mindustry.world",
-                    "mindustry.world.blocks",
-                    "mindustry.world.blocks.defense",
-                    "mindustry.world.blocks.defense.turrets",
-                    "mindustry.world.blocks.distribution",
-                    "mindustry.world.blocks.environment",
-                    "mindustry.world.blocks.liquid",
-                    "mindustry.world.blocks.logic",
-                    "mindustry.world.blocks.power",
-                    "mindustry.world.blocks.production",
-                    "mindustry.world.blocks.sandbox",
-                    "mindustry.world.blocks.storage",
-                    "mindustry.world.blocks.units"
-                    );
-                }catch(IllegalArgumentException e){
-                    type = Block.class;
-                }
-
-                block = make(type, mod + "-" + name);
+                block = make(resolve(value.getString("type", ""), Block.class), mod + "-" + name);
             }
 
             currentContent = block;
@@ -225,22 +219,19 @@ public class ContentParser{
             read(() -> {
                 if(value.has("consumes") && value.get("consumes").isObject()){
                     for(JsonValue child : value.get("consumes")){
-                        if(child.name.equals("item")){
-                            block.consumes.item(find(ContentType.item, child.asString()));
-                        }else if(child.name.equals("items")){
-                            block.consumes.add((Consume)parser.readValue(ConsumeItems.class, child));
-                        }else if(child.name.equals("liquid")){
-                            block.consumes.add((Consume)parser.readValue(ConsumeLiquid.class, child));
-                        }else if(child.name.equals("power")){
-                            if(child.isNumber()){
-                                block.consumes.power(child.asFloat());
-                            }else{
-                                block.consumes.add((Consume)parser.readValue(ConsumePower.class, child));
+                        switch(child.name){
+                            case "item" -> block.consumes.item(find(ContentType.item, child.asString()));
+                            case "items" -> block.consumes.add((Consume)parser.readValue(ConsumeItems.class, child));
+                            case "liquid" -> block.consumes.add((Consume)parser.readValue(ConsumeLiquid.class, child));
+                            case "power" -> {
+                                if(child.isNumber()){
+                                    block.consumes.power(child.asFloat());
+                                }else{
+                                    block.consumes.add((Consume)parser.readValue(ConsumePower.class, child));
+                                }
                             }
-                        }else if(child.name.equals("powerBuffered")){
-                            block.consumes.powerBuffered(child.asFloat());
-                        }else{
-                            throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
+                            case "powerBuffered" -> block.consumes.powerBuffered(child.asFloat());
+                            default -> throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
                         }
                     }
                     value.remove("consumes");
@@ -284,15 +275,6 @@ public class ContentParser{
                 if(value.has("requirements")){
                     JsonValue rec = value.remove("requirements");
 
-                    //intermediate class for parsing
-                    class UnitReq{
-                        public Block block;
-                        public ItemStack[] requirements = {};
-                        @Nullable
-                        public UnitType previous;
-                        public float time = 60f * 10f;
-                    }
-
                     UnitReq req = parser.readValue(UnitReq.class, rec);
 
                     if(req.block instanceof Reconstructor r){
@@ -308,7 +290,8 @@ public class ContentParser{
                 }
 
                 if(value.has("controller")){
-                    unit.defaultController = make(resolve(value.getString("controller"), "mindustry.ai.types"));
+                    unit.defaultController = supply(resolve(value.getString("controller"), FlyingAI.class));
+                    value.remove("controller");
                 }
 
                 //read extra default waves
@@ -334,8 +317,8 @@ public class ContentParser{
                 readBundle(ContentType.weather, name, value);
             }else{
                 readBundle(ContentType.weather, name, value);
-                Class<? extends Weather> type = resolve(getType(value), "mindustry.type.weather");
-                item = make(type);
+                item = make(resolve(getType(value), ParticleWeather.class), mod + "-" + name);
+                value.remove("type");
             }
             currentContent = item;
             read(() -> readFields(item, value));
@@ -425,6 +408,12 @@ public class ContentParser{
             this.currentMod = mod;
             this.currentContent = cont;
             run.run();
+
+            //check nulls after parsing
+            if(cont != null){
+                toBeParsed.remove(cont);
+                checkNullFields(cont);
+            }
         });
     }
 
@@ -447,6 +436,7 @@ public class ContentParser{
         try{
             run.run();
         }catch(Throwable t){
+            Log.err(t);
             //don't overwrite double errors
             markError(currentContent, t);
         }
@@ -624,8 +614,8 @@ public class ContentParser{
         JsonValue research = jsonMap.remove("research");
 
         toBeParsed.remove(object);
-        Class type = object.getClass();
-        ObjectMap<String, FieldMetadata> fields = parser.getFields(type);
+        var type = object.getClass();
+        var fields = parser.getFields(type);
         for(JsonValue child = jsonMap.child; child != null; child = child.next){
             FieldMetadata metadata = fields.get(child.name().replace(" ", "_"));
             if(metadata == null){
@@ -653,7 +643,6 @@ public class ContentParser{
                 throw ex;
             }
         }
-
 
         if(object instanceof UnlockableContent unlock && research != null){
 
@@ -706,21 +695,41 @@ public class ContentParser{
         }
     }
 
-    /** Tries to resolve a class from a list of potential class names. */
-    <T> Class<T> resolve(String base, String... potentials){
-        if(!base.isEmpty() && Character.isLowerCase(base.charAt(0))) base = Strings.capitalize(base);
+    /** Tries to resolve a class from the class type map. */
+    <T> Class<T> resolve(String base){
+        return resolve(base, null);
+    }
 
-        for(String type : potentials){
+    /** Tries to resolve a class from the class type map. */
+    <T> Class<T> resolve(String base, Class<T> def){
+        //no base class specified
+        if(base.isEmpty() && def != null) return def;
+
+        //return mapped class if found in the global map
+        var out = ClassMap.classes.get(!base.isEmpty() && Character.isLowerCase(base.charAt(0)) ? Strings.capitalize(base) : base);
+        if(out != null) return (Class<T>)out;
+
+        //try to resolve it as a raw class name if it's allowed
+        if(base.indexOf('.') != -1 && Scripts.allowClass(base)){
             try{
-                return (Class<T>)Class.forName(type + '.' + base);
+                return (Class<T>)Class.forName(base);
             }catch(Exception ignored){
-                try{
-                    return (Class<T>)Class.forName(type + '$' + base);
-                }catch(Exception ignored2){
+                //try to load from a mod's class loader
+                for(LoadedMod mod : mods.mods){
+                    if(mod.loader != null){
+                        try{
+                            return (Class<T>)Class.forName(base, true, mod.loader);
+                        }catch(Exception ignore){}
+                    }
                 }
             }
         }
-        throw new IllegalArgumentException("Types not found: " + base + "." + potentials[0]);
+
+        if(def != null){
+            Log.warn("[@] No type '" + base + "' found, defaulting to type '" + def.getSimpleName() + "'", currentContent == null ? currentMod.name : "");
+            return def;
+        }
+        throw new IllegalArgumentException("Type not found: " + base);
     }
 
     private interface FieldParser{
@@ -729,6 +738,15 @@ public class ContentParser{
 
     private interface TypeParser<T extends Content>{
         T parse(String mod, String name, JsonValue value) throws Exception;
+    }
+
+    //intermediate class for parsing
+    static class UnitReq{
+        public Block block;
+        public ItemStack[] requirements = {};
+        @Nullable
+        public UnitType previous;
+        public float time = 60f * 10f;
     }
 
 }

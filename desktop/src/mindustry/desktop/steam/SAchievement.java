@@ -56,6 +56,7 @@ public enum SAchievement{
     enablePixelation,
     openWiki,
     useAccelerator,
+    unlockAllZones,
 
     ;
 

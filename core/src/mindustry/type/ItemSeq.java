@@ -10,7 +10,7 @@ import mindustry.world.modules.ItemModule.*;
 
 import java.util.*;
 
-public class ItemSeq implements Iterable<ItemStack>, Serializable{
+public class ItemSeq implements Iterable<ItemStack>, JsonSerializable{
     protected final int[] values = new int[Vars.content.items().size];
     public int total;
 

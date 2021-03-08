@@ -1,9 +1,10 @@
 "use strict";
 
-function log(context, obj){
-    Vars.mods.scripts.log(context, String(obj))
-}
+let scriptName = "base.js"
+let modName = "none"
 
+const log = (context, obj) => Vars.mods.scripts.log(context, String(obj))
+const print = text => log(modName + "/" + scriptName, text)
 const readString = path => Vars.mods.scripts.readString(path)
 const readBytes = path => Vars.mods.scripts.readBytes(path)
 const loadMusic = path => Vars.mods.scripts.loadMusic(path)
@@ -13,11 +14,20 @@ const readFile = (purpose, ext, cons) => Vars.mods.scripts.readFile(purpose, ext
 const readBinFile = (purpose, ext, cons) => Vars.mods.scripts.readBinFile(purpose, ext, cons);
 const writeFile = (purpose, ext, str) => Vars.mods.scripts.writeFile(purpose, ext, str);
 const writeBinFile = (purpose, ext, bytes) => Vars.mods.scripts.writeBinFile(purpose, ext, bytes);
+const newFloats = cap => Vars.mods.getScripts().newFloats(cap);
 
-let scriptName = "base.js"
-let modName = "none"
+//these are not strictly necessary, but are kept for edge cases
+const run = method => new java.lang.Runnable(){run: method}
+const boolf = method => new Boolf(){get: method}
+const boolp = method => new Boolp(){get: method}
+const floatf = method => new Floatf(){get: method}
+const floatp = method => new Floatp(){get: method}
+const cons = method => new Cons(){get: method}
+const prov = method => new Prov(){get: method}
+const func = method => new Func(){get: method}
 
-const print = text => log(modName + "/" + scriptName, text);
+const newEffect = (lifetime, renderer) => new Effect.Effect(lifetime, new Effect.EffectRenderer({render: renderer}))
+Call = Packages.mindustry.gen.Call
 
 //js 'extend(Base, ..., {})' = java 'new Base(...) {}'
 function extend(/*Base, ..., def*/){
@@ -39,16 +49,3 @@ function extend(/*Base, ..., def*/){
 
 //For backwards compatibility, use extend instead
 const extendContent = extend;
-
-//these are not strictly necessary, but are kept for edge cases
-const run = method => new java.lang.Runnable(){run: method}
-const boolf = method => new Boolf(){get: method}
-const boolp = method => new Boolp(){get: method}
-const floatf = method => new Floatf(){get: method}
-const floatp = method => new Floatp(){get: method}
-const cons = method => new Cons(){get: method}
-const prov = method => new Prov(){get: method}
-const func = method => new Func(){get: method}
-
-const newEffect = (lifetime, renderer) => new Effect.Effect(lifetime, new Effect.EffectRenderer({render: renderer}))
-Call = Packages.mindustry.gen.Call

@@ -15,16 +15,22 @@ public class StatusEffect extends MappableContent{
     public float damageMultiplier = 1f;
     /** Unit health multiplier. */
     public float healthMultiplier = 1f;
-    /** Unit speed multiplier */
+    /** Unit speed multiplier. */
     public float speedMultiplier = 1f;
-    /** Unit speed multiplier */
+    /** Unit reload multiplier. */
     public float reloadMultiplier = 1f;
+    /** Unit build speed multiplier. */
+    public float buildSpeedMultiplier = 1f;
+    /** Unit weapon(s) disabled. */
+    public boolean disarm = false;
     /** Damage per frame. */
     public float damage;
     /** Chance of effect appearing. */
     public float effectChance = 0.15f;
     /** If true, the effect never disappears. */
     public boolean permanent;
+    /** If true, this effect will only react with other effects and cannot be applied. */
+    public boolean reactive;
     /** Tint color of effect. */
     public Color color = Color.white.cpy();
     /** Effect that happens randomly on top of the affected unit. */
@@ -63,6 +69,7 @@ public class StatusEffect extends MappableContent{
 
     protected void trans(StatusEffect effect, TransitionHandler handler){
         transitions.put(effect, handler);
+        effect.transitions.put(this, handler);
     }
 
     protected void opposite(StatusEffect... effect){

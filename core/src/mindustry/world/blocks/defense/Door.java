@@ -69,8 +69,8 @@ public class Door extends Wall{
             super.onProximityRemoved();
 
             for(Building b : proximity){
-                if(b instanceof DoorBuild){
-                    ((DoorBuild)b).updateChained();
+                if(b instanceof DoorBuild d){
+                    d.updateChained();
                 }
             }
         }
@@ -113,8 +113,8 @@ public class Door extends Wall{
             this.chained = set;
 
             for(Building b : proximity){
-                if(b instanceof DoorBuild){
-                    ((DoorBuild)b).flow(set);
+                if(b instanceof DoorBuild d){
+                    d.flow(set);
                 }
             }
         }
@@ -126,7 +126,7 @@ public class Door extends Wall{
 
         @Override
         public Cursor getCursor(){
-            return SystemCursor.hand;
+            return interactable(player.team()) ? SystemCursor.hand : SystemCursor.arrow;
         }
 
         @Override

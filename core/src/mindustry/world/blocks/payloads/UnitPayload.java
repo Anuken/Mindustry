@@ -1,5 +1,6 @@
 package mindustry.world.blocks.payloads;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -9,6 +10,7 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.entities.EntityCollisions.*;
 import mindustry.entities.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -33,7 +35,12 @@ public class UnitPayload implements Payload{
     @Override
     public void set(float x, float y, float rotation){
         unit.set(x, y);
-        unit.rotation(rotation);
+        unit.rotation = rotation;
+    }
+
+    @Override
+    public float rotation(){
+        return unit.rotation;
     }
 
     @Override
@@ -43,6 +50,9 @@ public class UnitPayload implements Payload{
 
     @Override
     public boolean dump(){
+        //TODO should not happen
+        if(unit.type == null) return true;
+
         if(!Units.canCreate(unit.team, unit.type)){
             deactiveTime = 1f;
             return false;
@@ -67,14 +77,19 @@ public class UnitPayload implements Payload{
         //prevents stacking
         unit.vel.add(Mathf.range(0.5f), Mathf.range(0.5f));
         unit.add();
+        Events.fire(new UnitUnloadEvent(unit));
 
         return true;
     }
 
     @Override
     public void draw(){
+        //TODO should not happen
+        if(unit.type == null) return;
+
         Drawf.shadow(unit.x, unit.y, 20);
         Draw.rect(unit.type.icon(Cicon.full), unit.x, unit.y, unit.rotation - 90);
+        unit.type.drawCell(unit);
 
         //draw warning
         if(deactiveTime > 0){

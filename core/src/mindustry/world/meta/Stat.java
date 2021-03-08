@@ -7,6 +7,7 @@ import java.util.*;
 /** Describes one type of stat for content. */
 public enum Stat{
     health,
+    armor,
     size,
     displaySize,
     buildTime,
@@ -15,6 +16,7 @@ public enum Stat{
     explosiveness,
     flammability,
     radioactivity,
+    charge,
     heatCapacity,
     viscosity,
     temperature,
@@ -30,6 +32,7 @@ public enum Stat{
     lightningDamage,
     abilities,
     canBoost,
+    maxUnits,
 
     itemCapacity(StatCat.items),
     itemsMoved(StatCat.items),
@@ -51,7 +54,6 @@ public enum Stat{
     productionTime(StatCat.crafting),
     drillTier(StatCat.crafting),
     drillSpeed(StatCat.crafting),
-    maxUnits(StatCat.crafting),
     linkRange(StatCat.crafting),
     instructions(StatCat.crafting),
 

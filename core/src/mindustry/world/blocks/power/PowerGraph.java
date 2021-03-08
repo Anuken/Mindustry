@@ -21,6 +21,8 @@ public class PowerGraph{
     private final WindowedMean powerBalance = new WindowedMean(60);
     private float lastPowerProduced, lastPowerNeeded, lastPowerStored;
     private float lastScaledPowerIn, lastScaledPowerOut, lastCapacity;
+    //diodes workaround for correct energy production info
+    private float energyDelta = 0f;
 
     private long lastFrameUpdated = -1;
     private final int graphID;
@@ -60,6 +62,15 @@ public class PowerGraph{
 
     public float getLastPowerStored(){
         return lastPowerStored;
+    }
+
+    public void transferPower(float amount){
+        if(amount > 0){
+            chargeBatteries(amount);
+        }else{
+            useBatteries(-amount);
+        }
+        energyDelta += amount;
     }
 
     public float getSatisfaction(){
@@ -102,7 +113,7 @@ public class PowerGraph{
         float totalAccumulator = 0f;
         for(Building battery : batteries){
             Consumers consumes = battery.block.consumes;
-            if(consumes.hasPower()){
+            if(battery.enabled && consumes.hasPower()){
                 totalAccumulator += battery.power.status * consumes.getPower().capacity;
             }
         }
@@ -112,7 +123,7 @@ public class PowerGraph{
     public float getBatteryCapacity(){
         float totalCapacity = 0f;
         for(Building battery : batteries){
-            if(battery.block.consumes.hasPower()){
+            if(battery.enabled && battery.block.consumes.hasPower()){
                 ConsumePower power = battery.block.consumes.getPower();
                 totalCapacity += (1f - battery.power.status) * power.capacity;
             }
@@ -123,7 +134,7 @@ public class PowerGraph{
     public float getTotalBatteryCapacity(){
         float totalCapacity = 0f;
         for(Building battery : batteries){
-            if(battery.block.consumes.hasPower()){
+            if(battery.enabled && battery.block.consumes.hasPower()){
                 totalCapacity += battery.block.consumes.getPower().capacity;
             }
         }
@@ -138,7 +149,7 @@ public class PowerGraph{
         float consumedPowerPercentage = Math.min(1.0f, needed / stored);
         for(Building battery : batteries){
             Consumers consumes = battery.block.consumes;
-            if(consumes.hasPower()){
+            if(battery.enabled && consumes.hasPower()){
                 battery.power.status *= (1f-consumedPowerPercentage);
             }
         }
@@ -153,7 +164,7 @@ public class PowerGraph{
 
         for(Building battery : batteries){
             Consumers consumes = battery.block.consumes;
-            if(consumes.hasPower()){
+            if(battery.enabled && consumes.hasPower()){
                 ConsumePower consumePower = consumes.getPower();
                 if(consumePower.capacity > 0f){
                     battery.power.status += (1f- battery.power.status) * chargedPercent;
@@ -213,13 +224,13 @@ public class PowerGraph{
         lastPowerNeeded = powerNeeded;
         lastPowerProduced = powerProduced;
 
-        lastScaledPowerIn = powerProduced / Time.delta;
+        lastScaledPowerIn = (powerProduced + energyDelta) / Time.delta;
         lastScaledPowerOut = powerNeeded / Time.delta;
         lastCapacity = getTotalBatteryCapacity();
-
         lastPowerStored = getBatteryStored();
 
-        powerBalance.add((lastPowerProduced - lastPowerNeeded) / Time.delta);
+        powerBalance.add((lastPowerProduced - lastPowerNeeded + energyDelta) / Time.delta);
+        energyDelta = 0f;
 
         if(!(consumers.size == 0 && producers.size == 0 && batteries.size == 0)){
 
@@ -238,6 +249,8 @@ public class PowerGraph{
     }
 
     public void addGraph(PowerGraph graph){
+        if(graph == this) return;
+
         for(Building tile : graph.all){
             add(tile);
         }
@@ -272,25 +285,24 @@ public class PowerGraph{
             Building child = queue.removeFirst();
             add(child);
             for(Building next : child.getPowerConnections(outArray2)){
-                if(!closedSet.contains(next.pos())){
+                if(closedSet.add(next.pos())){
                     queue.addLast(next);
-                    closedSet.add(next.pos());
                 }
             }
         }
     }
 
-    private void removeSingle(Building tile){
-        all.remove(tile, true);
-        producers.remove(tile, true);
-        consumers.remove(tile, true);
-        batteries.remove(tile, true);
+    /** Used for unit tests only. */
+    public void removeList(Building build){
+        all.remove(build);
+        producers.remove(build);
+        consumers.remove(build);
+        batteries.remove(build);
     }
 
+    /** Note that this does not actually remove the building from the graph;
+     * it creates *new* graphs that contain the correct buildings. */
     public void remove(Building tile){
-        removeSingle(tile);
-        //begin by clearing the closed set
-        closedSet.clear();
 
         //go through all the connections of this tile
         for(Building other : tile.getPowerConnections(outArray1)){
@@ -306,17 +318,15 @@ public class PowerGraph{
             while(queue.size > 0){
                 //get child from queue
                 Building child = queue.removeFirst();
-                //remove it from this graph
-                removeSingle(child);
                 //add it to the new branch graph
                 graph.add(child);
                 //go through connections
                 for(Building next : child.getPowerConnections(outArray2)){
                     //make sure it hasn't looped back, and that the new graph being assigned hasn't already been assigned
                     //also skip closed tiles
-                    if(next != tile && next.power.graph != graph && !closedSet.contains(next.pos())){
+                    if(next != tile && next.power.graph != graph){
+                        graph.add(next);
                         queue.addLast(next);
-                        closedSet.add(next.pos());
                     }
                 }
             }

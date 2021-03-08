@@ -13,7 +13,7 @@ public class FlyingAI extends AIController{
     public void updateMovement(){
         if(target != null && unit.hasWeapons() && command() == UnitCommand.attack){
             if(!unit.type.circleTarget){
-                moveTo(target, unit.range() * 0.8f);
+                moveTo(target, unit.type.range * 0.8f);
                 unit.lookAt(target);
             }else{
                 attack(120f);
@@ -49,10 +49,10 @@ public class FlyingAI extends AIController{
         float ang = unit.angleTo(target);
         float diff = Angles.angleDist(ang, unit.rotation());
 
-        if(diff > 100f && vec.len() < circleLength){
+        if(diff > 70f && vec.len() < circleLength){
             vec.setAngle(unit.vel().angle());
         }else{
-            vec.setAngle(Mathf.slerpDelta(unit.vel().angle(), vec.angle(), 0.6f));
+            vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 6f));
         }
 
         vec.setLength(unit.speed());

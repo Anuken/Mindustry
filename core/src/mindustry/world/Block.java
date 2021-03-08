@@ -26,6 +26,7 @@ import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
@@ -80,9 +81,9 @@ public class Block extends UnlockableContent{
     public boolean breakable;
     /** whether to add this block to brokenblocks */
     public boolean rebuildable = true;
-    /** whether this water can only be placed on water */
+    /** whether this block can only be placed on water */
     public boolean requiresWater = false;
-    /** whether this water can be placed on any liquids, anywhere */
+    /** whether this block can be placed on any liquids, anywhere */
     public boolean placeableLiquid = false;
     /** whether this floor can be placed on. */
     public boolean placeableOn = true;
@@ -122,6 +123,8 @@ public class Block extends UnlockableContent{
     public boolean fillsTile = true;
     /** whether this block can be replaced in all cases */
     public boolean alwaysReplace = false;
+    /** if false, this block can never be replaced. */
+    public boolean replaceable = true;
     /** The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other. */
     public BlockGroup group = BlockGroup.none;
     /** List of block flags. Used for AI indexing. */
@@ -145,6 +148,8 @@ public class Block extends UnlockableContent{
     public boolean conveyorPlacement;
     /** Whether to swap the diagonal placement modes. */
     public boolean swapDiagonalPlacement;
+    /** Build queue priority in schematics. */
+    public int schematicPriority = 0;
     /**
      * The color of this block when displayed on the minimap or map preview.
      * Do not set manually! This is overridden when loading for most blocks.
@@ -158,8 +163,10 @@ public class Block extends UnlockableContent{
     public boolean canOverdrive = true;
     /** Outlined icon color.*/
     public Color outlineColor = Color.valueOf("404049");
-    /** Whether the icon region has an outline added. */
+    /** Whether any icon region has an outline added. */
     public boolean outlineIcon = false;
+    /** Which of the icon regions gets the outline added. */
+    public int outlinedIcon = -1;
     /** Whether this block has a shadow under it. */
     public boolean hasShadow = true;
     /** Sounds made when this block breaks.*/
@@ -251,6 +258,26 @@ public class Block extends UnlockableContent{
 
     /** Drawn when you are placing a block. */
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        drawPotentialLinks(x, y);
+    }
+
+    public void drawPotentialLinks(int x, int y){
+        if((consumesPower || outputsPower) && hasPower){
+            Tile tile = world.tile(x, y);
+            if(tile != null){
+                PowerNode.getNodeLinks(tile, this, player.team(), other -> {
+                    PowerNode node = (PowerNode)other.block;
+                    Draw.color(node.laserColor1, Renderer.laserOpacity * 0.5f);
+                    node.drawLaser(tile.team(), x * tilesize + offset, y * tilesize + offset, other.x, other.y, size, other.block.size);
+
+                    Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
+
+                    PowerNode.insulators(other.tileX(), other.tileY(), tile.x, tile.y, cause -> {
+                        Drawf.square(cause.x, cause.y, cause.block.size * tilesize / 2f + 2f, Pal.plastanium);
+                    });
+                });
+            }
+        }
     }
 
     public float drawPlaceText(String text, int x, int y, boolean valid){
@@ -331,7 +358,11 @@ public class Block extends UnlockableContent{
         super.setStats();
 
         stats.add(Stat.size, "@x@", size, size);
-        stats.add(Stat.health, health, StatUnit.none);
+
+        if(synthetic()){
+            stats.add(Stat.health, health, StatUnit.none);
+        }
+
         if(canBeBuilt()){
             stats.add(Stat.buildTime, buildCost / 60, StatUnit.seconds);
             stats.add(Stat.buildCost, new ItemListValue(false, requirements));
@@ -375,11 +406,13 @@ public class Block extends UnlockableContent{
         if(hasItems && configurable){
             bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
         }
+        
+        if(flags.contains(BlockFlag.unitModifier)) stats.add(Stat.maxUnits, (unitCapModifier < 0 ? "-" : "+") + Math.abs(unitCapModifier));
     }
 
     public boolean canReplace(Block other){
         if(other.alwaysReplace) return true;
-        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group &&
+        return other.replaceable && (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group &&
             (size == other.size || (size >= other.size && ((subclass != null && subclass == other.subclass) || group.anyReplace)));
     }
 
@@ -390,6 +423,11 @@ public class Block extends UnlockableContent{
 
     /** Mutates the given list of points used during line placement. */
     public void changePlacementPath(Seq<Point2> points, int rotation){
+
+    }
+
+    /** Mutates the given list of requests used during line placement. */
+    public void handlePlacementLine(Seq<BuildPlan> plans){
 
     }
 
@@ -424,9 +462,13 @@ public class Block extends UnlockableContent{
         TextureRegion reg = getRequestRegion(req, list);
         Draw.rect(reg, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
 
-        if(req.config != null){
-            drawRequestConfig(req, list);
+        if(req.worldContext && player != null && teamRegion != null && teamRegion.found()){
+            if(teamRegions[player.team().id] == teamRegion) Draw.color(player.team().color);
+            Draw.rect(teamRegions[player.team().id], req.drawx(), req.drawy());
+            Draw.color();
         }
+
+        drawRequestConfig(req, list);
     }
 
     public TextureRegion getRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
@@ -437,13 +479,23 @@ public class Block extends UnlockableContent{
 
     }
 
-    public void drawRequestConfigCenter(BuildPlan req, Object content, String region){
-        Color color = content instanceof Item ? ((Item)content).color : content instanceof Liquid ? ((Liquid)content).color : null;
+    public void drawRequestConfigCenter(BuildPlan req, Object content, String region, boolean cross){
+        if(content == null){
+            if(cross){
+                Draw.rect("cross", req.drawx(), req.drawy());
+            }
+            return;
+        }
+        Color color = content instanceof Item i ? i.color : content instanceof Liquid l ? l.color : null;
         if(color == null) return;
 
         Draw.color(color);
         Draw.rect(region, req.drawx(), req.drawy());
         Draw.color();
+    }
+
+    public void drawRequestConfigCenter(BuildPlan req, Object content, String region){
+        drawRequestConfigCenter(req, content, region, false);
     }
 
     public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
@@ -573,6 +625,14 @@ public class Block extends UnlockableContent{
 
     public boolean isStatic(){
         return cacheLayer == CacheLayer.walls;
+    }
+
+    public void setupRequirements(Category cat, ItemStack[] stacks){
+        requirements(cat, stacks);
+    }
+
+    public void setupRequirements(Category cat, BuildVisibility visible, ItemStack[] stacks){
+        requirements(cat, visible, stacks);
     }
 
     public void requirements(Category cat, ItemStack[] stacks, boolean unlocked){
@@ -750,7 +810,7 @@ public class Block extends UnlockableContent{
 
         if(outlineIcon){
             final int radius = 4;
-            PixmapRegion region = Core.atlas.getPixmap(getGeneratedIcons()[getGeneratedIcons().length-1]);
+            PixmapRegion region = Core.atlas.getPixmap(getGeneratedIcons()[outlinedIcon >= 0 ? outlinedIcon : getGeneratedIcons().length -1]);
             Pixmap out = new Pixmap(region.width, region.height);
             Color color = new Color();
             for(int x = 0; x < region.width; x++){

@@ -224,7 +224,7 @@ public class HudFragment extends Fragment{
                     int i = 0;
                     for(Team team : Team.baseTeams){
                         ImageButton button = teams.button(Tex.whiteui, Styles.clearTogglePartiali, 40f, () -> Call.setPlayerTeamEditor(player, team))
-                            .size(50f).margin(6f).get();
+                        .size(50f).margin(6f).get();
                         button.getImageCell().grow();
                         button.getStyle().imageUpColor = team.color;
                         button.update(() -> button.setChecked(player.team() == team));
@@ -342,39 +342,39 @@ public class HudFragment extends Fragment{
 
         //TODO DEBUG: rate table
         if(false)
-        parent.fill(t -> {
-            t.name = "rates";
-            t.bottom().left();
-            t.table(Styles.black6, c -> {
-                Bits used = new Bits(content.items().size);
+            parent.fill(t -> {
+                t.name = "rates";
+                t.bottom().left();
+                t.table(Styles.black6, c -> {
+                    Bits used = new Bits(content.items().size);
 
-                Runnable rebuild = () -> {
-                    c.clearChildren();
+                    Runnable rebuild = () -> {
+                        c.clearChildren();
 
-                    for(Item item : content.items()){
-                        if(state.rules.sector != null && state.rules.sector.info.getExport(item) >= 1){
-                            c.image(item.icon(Cicon.small));
-                            c.label(() -> (int)state.rules.sector.info.getExport(item) + " /s").color(Color.lightGray);
-                            c.row();
+                        for(Item item : content.items()){
+                            if(state.rules.sector != null && state.rules.sector.info.getExport(item) >= 1){
+                                c.image(item.icon(Cicon.small));
+                                c.label(() -> (int)state.rules.sector.info.getExport(item) + " /s").color(Color.lightGray);
+                                c.row();
+                            }
                         }
-                    }
-                };
+                    };
 
-                c.update(() -> {
-                    boolean wrong = false;
-                    for(Item item : content.items()){
-                        boolean has = state.rules.sector != null && state.rules.sector.info.getExport(item) >= 1;
-                        if(used.get(item.id) != has){
-                            used.set(item.id, has);
-                            wrong = true;
+                    c.update(() -> {
+                        boolean wrong = false;
+                        for(Item item : content.items()){
+                            boolean has = state.rules.sector != null && state.rules.sector.info.getExport(item) >= 1;
+                            if(used.get(item.id) != has){
+                                used.set(item.id, has);
+                                wrong = true;
+                            }
                         }
-                    }
-                    if(wrong){
-                        rebuild.run();
-                    }
-                });
-            }).visible(() -> state.isCampaign() && content.items().contains(i -> state.rules.sector != null && state.rules.sector.info.getExport(i) > 0));
-        });
+                        if(wrong){
+                            rebuild.run();
+                        }
+                    });
+                }).visible(() -> state.isCampaign() && content.items().contains(i -> state.rules.sector != null && state.rules.sector.info.getExport(i) > 0));
+            });
 
         blockfrag.build(parent);
     }
@@ -637,20 +637,14 @@ public class HudFragment extends Fragment{
 
                 if(Float.isNaN(value) || Float.isInfinite(value)) value = 1f;
 
-                drawInner(Pal.darkishGray);
-
-                Draw.beginStencil();
-
-                Fill.crect(x, y, width, height * value);
-
-                Draw.beginStenciled();
-
-                drawInner(Tmp.c1.set(color).lerp(Color.white, blink));
-
-                Draw.endStencil();
+                drawInner(Pal.darkishGray, 1f);
+                drawInner(Tmp.c1.set(color).lerp(Color.white, blink), value);
             }
 
-            void drawInner(Color color){
+            void drawInner(Color color, float fract){
+                if(fract < 0) return;
+
+                fract = Mathf.clamp(fract);
                 if(flip){
                     x += width;
                     width = -width;
@@ -660,19 +654,26 @@ public class HudFragment extends Fragment{
                 float bh = height/2f;
                 Draw.color(color);
 
+                float f1 = Math.min(fract * 2f, 1f), f2 = (fract - 0.5f) * 2f;
+
+                float bo = -(1f - f1) * (width - stroke);
+
                 Fill.quad(
                 x, y,
                 x + stroke, y,
-                x + width, y + bh,
-                x + width - stroke, y + bh
+                x + width + bo, y + bh * f1,
+                x + width - stroke + bo, y + bh * f1
                 );
 
-                Fill.quad(
-                x + width, y + bh,
-                x + width - stroke, y + bh,
-                x, y + height,
-                x + stroke, y + height
-                );
+                if(f2 > 0){
+                    float bx = x + (width - stroke) * (1f - f2);
+                    Fill.quad(
+                    x + width, y + bh,
+                    x + width - stroke, y + bh,
+                    bx, y + height * fract,
+                    bx + stroke, y + height * fract
+                    );
+                }
 
                 Draw.reset();
 
@@ -765,6 +766,7 @@ public class HudFragment extends Fragment{
                     count[0] = payload.payloadUsed();
                 }
             }else{
+                count[0] = -1;
                 t.clear();
             }
         }).growX().visible(() -> player.unit() instanceof Payloadc p && p.payloadUsed() > 0).colspan(2);

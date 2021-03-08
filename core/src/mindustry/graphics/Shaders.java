@@ -15,10 +15,10 @@ import mindustry.type.*;
 import static mindustry.Vars.*;
 
 public class Shaders{
-    public static BlockBuild blockbuild;
+    public static BlockBuildShader blockbuild;
     public static @Nullable ShieldShader shield;
     public static BuildBeamShader buildBeam;
-    public static UnitBuild build;
+    public static UnitBuildShader build;
     public static DarknessShader darkness;
     public static LightShader light;
     public static SurfaceShader water, mud, tar, slag, space;
@@ -31,7 +31,7 @@ public class Shaders{
 
     public static void init(){
         mesh = new MeshShader();
-        blockbuild = new BlockBuild();
+        blockbuild = new BlockBuildShader();
         try{
             shield = new ShieldShader();
         }catch(Throwable t){
@@ -40,7 +40,7 @@ public class Shaders{
             t.printStackTrace();
         }
         buildBeam = new BuildBeamShader();
-        build = new UnitBuild();
+        build = new UnitBuildShader();
         darkness = new DarknessShader();
         light = new LightShader();
         water = new SurfaceShader("water");
@@ -142,12 +142,16 @@ public class Shaders{
         }
     }
 
-    public static class UnitBuild extends LoadShader{
+    /** @deprecated transition class for mods; use UnitBuildShader instead. */
+    @Deprecated
+    public static class UnitBuild extends UnitBuildShader{}
+
+    public static class UnitBuildShader extends LoadShader{
         public float progress, time;
         public Color color = new Color();
         public TextureRegion region;
 
-        public UnitBuild(){
+        public UnitBuildShader(){
             super("unitbuild", "default");
         }
 
@@ -162,11 +166,11 @@ public class Shaders{
         }
     }
 
-    public static class BlockBuild extends LoadShader{
+    public static class BlockBuildShader extends LoadShader{
         public float progress;
         public TextureRegion region = new TextureRegion();
 
-        public BlockBuild(){
+        public BlockBuildShader(){
             super("blockbuild", "default");
         }
 
