@@ -26,13 +26,15 @@ public class OverlayRenderer{
     public void drawBottom(){
         InputHandler input = control.input;
 
+        input.drawBottom();
+            
         if(player.dead()) return;
 
         if(player.isBuilder()){
             player.unit().drawBuildPlans();
         }
 
-        input.drawBottom();
+
     }
 
     public void drawTop(){
@@ -68,7 +70,7 @@ public class OverlayRenderer{
             }
         }
 
-        if(player.dead()) return; //dead players don't draw
+        // if(player.dead()) return; //dead players don't draw
 
         InputHandler input = control.input;
 

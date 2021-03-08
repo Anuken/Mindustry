@@ -266,12 +266,12 @@ public class DesktopInput extends InputHandler{
             }
         }
 
+        pollInput();
+
         if(player.dead()){
             cursorType = SystemCursor.arrow;
             return;
         }
-
-        pollInput();
 
         //deselect if not placing
         if(!isPlacing() && mode == placing){
