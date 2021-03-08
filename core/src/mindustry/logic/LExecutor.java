@@ -636,6 +636,11 @@ public class LExecutor{
             Object target = exec.obj(from);
             Object sense = exec.obj(type);
 
+            if(target == null && sense == LAccess.dead){
+                exec.setnum(to, 1);
+                return;
+            }
+
             //note that remote units/buildings can be sensed as well
             if(target instanceof Senseable se){
                 if(sense instanceof Content co){

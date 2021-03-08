@@ -197,7 +197,7 @@ public class LogicBlock extends Block{
         public LExecutor executor = new LExecutor();
         public float accumulator = 0;
         public Seq<LogicLink> links = new Seq<>();
-        public boolean checkedDuplicates = false, unboxed = false;
+        public boolean checkedDuplicates = false;
 
         public void readCompressed(byte[] data, boolean relative){
             DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
@@ -254,13 +254,10 @@ public class LogicBlock extends Block{
             super.onProximityAdded();
 
             //unbox buildings after reading
-            if(!unboxed){
-                for(var v : executor.vars){
-                    if(v.objval instanceof BuildingBox b){
-                        v.objval = world.build(b.pos);
-                    }
+            for(var v : executor.vars){
+                if(v.objval instanceof BuildingBox b){
+                    v.objval = world.build(b.pos);
                 }
-                unboxed = true;
             }
         }
 
