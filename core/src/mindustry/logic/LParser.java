@@ -174,6 +174,9 @@ public class LParser{
 
         //load destination indices
         for(var i : jumps){
+            if(!jumpLocations.containsKey(i.location)){
+                error("Undefined jump location: \"" + i.location + "\". Make sure the jump label exists and is typed correctly.");
+            }
             i.jump.destIndex = jumpLocations.get(i.location, -1);
         }
 
