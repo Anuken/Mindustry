@@ -114,8 +114,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
 
                     ObjectMap<T, BulletType> fragMap = new ObjectMap<>();
                     fragMap = OrderedMap.of(t, type.fragBullet);
-                    float i = indent + 1f;
-                    StatValue fragStatValue = new AmmoListValue<>(fragMap, i);
+                    StatValue fragStatValue = new AmmoListValue<>(fragMap, indent + 1f);
 
                     fragStatValue.display(bt);
                 }
