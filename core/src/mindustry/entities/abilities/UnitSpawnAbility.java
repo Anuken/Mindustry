@@ -42,7 +42,7 @@ public class UnitSpawnAbility extends Ability{
             Unit u = this.unit.create(unit.team);
             u.set(x, y);
             u.rotation = unit.rotation;
-            Events.fire(EventType.AbilityUnitCreate.class, new AbilityUnitCreate(u, unit));
+            Events.fire(EventType.AbilityUnitCreate.class, new EventType.AbilityUnitCreate(u, unit));
             
             if(!Vars.net.client()){
                 u.add();
