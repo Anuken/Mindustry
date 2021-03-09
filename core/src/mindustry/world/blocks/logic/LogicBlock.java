@@ -1,6 +1,5 @@
 package mindustry.world.blocks.logic;
 
-import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
@@ -302,7 +301,7 @@ public class LogicBlock extends Block{
 
                 try{
                     //create assembler to store extra variables
-                    LAssembler asm = LAssembler.assemble(str, LExecutor.maxInstructions);
+                    LAssembler asm = LAssembler.assemble(str);
 
                     //store connections
                     for(LogicLink link : links){
@@ -357,7 +356,7 @@ public class LogicBlock extends Block{
                     Log.err(e);
 
                     //handle malformed code and replace it with nothing
-                    executor.load("", LExecutor.maxInstructions);
+                    executor.load("");
                 }
             }
         }
