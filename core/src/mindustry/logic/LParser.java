@@ -5,7 +5,7 @@ import arc.struct.*;
 public class LParser{
     Seq<LStatement> statements = new Seq<>();
     char[] chars;
-    int position;
+    int pos;
 
     LParser(String text){
         this.chars = text.toCharArray();
@@ -17,17 +17,23 @@ public class LParser{
 
     void comment(){
         //read until \n or eof
-        while(position < chars.length && chars[position++] != '\n');
+        while(pos < chars.length && chars[pos++] != '\n');
+    }
+
+    void label(){
+        while(pos < chars.length){
+
+        }
     }
 
     void statement(){
         //read jump
-        if(chars[position] == '['){
+        if(chars[pos] == '['){
 
         }
 
-        while(position < chars.length){
-            char c = chars[position ++];
+        while(pos < chars.length){
+            char c = chars[pos++];
 
             //reached end of line, bail out.
             if(c == '\n') break;
@@ -40,10 +46,13 @@ public class LParser{
     }
 
     Seq<LStatement> parse(){
-        while(position < chars.length){
-            statement();
+        while(pos < chars.length){
+            switch(chars[pos++]){
+                case '\n', ' ' -> {} //skip newlines and spaces
+                case '\r' -> pos ++; //skip the newline after the \r
+                default -> statement();
+            }
         }
-        //TODO
         return statements;
     }
 
