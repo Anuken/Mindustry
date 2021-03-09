@@ -450,5 +450,15 @@ public class EventType{
         }
     }
     
+    public static class AbilityUnitCreate {
+        public Unit spawner;
+        public Unit spawned;
+        
+        public AbilityUnitCreate(Unit spawner, Unit spawned) {
+            this.spawner = spawner;
+            this.spawned = spawned;
+        }
+    }
+    
 }
 
