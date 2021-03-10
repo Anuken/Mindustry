@@ -278,6 +278,10 @@ public class ContentLoader{
         return getByID(ContentType.bullet, id);
     }
 
+    public Seq<StatusEffect> statusEffects(){
+        return getBy(ContentType.status);
+    }
+
     public Seq<SectorPreset> sectors(){
         return getBy(ContentType.sector);
     }

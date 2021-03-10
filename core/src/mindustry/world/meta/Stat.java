@@ -34,6 +34,12 @@ public enum Stat{
     canBoost,
     maxUnits,
 
+    damageMultiplier,
+    healthMultiplier,
+    speedMultiplier,
+    reloadMultiplier,
+    buildSpeedMultiplier,
+
     itemCapacity(StatCat.items),
     itemsMoved(StatCat.items),
     launchTime(StatCat.items),
@@ -78,7 +84,8 @@ public enum Stat{
 
     booster(StatCat.optional),
     boostEffect(StatCat.optional),
-    affinities(StatCat.optional);
+    affinities(StatCat.optional),
+    opposites(StatCat.optional);
 
     public final StatCat category;
 
