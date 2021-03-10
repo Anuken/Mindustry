@@ -309,6 +309,7 @@ public class UnitTypes implements ContentList{
             health = 320f;
             buildSpeed = 0.9f;
             armor = 4f;
+            riseSpeed = 0.07f;
 
             mineTier = 2;
             mineSpeed = 5f;
@@ -364,6 +365,7 @@ public class UnitTypes implements ContentList{
             canBoost = true;
             armor = 9f;
             landShake = 2f;
+            riseSpeed = 0.05f;
 
             commandLimit = 10;
             mechFrontSway = 0.55f;
@@ -416,6 +418,7 @@ public class UnitTypes implements ContentList{
             engineOffset = 12f;
             engineSize = 6f;
             lowAltitude = true;
+            riseSpeed = 0.02f;
 
             health = 7500f;
             armor = 9f;
