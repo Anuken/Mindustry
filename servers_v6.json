@@ -90,5 +90,9 @@
   {
     "name": "Darkdustry",
     "address": ["mindurka.ru"]
+  },
+  {
+    "name": "GGdustry",
+    "address": ["mindustry.ggdustry.tk:27225"]
   }
 ]
