@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
@@ -73,23 +74,32 @@ public class StatusEffect extends UnlockableContent{
         if(reloadMultiplier != 1) stats.addPercent(Stat.reloadMultiplier, reloadMultiplier);
         if(buildSpeedMultiplier != 1) stats.addPercent(Stat.buildSpeedMultiplier, buildSpeedMultiplier);
         if(damage > 0) stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
-        
-        var afseq = affinities.asArray().sort();
-        var opseq = opposites.asArray().sort();
 
-        for(int i = 0; i < afseq.size; i++){
-            var e = afseq.get(i);
-            stats.add(Stat.affinities, e.emoji() + "" + e.toString());
-        }
-        
-        if(afseq.any() && transitionDamage != 0){
-            stats.add(Stat.affinities, "/ [accent]" + (int)transitionDamage + " " + Stat.damage.localized());
+        boolean reacts = false;
+
+        for(var e : opposites.asArray().sort()){
+            stats.add(Stat.opposites, e.emoji() + "" + e);
         }
 
-        for(int i = 0; i < opseq.size; i++){
-            var e = opseq.get(i);
-            stats.add(Stat.opposites, e.emoji() + "" + e.toString());
+        if(reactive){
+            var other = Vars.content.statusEffects().find(f -> f.affinities.contains(this));
+            if(other != null && other.transitionDamage > 0){
+                stats.add(Stat.reactive, other.emoji() + other + " / [accent]" + (int)other.transitionDamage + "[lightgray] " + Stat.damage.localized());
+                reacts = true;
+            }
         }
+
+        //don't list affinities *and* reactions, as that would be redundant
+        if(!reacts){
+            for(var e : affinities.asArray().sort()){
+                stats.add(Stat.affinities, e.emoji() + "" + e);
+            }
+
+            if(affinities.size > 0 && transitionDamage != 0){
+                stats.add(Stat.affinities, "/ [accent]" + (int)transitionDamage + " " + Stat.damage.localized());
+            }
+        }
+
     }
 
     @Override
