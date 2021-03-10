@@ -298,7 +298,7 @@ public class Blocks implements ContentList{
 
         shale = new Floor("shale"){{
             variants = 3;
-            attributes.set(Attribute.oil, 1.5f);
+            attributes.set(Attribute.oil, 1.8f);
         }};
 
         stoneWall = new StaticWall("stone-wall"){{
