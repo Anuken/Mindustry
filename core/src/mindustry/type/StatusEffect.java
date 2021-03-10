@@ -38,13 +38,13 @@ public class StatusEffect extends UnlockableContent{
     public Color color = Color.white.cpy();
     /** Effect that happens randomly on top of the affected unit. */
     public Effect effect = Fx.none;
-
-    public ObjectSet<StatusEffect> affinities = new ObjectSet<>();
-    public ObjectSet<StatusEffect> opposites = new ObjectSet<>();
     /** Transition handler map. */
     protected ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
     /** Called on init. */
     protected Runnable initblock = () -> {};
+
+    public ObjectSet<StatusEffect> affinities = new ObjectSet<>();
+    public ObjectSet<StatusEffect> opposites = new ObjectSet<>();
 
     public StatusEffect(String name){
         super(name);
@@ -97,11 +97,6 @@ public class StatusEffect extends UnlockableContent{
         for(StatusEffect e : opposites){
             stats.add(Stat.opposites, e.toString(), StatUnit.none);
         }
-    }
-
-    @Override
-    public TextureRegion icon(Cicon c){
-        return Icon.effect.getRegion();
     }
 
     /** Runs every tick on the affected unit while time is greater than 0. */
