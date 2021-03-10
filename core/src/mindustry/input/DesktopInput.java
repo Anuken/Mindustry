@@ -41,7 +41,7 @@ public class DesktopInput extends InputHandler{
     /** Selected build request for movement. */
     public @Nullable BuildPlan sreq;
     /** Whether player is currently deleting removal requests. */
-    public boolean deleting = false, shouldShoot = false, panning = false;
+    public boolean deleting = false, shouldShoot = false, boosting = false, panning = false;
     /** Mouse pan speed. */
     public float panScale = 0.005f, panSpeed = 4.5f, panBoostSpeed = 11f;
     /** Delta time between consecutive clicks. */
@@ -646,7 +646,11 @@ public class DesktopInput extends InputHandler{
         unit.aim(unit.type.faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation, Core.input.mouseWorld().dst(unit)).add(unit.x, unit.y));
         unit.controlWeapons(true, player.shooting && !boosted);
 
-        player.boosting = Core.input.keyDown(Binding.boost) && !movement.isZero();
+        if(Core.input.keyTap(Binding.boost) && unit instanceof Mechc){
+            boosting = !boosting;
+        }
+
+        player.boosting = boosting && !movement.isZero();
         player.mouseX = unit.aimX();
         player.mouseY = unit.aimY();
 
