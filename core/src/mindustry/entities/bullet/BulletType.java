@@ -161,6 +161,11 @@ public abstract class BulletType extends Content{
         return Math.max(speed * lifetime * (1f - drag), maxRange);
     }
 
+    /** @return continuous damage in damage/sec, or -1 if not continuous. */
+    public float continuousDamage(){
+        return -1f;
+    }
+
     public boolean testCollision(Bullet bullet, Building tile){
         return healPercent <= 0.001f || tile.team != bullet.team || tile.healthf() < 1f;
     }
