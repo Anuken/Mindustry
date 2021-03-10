@@ -33,7 +33,7 @@ public class FormationAI extends AIController implements FormationMember{
         }
 
         if(unit.type.canBoost){
-            unit.elevation = Mathf.approachDelta(unit.elevation, unit.onSolid() ? 1f : leader.type.canBoost ? leader.elevation : 0f, 0.08f);
+            unit.elevation = Mathf.approachDelta(unit.elevation, unit.onSolid() ? 1f : leader.type.canBoost ? leader.elevation : 0f, unit.type.riseSpeed);
         }
 
         unit.controlWeapons(true, leader.isShooting);
