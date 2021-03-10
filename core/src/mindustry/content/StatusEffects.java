@@ -12,7 +12,7 @@ import mindustry.graphics.*;
 import static mindustry.Vars.*;
 
 public class StatusEffects implements ContentList{
-    public static StatusEffect none, burning, freezing, unmoving, slow, wet, muddy, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, boss, sporeSlowed, disarmed;
+    public static StatusEffect none, burning, freezing, unmoving, slow, wet, muddy, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss, sporeSlowed, disarmed;
 
     @Override
     public void load(){
@@ -170,6 +170,11 @@ public class StatusEffects implements ContentList{
         blasted = new StatusEffect("blasted"){{
             color = Color.valueOf("ff795e");
             reactive = true;
+        }};
+
+        corroded = new StatusEffect("corroded"){{
+            color = Pal.plastanium;
+            damage = 0.1f;
         }};
 
         disarmed = new StatusEffect("disarmed"){{
