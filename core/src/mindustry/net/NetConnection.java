@@ -18,6 +18,7 @@ public abstract class NetConnection{
     public boolean mobile, modclient;
     public @Nullable Player player;
     public boolean kicked = false;
+    public long syncTime;
 
     /** When this connection was established. */
     public long connectTime = Time.millis();

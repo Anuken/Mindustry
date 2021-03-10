@@ -110,8 +110,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         unit.aim(mouseX, mouseY);
         //this is only necessary when the thing being controlled isn't synced
         unit.controlWeapons(shooting, shooting);
+        //save previous formation to prevent reset
+        var formation = unit.formation;
         //extra precaution, necessary for non-synced things
         unit.controller(this);
+        //keep previous formation
+        unit.formation = formation;
     }
 
     @Override

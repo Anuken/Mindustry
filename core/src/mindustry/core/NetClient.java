@@ -190,7 +190,7 @@ public class NetClient implements ApplicationListener{
     public static void sendChatMessage(Player player, String message){
 
         //do not receive chat messages from clients that are too young or not registered
-        if(Time.timeSinceMillis(player.con.connectTime) < 500 || !player.con.hasConnected || !player.isAdded()) return;
+        if(net.server() && player != null && player.con != null && (Time.timeSinceMillis(player.con.connectTime) < 500 || !player.con.hasConnected || !player.isAdded())) return;
 
         if(message.length() > maxTextLength){
             throw new ValidateException(player, "Player has sent a message above the text limit.");
@@ -209,7 +209,7 @@ public class NetClient implements ApplicationListener{
 
             //special case; graphical server needs to see its message
             if(!headless){
-                sendMessage(message, colorizeName(player.id(), player.name), player);
+                sendMessage(message, colorizeName(player.id, player.name), player);
             }
 
             //server console logging

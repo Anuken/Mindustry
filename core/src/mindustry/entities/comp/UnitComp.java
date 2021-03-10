@@ -28,6 +28,7 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
 
 import static mindustry.Vars.*;
+import static mindustry.logic.GlobalConstants.*;
 
 @Component(base = true)
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Commanderc, Displayable, Senseable, Ranged, Minerc, Builderc{
@@ -139,7 +140,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case mineX -> mining() ? mineTile.x : -1;
             case mineY -> mining() ? mineTile.y : -1;
             case flag -> flag;
-            case controlled -> !isValid() ? 0 : controller instanceof LogicAI ? 1 : controller instanceof Player ? 2 : controller instanceof FormationAI ? 3 : 0;
+            case controlled -> !isValid() ? 0 :
+                    controller instanceof LogicAI ? ctrlProcessor :
+                    controller instanceof Player ? ctrlPlayer :
+                    controller instanceof FormationAI ? ctrlFormation :
+                    0;
             case commanded -> controller instanceof FormationAI && isValid() ? 1 : 0;
             case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
             case size -> hitSize / tilesize;
@@ -160,7 +165,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 pay.payloads().peek() instanceof BuildPayload p2 ? p2.block() : null) : null;
             default -> noSensed;
         };
-
     }
 
     @Override

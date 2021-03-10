@@ -292,7 +292,7 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.lasershoot;
 
                 bullet = new LaserBoltBulletType(5.2f, 14){{
-                    lifetime = 37f;
+                    lifetime = 32f;
                     healPercent = 5f;
                     collidesTeam = true;
                     backColor = Pal.heal;
@@ -411,7 +411,7 @@ public class UnitTypes implements ContentList{
             mechStepShake = 0.15f;
             ammoType = AmmoTypes.powerHigh;
 
-            speed = 0.38f;
+            speed = 0.39f;
             boostMultiplier = 2.2f;
             engineOffset = 12f;
             engineSize = 6f;
@@ -442,7 +442,7 @@ public class UnitTypes implements ContentList{
                 cooldownTime = 200f;
 
                 bullet = new ContinuousLaserBulletType(){{
-                    damage = 28f;
+                    damage = 30f;
                     length = 175f;
                     hitEffect = Fx.hitMeltHeal;
                     drawSize = 420f;
@@ -453,7 +453,7 @@ public class UnitTypes implements ContentList{
 
                     shootEffect = Fx.greenLaserChargeSmall;
 
-                    incendChance = 0.09f;
+                    incendChance = 0.1f;
                     incendSpread = 5f;
                     incendAmount = 1;
 

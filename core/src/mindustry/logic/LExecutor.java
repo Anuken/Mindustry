@@ -74,8 +74,8 @@ public class LExecutor{
         }
     }
 
-    public void load(String data, int maxInstructions){
-        load(LAssembler.assemble(data, maxInstructions));
+    public void load(String data){
+        load(LAssembler.assemble(data));
     }
 
     /** Loads with a specified assembler. Resets all variables. */
@@ -635,6 +635,11 @@ public class LExecutor{
         public void run(LExecutor exec){
             Object target = exec.obj(from);
             Object sense = exec.obj(type);
+
+            if(target == null && sense == LAccess.dead){
+                exec.setnum(to, 1);
+                return;
+            }
 
             //note that remote units/buildings can be sensed as well
             if(target instanceof Senseable se){

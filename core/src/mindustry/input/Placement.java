@@ -110,7 +110,7 @@ public class Placement{
 
     public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge){
         //check for orthogonal placement + unlocked state
-        if(!(plans.first().x == plans.peek().x || plans.first().y == plans.peek().y || !bridge.unlockedNow())){
+        if(!(plans.first().x == plans.peek().x || plans.first().y == plans.peek().y) || !bridge.unlockedNow()){
             return;
         }
 

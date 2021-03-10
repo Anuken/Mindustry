@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ai.formations.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
@@ -29,7 +30,7 @@ abstract class CommanderComp implements Entityc, Posc{
     transient float minFormationSpeed;
 
     public void update(){
-        if(controlling.isEmpty()){
+        if(controlling.isEmpty() && !Vars.net.client()){
             formation = null;
         }
 

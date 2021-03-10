@@ -50,6 +50,9 @@ public class UnitPayload implements Payload{
 
     @Override
     public boolean dump(){
+        //TODO should not happen
+        if(unit.type == null) return true;
+
         if(!Units.canCreate(unit.team, unit.type)){
             deactiveTime = 1f;
             return false;
@@ -81,6 +84,9 @@ public class UnitPayload implements Payload{
 
     @Override
     public void draw(){
+        //TODO should not happen
+        if(unit.type == null) return;
+
         Drawf.shadow(unit.x, unit.y, 20);
         Draw.rect(unit.type.icon(Cicon.full), unit.x, unit.y, unit.rotation - 90);
         unit.type.drawCell(unit);
