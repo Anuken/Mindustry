@@ -21,7 +21,11 @@ public class GroundAI extends AIController{
 
         if(core != null && unit.within(core, unit.range() / 1.1f + core.block.size * tilesize / 2f)){
             target = core;
-            Arrays.fill(targets, core);
+            for(int i = 0; i < targets.length; i++){
+                if(unit.mounts[i].weapon.bullet.collidesGround){
+                    targets[i] = core;
+                }
+            }
         }
 
         if((core == null || !unit.within(core, unit.range() * 0.5f)) && command() == UnitCommand.attack){
