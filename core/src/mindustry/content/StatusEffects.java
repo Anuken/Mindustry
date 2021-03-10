@@ -12,7 +12,7 @@ import mindustry.graphics.*;
 import static mindustry.Vars.*;
 
 public class StatusEffects implements ContentList{
-    public static StatusEffect none, burning, freezing, unmoving, slow, wet, muddy, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss, sporeSlowed, disarmed;
+    public static StatusEffect none, burning, freezing, unmoving, slow, wet, muddy, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, boss, sporeSlowed, disarmed;
 
     @Override
     public void load(){
@@ -20,14 +20,15 @@ public class StatusEffects implements ContentList{
         none = new StatusEffect("none");
 
         burning = new StatusEffect("burning"){{
-            color = Pal.lightFlame;
+            color = Color.valueOf("ffc455");
             damage = 0.12f; //over 8 seconds, this would be ~60 damage
             effect = Fx.burning;
+            transitionDamage = 8f;
 
             init(() -> {
                 opposite(wet, freezing);
                 affinity(tarred, ((unit, time, newTime, result) -> {
-                    unit.damagePierce(8f);
+                    unit.damagePierce(transitionDamage);
                     Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
                     result.set(burning, Math.min(time + newTime, 300f));
                 }));
@@ -39,12 +40,13 @@ public class StatusEffects implements ContentList{
             speedMultiplier = 0.6f;
             healthMultiplier = 0.8f;
             effect = Fx.freezing;
+            transitionDamage = 18f;
 
             init(() -> {
                 opposite(melting, burning);
 
                 affinity(blasted, ((unit, time, newTime, result) -> {
-                    unit.damagePierce(18f);
+                    unit.damagePierce(transitionDamage);
                     result.set(freezing, time);
                 }));
             });
@@ -65,10 +67,11 @@ public class StatusEffects implements ContentList{
             speedMultiplier = 0.94f;
             effect = Fx.wet;
             effectChance = 0.09f;
+            transitionDamage = 14;
 
             init(() -> {
                 affinity(shocked, ((unit, time, newTime, result) -> {
-                    unit.damagePierce(14f);
+                    unit.damagePierce(transitionDamage);
                     if(unit.team == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
@@ -167,11 +170,6 @@ public class StatusEffects implements ContentList{
         blasted = new StatusEffect("blasted"){{
             color = Color.valueOf("ff795e");
             reactive = true;
-        }};
-
-        corroded = new StatusEffect("corroded"){{
-            color = Pal.plastanium;
-            damage = 0.1f;
         }};
 
         disarmed = new StatusEffect("disarmed"){{

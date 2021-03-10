@@ -1,7 +1,6 @@
 package mindustry.type;
 
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -10,8 +9,8 @@ import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.world.meta.*;
 import mindustry.ui.*;
+import mindustry.world.meta.*;
 
 public class StatusEffect extends UnlockableContent{
     /** Damage dealt by the unit with the effect. */
@@ -24,6 +23,8 @@ public class StatusEffect extends UnlockableContent{
     public float reloadMultiplier = 1f;
     /** Unit build speed multiplier. */
     public float buildSpeedMultiplier = 1f;
+    /** Damage dealt upon transition to an affinity. */
+    public float transitionDamage = 0f;
     /** Unit weapon(s) disabled. */
     public boolean disarm = false;
     /** Damage per frame. */
@@ -66,37 +67,39 @@ public class StatusEffect extends UnlockableContent{
 
     @Override
     public void setStats(){
-        if(damageMultiplier != 1){
-            stats.addPercent(Stat.damageMultiplier, damageMultiplier);
+        if(damageMultiplier != 1) stats.addPercent(Stat.damageMultiplier, damageMultiplier);
+        if(healthMultiplier != 1) stats.addPercent(Stat.healthMultiplier, healthMultiplier);
+        if(speedMultiplier != 1) stats.addPercent(Stat.speedMultiplier, speedMultiplier);
+        if(reloadMultiplier != 1) stats.addPercent(Stat.reloadMultiplier, reloadMultiplier);
+        if(buildSpeedMultiplier != 1) stats.addPercent(Stat.buildSpeedMultiplier, buildSpeedMultiplier);
+        if(damage > 0) stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
+        
+        var afseq = affinities.asArray().sort();
+        var opseq = opposites.asArray().sort();
+
+        for(int i = 0; i < afseq.size; i++){
+            var e = afseq.get(i);
+            stats.add(Stat.affinities, e.emoji() + "" + e.toString());
+        }
+        
+        if(afseq.any() && transitionDamage != 0){
+            stats.add(Stat.affinities, "/ [accent]" + (int)transitionDamage + " " + Stat.damage.localized());
         }
 
-        if(healthMultiplier != 1){
-            stats.addPercent(Stat.healthMultiplier, healthMultiplier);
+        for(int i = 0; i < opseq.size; i++){
+            var e = opseq.get(i);
+            stats.add(Stat.opposites, e.emoji() + "" + e.toString());
         }
+    }
 
-        if(speedMultiplier != 1){
-            stats.addPercent(Stat.speedMultiplier, speedMultiplier);
-        }
+    @Override
+    public Cicon prefDatabaseIcon(){
+        return Cicon.large;
+    }
 
-        if(reloadMultiplier != 1){
-            stats.addPercent(Stat.reloadMultiplier, reloadMultiplier);
-        }
-
-        if(buildSpeedMultiplier != 1){
-            stats.addPercent(Stat.buildSpeedMultiplier, buildSpeedMultiplier);
-        }
-
-        if(damage > 0){
-            stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
-        }
-
-        for(StatusEffect e : affinities){
-            stats.add(Stat.affinities, e.toString(), StatUnit.none);
-        }
-
-        for(StatusEffect e : opposites){
-            stats.add(Stat.opposites, e.toString(), StatUnit.none);
-        }
+    @Override
+    public boolean showUnlock(){
+        return false;
     }
 
     /** Runs every tick on the affected unit while time is greater than 0. */
