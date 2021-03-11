@@ -464,12 +464,18 @@ public class NetServer implements ApplicationListener{
                     return;
                 }
 
-                if(!arg[0].equalsIgnoreCase("y") && !arg[0].equalsIgnoreCase("n")){
+                int sign;
+                switch(arg[0]){
+                    case "y", "yes" -> sign = 1;
+                    case "n", "no" -> sign = -1;
+                    default -> sign = 0;
+                }
+
+                if(sign == 0){
                     player.sendMessage("[scarlet]Vote either 'y' (yes) or 'n' (no).");
                     return;
                 }
 
-                int sign = arg[0].equalsIgnoreCase("y") ? 1 : -1;
                 currentlyKicking[0].vote(player, sign);
             }
         });
