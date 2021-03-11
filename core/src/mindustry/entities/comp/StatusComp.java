@@ -111,7 +111,7 @@ abstract class StatusComp implements Posc, Flyingc{
         }
 
         applied.clear();
-        speedMultiplier = damageMultiplier = healthMultiplier = reloadMultiplier = buildSpeedMultiplier = 1f;
+        speedMultiplier = damageMultiplier = healthMultiplier = reloadMultiplier = buildSpeedMultiplier = dragMultiplier = 1f;
         disarmed = false;
 
         if(statuses.isEmpty()) return;
