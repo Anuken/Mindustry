@@ -198,6 +198,12 @@ public class NetClient implements ApplicationListener{
 
         Events.fire(new PlayerChatEvent(player, message));
 
+        //log commands before they are handled
+        if(message.startsWith(netServer.clientCommands.getPrefix())){
+            //log with brackets
+            Log.info("<&fi@: @&fr>", "&lk" + player.name, "&lw" + message);
+        }
+
         //check if it's a command
         CommandResponse response = netServer.clientCommands.handleMessage(message, player);
         if(response.type == ResponseType.noCommand){ //no command to handle
@@ -219,8 +225,6 @@ public class NetClient implements ApplicationListener{
             //this is required so other clients get the correct name even if they don't know who's sending it yet
             Call.sendMessage(message, colorizeName(player.id(), player.name), player);
         }else{
-            //log command to console but with brackets
-            Log.info("<&fi@: @&fr>", "&lk" + player.name, "&lw" + message);
 
             //a command was sent, now get the output
             if(response.type != ResponseType.valid){

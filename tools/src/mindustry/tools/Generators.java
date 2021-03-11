@@ -398,7 +398,7 @@ public class Generators{
                     //if(icon.size == base.width) continue;
                     Image image = new Image(icon.size, icon.size);
                     image.drawScaled(base);
-                    image.save(item.getContentType().name() + "-" + item.name + "-" + icon.name(), false);
+                    image.save(item.getContentType().name() + "-" + item.name + "-" + icon.name(), !(item instanceof StatusEffect));
 
                     if(icon == Cicon.medium){
                         image.save("../ui/" + item.getContentType() + "-" + item.name + "-icon");
