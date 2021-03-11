@@ -944,6 +944,7 @@ public class Blocks implements ContentList{
             health = 75;
             speed = 4f / 60f;
             itemCapacity = 10;
+            absorbLasers = true;
         }};
 
         armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
