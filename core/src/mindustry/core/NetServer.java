@@ -465,7 +465,7 @@ public class NetServer implements ApplicationListener{
                 }
 
                 int sign;
-                switch(arg[0]){
+                switch(arg[0].toLowerCase()){
                     case "y", "yes" -> sign = 1;
                     case "n", "no" -> sign = -1;
                     default -> sign = 0;
