@@ -92,16 +92,6 @@ public class ContentParser{
             readFields(result, data);
             return result;
         });
-        put(Weather.class, (type, data) -> {
-            if(data.isString()){
-                return field(Weathers.class, data);
-            }
-            var bc = resolve(data.getString("type", ""), ParticleWeather.class);
-            data.remove("type");
-            Weather result = make(bc);
-            readFields(result, data);
-            return result;
-        });
         put(DrawBlock.class, (type, data) -> {
             if(data.isString()){
                 //try to instantiate
@@ -327,7 +317,8 @@ public class ContentParser{
                 readBundle(ContentType.weather, name, value);
             }else{
                 readBundle(ContentType.weather, name, value);
-                item = make(resolve(getType(value), ParticleWeather.class));
+                item = make(resolve(getType(value), ParticleWeather.class), mod + "-" + name);
+                value.remove("type");
             }
             currentContent = item;
             read(() -> readFields(item, value));
@@ -445,6 +436,7 @@ public class ContentParser{
         try{
             run.run();
         }catch(Throwable t){
+            Log.err(t);
             //don't overwrite double errors
             markError(currentContent, t);
         }

@@ -33,6 +33,11 @@ abstract class StatusComp implements Posc, Flyingc{
     void apply(StatusEffect effect, float duration){
         if(effect == StatusEffects.none || effect == null || isImmune(effect)) return; //don't apply empty or immune effects
 
+        //unlock status effects regardless of whether they were applied to friendly units
+        if(state.isCampaign()){
+            effect.unlock();
+        }
+
         if(statuses.size > 0){
             //check for opposite effects
             for(int i = 0; i < statuses.size; i ++){

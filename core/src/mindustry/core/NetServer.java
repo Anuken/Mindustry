@@ -656,9 +656,6 @@ public class NetServer implements ApplicationListener{
 
             long elapsed = Time.timeSinceMillis(con.lastReceivedClientTime);
             float maxSpeed = unit.realSpeed();
-            if(unit.isGrounded()){
-                maxSpeed *= unit.floorSpeedMultiplier();
-            }
 
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.2f;
 

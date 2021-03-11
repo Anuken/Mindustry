@@ -1,0 +1,3 @@
+[This is a truncated changelog, see Github for full notes]
+- Fixed crash when using chat as server host
+- Added support for parsing weather JSON

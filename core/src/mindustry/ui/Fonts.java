@@ -117,7 +117,6 @@ public class Fonts{
 
                 if(region.texture != uitex){
                     continue;
-                    //throw new IllegalArgumentException("Font icon '" + texture + "' is not in the UI texture.");
                 }
 
                 unicodeIcons.put(nametex[0], ch);
