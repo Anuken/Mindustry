@@ -26,6 +26,7 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 import static mindustry.logic.GlobalConstants.*;
@@ -334,6 +335,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
                     vel().add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta));
                 }
+            }
+        }
+
+        //apply knockback near rally points
+        for(Tile rally : indexer.getAllied(team, BlockFlag.rally)){
+            float relativeSize = (tilesize * rally.block().size) + hitSize/2f + 1f;
+            if(within(rally.worldx(), rally.worldy(), relativeSize)){
+                vel().add(Tmp.v1.set(this).sub(rally.worldx(), rally.worldy()).setLength(0.1f + 1f - dst(rally) / relativeSize).scl(0.45f * Time.delta));
             }
         }
 
