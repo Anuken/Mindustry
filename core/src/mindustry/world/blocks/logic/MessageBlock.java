@@ -44,8 +44,7 @@ public class MessageBlock extends Block{
             for(int i = 0; i < text.length(); i++){
                 char c = text.charAt(i);
                 if(c == '\n'){
-                    count ++;
-                    if(count <= maxNewlines){
+                    if(count++ <= maxNewlines){
                         tile.message.append('\n');
                     }
                 }else{

@@ -12,6 +12,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -43,7 +44,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
             boolean isFrag = indent > 0f;
 
             //no point in displaying unit icon twice
-            if(!unit && !isFrag){
+            if(!unit && !(t instanceof PowerTurret) && !isFrag){
                 table.image(icon(t)).size(3 * 8).padRight(4).right().top();
                 table.add(t.localizedName).padRight(10).left().top();
             }
@@ -52,7 +53,11 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                 bt.left().defaults().padRight(3).left();
 
                 if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
-                    bt.add(Core.bundle.format("bullet.damage", type.damage));
+                    if(type.continuousDamage() > 0){
+                        bt.add(Core.bundle.format("bullet.damage", type.damage) + " " + StatUnit.perSecond.localized());
+                    }else{
+                        bt.add(Core.bundle.format("bullet.damage", type.damage));
+                    }
                 }
 
                 if(type.buildingDamageMultiplier != 1){
@@ -83,20 +88,12 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                     sep(bt, type.pierceCap == -1 ? "@bullet.infinitepierce" : Core.bundle.format("bullet.pierce", type.pierceCap));
                 }
 
-                if(type.status == StatusEffects.burning || type.status == StatusEffects.melting || type.incendAmount > 0){
+                if(type.incendAmount > 0){
                     sep(bt, "@bullet.incendiary");
                 }
 
-                if(type.status == StatusEffects.freezing){
-                    sep(bt, "@bullet.freezing");
-                }
-
-                if(type.status == StatusEffects.tarred){
-                    sep(bt, "@bullet.tarred");
-                }
-
-                if(type.status == StatusEffects.sapped){
-                    sep(bt, "@bullet.sapping");
+                if(type.status != StatusEffects.none){
+                    sep(bt, (type.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName);
                 }
 
                 if(type.homingPower > 0.01f){
@@ -104,7 +101,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                 }
 
                 if(type.lightning > 0){
-                    sep(bt, "@bullet.shock");
+                    sep(bt, Core.bundle.format("bullet.lightning", type.lightning, type.lightningDamage < 0 ? type.damage : type.lightningDamage));
                 }
 
                 if(type.fragBullet != null){

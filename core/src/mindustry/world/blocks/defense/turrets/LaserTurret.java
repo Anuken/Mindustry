@@ -35,9 +35,6 @@ public class LaserTurret extends PowerTurret{
 
         stats.remove(Stat.booster);
         stats.add(Stat.input, new BoosterListValue(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, false, l -> consumes.liquidfilters.get(l.id)));
-        stats.remove(Stat.damage);
-        //damages every 5 ticks, at least in meltdown's case
-        stats.add(Stat.damage, shootType.damage * 60f / 5f, StatUnit.perSecond);
     }
 
     public class LaserTurretBuild extends PowerTurretBuild{

@@ -139,7 +139,9 @@ public class Control implements ApplicationListener, Loadable{
         }));
 
         Events.on(UnlockEvent.class, e -> {
-            ui.hudfrag.showUnlock(e.content);
+            if(e.content.showUnlock()){
+                ui.hudfrag.showUnlock(e.content);
+            }
 
             checkAutoUnlocks();
 
