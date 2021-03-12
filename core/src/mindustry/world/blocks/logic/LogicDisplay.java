@@ -75,8 +75,8 @@ public class LogicDisplay extends Block{
                     while(!commands.isEmpty()){
                         long c = commands.removeFirst();
                         byte type = DisplayCmd.type(c);
-                        int x = DisplayCmd.x(c), y = DisplayCmd.y(c),
-                        p1 = DisplayCmd.p1(c), p2 = DisplayCmd.p2(c), p3 = DisplayCmd.p3(c), p4 = DisplayCmd.p4(c);
+                        int x = unpackSign(DisplayCmd.x(c)), y = unpackSign(DisplayCmd.y(c)),
+                        p1 = unpackSign(DisplayCmd.p1(c)), p2 = unpackSign(DisplayCmd.p2(c)), p3 = unpackSign(DisplayCmd.p3(c)), p4 = unpackSign(DisplayCmd.p4(c));
 
                         switch(type){
                             case commandClear -> Core.graphics.clear(x / 255f, y / 255f, p1 / 255f, 1f);
@@ -106,6 +106,10 @@ public class LogicDisplay extends Block{
         }
     }
 
+    static int unpackSign(int value){
+        return (value & 0b0111111111) * ((value & (0b1000000000)) != 0 ? -1 : 1);
+    }
+
     public enum GraphicsType{
         clear,
         color,
@@ -123,10 +127,11 @@ public class LogicDisplay extends Block{
 
     @Struct
     static class DisplayCmdStruct{
+        @StructField(4)
         public byte type;
 
-        //9 bits are required for full 360 degrees
-        @StructField(9)
+        //at least 9 bits are required for full 360 degrees
+        @StructField(10)
         public int x, y, p1, p2, p3, p4;
     }
 }
