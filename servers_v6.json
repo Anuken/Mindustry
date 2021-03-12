@@ -90,5 +90,13 @@
   {
     "name": "Darkdustry",
     "address": ["mindurka.ru"]
+  },
+  {
+    "name": "Mindustry.Party",
+    "address": ["game.mindustry.party"]
+  },
+  {
+    "name": "thedimas",
+    "address": ["95.217.226.152:26160"] 
   }
 ]
