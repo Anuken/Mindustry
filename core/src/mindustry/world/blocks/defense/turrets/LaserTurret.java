@@ -1,6 +1,7 @@
 package mindustry.world.blocks.defense.turrets;
 
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -25,7 +26,7 @@ public class LaserTurret extends PowerTurret{
 
     @Override
     public void init(){
-        consumes.powerCond(powerUse, entity -> ((LaserTurretBuild)entity).bullet != null || ((LaserTurretBuild)entity).target != null);
+        consumes.powerCond(powerUse, entity -> ((LaserTurretBuild)entity).bullets.size > 0 || ((LaserTurretBuild)entity).target != null);
         super.init();
     }
 
@@ -38,7 +39,8 @@ public class LaserTurret extends PowerTurret{
     }
 
     public class LaserTurretBuild extends PowerTurretBuild{
-        Bullet bullet;
+        Seq<Bullet> bullets = new Seq<>();
+        FloatSeq bulletAngles = new FloatSeq();
         float bulletLife;
 
         @Override
@@ -50,17 +52,20 @@ public class LaserTurret extends PowerTurret{
         public void updateTile(){
             super.updateTile();
 
-            if(bulletLife > 0 && bullet != null){
+            if(bulletLife > 0f && bullets.size > 0){
                 wasShooting = true;
                 tr.trns(rotation, shootLength, 0f);
-                bullet.rotation(rotation);
-                bullet.set(x + tr.x, y + tr.y);
-                bullet.time(0f);
+                for(int i = 0; i < bullets.size; i++){
+                    Bullet b = bullets.get(i);
+                    b.rotation(rotation + bulletAngles.get(i));
+                    b.set(x + tr.x, y + tr.y);
+                    b.time(0f);
+                }
                 heat = 1f;
                 recoil = recoilAmount;
                 bulletLife -= Time.delta / Math.max(efficiency(), 0.00001f);
                 if(bulletLife <= 0f){
-                    bullet = null;
+                    bullets.clear();
                 }
             }else if(reload > 0){
                 wasShooting = true;
@@ -79,7 +84,7 @@ public class LaserTurret extends PowerTurret{
 
         @Override
         protected void updateShooting(){
-            if(bulletLife > 0 && bullet != null){
+            if(bulletLife > 0 && bullets.size > 0){
                 return;
             }
 
@@ -98,14 +103,21 @@ public class LaserTurret extends PowerTurret{
         }
 
         @Override
-        protected void bullet(BulletType type, float angle){
-            bullet = type.create(tile.build, team, x + tr.x, y + tr.y, angle);
+        protected void shoot(BulletType type){
             bulletLife = shootDuration;
+
+            super.shoot(type);
+        }
+
+        @Override
+        protected void bullet(BulletType type, float angle){
+            bullets.add(type.create(tile.build, team, x + tr.x, y + tr.y, angle));
+            bulletAngles.add(angle - rotation);
         }
 
         @Override
         public boolean shouldActiveSound(){
-            return bulletLife > 0 && bullet != null;
+            return bulletLife > 0 && bullets.size > 0;
         }
     }
 }
