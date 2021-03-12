@@ -250,7 +250,7 @@ public class PowerNode extends PowerBlock{
     public static void getNodeLinks(Tile tile, Block block, Team team, Cons<Building> others){
         Boolf<Building> valid = other -> other != null && other.tile() != tile && other.block instanceof PowerNode node &&
         other.power.links.size < node.maxNodes &&
-        node.overlaps(other.x - block.offset, other.y - block.offset, tile, block, node.laserRange * tilesize) && other.team == team
+        node.overlaps(other.x, other.y, tile, block, node.laserRange * tilesize) && other.team == team
         && !graphs.contains(other.power.graph) &&
         !Structs.contains(Edges.getEdges(block.size), p -> { //do not link to adjacent buildings
             var t = world.tile(tile.x + p.x, tile.y + p.y);
@@ -273,8 +273,7 @@ public class PowerNode extends PowerBlock{
             graphs.add(tile.build.power.graph);
         }
 
-        //max linking range is currently 12
-        Geometry.circle(tile.x, tile.y, 12, (x, y) -> {
+        Geometry.circle(tile.x, tile.y, 13, (x, y) -> {
             Building other = world.build(x, y);
             if(valid.get(other) && !tempTileEnts.contains(other)){
                 tempTileEnts.add(other);
@@ -308,7 +307,7 @@ public class PowerNode extends PowerBlock{
                     }
                 });
 
-                if(otherReq == null || otherReq.block == null) return;
+                if(otherReq == null || otherReq.block == null) continue;
 
                 drawLaser(player == null ? Team.sharded : player.team(), req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy(), size, otherReq.block.size);
             }

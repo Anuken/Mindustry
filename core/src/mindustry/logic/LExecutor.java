@@ -74,8 +74,8 @@ public class LExecutor{
         }
     }
 
-    public void load(String data, int maxInstructions){
-        load(LAssembler.assemble(data, maxInstructions));
+    public void load(String data){
+        load(LAssembler.assemble(data));
     }
 
     /** Loads with a specified assembler. Resets all variables. */
@@ -636,6 +636,11 @@ public class LExecutor{
             Object target = exec.obj(from);
             Object sense = exec.obj(type);
 
+            if(target == null && sense == LAccess.dead){
+                exec.setnum(to, 1);
+                return;
+            }
+
             //note that remote units/buildings can be sensed as well
             if(target instanceof Senseable se){
                 if(sense instanceof Content co){
@@ -856,8 +861,12 @@ public class LExecutor{
 
             //add graphics calls, cap graphics buffer size
             if(exec.graphicsBuffer.size < maxGraphicsBuffer){
-                exec.graphicsBuffer.add(DisplayCmd.get(type, exec.numi(x), exec.numi(y), num1, exec.numi(p2), exec.numi(p3), exec.numi(p4)));
+                exec.graphicsBuffer.add(DisplayCmd.get(type, packSign(exec.numi(x)), packSign(exec.numi(y)), packSign(num1), packSign(exec.numi(p2)), packSign(exec.numi(p3)), packSign(exec.numi(p4))));
             }
+        }
+
+        static int packSign(int value){
+            return (Math.abs(value) & 0b011111111) | (value < 0 ? 0b1000000000 : 0);
         }
     }
 

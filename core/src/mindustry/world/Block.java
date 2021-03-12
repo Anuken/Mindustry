@@ -123,6 +123,8 @@ public class Block extends UnlockableContent{
     public boolean fillsTile = true;
     /** whether this block can be replaced in all cases */
     public boolean alwaysReplace = false;
+    /** if false, this block can never be replaced. */
+    public boolean replaceable = true;
     /** The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other. */
     public BlockGroup group = BlockGroup.none;
     /** List of block flags. Used for AI indexing. */
@@ -410,7 +412,7 @@ public class Block extends UnlockableContent{
 
     public boolean canReplace(Block other){
         if(other.alwaysReplace) return true;
-        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group &&
+        return other.replaceable && (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group &&
             (size == other.size || (size >= other.size && ((subclass != null && subclass == other.subclass) || group.anyReplace)));
     }
 
@@ -623,6 +625,14 @@ public class Block extends UnlockableContent{
 
     public boolean isStatic(){
         return cacheLayer == CacheLayer.walls;
+    }
+
+    public void setupRequirements(Category cat, ItemStack[] stacks){
+        requirements(cat, stacks);
+    }
+
+    public void setupRequirements(Category cat, BuildVisibility visible, ItemStack[] stacks){
+        requirements(cat, visible, stacks);
     }
 
     public void requirements(Category cat, ItemStack[] stacks, boolean unlocked){

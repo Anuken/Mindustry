@@ -325,7 +325,7 @@ public class Renderer implements ApplicationListener{
         int w = world.width() * tilesize, h = world.height() * tilesize;
         int memory = w * h * 4 / 1024 / 1024;
 
-        if(memory >= 65){
+        if(memory >= (mobile ? 65 : 120)){
             ui.showInfo("@screenshot.invalid");
             return;
         }

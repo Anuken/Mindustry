@@ -383,6 +383,15 @@ public class EventType{
         }
     }
 
+    /** Called when a connection is established to a client. */
+    public static class ConnectionEvent{
+        public final NetConnection connection;
+
+        public ConnectionEvent(NetConnection connection){
+            this.connection = connection;
+        }
+    }
+
     /** Called after connecting; when a player receives world data and is ready to play.*/
     public static class PlayerJoin{
         public final Player player;

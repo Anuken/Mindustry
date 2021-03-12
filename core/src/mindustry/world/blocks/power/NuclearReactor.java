@@ -54,6 +54,7 @@ public class NuclearReactor extends PowerGenerator{
         hasLiquids = true;
         rebuildable = false;
         flags = EnumSet.of(BlockFlag.reactor, BlockFlag.generator);
+        schematicPriority = -5;
     }
 
     @Override

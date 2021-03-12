@@ -19,7 +19,7 @@ abstract class StatusComp implements Posc, Flyingc{
     private Seq<StatusEntry> statuses = new Seq<>();
     private transient Bits applied = new Bits(content.getBy(ContentType.status).size);
 
-    @ReadOnly transient float speedMultiplier = 1, damageMultiplier = 1, healthMultiplier = 1, reloadMultiplier = 1;
+    @ReadOnly transient float speedMultiplier = 1, damageMultiplier = 1, healthMultiplier = 1, reloadMultiplier = 1, buildSpeedMultiplier = 1, dragMultiplier = 1;
     @ReadOnly transient boolean disarmed = false;
 
     @Import UnitType type;
@@ -32,6 +32,11 @@ abstract class StatusComp implements Posc, Flyingc{
     /** Adds a status effect to this unit. */
     void apply(StatusEffect effect, float duration){
         if(effect == StatusEffects.none || effect == null || isImmune(effect)) return; //don't apply empty or immune effects
+
+        //unlock status effects regardless of whether they were applied to friendly units
+        if(state.isCampaign()){
+            effect.unlock();
+        }
 
         if(statuses.size > 0){
             //check for opposite effects
@@ -111,7 +116,7 @@ abstract class StatusComp implements Posc, Flyingc{
         }
 
         applied.clear();
-        speedMultiplier = damageMultiplier = healthMultiplier = reloadMultiplier = 1f;
+        speedMultiplier = damageMultiplier = healthMultiplier = reloadMultiplier = buildSpeedMultiplier = dragMultiplier = 1f;
         disarmed = false;
 
         if(statuses.isEmpty()) return;
@@ -134,6 +139,8 @@ abstract class StatusComp implements Posc, Flyingc{
                 healthMultiplier *= entry.effect.healthMultiplier;
                 damageMultiplier *= entry.effect.damageMultiplier;
                 reloadMultiplier *= entry.effect.reloadMultiplier;
+                buildSpeedMultiplier *= entry.effect.buildSpeedMultiplier;
+                dragMultiplier *= entry.effect.dragMultiplier;
 
                 disarmed |= entry.effect.disarm;
 

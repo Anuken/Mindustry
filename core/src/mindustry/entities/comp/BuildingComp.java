@@ -1142,7 +1142,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Returns whether or not a hand cursor should be shown over this block. */
     public Cursor getCursor(){
-        return block.configurable && team == player.team() ? SystemCursor.hand : SystemCursor.arrow;
+        return block.configurable && interactable(player.team()) ? SystemCursor.hand : SystemCursor.arrow;
     }
 
     /**
@@ -1325,7 +1325,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();
             case powerNetCapacity -> power == null ? 0 : power.graph.getLastCapacity();
             case enabled -> enabled ? 1 : 0;
-            case controlled -> this instanceof ControlBlock c && c.isControlled() ? 2 : 0;
+            case controlled -> this instanceof ControlBlock c && c.isControlled() ? GlobalConstants.ctrlPlayer : 0;
             case payloadCount -> getPayload() != null ? 1 : 0;
             case size -> block.size;
             default -> Float.NaN; //gets converted to null in logic
