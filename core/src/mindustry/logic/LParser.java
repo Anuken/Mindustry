@@ -37,7 +37,6 @@ public class LParser{
     }
 
     void error(String message){
-        //TODO
         throw new RuntimeException("Invalid code. " + message);
     }
 

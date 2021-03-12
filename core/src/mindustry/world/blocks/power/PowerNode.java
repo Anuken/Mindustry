@@ -252,6 +252,7 @@ public class PowerNode extends PowerBlock{
         other.power.links.size < node.maxNodes &&
         node.overlaps(other.x, other.y, tile, block, node.laserRange * tilesize) && other.team == team
         && !graphs.contains(other.power.graph) &&
+        !PowerNode.insulated(tile, other.tile) &&
         !Structs.contains(Edges.getEdges(block.size), p -> { //do not link to adjacent buildings
             var t = world.tile(tile.x + p.x, tile.y + p.y);
             return t != null && t.build == other;
