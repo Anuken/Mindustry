@@ -148,10 +148,6 @@ public class PowerNode extends PowerBlock{
             drawLaser(tile.team(), x * tilesize + offset, y * tilesize + offset, other.x, other.y, size, other.block.size);
 
             Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
-
-            insulators(tile.x, tile.y, other.tileX(), other.tileY(), cause -> {
-                Drawf.square(cause.x, cause.y, cause.block.size * tilesize / 2f + 2f, Pal.plastanium);
-            });
         });
 
         Draw.reset();
@@ -200,8 +196,10 @@ public class PowerNode extends PowerBlock{
     protected void getPotentialLinks(Tile tile, Cons<Building> others){
         Boolf<Building> valid = other -> other != null && other.tile() != tile && other.power != null &&
             (other.block.outputsPower || other.block.consumesPower || other.block instanceof PowerNode) &&
-            overlaps(tile.x * tilesize + offset, tile.y * tilesize + offset, other.tile(), laserRange * tilesize) && other.team == player.team()
-            && !graphs.contains(other.power.graph) &&
+            overlaps(tile.x * tilesize + offset, tile.y * tilesize + offset, other.tile(), laserRange * tilesize) && other.team == player.team() &&
+            !graphs.contains(other.power.graph) &&
+            !PowerNode.insulated(tile, other.tile) &&
+            !(other instanceof PowerNodeBuild obuild && obuild.power.links.size >= ((PowerNode)obuild.block).maxNodes) &&
             !Structs.contains(Edges.getEdges(size), p -> { //do not link to adjacent buildings
                 var t = world.tile(tile.x + p.x, tile.y + p.y);
                 return t != null && t.build == other;
@@ -341,20 +339,9 @@ public class PowerNode extends PowerBlock{
     }
 
     public static boolean insulated(int x, int y, int x2, int y2){
-        returnValue = false;
-        insulators(x, y, x2, y2, cause -> returnValue = true);
-        return returnValue;
-    }
-
-    public static void insulators(int x, int y, int x2, int y2, Cons<Building> iterator){
-        world.raycastEach(x, y, x2, y2, (wx, wy) -> {
-
+        return world.raycast(x, y, x2, y2, (wx, wy) -> {
             Building tile = world.build(wx, wy);
-            if(tile != null && tile.block.insulated){
-                iterator.get(tile);
-            }
-
-            return false;
+            return tile != null && tile.block.insulated;
         });
     }
 
@@ -364,26 +351,7 @@ public class PowerNode extends PowerBlock{
         public void placed(){
             if(net.client()) return;
 
-            Boolf<Building> valid = other -> other != null && other != this &&
-                (other.block.outputsPower || other.block.consumesPower || other.block instanceof PowerNode) && linkValid(this, other)
-                && !other.proximity().contains(this) && other.power.graph != power.graph;
-
-            tempTileEnts.clear();
-            Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {
-                Building other = world.build(x, y);
-                if(valid.get(other)){
-                    if(!insulated(this, other)){
-                        tempTileEnts.add(other);
-                    }
-                }
-            });
-
-            tempTileEnts.sort((a, b) -> {
-                int type = -Boolean.compare(a.block instanceof PowerNode, b.block instanceof PowerNode);
-                if(type != 0) return type;
-                return Float.compare(a.dst2(tile), b.dst2(tile));
-            });
-            tempTileEnts.each(valid, other -> {
+            getPotentialLinks(tile, other -> {
                 if(!power.links.contains(other.pos())){
                     configureAny(other.pos());
                 }
