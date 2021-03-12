@@ -24,6 +24,8 @@ public class StatusEffect extends UnlockableContent{
     public float reloadMultiplier = 1f;
     /** Unit build speed multiplier. */
     public float buildSpeedMultiplier = 1f;
+    /** Unit drag multiplier. */
+    public float dragMultiplier = 1f;
     /** Damage dealt upon transition to an affinity. */
     public float transitionDamage = 0f;
     /** Unit weapon(s) disabled. */
