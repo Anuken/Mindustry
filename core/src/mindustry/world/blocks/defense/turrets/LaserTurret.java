@@ -66,6 +66,7 @@ public class LaserTurret extends PowerTurret{
                 bulletLife -= Time.delta / Math.max(efficiency(), 0.00001f);
                 if(bulletLife <= 0f){
                     bullets.clear();
+                    bulletAngles.clear();
                 }
             }else if(reload > 0){
                 wasShooting = true;
