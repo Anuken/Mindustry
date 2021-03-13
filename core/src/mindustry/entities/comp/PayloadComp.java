@@ -31,8 +31,8 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
 
     boolean canPickup(Unit unit){
         float unitSize = unit.hitSize * unit.hitSize;
-        float legMass = unit.type.allowLegStep ? unit.type.legCount * unit.type.legPayloadMass : 0;
-        return payloadUsed() + unitSize + legMass <= type.payloadCapacity + 0.001f && unit.team == team() && unit.isAI();
+        float legSize = unit.type.allowLegStep ? unit.type.legCount * unit.type.legPayloadSize : 0;
+        return payloadUsed() + unitSize + legSize <= type.payloadCapacity + 0.001f && unit.team == team() && unit.isAI();
     }
 
     boolean canPickup(Building build){

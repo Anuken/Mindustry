@@ -589,7 +589,7 @@ public class UnitTypes implements ContentList{
             legLength = 9f;
             legTrns = 0.6f;
             legMoveSpace = 1.4f;
-            legPayloadMass = 9f;
+            legPayloadSize = 9f;
             hovering = true;
             armor = 3f;
 
@@ -629,7 +629,7 @@ public class UnitTypes implements ContentList{
             legTrns = 0.8f;
             legMoveSpace = 1.4f;
             legBaseOffset = 2f;
-            legPayloadMass = 18f;
+            legPayloadSize = 18f;
             hovering = true;
             armor = 5f;
             ammoType = AmmoTypes.power;
@@ -704,7 +704,7 @@ public class UnitTypes implements ContentList{
             legLengthScl = 0.96f;
             rippleScale = 2f;
             legSpeed = 0.2f;
-            legPayloadMass = 31f;
+            legPayloadSize = 31f;
             ammoType = AmmoTypes.power;
             buildSpeed = 1f;
 
@@ -808,7 +808,7 @@ public class UnitTypes implements ContentList{
             legLengthScl = 0.93f;
             rippleScale = 3f;
             legSpeed = 0.19f;
-            legPayloadMass = 64f;
+            legPayloadSize = 64f;
             ammoType = AmmoTypes.powerHigh;
             buildSpeed = 1f;
 
