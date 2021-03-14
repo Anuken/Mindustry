@@ -66,7 +66,7 @@ public class ServerControl implements ApplicationListener{
             "bans", "",
             "admins", "",
             "shufflemode", "custom",
-            "globalrules", "{reactorExplosions: false}"
+            "globalrules", "{reactorExplosions: false, logicUnitBuild: false}"
         );
 
         //update log level
