@@ -523,7 +523,6 @@ public class LExecutor{
         public int target;
         public LAccess type = LAccess.enabled;
         public int p1, p2, p3, p4;
-        public Interval timer = new Interval(1);
 
         public ControlI(LAccess type, int target, int p1, int p2, int p3, int p4){
             this.type = type;
@@ -539,7 +538,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Object obj = exec.obj(target);
-            if(obj instanceof Building b && b.team == exec.team && exec.linkIds.contains(b.id) && (type.cooldown <= 0 || timer.get(type.cooldown))){
+            if(obj instanceof Building b && b.team == exec.team && exec.linkIds.contains(b.id)){
                 if(type.isObj){
                     b.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
                 }else{

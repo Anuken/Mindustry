@@ -10,6 +10,7 @@ import mindustry.logic.LExecutor.*;
 public class LAssembler{
     public static ObjectMap<String, Func<String[], LStatement>> customParsers = new ObjectMap<>();
     public static final int maxTokenLength = 36;
+    private static final int invalidNum = Integer.MIN_VALUE;
 
     private static final StringMap opNameChanges = StringMap.of(
     "atan2", "angle",
@@ -77,23 +78,22 @@ public class LAssembler{
         //remove spaces for non-strings
         symbol = symbol.replace(' ', '_');
 
-        try{
-            double value = parseDouble(symbol);
-            if(Double.isNaN(value) || Double.isInfinite(value)) value = 0;
+        double value = parseDouble(symbol);
 
+        if(value == invalidNum){
+            return putVar(symbol).id;
+        }else{
             //this creates a hidden const variable with the specified value
             return putConst("___" + value, value).id;
-        }catch(NumberFormatException e){
-            return putVar(symbol).id;
         }
     }
 
-    double parseDouble(String symbol) throws NumberFormatException{
+    double parseDouble(String symbol){
         //parse hex/binary syntax
-        if(symbol.startsWith("0b")) return Long.parseLong(symbol.substring(2), 2);
-        if(symbol.startsWith("0x")) return Long.parseLong(symbol.substring(2), 16);
+        if(symbol.startsWith("0b")) return Strings.parseLong(symbol, 2, 2, symbol.length(), invalidNum);
+        if(symbol.startsWith("0x")) return Strings.parseLong(symbol, 16, 2, symbol.length(), invalidNum);
 
-        return Double.parseDouble(symbol);
+        return Strings.parseDouble(symbol, invalidNum);
     }
 
     /** Adds a constant value by name. */
