@@ -70,6 +70,7 @@ public class Turret extends ReloadTurret{
     public Effect chargeEffect = Fx.none;
     public Effect chargeBeginEffect = Fx.none;
     public Sound chargeSound = Sounds.none;
+    public float chargeMoveFract = 0f;
 
     public Sortf unitSort = Unit::dst2;
 
@@ -318,11 +319,11 @@ public class Turret extends ReloadTurret{
         }
 
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * delta() * baseReloadSpeed());
+            rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * delta() * (charging ? chargeMoveFract : 1f) * baseReloadSpeed());
         }
 
         public boolean shouldTurn(){
-            return !charging;
+            return true;
         }
 
         /** Consume ammo and return a type. */
