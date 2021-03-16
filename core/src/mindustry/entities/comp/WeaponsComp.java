@@ -130,7 +130,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                         }
                     }else{
                         mount.bullets.remove(b);
-                        mount.bulletAngles.removeValue(index);
+                        mount.bulletAngles.removeIndex(index);
                     }
                 });
             }else{
@@ -183,6 +183,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
     private void shoot(WeaponMount mount, float x, float y, float aimX, float aimY, float mountX, float mountY, float rotation, int side){
         Weapon weapon = mount.weapon;
+        mount.bullets.clear();
+        mount.bulletAngles.clear();
 
         float baseX = this.x, baseY = this.y;
         boolean delay = weapon.firstShotDelay + weapon.shotDelay > 0f;
