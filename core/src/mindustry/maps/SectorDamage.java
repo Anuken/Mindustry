@@ -245,7 +245,7 @@ public class SectorDamage{
         //first, calculate the total health of blocks in the path
 
         //radius around the path that gets counted
-        int radius = 7;
+        int radius = 5;
         IntSet counted = new IntSet();
 
         for(Tile t : sparse2){
@@ -273,7 +273,7 @@ public class SectorDamage{
         for(Building build : Groups.build){
             float e = build.efficiency();
             if(e > 0.08f){
-                if(build.team == state.rules.defaultTeam && build instanceof Ranged ranged && sparse.contains(t -> t.within(build, ranged.range() + radius*tilesize))){
+                if(build.team == state.rules.defaultTeam && build instanceof Ranged ranged && sparse.contains(t -> t.within(build, ranged.range() + 4*tilesize))){
                     if(build.block instanceof Turret t && build instanceof TurretBuild b && b.hasAmmo()){
                         sumDps += t.shots / t.reloadTime * 60f * b.peekAmmo().estimateDPS() * e;
                     }
