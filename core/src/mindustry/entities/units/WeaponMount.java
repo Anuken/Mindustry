@@ -1,5 +1,6 @@
 package mindustry.entities.units;
 
+import arc.struct.*;
 import arc.util.*;
 import mindustry.audio.*;
 import mindustry.gen.*;
@@ -24,8 +25,10 @@ public class WeaponMount{
     public boolean rotate = false;
     /** extra state for alternating weapons */
     public boolean side;
-    /** current bullet for continuous weapons */
-    public @Nullable Bullet bullet;
+    /** current bullets for continuous weapons */
+    public Seq<Bullet> bullets = new Seq<>();
+    /** rotation offsets for continuous weapons */
+    public FloatSeq bulletAngles = new FloatSeq();
     /** sound loop for continuous weapons */
     public @Nullable SoundLoop sound;
 

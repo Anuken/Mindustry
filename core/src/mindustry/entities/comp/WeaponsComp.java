@@ -88,10 +88,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     @Override
     public void remove(){
         for(WeaponMount mount : mounts){
-            if(mount.bullet != null){
-                mount.bullet.time = mount.bullet.lifetime - 10f;
-                mount.bullet = null;
-            }
+            mount.bullets.each(b -> {
+                if(mount.weapon.continuous) b.lifetime = b.lifetime - 10f;
+            });
+            mount.bullets.clear();
 
             if(mount.sound != null){
                 mount.sound.stop();
@@ -116,19 +116,23 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
             float shootAngle = weapon.rotate ? weaponRotation + 90 : Angles.angle(shootX, shootY, mount.aimX, mount.aimY) + (this.rotation - angleTo(mount.aimX, mount.aimY));
 
             //update continuous state
-            if(weapon.continuous && mount.bullet != null){
-                if(!mount.bullet.isAdded() || mount.bullet.time >= mount.bullet.lifetime || mount.bullet.type != weapon.bullet){
-                    mount.bullet = null;
-                }else{
-                    mount.bullet.rotation(weaponRotation + 90);
-                    mount.bullet.set(shootX, shootY);
-                    mount.reload = weapon.reload;
-                    vel.add(Tmp.v1.trns(rotation + 180f, mount.bullet.type.recoil));
-                    if(weapon.shootSound != Sounds.none && !headless){
-                        if(mount.sound == null) mount.sound = new SoundLoop(weapon.shootSound, 1f);
-                        mount.sound.update(x, y, true);
+            if(weapon.continuous && !mount.bullets.isEmpty()){
+                mount.bullets.each(b -> {
+                    int index = mount.bullets.indexOf(b);
+                    if(b.isAdded() && b.time < b.lifetime && b.type == weapon.bullet){
+                        b.rotation(weaponRotation + 90 + mount.bulletAngles.get(index));
+                        b.set(shootX, shootY);
+                        mount.reload = weapon.reload;
+                        vel.add(Tmp.v1.trns(rotation + 180f, b.type.recoil));
+                        if(weapon.shootSound != Sounds.none && !headless){
+                            if(mount.sound == null) mount.sound = new SoundLoop(weapon.shootSound, 1f);
+                            mount.sound.update(x, y, true);
+                        }
+                    }else{
+                        mount.bullets.remove(b);
+                        mount.bulletAngles.removeValue(index);
                     }
-                }
+                });
             }else{
                 //heat decreases when not firing
                 mount.heat = Math.max(mount.heat - Time.delta * reloadMultiplier / mount.weapon.cooldownTime, 0);
@@ -193,12 +197,18 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> {
                 Time.run(sequenceNum * weapon.shotDelay + weapon.firstShotDelay, () -> {
                     if(!isAdded()) return;
-                    mount.bullet = bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy), lifeScl);
+                    float inacc = Mathf.range(weapon.inaccuracy);
+                    mount.bullets.add(bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + inacc, lifeScl));
+                    mount.bulletAngles.add(f - rotation + inacc);
                 });
                 sequenceNum++;
             });
         }else{
-            Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> mount.bullet = bullet(weapon, x, y, f + Mathf.range(weapon.inaccuracy), lifeScl));
+            Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> {
+                float inacc = Mathf.range(weapon.inaccuracy);
+                mount.bullets.add(bullet(weapon, x, y, f + inacc, lifeScl));
+                mount.bulletAngles.add(f - rotation + inacc);
+            });
         }
 
         boolean parentize = ammo.keepVelocity;
