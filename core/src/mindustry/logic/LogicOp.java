@@ -41,7 +41,7 @@ public enum LogicOp{
     cos("cos", d -> Math.cos(d * 0.017453292519943295D)),
     arccos("arccos", d -> Math.acos(d) / 0.017453292519943295D),
     tan("tan", d -> Math.tan(d * 0.017453292519943295D)),
-    arctan("arctan", d -> Mathf.atan(d) / 0.017453292519943295D),
+    arctan("arctan", d -> Math.atan(d) / 0.017453292519943295D),
     floor("floor", Math::floor),
     ceil("ceil", Math::ceil),
     sqrt("sqrt", Math::sqrt),
