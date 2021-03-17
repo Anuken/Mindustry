@@ -1,6 +1,7 @@
 package mindustry.world.blocks.sandbox;
 
 import mindustry.world.blocks.power.*;
+import mindustry.world.meta.*;
 
 public class PowerSource extends PowerNode{
 
@@ -11,6 +12,12 @@ public class PowerSource extends PowerNode{
         maxNodes = 100;
         outputsPower = true;
         consumesPower = false;
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+        stats.add(Stat.sourcePowerGeneration, powerProduction);
     }
 
     public class PowerSourceBuild extends PowerNodeBuild{

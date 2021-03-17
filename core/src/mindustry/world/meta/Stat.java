@@ -54,6 +54,7 @@ public enum Stat{
     powerRange(StatCat.power),
     powerConnections(StatCat.power),
     basePowerGeneration(StatCat.power),
+    sourcePowerGeneration(StatCat.power),
 
     tiles(StatCat.crafting),
     input(StatCat.crafting),
