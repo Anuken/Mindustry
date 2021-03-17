@@ -905,7 +905,7 @@ public class LStatements{
         void rebuild(Table table){
             table.clearChildren();
 
-            table.add(" find ").left().self(this::param);;
+            table.add(" find ").left().self(this::param);
 
             table.button(b -> {
                 b.label(() -> locate.name());
@@ -918,14 +918,14 @@ public class LStatements{
             switch(locate){
                 case building -> {
                     row(table);
-                    table.add(" group ").left().self(this::param);;
+                    table.add(" group ").left().self(this::param);
                     table.button(b -> {
                         b.label(() -> flag.name());
                         b.clicked(() -> showSelect(b, BlockFlag.allLogic, flag, t -> flag = t, 2, cell -> cell.size(110, 50)));
                     }, Styles.logict, () -> {}).size(110, 40).color(table.color).left().padLeft(2);
                     row(table);
 
-                    table.add(" enemy ").left().self(this::param);;
+                    table.add(" enemy ").left().self(this::param);
 
                     fields(table, enemy, str -> enemy = str);
 

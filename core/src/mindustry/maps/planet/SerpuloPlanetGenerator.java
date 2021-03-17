@@ -115,10 +115,6 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         tile.floor = getBlock(position);
         tile.block = tile.floor.asFloor().wall;
 
-        //if(noise.octaveNoise3D(5, 0.6, 8.0, position.x, position.y, position.z) > 0.65){
-            //tile.block = Blocks.air;
-        //}
-
         if(rid.getValue(position.x, position.y, position.z, 22) > 0.32){
             tile.block = Blocks.air;
         }

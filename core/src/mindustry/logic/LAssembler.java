@@ -10,12 +10,8 @@ import mindustry.logic.LExecutor.*;
 public class LAssembler{
     public static ObjectMap<String, Func<String[], LStatement>> customParsers = new ObjectMap<>();
     public static final int maxTokenLength = 36;
-    private static final int invalidNum = Integer.MIN_VALUE;
 
-    private static final StringMap opNameChanges = StringMap.of(
-    "atan2", "angle",
-    "dst", "len"
-    );
+    private static final int invalidNum = Integer.MIN_VALUE;
 
     private int lastVar;
     /** Maps names to variable IDs. */
