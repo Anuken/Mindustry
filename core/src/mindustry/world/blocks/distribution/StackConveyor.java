@@ -283,7 +283,7 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public void handleItem(Building source, Item item){
-            if(items.empty()) poofIn();
+            if(items.empty() && tile != null) poofIn();
             super.handleItem(source, item);
             lastItem = item;
         }
@@ -291,7 +291,7 @@ public class StackConveyor extends Block implements Autotiler{
         @Override
         public void handleStack(Item item, int amount, Teamc source){
             if(amount <= 0) return;
-            if(items.empty()) poofIn();
+            if(items.empty() && tile != null) poofIn();
             super.handleStack(item, amount, source);
             lastItem = item;
         }

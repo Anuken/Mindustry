@@ -47,7 +47,7 @@ public class LogicBlock extends Block{
         config(Integer.class, (LogicBuild entity, Integer pos) -> {
             //if there is no valid link in the first place, nobody cares
             if(!entity.validLink(world.build(pos))) return;
-            Building lbuild = world.build(pos);
+            var lbuild = world.build(pos);
             int x = lbuild.tileX(), y = lbuild.tileY();
 
             LogicLink link = entity.links.find(l -> l.x == x && l.y == y);
@@ -62,8 +62,7 @@ public class LogicBlock extends Block{
                 }
             }else{
                 entity.links.remove(l -> world.build(l.x, l.y) == lbuild);
-                LogicLink out = new LogicLink(x, y, entity.findLinkName(lbuild.block), true);
-                entity.links.add(out);
+                entity.links.add(new LogicLink(x, y, entity.findLinkName(lbuild.block), true));
             }
 
             entity.updateCode(entity.code, true, null);

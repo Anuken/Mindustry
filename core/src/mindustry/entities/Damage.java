@@ -248,7 +248,7 @@ public class Damage{
 
         tmpUnit = null;
 
-        Cons<Unit> cons = e -> {
+        Units.nearbyEnemies(hitter.team, rect, e -> {
             if((tmpUnit != null && e.dst2(x, y) > tmpUnit.dst2(x, y)) || !e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)) return;
 
             e.hitbox(hitrect);
@@ -263,9 +263,7 @@ public class Damage{
             if(vec != null){
                 tmpUnit = e;
             }
-        };
-
-        Units.nearbyEnemies(hitter.team, rect, cons);
+        });
 
         if(tmpBuilding != null && tmpUnit != null){
             if(Mathf.dst2(x, y, tmpUnit.getX(), tmpUnit.getY()) <= Mathf.dst2(x, y, tmpBuilding.getX(), tmpBuilding.getY())){
@@ -339,7 +337,12 @@ public class Damage{
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground){
-        Cons<Unit> cons = entity -> {
+        Cons<Unit> cons
+
+
+
+
+        = entity -> {
             if(entity.team == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
                 return;
             }
