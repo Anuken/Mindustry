@@ -17,7 +17,7 @@ public class PowerSource extends PowerNode{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(Stat.sourcePowerGeneration, powerProduction);
+        stats.add(Stat.sourcePowerGeneration, powerProduction * 60.0f, StatUnit.powerSecond);
     }
 
     public class PowerSourceBuild extends PowerNodeBuild{
