@@ -225,14 +225,6 @@ public class UI implements ApplicationListener, Loadable{
         Events.fire(new ResizeEvent());
     }
 
-    @Override
-    public void dispose(){
-        if(packer != null){
-            packer.dispose();
-            packer = null;
-        }
-    }
-
     public TextureRegionDrawable getIcon(String name){
         if(Icon.icons.containsKey(name)) return Icon.icons.get(name);
         return Core.atlas.getDrawable("error");
