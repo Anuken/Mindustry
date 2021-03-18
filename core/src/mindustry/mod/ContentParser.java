@@ -317,7 +317,7 @@ public class ContentParser{
                 readBundle(ContentType.weather, name, value);
             }else{
                 readBundle(ContentType.weather, name, value);
-                item = make(resolve(getType(value), ParticleWeather.class), mod + "-" + name);
+                item = make(resolve(value.getString("type", ""), Weather.class), mod + "-" + name);
                 value.remove("type");
             }
             currentContent = item;
