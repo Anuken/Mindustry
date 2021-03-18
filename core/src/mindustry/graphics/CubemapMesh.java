@@ -3,6 +3,7 @@ package mindustry.graphics;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
+import arc.graphics.VertexAttributes.*;
 import arc.graphics.gl.*;
 import arc.math.geom.*;
 import arc.util.*;
