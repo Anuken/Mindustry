@@ -736,8 +736,8 @@ public class NetServer implements ApplicationListener{
             logic.skipWave();
             info("&lc@ has skipped the wave.", player.name);
         }else if(action == AdminAction.ban){
-            netServer.admins.banPlayerIP(other.con.address);
             netServer.admins.banPlayerID(other.con.uuid);
+            netServer.admins.banPlayerIP(other.con.address);
             other.kick(KickReason.banned);
             info("&lc@ has banned @.", player.name, other.name);
         }else if(action == AdminAction.kick){

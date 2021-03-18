@@ -419,6 +419,7 @@ public class EventType{
     }
     
     public static class PlayerBanEvent{
+        @Nullable
         public final Player player;
 
         public PlayerBanEvent(Player player){
@@ -427,6 +428,7 @@ public class EventType{
     }
     
     public static class PlayerUnbanEvent{
+        @Nullable
         public final Player player;
 
         public PlayerUnbanEvent(Player player){

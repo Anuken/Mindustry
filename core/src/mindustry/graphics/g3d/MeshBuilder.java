@@ -1,7 +1,6 @@
 package mindustry.graphics.g3d;
 
 import arc.graphics.*;
-import arc.graphics.VertexAttributes.*;
 import arc.graphics.gl.*;
 import arc.math.geom.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
