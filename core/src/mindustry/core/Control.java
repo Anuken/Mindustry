@@ -431,11 +431,7 @@ public class Control implements ApplicationListener, Loadable{
             music.stop();
         }
 
-        content.dispose();
         net.dispose();
-        Musics.dispose();
-        Sounds.dispose();
-        if(ui != null && ui.editor != null) ui.editor.dispose();
     }
 
     @Override

@@ -48,15 +48,6 @@ public class ModsDialog extends BaseDialog{
         super("@mods");
         addCloseButton();
 
-        Events.on(DisposeEvent.class, e -> {
-            textureCache.each((key, val) -> {
-                if(val.texture.width == val.width){
-                    val.texture.dispose();
-                }
-            });
-            textureCache.clear();
-        });
-
         browser = new BaseDialog("@mods.browser");
 
         browser.cont.table(table -> {

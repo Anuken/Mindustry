@@ -63,15 +63,6 @@ public class Schematics implements Loadable{
     private long lastClearTime;
 
     public Schematics(){
-        Events.on(DisposeEvent.class, e -> {
-            previews.each((schem, m) -> m.dispose());
-            previews.clear();
-            shadowBuffer.dispose();
-            if(errorTexture != null){
-                errorTexture.dispose();
-                errorTexture = null;
-            }
-        });
 
         Events.on(ClientLoadEvent.class, event -> {
             errorTexture = new Texture("sprites/error.png");
