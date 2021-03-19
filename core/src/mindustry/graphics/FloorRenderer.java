@@ -18,6 +18,7 @@ import static mindustry.Vars.*;
 
 public class FloorRenderer implements Disposable{
     private static final int chunksize = mobile ? 16 : 32, chunkunits = chunksize * tilesize;
+    private static final float pad = tilesize/2f;
 
     private int[][][] cache;
     private MultiCacheBatch cbatch;
@@ -42,8 +43,6 @@ public class FloorRenderer implements Disposable{
         }
 
         Camera camera = Core.camera;
-
-        float pad = tilesize/2f;
 
         int
             minx = (int)((camera.position.x - camera.width/2f - pad) / chunkunits),
@@ -140,21 +139,22 @@ public class FloorRenderer implements Disposable{
 
         Camera camera = Core.camera;
 
-        int crangex = (int)(camera.width / (chunksize * tilesize)) + 1;
-        int crangey = (int)(camera.height / (chunksize * tilesize)) + 1;
+        int
+            minx = (int)((camera.position.x - camera.width/2f - pad) / chunkunits),
+            miny = (int)((camera.position.y - camera.height/2f - pad) / chunkunits),
+            maxx = Mathf.ceil((camera.position.x + camera.width/2f + pad) / chunkunits),
+            maxy = Mathf.ceil((camera.position.y + camera.height/2f + pad) / chunkunits);
 
         layer.begin();
 
-        for(int x = -crangex; x <= crangex; x++){
-            for(int y = -crangey; y <= crangey; y++){
-                int worldx = (int)(camera.position.x / (chunksize * tilesize)) + x;
-                int worldy = (int)(camera.position.y / (chunksize * tilesize)) + y;
+        for(int x = minx; x <= maxx; x++){
+            for(int y = miny; y <= maxy; y++){
 
-                if(!Structs.inBounds(worldx, worldy, cache)){
+                if(!Structs.inBounds(x, y, cache)){
                     continue;
                 }
 
-                int[] chunk = cache[worldx][worldy];
+                int[] chunk = cache[x][y];
                 if(chunk[layer.ordinal()] == -1) continue;
                 cbatch.drawCache(chunk[layer.ordinal()]);
             }
