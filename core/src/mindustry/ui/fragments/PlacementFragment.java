@@ -97,9 +97,9 @@ public class PlacementFragment extends Fragment{
         scrollPositions.put(currentCategory, blockPane.getScrollY());
 
         if(Core.input.keyTap(Binding.pick) && player.isBuilder()){ //mouse eyedropper select
-            Building tile = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-            Block tryRecipe = tile == null ? null : tile instanceof ConstructBuild c ? c.cblock : tile.block;
-            Object tryConfig = tile == null ? null : tile.config();
+            var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            Block tryRecipe = build == null ? null : build instanceof ConstructBuild c ? c.cblock : build.block;
+            Object tryConfig = build == null || !build.block.copyConfig ? null : build.config();
 
             for(BuildPlan req : player.unit().plans()){
                 if(!req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).contains(Core.input.mouseWorld())){

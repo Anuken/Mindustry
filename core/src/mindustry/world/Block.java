@@ -63,6 +63,8 @@ public class Block extends UnlockableContent{
     public @Nullable Object lastConfig;
     /** whether to save the last config and apply it to newly placed blocks */
     public boolean saveConfig = false;
+    /** whether to allow copying the config through middle click */
+    public boolean copyConfig = true;
     /** whether this block has a tile entity that updates */
     public boolean update;
     /** whether this block has health and can be destroyed */
