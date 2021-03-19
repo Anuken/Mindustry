@@ -176,11 +176,9 @@ public class ItemBridge extends Block{
         public void playerPlaced(Object config){
             super.playerPlaced(config);
 
-            if(config == null){
-                Tile link = findLink(tile.x, tile.y);
-                if(linkValid(tile, link) && !proximity.contains(link.build)){
-                    link.build.configure(tile.pos());
-                }
+            Tile link = findLink(tile.x, tile.y);
+            if(linkValid(tile, link) && !proximity.contains(link.build) && ((ItemBridgeBuild)link.build).link == -1){
+                link.build.configure(tile.pos());
             }
 
             lastBuild = this;
