@@ -63,7 +63,7 @@ public class RemoteProcess extends BaseProcessor{
             classes = new Seq<>();
 
             Seq<Smethod> orderedElements = elements.copy();
-            orderedElements.sortComparing(Object::toString);
+            orderedElements.sort((a, b) -> -a.toString().compareTo(b.toString()));
 
             //create methods
             for(Smethod element : orderedElements){
@@ -71,12 +71,12 @@ public class RemoteProcess extends BaseProcessor{
 
                 //check for static
                 if(!element.is(Modifier.STATIC) || !element.is(Modifier.PUBLIC)){
-                    err("All @Remote methods must be public and static: ", element);
+                    err("All @Remote methods must be public and static", element);
                 }
 
                 //can't generate none methods
                 if(annotation.targets() == Loc.none){
-                    err("A @Remote method's targets() cannot be equal to 'none':", element);
+                    err("A @Remote method's targets() cannot be equal to 'none'", element);
                 }
 
                 //get and create class entry if needed

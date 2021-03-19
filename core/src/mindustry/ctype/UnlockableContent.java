@@ -95,6 +95,10 @@ public abstract class UnlockableContent extends MappableContent{
         return cicons[icon.ordinal()];
     }
 
+    public Cicon prefDatabaseIcon(){
+        return Cicon.xlarge;
+    }
+
     /** Iterates through any implicit dependencies of this content.
      * For blocks, this would be the items required to build it. */
     public void getDependencies(Cons<UnlockableContent> cons){
@@ -113,6 +117,11 @@ public abstract class UnlockableContent extends MappableContent{
     /** Whether this content is always hidden in the content database dialog. */
     public boolean isHidden(){
         return false;
+    }
+
+    /** @return whether to show a notification toast when this is unlocked */
+    public boolean showUnlock(){
+        return true;
     }
 
     /** Makes this piece of content unlocked; if it already unlocked, nothing happens. */

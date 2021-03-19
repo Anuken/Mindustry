@@ -119,7 +119,7 @@ public class GenericCrafter extends Block{
                 }
 
                 craftEffect.at(x, y);
-                progress = 0f;
+                progress %= 1f;
             }
 
             if(outputItem != null && timer(timerDump, dumpTime)){

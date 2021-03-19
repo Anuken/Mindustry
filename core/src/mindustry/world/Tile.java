@@ -491,6 +491,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return block.solid && block.fillsTile && !block.synthetic() ? data : 0;
     }
 
+    /** @return true if these tiles are right next to each other. */
+    public boolean adjacentTo(Tile tile){
+        return relativeTo(tile) != -1;
+    }
+
     protected void preChanged(){
         if(build != null){
             //only call removed() for the center block - this only gets called once.

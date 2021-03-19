@@ -35,8 +35,8 @@ import static mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
     /** note that snapshots are compressed, so the max snapshot size here is above the typical UDP safe limit */
-    private static final int maxSnapshotSize = 800, timerBlockSync = 0;
-    private static final float serverSyncTime = 12, blockSyncTime = 60 * 6;
+    private static final int maxSnapshotSize = 800, timerBlockSync = 0, serverSyncTime = 200;
+    private static final float blockSyncTime = 60 * 6;
     private static final FloatBuffer fbuffer = FloatBuffer.allocate(20);
     private static final Vec2 vector = new Vec2();
     private static final Rect viewport = new Rect();
@@ -81,6 +81,8 @@ public class NetServer implements ApplicationListener{
     public NetServer(){
 
         net.handleServer(Connect.class, (con, connect) -> {
+            Events.fire(new ConnectionEvent(con));
+
             if(admins.isIPBanned(connect.addressTCP) || admins.isSubnetBanned(connect.addressTCP)){
                 con.kick(KickReason.banned);
             }
@@ -93,9 +95,13 @@ public class NetServer implements ApplicationListener{
         });
 
         net.handleServer(ConnectPacket.class, (con, packet) -> {
+            if(con.kicked) return;
+
             if(con.address.startsWith("steam:")){
                 packet.uuid = con.address.substring("steam:".length());
             }
+
+            con.connectTime = Time.millis();
 
             String uuid = packet.uuid;
             byte[] buuid = Base64Coder.decode(uuid);
@@ -196,7 +202,7 @@ public class NetServer implements ApplicationListener{
             }
 
             if(packet.locale == null){
-                packet.locale = "en_US";
+                packet.locale = "en";
             }
 
             String ip = con.address;
@@ -249,7 +255,8 @@ public class NetServer implements ApplicationListener{
         });
 
         net.handleServer(InvokePacket.class, (con, packet) -> {
-            if(con.player == null) return;
+            if(con.player == null || con.kicked) return;
+
             try{
                 RemoteReadServer.readPacket(packet.reader(), packet.type, con.player);
             }catch(ValidateException e){
@@ -457,12 +464,17 @@ public class NetServer implements ApplicationListener{
                     return;
                 }
 
-                if(!arg[0].equalsIgnoreCase("y") && !arg[0].equalsIgnoreCase("n")){
+                int sign = switch(arg[0].toLowerCase()){
+                    case "y", "yes" ->  1;
+                    case "n", "no" -> -1;
+                    default -> 0;
+                };
+
+                if(sign == 0){
                     player.sendMessage("[scarlet]Vote either 'y' (yes) or 'n' (no).");
                     return;
                 }
 
-                int sign = arg[0].equalsIgnoreCase("y") ? 1 : -1;
                 currentlyKicking[0].vote(player, sign);
             }
         });
@@ -649,9 +661,6 @@ public class NetServer implements ApplicationListener{
 
             long elapsed = Time.timeSinceMillis(con.lastReceivedClientTime);
             float maxSpeed = unit.realSpeed();
-            if(unit.isGrounded()){
-                maxSpeed *= unit.floorSpeedMultiplier();
-            }
 
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.2f;
 
@@ -725,6 +734,7 @@ public class NetServer implements ApplicationListener{
             //no verification is done, so admins can hypothetically spam waves
             //not a real issue, because server owners may want to do just that
             logic.skipWave();
+            info("&lc@ has skipped the wave.", player.name);
         }else if(action == AdminAction.ban){
             netServer.admins.banPlayerIP(other.con.address);
             netServer.admins.banPlayerID(other.con.uuid);
@@ -734,7 +744,8 @@ public class NetServer implements ApplicationListener{
             other.kick(KickReason.kick);
             info("&lc@ has kicked @.", player.name, other.name);
         }else if(action == AdminAction.trace){
-            TraceInfo info = new TraceInfo(other.con.address, other.uuid(), other.con.modclient, other.con.mobile);
+            PlayerInfo stats = netServer.admins.getInfo(other.uuid());
+            TraceInfo info = new TraceInfo(other.con.address, other.uuid(), other.con.modclient, other.con.mobile, stats.timesJoined, stats.timesKicked);
             if(player.con != null){
                 Call.traceInfo(player.con, other, info);
             }else{
@@ -746,6 +757,8 @@ public class NetServer implements ApplicationListener{
 
     @Remote(targets = Loc.client)
     public static void connectConfirm(Player player){
+        if(player.con.kicked) return;
+
         player.add();
 
         if(player.con == null || player.con.hasConnected) return;
@@ -956,9 +969,11 @@ public class NetServer implements ApplicationListener{
                     return;
                 }
 
-                NetConnection connection = player.con;
+                var connection = player.con;
 
-                if(!player.timer(0, serverSyncTime) || !connection.hasConnected) return;
+                if(Time.timeSinceMillis(connection.syncTime) < serverSyncTime || !connection.hasConnected) return;
+
+                connection.syncTime = Time.millis();
 
                 try{
                     writeEntitySnapshot(player);

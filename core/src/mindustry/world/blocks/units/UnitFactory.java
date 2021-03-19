@@ -225,7 +225,7 @@ public class UnitFactory extends UnitBlock{
                 UnitPlan plan = plans.get(currentPlan);
 
                 if(progress >= plan.time && consValid()){
-                    progress = 0f;
+                    progress %= 1f;
 
                     payload = new UnitPayload(plan.unit.create(team));
                     payVector.setZero();

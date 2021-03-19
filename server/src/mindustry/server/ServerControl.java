@@ -66,7 +66,7 @@ public class ServerControl implements ApplicationListener{
             "bans", "",
             "admins", "",
             "shufflemode", "custom",
-            "globalrules", "{reactorExplosions: false}"
+            "globalrules", "{reactorExplosions: false, logicUnitBuild: false}"
         );
 
         //update log level
@@ -339,7 +339,7 @@ public class ServerControl implements ApplicationListener{
             if(!maps.all().isEmpty()){
                 info("Maps:");
                 for(Map map : maps.all()){
-                    info("  @: &fi@ / @x@", map.name(), map.custom ? "Custom" : "Default", map.width, map.height);
+                    info("  @: &fi@ / @x@", map.name().replace(' ', '_'), map.custom ? "Custom" : "Default", map.width, map.height);
                 }
             }else{
                 info("No maps found.");

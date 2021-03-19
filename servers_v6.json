@@ -1,4 +1,4 @@
-[ 
+[
   {
     "name": "RCR",
     "address": ["rcr.fvds.ru"]
@@ -17,7 +17,7 @@
   },
   {
     "name": "C.A.M.S.",
-    "address": ["routerchain.ddns.net", "nikochio.ddns.net"]
+    "address": ["routerchain.ddns.net", "nikochio.ddns.net", "mindustry.ru"]
   },
   {
     "name": "BE6.RUN",
@@ -61,19 +61,19 @@
   },
   {
     "name": "CxZx",
-    "address": ["frfr1.quackhost.uk:20060", "frfr1.quackhost.uk:20185", "defr2.forcehost.net:1069"]
+    "address": ["frfr1.quackhost.uk:20060", "frfr1.quackhost.uk:20185", "defr2.forcehost.net:1069", "us1.falixnodes.net:57461"]
   },
   {
     "name": "Korea",
     "address": ["mindustry.kr"]
   },
   {
-    "name": "HexPvP",
-    "address": ["hexpvp.ddns.net"]
+    "name": "hexpvp.ml",
+    "address": ["hexpvp.ml"]
   },
   {
     "name": "Omega",
-    "address": ["185.86.230.102:25906", "185.86.230.104:25985", "185.86.230.101:25641", "185.86.230.104:25677"] 
+    "address": ["185.86.230.102:25906", "185.86.230.104:25985", "185.86.230.101:25641", "185.86.230.104:25677", "185.86.230.100:25952"] 
   },
   {
     "name": "md.obvilionnetwork.ru",
@@ -86,5 +86,17 @@
   {
     "name": "Nydus",
     "address": ["v6.mindustry.nydus.app:6566"]
+  },
+  {
+    "name": "Darkdustry",
+    "address": ["mindurka.ru"]
+  },
+  {
+    "name": "Mindustry.Party",
+    "address": ["game.mindustry.party"]
+  },
+  {
+    "name": "thedimas",
+    "address": ["95.217.226.152:26160"] 
   }
 ]

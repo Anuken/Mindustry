@@ -172,7 +172,7 @@ public class ConstructBlock extends Block{
 
         @Override
         public Cursor getCursor(){
-            return SystemCursor.hand;
+            return interactable(player.team()) ? SystemCursor.hand : SystemCursor.arrow;
         }
 
         @Override

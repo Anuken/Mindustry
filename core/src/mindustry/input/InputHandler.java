@@ -30,11 +30,10 @@ import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.fragments.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.payloads.*;
-import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 
@@ -190,10 +189,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server)
     public static void requestUnitPayload(Player player, Unit target){
-        if(player == null) return;
+        if(player == null || !(player.unit() instanceof Payloadc pay)) return;
 
         Unit unit = player.unit();
-        Payloadc pay = (Payloadc)unit;
 
         if(target.isAI() && target.isGrounded() && pay.canPickup(target)
         && target.within(unit, unit.type.hitSize * 2f + target.type.hitSize * 2f)){
@@ -203,10 +201,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server)
     public static void requestBuildPayload(Player player, Building build){
-        if(player == null) return;
+        if(player == null || !(player.unit() instanceof Payloadc pay)) return;
 
         Unit unit = player.unit();
-        Payloadc pay = (Payloadc)unit;
 
         if(build != null && build.team == unit.team
         && unit.within(build, tilesize * build.block.size * 1.2f + tilesize * 5f)){
@@ -771,7 +768,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.reset();
         Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
         Draw.alpha(1f);
-        request.block.drawRequestConfigTop(request, selectRequests);
+        request.block.drawRequestConfigTop(request, cons -> {
+            selectRequests.each(cons);
+            lineRequests.each(cons);
+        });
         Draw.reset();
     }
 
@@ -867,6 +867,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     req.block = replace;
                 }
             });
+
+            block.handlePlacementLine(lineRequests);
         }
     }
 
@@ -944,8 +946,24 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Tries to begin mining a tile, returns true if successful. */
     boolean tryBeginMine(Tile tile){
         if(canMine(tile)){
-            //if a block is clicked twice, reset it
-            player.unit().mineTile = player.unit().mineTile == tile ? null : tile;
+            player.unit().mineTile = tile;
+            return true;
+        }
+        return false;
+    }
+
+    /** Tries to stop mining, returns true if mining was stopped. */
+    boolean tryStopMine(){
+        if(player.unit().mining()){
+            player.unit().mineTile = null;
+            return true;
+        }
+        return false;
+    }
+
+    boolean tryStopMine(Tile tile){
+        if(player.unit().mineTile == tile){
+            player.unit().mineTile = null;
             return true;
         }
         return false;

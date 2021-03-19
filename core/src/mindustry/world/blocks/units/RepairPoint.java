@@ -11,6 +11,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -38,6 +39,7 @@ public class RepairPoint extends Block{
         flags = EnumSet.of(BlockFlag.repair);
         hasPower = true;
         outlineIcon = true;
+        expanded = true;
     }
 
     @Override
@@ -54,6 +56,8 @@ public class RepairPoint extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, repairRadius, Pal.accent);
     }
 
@@ -62,7 +66,7 @@ public class RepairPoint extends Block{
         return new TextureRegion[]{baseRegion, region};
     }
 
-    public class RepairPointBuild extends Building{
+    public class RepairPointBuild extends Building implements Ranged{
         public Unit target;
         public float strength, rotation = 90;
 
@@ -123,6 +127,11 @@ public class RepairPoint extends Block{
         @Override
         public BlockStatus status(){
             return Mathf.equal(efficiency(), 0f, 0.01f) ? BlockStatus.noInput : cons.status();
+        }
+
+        @Override
+        public float range(){
+            return repairRadius;
         }
 
         @Override

@@ -291,6 +291,7 @@ public class ContentParser{
 
                 if(value.has("controller")){
                     unit.defaultController = supply(resolve(value.getString("controller"), FlyingAI.class));
+                    value.remove("controller");
                 }
 
                 //read extra default waves
@@ -316,7 +317,8 @@ public class ContentParser{
                 readBundle(ContentType.weather, name, value);
             }else{
                 readBundle(ContentType.weather, name, value);
-                item = make(resolve(getType(value), ParticleWeather.class));
+                item = make(resolve(getType(value), ParticleWeather.class), mod + "-" + name);
+                value.remove("type");
             }
             currentContent = item;
             read(() -> readFields(item, value));
@@ -434,6 +436,7 @@ public class ContentParser{
         try{
             run.run();
         }catch(Throwable t){
+            Log.err(t);
             //don't overwrite double errors
             markError(currentContent, t);
         }

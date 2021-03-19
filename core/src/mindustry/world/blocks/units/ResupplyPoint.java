@@ -47,11 +47,11 @@ public class ResupplyPoint extends Block{
         }
 
         @Override
-         public void updateTile(){
-             if(consValid() && timer(timerResupply, resupplyRate / timeScale) && resupply(this, range, ammoAmount, ammoColor)){
-                 consume();
-             }
-         }
+        public void updateTile(){
+            if(consValid() && timer(timerResupply, resupplyRate / timeScale) && resupply(this, range, ammoAmount, ammoColor)){
+                consume();
+            }
+        }
     }
 
     /** Tries to resupply nearby units.

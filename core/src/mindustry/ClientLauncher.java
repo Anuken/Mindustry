@@ -34,6 +34,11 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void setup(){
+        String dataDir = OS.env("MINDUSTRY_DATA_DIR");
+        if(dataDir != null){
+            Core.settings.setDataDirectory(files.absolute(dataDir));
+        }
+
         checkLaunch();
         loadLogger();
 
@@ -138,7 +143,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
             if(assets.update(1000 / loadingFPS)){
                 loader.dispose();
                 loader = null;
-                Log.info("Total time to load: @", Time.timeSinceMillis(beginTime));
+                Log.info("Total time to load: @ms", Time.timeSinceMillis(beginTime));
                 for(ApplicationListener listener : modules){
                     listener.init();
                 }

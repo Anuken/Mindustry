@@ -92,6 +92,9 @@ public class TypeIO{
         }else if(object instanceof UnitCommand c){
             write.b((byte)15);
             write.b(c.ordinal());
+        }else if(object instanceof BuildingBox b){
+            write.b(12);
+            write.i(b.pos);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -99,6 +102,12 @@ public class TypeIO{
 
     @Nullable
     public static Object readObject(Reads read){
+        return readObjectBoxed(read, false);
+    }
+
+    /** Reads an object, but boxes buildings. */
+    @Nullable
+    public static Object readObjectBoxed(Reads read, boolean box){
         byte type = read.b();
         switch(type){
             case 0: return null;
@@ -113,7 +122,7 @@ public class TypeIO{
             case 9: return TechTree.getNotNull(content.getByID(ContentType.all[read.b()], read.s()));
             case 10: return read.bool();
             case 11: return read.d();
-            case 12: return world.build(read.i());
+            case 12: return !box ? world.build(read.i()) : new BuildingBox(read.i());
             case 13: return LAccess.all[read.s()];
             case 14: int blen = read.i(); byte[] bytes = new byte[blen]; read.b(bytes); return bytes;
             case 15: return UnitCommand.all[read.b()];
@@ -572,10 +581,12 @@ public class TypeIO{
         writeString(write, trace.uuid);
         write.b(trace.modded ? (byte)1 : 0);
         write.b(trace.mobile ? (byte)1 : 0);
+        write.i(trace.timesJoined);
+        write.i(trace.timesKicked);
     }
 
     public static TraceInfo readTraceInfo(Reads read){
-        return new TraceInfo(readString(read), readString(read), read.b() == 1, read.b() == 1);
+        return new TraceInfo(readString(read), readString(read), read.b() == 1, read.b() == 1, read.i(), read.i());
     }
 
     public static void writeStringData(DataOutput buffer, String string) throws IOException{
@@ -596,6 +607,15 @@ public class TypeIO{
             return new String(bytes, charset);
         }else{
             return null;
+        }
+    }
+
+    /** Representes a building that has not been resolved yet. */
+    public static class BuildingBox{
+        public int pos;
+
+        public BuildingBox(int pos){
+            this.pos = pos;
         }
     }
 }

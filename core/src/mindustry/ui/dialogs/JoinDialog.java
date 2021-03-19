@@ -463,8 +463,10 @@ public class JoinDialog extends BaseDialog{
             net.reset();
             Vars.netClient.beginConnecting();
             net.connect(lastIp = ip, lastPort = port, () -> {
-                hide();
-                add.hide();
+                if(net.client()){
+                    hide();
+                    add.hide();
+                }
             });
         });
     }
@@ -568,7 +570,7 @@ public class JoinDialog extends BaseDialog{
                 if(isIpv6 && ip.lastIndexOf("]:") != -1 && ip.lastIndexOf("]:") != ip.length() - 1){
                     int idx = ip.indexOf("]:");
                     this.ip = ip.substring(1, idx);
-                    this.port = Integer.parseInt(ip.substring(idx + 2, ip.length()));
+                    this.port = Integer.parseInt(ip.substring(idx + 2));
                 }else if(!isIpv6 && ip.lastIndexOf(':') != -1 && ip.lastIndexOf(':') != ip.length() - 1){
                     int idx = ip.lastIndexOf(':');
                     this.ip = ip.substring(0, idx);
