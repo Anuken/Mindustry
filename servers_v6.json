@@ -98,5 +98,9 @@
   {
     "name": "thedimas",
     "address": ["95.217.226.152:26160"] 
+  },
+  {
+    "name": "MindustryDefense",
+    "address": ["178.170.47.34:28110"] 
   }
 ]
