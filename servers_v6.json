@@ -98,5 +98,9 @@
   {
     "name": "thedimas",
     "address": ["95.217.226.152:26160"] 
+  }, 
+  {
+    "name": "TSR", 
+    "address": ["gefr1.quackhost.uk:28382"]
   }
 ]
