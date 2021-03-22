@@ -19,8 +19,7 @@ public class RailBulletType extends BulletType{
         pierceBuilding = true;
         pierce = true;
         reflectable = false;
-        hitEffect = Fx.none;
-        despawnEffect = Fx.none;
+        hitEffect = despawnEffect = Fx.none;
         collides = false;
         lifetime = 1f;
         speed = 0.01f;

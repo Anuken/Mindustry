@@ -10,9 +10,7 @@ public class LaserBoltBulletType extends BasicBulletType{
     public LaserBoltBulletType(float speed, float damage){
         super(speed, damage);
 
-        smokeEffect = Fx.hitLaser;
-        hitEffect = Fx.hitLaser;
-        despawnEffect = Fx.hitLaser;
+        smokeEffect = hitEffect = despawnEffect = Fx.hitLaser;
         hittable = false;
         reflectable = false;
     }

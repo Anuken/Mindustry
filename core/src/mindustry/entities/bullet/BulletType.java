@@ -139,8 +139,7 @@ public abstract class BulletType extends Content{
     public BulletType(float speed, float damage){
         this.speed = speed;
         this.damage = damage;
-        hitEffect = Fx.hitBulletSmall;
-        despawnEffect = Fx.hitBulletSmall;
+        hitEffect = despawnEffect = Fx.hitBulletSmall;
     }
 
     public BulletType(){
@@ -200,6 +199,33 @@ public abstract class BulletType extends Content{
 
         Effect.shake(hitShake, hitShake, b);
 
+        spawnFragBullets(b, x, y);
+
+        spawnPuddles(x, y);
+
+        incend(x, y);
+
+        doSplashDamage(b, x, y);
+
+        spawnLightning(b, x, y);
+    }
+
+    public void despawned(Bullet b){
+        despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
+        hitSound.at(b.x, b.y, hitSoundPitch, hitSoundVolume);
+
+        Effect.shake(despawnShake, despawnShake, b);
+
+        spawnFragBullets(b, b.x, b.y);
+
+        incend(b.x, b.y);
+
+        doSplashDamage(b, b.x, b.y);
+
+        spawnLightning(b, b.x, b.y);
+    }
+
+    public void spawnFragBullets(Bullet b, float x, float y){
         if(fragBullet != null){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
@@ -207,18 +233,24 @@ public abstract class BulletType extends Content{
                 fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }
         }
+    }
 
+    public void spawnPuddles(float x, float y){
         if(puddleLiquid != null && puddles > 0){
             for(int i = 0; i < puddles; i++){
                 Tile tile = world.tileWorld(x + Mathf.range(puddleRange), y + Mathf.range(puddleRange));
                 Puddles.deposit(tile, puddleLiquid, puddleAmount);
             }
         }
+    }
 
+    public void incend(float x, float y){
         if(Mathf.chance(incendChance)){
             Damage.createIncend(x, y, incendSpread, incendAmount);
         }
+    }
 
+    public void doSplashDamage(Bullet b, float x, float y){
         if(splashDamageRadius > 0 && !b.absorbed){
             Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
 
@@ -239,20 +271,11 @@ public abstract class BulletType extends Content{
                 });
             }
         }
-
-        for(int i = 0; i < lightning; i++){
-            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone/2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
-        }
     }
 
-    public void despawned(Bullet b){
-        despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
-        hitSound.at(b);
-
-        Effect.shake(despawnShake, despawnShake, b);
-
-        if(!b.hit && (fragBullet != null || splashDamageRadius > 0 || lightning > 0)){
-            hit(b);
+    public void spawnLightning(Bullet b, float x, float y){
+        for(int i = 0; i < lightning; i++){
+            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone/2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
         }
     }
 

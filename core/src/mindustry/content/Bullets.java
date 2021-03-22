@@ -79,7 +79,7 @@ public class Bullets implements ContentList{
         }};
 
         artilleryPlastic = new ArtilleryBulletType(3.4f, 20, "shell"){{
-            hitEffect = Fx.plasticExplosion;
+            hitEffect = despawnEffect = Fx.plasticExplosion;
             knockback = 1f;
             lifetime = 80f;
             width = height = 13f;
@@ -93,7 +93,7 @@ public class Bullets implements ContentList{
         }};
 
         artilleryHoming = new ArtilleryBulletType(3f, 20, "shell"){{
-            hitEffect = Fx.flakExplosion;
+            hitEffect = despawnEffect = Fx.flakExplosion;
             knockback = 0.8f;
             lifetime = 80f;
             width = height = 11f;
@@ -107,7 +107,7 @@ public class Bullets implements ContentList{
         }};
 
         artilleryIncendiary = new ArtilleryBulletType(3f, 20, "shell"){{
-            hitEffect = Fx.blastExplosion;
+            hitEffect = despawnEffect = Fx.blastExplosion;
             knockback = 0.8f;
             lifetime = 80f;
             width = height = 13f;
@@ -122,7 +122,7 @@ public class Bullets implements ContentList{
         }};
 
         artilleryExplosive = new ArtilleryBulletType(2f, 20, "shell"){{
-            hitEffect = Fx.blastExplosion;
+            hitEffect = despawnEffect = Fx.blastExplosion;
             knockback = 0.8f;
             lifetime = 80f;
             width = height = 14f;
@@ -154,7 +154,7 @@ public class Bullets implements ContentList{
             shootEffect = Fx.shootSmall;
             width = 6f;
             height = 8f;
-            hitEffect = Fx.flakExplosion;
+            hitEffect = despawnEffect = Fx.flakExplosion;
             splashDamage = 27f * 1.5f;
             splashDamageRadius = 15f;
         }};
@@ -166,7 +166,7 @@ public class Bullets implements ContentList{
             reloadMultiplier = 0.5f;
             width = 6f;
             height = 8f;
-            hitEffect = Fx.flakExplosion;
+            hitEffect = despawnEffect = Fx.flakExplosion;
             splashDamage = 22f * 1.5f;
             splashDamageRadius = 24f;
         }};
@@ -178,7 +178,7 @@ public class Bullets implements ContentList{
             reloadMultiplier = 0.8f;
             width = 6f;
             height = 8f;
-            hitEffect = Fx.flakExplosion;
+            hitEffect = despawnEffect = Fx.flakExplosion;
             splashDamage = 22f * 1.5f;
             splashDamageRadius = 20f;
             fragBullet = flakGlassFrag;
@@ -211,7 +211,7 @@ public class Bullets implements ContentList{
             reloadMultiplier = 0.8f;
             width = 6f;
             height = 8f;
-            hitEffect = Fx.flakExplosion;
+            hitEffect = despawnEffect = Fx.flakExplosion;
             splashDamage = 18f * 1.5f;
             splashDamageRadius = 16f;
             fragBullet = fragGlassFrag;
@@ -225,7 +225,7 @@ public class Bullets implements ContentList{
             splashDamage = 25f * 1.5f;
             fragBullet = fragPlasticFrag;
             fragBullets = 6;
-            hitEffect = Fx.plasticExplosion;
+            hitEffect = despawnEffect = Fx.plasticExplosion;
             frontColor = Pal.plastaniumFront;
             backColor = Pal.plastaniumBack;
             shootEffect = Fx.shootBig;
@@ -263,8 +263,7 @@ public class Bullets implements ContentList{
             splashDamageRadius = 30f;
             splashDamage = 30f * 1.5f;
             ammoMultiplier = 4f;
-            hitEffect = Fx.blastExplosion;
-            despawnEffect = Fx.blastExplosion;
+            hitEffect = despawnEffect = Fx.blastExplosion;
 
             status = StatusEffects.blasted;
             statusDuration = 60f;
@@ -281,7 +280,7 @@ public class Bullets implements ContentList{
             splashDamageRadius = 20f;
             splashDamage = 20f * 1.5f;
             makeFire = true;
-            hitEffect = Fx.blastExplosion;
+            hitEffect = despawnEffect = Fx.blastExplosion;
             status = StatusEffects.burning;
         }};
 
@@ -292,8 +291,7 @@ public class Bullets implements ContentList{
             drag = -0.01f;
             splashDamageRadius = 25f;
             splashDamage = 25f * 1.5f;
-            hitEffect = Fx.blastExplosion;
-            despawnEffect = Fx.blastExplosion;
+            hitEffect = despawnEffect = Fx.blastExplosion;
             lightningDamage = 10;
             lightning = 2;
             lightningLength = 10;

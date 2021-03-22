@@ -131,7 +131,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.casing2;
                 shootSound = Sounds.artillery;
                 bullet = new ArtilleryBulletType(2f, 8, "shell"){{
-                    hitEffect = Fx.blastExplosion;
+                    hitEffect = despawnEffect = Fx.blastExplosion;
                     knockback = 0.8f;
                     lifetime = 110f;
                     width = height = 14f;
@@ -239,7 +239,7 @@ public class UnitTypes implements ContentList{
                     shootEffect = Fx.shootBig;
                     fragVelocityMin = 0.4f;
 
-                    hitEffect = Fx.blastExplosion;
+                    hitEffect = despawnEffect = Fx.blastExplosion;
                     splashDamage = 16f;
                     splashDamageRadius = 13f;
 
@@ -255,7 +255,7 @@ public class UnitTypes implements ContentList{
                         pierceCap = 3;
 
                         lifetime = 20f;
-                        hitEffect = Fx.flakExplosion;
+                        hitEffect = despawnEffect = Fx.flakExplosion;
                         splashDamage = 15f;
                         splashDamageRadius = 10f;
                     }};
@@ -563,7 +563,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 shootSound = Sounds.explosion;
                 bullet = new BombBulletType(0f, 0f, "clear"){{
-                    hitEffect = Fx.pulverize;
+                    hitEffect = despawnEffect = Fx.pulverize;
                     lifetime = 10f;
                     speed = 1f;
                     splashDamageRadius = 58f;
@@ -764,7 +764,7 @@ public class UnitTypes implements ContentList{
                 recoil = 3f;
 
                 bullet = new ArtilleryBulletType(2f, 12){{
-                    hitEffect = Fx.sapExplosion;
+                    hitEffect = despawnEffect = Fx.sapExplosion;
                     knockback = 0.8f;
                     lifetime = 70f;
                     width = height = 19f;
@@ -862,7 +862,7 @@ public class UnitTypes implements ContentList{
                 shadow = 30f;
 
                 bullet = new ArtilleryBulletType(3f, 50){{
-                    hitEffect = Fx.sapExplosion;
+                    hitEffect = despawnEffect = Fx.sapExplosion;
                     knockback = 0.8f;
                     lifetime = 80f;
                     width = height = 25f;
@@ -884,7 +884,7 @@ public class UnitTypes implements ContentList{
                     fragBullets = 9;
 
                     fragBullet = new ArtilleryBulletType(2.3f, 30){{
-                        hitEffect = Fx.sapExplosion;
+                        hitEffect = despawnEffect = Fx.sapExplosion;
                         knockback = 0.8f;
                         lifetime = 90f;
                         width = height = 20f;
@@ -966,7 +966,7 @@ public class UnitTypes implements ContentList{
                 bullet = new BombBulletType(27f, 25f){{
                     width = 10f;
                     height = 14f;
-                    hitEffect = Fx.flakExplosion;
+                    hitEffect = despawnEffect = Fx.flakExplosion;
                     shootEffect = Fx.none;
                     smokeEffect = Fx.none;
 
@@ -1013,8 +1013,7 @@ public class UnitTypes implements ContentList{
                     trailColor = Pal.unitBack;
                     backColor = Pal.unitBack;
                     frontColor = Pal.unitFront;
-                    hitEffect = Fx.blastExplosion;
-                    despawnEffect = Fx.blastExplosion;
+                    hitEffect = despawnEffect = Fx.blastExplosion;
                     weaveScale = 6f;
                     weaveMag = 1f;
                 }};
@@ -1044,8 +1043,7 @@ public class UnitTypes implements ContentList{
                 splashDamage = 30f;
                 ammoMultiplier = 4f;
                 lifetime = 50f;
-                hitEffect = Fx.blastExplosion;
-                despawnEffect = Fx.blastExplosion;
+                hitEffect = despawnEffect = Fx.blastExplosion;
 
                 status = StatusEffects.blasted;
                 statusDuration = 60f;
@@ -1446,8 +1444,7 @@ public class UnitTypes implements ContentList{
                     trailColor = Color.gray;
                     backColor = Pal.bulletYellowBack;
                     frontColor = Pal.bulletYellow;
-                    hitEffect = Fx.blastExplosion;
-                    despawnEffect = Fx.blastExplosion;
+                    hitEffect = despawnEffect = Fx.blastExplosion;
                     weaveScale = 8f;
                     weaveMag = 2f;
                 }};
@@ -1533,7 +1530,7 @@ public class UnitTypes implements ContentList{
 
                 bullet = new ArtilleryBulletType(3.2f, 12){{
                     trailMult = 0.8f;
-                    hitEffect = Fx.massiveExplosion;
+                    hitEffect = despawnEffect = Fx.massiveExplosion;
                     knockback = 1.5f;
                     lifetime = 100f;
                     height = 15.5f;
@@ -1584,8 +1581,7 @@ public class UnitTypes implements ContentList{
                     trailColor = Color.gray;
                     backColor = Pal.bulletYellowBack;
                     frontColor = Pal.bulletYellow;
-                    hitEffect = Fx.blastExplosion;
-                    despawnEffect = Fx.blastExplosion;
+                    hitEffect = despawnEffect = Fx.blastExplosion;
                     weaveScale = 8f;
                     weaveMag = 1f;
                 }};
@@ -1645,8 +1641,7 @@ public class UnitTypes implements ContentList{
                     trailColor = Pal.bulletYellowBack;
                     backColor = Pal.bulletYellowBack;
                     frontColor = Pal.bulletYellow;
-                    hitEffect = Fx.blastExplosion;
-                    despawnEffect = Fx.blastExplosion;
+                    hitEffect = despawnEffect = Fx.blastExplosion;
                     weaveScale = 8f;
                     weaveMag = 2f;
                 }};
@@ -1720,7 +1715,7 @@ public class UnitTypes implements ContentList{
                     updateEffectSeg = 60f;
                     pierceEffect = Fx.railHit;
                     updateEffect = Fx.railTrail;
-                    hitEffect = Fx.massiveExplosion;
+                    hitEffect = despawnEffect = Fx.massiveExplosion;
                     smokeEffect = Fx.shootBig2;
                     damage = 1250;
                     pierceDamageFactor = 0.5f;
