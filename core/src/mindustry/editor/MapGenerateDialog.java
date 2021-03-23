@@ -77,18 +77,25 @@ public class MapGenerateDialog extends BaseDialog{
                 });
             }).size(160f, 64f);
         }else{
-            buttons.button("@settings.reset", () -> {
+            buttons.button("@settings.reset", Icon.download, () -> {
                 filters.set(maps.readFilters(""));
                 rebuildFilters();
                 update();
-            }).size(160f, 64f);
+            }).size(180f, 64f);
         }
+
+        buttons.button("@clear", Icon.none, () -> {
+            filters.clear();
+            rebuildFilters();
+            update();
+        }).size(130f, 64f);
+
         buttons.button("@editor.randomize", Icon.refresh, () -> {
             for(GenerateFilter filter : filters){
                 filter.randomize();
             }
             update();
-        }).size(160f, 64f);
+        }).size(200f, 64f);
 
         buttons.button("@add", Icon.add, this::showAdd).height(64f).width(150f);
 
