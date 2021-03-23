@@ -646,11 +646,11 @@ public class DesktopInput extends InputHandler{
         unit.aim(unit.type.faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation, Core.input.mouseWorld().dst(unit)).add(unit.x, unit.y));
         unit.controlWeapons(true, player.shooting && !boosted);
 
-        if(Core.input.keyTap(Binding.boost) && unit instanceof Mechc){
+        if(Core.settings.getBool("boosttoggle") && Core.input.keyTap(Binding.boost) && unit instanceof Mechc){
             boosting = !boosting;
         }
 
-        player.boosting = boosting && !movement.isZero();
+        player.boosting = (!Core.settings.getBool("boosttoggle") ? Core.input.keyDown(Binding.boost) : boosting) && !movement.isZero();
         player.mouseX = unit.aimX();
         player.mouseY = unit.aimY();
 

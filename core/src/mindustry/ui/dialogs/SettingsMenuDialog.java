@@ -325,10 +325,11 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(!mobile){
             game.checkPref("backgroundpause", true);
             game.checkPref("buildautopause", false);
+            game.checkPref("boosttoggle", false);
         }
 
         game.checkPref("doubletapmine", false);
-      
+
         if(!ios){
             game.checkPref("modcrashdisable", true);
         }
