@@ -132,7 +132,7 @@ public abstract class BulletType extends Content{
     public float puddleAmount = 5f;
     public Liquid puddleLiquid = Liquids.water;
 
-    public float lightRadius = 16f;
+    public float lightRadius = 6f;
     public float lightOpacity = 0.3f;
     public Color lightColor = Pal.powerLight;
 

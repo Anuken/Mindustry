@@ -171,7 +171,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, (60f + Mathf.absin(10f, 5f)) * size, Color.orange, 0.5f * heat);
+            Drawf.light(team, x, y, (20f + Mathf.absin(10f, 5f)) * size, Color.orange, 0.5f * heat);
         }
     }
 }

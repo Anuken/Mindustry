@@ -94,7 +94,7 @@ public class UnitType extends UnlockableContent{
     public float strafePenalty = 0.5f;
     public float hitSize = 6f;
     public float itemOffsetY = 3f;
-    public float lightRadius = 60f, lightOpacity = 0.6f;
+    public float lightRadius = 20f, lightOpacity = 0.6f;
     public Color lightColor = Pal.powerLight;
     public boolean drawCell = true, drawItems = true, drawShields = true;
     public int trailLength = 3;

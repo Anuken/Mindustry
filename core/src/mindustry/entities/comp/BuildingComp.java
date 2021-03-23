@@ -889,7 +889,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             float fract = 1f;
             float opacity = color.a * fract;
             if(opacity > 0.001f){
-                Drawf.light(team, x, y, block.size * 30f * fract, color, opacity);
+                Drawf.light(team, x, y, block.size * 17f * fract, color, opacity);
             }
         }
     }

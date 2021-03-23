@@ -176,13 +176,13 @@ public class Block extends UnlockableContent{
     /** How reflective this block is. */
     public float albedo = 0f;
     /** Environmental passive light color. */
-    public Color lightColor = Color.white.cpy();
+    public Color lightColor = Color.white.cpy().a(0.3f);
     /**
      * Whether this environmental block passively emits light.
      * Not valid for non-environmental blocks. */
     public boolean emitLight = false;
     /** Radius of the light emitted by this block. */
-    public float lightRadius = 60f;
+    public float lightRadius = 20f;
 
     /** The sound that this block makes while active. One sound loop. Do not overuse. */
     public Sound loopSound = Sounds.none;

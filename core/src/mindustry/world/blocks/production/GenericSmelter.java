@@ -44,7 +44,7 @@ public class GenericSmelter extends GenericCrafter{
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, (60f + Mathf.absin(10f, 5f)) * warmup * size, flameColor, 0.65f);
+            Drawf.light(team, x, y, (20f + Mathf.absin(10f, 5f)) * warmup * size, flameColor, 0.46f);
         }
     }
 }

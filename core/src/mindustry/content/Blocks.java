@@ -221,7 +221,7 @@ public class Blocks implements ContentList{
             blendGroup = basalt;
 
             emitLight = true;
-            lightRadius = 30f;
+            lightRadius = 17f;
             lightColor = Color.orange.cpy().a(0.15f);
         }};
 
@@ -232,7 +232,7 @@ public class Blocks implements ContentList{
             blendGroup = basalt;
 
             emitLight = true;
-            lightRadius = 50f;
+            lightRadius = 24f;
             lightColor = Color.orange.cpy().a(0.3f);
         }};
 
@@ -1996,7 +1996,7 @@ public class Blocks implements ContentList{
         illuminator = new LightBlock("illuminator"){{
             requirements(Category.effect, BuildVisibility.lightingOnly, with(Items.graphite, 12, Items.silicon, 8));
             brightness = 0.75f;
-            radius = 120f;
+            radius = 180f;
             consumes.power(0.05f);
         }};
 

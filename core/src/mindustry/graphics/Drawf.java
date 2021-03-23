@@ -204,6 +204,10 @@ public class Drawf{
     }
 
     public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float rotation, float scale){
+        laser(team, line, edge, x, y, x2, y2, rotation, scale, Color.orange, 0.3f);
+    }
+
+    public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float rotation, float scale, Color color, float opacity){
         float scl = 8f * scale * Draw.scl;
         float vx = Mathf.cosDeg(rotation) * scl, vy = Mathf.sinDeg(rotation) * scl;
 
@@ -214,7 +218,7 @@ public class Drawf{
         Lines.line(line, x + vx, y + vy, x2 - vx, y2 - vy, false);
         Lines.stroke(1f);
 
-        light(team, x, y, x2, y2);
+        light(team, x, y, x2, y2, scl + 18f, color, opacity);
     }
 
     public static void tri(float x, float y, float width, float length, float rotation){
