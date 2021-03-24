@@ -102,8 +102,8 @@ public class RepairPoint extends Block{
             if(target != null && (target.dead() || target.dst(tile) - target.hitSize/2f > repairRadius || target.health() >= target.maxHealth())){
                 target = null;
             }else if(target != null && consValid()){
-                target.heal(repairSpeed * Time.delta * strength * efficiency());
-                rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.5f);
+                target.heal(repairSpeed * strength * edelta());
+                rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.5f * efficiency() * timeScale);
                 targetIsBeingRepaired = true;
             }
 
