@@ -333,9 +333,18 @@ project(":core"){
         }
     }
 
+    task musicJar(type: Jar){
+        classifier = 'music'
+        from files("assets"){
+            include "music/*"
+            include "sounds/*"
+        }
+    }
+
     artifacts{
         archives sourcesJar
         archives assetsJar
+        archives musicJar
     }
 
     dependencies{
