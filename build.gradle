@@ -322,9 +322,29 @@ project(":core"){
         classifier = 'sources'
         from sourceSets.main.allSource
     }
-    
+
+    task assetsJar(type: Jar, dependsOn: ":tools:pack"){
+        classifier = 'assets'
+        from files("assets"){
+            exclude "config"
+            exclude "cache"
+            exclude "music"
+            exclude "sounds"
+        }
+    }
+
+    task musicJar(type: Jar){
+        classifier = 'music'
+        from files("assets"){
+            include "music/*"
+            include "sounds/*"
+        }
+    }
+
     artifacts{
         archives sourcesJar
+        archives assetsJar
+        archives musicJar
     }
 
     dependencies{
