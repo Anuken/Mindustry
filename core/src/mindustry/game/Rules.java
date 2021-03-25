@@ -118,6 +118,8 @@ public class Rules{
         public boolean infiniteResources;
         /** If true, this team has infinite unit ammo. */
         public boolean infiniteAmmo;
+        /** Default timescale of un-boosted blocks. */
+        public float timescale = 1f;
     }
 
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */

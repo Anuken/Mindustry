@@ -1393,7 +1393,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         timeScaleDuration -= Time.delta;
         if(timeScaleDuration <= 0f || !block.canOverdrive){
-            timeScale = 1f;
+            timeScale = state.rules.teams.get(team).timescale;
         }
 
         if(!enabled && block.autoResetEnabled){
