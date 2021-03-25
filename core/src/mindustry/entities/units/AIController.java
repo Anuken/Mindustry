@@ -90,7 +90,7 @@ public class AIController implements UnitController{
 
         if(tile == targetTile || (costType == Pathfinder.costNaval && !targetTile.floor().isLiquid)) return;
 
-        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.speed()));
+        unit.moveAt(vec.trns(unit.angleTo(targetTile.worldx(), targetTile.worldy()), unit.speed()));
     }
 
     protected void updateWeapons(){
