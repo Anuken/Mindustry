@@ -51,7 +51,7 @@ Créez des chaînes d'approvisionnement complexes pour alimenter vos tourelles e
 [*] Éditez et prévisualisez les structures en jeu.
 [*] Outils d'édition configurables: choisissez comment chaque outil fonctionne.
 [*] Générateur de carte puissant, disposant d'un grand nombre de filtres permettant la manipulation procédurale du terrain.
-[*] Appliquez les effets bruit, distorsion, lissage, erosion, symétrie, génération de minerais et terrain aléatoire.
+[*] Appliquez les effets bruit, distorsion, lissage, érosion, symétrie, génération de minerais et terrain aléatoire.
 [*] Randomisez et configurez la génération des minerais ainsi que le placement des rivières et des tuiles de ressources.
 [*] Configurez la disposition des vagues d'ennemis.
 [*] Partagez vos cartes sur le Workshop Steam.
