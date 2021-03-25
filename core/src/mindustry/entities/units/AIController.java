@@ -130,7 +130,7 @@ public class AIController implements UnitController{
 
             boolean shoot = false;
 
-            if(targets[i] != null){
+            if(targets[i] != null && !(command() == UnitCommand.idle)){
                 shoot = targets[i].within(mountX, mountY, weapon.bullet.range()) && shouldShoot();
 
                 Vec2 to = Predict.intercept(unit, targets[i], weapon.bullet.speed);
