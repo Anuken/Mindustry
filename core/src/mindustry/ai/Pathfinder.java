@@ -149,7 +149,7 @@ public class Pathfinder implements Runnable{
     }
 
     /** Update a tile in the internal pathfinding grid.
-     * Causes a complete pathfinding reclaculation. Main thread only. */
+     * Causes a complete pathfinding recalculation. Main thread only. */
     public void updateTile(Tile tile){
         if(net.client()) return;
 

@@ -128,7 +128,7 @@ public class Units{
         nearby(x, y, width, height, unit -> {
             if(boolResult) return;
             if((unit.isGrounded() && !unit.type.hovering) == ground){
-                unit.hitbox(hitrect);
+                unit.hitboxTile(hitrect);
 
                 if(hitrect.overlaps(x, y, width, height)){
                     boolResult = true;
