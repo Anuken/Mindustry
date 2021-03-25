@@ -218,7 +218,7 @@ public class Units{
         cdist = 0f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(e.dead() || !predicate.get(e) || !e.within(x, y, range + e.hitSize/2f)) return;
+            if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.within(x, y, range + e.hitSize/2f)) return;
 
             float cost = sort.cost(e, x, y);
             if(result == null || cost < cdist){
