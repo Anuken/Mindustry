@@ -354,13 +354,13 @@ public class Fx{
     }),
 
     shieldWave = new Effect(22, e -> {
-        color(Pal.shield);
+        color(e.color);
         stroke(e.fout() * 2f);
         Lines.circle(e.x, e.y, 4f + e.finpow() * 60f);
     }),
 
     shieldApply = new Effect(11, e -> {
-        color(Pal.shield);
+        color(e.color);
         stroke(e.fout() * 2f);
         Lines.circle(e.x, e.y, 2f + e.finpow() * 7f);
     }),

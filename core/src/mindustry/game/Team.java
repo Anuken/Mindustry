@@ -15,7 +15,7 @@ import static mindustry.Vars.*;
 
 public class Team implements Comparable<Team>{
     public final int id;
-    public final Color color;
+    public final Color color, shield;
     public final Color[] palette;
     public boolean hasPalette;
     public String name;
@@ -51,6 +51,7 @@ public class Team implements Comparable<Team>{
     protected Team(int id, String name, Color color){
         this.name = name;
         this.color = color;
+        this.shield = color.cpy().a(0.7f);
         this.id = id;
 
         if(id < 6) baseTeams[id] = this;
