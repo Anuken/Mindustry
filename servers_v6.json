@@ -60,10 +60,6 @@
     "address": ["minty-server.ddns.net"]
   },
   {
-    "name": "CxZx",
-    "address": ["frfr1.quackhost.uk:20060", "frfr1.quackhost.uk:20185", "defr2.forcehost.net:1069", "us1.falixnodes.net:57461"]
-  },
-  {
     "name": "Korea",
     "address": ["mindustry.kr"]
   },
