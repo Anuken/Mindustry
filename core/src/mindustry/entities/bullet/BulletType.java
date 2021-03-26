@@ -187,7 +187,7 @@ public abstract class BulletType extends Content{
 
     public void hitEntity(Bullet b, Hitboxc entity, float initialHealth){
         if(entity instanceof Healthc h){
-            h.damage(damage);
+            h.damage(b.damage);
         }
 
         if(entity instanceof Unit unit){
