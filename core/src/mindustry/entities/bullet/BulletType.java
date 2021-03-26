@@ -185,8 +185,15 @@ public abstract class BulletType extends Content{
         }
     }
 
-    public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
+    public void hitEntity(Bullet b, Hitboxc entity, float initialHealth){
+        if(entity instanceof Healthc h){
+            h.damage(damage);
+        }
 
+        if(entity instanceof Unit unit){
+            unit.impulse(Tmp.v3.set(unit).sub(b.x, b.y).nor().scl(knockback * 80f));
+            unit.apply(status, statusDuration);
+        }
     }
 
     public void hit(Bullet b){

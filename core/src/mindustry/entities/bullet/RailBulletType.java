@@ -71,6 +71,7 @@ public class RailBulletType extends BulletType{
     @Override
     public void hitEntity(Bullet b, Hitboxc entity, float initialHealth){
         handle(b, entity, initialHealth);
+        super.hitEntity(b, entity, initialHealth);
     }
 
     @Override
