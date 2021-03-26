@@ -33,7 +33,7 @@
   },
   {
     "name": "Chaotic Neutral",
-    "address": ["Chaotic-Neutral.ddns.net:1111", "Chaotic-Neutral.ddns.net:5555", "Chaotic-Neutral.ddns.net:6666", "Chaotic-Neutral.ddns.net:7777"]
+    "address": ["Chaotic-Neutral.ddns.net:1111", "Chaotic-Neutral.ddns.net:2222", "Chaotic-Neutral.ddns.net:5555", "Chaotic-Neutral.ddns.net:6666", "Chaotic-Neutral.ddns.net:7777"]
   },
   {
     "name": "Ranked",
@@ -60,10 +60,6 @@
     "address": ["minty-server.ddns.net"]
   },
   {
-    "name": "CxZx",
-    "address": ["frfr1.quackhost.uk:20060", "frfr1.quackhost.uk:20185", "defr2.forcehost.net:1069", "us1.falixnodes.net:57461"]
-  },
-  {
     "name": "Korea",
     "address": ["mindustry.kr"]
   },
@@ -88,8 +84,8 @@
     "address": ["v6.mindustry.nydus.app:6566"]
   },
   {
-    "name": "Darkdustry",
-    "address": ["212.109.196.158:9999"]
+    "name": "MD Community",
+    "address": ["212.109.196.158:9999", "157.90.183.56:28424"]
   },
   {
     "name": "Mindustry.Party",
@@ -97,6 +93,6 @@
   },
   {
     "name": "thedimas",
-    "address": ["95.217.226.152:26160"] 
+    "address": ["95.217.226.152:26160"]
   }
 ]

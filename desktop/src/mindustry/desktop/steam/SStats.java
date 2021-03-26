@@ -289,6 +289,7 @@ public class SStats implements SteamUserStatsCallback{
 
         //check unlocked stuff on load as well
         Events.on(ResearchEvent.class, e -> checkUnlocks.run());
+        Events.on(UnlockEvent.class, e -> checkUnlocks.run());
         Events.on(ClientLoadEvent.class, e -> checkUnlocks.run());
 
         Events.on(WinEvent.class, e -> {
