@@ -69,28 +69,16 @@ public class MapGenerateDialog extends BaseDialog{
 
         shown(this::setup);
         addCloseButton();
-        if(applied){
-            buttons.button("@editor.apply", Icon.ok, () -> {
-                ui.loadAnd(() -> {
-                    apply();
-                    hide();
-                });
-            }).size(160f, 64f);
-        }else{
-            buttons.button("@settings.reset", () -> {
-                filters.set(maps.readFilters(""));
-                rebuildFilters();
-                update();
-            }).size(160f, 64f);
-        }
-        buttons.button("@editor.randomize", Icon.refresh, () -> {
+
+        buttons.button("@editor.randomize", Icon.refresh, ()  -> {
             for(GenerateFilter filter : filters){
                 filter.randomize();
             }
             update();
-        }).size(160f, 64f);
+        }).marginLeft(12f);;
 
-        buttons.button("@add", Icon.add, this::showAdd).height(64f).width(150f);
+        buttons.button("@edit", Icon.edit, this::showEdit).marginLeft(12f);;
+        buttons.button("@add", Icon.add, this::showAdd).marginLeft(12f);;
 
         if(!applied){
             hidden(this::apply);
@@ -283,18 +271,60 @@ public class MapGenerateDialog extends BaseDialog{
         }
     }
 
+    void showEdit(){
+        BaseDialog selection = new BaseDialog("@edit");
+        selection.cont.pane(p -> {
+            p.margin(10f);
+            p.table(Tex.button, t -> {
+                TextButton.TextButtonStyle style = Styles.cleart;
+
+                t.defaults().size(280f, 60f).left();
+                t.button("@clear", Icon.none, style, ()  -> {
+                    filters.clear();
+                    rebuildFilters();
+                    update();
+                    selection.hide();
+                }).marginLeft(12f);
+                t.row();
+                if(applied){
+                    t.button("@editor.apply", Icon.ok, style, () -> {
+                        ui.loadAnd(() -> {
+                            apply();
+                            hide();
+                            selection.hide();
+                        });
+                    }).marginLeft(12f);
+                }else{
+                    t.button("@settings.reset", Icon.download, style, () -> {
+                        filters.set(maps.readFilters(""));
+                        rebuildFilters();
+                        update();
+                        selection.hide();
+                    }).marginLeft(12f);
+                }
+            });
+        });
+
+        selection.addCloseButton();
+        selection.show();
+    }
+
     void showAdd(){
         BaseDialog selection = new BaseDialog("@add");
         selection.cont.pane(p -> {
-            p.marginRight(14);
-            p.defaults().size(210f, 60f);
+            p.background(Tex.button);
+            p.defaults().size(280f, 60f);
+            p.margin(10f);
+
+            TextButton.TextButtonStyle style = Styles.cleart;
+
             int i = 0;
             for(Prov<GenerateFilter> gen : filterTypes){
                 GenerateFilter filter = gen.get();
 
                 if((filter.isPost() && applied)) continue;
 
-                p.button(filter.name(), () -> {
+                p.button(filter.name(), style, () -> {
                     filters.add(filter);
                     rebuildFilters();
                     update();
@@ -303,13 +333,13 @@ public class MapGenerateDialog extends BaseDialog{
                 if(++i % 2 == 0) p.row();
             }
 
-            p.button("@filter.defaultores", () -> {
+            p.button("@filter.defaultores", style, () -> {
                 maps.addDefaultOres(filters);
                 rebuildFilters();
                 update();
                 selection.hide();
             });
-        }).get().setScrollingDisabled(true, false);
+        }).get().setScrollingDisabled(true, false);;
 
         selection.addCloseButton();
         selection.show();
