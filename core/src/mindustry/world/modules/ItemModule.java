@@ -127,6 +127,10 @@ public class ItemModule extends BlockModule{
         return get(item) >= amount;
     }
 
+    public boolean has(ItemStack stack){
+        return get(stack.item) >= stack.amount;
+    }
+
     public boolean has(ItemStack[] stacks){
         for(ItemStack stack : stacks){
             if(!has(stack.item, stack.amount)) return false;

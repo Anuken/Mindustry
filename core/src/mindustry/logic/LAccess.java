@@ -6,6 +6,7 @@ import arc.struct.*;
 public enum LAccess{
     totalItems,
     firstItem,
+    firstItemNeeded,
     totalLiquids,
     totalPower,
     itemCapacity,
