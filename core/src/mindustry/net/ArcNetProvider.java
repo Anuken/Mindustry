@@ -22,6 +22,7 @@ import static mindustry.Vars.*;
 public class ArcNetProvider implements NetProvider{
     final Client client;
     final Prov<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[512], 512);
+    final AsyncExecutor executor = new AsyncExecutor(Math.max(Runtime.getRuntime().availableProcessors(), 6));
 
     final Server server;
     final CopyOnWriteArrayList<ArcConnection> connections = new CopyOnWriteArrayList<>();
@@ -179,7 +180,7 @@ public class ArcNetProvider implements NetProvider{
 
     @Override
     public void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> invalid){
-        Threads.daemon(() -> {
+        executor.submit(() -> {
             try{
                 DatagramSocket socket = new DatagramSocket();
                 long time = Time.millis();
@@ -255,7 +256,7 @@ public class ArcNetProvider implements NetProvider{
     @Override
     public void closeServer(){
         connections.clear();
-        Threads.daemon(server::stop);
+        executor.submit(server::stop);
     }
 
     ArcConnection getByArcID(int id){

@@ -45,9 +45,9 @@ public class BeControl{
             }, updateInterval, updateInterval);
         }
 
-        if(System.getProperties().containsKey("becopy")){
+        if(OS.hasProp("becopy")){
             try{
-                Fi dest = Fi.get(System.getProperty("becopy"));
+                Fi dest = Fi.get(OS.prop("becopy"));
                 Fi self = Fi.get(BeControl.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
                 
                 for(Fi file : self.parent().findAll(f -> !f.equals(self))) file.delete();
@@ -101,8 +101,8 @@ public class BeControl{
                     float[] progress = {0};
                     int[] length = {0};
                     Fi file = bebuildDirectory.child("client-be-" + updateBuild + ".jar");
-                    Fi fileDest = System.getProperties().contains("becopy") ?
-                        Fi.get(System.getProperty("becopy")) :
+                    Fi fileDest = OS.hasProp("becopy") ?
+                        Fi.get(OS.prop("becopy")) :
                         Fi.get(BeControl.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
 
                     BaseDialog dialog = new BaseDialog("@be.updating");
