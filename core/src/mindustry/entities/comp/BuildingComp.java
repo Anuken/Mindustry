@@ -1340,7 +1340,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             ItemStack[] needed = 
                 c instanceof ConsumeItems ? ((ConsumeItems)c).items : 
                 c instanceof ConsumeItemFilter ? new ItemStack[]{new ItemStack(content.items().find(((ConsumeItemFilter)c).filter), 1)} : 
-                c instanceof ConsumeItemDynamic ? ((ConsumeItemDynamic)c).items.get(tile.build) : 
+                c instanceof ConsumeItemDynamic ? ((ConsumeItemDynamic)c).items.get(self()) : 
                 ItemStack.empty;
 
             for(ItemStack stack : needed){
