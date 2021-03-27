@@ -25,7 +25,7 @@
   },
   {
     "name": "io",
-    "address": ["mindustry.io", "mindustry.io:1000", "mindustry.io:2000", "mindustry.io:3000", "mindustry.io:4000"]
+    "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000", "mindustry.io.community:4000"]
   },
   {
     "name": "ECAN",
