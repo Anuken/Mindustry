@@ -223,7 +223,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         con.kick(reason);
     }
 
-    void kick(String reason, int duration){
+    void kick(String reason, long duration){
         con.kick(reason, duration);
     }
 
