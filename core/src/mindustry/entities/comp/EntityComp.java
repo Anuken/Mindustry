@@ -29,11 +29,11 @@ abstract class EntityComp{
     }
 
     boolean isLocal(){
-        return ((Object)this) == player || ((Object)this) instanceof Unitc && ((Unitc)((Object)this)).controller() == player;
+        return ((Object)this) == player || ((Object)this) instanceof Unitc u && u.controller() == player;
     }
 
     boolean isRemote(){
-        return ((Object)this) instanceof Unitc && ((Unitc)((Object)this)).isPlayer() && !isLocal();
+        return ((Object)this) instanceof Unitc u && u.isPlayer() && !isLocal();
     }
 
     boolean isNull(){
