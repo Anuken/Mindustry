@@ -368,7 +368,7 @@ public class Logic implements ApplicationListener{
 
         if(state.isGame()){
             if(!net.client()){
-                state.enemies = Groups.unit.count(u -> u.team() == state.rules.waveTeam && u.type.isCounted);
+                state.enemies = Groups.unit.count(u -> u.team() == state.rules.waveTeam && u.isCounted());
             }
 
             if(!state.isPaused()){

@@ -186,6 +186,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return !disarmed && !(type.canBoost && isFlying());
     }
 
+    public boolean isCounted(){
+        return type.isCounted;
+    }
+
     @Override
     public int itemCapacity(){
         return type.itemCapacity;
