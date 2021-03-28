@@ -4,6 +4,10 @@
     "address": ["rcr.fvds.ru"]
   },
   {
+    "name": "SMokeOfAnarchy.duckdns.org",
+    "address": ["smokeofanarchy.duckdns.org:6853"]
+  },
+  {
     "name": "mindustry.pl",
     "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl"]
   },
@@ -25,7 +29,7 @@
   },
   {
     "name": "io",
-    "address": ["mindustry.io", "mindustry.io:1000", "mindustry.io:2000", "mindustry.io:3000", "mindustry.io:4000"]
+    "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000", "mindustry.io.community:4000"]
   },
   {
     "name": "ECAN",
@@ -85,7 +89,7 @@
   },
   {
     "name": "MD Community",
-    "address": ["212.109.196.158:9999", "157.90.183.56:28424"]
+    "address": ["62.109.31.34", "157.90.183.56:28424"]
   },
   {
     "name": "Mindustry.Party",
