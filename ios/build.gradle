@@ -17,6 +17,16 @@ task copyAssets(){
     }
 }
 
+task copyNatives(){
+    doLast{
+        copy{
+            from "../../Arc/natives/natives-freetype-ios/libs", "../../Arc/natives/natives-ios/libs"
+            into "libs"
+        }
+
+    }
+}
+
 task deploy{
     if(System.getProperty("os.name").contains("Mac")) dependsOn copyAssets
     dependsOn createIPA
