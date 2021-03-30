@@ -34,6 +34,7 @@ task deploy{
 
 //must pack before deployment, as iOS never has the latest sprites.
 copyAssets.dependsOn ":tools:pack"
+copyAssets.dependsOn copyNatives
 launchIPhoneSimulator.dependsOn build
 launchIPadSimulator.dependsOn build
 launchIOSDevice.dependsOn build
