@@ -321,6 +321,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                 try{
                     SteamID lobby = smat.getLobbyByIndex(i);
                     String mode = smat.getLobbyData(lobby, "gamemode");
+                    if(mode == null || mode.isEmpty() || Strings.parseInt(smat.getLobbyData(lobby, "version"), -1) == -1) continue;
                     Host out = new Host(
                         -1, //invalid ping
                         smat.getLobbyData(lobby, "name"),
