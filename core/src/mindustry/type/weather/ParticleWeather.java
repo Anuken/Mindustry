@@ -41,7 +41,7 @@ public class ParticleWeather extends Weather{
 
     @Override
     public void update(WeatherState state){
-        float speed = force * state.intensity;
+        float speed = force * state.intensity * Time.delta;
         if(speed > 0.001f){
             float windx = state.windVector.x * speed, windy = state.windVector.y * speed;
 
