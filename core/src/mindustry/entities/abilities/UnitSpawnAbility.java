@@ -16,16 +16,21 @@ import static mindustry.Vars.*;
 
 public class UnitSpawnAbility extends Ability{
     public UnitType unit;
-    public float spawnTime = 60f, spawnX, spawnY;
+    public float spawnTime = 60f, firstSpawnDelay, spawnX, spawnY;
     public Effect spawnEffect = Fx.spawn;
 
     protected float timer;
 
     public UnitSpawnAbility(UnitType unit, float spawnTime, float spawnX, float spawnY){
+        this(unit, spawnTime, spawnX, spawnY, 0f);
+    }
+
+    public UnitSpawnAbility(UnitType unit, float spawnTime, float spawnX, float spawnY, float firstSpawnDelay){
         this.unit = unit;
         this.spawnTime = spawnTime;
         this.spawnX = spawnX;
         this.spawnY = spawnY;
+        this.firstSpawnDelay = firstSpawnDelay;
     }
 
     public UnitSpawnAbility(){
@@ -35,8 +40,8 @@ public class UnitSpawnAbility extends Ability{
     public void update(Unit unit){
         timer += Time.delta * state.rules.unitBuildSpeedMultiplier;
 
-        if(timer >= spawnTime && Units.canCreate(unit.team, this.unit)){
-            float x = unit.x + Angles.trnsx(unit.rotation, spawnY, spawnX), y = unit.y + Angles.trnsy(unit.rotation, spawnY, spawnX);
+        if(timer >= spawnTime + firstSpawnDelay && Units.canCreate(unit.team, this.unit)){
+            float x = unit.x + Angles.trnsx(unit.rotation, spawnY, -spawnX), y = unit.y + Angles.trnsy(unit.rotation, spawnY, -spawnX);
             spawnEffect.at(x, y);
             Unit u = this.unit.create(unit.team);
             u.set(x, y);
@@ -45,7 +50,7 @@ public class UnitSpawnAbility extends Ability{
                 u.add();
             }
 
-            timer = 0f;
+            timer = firstSpawnDelay;
         }
     }
 
@@ -53,8 +58,8 @@ public class UnitSpawnAbility extends Ability{
     public void draw(Unit unit){
         if(Units.canCreate(unit.team, this.unit)){
             Draw.draw(Draw.z(), () -> {
-                float x = unit.x + Angles.trnsx(unit.rotation, spawnY, spawnX), y = unit.y + Angles.trnsy(unit.rotation, spawnY, spawnX);
-                Drawf.construct(x, y, this.unit.icon(Cicon.full), unit.rotation - 90, timer / spawnTime, 1f, timer);
+                float x = unit.x + Angles.trnsx(unit.rotation, spawnY, -spawnX), y = unit.y + Angles.trnsy(unit.rotation, spawnY, -spawnX);
+                Drawf.construct(x, y, this.unit.icon(Cicon.full), unit.rotation - 90, (timer - firstSpawnDelay) / spawnTime, 1f, timer - firstSpawnDelay);
             });
         }
     }

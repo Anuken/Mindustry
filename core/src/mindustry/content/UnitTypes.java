@@ -1690,7 +1690,7 @@ public class UnitTypes implements ContentList{
 
             float spawnTime = 60f * 15f;
 
-            abilities.add(new UnitSpawnAbility(flare, spawnTime, 19.25f, -31.75f), new UnitSpawnAbility(flare, spawnTime, -19.25f, -31.75f));
+            abilities.add(new UnitSpawnAbility(flare, spawnTime, 19.25f, -31.75f), new UnitSpawnAbility(flare, spawnTime, -19.25f, -31.75f, -spawnTime / 2f));
 
             trailLength = 70;
             trailX = 23f;
