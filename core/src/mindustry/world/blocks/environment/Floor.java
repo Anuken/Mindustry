@@ -70,12 +70,17 @@ public class Floor extends Block{
     public Block wall = Blocks.air;
     /** Decoration block. Usually a rock. May be air. */
     public Block decoration = Blocks.air;
+    /** Vegetation overlay. Usually a flower. May be sk. */
+    public String[] vegetation = new String[]{};
+    /** Chance of growing some vegetation. */
+    public float vegetationChance = 0;
     /** Whether this overlay needs a surface to be on. False for floating blocks, like spawns. */
     public boolean needsSurface = true;
 
     protected TextureRegion[][] edges;
     protected Seq<Block> blenders = new Seq<>();
     protected Bits blended = new Bits(256);
+    protected TextureRegion[] vegetationRegions;
     protected TextureRegion edgeRegion;
 
     public Floor(String name){
@@ -96,6 +101,14 @@ public class Floor extends Block{
         }else{
             variantRegions = new TextureRegion[1];
             variantRegions[0] = Core.atlas.find(name);
+        }
+
+        if(vegetation.length > 0){
+            vegetationRegions = new TextureRegion[vegetation.length];
+
+            for(int i = 0; i < vegetation.length; i++){
+                vegetationRegions[i] = Core.atlas.find(vegetation[i]);
+            }
         }
 
         int size = (int)(tilesize / Draw.scl);
@@ -174,6 +187,13 @@ public class Floor extends Block{
         Floor floor = tile.overlay();
         if(floor != Blocks.air && floor != this){ //ore should never have itself on top, but it's possible, so prevent a crash in that case
             floor.drawBase(tile);
+        }
+
+        if(vegetationRegions != null && Mathf.randomSeed(tile.pos()) < vegetationChance){
+            float offset = 2f; // tile = 32x32, flowers = 16x16, 4f would put it against the edge, 2f would keep it contained to the tile
+            float x = tile.worldx() + Mathf.randomSeed(tile.pos(), -offset, +offset);
+            float y = tile.worldy() + Mathf.randomSeed(tile.pos(), -offset, +offset);
+            Draw.rect(vegetationRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, vegetationRegions.length - 1))], x, y, Mathf.randomSeed(tile.pos(), 0, 360));
         }
     }
 

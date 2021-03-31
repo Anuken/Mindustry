@@ -272,6 +272,8 @@ public class Blocks implements ContentList{
 
         grass = new Floor("grass"){{
             attributes.set(Attribute.water, 0.1f);
+            vegetation = new String[]{"flower-1", "flower-2"};
+            vegetationChance = 0.12f;
         }};
 
         salt = new Floor("salt"){{
