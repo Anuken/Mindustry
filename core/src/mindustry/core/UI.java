@@ -536,15 +536,19 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public static String formatAmount(int number){
+        //prevent overflow
+        if(number == Integer.MIN_VALUE) number ++;
+
         int mag = Math.abs(number);
+        String sign = number < 0 ? "-" : "";
         if(mag >= 1_000_000_000){
-            return Strings.fixed(number / 1_000_000_000f, 1) + "[gray]" + Core.bundle.get("unit.billions") + "[]";
+            return sign + Strings.fixed(mag / 1_000_000_000f, 1) + "[gray]" + Core.bundle.get("unit.billions") + "[]";
         }else if(mag >= 1_000_000){
-            return Strings.fixed(number / 1_000_000f, 1) + "[gray]" + Core.bundle.get("unit.millions") + "[]";
+            return sign + Strings.fixed(mag / 1_000_000f, 1) + "[gray]" + Core.bundle.get("unit.millions") + "[]";
         }else if(mag >= 10_000){
             return number / 1000 + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
         }else if(mag >= 1000){
-            return Strings.fixed(number / 1000f, 1) + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
+            return sign + Strings.fixed(mag / 1000f, 1) + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
         }else{
             return number + "";
         }

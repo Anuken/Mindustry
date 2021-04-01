@@ -363,8 +363,6 @@ public class PowerNode extends PowerBlock{
         @Override
         public void dropped(){
             power.links.clear();
-            //create new power graph to manually unlink (this may be redundant)
-            new PowerGraph().add(this);
         }
 
         @Override

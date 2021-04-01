@@ -84,10 +84,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             create(tile.block(), team);
         }else{
             if(block.hasPower){
+                power.init = false;
                 //reinit power graph
                 new PowerGraph().add(self());
             }
         }
+        proximity.clear();
         this.rotation = rotation;
         this.tile = tile;
 
@@ -757,6 +759,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
+    /** in overrides, this does the exact same thing as onProximityUpdate, use that instead */
     public void onProximityAdded(){
         if(block.hasPower) updatePowerGraph();
     }
@@ -1216,6 +1219,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             other.proximity.remove(self(), true);
             other.onProximityUpdate();
         }
+        proximity.clear();
     }
 
     public void updateProximity(){
