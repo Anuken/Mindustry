@@ -17,7 +17,7 @@ import static mindustry.Vars.*;
 
 public class OverlayRenderer{
     private static final float indicatorLength = 14f;
-    private static final float spawnerMargin = tilesize*11f;
+    private static final float spawnerMargin = tilesize * 11f;
     private static final Rect rect = new Rect();
 
     private float buildFade, unitFade;
@@ -27,13 +27,12 @@ public class OverlayRenderer{
         InputHandler input = control.input;
 
         input.drawBottom();
-            
+
         if(player.dead()) return;
 
         if(player.isBuilder()){
             player.unit().drawBuildPlans();
         }
-
 
     }
 
@@ -70,8 +69,6 @@ public class OverlayRenderer{
             }
         }
 
-        // if(player.dead()) return; //dead players don't draw
-
         InputHandler input = control.input;
 
         Unit select = input.selectedUnit();
@@ -86,7 +83,7 @@ public class OverlayRenderer{
 
             if(select instanceof BlockUnitc){
                 //special selection for block "units"
-                Fill.square(select.x, select.y, ((BlockUnitc)select).tile().block.size * tilesize/2f);
+                Fill.square(select.x, select.y, ((BlockUnitc)select).tile().block.size * tilesize / 2f);
             }else{
                 Draw.rect(select.type.icon(Cicon.full), select.x(), select.y(), select.rotation() - 90);
             }
@@ -147,13 +144,13 @@ public class OverlayRenderer{
             if(build != null && build.team == player.team()){
                 build.drawSelect();
                 if(!build.enabled && build.block.drawDisabled){
-                   build.drawDisabled();
+                    build.drawDisabled();
                 }
 
                 if(Core.input.keyDown(Binding.rotateplaced) && build.block.rotate && build.block.quickRotate && build.interactable(player.team())){
                     control.input.drawArrow(build.block, build.tileX(), build.tileY(), build.rotation, true);
                     Draw.color(Pal.accent, 0.3f + Mathf.absin(4f, 0.2f));
-                    Fill.square(build.x, build.y, build.block.size * tilesize/2f);
+                    Fill.square(build.x, build.y, build.block.size * tilesize / 2f);
                     Draw.color();
                 }
             }
@@ -162,9 +159,9 @@ public class OverlayRenderer{
         input.drawOverSelect();
 
         if(ui.hudfrag.blockfrag.hover() instanceof Unit unit && unit.controller() instanceof LogicAI ai && ai.controller instanceof Building build && build.isValid()){
-            Drawf.square(build.x, build.y, build.block.size * tilesize/2f + 2f);
+            Drawf.square(build.x, build.y, build.block.size * tilesize / 2f + 2f);
             if(!unit.within(build, unit.hitSize * 2f)){
-                Drawf.arrow(unit.x, unit.y, build.x, build.y, unit.hitSize *2f, 4f);
+                Drawf.arrow(unit.x, unit.y, build.x, build.y, unit.hitSize * 2f, 4f);
             }
         }
 
@@ -184,7 +181,6 @@ public class OverlayRenderer{
                 Lines.stroke(1f, Pal.place);
                 Lines.square(tile.x, tile.y, tile.block.size * tilesize / 2f + 2 + Mathf.absin(Time.time, 5f, 1f));
                 Draw.reset();
-
             }
         }
     }
