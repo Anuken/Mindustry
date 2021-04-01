@@ -554,7 +554,7 @@ public class ServerControl implements ApplicationListener{
                             return;
                         }
                     }else if(c.isString()){
-                        c.set(arg[1]);
+                        c.set(arg[1].replace("\\n", "\n"));
                     }
 
                     info("@ set to @.", c.name(), c.get());
