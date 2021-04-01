@@ -535,11 +535,11 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
-    public static String formatAmount(int number){
+    public static String formatAmount(long number){
         //prevent overflow
-        if(number == Integer.MIN_VALUE) number ++;
+        if(number == Long.MIN_VALUE) number ++;
 
-        int mag = Math.abs(number);
+        long mag = Math.abs(number);
         String sign = number < 0 ? "-" : "";
         if(mag >= 1_000_000_000){
             return sign + Strings.fixed(mag / 1_000_000_000f, 1) + "[gray]" + Core.bundle.get("unit.billions") + "[]";
