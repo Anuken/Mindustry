@@ -401,9 +401,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("destroyedblocks", true);
         graphics.checkPref("blockstatus", false);
         graphics.checkPref("playerchat", true);
-        if(!mobile){
-            graphics.checkPref("coreitems", true);
-        }
+        graphics.checkPref("coreitems", true);
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("smoothcamera", true);
         graphics.checkPref("position", false);
