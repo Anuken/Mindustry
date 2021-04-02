@@ -100,7 +100,7 @@
     "address": ["95.217.226.152:26160"]
   },
   {
-    " name " : " RoomServers " ,
-    " address " : [ " 217.28.222.250 " ]
+    " name " : "RoomServers" ,
+    " address " : ["217.28.222.250"]
   }
 ]
