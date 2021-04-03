@@ -273,7 +273,10 @@ public class EntityProcess extends BaseProcessor{
                     name += "Entity";
                 }
 
-                if(ann.legacy()){
+                boolean legacy = ann.legacy();
+
+                if(legacy){
+                    baseClass = tname(packageName + "." + name);
                     name += "Legacy" + Strings.capitalize(type.name());
                 }
 
@@ -338,7 +341,8 @@ public class EntityProcess extends BaseProcessor{
                         boolean isVisible = !f.is(Modifier.STATIC) && !f.is(Modifier.PRIVATE) && !f.has(ReadOnly.class);
 
                         //add the field only if it isn't visible or it wasn't implemented by the base class
-                        if(!isShadowed || !isVisible){
+                        //legacy classes have no extra fields
+                        if((!isShadowed || !isVisible) && !legacy){
                             builder.addField(spec);
                         }
 
@@ -348,7 +352,7 @@ public class EntityProcess extends BaseProcessor{
                         allFields.add(f);
 
                         //add extra sync fields
-                        if(f.has(SyncField.class) && isSync){
+                        if(f.has(SyncField.class) && isSync && !legacy){
                             if(!f.tname().toString().equals("float")) err("All SyncFields must be of type float", f);
 
                             syncedFields.add(f);
@@ -442,11 +446,14 @@ public class EntityProcess extends BaseProcessor{
                         }
                     }
 
+                    boolean specialIO = false;
+
                     if(hasIO){
                         //SPECIAL CASE: I/O code
                         //note that serialization is generated even for non-serializing entities for manual usage
                         if((first.name().equals("read") || first.name().equals("write"))){
                             io.write(mbuilder, first.name().equals("write"));
+                            specialIO = true;
                         }
 
                         //SPECIAL CASE: sync I/O code
@@ -525,7 +532,9 @@ public class EntityProcess extends BaseProcessor{
                         mbuilder.addStatement("mindustry.gen.Groups.queueFree(($T)this)", Poolable.class);
                     }
 
-                    builder.addMethod(mbuilder.build());
+                    if(!legacy || specialIO){
+                        builder.addMethod(mbuilder.build());
+                    }
                 }
 
                 //add pool reset method and implement Poolable
@@ -560,7 +569,7 @@ public class EntityProcess extends BaseProcessor{
                 .returns(tname(packageName + "." + name))
                 .addStatement(ann.pooled() ? "return Pools.obtain($L.class, " +name +"::new)" : "return new $L()", name).build());
 
-                definitions.add(new EntityDefinition(packageName + "." + name, builder, type, typeIsBase ? null : baseClass, components, groups, allFieldSpecs));
+                definitions.add(new EntityDefinition(packageName + "." + name, builder, type, typeIsBase ? null : baseClass, components, groups, allFieldSpecs, legacy));
             }
 
             //generate groups
@@ -724,6 +733,8 @@ public class EntityProcess extends BaseProcessor{
                     }
 
                     def.builder.addSuperinterface(inter.tname());
+
+                    if(def.legacy) continue;
 
                     //generate getter/setter for each method
                     for(Smethod method : inter.methods()){
@@ -951,9 +962,10 @@ public class EntityProcess extends BaseProcessor{
         final Selement naming;
         final String name;
         final @Nullable TypeName extend;
+        final boolean legacy;
         int classID;
 
-        public EntityDefinition(String name, Builder builder, Selement naming, TypeName extend, Seq<Stype> components, Seq<GroupDefinition> groups, Seq<FieldSpec> fieldSpec){
+        public EntityDefinition(String name, Builder builder, Selement naming, TypeName extend, Seq<Stype> components, Seq<GroupDefinition> groups, Seq<FieldSpec> fieldSpec, boolean legacy){
             this.builder = builder;
             this.name = name;
             this.naming = naming;
@@ -961,6 +973,7 @@ public class EntityProcess extends BaseProcessor{
             this.components = components;
             this.extend = extend;
             this.fieldSpecs = fieldSpec;
+            this.legacy = legacy;
         }
 
         @Override
