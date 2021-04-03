@@ -749,6 +749,7 @@ public class EntityProcess extends BaseProcessor{
 
             //store nulls
             TypeSpec.Builder nullsBuilder = TypeSpec.classBuilder("Nulls").addModifiers(Modifier.PUBLIC).addModifiers(Modifier.FINAL);
+            ObjectSet<String> nullList = ObjectSet.with("unit", "blockUnit");
 
             //create mock types of all components
             for(Stype interf : allInterfaces){
@@ -767,6 +768,12 @@ public class EntityProcess extends BaseProcessor{
 
                 //create null builder
                 String baseName = interf.name().substring(0, interf.name().length() - 1);
+
+                //prevent Nulls bloat
+                if(!nullList.contains(Strings.camelize(baseName))){
+                    continue;
+                }
+
                 String className = "Null" + baseName;
                 TypeSpec.Builder nullBuilder = TypeSpec.classBuilder(className)
                 .addModifiers(Modifier.FINAL);
