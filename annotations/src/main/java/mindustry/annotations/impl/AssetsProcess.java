@@ -20,8 +20,8 @@ public class AssetsProcess extends BaseProcessor{
 
     @Override
     public void process(RoundEnvironment env) throws Exception{
-        processSounds("Sounds", rootDirectory + "/core/assets/sounds", "arc.audio.Sound");
-        processSounds("Musics", rootDirectory + "/core/assets/music", "arc.audio.Music");
+        processSounds("Sounds", rootDirectory + "/assets/sounds", "arc.audio.Sound");
+        processSounds("Musics", rootDirectory + "/assets/music", "arc.audio.Music");
         processUI(env.getElementsAnnotatedWith(StyleDefaults.class));
     }
 
@@ -33,11 +33,11 @@ public class AssetsProcess extends BaseProcessor{
         MethodSpec.Builder loadStyles = MethodSpec.methodBuilder("loadStyles").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder icload = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         CodeBlock.Builder ichinit = CodeBlock.builder();
-        String resources = rootDirectory + "/core/assets-raw/sprites/ui";
-        Jval icons = Jval.read(Fi.get(rootDirectory + "/core/assets-raw/fontgen/config.json").readString());
+        String resources = rootDirectory + "/assets-raw/sprites/ui";
+        Jval icons = Jval.read(Fi.get(rootDirectory + "/assets-raw/fontgen/config.json").readString());
 
         ObjectMap<String, String> texIcons = new OrderedMap<>();
-        PropertiesUtils.load(texIcons, Fi.get(rootDirectory + "/core/assets/icons/icons.properties").reader());
+        PropertiesUtils.load(texIcons, Fi.get(rootDirectory + "/assets/icons/icons.properties").reader());
 
         StringBuilder iconcAll = new StringBuilder();
 
