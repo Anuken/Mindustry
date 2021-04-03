@@ -276,7 +276,7 @@ public abstract class BulletType extends Content{
 
     public void update(Bullet b){
         if(homingPower > 0.0001f && b.time >= homingDelay){
-            Teamc target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
+            Teamc target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> ((e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir)) && !b.hasCollided(e.id), t -> collidesGround && !b.hasCollided(t.id));
             if(target != null){
                 b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), homingPower * Time.delta * 50f));
             }
