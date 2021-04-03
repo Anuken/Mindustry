@@ -395,6 +395,11 @@ project(":core"){
             destinationDir = new File(buildDir, 'javadoc')
         }
     }
+
+    //comp** classes are only used for code generation
+    jar{
+        exclude("mindustry/entities/comp/**")
+    }
 }
 
 project(":server"){
