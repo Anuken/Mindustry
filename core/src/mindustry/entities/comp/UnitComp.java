@@ -367,11 +367,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             elevation -= type.fallSpeed * Time.delta;
 
             if(health <= -maxHealth){
-                Fx.explosion.at(this);
-                Effect.scorch(x, y, (int)(hitSize / 5));
-                type.deathSound.at(this);
-                Events.fire(new UnitDestroyEvent(self()));
-                remove();
+                destroy();
             }
 
             if(isGrounded()){
