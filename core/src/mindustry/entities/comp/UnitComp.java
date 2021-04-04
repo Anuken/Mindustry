@@ -44,6 +44,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     UnitType type;
     boolean spawnedByCore;
     double flag;
+    boolean shouldExplode = true;
 
     transient Seq<Ability> abilities = new Seq<>(0);
     private transient float resupplyTime = Mathf.random(10f);
@@ -366,6 +367,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             //move down
             elevation -= type.fallSpeed * Time.delta;
 
+            if(health <= -maxHealth){
+                shouldExplode = false;
+                destroy();
+            }
+
             if(isGrounded()){
                 destroy();
             }
@@ -425,7 +431,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         float flammability = item().flammability * stack().amount / 1.9f;
         float power = item().charge * stack().amount * 150f;
 
-        if(!spawnedByCore){
+        if(!spawnedByCore && shouldExplode){
             Damage.dynamicExplosion(x, y, flammability, explosiveness, power, bounds() / 2f, state.rules.damageExplosions, item().flammability > 1, team);
         }
 
@@ -443,7 +449,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //if this unit crash landed (was flying), damage stuff in a radius
-        if(type.flying && !spawnedByCore){
+        if(type.flying && !spawnedByCore && shouldExplode){
             Damage.damage(team,x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f, true, false, true);
         }
 
@@ -497,7 +503,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public void killed(){
         wasPlayer = isLocal();
-        health = 0;
         dead = true;
 
         //don't waste time when the unit is already on the ground, just destroy it

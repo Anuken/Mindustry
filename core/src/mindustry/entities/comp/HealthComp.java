@@ -34,7 +34,6 @@ abstract class HealthComp implements Entityc, Posc{
     void kill(){
         if(dead) return;
 
-        health = 0;
         dead = true;
         killed();
         remove();
@@ -86,7 +85,7 @@ abstract class HealthComp implements Entityc, Posc{
     }
 
     void clampHealth(){
-        health = Mathf.clamp(health, 0, maxHealth);
+        health = Math.min(health, maxHealth);
     }
 
     /** Heals by a flat amount. */
