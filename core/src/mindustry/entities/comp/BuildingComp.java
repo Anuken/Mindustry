@@ -614,7 +614,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 if((other.flammability > 0.3f && liquid.temperature > 0.7f) || (liquid.flammability > 0.3f && other.temperature > 0.7f)){
                     damage(1 * Time.delta);
                     next.damage(1 * Time.delta);
-                    if(Mathf.chance(0.1 * Time.delta)){
+                    if(Mathf.chance(0.1 * Math.min(1, Time.delta))){
                         Fx.fire.at(fx, fy);
                     }
                 }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) || (other.temperature > 0.7f && liquid.temperature < 0.55f)){
