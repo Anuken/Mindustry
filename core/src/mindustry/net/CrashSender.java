@@ -27,7 +27,7 @@ public class CrashSender{
     public static String createReport(String error){
         String report = "Mindustry has crashed. How unfortunate.\n";
         if(mods.list().size == 0 && Version.build != -1){
-            report += "Report this at " + Vars.reportIssueURL + "\n\n";
+            report += "Report this at " + Vars.reportIssueURL + "\n<!-- Do NOT delete the template! -->\n\n";
         }
         return report + "Version: " + Version.combined() + (Vars.headless ? " (Server)" : "") + "\n"
             + "OS: " + System.getProperty("os.name") + " x" + (OS.is64Bit ? "64" : "32") + "\n"
