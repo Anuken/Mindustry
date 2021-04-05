@@ -1106,6 +1106,7 @@ public class UnitTypes implements ContentList{
             engineOffset = 38;
             engineSize = 7.3f;
             hitSize = 58f;
+            lightRadius = 75f;
             destructibleWreck = false;
             armor = 13f;
             targetFlag = BlockFlag.reactor;
@@ -1390,6 +1391,7 @@ public class UnitTypes implements ContentList{
             payloadCapacity = (5.3f * 5.3f) * tilePayload;
             buildSpeed = 4f;
             drawShields = false;
+            lightRadius = 75f;
             commandLimit = 6;
             lowAltitude = true;
             buildBeamOffset = 43;
@@ -1595,7 +1597,6 @@ public class UnitTypes implements ContentList{
         sei = new UnitType("sei"){{
             health = 10500;
             armor = 12f;
-
             speed = 0.73f;
             drag = 0.17f;
             hitSize = 39f;
@@ -1683,6 +1684,7 @@ public class UnitTypes implements ContentList{
             speed = 0.62f;
             drag = 0.18f;
             hitSize = 50f;
+            lightRadius = 80f;
             armor = 16f;
             accel = 0.19f;
             rotateSpeed = 0.9f;
