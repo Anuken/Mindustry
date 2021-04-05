@@ -27,11 +27,11 @@ abstract class FireComp implements Timedc, Posc, Firec, Syncc{
 
     @Override
     public void update(){
-        if(Mathf.chance(0.09 * Time.delta)){
+        if(Mathf.chance(0.09 * Math.min(1, Time.delta))){
             Fx.fire.at(x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
-        if(Mathf.chance(0.05 * Time.delta)){
+        if(Mathf.chance(0.05 * Math.min(1, Time.delta))){
             Fx.fireSmoke.at(x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
