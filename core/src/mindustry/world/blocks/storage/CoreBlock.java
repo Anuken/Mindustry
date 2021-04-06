@@ -388,5 +388,22 @@ public class CoreBlock extends StorageBlock{
                 noEffect = false;
             }
         }
+
+        @Override
+        public void buildConfiguration(Table table){
+            if(!state.isCampaign() || net.client()){
+                deselect();
+                return;
+            }
+
+            table.button(Icon.downOpen, Styles.clearTransi, () -> {
+                ui.planet.showSelect(state.rules.sector, other -> {
+                    if(state.isCampaign()){
+                        other.info.destination = state.rules.sector;
+                    }
+                });
+                deselect();
+            }).size(40f);
+        }
     }
 }
