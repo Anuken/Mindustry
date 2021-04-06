@@ -9,7 +9,7 @@
   },
   {
     "name": "mindustry.pl",
-    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl"]
+    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl", "mindustry.pl:6966"]
   },
   {
     "name": "{AA}",
