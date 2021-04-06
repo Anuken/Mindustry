@@ -26,7 +26,9 @@ jobs:
         cd ../Mindustry
     - name: Create artifacts
       run: |
-        ./gradlew desktop:dist server:dist core:mergedJavadoc -Pbuildversion=${RELEASE_VERSION:1}
+        export PATH=./tools:$PATH
+        chmod +x ./tools/antialias
+        ./gradlew desktop:dist server:dist core:mergedJavadoc -Pbuildversion=${RELEASE_VERSION:1} -PfastAA
     - name: Update docs
       run: |
         cd ../
