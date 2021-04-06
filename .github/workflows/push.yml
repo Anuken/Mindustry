@@ -13,7 +13,10 @@ jobs:
       with:
         java-version: 14
     - name: Run unit tests
-      run: ./gradlew clean cleanTest test
+      run: |
+        export PATH=./tools:$PATH
+        chmod +x ./tools/antialias
+        ./gradlew clean cleanTest test -PfastAA
     - name: Trigger BE build
       if: ${{ github.repository == 'Anuken/Mindustry' }}
       run: |
