@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
@@ -53,6 +54,7 @@ public class CoreBlock extends StorageBlock{
         drawDisabled = false;
         canOverdrive = false;
         replaceable = false;
+        configurable = true;
     }
 
     @Remote(called = Loc.server)
