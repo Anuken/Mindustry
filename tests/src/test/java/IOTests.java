@@ -3,6 +3,8 @@ import arc.util.io.*;
 import mindustry.game.*;
 import mindustry.io.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.nio.*;
 
@@ -10,22 +12,23 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class IOTests{
 
-    @Test
-    void writeEnglish(){
+    @ParameterizedTest
+    @ValueSource(strings ={
+            "asd asd asd asd asdagagasasjakbgeah;jwrej 23424234",
+            "这个服务器可以用自己的语言说话"
+    })
+    void writeStringTest(String string){
         ByteBuffer buffer = ByteBuffer.allocate(500);
-        TypeIO.writeString(buffer, "asd asd asd asd asdagagasasjakbgeah;jwrej 23424234");
+        TypeIO.writeString(buffer, string);
         buffer.position(0);
-        assertEquals(TypeIO.readString(buffer), "asd asd asd asd asdagagasasjakbgeah;jwrej 23424234");
+        assertEquals(TypeIO.readString(buffer), string);
     }
 
-    @Test
-    void writeChinese(){
-        ByteBuffer buffer = ByteBuffer.allocate(500);
-        TypeIO.writeString(buffer, "这个服务器可以用自己的语言说话");
-        buffer.position(0);
-        assertEquals(TypeIO.readString(buffer), "这个服务器可以用自己的语言说话");
-    }
-
+    /**
+     * This test can be replaced by a @NullSource annotation
+     * in the writeStringTest as soon as JUnit libraries are
+     * updated to at least version 5.7.
+     */
     @Test
     void writeNull(){
         ByteBuffer buffer = ByteBuffer.allocate(500);
