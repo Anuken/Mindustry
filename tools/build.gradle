@@ -378,7 +378,7 @@ task pack(dependsOn: [classes, configurations.runtimeClasspath]){
             e.printStackTrace()
         }
 
-        println "Time taken for AA: ${(System.currentTimeMillis() - ms) / 1000f}"
+        println "Seconds taken for AA: ${(System.currentTimeMillis() - ms) / 1000f}"
 
         println("\n\nPacking normal 4096 sprites...\n\n")
 
