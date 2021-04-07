@@ -562,6 +562,8 @@ public class UnitTypes implements ContentList{
                 shootCone = 180f;
                 ejectEffect = Fx.none;
                 shootSound = Sounds.explosion;
+                x = shootY = 0f;
+                mirror = false;
                 bullet = new BombBulletType(0f, 0f, "clear"){{
                     hitEffect = Fx.pulverize;
                     lifetime = 10f;
