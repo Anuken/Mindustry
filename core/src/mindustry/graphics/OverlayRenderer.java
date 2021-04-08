@@ -14,6 +14,7 @@ import mindustry.ui.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
+import static mindustry.graphics.Pal.spore;
 
 public class OverlayRenderer{
     private static final float indicatorLength = 14f;
@@ -60,7 +61,12 @@ public class OverlayRenderer{
                     .setCenter(Core.camera.position.x, Core.camera.position.y).contains(unit.x, unit.y)){
                         Tmp.v1.set(unit.x, unit.y).sub(player).setLength(indicatorLength);
 
-                        Lines.stroke(1f, unit.team().color);
+                        if (unit.isBoss()) {
+                            Lines.stroke(1f, spore);
+                        }
+                        else {
+                            Lines.stroke(1f, unit.team().color);
+                        }
                         Lines.lineAngle(player.x + Tmp.v1.x, player.y + Tmp.v1.y, Tmp.v1.angle(), 3f);
                         Draw.reset();
                     }
