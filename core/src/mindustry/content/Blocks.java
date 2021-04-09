@@ -1299,14 +1299,14 @@ public class Blocks implements ContentList{
         cultivator = new Cultivator("cultivator"){{
             requirements(Category.production, with(Items.copper, 25, Items.lead, 25, Items.silicon, 10));
             outputItem = new ItemStack(Items.sporePod, 1);
-            craftTime = 140;
+            craftTime = 80;
             size = 2;
             hasLiquids = true;
             hasPower = true;
             hasItems = true;
 
-            consumes.power(0.9f);
-            consumes.liquid(Liquids.water, 0.2f);
+            consumes.power(1.4f);
+            consumes.liquid(Liquids.water, 0.35f);
         }};
 
         oilExtractor = new Fracker("oil-extractor"){{
