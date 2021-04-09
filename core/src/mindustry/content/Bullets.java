@@ -280,6 +280,7 @@ public class Bullets implements ContentList{
             homingPower = 0.08f;
             splashDamageRadius = 20f;
             splashDamage = 20f * 1.5f;
+            ammoMultiplier = 3f;
             makeFire = true;
             hitEffect = Fx.blastExplosion;
             status = StatusEffects.burning;
@@ -292,6 +293,7 @@ public class Bullets implements ContentList{
             drag = -0.01f;
             splashDamageRadius = 25f;
             splashDamage = 25f * 1.5f;
+            ammoMultiplier = 5f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
             lightningDamage = 10;
