@@ -639,6 +639,7 @@ public class Blocks implements ContentList{
             outputLiquid = new LiquidStack(Liquids.slag, 2f);
             craftTime = 10f;
             hasLiquids = hasPower = true;
+            drawer = new DrawLiquid();
 
             consumes.power(1f);
             consumes.item(Items.scrap, 1);
