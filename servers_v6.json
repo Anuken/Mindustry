@@ -21,7 +21,7 @@
   },
   {
     "name": "C.A.M.S.",
-    "address": ["routerchain.ddns.net", "nikochio.ddns.net", "easyplay.su"]
+    "address": ["routerchain.ddns.net", "nikochio.ddns.net"]
   },
   {
     "name": "BE6.RUN",
@@ -86,10 +86,6 @@
   {
     "name": "Nydus",
     "address": ["v6.mindustry.nydus.app:6566"]
-  },
-  {
-    "name": "MD Community",
-    "address": ["62.109.31.34", "185.13.47.140:1001"]
   },
   {
     "name": "Mindustry.Party",
