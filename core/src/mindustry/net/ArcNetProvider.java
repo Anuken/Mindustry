@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.async.*;
 import arc.util.pooling.*;
+import mindustry.net.Administration.*;
 import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 
@@ -81,6 +82,10 @@ public class ArcNetProvider implements NetProvider{
             @Override
             public void connected(Connection connection){
                 String ip = connection.getRemoteAddressTCP().getAddress().getHostAddress();
+                if(Config.ipForward.bool()){
+                    Log.debug("&bWait For IpForward: @", ip);
+                    return;
+                }
 
                 ArcConnection kn = new ArcConnection(ip, connection);
 
@@ -110,6 +115,15 @@ public class ArcNetProvider implements NetProvider{
             @Override
             public void received(Connection connection, Object object){
                 ArcConnection k = getByArcID(connection.getID());
+                if(object instanceof Connect c){
+                    if(k == null && Config.ipForward.bool()){
+                        ArcConnection kn = new ArcConnection(c.addressTCP, connection);
+                        Log.debug("&bReceived connection: @", c.addressTCP);
+                        connections.add(kn);
+                        Core.app.post(() -> net.handleServerReceived(kn, c));
+                    }
+                    return;
+                }
                 if(object instanceof FrameworkMessage || k == null) return;
 
                 Core.app.post(() -> {

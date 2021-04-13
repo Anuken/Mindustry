@@ -52,6 +52,12 @@ public class Packets{
         public boolean isImportant(){
             return true;
         }
+
+        //use in ipForward
+        @Override
+        public void read(ByteBuffer buffer){
+            addressTCP = TypeIO.readString(buffer);
+        }
     }
 
     public static class Disconnect implements Packet{
