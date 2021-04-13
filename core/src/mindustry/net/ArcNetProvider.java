@@ -83,7 +83,7 @@ public class ArcNetProvider implements NetProvider{
             public void connected(Connection connection){
                 String ip = connection.getRemoteAddressTCP().getAddress().getHostAddress();
                 if(Config.ipForward.bool()){
-                    Log.debug("&bWait For IpForward: @", ip);
+                    Log.debug("&bWait For IP forward: @", ip);
                     return;
                 }
 
