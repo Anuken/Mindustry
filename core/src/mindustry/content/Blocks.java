@@ -1396,8 +1396,8 @@ public class Blocks implements ContentList{
                 Items.silicon, Bullets.standardHoming
             );
 
-            spread = 4f;
-            shots = 2;
+            barrelSpacing = 4f;
+            barrels = 2;
             alternate = true;
             reloadTime = 20f;
             restitution = 0.03f;
@@ -1778,10 +1778,10 @@ public class Blocks implements ContentList{
             range = 200f;
             inaccuracy = 3f;
             recoilAmount = 3f;
-            spread = 8f;
             alternate = true;
             shootShake = 2f;
-            shots = 2;
+            barrelSpacing = 8f;
+            barrels = 2;
             size = 4;
             shootCone = 24f;
             shootSound = Sounds.shootBig;
