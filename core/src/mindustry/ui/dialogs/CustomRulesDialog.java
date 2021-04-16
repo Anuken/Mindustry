@@ -29,6 +29,9 @@ public class CustomRulesDialog extends BaseDialog{
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
     private BaseDialog banDialog;
+    public float minBuildSpeedMultiplier = 0.001f, maxBuildSpeedMultiplier = 50f;
+    public float minUnitBuildSpeedMultiplier = 0.001f, maxUnitBuildSpeedMultiplier = 50f;
+    public int minUnitCap = -999, maxUnitCap = 999;
 
     public CustomRulesDialog(){
         super("@mode.custom");
@@ -143,7 +146,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.schematic", b -> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
         check("@rules.coreincinerates", b -> rules.coreIncinerates = b, () -> rules.coreIncinerates);
         number("@rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
-        number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, 0.001f, 50f);
+        number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, minBuildSpeedMultiplier, maxBuildSpeedMultiplier);
         number("@rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
         number("@rules.blockhealthmultiplier", f -> rules.blockHealthMultiplier = f, () -> rules.blockHealthMultiplier);
         number("@rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
@@ -162,9 +165,9 @@ public class CustomRulesDialog extends BaseDialog{
         title("@rules.title.unit");
         check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
         check("@rules.unitcapvariable", b -> rules.unitCapVariable = b, () -> rules.unitCapVariable);
-        number("@rules.unitcap", true, f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
+        number("@rules.unitcap", true, f -> rules.unitCap = f, () -> rules.unitCap, minUnitCap, maxUnitCap);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
-        number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0.001f, 50f);
+        number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, minUnitBuildSpeedMultiplier, maxUnitBuildSpeedMultiplier);
 
         title("@rules.title.enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
