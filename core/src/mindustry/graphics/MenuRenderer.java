@@ -30,11 +30,13 @@ public class MenuRenderer implements Disposable{
     private float time = 0f;
     private float flyerRot = 45f;
     private int flyers = Mathf.chance(0.2) ? Mathf.random(35) : Mathf.random(15);
-    private UnitType flyerType = Structs.select(UnitTypes.flare, UnitTypes.flare, UnitTypes.horizon, UnitTypes.mono, UnitTypes.poly, UnitTypes.mega, UnitTypes.zenith);
+    private Seq<UnitType> flyerTypes;
+    private UnitType flyerType;
 
     public MenuRenderer(){
         Time.mark();
         generate();
+        calculateUnit();
         cache();
         Log.debug("Time to generate menu: @", Time.elapsed());
     }
@@ -162,6 +164,16 @@ public class MenuRenderer implements Disposable{
         }
 
         world.endMapLoad();
+    }
+
+    private void calculateUnit(){
+        content.units().each(u -> {
+            if(u.hitSize <= 20 && u.flying && u.region != Core.atlas.find("error")){
+                flyerTypes.add(u);
+            }
+        });
+
+        flyerType = flyerTypes.random();
     }
 
     private void cache(){
