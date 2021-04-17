@@ -63,7 +63,7 @@ public class MinerAI extends AIController{
                 return;
             }
 
-            if(unit.within(core, unit.type.miningRange)){
+            if(unit.within(core, unit.type.range)){
                 if(core.acceptStack(unit.stack.item, unit.stack.amount, unit) > 0){
                     Call.transferItemTo(unit, unit.stack.item, unit.stack.amount, unit.x, unit.y, core);
                 }
@@ -72,7 +72,7 @@ public class MinerAI extends AIController{
                 mining = true;
             }
 
-            circle(core, unit.type.miningRange / 1.8f);
+            circle(core, unit.type.range / 1.8f);
         }
     }
 
