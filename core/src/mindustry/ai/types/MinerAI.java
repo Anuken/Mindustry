@@ -19,7 +19,7 @@ public class MinerAI extends AIController{
 
         if(!(unit.canMine()) || core == null) return;
 
-        if(unit.mineTile != null && !unit.mineTile.within(unit, unit.type.range)){
+        if(unit.mineTile != null && !unit.mineTile.within(unit, unit.type.miningRange)){
             unit.mineTile(null);
         }
 
@@ -44,9 +44,9 @@ public class MinerAI extends AIController{
                 }
 
                 if(ore != null){
-                    moveTo(ore, unit.type.range / 2f, 20f);
+                    moveTo(ore, unit.type.miningRange / 2f, 20f);
 
-                    if(unit.within(ore, unit.type.range)){
+                    if(unit.within(ore, unit.type.miningRange)){
                         unit.mineTile = ore;
                     }
 
