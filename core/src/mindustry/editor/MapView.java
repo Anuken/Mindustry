@@ -70,16 +70,16 @@ public class MapView extends Element implements GestureListener{
                     return false;
                 }
 
-                if(!mobile && button != KeyCode.mouseLeft && button != KeyCode.mouseMiddle && button != KeyCode.mouseRight){
+                if(!mobile && button != Core.keybinds.get(Binding.select).key && button != Core.keybinds.get(Binding.pick).key && button != Core.keybinds.get(Binding.break_block).key){
                     return true;
                 }
-                
-                if(button == KeyCode.mouseRight){
+
+                if(button == Core.keybinds.get(Binding.break_block).key){
                     lastTool = tool;
                     tool = EditorTool.eraser;
                 }
 
-                if(button == KeyCode.mouseMiddle){
+                if(button == Core.keybinds.get(Binding.pick).key){
                     lastTool = tool;
                     tool = EditorTool.zoom;
                 }
@@ -105,7 +105,7 @@ public class MapView extends Element implements GestureListener{
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
-                if(!mobile && button != KeyCode.mouseLeft && button != KeyCode.mouseMiddle && button != KeyCode.mouseRight){
+                if(!mobile && button != Core.keybinds.get(Binding.select).key && button != Core.keybinds.get(Binding.pick).key && button != Core.keybinds.get(Binding.break_block).key){
                     return;
                 }
 
@@ -120,7 +120,7 @@ public class MapView extends Element implements GestureListener{
 
                 editor.flushOp();
 
-                if((button == KeyCode.mouseMiddle || button == KeyCode.mouseRight) && lastTool != null){
+                if((button == Core.keybinds.get(Binding.pick).key || button == Core.keybinds.get(Binding.break_block).key) && lastTool != null){
                     tool = lastTool;
                     lastTool = null;
                 }
@@ -198,7 +198,7 @@ public class MapView extends Element implements GestureListener{
 
         if(Core.scene.getScrollFocus() != this) return;
 
-        zoom += Core.input.axis(KeyCode.scroll) / 10f * zoom;
+        zoom += Core.input.axis(Binding.zoom) / 10f * zoom;
         clampZoom();
     }
 
