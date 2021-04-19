@@ -6,7 +6,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.entities.comp.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
@@ -128,7 +127,7 @@ public class Units{
         nearby(x, y, width, height, unit -> {
             if(boolResult) return;
             if((unit.isGrounded() && !unit.type.hovering) == ground){
-                unit.hitbox(hitrect);
+                unit.hitboxTile(hitrect);
 
                 if(hitrect.overlaps(x, y, width, height)){
                     boolResult = true;
@@ -218,7 +217,7 @@ public class Units{
         cdist = 0f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(e.dead() || !predicate.get(e) || !e.within(x, y, range + e.hitSize/2f)) return;
+            if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.within(x, y, range + e.hitSize/2f)) return;
 
             float cost = sort.cost(e, x, y);
             if(result == null || cost < cdist){

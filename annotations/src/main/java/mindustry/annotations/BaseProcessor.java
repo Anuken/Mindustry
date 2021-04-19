@@ -219,7 +219,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
                 String path = Fi.get(filer.getResource(StandardLocation.CLASS_OUTPUT, "no", "no")
                 .toUri().toURL().toString().substring(OS.isWindows ? 6 : "file:".length()))
                 .parent().parent().parent().parent().parent().parent().parent().toString().replace("%20", " ");
-                rootDirectory = Fi.get(path);
+                rootDirectory = Fi.get(path).parent();
             }catch(IOException e){
                 throw new RuntimeException(e);
             }

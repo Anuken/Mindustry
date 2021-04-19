@@ -108,13 +108,13 @@ public class PowerNode extends PowerBlock{
         super.setBars();
         bars.add("power", entity -> new Bar(() ->
         Core.bundle.format("bar.powerbalance",
-            ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + UI.formatAmount((int)(entity.power.graph.getPowerBalance() * 60)))),
+            ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + UI.formatAmount((long)(entity.power.graph.getPowerBalance() * 60)))),
             () -> Pal.powerBar,
             () -> Mathf.clamp(entity.power.graph.getLastPowerProduced() / entity.power.graph.getLastPowerNeeded())));
 
         bars.add("batteries", entity -> new Bar(() ->
         Core.bundle.format("bar.powerstored",
-            (UI.formatAmount((int)entity.power.graph.getLastPowerStored())), UI.formatAmount((int)entity.power.graph.getLastCapacity())),
+            (UI.formatAmount((long)entity.power.graph.getLastPowerStored())), UI.formatAmount((long)entity.power.graph.getLastCapacity())),
             () -> Pal.powerBar,
             () -> Mathf.clamp(entity.power.graph.getLastPowerStored() / entity.power.graph.getLastCapacity())));
 
@@ -363,8 +363,6 @@ public class PowerNode extends PowerBlock{
         @Override
         public void dropped(){
             power.links.clear();
-            //create new power graph to manually unlink (this may be redundant)
-            new PowerGraph().add(this);
         }
 
         @Override

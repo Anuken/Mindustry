@@ -97,6 +97,10 @@ public class Reconstructor extends UnitBlock{
         super.init();
     }
 
+    public void addUpgrade(UnitType from, UnitType to){
+        upgrades.add(new UnitType[]{from, to});
+    }
+
     public class ReconstructorBuild extends UnitBuild{
 
         public float fraction(){
