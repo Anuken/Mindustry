@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -197,10 +198,12 @@ public class CoreBlock extends StorageBlock{
             super.draw();
 
             if(state.isCampaign() && configTapped()){
-                float t = Universe.getTurnCounter();
-                float min = Mathf.floor(t / 60f / 60f);
-                float sec = Mathf.floor(t / 60f % 60f);
-                drawPlaceText(Core.bundle.format("launch.import", min, sec), (int)x, (int)y, true);
+                Draw.z(Layer.blockOver);
+                float t = turnDuration - Universe.getTurnCounter();
+                String min = Strings.fixed(Mathf.floor(t / 60f / 60f), 0);
+                float s = Mathf.floor(t / 60f % 60f);
+                String sec = (s < 10f ? "0" : "") + Strings.fixed(s, 0);
+                drawPlaceText(Core.bundle.format("launch.import", min, sec), tileX(), tileY(), true);
             }
         }
 
