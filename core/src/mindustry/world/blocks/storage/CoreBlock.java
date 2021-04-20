@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
@@ -189,6 +190,18 @@ public class CoreBlock extends StorageBlock{
 
         public void requestSpawn(Player player){
             Call.playerSpawn(tile, player);
+        }
+
+        @Override
+        public void draw(){
+            super.draw();
+
+            if(state.isCampaign() && configTapped()){
+                float t = Universe.getTurnCounter();
+                float min = Mathf.floor(t / 60f / 60f);
+                float sec = Mathf.floor(t / 60f % 60f);
+                drawPlaceText(Core.bundle.format("launch.import", min, sec), (int)x, (int)y, true);
+            }
         }
 
         @Override
