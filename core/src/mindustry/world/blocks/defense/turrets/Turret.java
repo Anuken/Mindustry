@@ -362,15 +362,16 @@ public class Turret extends ReloadTurret{
 
                 //when charging is enabled, use the charge shoot pattern
                 if(chargeTime > 0){
-                    float j = (shotCounter % barrels) - (barrels - 1) / 2f;
-                    tr.trns(rotation - 90, barrelSpacing * j + xOffset, shootLength);
+                    float j = (shotCounter % barrels) - (barrels - 1f) / 2f;
+                    tr.trns(rotation - 90f, barrelSpacing * j + xOffset, shootLength);
+
                     chargeBeginEffect.at(x + tr.x, y + tr.y, rotation);
                     chargeSound.at(x + tr.x, y + tr.y, 1);
 
                     for(int i = 0; i < chargeEffects; i++){
                         Time.run(Mathf.random(chargeMaxDelay), () -> {
                             if(!isValid()) return;
-                            tr.trns(rotation - 90, barrelSpacing * j + xOffset, shootLength);
+                            tr.trns(rotation - 90f, barrelSpacing * j + xOffset, shootLength);
                             chargeEffect.at(x + tr.x, y + tr.y, rotation);
                         });
                     }
@@ -379,7 +380,9 @@ public class Turret extends ReloadTurret{
 
                     Time.run(chargeTime, () -> {
                         shoot(type);
-                        charging = false;
+                        Time.run(burstSpacing * shots, () -> {
+                            charging = false; //Only make charging false after finishing burst shooting
+                        });
                     });
                 }else{
                     shoot(type);
@@ -392,6 +395,7 @@ public class Turret extends ReloadTurret{
         }
 
         protected void shoot(BulletType type){
+            final int c = shotCounter;
             for(int i = 0; i < shots; i++){
                 int ii = i;
                 Time.run(burstSpacing * i, () -> {
@@ -399,18 +403,22 @@ public class Turret extends ReloadTurret{
 
                     recoil = recoilAmount;
                     
-                    float j = (shotCounter % barrels) - (barrels - 1) / 2f;
-                    tr.trns(rotation - 90, barrelSpacing * j + xOffset, shootLength);
+                    float j = (c % barrels) - (barrels - 1f) / 2f;
+                    tr.trns(rotation - 90f, barrelSpacing * j + xOffset, shootLength);
 
                     bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (ii - (int)(shots / 2f)) * spread);
                     effects();
                     useAmmo();
                     recoil = recoilAmount;
                     heat = 1f;
+
+                    if(chargeTime > 0){
+                        charging = true; //Just in case it somehow becomes false when it shouldn't
+                    }
                 });
             }
 
-            shotCounter++;  
+            shotCounter++;
         }
 
         protected void bullet(BulletType type, float angle){
