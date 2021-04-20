@@ -8,6 +8,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
+import mindustry.game.SectorInfo.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
