@@ -100,7 +100,7 @@ public class SStats implements SteamUserStatsCallback{
             for(Planet planet : content.planets()){
                 for(Sector sec : planet.sectors){
                     if(sec.hasBase()){
-                        for(var v : sec.info.production.values()){
+                        for(ExportStat v : sec.info.production.values()){
                             if(v.mean > 0) total += v.mean * 60;
                         }
                     }
@@ -178,7 +178,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(UnitControlEvent.class, e -> {
-            if(e.unit instanceof BlockUnitc block && block.tile().block == Blocks.router){
+            if(e.unit instanceof BlockUnitc && ((BlockUnitc)block).tile().block == Blocks.router){
                 becomeRouter.complete();
             }
         });
