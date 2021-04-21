@@ -116,6 +116,14 @@ android{
             }
         }
     }
+    
+    if(!project.ext.hasSprites()){
+        println "Scheduling sprite pack."
+        run.dependsOn ":tools:pack"
+        deploy.dependsOn ":tools:pack"
+        assembleDebug.dependsOn ":tools:pack"
+        assembleRelease.dependsOn ":tools:pack"
+    }
 }
 // called every time gradle gets executed, takes the native dependencies of
 // the natives configuration, and extracts them to the proper libs/ folders
@@ -150,12 +158,4 @@ task run(type: Exec){
 
     def adb = path + "/platform-tools/adb"
     commandLine "$adb", 'shell', 'am', 'start', '-n', 'io.anuke.mindustry/mindustry.android.AndroidLauncher'
-}
-
-if(!project.ext.hasSprites()){
-    println "Scheduling sprite pack."
-    run.dependsOn ":tools:pack"
-    deploy.dependsOn ":tools:pack"
-    assembleDebug.dependsOn ":tools:pack"
-    assembleRelease.dependsOn ":tools:pack"
 }
