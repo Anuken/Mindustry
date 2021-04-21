@@ -156,4 +156,6 @@ if(!project.ext.hasSprites()){
     println "Scheduling sprite pack."
     run.dependsOn ":tools:pack"
     deploy.dependsOn ":tools:pack"
+    assembleDebug.dependsOn ":tools:pack"
+    assembleRelease.dependsOn ":tools:pack"
 }
