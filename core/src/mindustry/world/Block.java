@@ -109,6 +109,8 @@ public class Block extends UnlockableContent{
     public int health = -1;
     /** base block explosiveness */
     public float baseExplosiveness = 0f;
+    /** how much damage fire does per hit */
+    public float fireDamage = 1.6f;
     /** whether this block can be placed on edges of liquids. */
     public boolean floating = false;
     /** multiblock size */
