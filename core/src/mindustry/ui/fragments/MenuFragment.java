@@ -187,7 +187,7 @@ public class MenuFragment extends Fragment{
         }).width(width).growY();
     }
 
-    private void showQuitConfirm() {
+    private void showQuitConfirm(){
         ui.showConfirm("@confirm", "@quit.confirm", Core.app::exit);
     }
 
