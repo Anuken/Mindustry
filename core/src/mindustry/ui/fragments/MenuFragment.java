@@ -103,7 +103,7 @@ public class MenuFragment extends Fragment{
             editor = new MobileButton(Icon.terrain, "@editor", () -> checkPlay(ui.maps::show)),
             tools = new MobileButton(Icon.settings, "@settings", ui.settings::show),
             mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
-            exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit());
+            exit = new MobileButton(Icon.exit, "@quit", this::showQuitConfirm);
 
         if(!Core.graphics.isPortrait()){
             container.marginTop(60f);
@@ -171,7 +171,7 @@ public class MenuFragment extends Fragment{
                 //new Buttoni("@schematics", Icon.paste, ui.schematics::show),
                 new Buttoni("@settings", Icon.settings, ui.settings::show),
                 new Buttoni("@about.button", Icon.info, ui.about::show),
-                new Buttoni("@quit", Icon.exit, Core.app::exit)
+                new Buttoni("@quit", Icon.exit, this::showQuitConfirm)
             );
 
         }).width(width).growY();
@@ -185,6 +185,10 @@ public class MenuFragment extends Fragment{
             t.visible(() -> !t.getChildren().isEmpty());
 
         }).width(width).growY();
+    }
+
+    private void showQuitConfirm() {
+        ui.showConfirm("@confirm", "@quit.confirm", Core.app::exit);
     }
 
     private void checkPlay(Runnable run){
