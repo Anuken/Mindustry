@@ -236,7 +236,22 @@ public class NetClient implements ApplicationListener{
                 }else if(response.type == ResponseType.fewArguments){
                     text = "[scarlet]Too few arguments. Usage:[lightgray] " + response.command.text + "[gray] " + response.command.paramText;
                 }else{ //unknown command
-                    text = "[scarlet]Unknown command. Check [lightgray]/help[scarlet].";
+                    int minDst = 0;
+                    Command closest = null;
+
+                    for(Command command : netServer.clientCommands.getCommandList()){
+                        int dst = Strings.levenshtein(command.text, response.runCommand);
+                        if(dst < 3 && (closest == null || dst < minDst)){
+                            minDst = dst;
+                            closest = command;
+                        }
+                    }
+
+                    if(closest != null){
+                        text = "[scarlet]Unknown command. Did you mean \"[lightgray]" + closest.text + "[]\"?";
+                    }else{
+                        text = "[scarlet]Unknown command. Check [lightgray]/help[scarlet].";
+                    }
                 }
 
                 player.sendMessage(text);
@@ -279,7 +294,7 @@ public class NetClient implements ApplicationListener{
     public static void kick(KickReason reason){
         netClient.disconnectQuietly();
         logic.reset();
-        
+
         if(reason == KickReason.serverRestarting){
             ui.join.reconnect();
             return;
