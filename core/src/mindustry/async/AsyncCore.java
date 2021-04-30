@@ -17,7 +17,7 @@ public class AsyncCore{
     //futures to be awaited
     private final Seq<Future<?>> futures = new Seq<>();
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(processes.size, r -> {
+    private final ExecutorService executor = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r, "AsyncLogic-Thread");
         thread.setDaemon(true);
         thread.setUncaughtExceptionHandler((t, e) -> Core.app.post(() -> { throw new RuntimeException(e); }));
@@ -38,6 +38,14 @@ public class AsyncCore{
                 p.reset();
             }
         });
+    }
+
+    public void add(AsyncProcess p){
+        processes.add(p);
+    }
+
+    public void remove(AsyncProcess p){
+        processes.remove(p);
     }
 
     public void begin(){
