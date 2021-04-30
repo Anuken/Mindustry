@@ -291,6 +291,64 @@ public class ApplicationTests{
     }
 
     @Test
+    void liquidRouterOutputAll() {
+        world.loadMap(testMap);
+        state.set(State.playing);
+        Tile source = world.rawTile(4,0), router = world.rawTile(4, 2), conduitUp1 = world.rawTile(4,1),
+                conduitLeft = world.rawTile(3,2), conduitUp2 = world.rawTile(4, 3), conduitRight = world.rawTile(5, 2),
+                leftTank = world.rawTile(1, 2), topTank = world.rawTile(4,5), rightTank = world.rawTile(7, 2);
+
+        source.setBlock(Blocks.liquidSource, Team.sharded);
+        source.build.configureAny(Liquids.water);
+        conduitUp1.setBlock(Blocks.conduit, Team.sharded, 1);
+        router.setBlock(Blocks.liquidRouter, Team.sharded);
+        conduitLeft.setBlock(Blocks.conduit, Team.sharded,2);
+        conduitUp2.setBlock(Blocks.conduit, Team.sharded, 1);
+        conduitRight.setBlock(Blocks.conduit, Team.sharded, 0);
+        leftTank.setBlock(Blocks.liquidTank, Team.sharded);
+        topTank.setBlock(Blocks.liquidTank, Team.sharded);
+        rightTank.setBlock(Blocks.liquidTank, Team.sharded);
+
+        updateBlocks(10);
+        assertEquals(true, rightTank.build.liquids.currentAmount() > 0);
+        assertEquals(true, topTank.build.liquids.currentAmount() > 0);
+        assertEquals(true, leftTank.build.liquids.currentAmount() > 0);
+
+    }
+
+    @Test
+    void SorterOutputAll() {
+        world.loadMap(testMap);
+        state.set(State.playing);
+        Tile source1 = world.rawTile(4, 0), source2 = world.rawTile(6, 0), s1conveyor = world.rawTile(4, 1),
+                s2conveyor = world.rawTile(6, 1), s1s2conveyor = world.rawTile(5, 1), sorter = world.rawTile(5, 2),
+                leftconveyor = world.rawTile(4, 2), rightconveyor = world.rawTile(6, 2), sortedconveyor = world.rawTile(5, 3),
+                leftVault = world.rawTile(2, 2), rightVault = world.rawTile(8, 2), topVault = world.rawTile(5, 5);
+
+        source1.setBlock(Blocks.itemSource, Team.sharded);
+        source1.build.configureAny(Items.coal);
+        source2.setBlock(Blocks.itemSource, Team.sharded);
+        source2.build.configureAny(Items.copper);
+        s1conveyor.setBlock(Blocks.conveyor, Team.sharded, 0);
+        s2conveyor.setBlock(Blocks.conveyor, Team.sharded, 2);
+        s1s2conveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
+        sorter.setBlock(Blocks.sorter, Team.sharded);
+        sorter.build.configureAny(Items.copper);
+        leftconveyor.setBlock(Blocks.conveyor, Team.sharded, 2);
+        rightconveyor.setBlock(Blocks.conveyor, Team.sharded, 0);
+        sortedconveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
+        leftVault.setBlock(Blocks.vault, Team.sharded);
+        rightVault.setBlock(Blocks.vault, Team.sharded);
+        topVault.setBlock(Blocks.vault, Team.sharded);
+
+        updateBlocks(200);
+        assertEquals(Items.coal, rightVault.build.items.first());
+        assertEquals(Items.copper, topVault.build.items.first());
+        assertEquals(Items.coal, leftVault.build.items.first());
+
+    }
+
+    @Test
     void blockOverlapRemoved(){
         world.loadMap(testMap);
         state.set(State.playing);
