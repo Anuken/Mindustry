@@ -25,7 +25,7 @@ public class Scripts implements Disposable{
     private static final Seq<String> blacklist = Seq.with(".net.", "java.net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
         "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
         ".awt", "socket", "classloader", "oracle", "invoke", "java.util.function", "java.util.stream", "org.", "mod.classmap");
-    private static final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "jdk.proxy1", "mindustry.gen.",
+    private static final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "jdk.proxy1", "jdk.proxy2", "mindustry.gen.",
         "mindustry.logic.", "mindustry.async.", "saveio", "systemcursor", "filetreeinitevent");
 
     private final Context context;
