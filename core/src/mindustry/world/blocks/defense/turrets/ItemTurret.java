@@ -181,7 +181,7 @@ public class ItemTurret extends Turret{
         }
     }
 
-    class ItemEntry extends AmmoEntry{
+    public class ItemEntry extends AmmoEntry{
         protected Item item;
 
         ItemEntry(Item item, int amount){
