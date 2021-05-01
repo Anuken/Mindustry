@@ -39,7 +39,10 @@ public class ConsumeItems extends Consume{
             for(ItemStack stack : items){
                 c.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
                 () -> tile.items != null && tile.items.has(stack.item, stack.amount))).padRight(8);
-                if(++i % 4 == 0) table.row();
+
+                if(i++ % 5 == 4){
+                    c.row();
+                }
             }
         }).left();
     }

@@ -26,7 +26,7 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
 
     @Override
     public void build(Building tile, Table table){
-        table.add(new ReqImage(liquid.icon(Cicon.medium), () -> valid(tile))).size(8 * 4);
+        table.add(new ReqImage(liquid.icon(Cicon.medium), () -> valid(tile))).size(8 * 4).top().left();
     }
 
     @Override
