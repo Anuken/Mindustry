@@ -1735,7 +1735,7 @@ public class UnitTypes implements ContentList{
 
         alpha = new UnitType("alpha"){{
             defaultController = BuilderAI::new;
-            isCounted = false;
+            isCounted = displayCapBar = false;
 
             flying = true;
             mineSpeed = 6.5f;
@@ -1772,7 +1772,7 @@ public class UnitTypes implements ContentList{
 
         beta = new UnitType("beta"){{
             defaultController = BuilderAI::new;
-            isCounted = false;
+            isCounted = displayCapBar = false;
 
             flying = true;
             mineSpeed = 7f;
@@ -1814,7 +1814,7 @@ public class UnitTypes implements ContentList{
 
         gamma = new UnitType("gamma"){{
             defaultController = BuilderAI::new;
-            isCounted = false;
+            isCounted = displayCapBar = false;
 
             flying = true;
             mineSpeed = 8f;

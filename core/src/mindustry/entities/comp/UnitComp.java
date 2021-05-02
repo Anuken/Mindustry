@@ -252,6 +252,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return Units.getCap(team);
     }
 
+    public float countf(){
+        return (float)count() / (float)cap();
+    }
+
     public void setType(UnitType type){
         this.type = type;
         this.maxHealth = type.health;
