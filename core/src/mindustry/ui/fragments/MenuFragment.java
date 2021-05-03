@@ -144,20 +144,28 @@ public class MenuFragment extends Fragment{
             }).colspan(2);
         }
     }
-
+	private float getMenuTableHeight(){
+		float height = 70f*Core.graphics.getWidth()/1600f;
+		if(height < 65){
+			return 65f;
+		}else if(height > 90){
+			return 90f;
+		}else{
+			return height;
+		}
+	}
     private void buildDesktop(){
         container.clear();
         container.setSize(Core.graphics.getWidth(), Core.graphics.getHeight());
-
         float width = 230f;
+        
         Drawable background = Styles.black6;
 
         container.left();
         container.add().width(Core.graphics.getWidth()/10f);
         container.table(background, t -> {
-            t.defaults().width(width).height(70f);
+            t.defaults().width(width).height(getMenuTableHeight());
             t.name = "buttons";
-
             buttons(t,
                 new Buttoni("@play", Icon.play,
                     new Buttoni("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
@@ -167,8 +175,7 @@ public class MenuFragment extends Fragment{
                 ),
                 new Buttoni("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("@workshop", Icon.steam, platform::openWorkshop) : null,
                 new Buttoni("@mods", Icon.book, ui.mods::show),
-                //not enough space for this button
-                //new Buttoni("@schematics", Icon.paste, ui.schematics::show),
+                new Buttoni("@schematics", Icon.paste, ui.schematics::show),
                 new Buttoni("@settings", Icon.settings, ui.settings::show),
                 new Buttoni("@about.button", Icon.info, ui.about::show),
                 new Buttoni("@quit", Icon.exit, Core.app::exit)
@@ -181,7 +188,7 @@ public class MenuFragment extends Fragment{
             t.name = "submenu";
             t.color.a = 0f;
             t.top();
-            t.defaults().width(width).height(70f);
+            t.defaults().width(width).height(getMenuTableHeight());
             t.visible(() -> !t.getChildren().isEmpty());
 
         }).width(width).growY();
@@ -212,6 +219,10 @@ public class MenuFragment extends Fragment{
     }
 
     private void buttons(Table t, Buttoni... buttons){
+		if(!mobile){
+			container.table(Styles.black6, b -> {
+				b.defaults().width(230).height(getMenuTableHeight());}
+			).growY();}
         for(Buttoni b : buttons){
             if(b == null) continue;
             Button[] out = {null};
