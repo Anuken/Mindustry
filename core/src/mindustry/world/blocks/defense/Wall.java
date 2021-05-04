@@ -121,20 +121,8 @@ public class Wall extends Block{
                 //make sound
                 deflectSound.at(tile, Mathf.random(0.9f, 1.1f));
 
-                //translate bullet back to where it was upon collision
-                bullet.trns(-bullet.vel.x, -bullet.vel.y);
-
-                float penX = Math.abs(x - bullet.x), penY = Math.abs(y - bullet.y);
-
-                if(penX > penY){
-                    bullet.vel.x *= -1;
-                }else{
-                    bullet.vel.y *= -1;
-                }
-
-                bullet.owner(this);
-                bullet.team(team);
-                bullet.time(bullet.time() + 1f);
+                //reflect bullet
+                bullet.type.reflect(bullet, this);
 
                 //disable bullet collision by returning false
                 return false;

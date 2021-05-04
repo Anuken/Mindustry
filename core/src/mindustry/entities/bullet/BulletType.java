@@ -196,6 +196,23 @@ public abstract class BulletType extends Content{
         }
     }
 
+    public void reflect(Bullet b, Teamc reflecter){
+        //translate bullet back to where it was upon collision
+        b.trns(-b.vel.x, -b.vel.y);
+
+        float penX = Math.abs(reflecter.x - b.x), penY = Math.abs(reflecter.y - b.y);
+
+        if(penX > penY){
+            b.vel.x *= -1;
+        }else{
+            b.vel.y *= -1;
+        }
+
+        b.owner(reflecter);
+        b.team(reflecter.team);
+        b.time(b.time() + 1f);
+    }
+
     public void hit(Bullet b){
         hit(b, b.x, b.y);
     }
