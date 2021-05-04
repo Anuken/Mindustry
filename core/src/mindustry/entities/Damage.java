@@ -266,8 +266,8 @@ public class Damage{
         });
 
         if(tmpBuilding != null && tmpUnit != null){
-            if(Mathf.dst2(x, y, tmpUnit.getX(), tmpUnit.getY()) <= Mathf.dst2(x, y, tmpBuilding.getX(), tmpBuilding.getY())){
-                return tmpUnit;
+            if(Mathf.dst2(x, y, tmpBuilding.getX(), tmpBuilding.getY()) <= Mathf.dst2(x, y, tmpUnit.getX(), tmpUnit.getY())){
+                return tmpBuilding;
             }
         }else if(tmpBuilding != null){
             return tmpBuilding;
