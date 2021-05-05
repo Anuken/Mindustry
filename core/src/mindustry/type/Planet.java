@@ -111,6 +111,9 @@ public class Planet extends UnlockableContent{
     }
 
     public @Nullable Sector getLastSector(){
+        if(sectors.isEmpty()){
+            return null;
+        }
         return sectors.get(Math.min(Core.settings.getInt(name + "-last-sector", startSector), sectors.size - 1));
     }
 
