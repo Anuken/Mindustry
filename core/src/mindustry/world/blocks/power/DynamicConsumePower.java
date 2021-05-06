@@ -4,7 +4,7 @@ import arc.func.*;
 import mindustry.gen.*;
 import mindustry.world.consumers.*;
 
-/** A power consumer that uses a dynamic amount of power, and activates sometimes */
+/** A power consumer that uses a dynamic amount of power, and activates sometimes. */
 public class DynamicConsumePower extends ConsumePower{
     private final Floatf<Building> usage;
     private final Boolf<Building> consume;
