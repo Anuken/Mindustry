@@ -87,7 +87,7 @@ public abstract class BulletType extends Content{
     public float healPercent = 0f;
     /** whether to make fire on impact */
     public boolean makeFire = false;
-    /** wether the despawn effect should play when the bullet gets absorbed */
+    /** whether the hit effect should display when the bullet gets absorbed */
     public boolean absorbHitEffect = true;
 
     //additional effects
