@@ -315,6 +315,10 @@ public abstract class BulletType extends Content{
         if(lightningType == null){
             lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
         }
+
+        if(absorbEffect == Fx.none){
+            absorbEffect = hitEffect;
+        }
     }
 
     @Override
