@@ -309,7 +309,7 @@ public class ApplicationTests{
         topTank.setBlock(Blocks.liquidTank, Team.sharded);
         rightTank.setBlock(Blocks.liquidTank, Team.sharded);
 
-        updateBlocks(10);
+        updateBlocks(200);
         assertEquals(true, rightTank.build.liquids.currentAmount() > 0);
         assertEquals(true, topTank.build.liquids.currentAmount() > 0);
         assertEquals(true, leftTank.build.liquids.currentAmount() > 0);
@@ -346,6 +346,62 @@ public class ApplicationTests{
         assertEquals(Items.copper, topVault.build.items.first());
         assertEquals(Items.coal, leftVault.build.items.first());
 
+    }
+
+    @Test
+    void RouterOutputAll() {
+        world.loadMap(testMap);
+        state.set(State.playing);
+        Tile source1 = world.rawTile(5, 0),  conveyor = world.rawTile(5, 1),
+                router = world.rawTile(5, 2), leftconveyor = world.rawTile(4, 2), rightconveyor = world.rawTile(6, 2),
+                middleconveyor = world.rawTile(5, 3), leftVault = world.rawTile(2, 2),
+                rightVault = world.rawTile(8, 2), topVault = world.rawTile(5, 5);
+
+        source1.setBlock(Blocks.itemSource, Team.sharded);
+        source1.build.configureAny(Items.coal);
+        conveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
+        router.setBlock(Blocks.router, Team.sharded);
+        router.build.configureAny(Items.coal);
+        leftconveyor.setBlock(Blocks.conveyor, Team.sharded, 2);
+        rightconveyor.setBlock(Blocks.conveyor, Team.sharded, 0);
+        middleconveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
+        leftVault.setBlock(Blocks.vault, Team.sharded);
+        rightVault.setBlock(Blocks.vault, Team.sharded);
+        topVault.setBlock(Blocks.vault, Team.sharded);
+
+        updateBlocks(200);
+        assertEquals(Items.coal, rightVault.build.items.first());
+        assertEquals(Items.coal, topVault.build.items.first());
+        assertEquals(Items.coal, leftVault.build.items.first());
+    }
+
+    @Test
+    void JunctionOutputAll() {
+        world.loadMap(testMap);
+        state.set(State.playing);
+        Tile source1 = world.rawTile(5,0),source2 = world.rawTile(7, 2),  conveyor1 = world.rawTile(5, 1),
+                conveyor2 = world.rawTile(6,2), junction = world.rawTile(5, 2), conveyor3 = world.rawTile(5,3),
+                conveyor4 = world.rawTile(4,2), vault2 = world.rawTile(3, 1), vault1 = world.rawTile(5,5);
+        source1.setBlock(Blocks.itemSource, Team.sharded);
+        source1.build.configureAny(Items.coal);
+        source2.setBlock(Blocks.itemSource, Team.sharded);
+        source2.build.configureAny(Items.copper);
+        conveyor1.setBlock(Blocks.conveyor, Team.sharded, 1);
+        conveyor2.setBlock(Blocks.conveyor, Team.sharded, 2);
+        conveyor3.setBlock(Blocks.conveyor, Team.sharded, 1);
+        conveyor4.setBlock(Blocks.conveyor, Team.sharded, 2);
+
+        junction.setBlock(Blocks.junction, Team.sharded);
+
+
+        vault1.setBlock(Blocks.vault, Team.sharded);
+        vault2.setBlock(Blocks.vault, Team.sharded);
+
+        updateBlocks(200);
+        assertEquals(Items.coal, vault1.build.items.first());
+        assertEquals(Items.copper, vault2.build.items.first());
+        assertNotEquals(Items.copper, vault1.build.items.first());
+        assertNotEquals(Items.coal, vault2.build.items.first());
     }
 
     @Test
