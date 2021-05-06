@@ -146,8 +146,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                     controller instanceof FormationAI ? ctrlFormation :
                     0;
             case commanded -> controller instanceof FormationAI && isValid() ? 1 : 0;
-            case itemTimer -> controller instanceof LogicAI && isValid() ? ((LogicAI)controller).itemTimer : 0;
-            case payloadTimer -> controller instanceof LogicAI && isValid() ? ((LogicAI)controller).payTimer : 0;
+            case itemTimer -> controller instanceof LogicAI ai && isValid() ? ai.itemTimer : 0;
+            case payloadTimer -> controller instanceof LogicAI ai && isValid() ? ai.payTimer : 0;
             case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
             case size -> hitSize / tilesize;
             default -> Float.NaN;
