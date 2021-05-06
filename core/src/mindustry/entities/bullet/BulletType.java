@@ -87,6 +87,8 @@ public abstract class BulletType extends Content{
     public float healPercent = 0f;
     /** whether to make fire on impact */
     public boolean makeFire = false;
+    /** wether the despawn effect should play when the bullet gets absorbed */
+    public boolean absorbHitEffect = true;
 
     //additional effects
 
@@ -203,11 +205,7 @@ public abstract class BulletType extends Content{
 
     public void hit(Bullet b, float x, float y){
         b.hit = true;
-        if(!b.absorbed){
-            hitEffect.at(x, y, b.rotation(), hitColor);
-        }else{
-            absorbEffect.at(x, y, b.rotation(), absorbColor);
-        }
+        if(!b.absorbed && absorbHitEffect) hitEffect.at(x, y, b.rotation(), hitColor);
         hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
 
         Effect.shake(hitShake, hitShake, b);
@@ -258,7 +256,11 @@ public abstract class BulletType extends Content{
     }
 
     public void despawned(Bullet b){
-        despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
+        if(!b.absorbed){
+            despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
+        }else{
+            absorbEffect.at(b.x, b.y, b.rotation(), absorbColor);
+        }
         hitSound.at(b);
 
         Effect.shake(despawnShake, despawnShake, b);
