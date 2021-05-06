@@ -319,7 +319,7 @@ public abstract class BulletType extends Content{
         }
 
         if(absorbEffect == Fx.none){
-            absorbEffect = hitEffect;
+            absorbEffect = despawnEffect;
         }
     }
 
