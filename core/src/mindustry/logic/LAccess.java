@@ -41,6 +41,8 @@ public enum LAccess{
     controlled,
     controller,
     commanded,
+    itemTimer,
+    payloadTimer,
     name,
     config,
     payloadCount,
