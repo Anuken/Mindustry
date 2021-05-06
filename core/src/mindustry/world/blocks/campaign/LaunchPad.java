@@ -56,6 +56,9 @@ public class LaunchPad extends Block{
         super.setBars();
 
         bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
+
+        // same style as factory and reconstructor build progress
+        bars.add("progress", (LaunchPadBuild entity) -> new Bar("bar.launchprogress", Pal.ammo, entity::progressFraction));
     }
 
     @Override
@@ -64,6 +67,10 @@ public class LaunchPad extends Block{
     }
 
     public class LaunchPadBuild extends Building{
+
+        public float progressFraction(){
+            return Mathf.clamp(timer.getTime(timerLaunch) / (launchTime / timeScale));
+        }
 
         @Override
         public Cursor getCursor(){
