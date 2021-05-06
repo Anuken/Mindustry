@@ -317,7 +317,7 @@ public class ApplicationTests{
     }
 
     @Test
-    void SorterOutputAll() {
+    void sorterOutputAll() {
         world.loadMap(testMap);
         state.set(State.playing);
         Tile source1 = world.rawTile(4, 0), source2 = world.rawTile(6, 0), s1conveyor = world.rawTile(4, 1),
@@ -349,7 +349,7 @@ public class ApplicationTests{
     }
 
     @Test
-    void RouterOutputAll() {
+    void routerOutputAll() {
         world.loadMap(testMap);
         state.set(State.playing);
         Tile source1 = world.rawTile(5, 0),  conveyor = world.rawTile(5, 1),
@@ -376,7 +376,7 @@ public class ApplicationTests{
     }
 
     @Test
-    void JunctionOutputAll() {
+    void junctionOutputAll() {
         world.loadMap(testMap);
         state.set(State.playing);
         Tile source1 = world.rawTile(5,0),source2 = world.rawTile(7, 2),  conveyor1 = world.rawTile(5, 1),
