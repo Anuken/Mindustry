@@ -310,10 +310,9 @@ public class ApplicationTests{
         rightTank.setBlock(Blocks.liquidTank, Team.sharded);
 
         updateBlocks(200);
-        assertEquals(true, rightTank.build.liquids.currentAmount() > 0);
-        assertEquals(true, topTank.build.liquids.currentAmount() > 0);
-        assertEquals(true, leftTank.build.liquids.currentAmount() > 0);
-
+        assertTrue(rightTank.build.liquids.currentAmount() > 0, "Liquid router did not distribute to rightTank");
+        assertTrue(topTank.build.liquids.currentAmount() > 0, "Liquid router did not distribute to topTank");
+        assertTrue(leftTank.build.liquids.currentAmount() > 0, "Liquid router did not distribute to rightTank");
     }
 
     @Test
