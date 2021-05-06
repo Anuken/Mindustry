@@ -26,7 +26,7 @@ public abstract class BulletType extends Content{
     public float drag = 0f;
     public boolean pierce, pierceBuilding;
     public int pierceCap = -1;
-    public Effect hitEffect, despawnEffect;
+    public Effect hitEffect, despawnEffect, absorbEffect;
 
     /** Effect created when shooting. */
     public Effect shootEffect = Fx.shootSmall;
@@ -95,7 +95,7 @@ public abstract class BulletType extends Content{
     public int fragBullets = 9;
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
     public @Nullable BulletType fragBullet = null;
-    public Color hitColor = Color.white;
+    public Color hitColor = Color.white, absorbColor = Color.white;
 
     public Color trailColor = Pal.missileYellowBack;
     public float trailChance = -0.0001f;
@@ -141,6 +141,7 @@ public abstract class BulletType extends Content{
         this.damage = damage;
         hitEffect = Fx.hitBulletSmall;
         despawnEffect = Fx.hitBulletSmall;
+        absorbEffect = Fx.none;
     }
 
     public BulletType(){
@@ -202,7 +203,11 @@ public abstract class BulletType extends Content{
 
     public void hit(Bullet b, float x, float y){
         b.hit = true;
-        hitEffect.at(x, y, b.rotation(), hitColor);
+        if(!b.absorbed){
+            hitEffect.at(x, y, b.rotation(), hitColor);
+        }else{
+            absorbEffect.at(x, y, b.rotation(), absorbColor);
+        }
         hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
 
         Effect.shake(hitShake, hitShake, b);
