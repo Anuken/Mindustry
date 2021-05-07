@@ -213,9 +213,11 @@ public class Turret extends ReloadTurret{
             BulletType bullet = peekAmmo();
             float speed = bullet.speed;
             //slow bullets never intersect
-            if(speed < 0.1f) speed = 9999999f;
-
-            targetPos.set(Predict.intercept(this, pos, speed));
+            if(speed < 0.1f){
+                targetPos.set(Predict.instant(pos, chargeTime));
+            }else{
+                targetPos.set(Predict.intercept(this, pos, speed));
+            }
             if(targetPos.isZero()){
                 targetPos.set(pos);
             }

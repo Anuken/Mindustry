@@ -64,6 +64,16 @@ public class Predict{
         return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), ddx, ddy, v);
     }
 
+    public static Vec2 instant(Position t, float delay){
+        float ddx = 0, ddy = 0;
+        if(t instanceof Hitboxc h){
+            float mul = Math.max(delay, 0f);
+            ddx += h.deltaX() * mul;
+            ddy += h.deltaY() * mul;
+        }
+        return vresult.set(t).add(ddx, ddy);
+    }
+
     /**
      * See {@link #intercept(float, float, float, float, float, float, float)}.
      */
