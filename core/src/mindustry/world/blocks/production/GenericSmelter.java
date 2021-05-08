@@ -30,6 +30,8 @@ public class GenericSmelter extends GenericCrafter{
                 float r = 0.06f;
                 float cr = Mathf.random(0.1f);
 
+                Draw.z(Layer.block + 0.01f);
+
                 Draw.alpha(((1f - g) + Mathf.absin(Time.time, 8f, g) + Mathf.random(r) - r) * warmup);
 
                 Draw.tint(flameColor);
