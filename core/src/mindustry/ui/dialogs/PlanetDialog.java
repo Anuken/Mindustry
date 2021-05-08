@@ -612,6 +612,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             //production
             display.get(sector.info.production, "@sectors.production");
 
+            //import
+            if(sector.hasBase()){
+                display.get(sector.info.importStats(), "@sectors.import");
+            }
+
             //export
             display.get(sector.info.export, "@sectors.export");
 

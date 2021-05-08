@@ -27,6 +27,8 @@ public class SectorInfo{
     public ObjectMap<Item, ExportStat> rawProduction = new ObjectMap<>();
     /** Export statistics. */
     public ObjectMap<Item, ExportStat> export = new ObjectMap<>();
+    /** Import statistics. */
+    public ObjectMap<Item, ExportStat> imports = new ObjectMap<>();
     /** Items stored in all cores. */
     public ItemSeq items = new ItemSeq();
     /** The best available core type. */
@@ -116,7 +118,7 @@ public class SectorInfo{
 
     /** Subtracts from export statistics. */
     public void handleItemImport(Item item, int amount){
-        export.get(item, ExportStat::new).counter -= amount;
+        //import statistics are handled separately
     }
 
     public float getExport(Item item){
@@ -258,6 +260,27 @@ public class SectorInfo{
         ObjectFloatMap<Item> map = new ObjectFloatMap<>();
         export.each((item, value) -> map.put(item, value.mean));
         return map;
+    }
+
+    public ObjectMap<Item, ExportStat> importStats(){
+        //clear all import means
+        content.items().each((item) -> {
+            ExportStat stat = imports.get(item, ExportStat::new);
+            stat.mean = 0f;
+        });
+        //for all sectors on all planets that have bases and export to this sector
+        for(Planet planet : content.planets()){
+            for(Sector sector : planet.sectors){
+                Sector dest = sector.info.getRealDestination();
+                if (sector.hasBase() && dest != null && dest.info == this) {
+                    //add their exports to our imports
+                    sector.info.export.each((item, stat) -> {
+                        imports.get(item).mean += stat.mean;
+                    });
+                }
+            }
+        }
+        return imports;
     }
 
     public static class ExportStat{
