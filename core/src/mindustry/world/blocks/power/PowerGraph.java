@@ -18,7 +18,7 @@ public class PowerGraph{
     private final Seq<Building> batteries = new Seq<>(false);
     private final Seq<Building> all = new Seq<>(false);
 
-    private final WindowedMean powerBalance = new WindowedMean(60);
+    private final WindowedMean powerBalance = new WindowedMean(15);
     private float lastPowerProduced, lastPowerNeeded, lastPowerStored;
     private float lastScaledPowerIn, lastScaledPowerOut, lastCapacity;
     //diodes workaround for correct energy production info
