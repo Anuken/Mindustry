@@ -27,8 +27,6 @@ public class SectorInfo{
     public ObjectMap<Item, ExportStat> rawProduction = new ObjectMap<>();
     /** Export statistics. */
     public ObjectMap<Item, ExportStat> export = new ObjectMap<>();
-    /** Import statistics. */
-    public ObjectMap<Item, ExportStat> imports = new ObjectMap<>();
     /** Items stored in all cores. */
     public ItemSeq items = new ItemSeq();
     /** The best available core type. */
@@ -263,10 +261,12 @@ public class SectorInfo{
     }
 
     public ObjectMap<Item, ExportStat> importStats(){
-        //clear all import means
+        //build empty import stats
+        ObjectMap<Item, ExportStat> imports = new ObjectMap<>();
         content.items().each((item) -> {
-            ExportStat stat = imports.get(item, ExportStat::new);
+            ExportStat stat = new ExportStat();
             stat.mean = 0f;
+            imports.put(item, stat);
         });
         //for all sectors on all planets that have bases and export to this sector
         for(Planet planet : content.planets()){
