@@ -90,6 +90,7 @@ public abstract class BulletType extends Content{
 
     //additional effects
 
+    public float fragChance = 1f;
     public float fragCone = 360f;
     public float fragAngle = 0f;
     public int fragBullets = 9;
@@ -207,7 +208,7 @@ public abstract class BulletType extends Content{
 
         Effect.shake(hitShake, hitShake, b);
 
-        if(fragBullet != null){
+        if(fragBullet != null && Mathf.chance(fragChance)){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
                 float a = b.rotation() + Mathf.range(fragCone/2) + fragAngle;
