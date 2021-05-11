@@ -14,13 +14,13 @@ public class MirrorFilter extends GenerateFilter{
     private final Vec2 v1 = new Vec2(), v2 = new Vec2(), v3 = new Vec2();
 
     int angle = 45;
-    int rotate = 0;
+    boolean rotate = false;
 
     @Override
     public FilterOption[] options(){
         return Structs.arr(
         new SliderOption("angle", () -> angle, f -> angle = (int)f, 0, 360, 45),
-        new SliderOption("rotate", () -> rotate, f -> rotate = (int)f, 0, 1, 1)
+        new ToggleOption("rotate", () -> rotate, f -> rotate = f)
         );
     }
 
@@ -69,7 +69,7 @@ public class MirrorFilter extends GenerateFilter{
 
     void mirror(Vec2 p, float x0, float y0, float x1, float y1){
         //special case: uneven map mirrored at 45 degree angle (or someone might just want rotational symmetry)
-        if((in.width != in.height && angle % 90 != 0) || rotate == 1){
+        if((in.width != in.height && angle % 90 != 0) || rotate){
             p.x = in.width - p.x - 1;
             p.y = in.height - p.y - 1;
         }else{

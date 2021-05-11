@@ -111,4 +111,23 @@ public abstract class FilterOption{
             table.add("@filter.option." + name);
         }
     }
+
+    static class ToggleOption extends FilterOption{
+        final String name;
+        final Boolp getter;
+        final Boolc setter;
+
+        ToggleOption(String name, Boolp getter, Boolc setter){
+            this.name = name;
+            this.getter = getter;
+            this.setter = setter;
+        }
+
+        @Override
+        public void build(Table table){
+            table.row();
+            CheckBox check = table.check("@filter.option." + name, setter).growX().padBottom(5).padTop(5).center().get();
+            check.changed(changed);
+        }
+    }
 }
