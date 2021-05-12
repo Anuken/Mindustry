@@ -9,7 +9,7 @@
   },
   {
     "name": "mindustry.pl",
-    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl"]
+    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl", "mindustry.pl:6966"]
   },
   {
     "name": "{AA}",
@@ -21,7 +21,7 @@
   },
   {
     "name": "C.A.M.S.",
-    "address": ["routerchain.ddns.net", "nikochio.ddns.net", "mindustry.ru"]
+    "address": ["routerchain.ddns.net", "nikochio.ddns.net", "easyplay.su"]
   },
   {
     "name": "BE6.RUN",
@@ -73,7 +73,7 @@
   },
   {
     "name": "Omega",
-    "address": ["185.86.230.102:25906", "185.86.230.104:25985", "185.86.230.110:25691", "185.86.230.110:25742", "185.86.230.100:25952", "185.86.230.102:25849"] 
+    "address": ["185.86.230.102:25906", "185.86.230.101:25641", "185.86.230.110:25691", "185.86.230.110:25742", "185.86.230.110:25814", "185.86.230.102:25849"] 
   },
   {
     "name": "md.obvilionnetwork.ru",
@@ -89,7 +89,7 @@
   },
   {
     "name": "MD Community",
-    "address": ["62.109.31.34", "157.90.183.56:28424"]
+    "address": ["82.202.172.148", "mindurka.fvds.ru:1001"]
   },
   {
     "name": "Mindustry.Party",
@@ -97,6 +97,14 @@
   },
   {
     "name": "thedimas",
-    "address": ["95.217.226.152:26160"]
+    "address": ["play.thedimas.pp.ua"]
+  }, 
+  {
+    "name": "TSR", 
+    "address": ["fifr2.quackhost.uk:26627"]
+  },
+  {
+    "name": "Mindustry Defence",
+    "address": ["178.170.47.34:28110"]
   }
 ]

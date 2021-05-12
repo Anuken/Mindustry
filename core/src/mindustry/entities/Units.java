@@ -6,7 +6,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.entities.comp.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;

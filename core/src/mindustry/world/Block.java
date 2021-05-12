@@ -588,7 +588,7 @@ public class Block extends UnlockableContent{
     }
 
     public boolean isPlaceable(){
-        return isVisible() && !state.rules.bannedBlocks.contains(this);
+        return isVisible() && (!state.rules.bannedBlocks.contains(this) || state.rules.editor);
     }
 
     /** Called when building of this block begins. */

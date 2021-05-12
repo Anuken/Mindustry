@@ -444,7 +444,7 @@ public class NetServer implements ApplicationListener{
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
                 if(player.isLocal()){
-                    player.sendMessage("Local players can't vote. Kick the player yourself instead.");
+                    player.sendMessage("[scarlet]Local players can't vote. Kick the player yourself instead.");
                     return;
                 }
 

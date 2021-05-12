@@ -1,0 +1,8 @@
+[This is a truncated changelog, see Github for full notes]
+- Fixed bridges being planned without unlock in campaign
+- Fixed player moving slower on servers with status effects
+- Fixed player not respecting formation speed on servers
+- Fixed separators consuming power when idle
+- Fixed logic blocks not saving buildings on reload
+- Fixed rare door placement crash
+- Fixed logic units being able to take/remove items from any team block

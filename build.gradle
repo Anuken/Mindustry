@@ -23,6 +23,11 @@ buildscript{
     }
 }
 
+plugins{
+    id 'org.jetbrains.kotlin.jvm' version '1.4.32'
+    id "org.jetbrains.kotlin.kapt" version "1.4.32"
+}
+
 allprojects{
     apply plugin: 'maven'
     
@@ -287,6 +292,16 @@ project(":ios"){
 
 project(":core"){
     apply plugin: "java-library"
+    apply plugin: "kotlin"
+    apply plugin: "kotlin-kapt"
+
+    kapt{
+        javacOptions{
+            option("-source", "14")
+            option("-target", "1.8")
+            option("--enable-preview")
+        }
+    }
 
     compileJava.options.fork = true
 
@@ -354,10 +369,9 @@ project(":core"){
         api "com.github.Anuken:rhino:$rhinoVersion"
         if(localArc() && debugged()) api arcModule("extensions:recorder")
 
-        compileOnly project(":annotations")
-        annotationProcessor project(":annotations")
         annotationProcessor 'com.github.Anuken:jabel:34e4c172e65b3928cd9eabe1993654ea79c409cd'
-
+        compileOnly project(":annotations")
+        kapt project(":annotations")
     }
 
     afterEvaluate{
@@ -381,6 +395,11 @@ project(":core"){
             destinationDir = new File(buildDir, 'javadoc')
         }
     }
+
+    //comp** classes are only used for code generation
+    jar{
+        exclude("mindustry/entities/comp/**")
+    }
 }
 
 project(":server"){
@@ -397,10 +416,10 @@ project(":tests"){
 
     dependencies{
         testImplementation project(":core")
-        testImplementation "org.junit.jupiter:junit-jupiter-params:5.3.1"
-        testImplementation "org.junit.jupiter:junit-jupiter-api:5.3.1"
+        testImplementation "org.junit.jupiter:junit-jupiter-params:5.7.1"
+        testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.1"
         testImplementation arcModule("backends:backend-headless")
-        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.3.1"
+        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.1"
     }
 
     test{

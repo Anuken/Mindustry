@@ -8,6 +8,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
+import mindustry.game.SectorInfo.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -100,7 +101,7 @@ public class SStats implements SteamUserStatsCallback{
             for(Planet planet : content.planets()){
                 for(Sector sec : planet.sectors){
                     if(sec.hasBase()){
-                        for(var v : sec.info.production.values()){
+                        for(ExportStat v : sec.info.production.values()){
                             if(v.mean > 0) total += v.mean * 60;
                         }
                     }
@@ -178,7 +179,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(UnitControlEvent.class, e -> {
-            if(e.unit instanceof BlockUnitc block && block.tile().block == Blocks.router){
+            if(e.unit instanceof BlockUnitc && ((BlockUnitc)e.unit).tile().block == Blocks.router){
                 becomeRouter.complete();
             }
         });

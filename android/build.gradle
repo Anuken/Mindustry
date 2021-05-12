@@ -153,7 +153,9 @@ task run(type: Exec){
 }
 
 if(!project.ext.hasSprites()){
-    println "Scheduling sprite pack."
-    run.dependsOn ":tools:pack"
-    deploy.dependsOn ":tools:pack"
+    tasks.whenTaskAdded{ task ->
+        if(task.name == 'assembleDebug' || task.name == 'assembleRelease'){
+            task.dependsOn ":tools:pack"
+        }
+    }
 }

@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.math.geom.QuadTree.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 
 @Component

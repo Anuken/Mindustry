@@ -123,7 +123,6 @@ public class Teams{
 
     public void unregisterCore(CoreBuild entity){
         TeamData data = get(entity.team);
-        //remove core
         data.cores.remove(entity);
         //unregister in active list
         if(!data.active()){
@@ -271,7 +270,7 @@ public class Teams{
             if(type == null) return;
             unitCount = Math.max(amount + unitCount, 0);
             if(typeCounts == null || typeCounts.length <= type.id){
-                typeCounts  = new int[Vars.content.units().size];
+                typeCounts = new int[Vars.content.units().size];
             }
             typeCounts[type.id] = Math.max(amount + typeCounts[type.id], 0);
         }
