@@ -316,7 +316,7 @@ public class ApplicationTests{
     }
 
     @Test
-    void sorterOutputAll() {
+    void sorterOutputCorrect() {
         world.loadMap(testMap);
         state.set(State.playing);
         Tile source1 = world.rawTile(4, 0), source2 = world.rawTile(6, 0), s1conveyor = world.rawTile(4, 1),
@@ -375,7 +375,7 @@ public class ApplicationTests{
     }
 
     @Test
-    void junctionOutputAll() {
+    void junctionOutputCorrect() {
         world.loadMap(testMap);
         state.set(State.playing);
         Tile source1 = world.rawTile(5,0),source2 = world.rawTile(7, 2),  conveyor1 = world.rawTile(5, 1),
@@ -389,9 +389,7 @@ public class ApplicationTests{
         conveyor2.setBlock(Blocks.conveyor, Team.sharded, 2);
         conveyor3.setBlock(Blocks.conveyor, Team.sharded, 1);
         conveyor4.setBlock(Blocks.conveyor, Team.sharded, 2);
-
         junction.setBlock(Blocks.junction, Team.sharded);
-
 
         vault1.setBlock(Blocks.vault, Team.sharded);
         vault2.setBlock(Blocks.vault, Team.sharded);
@@ -399,8 +397,6 @@ public class ApplicationTests{
         updateBlocks(200);
         assertEquals(Items.coal, vault1.build.items.first());
         assertEquals(Items.copper, vault2.build.items.first());
-        assertNotEquals(Items.copper, vault1.build.items.first());
-        assertNotEquals(Items.coal, vault2.build.items.first());
     }
 
     @Test
