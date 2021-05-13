@@ -339,6 +339,7 @@ public class LExecutor{
         public static LogicAI checkLogicAI(LExecutor exec, Object unitObj){
             if(unitObj instanceof Unit unit && exec.obj(varUnit) == unit && unit.team == exec.team && !unit.isPlayer() && !(unit.controller() instanceof FormationAI)){
                 if(unit.controller() instanceof LogicAI la){
+                    la.controller = exec.building(varThis);
                     return la;
                 }else{
                     var la = new LogicAI();
