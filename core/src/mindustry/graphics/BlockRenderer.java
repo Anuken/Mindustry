@@ -19,7 +19,7 @@ import mindustry.world.blocks.power.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
-public class BlockRenderer implements Disposable{
+public class BlockRenderer{
     public static final int crackRegions = 8, maxCrackSize = 9;
 
     private static final int initialRequests = 32 * 32;
@@ -300,11 +300,4 @@ public class BlockRenderer implements Disposable{
 
     }
 
-    @Override
-    public void dispose(){
-        shadows.dispose();
-        dark.dispose();
-        shadows = dark = null;
-        floor.dispose();
-    }
 }

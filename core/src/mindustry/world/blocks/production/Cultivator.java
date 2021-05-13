@@ -47,6 +47,8 @@ public class Cultivator extends GenericCrafter{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
         drawPlaceText(Core.bundle.formatFloat("bar.efficiency", (1 + sumAttribute(attribute, x, y)) * 100, 1), x, y, valid);
     }
 

@@ -208,9 +208,7 @@ public class JsonIO{
     static class CustomJson extends Json{
         private Object baseObject;
 
-        {
-            apply(this);
-        }
+        { apply(this); }
 
         @Override
         public <T> T fromJson(Class<T> type, String json){

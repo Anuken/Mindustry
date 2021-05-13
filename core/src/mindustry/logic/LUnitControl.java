@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 public enum LUnitControl{
+    idle,
     stop,
     move("x", "y"),
     approach("x", "y", "radius"),

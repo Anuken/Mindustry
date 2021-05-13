@@ -44,6 +44,10 @@ public class DesktopInput extends InputHandler{
     public boolean deleting = false, shouldShoot = false, panning = false;
     /** Mouse pan speed. */
     public float panScale = 0.005f, panSpeed = 4.5f, panBoostSpeed = 11f;
+    /** Delta time between consecutive clicks. */
+    public long selectMillis = 0;
+    /** Previously selected tile. */
+    public Tile prevSelected;
 
     boolean showHint(){
         return ui.hudfrag.shown && Core.settings.getBool("hints") && selectRequests.isEmpty() &&
@@ -253,6 +257,13 @@ public class DesktopInput extends InputHandler{
         if((!Core.scene.hasScroll() || Core.input.keyDown(Binding.diagonal_placement)) && !ui.chatfrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0
             && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
+        }
+
+        if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
+            Tile selected = world.tileWorld(input.mouseWorldX(), input.mouseWorldY());
+            if(selected != null){
+                Call.tileTap(player, selected);
+            }
         }
 
         if(player.dead()){
@@ -466,10 +477,6 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
-            if(selected != null){
-                Call.tileTap(player, selected);
-            }
-
             BuildPlan req = getRequest(cursorX, cursorY);
 
             if(Core.input.keyDown(Binding.break_block)){
@@ -489,13 +496,15 @@ public class DesktopInput extends InputHandler{
                 deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && !tileTapped(selected.build) && !player.unit().activelyBuilding() && !droppingItem &&
-                    !tryBeginMine(selected) && player.unit().mineTile == null && !Core.scene.hasKeyboard()){
+                if(!tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && !tileTapped(selected.build) && !player.unit().activelyBuilding() && !droppingItem
+                    && !(tryStopMine(selected) || (!settings.getBool("doubletapmine") || selected == prevSelected && Time.timeSinceMillis(selectMillis) < 500) && tryBeginMine(selected)) && !Core.scene.hasKeyboard()){
                     player.shooting = shouldShoot;
                 }
             }else if(!Core.scene.hasKeyboard()){ //if it's out of bounds, shooting is just fine
                 player.shooting = shouldShoot;
             }
+            selectMillis = Time.millis();
+            prevSelected = selected;
         }else if(Core.input.keyTap(Binding.deselect) && isPlacing()){
             block = null;
             mode = none;

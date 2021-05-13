@@ -110,8 +110,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         unit.aim(mouseX, mouseY);
         //this is only necessary when the thing being controlled isn't synced
         unit.controlWeapons(shooting, shooting);
+        //save previous formation to prevent reset
+        var formation = unit.formation;
         //extra precaution, necessary for non-synced things
         unit.controller(this);
+        //keep previous formation
+        unit.formation = formation;
     }
 
     @Override
@@ -130,7 +134,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             //update some basic state to sync things
             if(unit.type.canBoost){
                 Tile tile = unit.tileOn();
-                unit.elevation = Mathf.approachDelta(unit.elevation, (tile != null && tile.solid()) || boosting ? 1f : 0f, 0.08f);
+                unit.elevation = Mathf.approachDelta(unit.elevation, (tile != null && tile.solid()) || boosting ? 1f : 0f, unit.type.riseSpeed);
             }
         }else if((core = bestCore()) != null){
             //have a small delay before death to prevent the camera from jumping around too quickly
@@ -219,7 +223,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         con.kick(reason);
     }
 
-    void kick(String reason, int duration){
+    void kick(String reason, long duration){
         con.kick(reason, duration);
     }
 

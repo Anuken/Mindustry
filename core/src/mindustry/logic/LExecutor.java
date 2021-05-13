@@ -74,8 +74,8 @@ public class LExecutor{
         }
     }
 
-    public void load(String data, int maxInstructions){
-        load(LAssembler.assemble(data, maxInstructions));
+    public void load(String data){
+        load(LAssembler.assemble(data));
     }
 
     /** Loads with a specified assembler. Resets all variables. */
@@ -447,7 +447,7 @@ public class LExecutor{
                         }
                     }
                     case build -> {
-                        if(unit.canBuild() && exec.obj(p3) instanceof Block block){
+                        if(state.rules.logicUnitBuild && unit.canBuild() && exec.obj(p3) instanceof Block block){
                             int x = World.toTile(x1 - block.offset/tilesize), y = World.toTile(y1 - block.offset/tilesize);
                             int rot = exec.numi(p4);
 
@@ -458,12 +458,14 @@ public class LExecutor{
                                 ai.plan.stuck = false;
                             }
 
+                            var conf = exec.obj(p5);
                             ai.plan.set(x, y, rot, block);
-                            ai.plan.config = exec.obj(p5) instanceof Content c ? c : null;
+                            ai.plan.config = conf instanceof Content c ? c : conf instanceof Building b ? b : null;
 
                             unit.clearBuilding();
+                            Tile tile = ai.plan.tile();
 
-                            if(ai.plan.tile() != null){
+                            if(tile != null && !(tile.block() == block && tile.build != null && tile.build.rotation == rot)){
                                 unit.updateBuilding = true;
                                 unit.addBuild(ai.plan);
                             }
@@ -487,7 +489,7 @@ public class LExecutor{
 
                         Building build = exec.building(p1);
                         int dropped = Math.min(unit.stack.amount, exec.numi(p2));
-                        if(build != null && build.isValid() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
+                        if(build != null && build.team == unit.team && build.isValid() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                             int accepted = build.acceptStack(unit.item(), dropped, unit);
                             if(accepted > 0){
                                 Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
@@ -501,7 +503,8 @@ public class LExecutor{
                         Building build = exec.building(p1);
                         int amount = exec.numi(p3);
 
-                        if(build != null && build.isValid() && build.items != null && exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
+                        if(build != null && build.team == unit.team && build.isValid() && build.items != null &&
+                            exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                             int taken = Math.min(build.items.get(item), Math.min(amount, unit.maxAccepted(item)));
 
                             if(taken > 0){
@@ -521,7 +524,6 @@ public class LExecutor{
         public int target;
         public LAccess type = LAccess.enabled;
         public int p1, p2, p3, p4;
-        public Interval timer = new Interval(1);
 
         public ControlI(LAccess type, int target, int p1, int p2, int p3, int p4){
             this.type = type;
@@ -537,7 +539,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Object obj = exec.obj(target);
-            if(obj instanceof Building b && b.team == exec.team && exec.linkIds.contains(b.id) && (type.cooldown <= 0 || timer.get(type.cooldown))){
+            if(obj instanceof Building b && b.team == exec.team && exec.linkIds.contains(b.id)){
                 if(type.isObj){
                     b.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
                 }else{
@@ -633,6 +635,11 @@ public class LExecutor{
         public void run(LExecutor exec){
             Object target = exec.obj(from);
             Object sense = exec.obj(type);
+
+            if(target == null && sense == LAccess.dead){
+                exec.setnum(to, 1);
+                return;
+            }
 
             //note that remote units/buildings can be sensed as well
             if(target instanceof Senseable se){
@@ -854,8 +861,12 @@ public class LExecutor{
 
             //add graphics calls, cap graphics buffer size
             if(exec.graphicsBuffer.size < maxGraphicsBuffer){
-                exec.graphicsBuffer.add(DisplayCmd.get(type, exec.numi(x), exec.numi(y), num1, exec.numi(p2), exec.numi(p3), exec.numi(p4)));
+                exec.graphicsBuffer.add(DisplayCmd.get(type, packSign(exec.numi(x)), packSign(exec.numi(y)), packSign(num1), packSign(exec.numi(p2)), packSign(exec.numi(p3)), packSign(exec.numi(p4))));
             }
+        }
+
+        static int packSign(int value){
+            return (Math.abs(value) & 0b011111111) | (value < 0 ? 0b1000000000 : 0);
         }
     }
 

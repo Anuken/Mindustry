@@ -115,10 +115,6 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         tile.floor = getBlock(position);
         tile.block = tile.floor.asFloor().wall;
 
-        //if(noise.octaveNoise3D(5, 0.6, 8.0, position.x, position.y, position.z) > 0.65){
-            //tile.block = Blocks.air;
-        //}
-
         if(rid.getValue(position.x, position.y, position.z, 22) > 0.32){
             tile.block = Blocks.air;
         }
@@ -338,7 +334,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                 }
             }else if(floor != Blocks.basalt && floor != Blocks.ice && floor.asFloor().hasSurface()){
                 float noise = noise(x + 782, y, 5, 0.75f, 260f, 1f);
-                if(noise > 0.67f && !enemies.contains(e -> Mathf.within(x, y, e.x, e.y, 8))){
+                if(noise > 0.67f && !roomseq.contains(e -> Mathf.within(x, y, e.x, e.y, 14))){
                     if(noise > 0.72f){
                         floor = noise > 0.78f ? Blocks.taintedWater : (floor == Blocks.sand ? Blocks.sandWater : Blocks.darksandTaintedWater);
                     }else{

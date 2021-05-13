@@ -139,7 +139,9 @@ public class Control implements ApplicationListener, Loadable{
         }));
 
         Events.on(UnlockEvent.class, e -> {
-            ui.hudfrag.showUnlock(e.content);
+            if(e.content.showUnlock()){
+                ui.hudfrag.showUnlock(e.content);
+            }
 
             checkAutoUnlocks();
 
@@ -429,11 +431,7 @@ public class Control implements ApplicationListener, Loadable{
             music.stop();
         }
 
-        content.dispose();
         net.dispose();
-        Musics.dispose();
-        Sounds.dispose();
-        if(ui != null && ui.editor != null) ui.editor.dispose();
     }
 
     @Override

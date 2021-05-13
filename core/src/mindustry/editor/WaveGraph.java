@@ -177,7 +177,7 @@ public class WaveGraph extends Table{
                 t.button(b -> {
                     Color tcolor = color(type).cpy();
                     b.image().size(32f).update(i -> i.setColor(b.isChecked() ? Tmp.c1.set(tcolor).mul(0.5f) : tcolor)).get().act(1);
-                    b.image(type.icon(Cicon.medium)).padRight(20).update(i -> i.setColor(b.isChecked() ? Color.gray : Color.white)).get().act(1);
+                    b.image(type.icon(Cicon.medium)).size(32f).padRight(20).update(i -> i.setColor(b.isChecked() ? Color.gray : Color.white)).get().act(1);
                     b.margin(0f);
                 }, Styles.fullTogglet, () -> {
                     if(!hidden.add(type)){

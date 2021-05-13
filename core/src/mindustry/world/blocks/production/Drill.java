@@ -113,6 +113,8 @@ public class Drill extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
         Tile tile = world.tile(x, y);
         if(tile == null) return;
 
@@ -198,7 +200,6 @@ public class Drill extends Block{
 
     public class DrillBuild extends Building{
         public float progress;
-        public int index;
         public float warmup;
         public float timeDrilled;
         public float lastDrillSpeed;
@@ -278,7 +279,6 @@ public class Drill extends Block{
             if(dominantItems > 0 && progress >= delay && items.total() < itemCapacity){
                 offload(dominantItem);
 
-                index ++;
                 progress %= delay;
 
                 drillEffect.at(x + Mathf.range(size), y + Mathf.range(size), dominantItem.color);

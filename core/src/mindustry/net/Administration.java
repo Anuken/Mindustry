@@ -220,7 +220,7 @@ public class Administration{
         getCreateInfo(id).banned = true;
 
         save();
-        Events.fire(new PlayerBanEvent(Groups.player.find(p -> id.equals(p.uuid()))));
+        Events.fire(new PlayerBanEvent(Groups.player.find(p -> id.equals(p.uuid())), id));
         return true;
     }
 
@@ -259,7 +259,7 @@ public class Administration{
         info.banned = false;
         bannedIPs.removeAll(info.ips, false);
         save();
-        Events.fire(new PlayerUnbanEvent(Groups.player.find(p -> id.equals(p.uuid()))));
+        Events.fire(new PlayerUnbanEvent(Groups.player.find(p -> id.equals(p.uuid())), id));
         return true;
     }
 
@@ -479,9 +479,7 @@ public class Administration{
         autosave("Whether the periodically save the map when playing.", false),
         autosaveAmount("The maximum amount of autosaves. Older ones get replaced.", 10),
         autosaveSpacing("Spacing between autosaves in seconds.", 60 * 5),
-        debug("Enable debug logging", false, () -> {
-            Log.level = debug() ? LogLevel.debug : LogLevel.info;
-        });
+        debug("Enable debug logging", false, () -> Log.level = debug() ? LogLevel.debug : LogLevel.info);
 
         public static final Config[] all = values();
 
@@ -586,12 +584,15 @@ public class Administration{
     public static class TraceInfo{
         public String ip, uuid;
         public boolean modded, mobile;
+        public int timesJoined, timesKicked;
 
-        public TraceInfo(String ip, String uuid, boolean modded, boolean mobile){
+        public TraceInfo(String ip, String uuid, boolean modded, boolean mobile, int timesJoined, int timesKicked){
             this.ip = ip;
             this.uuid = uuid;
             this.modded = modded;
             this.mobile = mobile;
+            this.timesJoined = timesJoined;
+            this.timesKicked = timesKicked;
         }
     }
 

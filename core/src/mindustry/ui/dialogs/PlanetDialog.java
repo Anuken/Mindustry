@@ -649,8 +649,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         if(sector == null){
             stable.clear();
+            stable.visible = false;
             return;
         }
+        stable.visible = true;
 
         float x = stable.getX(Align.center), y = stable.getY(Align.center);
         stable.clear();

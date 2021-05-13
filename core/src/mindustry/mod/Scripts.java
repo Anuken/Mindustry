@@ -18,13 +18,15 @@ import rhino.module.provider.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 import java.util.regex.*;
 
 public class Scripts implements Disposable{
     private static final Seq<String> blacklist = Seq.with(".net.", "java.net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
         "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
         ".awt", "socket", "classloader", "oracle", "invoke", "java.util.function", "java.util.stream", "org.", "mod.classmap");
-    private static final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.", "mindustry.logic.", "mindustry.async.", "saveio", "systemcursor", "filetreeinitevent");
+    private static final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "jdk.proxy1", "mindustry.gen.",
+        "mindustry.logic.", "mindustry.async.", "saveio", "systemcursor", "filetreeinitevent");
 
     private final Context context;
     private final Scriptable scope;
@@ -32,7 +34,7 @@ public class Scripts implements Disposable{
     LoadedMod currentMod = null;
 
     public static boolean allowClass(String type){
-        return !blacklist.contains(type.toLowerCase()::contains) || whitelist.contains(type.toLowerCase()::contains);
+        return !blacklist.contains(t -> type.toLowerCase(Locale.ROOT).contains(t)) || whitelist.contains(t -> type.toLowerCase(Locale.ROOT).contains(t));
     }
 
     public Scripts(){

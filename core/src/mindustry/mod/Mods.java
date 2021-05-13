@@ -24,6 +24,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 
 import java.io.*;
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -137,7 +138,7 @@ public class Mods implements Loadable{
 
     private void loadIcon(LoadedMod mod){
         //try to load icon for each mod that can have one
-        if(mod.root.child("icon.png").exists()){
+        if(mod.root.child("icon.png").exists() && !headless){
             try{
                 mod.iconTexture = new Texture(mod.root.child("icon.png"));
                 mod.iconTexture.setFilter(TextureFilter.linear);
@@ -526,7 +527,7 @@ public class Mods implements Loadable{
             if(mod.root.child("content").exists()){
                 Fi contentRoot = mod.root.child("content");
                 for(ContentType type : ContentType.all){
-                    Fi folder = contentRoot.child(type.name().toLowerCase() + "s");
+                    Fi folder = contentRoot.child(type.name().toLowerCase(Locale.ROOT) + "s");
                     if(folder.exists()){
                         for(Fi file : folder.findAll(f -> f.extension().equals("json") || f.extension().equals("hjson"))){
                             runs.add(new LoadRun(type, file, mod));
@@ -646,8 +647,8 @@ public class Mods implements Loadable{
             ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaf.readString()).toString(Jformat.plain));
             meta.cleanup();
             String camelized = meta.name.replace(" ", "");
-            String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
-            String baseName = meta.name.toLowerCase().replace(" ", "-");
+            String mainClass = meta.main == null ? camelized.toLowerCase(Locale.ROOT) + "." + camelized + "Mod" : meta.main;
+            String baseName = meta.name.toLowerCase(Locale.ROOT).replace(" ", "-");
 
             var other = mods.find(m -> m.name.equals(baseName));
 
@@ -771,7 +772,7 @@ public class Mods implements Loadable{
             this.loader = loader;
             this.main = main;
             this.meta = meta;
-            this.name = meta.name.toLowerCase().replace(" ", "-");
+            this.name = meta.name.toLowerCase(Locale.ROOT).replace(" ", "-");
         }
 
         /** @return whether this is a java class mod. */

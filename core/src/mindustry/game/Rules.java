@@ -50,6 +50,8 @@ public class Rules{
     public float unitBuildSpeedMultiplier = 1f;
     /** How much damage any other units deal. */
     public float unitDamageMultiplier = 1f;
+    /** Whether to allow units to build with logic. */
+    public boolean logicUnitBuild = true;
     /** How much health blocks start with. */
     public float blockHealthMultiplier = 1f;
     /** How much damage blocks (turrets) deal. */

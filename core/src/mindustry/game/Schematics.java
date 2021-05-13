@@ -27,6 +27,7 @@ import mindustry.input.Placement.*;
 import mindustry.io.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.power.*;
@@ -62,15 +63,6 @@ public class Schematics implements Loadable{
     private long lastClearTime;
 
     public Schematics(){
-        Events.on(DisposeEvent.class, e -> {
-            previews.each((schem, m) -> m.dispose());
-            previews.clear();
-            shadowBuffer.dispose();
-            if(errorTexture != null){
-                errorTexture.dispose();
-                errorTexture = null;
-            }
-        });
 
         Events.on(ClientLoadEvent.class, event -> {
             errorTexture = new Texture("sprites/error.png");
@@ -357,10 +349,11 @@ public class Schematics implements Loadable{
         for(int cx = x; cx <= x2; cx++){
             for(int cy = y; cy <= y2; cy++){
                 Building linked = world.build(cx, cy);
+                Block realBlock = linked == null ? null : linked instanceof ConstructBuild cons ? cons.cblock : linked.block;
 
-                if(linked != null && (linked.block.isVisible() || linked.block() instanceof CoreBlock) && !(linked.block instanceof ConstructBlock)){
-                    int top = linked.block.size/2;
-                    int bot = linked.block.size % 2 == 1 ? -linked.block.size/2 : -(linked.block.size - 1)/2;
+                if(linked != null && realBlock != null && (realBlock.isVisible() || realBlock instanceof CoreBlock)){
+                    int top = realBlock.size/2;
+                    int bot = realBlock.size % 2 == 1 ? -realBlock.size/2 : -(realBlock.size - 1)/2;
                     minx = Math.min(linked.tileX() + bot, minx);
                     miny = Math.min(linked.tileY() + bot, miny);
                     maxx = Math.max(linked.tileX() + top, maxx);
@@ -385,12 +378,13 @@ public class Schematics implements Loadable{
         for(int cx = ox; cx <= ox2; cx++){
             for(int cy = oy; cy <= oy2; cy++){
                 Building tile = world.build(cx, cy);
+                Block realBlock = tile == null ? null : tile instanceof ConstructBuild cons ? cons.cblock : tile.block;
 
-                if(tile != null && !counted.contains(tile.pos()) && !(tile.block instanceof ConstructBlock)
-                    && (tile.block.isVisible() || tile.block instanceof CoreBlock)){
-                    Object config = tile.config();
+                if(tile != null && !counted.contains(tile.pos()) && realBlock != null
+                    && (realBlock.isVisible() || realBlock instanceof CoreBlock)){
+                    Object config = tile instanceof ConstructBuild cons ? cons.lastConfig : tile.config();
 
-                    tiles.add(new Stile(tile.block, tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
+                    tiles.add(new Stile(realBlock, tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
                     counted.add(tile.pos());
                 }
             }

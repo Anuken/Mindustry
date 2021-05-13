@@ -33,6 +33,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
@@ -83,10 +84,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             create(tile.block(), team);
         }else{
             if(block.hasPower){
+                power.init = false;
                 //reinit power graph
                 new PowerGraph().add(self());
             }
         }
+        proximity.clear();
         this.rotation = rotation;
         this.tile = tile;
 
@@ -756,6 +759,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
+    /** in overrides, this does the exact same thing as onProximityUpdate, use that instead */
     public void onProximityAdded(){
         if(block.hasPower) updatePowerGraph();
     }
@@ -910,24 +914,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void placed(){
         if(net.client()) return;
 
-        if(block.consumesPower || block.outputsPower){
-            int range = 12;
-            tempTiles.clear();
-            Geometry.circle(tileX(), tileY(), range, (x, y) -> {
-                Building other = world.build(x, y);
-                if(other != null && other.block instanceof PowerNode node && node.linkValid(other, self()) && !PowerNode.insulated(other, self())
-                    && !other.proximity().contains(this.<Building>self()) &&
-                !(block.outputsPower && proximity.contains(p -> p.power != null && p.power.graph == other.power.graph))){
-                    tempTiles.add(other.tile);
+        if((block.consumesPower || block.outputsPower) && block.hasPower){
+            PowerNode.getNodeLinks(tile, block, team, other -> {
+                if(!other.power.links.contains(pos())){
+                    other.configureAny(pos());
                 }
             });
-            tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
-            if(!tempTiles.isEmpty()){
-                Tile toLink = tempTiles.first();
-                if(!toLink.build.power.links.contains(pos())){
-                    toLink.build.configureAny(pos());
-                }
-            }
         }
     }
 
@@ -952,7 +944,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Called when arbitrary configuration is applied to a tile. */
     public void configured(@Nullable Unit builder, @Nullable Object value){
         //null is of type void.class; anonymous classes use their superclass.
-        Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() || value.getClass().getSimpleName().startsWith("adapter") ? value.getClass().getSuperclass() : value.getClass();
+        Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() ? value.getClass().getSuperclass() : value.getClass();
 
         if(value instanceof Item) type = Item.class;
         if(value instanceof Block) type = Block.class;
@@ -964,6 +956,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         if(block.configurations.containsKey(type)){
             block.configurations.get(type).get(this, value);
+        }else if(value instanceof Building build){
+            //copy config of another building
+            var conf = build.config();
+            if(conf != null && !(conf instanceof Building)){
+                configured(builder, conf);
+            }
         }
     }
 
@@ -1148,7 +1146,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Returns whether or not a hand cursor should be shown over this block. */
     public Cursor getCursor(){
-        return block.configurable && team == player.team() ? SystemCursor.hand : SystemCursor.arrow;
+        return block.configurable && interactable(player.team()) ? SystemCursor.hand : SystemCursor.arrow;
     }
 
     /**
@@ -1221,6 +1219,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             other.proximity.remove(self(), true);
             other.onProximityUpdate();
         }
+        proximity.clear();
     }
 
     public void updateProximity(){
@@ -1312,7 +1311,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return switch(sensor){
             case x -> World.conv(x);
             case y -> World.conv(y);
-            //case dead -> !isValid(); //TODO 126
+            case dead -> !isValid() ? 1 : 0;
             case team -> team.id;
             case health -> health;
             case maxHealth -> maxHealth;
@@ -1331,8 +1330,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();
             case powerNetCapacity -> power == null ? 0 : power.graph.getLastCapacity();
             case enabled -> enabled ? 1 : 0;
-            case controlled -> this instanceof ControlBlock c ? c.isControlled() ? 1 : 0 : 0;
+            case controlled -> this instanceof ControlBlock c && c.isControlled() ? GlobalConstants.ctrlPlayer : 0;
             case payloadCount -> getPayload() != null ? 1 : 0;
+            case size -> block.size;
             default -> Float.NaN; //gets converted to null in logic
         };
     }
@@ -1365,12 +1365,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     @Override
     public void control(LAccess type, Object p1, double p2, double p3, double p4){
-        //don't execute configure instructions as the client
-        if(type == LAccess.configure && block.logicConfigurable && !net.client()){
+        //don't execute configure instructions that copy logic building configures; this can cause extreme lag
+        if(type == LAccess.configure && block.logicConfigurable && !(p1 instanceof LogicBuild)){
             //change config only if it's new
-            Object prev = senseObject(LAccess.config);
-            if(prev != p1){
-                configureAny(p1);
+            if(senseObject(LAccess.config) != p1){
+                configured(null, p1);
             }
         }
     }
