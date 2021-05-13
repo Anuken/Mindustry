@@ -745,7 +745,7 @@ public class Blocks implements ContentList{
         }};
 
         titaniumWall = new Wall("titanium-wall"){{
-            requirements(Category.defense, with(Items.titanium, 6));
+            requirements(Category.defense, with(Items.copper, 6));
             health = 110 * wallHealthMultiplier;
         }};
 
