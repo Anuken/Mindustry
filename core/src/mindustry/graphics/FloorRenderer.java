@@ -45,10 +45,10 @@ public class FloorRenderer implements Disposable{
         Camera camera = Core.camera;
 
         int
-            minx = (int)((camera.position.x - camera.width/2f - pad) / chunkunits),
-            miny = (int)((camera.position.y - camera.height/2f - pad) / chunkunits),
-            maxx = Mathf.ceil((camera.position.x + camera.width/2f + pad) / chunkunits),
-            maxy = Mathf.ceil((camera.position.y + camera.height/2f + pad) / chunkunits);
+            minx = (int)((camera.position.x - camera.width/1f - pad) / chunkunits),
+            miny = (int)((camera.position.y - camera.height/1f - pad) / chunkunits),
+            maxx = Mathf.ceil((camera.position.x + camera.width/1f + pad) / chunkunits),
+            maxy = Mathf.ceil((camera.position.y + camera.height/1f + pad) / chunkunits);
 
         int layers = CacheLayer.all.length;
 
@@ -140,10 +140,10 @@ public class FloorRenderer implements Disposable{
         Camera camera = Core.camera;
 
         int
-            minx = (int)((camera.position.x - camera.width/2f - pad) / chunkunits),
-            miny = (int)((camera.position.y - camera.height/2f - pad) / chunkunits),
-            maxx = Mathf.ceil((camera.position.x + camera.width/2f + pad) / chunkunits),
-            maxy = Mathf.ceil((camera.position.y + camera.height/2f + pad) / chunkunits);
+            minx = (int)((camera.position.x - camera.width/1f - pad) / chunkunits),
+            miny = (int)((camera.position.y - camera.height/1f - pad) / chunkunits),
+            maxx = Mathf.ceil((camera.position.x + camera.width/1f + pad) / chunkunits),
+            maxy = Mathf.ceil((camera.position.y + camera.height/1f + pad) / chunkunits);
 
         layer.begin();
 
