@@ -102,9 +102,5 @@
   {
     "name": "TSR", 
     "address": ["fifr2.quackhost.uk:26627"]
-  },
-  {
-    "name": "Mindustry Defence",
-    "address": ["178.170.47.34:28110"]
   }
 ]
