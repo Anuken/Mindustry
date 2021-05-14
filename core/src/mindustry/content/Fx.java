@@ -429,7 +429,7 @@ public class Fx{
         color(e.color);
         stroke(e.fout() * 1.5f);
 
-        randLenVectors(e.id, 8, e.finpow() * 17f, e.rotation, 360f, (x, y) -> {
+        randLenVectors(e.id, 8, e.finpow() * 17f, (x, y) -> {
             float ang = Mathf.angle(x, y);
             lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1f);
         });
@@ -439,7 +439,7 @@ public class Fx{
         color(Color.white);
         stroke(e.fout() * 1.5f);
 
-        randLenVectors(e.id, 8, e.finpow() * 17f, e.rotation, 360f, (x, y) -> {
+        randLenVectors(e.id, 8, e.finpow() * 17f, (x, y) -> {
             float ang = Mathf.angle(x, y);
             lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1f);
         });
@@ -449,7 +449,7 @@ public class Fx{
         color(e.color);
         stroke(e.fout() * 2f);
 
-        randLenVectors(e.id, 6, e.finpow() * 18f, e.rotation, 360f, (x, y) -> {
+        randLenVectors(e.id, 6, e.finpow() * 18f, (x, y) -> {
             float ang = Mathf.angle(x, y);
             lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1f);
         });
@@ -459,7 +459,7 @@ public class Fx{
         color(Pal.meltdownHit);
         stroke(e.fout() * 2f);
 
-        randLenVectors(e.id, 6, e.finpow() * 18f, e.rotation, 360f, (x, y) -> {
+        randLenVectors(e.id, 6, e.finpow() * 18f, (x, y) -> {
             float ang = Mathf.angle(x, y);
             lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1f);
         });
@@ -469,7 +469,7 @@ public class Fx{
         color(Pal.heal);
         stroke(e.fout() * 2f);
 
-        randLenVectors(e.id, 6, e.finpow() * 18f, e.rotation, 360f, (x, y) -> {
+        randLenVectors(e.id, 6, e.finpow() * 18f, (x, y) -> {
             float ang = Mathf.angle(x, y);
             lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1f);
         });
