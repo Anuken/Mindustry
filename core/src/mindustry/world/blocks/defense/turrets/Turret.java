@@ -233,7 +233,7 @@ public class Turret extends ReloadTurret{
             Drawf.shadow(region, x + tr2.x - elevation, y + tr2.y - elevation, rotation - 90);
             drawer.get(this);
 
-            if(heatRegion != Core.atlas.find("error")){
+            if(Core.atlas.isFound(heatRegion)){
                 heatDrawer.get(this);
             }
         }

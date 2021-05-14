@@ -1,6 +1,8 @@
 package mindustry.world.blocks.defense.turrets;
 
+import arc.*;
 import arc.audio.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -19,8 +21,11 @@ public class PointDefenseTurret extends ReloadTurret{
     public float retargetTime = 5f;
 
     public @Load("block-@size") TextureRegion baseRegion;
+    public @Load("@-heat") TextureRegion heatRegion;
+    public float elevation = -1f;
 
     public Color color = Color.white;
+    public Color heatColor = Pal.turretHeat;
     public Effect beamEffect = Fx.pointBeam;
     public Effect hitEffect = Fx.pointHit;
     public Effect shootEffect = Fx.sparkShoot;
@@ -30,6 +35,18 @@ public class PointDefenseTurret extends ReloadTurret{
     public float shootCone = 5f;
     public float bulletDamage = 10f;
     public float shootLength = 3f;
+    public float cooldown = 0.02f;
+
+    public Cons<PointDefenseBuild> drawer = tile -> Draw.rect(region, tile.x, tile.y, tile.rotation - 90);
+    public Cons<PointDefenseBuild> heatDrawer = tile -> {
+        if(tile.heat <= 0.00001f) return;
+
+        Draw.color(heatColor, tile.heat);
+        Draw.blend(Blending.additive);
+        Draw.rect(heatRegion, tile.x, tile.y, tile.rotation - 90);
+        Draw.blend();
+        Draw.color();
+    };
 
     public PointDefenseTurret(String name){
         super(name);
@@ -54,11 +71,20 @@ public class PointDefenseTurret extends ReloadTurret{
         stats.add(Stat.reload, 60f / reloadTime, StatUnit.none);
     }
 
+    @Override
+    public void init(){
+        super.init();
+
+        if(elevation < 0) elevation = size / 2f;
+    }
+
     public class PointDefenseBuild extends ReloadTurretBuild{
         public @Nullable Bullet target;
+        public float heat;
 
         @Override
         public void updateTile(){
+            heat = Mathf.lerpDelta(heat, 0f, cooldown);
 
             //retarget
             if(timer(timerTarget, retargetTime)){
@@ -95,6 +121,7 @@ public class PointDefenseTurret extends ReloadTurret{
                     hitEffect.at(target.x, target.y, color);
                     shootSound.at(x + Tmp.v1.x, y + Tmp.v1.y, Mathf.random(0.9f, 1.1f));
                     reload = 0;
+                    heat =  1f;
                 }
             }
         }
@@ -102,8 +129,13 @@ public class PointDefenseTurret extends ReloadTurret{
         @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
-            Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
-            Draw.rect(region, x, y, rotation - 90);
+
+            Drawf.shadow(region, x - elevation, y - elevation, rotation - 90);
+            drawer.get(this);
+
+            if(Core.atlas.isFound(heatRegion)){
+                heatDrawer.get(this);
+            }
         }
 
         @Override

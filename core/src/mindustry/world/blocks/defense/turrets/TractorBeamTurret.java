@@ -1,6 +1,8 @@
 package mindustry.world.blocks.defense.turrets;
 
+import arc.*;
 import arc.audio.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -22,8 +24,10 @@ public class TractorBeamTurret extends BaseTurret{
     public float retargetTime = 5f;
 
     public @Load("block-@size") TextureRegion baseRegion;
+    public @Load("@-heat") TextureRegion heatRegion;
     public @Load("@-laser") TextureRegion laser;
     public @Load("@-laser-end") TextureRegion laserEnd;
+    public float elevation = -1f;
     
     public float shootCone = 6f;
     public float shootLength = 5f;
@@ -33,11 +37,24 @@ public class TractorBeamTurret extends BaseTurret{
     public float damage = 0f;
     public boolean targetAir = true, targetGround = false;
     public Color laserColor = Color.white;
+    public Color heatColor = Pal.turretHeat;
+    public float cooldown = 0.02f;
     public StatusEffect status = StatusEffects.none;
     public float statusDuration = 300;
 
     public Sound shootSound = Sounds.tractorbeam;
     public float shootSoundVolume = 0.9f;
+
+    public Cons<TractorBeamBuild> drawer = tile -> Draw.rect(region, tile.x, tile.y, tile.rotation - 90);
+    public Cons<TractorBeamBuild> heatDrawer = tile -> {
+        if(tile.heat <= 0.00001f) return;
+
+        Draw.color(heatColor, tile.heat);
+        Draw.blend(Blending.additive);
+        Draw.rect(heatRegion, tile.x, tile.y, tile.rotation - 90);
+        Draw.blend();
+        Draw.color();
+    };
 
     public TractorBeamTurret(String name){
         super(name);
@@ -64,14 +81,22 @@ public class TractorBeamTurret extends BaseTurret{
         stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
     }
 
+    @Override
+    public void init(){
+        super.init();
+
+        if(elevation < 0) elevation = size / 2f;
+    }
+
     public class TractorBeamBuild extends BaseTurretBuild{
         public @Nullable Unit target;
         public float lastX, lastY, strength;
         public boolean any;
-        public float coolant = 1f;
+        public float coolant = 1f, heat;
 
         @Override
         public void updateTile(){
+            heat = Mathf.lerpDelta(heat, 0f, cooldown);
 
             //retarget
             if(timer(timerTarget, retargetTime)){
@@ -120,6 +145,7 @@ public class TractorBeamTurret extends BaseTurret{
                     }
 
                     any = true;
+                    heat =  1f;
                     target.impulseNet(Tmp.v1.set(this).sub(target).limit((force + (1f - target.dst(this) / range) * scaledForce) * edelta() * timeScale));
                 }
             }else{
@@ -135,8 +161,13 @@ public class TractorBeamTurret extends BaseTurret{
         @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
-            Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
-            Draw.rect(region, x, y, rotation - 90);
+
+            Drawf.shadow(region, x - elevation, y - elevation, rotation - 90);
+            drawer.get(this);
+
+            if(Core.atlas.isFound(heatRegion)){
+                heatDrawer.get(this);
+            }
 
             //draw laser if applicable
             if(any){
