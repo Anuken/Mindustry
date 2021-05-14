@@ -43,9 +43,9 @@ public class Vars implements Loadable{
     /** Name of current Steam player. */
     public static String steamPlayerName = "";
     /** Maximum extra padding around deployment schematics. */
-    public static final int maxLoadoutSchematicPad = 5;
+    public static final int maxLoadoutSchematicPad = 205;
     /** Maximum schematic size.*/
-    public static final int maxSchematicSize = 32;
+    public static final int maxSchematicSize = 1024;
     /** All schematic base64 starts with this string.*/
     public static final String schematicBaseStart ="bXNjaA";
     /** IO buffer size. */
@@ -71,13 +71,13 @@ public class Vars implements Loadable{
     /** list of built-in servers.*/
     public static final Seq<ServerGroup> defaultServers = Seq.with();
     /** maximum size of any block, do not change unless you know what you're doing */
-    public static final int maxBlockSize = 16;
+    public static final int maxBlockSize = 32;
     /** maximum distance between mine and core that supports automatic transferring */
-    public static final float mineTransferRange = 220f;
+    public static final float mineTransferRange = 440f;
     /** max chat message length */
-    public static final int maxTextLength = 150;
+    public static final int maxTextLength = 350;
     /** max player name length in bytes */
-    public static final int maxNameLength = 40;
+    public static final int maxNameLength = 120;
     /** displayed item size when ingame. */
     public static final float itemSize = 5f;
     /** units outside of this bound will die instantly */
@@ -99,7 +99,7 @@ public class Vars implements Loadable{
     /** launch animation duration */
     public static final float launchDuration = 140f;
     /** size of tiles in units */
-    public static final int tilesize = 8;
+    public static final int tilesize = 4;
     /** size of one tile payload (^2) */
     public static final float tilePayload = tilesize * tilesize;
     /** tile used in certain situations, instead of null */
