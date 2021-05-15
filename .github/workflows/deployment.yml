@@ -21,7 +21,7 @@ jobs:
     - name: пакинг минды в JAR
       run: ./gradlew desktop:dist -Pbuildversion=126.2 -PverionType=release --stacktrace
     - name: пакинг минды в андроид
-      run: ./gradlew android:assembleRelease -Pbuildversion=126.2 -PverionType=release --stacktrace  
+      run: ./gradlew android:assembleDebug -Pbuildversion=126.2 -PverionType=release --stacktrace  
     - name: выгрузка JAR
       uses: actions/upload-artifact@v2
       with:
