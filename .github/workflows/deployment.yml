@@ -31,5 +31,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Android APK (zipped)
-        path: android/build/outputs/apk/release/android-release.apk
+        path: android/build/outputs/apk/*
   
