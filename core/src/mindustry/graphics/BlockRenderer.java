@@ -161,10 +161,10 @@ public class BlockRenderer{
 
         float ww = world.width() * tilesize, wh = world.height() * tilesize;
         float x = camera.position.x + tilesize / 1f, y = camera.position.y + tilesize / 1f;
-        float u = (x - camera.width / 1f) / ww,
-        v = (y - camera.height / 1f) / wh,
-        u2 = (x + camera.width / 1f) / ww,
-        v2 = (y + camera.height / 1f) / wh;
+        float u = (x - camera.width / 2f) / ww,
+        v = (y - camera.height / 2f) / wh,
+        u2 = (x + camera.width / 2f) / ww,
+        v2 = (y + camera.height / 2f) / wh;
 
         Tmp.tr1.set(shadows.getTexture());
         Tmp.tr1.set(u, v2, u2, v);
