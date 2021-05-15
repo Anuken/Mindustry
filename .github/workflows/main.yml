@@ -22,4 +22,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Desktop
-        path: desktop/build/libs/desktop.jar
+        path: desktop/build/libs/Mindustry.jar
