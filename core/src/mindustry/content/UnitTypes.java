@@ -1818,7 +1818,7 @@ public class UnitTypes implements ContentList{
 
             flying = true;
             mineSpeed = 8f;
-            mineTier = 2;
+            mineTier = 4;
             buildSpeed = 1f;
             drag = 0.05f;
             speed = 3.55f;
