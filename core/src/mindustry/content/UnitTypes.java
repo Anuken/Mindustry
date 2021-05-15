@@ -1850,6 +1850,62 @@ public class UnitTypes implements ContentList{
                     buildingDamageMultiplier = 0.01f;
                     homingPower = 0.04f;
                 }};
+                
+                weapons.add(new Weapon("toxopid-cannon"){{
+                y = -14f;
+                x = 0f;
+                shootY = 22f;
+                mirror = false;
+                reload = 20;
+                shake = 10f;
+                recoil = 10f;
+                rotateSpeed = 100f;
+                ejectEffect = Fx.casing3;
+                shootSound = Sounds.artillery;
+                rotate = true;
+                shadow = 30f;
+
+                bullet = new ArtilleryBulletType(3f, 50){{
+                    hitEffect = Fx.sapExplosion;
+                    knockback = 0.8f;
+                    lifetime = 80f;
+                    width = height = 25f;
+                    collidesTiles = collides = true;
+                    ammoMultiplier = 16f;
+                    splashDamageRadius = 80f;
+                    splashDamage = 200f;
+                    backColor = Pal.sapBulletBack;
+                    frontColor = lightningColor = Pal.sapBullet;
+                    lightning = 20;
+                    lightningLength = 20;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    hitShake = 10f;
+
+                    status = StatusEffects.sapped;
+                    statusDuration = 60f * 10;
+
+                    fragLifeMin = 0.3f;
+                    fragBullets = 32;
+
+                    fragBullet = new ArtilleryBulletType(2.3f, 30){{
+                        hitEffect = Fx.sapExplosion;
+                        knockback = 0.8f;
+                        lifetime = 90f;
+                        width = height = 20f;
+                        collidesTiles = false;
+                        splashDamageRadius = 70f;
+                        splashDamage = 100f;
+                        backColor = Pal.sapBulletBack;
+                        frontColor = lightningColor = Pal.sapBullet;
+                        lightning = 2;
+                        lightningLength = 5;
+                        smokeEffect = Fx.shootBigSmoke2;
+                        hitShake = 5f;
+
+                        status = StatusEffects.sapped;
+                        statusDuration = 60f * 10;
+                    }};
+                }};
             }});
         }};
 
