@@ -71,7 +71,7 @@ public class Vars implements Loadable{
     /** list of built-in servers.*/
     public static final Seq<ServerGroup> defaultServers = Seq.with();
     /** maximum size of any block, do not change unless you know what you're doing */
-    public static final int maxBlockSize = 64;
+    public static final int maxBlockSize = 16;
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 440f;
     /** max chat message length */
