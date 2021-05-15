@@ -63,15 +63,6 @@ public class Schematics implements Loadable{
     private long lastClearTime;
 
     public Schematics(){
-        Events.on(DisposeEvent.class, e -> {
-            previews.each((schem, m) -> m.dispose());
-            previews.clear();
-            shadowBuffer.dispose();
-            if(errorTexture != null){
-                errorTexture.dispose();
-                errorTexture = null;
-            }
-        });
 
         Events.on(ClientLoadEvent.class, event -> {
             errorTexture = new Texture("sprites/error.png");
@@ -360,7 +351,7 @@ public class Schematics implements Loadable{
                 Building linked = world.build(cx, cy);
                 Block realBlock = linked == null ? null : linked instanceof ConstructBuild cons ? cons.cblock : linked.block;
 
-                if(linked != null && (realBlock.isVisible() || realBlock instanceof CoreBlock)){
+                if(linked != null && realBlock != null && (realBlock.isVisible() || realBlock instanceof CoreBlock)){
                     int top = realBlock.size/2;
                     int bot = realBlock.size % 2 == 1 ? -realBlock.size/2 : -(realBlock.size - 1)/2;
                     minx = Math.min(linked.tileX() + bot, minx);
@@ -389,7 +380,7 @@ public class Schematics implements Loadable{
                 Building tile = world.build(cx, cy);
                 Block realBlock = tile == null ? null : tile instanceof ConstructBuild cons ? cons.cblock : tile.block;
 
-                if(tile != null && !counted.contains(tile.pos())
+                if(tile != null && !counted.contains(tile.pos()) && realBlock != null
                     && (realBlock.isVisible() || realBlock instanceof CoreBlock)){
                     Object config = tile instanceof ConstructBuild cons ? cons.lastConfig : tile.config();
 

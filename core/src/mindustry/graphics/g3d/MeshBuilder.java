@@ -1,8 +1,6 @@
 package mindustry.graphics.g3d;
 
 import arc.graphics.*;
-import arc.graphics.VertexAttributes.*;
-import arc.graphics.gl.*;
 import arc.math.geom.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 
@@ -92,9 +90,9 @@ public class MeshBuilder{
 
     private static void begin(int count){
         mesh = new Mesh(true, count, 0,
-        new VertexAttribute(Usage.position, 3, Shader.positionAttribute),
-        new VertexAttribute(Usage.normal, 3, Shader.normalAttribute),
-        new VertexAttribute(Usage.colorPacked, 4, Shader.colorAttribute)
+        VertexAttribute.position3,
+        VertexAttribute.normal,
+        VertexAttribute.color
         );
 
         mesh.getVerticesBuffer().limit(mesh.getMaxVertices());

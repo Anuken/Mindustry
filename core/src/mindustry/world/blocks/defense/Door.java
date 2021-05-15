@@ -20,6 +20,7 @@ import static mindustry.Vars.*;
 
 public class Door extends Wall{
     protected final static Rect rect = new Rect();
+    protected final static Queue<DoorBuild> doorQueue = new Queue<>();
 
     public final int timerToggle = timers++;
     public Effect openfx = Fx.dooropen;
@@ -56,7 +57,7 @@ public class Door extends Wall{
 
     public class DoorBuild extends Building{
         public boolean open = false;
-        public ObjectSet<DoorBuild> chained = new ObjectSet<>();
+        public Seq<DoorBuild> chained = new Seq<>();
 
         @Override
         public void onProximityAdded(){
@@ -103,18 +104,19 @@ public class Door extends Wall{
         }
 
         public void updateChained(){
-            chained = new ObjectSet<>();
-            flow(chained);
-        }
+            chained = new Seq<>();
+            doorQueue.clear();
+            doorQueue.add(this);
 
-        public void flow(ObjectSet<DoorBuild> set){
-            if(!set.add(this)) return;
+            while(!doorQueue.isEmpty()){
+                var next = doorQueue.removeLast();
+                chained.add(next);
 
-            this.chained = set;
-
-            for(Building b : proximity){
-                if(b instanceof DoorBuild d){
-                    d.flow(set);
+                for(var b : next.proximity){
+                    if(b instanceof DoorBuild d && d.chained != chained){
+                        d.chained = chained;
+                        doorQueue.addFirst(d);
+                    }
                 }
             }
         }

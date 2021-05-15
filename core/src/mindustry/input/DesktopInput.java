@@ -259,6 +259,13 @@ public class DesktopInput extends InputHandler{
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
+        if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
+            Tile selected = world.tileWorld(input.mouseWorldX(), input.mouseWorldY());
+            if(selected != null){
+                Call.tileTap(player, selected);
+            }
+        }
+
         if(player.dead()){
             cursorType = SystemCursor.arrow;
             return;
@@ -470,10 +477,6 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
-            if(selected != null){
-                Call.tileTap(player, selected);
-            }
-
             BuildPlan req = getRequest(cursorX, cursorY);
 
             if(Core.input.keyDown(Binding.break_block)){

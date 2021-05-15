@@ -185,8 +185,15 @@ public abstract class BulletType extends Content{
         }
     }
 
-    public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
+    public void hitEntity(Bullet b, Hitboxc entity, float initialHealth){
+        if(entity instanceof Healthc h){
+            h.damage(b.damage);
+        }
 
+        if(entity instanceof Unit unit){
+            unit.impulse(Tmp.v3.set(unit).sub(b.x, b.y).nor().scl(knockback * 80f));
+            unit.apply(status, statusDuration);
+        }
     }
 
     public void hit(Bullet b){
@@ -276,7 +283,7 @@ public abstract class BulletType extends Content{
 
     public void update(Bullet b){
         if(homingPower > 0.0001f && b.time >= homingDelay){
-            Teamc target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
+            Teamc target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> e.checkTarget(collidesAir, collidesGround), t -> collidesGround);
             if(target != null){
                 b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), homingPower * Time.delta * 50f));
             }

@@ -339,6 +339,7 @@ public class LExecutor{
         public static LogicAI checkLogicAI(LExecutor exec, Object unitObj){
             if(unitObj instanceof Unit unit && exec.obj(varUnit) == unit && unit.team == exec.team && !unit.isPlayer() && !(unit.controller() instanceof FormationAI)){
                 if(unit.controller() instanceof LogicAI la){
+                    la.controller = exec.building(varThis);
                     return la;
                 }else{
                     var la = new LogicAI();
@@ -489,7 +490,7 @@ public class LExecutor{
 
                         Building build = exec.building(p1);
                         int dropped = Math.min(unit.stack.amount, exec.numi(p2));
-                        if(build != null && build.isValid() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
+                        if(build != null && build.team == unit.team && build.isValid() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                             int accepted = build.acceptStack(unit.item(), dropped, unit);
                             if(accepted > 0){
                                 Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
@@ -503,7 +504,8 @@ public class LExecutor{
                         Building build = exec.building(p1);
                         int amount = exec.numi(p3);
 
-                        if(build != null && build.isValid() && build.items != null && exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
+                        if(build != null && build.team == unit.team && build.isValid() && build.items != null &&
+                            exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                             int taken = Math.min(build.items.get(item), Math.min(amount, unit.maxAccepted(item)));
 
                             if(taken > 0){
@@ -523,7 +525,6 @@ public class LExecutor{
         public int target;
         public LAccess type = LAccess.enabled;
         public int p1, p2, p3, p4;
-        public Interval timer = new Interval(1);
 
         public ControlI(LAccess type, int target, int p1, int p2, int p3, int p4){
             this.type = type;
@@ -539,7 +540,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Object obj = exec.obj(target);
-            if(obj instanceof Building b && b.team == exec.team && exec.linkIds.contains(b.id) && (type.cooldown <= 0 || timer.get(type.cooldown))){
+            if(obj instanceof Building b && b.team == exec.team && exec.linkIds.contains(b.id)){
                 if(type.isObj){
                     b.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
                 }else{

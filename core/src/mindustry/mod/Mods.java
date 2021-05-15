@@ -138,7 +138,7 @@ public class Mods implements Loadable{
 
     private void loadIcon(LoadedMod mod){
         //try to load icon for each mod that can have one
-        if(mod.root.child("icon.png").exists()){
+        if(mod.root.child("icon.png").exists() && !headless){
             try{
                 mod.iconTexture = new Texture(mod.root.child("icon.png"));
                 mod.iconTexture.setFilter(TextureFilter.linear);

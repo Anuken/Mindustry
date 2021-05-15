@@ -63,6 +63,7 @@ public class StackConveyor extends Block implements Autotiler{
                 return otherblock.outputsItems() && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
             }else if(state == stateUnload){ //router mode
                 return otherblock.acceptsItems &&
+                    (!(otherblock instanceof ArmoredConveyor) || lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock)) &&
                     (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) ||
                     (otherblock instanceof StackConveyor && facing(otherx, othery, otherrot, tile.x, tile.y))) &&
                     !(world.build(otherx, othery) instanceof StackConveyorBuild s && s.state == stateUnload) &&
@@ -283,7 +284,7 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public void handleItem(Building source, Item item){
-            if(items.empty()) poofIn();
+            if(items.empty() && tile != null) poofIn();
             super.handleItem(source, item);
             lastItem = item;
         }
@@ -291,7 +292,7 @@ public class StackConveyor extends Block implements Autotiler{
         @Override
         public void handleStack(Item item, int amount, Teamc source){
             if(amount <= 0) return;
-            if(items.empty()) poofIn();
+            if(items.empty() && tile != null) poofIn();
             super.handleStack(item, amount, source);
             lastItem = item;
         }

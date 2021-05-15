@@ -31,7 +31,7 @@ public class Planet extends UnlockableContent{
     public @Nullable PlanetGenerator generator;
     /** Array of sectors; directly maps to tiles in the grid. */
     public Seq<Sector> sectors;
-    /** Radius of this planet's sphere. Does not take into account sattelites. */
+    /** Radius of this planet's sphere. Does not take into account satellites. */
     public float radius;
     /** Atmosphere radius adjustment parameters. */
     public float atmosphereRadIn = 0, atmosphereRadOut = 0.3f;
@@ -67,7 +67,7 @@ public class Planet extends UnlockableContent{
     public Planet solarSystem;
     /** All planets orbiting this one, in ascending order of radius. */
     public Seq<Planet> children = new Seq<>();
-    /** Sattelites orbiting this planet. */
+    /** Satellites orbiting this planet. */
     public Seq<Satellite> satellites = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
     protected Prov<PlanetMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2);
@@ -111,6 +111,9 @@ public class Planet extends UnlockableContent{
     }
 
     public @Nullable Sector getLastSector(){
+        if(sectors.isEmpty()){
+            return null;
+        }
         return sectors.get(Math.min(Core.settings.getInt(name + "-last-sector", startSector), sectors.size - 1));
     }
 

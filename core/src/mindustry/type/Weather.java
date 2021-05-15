@@ -113,7 +113,8 @@ public class Weather extends UnlockableContent{
                               float density, float intensity, float opacity,
                               float windx, float windy,
                               float minAlpha, float maxAlpha,
-                              float sinSclMin, float sinSclMax, float sinMagMin, float sinMagMax){
+                              float sinSclMin, float sinSclMax, float sinMagMin, float sinMagMax,
+                              boolean randomParticleRotation){
         rand.setSeed(0);
         Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
         Tmp.r1.grow(sizeMax * 1.5f);
@@ -128,6 +129,7 @@ public class Weather extends UnlockableContent{
             float x = (rand.random(0f, world.unitWidth()) + Time.time * windx * scl2);
             float y = (rand.random(0f, world.unitHeight()) + Time.time * windy * scl);
             float alpha = rand.random(minAlpha, maxAlpha);
+            float rotation = randomParticleRotation ? rand.random(0f, 360f) : 0f;
 
             x += Mathf.sin(y, rand.random(sinSclMin, sinSclMax), rand.random(sinMagMin, sinMagMax));
 
@@ -140,7 +142,7 @@ public class Weather extends UnlockableContent{
 
             if(Tmp.r3.setCentered(x, y, size).overlaps(Tmp.r2)){
                 Draw.alpha(alpha * opacity);
-                Draw.rect(region, x, y, size, size);
+                Draw.rect(region, x, y, size, size, rotation);
             }
         }
     }

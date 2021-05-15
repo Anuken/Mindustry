@@ -82,8 +82,6 @@ public class Vars implements Loadable{
     public static final float itemSize = 5f;
     /** units outside of this bound will die instantly */
     public static final float finalWorldBounds = 500;
-    /** mining range for manual miners */
-    public static final float miningRange = 70f;
     /** range for building */
     public static final float buildingRange = 220f;
     /** range for moving items */

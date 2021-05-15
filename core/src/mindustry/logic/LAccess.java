@@ -50,13 +50,11 @@ public enum LAccess{
     enabled("to"), //"to" is standard for single parameter access
     shoot("x", "y", "shoot"),
     shootp(true, "unit", "shoot"),
-    configure(true, 30, "to"),
+    configure(true, "to"),
     color("r", "g", "b");
 
     public final String[] params;
     public final boolean isObj;
-    /** Tick cooldown between invocations. */
-    public float cooldown = -1;
 
     public static final LAccess[]
         all = values(),
@@ -73,9 +71,4 @@ public enum LAccess{
         isObj = obj;
     }
 
-    LAccess(boolean obj, float cooldown, String... params){
-        this.params = params;
-        this.cooldown = cooldown;
-        isObj = obj;
-    }
 }

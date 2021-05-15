@@ -41,7 +41,7 @@ public class NetServer implements ApplicationListener{
     private static final Vec2 vector = new Vec2();
     private static final Rect viewport = new Rect();
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
-    private static final float correctDist = tilesize * 12f;
+    private static final float correctDist = tilesize * 14f;
 
     public final Administration admins = new Administration();
     public final CommandHandler clientCommands = new CommandHandler("/");
@@ -444,7 +444,7 @@ public class NetServer implements ApplicationListener{
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
                 if(player.isLocal()){
-                    player.sendMessage("Local players can't vote. Kick the player yourself instead.");
+                    player.sendMessage("[scarlet]Local players can't vote. Kick the player yourself instead.");
                     return;
                 }
 
@@ -736,8 +736,8 @@ public class NetServer implements ApplicationListener{
             logic.skipWave();
             info("&lc@ has skipped the wave.", player.name);
         }else if(action == AdminAction.ban){
-            netServer.admins.banPlayerIP(other.con.address);
             netServer.admins.banPlayerID(other.con.uuid);
+            netServer.admins.banPlayerIP(other.con.address);
             other.kick(KickReason.banned);
             info("&lc@ has banned @.", player.name, other.name);
         }else if(action == AdminAction.kick){

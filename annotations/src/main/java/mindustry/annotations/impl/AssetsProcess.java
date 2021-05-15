@@ -117,7 +117,6 @@ public class AssetsProcess extends BaseProcessor{
 
     void processSounds(String classname, String path, String rtype) throws Exception{
         TypeSpec.Builder type = TypeSpec.classBuilder(classname).addModifiers(Modifier.PUBLIC);
-        MethodSpec.Builder dispose = MethodSpec.methodBuilder("dispose").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder loadBegin = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
         HashSet<String> names = new HashSet<>();
@@ -137,8 +136,6 @@ public class AssetsProcess extends BaseProcessor{
             String filename = "\"" + filepath + "\"";
             loadBegin.addStatement("arc.Core.assets.load(" + filename + ", " + rtype + ".class).loaded = a -> " + name + " = (" + rtype + ")a", filepath, filepath.replace(".ogg", ".mp3"));
 
-            dispose.addStatement("arc.Core.assets.unload(" + filename + ")");
-            dispose.addStatement(name + " = null");
             type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new arc.audio." + rtype.substring(rtype.lastIndexOf(".") + 1) + "()").build());
         });
 
@@ -147,7 +144,6 @@ public class AssetsProcess extends BaseProcessor{
         }
 
         type.addMethod(loadBegin.build());
-        type.addMethod(dispose.build());
         JavaFile.builder(packageName, type.build()).build().writeTo(BaseProcessor.filer);
     }
 

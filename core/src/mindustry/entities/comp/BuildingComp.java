@@ -33,6 +33,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
@@ -83,10 +84,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             create(tile.block(), team);
         }else{
             if(block.hasPower){
+                power.init = false;
                 //reinit power graph
                 new PowerGraph().add(self());
             }
         }
+        proximity.clear();
         this.rotation = rotation;
         this.tile = tile;
 
@@ -756,6 +759,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
+    /** in overrides, this does the exact same thing as onProximityUpdate, use that instead */
     public void onProximityAdded(){
         if(block.hasPower) updatePowerGraph();
     }
@@ -940,7 +944,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Called when arbitrary configuration is applied to a tile. */
     public void configured(@Nullable Unit builder, @Nullable Object value){
         //null is of type void.class; anonymous classes use their superclass.
-        Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() || value.getClass().getSimpleName().startsWith("adapter") ? value.getClass().getSuperclass() : value.getClass();
+        Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() ? value.getClass().getSuperclass() : value.getClass();
 
         if(value instanceof Item) type = Item.class;
         if(value instanceof Block) type = Block.class;
@@ -1215,6 +1219,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             other.proximity.remove(self(), true);
             other.onProximityUpdate();
         }
+        proximity.clear();
     }
 
     public void updateProximity(){
@@ -1360,12 +1365,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     @Override
     public void control(LAccess type, Object p1, double p2, double p3, double p4){
-        //don't execute configure instructions as the client
-        if(type == LAccess.configure && block.logicConfigurable && !net.client()){
+        //don't execute configure instructions that copy logic building configures; this can cause extreme lag
+        if(type == LAccess.configure && block.logicConfigurable && !(p1 instanceof LogicBuild)){
             //change config only if it's new
-            Object prev = senseObject(LAccess.config);
-            if(prev != p1){
-                configureAny(p1);
+            if(senseObject(LAccess.config) != p1){
+                configured(null, p1);
             }
         }
     }

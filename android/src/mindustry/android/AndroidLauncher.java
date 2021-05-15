@@ -44,7 +44,6 @@ public class AndroidLauncher extends AndroidApplication{
             if(handler != null){
                 handler.uncaughtException(thread, error);
             }else{
-                error.printStackTrace();
                 Log.err(error);
                 System.exit(1);
             }

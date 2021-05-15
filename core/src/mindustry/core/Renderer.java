@@ -115,17 +115,6 @@ public class Renderer implements ApplicationListener{
 
     @Override
     public void dispose(){
-        minimap.dispose();
-        effectBuffer.dispose();
-        blocks.dispose();
-        if(planets != null){
-            planets.dispose();
-            planets = null;
-        }
-        if(bloom != null){
-            bloom.dispose();
-            bloom = null;
-        }
         Events.fire(new DisposeEvent());
     }
 

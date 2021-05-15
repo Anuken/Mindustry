@@ -62,7 +62,7 @@ public abstract class NetConnection{
     }
 
     /** Kick with an arbitrary reason, and a kick duration in milliseconds. */
-    public void kick(String reason, int kickDuration){
+    public void kick(String reason, long kickDuration){
         if(kicked) return;
 
         Log.info("Kicking connection @; Reason: @", address, reason.replace("\n", " "));

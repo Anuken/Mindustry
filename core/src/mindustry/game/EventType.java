@@ -419,18 +419,24 @@ public class EventType{
     }
     
     public static class PlayerBanEvent{
+        @Nullable
         public final Player player;
+        public final String uuid;
 
-        public PlayerBanEvent(Player player){
+        public PlayerBanEvent(Player player, String uuid){
             this.player = player;
+            this.uuid = uuid;
         }
     }
     
     public static class PlayerUnbanEvent{
+        @Nullable
         public final Player player;
+        public final String uuid;
 
-        public PlayerUnbanEvent(Player player){
+        public PlayerUnbanEvent(Player player, String uuid){
             this.player = player;
+            this.uuid = uuid;
         }
     }
     

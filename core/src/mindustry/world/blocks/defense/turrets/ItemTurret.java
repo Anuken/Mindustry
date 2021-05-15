@@ -165,21 +165,23 @@ public class ItemTurret extends Turret{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
+            ammo.clear();
+            totalAmmo = 0;
             int amount = read.ub();
             for(int i = 0; i < amount; i++){
                 Item item = Vars.content.item(revision < 2 ? read.ub() : read.s());
                 short a = read.s();
-                totalAmmo += a;
 
                 //only add ammo if this is a valid ammo type
                 if(item != null && ammoTypes.containsKey(item)){
+                    totalAmmo += a;
                     ammo.add(new ItemEntry(item, a));
                 }
             }
         }
     }
 
-    class ItemEntry extends AmmoEntry{
+    public class ItemEntry extends AmmoEntry{
         protected Item item;
 
         ItemEntry(Item item, int amount){

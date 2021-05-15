@@ -1,7 +1,6 @@
 package mindustry.graphics;
 
 import arc.graphics.*;
-import arc.graphics.VertexAttributes.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
@@ -200,9 +199,9 @@ public class IndexedRenderer implements Disposable{
         if(mesh != null) mesh.dispose();
 
         mesh = new Mesh(true, 6 * sprites, 0,
-        new VertexAttribute(Usage.position, 2, "a_position"),
-        new VertexAttribute(Usage.colorPacked, 4, "a_color"),
-        new VertexAttribute(Usage.textureCoordinates, 2, "a_texCoord0"));
+        VertexAttribute.position,
+        VertexAttribute.color,
+        VertexAttribute.texCoords);
         vertices = new float[6 * sprites * vsize];
         mesh.setVertices(vertices);
     }

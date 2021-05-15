@@ -108,13 +108,13 @@ public class PowerNode extends PowerBlock{
         super.setBars();
         bars.add("power", entity -> new Bar(() ->
         Core.bundle.format("bar.powerbalance",
-            ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + UI.formatAmount((int)(entity.power.graph.getPowerBalance() * 60)))),
+            ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + UI.formatAmount((long)(entity.power.graph.getPowerBalance() * 60)))),
             () -> Pal.powerBar,
             () -> Mathf.clamp(entity.power.graph.getLastPowerProduced() / entity.power.graph.getLastPowerNeeded())));
 
         bars.add("batteries", entity -> new Bar(() ->
         Core.bundle.format("bar.powerstored",
-            (UI.formatAmount((int)entity.power.graph.getLastPowerStored())), UI.formatAmount((int)entity.power.graph.getLastCapacity())),
+            (UI.formatAmount((long)entity.power.graph.getLastPowerStored())), UI.formatAmount((long)entity.power.graph.getLastCapacity())),
             () -> Pal.powerBar,
             () -> Mathf.clamp(entity.power.graph.getLastPowerStored() / entity.power.graph.getLastCapacity())));
 
@@ -143,7 +143,7 @@ public class PowerNode extends PowerBlock{
         Draw.color(Pal.placing);
         Drawf.circles(x * tilesize + offset, y * tilesize + offset, laserRange * tilesize);
 
-        getPotentialLinks(tile, other -> {
+        getPotentialLinks(tile, player.team(), other -> {
             Draw.color(laserColor1, Renderer.laserOpacity * 0.5f);
             drawLaser(tile.team(), x * tilesize + offset, y * tilesize + offset, other.x, other.y, size, other.block.size);
 
@@ -193,10 +193,10 @@ public class PowerNode extends PowerBlock{
         return Intersector.overlaps(Tmp.cr1.set(src.worldx() + offset, src.worldy() + offset, laserRange * tilesize), Tmp.r1.setSize(size * tilesize).setCenter(other.worldx() + offset, other.worldy() + offset));
     }
 
-    protected void getPotentialLinks(Tile tile, Cons<Building> others){
+    protected void getPotentialLinks(Tile tile, Team team, Cons<Building> others){
         Boolf<Building> valid = other -> other != null && other.tile() != tile && other.power != null &&
             (other.block.outputsPower || other.block.consumesPower || other.block instanceof PowerNode) &&
-            overlaps(tile.x * tilesize + offset, tile.y * tilesize + offset, other.tile(), laserRange * tilesize) && other.team == player.team() &&
+            overlaps(tile.x * tilesize + offset, tile.y * tilesize + offset, other.tile(), laserRange * tilesize) && other.team == team &&
             !graphs.contains(other.power.graph) &&
             !PowerNode.insulated(tile, other.tile) &&
             !(other instanceof PowerNodeBuild obuild && obuild.power.links.size >= ((PowerNode)obuild.block).maxNodes) &&
@@ -211,7 +211,7 @@ public class PowerNode extends PowerBlock{
         //add conducting graphs to prevent double link
         for(var p : Edges.getEdges(size)){
             Tile other = tile.nearby(p);
-            if(other != null && other.team() == player.team() && other.build != null && other.build.power != null){
+            if(other != null && other.team() == team && other.build != null && other.build.power != null){
                 graphs.add(other.build.power.graph);
             }
         }
@@ -351,7 +351,7 @@ public class PowerNode extends PowerBlock{
         public void placed(){
             if(net.client()) return;
 
-            getPotentialLinks(tile, other -> {
+            getPotentialLinks(tile, team, other -> {
                 if(!power.links.contains(other.pos())){
                     configureAny(other.pos());
                 }
@@ -363,8 +363,6 @@ public class PowerNode extends PowerBlock{
         @Override
         public void dropped(){
             power.links.clear();
-            //create new power graph to manually unlink (this may be redundant)
-            new PowerGraph().add(this);
         }
 
         @Override
@@ -382,7 +380,7 @@ public class PowerNode extends PowerBlock{
             if(this == other){
                 if(other.power.links.size == 0){
                     int[] total = {0};
-                    getPotentialLinks(tile, link -> {
+                    getPotentialLinks(tile, team, link -> {
                         if(!insulated(this, link) && total[0]++ < maxNodes){
                             configure(link.pos());
                         }

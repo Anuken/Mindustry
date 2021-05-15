@@ -339,7 +339,11 @@ public class ServerControl implements ApplicationListener{
             if(!maps.all().isEmpty()){
                 info("Maps:");
                 for(Map map : maps.all()){
-                    info("  @: &fi@ / @x@", map.name().replace(' ', '_'), map.custom ? "Custom" : "Default", map.width, map.height);
+                    if(map.custom){
+                        info("  @ (@): &fiCustom / @x@", map.name().replace(' ', '_'), map.file.name(), map.width, map.height);
+                    }else{
+                        info("  @: &fiDefault / @x@", map.name().replace(' ', '_'), map.width, map.height);
+                    }
                 }
             }else{
                 info("No maps found.");
@@ -554,7 +558,7 @@ public class ServerControl implements ApplicationListener{
                             return;
                         }
                     }else if(c.isString()){
-                        c.set(arg[1]);
+                        c.set(arg[1].replace("\\n", "\n"));
                     }
 
                     info("@ set to @.", c.name(), c.get());
