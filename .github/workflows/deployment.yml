@@ -2,7 +2,7 @@ name: compile mindustry
 on:
   push
 jobs: 
-  compile game:
+  compilegame:
     runs-on: ubuntu-latest
     
     steps: 
