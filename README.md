@@ -1,4 +1,4 @@
-![Logo](core/assets-raw/sprites/ui/logo.ng)
+![Logo](core/assets-raw/sprites/ui/logo.png)
 # Клиент для Mindustry
 Просто клиент со сломаным кодом но рабочий. Просто веселюсь
 # Установка
