@@ -14,12 +14,12 @@ jobs:
         java-version: 14
     - name: chmod
       run: chmod +x ./gradlew
-    - name: мутим спрайты
+    - name: magic
       run: ./gradlew pack
-    - name: Мутим жар
+    - name: meow
       run: ./gradlew desktop:dist -Pbuildversion=126.2 -PverionType=release --stacktrace
     - name: Upload desktop JAR for testing
       uses: actions/upload-artifact@v2
       with:
-        name: Desktop JAR (zipped)
-        path: desktop/build/libs/Mindustry.jar
+        name: Desktop
+        path: desktop/build/libs/desktop.jar
