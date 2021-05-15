@@ -3,4 +3,9 @@
 # Client for Mindustry
 Просто клиент со сломаным кодом но рабочий. Просто веселюсь
 # Installing
-Качаете в Actions почеднюю версию. Извлекаете из зипа Mindustry.jar, копируете в /путь/к/файлу/с/игрой/jre, удаляете файл desktop и переименовываете Mindustry.jar в desktop .
+## Windows
+1. Download the laster version in releases (desktop.jar)
+2. coping in path/to/the/game/jre 
+3. Done 
+## Android 
+Download the laster version in releass (android-version.apk)
