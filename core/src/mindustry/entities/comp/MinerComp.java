@@ -62,7 +62,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
             }
         }
 
-        if(!validMine(mineTile)){
+        if((!net.client() || isLocal()) && !validMine(mineTile)){
             mineTile = null;
             mineTimer = 0f;
         }else if(mining()){
