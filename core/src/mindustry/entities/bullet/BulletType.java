@@ -100,6 +100,7 @@ public abstract class BulletType extends Content{
     public Color trailColor = Pal.missileYellowBack;
     public float trailChance = -0.0001f;
     public Effect trailEffect = Fx.missileTrail;
+    public boolean directionalTrail;
     public float trailParam =  2f;
 
     /** Use a negative value to disable splash damage. */
@@ -295,7 +296,7 @@ public abstract class BulletType extends Content{
 
         if(trailChance > 0){
             if(Mathf.chanceDelta(trailChance)){
-                trailEffect.at(b.x, b.y, trailParam, trailColor);
+                trailEffect.at(b.x, b.y, directionalTrail ? b.rotation() : trailParam, trailColor);
             }
         }
     }
