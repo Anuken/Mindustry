@@ -87,6 +87,8 @@ public abstract class BulletType extends Content{
     public float healPercent = 0f;
     /** whether to make fire on impact */
     public boolean makeFire = false;
+    /** layer in which the bullet is drawn */
+    public float drawLayer = Layer.bullet;
 
     //additional effects
 
