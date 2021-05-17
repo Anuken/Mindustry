@@ -13,6 +13,8 @@ public class GenericSmelter extends GenericCrafter{
     public Color flameColor = Color.valueOf("ffc999");
     public @Load("@-top") TextureRegion topRegion;
 
+    public float radMul = 1f, magMul = 1f;
+
     public GenericSmelter(String name){
         super(name);
         ambientSound = Sounds.smelter;
@@ -35,10 +37,10 @@ public class GenericSmelter extends GenericCrafter{
                 Draw.alpha(((1f - g) + Mathf.absin(Time.time, 8f, g) + Mathf.random(r) - r) * warmup);
 
                 Draw.tint(flameColor);
-                Fill.circle(x, y, 3f + Mathf.absin(Time.time, 5f, 2f) + cr);
+                Fill.circle(x, y, 3f * radMul + Mathf.absin(Time.time, 5f, 2f * magMul) + cr);
                 Draw.color(1f, 1f, 1f, warmup);
                 Draw.rect(topRegion, x, y);
-                Fill.circle(x, y, 1.9f + Mathf.absin(Time.time, 5f, 1f) + cr);
+                Fill.circle(x, y, 1.9f * radMul + Mathf.absin(Time.time, 5f, magMul) + cr);
 
                 Draw.color();
             }
