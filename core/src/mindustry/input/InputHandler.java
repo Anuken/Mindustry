@@ -392,7 +392,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             //TODO try out some other formations
             commander.commandNearby(new CircleFormation());
-            Fx.commandSend.at(player);
+            Fx.commandSend.at(player, player.unit().type.commandRadius);
         }
 
     }
