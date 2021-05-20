@@ -1,9 +1,5 @@
 [
   {
-    "name": "RCR",
-    "address": ["rcr.fvds.ru"]
-  },
-  {
     "name": "SMokeOfAnarchy.duckdns.org",
     "address": ["smokeofanarchy.duckdns.org:6853"]
   },
