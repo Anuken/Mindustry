@@ -31,7 +31,6 @@ public class ForceProjector extends Block{
     public float cooldownNormal = 1.75f;
     public float cooldownLiquid = 1.5f;
     public float cooldownBrokenBase = 0.35f;
-    public float basePowerDraw = 0.2f;
     public @Load("@-top") TextureRegion topRegion;
 
     static ForceBuild paramEntity;
@@ -73,7 +72,6 @@ public class ForceProjector extends Block{
         super.setStats();
         stats.add(Stat.shieldHealth, shieldHealth, StatUnit.none);
         stats.add(Stat.cooldownTime, (int) (shieldHealth / cooldownBrokenBase / 60f), StatUnit.seconds);
-        stats.add(Stat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
         stats.add(Stat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
         stats.add(Stat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
     }
