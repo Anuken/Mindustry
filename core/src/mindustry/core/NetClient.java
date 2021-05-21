@@ -347,7 +347,22 @@ public class NetClient implements ApplicationListener{
     public static void infoMessage(String message){
         if(message == null) return;
 
-        ui.showText("", message);
+        ui.showText("", message, (option) -> Call.menuChoose(player, option));
+    }
+
+    @Remote(variants = Variant.both)
+    public static void infoMessage(String title, String message){
+        if(title == null && message == null) return;
+        if(title == null) title = "";
+
+        ui.showText(title, message, (option) -> Call.menuChoose(player, option));
+    }
+
+    @Remote(variants = Variant.both)
+    public static void menu(String title, String message, String[][] options){
+        if(title == null) title = "";
+
+        ui.showMenu(title, message, options, (option) -> Call.menuChoose(player, option));
     }
 
     @Remote(variants = Variant.both)

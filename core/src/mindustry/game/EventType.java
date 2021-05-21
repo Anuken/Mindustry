@@ -206,6 +206,17 @@ public class EventType{
         }
     }
 
+    /** Called when a player chooses an option in menu. */
+    public static class MenuOptionChooseEvent{
+        public final Player player;
+        public final int option;
+
+        public MenuOptionChooseEvent(Player player, int option){
+            this.option = option;
+            this.player = player;
+        }
+    }
+
     public static class PickupEvent{
         public final Unit carrier;
         public final @Nullable Unit unit;

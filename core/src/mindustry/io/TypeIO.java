@@ -95,6 +95,9 @@ public class TypeIO{
         }else if(object instanceof BuildingBox b){
             write.b(12);
             write.i(b.pos);
+        }else if(object instanceof String[][] strings){
+            write.b(16);
+            writeStrings(write, strings);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -126,6 +129,7 @@ public class TypeIO{
             case 13: return LAccess.all[read.s()];
             case 14: int blen = read.i(); byte[] bytes = new byte[blen]; read.b(bytes); return bytes;
             case 15: return UnitCommand.all[read.b()];
+            case 16: return readStrings(read);
             default: throw new IllegalArgumentException("Unknown object type: " + type);
         }
     }
@@ -605,6 +609,35 @@ public class TypeIO{
             byte[] bytes = new byte[slength];
             buffer.readFully(bytes);
             return new String(bytes, charset);
+        }else{
+            return null;
+        }
+    }
+
+    public static void writeStrings(Writes write, String[][] strings){
+        write.b(strings.length);
+        for(int i = 0; i < strings.length; i++){
+            write.b(strings[i].length);
+            for(int j = 0; j < strings[i].length; j++){
+                writeString(write, strings[i][j]);
+            }
+        }
+    }
+
+    public static String[][] readStrings(Reads read){
+        byte rows = read.b();
+        if(rows != -1){
+            String[][] strings = new String[rows][];
+            for(byte i = 0; i < rows; i++){
+                byte columns = read.b();
+                if(columns != -1){
+                    strings[i] = new String[columns];
+                    for(byte j = 0; j < columns; j++){
+                        strings[i][j] = readString(read);
+                    }
+                }
+            }
+            return strings;
         }else{
             return null;
         }

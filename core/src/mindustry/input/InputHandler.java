@@ -331,6 +331,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Events.fire(new TapEvent(player, tile));
     }
 
+    @Remote(targets = Loc.both, called = Loc.both)
+    public static void menuChoose(@Nullable Player player, int option){
+        Events.fire(new MenuOptionChooseEvent(player, option));
+    }
+
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void unitControl(Player player, @Nullable Unit unit){
         if(player == null) return;

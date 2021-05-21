@@ -425,18 +425,60 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showText(String titleText, String text){
-        showText(titleText, text, Align.center);
+        showText(titleText, text, (i) -> {});
+    }
+
+    public void showText(String titleText, String text, Cons<Integer> callback){
+        showText(titleText, text, Align.center, callback);
     }
 
     public void showText(String titleText, String text, int align){
+        showText(titleText, text, align, (i) -> {});
+    }
+
+    public void showText(String titleText, String text, int align, Cons<Integer> callback){
         new Dialog(titleText){{
             cont.row();
             cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent);
             cont.row();
             cont.add(text).width(400f).wrap().get().setAlignment(align, align);
             cont.row();
-            buttons.button("@ok", this::hide).size(110, 50).pad(4);
-            closeOnBack();
+            buttons.button("@ok", () -> {
+                callback.get(0);
+                hide();
+            }).size(110, 50).pad(4);
+            closeOnBack(() -> callback.get(-1));
+        }}.show();
+    }
+
+    public void showMenu(String title, String message, String[][] options, Cons<Integer> callback){
+        new Dialog(title){{
+            cont.row();
+            cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent);
+            cont.row();
+            cont.add(message).width(400f).wrap().get().setAlignment(Align.center);
+            cont.row();
+
+            int option = 0;
+            for(String[] optionsRow : options){
+                Table buttonRow = buttons.row().table().get().row();
+                int fullWidth = 400 - (optionsRow.length - 1) * 8; // adjust to count padding as well
+                int width = fullWidth / optionsRow.length;
+                int lastWidth = fullWidth - width * (optionsRow.length - 1); // take the rest of space for uneven table
+
+                for(int i = 0; i < optionsRow.length; i++){
+                    if(optionsRow[i] == null) continue;
+
+                    String optionName = optionsRow[i];
+                    int finalOption = option;
+                    buttonRow.button(optionName, () -> {
+                        callback.get(finalOption);
+                        hide();
+                    }).size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
+                    option++;
+                }
+            }
+            closeOnBack(() -> callback.get(-1));
         }}.show();
     }
 
