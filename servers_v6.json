@@ -1,5 +1,9 @@
 [
   {
+    "name": "MD Community",
+    "address": ["46.17.104.254", "46.17.104.254:4000"]
+  },
+  {
     "name": "RCR",
     "address": ["rcr.fvds.ru"]
   },
@@ -86,10 +90,6 @@
   {
     "name": "Nydus",
     "address": ["v6.mindustry.nydus.app:6566"]
-  },
-  {
-    "name": "MD Community",
-    "address": ["82.202.172.148", "mindurka.fvds.ru:1001"]
   },
   {
     "name": "Mindustry.Party",
