@@ -55,6 +55,7 @@ public class UnitType extends UnlockableContent{
     public float aimDst = -1f;
     public float buildBeamOffset = 3.8f;
     public int commandLimit = 8;
+    public float commandRadius = 150f;
     public float visualElevation = -1f;
     public boolean allowLegStep = false;
     public boolean hovering = false;
