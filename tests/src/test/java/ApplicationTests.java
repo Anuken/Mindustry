@@ -235,6 +235,12 @@ public class ApplicationTests{
         assertTrue(state.teams.playerCores().size > 0);
     }
 
+    @Test
+    void UpdateScoreMap() {
+        testMap.setHighScore(100);
+        assertEquals(100, testMap.getHightScore());
+    }
+
     void updateBlocks(int times){
         for(Tile tile : world.tiles){
             if(tile.build != null && tile.isCenter()){
