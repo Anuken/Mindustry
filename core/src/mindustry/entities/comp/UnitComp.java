@@ -348,13 +348,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
             //standard fall smoke
             if(Mathf.chanceDelta(0.1)){
-                Tmp.v1.setToRandomDirection().scl(hitSize);
+                Tmp.v1.rnd(Mathf.range(hitSize));
                 type.fallEffect.at(x + Tmp.v1.x, y + Tmp.v1.y);
             }
 
             //thruster fall trail
             if(Mathf.chanceDelta(0.2)){
-                float offset = type.engineOffset/2f + type.engineOffset/2f*elevation;
+                float offset = type.engineOffset/2f + type.engineOffset/2f * elevation;
                 float range = Mathf.range(type.engineSize);
                 type.fallThrusterEffect.at(
                     x + Angles.trnsx(rotation + 180, offset) + Mathf.range(range),

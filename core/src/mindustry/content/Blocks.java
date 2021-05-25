@@ -1124,6 +1124,7 @@ public class Blocks implements ContentList{
             size = 2;
             maxNodes = 2;
             laserRange = 40f;
+            schematicPriority = -15;
         }};
 
         diode = new PowerDiode("diode"){{

@@ -159,7 +159,7 @@ public class Fx{
     commandSend = new Effect(28, e -> {
         color(Pal.command);
         stroke(e.fout() * 2f);
-        Lines.circle(e.x, e.y, 4f + e.finpow() * 120f);
+        Lines.circle(e.x, e.y, 4f + e.finpow() * e.rotation);
     }),
 
     upgradeCore = new Effect(120f, e -> {
