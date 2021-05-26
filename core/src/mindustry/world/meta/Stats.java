@@ -1,6 +1,6 @@
 package mindustry.world.meta;
 
-import arc.math.Mathf;
+import arc.math.*;
 import arc.struct.ObjectMap.*;
 import arc.struct.*;
 import arc.util.*;
