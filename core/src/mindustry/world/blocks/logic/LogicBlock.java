@@ -242,8 +242,7 @@ public class LogicBlock extends Block{
                 }
 
                 updateCode(new String(bytes, charset));
-            }catch(IOException e){
-                Log.err(e);
+            }catch(Exception ignored){
             }
         }
 

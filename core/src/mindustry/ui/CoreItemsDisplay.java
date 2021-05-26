@@ -19,12 +19,15 @@ public class CoreItemsDisplay extends Table{
 
     public void resetUsed(){
         usedItems.clear();
+        background(null);
     }
 
     void rebuild(){
         clear();
-        background(Styles.black6);
-        margin(4);
+        if(usedItems.size > 0){
+            background(Styles.black6);
+            margin(4);
+        }
 
         update(() -> {
             core = Vars.player.team().core();

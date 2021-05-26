@@ -23,6 +23,7 @@ public class CommandCenter extends Block{
     public TextureRegionDrawable[] commandRegions = new TextureRegionDrawable[UnitCommand.all.length];
     public Color topColor = null, bottomColor = Color.valueOf("5e5e5e");
     public Effect effect = Fx.commandSend;
+    public float effectSize = 150f;
 
     public CommandCenter(String name){
         super(name);
@@ -35,7 +36,7 @@ public class CommandCenter extends Block{
 
         config(UnitCommand.class, (CommandBuild build, UnitCommand command) -> {
             build.team.data().command = command;
-            effect.at(build);
+            effect.at(build, effectSize);
             Events.fire(new CommandIssueEvent(build, command));
         });
     }
