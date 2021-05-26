@@ -137,6 +137,18 @@ public class ApplicationTests{
     }
 
     @Test
+    void checkInitialItems() {
+        world.loadMap(testMap);
+        logic.play();
+        for(Teams.TeamData team : state.teams.getActive()){
+            if (team.hasCore()){
+                assertTrue(team.team.items().has(Items.copper), "Has copper");
+                assertEquals(200, team.team.items().get(Items.copper.id),"Copper total number equal to initial items number");
+            }
+        }
+    }
+
+    @Test
     void createMap(){
         Tiles tiles = world.resize(8, 8);
 
