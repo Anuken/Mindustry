@@ -26,6 +26,7 @@ public class MassDriver extends Block{
     public int minDistribute = 10;
     public float knockback = 4f;
     public float reloadTime = 100f;
+    public MassDriverBolt bullet = Bullets.driverBolt;
     public float bulletSpeed = 5.5f;
     public float bulletLifetime = 200f;
     public Effect shootEffect = Fx.shootBig2;
@@ -268,7 +269,7 @@ public class MassDriver extends Block{
 
             float angle = tile.angleTo(target);
 
-            Bullets.driverBolt.create(this, team,
+            bullet.create(this, team,
                 x + Angles.trnsx(angle, translation), y + Angles.trnsy(angle, translation),
                 angle, -1f, bulletSpeed, bulletLifetime, data);
 
