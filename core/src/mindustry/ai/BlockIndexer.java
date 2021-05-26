@@ -248,18 +248,19 @@ public class BlockIndexer{
     }
 
     public Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
+        Building target = null;
+
         for(int i = 0; i < activeTeams.size; i++){
             Team enemy = activeTeams.items[i];
-
             if(enemy == team || team == Team.derelict) continue;
 
-            Building entity = indexer.findTile(enemy, x, y, range, pred, true);
-            if(entity != null){
-                return entity;
-            }
+            Building candidate = indexer.findTile(enemy, x, y, range, pred, true);
+            if(candidate == null) continue;
+
+            if(target == null || candidate.block.priority.ordinal() > target.block.priority.ordinal()) target = candidate;
         }
 
-        return null;
+        return target;
     }
 
     public Building findTile(Team team, float x, float y, float range, Boolf<Building> pred){
