@@ -27,7 +27,7 @@ public class MassDriver extends Block{
     public int minDistribute = 10;
     public float knockback = 4f;
     public float reloadTime = 100f;
-    public MassDriverBolt bullet = Bullets.driverBolt;
+    public MassDriverBolt bullet;
     public float bulletSpeed = 5.5f;
     public float bulletLifetime = 200f;
     public Effect shootEffect = Fx.shootBig2;
