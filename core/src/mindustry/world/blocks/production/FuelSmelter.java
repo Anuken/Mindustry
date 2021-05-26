@@ -49,7 +49,7 @@ public class FuelSmelter extends GenericSmelter{
         stats.add(Stat.fuelPerItem, fuelPerItem);
         stats.add(Stat.fuelUse, fuelPerCraft);
         stats.add(Stat.fuelCapacity, fuelCapacity);
-        stats.add(Stat.affinities, attribute, floating, fuelUseReduction / -100f, false, false, false);
+        stats.add(Stat.affinities, attribute, floating, fuelUseReduction / 100f, false, false, false);
     }
 
     public class FuelSmelterBuild extends SmelterBuild{
