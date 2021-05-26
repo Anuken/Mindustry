@@ -45,7 +45,7 @@ public class FuelSmelter extends GenericSmelter{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.affinities, attribute, false, fuelUseReduction / 100f, false, false, false);
+        stats.add(Stat.affinities, attribute, false, fuelUseReduction / -100f, false, false, false);
     }
 
     public class FuelSmelterBuild extends SmelterBuild{
