@@ -628,6 +628,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     @Remote(called = Loc.server)
     public static void setTile(Tile tile, Block block, Team team, int rotation){
+        if(tile == null) return;
         tile.setBlock(block, team, rotation);
     }
 
