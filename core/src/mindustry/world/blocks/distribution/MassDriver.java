@@ -277,9 +277,9 @@ public class MassDriver extends Block{
 
             float angle = tile.angleTo(target);
 
-            tr.trns(angle, shootLength);
+            tr.trns(angle, translation);
 
-            Bullets.driverBolt.create(this, team, x + tr.x, y + tr.y, angle, -1f, speed, lifetime, data);
+            Bullets.driverBolt.create(this, team, x + tr.x, y + tr.y, angle, -1f, bulletSpeed, bulletLifetime, data);
 
             shootEffect.at(x + tr.x, y + tr.y, angle);
             smokeEffect.at(x + tr.x, y + tr.y, angle);
