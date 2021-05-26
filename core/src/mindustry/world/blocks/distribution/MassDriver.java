@@ -25,6 +25,7 @@ public class MassDriver extends Block{
     public float translation = 7f;
     public int minDistribute = 10;
     public float knockback = 4f;
+    public float elevation = -1f;
     public float reloadTime = 100f;
     public float bulletSpeed = 5.5f;
     public float bulletLifetime = 200f;
@@ -34,6 +35,9 @@ public class MassDriver extends Block{
     public Sound shootSound = Sounds.shootBig;
     public float shake = 3f;
     public @Load("@-base") TextureRegion baseRegion;
+    
+    protected Vec2 tr = new Vec2();
+    protected Vec2 tr2 = new Vec2();
 
     public MassDriver(String name){
         super(name);
@@ -50,6 +54,13 @@ public class MassDriver extends Block{
         config(Integer.class, (MassDriverBuild tile, Integer point) -> tile.link = point);
     }
 
+    @Override
+    public void init(){
+        super.init();
+
+        if(elevation < 0) elevation = size / 2f;
+    }
+    
     @Override
     public TextureRegion[] icons(){
         return new TextureRegion[]{baseRegion, region};
@@ -196,13 +207,11 @@ public class MassDriver extends Block{
             Draw.rect(baseRegion, x, y);
 
             Draw.z(Layer.turret);
+            
+            tr2.trns(rotation, -reload * knockback);
 
-            Drawf.shadow(region,
-            x + Angles.trnsx(rotation + 180f, reload * knockback) - (size / 2),
-            y + Angles.trnsy(rotation + 180f, reload * knockback) - (size / 2), rotation - 90);
-            Draw.rect(region,
-            x + Angles.trnsx(rotation + 180f, reload * knockback),
-            y + Angles.trnsy(rotation + 180f, reload * knockback), rotation - 90);
+            Drawf.shadow(region,  x + tr2.x - elevation, y + tr2.y - elevation, rotation - 90);
+            Draw.rect(region, x + tr2.x, y + tr2.y, rotation - 90);
         }
 
         @Override
@@ -268,18 +277,13 @@ public class MassDriver extends Block{
 
             float angle = tile.angleTo(target);
 
-            Bullets.driverBolt.create(this, team,
-                x + Angles.trnsx(angle, translation), y + Angles.trnsy(angle, translation),
-                angle, -1f, bulletSpeed, bulletLifetime, data);
+            tr.trns(angle, shootLength);
 
-            shootEffect.at(x + Angles.trnsx(angle, translation),
-            y + Angles.trnsy(angle, translation), angle);
+            Bullets.driverBolt.create(this, team, x + tr.x, y + tr.y, angle, -1f, speed, lifetime, data);
 
-            smokeEffect.at(x + Angles.trnsx(angle, translation),
-            y + Angles.trnsy(angle, translation), angle);
-
+            shootEffect.at(x + tr.x, y + tr.y, angle);
+            smokeEffect.at(x + tr.x, y + tr.y, angle);
             Effect.shake(shake, shake, this);
-            
             shootSound.at(tile, Mathf.random(0.9f, 1.1f));
         }
 
