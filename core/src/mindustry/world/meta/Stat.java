@@ -57,6 +57,10 @@ public enum Stat{
 
     tiles(StatCat.crafting),
     input(StatCat.crafting),
+    fuelItem(StatCat.crafting),
+    fuelPerItem(StatCat.crafting),
+    fuelUse(StatCat.crafting),
+    fuelCapacity(StatCat.crafting),
     output(StatCat.crafting),
     productionTime(StatCat.crafting),
     drillTier(StatCat.crafting),
