@@ -141,11 +141,20 @@ public class ApplicationTests{
         world.loadMap(testMap);
         logic.play();
         for(Teams.TeamData team : state.teams.getActive()){
-            if (team.hasCore()){
+            if(team.hasCore()){
                 assertTrue(team.team.items().has(Items.copper), "Has copper");
                 assertEquals(200, team.team.items().get(Items.copper.id),"Copper total number equal to initial items number");
             }
         }
+    }
+
+    @Test
+    void TeamsStatusTest() {
+        world.loadMap(testMap);
+        logic.play();
+        assertTrue(state.teams.isActive(state.rules.defaultTeam));
+        assertTrue(state.teams.areEnemies(state.rules.defaultTeam, state.rules.waveTeam));
+        assertFalse(state.teams.canInteract(state.rules.defaultTeam, state.rules.waveTeam));
     }
 
     @Test
@@ -245,12 +254,6 @@ public class ApplicationTests{
         assertEquals(world.width(), map.width);
         assertEquals(world.height(), map.height);
         assertTrue(state.teams.playerCores().size > 0);
-    }
-
-    @Test
-    void UpdateScoreMap() {
-        testMap.setHighScore(100);
-        assertEquals(100, testMap.getHightScore());
     }
 
     void updateBlocks(int times){
