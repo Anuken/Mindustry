@@ -10,24 +10,23 @@ import mindustry.world.meta.*;
 public class FloorEfficiencyValue implements StatValue{
     private final Floor floor;
     private final float multiplier;
-    private final boolean startZero, hasPercent, round;
+    private final boolean startZero, isFuel;
 
-    public FloorEfficiencyValue(Floor floor, float multiplier, boolean startZero, boolean hasPercent, boolean round){
+    public FloorEfficiencyValue(Floor floor, float multiplier, boolean startZero, boolean isFuel){
         this.floor = floor;
         this.multiplier = multiplier;
         this.startZero = startZero;
-        this.hasPercent = hasPercent;
-        this.round = round;
+        this.isFuel = isFuel;
     }
 
     public FloorEfficiencyValue(Floor floor, float multiplier, boolean startZero){
-        this(floor, multiplier, startZero, true, true);
+        this(floor, multiplier, startZero, false);
     }
 
     @Override
     public void display(Table table){
         table.stack(new Image(floor.icon(Cicon.medium)).setScaling(Scaling.fit), new Table(t -> {
-            t.top().right().add((multiplier < 0 ? "[scarlet]" : startZero ? "[accent]" : "[accent]+") + (round ? (int)(multiplier * 100f) : (multiplier * 100f)) + (hasPercent ? "%" : "")).style(Styles.outlineLabel);
+            t.top().right().add((multiplier < 0 ? (isFuel ? "[accent]" : "[scarlet]") : startZero ? "[accent]" : (isFuel ? "[scarlet]+" : "[accent]+")) + (isFuel ? multiplier * 100f : (int)(multiplier * 100f)) + (isFuel ? "" : "%")).style(Styles.outlineLabel);
         }));
     }
 }

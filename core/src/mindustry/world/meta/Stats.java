@@ -56,26 +56,26 @@ public class Stats{
     }
 
     public void add(Stat stat, Attribute attr){
-        add(stat, attr, false, 1f, false, true, true);
+        add(stat, attr, false, 1f, false, false);
     }
 
     public void add(Stat stat, Attribute attr, float scale){
-        add(stat, attr, false, scale, false, true, true);
+        add(stat, attr, false, scale, false, false);
     }
 
     public void add(Stat stat, Attribute attr, boolean floating){
-        add(stat, attr, floating, 1f, false, true, true);
+        add(stat, attr, floating, 1f, false, false);
     }
 
     public void add(Stat stat, Attribute attr, boolean floating, float scale, boolean startZero){
-        add(stat, attr, floating, scale, startZero, true, true);
+        add(stat, attr, floating, scale, startZero, false);
     }
 
-    public void add(Stat stat, Attribute attr, boolean floating, float scale, boolean startZero, boolean hasPercent, boolean round){
+    public void add(Stat stat, Attribute attr, boolean floating, float scale, boolean startZero, boolean isFuel){
         for(var block : Vars.content.blocks()
             .select(block -> block instanceof Floor f && f.attributes.get(attr) != 0 && !(f.isLiquid && !floating))
             .<Floor>as().with(s -> s.sort(f -> f.attributes.get(attr)))){
-            add(stat, new FloorEfficiencyValue(block, block.attributes.get(attr) * scale, startZero, hasPercent, round));
+            add(stat, new FloorEfficiencyValue(block, block.attributes.get(attr) * scale, startZero, isFuel));
         }
     }
 
