@@ -5,16 +5,14 @@ import arc.scene.ui.layout.*;
 import mindustry.Vars;
 import mindustry.gen.Tex;
 import mindustry.ui.Cicon;
-import mindustry.ui.ItemDisplay;
 import mindustry.world.blocks.environment.Floor;
 import mindustry.world.blocks.production.*;
 import mindustry.world.meta.*;
-import org.w3c.dom.Attr;
 
 public class FuelListValue implements StatValue{
-    private final FuelSmelter smelter;
+    private final FuelCrafter smelter;
 
-    public FuelListValue(FuelSmelter smelter){
+    public FuelListValue(FuelCrafter smelter){
         this.smelter = smelter;
     }
 
