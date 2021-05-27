@@ -270,23 +270,23 @@ public class Logic implements ApplicationListener{
         }
     }
 
-    private void dynamicLightingUpdate(){
-        float realSpeed = state.rules.dynamicLightingSpeed / 120000f;
+    private void dayNightCycleUpdate(){
+        float realSpeed = state.rules.dayNightCycleSpeed / 120000f;
         float darkLight = 0.75f;
-        if (state.rules.dynamicLighting){
+        if (state.rules.dayNightCycle){
             if (state.rules.ambientLight.a >= 1) {
                 state.rules.ambientLight.a = 0;
             }
             if (state.rules.ambientLight.a + realSpeed > 1 || state.rules.ambientLight.a > darkLight){
                 state.rules.ambientLight.a = darkLight;
-                state.rules.dynamicLightingDark = false;
+                state.rules.dayNightCycleDark = false;
             }
             if (state.rules.ambientLight.a - realSpeed < 0){
                 state.rules.ambientLight.a = 0;
-                state.rules.dynamicLightingDark = true;
+                state.rules.dayNightCycleDark = true;
             }
 
-            if (state.rules.dynamicLightingDark){
+            if (state.rules.dayNightCycleDark){
                 state.rules.ambientLight.a = state.rules.ambientLight.a + realSpeed;
             } else {
                 state.rules.ambientLight.a = state.rules.ambientLight.a - realSpeed;
@@ -411,14 +411,14 @@ public class Logic implements ApplicationListener{
                 }
                 Time.update();
 
-                //weather, dynamic light is serverside
+                //weather, day night cycle is serverside
                 if(!net.client() && !state.isEditor()){
                     updateWeather();
-                    if (state.rules.dynamicLighting && state.rules.lighting == false){
+                    if (state.rules.dayNightCycle && state.rules.lighting == false){
                         state.rules.lighting = true;
                         state.rules.ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.1f);
                     };
-                    dynamicLightingUpdate();
+                    dayNightCycleUpdate();
 
                     for(TeamData data : state.teams.getActive()){
                         if(data.hasAI()){
@@ -427,7 +427,7 @@ public class Logic implements ApplicationListener{
                     }
                 }
 
-                if (net.server() && state.rules.dynamicLighting){
+                if (net.server() && state.rules.dayNightCycle){
                     Call.setRules(state.rules);
                 }
 

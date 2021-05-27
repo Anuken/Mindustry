@@ -90,11 +90,11 @@ public class Rules{
     public boolean lighting = false;
     /** Whether enemy lighting is visible.
      * If lighting is enabled and this is false, a fog-of-war effect is partially achieved. */
-    public boolean dynamicLighting = false;
-    /** Whether dynamic lighting is enabled. */
-    public float dynamicLightingSpeed = 1.5f;
+    public boolean dayNightCycle = false;
+    /** Whether Day & Night Cycle is enabled. */
+    public float dayNightCycleSpeed = 1.5f;
     /** The light changing speed.*/
-    public boolean dynamicLightingDark = false;
+    public boolean dayNightCycleDark = false;
     /** Whether the light getting darker or brighter.*/
     public boolean enemyLights = true;
     /** Ambient light color, used when lighting is enabled. */
