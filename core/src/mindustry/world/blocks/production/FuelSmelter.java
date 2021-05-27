@@ -81,7 +81,7 @@ public class FuelSmelter extends GenericSmelter{
 
         @Override
         public void handleItem(Building source, Item item){
-            if(item == fuelItem && fuel + fuelPerItem > fuelCapacity && fuelNeeded() > 0f){
+            if(item == fuelItem && fuel + fuelPerItem <= fuelCapacity && fuelNeeded() > 0f){
                 fuel += fuelPerItem;
                 return;
             }
