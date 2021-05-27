@@ -2,13 +2,13 @@ package mindustry.world.blocks.production;
 
 import arc.*;
 import arc.math.*;
-import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
+import mindustry.world.meta.values.*;
 
 /** A smelter uses fuel to craft. Attribute tiles make it use less fuel. */
 public class FuelSmelter extends GenericSmelter{
@@ -45,11 +45,7 @@ public class FuelSmelter extends GenericSmelter{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.fuelItem, fuelItem);
-        stats.add(Stat.fuelPerItem, fuelPerItem);
-        stats.add(Stat.fuelUse, fuelPerCraft);
-        stats.add(Stat.fuelCapacity, fuelCapacity);
-        stats.add(Stat.affinities, attribute, floating, fuelUseReduction / -100f, false, true);
+        stats.add(Stat.fuel, new FuelListValue(this));
     }
 
     public class FuelSmelterBuild extends SmelterBuild{
@@ -96,7 +92,6 @@ public class FuelSmelter extends GenericSmelter{
             super.write(write);
 
             write.i(fuel);
-            write.f(attrsum);
         }
 
         @Override
@@ -104,7 +99,6 @@ public class FuelSmelter extends GenericSmelter{
             super.read(read, revision);
 
             fuel = read.i();
-            attrsum = read.f();
         }
     }
 }
