@@ -202,13 +202,17 @@ public class Drawf{
     public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2){
         laser(team, line, edge, x, y, x2, y2, Mathf.angle(x2 - x, y2 - y), 1f);
     }
-
+    
     public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float rotation, float scale){
+        laser(team, line, edge, edge, x, y, x2, y2, rotation, scale);
+    }
+
+    public static void laser(Team team, TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float rotation, float scale){
         float scl = 8f * scale * Draw.scl;
         float vx = Mathf.cosDeg(rotation) * scl, vy = Mathf.sinDeg(rotation) * scl;
 
-        Draw.rect(edge, x, y, edge.width * scale * Draw.scl, edge.height * scale * Draw.scl, rotation + 180);
-        Draw.rect(edge, x2, y2, edge.width * scale * Draw.scl, edge.height * scale * Draw.scl, rotation);
+        Draw.rect(start, x, y, edge.width * scale * Draw.scl, edge.height * scale * Draw.scl, rotation + 180);
+        Draw.rect(end, x2, y2, edge.width * scale * Draw.scl, edge.height * scale * Draw.scl, rotation);
 
         Lines.stroke(12f * scale);
         Lines.line(line, x + vx, y + vy, x2 - vx, y2 - vy, false);
