@@ -162,12 +162,12 @@ public class ApplicationTests{
         world.loadMap(testMap);
         state.set(State.playing);
 
-        world.tile(0,0).setBlock(Blocks.conveyor);
-        assertEquals(world.tile(0, 0).block(), Blocks.conveyor);
-
         world.tile(0, 0).setBlock(Blocks.liquidSource);
         world.tile(0, 0).build.configureAny(Liquids.water);
         assertEquals(world.tile(0, 0).build.liquids.current(), Liquids.water);
+
+        world.tile(0,0).setBlock(Blocks.conveyor);
+        assertEquals(world.tile(0, 0).block(), Blocks.conveyor);
     }
 
     @Test
