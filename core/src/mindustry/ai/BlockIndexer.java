@@ -257,7 +257,7 @@ public class BlockIndexer{
             Building candidate = indexer.findTile(enemy, x, y, range, pred, true);
             if(candidate == null) continue;
 
-            //skip if the building we are looking at doesn't have a core (and our current target doesn't have one either
+            //skip if the building we are looking at doesn't have a core (and our current target has one)
             if(target != null && enemy.cores().isEmpty() && !target.team.cores().isEmpty()) continue;
 
             if(target == null || candidate.block.priority.ordinal() > target.block.priority.ordinal()) target = candidate;
