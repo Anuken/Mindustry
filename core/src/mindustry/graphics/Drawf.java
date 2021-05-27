@@ -196,7 +196,7 @@ public class Drawf{
     }
 
     public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float scale){
-        laser(team, line, edge, x, y, x2, y2, Mathf.angle(x2 - x, y2 - y), scale);
+        laser(team, line, edge, edge, x, y, x2, y2, Mathf.angle(x2 - x, y2 - y), scale);
     }
 
     public static void laser(Team team, TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale){
@@ -205,6 +205,10 @@ public class Drawf{
 
     public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2){
         laser(team, line, edge, edge, x, y, x2, y2, Mathf.angle(x2 - x, y2 - y), 1f);
+    }
+
+    public static void laser(Team team, TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2){
+        laser(team, line, start, end, x, y, x2, y2, Mathf.angle(x2 - x, y2 - y), 1f);
     }
 
     public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float rotation, float scale){
