@@ -353,14 +353,15 @@ public class Turret extends ReloadTurret{
         }
 
         protected void updateShooting(){
+            if (reload < reloadTime && !charging) {
+               reload += delta() * peekAmmo().reloadMultiplier * baseReloadSpeed();
+            }
             if(reload >= reloadTime && !charging){
                 BulletType type = peekAmmo();
+                
+                for (int x = 0; x < reload / reloadTime; x++) shoot(type);
 
-                shoot(type);
-
-                reload = 0f;
-            }else{
-                reload += delta() * peekAmmo().reloadMultiplier * baseReloadSpeed();
+                reload %= reloadTime;
             }
         }
 
