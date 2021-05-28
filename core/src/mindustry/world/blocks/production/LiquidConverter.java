@@ -53,9 +53,9 @@ public class LiquidConverter extends GenericCrafter{
 
                 progress += use / cl.amount;
                 liquids.add(outputLiquid.liquid, use);
-                if(progress >= craftTime){
+                while(progress >= craftTime){
                     consume();
-                    progress %= craftTime;
+                    progress -= craftTime;
                 }
             }
 

@@ -82,19 +82,21 @@ public class PointDefenseTurret extends ReloadTurret{
 
                 //shoot when possible
                 if(Angles.within(rotation, dest, shootCone) && reload >= reloadTime){
-                    if(target.damage() > bulletDamage){
-                        target.damage(target.damage() - bulletDamage);
-                    }else{
-                        target.remove();
+                    for (int i = 0; i < reload / reloadTime; i++) {
+                        if(target.damage() > bulletDamage){
+                            target.damage(target.damage() - bulletDamage);
+                        }else{
+                            target.remove();
+                        }
+
+                        Tmp.v1.trns(rotation, shootLength);
+
+                        beamEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color, new Vec2().set(target));
+                        shootEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color);
+                        hitEffect.at(target.x, target.y, color);
+                        shootSound.at(x + Tmp.v1.x, y + Tmp.v1.y, Mathf.random(0.9f, 1.1f));
                     }
-
-                    Tmp.v1.trns(rotation, shootLength);
-
-                    beamEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color, new Vec2().set(target));
-                    shootEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color);
-                    hitEffect.at(target.x, target.y, color);
-                    shootSound.at(x + Tmp.v1.x, y + Tmp.v1.y, Mathf.random(0.9f, 1.1f));
-                    reload = 0;
+                    reload %= reloadTime;
                 }
             }
         }

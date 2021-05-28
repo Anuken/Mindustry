@@ -105,7 +105,7 @@ public class GenericCrafter extends Block{
                 warmup = Mathf.lerp(warmup, 0f, 0.02f);
             }
 
-            if(progress >= 1f){
+            while(progress >= 1f){
                 consume();
 
                 if(outputItem != null){
@@ -119,7 +119,7 @@ public class GenericCrafter extends Block{
                 }
 
                 craftEffect.at(x, y);
-                progress %= 1f;
+                progress -= 1f;
             }
 
             if(outputItem != null && timer(timerDump, dumpTime)){

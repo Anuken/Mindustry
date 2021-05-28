@@ -106,7 +106,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
         for(WeaponMount mount : mounts){
             Weapon weapon = mount.weapon;
-            mount.reload = Math.max(mount.reload - Time.delta * reloadMultiplier, 0);
+            mount.reload = mount.reload - Time.delta * reloadMultiplier;
 
             float weaponRotation = this.rotation - 90 + (weapon.rotate ? mount.rotation : 0);
             float mountX = this.x + Angles.trnsx(this.rotation - 90, weapon.x, weapon.y),
@@ -157,8 +157,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                 mount.targetRotation = angleTo(mount.aimX, mount.aimY);
             }
 
-            //shoot if applicable
-            if(mount.shoot && //must be shooting
+            //shoot while applicable
+            while(mount.shoot && //must be shooting
                 can && //must be able to shoot
                 (ammo > 0 || !state.rules.unitAmmo || team().rules().infiniteAmmo) && //check ammo
                 (!weapon.alternate || mount.side == weapon.flipSprite) &&
@@ -169,7 +169,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
             ){
                 shoot(mount, shootX, shootY, mount.aimX, mount.aimY, mountX, mountY, shootAngle, Mathf.sign(weapon.x));
 
-                mount.reload = weapon.reload;
+                mount.reload += weapon.reload;
 
                 ammo--;
                 if(ammo < 0) ammo = 0;

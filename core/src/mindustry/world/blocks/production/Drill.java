@@ -276,10 +276,10 @@ public class Drill extends Block{
 
             float delay = drillTime + hardnessDrillMultiplier * dominantItem.hardness;
 
-            if(dominantItems > 0 && progress >= delay && items.total() < itemCapacity){
+            while(dominantItems > 0 && progress >= delay && items.total() < itemCapacity){
                 offload(dominantItem);
 
-                progress %= delay;
+                progress -= delay;
 
                 drillEffect.at(x + Mathf.range(size), y + Mathf.range(size), dominantItem.color);
             }
