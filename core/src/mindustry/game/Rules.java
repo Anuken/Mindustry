@@ -64,7 +64,7 @@ public class Rules{
     public float deconstructRefundMultiplier = 0.5f;
     /** No-build zone around enemy core radius. */
     public float enemyCoreBuildRadius = 400f;
-    /** Radius around enemy wave drop zones.*/
+    /** Radius around enemy wave drop zones. */
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
     public float waveSpacing = 2 * Time.toMinutes;
@@ -93,9 +93,9 @@ public class Rules{
     public boolean enemyLights = true;
     /** Whether Day & Night Cycle is enabled. */
     public boolean dayNightCycle = false;
-    /** The light changing speed.*/
+    /** The light changing speed. */
     public float dayNightCycleSpeed = 1.5f;
-    /** Whether the light getting darker or brighter.*/
+    /** Whether the light getting darker or brighter. */
     public boolean dayNightCycleDark = false;
     /** Ambient light color, used when lighting is enabled. */
     public Color ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
