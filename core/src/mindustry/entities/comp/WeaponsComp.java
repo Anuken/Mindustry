@@ -106,7 +106,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
         for(WeaponMount mount : mounts){
             Weapon weapon = mount.weapon;
-            mount.reload = mount.reload - Time.delta * reloadMultiplier;
+            if (reload > 0) mount.reload = mount.reload - Time.delta * reloadMultiplier;
 
             float weaponRotation = this.rotation - 90 + (weapon.rotate ? mount.rotation : 0);
             float mountX = this.x + Angles.trnsx(this.rotation - 90, weapon.x, weapon.y),
