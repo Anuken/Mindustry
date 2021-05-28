@@ -195,20 +195,16 @@ public class Drawf{
         Draw.color();
     }
 
-    public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float scale){
-        laser(team, line, edge, edge, x, y, x2, y2, scale);
-    }
-
-    public static void laser(Team team, TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale){
-        laser(team, line, start, end, x, y, x2, y2, scale);
-    }
-
     public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2){
-        laser(team, line, edge, edge, x, y, x2, 1f);
+        laser(team, line, edge, edge, x, y, x2, y2, 1f);
     }
 
     public static void laser(Team team, TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2){
         laser(team, line, start, end, x, y, x2, y2, 1f);
+    }
+
+    public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float scale){
+        laser(team, line, edge, edge, x, y, x2, y2, scale);
     }
 
     public static void laser(Team team, TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale){
