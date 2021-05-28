@@ -688,16 +688,28 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(Vars.state.rules.sector != null && team == state.rules.defaultTeam) Vars.state.rules.sector.info.handleProduction(item, amount);
     }
 
+    public boolean dump() {
+        boolean result = false;
+        while (dumpOnce()) result = true;
+        return result;
+    }
+
+    public boolean dump(Item todump) {
+        boolean result = false;
+        while (dumpOnce(todump)) result = true;
+        return result;
+    }
+
     /** Try dumping any item near the  */
-    public boolean dump(){
-        return dump(null);
+    public boolean dumpOnce(){
+        return dumpOnce(null);
     }
 
     /**
      * Try dumping a specific item near the 
      * @param todump Item to dump. Can be null to dump anything.
      */
-    public boolean dump(Item todump){
+    public boolean dumpOnce(Item todump){
         if(!block.hasItems || items.total() == 0 || (todump != null && !items.has(todump))) return false;
 
         int dump = this.cdump;
