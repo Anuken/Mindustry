@@ -414,10 +414,10 @@ public class Logic implements ApplicationListener{
                 if(!net.client() && !state.isEditor()){
                     updateWeather();
 
-                    if (state.hasSector()){
+                    if(state.hasSector()){
                         state.rules.dayNightCycle = false;
                     }
-                    if (state.rules.dayNightCycle && state.rules.lighting == false){
+                    if(state.rules.dayNightCycle && state.rules.lighting == false){
                         state.rules.lighting = true;
                         state.rules.ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.1f);
                     };
@@ -430,7 +430,7 @@ public class Logic implements ApplicationListener{
                     }
                 }
 
-                if (net.server() && state.rules.dayNightCycle){
+                if(net.server() && state.rules.dayNightCycle){
                     Call.setRules(state.rules);
                 }
 
