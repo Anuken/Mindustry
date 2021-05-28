@@ -90,13 +90,13 @@ public class Rules{
     public boolean lighting = false;
     /** Whether enemy lighting is visible.
      * If lighting is enabled and this is false, a fog-of-war effect is partially achieved. */
-    public boolean dayNightCycle = false;
-    /** Whether Day & Night Cycle is enabled. */
-    public float dayNightCycleSpeed = 1.5f;
-    /** The light changing speed.*/
-    public boolean dayNightCycleDark = false;
-    /** Whether the light getting darker or brighter.*/
     public boolean enemyLights = true;
+    /** Whether Day & Night Cycle is enabled. */
+    public boolean dayNightCycle = false;
+    /** The light changing speed.*/
+    public float dayNightCycleSpeed = 1.5f;
+    /** Whether the light getting darker or brighter.*/
+    public boolean dayNightCycleDark = false;
     /** Ambient light color, used when lighting is enabled. */
     public Color ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
     /** team of the player by default. */
