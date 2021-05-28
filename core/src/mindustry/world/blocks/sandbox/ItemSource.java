@@ -65,8 +65,10 @@ public class ItemSource extends Block{
         public void updateTile(){
             if(outputItem == null) return;
 
-            items.set(outputItem, 1);
-            dump(outputItem);
+            do{
+                items.set(outputItem, 10);
+            }while (dump(outputItem));
+
             items.set(outputItem, 0);
         }
 

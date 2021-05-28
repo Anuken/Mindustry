@@ -84,9 +84,9 @@ public class MendProjector extends Block{
                 consume();
             }
 
-            if(charge >= reload){
+            while (charge >= reload){
                 float realRange = range + phaseHeat * phaseRangeBoost;
-                charge = 0f;
+                charge -= reload;
 
                 indexer.eachBlock(this, realRange, other -> other.damaged(), other -> {
                     other.heal(other.maxHealth() * (healPercent + phaseHeat * phaseBoost) / 100f * efficiency());
