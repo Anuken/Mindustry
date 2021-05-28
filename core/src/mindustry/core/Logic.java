@@ -273,26 +273,25 @@ public class Logic implements ApplicationListener{
     private void dayNightCycleUpdate(){
         float realSpeed = state.rules.dayNightCycleSpeed / 120000f;
         float darkLight = 0.75f;
-        if (state.rules.dayNightCycle){
-            if (state.rules.ambientLight.a >= 1) {
+        if(state.rules.dayNightCycle){
+            if(state.rules.ambientLight.a >= 1){
                 state.rules.ambientLight.a = 0;
             }
-            if (state.rules.ambientLight.a + realSpeed > 1 || state.rules.ambientLight.a > darkLight){
+            if(state.rules.ambientLight.a + realSpeed > 1 || state.rules.ambientLight.a > darkLight){
                 state.rules.ambientLight.a = darkLight;
                 state.rules.dayNightCycleDark = false;
             }
-            if (state.rules.ambientLight.a - realSpeed < 0){
+            if(state.rules.ambientLight.a - realSpeed < 0){
                 state.rules.ambientLight.a = 0;
                 state.rules.dayNightCycleDark = true;
             }
 
-            if (state.rules.dayNightCycleDark){
+            if(state.rules.dayNightCycleDark){
                 state.rules.ambientLight.a = state.rules.ambientLight.a + realSpeed;
-            } else {
+            }else{
                 state.rules.ambientLight.a = state.rules.ambientLight.a - realSpeed;
             }
-            
-        }        
+        }
     }
 
     @Remote(called = Loc.server)
