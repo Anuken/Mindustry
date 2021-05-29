@@ -370,14 +370,16 @@ public class Turret extends ReloadTurret{
             if(chargeTime > 0){
                 useAmmo();
 
-                tr.trns(rotation, shootLength);
+                float rnd = Mathf.range(xRand);
+
+                tr.trns(rotation, shootLength, rnd);
                 chargeBeginEffect.at(x + tr.x, y + tr.y, rotation);
                 chargeSound.at(x + tr.x, y + tr.y, 1);
 
                 for(int i = 0; i < chargeEffects; i++){
                     Time.run(Mathf.random(chargeMaxDelay), () -> {
                         if(!isValid()) return;
-                        tr.trns(rotation, shootLength);
+                        tr.trns(rotation, shootLength, rnd);
                         chargeEffect.at(x + tr.x, y + tr.y, rotation);
                     });
                 }
@@ -386,7 +388,7 @@ public class Turret extends ReloadTurret{
 
                 Time.run(chargeTime, () -> {
                     if(!isValid()) return;
-                    tr.trns(rotation, shootLength);
+                    tr.trns(rotation, shootLength, rnd);
                     recoil = recoilAmount;
                     heat = 1f;
                     Angles.shotgun(shots, spread, rotation, r -> {
