@@ -66,6 +66,8 @@ public class Cultivator extends GenericCrafter{
             super.updateTile();
 
             warmup = Mathf.lerpDelta(warmup, consValid() ? 1f : 0f, 0.015f);
+            
+            if (warmup >= 0.999) warmup = 1;
         }
 
         @Override
