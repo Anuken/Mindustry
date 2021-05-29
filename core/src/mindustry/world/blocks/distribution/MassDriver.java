@@ -16,6 +16,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -48,6 +49,14 @@ public class MassDriver extends Block{
         //point2 is relative
         config(Point2.class, (MassDriverBuild tile, Point2 point) -> tile.link = Point2.pack(point.x + tile.tileX(), point.y + tile.tileY()));
         config(Integer.class, (MassDriverBuild tile, Integer point) -> tile.link = point);
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.shootRange, range / tilesize, StatUnit.blocks);
+        stats.add(Stat.reload, 60f / (reloadTime + 1), StatUnit.none);
     }
 
     @Override
