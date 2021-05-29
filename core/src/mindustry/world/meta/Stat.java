@@ -40,6 +40,7 @@ public enum Stat{
     reloadMultiplier,
     buildSpeedMultiplier,
     reactive,
+    healing,
 
     itemCapacity(StatCat.items),
     itemsMoved(StatCat.items),
