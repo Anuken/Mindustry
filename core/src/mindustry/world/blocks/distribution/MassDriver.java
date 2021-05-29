@@ -56,7 +56,7 @@ public class MassDriver extends Block{
         super.setStats();
 
         stats.add(Stat.shootRange, range / tilesize, StatUnit.blocks);
-        stats.add(Stat.reload, 60f / (reloadTime + 1), StatUnit.none);
+        stats.add(Stat.reload, 60f / reloadTime, StatUnit.none);
     }
 
     @Override
