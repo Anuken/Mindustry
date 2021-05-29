@@ -56,6 +56,7 @@ public class Turret extends ReloadTurret{
     public float shootShake = 0f;
     public float shootLength = -1;
     public float xRand = 0f;
+    public float shotRnd = 0f;
     /** Currently used for artillery only. */
     public float minRange = 0f;
     public float burstSpacing = 0;
@@ -365,12 +366,11 @@ public class Turret extends ReloadTurret{
         }
 
         protected void shoot(BulletType type){
+            float rnd = Mathf.range(xRand);
 
             //when charging is enabled, use the charge shoot pattern
             if(chargeTime > 0){
                 useAmmo();
-
-                float rnd = Mathf.range(xRand);
 
                 tr.trns(rotation, shootLength, rnd);
                 chargeBeginEffect.at(x + tr.x, y + tr.y, rotation);
@@ -388,10 +388,10 @@ public class Turret extends ReloadTurret{
 
                 Time.run(chargeTime, () -> {
                     if(!isValid()) return;
-                    tr.trns(rotation, shootLength, rnd);
                     recoil = recoilAmount;
                     heat = 1f;
                     Angles.shotgun(shots, spread, rotation, r -> {
+                        tr.trns(rotation, shootLength, rnd + Mathf.range(shotRnd));
                         bullet(type, r + Mathf.range(inaccuracy + type.inaccuracy));
                     });
                     effects();
@@ -406,8 +406,8 @@ public class Turret extends ReloadTurret{
 
                         recoil = recoilAmount;
 
-                        tr.trns(rotation, shootLength, Mathf.range(xRand));
-                        bullet(type, rotation + Mathf.range(inaccuracy));
+                        tr.trns(rotation, shootLength, rnd + Mathf.range(shotRnd));
+                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
                         effects();
                         useAmmo();
                         recoil = recoilAmount;
@@ -421,12 +421,11 @@ public class Turret extends ReloadTurret{
                 if(alternate){
                     float i = (shotCounter % shots) - (shots-1)/2f;
 
-                    tr.trns(rotation - 90, spread * i + Mathf.range(xRand), shootLength);
+                    tr.trns(rotation - 90, spread * i + rnd, shootLength);
                     bullet(type, rotation + Mathf.range(inaccuracy));
                 }else{
-                    tr.trns(rotation, shootLength, Mathf.range(xRand));
-
                     Angles.shotgun(shots, spread, rotation, r -> {
+                        tr.trns(rotation, shootLength, rnd + Mathf.range(shotRnd));
                         bullet(type, r + Mathf.range(inaccuracy + type.inaccuracy));
                     });
                 }
