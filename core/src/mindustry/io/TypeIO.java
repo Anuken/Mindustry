@@ -179,7 +179,7 @@ public class TypeIO{
 
         //block units are special
         if(unit instanceof BlockUnitc){
-            write.i(((BlockUnitc)unit).tile().pos());
+            write.i(((BlockUnitc)unit).tile.pos());
         }else if(unit == null){
             write.i(0);
         }else{
