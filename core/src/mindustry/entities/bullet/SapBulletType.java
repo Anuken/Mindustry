@@ -26,6 +26,7 @@ public class SapBulletType extends BulletType{
         hitEffect = Fx.hitLiquid;
         status = StatusEffects.sapped;
         statusDuration = 60f * 3f;
+        impact = true;
     }
 
     @Override

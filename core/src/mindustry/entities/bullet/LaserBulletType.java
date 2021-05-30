@@ -30,6 +30,7 @@ public class LaserBulletType extends BulletType{
         smokeEffect = Fx.none;
         hitSize = 4;
         lifetime = 16f;
+        impact = true;
         keepVelocity = false;
         collides = false;
         pierce = true;
