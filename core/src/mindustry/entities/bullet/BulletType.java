@@ -56,6 +56,8 @@ public abstract class BulletType extends Content{
     public float splashDamage = 0f;
     /** Knockback in velocity. */
     public float knockback;
+    /** Should knockback the bullet's direction */
+    public boolean impact;
     /** Status effect applied on hit. */
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
@@ -191,7 +193,9 @@ public abstract class BulletType extends Content{
         }
 
         if(entity instanceof Unit unit){
-            unit.impulse(Tmp.v3.set(unit).sub(b.x, b.y).nor().scl(knockback * 80f));
+            Tmp.v3.set(unit).sub(b.x, b.y).nor().scl(knockback * 80f);
+            if(impact) Tmp.v3.setAngle(b.rotation());
+            unit.impulse(Tmp.v3);
             unit.apply(status, statusDuration);
         }
     }
