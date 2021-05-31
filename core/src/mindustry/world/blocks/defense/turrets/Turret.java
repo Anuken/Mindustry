@@ -56,7 +56,7 @@ public class Turret extends ReloadTurret{
     public float shootShake = 0f;
     public float shootLength = -1;
     public float xRand = 0f;
-    public float shotRnd = 0f;
+    public float shotRand = 0f;
     /** Currently used for artillery only. */
     public float minRange = 0f;
     public float burstSpacing = 0;
@@ -391,7 +391,7 @@ public class Turret extends ReloadTurret{
                     recoil = recoilAmount;
                     heat = 1f;
                     Angles.shotgun(shots, spread, rotation, r -> {
-                        tr.trns(rotation, shootLength, rnd + Mathf.range(shotRnd));
+                        tr.trns(rotation, shootLength, rnd + Mathf.range(shotRand));
                         bullet(type, r + Mathf.range(inaccuracy + type.inaccuracy));
                     });
                     effects();
@@ -406,7 +406,7 @@ public class Turret extends ReloadTurret{
 
                         recoil = recoilAmount;
 
-                        tr.trns(rotation, shootLength, rnd + Mathf.range(shotRnd));
+                        tr.trns(rotation, shootLength, rnd + Mathf.range(shotRand));
                         bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
                         effects();
                         useAmmo();
@@ -425,7 +425,7 @@ public class Turret extends ReloadTurret{
                     bullet(type, rotation + Mathf.range(inaccuracy));
                 }else{
                     Angles.shotgun(shots, spread, rotation, r -> {
-                        tr.trns(rotation, shootLength, rnd + Mathf.range(shotRnd));
+                        tr.trns(rotation, shootLength, rnd + Mathf.range(shotRand));
                         bullet(type, r + Mathf.range(inaccuracy + type.inaccuracy));
                     });
                 }
