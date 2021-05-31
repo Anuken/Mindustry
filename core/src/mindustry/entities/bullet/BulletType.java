@@ -56,7 +56,7 @@ public abstract class BulletType extends Content{
     public float splashDamage = 0f;
     /** Knockback in velocity. */
     public float knockback;
-    /** Should knockback the bullet's direction */
+    /** Should knockback follow the bullet's direction */
     public boolean impact;
     /** Status effect applied on hit. */
     public StatusEffect status = StatusEffects.none;
