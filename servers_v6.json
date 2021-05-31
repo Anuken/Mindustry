@@ -12,6 +12,10 @@
     "address": ["smokeofanarchy.duckdns.org:6853"]
   },
   {
+    "name": "HexPvP",
+    "address": ["hexpvp.ml"]
+  },
+  {
     "name": "mindustry.pl",
     "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl", "mindustry.pl:6966"]
   },
@@ -70,10 +74,6 @@
   {
     "name": "Korea",
     "address": ["mindustry.kr"]
-  },
-  {
-    "name": "hexpvp.ml",
-    "address": ["hexpvp.ml"]
   },
   {
     "name": "Omega",
