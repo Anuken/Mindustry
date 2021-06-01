@@ -80,6 +80,10 @@
     "address": ["hexpvp.ml"]
   },
   {
+    "name": "Omega",
+    "address": ["178.170.47.34:20204", "157.90.213.2:30308", "157.90.180.53:25738"] 
+  },
+  {
     "name": "md.obvilionnetwork.ru",
     "address": ["obvilionnetwork.ru", "obvilionnetwork.ru:7001", "obvilionnetwork.ru:7002", "obvilionnetwork.ru:7003"]
   },
