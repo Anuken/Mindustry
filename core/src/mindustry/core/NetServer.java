@@ -183,7 +183,7 @@ public class NetServer implements ApplicationListener{
             boolean preventDuplicates = headless && netServer.admins.isStrict();
 
             if(preventDuplicates){
-                if(Groups.player.contains(p -> p.name.trim().equalsIgnoreCase(packet.name.trim()))){
+                if(Groups.player.contains(p -> Strings.stripColors(p.name).trim().equalsIgnoreCase(Strings.stripColors(packet.name).trim()))){
                     con.kick(KickReason.nameInUse);
                     return;
                 }
