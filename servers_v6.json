@@ -21,7 +21,7 @@
   },
   {
     "name": "C.A.M.S.",
-    "address": ["routerchain.ddns.net", "nikochio.ddns.net", "easyplay.su"]
+    "address": ["routerchain.ddns.net", "nikochio.ddns.net", "easyplay.su", "play.thedimas.pp.ua"]
   },
   {
     "name": "BE6.RUN",
@@ -95,10 +95,6 @@
     "name": "Mindustry.Party",
     "address": ["game.mindustry.party"]
   },
-  {
-    "name": "thedimas",
-    "address": ["play.thedimas.pp.ua"]
-  }, 
   {
     "name": "TSR", 
     "address": ["fifr4.quackhost.uk:20131"]
