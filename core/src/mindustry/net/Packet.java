@@ -6,10 +6,6 @@ import java.io.*;
 
 public abstract class Packet{
     //internally used by generated code
-    //TODO intermediate buffers should ONLY be needed for:
-    //readObject
-    //readBuilding
-    //readUnit (possibly)
     protected static final byte[] NODATA = {};
     protected static final ReusableByteInStream BAIS = new ReusableByteInStream();
     protected static final Reads READ = new Reads(new DataInputStream(BAIS));
