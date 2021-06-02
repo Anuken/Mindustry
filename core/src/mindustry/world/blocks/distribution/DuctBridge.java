@@ -25,7 +25,7 @@ public class DuctBridge extends Block{
     public @Load("@-dir") TextureRegion dirRegion;
 
     public int range = 4;
-    public float moveDelay = 5f;
+    public float speed = 5f;
 
     public DuctBridge(String name){
         super(name);
@@ -116,12 +116,12 @@ public class DuctBridge extends Block{
                 link.occupied[rotation % 4] = this;
                 if(items.any() && link.items.total() < link.block.itemCapacity){
                     progress += edelta();
-                    while(progress > moveDelay){
+                    while(progress > speed){
                         Item next = items.take();
                         if(next != null && link.items.total() < link.block.itemCapacity){
                             link.handleItem(this, next);
                         }
-                        progress -= moveDelay;
+                        progress -= speed;
                     }
                 }
             }
