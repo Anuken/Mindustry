@@ -2,6 +2,7 @@ package mindustry.maps.filters;
 
 import arc.struct.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
 
@@ -17,6 +18,11 @@ public class CoreSpawnFilter extends GenerateFilter{
         //disabled until necessary
         // SliderOption("amount", () -> amount, f -> amount = (int)f, 1, 10).display()
         );
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockCoreShard;
     }
 
     @Override

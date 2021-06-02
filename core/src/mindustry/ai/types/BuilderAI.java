@@ -70,13 +70,15 @@ public class BuilderAI extends AIController{
                 for(Player player : Groups.player){
                     if(player.isBuilder() && player.unit().activelyBuilding() && player.unit().buildPlan().samePos(req) && player.unit().buildPlan().breaking){
                         unit.plans.removeFirst();
+                        //remove from list of plans
+                        unit.team.data().blocks.remove(p -> p.x == req.x && p.y == req.y);
                         return;
                     }
                 }
             }
 
             boolean valid =
-                (req.tile() != null && req.tile().build instanceof ConstructBuild cons && cons.cblock == req.block) ||
+                (req.tile() != null && req.tile().build instanceof ConstructBuild cons && cons.current == req.block) ||
                 (req.breaking ?
                     Build.validBreak(unit.team(), req.x, req.y) :
                     Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation));

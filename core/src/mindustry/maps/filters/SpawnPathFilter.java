@@ -6,6 +6,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.content.*;
+import mindustry.gen.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
@@ -21,6 +22,11 @@ public class SpawnPathFilter extends GenerateFilter{
         return Structs.arr(
         new SliderOption("radius", () -> radius, f -> radius = (int)f, 1, 20).display()
         );
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockCommandCenter;
     }
 
     @Override

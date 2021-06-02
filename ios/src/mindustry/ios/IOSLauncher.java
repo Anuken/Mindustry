@@ -75,7 +75,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 class ChooserDelegate extends NSObject implements UIDocumentBrowserViewControllerDelegate{
                     @Override
                     public void didPickDocumentURLs(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
-
                     }
 
                     @Override

@@ -465,7 +465,7 @@ public class Pathfinder implements Runnable{
         protected abstract void getPositions(IntSeq out);
     }
 
-    interface PathCost{
+    public interface PathCost{
         int getCost(Team traversing, int tile);
     }
 

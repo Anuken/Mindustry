@@ -1,6 +1,5 @@
 package mindustry.entities.comp;
 
-import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -10,12 +9,10 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.entities.bullet.*;
-import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.blocks.defense.Wall.*;
 
 import static mindustry.Vars.*;
 
@@ -31,6 +28,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     BulletType type;
     float fdata;
     transient boolean absorbed, hit;
+    transient @Nullable Trail trail;
 
     @Override
     public void getCollisions(Cons<QuadTree> consumer){
@@ -43,24 +41,23 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     }
 
     @Override
-    public void drawBullets(){
-        type.draw(self());
-    }
-
-    @Override
     public void add(){
         type.init(self());
     }
 
     @Override
     public void remove(){
-        type.despawned(self());
+        //'despawned' only counts when the bullet is killed externally or reaches the end of life
+        if(!hit){
+            type.despawned(self());
+        }
+        type.removed(self());
         collided.clear();
     }
 
     @Override
     public float damageMultiplier(){
-        if(owner instanceof Unit) return ((Unit)owner).damageMultiplier() * state.rules.unitDamageMultiplier;
+        if(owner instanceof Unit u) return u.damageMultiplier() * state.rules.unitDamageMultiplier;
         if(owner instanceof Building) return state.rules.blockDamageMultiplier;
 
         return 1f;
@@ -80,8 +77,8 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Replace
     @Override
     public boolean collides(Hitboxc other){
-        return type.collides && (other instanceof Teamc && ((Teamc)other).team() != team)
-            && !(other instanceof Flyingc && !((Flyingc)other).checkTarget(type.collidesAir, type.collidesGround))
+        return type.collides && (other instanceof Teamc t && t.team() != team)
+            && !(other instanceof Flyingc f && !f.checkTarget(type.collidesAir, type.collidesGround))
             && !(type.pierce && collided.contains(other.id())); //prevent multiple collisions
     }
 
@@ -89,30 +86,16 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Override
     public void collision(Hitboxc other, float x, float y){
         type.hit(self(), x, y);
-        float health = 0f;
-
-        if(other instanceof Healthc h){
-            health = h.health();
-            h.damage(damage);
-        }
-
-        if(other instanceof Unit unit){
-            unit.impulse(Tmp.v3.set(unit).sub(this.x, this.y).nor().scl(type.knockback * 80f));
-            unit.apply(type.status, type.statusDuration);
-        }
 
         //must be last.
         if(!type.pierce){
+            hit = true;
             remove();
         }else{
             collided.add(other.id());
         }
 
-        type.hitEntity(self(), other, health);
-
-        if(owner instanceof WallBuild && player != null && team == player.team() && other instanceof Unit unit && unit.dead){
-            Events.fire(Trigger.phaseDeflectHit);
-        }
+        type.hitEntity(self(), other, other instanceof Healthc h ? h.health() : 0f);
     }
 
     @Override
@@ -136,6 +119,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
                     if(remove || type.collidesTeam){
                         if(!type.pierceBuilding){
+                            hit = true;
                             remove();
                         }else{
                             collided.add(tile.id);
@@ -152,13 +136,14 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         }
 
         if(type.pierceCap != -1 && collided.size >= type.pierceCap){
+            hit = true;
             remove();
         }
     }
 
     @Override
     public void draw(){
-        Draw.z(Layer.bullet);
+        Draw.z(type.layer);
 
         type.draw(self());
         type.drawLight(self());

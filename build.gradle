@@ -29,18 +29,18 @@ plugins{
 }
 
 allprojects{
-    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
     
     version = 'release'
     group = 'com.github.Anuken'
 
     ext{
-        versionNumber = '6'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'release'
+        versionNumber = '7'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'dev'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
-        steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
-        rhinoVersion = '378626d8abc552bba57864358358045d2f2dbe9b'
+        steamworksVersion = '0b86023401880bb5e586bc404bedbaae9b1f1c94'
+        rhinoVersion = '099aed6c82f8094b3ba39a273b8d2ba7bdcc6443'
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -88,13 +88,11 @@ allprojects{
         }
 
         hasSprites = {
-            return new File(rootDir, "core/assets/sprites/sprites.atlas").exists()
+            return new File(rootDir, "core/assets/sprites/sprites.aatls").exists()
         }
 
         getModifierString = {
-            if(versionModifier != "release"){
-                return "[${versionModifier.toUpperCase()}]"
-            }
+            if(versionModifier != "release") return "[${versionModifier.toUpperCase()}]"
             return ""
         }
 
@@ -112,8 +110,7 @@ allprojects{
             def v = System.getenv("ANDROID_HOME")
             if(v != null) return v
             //rootDir is null here, amazing. brilliant.
-            def file = new File("local.properties")
-            if(!file.exists()) file = new File("../local.properties")
+            def file = new File(rootDir, "local.properties")
             def props = new Properties().with{p -> p.load(file.newReader()); return p }
             return props.get("sdk.dir")
         }
@@ -200,10 +197,20 @@ allprojects{
 
     tasks.withType(JavaCompile){
         targetCompatibility = 8
-        sourceCompatibility = 14
+        //TODO fix dynamically, this is a hack
+        if(System.getProperty("user.name") == "anuke"){
+            sourceCompatibility = JavaVersion.VERSION_15
+        }else{
+            sourceCompatibility = JavaVersion.VERSION_14
+        }
         options.encoding = "UTF-8"
         options.compilerArgs += ["-Xlint:deprecation"]
         dependsOn clearCache
+
+        options.forkOptions.jvmArgs.addAll([
+            '--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED'
+        ])
     }
 }
 
@@ -211,15 +218,14 @@ configure(project(":annotations")){
     tasks.withType(JavaCompile){
         targetCompatibility = 8
         sourceCompatibility = 8
+        options.fork = true
     }
 }
 
 //compile with java 8 compatibility for everything except the annotation project
 configure(subprojects - project(":annotations")){
     tasks.withType(JavaCompile){
-        if(JavaVersion.current() != JavaVersion.VERSION_1_8){
-            options.compilerArgs.addAll(['--release', '8', '--enable-preview'])
-        }
+        options.compilerArgs.addAll(['--release', '8', '--enable-preview'])
 
         doFirst{
             options.compilerArgs = options.compilerArgs.findAll{it != '--enable-preview' }
@@ -242,9 +248,9 @@ project(":desktop"){
 
     dependencies{
         implementation project(":core")
+        implementation arcModule("extensions:discord")
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
-        implementation 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
 
         if(debugged()) implementation project(":debug")
 
@@ -360,14 +366,16 @@ project(":core"){
     dependencies{
         compileJava.dependsOn(preGen)
 
-        api "org.lz4:lz4-java:1.4.1"
+        api "org.lz4:lz4-java:1.7.1"
         api arcModule("arc-core")
+        api arcModule("extensions:flabel")
         api arcModule("extensions:freetype")
         api arcModule("extensions:g3d")
         api arcModule("extensions:fx")
         api arcModule("extensions:arcnet")
         api "com.github.Anuken:rhino:$rhinoVersion"
         if(localArc() && debugged()) api arcModule("extensions:recorder")
+        if(localArc()) api arcModule(":extensions:packer")
 
         annotationProcessor 'com.github.Anuken:jabel:34e4c172e65b3928cd9eabe1993654ea79c409cd'
         compileOnly project(":annotations")
@@ -416,16 +424,16 @@ project(":tests"){
 
     dependencies{
         testImplementation project(":core")
-        testImplementation "org.junit.jupiter:junit-jupiter-params:5.3.1"
-        testImplementation "org.junit.jupiter:junit-jupiter-api:5.3.1"
+        testImplementation "org.junit.jupiter:junit-jupiter-params:5.7.1"
+        testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.1"
         testImplementation arcModule("backends:backend-headless")
-        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.3.1"
+        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.1"
     }
 
     test{
         useJUnitPlatform()
         workingDir = new File("../core/assets")
-        testLogging {
+        testLogging{
             exceptionFormat = 'full'
             showStandardStreams = true
         }
@@ -450,6 +458,21 @@ project(":annotations"){
     dependencies{
         implementation 'com.squareup:javapoet:1.12.1'
         implementation "com.github.Anuken.Arc:arc-core:$arcHash"
+    }
+}
+
+configure([":core", ":desktop", ":server", ":tools"].collect{project(it)}){
+    java{
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    publishing{
+        publications{
+            maven(MavenPublication){
+                from components.java
+            }
+        }
     }
 }
 

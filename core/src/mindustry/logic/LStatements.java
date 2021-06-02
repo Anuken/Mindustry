@@ -15,6 +15,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
 import static mindustry.logic.LCanvas.*;
 import static mindustry.world.blocks.logic.LogicDisplay.*;
 
@@ -484,7 +485,7 @@ public class LStatements{
                             int c = 0;
                             for(Item item : Vars.content.items()){
                                 if(!item.unlockedNow()) continue;
-                                i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
+                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
                                     stype("@" + item.name);
                                     hide.run();
                                 }).size(40f);
@@ -498,7 +499,7 @@ public class LStatements{
                             int c = 0;
                             for(Liquid item : Vars.content.liquids()){
                                 if(!item.unlockedNow()) continue;
-                                i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
+                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
                                     stype("@" + item.name);
                                     hide.run();
                                 }).size(40f);
@@ -785,11 +786,11 @@ public class LStatements{
                         int c = 0;
                         for(UnitType item : Vars.content.units()){
                             if(!item.unlockedNow() || item.isHidden()) continue;
-                            i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
+                            i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
                                 type = "@" + item.name;
                                 field.setText(type);
                                 hide.run();
-                            }).size(40f).get().resizeImage(Cicon.small.size);
+                            }).size(40f);
 
                             if(++c % 6 == 0) i.row();
                         }
@@ -948,11 +949,11 @@ public class LStatements{
                                     int c = 0;
                                     for(Item item : Vars.content.items()){
                                         if(!item.unlockedNow()) continue;
-                                        i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
+                                        i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
                                             ore = "@" + item.name;
                                             rebuild(table);
                                             hide.run();
-                                        }).size(40f).get().resizeImage(Cicon.small.size);
+                                        }).size(40f);
 
                                         if(++c % 6 == 0) i.row();
                                     }

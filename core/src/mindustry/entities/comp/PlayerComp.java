@@ -19,7 +19,6 @@ import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
-import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
@@ -33,31 +32,31 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     @Import float x, y;
 
     @ReadOnly Unit unit = Nulls.unit;
-    transient private Unit lastReadUnit = Nulls.unit;
     transient @Nullable NetConnection con;
-
     @ReadOnly Team team = Team.sharded;
     @SyncLocal boolean typing, shooting, boosting;
-    boolean admin;
     @SyncLocal float mouseX, mouseY;
-    String name = "noname";
+    boolean admin;
+    String name = "frog";
     Color color = new Color();
-
     //locale should not be synced.
     transient String locale = "en";
     transient float deathTimer;
     transient String lastText = "";
     transient float textFadeTime;
+    transient private Unit lastReadUnit = Nulls.unit;
 
     public boolean isBuilder(){
         return unit.canBuild();
     }
 
-    public @Nullable CoreBuild closestCore(){
+    public @Nullable
+    CoreBuild closestCore(){
         return state.teams.closestCore(x, y, team);
     }
 
-    public @Nullable CoreBuild core(){
+    public @Nullable
+    CoreBuild core(){
         return team.core();
     }
 
@@ -69,7 +68,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     public TextureRegion icon(){
         //display default icon for dead players
-        if(dead()) return core() == null ? UnitTypes.alpha.icon(Cicon.full) : ((CoreBlock)core().block).unitType.icon(Cicon.full);
+        if(dead()) return core() == null ? UnitTypes.alpha.fullIcon : ((CoreBlock)core().block).unitType.fullIcon;
 
         return unit.icon();
     }
@@ -133,8 +132,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
             //update some basic state to sync things
             if(unit.type.canBoost){
-                Tile tile = unit.tileOn();
-                unit.elevation = Mathf.approachDelta(unit.elevation, (tile != null && tile.solid()) || boosting ? 1f : 0f, unit.type.riseSpeed);
+                unit.elevation = Mathf.approachDelta(unit.elevation, unit.onSolid() || boosting || (unit.isFlying() && !unit.canLand()) ? 1f : 0f, unit.type.riseSpeed);
             }
         }else if((core = bestCore()) != null){
             //have a small delay before death to prevent the camera from jumping around too quickly
@@ -266,9 +264,9 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
             layout.setText(font, text, Color.white, width, Align.bottom, true);
 
-            Draw.color(0f, 0f, 0f, 0.3f * (textFadeTime <= 0 || lastText == null  ? 1f : visualFadeTime));
-            Fill.rect(unit.x, unit.y + textHeight + layout.height - layout.height/2f, layout.width + 2, layout.height + 3);
-            font.draw(text, unit.x - width/2f, unit.y + textHeight + layout.height, width, Align.center, true);
+            Draw.color(0f, 0f, 0f, 0.3f * (textFadeTime <= 0 || lastText == null ? 1f : visualFadeTime));
+            Fill.rect(unit.x, unit.y + textHeight + layout.height - layout.height / 2f, layout.width + 2, layout.height + 3);
+            font.draw(text, unit.x - width / 2f, unit.y + textHeight + layout.height, width, Align.center, true);
         }
 
         Draw.reset();
@@ -294,7 +292,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         sendMessage(text, from, NetClient.colorizeName(from.id(), from.name));
     }
 
-     void sendMessage(String text, Player from, String fromName){
+    void sendMessage(String text, Player from, String fromName){
         if(isLocal()){
             if(ui != null){
                 ui.chatfrag.addMessage(text, fromName);

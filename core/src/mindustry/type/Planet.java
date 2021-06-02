@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 
 public class Planet extends UnlockableContent{
     /** Default spacing between planet orbits in world units. */
-    private static final float orbitSpacing = 9f;
+    private static final float orbitSpacing = 11f;
     /** intersect() temp var. */
     private static final Vec3 intersectResult = new Vec3();
     /** Mesh used for rendering. Created on load() - will be null on the server! */
@@ -31,7 +31,7 @@ public class Planet extends UnlockableContent{
     public @Nullable PlanetGenerator generator;
     /** Array of sectors; directly maps to tiles in the grid. */
     public Seq<Sector> sectors;
-    /** Radius of this planet's sphere. Does not take into account sattelites. */
+    /** Radius of this planet's sphere. Does not take into account satellites. */
     public float radius;
     /** Atmosphere radius adjustment parameters. */
     public float atmosphereRadIn = 0, atmosphereRadOut = 0.3f;
@@ -67,7 +67,7 @@ public class Planet extends UnlockableContent{
     public Planet solarSystem;
     /** All planets orbiting this one, in ascending order of radius. */
     public Seq<Planet> children = new Seq<>();
-    /** Sattelites orbiting this planet. */
+    /** Satellites orbiting this planet. */
     public Seq<Satellite> satellites = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
     protected Prov<PlanetMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2);
@@ -111,6 +111,9 @@ public class Planet extends UnlockableContent{
     }
 
     public @Nullable Sector getLastSector(){
+        if(sectors.isEmpty()){
+            return null;
+        }
         return sectors.get(Math.min(Core.settings.getInt(name + "-last-sector", startSector), sectors.size - 1));
     }
 
@@ -149,7 +152,7 @@ public class Planet extends UnlockableContent{
     public float getRotation(){
         //tidally locked planets always face toward parents
         if(tidalLock){
-            return getOrbitAngle();
+            return -getOrbitAngle() + 90;
         }
         //random offset for more variability
         float offset = Mathf.randomSeed(id+1, 360);
@@ -199,8 +202,18 @@ public class Planet extends UnlockableContent{
         return mat.setToTranslation(position).rotate(Vec3.Y, getRotation());
     }
 
+    /** Regenerates the planet mesh. For debugging only. */
+    public void reloadMesh(){
+        if(mesh != null){
+            mesh.dispose();
+        }
+        mesh = meshLoader.get();
+    }
+
     @Override
     public void load(){
+        super.load();
+
         mesh = meshLoader.get();
     }
 

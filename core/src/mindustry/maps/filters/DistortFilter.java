@@ -1,6 +1,7 @@
 package mindustry.maps.filters;
 
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 
@@ -18,6 +19,11 @@ public class DistortFilter extends GenerateFilter{
     @Override
     public boolean isBuffered(){
         return true;
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockTendrils;
     }
 
     @Override
