@@ -1,8 +1,95 @@
 package mindustry.graphics;
 
+import arc.*;
+import arc.graphics.*;
+import arc.graphics.Texture.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.util.*;
+import mindustry.type.*;
+import mindustry.world.meta.*;
+
+import static mindustry.Vars.*;
+
 public class EnvRenderers{
 
     public static void init(){
 
+        Color waterColor = Color.valueOf("353982");
+        Rand rand = new Rand();
+
+        Core.assets.load("sprites/rays.png", Texture.class).loaded = t -> {
+            ((Texture)t).setFilter(TextureFilter.linear);
+        };
+
+        renderer.addEnvRenderer(Env.underwater, () -> {
+            Draw.draw(Layer.light + 1, () -> {
+                Draw.color(waterColor, 0.4f);
+                Fill.rect(Core.camera.position.x, Core.camera.position.y, Core.camera.width, Core.camera.height);
+                Draw.reset();
+
+                Blending.additive.apply();
+                Draw.blit(Shaders.caustics);
+                Blending.normal.apply();
+            });
+
+            Draw.z(Layer.light + 2);
+
+            int rays = 50;
+            float timeScale = 2000f;
+            rand.setSeed(0);
+
+            Draw.blend(Blending.additive);
+
+            float t = Time.time / timeScale;
+            Texture tex = Core.assets.get("sprites/rays.png", Texture.class);
+
+            for(int i = 0; i < rays; i++){
+                float offset = rand.random(0f, 1f);
+                float time = t + offset;
+
+                int pos = (int)time;
+                float life = time % 1f;
+                float opacity = rand.random(0.2f, 0.7f) * Mathf.slope(life) * 0.7f;
+                float x = (rand.random(0f, world.unitWidth()) + (pos % 100)*753) % world.unitWidth();
+                float y = (rand.random(0f, world.unitHeight()) + (pos % 120)*453) % world.unitHeight();
+                float rot = rand.range(7f);
+                float sizeScale = 1f + rand.range(0.3f);
+
+                float topDst = (Core.camera.position.y + Core.camera.height/2f) - (y + tex.height/2f + tex.height*1.9f*sizeScale/2f);
+                float invDst = topDst/1000f;
+                opacity = Math.min(opacity, -invDst);
+
+                if(opacity > 0.01){
+                    Draw.alpha(opacity);
+                    Draw.rect(Draw.wrap(tex), x, y + tex.height/2f, tex.width*2*sizeScale, tex.height*2*sizeScale, rot);
+                    Draw.color();
+                }
+            }
+
+            Draw.blend();
+        });
+
+        Core.assets.load("sprites/distortAlpha.png", Texture.class);
+
+        renderer.addEnvRenderer(Env.scorching, () -> {
+            Texture tex = Core.assets.get("sprites/distortAlpha.png", Texture.class);
+            if(tex.getMagFilter() != TextureFilter.linear){
+                tex.setFilter(TextureFilter.linear);
+                tex.setWrap(TextureWrap.repeat);
+            }
+
+            //Draw.z(Layer.weather);
+            Draw.z(layer);
+            Weather.drawNoiseLayers(tex, scorchColor, scl, alpha, speed, 1f, 1f, 0f,
+                layers, speedl, alphal, lscl, colorl);
+            Draw.reset();
+        });
     }
+
+    public static Color scorchColor = Color.scarlet;
+    public static float scl = 1000f, lscl = 0.8f, alpha = 0.2f, speed = 0.4f, speedl = -1.3f, colorl = 0.9f, alphal = 0.7f;
+    public static int layers = 4;
+    public static float layer = Layer.weather - 1;
+
 }

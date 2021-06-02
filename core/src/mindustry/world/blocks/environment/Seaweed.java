@@ -5,9 +5,9 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.world.*;
 
-public class WavingProp extends Prop{
+public class Seaweed extends Prop{
 
-    public WavingProp(String name){
+    public Seaweed(String name){
         super(name);
     }
 

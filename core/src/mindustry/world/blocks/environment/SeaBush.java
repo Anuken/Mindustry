@@ -6,7 +6,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.world.*;
 
-public class Bush extends Prop{
+public class SeaBush extends Prop{
     public @Load(value = "@-bot", fallback = "@") TextureRegion botRegion;
     public @Load(value = "@-center") TextureRegion centerRegion;
 
@@ -16,7 +16,7 @@ public class Bush extends Prop{
 
     static Rand rand = new Rand();
 
-    public Bush(String name){
+    public SeaBush(String name){
         super(name);
         variants = 0;
     }

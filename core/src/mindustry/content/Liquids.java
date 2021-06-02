@@ -5,7 +5,7 @@ import mindustry.ctype.*;
 import mindustry.type.*;
 
 public class Liquids implements ContentList{
-    public static Liquid water, slag, oil, cryofluid;
+    public static Liquid water, slag, oil, cryofluid, neoplasm, rovazide;
 
     @Override
     public void load(){
@@ -38,5 +38,17 @@ public class Liquids implements ContentList{
             effect = StatusEffects.freezing;
             lightColor = Color.valueOf("0097f5").a(0.2f);
         }};
+
+        neoplasm = new Liquid("neoplasm", Color.valueOf("e05438")){{
+            heatCapacity = 0.4f;
+            temperature = 0.54f;
+            viscosity = 0.65f;
+            flammability = 0.1f;
+        }};
+
+        //rovazide = new Liquid("rovafuel", Color.valueOf("9dde68")){{
+        //    flammability = 1.5f;
+        //    explosiveness = 3f;
+        //}};
     }
 }

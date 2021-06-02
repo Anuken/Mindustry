@@ -5,10 +5,10 @@ import arc.math.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.world.*;
 
-public class StaticClusterWall extends StaticWall{
+public class StaticCoralWall extends StaticWall{
     public @Load(value = "@-cluster#", length = 1) TextureRegion[] clusters;
 
-    public StaticClusterWall(String name){
+    public StaticCoralWall(String name){
         super(name);
         variants = 1;
     }

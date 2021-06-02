@@ -37,8 +37,11 @@ public class Blocks implements ContentList{
 
     //environment
     air, spawn, cliff, deepwater, water, taintedWater, tar, slag, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space,
-    dacite,
+    dacite, rhyolite, rhyoliteCrater, regolith, yellowStone, redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
+    redweed, purbush, coralChunk, glowBlob, yellowCoral,
+    regolithWall, yellowStoneWall, rhyoliteWall, carbonWall,
+    graphiticStone,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
@@ -47,9 +50,14 @@ public class Blocks implements ContentList{
     //ores
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
 
+    //wall ores
+    wallOreBeryl, graphiticWall,
+    berylWall, //TODO remove?
+
     //crafting
-    siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
+    siliconSmelter, siliconCrucible, siliconArcFurnace, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
+    cellSynthesisChamber,
 
     //sandbox
     powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadVoid, payloadSource, illuminator,
@@ -73,6 +81,7 @@ public class Blocks implements ContentList{
 
     //production
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
+    beamDrill,
 
     //storage
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
@@ -93,7 +102,10 @@ public class Blocks implements ContentList{
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
 
     //campaign
-    launchPad, interplanetaryAccelerator,
+    launchPad, payloadLaunchPad, interplanetaryAccelerator,
+
+    //nuclear?
+    nuclearWarhead, warheadAssembler, ballisticSilo, //TODO
 
     //misc experimental
     blockForge, blockLoader, blockUnloader
@@ -278,6 +290,30 @@ public class Blocks implements ContentList{
 
         dacite = new Floor("dacite");
 
+        rhyolite = new Floor("rhyolite"){{
+            attributes.set(Attribute.water, -1f);
+        }};
+
+        rhyoliteCrater = new Floor("rhyolite-crater"){{
+            attributes.set(Attribute.water, -1f);
+            blendGroup = rhyolite;
+        }};
+
+        regolith = new Floor("regolith"){{
+            attributes.set(Attribute.water, -1f);
+        }};
+
+        yellowStone = new Floor("yellow-stone"){{
+            attributes.set(Attribute.water, -1f);
+        }};
+
+        graphiticStone = new Floor("graphitic-stone"){{
+            variants = 4;
+        }};
+
+        redmat = new Floor("redmat");
+        bluemat = new Floor("bluemat");
+
         grass = new Floor("grass"){{
             attributes.set(Attribute.water, 0.1f);
         }};
@@ -339,6 +375,26 @@ public class Blocks implements ContentList{
             basalt.asFloor().wall = darksandWater.asFloor().wall = darksandTaintedWater.asFloor().wall = this;
         }};
 
+        regolithWall = new StaticWall("regolith-wall"){{
+            variants = 2;
+            regolith.asFloor().wall = this;
+        }};
+
+        yellowStoneWall = new StaticWall("yellow-stone-wall"){{
+            variants = 2;
+            yellowStone.asFloor().wall = this;
+        }};
+
+        rhyoliteWall = new StaticWall("rhyolite-wall"){{
+            variants = 2;
+            rhyolite.asFloor().wall = rhyoliteCrater.asFloor().wall = this;
+        }};
+
+        carbonWall = new StaticWall("carbon-wall"){{
+            variants = 2;
+            graphiticStone.asFloor().wall = this;
+        }};
+
         sandWall = new StaticWall("sand-wall"){{
             variants = 2;
             sandWater.asFloor().wall = water.asFloor().wall = deepwater.asFloor().wall = this;
@@ -370,6 +426,29 @@ public class Blocks implements ContentList{
 
         sporeCluster = new Prop("spore-cluster"){{
             variants = 3;
+        }};
+
+        redweed = new Seaweed("redweed"){{
+            variants = 3;
+        }};
+
+        purbush = new SeaBush("pur-bush"){{
+
+        }};
+
+        yellowCoral = new SeaBush("yellowcoral"){{
+            lobesMin = 2;
+            lobesMax = 3;
+            magMax = 8f;
+            magMin = 2f;
+            origin = 0.3f;
+            spread = 40f;
+            sclMin = 60f;
+            sclMax = 100f;
+        }};
+
+        coralChunk = new StaticCoralWall("coralchunk"){{
+
         }};
 
         //glowBlob = new Prop("glowblob"){{
@@ -483,6 +562,20 @@ public class Blocks implements ContentList{
         }};
 
         //endregion
+        //region wall ore
+
+        wallOreBeryl = new WallOreBlock(Items.beryllium);
+
+        berylWall = new StaticWall("beryl-wall"){{
+            itemDrop = Items.beryllium;
+        }};
+
+        graphiticWall = new StaticWall("graphitic-wall"){{
+            itemDrop = Items.graphite;
+            variants = 3;
+        }};
+
+        //endregion
         //region crafting
 
         graphitePress = new GenericCrafter("graphite-press"){{
@@ -542,6 +635,24 @@ public class Blocks implements ContentList{
 
             consumes.items(with(Items.coal, 4, Items.sand, 6, Items.pyratite, 1));
             consumes.power(4f);
+        }};
+
+        //TODO
+        siliconArcFurnace = new GenericCrafter("silicon-arc-furnace"){{
+            requirements(Category.crafting, with(Items.thorium, 200, Items.metaglass, 120, Items.beryllium, 40, Items.silicon, 80));
+            craftEffect = Fx.none;
+            outputItem = new ItemStack(Items.silicon, 5);
+            craftTime = 40f;
+            size = 3;
+            hasPower = true;
+            hasLiquids = false;
+            envEnabled |= Env.space | Env.underwater;
+            itemCapacity = 30;
+            drawer = new DrawArcSmelter();
+
+            //TODO don't use sand?
+            consumes.items(with(Items.graphite, 1, Items.sand, 4));
+            consumes.power(6f);
         }};
 
         kiln = new GenericCrafter("kiln"){{
@@ -739,6 +850,35 @@ public class Blocks implements ContentList{
             requirements(Category.crafting, with(Items.graphite, 5, Items.lead, 15));
             health = 90;
             consumes.power(0.50f);
+        }};
+
+        cellSynthesisChamber = new LiquidConverter("cell-synthesis-chamber"){{
+            //TODO booster mechanics?
+            requirements(Category.crafting, with(Items.thorium, 100, Items.phaseFabric, 120, Items.titanium, 150, Items.surgeAlloy, 70));
+            outputLiquid = new LiquidStack(Liquids.neoplasm, 0.4f);
+            craftTime = 200f;
+            size = 3;
+            hasPower = true;
+            hasItems = true;
+            hasLiquids = true;
+            rotate = false;
+            solid = true;
+            outputsLiquid = true;
+            drawer = new DrawCells(){{
+                color = Color.valueOf("9e172c");
+                particleColorFrom = Color.valueOf("9e172c");
+                particleColorTo = Color.valueOf("f98f4a");
+                radius = 2.5f;
+                lifetime = 1400f;
+                recurrence = 2f;
+                particles = 20;
+                range = 3f;
+            }};
+            liquidCapacity = 30f;
+
+            consumes.power(2f);
+            consumes.items(with(Items.sporePod, 3, Items.phaseFabric, 1));
+            consumes.liquid(Liquids.water, 0.8f);
         }};
 
         //endregion
@@ -1033,17 +1173,17 @@ public class Blocks implements ContentList{
         //special transport blocks
 
         duct = new Duct("duct"){{
-            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 5, Items.copper, 5));
+            requirements(Category.distribution, with(Items.graphite, 5, Items.copper, 5));
             speed = 5f;
         }};
 
         ductRouter = new DuctRouter("duct-router"){{
-            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 10, Items.copper, 5));
+            requirements(Category.distribution, with(Items.graphite, 10, Items.copper, 5));
             speed = 5f;
         }};
 
         ductBridge = new DuctBridge("duct-bridge"){{
-            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 20, Items.copper, 15));
+            requirements(Category.distribution, with(Items.graphite, 20, Items.copper, 15));
         }};
 
         //endregion
@@ -1354,6 +1494,14 @@ public class Blocks implements ContentList{
             consumes.item(Items.sand);
             consumes.power(3f);
             consumes.liquid(Liquids.water, 0.15f);
+        }};
+
+        beamDrill = new BeamDrill("beam-drill"){{
+            requirements(Category.production, with(Items.copper, 150));
+            consumes.power(0.2f);
+            tier = 4;
+            size = 2;
+            range = 4;
         }};
 
         //endregion
@@ -2121,6 +2269,15 @@ public class Blocks implements ContentList{
             consumes.power(4f);
         }};
 
+        //TODO
+        payloadLaunchPad = new PayloadLaunchPad("payload-launch-pad"){{
+            requirements(Category.units, BuildVisibility.debugOnly, ItemStack.with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
+            size = 5;
+            launchTime = 60f;
+            hasPower = true;
+            consumes.power(7f);
+        }};
+
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
             requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
             researchCostMultiplier = 0.1f;
@@ -2129,6 +2286,23 @@ public class Blocks implements ContentList{
             consumes.power(10f);
             buildCostMultiplier = 0.5f;
             health = size * size * 80;
+        }};
+
+        nuclearWarhead = new NuclearWarhead("nuclear-warhead"){{
+            requirements(Category.crafting, BuildVisibility.debugOnly, with(Items.thorium, 40));
+            size = 2;
+        }};
+
+        warheadAssembler = new SingleBlockProducer("warhead-assembler"){{
+            requirements(Category.crafting, BuildVisibility.debugOnly, with(Items.thorium, 100));
+            result = nuclearWarhead;
+            size = 3;
+            buildSpeed = 0.3f;
+        }};
+
+        ballisticSilo = new BallisticSilo("ballistic-silo"){{
+            requirements(Category.crafting, BuildVisibility.debugOnly, with(Items.thorium, 100));
+            size = 5;
         }};
 
         //endregion campaign

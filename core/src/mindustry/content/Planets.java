@@ -9,6 +9,8 @@ import mindustry.type.*;
 public class Planets implements ContentList{
     public static Planet
     sun,
+    erekir,
+    tantros,
     serpulo;
 
     @Override
@@ -28,6 +30,25 @@ public class Planets implements ContentList{
                 Color.valueOf("ffe371"),
                 Color.valueOf("f4ee8e")
             );
+        }};
+
+        erekir = new Planet("erekir", sun, 2, 1){{
+            generator = new ErekirPlanetGenerator();
+            meshLoader = () -> new HexMesh(this, 4);
+            atmosphereColor = Color.valueOf("f07218");
+            startSector = 10;
+            atmosphereRadIn = 0.02f;
+            atmosphereRadOut = 0.3f;
+            tidalLock = true;
+        }};
+
+        tantros = new Planet("tantros", sun, 2, 1){{
+            generator = new TantrosPlanetGenerator();
+            meshLoader = () -> new HexMesh(this, 4);
+            atmosphereColor = Color.valueOf("3db899");
+            startSector = 10;
+            atmosphereRadIn = -0.01f;
+            atmosphereRadOut = 0.3f;
         }};
 
         serpulo = new Planet("serpulo", sun, 3, 1){{
