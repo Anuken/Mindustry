@@ -5,9 +5,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.ctype.*;
@@ -20,7 +18,7 @@ import static mindustry.Vars.*;
 
 public class Planet extends UnlockableContent{
     /** Default spacing between planet orbits in world units. */
-    private static final float orbitSpacing = 6f;
+    private static final float orbitSpacing = 11f;
     /** intersect() temp var. */
     private static final Vec3 intersectResult = new Vec3();
     /** Mesh used for rendering. Created on load() - will be null on the server! */
@@ -33,8 +31,10 @@ public class Planet extends UnlockableContent{
     public @Nullable PlanetGenerator generator;
     /** Array of sectors; directly maps to tiles in the grid. */
     public Seq<Sector> sectors;
-    /** Radius of this planet's sphere. Does not take into account sattelites. */
+    /** Radius of this planet's sphere. Does not take into account satellites. */
     public float radius;
+    /** Atmosphere radius adjustment parameters. */
+    public float atmosphereRadIn = 0, atmosphereRadOut = 0.3f;
     /** Orbital radius around the sun. Do not change unless you know exactly what you are doing.*/
     public float orbitRadius;
     /** Total radius of this planet and all its children. */
@@ -47,10 +47,14 @@ public class Planet extends UnlockableContent{
     public float sectorApproxRadius;
     /** Whether this planet is tidally locked relative to its parent - see https://en.wikipedia.org/wiki/Tidal_locking */
     public boolean tidalLock = false;
+    /** Whether or not this planet is listed in the planet access UI. **/
+    public boolean accessible = true;
     /** The default starting sector displayed to the map dialog. */
     public int startSector = 0;
     /** Whether the bloom render effect is enabled. */
     public boolean bloom = false;
+    /** Whether this planet is displayed. */
+    public boolean visible = true;
     /** For suns, this is the color that shines on other planets. Does nothing for children. */
     public Color lightColor = Color.white.cpy();
     /** Atmosphere tint for landable planets. */
@@ -63,7 +67,7 @@ public class Planet extends UnlockableContent{
     public Planet solarSystem;
     /** All planets orbiting this one, in ascending order of radius. */
     public Seq<Planet> children = new Seq<>();
-    /** Sattelites orbiting this planet. */
+    /** Satellites orbiting this planet. */
     public Seq<Satellite> satellites = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
     protected Prov<PlanetMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2);
@@ -107,6 +111,9 @@ public class Planet extends UnlockableContent{
     }
 
     public @Nullable Sector getLastSector(){
+        if(sectors.isEmpty()){
+            return null;
+        }
         return sectors.get(Math.min(Core.settings.getInt(name + "-last-sector", startSector), sectors.size - 1));
     }
 
@@ -145,7 +152,7 @@ public class Planet extends UnlockableContent{
     public float getRotation(){
         //tidally locked planets always face toward parents
         if(tidalLock){
-            return getOrbitAngle();
+            return -getOrbitAngle() + 90;
         }
         //random offset for more variability
         float offset = Mathf.randomSeed(id+1, 360);
@@ -176,17 +183,17 @@ public class Planet extends UnlockableContent{
     public void updateBaseCoverage(){
         for(Sector sector : sectors){
             float sum = 1f;
-            for(Sector other : sector.inRange(2)){
+            for(Sector other : sector.near()){
                 if(other.generateEnemyBase){
-                    sum += 1f;
+                    sum += 0.9f;
                 }
             }
 
             if(sector.hasEnemyBase()){
-                sum += 2f;
+                sum += 0.88f;
             }
 
-            sector.baseCoverage = Mathf.clamp(sum / 5f);
+            sector.threat = sector.preset == null ? Math.min(sum / 5f, 1.2f) : Mathf.clamp(sector.preset.difficulty / 10f);
         }
     }
 
@@ -195,13 +202,27 @@ public class Planet extends UnlockableContent{
         return mat.setToTranslation(position).rotate(Vec3.Y, getRotation());
     }
 
+    /** Regenerates the planet mesh. For debugging only. */
+    public void reloadMesh(){
+        if(mesh != null){
+            mesh.dispose();
+        }
+        mesh = meshLoader.get();
+    }
+
     @Override
     public void load(){
+        super.load();
+
         mesh = meshLoader.get();
     }
 
     @Override
     public void init(){
+
+        for(Sector sector : sectors){
+            sector.loadInfo();
+        }
 
         if(generator != null){
             Noise.setSeed(id + 1);
@@ -255,12 +276,15 @@ public class Planet extends UnlockableContent{
     }
 
     @Override
-    public void displayInfo(Table table){
-
-    }
-
-    @Override
     public ContentType getContentType(){
         return ContentType.planet;
+    }
+
+    public boolean visible(){
+        return visible;
+    }
+
+    public void draw(Mat3D projection, Mat3D transform){
+        mesh.render(projection, transform);
     }
 }

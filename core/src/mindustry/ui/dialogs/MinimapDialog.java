@@ -8,7 +8,7 @@ import arc.scene.event.*;
 import arc.scene.ui.layout.*;
 import mindustry.gen.*;
 
-import static mindustry.Vars.renderer;
+import static mindustry.Vars.*;
 
 public class MinimapDialog extends BaseDialog{
 

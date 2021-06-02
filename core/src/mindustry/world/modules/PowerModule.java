@@ -1,8 +1,8 @@
 package mindustry.world.modules;
 
-import arc.struct.IntSeq;
+import arc.struct.*;
 import arc.util.io.*;
-import mindustry.world.blocks.power.PowerGraph;
+import mindustry.world.blocks.power.*;
 
 public class PowerModule extends BlockModule{
     /**
@@ -11,6 +11,7 @@ public class PowerModule extends BlockModule{
      * In case of buffered consumers, this is the percentage of power stored in relation to the maximum capacity.
      */
     public float status = 0.0f;
+    public boolean init;
     public PowerGraph graph = new PowerGraph();
     public IntSeq links = new IntSeq();
 

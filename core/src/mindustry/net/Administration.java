@@ -3,7 +3,6 @@ package mindustry.net;
 import arc.*;
 import arc.func.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.Log.*;
 import arc.util.pooling.Pool.*;
@@ -12,8 +11,6 @@ import mindustry.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
-
-import java.io.*;
 
 import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
@@ -143,11 +140,18 @@ public class Administration{
 
     /** @return whether this action is allowed by the action filters. */
     public boolean allowAction(Player player, ActionType type, Tile tile, Cons<PlayerAction> setter){
+        return allowAction(player, type, action -> setter.get(action.set(player, type, tile)));
+    }
+
+    /** @return whether this action is allowed by the action filters. */
+    public boolean allowAction(Player player, ActionType type, Cons<PlayerAction> setter){
         //some actions are done by the server (null player) and thus are always allowed
         if(player == null) return true;
 
         PlayerAction act = Pools.obtain(PlayerAction.class, PlayerAction::new);
-        setter.get(act.set(player, type, tile));
+        act.player = player;
+        act.type = type;
+        setter.get(act);
         for(ActionFilter filter : actionFilters){
             if(!filter.allow(act)){
                 Pools.free(act);
@@ -216,7 +220,7 @@ public class Administration{
         getCreateInfo(id).banned = true;
 
         save();
-        Events.fire(new PlayerBanEvent(Groups.player.find(p -> id.equals(p.uuid()))));
+        Events.fire(new PlayerBanEvent(Groups.player.find(p -> id.equals(p.uuid())), id));
         return true;
     }
 
@@ -250,13 +254,12 @@ public class Administration{
     public boolean unbanPlayerID(String id){
         PlayerInfo info = getCreateInfo(id);
 
-        if(!info.banned)
-            return false;
+        if(!info.banned) return false;
 
         info.banned = false;
         bannedIPs.removeAll(info.ips, false);
         save();
-        Events.fire(new PlayerUnbanEvent(Groups.player.find(p -> id.equals(p.uuid()))));
+        Events.fire(new PlayerUnbanEvent(Groups.player.find(p -> id.equals(p.uuid())), id));
         return true;
     }
 
@@ -299,8 +302,6 @@ public class Administration{
      */
     public boolean adminPlayer(String id, String usid){
         PlayerInfo info = getCreateInfo(id);
-
-        if(info.admin && info.adminUsid != null && info.adminUsid.equals(usid)) return false;
 
         info.adminUsid = usid;
         info.admin = true;
@@ -368,7 +369,7 @@ public class Administration{
         ObjectSet<PlayerInfo> result = new ObjectSet<>();
 
         for(PlayerInfo info : playerInfo.values()){
-            if(info.lastName.equalsIgnoreCase(name) || (info.names.contains(name, false))
+            if(info.lastName.equalsIgnoreCase(name) || info.names.contains(name, false)
             || Strings.stripColors(Strings.stripColors(info.lastName)).equals(name)
             || info.ips.contains(name, false) || info.id.equals(name)){
                 result.add(info);
@@ -444,111 +445,11 @@ public class Administration{
 
     @SuppressWarnings("unchecked")
     private void load(){
-        if(!loadLegacy()){
-            //load default data
-            playerInfo = Core.settings.getJson("player-data", ObjectMap.class, ObjectMap::new);
-            bannedIPs = Core.settings.getJson("ip-bans", Seq.class, Seq::new);
-            whitelist = Core.settings.getJson("whitelist-ids", Seq.class, Seq::new);
-            subnetBans = Core.settings.getJson("banned-subnets", Seq.class, Seq::new);
-        }else{
-            //save over loaded legacy data
-            save();
-            Log.info("Loaded legacy (5.0) server data.");
-        }
-    }
-
-    private boolean loadLegacy(){
-        try{
-            byte[] info = Core.settings.getBytes("player-info");
-            byte[] ips = Core.settings.getBytes("banned-ips");
-            byte[] whitelist = Core.settings.getBytes("whitelisted");
-            byte[] subnet = Core.settings.getBytes("subnet-bans");
-
-            if(info != null){
-                DataInputStream d = new DataInputStream(new ByteArrayInputStream(info));
-                int size = d.readInt();
-                if(size != 0){
-                    d.readUTF();
-                    d.readUTF();
-
-                    for(int i = 0; i < size; i++){
-                        String mapKey = d.readUTF();
-
-                        PlayerInfo data = new PlayerInfo();
-
-                        data.id = d.readUTF();
-                        data.lastName = d.readUTF();
-                        data.lastIP = d.readUTF();
-                        int ipsize = d.readInt();
-                        if(ipsize != 0){
-                            d.readUTF();
-                            for(int j = 0; j < ipsize; j++){
-                                data.ips.add(d.readUTF());
-                            }
-                        }
-
-                        int namesize = d.readInt();
-                        if(namesize != 0){
-                            d.readUTF();
-                            for(int j = 0; j < ipsize; j++){
-                                data.names.add(d.readUTF());
-                            }
-                        }
-                        //ips, names...
-                        data.adminUsid = d.readUTF();
-                        data.timesKicked = d.readInt();
-                        data.timesJoined = d.readInt();
-                        data.banned = d.readBoolean();
-                        data.admin = d.readBoolean();
-                        data.lastKicked = d.readLong();
-
-                        playerInfo.put(mapKey, data);
-                    }
-                }
-                Core.settings.remove("player-info");
-            }
-
-            if(ips != null){
-                DataInputStream d = new DataInputStream(new ByteArrayInputStream(ips));
-                int size = d.readInt();
-                if(size != 0){
-                    d.readUTF();
-                    for(int i = 0; i < size; i++){
-                        bannedIPs.add(d.readUTF());
-                    }
-                }
-                Core.settings.remove("banned-ips");
-            }
-
-            if(whitelist != null){
-                DataInputStream d = new DataInputStream(new ByteArrayInputStream(whitelist));
-                int size = d.readInt();
-                if(size != 0){
-                    d.readUTF();
-                    for(int i = 0; i < size; i++){
-                        this.whitelist.add(d.readUTF());
-                    }
-                }
-                Core.settings.remove("whitelisted");
-            }
-
-            if(subnet != null){
-                DataInputStream d = new DataInputStream(new ByteArrayInputStream(subnet));
-                int size = d.readInt();
-                if(size != 0){
-                    d.readUTF();
-                    for(int i = 0; i < size; i++){
-                        subnetBans.add(d.readUTF());
-                    }
-                }
-                Core.settings.remove("subnet-bans");
-            }
-
-            return info != null || ips != null || whitelist != null || subnet != null;
-        }catch(Throwable e){
-            e.printStackTrace();
-        }
-        return false;
+        //load default data
+        playerInfo = Core.settings.getJson("player-data", ObjectMap.class, ObjectMap::new);
+        bannedIPs = Core.settings.getJson("ip-bans", Seq.class, Seq::new);
+        whitelist = Core.settings.getJson("whitelist-ids", Seq.class, Seq::new);
+        subnetBans = Core.settings.getJson("banned-subnets", Seq.class, Seq::new);
     }
 
     /** Server configuration definition. Each config value can be a string, boolean or number. */
@@ -578,7 +479,7 @@ public class Administration{
         autosave("Whether the periodically save the map when playing.", false),
         autosaveAmount("The maximum amount of autosaves. Older ones get replaced.", 10),
         autosaveSpacing("Spacing between autosaves in seconds.", 60 * 5),
-        debug("Enable debug logging", false, () -> Log.setLogLevel(debug() ? LogLevel.debug : LogLevel.info));
+        debug("Enable debug logging", false, () -> Log.level = debug() ? LogLevel.debug : LogLevel.info);
 
         public static final Config[] all = values();
 
@@ -683,12 +584,15 @@ public class Administration{
     public static class TraceInfo{
         public String ip, uuid;
         public boolean modded, mobile;
+        public int timesJoined, timesKicked;
 
-        public TraceInfo(String ip, String uuid, boolean modded, boolean mobile){
+        public TraceInfo(String ip, String uuid, boolean modded, boolean mobile, int timesJoined, int timesKicked){
             this.ip = ip;
             this.uuid = uuid;
             this.modded = modded;
             this.mobile = mobile;
+            this.timesJoined = timesJoined;
+            this.timesKicked = timesKicked;
         }
     }
 
@@ -697,7 +601,7 @@ public class Administration{
     public static class PlayerAction implements Poolable{
         public Player player;
         public ActionType type;
-        public Tile tile;
+        public @Nullable Tile tile;
 
         /** valid for block placement events only */
         public @Nullable Block block;
@@ -710,10 +614,23 @@ public class Administration{
         public @Nullable Item item;
         public int itemAmount;
 
+        /** valid for unit-type events only, and even in that case may be null. */
+        public @Nullable Unit unit;
+
+        /** valid only for removePlanned events only; contains packed positions. */
+        public @Nullable int[] plans;
+
         public PlayerAction set(Player player, ActionType type, Tile tile){
             this.player = player;
             this.type = type;
             this.tile = tile;
+            return this;
+        }
+
+        public PlayerAction set(Player player, ActionType type, Unit unit){
+            this.player = player;
+            this.type = type;
+            this.unit = unit;
             return this;
         }
 
@@ -726,11 +643,13 @@ public class Administration{
             type = null;
             tile = null;
             block = null;
+            unit = null;
+            plans = null;
         }
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned
     }
 
 }

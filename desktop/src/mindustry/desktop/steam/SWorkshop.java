@@ -1,18 +1,19 @@
 package mindustry.desktop.steam;
 
 import arc.*;
-import com.codedisaster.steamworks.*;
-import com.codedisaster.steamworks.SteamRemoteStorage.*;
-import com.codedisaster.steamworks.SteamUGC.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.func.*;
 import arc.scene.ui.*;
+import arc.struct.*;
 import arc.util.*;
+import com.codedisaster.steamworks.*;
+import com.codedisaster.steamworks.SteamRemoteStorage.*;
+import com.codedisaster.steamworks.SteamUGC.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.maps.*;
 import mindustry.mod.Mods.*;
+import mindustry.service.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 
@@ -42,7 +43,7 @@ public class SWorkshop implements SteamUGCCallback{
         workshopFiles.put(LoadedMod.class, folders.select(f -> f.child("mod.json").exists() || f.child("mod.hjson").exists()));
 
         if(!workshopFiles.get(Map.class).isEmpty()){
-            SAchievement.downloadMapWorkshop.complete();
+            Achievement.downloadMapWorkshop.complete();
         }
 
         workshopFiles.each((type, list) -> {
@@ -171,7 +172,7 @@ public class SWorkshop implements SteamUGCCallback{
             ugc.submitItemUpdate(h, changelog == null ? "<Created>" : changelog);
 
             if(p instanceof Map){
-                SAchievement.publishMap.complete();
+                Achievement.publishMap.complete();
             }
         }, () -> p.addSteamID(sid));
     }
@@ -229,11 +230,6 @@ public class SWorkshop implements SteamUGCCallback{
     }
 
     @Override
-    public void onRequestUGCDetails(SteamUGCDetails details, SteamResult result){
-
-    }
-
-    @Override
     public void onUGCQueryCompleted(SteamUGCQuery query, int numResultsReturned, int totalMatchingResults, boolean isCachedData, SteamResult result){
         Log.info("GET QUERY " + query);
 
@@ -263,7 +259,7 @@ public class SWorkshop implements SteamUGCCallback{
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getItemInstallInfo(publishedFileID, info);
         Log.info("Item subscribed from @", info.getFolder());
-        SAchievement.downloadMapWorkshop.complete();
+        Achievement.downloadMapWorkshop.complete();
     }
 
     @Override
@@ -311,40 +307,10 @@ public class SWorkshop implements SteamUGCCallback{
 
     @Override
     public void onDownloadItemResult(int appID, SteamPublishedFileID publishedFileID, SteamResult result){
-        SAchievement.downloadMapWorkshop.complete();
+        Achievement.downloadMapWorkshop.complete();
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getItemInstallInfo(publishedFileID, info);
         Log.info("Item downloaded to @", info.getFolder());
-    }
-
-    @Override
-    public void onUserFavoriteItemsListChanged(SteamPublishedFileID publishedFileID, boolean wasAddRequest, SteamResult result){
-
-    }
-
-    @Override
-    public void onSetUserItemVote(SteamPublishedFileID publishedFileID, boolean voteUp, SteamResult result){
-
-    }
-
-    @Override
-    public void onGetUserItemVote(SteamPublishedFileID publishedFileID, boolean votedUp, boolean votedDown, boolean voteSkipped, SteamResult result){
-
-    }
-
-    @Override
-    public void onStartPlaytimeTracking(SteamResult result){
-
-    }
-
-    @Override
-    public void onStopPlaytimeTracking(SteamResult result){
-
-    }
-
-    @Override
-    public void onStopPlaytimeTrackingForAllItems(SteamResult result){
-
     }
 
     @Override

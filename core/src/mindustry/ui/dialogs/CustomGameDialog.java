@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
@@ -25,20 +26,25 @@ public class CustomGameDialog extends BaseDialog{
 
     void setup(){
         clearChildren();
-        add(titleTable);
-        row();
+        add(titleTable).growX().row();
         stack(cont, buttons).grow();
         buttons.bottom();
         cont.clear();
 
         Table maps = new Table();
-        maps.marginRight(14);
-        maps.marginBottom(55f);
+        maps.marginBottom(55f).marginRight(-20f);
         ScrollPane pane = new ScrollPane(maps);
         pane.setFadeScrollBars(false);
 
         int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(210)), 1);
         float images = 146f;
+
+        ImageButtonStyle style = new ImageButtonStyle(){{
+            up = Styles.none;
+            down = Styles.flatOver;
+            over = Styles.flatOver;
+            disabled = Styles.none;
+        }};
 
         int i = 0;
         maps.defaults().width(170).fillY().top().pad(4f);
@@ -48,7 +54,7 @@ public class CustomGameDialog extends BaseDialog{
                 maps.row();
             }
 
-            ImageButton image = new ImageButton(new TextureRegion(map.safeTexture()), Styles.cleari);
+            ImageButton image = new ImageButton(new TextureRegion(map.safeTexture()), style);
             image.margin(5);
             image.top();
 
@@ -87,6 +93,6 @@ public class CustomGameDialog extends BaseDialog{
             maps.add("@maps.none").pad(50);
         }
 
-        cont.add(pane).uniformX();
+        cont.add(pane).grow();
     }
 }

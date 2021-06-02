@@ -1,9 +1,9 @@
 package mindustry.world.blocks.power;
 
-import mindustry.world.Block;
-import mindustry.world.meta.BlockGroup;
+import mindustry.world.*;
+import mindustry.world.meta.*;
 
-public abstract class PowerBlock extends Block{
+public class PowerBlock extends Block{
 
     public PowerBlock(String name){
         super(name);

@@ -13,22 +13,27 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.ConstructBlock.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
@@ -39,25 +44,25 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Buildingc.class}, isFinal = false, genio = false, serialize = false)
 @Component(base = true)
-abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable, Controllable{
+abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable, Controllable, Sized{
     //region vars and initialization
     static final float timeToSleep = 60f * 1, timeToUncontrol = 60f * 6;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
-    static final Seq<Building> tempTileEnts = new Seq<>();
-    static final Seq<Tile> tempTiles = new Seq<>();
+    static final Seq<Building> tempBuilds = new Seq<>();
     static int sleepingEntities = 0;
     
-    @Import float x, y, health;
+    @Import float x, y, health, maxHealth;
     @Import Team team;
 
     transient Tile tile;
     transient Block block;
-    transient Seq<Building> proximity = new Seq<>(8);
+    transient Seq<Building> proximity = new Seq<>(6);
     transient boolean updateFlow;
-    transient byte dump;
+    transient byte cdump;
     transient int rotation;
     transient boolean enabled = true;
     transient float enabledControlTime;
+    transient String lastAccessed;
 
     PowerModule power;
     ItemModule items;
@@ -65,6 +70,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     ConsumeModule cons;
 
     private transient float timeScale = 1f, timeScaleDuration;
+    private transient float dumpAccum;
 
     private transient @Nullable SoundLoop sound;
 
@@ -78,11 +84,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             create(tile.block(), team);
         }else{
             if(block.hasPower){
+                power.init = false;
                 //reinit power graph
-                power.graph = new PowerGraph();
-                power.graph.add(self());
+                new PowerGraph().add(self());
             }
         }
+        proximity.clear();
         this.rotation = rotation;
         this.tile = tile;
 
@@ -103,8 +110,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         this.block = block;
         this.team = team;
 
-        if(block.activeSound != Sounds.none){
-            sound = new SoundLoop(block.activeSound, block.activeSoundVolume);
+        if(block.loopSound != Sounds.none){
+            sound = new SoundLoop(block.loopSound, block.loopSoundVolume);
         }
 
         health = block.health;
@@ -143,7 +150,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         write.f(health);
         write.b(rotation | 0b10000000);
         write.b(team.id);
-        write.b(0); //extra padding for later use
+        write.b(1); //version
+        write.b(enabled ? 1 : 0);
         if(items != null) items.write(write);
         if(power != null) power.write(write);
         if(liquids != null) liquids.write(write);
@@ -158,7 +166,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         rotation = rot & 0b01111111;
         boolean legacy = true;
         if((rot & 0b10000000) != 0){
-            read.b(); //padding
+            byte ver = read.b(); //version of entity save
+            if(ver == 1){
+                byte on = read.b();
+                this.enabled = on == 1;
+                if(!this.enabled){
+                    enabledControlTime = timeToUncontrol;
+                }
+            }
             legacy = false;
         }
 
@@ -191,6 +206,39 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //endregion
     //region utility methods
 
+    public void addPlan(boolean checkPrevious){
+        if(!block.rebuildable || (team == state.rules.defaultTeam && state.isCampaign() && !block.isVisible())) return;
+
+        Object overrideConfig = null;
+
+        if(self() instanceof ConstructBuild entity){
+            //update block to reflect the fact that something was being constructed
+            if(entity.current != null && entity.current.synthetic() && entity.wasConstructing){
+                block = entity.current;
+                overrideConfig = entity.lastConfig;
+            }else{
+                //otherwise this was a deconstruction that was interrupted, don't want to rebuild that
+                return;
+            }
+        }
+
+        TeamData data = state.teams.get(team);
+
+        if(checkPrevious){
+            //remove existing blocks that have been placed here.
+            //painful O(n) iteration + copy
+            for(int i = 0; i < data.blocks.size; i++){
+                BlockPlan b = data.blocks.get(i);
+                if(b.x == tile.x && b.y == tile.y){
+                    data.blocks.removeIndex(i);
+                    break;
+                }
+            }
+        }
+
+        data.blocks.addFirst(new BlockPlan(tile.x, tile.y, (short)rotation, block.id, overrideConfig == null ? config() : overrideConfig));
+    }
+
     /** Configure with the current, local player. */
     public void configure(Object value){
         //save last used config
@@ -216,9 +264,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return true;
     }
 
-    public void applyBoost(float intensity, float  duration){
+    public void applyBoost(float intensity, float duration){
+        //do not refresh time scale when getting a weaker intensity
+        if(intensity >= this.timeScale){
+            timeScaleDuration = Math.max(timeScaleDuration, duration);
+        }
         timeScale = Math.max(timeScale, intensity);
-        timeScaleDuration = Math.max(timeScaleDuration, duration);
     }
 
     public Building nearby(int dx, int dy){
@@ -318,6 +369,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
     }
 
+    public BlockStatus status(){
+        return cons.status();
+    }
+
     /** Call when nothing is happening to the entity. This increments the internal sleep timer. */
     public void sleep(){
         sleepTime += Time.delta;
@@ -345,6 +400,38 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     //endregion
     //region handler methods
+
+    /** @return whether the player can select (but not actually control) this building. */
+    public boolean canControlSelect(Player player){
+        return false;
+    }
+
+    /** Called when a player control-selects this building - not called for ControlBlock subclasses. */
+    public void onControlSelect(Player player){
+
+    }
+
+    public void acceptPlayerPayload(Player player, Cons<Payload> grabber){
+        Fx.spawn.at(player);
+        var unit = player.unit();
+        player.clearUnit();
+        //player.deathTimer = Player.deathDelay + 1f; //for instant respawn
+        unit.remove();
+        grabber.get(new UnitPayload(unit));
+        Fx.unitDrop.at(unit);
+        if(Vars.net.client()){
+            Vars.netClient.clearRemovedEntity(unit.id);
+        }
+    }
+
+    public boolean canUnload(){
+        return block.unloadable;
+    }
+
+    /** Called when an unloader takes an item. */
+    public void itemTaken(Item item){
+
+    }
 
     /** Called when this block is dropped as a payload. */
     public void dropped(){
@@ -393,7 +480,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     /** Handle a stack input. */
-    public void handleStack(Item item, int amount, Teamc source){
+    public void handleStack(Item item, int amount, @Nullable Teamc source){
         noSleep();
         items.add(item, amount);
     }
@@ -401,10 +488,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Returns offset for stack placement. */
     public void getStackOffset(Item item, Vec2 trns){
 
-    }
-
-    public void onProximityUpdate(){
-        noSleep();
     }
 
     public boolean acceptPayload(Building source, Payload payload){
@@ -423,7 +506,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      */
     public boolean movePayload(Payload todump){
         int trns = block.size/2 + 1;
-        Tile next = tile.getNearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
+        Tile next = tile.nearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
 
         if(next != null && next.build != null && next.build.team == team && next.build.acceptPayload(self(), todump)){
             next.build.handlePayload(self(), todump);
@@ -441,7 +524,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public boolean dumpPayload(Payload todump){
         if(proximity.size == 0) return false;
 
-        int dump = this.dump;
+        int dump = this.cdump;
 
         for(int i = 0; i < proximity.size; i++){
             Building other = proximity.get((i + dump) % proximity.size);
@@ -466,8 +549,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return block.consumes.itemFilters.get(item.id) && items.get(item) < getMaximumAccepted(item);
     }
 
-    public boolean acceptLiquid(Building source, Liquid liquid, float amount){
-        return block.hasLiquids && liquids.get(liquid) + amount < block.liquidCapacity && block.consumes.liquidfilters.get(liquid.id);
+    public boolean acceptLiquid(Building source, Liquid liquid){
+        return block.hasLiquids && block.consumes.liquidfilters.get(liquid.id);
     }
 
     public void handleLiquid(Building source, Liquid liquid, float amount){
@@ -475,7 +558,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void dumpLiquid(Liquid liquid){
-        int dump = this.dump;
+        dumpLiquid(liquid, 2f);
+    }
+
+    public void dumpLiquid(Liquid liquid, float scaling){
+        int dump = this.cdump;
+
+        if(liquids.get(liquid) <= 0.0001f) return;
+
+        if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) liquid.unlock();
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -486,10 +577,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 float ofract = other.liquids.get(liquid) / other.block.liquidCapacity;
                 float fract = liquids.get(liquid) / block.liquidCapacity;
 
-                if(ofract < fract) transferLiquid(other, (fract - ofract) * block.liquidCapacity / 2f, liquid);
+                if(ofract < fract) transferLiquid(other, (fract - ofract) * block.liquidCapacity / scaling, liquid);
             }
         }
-
     }
 
     public boolean canDumpLiquid(Building to, Liquid liquid){
@@ -497,23 +587,23 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void transferLiquid(Building next, float amount, Liquid liquid){
-        float flow = Math.min(next.block.liquidCapacity - next.liquids.get(liquid) - 0.001f, amount);
+        float flow = Math.min(next.block.liquidCapacity - next.liquids.get(liquid), amount);
 
-        if(next.acceptLiquid(self(), liquid, flow)){
+        if(next.acceptLiquid(self(), liquid)){
             next.handleLiquid(self(), liquid, flow);
             liquids.remove(liquid, flow);
         }
     }
 
-    public float moveLiquidForward(float leakResistance, Liquid liquid){
-        Tile next = tile.getNearby(rotation);
+    public float moveLiquidForward(boolean leaks, Liquid liquid){
+        Tile next = tile.nearby(rotation);
 
         if(next == null) return 0;
 
         if(next.build != null){
             return moveLiquid(next.build, liquid);
-        }else if(leakResistance != 100f && !next.block().solid && !next.block().hasLiquids){
-            float leakAmount = liquids.get(liquid) / leakResistance;
+        }else if(leaks && !next.block().solid && !next.block().hasLiquids){
+            float leakAmount = liquids.get(liquid) / 1.5f;
             Puddles.deposit(next, tile, liquid, leakAmount);
             liquids.remove(liquid, leakAmount);
         }
@@ -528,10 +618,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(next.team == team && next.block.hasLiquids && liquids.get(liquid) > 0f){
             float ofract = next.liquids.get(liquid) / next.block.liquidCapacity;
             float fract = liquids.get(liquid) / block.liquidCapacity * block.liquidPressure;
-            float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (block.liquidCapacity), liquids.get(liquid));
-            flow = Math.min(flow, next.block.liquidCapacity - next.liquids.get(liquid) - 0.001f);
+            float flow = Math.min(Mathf.clamp((fract - ofract)) * (block.liquidCapacity), liquids.get(liquid));
+            flow = Math.min(flow, next.block.liquidCapacity - next.liquids.get(liquid));
 
-            if(flow > 0f && ofract <= fract && next.acceptLiquid(self(), liquid, flow)){
+            if(flow > 0f && ofract <= fract && next.acceptLiquid(self(), liquid)){
                 next.handleLiquid(self(), liquid, flow);
                 liquids.remove(liquid, flow);
                 return flow;
@@ -575,7 +665,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * containers, it gets added to the block's inventory.
      */
     public void offload(Item item){
-        int dump = this.dump;
+        produced(item, 1);
+        int dump = this.cdump;
+        if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) item.unlock();
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -593,7 +685,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * Tries to put this item into a nearby container. Returns success. Unlike #offload(), this method does not change the block inventory.
      */
     public boolean put(Item item){
-        int dump = this.dump;
+        int dump = this.cdump;
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -607,19 +699,41 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return false;
     }
 
-    /** Try dumping any item near the  */
+    public void produced(Item item){
+        produced(item, 1);
+    }
+
+    public void produced(Item item, int amount){
+        if(Vars.state.rules.sector != null && team == state.rules.defaultTeam) Vars.state.rules.sector.info.handleProduction(item, amount);
+    }
+
+    /** Dumps any item with an accumulator. May dump multiple times per frame. Use with care. */
+    public void dumpAccumulate(){
+        dumpAccumulate(null);
+    }
+
+    /** Dumps any item with an accumulator. May dump multiple times per frame. Use with care. */
+    public void dumpAccumulate(Item item){
+        dumpAccum += delta();
+        while(dumpAccum >= 1f){
+            dump(item);
+            dumpAccum -=1f;
+        }
+    }
+
+    /** Try dumping any item near the building. */
     public boolean dump(){
         return dump(null);
     }
 
     /**
-     * Try dumping a specific item near the 
+     * Try dumping a specific item near the building.
      * @param todump Item to dump. Can be null to dump anything.
      */
     public boolean dump(Item todump){
         if(!block.hasItems || items.total() == 0 || (todump != null && !items.has(todump))) return false;
 
-        int dump = this.dump;
+        int dump = this.cdump;
 
         if(proximity.size == 0) return false;
 
@@ -654,7 +768,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void incrementDump(int prox){
-        dump = (byte)((dump + 1) % prox);
+        cdump = (byte)((cdump + 1) % prox);
     }
 
     /** Used for dumping items. */
@@ -672,19 +786,27 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return false;
     }
 
+    /** Called shortly before this building is removed. */
     public void onProximityRemoved(){
         if(power != null){
             powerGraphRemoved();
         }
     }
 
+    /** Called after this building is created in the world. May be called multiple times, or when adjacent buildings change. */
     public void onProximityAdded(){
-        if(block.hasPower) updatePowerGraph();
+        if(power != null){
+            updatePowerGraph();
+        }
+    }
+
+    /** Called when anything adjacent to this building is placed/removed, including itself. */
+    public void onProximityUpdate(){
+        noSleep();
     }
 
     public void updatePowerGraph(){
-
-        for(Building other : getPowerConnections(tempTileEnts)){
+        for(Building other : getPowerConnections(tempBuilds)){
             if(other.power != null){
                 other.power.graph.addGraph(power.graph);
             }
@@ -692,9 +814,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void powerGraphRemoved(){
-        if(power == null){
-            return;
-        }
+        if(power == null) return;
 
         power.graph.remove(self());
         for(int i = 0; i < power.links.size; i++){
@@ -705,6 +825,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
         power.links.clear();
     }
+    
+    public boolean conductsTo(Building other){
+        return !block.insulated;
+    }
 
     public Seq<Building> getPowerConnections(Seq<Building> out){
         out.clear();
@@ -712,15 +836,16 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         for(Building other : proximity){
             if(other != null && other.power != null
+            && other.team == team
             && !(block.consumesPower && other.block.consumesPower && !block.outputsPower && !other.block.outputsPower)
-            && !power.links.contains(other.pos())){
+            && conductsTo(other) && other.conductsTo(self()) && !power.links.contains(other.pos())){
                 out.add(other);
             }
         }
 
         for(int i = 0; i < power.links.size; i++){
             Tile link = world.tile(power.links.get(i));
-            if(link != null && link.build != null && link.build.power != null) out.add(link.build);
+            if(link != null && link.build != null && link.build.power != null && link.build.team == team) out.add(link.build);
         }
         return out;
     }
@@ -739,28 +864,29 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     /** @return whether this block should play its idle sound.*/
-    public boolean shouldIdleSound(){
+    public boolean shouldAmbientSound(){
         return shouldConsume();
     }
 
     public void drawStatus(){
         if(block.enableDrawStatus && block.consumes.any()){
-            float brcx = tile.drawx() + (block.size * tilesize / 2f) - (tilesize / 2f);
-            float brcy = tile.drawy() - (block.size * tilesize / 2f) + (tilesize / 2f);
+            float multiplier = block.size > 1 ? 1 : 0.64f;
+            float brcx = x + (block.size * tilesize / 2f) - (tilesize * multiplier / 2f);
+            float brcy = y - (block.size * tilesize / 2f) + (tilesize * multiplier / 2f);
 
             Draw.z(Layer.power + 1);
             Draw.color(Pal.gray);
-            Fill.square(brcx, brcy, 2.5f, 45);
-            Draw.color(cons.status().color);
-            Fill.square(brcx, brcy, 1.5f, 45);
+            Fill.square(brcx, brcy, 2.5f * multiplier, 45);
+            Draw.color(status().color);
+            Fill.square(brcx, brcy, 1.5f * multiplier, 45);
             Draw.color();
         }
     }
 
     public void drawCracks(){
-        if(!damaged() || block.size > Block.maxCrackSize) return;
+        if(!damaged() || block.size > BlockRenderer.maxCrackSize) return;
         int id = pos();
-        TextureRegion region = Block.cracks[block.size - 1][Mathf.clamp((int)((1f - healthf()) * Block.crackRegions), 0, Block.crackRegions-1)];
+        TextureRegion region = renderer.blocks.cracks[block.size - 1][Mathf.clamp((int)((1f - healthf()) * BlockRenderer.crackRegions), 0, BlockRenderer.crackRegions-1)];
         Draw.colorl(0.2f, 0.1f + (1f - healthf())* 0.6f);
         Draw.rect(region, x, y, (id%4)*90);
         Draw.color();
@@ -828,24 +954,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void placed(){
         if(net.client()) return;
 
-        if((block.consumesPower && !block.outputsPower) || (!block.consumesPower && block.outputsPower)){
-            int range = 10;
-            tempTiles.clear();
-            Geometry.circle(tileX(), tileY(), range, (x, y) -> {
-                Building other = world.build(x, y);
-                if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, self()) && !PowerNode.insulated(other, self())
-                    && !other.proximity().contains(this.<Building>self()) &&
-                !(block.outputsPower && proximity.contains(p -> p.power != null && p.power.graph == other.power.graph))){
-                    tempTiles.add(other.tile);
+        if((block.consumesPower || block.outputsPower) && block.hasPower){
+            PowerNode.getNodeLinks(tile, block, team, other -> {
+                if(!other.power.links.contains(pos())){
+                    other.configureAny(pos());
                 }
             });
-            tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
-            if(!tempTiles.isEmpty()){
-                Tile toLink = tempTiles.first();
-                if(!toLink.build.power.links.contains(pos())){
-                    toLink.build.configureAny(pos());
-                }
-            }
         }
     }
 
@@ -872,8 +986,22 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //null is of type void.class; anonymous classes use their superclass.
         Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() ? value.getClass().getSuperclass() : value.getClass();
 
+        if(value instanceof Item) type = Item.class;
+        if(value instanceof Block) type = Block.class;
+        if(value instanceof Liquid) type = Liquid.class;
+        
+        if(builder != null && builder.isPlayer()){
+            lastAccessed = builder.getPlayer().name;
+        }
+
         if(block.configurations.containsKey(type)){
             block.configurations.get(type).get(this, value);
+        }else if(value instanceof Building build){
+            //copy config of another building
+            var conf = build.config();
+            if(conf != null && !(conf instanceof Building)){
+                configured(builder, conf);
+            }
         }
     }
 
@@ -882,7 +1010,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     }
 
-    /** Called when the block is destroyed. */
+    /** Called *after* the tile has been removed. */
+    public void afterDestroyed(){
+
+    }
+
+    /** Called when the block is destroyed. The tile is still intact at this stage. */
     public void onDestroyed(){
         float explosiveness = block.baseExplosiveness;
         float flammability = 0f;
@@ -893,12 +1026,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 int amount = items.get(item);
                 explosiveness += item.explosiveness * amount;
                 flammability += item.flammability * amount;
+                power += item.charge * amount * 100f;
             }
         }
 
         if(block.hasLiquids){
-            flammability += liquids.sum((liquid, amount) -> liquid.explosiveness * amount / 2f);
-            explosiveness += liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
+            flammability += liquids.sum((liquid, amount) -> liquid.flammability * amount / 2f);
+            explosiveness += liquids.sum((liquid, amount) -> liquid.explosiveness * amount / 2f);
         }
 
         if(block.consumes.hasPower() && block.consumes.getPower().buffered){
@@ -921,31 +1055,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             });
         }
 
-        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, Pal.darkFlame, state.rules.damageExplosions);
+        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, state.rules.damageExplosions);
 
         if(!floor().solid && !floor().isLiquid){
             Effect.rubble(x, y, block.size);
-        }
-    }
-
-    /**
-     * Returns the flammability of the  Used for fire calculations.
-     * Takes flammability of floor liquid into account.
-     */
-    public float getFlammability(){
-        if(!block.hasItems){
-            if(floor().isLiquid && !block.solid){
-                return floor().liquidDrop.flammability;
-            }
-            return 0;
-        }else{
-            float result = items.sum((item, amount) -> item.flammability * amount);
-
-            if(block.hasLiquids){
-                result += liquids.sum((liquid, amount) -> liquid.flammability * amount / 3f);
-            }
-
-            return result;
         }
     }
 
@@ -954,7 +1067,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public TextureRegion getDisplayIcon(){
-        return block.icon(Cicon.medium);
+        return block.uiIcon;
     }
 
     @Override
@@ -995,7 +1108,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                             l.left();
                             for(Item item : content.items()){
                                 if(items.hasFlowItem(item)){
-                                    l.image(item.icon(Cicon.small)).padRight(3f);
+                                    l.image(item.uiIcon).padRight(3f);
                                     l.label(() -> items.getFlowRate(item) < 0 ? "..." : Strings.fixed(items.getFlowRate(item), 1) + ps).color(Color.lightGray);
                                     l.row();
                                 }
@@ -1022,7 +1135,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                         Runnable rebuild = () -> {
                             l.clearChildren();
                             l.left();
-                            l.image(() -> liquids.current().icon(Cicon.small)).padRight(3f);
+                            l.image(() -> liquids.current().uiIcon).padRight(3f);
                             l.label(() -> liquids.getFlowRate() < 0 ? "..." : Strings.fixed(liquids.getFlowRate(), 2) + ps).color(Color.lightGray);
                         };
 
@@ -1034,6 +1147,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                         });
                     }).left();
                 }
+            }
+
+            if(net.active() && lastAccessed != null){
+                table.row();
+                table.add(Core.bundle.format("lastaccessed", lastAccessed)).growX().wrap().left();
             }
 
             table.marginBottom(-5);
@@ -1050,8 +1168,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void displayBars(Table table){
         for(Func<Building, Bar> bar : block.bars.list()){
-            table.add(bar.get(self())).growX();
-            table.row();
+            //TODO fix conclusively
+            try{
+                table.add(bar.get(self())).growX();
+                table.row();
+            }catch(ClassCastException e){
+                break;
+            }
         }
     }
 
@@ -1068,7 +1191,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Returns whether or not a hand cursor should be shown over this block. */
     public Cursor getCursor(){
-        return block.configurable ? SystemCursor.hand : SystemCursor.arrow;
+        return block.configurable && interactable(player.team()) ? SystemCursor.hand : SystemCursor.arrow;
     }
 
     /**
@@ -1100,7 +1223,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return false;
     }
 
-
     public float handleDamage(float amount){
         return amount;
     }
@@ -1112,13 +1234,29 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Handle a bullet collision.
      * @return whether the bullet should be removed. */
     public boolean collision(Bullet other){
-        damage(other.damage() * other.type().tileDamageMultiplier);
+        damage(other.team, other.damage() * other.type().buildingDamageMultiplier);
 
         return true;
     }
 
+    /** Used to handle damage from splash damage for certain types of blocks. */
+    public void damage(@Nullable Team source, float damage){
+        damage(damage);
+    }
+
+    /** Changes this building's team in a safe manner. */
+    public void changeTeam(Team next){
+        indexer.removeIndex(tile);
+        this.team = next;
+        indexer.addIndex(tile);
+    }
+
     public boolean canPickup(){
         return true;
+    }
+
+    public void pickedUp(){
+
     }
 
     public void removeFromProximity(){
@@ -1138,6 +1276,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             other.proximity.remove(self(), true);
             other.onProximityUpdate();
         }
+        proximity.clear();
     }
 
     public void updateProximity(){
@@ -1163,10 +1302,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             proximity.add(tile);
         }
 
-        for(Building other : tmpTiles){
-            other.onProximityUpdate();
-        }
-
         onProximityAdded();
         onProximityUpdate();
 
@@ -1177,6 +1312,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void updateTile(){
 
+    }
+
+    /** @return ambient sound volume scale. */
+    public float ambientVolume(){
+        return efficiency();
     }
 
     //endregion
@@ -1192,6 +1332,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Override
     public boolean isValid(){
         return tile.build == self() && !dead();
+    }
+
+    @Override
+    public float hitSize(){
+        return tile.block().size * tilesize;
     }
 
     @Replace
@@ -1221,24 +1366,31 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Override
     public double sense(LAccess sensor){
         return switch(sensor){
-            case x -> x;
-            case y -> y;
+            case x -> World.conv(x);
+            case y -> World.conv(y);
+            case dead -> !isValid() ? 1 : 0;
             case team -> team.id;
             case health -> health;
-            case maxHealth -> maxHealth();
+            case maxHealth -> maxHealth;
             case efficiency -> efficiency();
+            case timescale -> timeScale;
+            case range -> this instanceof Ranged r ? r.range() / tilesize : 0;
             case rotation -> rotation;
             case totalItems -> items == null ? 0 : items.total();
             case totalLiquids -> liquids == null ? 0 : liquids.total();
             case totalPower -> power == null || !block.consumes.hasPower() ? 0 : power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
-            case itemCapacity -> block.itemCapacity;
-            case liquidCapacity -> block.liquidCapacity;
+            case itemCapacity -> block.hasItems ? block.itemCapacity : 0;
+            case liquidCapacity -> block.hasLiquids ? block.liquidCapacity : 0;
             case powerCapacity -> block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
             case powerNetIn -> power == null ? 0 : power.graph.getLastScaledPowerIn() * 60;
             case powerNetOut -> power == null ? 0 : power.graph.getLastScaledPowerOut() * 60;
             case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();
             case powerNetCapacity -> power == null ? 0 : power.graph.getLastCapacity();
-            default -> 0;
+            case enabled -> enabled ? 1 : 0;
+            case controlled -> this instanceof ControlBlock c && c.isControlled() ? GlobalConstants.ctrlPlayer : 0;
+            case payloadCount -> getPayload() != null ? 1 : 0;
+            case size -> block.size;
+            default -> Float.NaN; //gets converted to null in logic
         };
     }
 
@@ -1246,16 +1398,18 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public Object senseObject(LAccess sensor){
         return switch(sensor){
             case type -> block;
+            case firstItem -> items == null ? null : items.first();
+            case config -> block.configurations.containsKey(Item.class) || block.configurations.containsKey(Liquid.class) ? config() : null;
+            case payloadType -> getPayload() instanceof UnitPayload p1 ? p1.unit.type : getPayload() instanceof BuildPayload p2 ? p2.block() : null;
             default -> noSensed;
         };
-
     }
 
     @Override
     public double sense(Content content){
-        if(content instanceof Item && items != null) return items.get((Item)content);
-        if(content instanceof Liquid && liquids != null) return liquids.get((Liquid)content);
-        return 0;
+        if(content instanceof Item i && items != null) return items.get(i);
+        if(content instanceof Liquid l && liquids != null) return liquids.get(l);
+        return Float.NaN; //invalid sense
     }
 
     @Override
@@ -1263,6 +1417,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(type == LAccess.enabled){
             enabled = !Mathf.zero((float)p1);
             enabledControlTime = timeToUncontrol;
+        }
+    }
+
+    @Override
+    public void control(LAccess type, Object p1, double p2, double p3, double p4){
+        //don't execute configure instructions that copy logic building configures; this can cause extreme lag
+        if(type == LAccess.config && block.logicConfigurable && !(p1 instanceof LogicBuild)){
+            //change config only if it's new
+            configured(null, p1);
         }
     }
 
@@ -1280,17 +1443,21 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         onDestroyed();
         tile.remove();
         remove();
+        afterDestroyed();
     }
 
     @Final
     @Override
     public void update(){
+        if(state.isEditor()) return;
+
         timeScaleDuration -= Time.delta;
         if(timeScaleDuration <= 0f || !block.canOverdrive){
             timeScale = 1f;
         }
 
-        if(block.autoResetEnabled){
+        if(!enabled && block.autoResetEnabled){
+            noSleep();
             enabledControlTime -= Time.delta;
 
             if(enabledControlTime <= 0){
@@ -1298,12 +1465,18 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
-        if(sound != null){
-            sound.update(x, y, shouldActiveSound());
+        if(team == Team.derelict || !block.supportsEnv(state.rules.environment)){
+            enabled = false;
         }
 
-        if(block.idleSound != Sounds.none && shouldIdleSound()){
-            loops.play(block.idleSound, self(), block.idleSoundVolume);
+        if(!headless){
+            if(sound != null){
+                sound.update(x, y, shouldActiveSound());
+            }
+
+            if(block.ambientSound != Sounds.none && shouldAmbientSound()){
+                control.sound.loop(block.ambientSound, self(), block.ambientSoundVolume * ambientVolume());
+            }
         }
 
         if(enabled || !block.noUpdateDisabled){

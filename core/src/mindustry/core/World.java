@@ -4,9 +4,9 @@ import arc.*;
 import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.math.geom.Geometry.*;
 import arc.struct.*;
 import arc.struct.ObjectIntMap.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
@@ -64,6 +64,11 @@ public class World{
     public boolean wallSolid(int x, int y){
         Tile tile = tile(x, y);
         return tile == null || tile.block().solid;
+    }
+
+    public boolean wallSolidFull(int x, int y){
+        Tile tile = tile(x, y);
+        return tile == null || (tile.block().solid && tile.block().fillsTile);
     }
 
     public boolean isAccessible(int x, int y){
@@ -144,7 +149,17 @@ public class World{
         return build(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
-    public int toTile(float coord){
+    /** Convert from world to logic tile coordinates. Whole numbers are at centers of tiles. */
+    public static float conv(float coord){
+        return coord / tilesize;
+    }
+
+    /** Convert from tile to world coordinates. */
+    public static float unconv(float coord){
+        return coord * tilesize;
+    }
+
+    public static int toTile(float coord){
         return Math.round(coord / tilesize);
     }
 
@@ -172,22 +187,22 @@ public class World{
 
     /**
      * Call to signify the beginning of map loading.
-     * BuildinghangeEvents will not be fired until endMapLoad().
+     * TileEvents will not be fired until endMapLoad().
      */
     public void beginMapLoad(){
         generating = true;
     }
 
     /**
-     * Call to signify the end of map loading. Updates tile occlusions and sets up physics for the world.
+     * Call to signify the end of map loading. Updates tile proximities and sets up physics for the world.
      * A WorldLoadEvent will be fire.
      */
     public void endMapLoad(){
 
         for(Tile tile : tiles){
             //remove legacy blocks; they need to stop existing
-            if(tile.block() instanceof LegacyBlock){
-                tile.remove();
+            if(tile.block() instanceof LegacyBlock l){
+                l.removeSelf(tile);
                 continue;
             }
 
@@ -249,22 +264,20 @@ public class World{
         setSectorRules(sector);
 
         if(state.rules.defaultTeam.core() != null){
-            sector.setSpawnPosition(state.rules.defaultTeam.core().pos());
+            sector.info.spawnPosition = state.rules.defaultTeam.core().pos();
         }
     }
 
     private void setSectorRules(Sector sector){
-        state.map = new Map(StringMap.of("name", sector.planet.localizedName + "; Sector " + sector.id));
+        state.map = new Map(StringMap.of("name", sector.preset == null ? sector.planet.localizedName + "; Sector " + sector.id : sector.preset.localizedName));
         state.rules.sector = sector;
-
         state.rules.weather.clear();
 
-        //apply weather based on terrain
-        ObjectIntMap<Block> floorc = new ObjectIntMap<>();
+        sector.planet.generator.addWeather(sector, state.rules);
+
         ObjectSet<UnlockableContent> content = new ObjectSet<>();
 
-        float waterFloors = 0, totalFloors = 0;
-
+        //TODO duplicate code?
         for(Tile tile : world.tiles){
             if(world.getDarkness(tile.x, tile.y) >= 3){
                 continue;
@@ -274,57 +287,11 @@ public class World{
             if(tile.floor().itemDrop != null) content.add(tile.floor().itemDrop);
             if(tile.overlay().itemDrop != null) content.add(tile.overlay().itemDrop);
             if(liquid != null) content.add(liquid);
-
-            if(!tile.block().isStatic()){
-                totalFloors ++;
-                if(liquid == Liquids.water){
-                    waterFloors += tile.floor().isDeep() ? 1f : 0.7f;
-                }
-                floorc.increment(tile.floor());
-                if(tile.overlay() != Blocks.air){
-                    floorc.increment(tile.overlay());
-                }
-            }
         }
 
-        //sort counts in descending order
-        Seq<Entry<Block>> entries = floorc.entries().toArray();
-        entries.sort(e -> -e.value);
-        //remove all blocks occuring < 30 times - unimportant
-        entries.removeAll(e -> e.value < 30);
-
-        Block[] floors = new Block[entries.size];
-        int[] floorCounts = new int[entries.size];
-        for(int i = 0; i < entries.size; i++){
-            floorCounts[i] = entries.get(i).value;
-            floors[i] = entries.get(i).key;
-        }
-
-        //TODO bad code
-        boolean hasSnow = floors[0].name.contains("ice") || floors[0].name.contains("snow");
-        boolean hasRain = !hasSnow && floors[0].name.contains("water");
-        boolean hasDesert = !hasSnow && !hasRain && floors[0].name.contains("sand");
-        boolean hasSpores = floors[0].name.contains("spore") || floors[0].name.contains("moss") || floors[0].name.contains("tainted");
-
-        if(hasSnow){
-            state.rules.weather.add(new WeatherEntry(Weathers.snow));
-        }
-
-        if(hasRain){
-            state.rules.weather.add(new WeatherEntry(Weathers.rain));
-        }
-
-        if(hasDesert){
-            state.rules.weather.add(new WeatherEntry(Weathers.sandstorm));
-        }
-
-        if(hasSpores){
-            state.rules.weather.add(new WeatherEntry(Weathers.sporestorm));
-        }
-
-        state.secinfo.resources = content.asArray();
-        state.secinfo.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
-
+        sector.info.resources = content.asArray();
+        sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
+        sector.saveInfo();
     }
 
     public Context filterContext(Map map){
@@ -385,12 +352,6 @@ public class World{
         if(invalidMap) Core.app.post(() -> state.set(State.menu));
     }
 
-    public void notifyChanged(Tile tile){
-        if(!generating){
-            Core.app.post(() -> Events.fire(new TileChangeEvent(tile)));
-        }
-    }
-
     public void raycastEachWorld(float x0, float y0, float x1, float y1, Raycaster cons){
         raycastEach(toTile(x0), toTile(y0), toTile(x1), toTile(y1), cons);
     }
@@ -436,7 +397,6 @@ public class World{
         int err = dx - dy;
         int e2;
         while(true){
-
             if(cons.accept(x0, y0)) return true;
             if(x0 == x1 && y0 == y1) return false;
 
@@ -457,7 +417,7 @@ public class World{
         byte[] dark = new byte[tiles.width * tiles.height];
         byte[] writeBuffer = new byte[tiles.width * tiles.height];
 
-        byte darkIterations = 4;
+        byte darkIterations = darkRadius;
 
         for(int i = 0; i < dark.length; i++){
             Tile tile = tiles.geti(i);
@@ -491,7 +451,7 @@ public class World{
                 tile.data = dark[idx];
             }
 
-            if(dark[idx] == 4){
+            if(dark[idx] == darkRadius){
                 boolean full = true;
                 for(Point2 p : Geometry.d4){
                     int px = p.x + tile.x, py = p.y + tile.y;
@@ -502,11 +462,28 @@ public class World{
                     }
                 }
 
-                if(full) tile.data = 5;
+                if(full) tile.data = darkRadius + 1;
             }
         }
     }
 
+    public byte getWallDarkness(Tile tile){
+        if(tile.isDarkened()){
+            int minDst = darkRadius + 1;
+            for(int cx = tile.x - darkRadius; cx <= tile.x + darkRadius; cx++){
+                for(int cy = tile.y - darkRadius; cy <= tile.y + darkRadius; cy++){
+                    if(tiles.in(cx, cy) && !rawTile(cx, cy).isDarkened()){
+                        minDst = Math.min(minDst, Math.abs(cx - tile.x) + Math.abs(cy - tile.y));
+                    }
+                }
+            }
+
+            return (byte)Math.max((minDst - 1), 0);
+        }
+        return 0;
+    }
+
+    //TODO optimize; this is very slow and called too often!
     public float getDarkness(int x, int y){
         int edgeBlend = 2;
 
@@ -536,7 +513,7 @@ public class World{
 
             int circleDst = (int)(rawDst - (length - circleBlend));
             if(circleDst > 0){
-                dark = Math.max(circleDst / 1f, dark);
+                dark = Math.max(circleDst, dark);
             }
         }
 
@@ -546,10 +523,6 @@ public class World{
         }
 
         return dark;
-    }
-
-    public interface Raycaster{
-        boolean accept(int x, int y);
     }
 
     private class Context implements WorldContext{
@@ -607,6 +580,7 @@ public class World{
                 GenerateInput input = new GenerateInput();
 
                 for(GenerateFilter filter : filters){
+                    filter.randomize();
                     input.begin(filter, width(), height(), (x, y) -> tiles.getn(x, y));
                     filter.apply(tiles, input);
                 }

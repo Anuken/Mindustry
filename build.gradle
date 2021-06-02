@@ -12,31 +12,35 @@ buildscript{
         mavenCentral()
         google()
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        jcenter()
         maven{ url 'https://jitpack.io' }
     }
 
     dependencies{
-        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.8'
+        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.11'
         classpath "com.github.anuken:packr:-SNAPSHOT"
         classpath "com.github.Anuken.Arc:packer:$arcHash"
         classpath "com.github.Anuken.Arc:arc-core:$arcHash"
     }
 }
 
+plugins{
+    id 'org.jetbrains.kotlin.jvm' version '1.4.32'
+    id "org.jetbrains.kotlin.kapt" version "1.4.32"
+}
+
 allprojects{
-    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
     
     version = 'release'
     group = 'com.github.Anuken'
 
     ext{
-        versionNumber = '6'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'alpha'
+        versionNumber = '7'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'dev'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
-        steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
-        rhinoVersion = '8437435dab9993769d72739608580d40c5343285'
+        steamworksVersion = '0b86023401880bb5e586bc404bedbaae9b1f1c94'
+        rhinoVersion = '099aed6c82f8094b3ba39a273b8d2ba7bdcc6443'
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -83,10 +87,12 @@ allprojects{
             return "v$buildVersion"
         }
 
+        hasSprites = {
+            return new File(rootDir, "core/assets/sprites/sprites.aatls").exists()
+        }
+
         getModifierString = {
-            if(versionModifier != "release"){
-                return "[${versionModifier.toUpperCase()}]"
-            }
+            if(versionModifier != "release") return "[${versionModifier.toUpperCase()}]"
             return ""
         }
 
@@ -97,6 +103,16 @@ allprojects{
 
         getPackage = {
             return project.ext.mainClassName.substring(0, project.ext.mainClassName.indexOf("desktop") - 1)
+        }
+
+        findSdkDir = {
+            //null because IntelliJ doesn't get env variables
+            def v = System.getenv("ANDROID_HOME")
+            if(v != null) return v
+            //rootDir is null here, amazing. brilliant.
+            def file = new File(rootDir, "local.properties")
+            def props = new Properties().with{p -> p.load(file.newReader()); return p }
+            return props.get("sdk.dir")
         }
 
         generateLocales = {
@@ -169,14 +185,32 @@ allprojects{
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
         maven{ url 'https://jitpack.io' }
-        jcenter()
+    }
+
+    task clearCache{
+        doFirst{
+            delete{
+                delete "$rootDir/core/assets/cache"
+            }
+        }
     }
 
     tasks.withType(JavaCompile){
         targetCompatibility = 8
-        sourceCompatibility = 14
+        //TODO fix dynamically, this is a hack
+        if(System.getProperty("user.name") == "anuke"){
+            sourceCompatibility = JavaVersion.VERSION_15
+        }else{
+            sourceCompatibility = JavaVersion.VERSION_14
+        }
         options.encoding = "UTF-8"
         options.compilerArgs += ["-Xlint:deprecation"]
+        dependsOn clearCache
+
+        options.forkOptions.jvmArgs.addAll([
+            '--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED'
+        ])
     }
 }
 
@@ -184,15 +218,14 @@ configure(project(":annotations")){
     tasks.withType(JavaCompile){
         targetCompatibility = 8
         sourceCompatibility = 8
+        options.fork = true
     }
 }
 
 //compile with java 8 compatibility for everything except the annotation project
 configure(subprojects - project(":annotations")){
     tasks.withType(JavaCompile){
-        if(JavaVersion.current() != JavaVersion.VERSION_1_8){
-            options.compilerArgs.addAll(['--release', '8', '--enable-preview'])
-        }
+        options.compilerArgs.addAll(['--release', '8', '--enable-preview'])
 
         doFirst{
             options.compilerArgs = options.compilerArgs.findAll{it != '--enable-preview' }
@@ -215,9 +248,9 @@ project(":desktop"){
 
     dependencies{
         implementation project(":core")
+        implementation arcModule("extensions:discord")
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
-        implementation 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
 
         if(debugged()) implementation project(":debug")
 
@@ -233,18 +266,22 @@ project(":ios"){
 
     task incrementConfig{
         def vfile = file('robovm.properties')
+        def bversion = getBuildVersion()
         def props = new Properties()
         if(vfile.exists()){
             props.load(new FileInputStream(vfile))
         }else{
             props['app.id'] = 'io.anuke.mindustry'
-            props['app.version'] = '5.0'
+            props['app.version'] = '6.0'
             props['app.mainclass'] = 'mindustry.IOSLauncher'
             props['app.executable'] = 'IOSLauncher'
             props['app.name'] = 'Mindustry'
         }
         
         props['app.build'] = (!props.containsKey("app.build") ? 40 : props['app.build'].toInteger() + 1) + ""
+        if(bversion != "custom build"){
+            props['app.version'] = versionNumber + "." + bversion + (bversion.contains(".") ? "" : ".0")
+        }
         props.store(vfile.newWriter(), null)
     }
 
@@ -261,6 +298,18 @@ project(":ios"){
 
 project(":core"){
     apply plugin: "java-library"
+    apply plugin: "kotlin"
+    apply plugin: "kotlin-kapt"
+
+    kapt{
+        javacOptions{
+            option("-source", "14")
+            option("-target", "1.8")
+            option("--enable-preview")
+        }
+    }
+
+    compileJava.options.fork = true
 
     task preGen{
         outputs.upToDateWhen{ false }
@@ -275,9 +324,10 @@ project(":core"){
             def props = loadVersionProps()
             def androidVersion = props['androidBuildCode'].toInteger() - 2
             def loglines = file("../changelog").text.split("\n")
+            def notice = "[This is a truncated changelog, see Github for full notes]"
             def maxLength = 460
 
-            def androidLogList = loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]")}
+            def androidLogList = [notice] + loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]")}
             def result = ""
             androidLogList.forEach{line ->
                 if(result.length() + line.length() + 1 < maxLength){
@@ -289,22 +339,74 @@ project(":core"){
         }
     }
 
+    task sourcesJar(type: Jar, dependsOn: classes){
+        archiveClassifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task assetsJar(type: Jar, dependsOn: ":tools:pack"){
+        archiveClassifier = 'assets'
+        from files("assets"){
+            exclude "config", "cache", "music", "sounds"
+        }
+    }
+
+    task musicJar(type: Jar){
+        archiveClassifier = 'music'
+        from files("assets"){
+            include "music/*", "sounds/*"
+        }
+    }
+
+    artifacts{
+        archives sourcesJar
+        archives assetsJar
+    }
+
     dependencies{
         compileJava.dependsOn(preGen)
 
-        api "org.lz4:lz4-java:1.4.1"
+        api "org.lz4:lz4-java:1.7.1"
         api arcModule("arc-core")
+        api arcModule("extensions:flabel")
         api arcModule("extensions:freetype")
         api arcModule("extensions:g3d")
         api arcModule("extensions:fx")
         api arcModule("extensions:arcnet")
         api "com.github.Anuken:rhino:$rhinoVersion"
         if(localArc() && debugged()) api arcModule("extensions:recorder")
+        if(localArc()) api arcModule(":extensions:packer")
 
+        annotationProcessor 'com.github.Anuken:jabel:34e4c172e65b3928cd9eabe1993654ea79c409cd'
         compileOnly project(":annotations")
-        annotationProcessor project(":annotations")
-        annotationProcessor 'com.github.Anuken:jabel:40eec868af'
+        kapt project(":annotations")
+    }
 
+    afterEvaluate{
+        task mergedJavadoc(type: Javadoc){
+            def blacklist = [project(":ios"), project(":desktop"), project(":server"), project(":annotations")]
+            if(findProject(":android") != null){
+                blacklist += project(":android")
+            }
+
+            source rootProject.subprojects.collect{ project ->
+                if(!blacklist.contains(project) && project.hasProperty("sourceSets")){
+                    return project.sourceSets.main.allJava
+                }
+            }
+
+            classpath = files(rootProject.subprojects.collect { project ->
+                if(!blacklist.contains(project) && project.hasProperty("sourceSets")){
+                    return project.sourceSets.main.compileClasspath
+                }
+            })
+            destinationDir = new File(buildDir, 'javadoc')
+        }
+    }
+
+    //comp** classes are only used for code generation
+    jar{
+        exclude("mindustry/entities/comp/**")
     }
 }
 
@@ -322,16 +424,16 @@ project(":tests"){
 
     dependencies{
         testImplementation project(":core")
-        testImplementation "org.junit.jupiter:junit-jupiter-params:5.3.1"
-        testImplementation "org.junit.jupiter:junit-jupiter-api:5.3.1"
+        testImplementation "org.junit.jupiter:junit-jupiter-params:5.7.1"
+        testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.1"
         testImplementation arcModule("backends:backend-headless")
-        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.3.1"
+        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.1"
     }
 
     test{
         useJUnitPlatform()
         workingDir = new File("../core/assets")
-        testLogging {
+        testLogging{
             exceptionFormat = 'full'
             showStandardStreams = true
         }
@@ -356,7 +458,21 @@ project(":annotations"){
     dependencies{
         implementation 'com.squareup:javapoet:1.12.1'
         implementation "com.github.Anuken.Arc:arc-core:$arcHash"
-        implementation files("${System.getProperty('java.home')}/../lib/tools.jar")
+    }
+}
+
+configure([":core", ":desktop", ":server", ":tools"].collect{project(it)}){
+    java{
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    publishing{
+        publications{
+            maven(MavenPublication){
+                from components.java
+            }
+        }
     }
 }
 
@@ -379,4 +495,13 @@ task deployAll{
     dependsOn "desktop:packrMacOS"
     dependsOn "server:deploy"
     dependsOn "android:deploy"
+}
+
+task resolveDependencies{
+    doLast{
+        rootProject.allprojects{ project ->
+            Set<Configuration> configurations = project.buildscript.configurations + project.configurations
+            configurations.findAll{c -> c.canBeResolved}.forEach{c -> c.resolve()}
+        }
+    }
 }

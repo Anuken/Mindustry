@@ -4,8 +4,8 @@ import arc.graphics.g2d.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
-import mindustry.logic.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 public class SwitchBlock extends Block{
     public @Load("@-on") TextureRegion onRegion;
@@ -16,17 +16,12 @@ public class SwitchBlock extends Block{
         update = true;
         drawDisabled = false;
         autoResetEnabled = false;
+        group = BlockGroup.logic;
 
         config(Boolean.class, (SwitchBuild entity, Boolean b) -> entity.enabled = b);
     }
 
     public class SwitchBuild extends Building{
-
-        @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.enabled) return enabled ? 1 : 0;
-            return super.sense(sensor);
-        }
 
         @Override
         public boolean configTapped(){
@@ -42,6 +37,11 @@ public class SwitchBlock extends Block{
             if(enabled){
                 Draw.rect(onRegion, x, y);
             }
+        }
+
+        @Override
+        public Boolean config(){
+            return enabled;
         }
 
         @Override

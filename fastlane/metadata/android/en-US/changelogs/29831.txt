@@ -1,0 +1,9 @@
+[This is a truncated changelog, see Github for full notes]
+- Various minor bugfixes
+- Made water extractor use metaglass for building, to be consistent with pumps
+- Added automatic conveyor/conduit bridging over obstacles
+- Added 'defender' AI for Oct; follows nearby units
+- Cores can now replace most transport blocks; turrets can now replace each other
+- Improved bridge & power node linking previews
+- Buffed Segment & Vela
+- Logic: More hints

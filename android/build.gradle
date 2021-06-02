@@ -4,7 +4,6 @@ buildscript{
         mavenCentral()
         google()
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        jcenter()
     }
 
     dependencies{
@@ -20,22 +19,8 @@ configurations{ natives }
 
 repositories{
     mavenCentral()
-    jcenter()
     maven{ url "https://maven.google.com" }
-}
-
-dependencies{
-    implementation project(":core")
-
-    implementation arcModule("backends:backend-android")
-    implementation 'com.jakewharton.android.repackaged:dalvik-dx:9.0.0_r3'
-
-    natives "com.github.Anuken.Arc:natives-android:${getArcHash()}"
-    natives "com.github.Anuken.Arc:natives-freetype-android:${getArcHash()}"
-    natives "com.github.Anuken.Arc:natives-box2d-android:${getArcHash()}"
-
-    //android dependencies magically disappear during compilation, thanks gradle!
-    if(new File(projectDir.parent, '../Arc').exists()) compileOnly fileTree(dir: '../../Arc/backends/backend-android/libs', include: ['*.jar'])
+    jcenter() //remove later once google/JetBrains fixes the dependency
 }
 
 task deploy(type: Copy){
@@ -47,8 +32,8 @@ task deploy(type: Copy){
 }
 
 android{
-    buildToolsVersion '29.0.3'
-    compileSdkVersion 29
+    buildToolsVersion '30.0.2'
+    compileSdkVersion 30
     sourceSets{
         main{
             manifest.srcFile 'AndroidManifest.xml'
@@ -59,9 +44,13 @@ android{
             assets.srcDirs = ['assets', 'src/main/assets', '../core/assets/']
             jniLibs.srcDirs = ['libs']
         }
+        gp{
+            java.srcDirs = ['srcgp']
+        }
 
         androidTest.setRoot('tests')
     }
+
     packagingOptions{
         exclude 'META-INF/robovm/ios/robovm.xml'
     }
@@ -73,10 +62,10 @@ android{
 
         applicationId "io.anuke.mindustry"
         minSdkVersion 14
-        targetSdkVersion 29
+        targetSdkVersion 30
         
         versionName versionNameResult
-        versionCode vcode
+        versionCode = (System.getenv("TRAVIS_BUILD_ID") != null ? System.getenv("TRAVIS_BUILD_ID").toInteger() : vcode)
 
         if(project.hasProperty("release")){
             props['androidBuildCode'] = (vcode + 1).toString()
@@ -98,23 +87,63 @@ android{
                 storePassword RELEASE_STORE_PASSWORD
                 keyAlias RELEASE_KEY_ALIAS
                 keyPassword RELEASE_KEY_PASSWORD
+            }else if(System.getenv("CI") == "true"){
+                storeFile = file("../../bekeystore.jks")
+                storePassword = System.getenv("keystore_password")
+                keyAlias = System.getenv("keystore_alias")
+                keyPassword = System.getenv("keystore_alias_password")
             }else{
                 println("No keystore property found. Releases will be unsigned.")
             }
         }
     }
 
-    if(project.hasProperty("RELEASE_STORE_FILE")) {
-        buildTypes {
-            release {
+    buildTypes{
+        all{
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles("proguard-rules.pro")
+        }
+    }
+
+    if(project.hasProperty("RELEASE_STORE_FILE") || System.getenv("CI") == "true"){
+        buildTypes{
+            release{
                 signingConfig signingConfigs.release
             }
         }
     }
+
+    // Specifies one flavor dimension.
+    flavorDimensions "version"
+    productFlavors{
+        standard{
+
+        }
+        gp{
+            applicationIdSuffix ".gp"
+            versionNameSuffix "-gp"
+        }
+    }
 }
-// called every time gradle gets executed, takes the native dependencies of
-// the natives configuration, and extracts them to the proper libs/ folders
-// so they get packed with the APK.
+
+dependencies{
+    implementation project(":core")
+
+    implementation arcModule("backends:backend-android")
+    implementation 'com.jakewharton.android.repackaged:dalvik-dx:9.0.0_r3'
+
+    natives "com.github.Anuken.Arc:natives-android:${getArcHash()}"
+    natives "com.github.Anuken.Arc:natives-freetype-android:${getArcHash()}"
+
+    gpImplementation "com.google.android.gms:play-services-games:21.0.0"
+    gpImplementation "com.google.android.gms:play-services-auth:19.0.0"
+
+    //android dependencies magically disappear during compilation, thanks gradle!
+    def sdkFile = new File((String)findSdkDir(), "/platforms/android-29/android.jar")
+    if(sdkFile.exists()) compileOnly files(sdkFile.absolutePath)
+}
+
 task copyAndroidNatives(){
     configurations.natives.files.each{ jar ->
         copy{
@@ -126,23 +155,13 @@ task copyAndroidNatives(){
 }
 
 task run(type: Exec){
-    def path
-    def localProperties = project.file("../local.properties")
-    if(localProperties.exists()){
-        Properties properties = new Properties()
-        localProperties.withInputStream{ instr ->
-            properties.load(instr)
-        }
-        def sdkDir = properties.getProperty('sdk.dir')
-        if(sdkDir){
-            path = sdkDir
-        }else{
-            path = "$System.env.ANDROID_HOME"
-        }
-    }else{
-        path = "$System.env.ANDROID_HOME"
-    }
+    commandLine "${findSdkDir()}/platform-tools/adb", 'shell', 'am', 'start', '-n', 'io.anuke.mindustry/mindustry.android.AndroidLauncher'
+}
 
-    def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'io.anuke.mindustry/mindustry.android.AndroidLauncher'
+if(!project.ext.hasSprites()){
+    tasks.whenTaskAdded{ task ->
+        if(task.name == 'assembleDebug' || task.name == 'assembleRelease'){
+            task.dependsOn ":tools:pack"
+        }
+    }
 }

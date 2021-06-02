@@ -1,5 +1,6 @@
 package mindustry.world;
 
+import arc.*;
 import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -7,10 +8,11 @@ import arc.math.geom.QuadTree.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -19,7 +21,9 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 public class Tile implements Position, QuadTreeObject, Displayable{
-    static final ObjectSet<Building> tileSet = new ObjectSet<>();
+    private static final TileChangeEvent tileChange = new TileChangeEvent();
+    private static final TilePreChangeEvent preChange = new TilePreChangeEvent();
+    private static final ObjectSet<Building> tileSet = new ObjectSet<>();
 
     /** Extra data for very specific blocks. */
     public byte data;
@@ -45,7 +49,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         this.block = wall;
 
         //update entity and create it if needed
-        changeEntity(Team.derelict, wall::newBuilding, 0);
+        changeBuild(Team.derelict, wall::newBuilding, 0);
         changed();
     }
 
@@ -103,11 +107,28 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return -1;
     }
 
-    /** Convenience method that returns the building of this tile with a cast.
-     * Method name is shortened to prevent conflict. */
-    @SuppressWarnings("unchecked")
-    public <T extends Building> T bc(){
-        return (T)build;
+    /**
+     * Returns the flammability of the  Used for fire calculations.
+     * Takes flammability of floor liquid into account.
+     */
+    public float getFlammability(){
+        if(block == Blocks.air){
+            if(floor.liquidDrop != null) return floor.liquidDrop.flammability;
+            return 0;
+        }else if(build != null){
+            float result = 0f;
+
+            if(block.hasItems){
+                result += build.items.sum((item, amount) -> item.flammability * amount) / block.itemCapacity * Mathf.clamp(block.itemCapacity / 2.4f, 1f, 3f);
+            }
+
+            if(block.hasLiquids){
+                result += build.liquids.sum((liquid, amount) -> liquid.flammability * amount / 1.6f) / block.liquidCapacity * Mathf.clamp(block.liquidCapacity / 30f, 1f, 2f);
+            }
+
+            return result;
+        }
+        return 0;
     }
 
     public float worldx(){
@@ -151,6 +172,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return build == null ? Team.derelict : build.team;
     }
 
+    /** Do not call unless you know what you are doing! This does not update the indexer! */
     public void setTeam(Team team){
         if(build != null){
             build.team(team);
@@ -182,11 +204,13 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
         if(type.isStatic() || this.block.isStatic()){
             recache();
+            recacheWall();
         }
 
-        this.block = type;
         preChanged();
-        changeEntity(team, entityprov, (byte)Mathf.mod(rotation, 4));
+
+        this.block = type;
+        changeBuild(team, entityprov, (byte)Mathf.mod(rotation, 4));
 
         if(build != null){
             build.team(team);
@@ -217,6 +241,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                                     //assign entity and type to blocks, so they act as proxies for this one
                                     other.build = entity;
                                     other.block = block;
+
                                 }
                             }
                         }
@@ -267,10 +292,21 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         Geometry.circle(x, y, world.width(), world.height(), radius, cons);
     }
 
+    public void circle(int radius, Cons<Tile> cons){
+        circle(radius, (x, y) -> cons.get(world.rawTile(x, y)));
+    }
+
+    public void recacheWall(){
+        if(!headless && !world.isGenerating()){
+            renderer.blocks.recacheWall(this);
+        }
+    }
+
     public void recache(){
         if(!headless && !world.isGenerating()){
             renderer.blocks.floor.recacheTile(this);
             renderer.minimap.update(this);
+            //update neighbor tiles as well
             for(int i = 0; i < 8; i++){
                 Tile other = world.tile(x + Geometry.d8[i].x, y + Geometry.d8[i].y);
                 if(other != null){
@@ -332,6 +368,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         recache();
     }
 
+    /** Sets the overlay without a recache. */
+    public void setOverlayQuiet(Block block){
+        this.overlay = (Floor)block;
+    }
+
     public void clearOverlay(){
         setOverlayID((short)0);
     }
@@ -346,11 +387,16 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean solid(){
-        return block.solid || (build != null && build.checkSolid());
+        return block.solid || floor.solid || (build != null && build.checkSolid());
     }
 
     public boolean breakable(){
         return block.destructible || block.breakable || block.update;
+    }
+
+    /** @return whether the floor on this tile deals damage or can be drowned on. */
+    public boolean dangerous(){
+        return !block.solid && (floor.isDeep() || floor.damageTaken > 0);
     }
 
     /**
@@ -416,20 +462,24 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return rect.setCentered(drawx(), drawy(), block.size * tilesize, block.size * tilesize);
     }
 
+    public Rect getBounds(Rect rect){
+        return rect.set(x * tilesize - tilesize/2f, y * tilesize - tilesize/2f, tilesize, tilesize);
+    }
+
     @Override
     public void hitbox(Rect rect){
         getHitbox(rect);
     }
 
-    public Tile getNearby(Point2 relative){
+    public Tile nearby(Point2 relative){
         return world.tile(x + relative.x, y + relative.y);
     }
 
-    public Tile getNearby(int dx, int dy){
+    public Tile nearby(int dx, int dy){
         return world.tile(x + dx, y + dy);
     }
 
-    public Tile getNearby(int rotation){
+    public Tile nearby(int rotation){
         if(rotation == 0) return world.tile(x + 1, y);
         if(rotation == 1) return world.tile(x, y + 1);
         if(rotation == 2) return world.tile(x - 1, y);
@@ -437,7 +487,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return null;
     }
 
-    public Building getNearbyEntity(int rotation){
+    public Building nearbyBuild(int rotation){
         if(rotation == 0) return world.build(x + 1, y);
         if(rotation == 1) return world.build(x, y + 1);
         if(rotation == 2) return world.build(x - 1, y);
@@ -453,11 +503,27 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return overlay == Blocks.air || overlay.itemDrop == null ? floor.itemDrop : overlay.itemDrop;
     }
 
+    public @Nullable Item wallDrop(){
+        return block.solid ?
+            block.itemDrop != null ? block.itemDrop :
+            overlay instanceof WallOreBlock ? overlay.itemDrop :
+            null : null;
+    }
+
     public int staticDarkness(){
         return block.solid && block.fillsTile && !block.synthetic() ? data : 0;
     }
 
+    /** @return true if these tiles are right next to each other. */
+    public boolean adjacentTo(Tile tile){
+        return relativeTo(tile) != -1;
+    }
+
     protected void preChanged(){
+        if(!world.isGenerating()){
+            Events.fire(preChange.set(this));
+        }
+
         if(build != null){
             //only call removed() for the center block - this only gets called once.
             build.onRemoved();
@@ -475,6 +541,9 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                         if(other != null){
                             //reset entity and block *manually* - thus, preChanged() will not be called anywhere else, for multiblocks
                             if(other != this){ //do not remove own entity so it can be processed in changed()
+                                //manually call pre-change event for other tile
+                                Events.fire(preChange.set(other));
+
                                 other.build = null;
                                 other.block = Blocks.air;
 
@@ -486,15 +555,9 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                 }
             }
         }
-
-
-        //recache when static blocks get changed
-        if(block.isStatic()){
-            recache();
-        }
     }
 
-    protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
+    protected void changeBuild(Team team, Prov<Building> entityprov, int rotation){
         if(build != null){
             int size = build.block.size;
             build.remove();
@@ -545,12 +608,18 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     protected void fireChanged(){
-        world.notifyChanged(this);
+        if(!world.isGenerating()){
+            Events.fire(tileChange.set(this));
+        }
     }
 
     @Override
     public void display(Table table){
-        Block toDisplay = overlay.itemDrop != null ? overlay : floor;
+
+        Block toDisplay =
+            block.itemDrop != null ? block :
+            overlay.itemDrop != null || wallDrop() != null ? overlay :
+            floor;
 
         table.table(t -> {
             t.left();
@@ -589,7 +658,15 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     @Remote(called = Loc.server)
     public static void setTile(Tile tile, Block block, Team team, int rotation){
+        if(tile == null) return;
         tile.setBlock(block, team, rotation);
+    }
+
+    @Remote(called = Loc.server)
+    public static void setTeam(Building build, Team team){
+        if(build != null){
+            build.changeTeam(team);
+        }
     }
 
     @Remote(called = Loc.server, unreliable = true)

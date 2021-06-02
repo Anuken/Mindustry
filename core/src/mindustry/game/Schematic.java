@@ -2,7 +2,7 @@ package mindustry.game;
 
 import arc.files.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
@@ -15,6 +15,9 @@ import static mindustry.Vars.*;
 
 public class Schematic implements Publishable, Comparable<Schematic>{
     public final Seq<Stile> tiles;
+    /** These are used for the schematic tag UI. */
+    public Seq<String> labels = new Seq<>();
+    /** Internal meta tags. */
     public StringMap tags;
     public int width, height;
     public @Nullable Fi file;
@@ -29,7 +32,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
     }
 
     public float powerProduction(){
-        return tiles.sumf(s -> s.block instanceof PowerGenerator ? ((PowerGenerator)s.block).powerProduction : 0f);
+        return tiles.sumf(s -> s.block instanceof PowerGenerator p ? p.powerProduction : 0f);
     }
 
     public float powerConsumption(){
@@ -62,6 +65,10 @@ public class Schematic implements Publishable, Comparable<Schematic>{
         return tags.get("name", "unknown");
     }
 
+    public String description(){
+        return tags.get("description", "");
+    }
+
     public void save(){
         schematics.saveChanges(this);
     }
@@ -90,7 +97,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
 
     @Override
     public String steamDescription(){
-        return null;
+        return description();
     }
 
     @Override

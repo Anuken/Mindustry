@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
@@ -20,6 +21,11 @@ public class MirrorFilter extends GenerateFilter{
         return Structs.arr(
         new SliderOption("angle", () -> angle, f -> angle = (int)f, 0, 360, 45)
         );
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockMetalFloor5;
     }
 
     @Override
@@ -39,7 +45,7 @@ public class MirrorFilter extends GenerateFilter{
             if(!tile.block().synthetic()){
                 in.block = tile.block();
             }
-            in.ore = tile.overlay();
+            in.overlay = tile.overlay();
         }
     }
 
@@ -68,8 +74,8 @@ public class MirrorFilter extends GenerateFilter{
     void mirror(Vec2 p, float x0, float y0, float x1, float y1){
         //special case: uneven map mirrored at 45 degree angle
         if(in.width != in.height && angle % 90 != 0){
-            p.x = (p.x - in.width/2f) * -1 + in.width/2f;
-            p.y = (p.y - in.height/2f) * -1 + in.height/2f;
+            p.x = in.width - p.x - 1;
+            p.y = in.height - p.y - 1;
         }else{
             float dx = x1 - x0;
             float dy = y1 - y0;

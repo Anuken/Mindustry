@@ -13,8 +13,9 @@ import java.io.*;
 
 @SuppressWarnings("unchecked")
 public class JsonIO{
-    private static CustomJson jsonBase = new CustomJson();
-    private static Json json = new Json(){
+    private static final CustomJson jsonBase = new CustomJson();
+
+    public static final Json json = new Json(){
         { apply(this); }
 
         @Override
@@ -38,10 +39,6 @@ public class JsonIO{
             return super.convertToString(object);
         }
     };
-
-    public static Json json(){
-        return json;
-    }
 
     public static String write(Object object){
         return json.toJson(object, object.getClass());
@@ -69,7 +66,6 @@ public class JsonIO{
     }
 
     static void apply(Json json){
-        json.setIgnoreUnknownFields(true);
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
 
@@ -83,8 +79,9 @@ public class JsonIO{
 
             @Override
             public Sector read(Json json, JsonValue jsonData, Class type){
-                String[] split = jsonData.asString().split("-");
-                return Vars.content.<Planet>getByName(ContentType.planet, split[0]).sectors.get(Integer.parseInt(split[1]));
+                String name = jsonData.asString();
+                int idx = name.lastIndexOf('-');
+                return Vars.content.<Planet>getByName(ContentType.planet, name.substring(0, idx)).sectors.get(Integer.parseInt(name.substring(idx + 1)));
             }
         });
 
@@ -165,6 +162,18 @@ public class JsonIO{
             }
         });
 
+        json.setSerializer(UnitType.class, new Serializer<>(){
+            @Override
+            public void write(Json json, UnitType object, Class knownType){
+                json.writeValue(object.name);
+            }
+
+            @Override
+            public UnitType read(Json json, JsonValue jsonData, Class type){
+                return Vars.content.getByName(ContentType.unit, jsonData.asString());
+            }
+        });
+
         json.setSerializer(ItemStack.class, new Serializer<>(){
             @Override
             public void write(Json json, ItemStack object, Class knownType){
@@ -183,11 +192,12 @@ public class JsonIO{
         json.setSerializer(UnlockableContent.class, new Serializer<>(){
             @Override
             public void write(Json json, UnlockableContent object, Class knownType){
-                json.writeValue(object.name);
+                json.writeValue(object == null ? null : object.name);
             }
 
             @Override
             public UnlockableContent read(Json json, JsonValue jsonData, Class type){
+                if(jsonData.isNull()) return null;
                 String str = jsonData.asString();
                 Item item = Vars.content.getByName(ContentType.item, str);
                 Liquid liquid = Vars.content.getByName(ContentType.liquid, str);
@@ -199,9 +209,7 @@ public class JsonIO{
     static class CustomJson extends Json{
         private Object baseObject;
 
-        {
-            apply(this);
-        }
+        { apply(this); }
 
         @Override
         public <T> T fromJson(Class<T> type, String json){

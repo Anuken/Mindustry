@@ -20,8 +20,8 @@ public class LiquidRouter extends LiquidBlock{
         }
 
         @Override
-        public boolean acceptLiquid(Building source, Liquid liquid, float amount){
-            return liquids.get(liquid) + amount < liquidCapacity && (liquids.current() == liquid || liquids.currentAmount() < 0.2f);
+        public boolean acceptLiquid(Building source, Liquid liquid){
+            return (liquids.current() == liquid || liquids.currentAmount() < 0.2f);
         }
     }
 }

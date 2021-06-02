@@ -8,7 +8,7 @@ import mindustry.maps.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
-import static mindustry.Vars.maps;
+import static mindustry.Vars.*;
 
 public class MapLoadDialog extends BaseDialog{
     private Map selected = null;

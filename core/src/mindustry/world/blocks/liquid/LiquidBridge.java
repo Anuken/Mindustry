@@ -6,7 +6,7 @@ import mindustry.type.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class LiquidBridge extends ItemBridge{
 
@@ -29,7 +29,7 @@ public class LiquidBridge extends ItemBridge{
 
             Building other = world.build(link);
             if(other == null || !linkValid(tile, other.tile())){
-                dumpLiquid(liquids.current());
+                dumpLiquid(liquids.current(), 1f);
             }else{
                 ((ItemBridgeBuild)other).incoming.add(tile.pos());
 

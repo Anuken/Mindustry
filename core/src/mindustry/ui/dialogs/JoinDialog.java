@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.Net.*;
 import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
@@ -8,6 +9,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Timer.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.core.*;
@@ -31,6 +33,11 @@ public class JoinDialog extends BaseDialog{
     Table hosts = new Table();
     int totalHosts;
     int refreshes;
+    boolean showHidden;
+
+    String lastIp;
+    int lastPort;
+    Task ping;
 
     public JoinDialog(){
         super("@joingame");
@@ -43,9 +50,7 @@ public class JoinDialog extends BaseDialog{
         addCloseButton();
 
         buttons.add().growX().width(-1);
-        if(!steam){
-            buttons.button("?", () -> ui.showInfo("@join.info")).size(60f, 64f).width(-1);
-        }
+        if(!steam) buttons.button("?", () -> ui.showInfo("@join.info")).size(60f, 64f);
 
         add = new BaseDialog("@joingame.title");
         add.cont.add("@joingame.ip").padRight(5f).left();
@@ -90,8 +95,12 @@ public class JoinDialog extends BaseDialog{
         });
 
         onResize(() -> {
-            setup();
-            refreshAll();
+            //only refresh on resize when the minimum dimension is smaller than the maximum preferred width
+            //this means that refreshes on resize will only happen for small phones that need the list to fit in portrait mode
+            if(Math.min(Core.graphics.getWidth(), Core.graphics.getHeight()) / Scl.scl() * 0.9f < 500f){
+                setup();
+                refreshAll();
+            }
         });
     }
 
@@ -193,7 +202,7 @@ public class JoinDialog extends BaseDialog{
 
     void refreshServer(Server server){
         server.content.clear();
-        server.content.label(() -> Core.bundle.get("server.refreshing") + Strings.animated(Time.time(), 4, 11, "."));
+        server.content.label(() -> Core.bundle.get("server.refreshing") + Strings.animated(Time.time, 4, 11, "."));
 
         net.pingHost(server.ip, server.port, host -> setupServer(server, host), e -> {
             server.content.clear();
@@ -252,9 +261,9 @@ public class JoinDialog extends BaseDialog{
 
         hosts.clear();
 
-        section("@servers.local", local);
-        section("@servers.remote", remote);
-        section("@servers.global", global);
+        section("@servers.local", local, false);
+        section("@servers.remote", remote, false);
+        section("@servers.global", global, true);
 
         ScrollPane pane = new ScrollPane(hosts);
         pane.setFadeScrollBars(false);
@@ -292,7 +301,7 @@ public class JoinDialog extends BaseDialog{
                 pad = 6;
             }
 
-            Cell cell = ((Table)pane.parent).getCell(button);
+            var cell = ((Table)pane.parent).getCell(button);
 
             if(!Mathf.equal(cell.minWidth(), pw)){
                 cell.width(pw);
@@ -302,12 +311,21 @@ public class JoinDialog extends BaseDialog{
         });
     }
 
-    void section(String label, Table servers){
+    void section(String label, Table servers, boolean eye){
         Collapser coll = new Collapser(servers, Core.settings.getBool("collapsed-" + label, false));
         coll.setDuration(0.1f);
 
         hosts.table(name -> {
             name.add(label).pad(10).growX().left().color(Pal.accent);
+
+            if(eye){
+                name.button(Icon.eyeSmall, Styles.emptyi, () -> {
+                    showHidden = !showHidden;
+                    refreshGlobal();
+                }).update(i -> i.getStyle().imageUp = (showHidden ? Icon.eyeSmall : Icon.eyeOffSmall))
+                    .size(40f).right().padRight(3).tooltip("@servers.showhidden");
+            }
+
             name.button(Icon.downOpen, Styles.emptyi, () -> {
                 coll.toggle(false);
                 Core.settings.put("collapsed-" + label, coll.isCollapsed());
@@ -325,7 +343,7 @@ public class JoinDialog extends BaseDialog{
 
         local.clear();
         local.background(null);
-        local.table(Tex.button, t -> t.label(() -> "[accent]" + Core.bundle.get("hosts.discovering.any") + Strings.animated(Time.time(), 4, 10f, ".")).pad(10f)).growX();
+        local.table(Tex.button, t -> t.label(() -> "[accent]" + Core.bundle.get("hosts.discovering.any") + Strings.animated(Time.time, 4, 10f, ".")).pad(10f)).growX();
         net.discoverServers(this::addLocalHost, this::finishLocalHosts);
     }
 
@@ -334,15 +352,72 @@ public class JoinDialog extends BaseDialog{
 
         global.clear();
         global.background(null);
-        for(String host : defaultServers){
-            String resaddress = host.contains(":") ? host.split(":")[0] : host;
-            int resport = host.contains(":") ? Strings.parseInt(host.split(":")[1]) : port;
-            net.pingHost(resaddress, resport, res -> {
-                if(refreshes != cur) return;
-                res.port = resport;
-                addGlobalHost(res);
-            }, e -> {});
+        for(ServerGroup group : defaultServers){
+            boolean hidden = group.hidden();
+            if(hidden && !showHidden){
+                continue;
+            }
+
+            Table[] groupTable = {null};
+
+            //table containing all groups
+            for(String address : group.addresses){
+                String resaddress = address.contains(":") ? address.split(":")[0] : address;
+                int resport = address.contains(":") ? Strings.parseInt(address.split(":")[1]) : port;
+                net.pingHost(resaddress, resport, res -> {
+                    if(refreshes != cur) return;
+                    res.port = resport;
+
+                    //add header
+                    if(groupTable[0] == null){
+                        global.table(t -> groupTable[0] = t).row();
+
+                        groupTable[0].table(head -> {
+                            if(!group.name.isEmpty()){
+                                head.add(group.name).color(Color.lightGray).padRight(4);
+                            }
+                            head.image().height(3f).growX().color(Color.lightGray);
+
+                            //button for showing/hiding servers
+                            ImageButton[] image = {null};
+                            image[0] = head.button(hidden ? Icon.eyeOffSmall : Icon.eyeSmall, Styles.accenti, () -> {
+                               group.setHidden(!group.hidden());
+                               image[0].getStyle().imageUp = group.hidden() ? Icon.eyeOffSmall : Icon.eyeSmall;
+                               if(group.hidden() && !showHidden){
+                                   groupTable[0].remove();
+                               }
+                            }).size(40f).get();
+                            image[0].addListener(new Tooltip(t -> t.background(Styles.black6).margin(4).label(() -> !group.hidden() ? "@server.shown" : "@server.hidden")));
+                        }).width(targetWidth()).padBottom(-2).row();
+                    }
+
+                    addGlobalHost(res, groupTable[0]);
+
+                    groupTable[0].margin(5f);
+                    groupTable[0].pack();
+                }, e -> {});
+            }
         }
+    }
+
+    void addGlobalHost(Host host, Table container){
+        global.background(null);
+        float w = targetWidth();
+
+        //TODO looks bad
+        container.button(b -> buildServer(host, b), Styles.cleart, () -> {
+            Events.fire(new ClientPreConnectEvent(host));
+            if(!Core.settings.getBool("server-disclaimer", false)){
+                ui.showCustomConfirm("@warning", "@servers.disclaimer", "@ok", "@back", () -> {
+                    Core.settings.put("server-disclaimer", true);
+                    safeConnect(host.address, host.port, host.version);
+                }, () -> {
+                    Core.settings.put("server-disclaimer", false);
+                });
+            }else{
+                safeConnect(host.address, host.port, host.version);
+            }
+        }).width(w).row();
     }
 
     void finishLocalHosts(){
@@ -367,22 +442,10 @@ public class JoinDialog extends BaseDialog{
 
         local.row();
 
-        TextButton button = local.button("", Styles.cleart, () -> safeConnect(host.address, host.port, host.version))
-        .width(w).pad(5f).get();
-        button.clearChildren();
-        buildServer(host, button);
-    }
-
-    void addGlobalHost(Host host){
-        global.background(null);
-        float w = targetWidth();
-
-        global.row();
-
-        TextButton button = global.button("", Styles.cleart, () -> safeConnect(host.address, host.port, host.version))
-        .width(w).pad(5f).get();
-        button.clearChildren();
-        buildServer(host, button);
+        local.button(b -> buildServer(host, b), Styles.cleart, () -> {
+            Events.fire(new ClientPreConnectEvent(host));
+            safeConnect(host.address, host.port, host.version);
+        }).width(w);
     }
 
     public void connect(String ip, int port){
@@ -402,10 +465,33 @@ public class JoinDialog extends BaseDialog{
             logic.reset();
             net.reset();
             Vars.netClient.beginConnecting();
-            net.connect(ip, port, () -> {
-                hide();
-                add.hide();
+            net.connect(lastIp = ip, lastPort = port, () -> {
+                if(net.client()){
+                    hide();
+                    add.hide();
+                }
             });
+        });
+    }
+
+    public void reconnect(){
+        if(lastIp == null || lastIp.isEmpty()) return;
+        ui.loadfrag.show("@reconnecting");
+
+        ping = Timer.schedule(() -> {
+            net.pingHost(lastIp, lastPort, host -> {
+                if(ping == null) return;
+                ping.cancel();
+                ping = null;
+                connect(lastIp, lastPort);
+            }, exception -> {});
+        }, 1, 1);
+        
+        ui.loadfrag.setButton(() -> {
+            ui.loadfrag.hide();
+            if(ping == null) return;
+            ping.cancel();
+            ping = null;
         });
     }
 
@@ -432,23 +518,42 @@ public class JoinDialog extends BaseDialog{
             Core.settings.remove("server-list");
         }
 
+        var url = becontrol.active() ? serverJsonBeURL : serverJsonURL;
+        Log.info("Fetching community servers at @", url);
+
         //get servers
-        Core.net.httpGet(becontrol.active() ? serverJsonBeURL : serverJsonV6URL, result -> {
+        Core.net.httpGet(url, result -> {
             try{
+                if(result.getStatus() != HttpStatus.OK){
+                    Log.warn("Failed to fetch community servers: @", result.getStatus());
+                    return;
+                }
+
                 Jval val = Jval.read(result.getResultAsString());
                 Core.app.post(() -> {
                     try{
                         defaultServers.clear();
-                        val.asArray().each(child -> defaultServers.add(child.getString("address", "<invalid>")));
-                        Log.info("Fetched @ global servers.", defaultServers.size);
-                    }catch(Throwable ignored){
+                        val.asArray().each(child -> {
+                            String name = child.getString("name", "");
+                            String[] addresses;
+                            if(child.has("addresses") || (child.has("address") && child.get("address").isArray())){
+                                addresses = (child.has("addresses") ? child.get("addresses") : child.get("address")).asArray().map(Jval::asString).toArray(String.class);
+                            }else{
+                                addresses = new String[]{child.getString("address", "<invalid>")};
+                            }
+                            defaultServers.add(new ServerGroup(name, addresses));
+                        });
+                        Log.info("Fetched @ community servers.", defaultServers.size);
+                    }catch(Throwable e){
                         Log.err("Failed to parse community servers.");
+                        Log.err(e);
                     }
                 });
             }catch(Throwable e){
                 Log.err("Failed to fetch community servers.");
+                Log.err(e);
             }
-        }, t -> {});
+        }, Log::err);
     }
 
     private void saveServers(){
@@ -463,25 +568,32 @@ public class JoinDialog extends BaseDialog{
         transient Host lastHost;
 
         void setIP(String ip){
-
-            //parse ip:port, if unsuccessful, use default values
-            if(ip.lastIndexOf(':') != -1 && ip.lastIndexOf(':') != ip.length() - 1){
-                try{
+            try{
+                boolean isIpv6 = Strings.count(ip, ':') > 1;
+                if(isIpv6 && ip.lastIndexOf("]:") != -1 && ip.lastIndexOf("]:") != ip.length() - 1){
+                    int idx = ip.indexOf("]:");
+                    this.ip = ip.substring(1, idx);
+                    this.port = Integer.parseInt(ip.substring(idx + 2));
+                }else if(!isIpv6 && ip.lastIndexOf(':') != -1 && ip.lastIndexOf(':') != ip.length() - 1){
                     int idx = ip.lastIndexOf(':');
                     this.ip = ip.substring(0, idx);
                     this.port = Integer.parseInt(ip.substring(idx + 1));
-                }catch(Exception e){
+                }else{
                     this.ip = ip;
                     this.port = Vars.port;
                 }
-            }else{
+            }catch(Exception e){
                 this.ip = ip;
                 this.port = Vars.port;
             }
         }
 
         String displayIP(){
-            return ip + (port != Vars.port ? ":" + port : "");
+            if(Strings.count(ip, ':') > 1){
+                return port != Vars.port ? "[" + ip + "]:" + port : ip;
+            }else{
+                return ip + (port != Vars.port ? ":" + port : "");
+            }
         }
 
         public Server(){

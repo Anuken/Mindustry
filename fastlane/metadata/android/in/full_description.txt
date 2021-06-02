@@ -1,0 +1,14 @@
+Buat rantai pasokan pengantar berjalan yang rumit untuk memasukkan amunisi ke menara Anda, menghasilkan bahan yang akan digunakan untuk membangun, dan mempertahankan bangunan Anda dari gelombang musuh. Bermain dengan teman-teman Anda dalam game co-op multipemain lintas platform, atau tantang mereka dalam pertandingan PvP berbasis tim.
+
+Fitur:
+- 24 peta bawaan
+- Kampanye, lengkap dengan pohon teknologi dan sebuah planet untuk dikuasai
+- Pasukan penjaga yang sangat kuat untuk dikalahkan
+- Sistem transportasi energi, cairan dan barang
+- 33 jenis unit yang terdiri dari drone, meka, dan kapal
+- 120+ blok teknologi yang bisa dipelajari
+- 75+ blok lingkungan yang berbeda
+- Multipemain lintas platform melalui jaringan lokal atau server khusus
+- Pengaturan permainan khusus: Ubah biaya blok, statistik musuh, item awal, waktu gelombang, dan lainnya
+- Editor yang andal, dengan alat untuk menghasilkan sumber daya, medan, dekorasi, dan menerapkan simetri ke peta secara acak
+- Tata letak gelombang peta yang dapat disesuaikan

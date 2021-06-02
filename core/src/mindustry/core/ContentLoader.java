@@ -1,20 +1,21 @@
 package mindustry.core;
 
+import arc.*;
 import arc.files.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.util.ArcAnnotate.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.game.EventType.*;
 import mindustry.entities.bullet.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-import static arc.Core.files;
-import static mindustry.Vars.mods;
+import static arc.Core.*;
+import static mindustry.Vars.*;
 
 /**
  * Loads all game content.
@@ -97,10 +98,13 @@ public class ContentLoader{
     /** Calls Content#init() on everything. Use only after all modules have been created.*/
     public void init(){
         initialize(Content::init);
+        if(constants != null) constants.init();
+        Events.fire(new ContentInitEvent());
     }
 
     /** Calls Content#load() on everything. Use only after all modules have been created on the client.*/
     public void load(){
+        initialize(Content::loadIcon);
         initialize(Content::load);
     }
 
@@ -129,9 +133,9 @@ public class ContentLoader{
     /** Loads block colors. */
     public void loadColors(){
         Pixmap pixmap = new Pixmap(files.internal("sprites/block_colors.png"));
-        for(int i = 0; i < pixmap.getWidth(); i++){
+        for(int i = 0; i < pixmap.width; i++){
             if(blocks().size > i){
-                int color = pixmap.getPixel(i, 0);
+                int color = pixmap.get(i, 0);
 
                 if(color == 0 || color == 255) continue;
 
@@ -161,8 +165,8 @@ public class ContentLoader{
     public void removeLast(){
         if(lastAdded != null && contentMap[lastAdded.getContentType().ordinal()].peek() == lastAdded){
             contentMap[lastAdded.getContentType().ordinal()].pop();
-            if(lastAdded instanceof MappableContent){
-                contentNameMap[lastAdded.getContentType().ordinal()].remove(((MappableContent)lastAdded).name);
+            if(lastAdded instanceof MappableContent c){
+                contentNameMap[lastAdded.getContentType().ordinal()].remove(c.name);
             }
         }
     }
@@ -275,12 +279,20 @@ public class ContentLoader{
         return getByID(ContentType.bullet, id);
     }
 
+    public Seq<StatusEffect> statusEffects(){
+        return getBy(ContentType.status);
+    }
+
     public Seq<SectorPreset> sectors(){
         return getBy(ContentType.sector);
     }
 
     public Seq<UnitType> units(){
         return getBy(ContentType.unit);
+    }
+
+    public UnitType unit(int id){
+        return getByID(ContentType.unit, id);
     }
 
     public Seq<Planet> planets(){

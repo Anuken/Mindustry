@@ -1,14 +1,15 @@
 package mindustry.world.meta;
 
-import arc.Core;
+import arc.*;
 
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Defines a unit of measurement for block stats.
  */
 public enum StatUnit{
     blocks,
+    blocksSquared,
     powerSecond,
     liquidSecond,
     itemsSecond,
@@ -19,6 +20,7 @@ public enum StatUnit{
     minutes,
     perSecond,
     perMinute,
+    perShot(false),
     timesSpeed(false),
     percent(false),
     shieldHealth,

@@ -1,11 +1,9 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.input.*;
 import arc.scene.ui.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
-import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
@@ -45,12 +43,11 @@ public class BaseDialog extends Dialog{
     }
 
     protected void onResize(Runnable run){
-        Events.on(ResizeEvent.class, event -> {
-            if(isShown() && Core.scene.getDialog() == this){
-                run.run();
-                updateScrollFocus();
-            }
-        });
+        resized(run);
+    }
+
+    public void addCloseListener(){
+       closeOnBack();
     }
 
     @Override
@@ -58,10 +55,6 @@ public class BaseDialog extends Dialog{
         buttons.defaults().size(210f, 64f);
         buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
 
-        keyDown(key -> {
-            if(key == KeyCode.escape || key == KeyCode.back){
-                Core.app.post(this::hide);
-            }
-        });
+        addCloseListener();
     }
 }

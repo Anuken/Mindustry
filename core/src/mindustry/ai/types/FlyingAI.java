@@ -12,11 +12,11 @@ public class FlyingAI extends AIController{
     @Override
     public void updateMovement(){
         if(target != null && unit.hasWeapons() && command() == UnitCommand.attack){
-            if(unit.type().weapons.first().rotate){
-                moveTo(target, unit.range() * 0.8f);
+            if(!unit.type.circleTarget){
+                moveTo(target, unit.type.range * 0.8f);
                 unit.lookAt(target);
             }else{
-                attack(100f);
+                attack(120f);
             }
         }
 
@@ -34,16 +34,14 @@ public class FlyingAI extends AIController{
         Teamc result = target(x, y, range, air, ground);
         if(result != null) return result;
 
-        if(ground) result = targetFlag(x, y, BlockFlag.producer, true);
+        if(ground) result = targetFlag(x, y, BlockFlag.generator, true);
         if(result != null) return result;
 
-        if(ground) result = targetFlag(x, y, BlockFlag.turret, true);
+        if(ground) result = targetFlag(x, y, BlockFlag.core, true);
         if(result != null) return result;
 
         return null;
     }
-
-    //TODO clean up
 
     protected void attack(float circleLength){
         vec.set(target).sub(unit);
@@ -51,13 +49,13 @@ public class FlyingAI extends AIController{
         float ang = unit.angleTo(target);
         float diff = Angles.angleDist(ang, unit.rotation());
 
-        if(diff > 100f && vec.len() < circleLength){
+        if(diff > 70f && vec.len() < circleLength){
             vec.setAngle(unit.vel().angle());
         }else{
-            vec.setAngle(Mathf.slerpDelta(unit.vel().angle(), vec.angle(), 0.6f));
+            vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 6f));
         }
 
-        vec.setLength(unit.type().speed);
+        vec.setLength(unit.speed());
 
         unit.moveAt(vec);
     }

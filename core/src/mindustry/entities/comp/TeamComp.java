@@ -1,11 +1,12 @@
 package mindustry.entities.comp;
 
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 @Component
 abstract class TeamComp implements Posc{
@@ -17,15 +18,18 @@ abstract class TeamComp implements Posc{
         return team.rules().cheat;
     }
 
-    public @Nullable Building core(){
+    @Nullable
+    public CoreBuild core(){
         return team.core();
     }
 
-    public @Nullable Building closestCore(){
+    @Nullable
+    public CoreBuild closestCore(){
         return state.teams.closestCore(x, y, team);
     }
 
-    public @Nullable Building closestEnemyCore(){
+    @Nullable
+    public CoreBuild closestEnemyCore(){
         return state.teams.closestEnemyCore(x, y, team);
     }
 }

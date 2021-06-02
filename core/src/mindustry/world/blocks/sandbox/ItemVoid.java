@@ -3,12 +3,15 @@ package mindustry.world.blocks.sandbox;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 public class ItemVoid extends Block{
 
     public ItemVoid(String name){
         super(name);
+        group = BlockGroup.transportation;
         update = solid = acceptsItems = true;
+        envEnabled = Env.any;
     }
 
     public class ItemVoidBuild extends Building{

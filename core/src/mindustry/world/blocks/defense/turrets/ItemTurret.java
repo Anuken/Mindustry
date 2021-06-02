@@ -14,12 +14,10 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
-import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
 public class ItemTurret extends Turret{
-    public int maxAmmo = 30;
     public ObjectMap<Item, BulletType> ammoTypes = new ObjectMap<>();
 
     public ItemTurret(String name){
@@ -28,22 +26,40 @@ public class ItemTurret extends Turret{
     }
 
     /** Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...] */
-    protected void ammo(Object... objects){
-        ammoTypes = OrderedMap.of(objects);
+    public void ammo(Object... objects){
+        ammoTypes = ObjectMap.of(objects);
+    }
+
+    /** Makes copies of all bullets and limits their range. */
+    public void limitRange(){
+        limitRange(1f);
+    }
+
+    /** Makes copies of all bullets and limits their range. */
+    public void limitRange(float margin){
+        for(var entry : ammoTypes.copy().entries()){
+            var copy = entry.value.copy();
+            copy.lifetime = (range + margin) / copy.speed;
+            ammoTypes.put(entry.key, copy);
+        }
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
-        stats.remove(BlockStat.itemCapacity);
-        stats.add(BlockStat.ammo, new AmmoListValue<>(ammoTypes));
+        stats.remove(Stat.itemCapacity);
+        stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
+    }
+
+    @Override
+    public void init(){
         consumes.add(new ConsumeItemFilter(i -> ammoTypes.containsKey(i)){
             @Override
             public void build(Building tile, Table table){
                 MultiReqImage image = new MultiReqImage();
-                content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
-                    () -> tile != null && !((ItemTurretBuild)tile).ammo.isEmpty() && ((ItemEntry)((ItemTurretBuild)tile).ammo.peek()).item == item)));
+                content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.uiIcon),
+                () -> tile instanceof ItemTurretBuild it && !it.ammo.isEmpty() && ((ItemEntry)it.ammo.peek()).item == item)));
 
                 table.add(image).size(8 * 4);
             }
@@ -51,14 +67,16 @@ public class ItemTurret extends Turret{
             @Override
             public boolean valid(Building entity){
                 //valid when there's any ammo in the turret
-                return !((ItemTurretBuild)entity).ammo.isEmpty();
+                return entity instanceof ItemTurretBuild it && !it.ammo.isEmpty();
             }
 
             @Override
-            public void display(BlockStats stats){
+            public void display(Stats stats){
                 //don't display
             }
         });
+
+        super.init();
     }
 
     public class ItemTurretBuild extends TurretBuild{
@@ -84,7 +102,7 @@ public class ItemTurret extends Turret{
         public void displayBars(Table bars){
             super.displayBars(bars);
 
-            bars.add(new Bar("blocks.ammo", Pal.ammo, () -> (float)totalAmmo / maxAmmo)).growX();
+            bars.add(new Bar("stat.ammo", Pal.ammo, () -> (float)totalAmmo / maxAmmo)).growX();
             bars.row();
         }
 
@@ -134,11 +152,6 @@ public class ItemTurret extends Turret{
 
             //must not be found
             ammo.add(new ItemEntry(item, (int)type.ammoMultiplier));
-
-            //fire events for the tutorial
-            if(state.rules.tutorial){
-                Events.fire(new TurretAmmoDeliverEvent());
-            }
         }
 
         @Override
@@ -165,21 +178,23 @@ public class ItemTurret extends Turret{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
+            ammo.clear();
+            totalAmmo = 0;
             int amount = read.ub();
             for(int i = 0; i < amount; i++){
                 Item item = Vars.content.item(revision < 2 ? read.ub() : read.s());
                 short a = read.s();
-                totalAmmo += a;
 
                 //only add ammo if this is a valid ammo type
-                if(ammoTypes.containsKey(item)){
+                if(item != null && ammoTypes.containsKey(item)){
+                    totalAmmo += a;
                     ammo.add(new ItemEntry(item, a));
                 }
             }
         }
     }
 
-    class ItemEntry extends AmmoEntry{
+    public class ItemEntry extends AmmoEntry{
         protected Item item;
 
         ItemEntry(Item item, int amount){

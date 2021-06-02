@@ -4,7 +4,6 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -12,7 +11,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
-import mindustry.world.blocks.production.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -21,10 +20,11 @@ public class PayloadConveyor extends Block{
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-edge") TextureRegion edgeRegion;
     public Interp interp = Interp.pow5;
+    public float payloadLimit = 2.9f;
 
     public PayloadConveyor(String name){
         super(name);
-
+        group = BlockGroup.transportation;
         size = 3;
         rotate = true;
         update = true;
@@ -45,9 +45,16 @@ public class PayloadConveyor extends Block{
         for(int i = 0; i < 4; i++){
             Building other = world.build(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
             if(other != null && other.block.outputsPayload && other.block.size == size){
-                Drawf.selected(other.tileX(), other.tileY(), other.block, Pal.accent);
+                Drawf.selected(other.tileX(), other.tileY(), other.block, other.team.color);
             }
         }
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.payloadCapacity, (payloadLimit), StatUnit.blocksSquared);
     }
 
     public class PayloadConveyorBuild extends Building{
@@ -57,6 +64,16 @@ public class PayloadConveyor extends Block{
         public @Nullable Building next;
         public boolean blocked;
         public int step = -1, stepAccepted = -1;
+
+        @Override
+        public boolean canControlSelect(Player player){
+            return this.item == null && !player.unit().spawnedByCore && player.unit().hitSize / tilesize <= payloadLimit && player.tileOn().build == this;
+        }
+
+        @Override
+        public void onControlSelect(Player player){
+            acceptPlayerPayload(player, p -> item = p);
+        }
 
         @Override
         public Payload takePayload(){
@@ -87,7 +104,7 @@ public class PayloadConveyor extends Block{
             }
 
             int ntrns = 1 + size/2;
-            Tile next = tile.getNearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
+            Tile next = tile.nearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
             blocked = (next != null && next.solid() && !next.block().outputsPayload) || (this.next != null && (this.next.rotation + 2)%4 == rotation);
         }
 
@@ -107,6 +124,9 @@ public class PayloadConveyor extends Block{
             progress = time() % moveTime;
 
             updatePayload();
+            if(item != null && next == null){
+                PayloadBlock.pushOutput(item, progress / moveTime);
+            }
 
             //TODO nondeterministic input priority
             int curStep = curStep();
@@ -161,7 +181,7 @@ public class PayloadConveyor extends Block{
             float dst = 0.8f;
 
             float glow = Math.max((dst - (Math.abs(fract() - 0.5f) * 2)) / dst, 0);
-            Draw.mixcol(Pal.accent, glow);
+            Draw.mixcol(team.color, glow);
 
             float trnext = fract() * size * tilesize, trprev = size * tilesize * (fract() - 1), rot = rotdeg();
 
@@ -203,7 +223,7 @@ public class PayloadConveyor extends Block{
         }
 
         public float time(){
-            return Time.time();
+            return Time.time;
         }
 
         @Override
@@ -216,11 +236,9 @@ public class PayloadConveyor extends Block{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
-            if(source == this){
-                return this.item == null && payload.fits();
-            }
-            //accepting payloads from units isn't supported
-            return this.item == null && progress <= 5f && payload.fits();
+            return this.item == null
+                && payload.fits(payloadLimit)
+                && (source == this || this.enabled && progress <= 5f);
         }
 
         @Override
@@ -231,6 +249,12 @@ public class PayloadConveyor extends Block{
             this.animation = 0;
 
             updatePayload();
+        }
+
+        @Override
+        public void onRemoved(){
+            super.onRemoved();
+            if(item != null) item.dump();
         }
 
         @Override
@@ -278,7 +302,7 @@ public class PayloadConveyor extends Block{
             if(direction == rotation){
                 return !blocked || next != null;
             }
-            return PayloadAcceptor.blends(this, direction);
+            return PayloadBlock.blends(this, direction);
         }
 
         protected TextureRegion clipRegion(Rect bounds, Rect sprite, TextureRegion region){

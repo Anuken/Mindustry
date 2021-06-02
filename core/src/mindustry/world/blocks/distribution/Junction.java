@@ -7,7 +7,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class Junction extends Block{
     public float speed = 26; //frames taken to go through this junction
@@ -44,13 +44,13 @@ public class Junction extends Block{
                     long l = buffer.buffers[i][0];
                     float time = BufferItem.time(l);
 
-                    if(Time.time() >= time + speed / timeScale || Time.time() < time){
+                    if(Time.time >= time + speed / timeScale || Time.time < time){
 
                         Item item = content.item(BufferItem.item(l));
                         Building dest = nearby(i);
 
                         //skip blocks that don't want the item, keep waiting until they do
-                        if(dest == null || !dest.acceptItem(this, item) || dest.team != team){
+                        if(item == null || dest == null || !dest.acceptItem(this, item) || dest.team != team){
                             continue;
                         }
 

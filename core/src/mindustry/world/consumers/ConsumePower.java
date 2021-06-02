@@ -1,7 +1,7 @@
 package mindustry.world.consumers;
 
-import arc.math.Mathf;
-import arc.scene.ui.layout.Table;
+import arc.math.*;
+import arc.scene.ui.layout.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
 
@@ -54,11 +54,11 @@ public class ConsumePower extends Consume{
     }
 
     @Override
-    public void display(BlockStats stats){
+    public void display(Stats stats){
         if(buffered){
-            stats.add(BlockStat.powerCapacity, capacity, StatUnit.none);
+            stats.add(Stat.powerCapacity, capacity, StatUnit.none);
         }else{
-            stats.add(BlockStat.powerUse, usage * 60f, StatUnit.powerSecond);
+            stats.add(Stat.powerUse, usage * 60f, StatUnit.powerSecond);
         }
     }
 

@@ -20,7 +20,7 @@ public class Build{
     private static final IntSet tmp = new IntSet();
 
     @Remote(called = Loc.server)
-    public static void beginBreak(Team team, int x, int y){
+    public static void beginBreak(@Nullable Unit unit, Team team, int x, int y){
         if(!validBreak(team, x, y)){
             return;
         }
@@ -35,19 +35,34 @@ public class Build{
 
         int rotation = tile.build != null ? tile.build.rotation : 0;
         Block previous = tile.block();
+
+        //instantly deconstruct if necessary
+        if(previous.instantDeconstruct){
+            ConstructBlock.deconstructFinish(tile, previous, unit);
+            return;
+        }
+
         Block sub = ConstructBlock.get(previous.size);
 
+        Seq<Building> prevBuild = new Seq<>(1);
+        if(tile.build != null) prevBuild.add(tile.build);
+
         tile.setBlock(sub, team, rotation);
-        tile.<ConstructBuild>bc().setDeconstruct(previous);
+        var build = (ConstructBuild)tile.build;
+        build.setDeconstruct(previous);
+        build.prevBuild = prevBuild;
         tile.build.health = tile.build.maxHealth * prevPercent;
 
+        if(unit != null && unit.getControllerName() != null){
+            tile.build.lastAccessed = unit.getControllerName();
+        }
 
-        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, true)));
+        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, unit, true)));
     }
 
-    /** Places a BuildBlock at this location. */
+    /** Places a ConstructBlock at this location. */
     @Remote(called = Loc.server)
-    public static void beginPlace(Block result, Team team, int x, int y, int rotation){
+    public static void beginPlace(@Nullable Unit unit, Block result, Team team, int x, int y, int rotation){
         if(!validPlace(result, team, x, y, rotation)){
             return;
         }
@@ -56,6 +71,24 @@ public class Build{
 
         //just in case
         if(tile == null) return;
+
+        //auto-rotate the block to the correct orientation and bail out
+        if(tile.team() == team && tile.block == result && tile.build != null && tile.block.quickRotate){
+            if(unit != null && unit.getControllerName() != null) tile.build.lastAccessed = unit.getControllerName();
+            tile.build.rotation = Mathf.mod(rotation, 4);
+            tile.build.updateProximity();
+            tile.build.noSleep();
+            Fx.rotateBlock.at(tile.build.x, tile.build.y, tile.build.block.size);
+            return;
+        }
+
+        //break all props in the way
+        tile.getLinkedTilesAs(result, out -> {
+            if(out.block != Blocks.air && out.block.alwaysReplace){
+                out.block.breakEffect.at(out.drawx(), out.drawy(), out.block.size, out.block.mapColor);
+                out.remove();
+            }
+        });
 
         Block previous = tile.block();
         Block sub = ConstructBlock.get(result.size);
@@ -72,14 +105,15 @@ public class Build{
 
         tile.setBlock(sub, team, rotation);
 
-        ConstructBuild build = tile.bc();
+        var build = (ConstructBuild)tile.build;
 
         build.setConstruct(previous.size == sub.size ? previous : Blocks.air, result);
         build.prevBuild = prevBuild;
+        if(unit != null && unit.getControllerName() != null) build.lastAccessed = unit.getControllerName();
 
         result.placeBegan(tile, previous);
 
-        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, false)));
+        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, unit, false)));
     }
 
     /** Returns whether a tile can be placed at this location by this team. */
@@ -126,7 +160,6 @@ public class Build{
             for(int dy = 0; dy < type.size; dy++){
                 int wx = dx + offsetx + tile.x, wy = dy + offsety + tile.y;
 
-
                 Tile check = world.tile(wx, wy);
 
                 if(
@@ -135,8 +168,13 @@ public class Build{
                 (type == check.block() && check.build != null && rotation == check.build.rotation && type.rotate) || //same block, same rotation
                 !check.interactable(team) || //cannot interact
                 !check.floor().placeableOn || //solid wall
+                (!checkVisible && !check.block().alwaysReplace) || //replacing a block that should be replaced (e.g. payload placement)
                     !((type.canReplace(check.block()) || //can replace type
-                        (check.block instanceof ConstructBlock && check.<ConstructBuild>bc().cblock == type && check.centerX() == tile.x && check.centerY() == tile.y)) && //same type in construction
+                        //controversial change: allow rebuilding damaged blocks
+                        //this could be buggy and abuse-able, so I'm not enabling it yet
+                        //note that this requires a change in BuilderComp as well
+                        //(type == check.block() && check.centerX() == x && check.centerY() == y && check.build != null && check.build.health < check.build.maxHealth - 0.0001f) ||
+                        (check.build instanceof ConstructBuild build && build.current == type && check.centerX() == tile.x && check.centerY() == tile.y)) && //same type in construction
                     type.bounds(tile.x, tile.y, Tmp.r1).grow(0.01f).contains(check.block.bounds(check.centerX(), check.centerY(), Tmp.r2))) || //no replacement
                 (type.requiresWater && check.floor().liquidDrop != Liquids.water) //requires water but none found
                 ) return false;

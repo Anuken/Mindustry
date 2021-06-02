@@ -4,6 +4,8 @@ import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
+import mindustry.ai.*;
 import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
 import mindustry.game.*;
@@ -12,7 +14,8 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
-import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.meta.*;
@@ -22,17 +25,13 @@ import static mindustry.Vars.*;
 public class BaseGenerator{
     private static final Vec2 axis = new Vec2(), rotator = new Vec2();
 
-    private static final int range = 180;
+    private static final int range = 160;
 
     private Tiles tiles;
-    private Team team;
-    private ObjectMap<Item, OreBlock> ores = new ObjectMap<>();
-    private ObjectMap<Item, Floor> oreFloors = new ObjectMap<>();
     private Seq<Tile> cores;
 
     public void generate(Tiles tiles, Seq<Tile> cores, Tile spawn, Team team, Sector sector, float difficulty){
         this.tiles = tiles;
-        this.team = team;
         this.cores = cores;
 
         //don't generate bases when there are no loaded schematics
@@ -40,37 +39,26 @@ public class BaseGenerator{
 
         Mathf.rand.setSeed(sector.id);
 
-        for(Block block : content.blocks()){
-            if(block instanceof OreBlock && block.asFloor().itemDrop != null){
-                ores.put(block.asFloor().itemDrop, (OreBlock)block);
-            }else if(block.isFloor() && block.asFloor().itemDrop != null && !oreFloors.containsKey(block.asFloor().itemDrop)){
-                oreFloors.put(block.asFloor().itemDrop, block.asFloor());
-            }
-        }
-
-        //TODO limit base size
-        float costBudget = 1000;
-
-        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == 1 && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
-        Seq<Block> wallsLarge = content.blocks().select(b -> b instanceof Wall && b.size == 2 && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
+        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == 1 && !b.insulated && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
+        Seq<Block> wallsLarge = content.blocks().select(b -> b instanceof Wall && b.size == 2 && !b.insulated && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
 
         //sort by cost for correct fraction
         wallsSmall.sort(b -> b.buildCost);
         wallsLarge.sort(b -> b.buildCost);
 
-        //TODO proper difficulty selection
-        float bracket = difficulty;
         float bracketRange = 0.2f;
+        float baseChance = Mathf.lerp(0.7f, 1.9f, difficulty);
         int wallAngle = 70; //180 for full coverage
-        double resourceChance = 0.5;
-        double nonResourceChance = 0.0005;
-        BasePart coreschem = bases.cores.getFrac(bracket);
+        double resourceChance = 0.5 * baseChance;
+        double nonResourceChance = 0.0005 * baseChance;
+        BasePart coreschem = bases.cores.getFrac(difficulty);
+        int passes = difficulty < 0.4 ? 1 : difficulty < 0.8 ? 2 : 3;
 
-        Block wall = wallsSmall.getFrac(bracket), wallLarge = wallsLarge.getFrac(bracket);
+        Block wall = wallsSmall.getFrac(difficulty * 0.91f), wallLarge = wallsLarge.getFrac(difficulty * 0.91f);
 
         for(Tile tile : cores){
             tile.clearOverlay();
-            Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, coreschem.required instanceof Item ? ores.get((Item)coreschem.required) : Blocks.oreCopper);
+            Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, coreschem.required instanceof Item ? bases.ores.get((Item)coreschem.required) : Blocks.oreCopper, false);
 
             //fill core with every type of item (even non-material)
             Building entity = tile.build;
@@ -79,20 +67,22 @@ public class BaseGenerator{
             }
         }
 
-        //random schematics
-        pass(tile -> {
-            if(!tile.block().alwaysReplace) return;
+        for(int i = 0; i < passes; i++){
+            //random schematics
+            pass(tile -> {
+                if(!tile.block().alwaysReplace) return;
 
-            if(((tile.overlay().asFloor().itemDrop != null || (tile.drop() != null && Mathf.chance(nonResourceChance)))
+                if(((tile.overlay().asFloor().itemDrop != null || (tile.drop() != null && Mathf.chance(nonResourceChance)))
                 || (tile.floor().liquidDrop != null && Mathf.chance(nonResourceChance * 2))) && Mathf.chance(resourceChance)){
-                Seq<BasePart> parts = bases.forResource(tile.drop() != null ? tile.drop() : tile.floor().liquidDrop);
-                if(!parts.isEmpty()){
-                    tryPlace(parts.getFrac(bracket + Mathf.range(bracketRange)), tile.x, tile.y);
+                    Seq<BasePart> parts = bases.forResource(tile.drop() != null ? tile.drop() : tile.floor().liquidDrop);
+                    if(!parts.isEmpty()){
+                        tryPlace(parts.getFrac(difficulty + Mathf.range(bracketRange)), tile.x, tile.y, team);
+                    }
+                }else if(Mathf.chance(nonResourceChance)){
+                    tryPlace(bases.parts.getFrac(difficulty + Mathf.range(bracketRange)), tile.x, tile.y, team);
                 }
-            }else if(Mathf.chance(nonResourceChance)){
-                tryPlace(bases.parts.getFrac(bracket + Mathf.range(bracketRange)), tile.x, tile.y);
-            }
-        });
+            });
+        }
 
         //replace walls with the correct type (disabled)
         if(false)
@@ -109,6 +99,15 @@ public class BaseGenerator{
 
                 if(tile.block().alwaysReplace){
                     boolean any = false;
+
+                    for(Point2 p : Geometry.d4){
+                        Tile o = tiles.get(tile.x + p.x, tile.y + p.y);
+
+                        //do not block payloads
+                        if(o != null && (o.block() instanceof PayloadConveyor || o.block() instanceof PayloadBlock)){
+                            return;
+                        }
+                    }
 
                     for(Point2 p : Geometry.d8){
                         if(Angles.angleDist(Angles.angle(p.x, p.y), spawn.angleTo(tile)) > wallAngle){
@@ -147,13 +146,31 @@ public class BaseGenerator{
                 }
             });
         }
+
+        //clear path for ground units
+        for(Tile tile : cores){
+            Astar.pathfind(tile, spawn, t -> t.team() == state.rules.waveTeam && !t.within(tile, 25f * 8) ? 100000 : t.floor().hasSurface() ? 1 : 10, t -> !t.block().isStatic()).each(t -> {
+                if(!t.within(tile, 25f * 8)){
+                    if(t.team() == state.rules.waveTeam){
+                        t.setBlock(Blocks.air);
+                    }
+
+                    for(Point2 p : Geometry.d8){
+                        Tile other = t.nearby(p);
+                        if(other != null && other.team() == state.rules.waveTeam){
+                            other.setBlock(Blocks.air);
+                        }
+                    }
+                }
+            });
+        }
     }
 
     public void postGenerate(){
         if(tiles == null) return;
 
         for(Tile tile : tiles){
-            if(tile.isCenter() && tile.block() instanceof PowerNode){
+            if(tile.isCenter() && tile.block() instanceof PowerNode && tile.team() == state.rules.waveTeam){
                 tile.build.placed();
             }
         }
@@ -164,7 +181,19 @@ public class BaseGenerator{
         core.circle(range, (x, y) -> cons.get(tiles.getn(x, y)));
     }
 
-    boolean tryPlace(BasePart part, int x, int y){
+    /**
+     * Tries to place a base part at a certain location with a certain team.
+     * @return success state
+     * */
+    public static boolean tryPlace(BasePart part, int x, int y, Team team){
+        return tryPlace(part, x, y, team, null);
+    }
+
+    /**
+     * Tries to place a base part at a certain location with a certain team.
+     * @return success state
+     * */
+    public static boolean tryPlace(BasePart part, int x, int y, Team team, @Nullable Intc2 posc){
         int rotation = Mathf.range(2);
         axis.set((int)(part.schematic.width / 2f), (int)(part.schematic.height / 2f));
         Schematic result = Schematics.rotate(part.schematic, rotation);
@@ -180,21 +209,24 @@ public class BaseGenerator{
             if(isTaken(tile.block, realX, realY)){
                 return false;
             }
+
+            if(posc != null){
+                posc.get(realX, realY);
+            }
         }
 
-        if(part.required instanceof Item){
-            Item item = (Item)part.required;
+        if(part.required instanceof Item item){
             for(Stile tile : result.tiles){
                 if(tile.block instanceof Drill){
 
                     tile.block.iterateTaken(tile.x + cx, tile.y + cy, (ex, ey) -> {
 
-                        if(!tiles.getn(ex, ey).floor().isLiquid){
-                            set(tiles.getn(ex, ey), item);
+                        if(world.tiles.getn(ex, ey).floor().hasSurface()){
+                            set(world.tiles.getn(ex, ey), item);
                         }
 
-                        Tile rand = tiles.getc(ex + Mathf.range(1), ey + Mathf.range(1));
-                        if(!rand.floor().isLiquid){
+                        Tile rand = world.tiles.getc(ex + Mathf.range(1), ey + Mathf.range(1));
+                        if(rand.floor().hasSurface()){
                             //random ores nearby to make it look more natural
                             set(rand, item);
                         }
@@ -206,8 +238,7 @@ public class BaseGenerator{
         Schematics.place(result, cx + result.width/2, cy + result.height/2, team);
 
         //fill drills with items after placing
-        if(part.required instanceof Item){
-            Item item = (Item)part.required;
+        if(part.required instanceof Item item){
             for(Stile tile : result.tiles){
                 if(tile.block instanceof Drill){
 
@@ -223,15 +254,15 @@ public class BaseGenerator{
         return true;
     }
 
-    void set(Tile tile, Item item){
-        if(ores.containsKey(item)){
-            tile.setOverlay(ores.get(item));
-        }else if(oreFloors.containsKey(item)){
-            tile.setFloor(oreFloors.get(item));
+    static void set(Tile tile, Item item){
+        if(bases.ores.containsKey(item)){
+            tile.setOverlay(bases.ores.get(item));
+        }else if(bases.oreFloors.containsKey(item)){
+            tile.setFloor(bases.oreFloors.get(item));
         }
     }
 
-    boolean isTaken(Block block, int x, int y){
+    static boolean isTaken(Block block, int x, int y){
         int offsetx = -(block.size - 1) / 2;
         int offsety = -(block.size - 1) / 2;
         int pad = 1;
@@ -247,8 +278,8 @@ public class BaseGenerator{
         return false;
     }
 
-    boolean overlaps(int x, int y){
-        Tile tile = tiles.get(x, y);
+    static boolean overlaps(int x, int y){
+        Tile tile = world.tiles.get(x, y);
 
         return tile == null || !tile.block().alwaysReplace || world.getDarkness(x, y) > 0;
     }

@@ -12,6 +12,8 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -25,11 +27,10 @@ public class ForceProjector extends Block{
     public float phaseRadiusBoost = 80f;
     public float phaseShieldBoost = 400f;
     public float radius = 101.7f;
-    public float breakage = 550f;
+    public float shieldHealth = 700f;
     public float cooldownNormal = 1.75f;
     public float cooldownLiquid = 1.5f;
     public float cooldownBrokenBase = 0.35f;
-    public float basePowerDraw = 0.2f;
     public @Load("@-top") TextureRegion topRegion;
 
     static ForceBuild paramEntity;
@@ -38,7 +39,7 @@ public class ForceProjector extends Block{
             trait.absorb();
             Fx.absorb.at(trait);
             paramEntity.hit = 1f;
-            paramEntity.buildup += trait.damage() * paramEntity.warmup;
+            paramEntity.buildup += trait.damage();
         }
     };
 
@@ -46,10 +47,25 @@ public class ForceProjector extends Block{
         super(name);
         update = true;
         solid = true;
+        group = BlockGroup.projectors;
         hasPower = true;
         hasLiquids = true;
         hasItems = true;
+        ambientSound = Sounds.shield;
+        ambientSoundVolume = 0.08f;
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).boost().update(false);
+    }
+
+    @Override
+    public void init(){
+        clipSize = Math.max(clipSize, (radius + phaseRadiusBoost + 3f) * 2f);
+        super.init();
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+        bars.add("shield", (ForceBuild entity) -> new Bar("stat.shieldhealth", Pal.accent, () -> entity.broken ? 0f : 1f - entity.buildup / (shieldHealth + phaseShieldBoost * entity.phaseHeat)).blink(Color.white));
     }
 
     @Override
@@ -59,12 +75,12 @@ public class ForceProjector extends Block{
 
     @Override
     public void setStats(){
+        stats.timePeriod = phaseUseTime;
         super.setStats();
-        stats.add(BlockStat.shieldHealth, breakage, StatUnit.none);
-        stats.add(BlockStat.cooldownTime, (int) (breakage / cooldownBrokenBase / 60f), StatUnit.seconds);
-        stats.add(BlockStat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
-        stats.add(BlockStat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
+        stats.add(Stat.shieldHealth, shieldHealth, StatUnit.none);
+        stats.add(Stat.cooldownTime, (int) (shieldHealth / cooldownBrokenBase / 60f), StatUnit.seconds);
+        stats.add(Stat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
+        stats.add(Stat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
     }
 
     @Override
@@ -80,24 +96,25 @@ public class ForceProjector extends Block{
         Draw.color();
     }
 
-    public class ForceBuild extends Building{
+    public class ForceBuild extends Building implements Ranged{
         public boolean broken = true;
         public float buildup, radscl, hit, warmup, phaseHeat;
-        public ForceDraw drawer;
 
         @Override
-        public void created(){
-            super.created();
-            drawer = ForceDraw.create();
-            drawer.build = this;
-            drawer.set(x, y);
-            drawer.add();
+        public float range(){
+            return realRadius();
+        }
+
+        @Override
+        public boolean shouldAmbientSound(){
+            return !broken && realRadius() > 1f;
         }
 
         @Override
         public void onRemoved(){
+            float radius = realRadius();
+            if(!broken && radius > 1f) Fx.forceShrink.at(x, y, radius, team.color);
             super.onRemoved();
-            drawer.remove();
         }
 
         @Override
@@ -112,7 +129,7 @@ public class ForceProjector extends Block{
 
             radscl = Mathf.lerpDelta(radscl, broken ? 0f : warmup, 0.05f);
 
-            if(Mathf.chanceDelta(buildup / breakage * 0.1f)){
+            if(Mathf.chanceDelta(buildup / shieldHealth * 0.1f)){
                 Fx.reactorsmoke.at(x + Mathf.range(tilesize / 2f), y + Mathf.range(tilesize / 2f));
             }
 
@@ -133,9 +150,9 @@ public class ForceProjector extends Block{
                 broken = false;
             }
 
-            if(buildup >= breakage + phaseShieldBoost && !broken){
+            if(buildup >= shieldHealth + phaseShieldBoost * phaseHeat && !broken){
                 broken = true;
-                buildup = breakage;
+                buildup = shieldHealth;
                 Fx.shieldBreak.at(x, y, realRadius(), team.color);
             }
 
@@ -156,20 +173,24 @@ public class ForceProjector extends Block{
         }
 
         @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.heat) return buildup;
+            return super.sense(sensor);
+        }
+
+        @Override
         public void draw(){
             super.draw();
 
-            if(drawer != null){
-                drawer.set(x, y);
-            }
-
             if(buildup > 0f){
-                Draw.alpha(buildup / breakage * 0.75f);
+                Draw.alpha(buildup / shieldHealth * 0.75f);
                 Draw.blend(Blending.additive);
                 Draw.rect(topRegion, x, y);
                 Draw.blend();
                 Draw.reset();
             }
+            
+            drawShield();
         }
 
         public void drawShield(){
@@ -213,23 +234,6 @@ public class ForceProjector extends Block{
             radscl = read.f();
             warmup = read.f();
             phaseHeat = read.f();
-        }
-    }
-
-    @EntityDef(value = {ForceDrawc.class}, serialize = false)
-    @Component(base = true)
-    abstract class ForceDrawComp implements Drawc{
-        transient ForceBuild build;
-
-        @Override
-        public void draw(){
-            build.drawShield();
-        }
-
-        @Replace
-        @Override
-        public float clipSize(){
-            return build.realRadius() * 3f;
         }
     }
 }

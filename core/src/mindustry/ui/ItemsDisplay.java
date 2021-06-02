@@ -5,7 +5,7 @@ import arc.math.*;
 import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -41,7 +41,7 @@ public class ItemsDisplay extends Table{
                     if(!items.has(item)) continue;
 
                     Label label = t.add(UI.formatAmount(items.get(item))).left().get();
-                    t.image(item.icon(Cicon.small)).size(8 * 3).padLeft(4).padRight(4);
+                    t.image(item.uiIcon).size(8 * 3).padLeft(4).padRight(4);
                     t.add(item.localizedName).color(Color.lightGray).left();
                     t.row();
 

@@ -1,5 +1,6 @@
 package mindustry.audio;
 
+import arc.*;
 import arc.audio.*;
 import arc.math.*;
 import arc.util.*;
@@ -18,7 +19,7 @@ public class SoundLoop{
     }
 
     public void update(float x, float y, boolean play){
-        if(baseVolume < 0) return;
+        if(baseVolume <= 0) return;
 
         if(id < 0){
             if(play){
@@ -31,18 +32,19 @@ public class SoundLoop{
             }else{
                 volume = Mathf.clamp(volume - fadeSpeed * Time.delta);
                 if(volume <= 0.001f){
-                    sound.stop(id);
+                    Core.audio.stop(id);
                     id = -1;
                     return;
                 }
             }
-            sound.setPan(id, sound.calcPan(x, y), sound.calcVolume(x, y) * volume * baseVolume);
+
+            Core.audio.set(id, sound.calcPan(x, y), sound.calcVolume(x, y) * volume * baseVolume);
         }
     }
 
     public void stop(){
         if(id != -1){
-            sound.stop(id);
+            Core.audio.stop(id);
             id = -1;
             volume = baseVolume = -1;
         }

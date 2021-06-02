@@ -8,8 +8,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 
 public class LightningBulletType extends BulletType{
-    protected Color lightningColor = Pal.lancerLaser;
-    protected int lightningLength = 25, lightningLengthRand = 0;
+    public Color lightningColor = Pal.lancerLaser;
+    public int lightningLength = 25, lightningLengthRand = 0;
 
     public LightningBulletType(){
         super(0.0001f, 1f);
@@ -19,11 +19,18 @@ public class LightningBulletType extends BulletType{
         hitEffect = Fx.hitLancer;
         keepVelocity = false;
         hittable = false;
+        //for stats
+        status = StatusEffects.shocked;
     }
 
     @Override
     public float range(){
         return (lightningLength + lightningLengthRand/2f) * 6f;
+    }
+
+    @Override
+    public float estimateDPS(){
+        return super.estimateDPS() * Math.max(lightningLength / 10f, 1);
     }
 
     @Override

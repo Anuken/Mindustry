@@ -10,12 +10,36 @@ import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
 public class Drawf{
+
+    public static void dashLine(Color color, float x, float y, float x2, float y2){
+        int segments = (int)(Math.max(Math.abs(x - x2), Math.abs(y - y2)) / tilesize * 2);
+        Lines.stroke(3f, Pal.gray);
+        Lines.dashLine(x, y, x2, y2, segments);
+        Lines.stroke(1f, color);
+        Lines.dashLine(x, y, x2, y2, segments);
+        Draw.reset();
+    }
+
+    public static void target(float x, float y, float rad, Color color){
+        target(x, y, rad, 1, color);
+    }
+
+    public static void target(float x, float y, float rad, float alpha, Color color){
+        Lines.stroke(3f);
+        Draw.color(Pal.gray, alpha);
+        Lines.poly(x, y, 4, rad, Time.time * 1.5f);
+        Lines.spikes(x, y, 3f/7f * rad, 6f/7f * rad, 4, Time.time * 1.5f);
+        Lines.stroke(1f);
+        Draw.color(color, alpha);
+        Lines.poly(x, y, 4, rad, Time.time * 1.5f);
+        Lines.spikes(x, y, 3f/7f * rad, 6f/7f * rad, 4, Time.time * 1.5f);
+        Draw.reset();
+    }
 
     public static float text(){
         float z = Draw.z();
@@ -51,7 +75,7 @@ public class Drawf{
     }
 
     private static boolean allowLight(Team team){
-        return team == Team.derelict || team == Vars.player.team() || state.rules.enemyLights;
+        return renderer != null && (team == Team.derelict || team == Vars.player.team() || state.rules.enemyLights);
     }
 
     public static void selected(Building tile, Color color){
@@ -80,7 +104,7 @@ public class Drawf{
 
     public static void shadow(float x, float y, float rad, float alpha){
         Draw.color(0, 0, 0, 0.4f * alpha);
-        Draw.rect("circle-shadow", x, y, rad, rad);
+        Draw.rect("circle-shadow", x, y, rad * Draw.xscl, rad * Draw.yscl);
         Draw.color();
     }
 
@@ -93,6 +117,12 @@ public class Drawf{
     public static void shadow(TextureRegion region, float x, float y){
         Draw.color(Pal.shadow);
         Draw.rect(region, x, y);
+        Draw.color();
+    }
+    
+    public static void shadow(TextureRegion region, float x, float y, float width, float height, float rotation){
+        Draw.color(Pal.shadow);
+        Draw.rect(region, x, y, width, height, rotation);
         Draw.color();
     }
 
@@ -136,16 +166,24 @@ public class Drawf{
         Draw.reset();
     }
 
-    public static void square(float x, float y, float radius, Color color){
+    public static void square(float x, float y, float radius, float rotation, Color color){
         Lines.stroke(3f, Pal.gray);
-        Lines.square(x, y, radius + 1f, 45);
+        Lines.square(x, y, radius + 1f, rotation);
         Lines.stroke(1f, color);
-        Lines.square(x, y, radius + 1f, 45);
+        Lines.square(x, y, radius + 1f, rotation);
         Draw.reset();
     }
 
+    public static void square(float x, float y, float radius, float rotation){
+        square(x, y, radius, rotation, Pal.accent);
+    }
+
+    public static void square(float x, float y, float radius, Color color){
+        square(x, y, radius, 45, color);
+    }
+
     public static void square(float x, float y, float radius){
-        square(x, y, radius, Pal.accent);
+        square(x, y, radius, 45);
     }
 
     public static void arrow(float x, float y, float x2, float y2, float length, float radius){
@@ -193,13 +231,17 @@ public class Drawf{
     }
 
     public static void construct(Building t, UnlockableContent content, float rotation, float progress, float speed, float time){
-        construct(t, content.icon(Cicon.full), rotation, progress, speed, time);
+        construct(t, content.fullIcon, rotation, progress, speed, time);
     }
 
     public static void construct(float x, float y, TextureRegion region, float rotation, float progress, float speed, float time){
+        construct(x, y, region, Pal.accent, rotation, progress, speed, time);
+    }
+    
+    public static void construct(float x, float y, TextureRegion region, Color color, float rotation, float progress, float speed, float time){
         Shaders.build.region = region;
         Shaders.build.progress = progress;
-        Shaders.build.color.set(Pal.accent);
+        Shaders.build.color.set(color);
         Shaders.build.color.a = speed;
         Shaders.build.time = -time / 20f;
 
@@ -211,9 +253,13 @@ public class Drawf{
     }
 
     public static void construct(Building t, TextureRegion region, float rotation, float progress, float speed, float time){
+        construct(t, region, Pal.accent, rotation, progress, speed, time);
+    }
+        
+    public static void construct(Building t, TextureRegion region, Color color, float rotation, float progress, float speed, float time){
         Shaders.build.region = region;
         Shaders.build.progress = progress;
-        Shaders.build.color.set(Pal.accent);
+        Shaders.build.color.set(color);
         Shaders.build.color.a = speed;
         Shaders.build.time = -time / 20f;
 

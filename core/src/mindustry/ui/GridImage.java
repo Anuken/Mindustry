@@ -1,7 +1,7 @@
 package mindustry.ui;
 
-import arc.graphics.g2d.Fill;
-import arc.scene.Element;
+import arc.graphics.g2d.*;
+import arc.scene.*;
 
 public class GridImage extends Element{
     private int imageWidth, imageHeight;

@@ -6,7 +6,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
-import static mindustry.Vars.player;
+import static mindustry.Vars.*;
 
 @Component
 @BaseComponent
@@ -29,27 +29,23 @@ abstract class EntityComp{
     }
 
     boolean isLocal(){
-        return ((Object)this) == player || ((Object)this) instanceof Unitc && ((Unitc)((Object)this)).controller() == player;
+        return ((Object)this) == player || ((Object)this) instanceof Unitc u && u.controller() == player;
     }
 
     boolean isRemote(){
-        return ((Object)this) instanceof Unitc && ((Unitc)((Object)this)).isPlayer() && !isLocal();
+        return ((Object)this) instanceof Unitc u && u.isPlayer() && !isLocal();
     }
 
     boolean isNull(){
         return false;
     }
 
+    /** Replaced with `this` after code generation. */
     <T extends Entityc> T self(){
         return (T)this;
     }
 
     <T> T as(){
-        return (T)this;
-    }
-
-    <T> T with(Cons<T> cons){
-        cons.get((T)this);
         return (T)this;
     }
 

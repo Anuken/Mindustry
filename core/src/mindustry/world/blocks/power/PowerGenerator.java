@@ -1,6 +1,7 @@
 package mindustry.world.blocks.power;
 
 import arc.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -12,13 +13,13 @@ import mindustry.world.meta.*;
 public class PowerGenerator extends PowerDistributor{
     /** The amount of power produced per tick in case of an efficiency of 1.0, which represents 100%. */
     public float powerProduction;
-    public BlockStat generationType = BlockStat.basePowerGeneration;
+    public Stat generationType = Stat.basePowerGeneration;
 
     public PowerGenerator(String name){
         super(name);
         sync = true;
         baseExplosiveness = 5f;
-        flags = EnumSet.of(BlockFlag.producer);
+        flags = EnumSet.of(BlockFlag.generator);
     }
 
     @Override
@@ -49,6 +50,11 @@ public class PowerGenerator extends PowerDistributor{
         public float generateTime;
         /** The efficiency of the producer. An efficiency of 1.0 means 100% */
         public float productionEfficiency = 0.0f;
+
+        @Override
+        public float ambientVolume(){
+            return Mathf.clamp(productionEfficiency);
+        }
 
         @Override
         public float getPowerProduction(){

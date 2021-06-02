@@ -1,26 +1,106 @@
 [
   {
-    "address": "mindustry.pl:6000"
+    "name": "RCR",
+    "address": ["185.104.248.61"]
   },
   {
-    "address": "mindustry.pl:6666"
+    "name": "SMokeOfAnarchy.duckdns.org",
+    "address": ["smokeofanarchy.duckdns.org:6853"]
   },
   {
-    "address": "routerchain.ddns.net"
+    "name": "mindustry.pl",
+    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl", "mindustry.pl:6966"]
   },
   {
-    "address": "mindustry.atannergaming.com:13000"
+    "name": "{AA}",
+    "address": ["aamindustry.play.ai", "aamindustry.play.ai:6571", "aamindustry.play.ai:6572", "aamindustry.play.ai:6573", "aamindustry.play.ai:6574"]
+  },
+   {
+    "name": "Atanner",
+    "address": ["atannergaming.com:13000"]
   },
   {
-    "address": "pandorum.su:8000"
+    "name": "C.A.M.S.",
+    "address": ["routerchain.ddns.net", "nikochio.ddns.net", "easyplay.su"]
   },
   {
-    "address": "mindustry.ecansol.com:6597"
+    "name": "BE6.RUN",
+    "address": ["be6.run", "mindustrycn.top"]
   },
   {
-    "address": "mindustry.ecansol.com:6499"
+    "name": "io",
+    "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000", "mindustry.io.community:4000"]
   },
   {
-    "address": "mindustry.ecansol.com:6599"
+    "name": "ECAN",
+    "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
+  },
+  {
+    "name": "Chaotic Neutral",
+    "address": ["Chaotic-Neutral.ddns.net:1111", "Chaotic-Neutral.ddns.net:2222", "Chaotic-Neutral.ddns.net:5555", "Chaotic-Neutral.ddns.net:6666", "Chaotic-Neutral.ddns.net:7777"]
+  },
+  {
+    "name": "Ranked",
+    "address": ["mindustryranked.ddns.net:16567"]
+  },
+  {
+    "name": "TWS",
+    "address": ["twsmindustry.24x7.hk:6701", "twsmindustry.24x7.hk:6702"]
+  },
+  {
+    "name": "mindustry.ddns.net",
+    "address": ["mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
+  },
+  {
+    "name": "Surrealment",
+    "address": ["md.surrealment.com"]
+  },
+  {
+    "name": "ALEX",
+    "address": ["alexmindustryhub.ddns.net:6568", "alexmindustry.ddns.net:6568", "alexmindustry.ddns.net:6569", "alexmindustryattac.ddns.net:25800","alexmindustryturbo.ddns.net:25854","alexmindustryhex.ddns.net:25587"]
+  },
+  {
+    "name": "Minty [subzero]",
+    "address": ["minty-server.ddns.net"]
+  },
+  {
+    "name": "Korea",
+    "address": ["mindustry.kr"]
+  },
+  {
+    "name": "hexpvp.ml",
+    "address": ["hexpvp.ml"]
+  },
+  {
+    "name": "Omega",
+    "address": ["178.170.47.34:20204", "157.90.213.2:30308", "157.90.180.53:25738"] 
+  },
+  {
+    "name": "md.obvilionnetwork.ru",
+    "address": ["obvilionnetwork.ru", "obvilionnetwork.ru:7001", "obvilionnetwork.ru:7002", "obvilionnetwork.ru:7003"]
+  },
+  {
+    "name": "Mindustry PLAY",
+    "address": ["92.63.100.160"]
+  },
+  {
+    "name": "Nydus",
+    "address": ["v6.mindustry.nydus.app:6566"]
+  },
+  {
+    "name": "MD Community",
+    "address": ["46.17.104.254", "46.17.104.254:4000"]
+  },
+  {
+    "name": "Mindustry.Party",
+    "address": ["game.mindustry.party"]
+  },
+  {
+    "name": "thedimas",
+    "address": ["play.thedimas.pp.ua"]
+  }, 
+  {
+    "name": "TSR", 
+    "address": ["fifr4.quackhost.uk:20131"]
   }
 ]

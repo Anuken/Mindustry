@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -22,7 +23,8 @@ public class LogicDisplay extends Block{
         commandLineRect = 5,
         commandPoly = 6,
         commandLinePoly = 7,
-        commandTriangle = 8;
+        commandTriangle = 8,
+        commandImage = 9;
 
     public int maxSides = 25;
 
@@ -32,13 +34,15 @@ public class LogicDisplay extends Block{
         super(name);
         update = true;
         solid = true;
+        group = BlockGroup.logic;
+        drawDisabled = false;
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.displaySize, "@x@", displaySize, displaySize);
+        stats.add(Stat.displaySize, "@x@", displaySize, displaySize);
     }
 
     public class LogicDisplayBuild extends Building{
@@ -71,19 +75,20 @@ public class LogicDisplay extends Block{
                     while(!commands.isEmpty()){
                         long c = commands.removeFirst();
                         byte type = DisplayCmd.type(c);
-                        int x = DisplayCmd.x(c), y = DisplayCmd.y(c),
-                        p1 = DisplayCmd.p1(c), p2 = DisplayCmd.p2(c), p3 = DisplayCmd.p3(c), p4 = DisplayCmd.p4(c);
+                        int x = unpackSign(DisplayCmd.x(c)), y = unpackSign(DisplayCmd.y(c)),
+                        p1 = unpackSign(DisplayCmd.p1(c)), p2 = unpackSign(DisplayCmd.p2(c)), p3 = unpackSign(DisplayCmd.p3(c)), p4 = unpackSign(DisplayCmd.p4(c));
 
                         switch(type){
-                            case commandClear: Core.graphics.clear(x/255f, y/255f, p1/255f, 1f); break;
-                            case commandLine: Lines.line(x, y, p1, p2); break;
-                            case commandRect: Fill.crect(x, y, p1, p2); break;
-                            case commandLineRect: Lines.rect(x, y, p1, p2); break;
-                            case commandPoly: Fill.poly(x, y, Math.min(p1, maxSides), p2, p3); break;
-                            case commandLinePoly: Lines.poly(x, y, Math.min(p1, maxSides), p2, p3); break;
-                            case commandTriangle: Fill.tri(x, y, p1, p2, p3, p4); break;
-                            case commandColor: this.color = Color.toFloatBits(x, y, p1, p2); Draw.color(this.color); break;
-                            case commandStroke: this.stroke = x; Lines.stroke(x); break;
+                            case commandClear -> Core.graphics.clear(x / 255f, y / 255f, p1 / 255f, 1f);
+                            case commandLine -> Lines.line(x, y, p1, p2);
+                            case commandRect -> Fill.crect(x, y, p1, p2);
+                            case commandLineRect -> Lines.rect(x, y, p1, p2);
+                            case commandPoly -> Fill.poly(x, y, Math.min(p1, maxSides), p2, p3);
+                            case commandLinePoly -> Lines.poly(x, y, Math.min(p1, maxSides), p2, p3);
+                            case commandTriangle -> Fill.tri(x, y, p1, p2, p3, p4);
+                            case commandColor -> Draw.color(this.color = Color.toFloatBits(x, y, p1, p2));
+                            case commandStroke -> Lines.stroke(this.stroke = x);
+                            case commandImage -> Draw.rect(Fonts.logicIcon(p1), x, y, p2, p2, p3);
                         }
                     }
 
@@ -93,12 +98,18 @@ public class LogicDisplay extends Block{
                 });
             }
 
+            Draw.blend(Blending.disabled);
             Draw.draw(Draw.z(), () -> {
                 if(buffer != null){
                     Draw.rect(Draw.wrap(buffer.getTexture()), x, y, buffer.getWidth() * Draw.scl, -buffer.getHeight() * Draw.scl);
                 }
             });
+            Draw.blend();
         }
+    }
+
+    static int unpackSign(int value){
+        return (value & 0b0111111111) * ((value & (0b1000000000)) != 0 ? -1 : 1);
     }
 
     public enum GraphicsType{
@@ -110,17 +121,19 @@ public class LogicDisplay extends Block{
         lineRect,
         poly,
         linePoly,
-        triangle;
+        triangle,
+        image;
 
         public static final GraphicsType[] all = values();
     }
 
     @Struct
     static class DisplayCmdStruct{
+        @StructField(4)
         public byte type;
 
-        //9 bits are required for full 360 degrees
-        @StructField(9)
+        //at least 9 bits are required for full 360 degrees
+        @StructField(10)
         public int x, y, p1, p2, p3, p4;
     }
 }

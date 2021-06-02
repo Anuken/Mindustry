@@ -10,12 +10,12 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class Unloader extends Block{
     public float speed = 1f;
-    public final int timerUnload = timers++;
 
     public Unloader(String name){
         super(name);
@@ -27,9 +27,16 @@ public class Unloader extends Block{
         saveConfig = true;
         itemCapacity = 0;
         noUpdateDisabled = true;
+        unloadable = false;
 
         config(Item.class, (UnloaderBuild tile, Item item) -> tile.sortItem = item);
         configClear((UnloaderBuild tile) -> tile.sortItem = null);
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+        stats.add(Stat.speed, 60f / speed, StatUnit.itemsSecond);
     }
 
     @Override
@@ -44,30 +51,57 @@ public class Unloader extends Block{
     }
 
     public class UnloaderBuild extends Building{
+        public float unloadTimer = 0f;
         public Item sortItem = null;
         public Building dumpingTo;
+        public int offset = 0;
+        public int[] rotations;
 
         @Override
         public void updateTile(){
-            if(timer(timerUnload, speed / timeScale())){
-                for(Building other : proximity){
-                    if(other.interactable(team) && other.block.unloadable && other.block.hasItems
-                        && ((sortItem == null && other.items.total() > 0) || (sortItem != null && other.items.has(sortItem)))){
+            if((unloadTimer += delta()) >= speed){
+                boolean any = false;
+                if(rotations == null || rotations.length != proximity.size){
+                    rotations = new int[proximity.size];
+                }
+
+                for(int i = 0; i < proximity.size; i++){
+                    int pos = (offset + i) % proximity.size;
+                    var other = proximity.get(pos);
+
+                    if(other.interactable(team) && other.block.unloadable && other.canUnload() && other.block.hasItems
+                    && ((sortItem == null && other.items.total() > 0) || (sortItem != null && other.items.has(sortItem)))){
                         //make sure the item can't be dumped back into this block
                         dumpingTo = other;
 
                         //get item to be taken
-                        Item item = sortItem == null ? other.items.beginTake() : sortItem;
+                        Item item = sortItem == null ? other.items.takeIndex(rotations[pos]) : sortItem;
 
                         //remove item if it's dumped correctly
                         if(put(item)){
+                            other.items.remove(item, 1);
+                            any = true;
+
                             if(sortItem == null){
-                                other.items.endTake(item);
-                            }else{
-                                other.items.remove(item, 1);
+                                rotations[pos] = item.id + 1;
                             }
+
+                            other.itemTaken(item);
+                        }else if(sortItem == null){
+                            rotations[pos] = other.items.nextIndex(rotations[pos]);
                         }
                     }
+                }
+
+                if(any){
+                    unloadTimer %= speed;
+                }else{
+                    unloadTimer = Math.min(unloadTimer, speed);
+                }
+
+                if(proximity.size > 0){
+                    offset ++;
+                    offset %= proximity.size;
                 }
             }
         }

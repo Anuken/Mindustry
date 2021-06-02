@@ -3,9 +3,8 @@ package mindustry.io;
 import arc.graphics.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.io.*;
-import arc.util.pooling.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -29,7 +28,7 @@ import java.nio.*;
 
 import static mindustry.Vars.*;
 
-/** Class for specifying read/write methods for code generation. */
+/** Class for specifying read/write methods for code generation. All IO MUST be thread safe!*/
 @SuppressWarnings("unused")
 @TypeIOHandler
 public class TypeIO{
@@ -37,64 +36,64 @@ public class TypeIO{
     public static void writeObject(Writes write, Object object){
         if(object == null){
             write.b((byte)0);
-        }else if(object instanceof Integer){
+        }else if(object instanceof Integer i){
             write.b((byte)1);
-            write.i((Integer)object);
-        }else if(object instanceof Long){
+            write.i(i);
+        }else if(object instanceof Long l){
             write.b((byte)2);
-            write.l((Long)object);
-        }else if(object instanceof Float){
+            write.l(l);
+        }else if(object instanceof Float f){
             write.b((byte)3);
-            write.f((Float)object);
-        }else if(object instanceof String){
+            write.f(f);
+        }else if(object instanceof String s){
             write.b((byte)4);
-            writeString(write, (String)object);
-        }else if(object instanceof Content){
-            Content map = (Content)object;
+            writeString(write, s);
+        }else if(object instanceof Content map){
             write.b((byte)5);
             write.b((byte)map.getContentType().ordinal());
             write.s(map.id);
-        }else if(object instanceof IntSeq){
+        }else if(object instanceof IntSeq arr){
             write.b((byte)6);
-            IntSeq arr = (IntSeq)object;
             write.s((short)arr.size);
             for(int i = 0; i < arr.size; i++){
                 write.i(arr.items[i]);
             }
-        }else if(object instanceof Point2){
+        }else if(object instanceof Point2 p){
             write.b((byte)7);
-            write.i(((Point2)object).x);
-            write.i(((Point2)object).y);
-        }else if(object instanceof Point2[]){
+            write.i(p.x);
+            write.i(p.y);
+        }else if(object instanceof Point2[] p){
             write.b((byte)8);
-            write.b(((Point2[])object).length);
-            for(int i = 0; i < ((Point2[])object).length; i++){
-                write.i(((Point2[])object)[i].pack());
+            write.b(p.length);
+            for(Point2 point2 : p){
+                write.i(point2.pack());
             }
-        }else if(object instanceof TechNode){
-            TechNode map = (TechNode)object;
+        }else if(object instanceof TechNode map){
             write.b(9);
             write.b((byte)map.content.getContentType().ordinal());
             write.s(map.content.id);
-        }else if(object instanceof Boolean){
+        }else if(object instanceof Boolean b){
             write.b((byte)10);
-            write.bool((Boolean)object);
-        }else if(object instanceof Double){
+            write.bool(b);
+        }else if(object instanceof Double d){
             write.b((byte)11);
-            write.d((Double)object);
-        }else if(object instanceof Building){
-            write.b((byte)12);
-            write.i(((Building)object).pos());
-        }else if(object instanceof LAccess){
+            write.d(d);
+        }else if(object instanceof Building b){
+            write.b(12);
+            write.i(b.pos());
+        }else if(object instanceof LAccess l){
             write.b((byte)13);
-            write.s(((LAccess)object).ordinal());
-        }else if(object instanceof byte[]){
+            write.s(l.ordinal());
+        }else if(object instanceof byte[] b){
             write.b((byte)14);
-            write.i(((byte[])object).length);
-            write.b((byte[])object);
-        }else if(object instanceof UnitCommand){
+            write.i(b.length);
+            write.b(b);
+        }else if(object instanceof UnitCommand c){
             write.b((byte)15);
-            write.b(((UnitCommand)object).ordinal());
+            write.b(c.ordinal());
+        }else if(object instanceof BuildingBox b){
+            write.b(12);
+            write.i(b.pos);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -102,6 +101,12 @@ public class TypeIO{
 
     @Nullable
     public static Object readObject(Reads read){
+        return readObjectBoxed(read, false);
+    }
+
+    /** Reads an object, but boxes buildings. */
+    @Nullable
+    public static Object readObjectBoxed(Reads read, boolean box){
         byte type = read.b();
         switch(type){
             case 0: return null;
@@ -116,7 +121,7 @@ public class TypeIO{
             case 9: return TechTree.getNotNull(content.getByID(ContentType.all[read.b()], read.s()));
             case 10: return read.bool();
             case 11: return read.d();
-            case 12: return world.build(read.i());
+            case 12: return !box ? world.build(read.i()) : new BuildingBox(read.i());
             case 13: return LAccess.all[read.s()];
             case 14: int blen = read.i(); byte[] bytes = new byte[blen]; read.b(bytes); return bytes;
             case 15: return UnitCommand.all[read.b()];
@@ -169,10 +174,13 @@ public class TypeIO{
     }
 
     public static void writeUnit(Writes write, Unit unit){
-        write.b(unit.isNull() ? 0 : unit instanceof BlockUnitc ? 1 : 2);
+        write.b(unit == null || unit.isNull() ? 0 : unit instanceof BlockUnitc ? 1 : 2);
+
         //block units are special
         if(unit instanceof BlockUnitc){
             write.i(((BlockUnitc)unit).tile().pos());
+        }else if(unit == null){
+            write.i(0);
         }else{
             write.i(unit.id);
         }
@@ -188,7 +196,7 @@ public class TypeIO{
             return unit == null ? Nulls.unit : unit;
         }else if(type == 1){ //block
             Building tile = world.build(id);
-            return tile instanceof ControlBlock ? ((ControlBlock)tile).unit() : Nulls.unit;
+            return tile instanceof ControlBlock cont ? cont.unit() : Nulls.unit;
         }
         return Nulls.unit;
     }
@@ -293,12 +301,15 @@ public class TypeIO{
 
     public static void writeController(Writes write, UnitController control){
         //no real unit controller state is written, only the type
-        if(control instanceof Player){
+        if(control instanceof Player p){
             write.b(0);
-            write.i(((Player)control).id);
-        }else if(control instanceof FormationAI){
+            write.i(p.id);
+        }else if(control instanceof FormationAI form && form.leader != null){
             write.b(1);
-            write.i(((FormationAI)control).leader.id);
+            write.i(form.leader.id);
+        }else if(control instanceof LogicAI logic && logic.controller != null){
+            write.b(3);
+            write.i(logic.controller.pos());
         }else{
             write.b(2);
         }
@@ -314,13 +325,30 @@ public class TypeIO{
             return player;
         }else if(type == 1){ //formation controller
             int id = read.i();
-            return prev instanceof FormationAI ? prev : new FormationAI(Groups.unit.getByID(id), null);
+            if(prev instanceof FormationAI f){
+                f.leader = Groups.unit.getByID(id);
+                return f;
+            }
+            return new FormationAI(Groups.unit.getByID(id), null);
+        }else if(type == 3){
+            int pos = read.i();
+            if(prev instanceof LogicAI pai){
+                pai.controller = world.build(pos);
+                return pai;
+            }else{
+                //create new AI for assignment
+                LogicAI out = new LogicAI();
+                //instantly time out when updated.
+                out.controlTimer = LogicAI.logicControlTimeout;
+                out.controller = world.build(pos);
+                return out;
+            }
         }else{
             //there are two cases here:
             //1: prev controller was not a player, carry on
             //2: prev controller was a player, so replace this controller with *anything else*
             //...since AI doesn't update clientside it doesn't matter
-            return (!(prev instanceof AIController) || (prev instanceof FormationAI)) ? new GroundAI() : prev;
+            return (!(prev instanceof AIController) || (prev instanceof FormationAI) || (prev instanceof LogicAI)) ? new GroundAI() : prev;
         }
     }
 
@@ -363,13 +391,13 @@ public class TypeIO{
         return new Vec2(read.f(), read.f());
     }
 
-    public static void writeStatuse(Writes write, StatusEntry entry){
+    public static void writeStatus(Writes write, StatusEntry entry){
         write.s(entry.effect.id);
         write.f(entry.time);
     }
 
-    public static StatusEntry readStatuse(Reads read){
-        return Pools.obtain(StatusEntry.class, StatusEntry::new).set(content.getByID(ContentType.status, read.s()), read.f());
+    public static StatusEntry readStatus(Reads read){
+        return new StatusEntry().set(content.getByID(ContentType.status, read.s()), read.f());
     }
 
     public static void writeItems(Writes write, ItemStack stack){
@@ -435,6 +463,16 @@ public class TypeIO{
 
     public static Color readColor(Reads read, Color color){
         return color.set(read.i());
+    }
+
+    public static void writeContent(Writes write, Content cont){
+        write.b(cont.getContentType().ordinal());
+        write.s(cont.id);
+    }
+
+    public static Content readContent(Reads read){
+        byte id = read.b();
+        return content.getByID(ContentType.all[id], read.s());
     }
 
     public static void writeLiquid(Writes write, Liquid liquid){
@@ -521,15 +559,33 @@ public class TypeIO{
         return read.b(new byte[length]);
     }
 
+    public static void writeInts(Writes write, int[] ints){
+        write.s((short)ints.length);
+        for(int i : ints){
+            write.i(i);
+        }
+    }
+
+    public static int[] readInts(Reads read){
+        short length = read.s();
+        int[] out = new int[length];
+        for(int i = 0; i < length; i++){
+            out[i] = read.i();
+        }
+        return out;
+    }
+
     public static void writeTraceInfo(Writes write, TraceInfo trace){
         writeString(write, trace.ip);
         writeString(write, trace.uuid);
         write.b(trace.modded ? (byte)1 : 0);
         write.b(trace.mobile ? (byte)1 : 0);
+        write.i(trace.timesJoined);
+        write.i(trace.timesKicked);
     }
 
     public static TraceInfo readTraceInfo(Reads read){
-        return new TraceInfo(readString(read), readString(read), read.b() == 1, read.b() == 1);
+        return new TraceInfo(readString(read), readString(read), read.b() == 1, read.b() == 1, read.i(), read.i());
     }
 
     public static void writeStringData(DataOutput buffer, String string) throws IOException{
@@ -550,6 +606,15 @@ public class TypeIO{
             return new String(bytes, charset);
         }else{
             return null;
+        }
+    }
+
+    /** Representes a building that has not been resolved yet. */
+    public static class BuildingBox{
+        public int pos;
+
+        public BuildingBox(int pos){
+            this.pos = pos;
         }
     }
 }

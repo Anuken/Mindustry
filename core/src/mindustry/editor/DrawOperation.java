@@ -1,22 +1,16 @@
 package mindustry.editor;
 
+import arc.struct.*;
 import mindustry.annotations.Annotations.*;
-import arc.struct.LongSeq;
-import mindustry.game.Team;
-import mindustry.gen.TileOp;
-import mindustry.world.Block;
-import mindustry.world.Tile;
-import mindustry.world.blocks.environment.Floor;
+import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class DrawOperation{
-    private MapEditor editor;
     private LongSeq array = new LongSeq();
-
-    public DrawOperation(MapEditor editor) {
-        this.editor = editor;
-    }
 
     public boolean isEmpty(){
         return array.isEmpty();
@@ -38,7 +32,7 @@ public class DrawOperation{
         }
     }
 
-    private void updateTile(int i) {
+    private void updateTile(int i){
         long l = array.get(i);
         array.set(i, TileOp.get(TileOp.x(l), TileOp.y(l), TileOp.type(l), getTile(editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l))));
         setTile(editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l), TileOp.value(l));

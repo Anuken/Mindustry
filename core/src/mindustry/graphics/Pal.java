@@ -1,9 +1,11 @@
 package mindustry.graphics;
 
-import arc.graphics.Color;
+import arc.graphics.*;
 
 public class Pal{
     public static Color
+
+    thoriumPink = Color.valueOf("f9a3c7"),
 
     items = Color.valueOf("2ea756"),
     command = Color.valueOf("eab678"),
@@ -12,10 +14,12 @@ public class Pal{
     sapBullet = Color.valueOf("bf92f9"),
     sapBulletBack = Color.valueOf("6d56bf"),
 
+    reactorPurple = Color.valueOf("bf92f9"),
+    reactorPurple2 = Color.valueOf("8a73c6"),
+
     spore = Color.valueOf("7457ce"),
 
     shield = Color.valueOf("ffd37f").a(0.7f),
-    shieldIn = Color.black.cpy().a(0f),
 
     bulletYellow = Color.valueOf("fff8e8"),
     bulletYellowBack = Color.valueOf("f9c27a"),
@@ -94,5 +98,13 @@ public class Pal{
     redDust = Color.valueOf("ffa480"),
     redderDust = Color.valueOf("ff7b69"),
 
-    plasticSmoke = Color.valueOf("f1e479");
+    plasticSmoke = Color.valueOf("f1e479"),
+	
+    adminChat = Color.valueOf("ff4000"),
+
+    logicBlocks = Color.valueOf("d4816b"),
+    logicControl = Color.valueOf("6bb2b2"),
+    logicOperations = Color.valueOf("877bad"),
+    logicIo = Color.valueOf("a08a8a"),
+    logicUnits = Color.valueOf("c7b59d");
 }

@@ -14,22 +14,16 @@ task copyAssets(){
             from "../core/assets"
             into "assets/"
         }
-        
-        exec{
-            ignoreExitValue true
-            commandLine "sh", "./convert_audio.sh", "assets/sounds"
+    }
+}
+
+task copyNatives(){
+    doLast{
+        copy{
+            from "../../Arc/natives/natives-freetype-ios/libs", "../../Arc/natives/natives-ios/libs"
+            into "libs"
         }
-    
-        exec{
-            ignoreExitValue true
-            commandLine "sh", "./convert_audio.sh", "assets/music"
-        }
-    
-        delete{
-            delete fileTree('assets') {
-                include '**/*.ogg'
-            }
-        }
+
     }
 }
 
@@ -38,6 +32,9 @@ task deploy{
     dependsOn createIPA
 }
 
+//must pack before deployment, as iOS never has the latest sprites.
+copyAssets.dependsOn ":tools:pack"
+copyAssets.dependsOn copyNatives
 launchIPhoneSimulator.dependsOn build
 launchIPadSimulator.dependsOn build
 launchIOSDevice.dependsOn build
@@ -45,4 +42,11 @@ createIPA.dependsOn build
 
 robovm{
     archs = "thumbv7:arm64"
+
+    if(project.hasProperty("signIdentity")) println "iOS Sign Identity: " + project.property("signIdentity")
+    if(project.hasProperty("provisioningProfile")) println "iOS Provisioning Profile: " + project.property("provisioningProfile")
+
+    iosSignIdentity = project.properties["signIdentity"]
+    iosProvisioningProfile = project.properties["provisioningProfile"]
+    iosSkipSigning = false
 }

@@ -3,39 +3,47 @@ package mindustry.ui;
 import arc.*;
 import arc.Graphics.Cursor.*;
 import arc.assets.*;
-import arc.assets.loaders.*;
-import arc.assets.loaders.resolvers.*;
 import arc.files.*;
 import arc.freetype.*;
 import arc.freetype.FreeTypeFontGenerator.*;
 import arc.freetype.FreetypeFontLoader.*;
 import arc.graphics.*;
-import arc.graphics.Pixmap.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.Font.*;
 import arc.graphics.g2d.PixmapPacker.*;
 import arc.graphics.g2d.TextureAtlas.*;
-import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
+import mindustry.gen.*;
 
 import java.util.*;
 
 public class Fonts{
     private static final String mainFont = "fonts/font.woff";
+    private static final ObjectSet<String> unscaled = ObjectSet.with("iconLarge");
     private static ObjectIntMap<String> unicodeIcons = new ObjectIntMap<>();
     private static ObjectMap<String, String> stringIcons = new ObjectMap<>();
+    private static ObjectMap<String, TextureRegion> largeIcons = new ObjectMap<>();
+    private static TextureRegion[] iconTable;
+    private static int lastCid;
 
     public static Font def;
     public static Font outline;
     public static Font chat;
     public static Font icon;
+    public static Font iconLarge;
     public static Font tech;
+
+    public static TextureRegion logicIcon(int id){
+        return iconTable[id];
+    }
 
     public static int getUnicode(String content){
         return unicodeIcons.get(content, 0);
@@ -43,6 +51,10 @@ public class Fonts{
 
     public static String getUnicodeStr(String content){
         return stringIcons.get(content, "");
+    }
+
+    public static boolean hasUnicodeStr(String content){
+        return stringIcons.containsKey(content);
     }
 
     /** Called from a static context to make the cursor appear immediately upon startup.*/
@@ -55,10 +67,11 @@ public class Fonts{
     }
 
     public static int cursorScale(){
-        return Math.max(1, Mathf.round(Scl.scl(1f)));
+        return 1;
     }
 
     public static void loadFonts(){
+        largeIcons.clear();
         FreeTypeFontParameter param = fontParameter();
 
         Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = f -> Fonts.def = (Font)f;
@@ -68,6 +81,25 @@ public class Fonts{
             incremental = true;
             characters = "\0";
         }})).loaded = f -> Fonts.icon = (Font)f;
+        Core.assets.load("iconLarge", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
+            size = 48;
+            incremental = false;
+            characters = "\0" + Iconc.all;
+            borderWidth = 5f;
+            borderColor = Color.darkGray;
+        }})).loaded = f -> Fonts.iconLarge = (Font)f;
+    }
+
+    public static TextureRegion getLargeIcon(String name){
+        return largeIcons.get(name, () -> {
+            var region = new TextureRegion();
+            int code = Iconc.codes.get(name, '\uF8D4');
+            var glyph = iconLarge.getData().getGlyph((char)code);
+            if(glyph == null) return Core.atlas.find("error");
+            region.set(iconLarge.getRegion().texture);
+            region.set(glyph.u, glyph.v2, glyph.u2, glyph.v);
+            return region;
+        });
     }
 
     public static void loadContentIcons(){
@@ -86,7 +118,6 @@ public class Fonts{
 
                 if(region.texture != uitex){
                     continue;
-                    //throw new IllegalArgumentException("Font icon '" + texture + "' is not in the UI texture.");
                 }
 
                 unicodeIcons.put(nametex[0], ch);
@@ -97,7 +128,7 @@ public class Fonts{
                 glyph.srcX = 0;
                 glyph.srcY = 0;
                 glyph.width = size;
-                glyph.height = size;
+                glyph.height = (int)((float)region.height / region.width * size);
                 glyph.u = region.u;
                 glyph.v = region.v2;
                 glyph.u2 = region.u2;
@@ -111,16 +142,28 @@ public class Fonts{
                 fonts.each(f -> f.getData().setGlyph(ch, glyph));
             }
         }
+
+        iconTable = new TextureRegion[512];
+        iconTable[0] = Core.atlas.find("error");
+        lastCid = 1;
+
+        Vars.content.each(c -> {
+            if(c instanceof UnlockableContent u){
+                TextureRegion region = Core.atlas.find(u.name + "-icon-logic");
+                if(region.found()){
+                    iconTable[u.iconId = lastCid++] = region;
+                }
+            }
+        });
     }
 
     /** Called from a static context for use in the loading screen.*/
     public static void loadDefaultFont(){
         int max = Gl.getInt(Gl.maxTextureSize);
 
-        UI.packer = new PixmapPacker(max >= 4096 ? 4096 : 2048, 2048, Format.rgba8888, 2, true);
-        FileHandleResolver resolver = new InternalFileHandleResolver();
-        Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
-        Core.assets.setLoader(Font.class, null, new FreetypeFontLoader(resolver){
+        UI.packer = new PixmapPacker(max >= 4096 ? 4096 : 2048, 2048, 2, true);
+        Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(Core.files::internal));
+        Core.assets.setLoader(Font.class, null, new FreetypeFontLoader(Core.files::internal){
             ObjectSet<FreeTypeFontParameter> scaled = new ObjectSet<>();
 
             @Override
@@ -129,7 +172,8 @@ public class Fonts{
                     parameter.fontParameters.borderWidth = Scl.scl(2f);
                     parameter.fontParameters.spaceX -= parameter.fontParameters.borderWidth;
                 }
-                if(!scaled.contains(parameter.fontParameters)){
+
+                if(!scaled.contains(parameter.fontParameters) && !unscaled.contains(fileName)){
                     parameter.fontParameters.size = (int)(Scl.scl(parameter.fontParameters.size));
                     scaled.add(parameter.fontParameters);
                 }
@@ -153,7 +197,7 @@ public class Fonts{
             size = 18;
         }})).loaded = f -> {
             Fonts.tech = (Font)f;
-            ((Font)f).getData().down *= 1.5f;
+            Fonts.tech.getData().down *= 1.5f;
         };
     }
 
@@ -170,13 +214,16 @@ public class Fonts{
         for(AtlasRegion region : regions){
             //get new pack rect
             page.setDirty(false);
-            Rect rect = UI.packer.pack(region.name + (region.splits != null ? ".9" : ""), atlas.getPixmap(region));
+            Rect rect = UI.packer.pack(region.name, atlas.getPixmap(region), region.splits, region.pads);
+
             //set new texture
             region.texture = UI.packer.getPages().first().getTexture();
             //set its new position
             region.set((int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
             //add old texture
             atlas.getTextures().add(region.texture);
+            //clear it
+            region.pixmapRegion = null;
         }
 
         //remove old texture, it will no longer be used

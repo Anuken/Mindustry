@@ -4,9 +4,8 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.game.*;
-import mindustry.type.*;
 import mindustry.graphics.*;
-import mindustry.ui.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.meta.*;
@@ -15,7 +14,7 @@ import static mindustry.Vars.*;
 
 public class Pump extends LiquidBlock{
     /** Pump amount per tile. */
-    protected float pumpAmount = 0.2f;
+    public float pumpAmount = 0.2f;
 
     public Pump(String name){
         super(name);
@@ -26,11 +25,13 @@ public class Pump extends LiquidBlock{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.output, 60f * pumpAmount * size * size, StatUnit.liquidSecond);
+        stats.add(Stat.output, 60f * pumpAmount * size * size, StatUnit.liquidSecond);
     }
 
     @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid) {
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
         Tile tile = world.tile(x, y);
         if(tile == null) return;
 
@@ -46,11 +47,11 @@ public class Pump extends LiquidBlock{
 
         if(liquidDrop != null){
             float width = drawPlaceText(Core.bundle.formatFloat("bar.pumpspeed", amount * pumpAmount * 60f, 0), x, y, valid);
-            float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5;
+            float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5, s = iconSmall / 4f;
             Draw.mixcol(Color.darkGray, 1f);
-            Draw.rect(liquidDrop.icon(Cicon.small), dx, dy - 1);
+            Draw.rect(liquidDrop.fullIcon, dx, dy - 1, s, s);
             Draw.reset();
-            Draw.rect(liquidDrop.icon(Cicon.small), dx, dy);
+            Draw.rect(liquidDrop.fullIcon, dx, dy, s, s);
         }
     }
 

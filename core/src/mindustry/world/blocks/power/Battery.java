@@ -8,7 +8,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class Battery extends PowerDistributor{
     public @Load("@-top") TextureRegion topRegion;
@@ -20,7 +20,7 @@ public class Battery extends PowerDistributor{
         super(name);
         outputsPower = true;
         consumesPower = true;
-        flags = EnumSet.of(BlockFlag.powerResupply);
+        flags = EnumSet.of(BlockFlag.battery);
     }
 
     public class BatteryBuild extends Building{
@@ -41,6 +41,13 @@ public class Battery extends PowerDistributor{
                     power.status = Mathf.clamp(power.status + amount / block.consumes.getPower().capacity);
                 }
             }
+        }
+
+        @Override
+        public BlockStatus status(){
+            if(Mathf.equal(power.status, 0f, 0.001f)) return BlockStatus.noInput;
+            if(Mathf.equal(power.status, 1f, 0.001f)) return BlockStatus.active;
+            return BlockStatus.noOutput;
         }
     }
 }

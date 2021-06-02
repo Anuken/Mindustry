@@ -28,35 +28,42 @@ public class PowerTestFixture{
         headless = true;
         Core.graphics = new FakeGraphics();
         Core.files = new MockFiles();
+
+        boolean make = content == null;
+
+        if(make){
+            Vars.content = new ContentLoader(){
+                @Override
+                public void handleMappableContent(MappableContent content){
+
+                }
+            };
+        }
         Vars.state = new GameState();
         Vars.tree = new FileTree();
-        Vars.content = new ContentLoader(){
-            @Override
-            public void handleMappableContent(MappableContent content){
-
-            }
-        };
-        content.createBaseContent();
-        Log.setUseColors(false);
+        if(make){
+            content.createBaseContent();
+        }
+        Log.useColors = false;
         Time.setDeltaProvider(() -> 0.5f);
     }
 
     protected static PowerGenerator createFakeProducerBlock(float producedPower){
-        return new PowerGenerator("fakegen"){{
+        return new PowerGenerator("fakegen" + System.nanoTime()){{
             buildType = () -> new GeneratorBuild();
             powerProduction = producedPower;
         }};
     }
 
     protected static Battery createFakeBattery(float capacity){
-        return new Battery("fakebattery"){{
+        return new Battery("fakebattery" + System.nanoTime()){{
             buildType = () -> new BatteryBuild();
             consumes.powerBuffered(capacity);
         }};
     }
 
     protected static Block createFakeDirectConsumer(float powerPerTick){
-        return new PowerBlock("fakedirectconsumer"){{
+        return new PowerBlock("fakedirectconsumer" + System.nanoTime()){{
             buildType = Building::create;
             consumes.power(powerPerTick);
         }};
@@ -88,14 +95,13 @@ public class PowerTestFixture{
             // Simulate the "changed" method. Calling it through reflections would require half the game to be initialized.
             tile.build = block.newBuilding().init(tile, Team.sharded, false, 0);
             if(block.hasPower){
-                tile.build.power.graph = new PowerGraph(){
+                new PowerGraph(){
                     //assume there's always something consuming power
                     @Override
                     public float getUsageFraction(){
                         return 1f;
                     }
-                };
-                tile.build.power.graph.add(tile.build);
+                }.add(tile.build);
             }
 
             // Assign incredibly high health so the block does not get destroyed on e.g. burning Blast Compound

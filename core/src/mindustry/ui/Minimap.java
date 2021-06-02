@@ -1,9 +1,9 @@
 package mindustry.ui;
 
-import arc.Core;
-import arc.graphics.g2d.Draw;
-import arc.input.KeyCode;
-import arc.scene.Element;
+import arc.*;
+import arc.graphics.g2d.*;
+import arc.input.*;
+import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
 import mindustry.gen.*;

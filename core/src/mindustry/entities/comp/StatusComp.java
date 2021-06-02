@@ -19,7 +19,9 @@ abstract class StatusComp implements Posc, Flyingc{
     private Seq<StatusEntry> statuses = new Seq<>();
     private transient Bits applied = new Bits(content.getBy(ContentType.status).size);
 
-    @ReadOnly transient float speedMultiplier = 1, damageMultiplier = 1, armorMultiplier = 1, reloadMultiplier = 1;
+    //these are considered read-only
+    transient float speedMultiplier = 1, damageMultiplier = 1, healthMultiplier = 1, reloadMultiplier = 1, buildSpeedMultiplier = 1, dragMultiplier = 1;
+    transient boolean disarmed = false;
 
     @Import UnitType type;
 
@@ -32,6 +34,11 @@ abstract class StatusComp implements Posc, Flyingc{
     void apply(StatusEffect effect, float duration){
         if(effect == StatusEffects.none || effect == null || isImmune(effect)) return; //don't apply empty or immune effects
 
+        //unlock status effects regardless of whether they were applied to friendly units
+        if(state.isCampaign()){
+            effect.unlock();
+        }
+
         if(statuses.size > 0){
             //check for opposite effects
             for(int i = 0; i < statuses.size; i ++){
@@ -40,25 +47,29 @@ abstract class StatusComp implements Posc, Flyingc{
                 if(entry.effect == effect){
                     entry.time = Math.max(entry.time, duration);
                     return;
-                }else if(entry.effect.reactsWith(effect)){ //find opposite
-                    StatusEntry.tmp.effect = entry.effect;
-                    entry.effect.getTransition(self(), effect, entry.time, duration, StatusEntry.tmp);
-                    entry.time = StatusEntry.tmp.time;
-
-                    if(StatusEntry.tmp.effect != entry.effect){
-                        entry.effect = StatusEntry.tmp.effect;
-                    }
-
+                }else if(entry.effect.applyTransition(self(), effect, entry, duration)){ //find reaction
+                    //TODO effect may react with multiple other effects
                     //stop looking when one is found
                     return;
                 }
             }
         }
 
-        //otherwise, no opposites found, add direct effect
-        StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
-        entry.set(effect, duration);
-        statuses.add(entry);
+        if(!effect.reactive){
+            //otherwise, no opposites found, add direct effect
+            StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
+            entry.set(effect, duration);
+            statuses.add(entry);
+        }
+    }
+
+    float getDuration(StatusEffect effect){
+        var entry = statuses.find(e -> e.effect == effect);
+        return entry == null ? 0 : entry.time;
+    }
+
+    void clearStatuses(){
+        statuses.clear();
     }
 
     /** Removes a status effect. */
@@ -104,7 +115,8 @@ abstract class StatusComp implements Posc, Flyingc{
         }
 
         applied.clear();
-        speedMultiplier = damageMultiplier = armorMultiplier = reloadMultiplier = 1f;
+        speedMultiplier = damageMultiplier = healthMultiplier = reloadMultiplier = buildSpeedMultiplier = dragMultiplier = 1f;
+        disarmed = false;
 
         if(statuses.isEmpty()) return;
 
@@ -114,20 +126,30 @@ abstract class StatusComp implements Posc, Flyingc{
             StatusEntry entry = statuses.get(index++);
 
             entry.time = Math.max(entry.time - Time.delta, 0);
-            applied.set(entry.effect.id);
 
-            if(entry.time <= 0 && !entry.effect.permanent){
+            if(entry.effect == null || (entry.time <= 0 && !entry.effect.permanent)){
                 Pools.free(entry);
                 index --;
                 statuses.remove(index);
             }else{
+                applied.set(entry.effect.id);
+
                 speedMultiplier *= entry.effect.speedMultiplier;
-                armorMultiplier *= entry.effect.armorMultiplier;
+                healthMultiplier *= entry.effect.healthMultiplier;
                 damageMultiplier *= entry.effect.damageMultiplier;
                 reloadMultiplier *= entry.effect.reloadMultiplier;
+                buildSpeedMultiplier *= entry.effect.buildSpeedMultiplier;
+                dragMultiplier *= entry.effect.dragMultiplier;
+
+                disarmed |= entry.effect.disarm;
+
                 entry.effect.update(self(), entry.time);
             }
         }
+    }
+
+    public Bits statusBits(){
+        return applied;
     }
 
     public void draw(){

@@ -20,17 +20,20 @@ public class SapBulletType extends BulletType{
         speed = 0.0001f;
         despawnEffect = Fx.none;
         pierce = true;
+        collides = false;
         hitSize = 0f;
         hittable = false;
         hitEffect = Fx.hitLiquid;
         status = StatusEffects.sapped;
+        lightColor = Pal.sap;
+        lightOpacity = 0.6f;
         statusDuration = 60f * 3f;
+        impact = true;
     }
 
     @Override
     public void draw(Bullet b){
-        if(b.data instanceof Position){
-            Position data = (Position)b.data;
+        if(b.data instanceof Position data){
             Tmp.v1.set(data).lerp(b, b.fin());
 
             Draw.color(color);
@@ -39,7 +42,7 @@ public class SapBulletType extends BulletType{
 
             Draw.reset();
 
-            Drawf.light(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, 15f * b.fout(), lightColor, 0.6f);
+            Drawf.light(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, 15f * b.fout(), lightColor, lightOpacity);
         }
     }
 
@@ -50,7 +53,7 @@ public class SapBulletType extends BulletType{
 
     @Override
     public float range(){
-        return length;
+        return Math.max(length, maxRange);
     }
 
     @Override
@@ -61,21 +64,17 @@ public class SapBulletType extends BulletType{
         b.data = target;
 
         if(target != null){
-            float result = Math.min(target.health(), damage);
+            float result = Math.max(Math.min(target.health(), damage), 0);
 
-            if(b.owner instanceof Healthc){
-                ((Healthc)b.owner).heal(result * sapStrength);
+            if(b.owner instanceof Healthc h){
+                h.heal(result * sapStrength);
             }
         }
 
-        if(target instanceof Hitboxc){
-            Hitboxc hit = (Hitboxc)target;
-
+        if(target instanceof Hitboxc hit){
             hit.collision(b, hit.x(), hit.y());
             b.collision(hit, hit.x(), hit.y());
-        }else if(target instanceof Building){
-            Building tile = (Building)target;
-
+        }else if(target instanceof Building tile){
             if(tile.collide(b)){
                 tile.collision(b);
                 hit(b, tile.x, tile.y);

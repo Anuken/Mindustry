@@ -22,6 +22,7 @@ public class LoadoutDialog extends BaseDialog{
     private Boolf<Item> validator = i -> true;
     private Table items;
     private int capacity;
+    private @Nullable ItemSeq total;
 
     public LoadoutDialog(){
         super("@configure");
@@ -46,6 +47,8 @@ public class LoadoutDialog extends BaseDialog{
 
         buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
 
+        buttons.button("@max", Icon.export, this::maxItems).size(210f, 64f);
+
         buttons.button("@settings.reset", Icon.refresh, () -> {
             resetter.run();
             reseed();
@@ -54,12 +57,23 @@ public class LoadoutDialog extends BaseDialog{
         }).size(210f, 64f);
     }
 
+    public void maxItems() {
+        for(ItemStack stack : stacks){
+            stack.amount = total == null ? capacity : Math.max(Math.min(capacity, total.get(stack.item)), 0);
+        }
+    }
+
     public void show(int capacity, Seq<ItemStack> stacks, Boolf<Item> validator, Runnable reseter, Runnable updater, Runnable hider){
+        show(capacity, null, stacks, validator, reseter, updater, hider);
+    }
+
+    public void show(int capacity, ItemSeq total, Seq<ItemStack> stacks, Boolf<Item> validator, Runnable reseter, Runnable updater, Runnable hider){
         this.originalStacks = stacks;
         this.validator = validator;
         this.resetter = reseter;
         this.updater = updater;
         this.capacity = capacity;
+        this.total = total;
         this.hider = hider;
         reseed();
         show();
@@ -97,7 +111,7 @@ public class LoadoutDialog extends BaseDialog{
                     ui.showInfo(Core.bundle.format("configure.invalid", capacity));
                 })).size(bsize);
 
-                t.image(stack.item.icon(Cicon.small)).size(8 * 3).padRight(4).padLeft(4);
+                t.image(stack.item.uiIcon).size(8 * 3).padRight(4).padLeft(4);
                 t.label(() -> stack.amount + "").left().width(90f);
             }).pad(2).left().fillX();
 

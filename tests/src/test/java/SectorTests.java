@@ -66,7 +66,7 @@ public class SectorTests{
                     outer:
                     for(int i = 1; i <= 1000; i++){
                         for(SpawnGroup spawn : spawns){
-                            if(spawn.effect == StatusEffects.boss && spawn.getUnitsSpawned(i) > 0){
+                            if(spawn.effect == StatusEffects.boss && spawn.getSpawned(i) > 0){
                                 bossWave = i;
                                 break outer;
                             }
@@ -84,7 +84,7 @@ public class SectorTests{
                 for(int i = 1; i <= bossWave; i++){
                     int total = 0;
                     for(SpawnGroup spawn : spawns){
-                        total += spawn.getUnitsSpawned(i);
+                        total += spawn.getSpawned(i);
                     }
 
                     assertNotEquals(0, total, "Sector " + zone + " has no spawned enemies at wave " + i);

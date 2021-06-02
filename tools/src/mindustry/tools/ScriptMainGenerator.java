@@ -1,6 +1,7 @@
 package mindustry.tools;
 
 import arc.*;
+import arc.Graphics.Cursor.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -13,11 +14,13 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.net.*;
+import mindustry.world.*;
 
 import java.io.*;
 import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
+import java.util.zip.*;
 
 public class ScriptMainGenerator{
 
@@ -36,14 +39,18 @@ public class ScriptMainGenerator{
             getClasses("arc.func"),
             getClasses("arc.struct"),
             getClasses("arc.scene"),
-            getClasses("arc.math")
+            getClasses("arc.math"),
+            getClasses("arc.audio"),
+            getClasses("arc.input"),
+            getClasses("arc.util"),
+            getClasses("arc.struct")
         );
         classes.addAll(whitelist);
         classes.sort(Structs.comparing(Class::getName));
 
         classes.removeAll(type -> type.isSynthetic() || type.isAnonymousClass() || type.getCanonicalName() == null || Modifier.isPrivate(type.getModifiers())
         || blacklist.contains(s -> type.getName().startsWith(base + "." + s + ".")) || nameBlacklist.contains(type.getSimpleName()));
-        classes.add(NetConnection.class, SaveIO.class);
+        classes.add(NetConnection.class, SaveIO.class, SystemCursor.class);
 
         classes.distinct();
         classes.sortComparing(Class::getName);
@@ -64,11 +71,49 @@ public class ScriptMainGenerator{
         }
 
         new Fi("core/assets/scripts/global.js").writeString(result.toString());
+
+        //map simple name to type
+        Seq<String> packages = Seq.with(
+        "mindustry.entities.effect",
+        "mindustry.entities.bullet",
+        "mindustry.entities.abilities",
+        "mindustry.ai.types",
+        "mindustry.type.weather",
+        "mindustry.type.weapons",
+        "mindustry.game.Objectives",
+        "mindustry.world.blocks",
+        "mindustry.world.draw",
+        "mindustry.type"
+        );
+
+        String classTemplate = "package mindustry.mod;\n" +
+        "\n" +
+        "import arc.struct.*;\n" +
+        "/** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */\n" +
+        "@SuppressWarnings(\"deprecation\")\n" +
+        "public class ClassMap{\n" +
+        "    public static final ObjectMap<String, Class<?>> classes = new ObjectMap<>();\n" +
+        "    \n" +
+        "    static{\n$CLASSES$" +
+        "    }\n" +
+        "}\n";
+
+        StringBuilder cdef = new StringBuilder();
+
+        Seq<Class<?>> mapped = classes.select(c -> Modifier.isPublic(c.getModifiers()) && packages.contains(c.getCanonicalName()::startsWith))
+        .and(Block.class); //special case
+
+        for(Class<?> c : mapped){
+            cdef.append("        classes.put(\"").append(c.getSimpleName()).append("\", ").append(c.getCanonicalName()).append(".class);\n");
+        }
+
+        new Fi("core/src/mindustry/mod/ClassMap.java").writeString(classTemplate.replace("$CLASSES$", cdef.toString()));
+        Log.info("Generated @ class mappings.", mapped.size);
     }
 
-
-    private static Seq<Class> getClasses(String packageName) throws Exception{
+    public static Seq<Class> getClasses(String packageName) throws Exception{
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
         Seq<File> dirs = new Seq<>();
 
         for(URL resource : Collections.list(classLoader.getResources(packageName.replace('.', '/')))){
@@ -82,18 +127,38 @@ public class ScriptMainGenerator{
         return classes;
     }
 
-    private static Seq<Class> findClasses(File directory, String packageName) throws Exception{
+    public static Seq<Class> findClasses(File directory, String packageName) throws Exception{
         Seq<Class> classes = new Seq<>();
+        String dir = directory.toString();
+        if(dir.startsWith("file:")){
+            directory = new File(dir.substring("file:".length()).replace("!/arc", "").replace("!/mindustry", ""));
+        }
         if(!directory.exists()) return classes;
 
-        File[] files = directory.listFiles();
-        for(File file : files){
-            if(file.isDirectory()){
-                classes.addAll(findClasses(file, packageName + "." + file.getName()));
-            }else if(file.getName().endsWith(".class")){
-                classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6), false, Thread.currentThread().getContextClassLoader()));
+        if(directory.getName().endsWith(".jar")){
+            ZipInputStream zip = new ZipInputStream(new FileInputStream(directory));
+            for(ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()){
+                if(!entry.isDirectory() && entry.getName().endsWith(".class")){
+                    String className = entry.getName().replace('/', '.');
+                    className = className.substring(0, className.length() - ".class".length());
+                    if(className.startsWith(packageName)){
+                        Class res = Class.forName(className, false, Thread.currentThread().getContextClassLoader());
+                        classes.add(res);
+                        //classes.addAll(res.getDeclaredClasses()); //????
+                    }
+                }
+            }
+        }else{
+            File[] files = directory.listFiles();
+            for(File file : files){
+                if(file.isDirectory()){
+                    classes.addAll(findClasses(file, packageName + "." + file.getName()));
+                }else if(file.getName().endsWith(".class")){
+                    classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6), false, Thread.currentThread().getContextClassLoader()));
+                }
             }
         }
+
         return classes;
     }
 }

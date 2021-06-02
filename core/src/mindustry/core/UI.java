@@ -24,7 +24,7 @@ import mindustry.editor.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.LogicDialog;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.ui.fragments.*;
@@ -33,6 +33,8 @@ import static arc.scene.actions.Actions.*;
 import static mindustry.Vars.*;
 
 public class UI implements ApplicationListener, Loadable{
+    private static String billions, millions, thousands;
+
     public static PixmapPacker packer;
 
     public MenuFragment menufrag;
@@ -42,6 +44,7 @@ public class UI implements ApplicationListener, Loadable{
     public MinimapFragment minimapfrag;
     public PlayerListFragment listfrag;
     public LoadingFragment loadfrag;
+    public HintsFragment hints;
 
     public WidgetGroup menuGroup, hudGroup;
 
@@ -55,7 +58,7 @@ public class UI implements ApplicationListener, Loadable{
     public HostDialog host;
     public PausedDialog paused;
     public SettingsMenuDialog settings;
-    public ControlsDialog controls;
+    public KeybindDialog controls;
     public MapEditorDialog editor;
     public LanguageDialog language;
     public BansDialog bans;
@@ -91,6 +94,12 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene = new Scene();
         Core.input.addProcessor(Core.scene);
 
+        int[] insets = Core.graphics.getSafeInsets();
+        Core.scene.marginLeft = insets[0];
+        Core.scene.marginRight = insets[1];
+        Core.scene.marginTop = insets[2];
+        Core.scene.marginBottom = insets[3];
+
         Tex.load();
         Icon.load();
         Styles.load();
@@ -101,10 +110,10 @@ public class UI implements ApplicationListener, Loadable{
         Dialog.setHideAction(() -> sequence(fadeOut(0.1f)));
 
         Tooltips.getInstance().animations = false;
-        Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black5).margin(4f).add(text));
+        Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black6).margin(4f).add(text));
 
         Core.settings.setErrorHandler(e -> {
-            e.printStackTrace();
+            Log.err(e);
             Core.app.post(() -> showErrorMessage("Failed to access local storage.\nSettings will not be saved."));
         });
 
@@ -140,22 +149,21 @@ public class UI implements ApplicationListener, Loadable{
             }
         }
 
-        //draw overlay for buttons
-        if(state.rules.tutorial){
-            control.tutorial.draw();
-            Draw.flush();
-        }
-
         Events.fire(Trigger.uiDrawEnd);
     }
 
     @Override
     public void init(){
+        billions = Core.bundle.get("unit.billions");
+        millions = Core.bundle.get("unit.millions");
+        thousands = Core.bundle.get("unit.thousands");
+
         menuGroup = new WidgetGroup();
         hudGroup = new WidgetGroup();
 
         menufrag = new MenuFragment();
         hudfrag = new HudFragment();
+        hints = new HintsFragment();
         chatfrag = new ChatFragment();
         minimapfrag = new MinimapFragment();
         listfrag = new PlayerListFragment();
@@ -164,7 +172,7 @@ public class UI implements ApplicationListener, Loadable{
 
         picker = new ColorPicker();
         editor = new MapEditorDialog();
-        controls = new ControlsDialog();
+        controls = new KeybindDialog();
         restart = new GameOverDialog();
         join = new JoinDialog();
         discord = new DiscordDialog();
@@ -212,16 +220,15 @@ public class UI implements ApplicationListener, Loadable{
     @Override
     public void resize(int width, int height){
         if(Core.scene == null) return;
+
+        int[] insets = Core.graphics.getSafeInsets();
+        Core.scene.marginLeft = insets[0];
+        Core.scene.marginRight = insets[1];
+        Core.scene.marginTop = insets[2];
+        Core.scene.marginBottom = insets[3];
+
         Core.scene.resize(width, height);
         Events.fire(new ResizeEvent());
-    }
-
-    @Override
-    public void dispose(){
-        if(packer != null){
-            packer.dispose();
-            packer = null;
-        }
     }
 
     public TextureRegionDrawable getIcon(String name){
@@ -262,11 +269,11 @@ public class UI implements ApplicationListener, Loadable{
                 TextField field = cont.field(def, t -> {}).size(330f, 50f).get();
                 field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
                 buttons.defaults().size(120, 54).pad(4);
+                buttons.button("@cancel", this::hide);
                 buttons.button("@ok", () -> {
                     confirmed.get(field.getText());
                     hide();
                 }).disabled(b -> field.getText().isEmpty());
-                buttons.button("@cancel", this::hide);
                 keyDown(KeyCode.enter, () -> {
                     String text = field.getText();
                     if(!text.isEmpty()){
@@ -328,34 +335,40 @@ public class UI implements ApplicationListener, Loadable{
 
     /** Shows a label in the world. This label is behind everything. Does not fade. */
     public void showLabel(String info, float duration, float worldx, float worldy){
-        Table table = new Table();
-        table.setFillParent(true);
+        var table = new Table(Styles.black3).margin(4);
         table.touchable = Touchable.disabled;
         table.update(() -> {
             if(state.isMenu()) table.remove();
+            Vec2 v = Core.camera.project(worldx, worldy);
+            table.setPosition(v.x, v.y, Align.center);
         });
         table.actions(Actions.delay(duration), Actions.remove());
-        table.align(Align.center).table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).update(t -> {
-            Vec2 v = Core.camera.project(worldx, worldy);
-            t.setPosition(v.x, v.y, Align.center);
-        });
+        table.add(info).style(Styles.outlineLabel);
+        table.pack();
         table.act(0f);
         //make sure it's at the back
         Core.scene.root.addChildAt(0, table);
+
+        table.getChildren().first().act(0f);
     }
 
     public void showInfo(String info){
-        showInfo(info, () -> {});
-    }
-
-    public void showInfo(String info, Runnable listener){
         new Dialog(""){{
             getCell(cont).growX();
             cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons.button("@ok", () -> {
-                hide();
-                listener.run();
-            }).size(110, 50).pad(4);
+            buttons.button("@ok", this::hide).size(110, 50).pad(4);
+            keyDown(KeyCode.enter, this::hide);
+            closeOnBack();
+        }}.show();
+    }
+
+    public void showInfoOnHidden(String info, Runnable listener){
+        new Dialog(""){{
+            getCell(cont).growX();
+            cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            buttons.button("@ok", this::hide).size(110, 50).pad(4);
+            hidden(listener);
+            closeOnBack();
         }}.show();
     }
 
@@ -364,6 +377,7 @@ public class UI implements ApplicationListener, Loadable{
             getCell(cont).growX();
             cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.left);
             buttons.button("@ok", this::hide).size(110, 50).pad(4);
+            closeOnBack();
         }}.show();
     }
 
@@ -378,6 +392,7 @@ public class UI implements ApplicationListener, Loadable{
             cont.add(text).pad(2f).growX().wrap().get().setAlignment(Align.center);
             cont.row();
             cont.button("@ok", this::hide).size(120, 50).pad(4);
+            closeOnBack();
         }}.show();
     }
 
@@ -388,7 +403,7 @@ public class UI implements ApplicationListener, Loadable{
     public void showException(String text, Throwable exc){
         loadfrag.hide();
         new Dialog(""){{
-            String message = Strings.getFinalMesage(exc);
+            String message = Strings.getFinalMessage(exc);
 
             setFillParent(true);
             cont.margin(15);
@@ -405,6 +420,7 @@ public class UI implements ApplicationListener, Loadable{
             cont.button("@ok", this::hide).size(110, 50).fillX().left();
             cont.row();
             cont.add(col).colspan(2).pad(2);
+            closeOnBack();
         }}.show();
     }
 
@@ -420,6 +436,7 @@ public class UI implements ApplicationListener, Loadable{
             cont.add(text).width(400f).wrap().get().setAlignment(align, align);
             cont.row();
             buttons.button("@ok", this::hide).size(110, 50).pad(4);
+            closeOnBack();
         }}.show();
     }
 
@@ -427,6 +444,7 @@ public class UI implements ApplicationListener, Loadable{
         new Dialog(titleText){{
             cont.margin(15).add(text).width(400f).wrap().left().get().setAlignment(Align.left, Align.left);
             buttons.button("@ok", this::hide).size(110, 50).pad(4);
+            closeOnBack();
         }}.show();
     }
 
@@ -436,7 +454,12 @@ public class UI implements ApplicationListener, Loadable{
             titleTable.row();
             titleTable.image().color(Pal.accent).height(3f).growX().pad(2f);
             buttons.button("@ok", this::hide).size(110, 50).pad(4);
+            closeOnBack();
         }}.show();
+    }
+
+    public void showConfirm(String text, Runnable confirmed){
+        showConfirm("@confirm", text, null, confirmed);
     }
 
     public void showConfirm(String title, String text, Runnable confirmed){
@@ -487,13 +510,20 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
+    /** Display text in the middle of the screen, then fade out. */
     public void announce(String text){
-        Table t = new Table();
+        announce(text, 3);
+    }
+
+    /** Display text in the middle of the screen, then fade out. */
+    public void announce(String text, float duration){
+        Table t = new Table(Styles.black3);
         t.touchable = Touchable.disabled;
-        t.background(Styles.black3).margin(8f)
-        .add(text).style(Styles.outlineLabel).labelAlign(Align.center);
+        t.margin(8f).add(text).style(Styles.outlineLabel).labelAlign(Align.center);
         t.update(() -> t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center));
-        t.actions(Actions.fadeOut(3, Interp.pow4In), Actions.remove());
+        t.actions(Actions.fadeOut(duration, Interp.pow4In), Actions.remove());
+        t.pack();
+        t.act(0.1f);
         Core.scene.add(t);
     }
 
@@ -509,17 +539,27 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
-    //TODO move?
+    public static String formatTime(float ticks){
+        int time = (int)(ticks / 60);
+        if(time < 60) return "0:" + (time < 10 ? "0" : "") + time;
+        int mod = time % 60;
+        return (time / 60) + ":" + (mod < 10 ? "0" : "") + mod;
+    }
 
     public static String formatAmount(long number){
-        if(number >= 1_000_000_000){
-            return Strings.fixed(number / 1_000_000_000f, 1) + "[gray]" + Core.bundle.get("unit.billions") + "[]";
-        }else if(number >= 1_000_000){
-            return Strings.fixed(number / 1_000_000f, 1) + "[gray]" + Core.bundle.get("unit.millions") + "[]";
-        }else if(number >= 10_000){
-            return number / 1000 + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
-        }else if(number >= 1000){
-            return Strings.fixed(number / 1000f, 1) + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
+        //prevent overflow
+        if(number == Long.MIN_VALUE) number ++;
+
+        long mag = Math.abs(number);
+        String sign = number < 0 ? "-" : "";
+        if(mag >= 1_000_000_000){
+            return sign + Strings.fixed(mag / 1_000_000_000f, 1) + "[gray]" + billions+ "[]";
+        }else if(mag >= 1_000_000){
+            return sign + Strings.fixed(mag / 1_000_000f, 1) + "[gray]" +millions + "[]";
+        }else if(mag >= 10_000){
+            return number / 1000 + "[gray]" + thousands + "[]";
+        }else if(mag >= 1000){
+            return sign + Strings.fixed(mag / 1000f, 1) + "[gray]" + thousands + "[]";
         }else{
             return number + "";
         }

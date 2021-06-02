@@ -4,12 +4,12 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
-import mindustry.world.meta.values.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class LaserTurret extends PowerTurret{
     public float firingMoveFract = 0.25f;
@@ -33,11 +33,8 @@ public class LaserTurret extends PowerTurret{
     public void setStats(){
         super.setStats();
 
-        stats.remove(BlockStat.booster);
-        stats.add(BlockStat.input, new BoosterListValue(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, false, l -> consumes.liquidfilters.get(l.id)));
-        stats.remove(BlockStat.damage);
-        //damages every 5 ticks, at least in meltdown's case
-        stats.add(BlockStat.damage, shootType.damage * 60f / 5f, StatUnit.perSecond);
+        stats.remove(Stat.booster);
+        stats.add(Stat.input, StatValues.boosters(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, false, l -> consumes.liquidfilters.get(l.id)));
     }
 
     public class LaserTurretBuild extends PowerTurretBuild{
@@ -54,7 +51,8 @@ public class LaserTurret extends PowerTurret{
             super.updateTile();
 
             if(bulletLife > 0 && bullet != null){
-                tr.trns(rotation, size * tilesize / 2f, 0f);
+                wasShooting = true;
+                tr.trns(rotation, shootLength, 0f);
                 bullet.rotation(rotation);
                 bullet.set(x + tr.x, y + tr.y);
                 bullet.time(0f);
@@ -65,18 +63,25 @@ public class LaserTurret extends PowerTurret{
                     bullet = null;
                 }
             }else if(reload > 0){
+                wasShooting = true;
                 Liquid liquid = liquids.current();
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-                float used = (cheating() ? maxUsed * Time.delta : Math.min(liquids.get(liquid), maxUsed * Time.delta)) * liquid.heatCapacity * coolantMultiplier;
-                reload -= used;
+                float used = (cheating() ? maxUsed * Time.delta : Math.min(liquids.get(liquid), maxUsed * Time.delta));
+                reload -= used * liquid.heatCapacity * coolantMultiplier;
                 liquids.remove(liquid, used);
 
                 if(Mathf.chance(0.06 * used)){
                     coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
                 }
             }
+        }
 
+        @Override
+        public double sense(LAccess sensor){
+            //reload reversed for laser turrets
+            if(sensor == LAccess.progress) return Mathf.clamp(1f - reload / reloadTime);
+            return super.sense(sensor);
         }
 
         @Override

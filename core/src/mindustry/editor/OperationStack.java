@@ -1,6 +1,6 @@
 package mindustry.editor;
 
-import arc.struct.Seq;
+import arc.struct.*;
 
 public class OperationStack{
     private static final int maxSize = 10;

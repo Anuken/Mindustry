@@ -72,7 +72,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
         super.setStats();
 
         if(hasItems){
-            stats.add(BlockStat.productionTime, itemDuration / 60f, StatUnit.seconds);
+            stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
     }
 
@@ -97,10 +97,11 @@ public class ItemLiquidGenerator extends PowerGenerator{
             //Note: Do not use this delta when calculating the amount of power or the power efficiency, but use it for resource consumption if necessary.
             //Power amount is delta'd by PowerGraph class already.
             float calculationDelta = delta();
+            boolean cons = consValid();
 
-            heat = Mathf.lerpDelta(heat, generateTime >= 0.001f ? 1f : 0f, 0.05f);
+            heat = Mathf.lerpDelta(heat, generateTime >= 0.001f && enabled && cons ? 1f : 0f, 0.05f);
 
-            if(!consValid()){
+            if(!cons){
                 productionEfficiency = 0.0f;
                 return;
             }
@@ -159,7 +160,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
             if(hasItems){
                 Draw.color(heatColor);
-                Draw.alpha(heat * 0.4f + Mathf.absin(Time.time(), 8f, 0.6f) * heat);
+                Draw.alpha(heat * 0.4f + Mathf.absin(Time.time, 8f, 0.6f) * heat);
                 Draw.rect(topRegion, x, y);
                 Draw.reset();
             }

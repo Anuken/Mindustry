@@ -6,10 +6,12 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.ui.*;
 
 public class ForceFieldAbility extends Ability{
     /** Shield radius. */
@@ -94,7 +96,12 @@ public class ForceFieldAbility extends Ability{
         }
     }
 
-    private void checkRadius(Unit unit){
+    @Override
+    public void displayBars(Unit unit, Table bars){
+        bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> unit.shield / max)).row();
+    }
+
+    public void checkRadius(Unit unit){
         //timer2 is used to store radius scale as an effect
         realRad = radiusScale * radius;
     }

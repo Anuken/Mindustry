@@ -2,14 +2,13 @@ package mindustry.world.modules;
 
 import arc.math.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.type.*;
 
 import java.util.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class ItemModule extends BlockModule{
     public static final ItemModule empty = new ItemModule();
@@ -104,7 +103,7 @@ public class ItemModule extends BlockModule{
 
     public void each(ItemConsumer cons){
         for(int i = 0; i < items.length; i++){
-            if(items[i] > 0){
+            if(items[i] != 0){
                 cons.accept(content.item(i), items[i]);
             }
         }
@@ -207,7 +206,7 @@ public class ItemModule extends BlockModule{
 
     /** Begins a speculative take operation. This returns the item that would be returned by #take(), but does not change state. */
     @Nullable
-    public Item beginTake(){
+    public Item takeIndex(int takeRotation){
         for(int i = 0; i < items.length; i++){
             int index = (i + takeRotation);
             if(index >= items.length) index -= items.length;
@@ -218,11 +217,15 @@ public class ItemModule extends BlockModule{
         return null;
     }
 
-    /** Finishes a take operation. Updates take state, removes the item. */
-    public void endTake(Item item){
-        items[item.id] --;
-        total --;
-        takeRotation = item.id + 1;
+    public int nextIndex(int takeRotation){
+        for(int i = 1; i < items.length; i++){
+            int index = (i + takeRotation);
+            if(index >= items.length) index -= items.length;
+            if(items[index] > 0){
+                return (takeRotation + i) % items.length;
+            }
+        }
+        return takeRotation;
     }
 
     public int get(int id){
@@ -244,6 +247,16 @@ public class ItemModule extends BlockModule{
         }
     }
 
+    public void add(ItemSeq stacks){
+        stacks.each(this::add);
+    }
+
+    public void add(ItemModule items){
+        for(int i = 0; i < items.items.length; i++){
+            add(i, items.items[i]);
+        }
+    }
+
     public void add(Item item, int amount){
         add(item.id, amount);
     }
@@ -259,12 +272,6 @@ public class ItemModule extends BlockModule{
     public void undoFlow(Item item){
         if(flow != null){
             cacheSums[item.id] -= 1;
-        }
-    }
-
-    public void addAll(ItemModule items){
-        for(int i = 0; i < items.items.length; i++){
-            add(i, items.items[i]);
         }
     }
 

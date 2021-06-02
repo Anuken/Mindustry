@@ -17,7 +17,7 @@ import mindustry.ui.*;
 
 public class WaveGraph extends Table{
     public Seq<SpawnGroup> groups = new Seq<>();
-    public int from, to = 20;
+    public int from = 0, to = 20;
 
     private Mode mode = Mode.counts;
     private int[][] values;
@@ -81,7 +81,7 @@ public class WaveGraph extends Table{
                 for(int i = 0; i < values.length; i++){
                     float sum = 0;
                     for(UnitType type : used.orderedItems()){
-                        sum += type.health * values[i][type.id];
+                        sum += (type.health) * values[i][type.id];
                     }
 
                     float cx = graphX + i*spacing, cy = 2f + graphY + sum * (graphH - 4f) / maxHealth;
@@ -114,7 +114,7 @@ public class WaveGraph extends Table{
 
                 Lines.line(cx, cy, cx, cy + len);
                 if(i == values.length/2){
-                    font.draw("" + (i + from), cx, cy - 2f, Align.center);
+                    font.draw("" + (i + from + 1), cx, cy - 2f, Align.center);
                 }
             }
             font.setColor(Color.white);
@@ -154,13 +154,13 @@ public class WaveGraph extends Table{
             int sum = 0;
 
             for(SpawnGroup spawn : groups){
-                int spawned = spawn.getUnitsSpawned(i);
+                int spawned = spawn.getSpawned(i);
                 values[index][spawn.type.id] += spawned;
                 if(spawned > 0){
                     used.add(spawn.type);
                 }
                 max = Math.max(max, values[index][spawn.type.id]);
-                healthsum += spawned * spawn.type.health;
+                healthsum += spawned * (spawn.type.health);
                 sum += spawned;
             }
             maxTotal = Math.max(maxTotal, sum);
@@ -177,7 +177,7 @@ public class WaveGraph extends Table{
                 t.button(b -> {
                     Color tcolor = color(type).cpy();
                     b.image().size(32f).update(i -> i.setColor(b.isChecked() ? Tmp.c1.set(tcolor).mul(0.5f) : tcolor)).get().act(1);
-                    b.image(type.icon(Cicon.medium)).padRight(20).update(i -> i.setColor(b.isChecked() ? Color.gray : Color.white)).get().act(1);
+                    b.image(type.uiIcon).size(32f).padRight(20).update(i -> i.setColor(b.isChecked() ? Color.gray : Color.white)).get().act(1);
                     b.margin(0f);
                 }, Styles.fullTogglet, () -> {
                     if(!hidden.add(type)){

@@ -2,32 +2,36 @@ package mindustry.world.blocks;
 
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
-import mindustry.world.meta.Attribute;
+import mindustry.world.meta.*;
 
 import java.util.*;
 
-public class Attributes implements Serializable{
-    private final float[] arr = new float[Attribute.all.length];
+public class Attributes implements JsonSerializable{
+    private float[] arr = new float[Attribute.all.length];
 
     public void clear(){
         Arrays.fill(arr, 0);
     }
 
     public float get(Attribute attr){
-        return arr[attr.ordinal()];
+        check();
+        return arr[attr.id];
     }
 
     public void set(Attribute attr, float value){
-        arr[attr.ordinal()] = value;
+        check();
+        arr[attr.id] = value;
     }
 
     public void add(Attributes other){
+        check();
         for(int i = 0; i < arr.length; i++){
             arr[i] += other.arr[i];
         }
     }
 
     public void add(Attributes other, float scl){
+        check();
         for(int i = 0; i < arr.length; i++){
             arr[i] += other.arr[i] * scl;
         }
@@ -35,17 +39,23 @@ public class Attributes implements Serializable{
 
     @Override
     public void write(Json json){
+        check();
         for(Attribute at : Attribute.all){
-            if(arr[at.ordinal()] != 0){
-                json.writeValue(at.name(), arr[at.ordinal()]);
+            if(arr[at.id] != 0){
+                json.writeValue(at.name, arr[at.id]);
             }
         }
     }
 
     @Override
     public void read(Json json, JsonValue data){
+        check();
         for(Attribute at : Attribute.all){
-            arr[at.ordinal()] = data.getFloat(at.name(), 0);
+            arr[at.id] = data.getFloat(at.name, 0);
         }
+    }
+
+    private void check(){
+        if(arr.length != Attribute.all.length) arr = new float[Attribute.all.length];
     }
 }

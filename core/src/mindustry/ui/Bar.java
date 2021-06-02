@@ -8,6 +8,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.style.*;
+import arc.scene.ui.layout.*;
 import arc.util.pooling.*;
 import mindustry.gen.*;
 
@@ -15,9 +16,9 @@ public class Bar extends Element{
     private static Rect scissor = new Rect();
 
     private Floatp fraction;
-    private String name = "";
-    private float value, lastValue, blink;
-    private Color blinkColor = new Color();
+    private CharSequence name = "";
+    private float value, lastValue, blink, outlineRadius;
+    private Color blinkColor = new Color(), outlineColor = new Color();
 
     public Bar(String name, Color color, Floatp fraction){
         this.fraction = fraction;
@@ -27,13 +28,21 @@ public class Bar extends Element{
         setColor(color);
     }
 
-    public Bar(Prov<String> name, Prov<Color> color, Floatp fraction){
+    public Bar(Prov<CharSequence> name, Prov<Color> color, Floatp fraction){
         this.fraction = fraction;
-        lastValue = value = Mathf.clamp(fraction.get());
+        try{
+            lastValue = value = Mathf.clamp(fraction.get());
+        }catch(Exception e){ //getting the fraction may involve referring to invalid data
+            lastValue = value = 0f;
+        }
         update(() -> {
-            this.name = name.get();
-            this.blinkColor.set(color.get());
-            setColor(color.get());
+            try{
+                this.name = name.get();
+                this.blinkColor.set(color.get());
+                setColor(color.get());
+            }catch(Exception e){ //getting the fraction may involve referring to invalid data
+                this.name = "";
+            }
         });
     }
 
@@ -53,6 +62,12 @@ public class Bar extends Element{
         update(() -> this.name = name.get());
     }
 
+    public Bar outline(Color color, float stroke){
+        outlineColor.set(color);
+        outlineRadius = Scl.scl(stroke);
+        return this;
+    }
+
     public Bar blink(Color color){
         blinkColor.set(color);
         return this;
@@ -62,16 +77,34 @@ public class Bar extends Element{
     public void draw(){
         if(fraction == null) return;
 
-        float computed = Mathf.clamp(fraction.get());
+        float computed;
+        try{
+            computed = Mathf.clamp(fraction.get());
+        }catch(Exception e){ //getting the fraction may involve referring to invalid data
+            computed = 0f;
+        }
+
         if(lastValue > computed){
             blink = 1f;
             lastValue = computed;
         }
 
+        if(Float.isNaN(lastValue)) lastValue = 0;
+        if(Float.isInfinite(lastValue)) lastValue = 1f;
+        if(Float.isNaN(value)) value = 0;
+        if(Float.isInfinite(value)) value = 1f;
+        if(Float.isNaN(computed)) computed = 0;
+        if(Float.isInfinite(computed)) computed = 1f;
+
         blink = Mathf.lerpDelta(blink, 0f, 0.2f);
         value = Mathf.lerpDelta(value, computed, 0.15f);
 
         Drawable bar = Tex.bar;
+
+        if(outlineRadius > 0){
+            Draw.color(outlineColor);
+            bar.draw(x - outlineRadius, y - outlineRadius, width + outlineRadius*2, height + outlineRadius*2);
+        }
 
         Draw.colorl(0.1f);
         bar.draw(x, y, width, height);

@@ -2,14 +2,15 @@ package mindustry.entities.units;
 
 import arc.func.*;
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
 /** Class for storing build requests. Can be either a place or remove request. */
-public class BuildPlan{
+public class BuildPlan implements Position{
     /** Position and rotation of this request. */
     public int x, y, rotation;
     /** Block being placed. If null, this is a breaking request.*/
@@ -59,6 +60,20 @@ public class BuildPlan{
 
     public BuildPlan(){
 
+    }
+
+    public boolean placeable(Team team){
+        return Build.validPlace(block, team, x, y, rotation);
+    }
+
+    public boolean isRotation(Team team){
+        if(breaking) return false;
+        Tile tile = tile();
+        return tile != null && tile.team() == team && tile.block() == block && tile.build != null && tile.build.rotation != rotation;
+    }
+
+    public boolean samePos(BuildPlan other){
+        return x == other.x && y == other.y;
     }
 
     /** Transforms the internal position of this config using the specified function, and return the result. */
@@ -127,11 +142,11 @@ public class BuildPlan{
     }
 
     public float drawx(){
-        return x*tilesize + block.offset;
+        return x*tilesize + (block == null ? 0 : block.offset);
     }
 
     public float drawy(){
-        return y*tilesize + block.offset;
+        return y*tilesize + (block == null ? 0 : block.offset);
     }
 
     public @Nullable Tile tile(){
@@ -143,15 +158,26 @@ public class BuildPlan{
     }
 
     @Override
+    public float getX(){
+        return drawx();
+    }
+
+    @Override
+    public float getY(){
+        return drawy();
+    }
+
+    @Override
     public String toString(){
-        return "BuildRequest{" +
+        return "BuildPlan{" +
         "x=" + x +
         ", y=" + y +
         ", rotation=" + rotation +
-        ", recipe=" + block +
+        ", block=" + block +
         ", breaking=" + breaking +
         ", progress=" + progress +
         ", initialized=" + initialized +
+        ", config=" + config +
         '}';
     }
 }

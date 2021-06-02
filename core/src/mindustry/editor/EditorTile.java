@@ -1,7 +1,6 @@
 package mindustry.editor;
 
 import arc.func.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.editor.DrawOperation.*;
 import mindustry.game.*;
@@ -27,7 +26,7 @@ public class EditorTile extends Tile{
 
         if(type instanceof OverlayFloor){
             //don't place on liquids
-            if(!floor.isLiquid){
+            if(floor.hasSurface() || !type.needsSurface){
                 setOverlayID(type.id);
             }
             return;
@@ -51,9 +50,19 @@ public class EditorTile extends Tile{
             return;
         }
 
-        op(OpType.block, block.id);
-        if(rotation != 0) op(OpType.rotation, (byte)rotation);
-        if(team != Team.derelict) op(OpType.team, (byte)team.id);
+        if(!isCenter()){
+            EditorTile cen = (EditorTile)build.tile;
+            cen.op(OpType.rotation, (byte)build.rotation);
+            cen.op(OpType.team, (byte)build.team.id);
+            cen.op(OpType.block, block.id);
+            update();
+        }else{
+            if(build != null) op(OpType.rotation, (byte)build.rotation);
+            if(build != null) op(OpType.team, (byte)build.team.id);
+            op(OpType.block, block.id);
+
+        }
+
         super.setBlock(type, team, rotation);
     }
 
@@ -67,6 +76,8 @@ public class EditorTile extends Tile{
         if(getTeamID() == team.id) return;
         op(OpType.team, (byte)getTeamID());
         super.setTeam(team);
+
+        getLinkedTiles(t -> editor.renderer.updatePoint(t.x, t.y));
     }
 
     @Override
@@ -76,7 +87,7 @@ public class EditorTile extends Tile{
             return;
         }
 
-        if(floor.isLiquid) return;
+        if(!floor.hasSurface() && overlay.asFloor().needsSurface) return;
         if(overlay() == overlay) return;
         op(OpType.overlay, this.overlay.id);
         super.setOverlay(overlay);
@@ -97,11 +108,18 @@ public class EditorTile extends Tile{
             super.recache();
         }
     }
-    
+
     @Override
-    protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
+    protected void changed(){
+        if(state.isGame()){
+            super.changed();
+        }
+    }
+
+    @Override
+    protected void changeBuild(Team team, Prov<Building> entityprov, int rotation){
         if(skip()){
-            super.changeEntity(team, entityprov, rotation);
+            super.changeBuild(team, entityprov, rotation);
             return;
         }
 
@@ -122,14 +140,14 @@ public class EditorTile extends Tile{
     }
 
     private void update(){
-        ui.editor.editor.renderer.updatePoint(x, y);
+        editor.renderer.updatePoint(x, y);
     }
 
     private boolean skip(){
-        return state.isGame() || ui.editor.editor.isLoading();
+        return state.isGame() || editor.isLoading();
     }
 
     private void op(OpType type, short value){
-        ui.editor.editor.addTileOp(TileOp.get(x, y, (byte)type.ordinal(), value));
+        editor.addTileOp(TileOp.get(x, y, (byte)type.ordinal(), value));
     }
 }

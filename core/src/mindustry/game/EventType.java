@@ -1,11 +1,12 @@
 package mindustry.game;
 
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.net.*;
+import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -17,14 +18,13 @@ public class EventType{
         phaseDeflectHit,
         impactPower,
         thoriumReactorOverheat,
-        itemLaunch,
         fireExtinguish,
+        acceleratorUse,
         newGame,
         tutorialComplete,
         flameAmmo,
         turretCool,
         enablePixelation,
-        drown,
         exclusionDeath,
         suicideBomb,
         openWiki,
@@ -35,7 +35,13 @@ public class EventType{
         preDraw,
         postDraw,
         uiDrawBegin,
-        uiDrawEnd
+        uiDrawEnd,
+        //before/after bloom used, skybox or planets drawn
+        universeDrawBegin,
+        //skybox drawn and bloom is enabled - use Vars.renderer.planets
+        universeDraw,
+        //planets drawn and bloom disabled
+        universeDrawEnd
     }
 
     public static class WinEvent{}
@@ -59,8 +65,12 @@ public class EventType{
     public static class CoreItemDeliverEvent{}
     /** Called when the player opens info for a specific block.*/
     public static class BlockInfoEvent{}
+    /** Called *after* all content has been initialized. */
+    public static class ContentInitEvent{}
     /** Called when the client game is first loaded. */
     public static class ClientLoadEvent{}
+    /** Called *after* all the modded files have been added into Vars.tree */
+    public static class FileTreeInitEvent{}
     /** Called when a game begins and the world is loaded. */
     public static class WorldLoadEvent{}
 
@@ -73,11 +83,36 @@ public class EventType{
         }
     }
 
+    /** Called when a sector is destroyed by waves when you're not there. */
+    public static class SectorInvasionEvent{
+        public final Sector sector;
+
+        public SectorInvasionEvent(Sector sector){
+            this.sector = sector;
+        }
+    }
+
     public static class LaunchItemEvent{
         public final ItemStack stack;
 
         public LaunchItemEvent(ItemStack stack){
             this.stack = stack;
+        }
+    }
+
+    public static class SectorLaunchEvent{
+        public final Sector sector;
+
+        public SectorLaunchEvent(Sector sector){
+            this.sector = sector;
+        }
+    }
+
+    public static class SchematicCreateEvent{
+        public final Schematic schematic;
+
+        public SchematicCreateEvent(Schematic schematic){
+            this.schematic = schematic;
         }
     }
 
@@ -172,6 +207,34 @@ public class EventType{
         }
     }
 
+    public static class PickupEvent{
+        public final Unit carrier;
+        public final @Nullable Unit unit;
+        public final @Nullable Building build;
+
+        public PickupEvent(Unit carrier, Unit unit){
+            this.carrier = carrier;
+            this.unit = unit;
+            this.build = null;
+        }
+
+        public PickupEvent(Unit carrier, Building build){
+            this.carrier = carrier;
+            this.build = build;
+            this.unit = null;
+        }
+    }
+
+    public static class UnitControlEvent{
+        public final Player player;
+        public final @Nullable Unit unit;
+
+        public UnitControlEvent(Player player, @Nullable Unit unit){
+            this.player = player;
+            this.unit = unit;
+        }
+    }
+
     public static class GameOverEvent{
         public final Team winner;
 
@@ -180,11 +243,31 @@ public class EventType{
         }
     }
 
-    public static class TileChangeEvent{
-        public final Tile tile;
+    /**
+     * Called *before* a tile has changed.
+     * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
+     * Do not modify any tiles inside listeners that use this tile.
+     * */
+    public static class TilePreChangeEvent{
+        public Tile tile;
 
-        public TileChangeEvent(Tile tile){
+        public TilePreChangeEvent set(Tile tile){
             this.tile = tile;
+            return this;
+        }
+    }
+
+    /**
+     * Called *after* a tile has changed.
+     * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
+     * Do not modify any tiles inside listeners that use this tile.
+     * */
+    public static class TileChangeEvent{
+        public Tile tile;
+
+        public TileChangeEvent set(Tile tile){
+            this.tile = tile;
+            return this;
         }
     }
 
@@ -214,17 +297,19 @@ public class EventType{
     }
 
     /**
-     * Called when block building begins by placing down the BuildBlock.
-     * The tile's block will nearly always be a BuildBlock.
+     * Called when block building begins by placing down the ConstructBlock.
+     * The tile's block will nearly always be a ConstructBlock.
      */
     public static class BlockBuildBeginEvent{
         public final Tile tile;
         public final Team team;
+        public final @Nullable Unit unit;
         public final boolean breaking;
 
-        public BlockBuildBeginEvent(Tile tile, Team team, boolean breaking){
+        public BlockBuildBeginEvent(Tile tile, Team team, Unit unit, boolean breaking){
             this.tile = tile;
             this.team = team;
+            this.unit = unit;
             this.breaking = breaking;
         }
     }
@@ -247,15 +332,15 @@ public class EventType{
 
     /**
      * Called when a player or drone begins building something.
-     * This does not necessarily happen when a new BuildBlock is created.
+     * This does not necessarily happen when a new ConstructBlock is created.
      */
     public static class BuildSelectEvent{
         public final Tile tile;
         public final Team team;
-        public final Builderc builder;
+        public final Unit builder;
         public final boolean breaking;
 
-        public BuildSelectEvent(Tile tile, Team team, Builderc builder, boolean breaking){
+        public BuildSelectEvent(Tile tile, Team team, Unit builder, boolean breaking){
             this.tile = tile;
             this.team = team;
             this.builder = builder;
@@ -289,10 +374,22 @@ public class EventType{
         }
     }
 
+    /** Called when a unit is created in a reconstructor or factory. */
     public static class UnitCreateEvent{
         public final Unit unit;
+        public final Building spawner;
 
-        public UnitCreateEvent(Unit unit){
+        public UnitCreateEvent(Unit unit, Building spawner){
+            this.unit = unit;
+            this.spawner = spawner;
+        }
+    }
+
+    /** Called when a unit is dumped from any payload block. */
+    public static class UnitUnloadEvent{
+        public final Unit unit;
+
+        public UnitUnloadEvent(Unit unit){
             this.unit = unit;
         }
     }
@@ -304,6 +401,26 @@ public class EventType{
         public UnitChangeEvent(Player player, Unit unit){
             this.player = player;
             this.unit = unit;
+        }
+    }
+
+    /** Called when a connection is established to a client. */
+    public static class ConnectionEvent{
+        public final NetConnection connection;
+
+        public ConnectionEvent(NetConnection connection){
+            this.connection = connection;
+        }
+    }
+
+    /** Called when a player sends a connection packet. */
+    public static class ConnectPacketEvent{
+        public final NetConnection connection;
+        public final ConnectPacket packet;
+
+        public ConnectPacketEvent(NetConnection connection, ConnectPacket packet){
+            this.connection = connection;
+            this.packet = packet;
         }
     }
 
@@ -334,18 +451,24 @@ public class EventType{
     }
     
     public static class PlayerBanEvent{
+        @Nullable
         public final Player player;
+        public final String uuid;
 
-        public PlayerBanEvent(Player player){
+        public PlayerBanEvent(Player player, String uuid){
             this.player = player;
+            this.uuid = uuid;
         }
     }
     
     public static class PlayerUnbanEvent{
+        @Nullable
         public final Player player;
+        public final String uuid;
 
-        public PlayerUnbanEvent(Player player){
+        public PlayerUnbanEvent(Player player, String uuid){
             this.player = player;
+            this.uuid = uuid;
         }
     }
     

@@ -12,13 +12,15 @@ public class MemoryBlock extends Block{
         super(name);
         destructible = true;
         solid = true;
+        group = BlockGroup.logic;
+        drawDisabled = false;
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.memoryCapacity, memoryCapacity, StatUnit.none);
+        stats.add(Stat.memoryCapacity, memoryCapacity, StatUnit.none);
     }
 
     public class MemoryBuild extends Building{

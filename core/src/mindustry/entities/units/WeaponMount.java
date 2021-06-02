@@ -1,6 +1,7 @@
 package mindustry.entities.units;
 
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
+import mindustry.audio.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
@@ -25,6 +26,12 @@ public class WeaponMount{
     public boolean side;
     /** current bullet for continuous weapons */
     public @Nullable Bullet bullet;
+    /** sound loop for continuous weapons */
+    public @Nullable SoundLoop sound;
+    /** current target; used for autonomous weapons and AI */
+    public @Nullable Teamc target;
+    /** retarget counter */
+    public float retarget = 0f;
 
     public WeaponMount(Weapon weapon){
         this.weapon = weapon;

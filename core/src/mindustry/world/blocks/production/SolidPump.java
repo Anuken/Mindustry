@@ -3,7 +3,6 @@ package mindustry.world.blocks.production;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -36,6 +35,8 @@ public class SolidPump extends Pump{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        drawPotentialLinks(x, y);
+
         if(attribute != null){
             drawPlaceText(Core.bundle.formatFloat("bar.efficiency", Math.max(sumAttribute(attribute, x, y) / size / size + baseEfficiency, 0f) * 100 * percentSolid(x, y), 1), x, y, valid);
         }
@@ -54,10 +55,10 @@ public class SolidPump extends Pump{
     public void setStats(){
         super.setStats();
 
-        stats.remove(BlockStat.output);
-        stats.add(BlockStat.output, result, 60f * pumpAmount, true);
+        stats.remove(Stat.output);
+        stats.add(Stat.output, result, 60f * pumpAmount, true);
         if(attribute != null){
-            stats.add(baseEfficiency > 0.0001f ? BlockStat.affinities : BlockStat.tiles, attribute);
+            stats.add(baseEfficiency > 0.0001f ? Stat.affinities : Stat.tiles, attribute, floating, 1f, baseEfficiency <= 0.001f);
         }
     }
 

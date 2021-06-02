@@ -1,7 +1,7 @@
 package mindustry.ui.layout;
 
-import arc.struct.*;
 import arc.math.geom.*;
+import arc.struct.*;
 
 /**
  * Algorithm taken from <a href="https://github.com/abego/treelayout">TreeLayout</a>.

@@ -1,13 +1,11 @@
 package mindustry.maps.filters;
 
 import arc.util.*;
-import mindustry.content.Blocks;
-import mindustry.maps.filters.FilterOption.BlockOption;
-import mindustry.maps.filters.FilterOption.SliderOption;
-import mindustry.world.Block;
+import mindustry.content.*;
+import mindustry.gen.*;
+import mindustry.world.*;
 
-import static mindustry.maps.filters.FilterOption.floorsOnly;
-import static mindustry.maps.filters.FilterOption.wallsOnly;
+import static mindustry.maps.filters.FilterOption.*;
 
 public class RiverNoiseFilter extends GenerateFilter{
     float scl = 40, threshold = 0f, threshold2 = 0.1f;
@@ -23,6 +21,11 @@ public class RiverNoiseFilter extends GenerateFilter{
         new BlockOption("floor", () -> floor, b -> floor = b, floorsOnly),
         new BlockOption("floor2", () -> floor2, b -> floor2 = b, floorsOnly)
         );
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockWater;
     }
 
     @Override

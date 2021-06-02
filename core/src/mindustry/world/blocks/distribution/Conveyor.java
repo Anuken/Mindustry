@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -13,6 +12,7 @@ import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -33,7 +33,7 @@ public class Conveyor extends Block implements Autotiler{
     public float speed = 0f;
     public float displayedSpeed = 0f;
 
-    protected Conveyor(String name){
+    public Conveyor(String name){
         super(name);
         rotate = true;
         update = true;
@@ -42,8 +42,8 @@ public class Conveyor extends Block implements Autotiler{
         itemCapacity = 4;
         conveyorPlacement = true;
 
-        idleSound = Sounds.conveyor;
-        idleSoundVolume = 0.004f;
+        ambientSound = Sounds.conveyor;
+        ambientSoundVolume = 0.0022f;
         unloadable = false;
         noUpdateDisabled = false;
     }
@@ -53,7 +53,7 @@ public class Conveyor extends Block implements Autotiler{
         super.setStats();
         
         //have to add a custom calculated speed, since the actual movement speed is apparently not linear
-        stats.add(BlockStat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
+        stats.add(Stat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
     }
 
     @Override
@@ -68,8 +68,19 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return (otherblock.outputsItems() || lookingAt(tile, rotation, otherx, othery, otherblock))
+        return (otherblock.outputsItems() || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
             && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
+    }
+
+    //stack conveyors should be bridged over, not replaced
+    @Override
+    public boolean canReplace(Block other){
+        return super.canReplace(other) && !(other instanceof StackConveyor);
+    }
+
+    @Override
+    public void handlePlacementLine(Seq<BuildPlan> plans){
+        Placement.calculateBridges(plans, (ItemBridge)Blocks.itemBridge);
     }
 
     @Override
@@ -84,7 +95,7 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
-        Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof Conveyor || req.block instanceof Junction));
+        Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof Conveyor || req.block instanceof Junction));
         return cont.get(Geometry.d4(req.rotation)) &&
             cont.get(Geometry.d4(req.rotation - 2)) &&
             req.tile() != null &&
@@ -92,11 +103,10 @@ public class Conveyor extends Block implements Autotiler{
             Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? Blocks.junction : this;
     }
 
-    public class ConveyorBuild extends Building{
+    public class ConveyorBuild extends Building implements ChainedBuilding{
         //parallel array data
         public Item[] ids = new Item[capacity];
-        public float[] xs = new float[capacity];
-        public float[] ys = new float[capacity];
+        public float[] xs = new float[capacity], ys = new float[capacity];
         //amount of items, always < capacity
         public int len = 0;
         //next entity
@@ -115,7 +125,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void draw(){
-            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * timeScale())) % 4) : 0;
+            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time * speed * 8f * timeScale)) % 4) : 0;
 
             //draw extra conveyors facing this one for non-square tiling purposes
             Draw.z(Layer.blockUnder);
@@ -128,22 +138,28 @@ public class Conveyor extends Block implements Autotiler{
                 }
             }
 
-            Draw.z(Layer.block);
+            Draw.z(Layer.block - 0.2f);
 
             Draw.rect(regions[blendbits][frame], x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
 
-            Draw.z(Layer.blockOver);
+            Draw.z(Layer.block - 0.1f);
 
             for(int i = 0; i < len; i++){
                 Item item = ids[i];
                 tr1.trns(rotation * 90, tilesize, 0);
                 tr2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
 
-                Draw.rect(item.icon(Cicon.medium),
+                Draw.rect(item.fullIcon,
                     (tile.x * tilesize + tr1.x * ys[i] + tr2.x),
                     (tile.y * tilesize + tr1.y * ys[i] + tr2.y),
                     itemSize, itemSize);
             }
+        }
+
+        @Override
+        public void drawCracks(){
+            Draw.z(Layer.block - 0.15f);
+            super.drawCracks();
         }
 
         @Override
@@ -157,12 +173,13 @@ public class Conveyor extends Block implements Autotiler{
                 lastInserted = build.lastInserted;
                 mid = build.mid;
                 minitem = build.minitem;
+                items.add(build.items);
             }
         }
 
         @Override
-        public boolean shouldIdleSound(){
-            return clogHeat <= 0.5f ;
+        public boolean shouldAmbientSound(){
+            return clogHeat <= 0.5f;
         }
 
         @Override
@@ -183,7 +200,7 @@ public class Conveyor extends Block implements Autotiler{
         @Override
         public void unitOn(Unit unit){
 
-            if(clogHeat > 0.5f) return;
+            if(clogHeat > 0.5f || !enabled) return;
 
             noSleep();
 
@@ -254,8 +271,8 @@ public class Conveyor extends Block implements Autotiler{
             noSleep();
         }
 
-        public boolean pass(Item item) {
-            if(next != null && next.team == team && next.acceptItem(this, item)){
+        public boolean pass(Item item){
+            if(item != null && next != null && next.team == team && next.acceptItem(this, item)){
                 next.handleItem(this, item);
                 return true;
             }
@@ -311,7 +328,7 @@ public class Conveyor extends Block implements Autotiler{
             if(len >= capacity) return false;
             Tile facing = Edges.getFacingEdge(source.tile, tile);
             int direction = Math.abs(facing.relativeTo(tile.x, tile.y) - rotation);
-            return (((direction == 0) && minitem >= itemSpace) || ((direction % 2 == 1) && minitem > 0.7f)) && !(source.block.rotate && (source.rotation + 2) % 4 == rotation);
+            return (((direction == 0) && minitem >= itemSpace) || ((direction % 2 == 1) && minitem > 0.7f)) && !(source.block.rotate && next == source);
         }
 
         @Override
@@ -390,6 +407,12 @@ public class Conveyor extends Block implements Autotiler{
             }
 
             len--;
+        }
+
+        @Nullable
+        @Override
+        public Building next(){
+            return nextc;
         }
     }
 }

@@ -24,6 +24,7 @@ public class ItemSource extends Block{
         configurable = true;
         saveConfig = true;
         noUpdateDisabled = true;
+        envEnabled = Env.any;
 
         config(Item.class, (ItemSourceBuild tile, Item item) -> tile.outputItem = item);
         configClear((ItemSourceBuild tile) -> tile.outputItem = null);
@@ -37,7 +38,7 @@ public class ItemSource extends Block{
 
     @Override
     public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
-        drawRequestConfigCenter(req, req.config, "center");
+        drawRequestConfigCenter(req, req.config, "center", true);
     }
 
     @Override

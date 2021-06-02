@@ -20,10 +20,9 @@ import static mindustry.Vars.*;
 
 public interface Platform{
 
-    /** Dynamically loads a jar file. */
-    default Class<?> loadJar(Fi jar, String mainClass) throws Exception{
-        URLClassLoader classLoader = new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
-        return classLoader.loadClass(mainClass);
+    /** Dynamically creates a class loader for a jar file. */
+    default ClassLoader loadJar(Fi jar, ClassLoader parent) throws Exception{
+        return new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, parent);
     }
 
     /** Steam: Update lobby visibility.*/
@@ -60,6 +59,15 @@ public interface Platform{
     }
 
     default Context getScriptContext(){
+        ContextFactory.getGlobalSetter().setContextFactoryGlobal(new ContextFactory(){
+            @Override
+            protected Context makeContext(){
+                Context ctx = super.makeContext();
+                ctx.setClassShutter(Scripts::allowClass);
+                return ctx;
+            }
+        });
+
         Context c = Context.enter();
         c.setOptimizationLevel(9);
         return c;
@@ -117,15 +125,20 @@ public interface Platform{
      * @param cons Selection listener
      * @param open Whether to open or save files
      * @param extension File extension to filter
+     * @param title The title of the native dialog
      */
-    default void showFileChooser(boolean open, String extension, Cons<Fi> cons){
-        new FileChooser(open ? "@open" : "@save", file -> file.extEquals(extension), open, file -> {
+    default void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
+        new FileChooser(title, file -> file.extEquals(extension), open, file -> {
             if(!open){
                 cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
             }else{
                 cons.get(file);
             }
         }).show();
+    }
+
+    default void showFileChooser(boolean open, String extension, Cons<Fi> cons){
+        showFileChooser(open, open ? "@open": "@save", extension, cons);
     }
 
     /**

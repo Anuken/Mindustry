@@ -8,25 +8,25 @@ import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-import java.util.*;
-
 import static mindustry.Vars.*;
 
 public class GroundAI extends AIController{
-    //static final float commandCooldown = 60f * 10;
-    //float commandTimer = 60*3;
 
     @Override
     public void updateMovement(){
 
         Building core = unit.closestEnemyCore();
 
-        if(core != null && unit.within(core, unit.range() / 1.1f + core.block.size * tilesize / 2f)){
+        if(core != null && unit.within(core, unit.range() / 1.3f + core.block.size * tilesize / 2f)){
             target = core;
-            Arrays.fill(targets, core);
+            for(var mount : unit.mounts){
+                if(mount.weapon.controllable && mount.weapon.bullet.collidesGround){
+                    mount.target = core;
+                }
+            }
         }
 
-        if((core == null || !unit.within(core, unit.range() * 0.5f)) && command() == UnitCommand.attack){
+        if((core == null || !unit.within(core, unit.type.range * 0.5f)) && command() == UnitCommand.attack){
             boolean move = true;
 
             if(state.rules.waves && unit.team == state.rules.defaultTeam){
@@ -34,54 +34,28 @@ public class GroundAI extends AIController{
                 if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)) move = false;
             }
 
-            if(move) moveTo(Pathfinder.fieldCore);
+            if(move) pathfind(Pathfinder.fieldCore);
         }
 
         if(command() == UnitCommand.rally){
             Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
 
             if(target != null && !unit.within(target, 70f)){
-                moveTo(Pathfinder.fieldRally);
+                pathfind(Pathfinder.fieldRally);
             }
         }
 
-        if(unit.type().canBoost && unit.tileOn() != null && !unit.tileOn().solid()){
-            unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
+        if(unit.type.canBoost && unit.elevation > 0.001f && !unit.onSolid()){
+            unit.elevation = Mathf.approachDelta(unit.elevation, 0f, unit.type.riseSpeed);
         }
 
-        if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type().rotateShooting){
-            if(unit.type().hasWeapons()){
-                unit.lookAt(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));
+        if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type.rotateShooting){
+            if(unit.type.hasWeapons()){
+                unit.lookAt(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
             }
         }else if(unit.moving()){
             unit.lookAt(unit.vel().angle());
         }
 
-        //auto-command works but it's very buggy
-        /*
-        if(unit instanceof Commanderc){
-            Commanderc c = (Commanderc)unit;
-            //try to command when missing members
-            if(c.controlling().size <= unit.type().commandLimit/2){
-                commandTimer -= Time.delta;
-
-                if(commandTimer <= 0){
-                    c.commandNearby(new SquareFormation(), u -> !(u.controller() instanceof FormationAI) && !(u instanceof Commanderc));
-                    commandTimer = commandCooldown;
-                }
-            }
-        }*/
-    }
-
-    protected void moveTo(int pathTarget){
-        int costType = unit.pathType();
-
-        Tile tile = unit.tileOn();
-        if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathTarget));
-
-        if(tile == targetTile || (costType == Pathfinder.costWater && !targetTile.floor().isLiquid)) return;
-
-        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
     }
 }

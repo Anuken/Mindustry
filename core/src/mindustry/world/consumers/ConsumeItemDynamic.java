@@ -43,10 +43,12 @@ public class ConsumeItemDynamic extends Consume{
 
     private void rebuild(Building tile, Table table){
         table.clear();
+        int i = 0;
 
         for(ItemStack stack : items.get(tile)){
-            table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
-            () -> tile.items != null && tile.items.has(stack.item, stack.amount))).padRight(8);
+            table.add(new ReqImage(new ItemImage(stack.item.uiIcon, stack.amount),
+            () -> tile.items != null && tile.items.has(stack.item, stack.amount))).padRight(8).left();
+            if(++i % 4 == 0) table.row();
         }
     }
 
@@ -73,7 +75,7 @@ public class ConsumeItemDynamic extends Consume{
     }
 
     @Override
-    public void display(BlockStats stats){
+    public void display(Stats stats){
         //should be handled by the block
     }
 }

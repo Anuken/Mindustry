@@ -5,6 +5,7 @@ import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.*;
@@ -18,40 +19,52 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
-import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.graphics.MultiPacker.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
+//TODO document
 public class UnitType extends UnlockableContent{
-    public static final float shadowTX = -12, shadowTY = -13, outlineSpace = 0.01f;
+    public static final float shadowTX = -12, shadowTY = -13;
     private static final Vec2 legOffset = new Vec2();
 
     /** If true, the unit is always at elevation 1. */
     public boolean flying;
     public Prov<? extends Unit> constructor;
     public Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
+
+    /** Environmental flags that are *all* required for this unit to function. 0 = any environment */
+    public int envRequired = 0;
+    /** The environment flags that this unit can function in. If the env matches any of these, it will be enabled. */
+    public int envEnabled = Env.terrestrial;
+    /** The environment flags that this unit *cannot* function in. If the env matches any of these, it will be *disabled*. */
+    public int envDisabled = 0;
+
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
-    public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, fallSpeed = 0.018f;
-    public float health = 200f, range = -1, armor = 0f;
+    public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, riseSpeed = 0.08f, fallSpeed = 0.018f;
+    public float health = 200f, range = -1, miningRange = 70f, armor = 0f, maxRange = -1f;
     public float crashDamageMultiplier = 1f;
     public boolean targetAir = true, targetGround = true;
-    public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
+    public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false, circleTarget = false;
     public boolean canBoost = false;
     public boolean destructibleWreck = true;
     public float groundLayer = Layer.groundUnit;
     public float payloadCapacity = 8;
     public float aimDst = -1f;
-    public int commandLimit = 24;
+    public float buildBeamOffset = 3.8f;
+    public int commandLimit = 8;
+    public float commandRadius = 150f;
     public float visualElevation = -1f;
     public boolean allowLegStep = false;
     public boolean hovering = false;
@@ -59,6 +72,11 @@ public class UnitType extends UnlockableContent{
     public Effect fallEffect = Fx.fallSmoke;
     public Effect fallThrusterEffect = Fx.fallSmoke;
     public Seq<Ability> abilities = new Seq<>();
+    public BlockFlag targetFlag = BlockFlag.generator;
+
+    public Color outlineColor = Pal.darkerMetal;
+    public int outlineRadius = 3;
+    public boolean outlines = true;
 
     public int legCount = 4, legGroupSize = 2;
     public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0, legLengthScl = 1f, kinematicScl = 1f, maxStretch = 1.75f;
@@ -78,21 +96,26 @@ public class UnitType extends UnlockableContent{
     public int ammoCapacity = -1;
     public AmmoType ammoType = AmmoTypes.copper;
     public int mineTier = -1;
-    public float buildSpeed = 1f, mineSpeed = 1f;
+    public float buildSpeed = -1f, mineSpeed = 1f;
+    public Sound mineSound = Sounds.minebeam;
+    public float mineSoundVolume = 0.6f;
 
+    /** This is a VERY ROUGH estimate of unit DPS. */
+    public float dpsEstimate = -1;
     public float clipSize = -1;
     public boolean canDrown = true;
     public float engineOffset = 5f, engineSize = 2.5f;
     public float strafePenalty = 0.5f;
     public float hitSize = 6f;
     public float itemOffsetY = 3f;
-    public float lightRadius = 60f, lightOpacity = 0.6f;
+    public float lightRadius = -1f, lightOpacity = 0.6f;
     public Color lightColor = Pal.powerLight;
     public boolean drawCell = true, drawItems = true, drawShields = true;
     public int trailLength = 3;
     public float trailX = 4f, trailY = -3f, trailScl = 1f;
     /** Whether the unit can heal blocks. Initialized in init() */
     public boolean canHeal = false;
+    /** If true, all weapons will attack the same target. */
     public boolean singleTarget = false;
 
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
@@ -100,13 +123,15 @@ public class UnitType extends UnlockableContent{
 
     public Seq<Weapon> weapons = new Seq<>();
     public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion,
-        occlusionRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion;
+        softShadowRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion;
     public TextureRegion[] wreckRegions;
+
+    protected @Nullable ItemStack[] cachedRequirements;
 
     public UnitType(String name){
         super(name);
 
-        constructor = EntityMapping.map(name);
+        constructor = EntityMapping.map(this.name);
     }
 
     public UnitController createController(){
@@ -116,7 +141,7 @@ public class UnitType extends UnlockableContent{
     public Unit create(Team team){
         Unit unit = constructor.get();
         unit.team = team;
-        unit.type(this);
+        unit.setType(this);
         unit.ammo = ammoCapacity; //fill up on ammo upon creation
         unit.elevation = flying ? 1f : 0;
         unit.heal();
@@ -134,6 +159,14 @@ public class UnitType extends UnlockableContent{
         return spawn(state.rules.defaultTeam, x, y);
     }
 
+    public Unit spawn(Team team, Position pos){
+        return spawn(team, pos.getX(), pos.getY());
+    }
+
+    public Unit spawn(Position pos){
+        return spawn(state.rules.defaultTeam, pos);
+    }
+
     public boolean hasWeapons(){
         return weapons.size > 0;
     }
@@ -147,7 +180,7 @@ public class UnitType extends UnlockableContent{
     public void display(Unit unit, Table table){
         table.table(t -> {
             t.left();
-            t.add(new Image(icon(Cicon.medium))).size(8 * 4).scaling(Scaling.fit);
+            t.add(new Image(uiIcon)).size(iconMed).scaling(Scaling.fit);
             t.labelWrap(localizedName).left().width(190f).padLeft(5);
         }).growX().left();
         table.row();
@@ -155,24 +188,52 @@ public class UnitType extends UnlockableContent{
         table.table(bars -> {
             bars.defaults().growX().height(20f).pad(4);
 
-            bars.add(new Bar("blocks.health", Pal.health, unit::healthf).blink(Color.white));
+            bars.add(new Bar("stat.health", Pal.health, unit::healthf).blink(Color.white));
             bars.row();
 
             if(state.rules.unitAmmo){
-                bars.add(new Bar(ammoType.icon + " " + Core.bundle.get("blocks.ammo"), ammoType.barColor, () -> unit.ammo / ammoCapacity));
+                bars.add(new Bar(ammoType.icon + " " + Core.bundle.get("stat.ammo"), ammoType.barColor, () -> unit.ammo / ammoCapacity));
                 bars.row();
             }
+
+            for(Ability ability : unit.abilities){
+                ability.displayBars(unit, bars);
+            }
+
+            if(unit instanceof Payloadc payload){
+                bars.add(new Bar("stat.payloadcapacity", Pal.items, () -> payload.payloadUsed() / unit.type().payloadCapacity));
+                bars.row();
+
+                var count = new float[]{-1};
+                bars.table().update(t -> {
+                    if(count[0] != payload.payloadUsed()){
+                        payload.contentInfo(t, 8 * 2, 270);
+                        count[0] = payload.payloadUsed();
+                    }
+                }).growX().left().height(0f).pad(0f);
+            }
         }).growX();
+
+        if(unit.controller() instanceof LogicAI){
+            table.row();
+            table.add(Blocks.microProcessor.emoji() + " " + Core.bundle.get("units.processorcontrol")).growX().wrap().left();
+            table.row();
+            table.label(() -> Iconc.settings + " " + (long)unit.flag + "").color(Color.lightGray).growX().wrap().left();
+        }
         
         table.row();
+    }
+
+    /** @return whether this block supports a specific environment. */
+    public boolean supportsEnv(int env){
+        return (envEnabled & env) != 0 && (envDisabled & env) == 0 && (envRequired == 0 || (envRequired & env) == envRequired);
     }
 
     @Override
     public void getDependencies(Cons<UnlockableContent> cons){
         //units require reconstructors being researched
         for(Block block : content.blocks()){
-            if(block instanceof Reconstructor){
-                Reconstructor r = (Reconstructor)block;
+            if(block instanceof Reconstructor r){
                 for(UnitType[] recipe : r.upgrades){
                     //result of reconstruction is this, so it must be a dependency
                     if(recipe[1] == this){
@@ -181,12 +242,54 @@ public class UnitType extends UnlockableContent{
                 }
             }
         }
+
+        for(ItemStack stack : researchRequirements()){
+            cons.get(stack.item);
+        }
     }
 
-
     @Override
-    public void displayInfo(Table table){
-        ContentDisplay.displayUnit(table, this);
+    public void setStats(){
+        Unit inst = constructor.get();
+
+        stats.add(Stat.health, health);
+        stats.add(Stat.armor, armor);
+        stats.add(Stat.speed, speed);
+        stats.add(Stat.size, hitSize / tilesize, StatUnit.blocksSquared);
+        stats.add(Stat.itemCapacity, itemCapacity);
+        stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
+        stats.add(Stat.commandLimit, commandLimit);
+
+        if(abilities.any()){
+            var unique = new ObjectSet<String>();
+
+            for(Ability a : abilities){
+                if(unique.add(a.localized())){
+                    stats.add(Stat.abilities, a.localized());
+                }
+            }
+        }
+
+        stats.add(Stat.flying, flying);
+
+        if(!flying){
+            stats.add(Stat.canBoost, canBoost);
+        }
+
+        if(mineTier >= 1){
+            stats.addPercent(Stat.mineSpeed, mineSpeed);
+            stats.add(Stat.mineTier, StatValues.blocks(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= mineTier && !f.playerUnmineable));
+        }
+        if(buildSpeed > 0){
+            stats.addPercent(Stat.buildSpeed, buildSpeed);
+        }
+        if(inst instanceof Payloadc){
+            stats.add(Stat.payloadCapacity, (payloadCapacity / (tilesize * tilesize)), StatUnit.blocksSquared);
+        }
+
+        if(weapons.any()){
+            stats.add(Stat.weapons, StatValues.weapons(this, weapons));
+        }
     }
 
     @CallSuper
@@ -203,18 +306,39 @@ public class UnitType extends UnlockableContent{
             immunities.add(StatusEffects.wet);
         }
 
+        if(lightRadius == -1){
+            lightRadius = Math.max(60f, hitSize * 2.3f);
+        }
+
+        clipSize = Math.max(clipSize, lightRadius * 1.1f);
         singleTarget = weapons.size <= 1;
 
         if(itemCapacity < 0){
-            itemCapacity = Math.max(Mathf.round(hitSize * 7, 20), 20);
+            itemCapacity = Math.max(Mathf.round((int)(hitSize * 4.3), 10), 10);
         }
+
+        //assume slight range margin
+        float margin = 4f;
 
         //set up default range
         if(range < 0){
             range = Float.MAX_VALUE;
             for(Weapon weapon : weapons){
-                range = Math.min(range, weapon.bullet.range() + hitSize /2f);
+                range = Math.min(range, weapon.bullet.range() - margin);
+                maxRange = Math.max(maxRange, weapon.bullet.range() - margin);
             }
+        }
+
+        if(maxRange < 0){
+            maxRange = Math.max(0f, range);
+
+            for(Weapon weapon : weapons){
+                maxRange = Math.max(maxRange, weapon.bullet.range() - margin);
+            }
+        }
+
+        if(weapons.isEmpty()){
+            range = maxRange = miningRange;
         }
 
         if(mechStride < 0){
@@ -230,7 +354,7 @@ public class UnitType extends UnlockableContent{
             mechStepParticles = hitSize > 15f;
         }
 
-        canHeal = weapons.contains(w -> w.bullet instanceof HealBulletType);
+        canHeal = weapons.contains(w -> w.bullet.healPercent > 0f);
 
         //add mirrored weapon variants
         Seq<Weapon> mapped = new Seq<>();
@@ -263,11 +387,24 @@ public class UnitType extends UnlockableContent{
 
             ammoCapacity = Math.max(1, (int)(shotsPerSecond * targetSeconds));
         }
+
+        //calculate estimated DPS for one target based on weapons
+        if(dpsEstimate < 0){
+            dpsEstimate = weapons.sumf(Weapon::dps);
+
+            //suicide enemy
+            if(weapons.contains(w -> w.bullet.killShooter)){
+                //scale down DPS to be insignificant
+                dpsEstimate /= 25f;
+            }
+        }
     }
 
     @CallSuper
     @Override
     public void load(){
+        super.load();
+
         weapons.each(Weapon::load);
         region = Core.atlas.find(name);
         legRegion = Core.atlas.find(name + "-leg");
@@ -277,29 +414,64 @@ public class UnitType extends UnlockableContent{
         legBaseRegion = Core.atlas.find(name + "-leg-base", name + "-leg");
         baseRegion = Core.atlas.find(name + "-base");
         cellRegion = Core.atlas.find(name + "-cell", Core.atlas.find("power-cell"));
-        occlusionRegion = Core.atlas.find("circle-shadow");
+        softShadowRegion = Core.atlas.find("circle-shadow");
         outlineRegion = Core.atlas.find(name + "-outline");
-        shadowRegion = icon(Cicon.full);
+        shadowRegion = fullIcon;
 
         wreckRegions = new TextureRegion[3];
         for(int i = 0; i < wreckRegions.length; i++){
             wreckRegions[i] = Core.atlas.find(name + "-wreck" + i);
         }
+
+        clipSize = Math.max(region.width * 2f, clipSize);
+    }
+
+    private void makeOutline(MultiPacker packer, TextureRegion region){
+        if(region instanceof AtlasRegion at && region.found()){
+            String name = at.name;
+            if(!packer.has(name + "-outline")){
+                PixmapRegion base = Core.atlas.getPixmap(region);
+                var result = Pixmaps.outline(base, outlineColor, outlineRadius);
+                if(Core.settings.getBool("linear")){
+                    Pixmaps.bleed(result);
+                }
+                packer.add(PageType.main, name + "-outline", result);
+            }
+        }
+    }
+
+    @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+
+        //currently does not create outlines for legs or base regions due to older mods having them outlined by default
+        if(outlines){
+            makeOutline(packer, region);
+            for(Weapon weapon : weapons){
+                if(!weapon.name.isEmpty()){
+                    makeOutline(packer, weapon.region);
+                }
+            }
+        }
     }
 
     @Override
     public ItemStack[] researchRequirements(){
+        if(cachedRequirements != null){
+            return cachedRequirements;
+        }
+
         ItemStack[] stacks = null;
 
         //calculate costs based on reconstructors or factories found
-        Block rec = content.blocks().find(b -> b instanceof Reconstructor && Structs.contains(((Reconstructor)b).upgrades, u -> u[1] == this));
+        Block rec = content.blocks().find(b -> b instanceof Reconstructor re && re.upgrades.contains(u -> u[1] == this));
 
-        if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems){
-            stacks = ((ConsumeItems)rec.consumes.get(ConsumeType.item)).items;
+        if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems ci){
+            stacks = ci.items;
         }else{
-            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory && Structs.contains(((UnitFactory)u).plans, p -> p.unit == this));
+            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory uf && uf.plans.contains(p -> p.unit == this));
             if(factory != null){
-                stacks = Structs.find(factory.plans, p -> p.unit == this).requirements;
+                stacks = factory.plans.find(p -> p.unit == this).requirements;
             }
         }
 
@@ -308,6 +480,8 @@ public class UnitType extends UnlockableContent{
             for(int i = 0; i < out.length; i++){
                 out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(Math.pow(stacks[i].amount, 1.1) * 50)));
             }
+
+            cachedRequirements = out;
 
             return out;
         }
@@ -359,14 +533,12 @@ public class UnitType extends UnlockableContent{
             drawPayload((Unit & Payloadc)unit);
         }
 
-        //TODO
-        drawOcclusion(unit);
-
-        Draw.z(z - outlineSpace);
-
-        drawOutline(unit);
+        drawSoftShadow(unit);
 
         Draw.z(z);
+
+        drawOutline(unit);
+        drawWeaponOutlines(unit);
         if(engineSize > 0) drawEngine(unit);
         drawBody(unit);
         if(drawCell) drawCell(unit);
@@ -403,7 +575,10 @@ public class UnitType extends UnlockableContent{
     public void drawShield(Unit unit){
         float alpha = unit.shieldAlpha();
         float radius = unit.hitSize() * 1.3f;
-        Fill.light(unit.x, unit.y, Lines.circleVertices(radius), radius, Tmp.c1.set(Pal.shieldIn), Tmp.c2.set(Pal.shield).lerp(Color.white, Mathf.clamp(unit.hitTime() / 2f)).a(Pal.shield.a * alpha));
+        Fill.light(unit.x, unit.y, Lines.circleVertices(radius), radius,
+            Color.clear,
+            Tmp.c2.set(unit.team.color).lerp(Color.white, Mathf.clamp(unit.hitTime() / 2f)).a(0.7f * alpha)
+        );
     }
 
     public void drawControl(Unit unit){
@@ -422,11 +597,11 @@ public class UnitType extends UnlockableContent{
         Draw.color();
     }
 
-    public void drawOcclusion(Unit unit){
+    public void drawSoftShadow(Unit unit){
         Draw.color(0, 0, 0, 0.4f);
         float rad = 1.6f;
         float size = Math.max(region.width, region.height) * Draw.scl;
-        Draw.rect(occlusionRegion, unit, size * rad, size * rad);
+        Draw.rect(softShadowRegion, unit, size * rad * Draw.xscl, size * rad * Draw.yscl);
         Draw.color();
     }
 
@@ -434,11 +609,11 @@ public class UnitType extends UnlockableContent{
         applyColor(unit);
 
         //draw back items
-        if(unit.hasItem() && unit.itemTime > 0.01f){
-            float size = (itemSize + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime;
+        if(unit.item() != null && unit.itemTime > 0.01f){
+            float size = (itemSize + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime;
 
-            Draw.mixcol(Pal.accent, Mathf.absin(Time.time(), 5f, 0.5f));
-            Draw.rect(unit.item().icon(Cicon.medium),
+            Draw.mixcol(Pal.accent, Mathf.absin(Time.time, 5f, 0.5f));
+            Draw.rect(unit.item().fullIcon,
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
             size, size, unit.rotation);
@@ -449,7 +624,7 @@ public class UnitType extends UnlockableContent{
             Lines.circle(
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
-            (3f + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime);
+            (3f + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime);
 
             if(unit.isLocal() && !renderer.pixelator.enabled()){
                 Fonts.outline.draw(unit.stack.amount + "",
@@ -471,20 +646,20 @@ public class UnitType extends UnlockableContent{
 
         if(unit instanceof Trailc){
             Trail trail = ((Trailc)unit).trail();
-            trail.draw(unit.team.color, (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f) * scale) * trailScl);
+            trail.draw(unit.team.color, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * scale) * trailScl);
         }
 
         Draw.color(unit.team.color);
         Fill.circle(
             unit.x + Angles.trnsx(unit.rotation + 180, offset),
             unit.y + Angles.trnsy(unit.rotation + 180, offset),
-            (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f)) * scale
+            (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) * scale
         );
         Draw.color(Color.white);
         Fill.circle(
             unit.x + Angles.trnsx(unit.rotation + 180, offset - 1f),
             unit.y + Angles.trnsy(unit.rotation + 180, offset - 1f),
-            (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f)) / 2f  * scale
+            (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) / 2f  * scale
         );
         Draw.color();
     }
@@ -493,58 +668,38 @@ public class UnitType extends UnlockableContent{
         applyColor(unit);
 
         for(WeaponMount mount : unit.mounts){
-            Weapon weapon = mount.weapon;
+            mount.weapon.draw(unit, mount);
+        }
 
-            float rotation = unit.rotation - 90;
-            float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);
-            float recoil = -((mount.reload) / weapon.reload * weapon.recoil);
-            float wx = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
-                wy = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil);
+        Draw.reset();
+    }
 
-            if(weapon.occlusion > 0){
-                Drawf.shadow(wx, wy, weapon.occlusion);
-            }
+    public void drawWeaponOutlines(Unit unit){
+        applyColor(unit);
+        applyOutlineColor(unit);
 
-            if(weapon.outlineRegion.found()){
-                float z = Draw.z();
-                if(!weapon.top) Draw.z(z - outlineSpace);
-
-                Draw.rect(weapon.outlineRegion,
-                wx, wy,
-                weapon.outlineRegion.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
-                weapon.region.height * Draw.scl,
-                weaponRotation);
-
-                Draw.z(z);
-            }
-
-            Draw.rect(weapon.region,
-            wx, wy,
-            weapon.region.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
-            weapon.region.height * Draw.scl,
-            weaponRotation);
-
-            if(weapon.heatRegion.found() && mount.heat > 0){
-                Draw.color(weapon.heatColor, mount.heat);
-                Draw.blend(Blending.additive);
-                Draw.rect(weapon.heatRegion,
-                wx, wy,
-                weapon.heatRegion.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
-                weapon.heatRegion.height * Draw.scl,
-                weaponRotation);
-                Draw.blend();
-                Draw.color();
+        for(WeaponMount mount : unit.mounts){
+            if(!mount.weapon.top){
+                mount.weapon.drawOutline(unit, mount);
             }
         }
 
         Draw.reset();
     }
 
+    public void applyOutlineColor(Unit unit){
+        if(unit.isBoss()){
+            Draw.mixcol(unit.team.color, Mathf.absin(7f, 1f));
+        }
+    }
+
     public void drawOutline(Unit unit){
         Draw.reset();
 
         if(Core.atlas.isFound(outlineRegion)){
+            applyOutlineColor(unit);
             Draw.rect(outlineRegion, unit.x, unit.y, unit.rotation - 90);
+            Draw.reset();
         }
     }
 
@@ -565,7 +720,8 @@ public class UnitType extends UnlockableContent{
     }
 
     public Color cellColor(Unit unit){
-        return Tmp.c1.set(Color.black).lerp(unit.team.color, unit.healthf() + Mathf.absin(Time.time(), Math.max(unit.healthf() * 5f, 1f), 1f - unit.healthf()));
+        float f = Mathf.clamp(unit.healthf());
+        return Tmp.c1.set(Color.black).lerp(unit.team.color, f + Mathf.absin(Time.time, Math.max(f * 5f, 1f), 1f - f));
     }
 
     public void drawLight(Unit unit){
@@ -623,7 +779,6 @@ public class UnitType extends UnlockableContent{
             }
         }
 
-        //TODO should be below/above legs
         if(baseRegion.found()){
             Draw.rect(baseRegion, unit.x, unit.y, rotation - 90);
         }
@@ -674,7 +829,9 @@ public class UnitType extends UnlockableContent{
 
     public void applyColor(Unit unit){
         Draw.color();
-        Draw.mixcol(Color.white, unit.hitTime);
+        Tmp.c1.set(Color.white).lerp(Pal.heal, Mathf.clamp(unit.healTime - unit.hitTime));
+        Draw.mixcol(Tmp.c1, Math.max(unit.hitTime, Mathf.clamp(unit.healTime)));
+
         if(unit.drownTime > 0 && unit.floorOn().isDeep()){
             Draw.mixcol(unit.floorOn().mapColor, unit.drownTime * 0.8f);
         }

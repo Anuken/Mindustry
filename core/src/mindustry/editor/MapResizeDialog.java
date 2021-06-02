@@ -6,12 +6,14 @@ import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.ui.dialogs.*;
+import static mindustry.Vars.*;
 
 public class MapResizeDialog extends BaseDialog{
-    private static final int minSize = 50, maxSize = 500, increment = 50;
+    public static int minSize = 50, maxSize = 500, increment = 50;
+
     int width, height;
 
-    public MapResizeDialog(MapEditor editor, Intc2 cons){
+    public MapResizeDialog(Intc2 cons){
         super("@editor.resizemap");
         shown(() -> {
             cont.clear();

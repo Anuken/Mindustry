@@ -5,6 +5,8 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.serialization.*;
+import arc.util.serialization.JsonValue.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -36,7 +38,7 @@ public class ApplicationTests{
         try{
             boolean[] begins = {false};
             Throwable[] exceptionThrown = {null};
-            Log.setUseColors(false);
+            Log.useColors = false;
 
             ApplicationCore core = new ApplicationCore(){
                 @Override
@@ -58,6 +60,7 @@ public class ApplicationTests{
                     add(netServer = new NetServer());
 
                     content.init();
+
                 }
 
                 @Override
@@ -69,7 +72,7 @@ public class ApplicationTests{
                 }
             };
 
-            new HeadlessApplication(core, null, throwable -> exceptionThrown[0] = throwable);
+            new HeadlessApplication(core, throwable -> exceptionThrown[0] = throwable);
 
             while(!begins[0]){
                 if(exceptionThrown[0] != null){
@@ -77,6 +80,10 @@ public class ApplicationTests{
                 }
                 Thread.sleep(10);
             }
+
+
+            Block block = content.getByName(ContentType.block, "build2");
+            assertEquals("build2", block == null ? null : block.name, "2x2 construct block doesn't exist?");
         }catch(Throwable r){
             fail(r);
         }
@@ -87,6 +94,21 @@ public class ApplicationTests{
         Time.setDeltaProvider(() -> 1f);
         logic.reset();
         state.set(State.menu);
+    }
+
+    @Test
+    void serverListJson(){
+        String[] files = {"servers.json", "servers_be.json", "servers_v6.json"};
+
+        for(String file : files){
+            try{
+                String str = Core.files.absolute("./../../" + file).readString();
+                assertEquals(ValueType.array, new JsonReader().parse(str).type());
+                assertTrue(Jval.read(str).isArray());
+            }catch(Exception e){
+                fail("Failed to parse " + file, e);
+            }
+        }
     }
 
     @Test
@@ -145,7 +167,7 @@ public class ApplicationTests{
         tile.build.items.add(Items.coal, 5);
         tile.build.items.add(Items.titanium, 50);
         assertEquals(tile.build.items.total(), 55);
-        tile.build.items.remove(Items.phasefabric, 10);
+        tile.build.items.remove(Items.phaseFabric, 10);
         tile.build.items.remove(Items.titanium, 10);
         assertEquals(tile.build.items.total(), 45);
     }
@@ -235,10 +257,10 @@ public class ApplicationTests{
         world.loadMap(testMap);
         state.set(State.playing);
 
-        world.tile(0, 0).setBlock(Blocks.liquidSource);
+        world.tile(0, 0).setBlock(Blocks.liquidSource, Team.sharded);
         world.tile(0, 0).build.configureAny(Liquids.water);
 
-        world.tile(2, 1).setBlock(Blocks.liquidTank);
+        world.tile(2, 1).setBlock(Blocks.liquidTank, Team.sharded);
 
         updateBlocks(10);
 
@@ -253,19 +275,128 @@ public class ApplicationTests{
 
         Tile source = world.rawTile(0, 0), tank = world.rawTile(1, 4), junction = world.rawTile(0, 1), conduit = world.rawTile(0, 2);
 
-        source.setBlock(Blocks.liquidSource);
+        source.setBlock(Blocks.liquidSource, Team.sharded);
         source.build.configureAny(Liquids.water);
 
-        junction.setBlock(Blocks.liquidJunction);
+        junction.setBlock(Blocks.liquidJunction, Team.sharded);
 
-        conduit.setBlock(Blocks.conduit, Team.derelict, 1);
+        conduit.setBlock(Blocks.conduit, Team.sharded, 1);
 
-        tank.setBlock(Blocks.liquidTank);
+        tank.setBlock(Blocks.liquidTank, Team.sharded);
 
         updateBlocks(10);
 
         assertTrue(tank.build.liquids.currentAmount() >= 1, "Liquid not moved through junction");
         assertTrue(tank.build.liquids.current() == Liquids.water, "Tank has no water");
+    }
+
+    @Test
+    void liquidRouterOutputAll() {
+        world.loadMap(testMap);
+        state.set(State.playing);
+        Tile source = world.rawTile(4,0), router = world.rawTile(4, 2), conduitUp1 = world.rawTile(4,1),
+                conduitLeft = world.rawTile(3,2), conduitUp2 = world.rawTile(4, 3), conduitRight = world.rawTile(5, 2),
+                leftTank = world.rawTile(1, 2), topTank = world.rawTile(4,5), rightTank = world.rawTile(7, 2);
+
+        source.setBlock(Blocks.liquidSource, Team.sharded);
+        source.build.configureAny(Liquids.water);
+        conduitUp1.setBlock(Blocks.conduit, Team.sharded, 1);
+        router.setBlock(Blocks.liquidRouter, Team.sharded);
+        conduitLeft.setBlock(Blocks.conduit, Team.sharded,2);
+        conduitUp2.setBlock(Blocks.conduit, Team.sharded, 1);
+        conduitRight.setBlock(Blocks.conduit, Team.sharded, 0);
+        leftTank.setBlock(Blocks.liquidTank, Team.sharded);
+        topTank.setBlock(Blocks.liquidTank, Team.sharded);
+        rightTank.setBlock(Blocks.liquidTank, Team.sharded);
+
+        updateBlocks(200);
+        assertTrue(rightTank.build.liquids.currentAmount() > 0, "Liquid router did not distribute to rightTank");
+        assertTrue(topTank.build.liquids.currentAmount() > 0, "Liquid router did not distribute to topTank");
+        assertTrue(leftTank.build.liquids.currentAmount() > 0, "Liquid router did not distribute to rightTank");
+    }
+
+    @Test
+    void sorterOutputCorrect() {
+        world.loadMap(testMap);
+        state.set(State.playing);
+        Tile source1 = world.rawTile(4, 0), source2 = world.rawTile(6, 0), s1conveyor = world.rawTile(4, 1),
+                s2conveyor = world.rawTile(6, 1), s1s2conveyor = world.rawTile(5, 1), sorter = world.rawTile(5, 2),
+                leftconveyor = world.rawTile(4, 2), rightconveyor = world.rawTile(6, 2), sortedconveyor = world.rawTile(5, 3),
+                leftVault = world.rawTile(2, 2), rightVault = world.rawTile(8, 2), topVault = world.rawTile(5, 5);
+
+        source1.setBlock(Blocks.itemSource, Team.sharded);
+        source1.build.configureAny(Items.coal);
+        source2.setBlock(Blocks.itemSource, Team.sharded);
+        source2.build.configureAny(Items.copper);
+        s1conveyor.setBlock(Blocks.conveyor, Team.sharded, 0);
+        s2conveyor.setBlock(Blocks.conveyor, Team.sharded, 2);
+        s1s2conveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
+        sorter.setBlock(Blocks.sorter, Team.sharded);
+        sorter.build.configureAny(Items.copper);
+        leftconveyor.setBlock(Blocks.conveyor, Team.sharded, 2);
+        rightconveyor.setBlock(Blocks.conveyor, Team.sharded, 0);
+        sortedconveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
+        leftVault.setBlock(Blocks.vault, Team.sharded);
+        rightVault.setBlock(Blocks.vault, Team.sharded);
+        topVault.setBlock(Blocks.vault, Team.sharded);
+
+        updateBlocks(200);
+        assertEquals(Items.coal, rightVault.build.items.first());
+        assertEquals(Items.copper, topVault.build.items.first());
+        assertEquals(Items.coal, leftVault.build.items.first());
+
+    }
+
+    @Test
+    void routerOutputAll() {
+        world.loadMap(testMap);
+        state.set(State.playing);
+        Tile source1 = world.rawTile(5, 0),  conveyor = world.rawTile(5, 1),
+                router = world.rawTile(5, 2), leftconveyor = world.rawTile(4, 2), rightconveyor = world.rawTile(6, 2),
+                middleconveyor = world.rawTile(5, 3), leftVault = world.rawTile(2, 2),
+                rightVault = world.rawTile(8, 2), topVault = world.rawTile(5, 5);
+
+        source1.setBlock(Blocks.itemSource, Team.sharded);
+        source1.build.configureAny(Items.coal);
+        conveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
+        router.setBlock(Blocks.router, Team.sharded);
+        router.build.configureAny(Items.coal);
+        leftconveyor.setBlock(Blocks.conveyor, Team.sharded, 2);
+        rightconveyor.setBlock(Blocks.conveyor, Team.sharded, 0);
+        middleconveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
+        leftVault.setBlock(Blocks.vault, Team.sharded);
+        rightVault.setBlock(Blocks.vault, Team.sharded);
+        topVault.setBlock(Blocks.vault, Team.sharded);
+
+        updateBlocks(200);
+        assertEquals(Items.coal, rightVault.build.items.first());
+        assertEquals(Items.coal, topVault.build.items.first());
+        assertEquals(Items.coal, leftVault.build.items.first());
+    }
+
+    @Test
+    void junctionOutputCorrect() {
+        world.loadMap(testMap);
+        state.set(State.playing);
+        Tile source1 = world.rawTile(5,0),source2 = world.rawTile(7, 2),  conveyor1 = world.rawTile(5, 1),
+                conveyor2 = world.rawTile(6,2), junction = world.rawTile(5, 2), conveyor3 = world.rawTile(5,3),
+                conveyor4 = world.rawTile(4,2), vault2 = world.rawTile(3, 1), vault1 = world.rawTile(5,5);
+        source1.setBlock(Blocks.itemSource, Team.sharded);
+        source1.build.configureAny(Items.coal);
+        source2.setBlock(Blocks.itemSource, Team.sharded);
+        source2.build.configureAny(Items.copper);
+        conveyor1.setBlock(Blocks.conveyor, Team.sharded, 1);
+        conveyor2.setBlock(Blocks.conveyor, Team.sharded, 2);
+        conveyor3.setBlock(Blocks.conveyor, Team.sharded, 1);
+        conveyor4.setBlock(Blocks.conveyor, Team.sharded, 2);
+        junction.setBlock(Blocks.junction, Team.sharded);
+
+        vault1.setBlock(Blocks.vault, Team.sharded);
+        vault2.setBlock(Blocks.vault, Team.sharded);
+
+        updateBlocks(200);
+        assertEquals(Items.coal, vault1.build.items.first());
+        assertEquals(Items.copper, vault2.build.items.first());
     }
 
     @Test
@@ -364,13 +495,13 @@ public class ApplicationTests{
         world.loadMap(testMap);
         state.set(State.playing);
         int length = 128;
-        world.tile(0, 0).setBlock(Blocks.itemSource);
+        world.tile(0, 0).setBlock(Blocks.itemSource, Team.sharded);
         world.tile(0, 0).build.configureAny(Items.copper);
 
         Seq<Building> entities = Seq.with(world.tile(0, 0).build);
 
         for(int i = 0; i < length; i++){
-            world.tile(i + 1, 0).setBlock(Blocks.conveyor, Team.derelict, 0);
+            world.tile(i + 1, 0).setBlock(Blocks.conveyor, Team.sharded, 0);
             entities.add(world.tile(i + 1, 0).build);
         }
 
@@ -388,7 +519,7 @@ public class ApplicationTests{
                     return true;
                 }
             };
-        }});
+        }}, Team.sharded);
 
         entities.each(Building::updateProximity);
 
@@ -422,6 +553,24 @@ public class ApplicationTests{
 
         assertEquals(250, world.width());
         assertEquals(300, world.height());
+    }
+
+    @Test
+    void load108Save(){
+        resetWorld();
+        SaveIO.load(Core.files.internal("108.msav"));
+
+        assertEquals(256, world.width());
+        assertEquals(256, world.height());
+    }
+
+    @Test
+    void load114Save(){
+        resetWorld();
+        SaveIO.load(Core.files.internal("114.msav"));
+
+        assertEquals(500, world.width());
+        assertEquals(500, world.height());
     }
 
     @Test
@@ -478,8 +627,8 @@ public class ApplicationTests{
     void buildingOverlap(){
         initBuilding();
 
-        Builderc d1 = (Builderc)UnitTypes.poly.create(Team.sharded);
-        Builderc d2 = (Builderc)UnitTypes.poly.create(Team.sharded);
+        Unit d1 = UnitTypes.poly.create(Team.sharded);
+        Unit d2 = UnitTypes.poly.create(Team.sharded);
 
         //infinite build range
         state.rules.editor = true;
@@ -505,8 +654,8 @@ public class ApplicationTests{
     void buildingDestruction(){
         initBuilding();
 
-        Builderc d1 = (Builderc)UnitTypes.poly.create(Team.sharded);
-        Builderc d2 = (Builderc)UnitTypes.poly.create(Team.sharded);
+        Builderc d1 = UnitTypes.poly.create(Team.sharded);
+        Builderc d2 = UnitTypes.poly.create(Team.sharded);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
@@ -545,7 +694,7 @@ public class ApplicationTests{
 
     @Test
     void allBlockTest(){
-        Tiles tiles = world.resize(256*3 + 20, 10);
+        Tiles tiles = world.resize(256 * 3 + 20, 10);
 
         world.beginMapLoad();
         for(int x = 0; x < tiles.width; x++){
@@ -594,8 +743,9 @@ public class ApplicationTests{
     }
 
     void depositTest(Block block, Item item){
-        Unit unit = UnitTypes.mono.create(Team.derelict);
+        Unit unit = UnitTypes.mono.create(Team.sharded);
         Tile tile = new Tile(0, 0, Blocks.air, Blocks.air, block);
+        tile.setTeam(Team.sharded);
         int capacity = tile.block().itemCapacity;
 
         assertNotNull(tile.build, "Tile should have an entity, but does not: " + tile);

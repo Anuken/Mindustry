@@ -1,12 +1,13 @@
 package mindustry.maps.filters;
 
-import arc.struct.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class MedianFilter extends GenerateFilter{
     float radius = 2;
@@ -24,6 +25,11 @@ public class MedianFilter extends GenerateFilter{
     @Override
     public boolean isBuffered(){
         return true;
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockSporePine;
     }
 
     @Override

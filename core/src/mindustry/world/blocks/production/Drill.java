@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -13,9 +14,11 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -36,11 +39,11 @@ public class Drill extends Block{
     public float warmupSpeed = 0.02f;
 
     //return variables for countOre
-    protected Item returnItem;
+    protected @Nullable Item returnItem;
     protected int returnCount;
 
     /** Whether to draw the item this drill is mining. */
-    public boolean drawMineItem = false;
+    public boolean drawMineItem = true;
     /** Effect played when an item is produced. This is colored. */
     public Effect drillEffect = Fx.mine;
     /** Speed the drill bit rotates at. */
@@ -55,6 +58,7 @@ public class Drill extends Block{
     public @Load("@-rim") TextureRegion rimRegion;
     public @Load("@-rotator") TextureRegion rotatorRegion;
     public @Load("@-top") TextureRegion topRegion;
+    public @Load(value = "@-item", fallback = "drill-item-@size") TextureRegion itemRegion;
 
     public Drill(String name){
         super(name);
@@ -64,8 +68,8 @@ public class Drill extends Block{
         hasLiquids = true;
         liquidCapacity = 5f;
         hasItems = true;
-        idleSound = Sounds.drill;
-        idleSoundVolume = 0.003f;
+        ambientSound = Sounds.drill;
+        ambientSoundVolume = 0.018f;
     }
 
     @Override
@@ -74,11 +78,11 @@ public class Drill extends Block{
         Tile tile = req.tile();
         if(tile == null) return;
 
-        countOre(req.tile());
-        if(returnItem == null) return;
+        countOre(tile);
+        if(returnItem == null || !drawMineItem) return;
 
         Draw.color(returnItem.color);
-        Draw.rect("drill-top", req.drawx(), req.drawy());
+        Draw.rect(itemRegion, req.drawx(), req.drawy());
         Draw.color();
     }
 
@@ -87,7 +91,7 @@ public class Drill extends Block{
         super.setBars();
 
         bars.add("drillspeed", (DrillBuild e) ->
-             new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(e.lastDrillSpeed * 60 * e.timeScale(), 2)), () -> Pal.ammo, () -> e.warmup));
+             new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(e.lastDrillSpeed * 60 * e.timeScale, 2)), () -> Pal.ammo, () -> e.warmup));
     }
 
     public Item getDrop(Tile tile){
@@ -110,6 +114,8 @@ public class Drill extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
         Tile tile = world.tile(x, y);
         if(tile == null) return;
 
@@ -117,11 +123,17 @@ public class Drill extends Block{
 
         if(returnItem != null){
             float width = drawPlaceText(Core.bundle.formatFloat("bar.drillspeed", 60f / (drillTime + hardnessDrillMultiplier * returnItem.hardness) * returnCount, 2), x, y, valid);
-            float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5;
+            float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5, s = iconSmall / 4f;
             Draw.mixcol(Color.darkGray, 1f);
-            Draw.rect(returnItem.icon(Cicon.small), dx, dy - 1);
+            Draw.rect(returnItem.fullIcon, dx, dy - 1, s, s);
             Draw.reset();
-            Draw.rect(returnItem.icon(Cicon.small), dx, dy);
+            Draw.rect(returnItem.fullIcon, dx, dy, s, s);
+
+            if(drawMineItem){
+                Draw.color(returnItem.color);
+                Draw.rect(itemRegion, tile.worldx() + offset, tile.worldy() + offset);
+                Draw.color();
+            }
         }else{
             Tile to = tile.getLinkedTilesAs(this, tempTiles).find(t -> t.drop() != null && t.drop().hardness > tier);
             Item item = to == null ? null : to.drop();
@@ -135,29 +147,11 @@ public class Drill extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.drillTier, table -> {
-            Seq<Block> list = content.blocks().select(b -> b.isFloor() && b.asFloor().itemDrop != null && b.asFloor().itemDrop.hardness <= tier);
+        stats.add(Stat.drillTier, StatValues.blocks(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= tier));
 
-            table.table(l -> {
-                l.left();
-
-                for(int i = 0; i < list.size; i++){
-                    Block item = list.get(i);
-
-                    l.image(item.icon(Cicon.small)).size(8 * 3).padRight(2).padLeft(2).padTop(3).padBottom(3);
-                    l.add(item.localizedName).left().padLeft(1).padRight(4);
-                    if(i % 5 == 4){
-                        l.row();
-                    }
-                }
-            });
-
-
-        });
-
-        stats.add(BlockStat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
+        stats.add(Stat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
         if(liquidBoostIntensity != 1){
-            stats.add(BlockStat.boostEffect, liquidBoostIntensity * liquidBoostIntensity, StatUnit.timesSpeed);
+            stats.add(Stat.boostEffect, liquidBoostIntensity * liquidBoostIntensity, StatUnit.timesSpeed);
         }
     }
 
@@ -184,7 +178,7 @@ public class Drill extends Block{
         }
 
         itemArray.sort((item1, item2) -> {
-            int type = Boolean.compare(item1 != Items.sand, item2 != Items.sand);
+            int type = Boolean.compare(!item1.lowPriority, !item2.lowPriority);
             if(type != 0) return type;
             int amounts = Integer.compare(oreCount.get(item1, 0), oreCount.get(item2, 0));
             if(amounts != 0) return amounts;
@@ -207,7 +201,6 @@ public class Drill extends Block{
 
     public class DrillBuild extends Building{
         public float progress;
-        public int index;
         public float warmup;
         public float timeDrilled;
         public float lastDrillSpeed;
@@ -221,23 +214,30 @@ public class Drill extends Block{
         }
 
         @Override
-        public boolean shouldIdleSound(){
-            return efficiency() > 0.01f;
+        public boolean shouldAmbientSound(){
+            return efficiency() > 0.01f && items.total() < itemCapacity;
+        }
+
+        @Override
+        public float ambientVolume(){
+            return efficiency() * (size * size) / 4f;
         }
 
         @Override
         public void drawSelect(){
             if(dominantItem != null){
-                float dx = x - size * tilesize/2f, dy = y + size * tilesize/2f;
+                float dx = x - size * tilesize/2f, dy = y + size * tilesize/2f, s = iconSmall / 4f;
                 Draw.mixcol(Color.darkGray, 1f);
-                Draw.rect(dominantItem.icon(Cicon.small), dx, dy - 1);
+                Draw.rect(dominantItem.fullIcon, dx, dy - 1, s, s);
                 Draw.reset();
-                Draw.rect(dominantItem.icon(Cicon.small), dx, dy);
+                Draw.rect(dominantItem.fullIcon, dx, dy, s, s);
             }
         }
 
         @Override
         public void onProximityUpdate(){
+            super.onProximityUpdate();
+
             countOre(tile);
             dominantItem = returnItem;
             dominantItems = returnCount;
@@ -250,7 +250,7 @@ public class Drill extends Block{
             }
 
             if(timer(timerDump, dumpTime)){
-                dump(dominantItem);
+                dump(items.has(dominantItem) ? dominantItem : null);
             }
 
             timeDrilled += warmup * delta();
@@ -270,7 +270,7 @@ public class Drill extends Block{
                 progress += delta() * dominantItems * speed * warmup;
 
                 if(Mathf.chanceDelta(updateEffectChance * warmup))
-                    updateEffect.at(getX() + Mathf.range(size * 2f), getY() + Mathf.range(size * 2f));
+                    updateEffect.at(x + Mathf.range(size * 2f), y + Mathf.range(size * 2f));
             }else{
                 lastDrillSpeed = 0f;
                 warmup = Mathf.lerpDelta(warmup, 0f, warmupSpeed);
@@ -282,11 +282,16 @@ public class Drill extends Block{
             if(dominantItems > 0 && progress >= delay && items.total() < itemCapacity){
                 offload(dominantItem);
 
-                index ++;
                 progress %= delay;
 
-                drillEffect.at(getX() + Mathf.range(size), getY() + Mathf.range(size), dominantItem.color);
+                drillEffect.at(x + Mathf.range(size), y + Mathf.range(size), dominantItem.color);
             }
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress && dominantItem != null) return Mathf.clamp(progress / (drillTime + hardnessDrillMultiplier * dominantItem.hardness));
+            return super.sense(sensor);
         }
 
         @Override
@@ -302,7 +307,7 @@ public class Drill extends Block{
 
             if(drawRim){
                 Draw.color(heatColor);
-                Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Time.time(), 3f, s)));
+                Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Time.time, 3f, s)));
                 Draw.blend(Blending.additive);
                 Draw.rect(rimRegion, x, y);
                 Draw.blend();
@@ -315,8 +320,29 @@ public class Drill extends Block{
 
             if(dominantItem != null && drawMineItem){
                 Draw.color(dominantItem.color);
-                Draw.rect("drill-top", x, y);
+                Draw.rect(itemRegion, x, y);
                 Draw.color();
+            }
+        }
+
+        @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.f(progress);
+            write.f(warmup);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            if(revision >= 1){
+                progress = read.f();
+                warmup = read.f();
             }
         }
     }

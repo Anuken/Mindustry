@@ -1,6 +1,6 @@
 package mindustry.entities.abilities;
 
-import arc.util.ArcAnnotate.*;
+import arc.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -25,11 +25,15 @@ public class StatusFieldAbility extends Ability{
     }
 
     @Override
+    public String localized(){
+        return Core.bundle.format("ability.statusfield", effect.emoji());
+    }
+
+    @Override
     public void update(Unit unit){
         timer += Time.delta;
 
         if(timer >= reload){
-
             Units.nearby(unit.team, unit.x, unit.y, range, other -> {
                 other.apply(effect, duration);
             });

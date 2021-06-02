@@ -2,13 +2,14 @@ package mindustry.entities.comp;
 
 import arc.func.*;
 import arc.math.*;
-import arc.math.geom.QuadTree.*;
 import arc.math.geom.*;
+import arc.math.geom.QuadTree.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 
 @Component
-abstract class HitboxComp implements Posc, QuadTreeObject{
+abstract class HitboxComp implements Posc, Sized, QuadTreeObject{
     @Import float x, y;
 
     transient float lastX, lastY, deltaX, deltaY, hitSize;
@@ -26,6 +27,11 @@ abstract class HitboxComp implements Posc, QuadTreeObject{
     @Override
     public void afterRead(){
         updateLastPosition();
+    }
+
+    @Override
+    public float hitSize(){
+        return hitSize;
     }
 
     void getCollisions(Cons<QuadTree> consumer){

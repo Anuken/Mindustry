@@ -15,7 +15,7 @@ public class CircleFormation extends FormationPattern{
             float radius = spacing / (float)Math.sin(180f / slots * Mathf.degRad);
             outLocation.set(Angles.trnsx(angle, radius), Angles.trnsy(angle, radius), angle);
         }else{
-            outLocation.set(0, 0, 360f * slotNumber);
+            outLocation.set(0, spacing * 1.1f, 360f * slotNumber);
         }
 
         outLocation.z += angleOffset;

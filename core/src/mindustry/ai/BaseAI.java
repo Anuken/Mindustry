@@ -7,6 +7,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.game.Schematic.*;
 import mindustry.game.Teams.*;
@@ -14,46 +15,130 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
+import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
 
 public class BaseAI{
     private static final Vec2 axis = new Vec2(), rotator = new Vec2();
     private static final float correctPercent = 0.5f;
-    private static final float step = 5;
-    private static final int attempts = 5;
+    private static final int attempts = 4;
     private static final float emptyChance = 0.01f;
-    private static final int timerStep = 0, timerSpawn = 1;
+    private static final int timerStep = 0, timerSpawn = 1, timerRefreshPath = 2;
+    private static final int pathStep = 50;
+    private static final Seq<Tile> tmpTiles = new Seq<>();
 
     private static int correct = 0, incorrect = 0;
 
     private int lastX, lastY, lastW, lastH;
-    private boolean triedWalls;
+    private boolean triedWalls, foundPath;
 
     TeamData data;
     Interval timer = new Interval(4);
+
+    IntSet path = new IntSet();
+    IntSet calcPath = new IntSet();
+    @Nullable Tile calcTile;
+    boolean calculating, startedCalculating;
+    int calcCount = 0;
+    int totalCalcs = 0;
 
     public BaseAI(TeamData data){
         this.data = data;
     }
 
     public void update(){
-        if(timer.get(timerSpawn, 60) && data.hasCore()){
+        if(data.team.rules().aiCoreSpawn && timer.get(timerSpawn, 60 * 2.5f) && data.hasCore()){
             CoreBlock block = (CoreBlock)data.core().block;
+            int coreUnits = Groups.unit.count(u -> u.team == data.team && u.type == block.unitType);
 
-            //create AI core unit
-            if(!Groups.unit.contains(u -> u.team() == data.team && u.type() == block.unitType)){
+            //create AI core unit(s)
+            if(!state.isEditor() && coreUnits < data.cores.size){
                 Unit unit = block.unitType.create(data.team);
-                unit.set(data.core());
+                unit.set(data.cores.random());
                 unit.add();
                 Fx.spawn.at(unit);
             }
         }
 
+        //refresh path
+        if(!calculating && (timer.get(timerRefreshPath, 3f * Time.toMinutes) || !startedCalculating) && data.hasCore()){
+            calculating = true;
+            startedCalculating = true;
+            calcPath.clear();
+        }
+
+        //didn't find tile in time
+        if(calculating && calcCount >= world.width() * world.height()){
+            calculating = false;
+            calcCount = 0;
+            calcPath.clear();
+            totalCalcs ++;
+        }
+
+        //calculate path for units so schematics are not placed on it
+        if(calculating){
+            if(calcTile == null){
+                Vars.spawner.eachGroundSpawn((x, y) -> calcTile = world.tile(x, y));
+                if(calcTile == null){
+                    calculating = false;
+                }
+            }else{
+                var field = pathfinder.getField(state.rules.waveTeam, Pathfinder.costGround, Pathfinder.fieldCore);
+
+                int[][] weights = field.weights;
+                for(int i = 0; i < pathStep; i++){
+                    int minCost = Integer.MAX_VALUE;
+                    int cx = calcTile.x, cy = calcTile.y;
+                    boolean foundAny = false;
+                    for(Point2 p : Geometry.d4){
+                        int nx = cx + p.x, ny = cy + p.y;
+
+                        Tile other = world.tile(nx, ny);
+                        if(other != null && weights[nx][ny] < minCost && weights[nx][ny] != -1){
+                            minCost = weights[nx][ny];
+                            calcTile = other;
+                            foundAny = true;
+                        }
+                    }
+
+                    //didn't find anything, break out of loop, this will trigger a clear later
+                    if(!foundAny){
+                        calcCount = Integer.MAX_VALUE;
+                        break;
+                    }
+
+                    calcPath.add(calcTile.pos());
+                    for(Point2 p : Geometry.d8){
+                        calcPath.add(Point2.pack(p.x + calcTile.x, p.y + calcTile.y));
+                    }
+
+                    //found the end.
+                    if(calcTile.build instanceof CoreBuild b && b.team == state.rules.defaultTeam){
+                        //clean up calculations and flush results
+                        calculating = false;
+                        calcCount = 0;
+                        path.clear();
+                        path.addAll(calcPath);
+                        calcPath.clear();
+                        calcTile = null;
+                        totalCalcs ++;
+                        foundPath = true;
+
+                        break;
+                    }
+
+                    calcCount ++;
+                }
+            }
+        }
+
         //only schedule when there's something to build.
-        if(data.blocks.isEmpty() && timer.get(timerStep, step)){
+        if(foundPath && data.blocks.isEmpty() && timer.get(timerStep, Mathf.lerp(20f, 4f, data.team.rules().aiTier))){
             if(!triedWalls){
                 tryWalls();
                 triedWalls = true;
@@ -68,8 +153,13 @@ public class BaseAI{
                 if(pos == null) return;
 
                 Tmp.v1.rnd(Mathf.random(range));
-                int wx = (int)(world.toTile(pos.getX()) + Tmp.v1.x), wy = (int)(world.toTile(pos.getY()) + Tmp.v1.y);
+                int wx = (int)(World.toTile(pos.getX()) + Tmp.v1.x), wy = (int)(World.toTile(pos.getY()) + Tmp.v1.y);
                 Tile tile = world.tiles.getc(wx, wy);
+
+                //try not to block the spawn point
+                if(spawner.getSpawns().contains(t -> t.within(tile, tilesize * 40f))){
+                    continue;
+                }
 
                 Seq<BasePart> parts = null;
 
@@ -111,26 +201,45 @@ public class BaseAI{
         int cx = x - (int)rotator.x;
         int cy = y - (int)rotator.y;
 
-        //chekc valid placeability
+        //check valid placeability
         for(Stile tile : result.tiles){
             int realX = tile.x + cx, realY = tile.y + cy;
             if(!Build.validPlace(tile.block, data.team, realX, realY, tile.rotation)){
+                return false;
+            }
+            Tile wtile = world.tile(realX, realY);
+
+            if(tile.block instanceof PayloadConveyor || tile.block instanceof PayloadBlock){
+                //near a building
+                for(Point2 point : Edges.getEdges(tile.block.size)){
+                    var t = world.build(tile.x + point.x, tile.y + point.y);
+                    if(t != null){
+                        return false;
+                    }
+                }
+            }
+
+            //may intersect AI path
+            tmpTiles.clear();
+            if(tile.block.solid && wtile != null && wtile.getLinkedTilesAs(tile.block, tmpTiles).contains(t -> path.contains(t.pos()))){
                 return false;
             }
         }
 
         //make sure at least X% of resource requirements are met
         correct = incorrect = 0;
+        boolean anyDrills = false;
 
         if(part.required instanceof Item){
             for(Stile tile : result.tiles){
                 if(tile.block instanceof Drill){
+                    anyDrills = true;
 
                     tile.block.iterateTaken(tile.x + cx, tile.y + cy, (ex, ey) -> {
                         Tile res = world.rawTile(ex, ey);
                         if(res.drop() == part.required){
                             correct ++;
-                        }else{
+                        }else if(res.drop() != null){
                             incorrect ++;
                         }
                     });
@@ -139,7 +248,7 @@ public class BaseAI{
         }
 
         //fail if not enough fit requirements
-        if((float)correct / incorrect < correctPercent){
+        if(anyDrills && (incorrect != 0 || correct == 0)){
             return false;
         }
 
@@ -166,6 +275,7 @@ public class BaseAI{
         if(spawn == null) return;
 
         for(int wx = lastX; wx <= lastX + lastW; wx++){
+            outer:
             for(int wy = lastY; wy <= lastY + lastH; wy++){
                 Tile tile = world.tile(wx, wy);
 
@@ -179,13 +289,17 @@ public class BaseAI{
                     }
 
                     Tile o = world.tile(tile.x + p.x, tile.y + p.y);
+                    if(o != null && (o.block() instanceof PayloadBlock || o.block() instanceof PayloadConveyor)){
+                        continue outer;
+                    }
+
                     if(o != null && o.team() == data.team && !(o.block() instanceof Wall)){
                         any = true;
-                        break;
                     }
                 }
 
-                if(any && Build.validPlace(wall, data.team, tile.x, tile.y, 0)){
+                tmpTiles.clear();
+                if(any && Build.validPlace(wall, data.team, tile.x, tile.y, 0) && !tile.getLinkedTilesAs(wall, tmpTiles).contains(t -> path.contains(t.pos()))){
                     data.blocks.add(new BlockPlan(tile.x, tile.y, (short)0, wall.id, null));
                 }
             }

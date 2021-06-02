@@ -15,8 +15,7 @@ public class Planets implements ContentList{
     public void load(){
         sun = new Planet("sun", null, 0, 2){{
             bloom = true;
-
-            //lightColor = Color.valueOf("f4ee8e");
+            accessible = false;
 
             meshLoader = () -> new SunMesh(
                 this, 4,
@@ -35,7 +34,10 @@ public class Planets implements ContentList{
             generator = new SerpuloPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
             atmosphereColor = Color.valueOf("3c1b8f");
+            atmosphereRadIn = 0.02f;
+            atmosphereRadOut = 0.3f;
             startSector = 15;
+            alwaysUnlocked = true;
         }};
     }
 }

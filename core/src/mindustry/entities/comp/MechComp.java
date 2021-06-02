@@ -39,7 +39,7 @@ abstract class MechComp implements Posc, Flyingc, Hitboxc, Unitc, Mechc, Elevati
 
         float lastExtend = walkExtension;
 
-        if(extendScl < lastExtend && base % 2f > 1f){
+        if(extendScl < lastExtend && base % 2f > 1f && !isFlying()){
             int side = -Mathf.sign(extend);
             float width = hitSize / 2f * side, length = type.mechStride * 1.35f;
 
@@ -78,8 +78,16 @@ abstract class MechComp implements Posc, Flyingc, Hitboxc, Unitc, Mechc, Elevati
 
     @Override
     public void moveAt(Vec2 vector, float acceleration){
+        //mark walking state when moving in a controlled manner
         if(!vector.isZero()){
-            //mark walking state when moving in a controlled manner
+            walked = true;
+        }
+    }
+
+    @Override
+    public void approach(Vec2 vector){
+        //mark walking state when moving in a controlled manner
+        if(!vector.isZero(0.001f)){
             walked = true;
         }
     }

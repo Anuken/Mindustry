@@ -1,9 +1,9 @@
 package mindustry.ui.dialogs;
 
-import arc.Core;
-import arc.scene.ui.layout.Table;
+import arc.*;
+import arc.scene.ui.layout.*;
 import mindustry.gen.*;
-import mindustry.net.Administration.TraceInfo;
+import mindustry.net.Administration.*;
 
 public class TraceDialog extends BaseDialog{
 
@@ -31,6 +31,10 @@ public class TraceDialog extends BaseDialog{
         table.add(Core.bundle.format("trace.modclient", info.modded));
         table.row();
         table.add(Core.bundle.format("trace.mobile", info.mobile));
+        table.row();
+        table.add(Core.bundle.format("trace.times.joined", info.timesJoined));
+        table.row();
+        table.add(Core.bundle.format("trace.times.kicked", info.timesKicked));
         table.row();
 
         table.add().pad(5);

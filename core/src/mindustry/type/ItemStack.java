@@ -1,7 +1,8 @@
 package mindustry.type;
 
-import arc.struct.Seq;
-import mindustry.content.Items;
+import arc.math.*;
+import arc.struct.*;
+import mindustry.content.*;
 
 public class ItemStack implements Comparable<ItemStack>{
     public static final ItemStack[] empty = {};
@@ -35,16 +36,16 @@ public class ItemStack implements Comparable<ItemStack>{
         return other != null && other.item == item && other.amount == amount;
     }
 
-    public static ItemStack[] mult(ItemStack[] stacks, int amount){
-        ItemStack[] copy = new ItemStack[stacks.length];
+    public static ItemStack[] mult(ItemStack[] stacks, float amount){
+        var copy = new ItemStack[stacks.length];
         for(int i = 0; i < copy.length; i++){
-            copy[i] = new ItemStack(stacks[i].item, stacks[i].amount * amount);
+            copy[i] = new ItemStack(stacks[i].item, Mathf.round(stacks[i].amount * amount));
         }
         return copy;
     }
 
     public static ItemStack[] with(Object... items){
-        ItemStack[] stacks = new ItemStack[items.length / 2];
+        var stacks = new ItemStack[items.length / 2];
         for(int i = 0; i < items.length; i += 2){
             stacks[i / 2] = new ItemStack((Item)items[i], ((Number)items[i + 1]).intValue());
         }
@@ -62,6 +63,13 @@ public class ItemStack implements Comparable<ItemStack>{
     @Override
     public int compareTo(ItemStack itemStack){
         return item.compareTo(itemStack.item);
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(this == o) return true;
+        if(!(o instanceof ItemStack stack)) return false;
+        return amount == stack.amount && item == stack.item;
     }
 
     @Override

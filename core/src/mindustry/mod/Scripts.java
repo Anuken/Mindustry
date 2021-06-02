@@ -2,9 +2,11 @@ package mindustry.mod;
 
 import arc.*;
 import arc.assets.*;
+import arc.assets.loaders.MusicLoader.*;
+import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
-import arc.mock.*;
+import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -16,26 +18,30 @@ import rhino.module.provider.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 import java.util.regex.*;
 
 public class Scripts implements Disposable{
-    private final Seq<String> blacklist = Seq.with(".net.", "java.net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
+    private static final Seq<String> blacklist = Seq.with(".net.", "java.net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
         "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
-        ".awt", "socket", "classloader", "oracle", "invoke", "java.util.function", "java.util.stream", "org.");
-    private final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.", "mindustry.logic.", "mindustry.async.", "saveio");
+        ".awt", "socket", "classloader", "oracle", "invoke", "java.util.function", "java.util.stream", "org.", "mod.classmap");
+    private static final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "jdk.proxy", "mindustry.gen.",
+        "mindustry.logic.", "mindustry.async.", "saveio", "systemcursor", "filetreeinitevent", "asyncexecutor");
+
     private final Context context;
     private final Scriptable scope;
     private boolean errored;
+
     LoadedMod currentMod = null;
+
+    public static boolean allowClass(String type){
+        return !blacklist.contains(t -> type.toLowerCase(Locale.ROOT).contains(t)) || whitelist.contains(t -> type.toLowerCase(Locale.ROOT).contains(t));
+    }
 
     public Scripts(){
         Time.mark();
 
         context = Vars.platform.getScriptContext();
-        context.setClassShutter(type -> !blacklist.contains(type.toLowerCase()::contains) || whitelist.contains(type.toLowerCase()::contains));
-        context.getWrapFactory().setJavaPrimitiveWrap(false);
-        context.setLanguageVersion(Context.VERSION_ES6);
-
         scope = new ImporterTopLevel(context);
 
         new RequireBuilder()
@@ -55,16 +61,16 @@ public class Scripts implements Disposable{
     public String runConsole(String text){
         try{
             Object o = context.evaluateString(scope, text, "console.js", 1, null);
-            if(o instanceof NativeJavaObject) o = ((NativeJavaObject)o).unwrap();
+            if(o instanceof NativeJavaObject n) o = n.unwrap();
             if(o instanceof Undefined) o = "undefined";
             return String.valueOf(o);
         }catch(Throwable t){
-            return getError(t);
+            return getError(t, false);
         }
     }
 
-    private String getError(Throwable t){
-        t.printStackTrace();
+    private String getError(Throwable t, boolean log){
+        if(log) Log.err(t);
         return t.getClass().getSimpleName() + (t.getMessage() == null ? "" : ": " + t.getMessage());
     }
 
@@ -78,6 +84,10 @@ public class Scripts implements Disposable{
 
     //region utility mod functions
 
+    public float[] newFloats(int capacity){
+        return new float[capacity];
+    }
+
     public String readString(String path){
         return Vars.tree.get(path, true).readString();
     }
@@ -87,33 +97,67 @@ public class Scripts implements Disposable{
     }
 
     public Sound loadSound(String soundName){
-        if(Vars.headless) return new MockSound();
+        if(Vars.headless) return new Sound();
 
         String name = "sounds/" + soundName;
-        String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
+        String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
 
-        if(Core.assets.contains(path, Sound.class)) return Core.assets.get(path, Sound.class);
-        ModLoadingSound sound = new ModLoadingSound();
-        AssetDescriptor<?> desc = Core.assets.load(path, Sound.class);
-        desc.loaded = result -> sound.sound = (Sound)result;
+        var sound = new Sound();
+        AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundParameter(sound));
         desc.errored = Throwable::printStackTrace;
 
         return sound;
     }
 
     public Music loadMusic(String soundName){
-        if(Vars.headless) return new MockMusic();
+        if(Vars.headless) return new Music();
 
         String name = "music/" + soundName;
-        String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
+        String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
 
-        if(Core.assets.contains(path, Music.class)) return Core.assets.get(path, Music.class);
-        ModLoadingMusic sound = new ModLoadingMusic();
-        AssetDescriptor<?> desc = Core.assets.load(path, Music.class);
-        desc.loaded = result -> sound.music = (Music)result;
+        var music = new Music();
+        AssetDescriptor<?> desc = Core.assets.load(path, Music.class, new MusicParameter(music));
         desc.errored = Throwable::printStackTrace;
 
-        return sound;
+        return music;
+    }
+
+    /** Ask the user to select a file to read for a certain purpose like "Please upload a sprite" */
+    public void readFile(String purpose, String ext, Cons<String> cons){
+        selectFile(true, purpose, ext, fi -> cons.get(fi.readString()));
+    }
+
+    /** readFile but for a byte[] */
+    public void readBinFile(String purpose, String ext, Cons<byte[]> cons){
+        selectFile(true, purpose, ext, fi -> cons.get(fi.readBytes()));
+    }
+
+    /** Ask the user to write a file. */
+    public void writeFile(String purpose, String ext, String contents){
+        if(contents == null) contents = "";
+        final String fContents = contents;
+        selectFile(false, purpose, ext, fi -> fi.writeString(fContents));
+    }
+
+    /** writeFile but for a byte[] */
+    public void writeBinFile(String purpose, String ext, byte[] contents){
+        if(contents == null) contents = new byte[0];
+        final byte[] fContents = contents;
+        selectFile(false, purpose, ext, fi -> fi.writeBytes(fContents));
+    }
+
+    private void selectFile(boolean open, String purpose, String ext, Cons<Fi> cons){
+        purpose = purpose.startsWith("@") ? Core.bundle.get(purpose.substring(1)) : purpose;
+        //add purpose and extension at the top
+        String title = Core.bundle.get(open ? "open" : "save") + " - " + purpose + " (." + ext + ")";
+        Vars.platform.showFileChooser(open, title, ext, fi -> {
+            try{
+                cons.get(fi);
+            }catch(Exception e){
+                Log.err("Failed to select file '@' for a mod", fi);
+                Log.err(e);
+            }
+        });
     }
 
     //endregion
@@ -138,7 +182,7 @@ public class Scripts implements Disposable{
             if(currentMod != null){
                 file = currentMod.name + "/" + file;
             }
-            log(LogLevel.err, file, "" + getError(t));
+            log(LogLevel.err, file, "" + getError(t, true));
             return false;
         }
     }

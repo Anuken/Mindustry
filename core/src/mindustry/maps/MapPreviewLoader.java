@@ -1,19 +1,19 @@
 package mindustry.maps;
 
+import arc.*;
 import arc.assets.*;
 import arc.assets.loaders.*;
-import arc.assets.loaders.resolvers.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ctype.Content;
+import mindustry.ctype.*;
 
 public class MapPreviewLoader extends TextureLoader{
 
     public MapPreviewLoader(){
-        super(new AbsoluteFileHandleResolver());
+        super(Core.files::absolute);
     }
 
     @Override

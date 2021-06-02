@@ -1,12 +1,10 @@
 package mindustry.net;
 
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.net.Administration.*;
-import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 
 import java.io.*;
@@ -19,7 +17,10 @@ public abstract class NetConnection{
     public boolean mobile, modclient;
     public @Nullable Player player;
     public boolean kicked = false;
+    public long syncTime;
 
+    /** When this connection was established. */
+    public long connectTime = Time.millis();
     /** ID of last received client snapshot. */
     public int lastReceivedClientSnapshot = -1;
     /** Timestamp of last received snapshot. */
@@ -38,7 +39,7 @@ public abstract class NetConnection{
     public void kick(KickReason reason){
         if(kicked) return;
 
-        Log.info("Kicking connection @; Reason: @", address, reason.name());
+        Log.info("Kicking connection @ / @; Reason: @", address, uuid, reason.name());
 
         if((reason == KickReason.kick || reason == KickReason.banned || reason == KickReason.vote)){
             PlayerInfo info = netServer.admins.getInfo(uuid);
@@ -48,7 +49,7 @@ public abstract class NetConnection{
 
         Call.kick(this, reason);
 
-        Time.runTask(2f, this::close);
+        close();
 
         netServer.admins.save();
         kicked = true;
@@ -60,16 +61,16 @@ public abstract class NetConnection{
     }
 
     /** Kick with an arbitrary reason, and a kick duration in milliseconds. */
-    public void kick(String reason, int kickDuration){
+    public void kick(String reason, long kickDuration){
         if(kicked) return;
 
-        Log.info("Kicking connection @; Reason: @", address, reason.replace("\n", " "));
+        Log.info("Kicking connection @ / @; Reason: @", address, uuid, reason.replace("\n", " "));
 
         netServer.admins.handleKicked(uuid, address, kickDuration);
 
         Call.kick(this, reason);
 
-        Time.runTask(2f, this::close);
+        close();
 
         netServer.admins.save();
         kicked = true;
@@ -84,8 +85,8 @@ public abstract class NetConnection{
             int cid;
             StreamBegin begin = new StreamBegin();
             begin.total = stream.stream.available();
-            begin.type = Registrator.getID(stream.getClass());
-            send(begin, SendMode.tcp);
+            begin.type = Net.getPacketId(stream);
+            send(begin, true);
             cid = begin.id;
 
             while(stream.stream.available() > 0){
@@ -95,14 +96,14 @@ public abstract class NetConnection{
                 StreamChunk chunk = new StreamChunk();
                 chunk.id = cid;
                 chunk.data = bytes;
-                send(chunk, SendMode.tcp);
+                send(chunk, true);
             }
         }catch(IOException e){
             throw new RuntimeException(e);
         }
     }
 
-    public abstract void send(Object object, SendMode mode);
+    public abstract void send(Object object, boolean reliable);
 
     public abstract void close();
 }

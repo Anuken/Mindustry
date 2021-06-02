@@ -1,7 +1,8 @@
 package mindustry.ai.types;
 
+import arc.math.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.Teams.*;
@@ -12,41 +13,72 @@ import mindustry.world.blocks.ConstructBlock.*;
 import static mindustry.Vars.*;
 
 public class BuilderAI extends AIController{
-    float buildRadius = 1500;
+    public static float buildRadius = 1500, retreatDst = 110f, fleeRange = 370f, retreatDelay = Time.toSeconds * 2f;
+
     boolean found = false;
-    @Nullable Builderc following;
+    @Nullable Unit following;
+    @Nullable Teamc enemy;
+    float retreatTimer;
 
     @Override
-    public void updateUnit(){
-        Builderc builder = (Builderc)unit;
+    public void updateMovement(){
 
-        if(builder.moving()){
-            builder.lookAt(builder.vel().angle());
+        if(target != null && shouldShoot()){
+            unit.lookAt(target);
         }
 
-        builder.updateBuilding(true);
+        unit.updateBuilding = true;
 
         if(following != null){
+            retreatTimer = 0f;
             //try to follow and mimic someone
 
             //validate follower
             if(!following.isValid() || !following.activelyBuilding()){
                 following = null;
-                builder.plans().clear();
+                unit.plans.clear();
                 return;
             }
 
             //set to follower's first build plan, whatever that is
-            builder.plans().clear();
-            builder.plans().addFirst(following.buildPlan());
+            unit.plans.clear();
+            unit.plans.addFirst(following.buildPlan());
+        }else if(unit.buildPlan() == null){
+            //not following anyone or building
+            if(timer.get(timerTarget4, 40)){
+                enemy = target(unit.x, unit.y, fleeRange, true, true);
+            }
+
+            //fly away from enemy when not doing anything, but only after a delay
+            if((retreatTimer += Time.delta) >= retreatDelay){
+                if(enemy != null){
+                    var core = unit.closestCore();
+                    if(core != null && !unit.within(core, retreatDst)){
+                        moveTo(core, retreatDst);
+                    }
+                }
+            }
         }
 
-        if(builder.buildPlan() != null){
+        if(unit.buildPlan() != null){
+            retreatTimer = 0f;
             //approach request if building
-            BuildPlan req = builder.buildPlan();
+            BuildPlan req = unit.buildPlan();
+
+            //clear break plan if another player is breaking something.
+            if(!req.breaking && timer.get(timerTarget2, 40f)){
+                for(Player player : Groups.player){
+                    if(player.isBuilder() && player.unit().activelyBuilding() && player.unit().buildPlan().samePos(req) && player.unit().buildPlan().breaking){
+                        unit.plans.removeFirst();
+                        //remove from list of plans
+                        unit.team.data().blocks.remove(p -> p.x == req.x && p.y == req.y);
+                        return;
+                    }
+                }
+            }
 
             boolean valid =
-                (req.tile().build instanceof ConstructBuild && req.tile().<ConstructBuild>bc().cblock == req.block) ||
+                (req.tile() != null && req.tile().build instanceof ConstructBuild cons && cons.current == req.block) ||
                 (req.breaking ?
                     Build.validBreak(unit.team(), req.x, req.y) :
                     Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation));
@@ -56,7 +88,7 @@ public class BuilderAI extends AIController{
                 moveTo(req.tile(), buildingRange - 20f);
             }else{
                 //discard invalid request
-                builder.plans().removeFirst();
+                unit.plans.removeFirst();
             }
         }else{
 
@@ -67,18 +99,16 @@ public class BuilderAI extends AIController{
                 Units.nearby(unit.team, unit.x, unit.y, buildRadius, u -> {
                     if(found) return;
 
-                    if(u instanceof Builderc && u != unit && ((Builderc)u).activelyBuilding()){
-                        Builderc b = (Builderc)u;
-                        BuildPlan plan = b.buildPlan();
+                    if(u.canBuild() && u != unit && u.activelyBuilding()){
+                        BuildPlan plan = u.buildPlan();
 
                         Building build = world.build(plan.x, plan.y);
-                        if(build instanceof ConstructBuild){
-                            ConstructBuild cons = (ConstructBuild)build;
+                        if(build instanceof ConstructBuild cons){
                             float dist = Math.min(cons.dst(unit) - buildingRange, 0);
 
                             //make sure you can reach the request in time
-                            if(dist / unit.type().speed < cons.buildCost * 0.9f){
-                                following = b;
+                            if(dist / unit.speed() < cons.buildCost * 0.9f){
+                                following = u;
                                 found = true;
                             }
                         }
@@ -86,8 +116,10 @@ public class BuilderAI extends AIController{
                 });
             }
 
+            float rebuildTime = (unit.team.rules().ai ? Mathf.lerp(15f, 2f, unit.team.rules().aiTier) : 2f) * 60f;
+
             //find new request
-            if(!unit.team.data().blocks.isEmpty() && following == null && timer.get(timerTarget3, 60 * 2f)){
+            if(!unit.team.data().blocks.isEmpty() && following == null && timer.get(timerTarget3, rebuildTime)){
                 Queue<BlockPlan> blocks = unit.team.data().blocks;
                 BlockPlan block = blocks.first();
 
@@ -96,14 +128,30 @@ public class BuilderAI extends AIController{
                     blocks.removeFirst();
                 }else if(Build.validPlace(content.block(block.block), unit.team(), block.x, block.y, block.rotation)){ //it's valid.
                     //add build request.
-                    builder.addBuild(new BuildPlan(block.x, block.y, block.rotation, content.block(block.block), block.config));
+                    unit.addBuild(new BuildPlan(block.x, block.y, block.rotation, content.block(block.block), block.config));
+                    //shift build plan to tail so next unit builds something else.
+                    blocks.addLast(blocks.removeFirst());
                 }else{
                     //shift head of queue to tail, try something else next time
                     blocks.removeFirst();
                     blocks.addLast(block);
                 }
             }
-
         }
+    }
+
+    @Override
+    public AIController fallback(){
+        return unit.type.flying ? new FlyingAI() : new GroundAI();
+    }
+
+    @Override
+    public boolean useFallback(){
+        return state.rules.waves && unit.team == state.rules.waveTeam && !unit.team.rules().ai;
+    }
+
+    @Override
+    public boolean shouldShoot(){
+        return !unit.isBuilding();
     }
 }

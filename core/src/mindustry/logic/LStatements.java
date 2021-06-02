@@ -8,11 +8,15 @@ import arc.scene.ui.layout.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+import static mindustry.logic.LCanvas.*;
 import static mindustry.world.blocks.logic.LogicDisplay.*;
 
 public class LStatements{
@@ -28,8 +32,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.control;
+        public Color color(){
+            return Pal.logicControl;
         }
 
         @Override
@@ -46,8 +50,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.operations;
+        public Color color(){
+            return Pal.logicOperations;
         }
 
         @Override
@@ -78,8 +82,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.io;
+        public Color color(){
+            return Pal.logicIo;
         }
 
         @Override
@@ -110,8 +114,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.io;
+        public Color color(){
+            return Pal.logicIo;
         }
 
         @Override
@@ -141,6 +145,12 @@ public class LStatements{
                     type = t;
                     if(type == GraphicsType.color){
                         p2 = "255";
+                    }
+
+                    if(type == GraphicsType.image){
+                        p1 = "@copper";
+                        p2 = "32";
+                        p3 = "0";
                     }
                     rebuild(table);
                 }, 2, cell -> cell.size(100, 50)));
@@ -204,6 +214,15 @@ public class LStatements{
                         fields(s, "x3", p3, v -> p3 = v);
                         fields(s, "y3", p4, v -> p4 = v);
                     }
+                    case image -> {
+                        fields(s, "x", x, v -> x = v);
+                        fields(s, "y", y, v -> y = v);
+                        row(s);
+                        fields(s, "image", p1, v -> p1 = v);
+                        fields(s, "size", p2, v -> p2 = v);
+                        row(s);
+                        fields(s, "rotation", p3, v -> p3 = v);
+                    }
                 }
             }).expand().left();
         }
@@ -217,8 +236,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.io;
+        public Color color(){
+            return Pal.logicIo;
         }
 
         @Override
@@ -242,8 +261,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.io;
+        public Color color(){
+            return Pal.logicIo;
         }
     }
 
@@ -258,8 +277,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -279,8 +298,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -303,8 +322,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -338,7 +357,7 @@ public class LStatements{
                 }, 2, cell -> cell.size(100, 50)));
             }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
-            table.add(" of ");
+            table.add(" of ").self(this::param);
 
             field(table, target, v -> target = v);
 
@@ -347,17 +366,17 @@ public class LStatements{
             //Q: why don't you just use arrays for this?
             //A: arrays aren't as easy to serialize so the code generator doesn't handle them
             int c = 0;
-            for(int i = 0; i < type.parameters.length; i++){
+            for(int i = 0; i < type.params.length; i++){
 
-                fields(table, type.parameters[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : v -> p4 = v);
+                fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : v -> p4 = v);
 
                 if(++c % 2 == 0) row(table);
             }
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -376,17 +395,19 @@ public class LStatements{
         public void build(Table table){
             table.defaults().left();
 
-            table.add(" from ");
+            if(buildFrom()){
+                table.add(" from ").self(this::param);
 
-            fields(table, radar, v -> radar = v);
+                fields(table, radar, v -> radar = v);
 
-            row(table);
+                row(table);
+            }
 
             for(int i = 0; i < 3; i++){
                 int fi = i;
                 Prov<RadarTarget> get = () -> (fi == 0 ? target1 : fi == 1 ? target2 : target3);
 
-                table.add(i == 0 ? " target " : " and ");
+                table.add(i == 0 ? " target " : " and ").self(this::param);
 
                 table.button(b -> {
                     b.label(() -> get.get().name());
@@ -400,13 +421,13 @@ public class LStatements{
                 }
             }
 
-            table.add(" order ");
+            table.add(" order ").self(this::param);
 
             fields(table, sortOrder, v -> sortOrder = v);
 
             table.row();
 
-            table.add(" sort ");
+            table.add(" sort ").self(this::param);
 
             table.button(b -> {
                 b.label(() -> sort.name());
@@ -415,14 +436,18 @@ public class LStatements{
                 }, 2, cell -> cell.size(100, 50)));
             }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
-            table.add(" output ");
+            table.add(" output ").self(this::param);
 
             fields(table, output, v -> output = v);
         }
 
+        public boolean buildFrom(){
+            return true;
+        }
+
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -460,7 +485,7 @@ public class LStatements{
                             int c = 0;
                             for(Item item : Vars.content.items()){
                                 if(!item.unlockedNow()) continue;
-                                i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
+                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
                                     stype("@" + item.name);
                                     hide.run();
                                 }).size(40f);
@@ -474,7 +499,7 @@ public class LStatements{
                             int c = 0;
                             for(Liquid item : Vars.content.liquids()){
                                 if(!item.unlockedNow()) continue;
-                                i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
+                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
                                     stype("@" + item.name);
                                     hide.run();
                                 }).size(40f);
@@ -488,7 +513,7 @@ public class LStatements{
                                 i.button(sensor.name(), Styles.cleart, () -> {
                                     stype("@" + sensor.name());
                                     hide.run();
-                                }).size(240f, 40f).row();
+                                }).size(240f, 40f).self(c -> tooltip(c, sensor)).row();
                             }
                         })
                     };
@@ -505,15 +530,17 @@ public class LStatements{
 
                             stack.clearChildren();
                             stack.addChild(tables[selected]);
-                            t.pack();
-                        }).size(80f, 50f).growX().checked(selected == fi).group(group);
+
+                            t.parent.parent.pack();
+                            t.parent.parent.invalidateHierarchy();
+                        }).height(50f).growX().checked(selected == fi).group(group);
                     }
                     t.row();
                     t.add(stack).colspan(3).width(240f).left();
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
 
-            table.add(" in ");
+            table.add(" in ").self(this::param);
 
             field(table, from, str -> from = str);
         }
@@ -524,8 +551,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -549,8 +576,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.operations;
+        public Color color(){
+            return Pal.logicOperations;
         }
 
         @Override
@@ -577,28 +604,51 @@ public class LStatements{
             table.add(" = ");
 
             if(op.unary){
-                opButton(table);
+                opButton(table, table);
 
                 field(table, a, str -> a = str);
             }else{
                 row(table);
 
-                field(table, a, str -> a = str);
+                //"function"-type operations have the name at the left and arguments on the right
+                if(op.func){
+                    if(LCanvas.useRows()){
+                        table.left();
+                        table.row();
+                        table.table(c -> {
+                            c.color.set(color());
+                            c.left();
+                            funcs(c, table);
+                        }).colspan(2).left();
+                    }else{
+                        funcs(table, table);
+                    }
+                }else{
+                    field(table, a, str -> a = str);
 
-                opButton(table);
+                    opButton(table, table);
 
-                field(table, b, str -> b = str);
+                    field(table, b, str -> b = str);
+                }
             }
         }
 
-        void opButton(Table table){
+        void funcs(Table table, Table parent){
+            opButton(table, parent);
+
+            field(table, a, str -> a = str);
+
+            field(table, b, str -> b = str);
+        }
+
+        void opButton(Table table, Table parent){
             table.button(b -> {
                 b.label(() -> op.symbol);
                 b.clicked(() -> showSelect(b, LogicOp.all, op, o -> {
                     op = o;
-                    rebuild(table);
+                    rebuild(parent);
                 }));
-            }, Styles.logict, () -> {}).size(60f, 40f).pad(4f).color(table.color);
+            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
         }
 
         @Override
@@ -607,8 +657,30 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.operations;
+        public Color color(){
+            return Pal.logicOperations;
+        }
+    }
+
+    //TODO untested
+    //@RegisterStatement("wait")
+    public static class WaitStatement extends LStatement{
+        public String value = "0.5";
+
+        @Override
+        public void build(Table table){
+            field(table, value, str -> value = str);
+            table.add(" sec");
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicOperations;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new WaitI(builder.var(value));
         }
     }
 
@@ -625,8 +697,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.control;
+        public Color color(){
+            return Pal.logicControl;
         }
     }
 
@@ -690,8 +762,241 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.control;
+        public Color color(){
+            return Pal.logicControl;
+        }
+    }
+
+    @RegisterStatement("ubind")
+    public static class UnitBindStatement extends LStatement{
+        public String type = "@poly";
+
+        @Override
+        public void build(Table table){
+            table.add(" type ");
+
+            TextField field = field(table, type, str -> type = str).get();
+
+            table.button(b -> {
+                b.image(Icon.pencilSmall);
+                b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                    t.row();
+                    t.table(i -> {
+                        i.left();
+                        int c = 0;
+                        for(UnitType item : Vars.content.units()){
+                            if(!item.unlockedNow() || item.isHidden()) continue;
+                            i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
+                                type = "@" + item.name;
+                                field.setText(type);
+                                hide.run();
+                            }).size(40f);
+
+                            if(++c % 6 == 0) i.row();
+                        }
+                    }).colspan(3).width(240f).left();
+                }));
+            }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicUnits;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new UnitBindI(builder.var(type));
+        }
+    }
+
+    @RegisterStatement("ucontrol")
+    public static class UnitControlStatement extends LStatement{
+        public LUnitControl type = LUnitControl.move;
+        public String p1 = "0", p2 = "0", p3 = "0", p4 = "0", p5 = "0";
+
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
+            table.left();
+
+            table.add(" ");
+
+            table.button(b -> {
+                b.label(() -> type.name());
+                b.clicked(() -> showSelect(b, LUnitControl.all, type, t -> {
+                    if(t == LUnitControl.build && !Vars.state.rules.logicUnitBuild){
+                        Vars.ui.showInfo("@logic.nounitbuild");
+                    }else{
+                        type = t;
+                    }
+                    rebuild(table);
+                }, 2, cell -> cell.size(120, 50)));
+            }, Styles.logict, () -> {}).size(120, 40).color(table.color).left().padLeft(2);
+
+            row(table);
+
+            //Q: why don't you just use arrays for this?
+            //A: arrays aren't as easy to serialize so the code generator doesn't handle them
+            int c = 0;
+            for(int i = 0; i < type.params.length; i++){
+
+                fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : i == 3 ? p4 : p5, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : i == 3 ? v -> p4 = v : v -> p5 = v).width(100f);
+
+                if(++c % 2 == 0) row(table);
+
+                if(i == 3){
+                    table.row();
+                }
+            }
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicUnits;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new UnitControlI(type, builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4), builder.var(p5));
+        }
+    }
+
+    @RegisterStatement("uradar")
+    public static class UnitRadarStatement extends RadarStatement{
+
+        public UnitRadarStatement(){
+            radar = "0";
+        }
+
+        @Override
+        public boolean buildFrom(){
+            //do not build the "from" section
+            return false;
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicUnits;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new RadarI(target1, target2, target3, sort, LExecutor.varUnit, builder.var(sortOrder), builder.var(output));
+        }
+    }
+
+    @RegisterStatement("ulocate")
+    public static class UnitLocateStatement extends LStatement{
+        public LLocate locate = LLocate.building;
+        public BlockFlag flag = BlockFlag.core;
+        public String enemy = "true", ore = "@copper";
+        public String outX = "outx", outY = "outy", outFound = "found", outBuild = "building";
+
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
+            table.add(" find ").left().self(this::param);
+
+            table.button(b -> {
+                b.label(() -> locate.name());
+                b.clicked(() -> showSelect(b, LLocate.all, locate, t -> {
+                    locate = t;
+                    rebuild(table);
+                }, 2, cell -> cell.size(110, 50)));
+            }, Styles.logict, () -> {}).size(110, 40).color(table.color).left().padLeft(2);
+
+            switch(locate){
+                case building -> {
+                    row(table);
+                    table.add(" group ").left().self(this::param);
+                    table.button(b -> {
+                        b.label(() -> flag.name());
+                        b.clicked(() -> showSelect(b, BlockFlag.allLogic, flag, t -> flag = t, 2, cell -> cell.size(110, 50)));
+                    }, Styles.logict, () -> {}).size(110, 40).color(table.color).left().padLeft(2);
+                    row(table);
+
+                    table.add(" enemy ").left().self(this::param);
+
+                    fields(table, enemy, str -> enemy = str);
+
+                    table.row();
+                }
+
+                case ore -> {
+                    table.add(" ore ").left().self(this::param);
+                    table.table(ts -> {
+                        ts.color.set(table.color);
+
+                        fields(ts, ore, str -> ore = str);
+
+                        ts.button(b -> {
+                            b.image(Icon.pencilSmall);
+                            b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                                t.row();
+                                t.table(i -> {
+                                    i.left();
+                                    int c = 0;
+                                    for(Item item : Vars.content.items()){
+                                        if(!item.unlockedNow()) continue;
+                                        i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
+                                            ore = "@" + item.name;
+                                            rebuild(table);
+                                            hide.run();
+                                        }).size(40f);
+
+                                        if(++c % 6 == 0) i.row();
+                                    }
+                                }).colspan(3).width(240f).left();
+                            }));
+                        }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
+                    });
+
+
+                    table.row();
+                }
+
+                case spawn, damaged -> {
+                    table.row();
+                }
+            }
+
+            table.add(" outX ").left().self(this::param);
+            fields(table, outX, str -> outX = str);
+
+            table.add(" outY ").left().self(this::param);
+            fields(table, outY, str -> outY = str);
+
+            row(table);
+
+            table.add(" found ").left().self(this::param);
+            fields(table, outFound, str -> outFound = str);
+
+            if(locate != LLocate.ore){
+                table.add(" building ").left().self(this::param);
+                fields(table, outBuild, str -> outBuild = str);
+            }
+
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicUnits;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new UnitLocateI(locate, flag, builder.var(enemy), builder.var(ore), builder.var(outX), builder.var(outY), builder.var(outFound), builder.var(outBuild));
         }
     }
 }

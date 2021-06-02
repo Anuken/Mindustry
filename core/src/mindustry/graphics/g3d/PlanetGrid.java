@@ -22,15 +22,16 @@ public class PlanetGrid{
     {5, 3, 10, 1, 4}, {2, 5, 4, 0, 11}, {3, 7, 6, 1, 8}, {7, 2, 9, 0, 6}
     };
 
-    public final int size;
-    public final Ptile[] tiles;
-    public final Corner[] corners;
-    public final Edge[] edges;
+    public int size;
+    public Ptile[] tiles;
+    public Corner[] corners;
+    public Edge[] edges;
 
-    PlanetGrid(int size){
+    //this is protected so if you want to make strange grids you should know what you're doing.
+    protected PlanetGrid(int size){
         this.size = size;
 
-        tiles = new Ptile[Buildingount(size)];
+        tiles = new Ptile[tileCount(size)];
         for(int i = 0; i < tiles.length; i++){
             tiles[i] = new Ptile(i, i < 12 ? 5 : 6);
         }
@@ -67,7 +68,7 @@ public class PlanetGrid{
         return result;
     }
 
-    static PlanetGrid initialGrid(){
+    public static PlanetGrid initialGrid(){
         PlanetGrid grid = new PlanetGrid(0);
 
         for(Ptile t : grid.tiles){
@@ -111,7 +112,7 @@ public class PlanetGrid{
         return grid;
     }
 
-    static PlanetGrid subdividedGrid(PlanetGrid prev){
+    public static PlanetGrid subdividedGrid(PlanetGrid prev){
         PlanetGrid grid = new PlanetGrid(prev.size + 1);
 
         int prevTiles = prev.tiles.length;
@@ -187,27 +188,27 @@ public class PlanetGrid{
     }
 
     static int pos(Ptile t, Ptile n){
-        for(int i = 0; i < t.edgeCount; i++)
-            if(t.tiles[i] == n)
-                return i;
+        for(int i = 0; i < t.edgeCount; i++){
+            if(t.tiles[i] == n) return i;
+        }
         return -1;
     }
 
     static int pos(Ptile t, Corner c){
-        for(int i = 0; i < t.edgeCount; i++)
-            if(t.corners[i] == c)
-                return i;
+        for(int i = 0; i < t.edgeCount; i++){
+            if(t.corners[i] == c) return i;
+        }
         return -1;
     }
 
     static int pos(Corner c, Corner n){
-        for(int i = 0; i < 3; i++)
-            if(c.corners[i] == n)
-                return i;
+        for(int i = 0; i < 3; i++){
+            if(c.corners[i] == n) return i;
+        }
         return -1;
     }
 
-    static int Buildingount(int size){
+    static int tileCount(int size){
         return 10 * Mathf.pow(3, size) + 2;
     }
 
@@ -220,12 +221,12 @@ public class PlanetGrid{
     }
 
     public static class Ptile{
-        public final int id;
-        public final int edgeCount;
+        public int id;
+        public int edgeCount;
 
-        public final Ptile[] tiles;
-        public final Corner[] corners;
-        public final Edge[] edges;
+        public Ptile[] tiles;
+        public Corner[] corners;
+        public Edge[] edges;
 
         public Vec3 v = new Vec3();
 
@@ -240,11 +241,11 @@ public class PlanetGrid{
     }
 
     public static class Corner{
-        public final int id;
-        public final Ptile[] tiles = new Ptile[3];
-        public final Corner[] corners = new Corner[3];
-        public final Edge[] edges = new Edge[3];
-        public final Vec3 v = new Vec3();
+        public int id;
+        public Ptile[] tiles = new Ptile[3];
+        public Corner[] corners = new Corner[3];
+        public Edge[] edges = new Edge[3];
+        public Vec3 v = new Vec3();
 
         public Corner(int id){
             this.id = id;
@@ -252,9 +253,9 @@ public class PlanetGrid{
     }
 
     public static class Edge{
-        public final int id;
-        public final Ptile[] tiles = new Ptile[2];
-        public final Corner[] corners = new Corner[2];
+        public int id;
+        public Ptile[] tiles = new Ptile[2];
+        public Corner[] corners = new Corner[2];
 
         public Edge(int id){
             this.id = id;

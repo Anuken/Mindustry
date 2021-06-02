@@ -1,17 +1,17 @@
 package mindustry.world.consumers;
 
+import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.scene.ui.layout.Table;
 import mindustry.gen.*;
-import mindustry.world.meta.BlockStats;
+import mindustry.world.meta.*;
 
 /** An abstract class that defines a type of resource that a block can consume. */
 public abstract class Consume{
     /** If true, this consumer will not influence consumer validity. */
-    protected boolean optional;
+    public boolean optional;
     /** If true, this consumer will be displayed as a boost input. */
-    protected boolean booster;
-    protected boolean update = true;
+    public boolean booster;
+    public boolean update = true;
 
     /**
      * Apply a filter to items accepted.
@@ -69,5 +69,5 @@ public abstract class Consume{
 
     public abstract boolean valid(Building entity);
 
-    public abstract void display(BlockStats stats);
+    public abstract void display(Stats stats);
 }

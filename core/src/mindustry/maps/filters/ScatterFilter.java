@@ -1,13 +1,14 @@
 package mindustry.maps.filters;
 
 import arc.util.*;
-import mindustry.content.Blocks;
-import mindustry.world.Block;
+import mindustry.content.*;
+import mindustry.gen.*;
+import mindustry.world.*;
 
 import static mindustry.maps.filters.FilterOption.*;
 
 public class ScatterFilter extends GenerateFilter{
-    protected float chance = 0.014f;
+    protected float chance = 0.013f;
     protected Block flooronto = Blocks.air, floor = Blocks.air, block = Blocks.air;
 
     @Override
@@ -21,13 +22,18 @@ public class ScatterFilter extends GenerateFilter{
     }
 
     @Override
+    public char icon(){
+        return Iconc.blockBoulder;
+    }
+
+    @Override
     public void apply(){
 
         if(block != Blocks.air && (in.floor == flooronto || flooronto == Blocks.air) && in.block == Blocks.air && chance() <= chance){
             if(!block.isOverlay()){
                 in.block = block;
             }else{
-                in.ore = block;
+                in.overlay = block;
             }
         }
 

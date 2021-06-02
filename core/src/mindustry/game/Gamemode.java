@@ -2,6 +2,7 @@ package mindustry.game;
 
 import arc.*;
 import arc.func.*;
+import arc.util.*;
 import mindustry.maps.*;
 
 import static mindustry.Vars.*;
@@ -22,8 +23,7 @@ public enum Gamemode{
         rules.waves = true;
         rules.waveTimer = true;
 
-        rules.waveSpacing /= 2f;
-        rules.teams.get(rules.waveTeam).ai = true;
+        rules.waveSpacing = 60f * Time.toMinutes;
         rules.teams.get(rules.waveTeam).infiniteResources = true;
     }, map -> map.teams.contains(state.rules.waveTeam.id)),
     pvp(rules -> {
@@ -32,7 +32,6 @@ public enum Gamemode{
         rules.buildCostMultiplier = 1f;
         rules.buildSpeedMultiplier = 1f;
         rules.unitBuildSpeedMultiplier = 2f;
-        rules.unitHealthMultiplier = 3f;
         rules.attackMode = true;
     }, map -> map.teams.size > 1),
     editor(true, rules -> {

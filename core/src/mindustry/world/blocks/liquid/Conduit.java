@@ -13,9 +13,11 @@ import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.distribution.*;
 
 import static mindustry.Vars.*;
 
@@ -27,7 +29,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "conduit-bottom-#") TextureRegion[] botRegions;
 
-    public float leakResistance = 1.5f;
+    public boolean leaks = true;
 
     public Conduit(String name){
         super(name);
@@ -69,11 +71,16 @@ public class Conduit extends LiquidBlock implements Autotiler{
     }
 
     @Override
+    public void handlePlacementLine(Seq<BuildPlan> plans){
+        Placement.calculateBridges(plans, (ItemBridge)Blocks.bridgeConduit);
+    }
+
+    @Override
     public TextureRegion[] icons(){
         return new TextureRegion[]{Core.atlas.find("conduit-bottom"), topRegions[0]};
     }
 
-    public class ConduitBuild extends LiquidBuild{
+    public class ConduitBuild extends LiquidBuild implements ChainedBuilding{
         public float smoothLiquid;
         public int blendbits, xscl, yscl, blending;
 
@@ -120,9 +127,9 @@ public class Conduit extends LiquidBlock implements Autotiler{
         }
 
         @Override
-        public boolean acceptLiquid(Building source, Liquid liquid, float amount){
+        public boolean acceptLiquid(Building source, Liquid liquid){
             noSleep();
-            return liquids.get(liquid) + amount < liquidCapacity && (liquids.current() == liquid || liquids.currentAmount() < 0.2f)
+            return (liquids.current() == liquid || liquids.currentAmount() < 0.2f)
                 && ((source.relativeTo(tile.x, tile.y) + 2) % 4 != rotation);
         }
 
@@ -131,11 +138,21 @@ public class Conduit extends LiquidBlock implements Autotiler{
             smoothLiquid = Mathf.lerpDelta(smoothLiquid, liquids.currentAmount() / liquidCapacity, 0.05f);
 
             if(liquids.total() > 0.001f && timer(timerFlow, 1)){
-                moveLiquidForward(leakResistance, liquids.current());
+                moveLiquidForward(leaks, liquids.current());
                 noSleep();
             }else{
                 sleep();
             }
+        }
+
+        @Nullable
+        @Override
+        public Building next(){
+            Tile next = tile.nearby(rotation);
+            if(next != null && next.build instanceof ConduitBuild){
+                return next.build;
+            }
+            return null;
         }
     }
 }

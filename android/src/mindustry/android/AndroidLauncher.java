@@ -15,9 +15,11 @@ import arc.func.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import dalvik.system.*;
+import io.anuke.mindustry.*;
 import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.io.*;
+import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.ui.dialogs.*;
 
@@ -27,12 +29,14 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-
 public class AndroidLauncher extends AndroidApplication{
     public static final int PERMISSION_REQUEST_CODE = 1;
     boolean doubleScaleTablets = true;
     FileChooser chooser;
     Runnable permCallback;
+
+    Object gpService;
+    Class<?> serviceClass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -45,13 +49,13 @@ public class AndroidLauncher extends AndroidApplication{
             if(handler != null){
                 handler.uncaughtException(thread, error);
             }else{
-                error.printStackTrace();
+                Log.err(error);
                 System.exit(1);
             }
         });
 
         super.onCreate(savedInstanceState);
-        if(doubleScaleTablets && isTablet(this.getContext())){
+        if(doubleScaleTablets && isTablet(this)){
             Scl.setAddition(0.5f);
         }
 
@@ -64,7 +68,9 @@ public class AndroidLauncher extends AndroidApplication{
 
             @Override
             public rhino.Context getScriptContext(){
-                return AndroidRhinoContext.enter(getContext().getCacheDir());
+                rhino.Context result = AndroidRhinoContext.enter(((Context)AndroidLauncher.this).getCacheDir());
+                result.setClassShutter(Scripts::allowClass);
+                return result;
             }
 
             @Override
@@ -72,17 +78,16 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
-            public Class<?> loadJar(Fi jar, String mainClass) throws Exception{
-                DexClassLoader loader = new DexClassLoader(jar.file().getPath(), getFilesDir().getPath(), null, getClassLoader());
-                return Class.forName(mainClass, true, loader);
+            public ClassLoader loadJar(Fi jar, ClassLoader parent) throws Exception{
+                return new DexClassLoader(jar.file().getPath(), getFilesDir().getPath(), null, parent);
             }
 
             @Override
-            public void showFileChooser(boolean open, String extension, Cons<Fi> cons){
-                showFileChooser(open, cons, extension);
+            public void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
+                showFileChooser(open, title, cons, extension);
             }
 
-            void showFileChooser(boolean open, Cons<Fi> cons, String... extensions){
+            void showFileChooser(boolean open, String title, Cons<Fi> cons, String... extensions){
                 String extension = extensions[0];
 
                 if(VERSION.SDK_INT >= VERSION_CODES.Q){
@@ -119,7 +124,7 @@ public class AndroidLauncher extends AndroidApplication{
                     });
                 }else if(VERSION.SDK_INT >= VERSION_CODES.M && !(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                     checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
-                    chooser = new FileChooser(open ? "@open" : "@save", file -> Structs.contains(extensions, file.extension().toLowerCase()), open, file -> {
+                    chooser = new FileChooser(title, file -> Structs.contains(extensions, file.extension().toLowerCase()), open, file -> {
                         if(!open){
                             cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
                         }else{
@@ -137,16 +142,16 @@ public class AndroidLauncher extends AndroidApplication{
                     requestPermissions(perms.toArray(new String[0]), PERMISSION_REQUEST_CODE);
                 }else{
                     if(open){
-                        new FileChooser("@open", file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
+                        new FileChooser(title, file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
                     }else{
-                        super.showFileChooser(open, extension, cons);
+                        super.showFileChooser(open, "@open", extension, cons);
                     }
                 }
             }
 
             @Override
             public void showMultiFileChooser(Cons<Fi> cons, String... extensions){
-                showFileChooser(true, cons, extensions);
+                showFileChooser(true, "@open", cons, extensions);
             }
 
             @Override
@@ -162,33 +167,47 @@ public class AndroidLauncher extends AndroidApplication{
         }, new AndroidApplicationConfiguration(){{
             useImmersiveMode = true;
             hideStatusBar = true;
-            stencil = 8;
         }});
         checkFiles(getIntent());
 
+        try{
+            //new external folder
+            Fi data = Core.files.absolute(((Context)this).getExternalFilesDir(null).getAbsolutePath());
+            Core.settings.setDataDirectory(data);
 
-        //new external folder
-        Fi data = Core.files.absolute(getContext().getExternalFilesDir(null).getAbsolutePath());
-        Core.settings.setDataDirectory(data);
-
-        //move to internal storage if there's no file indicating that it moved
-        if(!Core.files.local("files_moved").exists()){
-            Log.info("Moving files to external storage...");
-
+            //delete unused cache folder to free up space
             try{
-                //current local storage folder
-                Fi src = Core.files.absolute(Core.files.getLocalStoragePath());
-                for(Fi fi : src.list()){
-                    fi.copyTo(data);
+                Fi cache = Core.settings.getDataDirectory().child("cache");
+                if(cache.exists()){
+                    cache.deleteDirectory();
                 }
-                //create marker
-                Core.files.local("files_moved").writeString("files moved to " + data);
-                Core.files.local("files_moved_103").writeString("files moved again");
-                Log.info("Files moved.");
             }catch(Throwable t){
-                Log.err("Failed to move files!");
-                t.printStackTrace();
+                Log.err("Failed to delete cached folder", t);
             }
+
+
+            //move to internal storage if there's no file indicating that it moved
+            if(!Core.files.local("files_moved").exists()){
+                Log.info("Moving files to external storage...");
+
+                try{
+                    //current local storage folder
+                    Fi src = Core.files.absolute(Core.files.getLocalStoragePath());
+                    for(Fi fi : src.list()){
+                        fi.copyTo(data);
+                    }
+                    //create marker
+                    Core.files.local("files_moved").writeString("files moved to " + data);
+                    Core.files.local("files_moved_103").writeString("files moved again");
+                    Log.info("Files moved.");
+                }catch(Throwable t){
+                    Log.err("Failed to move files!");
+                    t.printStackTrace();
+                }
+            }
+        }catch(Exception e){
+            //print log but don't crash
+            Log.err(e);
         }
     }
 
@@ -204,6 +223,24 @@ public class AndroidLauncher extends AndroidApplication{
             if(permCallback != null){
                 Core.app.post(permCallback);
                 permCallback = null;
+            }
+        }
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        //TODO enable once GPGS is set up on the GP console
+        if(false && BuildConfig.FLAVOR.equals("gp")){
+            try{
+                if(gpService == null){
+                    serviceClass = Class.forName("mindustry.android.GPGameService");
+                    gpService = serviceClass.getConstructor().newInstance();
+                }
+                serviceClass.getMethod("onResume", Context.class).invoke(gpService, this);
+            }catch(Exception e){
+                Log.err("Failed to update Google Play Services", e);
             }
         }
     }

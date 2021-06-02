@@ -7,6 +7,8 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class ConsumeLiquid extends ConsumeLiquidBase{
     public final Liquid liquid;
 
@@ -26,7 +28,7 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
 
     @Override
     public void build(Building tile, Table table){
-        table.add(new ReqImage(liquid.icon(Cicon.medium), () -> valid(tile))).size(8 * 4);
+        table.add(new ReqImage(liquid.uiIcon, () -> valid(tile))).size(iconMed).top().left();
     }
 
     @Override
@@ -41,11 +43,11 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
 
     @Override
     public boolean valid(Building entity){
-        return entity != null && entity.liquids != null && entity.liquids.get(liquid) >= use(entity);
+        return entity != null && entity.liquids != null && entity.liquids.get(liquid) >= amount * entity.delta();
     }
 
     @Override
-    public void display(BlockStats stats){
-        stats.add(booster ? BlockStat.booster : BlockStat.input, liquid, amount * timePeriod, timePeriod == 60);
+    public void display(Stats stats){
+        stats.add(booster ? Stat.booster : Stat.input, liquid, amount * 60f, true);
     }
 }

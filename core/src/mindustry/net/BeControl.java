@@ -23,7 +23,7 @@ import static mindustry.Vars.*;
 
 /** Handles control of bleeding edge builds. */
 public class BeControl{
-    private static final int updateInterval = 60 * 1;
+    private static final int updateInterval = 60;
 
     private AsyncExecutor executor = new AsyncExecutor(1);
     private boolean checkUpdates = true;
@@ -45,10 +45,12 @@ public class BeControl{
             }, updateInterval, updateInterval);
         }
 
-        if(System.getProperties().contains("becopy")){
+        if(OS.hasProp("becopy")){
             try{
-                Fi dest = Fi.get(System.getProperty("becopy"));
+                Fi dest = Fi.get(OS.prop("becopy"));
                 Fi self = Fi.get(BeControl.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+                
+                for(Fi file : self.parent().findAll(f -> !f.equals(self))) file.delete();
 
                 self.copyTo(dest);
             }catch(Throwable e){
@@ -99,8 +101,8 @@ public class BeControl{
                     float[] progress = {0};
                     int[] length = {0};
                     Fi file = bebuildDirectory.child("client-be-" + updateBuild + ".jar");
-                    Fi fileDest = System.getProperties().contains("becopy") ?
-                        Fi.get(System.getProperty("becopy")) :
+                    Fi fileDest = OS.hasProp("becopy") ?
+                        Fi.get(OS.prop("becopy")) :
                         Fi.get(BeControl.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
 
                     BaseDialog dialog = new BaseDialog("@be.updating");
