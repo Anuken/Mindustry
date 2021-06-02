@@ -238,7 +238,7 @@ public class DesktopInput extends InputHandler{
         if(!player.dead() && !state.isPaused() && !scene.hasField()){
             updateMovement(player.unit());
 
-            if(Core.input.keyDown(Binding.respawn)){
+            if(Core.input.keyTap(Binding.respawn)){
                 Call.unitClear(player);
                 controlledType = null;
             }
