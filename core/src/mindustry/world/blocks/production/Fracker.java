@@ -18,10 +18,12 @@ public class Fracker extends SolidPump{
         hasItems = true;
         ambientSound = Sounds.drill;
         ambientSoundVolume = 0.03f;
+        envRequired |= Env.groundOil;
     }
 
     @Override
     public void setStats(){
+        stats.timePeriod = itemUseTime;
         super.setStats();
 
         stats.add(Stat.productionTime, itemUseTime / 60f, StatUnit.seconds);

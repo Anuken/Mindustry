@@ -7,6 +7,7 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.game.SectorInfo.*;
+import mindustry.gen.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
@@ -236,6 +237,10 @@ public class Universe{
                                 state.rules.winWave = waveMax;
                                 state.rules.waves = true;
                                 state.rules.attackMode = false;
+                                //update rules in multiplayer
+                                if(net.server()){
+                                    Call.setRules(state.rules);
+                                }
                             }else{
                                 sector.info.winWave = waveMax;
                                 sector.info.waves = true;

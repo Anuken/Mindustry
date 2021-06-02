@@ -1,5 +1,6 @@
 package mindustry.entities.comp;
 
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
@@ -20,7 +21,11 @@ abstract class VelComp implements Posc{
     @MethodPriority(-1)
     @Override
     public void update(){
+        float px = x, py = y;
         move(vel.x * Time.delta, vel.y * Time.delta);
+        if(Mathf.equal(px, x)) vel.x = 0;
+        if(Mathf.equal(py, y)) vel.y = 0;
+
         vel.scl(Math.max(1f - drag * Time.delta, 0));
     }
 
@@ -45,6 +50,10 @@ abstract class VelComp implements Posc{
         return !vel.isZero(0.01f);
     }
 
+    void move(Vec2 v){
+        move(v.x, v.y);
+    }
+
     void move(float cx, float cy){
         SolidPred check = solidity();
 
@@ -53,6 +62,22 @@ abstract class VelComp implements Posc{
         }else{
             x += cx;
             y += cy;
+        }
+    }
+
+    void velAddNet(Vec2 v){
+        vel.add(v);
+        if(isRemote()){
+            x += v.x;
+            y += v.y;
+        }
+    }
+
+    void velAddNet(float vx, float vy){
+        vel.add(vx, vy);
+        if(isRemote()){
+            x += vx;
+            y += vy;
         }
     }
 }

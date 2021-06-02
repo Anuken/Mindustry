@@ -2,6 +2,7 @@ package mindustry.maps.filters;
 
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 import static mindustry.maps.filters.FilterOption.*;
@@ -20,6 +21,11 @@ public class OreFilter extends GenerateFilter{
         new BlockOption("ore", () -> ore, b -> ore = b, oresOnly),
         new BlockOption("target", () -> target, b -> target = b, oresFloorsOptional)
         );
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockOreCopper;
     }
 
     @Override

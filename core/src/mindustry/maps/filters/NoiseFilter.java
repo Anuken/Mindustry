@@ -2,6 +2,7 @@ package mindustry.maps.filters;
 
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 import static mindustry.maps.filters.FilterOption.*;
@@ -21,6 +22,11 @@ public class NoiseFilter extends GenerateFilter{
         new BlockOption("floor", () -> floor, b -> floor = b, floorsOptional),
         new BlockOption("wall", () -> block, b -> block = b, wallsOptional)
         );
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockPebbles;
     }
 
     @Override

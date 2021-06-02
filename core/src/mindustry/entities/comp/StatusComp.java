@@ -19,8 +19,9 @@ abstract class StatusComp implements Posc, Flyingc{
     private Seq<StatusEntry> statuses = new Seq<>();
     private transient Bits applied = new Bits(content.getBy(ContentType.status).size);
 
-    @ReadOnly transient float speedMultiplier = 1, damageMultiplier = 1, healthMultiplier = 1, reloadMultiplier = 1, buildSpeedMultiplier = 1, dragMultiplier = 1;
-    @ReadOnly transient boolean disarmed = false;
+    //these are considered read-only
+    transient float speedMultiplier = 1, damageMultiplier = 1, healthMultiplier = 1, reloadMultiplier = 1, buildSpeedMultiplier = 1, dragMultiplier = 1;
+    transient boolean disarmed = false;
 
     @Import UnitType type;
 
@@ -46,15 +47,8 @@ abstract class StatusComp implements Posc, Flyingc{
                 if(entry.effect == effect){
                     entry.time = Math.max(entry.time, duration);
                     return;
-                }else if(entry.effect.reactsWith(effect)){ //find opposite
-                    StatusEntry.tmp.effect = entry.effect;
-                    entry.effect.getTransition(self(), effect, entry.time, duration, StatusEntry.tmp);
-                    entry.time = StatusEntry.tmp.time;
-
-                    if(StatusEntry.tmp.effect != entry.effect){
-                        entry.effect = StatusEntry.tmp.effect;
-                    }
-
+                }else if(entry.effect.applyTransition(self(), effect, entry, duration)){ //find reaction
+                    //TODO effect may react with multiple other effects
                     //stop looking when one is found
                     return;
                 }
@@ -67,6 +61,11 @@ abstract class StatusComp implements Posc, Flyingc{
             entry.set(effect, duration);
             statuses.add(entry);
         }
+    }
+
+    float getDuration(StatusEffect effect){
+        var entry = statuses.find(e -> e.effect == effect);
+        return entry == null ? 0 : entry.time;
     }
 
     void clearStatuses(){
@@ -147,6 +146,10 @@ abstract class StatusComp implements Posc, Flyingc{
                 entry.effect.update(self(), entry.time);
             }
         }
+    }
+
+    public Bits statusBits(){
+        return applied;
     }
 
     public void draw(){

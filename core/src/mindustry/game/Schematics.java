@@ -26,7 +26,6 @@ import mindustry.input.*;
 import mindustry.input.Placement.*;
 import mindustry.io.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.legacy.*;
@@ -128,8 +127,6 @@ public class Schematics implements Loadable{
             Log.err(e);
             ui.showException(e);
         }
-
-
     }
 
     private @Nullable Schematic loadFile(Fi file){
@@ -173,7 +170,7 @@ public class Schematics implements Loadable{
         Draw.flush();
         buffer.begin();
         Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, buffer.getWidth(), buffer.getHeight());
-        file.writePNG(pixmap);
+        file.writePng(pixmap);
         buffer.end();
     }
 
@@ -349,7 +346,7 @@ public class Schematics implements Loadable{
         for(int cx = x; cx <= x2; cx++){
             for(int cy = y; cy <= y2; cy++){
                 Building linked = world.build(cx, cy);
-                Block realBlock = linked == null ? null : linked instanceof ConstructBuild cons ? cons.cblock : linked.block;
+                Block realBlock = linked == null ? null : linked instanceof ConstructBuild cons ? cons.current : linked.block;
 
                 if(linked != null && realBlock != null && (realBlock.isVisible() || realBlock instanceof CoreBlock)){
                     int top = realBlock.size/2;
@@ -378,7 +375,7 @@ public class Schematics implements Loadable{
         for(int cx = ox; cx <= ox2; cx++){
             for(int cy = oy; cy <= oy2; cy++){
                 Building tile = world.build(cx, cy);
-                Block realBlock = tile == null ? null : tile instanceof ConstructBuild cons ? cons.cblock : tile.block;
+                Block realBlock = tile == null ? null : tile instanceof ConstructBuild cons ? cons.current : tile.block;
 
                 if(tile != null && !counted.contains(tile.pos()) && realBlock != null
                     && (realBlock.isVisible() || realBlock instanceof CoreBlock)){
@@ -424,7 +421,7 @@ public class Schematics implements Loadable{
         Seq<Tile> seq = new Seq<>();
         if(coreTile == null) throw new IllegalArgumentException("Loadout schematic has no core tile!");
         int ox = x - coreTile.x, oy = y - coreTile.y;
-        schem.tiles.each(st -> {
+        schem.tiles.copy().sort(s -> -s.block.schematicPriority).each(st -> {
             Tile tile = world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
 
@@ -498,9 +495,17 @@ public class Schematics implements Loadable{
             short width = stream.readShort(), height = stream.readShort();
 
             StringMap map = new StringMap();
-            byte tags = stream.readByte();
+            int tags = stream.readUnsignedByte();
             for(int i = 0; i < tags; i++){
                 map.put(stream.readUTF(), stream.readUTF());
+            }
+
+            String[] labels = null;
+
+            //try to read the categories, but skip if it fails
+            try{
+                labels = JsonIO.read(String[].class, map.get("labels", "[]"));
+            }catch(Exception ignored){
             }
 
             IntMap<Block> blocks = new IntMap<>();
@@ -523,7 +528,9 @@ public class Schematics implements Loadable{
                 }
             }
 
-            return new Schematic(tiles, map, width, height);
+            Schematic out = new Schematic(tiles, map, width, height);
+            if(labels != null) out.labels.addAll(labels);
+            return out;
         }
     }
 
@@ -539,6 +546,8 @@ public class Schematics implements Loadable{
 
             stream.writeShort(schematic.width);
             stream.writeShort(schematic.height);
+
+            schematic.tags.put("labels", JsonIO.write(schematic.labels.toArray(String.class)));
 
             stream.writeByte(schematic.tags.size);
             for(ObjectMap.Entry<String, String> e : schematic.tags.entries()){

@@ -12,8 +12,6 @@ import mindustry.entities.EntityCollisions.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
-import mindustry.ui.*;
 
 public class UnitPayload implements Payload{
     public static final float deactiveDuration = 40f;
@@ -36,6 +34,16 @@ public class UnitPayload implements Payload{
     public void set(float x, float y, float rotation){
         unit.set(x, y);
         unit.rotation = rotation;
+    }
+
+    @Override
+    public float x(){
+        return unit.x;
+    }
+
+    @Override
+    public float y(){
+        return unit.y;
     }
 
     @Override
@@ -71,6 +79,11 @@ public class UnitPayload implements Payload{
             if(!nearEmpty) return false;
         }
 
+        //cannnot dump when there's a lot of overlap going on
+        if(!unit.type.flying && Units.count(unit.x, unit.y, unit.physicSize(), o -> o.isGrounded() && (o.type.allowLegStep == unit.type.allowLegStep)) > 0){
+            return false;
+        }
+
         //no client dumping
         if(Vars.net.client()) return true;
 
@@ -87,8 +100,8 @@ public class UnitPayload implements Payload{
         //TODO should not happen
         if(unit.type == null) return;
 
-        Drawf.shadow(unit.x, unit.y, 20);
-        Draw.rect(unit.type.icon(Cicon.full), unit.x, unit.y, unit.rotation - 90);
+        unit.type.drawSoftShadow(unit);
+        Draw.rect(unit.type.fullIcon, unit.x, unit.y, unit.rotation - 90);
         unit.type.drawCell(unit);
 
         //draw warning
@@ -106,7 +119,7 @@ public class UnitPayload implements Payload{
     }
 
     @Override
-    public TextureRegion icon(Cicon icon){
-        return unit.type.icon(icon);
+    public TextureRegion icon(){
+        return unit.type.fullIcon;
     }
 }

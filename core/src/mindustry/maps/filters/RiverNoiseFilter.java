@@ -2,6 +2,7 @@ package mindustry.maps.filters;
 
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 import static mindustry.maps.filters.FilterOption.*;
@@ -20,6 +21,11 @@ public class RiverNoiseFilter extends GenerateFilter{
         new BlockOption("floor", () -> floor, b -> floor = b, floorsOnly),
         new BlockOption("floor2", () -> floor2, b -> floor2 = b, floorsOnly)
         );
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockWater;
     }
 
     @Override

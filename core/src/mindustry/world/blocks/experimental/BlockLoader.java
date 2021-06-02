@@ -9,11 +9,10 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.payloads.*;
-import mindustry.world.blocks.production.*;
 
 import static mindustry.Vars.*;
 
-public class BlockLoader extends PayloadAcceptor{
+public class BlockLoader extends PayloadBlock{
     public final int timerLoad = timers++;
 
     public float loadTime = 2f;
@@ -58,7 +57,7 @@ public class BlockLoader extends PayloadAcceptor{
         Draw.rect(topRegion, req.drawx(), req.drawy());
     }
 
-    public class BlockLoaderBuild extends PayloadAcceptorBuild<BuildPayload>{
+    public class BlockLoaderBuild extends PayloadBlockBuild<BuildPayload>{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
@@ -90,7 +89,6 @@ public class BlockLoader extends PayloadAcceptor{
             Draw.rect(outRegion, x, y, rotdeg());
 
             Draw.z(Layer.blockOver);
-            payRotation = rotdeg();
             drawPayload();
 
             Draw.z(Layer.blockOver + 0.1f);

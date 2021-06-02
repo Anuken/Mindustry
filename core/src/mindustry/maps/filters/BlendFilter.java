@@ -3,6 +3,7 @@ package mindustry.maps.filters;
 import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 import static mindustry.maps.filters.FilterOption.*;
@@ -24,6 +25,11 @@ public class BlendFilter extends GenerateFilter{
     @Override
     public boolean isBuffered(){
         return true;
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockSand;
     }
 
     @Override

@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
@@ -20,6 +21,11 @@ public class MirrorFilter extends GenerateFilter{
         return Structs.arr(
         new SliderOption("angle", () -> angle, f -> angle = (int)f, 0, 360, 45)
         );
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockMetalFloor5;
     }
 
     @Override

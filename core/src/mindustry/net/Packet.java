@@ -1,19 +1,24 @@
 package mindustry.net;
 
-import arc.util.pooling.Pool.*;
+import arc.util.io.*;
 
-import java.nio.*;
+public abstract class Packet{
+    //these are constants because I don't want to bother making an enum to mirror the annotation enum
 
-public interface Packet extends Poolable{
-    default void read(ByteBuffer buffer){}
-    default void write(ByteBuffer buffer){}
-    default void reset(){}
+    /** Does not get handled unless client is connected. */
+    public static final int priorityLow = 0;
+    /** Gets put in a queue and processed if not connected. */
+    public static final int priorityNormal = 1;
+    /** Gets handled immediately, regardless of connection status. */
+    public static final int priorityHigh = 2;
 
-    default boolean isImportant(){
-        return false;
+    public void read(Reads read){}
+    public void write(Writes write){}
+
+    public int getPriority(){
+        return priorityNormal;
     }
 
-    default boolean isUnimportant(){
-        return false;
-    }
+    public void handleClient(){}
+    public void handleServer(NetConnection con){}
 }

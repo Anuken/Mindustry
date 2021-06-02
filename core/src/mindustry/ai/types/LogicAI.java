@@ -98,7 +98,7 @@ public class LogicAI extends AIController{
         }
 
         if(unit.type.canBoost && !unit.type.flying){
-            unit.elevation = Mathf.approachDelta(unit.elevation, Mathf.num(boost || unit.onSolid()), 0.08f);
+            unit.elevation = Mathf.approachDelta(unit.elevation, Mathf.num(boost || unit.onSolid() || (unit.isFlying() && !unit.canLand())), unit.type.riseSpeed);
         }
 
         //look where moving if there's nothing to aim at

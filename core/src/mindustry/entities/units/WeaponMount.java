@@ -28,6 +28,10 @@ public class WeaponMount{
     public @Nullable Bullet bullet;
     /** sound loop for continuous weapons */
     public @Nullable SoundLoop sound;
+    /** current target; used for autonomous weapons and AI */
+    public @Nullable Teamc target;
+    /** retarget counter */
+    public float retarget = 0f;
 
     public WeaponMount(Weapon weapon){
         this.weapon = weapon;

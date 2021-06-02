@@ -34,7 +34,7 @@ public class ItemSelection{
                 if(closeSelect) control.input.frag.config.hideConfig();
             }).group(group).get();
             button.changed(() -> consumer.get(button.isChecked() ? item : null));
-            button.getStyle().imageUp = new TextureRegionDrawable(item.icon(Cicon.small));
+            button.getStyle().imageUp = new TextureRegionDrawable(item.uiIcon);
             button.update(() -> button.setChecked(holder.get() == item));
 
             if(i++ % 4 == 3){

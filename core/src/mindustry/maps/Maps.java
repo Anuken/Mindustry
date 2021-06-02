@@ -217,7 +217,7 @@ public class Maps{
                 }
 
                 Pixmap pix = MapIO.generatePreview(world.tiles);
-                executor.submit(() -> map.previewFile().writePNG(pix));
+                executor.submit(() -> map.previewFile().writePng(pix));
                 writeCache(map);
 
                 map.texture = new Texture(pix);
@@ -409,7 +409,7 @@ public class Maps{
             map.texture = new Texture(pix);
             executor.submit(() -> {
                 try{
-                    map.previewFile().writePNG(pix);
+                    map.previewFile().writePng(pix);
                     writeCache(map);
                 }catch(Exception e){
                     e.printStackTrace();

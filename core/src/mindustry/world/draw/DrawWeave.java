@@ -12,22 +12,22 @@ public class DrawWeave extends DrawBlock{
     public TextureRegion weave, bottom;
 
     @Override
-    public void draw(GenericCrafterBuild entity){
-        Draw.rect(bottom, entity.x, entity.y);
-        Draw.rect(weave, entity.x, entity.y, entity.totalProgress);
+    public void draw(GenericCrafterBuild build){
+        Draw.rect(bottom, build.x, build.y);
+        Draw.rect(weave, build.x, build.y, build.totalProgress);
 
         Draw.color(Pal.accent);
-        Draw.alpha(entity.warmup);
+        Draw.alpha(build.warmup);
 
         Lines.lineAngleCenter(
-        entity.x + Mathf.sin(entity.totalProgress, 6f, Vars.tilesize / 3f * entity.block.size),
-        entity.y,
+        build.x + Mathf.sin(build.totalProgress, 6f, Vars.tilesize / 3f * build.block.size),
+        build.y,
         90,
-        entity.block.size * Vars.tilesize / 2f);
+        build.block.size * Vars.tilesize / 2f);
 
         Draw.reset();
 
-        Draw.rect(entity.block.region, entity.x, entity.y);
+        Draw.rect(build.block.region, build.x, build.y);
     }
 
     @Override

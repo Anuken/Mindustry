@@ -28,7 +28,6 @@ import mindustry.maps.Map;
 import mindustry.maps.*;
 import mindustry.net.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 
@@ -123,6 +122,10 @@ public class Control implements ApplicationListener, Loadable{
         //add player when world loads regardless
         Events.on(WorldLoadEvent.class, e -> {
             player.add();
+            //make player admin on any load when hosting
+            if(net.active() && net.server()){
+                player.admin = true;
+            }
         });
 
         //autohost for pvp maps
@@ -130,7 +133,7 @@ public class Control implements ApplicationListener, Loadable{
             if(state.rules.pvp && !net.active()){
                 try{
                     net.host(port);
-                    player.admin(true);
+                    player.admin = true;
                 }catch(IOException e){
                     ui.showException("@server.error", e);
                     state.set(State.menu);
@@ -148,7 +151,7 @@ public class Control implements ApplicationListener, Loadable{
             if(e.content instanceof SectorPreset){
                 for(TechNode node : TechTree.all){
                     if(!node.content.unlocked() && node.objectives.contains(o -> o instanceof SectorComplete sec && sec.preset == e.content) && !node.objectives.contains(o -> !o.complete())){
-                        ui.hudfrag.showToast(new TextureRegionDrawable(node.content.icon(Cicon.large)), bundle.get("available"));
+                        ui.hudfrag.showToast(new TextureRegionDrawable(node.content.uiIcon), iconLarge, bundle.get("available"));
                     }
                 }
             }
@@ -192,33 +195,36 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.run(Trigger.newGame, () -> {
-            Building core = player.closestCore();
+            Building core = player.bestCore();
 
             if(core == null) return;
 
-            //TODO this sounds pretty bad due to conflict
-            if(settings.getInt("musicvol") > 0){
-                Musics.land.stop();
-                Musics.land.play();
-                Musics.land.setVolume(settings.getInt("musicvol") / 100f);
-            }
-
-            app.post(() -> ui.hudfrag.showLand());
-            renderer.zoomIn(Fx.coreLand.lifetime);
-            app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block));
             camera.position.set(core);
             player.set(core);
 
-            Time.run(Fx.coreLand.lifetime, () -> {
-                Fx.launch.at(core);
-                Effect.shake(5f, 5f, core);
-
-                if(state.isCampaign()){
-                    ui.announce("[accent]" + state.rules.sector.name() + "\n" +
-                        (state.rules.sector.info.resources.any() ? "[lightgray]" + bundle.get("sectors.resources") + "[white] " +
-                            state.rules.sector.info.resources.toString(" ", u -> u.emoji()) : ""), 5);
+            if(showLandAnimation){
+                //TODO this sounds pretty bad due to conflict
+                if(settings.getInt("musicvol") > 0){
+                    Musics.land.stop();
+                    Musics.land.play();
+                    Musics.land.setVolume(settings.getInt("musicvol") / 100f);
                 }
-            });
+
+                app.post(() -> ui.hudfrag.showLand());
+                renderer.zoomIn(Fx.coreLand.lifetime);
+                app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block));
+
+                Time.run(Fx.coreLand.lifetime, () -> {
+                    Fx.launch.at(core);
+                    Effect.shake(5f, 5f, core);
+
+                    if(state.isCampaign()){
+                        ui.announce("[accent]" + state.rules.sector.name() + "\n" +
+                        (state.rules.sector.info.resources.any() ? "[lightgray]" + bundle.get("sectors.resources") + "[white] " +
+                        state.rules.sector.info.resources.toString(" ", u -> u.emoji()) : ""), 5);
+                    }
+                });
+            }
         });
 
     }
@@ -345,7 +351,7 @@ public class Control implements ApplicationListener, Loadable{
                         //reset wave so things are more fair
                         state.wave = 1;
                         //set up default wave time
-                        state.wavetime = state.rules.waveSpacing * 2f;
+                        state.wavetime = state.rules.waveSpacing * (sector.preset == null ? 2f : sector.preset.startWaveTimeMultiplier);
                         //reset captured state
                         sector.info.wasCaptured = false;
                         //re-enable waves
