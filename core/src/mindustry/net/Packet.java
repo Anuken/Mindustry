@@ -10,6 +10,7 @@ public abstract class Packet{
     //readObject
     //readBuilding
     //readUnit (possibly)
+    protected static final byte[] NODATA = {};
     protected static final ReusableByteInStream BAIS = new ReusableByteInStream();
     protected static final Reads READ = new Reads(new DataInputStream(BAIS));
 
@@ -28,6 +29,8 @@ public abstract class Packet{
     public void read(Reads read, int length){
         read(read);
     }
+
+    public void handled(){}
 
     public int getPriority(){
         return priorityNormal;

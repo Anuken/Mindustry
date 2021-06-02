@@ -31,7 +31,7 @@ public class CallGenerator{
             .addModifiers(Modifier.PUBLIC);
 
             //temporary data to deserialize later
-            packet.addField(byte[].class, "DATA", Modifier.PRIVATE);
+            packet.addField(FieldSpec.builder(byte[].class, "DATA", Modifier.PRIVATE).initializer("NODATA").build());
 
             packet.superclass(tname("mindustry.net.Packet"));
 
@@ -149,11 +149,11 @@ public class CallGenerator{
 
         typespec.addMethod(readbuilder.build());
 
-        MethodSpec.Builder builder = MethodSpec.methodBuilder("check")
-            .addModifiers(Modifier.PRIVATE);
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("handled")
+            .addModifiers(Modifier.PUBLIC)
+            .addAnnotation(Override.class);
 
         //make sure data is present, begin reading it if so
-        builder.beginControlFlow("if(DATA != null)");
         builder.addStatement("BAIS.setBytes(DATA)");
 
         Seq<Svar> params = ent.element.params();
@@ -201,8 +201,6 @@ public class CallGenerator{
                 builder.endControlFlow();
             }
         }
-
-        builder.endControlFlow();
 
         typespec.addMethod(builder.build());
     }
@@ -350,8 +348,6 @@ public class CallGenerator{
         .addModifiers(Modifier.PUBLIC)
         .addAnnotation(Override.class)
         .returns(void.class);
-
-        builder.addStatement("check()");
 
         Smethod elem = ent.element;
         Seq<Svar> params = elem.params();
