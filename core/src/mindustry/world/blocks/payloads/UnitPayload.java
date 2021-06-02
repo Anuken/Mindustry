@@ -4,10 +4,10 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.core.*;
 import mindustry.entities.EntityCollisions.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -69,14 +69,12 @@ public class UnitPayload implements Payload{
         //check if unit can be dumped here
         SolidPred solid = unit.solidity();
         if(solid != null){
-            int tx = unit.tileX(), ty = unit.tileY();
-            boolean nearEmpty = !solid.solid(tx, ty);
-            for(Point2 p : Geometry.d4){
-                nearEmpty |= !solid.solid(tx + p.x, ty + p.y);
-            }
+            Tmp.v1.trns(unit.rotation, 1f);
+
+            int tx = World.toTile(unit.x + Tmp.v1.x), ty = World.toTile(unit.y + Tmp.v1.y);
 
             //cannot dump on solid blocks
-            if(!nearEmpty) return false;
+            if(solid.solid(tx, ty)) return false;
         }
 
         //cannnot dump when there's a lot of overlap going on

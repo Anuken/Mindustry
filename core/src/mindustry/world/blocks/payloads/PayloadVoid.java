@@ -19,6 +19,8 @@ public class PayloadVoid extends PayloadBlock{
         update = true;
         rotate = false;
         size = 3;
+        //make sure to display large units.
+        clipSize = 120;
     }
 
     @Override

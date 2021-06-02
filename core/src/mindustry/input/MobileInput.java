@@ -856,8 +856,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         boolean omni = unit.type.omniMovement;
         boolean allowHealing = type.canHeal;
-        boolean validHealTarget = allowHealing && target instanceof Building && ((Building)target).isValid() && target.team() == unit.team &&
-            ((Building)target).damaged() && target.within(unit, type.range);
+        boolean validHealTarget = allowHealing && target instanceof Building b && b.isValid() && target.team() == unit.team && b.damaged() && target.within(unit, type.range);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
 
         //reset target if:
@@ -912,13 +911,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             unit.vel.approachDelta(Vec2.ZERO, unit.speed() * type.accel / 2f);
         }
 
-        float expansion = 3f;
-
         unit.hitbox(rect);
-        rect.x -= expansion;
-        rect.y -= expansion;
-        rect.width += expansion * 2f;
-        rect.height += expansion * 2f;
+        rect.grow(6f);
 
         player.boosting = collisions.overlapsTile(rect) || !unit.within(targetPos, 85f);
 
@@ -927,7 +921,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
             if(!movement.isZero()){
-                unit.vel.rotateTo(movement.angle(), unit.type.rotateSpeed * Math.max(Time.delta, 1));
+                unit.rotation = Angles.moveToward(unit.rotation, movement.angle(), unit.type.rotateSpeed * Math.max(Time.delta, 1));
             }
         }
 
