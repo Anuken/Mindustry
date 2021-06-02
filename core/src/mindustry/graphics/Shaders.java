@@ -48,12 +48,12 @@ public class Shaders{
         tar = new SurfaceShader("tar");
         slag = new SurfaceShader("slag");
         space = new SpaceShader("space");
-        //caustics = new SurfaceShader("caustics"){
-        //    @Override
-        //    public String textureName(){
-        //        return "caustics";
-        //    }
-        //};
+        caustics = new SurfaceShader("caustics"){
+            @Override
+            public String textureName(){
+                return "caustics";
+            }
+        };
         planet = new PlanetShader();
         planetGrid = new PlanetGridShader();
         atmosphere = new AtmosphereShader();
