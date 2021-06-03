@@ -1975,8 +1975,8 @@ public class UnitTypes implements ContentList{
                     weaveMag = 1f;
 
                     trailColor = Pal.heal;
-                    trailParam = 5f;
-                    trailInterval = 3f;
+                    trailWidth = 4.5f;
+                    trailLength = 29;
 
                     fragBullets = 7;
                     fragVelocityMin = 0.3f;
@@ -1997,12 +1997,14 @@ public class UnitTypes implements ContentList{
                         lightRadius = 40f;
                         lightOpacity = 0.7f;
 
-                        trailInterval = 2f;
-                        trailParam = 3f;
+                        trailColor = Pal.heal;
+                        trailWidth = 2.5f;
+                        trailLength = 20;
+                        trailChance = -1f;
+
                         healPercent = 2.8f;
                         collidesTeam = true;
                         backColor = Pal.heal;
-                        trailColor = Pal.heal;
 
                         despawnEffect = Fx.none;
                         hitEffect = new ExplosionEffect(){{
