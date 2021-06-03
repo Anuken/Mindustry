@@ -7,5 +7,6 @@
   fast: true,
   
   edgePadding: false,
-  bleed: false
+  bleed: false,
+  debug: true
 }
