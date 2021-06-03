@@ -1034,16 +1034,17 @@ public class Blocks implements ContentList{
 
         duct = new Duct("duct"){{
             requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 5, Items.copper, 5));
-            speed = 5f;
+            speed = 4f;
         }};
 
         ductRouter = new DuctRouter("duct-router"){{
             requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 10, Items.copper, 5));
-            speed = 5f;
+            speed = 4f;
         }};
 
         ductBridge = new DuctBridge("duct-bridge"){{
             requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 20, Items.copper, 15));
+            speed = 4f;
         }};
 
         //endregion
@@ -1900,7 +1901,7 @@ public class Blocks implements ContentList{
             requirements(Category.units, with(Items.copper, 150, Items.lead, 130, Items.metaglass, 120));
             plans = Seq.with(
                 new UnitPlan(UnitTypes.risso, 60f * 45f, with(Items.silicon, 20, Items.metaglass, 35)),
-                new UnitPlan(UnitTypes.retusa, 60f * 60f, with(Items.silicon, 15, Items.metaglass, 25, Items.titanium, 20))
+                new UnitPlan(UnitTypes.retusa, 60f * 50f, with(Items.silicon, 15, Items.metaglass, 25, Items.titanium, 20))
             );
             size = 3;
             consumes.power(1.2f);
@@ -1942,7 +1943,8 @@ public class Blocks implements ContentList{
                 new UnitType[]{UnitTypes.poly, UnitTypes.mega},
                 new UnitType[]{UnitTypes.minke, UnitTypes.bryde},
                 new UnitType[]{UnitTypes.pulsar, UnitTypes.quasar},
-                new UnitType[]{UnitTypes.atrax, UnitTypes.spiroct}
+                new UnitType[]{UnitTypes.atrax, UnitTypes.spiroct},
+                new UnitType[]{UnitTypes.oxynoe, UnitTypes.cyerce}
             );
         }};
 
@@ -1963,7 +1965,8 @@ public class Blocks implements ContentList{
                 new UnitType[]{UnitTypes.fortress, UnitTypes.scepter},
                 new UnitType[]{UnitTypes.bryde, UnitTypes.sei},
                 new UnitType[]{UnitTypes.mega, UnitTypes.quad},
-                new UnitType[]{UnitTypes.quasar, UnitTypes.vela}
+                new UnitType[]{UnitTypes.quasar, UnitTypes.vela},
+                new UnitType[]{UnitTypes.cyerce, UnitTypes.aegires}
             );
         }};
 
@@ -1984,7 +1987,8 @@ public class Blocks implements ContentList{
                 new UnitType[]{UnitTypes.scepter, UnitTypes.reign},
                 new UnitType[]{UnitTypes.sei, UnitTypes.omura},
                 new UnitType[]{UnitTypes.quad, UnitTypes.oct},
-                new UnitType[]{UnitTypes.vela, UnitTypes.corvus}
+                new UnitType[]{UnitTypes.vela, UnitTypes.corvus},
+                new UnitType[]{UnitTypes.aegires, UnitTypes.navanax}
             );
         }};
 

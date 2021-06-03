@@ -57,6 +57,14 @@ public class PayloadConveyor extends Block{
         stats.add(Stat.payloadCapacity, (payloadLimit), StatUnit.blocksSquared);
     }
 
+    @Override
+    public void init(){
+        super.init();
+
+        //increase clip size for oversize loads
+        clipSize = Math.max(clipSize, size * tilesize * 2.1f);
+    }
+
     public class PayloadConveyorBuild extends Building{
         public @Nullable Payload item;
         public float progress, itemRotation, animation;

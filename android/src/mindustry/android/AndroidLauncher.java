@@ -15,7 +15,6 @@ import arc.func.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import dalvik.system.*;
-import io.anuke.mindustry.*;
 import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.io.*;
@@ -232,7 +231,7 @@ public class AndroidLauncher extends AndroidApplication{
         super.onResume();
 
         //TODO enable once GPGS is set up on the GP console
-        if(false && BuildConfig.FLAVOR.equals("gp")){
+        if(false && getPackageName().endsWith(".gp")){
             try{
                 if(gpService == null){
                     serviceClass = Class.forName("mindustry.android.GPGameService");

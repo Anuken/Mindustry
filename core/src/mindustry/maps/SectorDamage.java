@@ -3,7 +3,6 @@ package mindustry.maps;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -186,7 +185,6 @@ public class SectorDamage{
 
         Tile start = spawns.first();
 
-        Time.mark();
         var field = pathfinder.getField(state.rules.waveTeam, Pathfinder.costGround, Pathfinder.fieldCore);
         Seq<Tile> path = new Seq<>();
         boolean found = false;

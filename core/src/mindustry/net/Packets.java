@@ -2,7 +2,6 @@ package mindustry.net;
 
 import arc.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import mindustry.core.*;
@@ -130,8 +129,6 @@ public class Packets{
             CRC32 crc = new CRC32();
             crc.update(Base64Coder.decode(uuid), 0, b.length);
             buffer.l(crc.getValue());
-
-            Log.info("CRC value sent: @", Long.toHexString(crc.getValue()));
 
             buffer.b(mobile ? (byte)1 : 0);
             buffer.i(color);

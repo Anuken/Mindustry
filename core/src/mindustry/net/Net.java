@@ -257,6 +257,7 @@ public class Net{
      * Call to handle a packet being received for the client.
      */
     public void handleClientReceived(Packet object){
+        object.handled();
 
         if(object instanceof StreamBegin b){
             streams.put(b.id, currentStream = new StreamBuilder(b));
@@ -291,6 +292,8 @@ public class Net{
      * Call to handle a packet being received for the server.
      */
     public void handleServerReceived(NetConnection connection, Packet object){
+        object.handled();
+
         try{
             //handle object normally
             if(serverListeners.get(object.getClass()) != null){
