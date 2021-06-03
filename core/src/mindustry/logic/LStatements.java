@@ -708,7 +708,7 @@ public class LStatements{
 
         public transient StatementElem dest;
 
-        public int destIndex;
+        public int destIndex = -1;
 
         public ConditionOp op = ConditionOp.notEqual;
         public String value = "x", compare = "false";
@@ -739,6 +739,10 @@ public class LStatements{
             }, Styles.logict, () -> {}).size(op == ConditionOp.always ? 80f : 48f, 40f).pad(4f).color(table.color);
 
             if(op != ConditionOp.always) field(table, compare, str -> compare = str);
+
+            row(table);
+
+            table.label(() -> " go to " + ((dest != null) ? dest.address:destIndex));
         }
 
         //elements need separate conversion logic

@@ -217,6 +217,8 @@ public class LCanvas extends Table{
 
                 e.setSize(width, e.getPrefHeight());
                 e.setPosition(0, height - cy, Align.topLeft);
+                
+                if(e instanceof StatementElem se) se.address = i;
 
                 cy += e.getPrefHeight() + space;
                 seq.add(e);
@@ -316,6 +318,7 @@ public class LCanvas extends Table{
 
     public class StatementElem extends Table{
         public LStatement st;
+        public int address = 0;
 
         public StatementElem(LStatement st){
             this.st = st;
@@ -335,6 +338,8 @@ public class LCanvas extends Table{
 
                 t.add(st.name()).style(Styles.outlineLabel).color(color).padRight(8);
                 t.add().growX();
+
+                t.label(() -> address + "").name("address").style(Styles.outlineLabel).color(color).padRight(8);
 
                 t.button(Icon.copy, Styles.logici, () -> {
                 }).size(24f).padRight(6).get().tapped(this::copy);
