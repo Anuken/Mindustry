@@ -57,6 +57,7 @@ public class OverdriveProjector extends Block{
 
     @Override
     public void setStats(){
+        stats.timePeriod = useTime;
         super.setStats();
 
         stats.add(Stat.speedIncrease, (int)(100f * speedBoost), StatUnit.percent);

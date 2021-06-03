@@ -66,7 +66,7 @@ public class GameOverDialog extends BaseDialog{
                         if(state.stats.itemsDelivered.get(item, 0) > 0){
                             t.table(items -> {
                                 items.add("    [lightgray]" + state.stats.itemsDelivered.get(item, 0));
-                                items.image(item.icon(Cicon.small)).size(8 * 3).pad(4);
+                                items.image(item.uiIcon).size(8 * 3).pad(4);
                             }).left().row();
                         }
                     }

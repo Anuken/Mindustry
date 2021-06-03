@@ -121,7 +121,10 @@ public abstract class BasicGenerator implements WorldGenerator{
     }
 
     public void tech(){
-        Block[] blocks = {Blocks.darkPanel3};
+        tech(Blocks.darkPanel3, Blocks.darkPanel4, Blocks.darkMetal);
+    }
+
+    public void tech(Block floor1, Block floor2, Block wall){
         int secSize = 20;
         pass((x, y) -> {
             if(!floor.asFloor().hasSurface()) return;
@@ -130,14 +133,14 @@ public abstract class BasicGenerator implements WorldGenerator{
             int sclx = x / secSize, scly = y / secSize;
             if(noise(sclx, scly, 0.2f, 1f) > 0.63f && noise(sclx, scly + 999, 200f, 1f) > 0.6f && (mx == 0 || my == 0 || mx == secSize - 1 || my == secSize - 1)){
                 if(Mathf.chance(noise(x + 0x231523, y, 40f, 1f))){
-                    floor = blocks[rand.random(0, blocks.length - 1)];
+                    floor = floor1;
                     if(Mathf.dst(mx, my, secSize/2, secSize/2) > secSize/2f + 2){
-                        floor = Blocks.darkPanel4;
+                        floor = floor2;
                     }
                 }
 
                 if(block.solid && Mathf.chance(0.7)){
-                    block = Blocks.darkMetal;
+                    block = wall;
                 }
             }
         });
@@ -215,7 +218,9 @@ public abstract class BasicGenerator implements WorldGenerator{
             read.set(write);
         }
 
-        tiles.each((x, y) -> tiles.get(x, y).setBlock(!read.get(x, y) ? Blocks.air : tiles.get(x, y).floor().wall));
+        for(var t : tiles){
+            t.setBlock(!read.get(t.x, t.y) ? Blocks.air : t.floor().wall);
+        }
     }
 
     protected float noise(float x, float y, double scl, double mag){

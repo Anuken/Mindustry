@@ -1,16 +1,23 @@
 package mindustry.world.draw;
 
 import arc.graphics.g2d.*;
+import arc.math.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.GenericCrafter.*;
 
 /** An implementation of custom rendering behavior for a block.
  * This is used mostly for mods. */
 public class DrawBlock{
+    protected static final Rand rand = new Rand();
 
     /** Draws the block. */
-    public void draw(GenericCrafterBuild entity){
-        Draw.rect(entity.block.region, entity.x, entity.y, entity.block.rotate ? entity.rotdeg() : 0);
+    public void draw(GenericCrafterBuild build){
+        Draw.rect(build.block.region, build.x, build.y, build.block.rotate ? build.rotdeg() : 0);
+    }
+
+    /** Draws any extra light for the block. */
+    public void drawLight(GenericCrafterBuild build){
+
     }
 
     /** Load any relevant texture regions. */

@@ -18,14 +18,7 @@ public class MapRenderer implements Disposable{
     private IndexedRenderer[][] chunks;
     private IntSet updates = new IntSet();
     private IntSet delayedUpdates = new IntSet();
-    private MapEditor editor;
     private int width, height;
-    private Texture texture;
-
-    public MapRenderer(MapEditor editor){
-        this.editor = editor;
-        this.texture = Core.atlas.find("clear-editor").texture;
-    }
 
     public void resize(int width, int height){
         updates.clear();
@@ -63,6 +56,8 @@ public class MapRenderer implements Disposable{
         if(chunks == null){
             return;
         }
+
+        var texture = Core.atlas.find("clear-editor").texture;
 
         for(int x = 0; x < chunks.length; x++){
             for(int y = 0; y < chunks[0].length; y++){

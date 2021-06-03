@@ -94,7 +94,11 @@ public class PlanetRenderer implements Disposable{
         cam.position.setZero();
         cam.update();
 
+        Gl.depthMask(false);
+
         skybox.render(cam.combined);
+
+        Gl.depthMask(true);
 
         cam.position.set(lastPos);
         cam.update();
@@ -172,7 +176,7 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void renderOrbit(Planet planet){
-        if(planet.parent == null || !planet.visible()) return;
+        if(planet.parent == null || !planet.visible() || orbitAlpha <= 0.02f) return;
 
         Vec3 center = planet.parent.position;
         float radius = planet.orbitRadius;
@@ -182,6 +186,8 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void renderSectors(Planet planet){
+        if(orbitAlpha <= 0.02f) return;
+
         //apply transformed position
         batch.proj().mul(planet.getTransform(mat));
 
@@ -203,6 +209,7 @@ public class PlanetRenderer implements Disposable{
     public void drawArc(Planet planet, Vec3 a, Vec3 b){
         drawArc(planet, a, b, Pal.accent, Color.clear, 1f);
     }
+
     public void drawArc(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length){
         drawArc(planet, a, b, from, to, length, 80f, 25);
     }

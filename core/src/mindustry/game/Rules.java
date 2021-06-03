@@ -10,6 +10,8 @@ import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
 /**
  * Defines current rules on how the game should function.
@@ -34,6 +36,8 @@ public class Rules{
     public boolean editor = false;
     /** Whether a gameover can happen at all. Set this to false to implement custom gameover conditions. */
     public boolean canGameOver = true;
+    /** Whether cores change teams when they are destroyed. */
+    public boolean coreCapture = false;
     /** Whether reactors can explode and damage other blocks. */
     public boolean reactorExplosions = true;
     /** Whether schematics are allowed. */
@@ -72,6 +76,10 @@ public class Rules{
     public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
     public int unitCap = 0;
+    /** Environmental flags that dictate visuals & how blocks function. */
+    public int environment = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater;
+    /** Attributes of the environment. */
+    public Attributes attributes = new Attributes();
     /** Sector for saves that have them. */
     public @Nullable Sector sector;
     /** Spawn layout. */

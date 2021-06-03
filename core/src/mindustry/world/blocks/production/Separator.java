@@ -3,6 +3,7 @@ package mindustry.world.blocks.production;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
@@ -11,7 +12,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
-import mindustry.world.meta.values.*;
 
 /**
  * Extracts a random list of items from an input item and an input liquid.
@@ -34,15 +34,10 @@ public class Separator extends Block{
 
     @Override
     public void setStats(){
+        stats.timePeriod = craftTime;
         super.setStats();
 
-        stats.add(Stat.output, new ItemFilterValue(item -> {
-            for(ItemStack i : results){
-                if(item == i.item) return true;
-            }
-            return false;
-        }));
-
+        stats.add(Stat.output, StatValues.items(item -> Structs.contains(results, i -> i.item == item)));
         stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
     }
 

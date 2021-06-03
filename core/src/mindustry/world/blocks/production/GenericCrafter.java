@@ -8,6 +8,7 @@ import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.draw.*;
@@ -21,6 +22,9 @@ public class GenericCrafter extends Block{
     public Effect craftEffect = Fx.none;
     public Effect updateEffect = Fx.none;
     public float updateEffectChance = 0.04f;
+    public float warmupSpeed = 0.019f;
+    /** Only used for legacy cultivator blocks. */
+    public boolean legacyReadWarmup = false;
 
     public DrawBlock drawer = new DrawBlock();
 
@@ -37,11 +41,12 @@ public class GenericCrafter extends Block{
 
     @Override
     public void setStats(){
+        stats.timePeriod = craftTime;
         super.setStats();
         stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
 
         if(outputItem != null){
-            stats.add(Stat.output, outputItem);
+            stats.add(Stat.output, StatValues.items(craftTime, outputItem));
         }
 
         if(outputLiquid != null){
@@ -83,8 +88,14 @@ public class GenericCrafter extends Block{
         }
 
         @Override
+        public void drawLight(){
+            super.drawLight();
+            drawer.drawLight(this);
+        }
+
+        @Override
         public boolean shouldConsume(){
-            if(outputItem != null && items.get(outputItem.item) >= itemCapacity){
+            if(outputItem != null && items.get(outputItem.item) + outputItem.amount > itemCapacity){
                 return false;
             }
             return (outputLiquid == null || !(liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.001f)) && enabled;
@@ -96,13 +107,13 @@ public class GenericCrafter extends Block{
 
                 progress += getProgressIncrease(craftTime);
                 totalProgress += delta();
-                warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
+                warmup = Mathf.approachDelta(warmup, 1f, warmupSpeed);
 
                 if(Mathf.chanceDelta(updateEffectChance)){
                     updateEffect.at(getX() + Mathf.range(size * 4f), getY() + Mathf.range(size * 4));
                 }
             }else{
-                warmup = Mathf.lerp(warmup, 0f, 0.02f);
+                warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
             }
 
             if(progress >= 1f){
@@ -122,13 +133,19 @@ public class GenericCrafter extends Block{
                 progress %= 1f;
             }
 
-            if(outputItem != null && timer(timerDump, dumpTime)){
+            if(outputItem != null && timer(timerDump, dumpTime / timeScale)){
                 dump(outputItem.item);
             }
 
             if(outputLiquid != null){
                 dumpLiquid(outputLiquid.liquid);
             }
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return Mathf.clamp(progress);
+            return super.sense(sensor);
         }
 
         @Override
@@ -146,6 +163,7 @@ public class GenericCrafter extends Block{
             super.write(write);
             write.f(progress);
             write.f(warmup);
+            if(legacyReadWarmup) write.f(0f);
         }
 
         @Override
@@ -153,6 +171,7 @@ public class GenericCrafter extends Block{
             super.read(read, revision);
             progress = read.f();
             warmup = read.f();
+            if(legacyReadWarmup) read.f();
         }
     }
 }

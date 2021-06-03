@@ -72,7 +72,7 @@ public class CustomRulesDialog extends BaseDialog{
             for(Block block : array){
                 t.table(Tex.underline, b -> {
                     b.left().margin(4f);
-                    b.image(block.icon(Cicon.medium)).size(Cicon.medium.size).padRight(3);
+                    b.image(block.uiIcon).size(iconMed).padRight(3);
                     b.add(block.localizedName).color(Color.lightGray).padLeft(3).growX().left().wrap();
 
                     b.button(Icon.cancel, Styles.clearPartiali, () -> {
@@ -94,11 +94,11 @@ public class CustomRulesDialog extends BaseDialog{
                 int[] i = {0};
                 content.blocks().each(b -> !rules.bannedBlocks.contains(b) && b.canBeBuilt(), b -> {
                     int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
-                    t.button(new TextureRegionDrawable(b.icon(Cicon.medium)), Styles.cleari, () -> {
+                    t.button(new TextureRegionDrawable(b.uiIcon), Styles.cleari, iconMed, () -> {
                         rules.bannedBlocks.add(b);
                         rebuildBanned();
                         dialog.hide();
-                    }).size(60f).get().resizeImage(Cicon.medium.size);
+                    }).size(60f);
 
                     if(++i[0] % cols == 0){
                         t.row();
@@ -149,7 +149,7 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
 
         main.button("@configure",
-            () -> loadoutDialog.show(Blocks.coreShard.itemCapacity, rules.loadout,
+            () -> loadoutDialog.show(999999, rules.loadout,
                 i -> true,
                 () -> rules.loadout.clear().add(new ItemStack(Items.copper, 100)),
                 () -> {}, () -> {}
@@ -169,6 +169,7 @@ public class CustomRulesDialog extends BaseDialog{
         title("@rules.title.enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
         check("@rules.buildai", b -> rules.teams.get(rules.waveTeam).ai = rules.teams.get(rules.waveTeam).infiniteResources = b, () -> rules.teams.get(rules.waveTeam).ai);
+        check("@rules.corecapture", b -> rules.coreCapture = b, () -> rules.coreCapture);
         number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
 
         title("@rules.title.environment");

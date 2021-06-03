@@ -4,10 +4,10 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
-import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
@@ -34,7 +34,7 @@ public class LaserTurret extends PowerTurret{
         super.setStats();
 
         stats.remove(Stat.booster);
-        stats.add(Stat.input, new BoosterListValue(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, false, l -> consumes.liquidfilters.get(l.id)));
+        stats.add(Stat.input, StatValues.boosters(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, false, l -> consumes.liquidfilters.get(l.id)));
     }
 
     public class LaserTurretBuild extends PowerTurretBuild{
@@ -67,14 +67,21 @@ public class LaserTurret extends PowerTurret{
                 Liquid liquid = liquids.current();
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-                float used = (cheating() ? maxUsed * Time.delta : Math.min(liquids.get(liquid), maxUsed * Time.delta)) * liquid.heatCapacity * coolantMultiplier;
-                reload -= used;
+                float used = (cheating() ? maxUsed * Time.delta : Math.min(liquids.get(liquid), maxUsed * Time.delta));
+                reload -= used * liquid.heatCapacity * coolantMultiplier;
                 liquids.remove(liquid, used);
 
                 if(Mathf.chance(0.06 * used)){
                     coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
                 }
             }
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            //reload reversed for laser turrets
+            if(sensor == LAccess.progress) return Mathf.clamp(1f - reload / reloadTime);
+            return super.sense(sensor);
         }
 
         @Override

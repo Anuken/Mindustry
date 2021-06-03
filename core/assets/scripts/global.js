@@ -53,10 +53,12 @@ function extend(/*Base, ..., def*/){
 const extendContent = extend;
 
 importPackage(Packages.arc)
+importPackage(Packages.arc.audio)
 importPackage(Packages.arc.func)
 importPackage(Packages.arc.graphics)
 importPackage(Packages.arc.graphics.g2d)
 importPackage(Packages.arc.graphics.gl)
+importPackage(Packages.arc.input)
 importPackage(Packages.arc.math)
 importPackage(Packages.arc.math.geom)
 importPackage(Packages.arc.scene)
@@ -68,6 +70,12 @@ importPackage(Packages.arc.scene.ui.layout)
 importPackage(Packages.arc.scene.utils)
 importPackage(Packages.arc.struct)
 importPackage(Packages.arc.util)
+importPackage(Packages.arc.util.async)
+importPackage(Packages.arc.util.io)
+importPackage(Packages.arc.util.noise)
+importPackage(Packages.arc.util.pooling)
+importPackage(Packages.arc.util.serialization)
+importPackage(Packages.arc.util.viewport)
 importPackage(Packages.mindustry)
 importPackage(Packages.mindustry.ai)
 importPackage(Packages.mindustry.ai.formations)
@@ -97,7 +105,9 @@ importPackage(Packages.mindustry.maps.filters)
 importPackage(Packages.mindustry.maps.generators)
 importPackage(Packages.mindustry.maps.planet)
 importPackage(Packages.mindustry.net)
+importPackage(Packages.mindustry.service)
 importPackage(Packages.mindustry.type)
+importPackage(Packages.mindustry.type.weapons)
 importPackage(Packages.mindustry.type.weather)
 importPackage(Packages.mindustry.ui)
 importPackage(Packages.mindustry.ui.dialogs)
@@ -123,7 +133,6 @@ importPackage(Packages.mindustry.world.blocks.units)
 importPackage(Packages.mindustry.world.consumers)
 importPackage(Packages.mindustry.world.draw)
 importPackage(Packages.mindustry.world.meta)
-importPackage(Packages.mindustry.world.meta.values)
 importPackage(Packages.mindustry.world.modules)
 const PlayerIpUnbanEvent = Packages.mindustry.game.EventType.PlayerIpUnbanEvent
 const PlayerIpBanEvent = Packages.mindustry.game.EventType.PlayerIpBanEvent
@@ -132,6 +141,8 @@ const PlayerBanEvent = Packages.mindustry.game.EventType.PlayerBanEvent
 const PlayerLeave = Packages.mindustry.game.EventType.PlayerLeave
 const PlayerConnect = Packages.mindustry.game.EventType.PlayerConnect
 const PlayerJoin = Packages.mindustry.game.EventType.PlayerJoin
+const ConnectPacketEvent = Packages.mindustry.game.EventType.ConnectPacketEvent
+const ConnectionEvent = Packages.mindustry.game.EventType.ConnectionEvent
 const UnitChangeEvent = Packages.mindustry.game.EventType.UnitChangeEvent
 const UnitUnloadEvent = Packages.mindustry.game.EventType.UnitUnloadEvent
 const UnitCreateEvent = Packages.mindustry.game.EventType.UnitCreateEvent
@@ -145,6 +156,7 @@ const ResearchEvent = Packages.mindustry.game.EventType.ResearchEvent
 const UnlockEvent = Packages.mindustry.game.EventType.UnlockEvent
 const StateChangeEvent = Packages.mindustry.game.EventType.StateChangeEvent
 const TileChangeEvent = Packages.mindustry.game.EventType.TileChangeEvent
+const TilePreChangeEvent = Packages.mindustry.game.EventType.TilePreChangeEvent
 const GameOverEvent = Packages.mindustry.game.EventType.GameOverEvent
 const UnitControlEvent = Packages.mindustry.game.EventType.UnitControlEvent
 const PickupEvent = Packages.mindustry.game.EventType.PickupEvent

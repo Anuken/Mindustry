@@ -29,6 +29,13 @@ public class LightBlock extends Block{
         config(Integer.class, (LightBuild tile, Integer value) -> tile.color = value);
     }
 
+    @Override
+    public void init(){
+        lightRadius = radius;
+        emitLight = true;
+        super.init();
+    }
+
     public class LightBuild extends Building{
         public int color = Pal.accent.rgba();
         public float smoothTime = 1f;
@@ -67,7 +74,7 @@ public class LightBlock extends Block{
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, radius * Math.min(smoothTime, 2f), Tmp.c1.set(color), brightness * efficiency());
+            Drawf.light(team, x, y, lightRadius * Math.min(smoothTime, 2f), Tmp.c1.set(color), brightness * efficiency());
         }
 
         @Override

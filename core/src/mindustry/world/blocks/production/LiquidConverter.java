@@ -1,5 +1,6 @@
 package mindustry.world.blocks.production;
 
+import arc.math.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -47,16 +48,25 @@ public class LiquidConverter extends GenericCrafter{
             ConsumeLiquid cl = consumes.get(ConsumeType.liquid);
 
             if(cons.valid()){
+                if(Mathf.chanceDelta(updateEffectChance)){
+                    updateEffect.at(getX() + Mathf.range(size * 4f), getY() + Mathf.range(size * 4));
+                }
+
+                warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
                 float use = Math.min(cl.amount * edelta(), liquidCapacity - liquids.get(outputLiquid.liquid));
+                float ratio = outputLiquid.amount / cl.amount;
 
                 liquids.remove(cl.liquid, Math.min(use, liquids.get(cl.liquid)));
 
                 progress += use / cl.amount;
-                liquids.add(outputLiquid.liquid, use);
+                liquids.add(outputLiquid.liquid, use * ratio);
                 if(progress >= craftTime){
                     consume();
                     progress %= craftTime;
                 }
+            }else{
+                //warmup is still 1 even if not consuming
+                warmup = Mathf.lerp(warmup, cons.canConsume() ? 1f : 0f, 0.02f);
             }
 
             dumpLiquid(outputLiquid.liquid);

@@ -192,11 +192,12 @@ public class JsonIO{
         json.setSerializer(UnlockableContent.class, new Serializer<>(){
             @Override
             public void write(Json json, UnlockableContent object, Class knownType){
-                json.writeValue(object.name);
+                json.writeValue(object == null ? null : object.name);
             }
 
             @Override
             public UnlockableContent read(Json json, JsonValue jsonData, Class type){
+                if(jsonData.isNull()) return null;
                 String str = jsonData.asString();
                 Item item = Vars.content.getByName(ContentType.item, str);
                 Liquid liquid = Vars.content.getByName(ContentType.liquid, str);

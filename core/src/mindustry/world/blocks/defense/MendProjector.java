@@ -43,6 +43,7 @@ public class MendProjector extends Block{
 
     @Override
     public void setStats(){
+        stats.timePeriod = useTime;
         super.setStats();
 
         stats.add(Stat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
@@ -90,9 +91,15 @@ public class MendProjector extends Block{
 
                 indexer.eachBlock(this, realRange, other -> other.damaged(), other -> {
                     other.heal(other.maxHealth() * (healPercent + phaseHeat * phaseBoost) / 100f * efficiency());
-                    Fx.healBlockFull.at(other.x, other.y, other.block.size, Tmp.c1.set(baseColor).lerp(phaseColor, phaseHeat));
+                    Fx.healBlockFull.at(other.x, other.y, other.block.size, baseColor);
                 });
             }
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return Mathf.clamp(charge / reload);
+            return super.sense(sensor);
         }
 
         @Override

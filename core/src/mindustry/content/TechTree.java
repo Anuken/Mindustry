@@ -445,7 +445,6 @@ public class TechTree implements ContentList{
                         node(ruinousShores, Seq.with(
                             new SectorComplete(craters),
                             new Research(graphitePress),
-                            new Research(combustionGenerator),
                             new Research(kiln),
                             new Research(mechanicalPump)
                         ), () -> {
@@ -549,8 +548,7 @@ public class TechTree implements ContentList{
                             node(fungalPass, Seq.with(
                                 new SectorComplete(stainedMountains),
                                 new Research(groundFactory),
-                                new Research(door),
-                                new Research(siliconSmelter)
+                                new Research(door)
                             ), () -> {
                                 node(nuclearComplex, Seq.with(
                                     new SectorComplete(fungalPass),

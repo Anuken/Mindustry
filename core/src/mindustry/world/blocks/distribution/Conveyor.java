@@ -106,8 +106,7 @@ public class Conveyor extends Block implements Autotiler{
     public class ConveyorBuild extends Building implements ChainedBuilding{
         //parallel array data
         public Item[] ids = new Item[capacity];
-        public float[] xs = new float[capacity];
-        public float[] ys = new float[capacity];
+        public float[] xs = new float[capacity], ys = new float[capacity];
         //amount of items, always < capacity
         public int len = 0;
         //next entity
@@ -150,7 +149,7 @@ public class Conveyor extends Block implements Autotiler{
                 tr1.trns(rotation * 90, tilesize, 0);
                 tr2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
 
-                Draw.rect(item.icon(Cicon.medium),
+                Draw.rect(item.fullIcon,
                     (tile.x * tilesize + tr1.x * ys[i] + tr2.x),
                     (tile.y * tilesize + tr1.y * ys[i] + tr2.y),
                     itemSize, itemSize);

@@ -147,11 +147,12 @@ public class ModsDialog extends BaseDialog{
     }
 
     void setup(){
+        boolean squish = Core.graphics.isPortrait();
         float h = 110f;
-        float w = mobile ? 440f : 524f;
+        float w = squish ? 410f : 524f;
 
         cont.clear();
-        cont.defaults().width(mobile ? 500 : 560f).pad(4);
+        cont.defaults().width(squish ? 480 : 560f).pad(4);
         cont.add("@mod.reloadrequired").visible(mods::requiresReload).center().get().setAlignment(Align.center);
         cont.row();
 
@@ -365,7 +366,7 @@ public class ModsDialog extends BaseDialog{
                 d.cont.pane(cs -> {
                     int i = 0;
                     for(UnlockableContent c : all){
-                        cs.button(new TextureRegionDrawable(c.icon(Cicon.medium)), Styles.cleari, Cicon.medium.size, () -> {
+                        cs.button(new TextureRegionDrawable(c.uiIcon), Styles.cleari, iconMed, () -> {
                             ui.content.show(c);
                         }).size(50f).with(im -> {
                             var click = im.getClickListener();

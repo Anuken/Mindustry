@@ -10,7 +10,7 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
-public class StaticWall extends Boulder{
+public class StaticWall extends Prop{
     public @Load("@-large") TextureRegion large;
     public TextureRegion[][] split;
 
@@ -33,6 +33,11 @@ public class StaticWall extends Boulder{
             Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
         }else{
             Draw.rect(region, tile.worldx(), tile.worldy());
+        }
+
+        //draw ore on top
+        if(tile.overlay() instanceof WallOreBlock ore){
+            ore.drawBase(tile);
         }
     }
 

@@ -21,8 +21,8 @@ import static mindustry.Vars.*;
 public interface Platform{
 
     /** Dynamically creates a class loader for a jar file. */
-    default ClassLoader loadJar(Fi jar, String mainClass) throws Exception{
-        return new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, getClass().getClassLoader());
+    default ClassLoader loadJar(Fi jar, ClassLoader parent) throws Exception{
+        return new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, parent);
     }
 
     /** Steam: Update lobby visibility.*/
@@ -59,6 +59,15 @@ public interface Platform{
     }
 
     default Context getScriptContext(){
+        ContextFactory.getGlobalSetter().setContextFactoryGlobal(new ContextFactory(){
+            @Override
+            protected Context makeContext(){
+                Context ctx = super.makeContext();
+                ctx.setClassShutter(Scripts::allowClass);
+                return ctx;
+            }
+        });
+
         Context c = Context.enter();
         c.setOptimizationLevel(9);
         return c;
