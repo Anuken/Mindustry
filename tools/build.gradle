@@ -220,7 +220,7 @@ task pack(dependsOn: [classes, configurations.runtimeClasspath]){
             if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-")) || file.toString().contains(".9.png")) return
 
             executor.submit{
-                antialias(file.file)
+                //antialias(file.file)
             }
         }
 
