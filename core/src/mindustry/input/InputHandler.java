@@ -448,10 +448,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return !selectRequests.isEmpty();
     }
 
-    public OverlayFragment getFrag(){
-        return frag;
-    }
-
     public void update(){
         player.typing = ui.chatfrag.shown();
 
@@ -466,8 +462,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         wasShooting = player.shooting;
 
         //only reset the controlled type and control a unit after the timer runs out
-        //essentially, this means the client waits for 1 second after controlling something before trying to control something else automatically
-        if(!player.dead() && (recentRespawnTimer -= Time.delta / 60f) <= 0f && player.justSwitchFrom != player.unit()){
+        //essentially, this means the client waits for ~1 second after controlling something before trying to control something else automatically
+        if(!player.dead() && (recentRespawnTimer -= Time.delta / 70f) <= 0f && player.justSwitchFrom != player.unit()){
             controlledType = player.unit().type;
         }
 
