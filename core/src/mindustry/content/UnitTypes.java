@@ -1936,7 +1936,6 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 bullet = new FlakBulletType(2.5f, 25){{
                     sprite = "missile-large";
-                    collides = false;
                     //for targeting
                     collidesGround = collidesAir = true;
                     explodeRange = 40f;
@@ -1950,9 +1949,9 @@ public class UnitTypes implements ContentList{
                     lightColor = Pal.heal;
 
                     splashDamageRadius = 30f;
-                    splashDamage = 28f;
+                    splashDamage = 25f;
 
-                    lifetime = 90f;
+                    lifetime = 80f;
                     backColor = Pal.heal;
                     frontColor = Color.white;
 
@@ -1982,11 +1981,11 @@ public class UnitTypes implements ContentList{
                     fragBullets = 7;
                     fragVelocityMin = 0.3f;
 
-                    fragBullet = new MissileBulletType(3.9f, 12){{
+                    fragBullet = new MissileBulletType(3.9f, 11){{
                         homingPower = 0.2f;
                         weaveMag = 4;
                         weaveScale = 4;
-                        lifetime = 70f;
+                        lifetime = 60f;
                         shootEffect = Fx.shootHeal;
                         smokeEffect = Fx.hitLaser;
                         splashDamage = 13f;
@@ -2112,8 +2111,8 @@ public class UnitTypes implements ContentList{
 
                         bullet = new ContinuousLaserBulletType(){{
                             maxRange = 90f;
-                            damage = 25f;
-                            length = 90f;
+                            damage = 26f;
+                            length = 95f;
                             hitEffect = Fx.hitMeltHeal;
                             drawSize = 200f;
                             lifetime = 155f;
@@ -2160,7 +2159,7 @@ public class UnitTypes implements ContentList{
                     timeIncrease = 3f;
                     timeDuration = 60f * 20f;
                     powerDamageScl = 3f;
-                    damage = 40;
+                    damage = 50;
                     hitColor = lightColor = Pal.heal;
                     lightRadius = 70f;
                     clipSize = 250f;
@@ -2176,7 +2175,7 @@ public class UnitTypes implements ContentList{
                     trailWidth = 6f;
                     trailColor = Pal.heal;
                     trailInterval = 3f;
-                    splashDamage = 40f;
+                    splashDamage = 60f;
                     splashDamageRadius = rad;
                     hitShake = 4f;
                     trailRotation = true;

@@ -45,6 +45,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     transient String lastText = "";
     transient float textFadeTime;
     transient private Unit lastReadUnit = Nulls.unit;
+    transient @Nullable Unit justSwitchFrom, justSwitchTo;
 
     public boolean isBuilder(){
         return unit.canBuild();
@@ -100,6 +101,16 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Override
     public void afterSync(){
+        //fix rubberbanding:
+        //when the player recs a unit that they JUST transitioned away from, use the new unit instead
+        //reason: we know the server is lying here, essentially skip the unit snapshot because we know the client's information is more recent
+        if(isLocal() && unit == justSwitchFrom && justSwitchFrom != null && justSwitchTo != null){
+            unit = justSwitchTo;
+        }else{
+            justSwitchFrom = null;
+            justSwitchTo = null;
+        }
+
         //simulate a unit change after sync
         Unit set = unit;
         unit = lastReadUnit;
@@ -149,6 +160,13 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     }
 
+    public void checkSpawn(){
+        CoreBuild core = bestCore();
+        if(core != null){
+            core.requestSpawn(self());
+        }
+    }
+
     @Override
     public void remove(){
         //clear unit upon removal
@@ -171,6 +189,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     }
 
     public void unit(Unit unit){
+        //refuse to switch when the unit was just transitioned from
+        if(isLocal() && unit == justSwitchFrom && justSwitchFrom != null && justSwitchTo != null){
+            return;
+        }
+
         if(unit == null) throw new IllegalArgumentException("Unit cannot be null. Use clearUnit() instead.");
         if(this.unit == unit) return;
 

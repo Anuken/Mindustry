@@ -58,6 +58,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public Group uiGroup;
     public boolean isBuilding = true, buildWasAutoPaused = false, wasShooting = false;
     public @Nullable UnitType controlledType;
+    public float recentRespawnTimer;
 
     public @Nullable Schematic lastSchematic;
     public GestureDetector detector;
@@ -375,14 +376,26 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot control a unit.");
         }
 
+        //TODO problem:
+        //1. server send snapshot
+        //2. client requests to control unit, becomes unit locally
+        //3. snapshot arrives, client now thinks they're in the old unit (!!!)
+        //4. server gets packet that player is in the right unit
+        //5. server sends snapshot
+        //6. client gets snapshot, realizes that they are actually in the unit they selected
+        //7. client gets switched to new unit -> rubberbanding (!!!)
+
         //clear player unit when they possess a core
         if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
         }else if(unit.isAI() && unit.team == player.team() && !unit.dead){
-            if(!net.client()){
-                player.unit(unit);
+            if(net.client()){
+                player.justSwitchFrom = player.unit();
+                player.justSwitchTo = unit;
             }
+
+            player.unit(unit);
 
             Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, unit));
             if(!player.dead()){
@@ -393,12 +406,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Events.fire(new UnitControlEvent(player, unit));
     }
 
-    @Remote(targets = Loc.both, called = Loc.both, forward = true)
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unitClear(Player player){
         if(player == null) return;
 
+        //problem: this gets called on both ends. it shouldn't be.
         Fx.spawn.at(player);
         player.clearUnit();
+        player.checkSpawn();
         player.deathTimer = Player.deathDelay + 1f; //for instant respawn
     }
 
@@ -419,7 +434,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             player.unit().commandNearby(new CircleFormation());
             Fx.commandSend.at(player, player.unit().type.commandRadius);
         }
-
     }
 
     public Eachable<BuildPlan> allRequests(){
@@ -451,7 +465,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         wasShooting = player.shooting;
 
-        if(!player.dead()){
+        //only reset the controlled type and control a unit after the timer runs out
+        //essentially, this means the client waits for 1 second after controlling something before trying to control something else automatically
+        if(!player.dead() && (recentRespawnTimer -= Time.delta / 60f) <= 0f){
             controlledType = player.unit().type;
         }
 
@@ -461,6 +477,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(unit != null){
                 //only trying controlling once a second to prevent packet spam
                 if(!net.client() || controlInterval.get(0, 70f)){
+                    recentRespawnTimer = 1f;
                     Call.unitControl(player, unit);
                 }
             }
