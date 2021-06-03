@@ -102,5 +102,9 @@
   {
     "name": "TSR", 
     "address": ["fifr4.quackhost.uk:20131"]
+  },
+  {
+    "name": "Sakura", 
+    "address": ["160.16.207.141"]
   }
 ]
