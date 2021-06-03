@@ -212,26 +212,29 @@ task pack(dependsOn: [classes, configurations.runtimeClasspath]){
             delete "../core/assets-raw/sprites_out/ui/icons"
         }
 
-        ExecutorService executor = Executors.newFixedThreadPool(16)
-        long ms = System.currentTimeMillis()
+        //disabled until the elusive sprite packing bug is fixed
+        if(false){
+            ExecutorService executor = Executors.newFixedThreadPool(16)
+            long ms = System.currentTimeMillis()
 
-        //antialias everything except UI elements
-        fileTree(dir: new File(rootDir, 'core/assets-raw/sprites_out/').absolutePath, include: "**/*.png").visit{ file ->
-            if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-")) || file.toString().contains(".9.png")) return
+            //antialias everything except UI elements
+            fileTree(dir: new File(rootDir, 'core/assets-raw/sprites_out/').absolutePath, include: "**/*.png").visit{ file ->
+                if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-")) || file.toString().contains(".9.png")) return
 
-            executor.submit{
-                //antialias(file.file)
+                executor.submit{
+                    antialias(file.file)
+                }
             }
-        }
 
-        executor.shutdown()
-        try{
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)
-        }catch(InterruptedException e){
-            e.printStackTrace()
-        }
+            executor.shutdown()
+            try{
+                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)
+            }catch(InterruptedException e){
+                e.printStackTrace()
+            }
 
-        println "Time taken for AA: ${(System.currentTimeMillis() - ms) / 1000f}"
+            println "Time taken for AA: ${(System.currentTimeMillis() - ms) / 1000f}"
+        }
 
         println("\n\nPacking normal 4096 sprites...\n\n")
 
