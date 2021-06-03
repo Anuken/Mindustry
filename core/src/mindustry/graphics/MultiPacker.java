@@ -26,6 +26,10 @@ public class MultiPacker implements Disposable{
         return null;
     }
 
+    public PixmapPacker getPacker(PageType type){
+        return packers[type.ordinal()];
+    }
+
     public boolean has(String name){
         for(var page : PageType.all){
             if(packers[page.ordinal()].getRect(name) != null){

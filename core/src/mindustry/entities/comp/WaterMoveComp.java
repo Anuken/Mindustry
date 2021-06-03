@@ -15,7 +15,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
-//just a proof of concept
 @Component
 abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     @Import float x, y, rotation;
