@@ -390,7 +390,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
         }else if(unit.isAI() && unit.team == player.team() && !unit.dead){
-            if(net.client()){
+            if(net.client() && player.isLocal()){
                 player.justSwitchFrom = player.unit();
                 player.justSwitchTo = unit;
             }
@@ -467,7 +467,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         //only reset the controlled type and control a unit after the timer runs out
         //essentially, this means the client waits for 1 second after controlling something before trying to control something else automatically
-        if(!player.dead() && (recentRespawnTimer -= Time.delta / 60f) <= 0f){
+        if(!player.dead() && (recentRespawnTimer -= Time.delta / 60f) <= 0f && player.justSwitchFrom != player.unit()){
             controlledType = player.unit().type;
         }
 
