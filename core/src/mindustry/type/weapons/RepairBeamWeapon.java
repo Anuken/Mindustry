@@ -5,12 +5,14 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.units.*;
+import mindustry.world.meta.*;
 
 /**
  * Note that this weapon requires a bullet with a positive maxRange.
@@ -45,6 +47,12 @@ public class RepairBeamWeapon extends Weapon{
         useAmmo = false;
         mountType = HealBeamMount::new;
         recoil = 0f;
+    }
+
+    @Override
+    public void addStats(UnitType u, Table w){
+        w.row();
+        w.add("[lightgray]" + Stat.repairSpeed.localized() + ": " + (mirror ? "2x " : "") + "[white]" + (int)(repairSpeed * 60) + " " + StatUnit.perSecond.localized());
     }
 
     @Override
