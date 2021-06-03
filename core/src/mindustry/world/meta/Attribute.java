@@ -1,9 +1,11 @@
 package mindustry.world.meta;
 
+import arc.struct.*;
 import mindustry.*;
 
 public class Attribute{
     public static Attribute[] all = {};
+    public static ObjectMap<String, Attribute> map = new ObjectMap<>();
 
     public static final Attribute
     /** Heat content. Used for thermal generator yield. */
@@ -36,6 +38,11 @@ public class Attribute{
         return name;
     }
 
+    /** Never returns null, may throw an exception if not found. */
+    public static Attribute get(String name){
+        return map.getThrow(name, () -> new IllegalArgumentException("Unknown Attribute type: " + name));
+    }
+
     /** Automatically registers this attribute for use. Do not call after mod init. */
     public static Attribute add(String name){
         Attribute a = new Attribute(all.length, name);
@@ -43,6 +50,7 @@ public class Attribute{
         all = new Attribute[all.length + 1];
         System.arraycopy(prev, 0, all, 0, a.id);
         all[a.id] = a;
+        map.put(name, a);
         return a;
     }
 }

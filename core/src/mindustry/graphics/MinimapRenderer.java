@@ -144,6 +144,14 @@ public class MinimapRenderer{
     public void update(Tile tile){
         if(world.isGenerating() || !state.isGame()) return;
 
+        if(tile.build != null && tile.isCenter()){
+            tile.getLinkedTiles(other -> {
+                if(!other.isCenter()){
+                    update(other);
+                }
+            });
+        }
+
         int color = colorFor(tile);
         pixmap.set(tile.x, pixmap.height - 1 - tile.y, color);
 
