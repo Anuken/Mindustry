@@ -1028,6 +1028,7 @@ public class Blocks implements ContentList{
             reloadTime = 200f;
             range = 440f;
             consumes.power(1.75f);
+            bullet = new MassDriverBolt();
         }};
 
         //special transport blocks
