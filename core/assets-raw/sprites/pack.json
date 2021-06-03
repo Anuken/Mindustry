@@ -4,9 +4,5 @@
   flattenPaths: true,
   maxWidth: 4096,
   maxHeight: 4096,
-  fast: true,
-  
-  edgePadding: false,
-  bleed: false,
-  debug: true
+  fast: true
 }
