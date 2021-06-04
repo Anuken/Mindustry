@@ -122,7 +122,8 @@ public class PayloadMassDriver extends PayloadBlock{
         public float turretRotation = 90;
         public float reload = 0f, charge = 0f;
         public float targetSize = grabWidth*2f, curSize = targetSize;
-        public float payLength = 0f;
+        public float payLength = 0f, effectDelayTimer = -1f;
+        public PayloadDriverBuild lastOther;
         public boolean loaded;
         public boolean charging;
         public PayloadDriverState state = idle;
@@ -149,6 +150,16 @@ public class PayloadMassDriver extends PayloadBlock{
 
             if(payload != null){
                 targetSize = payload.size();
+            }
+
+            boolean pos = effectDelayTimer > 0;
+            effectDelayTimer -= Time.delta;
+            if(effectDelayTimer <= 0 && pos && lastOther != null){
+                var other = lastOther;
+                float cx = Angles.trnsx(other.turretRotation, length), cy = Angles.trnsy(other.turretRotation, length);
+                receiveEffect.at(x - cx/2f, y - cy/2f, turretRotation);
+                reload = 1f;
+                Effect.shake(shake, shake, this);
             }
 
             charging = false;
@@ -192,7 +203,7 @@ public class PayloadMassDriver extends PayloadBlock{
                         payVector.setZero();
                         payRotation = Angles.moveToward(payRotation, turretRotation + 180f, payloadRotateSpeed * delta());
                     }
-                }else{
+                }else if(effectDelayTimer <= 0){
                     moveOutPayload();
                 }
             }
@@ -270,26 +281,22 @@ public class PayloadMassDriver extends PayloadBlock{
                                 transferEffect.at(x + cx, y + cy, turretRotation, new PayloadMassDriverData(x + cx, y + cy, other.x - cx, other.y - cy, payload));
                                 Payload pay = payload;
                                 other.recPayload = payload;
+                                other.effectDelayTimer = transferEffect.lifetime;
 
-                                Time.run(transferEffect.lifetime, () -> {
-                                    receiveEffect.at(other.x - cx/2f, other.y - cy/2f, other.turretRotation);
-                                    Effect.shake(shake, shake, this);
+                                //transfer payload
+                                other.handlePayload(this, pay);
+                                other.lastOther = this;
+                                other.payVector.set(-cx, -cy);
+                                other.payRotation = turretRotation;
+                                other.payLength = length;
+                                other.loaded = true;
+                                other.updatePayload();
+                                other.recPayload = null;
 
-                                    //transfer payload
-                                    other.reload = 1f;
-                                    other.handlePayload(this, pay);
-                                    other.payVector.set(-cx, -cy);
-                                    other.payRotation = turretRotation;
-                                    other.payLength = length;
-                                    other.loaded = true;
-                                    other.updatePayload();
-                                    other.recPayload = null;
-
-                                    if(other.waitingShooters.size != 0 && other.waitingShooters.first() == this){
-                                        other.waitingShooters.removeFirst();
-                                    }
-                                    other.state = idle;
-                                });
+                                if(other.waitingShooters.size != 0 && other.waitingShooters.first() == this){
+                                    other.waitingShooters.removeFirst();
+                                }
+                                other.state = idle;
 
                                 //reset state after shooting immediately
                                 payload = null;
@@ -341,8 +348,10 @@ public class PayloadMassDriver extends PayloadBlock{
             if(payload != null){
                 updatePayload();
 
-                Draw.z(loaded ? Layer.blockOver + 0.2f : Layer.blockOver);
-                payload.draw();
+                if(effectDelayTimer <= 0){
+                    Draw.z(loaded ? Layer.blockOver + 0.2f : Layer.blockOver);
+                    payload.draw();
+                }
             }
 
             Draw.z(Layer.blockOver + 0.1f);
