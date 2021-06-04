@@ -742,7 +742,7 @@ public class LStatements{
 
             row(table);
 
-            table.label(() -> " go to " + ((dest != null) ? dest.address:destIndex));
+            table.label(() -> " go to " + ((dest != null) ? dest.address:-1));
         }
 
         //elements need separate conversion logic
