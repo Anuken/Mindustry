@@ -31,7 +31,7 @@ public class MinerAI extends AIController{
             //core full of the target item, do nothing
             if(targetItem != null && core.acceptStack(targetItem, 1, unit) == 0){
                 unit.clearItem();
-                unit.mineTile(null);
+                unit.mineTile =null;
                 return;
             }
 
@@ -46,7 +46,7 @@ public class MinerAI extends AIController{
                 if(ore != null){
                     moveTo(ore, unit.type.miningRange / 2f, 20f);
 
-                    if(unit.within(ore, unit.type.miningRange)){
+                    if(ore.block() == Blocks.air && unit.within(ore, unit.type.miningRange)){
                         unit.mineTile = ore;
                     }
 

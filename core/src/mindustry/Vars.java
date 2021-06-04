@@ -11,10 +11,13 @@ import arc.util.Log.*;
 import mindustry.ai.*;
 import mindustry.async.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
+import mindustry.editor.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.io.*;
 import mindustry.logic.*;
@@ -23,6 +26,7 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.Net;
 import mindustry.net.*;
+import mindustry.service.*;
 import mindustry.world.*;
 
 import java.io.*;
@@ -42,6 +46,10 @@ public class Vars implements Loadable{
     public static boolean experimental = false;
     /** Name of current Steam player. */
     public static String steamPlayerName = "";
+    /** Default accessible content types used for player-selectable icons. */
+    public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block};
+    /** Wall darkness radius. */
+    public static final int darkRadius = 4;
     /** Maximum extra padding around deployment schematics. */
     public static final int maxLoadoutSchematicPad = 5;
     /** Maximum schematic size.*/
@@ -65,7 +73,8 @@ public class Vars implements Loadable{
     /** URL to the JSON file containing all the BE servers. Only queried in BE. */
     public static final String serverJsonBeURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_be.json";
     /** URL to the JSON file containing all the stable servers.  */
-    public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_v6.json";
+    //TODO this uses BE servers until full v7 release, there's no point in displaying v6 at all
+    public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_be.json";
     /** URL of the github issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
@@ -81,7 +90,7 @@ public class Vars implements Loadable{
     /** displayed item size when ingame. */
     public static final float itemSize = 5f;
     /** units outside of this bound will die instantly */
-    public static final float finalWorldBounds = 500;
+    public static final float finalWorldBounds = 250;
     /** range for building */
     public static final float buildingRange = 220f;
     /** range for moving items */
@@ -102,6 +111,8 @@ public class Vars implements Loadable{
     public static final int tilesize = 8;
     /** size of one tile payload (^2) */
     public static final float tilePayload = tilesize * tilesize;
+    /** icon sizes for UI */
+    public static final float iconXLarge = 8*6f, iconLarge = 8*5f, iconMed = 8*4f, iconSmall = 8*3f;
     /** tile used in certain situations, instead of null */
     public static Tile emptyTile;
     /** for map generator dialog */
@@ -131,6 +142,14 @@ public class Vars implements Loadable{
     public static final int multicastPort = 20151;
     /** multicast group for discovery.*/
     public static final String multicastGroup = "227.2.7.7";
+    /** whether the graphical game client has loaded */
+    public static boolean clientLoaded = false;
+    /** max GL texture size */
+    public static int maxTextureSize = 2048;
+    /** Whether to show the core landing animation. */
+    public static boolean showLandAnimation = true;
+    /** Whether to prompt the user to confirm exiting. */
+    public static boolean confirmExit = true;
     /** if true, UI is not drawn */
     public static boolean disableUI;
     /** if true, game is set up in mobile mode, even on desktop. used for debugging */
@@ -199,6 +218,8 @@ public class Vars implements Loadable{
     public static AsyncCore asyncCore;
     public static BaseRegistry bases;
     public static GlobalConstants constants;
+    public static MapEditor editor;
+    public static GameService service = new GameService();
 
     public static Universe universe;
     public static World world;
@@ -243,6 +264,7 @@ public class Vars implements Loadable{
         }
 
         Version.init();
+        CacheLayer.init();
 
         dataDirectory = settings.getDataDirectory();
         screenshotDirectory = dataDirectory.child("screenshots/");
@@ -266,6 +288,7 @@ public class Vars implements Loadable{
         universe = new Universe();
         becontrol = new BeControl();
         asyncCore = new AsyncCore();
+        if(!headless) editor = new MapEditor();
 
         maps = new Maps();
         spawner = new WaveSpawner();
@@ -394,7 +417,7 @@ public class Vars implements Loadable{
             Log.info("NOTE: external translation bundle has been loaded.");
 
             if(!headless){
-                Time.run(10f, () -> ui.showInfo("Note: You have successfully loaded an external translation bundle."));
+                Time.run(10f, () -> ui.showInfo("Note: You have successfully loaded an external translation bundle.\n[accent]" + handle.absolutePath()));
             }
         }catch(Throwable e){
             //no external bundle found

@@ -5,33 +5,62 @@ import arc.func.*;
 import arc.net.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.pooling.*;
 import mindustry.gen.*;
 import mindustry.net.Packets.*;
 import mindustry.net.Streamable.*;
-import net.jpountz.lz4.*;
 
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 
+import static arc.util.Log.*;
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class Net{
+    private static Seq<Prov<? extends Packet>> packetProvs = new Seq<>();
+    private static Seq<Class<? extends Packet>> packetClasses = new Seq<>();
+    private static ObjectIntMap<Class<?>> packetToId = new ObjectIntMap<>();
+
     private boolean server;
     private boolean active;
     private boolean clientLoaded;
     private @Nullable StreamBuilder currentStream;
 
-    private final Seq<Object> packetQueue = new Seq<>();
+    private final Seq<Packet> packetQueue = new Seq<>();
     private final ObjectMap<Class<?>, Cons> clientListeners = new ObjectMap<>();
     private final ObjectMap<Class<?>, Cons2<NetConnection, Object>> serverListeners = new ObjectMap<>();
     private final IntMap<StreamBuilder> streams = new IntMap<>();
 
     private final NetProvider provider;
-    private final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
-    private final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
+
+    static{
+        registerPacket(StreamBegin::new);
+        registerPacket(StreamChunk::new);
+        registerPacket(WorldStream::new);
+        registerPacket(ConnectPacket::new);
+
+        //register generated packet classes
+        Call.registerPackets();
+    }
+
+    /** Registers a new packet type for serialization. */
+    public static <T extends Packet> void registerPacket(Prov<T> cons){
+        packetProvs.add(cons);
+        var t = cons.get();
+        packetClasses.add(t.getClass());
+        packetToId.put(t.getClass(), packetProvs.size - 1);
+    }
+
+    public static byte getPacketId(Packet packet){
+        int id = packetToId.get(packet.getClass(), -1);
+        if(id == -1) throw new ArcRuntimeException("Unknown packet type: " + packet.getClass());
+        return (byte)id;
+    }
+
+    public static <T extends Packet> T newPacket(byte id){
+        return ((Prov<T>)packetProvs.get(id & 0xff)).get();
+    }
 
     public Net(NetProvider provider){
         this.provider = provider;
@@ -39,9 +68,9 @@ public class Net{
 
     public void handleException(Throwable e){
         if(e instanceof ArcNetException){
-            Core.app.post(() -> showError(new IOException("mismatch")));
+            Core.app.post(() -> showError(new IOException("mismatch", e)));
         }else if(e instanceof ClosedChannelException){
-            Core.app.post(() -> showError(new IOException("alreadyconnected")));
+            Core.app.post(() -> showError(new IOException("alreadyconnected", e)));
         }else{
             Core.app.post(() -> showError(e));
         }
@@ -171,14 +200,6 @@ public class Net{
         active = false;
     }
 
-    public byte[] compressSnapshot(byte[] input){
-        return compressor.compress(input);
-    }
-
-    public byte[] decompressSnapshot(byte[] input, int size){
-        return decompressor.decompress(input, size);
-    }
-
     /**
      * Starts discovering servers on a different thread.
      * Callback is run on the main Arc thread.
@@ -195,21 +216,21 @@ public class Net{
     }
 
     /** Send an object to all connected clients, or to the server if this is a client.*/
-    public void send(Object object, SendMode mode){
+    public void send(Object object, boolean reliable){
         if(server){
             for(NetConnection con : provider.getConnections()){
-                con.send(object, mode);
+                con.send(object, reliable);
             }
         }else{
-            provider.sendClient(object, mode);
+            provider.sendClient(object, reliable);
         }
     }
 
     /** Send an object to everyone EXCEPT a certain client. Server-side only.*/
-    public void sendExcept(NetConnection except, Object object, SendMode mode){
+    public void sendExcept(NetConnection except, Object object, boolean reliable){
         for(NetConnection con : getConnections()){
             if(con != except){
-                con.send(object, mode);
+                con.send(object, reliable);
             }
         }
     }
@@ -235,7 +256,8 @@ public class Net{
     /**
      * Call to handle a packet being received for the client.
      */
-    public void handleClientReceived(Object object){
+    public void handleClientReceived(Packet object){
+        object.handled();
 
         if(object instanceof StreamBegin b){
             streams.put(b.id, currentStream = new StreamBuilder(b));
@@ -251,33 +273,45 @@ public class Net{
                 handleClientReceived(builder.build());
                 currentStream = null;
             }
-        }else if(clientListeners.get(object.getClass()) != null){
+        }else{
+            int p = object.getPriority();
 
-            if(clientLoaded || ((object instanceof Packet) && ((Packet)object).isImportant())){
+            if(clientLoaded || p == Packet.priorityHigh){
                 if(clientListeners.get(object.getClass()) != null){
                     clientListeners.get(object.getClass()).get(object);
+                }else{
+                    object.handleClient();
                 }
-                Pools.free(object);
-            }else if(!((object instanceof Packet) && ((Packet)object).isUnimportant())){
+            }else if(p != Packet.priorityLow){
                 packetQueue.add(object);
-            }else{
-                Pools.free(object);
             }
-        }else{
-            Log.err("Unhandled packet type: '@'!", object);
         }
     }
 
     /**
      * Call to handle a packet being received for the server.
      */
-    public void handleServerReceived(NetConnection connection, Object object){
+    public void handleServerReceived(NetConnection connection, Packet object){
+        object.handled();
 
-        if(serverListeners.get(object.getClass()) != null){
-            serverListeners.get(object.getClass()).get(connection, object);
-            Pools.free(object);
-        }else{
-            Log.err("Unhandled packet type: '@'!", object.getClass());
+        try{
+            //handle object normally
+            if(serverListeners.get(object.getClass()) != null){
+                serverListeners.get(object.getClass()).get(connection, object);
+            }else{
+                object.handleServer(connection);
+            }
+        }catch(ValidateException e){
+            //ignore invalid actions
+            debug("Validation failed for '@': @", e.player, e.getMessage());
+        }catch(RuntimeException e){
+            //ignore indirect ValidateException-s
+            if(e.getCause() instanceof ValidateException v){
+                debug("Validation failed for '@': @", v.player, v.getMessage());
+            }else{
+                //rethrow if not ValidateException
+                throw e;
+            }
         }
     }
 
@@ -315,17 +349,13 @@ public class Net{
         active = false;
     }
 
-    public enum SendMode{
-        tcp, udp
-    }
-
     /** Networking implementation. */
     public interface NetProvider{
         /** Connect to a server. */
         void connectClient(String ip, int port, Runnable success) throws IOException;
 
         /** Send an object to the server. */
-        void sendClient(Object object, SendMode mode);
+        void sendClient(Object object, boolean reliable);
 
         /** Disconnect from the server. */
         void disconnectClient();
@@ -355,4 +385,5 @@ public class Net{
             closeServer();
         }
     }
+
 }

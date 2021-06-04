@@ -15,17 +15,21 @@ public class DrawAnimation extends DrawBlock{
     public TextureRegion liquid, top;
 
     @Override
-    public void draw(GenericCrafterBuild entity){
-        Draw.rect(entity.block.region, entity.x, entity.y);
+    public void draw(GenericCrafterBuild build){
+        Draw.rect(build.block.region, build.x, build.y);
         Draw.rect(
             sine ?
-                frames[(int)Mathf.absin(entity.totalProgress, frameSpeed, frameCount - 0.001f)] :
-                frames[(int)((entity.totalProgress / frameSpeed) % frameCount)],
-            entity.x, entity.y);
-        Draw.color(Color.clear, entity.liquids.current().color, entity.liquids.total() / entity.block.liquidCapacity);
-        Draw.rect(liquid, entity.x, entity.y);
-        Draw.color();
-        Draw.rect(top, entity.x, entity.y);
+                frames[(int)Mathf.absin(build.totalProgress, frameSpeed, frameCount - 0.001f)] :
+                frames[(int)((build.totalProgress / frameSpeed) % frameCount)],
+            build.x, build.y);
+        if(build.liquids != null){
+            Draw.color(Color.clear, build.liquids.current().color, build.liquids.total() / build.block.liquidCapacity);
+            Draw.rect(liquid, build.x, build.y);
+            Draw.color();
+        }
+        if(top.found()){
+            Draw.rect(top, build.x, build.y);
+        }
     }
 
     @Override

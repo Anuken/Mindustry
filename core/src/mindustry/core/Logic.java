@@ -17,6 +17,7 @@ import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.graphics.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.util.*;
 
@@ -37,8 +38,8 @@ public class Logic implements ApplicationListener{
         Events.on(BlockDestroyEvent.class, event -> {
             //blocks that get broken are appended to the team's broken block queue
             Tile tile = event.tile;
-            //skip null entities or un-rebuildables, for obvious reasons; also skip client since they can't modify these requests
-            if(tile.build == null || !tile.block().rebuildable || net.client()) return;
+            //skip null entities or un-rebuildables, for obvious reasons
+            if(tile.build == null || !tile.block().rebuildable) return;
 
             tile.build.addPlan(true);
         });
@@ -177,10 +178,11 @@ public class Logic implements ApplicationListener{
         if(!state.isCampaign()){
             for(TeamData team : state.teams.getActive()){
                 if(team.hasCore()){
-                    Building entity = team.core();
+                    CoreBuild entity = team.core();
                     entity.items.clear();
                     for(ItemStack stack : state.rules.loadout){
-                        entity.items.add(stack.item, stack.amount);
+                        //make sure to cap storage
+                        entity.items.add(stack.item, Math.min(stack.amount, entity.storageCapacity - entity.items.get(stack.item)));
                     }
                 }
             }
@@ -446,6 +448,7 @@ public class Logic implements ApplicationListener{
 
                 //apply weather attributes
                 state.envAttrs.clear();
+                state.envAttrs.add(state.rules.attributes);
                 Groups.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
 
                 Groups.update();

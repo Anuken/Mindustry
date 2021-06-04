@@ -39,6 +39,11 @@ public class BufferedItemBridge extends ExtendingItemBridge{
         }
 
         @Override
+        public void doDump(){
+            dump();
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             buffer.write(write);

@@ -3,6 +3,7 @@ package mindustry.maps.filters;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 
@@ -24,6 +25,11 @@ public class MedianFilter extends GenerateFilter{
     @Override
     public boolean isBuffered(){
         return true;
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockSporePine;
     }
 
     @Override

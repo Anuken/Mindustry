@@ -1,24 +1,56 @@
 package mindustry.world.meta;
 
+import arc.struct.*;
 import mindustry.*;
 
-public enum Attribute{
-    /** Heat of this block. Used for calculating output of thermal generators. */
-    heat,
-    /** Spore content of this block. Used for increasing cultivator yield. */
-    spores,
-    /** Water content of this block. Used for increasing water extractor yield. */
-    water,
-    /** Oil content of this block. Used for increasing oil extractor yield. */
-    oil,
+public class Attribute{
+    public static Attribute[] all = {};
+    public static ObjectMap<String, Attribute> map = new ObjectMap<>();
+
+    public static final Attribute
+    /** Heat content. Used for thermal generator yield. */
+    heat = add("heat"),
+    /** Spore content. Used for cultivator yield. */
+    spores = add("spores"),
+    /** Water content. Used for water extractor yield. */
+    water = add("water"),
+    /** Oil content. Used for  oil extractor yield. */
+    oil = add("oil"),
     /** Light coverage. Negative values decrease solar panel efficiency. */
-    light;
+    light = add("light");
 
-    public static final Attribute[] all = values();
+    public final int id;
+    public final String name;
 
-    /** @return the envrionmental value for this attribute. */
+    /** @return the environmental value for this attribute. */
     public float env(){
         if(Vars.state == null) return 0;
         return Vars.state.envAttrs.get(this);
+    }
+
+    Attribute(int id, String name){
+        this.id = id;
+        this.name = name;
+    }
+
+    @Override
+    public String toString(){
+        return name;
+    }
+
+    /** Never returns null, may throw an exception if not found. */
+    public static Attribute get(String name){
+        return map.getThrow(name, () -> new IllegalArgumentException("Unknown Attribute type: " + name));
+    }
+
+    /** Automatically registers this attribute for use. Do not call after mod init. */
+    public static Attribute add(String name){
+        Attribute a = new Attribute(all.length, name);
+        Attribute[] prev = all;
+        all = new Attribute[all.length + 1];
+        System.arraycopy(prev, 0, all, 0, a.id);
+        all[a.id] = a;
+        map.put(name, a);
+        return a;
     }
 }
