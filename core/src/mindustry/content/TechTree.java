@@ -423,7 +423,7 @@ public class TechTree implements ContentList{
 
                             node(retusa, () -> {
                                 node(oxynoe, () -> {
-                                    node(cyclone, () -> {
+                                    node(cyerce, () -> {
                                         node(aegires, () -> {
                                             node(navanax, () -> {
 
