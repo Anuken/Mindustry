@@ -445,7 +445,7 @@ public class BulletType extends Content implements Cloneable{
         bullet.owner = owner;
         bullet.team = team;
         bullet.time = 0f;
-        bullet.vel.trns(angle, speed * velocityScl);
+        bullet.initVel(angle, speed * velocityScl);
         if(backMove){
             bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
         }else{
@@ -462,7 +462,7 @@ public class BulletType extends Content implements Cloneable{
         }
         bullet.add();
 
-        if(keepVelocity && owner instanceof Velc v) bullet.vel.add(v.vel().x, v.vel().y);
+        if(keepVelocity && owner instanceof Velc v) bullet.vel.add(v.vel());
         return bullet;
     }
 
