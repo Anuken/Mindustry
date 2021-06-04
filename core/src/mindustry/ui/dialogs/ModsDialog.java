@@ -147,12 +147,11 @@ public class ModsDialog extends BaseDialog{
     }
 
     void setup(){
-        boolean squish = Core.graphics.isPortrait();
         float h = 110f;
-        float w = squish ? 410f : 524f;
+        float w = Math.min(Core.graphics.getWidth() / 1.1f, 520f); //squish ? 410f : 524f;
 
         cont.clear();
-        cont.defaults().width(squish ? 480 : 560f).pad(4);
+        cont.defaults().width(Math.min(Core.graphics.getWidth() / 1.2f, 520f)).pad(4);
         cont.add("@mod.reloadrequired").visible(mods::requiresReload).center().get().setAlignment(Align.center);
         cont.row();
 
