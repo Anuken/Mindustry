@@ -198,15 +198,10 @@ public class StatValues{
 
                 table.image(region).size(60).scaling(Scaling.bounded).right().top();
 
-                table.table(Tex.underline,  w -> {
+                table.table(Tex.underline, w -> {
                     w.left().defaults().padRight(3).left();
 
-                    if(weapon.inaccuracy > 0){
-                        sep(w, "[lightgray]" + Stat.inaccuracy.localized() + ": [white]" + (int)weapon.inaccuracy + " " + StatUnit.degrees.localized());
-                    }
-                    sep(w, "[lightgray]" + Stat.reload.localized() + ": " + (weapon.mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / weapon.reload * weapon.shots, 2));
-
-                    ammo(ObjectMap.of(unit, weapon.bullet)).display(w);
+                    weapon.addStats(unit, w);
                 }).padTop(-9).left();
                 table.row();
             }
@@ -298,7 +293,6 @@ public class StatValues{
     }
 
     //for AmmoListValue
-
     private static void sep(Table table, String text){
         table.row();
         table.add(text);

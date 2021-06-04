@@ -7,6 +7,8 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.audio.*;
 import mindustry.content.*;
@@ -15,6 +17,7 @@ import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -117,6 +120,17 @@ public class Weapon implements Cloneable{
 
     public Weapon(){
         this("");
+    }
+
+    public void addStats(UnitType u, Table t){
+        if(inaccuracy > 0){
+            t.row();
+            t.add("[lightgray]" + Stat.inaccuracy.localized() + ": [white]" + (int)inaccuracy + " " + StatUnit.degrees.localized());
+        }
+        t.row();
+        t.add("[lightgray]" + Stat.reload.localized() + ": " + (mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / reload * shots, 2));
+
+        StatValues.ammo(ObjectMap.of(u, bullet)).display(t);
     }
 
     public float dps(){
