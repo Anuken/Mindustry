@@ -16,7 +16,7 @@ public class ParticleWeather extends Weather{
     public float sinSclMin = 30f, sinSclMax = 80f, sinMagMin = 1f, sinMagMax = 7f;
 
     public Color noiseColor = color;
-    public boolean drawNoise = false, drawParticles = true, useWindVector = false;
+    public boolean drawNoise = false, drawParticles = true, useWindVector = false, randomParticleRotation = false;
     public int noiseLayers = 1;
     public float noiseLayerSpeedM = 1.1f, noiseLayerAlphaM = 0.8f, noiseLayerSclM = 0.99f, noiseLayerColorM = 1f;
     public String noisePath = "noiseAlpha";
@@ -41,7 +41,7 @@ public class ParticleWeather extends Weather{
 
     @Override
     public void update(WeatherState state){
-        float speed = force * state.intensity;
+        float speed = force * state.intensity * Time.delta;
         if(speed > 0.001f){
             float windx = state.windVector.x * speed, windy = state.windVector.y * speed;
 
@@ -84,7 +84,7 @@ public class ParticleWeather extends Weather{
         }
 
         if(drawParticles){
-            drawParticles(region, color, sizeMin, sizeMax, density, state.intensity, state.opacity, windx, windy, minAlpha, maxAlpha, sinSclMin, sinSclMax, sinMagMin, sinMagMax);
+            drawParticles(region, color, sizeMin, sizeMax, density, state.intensity, state.opacity, windx, windy, minAlpha, maxAlpha, sinSclMin, sinSclMax, sinMagMin, sinMagMax, randomParticleRotation);
         }
     }
 }

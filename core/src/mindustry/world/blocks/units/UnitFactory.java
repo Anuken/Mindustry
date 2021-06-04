@@ -98,7 +98,7 @@ public class UnitFactory extends UnitBlock{
             table.row();
             for(var plan : p){
                 if(plan.unit.unlockedNow()){
-                    table.image(plan.unit.icon(Cicon.small)).size(8 * 3).padRight(2).right();
+                    table.image(plan.unit.uiIcon).size(8 * 3).padRight(2).right();
                     table.add(plan.unit.localizedName).left();
                     table.add(Strings.autoFixed(plan.time / 60f, 1) + " " + Core.bundle.get("unit.seconds")).color(Color.lightGray).padLeft(12).left();
                     table.row();
@@ -143,6 +143,7 @@ public class UnitFactory extends UnitBlock{
         @Override
         public Object senseObject(LAccess sensor){
             if(sensor == LAccess.config) return currentPlan == -1 ? null : plans.get(currentPlan).unit;
+            if(sensor == LAccess.progress) return Mathf.clamp(fraction());
             return super.senseObject(sensor);
         }
 
@@ -172,7 +173,7 @@ public class UnitFactory extends UnitBlock{
             table.table(t -> {
                 t.left();
                 t.image().update(i -> {
-                    i.setDrawable(currentPlan == -1 ? Icon.cancel : reg.set(plans.get(currentPlan).unit.icon(Cicon.medium)));
+                    i.setDrawable(currentPlan == -1 ? Icon.cancel : reg.set(plans.get(currentPlan).unit.uiIcon));
                     i.setScaling(Scaling.fit);
                     i.setColor(currentPlan == -1 ? Color.lightGray : Color.white);
                 }).size(32).padBottom(-4).padRight(2);

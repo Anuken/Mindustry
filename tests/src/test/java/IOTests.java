@@ -3,6 +3,8 @@ import arc.util.io.*;
 import mindustry.game.*;
 import mindustry.io.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 
 import java.nio.*;
 
@@ -10,28 +12,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class IOTests{
 
-    @Test
-    void writeEnglish(){
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {
+        "asd asd asd asd asdagagasasjakbgeah;jwrej 23424234",
+        "这个服务器可以用自己的语言说话"
+    })
+    void writeStringTest(String string){
         ByteBuffer buffer = ByteBuffer.allocate(500);
-        TypeIO.writeString(buffer, "asd asd asd asd asdagagasasjakbgeah;jwrej 23424234");
+        TypeIO.writeString(buffer, string);
         buffer.position(0);
-        assertEquals(TypeIO.readString(buffer), "asd asd asd asd asdagagasasjakbgeah;jwrej 23424234");
-    }
-
-    @Test
-    void writeChinese(){
-        ByteBuffer buffer = ByteBuffer.allocate(500);
-        TypeIO.writeString(buffer, "这个服务器可以用自己的语言说话");
-        buffer.position(0);
-        assertEquals(TypeIO.readString(buffer), "这个服务器可以用自己的语言说话");
-    }
-
-    @Test
-    void writeNull(){
-        ByteBuffer buffer = ByteBuffer.allocate(500);
-        TypeIO.writeString(buffer, null);
-        buffer.position(0);
-        assertNull(TypeIO.readString(buffer));
+        assertEquals(TypeIO.readString(buffer), string);
     }
 
     @Test

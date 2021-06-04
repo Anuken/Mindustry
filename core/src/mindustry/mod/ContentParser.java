@@ -26,6 +26,7 @@ import mindustry.entities.effect.*;
 import mindustry.game.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.type.weather.*;
@@ -59,6 +60,8 @@ public class ContentParser{
             return result;
         });
         put(Interp.class, (type, data) -> field(Interp.class, data));
+        put(CacheLayer.class, (type, data) -> field(CacheLayer.class, data));
+        put(Attribute.class, (type, data) -> Attribute.get(data.asString()));
         put(Schematic.class, (type, data) -> {
             Object result = fieldOpt(Loadouts.class, data);
             if(result != null){
@@ -132,7 +135,9 @@ public class ContentParser{
             return obj;
         });
         put(Weapon.class, (type, data) -> {
-            Weapon weapon = new Weapon();
+            var oc = resolve(data.getString("type", ""), Weapon.class);
+            data.remove("type");
+            var weapon = make(oc);
             readFields(weapon, data);
             weapon.name = currentMod.name + "-" + weapon.name;
             return weapon;
@@ -325,8 +330,17 @@ public class ContentParser{
             return item;
         },
         ContentType.item, parser(ContentType.item, Item::new),
-        ContentType.liquid, parser(ContentType.liquid, Liquid::new)
-        //ContentType.sector, parser(ContentType.sector, SectorPreset::new)
+        ContentType.liquid, parser(ContentType.liquid, Liquid::new),
+        ContentType.status, parser(ContentType.status, StatusEffect::new),
+        ContentType.sector, (TypeParser<SectorPreset>)(mod, name, value) -> {
+            if(value.isString()){
+                return locate(ContentType.sector, name);
+            }
+
+            if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
+
+            return new SectorPreset(name, locate(ContentType.planet, value.getString("planet", "serpulo")), value.getInt("sector"));
+        }
     );
 
     private Prov<Unit> unitType(JsonValue value){
@@ -714,14 +728,10 @@ public class ContentParser{
             try{
                 return (Class<T>)Class.forName(base);
             }catch(Exception ignored){
-                //try to load from a mod's class loader
-                for(LoadedMod mod : mods.mods){
-                    if(mod.loader != null){
-                        try{
-                            return (Class<T>)Class.forName(base, true, mod.loader);
-                        }catch(Exception ignore){}
-                    }
-                }
+                //try to use mod class loader
+                try{
+                    return (Class<T>)Class.forName(base, true, mods.mainLoader());
+                }catch(Exception ignore){}
             }
         }
 

@@ -4,7 +4,6 @@ import arc.graphics.g2d.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
@@ -34,7 +33,7 @@ abstract class BlockUnitComp implements Unitc{
     @Replace
     @Override
     public TextureRegion icon(){
-        return tile.block.icon(Cicon.full);
+        return tile.block.fullIcon;
     }
 
     @Override

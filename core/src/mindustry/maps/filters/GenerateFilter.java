@@ -82,6 +82,10 @@ public abstract class GenerateFilter{
         return Core.bundle.get("filter." + c.getSimpleName().toLowerCase().replace("filter", ""), c.getSimpleName().replace("Filter", ""));
     }
 
+    public char icon(){
+        return '\0';
+    }
+
     /** set the seed to a random number */
     public void randomize(){
         seed = Mathf.random(99999999);

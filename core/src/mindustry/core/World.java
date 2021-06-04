@@ -271,13 +271,13 @@ public class World{
     private void setSectorRules(Sector sector){
         state.map = new Map(StringMap.of("name", sector.preset == null ? sector.planet.localizedName + "; Sector " + sector.id : sector.preset.localizedName));
         state.rules.sector = sector;
-
         state.rules.weather.clear();
 
-        //apply weather based on terrain
-        ObjectIntMap<Block> floorc = new ObjectIntMap<>();
+        sector.planet.generator.addWeather(sector, state.rules);
+
         ObjectSet<UnlockableContent> content = new ObjectSet<>();
 
+        //TODO duplicate code?
         for(Tile tile : world.tiles){
             if(world.getDarkness(tile.x, tile.y) >= 3){
                 continue;
@@ -287,47 +287,6 @@ public class World{
             if(tile.floor().itemDrop != null) content.add(tile.floor().itemDrop);
             if(tile.overlay().itemDrop != null) content.add(tile.overlay().itemDrop);
             if(liquid != null) content.add(liquid);
-
-            if(!tile.block().isStatic()){
-                floorc.increment(tile.floor());
-                if(tile.overlay() != Blocks.air){
-                    floorc.increment(tile.overlay());
-                }
-            }
-        }
-
-        //sort counts in descending order
-        Seq<Entry<Block>> entries = floorc.entries().toArray();
-        entries.sort(e -> -e.value);
-        //remove all blocks occuring < 30 times - unimportant
-        entries.removeAll(e -> e.value < 30);
-
-        Block[] floors = new Block[entries.size];
-        for(int i = 0; i < entries.size; i++){
-            floors[i] = entries.get(i).key;
-        }
-
-        //TODO bad code
-        boolean hasSnow = floors[0].name.contains("ice") || floors[0].name.contains("snow");
-        boolean hasRain = !hasSnow && content.contains(Liquids.water) && !floors[0].name.contains("sand");
-        boolean hasDesert = !hasSnow && !hasRain && floors[0] == Blocks.sand;
-        boolean hasSpores = floors[0].name.contains("spore") || floors[0].name.contains("moss") || floors[0].name.contains("tainted");
-
-        if(hasSnow){
-            state.rules.weather.add(new WeatherEntry(Weathers.snow));
-        }
-
-        if(hasRain){
-            state.rules.weather.add(new WeatherEntry(Weathers.rain));
-            state.rules.weather.add(new WeatherEntry(Weathers.fog));
-        }
-
-        if(hasDesert){
-            state.rules.weather.add(new WeatherEntry(Weathers.sandstorm));
-        }
-
-        if(hasSpores){
-            state.rules.weather.add(new WeatherEntry(Weathers.sporestorm));
         }
 
         sector.info.resources = content.asArray();
@@ -391,12 +350,6 @@ public class World{
         }
 
         if(invalidMap) Core.app.post(() -> state.set(State.menu));
-    }
-
-    public void notifyChanged(Tile tile){
-        if(!generating){
-            Core.app.post(() -> Events.fire(new TileChangeEvent(tile)));
-        }
     }
 
     public void raycastEachWorld(float x0, float y0, float x1, float y1, Raycaster cons){
@@ -464,7 +417,7 @@ public class World{
         byte[] dark = new byte[tiles.width * tiles.height];
         byte[] writeBuffer = new byte[tiles.width * tiles.height];
 
-        byte darkIterations = 4;
+        byte darkIterations = darkRadius;
 
         for(int i = 0; i < dark.length; i++){
             Tile tile = tiles.geti(i);
@@ -498,7 +451,7 @@ public class World{
                 tile.data = dark[idx];
             }
 
-            if(dark[idx] == 4){
+            if(dark[idx] == darkRadius){
                 boolean full = true;
                 for(Point2 p : Geometry.d4){
                     int px = p.x + tile.x, py = p.y + tile.y;
@@ -509,11 +462,28 @@ public class World{
                     }
                 }
 
-                if(full) tile.data = 5;
+                if(full) tile.data = darkRadius + 1;
             }
         }
     }
 
+    public byte getWallDarkness(Tile tile){
+        if(tile.isDarkened()){
+            int minDst = darkRadius + 1;
+            for(int cx = tile.x - darkRadius; cx <= tile.x + darkRadius; cx++){
+                for(int cy = tile.y - darkRadius; cy <= tile.y + darkRadius; cy++){
+                    if(tiles.in(cx, cy) && !rawTile(cx, cy).isDarkened()){
+                        minDst = Math.min(minDst, Math.abs(cx - tile.x) + Math.abs(cy - tile.y));
+                    }
+                }
+            }
+
+            return (byte)Math.max((minDst - 1), 0);
+        }
+        return 0;
+    }
+
+    //TODO optimize; this is very slow and called too often!
     public float getDarkness(int x, int y){
         int edgeBlend = 2;
 

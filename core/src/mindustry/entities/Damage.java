@@ -48,12 +48,12 @@ public class Damage{
                 }
             }
 
-            int waves = Mathf.clamp((int)(explosiveness / 4), 0, 30);
+            int waves = explosiveness <= 2 ? 0 : Mathf.clamp((int)(explosiveness / 11), 1, 25);
 
             for(int i = 0; i < waves; i++){
                 int f = i;
                 Time.run(i * 2f, () -> {
-                    Damage.damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f, false);
+                    damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f, false);
                     Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
                 });
             }
@@ -83,8 +83,17 @@ public class Damage{
         }
     }
 
+    public static @Nullable Building findAbsorber(Team team, float x1, float y1, float x2, float y2){
+        tmpBuilding = null;
+
+        boolean found = world.raycast(World.toTile(x1), World.toTile(y1), World.toTile(x2), World.toTile(y2),
+        (x, y) -> (tmpBuilding = world.build(x, y)) != null && tmpBuilding.team != team && tmpBuilding.block.absorbLasers);
+
+        return found ? tmpBuilding : null;
+    }
+
     public static float findLaserLength(Bullet b, float length){
-        Tmp.v1.trns(b.rotation(), length);
+        Tmp.v1.trnsExact(b.rotation(), length);
 
         furthest = null;
 
@@ -125,7 +134,7 @@ public class Damage{
         if(laser) length = findLaserLength(hitter, length);
 
         collidedBlocks.clear();
-        tr.trns(angle, length);
+        tr.trnsExact(angle, length);
 
         Intc2 collider = (cx, cy) -> {
             Building tile = world.build(cx, cy);
@@ -266,8 +275,8 @@ public class Damage{
         });
 
         if(tmpBuilding != null && tmpUnit != null){
-            if(Mathf.dst2(x, y, tmpUnit.getX(), tmpUnit.getY()) <= Mathf.dst2(x, y, tmpBuilding.getX(), tmpBuilding.getY())){
-                return tmpUnit;
+            if(Mathf.dst2(x, y, tmpBuilding.getX(), tmpBuilding.getY()) <= Mathf.dst2(x, y, tmpUnit.getX(), tmpUnit.getY())){
+                return tmpBuilding;
             }
         }else if(tmpBuilding != null){
             return tmpBuilding;
@@ -378,7 +387,7 @@ public class Damage{
             //this needs to be compensated
             if(in != null && in.team != team && in.block.size > 1 && in.health > damage){
                 //deal the damage of an entire side, to be equivalent with maximum 'standard' damage
-                in.damage(damage * Math.min((in.block.size), baseRadius * 0.45f));
+                in.damage(team, damage * Math.min((in.block.size), baseRadius * 0.4f));
                 //no need to continue with the explosion
                 return;
             }
@@ -435,7 +444,7 @@ public class Damage{
                 int cx = Point2.x(e.key), cy = Point2.y(e.key);
                 var build = world.build(cx, cy);
                 if(build != null){
-                    build.damage(e.value);
+                    build.damage(team, e.value);
                 }
             }
         });

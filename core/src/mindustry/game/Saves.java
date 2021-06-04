@@ -214,7 +214,7 @@ public class Saves{
             }
             previewExecutor.submit(() -> {
                 try{
-                    previewFile().writePNG(renderer.minimap.getPixmap());
+                    previewFile().writePng(renderer.minimap.getPixmap());
                     requestedPreview = false;
                 }catch(Throwable t){
                     Log.err(t);

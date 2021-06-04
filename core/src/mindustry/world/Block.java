@@ -29,7 +29,6 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
-import mindustry.world.meta.values.*;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -45,6 +44,7 @@ public class Block extends UnlockableContent{
     public boolean consumesPower = true;
     public boolean outputsPower = false;
     public boolean outputsPayload = false;
+    public boolean acceptsPayload = false;
     public boolean outputFacing = true;
     public boolean acceptsItems = false;
 
@@ -77,6 +77,8 @@ public class Block extends UnlockableContent{
     public boolean solidifes;
     /** whether this is rotateable */
     public boolean rotate;
+    /** whether to draw a rotation arrow - this does not apply to lines of blocks */
+    public boolean drawArrow = true;
     /** for static blocks only: if true, tile data() is saved in world data. */
     public boolean saveData;
     /** whether you can break this with rightclick */
@@ -105,6 +107,8 @@ public class Block extends UnlockableContent{
     public boolean noUpdateDisabled = false;
     /** Whether to use this block's color in the minimap. Only used for overlays. */
     public boolean useColor = true;
+    /** item that drops from this block, used for drills */
+    public @Nullable Item itemDrop = null;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
@@ -115,8 +119,12 @@ public class Block extends UnlockableContent{
     public int size = 1;
     /** multiblock offset */
     public float offset = 0f;
-    /** Whether to draw this block in the expanded draw range. */
+    /** Deprecated for removal: Use clipSize instead.
+     * This does nothing, and is kept to preserve compatibility with v6 mods. */
+    @Deprecated
     public boolean expanded = false;
+    /** Clipping size of this block. Should be as large as the block will draw. */
+    public float clipSize = -1f;
     /** Max of timers used. */
     public int timers = 0;
     /** Cache layer. Only used for 'cached' rendering. */
@@ -144,6 +152,12 @@ public class Block extends UnlockableContent{
     public boolean consumesTap;
     /** Whether to draw the glow of the liquid for this block, if it has one. */
     public boolean drawLiquidLight = true;
+    /** Environmental flags that are *all* required for this block to function. 0 = any environment */
+    public int envRequired = 0;
+    /** The environment flags that this block can function in. If the env matches any of these, it will be enabled. */
+    public int envEnabled = Env.terrestrial;
+    /** The environment flags that this block *cannot* function in. If the env matches any of these, it will be *disabled*. */
+    public int envDisabled = 0;
     /** Whether to periodically sync this block across the network. */
     public boolean sync;
     /** Whether this block uses conveyor-type placement mode. */
@@ -167,7 +181,9 @@ public class Block extends UnlockableContent{
     public Color outlineColor = Color.valueOf("404049");
     /** Whether any icon region has an outline added. */
     public boolean outlineIcon = false;
-    /** Which of the icon regions gets the outline added. */
+    /** Outline icon radius. */
+    public int outlineRadius = 4;
+    /** Which of the icon regions gets the outline added. Uses last icon if <= 0. */
     public int outlinedIcon = -1;
     /** Whether this block has a shadow under it. */
     public boolean hasShadow = true;
@@ -179,7 +195,7 @@ public class Block extends UnlockableContent{
     public Color lightColor = Color.white.cpy();
     /**
      * Whether this environmental block passively emits light.
-     * Not valid for non-environmental blocks. */
+     * Does not change behavior for non-environmental blocks, but still updates clipSize. */
     public boolean emitLight = false;
     /** Radius of the light emitted by this block. */
     public float lightRadius = 60f;
@@ -198,19 +214,23 @@ public class Block extends UnlockableContent{
     public ItemStack[] requirements = {};
     /** Category in place menu. */
     public Category category = Category.distribution;
-    /** Cost of building this block; do not modify directly! */
-    public float buildCost;
+    /** Time to build this block in ticks; do not modify directly! */
+    public float buildCost = 20f;
     /** Whether this block is visible and can currently be built. */
     public BuildVisibility buildVisibility = BuildVisibility.hidden;
     /** Multiplier for speed of building this block. */
     public float buildCostMultiplier = 1f;
     /** Build completion at which deconstruction finishes. */
     public float deconstructThreshold = 0f;
+    /** If true, this block deconstructs immediately. Instant deconstruction implies no resource refund. */
+    public boolean instantDeconstruct = false;
+    /** Effect for breaking the block. Passes size as rotation. */
+    public Effect breakEffect = Fx.breakBlock;
     /** Multiplier for cost of research in tech tree. */
     public float researchCostMultiplier = 1;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
-    /** Whether you can rotate this block with Keybind rotateplaced + Scroll Wheel. */
+    /** Whether you can rotate this block after it is placed. */
     public boolean quickRotate = true;
     /** Main subclass. Non-anonymous. */
     public @Nullable Class<?> subclass;
@@ -318,7 +338,7 @@ public class Block extends UnlockableContent{
     }
 
     public TextureRegion getDisplayIcon(Tile tile){
-        return tile.build == null ? icon(Cicon.medium) : tile.build.getDisplayIcon();
+        return tile.build == null ? uiIcon : tile.build.getDisplayIcon();
     }
 
     public String getDisplayName(Tile tile){
@@ -363,7 +383,7 @@ public class Block extends UnlockableContent{
 
         if(canBeBuilt()){
             stats.add(Stat.buildTime, buildCost / 60, StatUnit.seconds);
-            stats.add(Stat.buildCost, new ItemListValue(false, requirements));
+            stats.add(Stat.buildCost, StatValues.items(false, requirements));
         }
 
         if(instantTransfer){
@@ -405,7 +425,9 @@ public class Block extends UnlockableContent{
             bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
         }
         
-        if(flags.contains(BlockFlag.unitModifier)) stats.add(Stat.maxUnits, (unitCapModifier < 0 ? "-" : "+") + Math.abs(unitCapModifier));
+        if(unitCapModifier != 0){
+            stats.add(Stat.maxUnits, (unitCapModifier < 0 ? "-" : "+") + Math.abs(unitCapModifier));
+        }
     }
 
     public boolean canReplace(Block other){
@@ -470,7 +492,7 @@ public class Block extends UnlockableContent{
     }
 
     public TextureRegion getRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        return icon(Cicon.full);
+        return fullIcon;
     }
 
     public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
@@ -554,6 +576,11 @@ public class Block extends UnlockableContent{
         return editorVariantRegions;
     }
 
+    /** @return special icons to outline and save with an -outline variant. Vanilla only. */
+    public TextureRegion[] makeIconRegions(){
+        return new TextureRegion[0];
+    }
+
     protected TextureRegion[] icons(){
         //use team region in vanilla team blocks
         return teamRegion.found() && minfo.mod == null ? new TextureRegion[]{region, teamRegions[Team.sharded.id]} : new TextureRegion[]{region};
@@ -564,7 +591,7 @@ public class Block extends UnlockableContent{
     }
 
     public TextureRegion[] variantRegions(){
-        return variantRegions == null ? (variantRegions = new TextureRegion[]{icon(Cicon.full)}) : variantRegions;
+        return variantRegions == null ? (variantRegions = new TextureRegion[]{fullIcon}) : variantRegions;
     }
 
     public boolean hasBuilding(){
@@ -588,7 +615,12 @@ public class Block extends UnlockableContent{
     }
 
     public boolean isPlaceable(){
-        return isVisible() && !state.rules.bannedBlocks.contains(this);
+        return isVisible() && (!state.rules.bannedBlocks.contains(this) || state.rules.editor) && supportsEnv(state.rules.environment);
+    }
+
+    /** @return whether this block supports a specific environment. */
+    public boolean supportsEnv(int env){
+        return (envEnabled & env) != 0 && (envDisabled & env) == 0 && (envRequired == 0 || (envRequired & env) == envRequired);
     }
 
     /** Called when building of this block begins. */
@@ -737,16 +769,25 @@ public class Block extends UnlockableContent{
             health = size * size * 40;
         }
 
+        clipSize = Math.max(clipSize, size * tilesize);
+
+        if(emitLight){
+            clipSize = Math.max(clipSize, lightRadius * 2f);
+        }
+
         if(group == BlockGroup.transportation || consumes.has(ConsumeType.item) || category == Category.distribution){
             acceptsItems = true;
         }
 
         offset = ((size + 1) % 2) * tilesize / 2f;
 
-        buildCost = 0f;
-        for(ItemStack stack : requirements){
-            buildCost += stack.amount * stack.item.cost;
+        if(requirements.length > 0){
+            buildCost = 0f;
+            for(ItemStack stack : requirements){
+                buildCost += stack.amount * stack.item.cost;
+            }
         }
+
         buildCost *= buildCostMultiplier;
 
         if(consumes.has(ConsumeType.power)) hasPower = true;
@@ -772,9 +813,10 @@ public class Block extends UnlockableContent{
         }
     }
 
-    @CallSuper
     @Override
     public void load(){
+        super.load();
+
         region = Core.atlas.find(name);
 
         ContentRegions.loadRegions(this);
@@ -795,62 +837,41 @@ public class Block extends UnlockableContent{
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
 
-        packer.add(PageType.editor, name + "-icon-editor", Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)));
-
         if(!synthetic()){
-            PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full));
-            mapColor.set(image.getPixel(image.width/2, image.height/2));
+            PixmapRegion image = Core.atlas.getPixmap(fullIcon);
+            mapColor.set(image.get(image.width/2, image.height/2));
         }
-
-        getGeneratedIcons();
 
         Pixmap last = null;
 
+        var gen = icons();
+
         if(outlineIcon){
-            final int radius = 4;
-            PixmapRegion region = Core.atlas.getPixmap(getGeneratedIcons()[outlinedIcon >= 0 ? outlinedIcon : getGeneratedIcons().length -1]);
-            Pixmap out = new Pixmap(region.width, region.height);
-            Color color = new Color();
-            for(int x = 0; x < region.width; x++){
-                for(int y = 0; y < region.height; y++){
-
-                    region.getPixel(x, y, color);
-                    out.draw(x, y, color);
-                    if(color.a < 1f){
-                        boolean found = false;
-                        outer:
-                        for(int rx = -radius; rx <= radius; rx++){
-                            for(int ry = -radius; ry <= radius; ry++){
-                                if(Structs.inBounds(rx + x, ry + y, region.width, region.height) && Mathf.within(rx, ry, radius) && color.set(region.getPixel(rx + x, ry + y)).a > 0.01f){
-                                    found = true;
-                                    break outer;
-                                }
-                            }
-                        }
-                        if(found){
-                            out.draw(x, y, outlineColor);
-                        }
-                    }
-                }
+            PixmapRegion region = Core.atlas.getPixmap(gen[outlinedIcon >= 0 ? outlinedIcon : gen.length -1]);
+            Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
+            if(Core.settings.getBool("linear")){
+                Pixmaps.bleed(out);
             }
-            last = out;
-
             packer.add(PageType.main, name, out);
         }
 
-        if(generatedIcons.length > 1){
-            Pixmap base = Core.atlas.getPixmap(generatedIcons[0]).crop();
-            for(int i = 1; i < generatedIcons.length; i++){
-                if(i == generatedIcons.length - 1 && last != null){
-                    base.drawPixmap(last);
+        var editorBase = Core.atlas.getPixmap(fullIcon);
+
+        if(gen.length > 1){
+            Pixmap base = Core.atlas.getPixmap(gen[0]).crop();
+            for(int i = 1; i < gen.length; i++){
+                if(i == gen.length - 1 && last != null){
+                    base.draw(last, 0, 0, true);
                 }else{
-                    base.draw(Core.atlas.getPixmap(generatedIcons[i]));
+                    base.draw(Core.atlas.getPixmap(gen[i]), true);
                 }
             }
             packer.add(PageType.main, "block-" + name + "-full", base);
-            generatedIcons = null;
-            Arrays.fill(cicons, null);
+
+            editorBase = new PixmapRegion(base);
         }
+
+        packer.add(PageType.editor, name + "-icon-editor", editorBase);
     }
 
 }

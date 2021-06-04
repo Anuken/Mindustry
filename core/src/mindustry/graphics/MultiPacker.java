@@ -1,19 +1,42 @@
 package mindustry.graphics;
 
 import arc.graphics.*;
-import arc.graphics.Pixmap.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
+import mindustry.*;
 
 public class MultiPacker implements Disposable{
     private PixmapPacker[] packers = new PixmapPacker[PageType.all.length];
 
     public MultiPacker(){
         for(int i = 0; i < packers.length; i++){
-            int pageSize = 2048;
-            packers[i] = new PixmapPacker(pageSize, pageSize, Format.rgba8888, 2, true);
+            packers[i] = new PixmapPacker(Math.min(Vars.maxTextureSize, PageType.all[i].width), Math.min(Vars.maxTextureSize, PageType.all[i].height), 2, true);
         }
+    }
+
+    @Nullable
+    public PixmapRegion get(String name){
+        for(var packer : packers){
+            var region = packer.getRegion(name);
+            if(region != null){
+                return region;
+            }
+        }
+        return null;
+    }
+
+    public PixmapPacker getPacker(PageType type){
+        return packers[type.ordinal()];
+    }
+
+    public boolean has(String name){
+        for(var page : PageType.all){
+            if(packers[page.ordinal()].getRect(name) != null){
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean has(PageType type, String name){
@@ -22,6 +45,10 @@ public class MultiPacker implements Disposable{
 
     public void add(PageType type, String name, PixmapRegion region){
         packers[type.ordinal()].pack(name, region);
+    }
+
+    public void add(PageType type, String name, PixmapRegion region, int[] splits, int[] pads){
+        packers[type.ordinal()].pack(name, region, splits, pads);
     }
 
     public void add(PageType type, String name, Pixmap pix){
@@ -47,14 +74,31 @@ public class MultiPacker implements Disposable{
     //main page (sprites.png) - all sprites for units, weapons, placeable blocks, effects, bullets, etc
     //environment page (sprites2.png) - all sprites for things in the environmental cache layer
     //editor page (sprites3.png) - all sprites needed for rendering in the editor, including block icons and a few minor sprites
-    //zone page (sprites4.png) - zone previews
-    //ui page (sprites5.png) - content icons, white icons and UI elements
+    //zone page (sprites4.png) - zone preview
+    //rubble page - scorch textures for unit deaths & wrecks
+    //ui page (sprites5.png) - content icons, white icons, fonts and UI elements
     public enum PageType{
-        main,
+        main(4096),
         environment,
-        editor,
-        ui;
+        editor(4096, 2048),
+        rubble,
+        ui(4096);
 
         public static final PageType[] all = values();
+
+        public int width = 2048, height = 2048;
+
+        PageType(int defaultSize){
+            this.width = this.height = defaultSize;
+        }
+
+        PageType(int width, int height){
+            this.width = width;
+            this.height = height;
+        }
+
+        PageType(){
+
+        }
     }
 }

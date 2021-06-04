@@ -134,6 +134,8 @@ public class SoundControl{
             }
         }
 
+        Core.audio.setPaused(Core.audio.soundBus.id, state.isPaused());
+
         if(state.isMenu()){
             silenced = false;
             if(ui.planet.isShown()){

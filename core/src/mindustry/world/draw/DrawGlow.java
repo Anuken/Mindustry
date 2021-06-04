@@ -11,10 +11,10 @@ public class DrawGlow extends DrawBlock{
     public TextureRegion top;
 
     @Override
-    public void draw(GenericCrafterBuild entity){
-        Draw.rect(entity.block.region, entity.x, entity.y);
-        Draw.alpha(Mathf.absin(entity.totalProgress, glowScale, glowAmount) * entity.warmup);
-        Draw.rect(top, entity.x, entity.y);
+    public void draw(GenericCrafterBuild build){
+        Draw.rect(build.block.region, build.x, build.y);
+        Draw.alpha(Mathf.absin(build.totalProgress, glowScale, glowAmount) * build.warmup);
+        Draw.rect(top, build.x, build.y);
         Draw.reset();
     }
 

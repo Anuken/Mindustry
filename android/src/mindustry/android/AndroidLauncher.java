@@ -18,6 +18,7 @@ import dalvik.system.*;
 import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.io.*;
+import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.ui.dialogs.*;
 
@@ -32,6 +33,9 @@ public class AndroidLauncher extends AndroidApplication{
     boolean doubleScaleTablets = true;
     FileChooser chooser;
     Runnable permCallback;
+
+    Object gpService;
+    Class<?> serviceClass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -50,7 +54,7 @@ public class AndroidLauncher extends AndroidApplication{
         });
 
         super.onCreate(savedInstanceState);
-        if(doubleScaleTablets && isTablet(this.getContext())){
+        if(doubleScaleTablets && isTablet(this)){
             Scl.setAddition(0.5f);
         }
 
@@ -63,7 +67,9 @@ public class AndroidLauncher extends AndroidApplication{
 
             @Override
             public rhino.Context getScriptContext(){
-                return AndroidRhinoContext.enter(getContext().getCacheDir());
+                rhino.Context result = AndroidRhinoContext.enter(((Context)AndroidLauncher.this).getCacheDir());
+                result.setClassShutter(Scripts::allowClass);
+                return result;
             }
 
             @Override
@@ -71,8 +77,8 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
-            public ClassLoader loadJar(Fi jar, String mainClass) throws Exception{
-                return new DexClassLoader(jar.file().getPath(), getFilesDir().getPath(), null, getClassLoader());
+            public ClassLoader loadJar(Fi jar, ClassLoader parent) throws Exception{
+                return new DexClassLoader(jar.file().getPath(), getFilesDir().getPath(), null, parent);
             }
 
             @Override
@@ -165,8 +171,19 @@ public class AndroidLauncher extends AndroidApplication{
 
         try{
             //new external folder
-            Fi data = Core.files.absolute(getContext().getExternalFilesDir(null).getAbsolutePath());
+            Fi data = Core.files.absolute(((Context)this).getExternalFilesDir(null).getAbsolutePath());
             Core.settings.setDataDirectory(data);
+
+            //delete unused cache folder to free up space
+            try{
+                Fi cache = Core.settings.getDataDirectory().child("cache");
+                if(cache.exists()){
+                    cache.deleteDirectory();
+                }
+            }catch(Throwable t){
+                Log.err("Failed to delete cached folder", t);
+            }
+
 
             //move to internal storage if there's no file indicating that it moved
             if(!Core.files.local("files_moved").exists()){
@@ -205,6 +222,24 @@ public class AndroidLauncher extends AndroidApplication{
             if(permCallback != null){
                 Core.app.post(permCallback);
                 permCallback = null;
+            }
+        }
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        //TODO enable once GPGS is set up on the GP console
+        if(false && getPackageName().endsWith(".gp")){
+            try{
+                if(gpService == null){
+                    serviceClass = Class.forName("mindustry.android.GPGameService");
+                    gpService = serviceClass.getConstructor().newInstance();
+                }
+                serviceClass.getMethod("onResume", Context.class).invoke(gpService, this);
+            }catch(Exception e){
+                Log.err("Failed to update Google Play Services", e);
             }
         }
     }

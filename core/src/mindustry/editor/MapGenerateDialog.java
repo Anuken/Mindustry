@@ -26,28 +26,27 @@ import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class MapGenerateDialog extends BaseDialog{
-    private final Prov<GenerateFilter>[] filterTypes = new Prov[]{
+    final Prov<GenerateFilter>[] filterTypes = new Prov[]{
         NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new,
         RiverNoiseFilter::new, OreFilter::new, OreMedianFilter::new, MedianFilter::new,
         BlendFilter::new, MirrorFilter::new, ClearFilter::new, CoreSpawnFilter::new,
         EnemySpawnFilter::new, SpawnPathFilter::new
     };
-    private final MapEditor editor;
-    private final boolean applied;
+    final boolean applied;
 
-    private Pixmap pixmap;
-    private Texture texture;
-    private GenerateInput input = new GenerateInput();
+    Pixmap pixmap;
+    Texture texture;
+    GenerateInput input = new GenerateInput();
     Seq<GenerateFilter> filters = new Seq<>();
-    private int scaling = mobile ? 3 : 1;
-    private Table filterTable;
+    int scaling = mobile ? 3 : 1;
+    Table filterTable;
 
-    private AsyncExecutor executor = new AsyncExecutor(1);
-    private AsyncResult<Void> result;
+    AsyncExecutor executor = new AsyncExecutor(1);
+    AsyncResult<Void> result;
     boolean generating;
 
-    private long[] buffer1, buffer2;
-    private Cons<Seq<GenerateFilter>> applier;
+    long[] buffer1, buffer2;
+    Cons<Seq<GenerateFilter>> applier;
     CachedTile ctile = new CachedTile(){
         //nothing.
         @Override
@@ -62,35 +61,79 @@ public class MapGenerateDialog extends BaseDialog{
     };
 
     /** @param applied whether or not to use the applied in-game mode. */
-    public MapGenerateDialog(MapEditor editor, boolean applied){
+    public MapGenerateDialog(boolean applied){
         super("@editor.generate");
-        this.editor = editor;
         this.applied = applied;
 
         shown(this::setup);
-        addCloseButton();
+        addCloseListener();
+
+        var style = Styles.cleart;
+
+        buttons.defaults().size(180f, 64f).pad(2f);
+        buttons.button("@back", Icon.left, this::hide);
+
         if(applied){
             buttons.button("@editor.apply", Icon.ok, () -> {
                 ui.loadAnd(() -> {
                     apply();
                     hide();
                 });
-            }).size(160f, 64f);
-        }else{
-            buttons.button("@settings.reset", () -> {
-                filters.set(maps.readFilters(""));
-                rebuildFilters();
-                update();
-            }).size(160f, 64f);
+            });
         }
+
         buttons.button("@editor.randomize", Icon.refresh, () -> {
             for(GenerateFilter filter : filters){
                 filter.randomize();
             }
             update();
-        }).size(160f, 64f);
+        });
 
-        buttons.button("@add", Icon.add, this::showAdd).height(64f).width(150f);
+        buttons.button("@edit", Icon.edit, () -> {
+            BaseDialog dialog = new BaseDialog("@editor.export");
+            dialog.cont.pane(p -> {
+                p.margin(10f);
+                p.table(Tex.button, in -> {
+                    in.defaults().size(280f, 60f).left();
+
+                    in.button("@waves.copy", Icon.copy, style, () -> {
+                        dialog.hide();
+
+                        Core.app.setClipboardText(JsonIO.write(filters));
+                    }).marginLeft(12f).row();
+                    in.button("@waves.load", Icon.download, style, () -> {
+                        dialog.hide();
+                        try{
+                            filters.set(JsonIO.read(Seq.class, Core.app.getClipboardText()));
+
+                            rebuildFilters();
+                            update();
+                        }catch(Throwable e){
+                            ui.showException(e);
+                        }
+                    }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null).row();
+                    in.button("@clear", Icon.none, style, () -> {
+                        dialog.hide();
+                        filters.clear();
+                        rebuildFilters();
+                        update();
+                    }).marginLeft(12f).row();
+                    if(!applied){
+                        in.button("@settings.reset", Icon.refresh, style, () -> {
+                            dialog.hide();
+                            filters.set(maps.readFilters(""));
+                            rebuildFilters();
+                            update();
+                        }).marginLeft(12f).row();
+                    }
+                });
+            });
+
+            dialog.addCloseButton();
+            dialog.show();
+        });
+
+        buttons.button("@add", Icon.add, this::showAdd);
 
         if(!applied){
             hidden(this::apply);
@@ -173,7 +216,7 @@ public class MapGenerateDialog extends BaseDialog{
                 @Override
                 public void draw(){
                     super.draw();
-                    for(GenerateFilter filter : filters){
+                    for(var filter : filters){
                         filter.draw(this);
                     }
                 }
@@ -214,7 +257,7 @@ public class MapGenerateDialog extends BaseDialog{
         filterTable.top().left();
         int i = 0;
 
-        for(GenerateFilter filter : filters){
+        for(var filter : filters){
 
             //main container
             filterTable.table(Tex.pane, c -> {
@@ -284,31 +327,33 @@ public class MapGenerateDialog extends BaseDialog{
     }
 
     void showAdd(){
-        BaseDialog selection = new BaseDialog("@add");
+        var selection = new BaseDialog("@add");
         selection.cont.pane(p -> {
+            p.background(Tex.button);
             p.marginRight(14);
-            p.defaults().size(210f, 60f);
+            p.defaults().size(195f, 56f);
             int i = 0;
-            for(Prov<GenerateFilter> gen : filterTypes){
-                GenerateFilter filter = gen.get();
+            for(var gen : filterTypes){
+                var filter = gen.get();
+                var icon = filter.icon();
 
-                if((filter.isPost() && applied)) continue;
+                if(filter.isPost() && applied) continue;
 
-                p.button(filter.name(), () -> {
+                p.button((icon == '\0' ? "" : icon + " ") + filter.name(), Styles.cleart, () -> {
                     filters.add(filter);
                     rebuildFilters();
                     update();
                     selection.hide();
-                });
-                if(++i % 2 == 0) p.row();
+                }).with(Table::left).get().getLabelCell().growX().left().padLeft(5).labelAlign(Align.left);
+                if(++i % 3 == 0) p.row();
             }
 
-            p.button("@filter.defaultores", () -> {
+            p.button(Iconc.refresh + " " + Core.bundle.get("filter.defaultores"), Styles.cleart, () -> {
                 maps.addDefaultOres(filters);
                 rebuildFilters();
                 update();
                 selection.hide();
-            });
+            }).with(Table::left).get().getLabelCell().growX().left().padLeft(5).labelAlign(Align.left);
         }).get().setScrollingDisabled(true, false);
 
         selection.addCloseButton();
@@ -350,25 +395,25 @@ public class MapGenerateDialog extends BaseDialog{
             return;
         }
 
-        Seq<GenerateFilter> copy = new Seq<>(filters);
+        var copy = filters.copy();
 
         result = executor.submit(() -> {
             try{
-                int w = pixmap.getWidth();
+                int w = pixmap.width;
                 world.setGenerating(true);
                 generating = true;
 
                 if(!filters.isEmpty()){
                     //write to buffer1 for reading
-                    for(int px = 0; px < pixmap.getWidth(); px++){
-                        for(int py = 0; py < pixmap.getHeight(); py++){
+                    for(int px = 0; px < pixmap.width; px++){
+                        for(int py = 0; py < pixmap.height; py++){
                             buffer1[px + py*w] = pack(editor.tile(px * scaling, py * scaling));
                         }
                     }
                 }
 
-                for(GenerateFilter filter : copy){
-                    input.begin(filter, editor.width(), editor.height(), (x, y) -> unpack(buffer1[Mathf.clamp(x / scaling, 0, pixmap.getWidth()-1) + w* Mathf.clamp(y / scaling, 0, pixmap.getHeight()-1)]));
+                for(var filter : copy){
+                    input.begin(filter, editor.width(), editor.height(), (x, y) -> unpack(buffer1[Mathf.clamp(x / scaling, 0, pixmap.width -1) + w* Mathf.clamp(y / scaling, 0, pixmap.height -1)]));
 
                     //read from buffer1 and write to buffer2
                     pixmap.each((px, py) -> {
@@ -382,8 +427,8 @@ public class MapGenerateDialog extends BaseDialog{
                     pixmap.each((px, py) -> buffer1[px + py*w] = buffer2[px + py*w]);
                 }
 
-                for(int px = 0; px < pixmap.getWidth(); px++){
-                    for(int py = 0; py < pixmap.getHeight(); py++){
+                for(int px = 0; px < pixmap.width; px++){
+                    for(int py = 0; py < pixmap.height; py++){
                         int color;
                         //get result from buffer1 if there's filters left, otherwise get from editor directly
                         if(filters.isEmpty()){
@@ -393,7 +438,7 @@ public class MapGenerateDialog extends BaseDialog{
                             long tile = buffer1[px + py*w];
                             color = MapIO.colorFor(content.block(PackTile.block(tile)), content.block(PackTile.floor(tile)), content.block(PackTile.overlay(tile)), Team.derelict);
                         }
-                        pixmap.draw(px, pixmap.getHeight() - 1 - py, color);
+                        pixmap.set(px, pixmap.height - 1 - py, color);
                     }
                 }
 

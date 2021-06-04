@@ -4,7 +4,6 @@ import arc.struct.*;
 import mindustry.entities.bullet.*;
 import mindustry.logic.*;
 import mindustry.world.meta.*;
-import mindustry.world.meta.values.*;
 
 public class PowerTurret extends Turret{
     public BulletType shootType;
@@ -18,7 +17,7 @@ public class PowerTurret extends Turret{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(Stat.ammo, new AmmoListValue<>(OrderedMap.of(this, shootType)));
+        stats.add(Stat.ammo, StatValues.ammo(ObjectMap.of(this, shootType)));
     }
 
     @Override
@@ -31,7 +30,9 @@ public class PowerTurret extends Turret{
 
         @Override
         public void updateTile(){
-            unit.ammo(power.status * unit.type().ammoCapacity);
+            if(unit != null){
+                unit.ammo(power.status * unit.type().ammoCapacity);
+            }
 
             super.updateTile();
         }

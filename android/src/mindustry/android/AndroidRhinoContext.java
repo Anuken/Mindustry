@@ -175,7 +175,7 @@ public class AndroidRhinoContext{
             }catch(IOException e){
                 e.printStackTrace();
             }
-            android.content.Context context = ((AndroidApplication) Core.app).getContext();
+            android.content.Context context = (android.content.Context)((AndroidApplication)Core.app);
             return new DexClassLoader(dexFile.getPath(), VERSION.SDK_INT >= 21 ? context.getCodeCacheDir().getPath() : context.getCacheDir().getAbsolutePath(), null, getParent()).loadClass(name);
         }
 

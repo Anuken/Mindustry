@@ -17,13 +17,13 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 public abstract class FilterOption{
-    public static final Boolf<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full));
-    public static final Boolf<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full)) && b.inEditor;
-    public static final Boolf<Block> floorsOptional = b -> b == Blocks.air || ((b instanceof Floor && !(b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full)));
-    public static final Boolf<Block> wallsOptional = b -> (b == Blocks.air || ((!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full)))) && b.inEditor;
-    public static final Boolf<Block> wallsOresOptional = b -> b == Blocks.air || (((!b.synthetic() && !(b instanceof Floor)) || (b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full))) && b.inEditor;
-    public static final Boolf<Block> oresOnly = b -> b instanceof OverlayFloor && !headless && Core.atlas.isFound(b.icon(Cicon.full));
-    public static final Boolf<Block> oresFloorsOptional = b -> (b instanceof Floor) && !headless && Core.atlas.isFound(b.icon(Cicon.full));
+    public static final Boolf<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.fullIcon);
+    public static final Boolf<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.fullIcon) && b.inEditor;
+    public static final Boolf<Block> floorsOptional = b -> b == Blocks.air || ((b instanceof Floor && !(b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.fullIcon));
+    public static final Boolf<Block> wallsOptional = b -> (b == Blocks.air || ((!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.fullIcon))) && b.inEditor;
+    public static final Boolf<Block> wallsOresOptional = b -> b == Blocks.air || (((!b.synthetic() && !(b instanceof Floor)) || (b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.fullIcon)) && b.inEditor;
+    public static final Boolf<Block> oresOnly = b -> b instanceof OverlayFloor && !headless && Core.atlas.isFound(b.fullIcon);
+    public static final Boolf<Block> oresFloorsOptional = b -> (b instanceof Floor) && !headless && Core.atlas.isFound(b.fullIcon);
     public static final Boolf<Block> anyOptional = b -> (floorsOnly.get(b) || wallsOnly.get(b) || oresOnly.get(b) || b == Blocks.air) && b.inEditor;
 
     public abstract void build(Table table);
@@ -89,15 +89,15 @@ public abstract class FilterOption{
 
         @Override
         public void build(Table table){
-            table.button(b -> b.image(supplier.get().icon(Cicon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable())
-                .setRegion(supplier.get() == Blocks.air ? Icon.none.getRegion() : supplier.get().icon(Cicon.small))).size(8 * 3), () -> {
+            table.button(b -> b.image(supplier.get().uiIcon).update(i -> ((TextureRegionDrawable)i.getDrawable())
+                .setRegion(supplier.get() == Blocks.air ? Icon.none.getRegion() : supplier.get().uiIcon)).size(iconSmall), () -> {
                 BaseDialog dialog = new BaseDialog("");
                 dialog.setFillParent(false);
                 int i = 0;
                 for(Block block : Vars.content.blocks()){
                     if(!filter.get(block)) continue;
 
-                    dialog.cont.image(block == Blocks.air ? Icon.none.getRegion() : block.icon(Cicon.medium)).size(8 * 4).pad(3).get().clicked(() -> {
+                    dialog.cont.image(block == Blocks.air ? Icon.none.getRegion() : block.uiIcon).size(iconMed).pad(3).get().clicked(() -> {
                         consumer.get(block);
                         dialog.hide();
                         changed.run();
@@ -109,6 +109,25 @@ public abstract class FilterOption{
             }).pad(4).margin(12f);
 
             table.add("@filter.option." + name);
+        }
+    }
+
+    static class ToggleOption extends FilterOption{
+        final String name;
+        final Boolp getter;
+        final Boolc setter;
+
+        ToggleOption(String name, Boolp getter, Boolc setter){
+            this.name = name;
+            this.getter = getter;
+            this.setter = setter;
+        }
+
+        @Override
+        public void build(Table table){
+            table.row();
+            CheckBox check = table.check("@filter.option." + name, setter).growX().padBottom(5).padTop(5).center().get();
+            check.changed(changed);
         }
     }
 }
