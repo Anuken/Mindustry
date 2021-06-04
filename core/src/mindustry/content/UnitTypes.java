@@ -1759,7 +1759,7 @@ public class UnitTypes implements ContentList{
 
             armor = 3f;
 
-            buildSpeed = 2f;
+            buildSpeed = 1.5f;
 
             weapons.add(new RepairBeamWeapon("repair-beam-weapon-center"){{
                 x = 0f;
@@ -1833,7 +1833,7 @@ public class UnitTypes implements ContentList{
             trailY = -4f;
             trailScl = 1.9f;
 
-            buildSpeed = 2.5f;
+            buildSpeed = 2f;
 
             weapons.add(new Weapon("plasma-mount-weapon"){{
 
@@ -1906,7 +1906,7 @@ public class UnitTypes implements ContentList{
             trailY = -9f;
             trailScl = 2f;
 
-            buildSpeed = 3f;
+            buildSpeed = 2f;
 
             weapons.add(new RepairBeamWeapon("repair-beam-weapon-center"){{
                 x = 11f;
@@ -2044,7 +2044,7 @@ public class UnitTypes implements ContentList{
             trailY = -17f;
             trailScl = 3.2f;
 
-            buildSpeed = 3.5f;
+            buildSpeed = 3f;
 
             abilities.add(new EnergyFieldAbility(35f, 65f, 180f){{
                 repair = 35f;
@@ -2085,7 +2085,7 @@ public class UnitTypes implements ContentList{
             trailY = -32f;
             trailScl = 3.5f;
 
-            buildSpeed = 3.8f;
+            buildSpeed = 3.5f;
 
             for(float mountY : new float[]{-117/4f, 50/4f}){
                 for(float sign : Mathf.signs){

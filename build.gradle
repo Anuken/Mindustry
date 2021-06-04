@@ -13,11 +13,12 @@ buildscript{
         google()
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven{ url 'https://jitpack.io' }
+        maven{ url "http://artifactory.nimblygames.com/artifactory/ng-public/" } //packr
     }
 
     dependencies{
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.11'
-        classpath "com.github.anuken:packr:-SNAPSHOT"
+        classpath "com.badlogicgames.packr:packr-all:4.0.0"
         classpath "com.github.Anuken.Arc:packer:$arcHash"
         classpath "com.github.Anuken.Arc:arc-core:$arcHash"
     }

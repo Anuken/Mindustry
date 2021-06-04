@@ -72,7 +72,12 @@ task steamtest(dependsOn: dist){
     }
 }
 
-//TODO replace with jpackage templates
+//required templates:
+//- Windows64
+//required JDKs:
+//- Windows32
+//- Linux64
+//- Mac
 PackrConfig.Platform.values().each{ platform ->
     task "packr${platform.toString()}"{
         dependsOn dist
@@ -102,6 +107,7 @@ PackrConfig.Platform.values().each{ platform ->
             }else{
                 def config = new PackrConfig()
                 config.with{
+                    //TODO consider useZgcIfSupportedOs = true
                     config.executable = appName
                     config.platform = platform
                     verbose = true
@@ -112,8 +118,7 @@ PackrConfig.Platform.values().each{ platform ->
                     classpath = ["$rootDir/desktop/build/packr/desktop.jar".toString()]
                     removePlatformLibs = ["$rootDir/desktop/build/packr/desktop.jar".toString()]
 
-                    vmArgs = []
-                    minimizeJre = "$rootDir/desktop/packr_minimize.json".toString()
+                    vmArgs = ["XX:+ShowCodeDetailsInExceptionMessages"]
                     jdk = JDK_DIR + "jdk-${platform.toString().toLowerCase()}.zip"
 
                     if(platform == PackrConfig.Platform.MacOS){
