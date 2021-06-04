@@ -1322,7 +1322,7 @@ public class Blocks implements ContentList{
         cultivator = new AttributeCrafter("cultivator"){{
             requirements(Category.production, with(Items.copper, 25, Items.lead, 25, Items.silicon, 10));
             outputItem = new ItemStack(Items.sporePod, 1);
-            craftTime = 100;
+            craftTime = 80;
             size = 2;
             hasLiquids = true;
             hasPower = true;
@@ -1336,8 +1336,8 @@ public class Blocks implements ContentList{
             drawer = new DrawCultivator();
             maxBoost = 2f;
 
-            consumes.power(80f / 60f);
-            consumes.liquid(Liquids.water, 20f / 60f);
+            consumes.power(90f / 60f);
+            consumes.liquid(Liquids.water, 18f / 60f);
         }};
 
         oilExtractor = new Fracker("oil-extractor"){{
