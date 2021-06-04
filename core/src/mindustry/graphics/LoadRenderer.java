@@ -37,6 +37,7 @@ public class LoadRenderer implements Disposable{
     private int lastLength = -1;
     private FxProcessor fx;
     private WindowedMean renderTimes = new WindowedMean(20);
+    private BloomFilter bloom;
     private long lastFrameTime;
 
     {
@@ -49,7 +50,7 @@ public class LoadRenderer implements Disposable{
 
         //vignetting is probably too much
         //fx.addEffect(new VignettingFilter(false));
-        fx.addEffect(new BloomFilter());
+        fx.addEffect(bloom = new BloomFilter());
 
         bars = new Bar[]{
             new Bar("s_proc#", OS.cores / 16f, OS.cores < 4),
@@ -69,6 +70,7 @@ public class LoadRenderer implements Disposable{
     public void dispose(){
         mesh.dispose();
         fx.dispose();
+        bloom.dispose();
     }
 
     public void draw(){

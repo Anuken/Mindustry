@@ -11,7 +11,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
-import mindustry.world.blocks.production.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -21,7 +20,7 @@ public class PayloadConveyor extends Block{
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-edge") TextureRegion edgeRegion;
     public Interp interp = Interp.pow5;
-    public float payloadLimit = 2.5f;
+    public float payloadLimit = 2.9f;
 
     public PayloadConveyor(String name){
         super(name);
@@ -51,6 +50,21 @@ public class PayloadConveyor extends Block{
         }
     }
 
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.payloadCapacity, (payloadLimit), StatUnit.blocksSquared);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        //increase clip size for oversize loads
+        clipSize = Math.max(clipSize, size * tilesize * 2.1f);
+    }
+
     public class PayloadConveyorBuild extends Building{
         public @Nullable Payload item;
         public float progress, itemRotation, animation;
@@ -58,6 +72,16 @@ public class PayloadConveyor extends Block{
         public @Nullable Building next;
         public boolean blocked;
         public int step = -1, stepAccepted = -1;
+
+        @Override
+        public boolean canControlSelect(Player player){
+            return this.item == null && !player.unit().spawnedByCore && player.unit().hitSize / tilesize <= payloadLimit && player.tileOn().build == this;
+        }
+
+        @Override
+        public void onControlSelect(Player player){
+            acceptPlayerPayload(player, p -> item = p);
+        }
 
         @Override
         public Payload takePayload(){
@@ -108,6 +132,9 @@ public class PayloadConveyor extends Block{
             progress = time() % moveTime;
 
             updatePayload();
+            if(item != null && next == null){
+                PayloadBlock.pushOutput(item, progress / moveTime);
+            }
 
             //TODO nondeterministic input priority
             int curStep = curStep();
@@ -283,7 +310,7 @@ public class PayloadConveyor extends Block{
             if(direction == rotation){
                 return !blocked || next != null;
             }
-            return PayloadAcceptor.blends(this, direction);
+            return PayloadBlock.blends(this, direction);
         }
 
         protected TextureRegion clipRegion(Rect bounds, Rect sprite, TextureRegion region){

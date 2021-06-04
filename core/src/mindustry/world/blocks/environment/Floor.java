@@ -4,7 +4,6 @@ import arc.*;
 import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -15,7 +14,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
@@ -50,8 +48,6 @@ public class Floor extends Block{
     public @Nullable Liquid liquidDrop = null;
     /** Multiplier for pumped liquids, used for deep water. */
     public float liquidMultiplier = 1f;
-    /** item that drops from this block, used for drills */
-    public @Nullable Item itemDrop = null;
     /** whether this block can be drowned in */
     public boolean isLiquid;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
@@ -119,7 +115,7 @@ public class Floor extends Block{
         if(wall == null) wall = Blocks.air;
 
         if(decoration == Blocks.air){
-            decoration = content.blocks().min(b -> b instanceof Boulder && b.minfo.mod == null && b.breakable ? mapColor.diff(b.mapColor) : Float.POSITIVE_INFINITY);
+            decoration = content.blocks().min(b -> b instanceof Prop && b.minfo.mod == null && b.breakable ? mapColor.diff(b.mapColor) : Float.POSITIVE_INFINITY);
         }
 
         if(isLiquid && walkEffect == Fx.none){
@@ -134,7 +130,7 @@ public class Floor extends Block{
     @Override
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
-        packer.add(PageType.editor, "editor-" + name, Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)).crop());
+        packer.add(PageType.editor, "editor-" + name, Core.atlas.getPixmap(fullIcon).crop());
 
         if(blendGroup != this){
             return;
@@ -147,16 +143,13 @@ public class Floor extends Block{
             }
         }
 
-        Color color = new Color();
-        Color color2 = new Color();
-        PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)icons()[0]);
+        PixmapRegion image = Core.atlas.getPixmap(icons()[0]);
         PixmapRegion edge = Core.atlas.getPixmap("edge-stencil");
         Pixmap result = new Pixmap(edge.width, edge.height);
 
         for(int x = 0; x < edge.width; x++){
             for(int y = 0; y < edge.height; y++){
-                edge.getPixel(x, y, color);
-                result.draw(x, y, color.mul(color2.set(image.getPixel(x % image.width, y % image.height))));
+                result.set(x, y, Color.muli(edge.get(x, y), image.get(x % image.width, y % image.height)));
             }
         }
 

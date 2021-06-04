@@ -10,12 +10,7 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 public class DrawOperation{
-    private MapEditor editor;
     private LongSeq array = new LongSeq();
-
-    public DrawOperation(MapEditor editor){
-        this.editor = editor;
-    }
 
     public boolean isEmpty(){
         return array.isEmpty();

@@ -3,6 +3,7 @@ package mindustry.maps.filters;
 import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 import static mindustry.maps.filters.FilterOption.*;
@@ -23,6 +24,11 @@ public class TerrainFilter extends GenerateFilter{
         new BlockOption("floor", () -> floor, b -> floor = b, floorsOptional),
         new BlockOption("wall", () -> block, b -> block = b, wallsOnly)
         );
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockStoneWall;
     }
 
     @Override

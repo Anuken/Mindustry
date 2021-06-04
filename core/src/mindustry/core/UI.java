@@ -33,6 +33,8 @@ import static arc.scene.actions.Actions.*;
 import static mindustry.Vars.*;
 
 public class UI implements ApplicationListener, Loadable{
+    private static String billions, millions, thousands;
+
     public static PixmapPacker packer;
 
     public MenuFragment menufrag;
@@ -56,7 +58,7 @@ public class UI implements ApplicationListener, Loadable{
     public HostDialog host;
     public PausedDialog paused;
     public SettingsMenuDialog settings;
-    public ControlsDialog controls;
+    public KeybindDialog controls;
     public MapEditorDialog editor;
     public LanguageDialog language;
     public BansDialog bans;
@@ -152,6 +154,10 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void init(){
+        billions = Core.bundle.get("unit.billions");
+        millions = Core.bundle.get("unit.millions");
+        thousands = Core.bundle.get("unit.thousands");
+
         menuGroup = new WidgetGroup();
         hudGroup = new WidgetGroup();
 
@@ -166,7 +172,7 @@ public class UI implements ApplicationListener, Loadable{
 
         picker = new ColorPicker();
         editor = new MapEditorDialog();
-        controls = new ControlsDialog();
+        controls = new KeybindDialog();
         restart = new GameOverDialog();
         join = new JoinDialog();
         discord = new DiscordDialog();
@@ -347,17 +353,11 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showInfo(String info){
-        showInfo(info, () -> {});
-    }
-
-    public void showInfo(String info, Runnable listener){
         new Dialog(""){{
             getCell(cont).growX();
             cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons.button("@ok", () -> {
-                hide();
-                listener.run();
-            }).size(110, 50).pad(4);
+            buttons.button("@ok", this::hide).size(110, 50).pad(4);
+            keyDown(KeyCode.enter, this::hide);
             closeOnBack();
         }}.show();
     }
@@ -458,6 +458,10 @@ public class UI implements ApplicationListener, Loadable{
         }}.show();
     }
 
+    public void showConfirm(String text, Runnable confirmed){
+        showConfirm("@confirm", text, null, confirmed);
+    }
+
     public void showConfirm(String title, String text, Runnable confirmed){
         showConfirm(title, text, null, confirmed);
     }
@@ -535,6 +539,13 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
+    public static String formatTime(float ticks){
+        int time = (int)(ticks / 60);
+        if(time < 60) return "0:" + (time < 10 ? "0" : "") + time;
+        int mod = time % 60;
+        return (time / 60) + ":" + (mod < 10 ? "0" : "") + mod;
+    }
+
     public static String formatAmount(long number){
         //prevent overflow
         if(number == Long.MIN_VALUE) number ++;
@@ -542,13 +553,13 @@ public class UI implements ApplicationListener, Loadable{
         long mag = Math.abs(number);
         String sign = number < 0 ? "-" : "";
         if(mag >= 1_000_000_000){
-            return sign + Strings.fixed(mag / 1_000_000_000f, 1) + "[gray]" + Core.bundle.get("unit.billions") + "[]";
+            return sign + Strings.fixed(mag / 1_000_000_000f, 1) + "[gray]" + billions+ "[]";
         }else if(mag >= 1_000_000){
-            return sign + Strings.fixed(mag / 1_000_000f, 1) + "[gray]" + Core.bundle.get("unit.millions") + "[]";
+            return sign + Strings.fixed(mag / 1_000_000f, 1) + "[gray]" +millions + "[]";
         }else if(mag >= 10_000){
-            return number / 1000 + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
+            return number / 1000 + "[gray]" + thousands + "[]";
         }else if(mag >= 1000){
-            return sign + Strings.fixed(mag / 1000f, 1) + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
+            return sign + Strings.fixed(mag / 1000f, 1) + "[gray]" + thousands + "[]";
         }else{
             return number + "";
         }

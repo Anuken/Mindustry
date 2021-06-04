@@ -9,17 +9,17 @@ import mindustry.io.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
+import static mindustry.Vars.*;
+
 public class MapInfoDialog extends BaseDialog{
-    private final MapEditor editor;
     private final WaveInfoDialog waveInfo;
     private final MapGenerateDialog generate;
     private final CustomRulesDialog ruleInfo = new CustomRulesDialog();
 
-    public MapInfoDialog(MapEditor editor){
+    public MapInfoDialog(){
         super("@editor.mapinfo");
-        this.editor = editor;
-        this.waveInfo = new WaveInfoDialog(editor);
-        this.generate = new MapGenerateDialog(editor, false);
+        this.waveInfo = new WaveInfoDialog();
+        this.generate = new MapGenerateDialog(false);
 
         addCloseButton();
 

@@ -109,7 +109,10 @@ public class Accelerator extends Block{
 
             if(!state.isCampaign() || !consValid()) return;
 
-            ui.showInfo("@indev.campaign");
+            ui.planet.showPlanetLaunch(state.rules.sector, sector -> {
+                //TODO cutscene, etc...
+                consume();
+            });
             Events.fire(Trigger.acceleratorUse);
         }
 

@@ -24,7 +24,7 @@ public class Liquids implements ContentList{
         }};
 
         oil = new Liquid("oil", Color.valueOf("313131")){{
-            viscosity = 0.7f;
+            viscosity = 0.75f;
             flammability = 1.2f;
             explosiveness = 1.2f;
             heatCapacity = 0.7f;

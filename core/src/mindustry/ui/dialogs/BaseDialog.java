@@ -4,7 +4,6 @@ import arc.*;
 import arc.scene.ui.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
-import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
@@ -44,12 +43,7 @@ public class BaseDialog extends Dialog{
     }
 
     protected void onResize(Runnable run){
-        Events.on(ResizeEvent.class, event -> {
-            if(isShown() && Core.scene.getDialog() == this){
-                run.run();
-                updateScrollFocus();
-            }
-        });
+        resized(run);
     }
 
     public void addCloseListener(){

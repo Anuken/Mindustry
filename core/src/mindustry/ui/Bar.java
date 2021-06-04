@@ -8,6 +8,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.style.*;
+import arc.scene.ui.layout.*;
 import arc.util.pooling.*;
 import mindustry.gen.*;
 
@@ -15,9 +16,9 @@ public class Bar extends Element{
     private static Rect scissor = new Rect();
 
     private Floatp fraction;
-    private String name = "";
-    private float value, lastValue, blink;
-    private Color blinkColor = new Color();
+    private CharSequence name = "";
+    private float value, lastValue, blink, outlineRadius;
+    private Color blinkColor = new Color(), outlineColor = new Color();
 
     public Bar(String name, Color color, Floatp fraction){
         this.fraction = fraction;
@@ -27,7 +28,7 @@ public class Bar extends Element{
         setColor(color);
     }
 
-    public Bar(Prov<String> name, Prov<Color> color, Floatp fraction){
+    public Bar(Prov<CharSequence> name, Prov<Color> color, Floatp fraction){
         this.fraction = fraction;
         try{
             lastValue = value = Mathf.clamp(fraction.get());
@@ -59,6 +60,12 @@ public class Bar extends Element{
         this.blinkColor.set(color);
         setColor(color);
         update(() -> this.name = name.get());
+    }
+
+    public Bar outline(Color color, float stroke){
+        outlineColor.set(color);
+        outlineRadius = Scl.scl(stroke);
+        return this;
     }
 
     public Bar blink(Color color){
@@ -93,6 +100,11 @@ public class Bar extends Element{
         value = Mathf.lerpDelta(value, computed, 0.15f);
 
         Drawable bar = Tex.bar;
+
+        if(outlineRadius > 0){
+            Draw.color(outlineColor);
+            bar.draw(x - outlineRadius, y - outlineRadius, width + outlineRadius*2, height + outlineRadius*2);
+        }
 
         Draw.colorl(0.1f);
         bar.draw(x, y, width, height);

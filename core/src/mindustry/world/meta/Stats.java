@@ -6,7 +6,6 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.type.*;
 import mindustry.world.blocks.environment.*;
-import mindustry.world.meta.values.*;
 
 /** Hold and organizes a list of block stats. */
 public class Stats{
@@ -14,6 +13,8 @@ public class Stats{
     public boolean useCategories = false;
     /** Whether these stats are initialized yet. */
     public boolean intialized = false;
+    /** Production time period in ticks. Used for crafters. **/
+    public float timePeriod = -1;
 
     @Nullable
     private OrderedMap<StatCat, OrderedMap<Stat, Seq<StatValue>>> map;
@@ -21,7 +22,7 @@ public class Stats{
 
     /** Adds a single float value with this stat, formatted to 2 decimal places. */
     public void add(Stat stat, float value, StatUnit unit){
-        add(stat, new NumberValue(value, unit));
+        add(stat, StatValues.number(value, unit));
     }
 
     /** Adds a single float value with this stat and no unit. */
@@ -31,27 +32,27 @@ public class Stats{
 
     /** Adds an integer percent stat value. Value is assumed to be in the 0-1 range. */
     public void addPercent(Stat stat, float value){
-        add(stat, new NumberValue((int)(value * 100), StatUnit.percent));
+        add(stat, StatValues.number((int)(value * 100), StatUnit.percent));
     }
 
     /** Adds a single y/n boolean value. */
     public void add(Stat stat, boolean value){
-        add(stat, new BooleanValue(value));
+        add(stat, StatValues.bool(value));
     }
 
     /** Adds an item value. */
     public void add(Stat stat, Item item){
-        add(stat, new ItemListValue(new ItemStack(item, 1)));
+        add(stat, StatValues.items(new ItemStack(item, 1)));
     }
 
     /** Adds an item value. */
     public void add(Stat stat, ItemStack item){
-        add(stat, new ItemListValue(item));
+        add(stat, StatValues.items(item));
     }
 
     /** Adds an item value. */
     public void add(Stat stat, Liquid liquid, float amount, boolean perSecond){
-        add(stat, new LiquidValue(liquid, amount, perSecond));
+        add(stat, StatValues.liquid(liquid, amount, perSecond));
     }
 
     public void add(Stat stat, Attribute attr){
@@ -70,13 +71,13 @@ public class Stats{
         for(var block : Vars.content.blocks()
             .select(block -> block instanceof Floor f && f.attributes.get(attr) != 0 && !(f.isLiquid && !floating))
             .<Floor>as().with(s -> s.sort(f -> f.attributes.get(attr)))){
-            add(stat, new FloorEfficiencyValue(block, block.attributes.get(attr) * scale, startZero));
+            add(stat, StatValues.floorEfficiency(block, block.attributes.get(attr) * scale, startZero));
         }
     }
 
     /** Adds a single string value with this stat. */
     public void add(Stat stat, String format, Object... args){
-        add(stat, new StringValue(format, args));
+        add(stat, StatValues.string(format, args));
     }
 
     /** Adds a stat value. */

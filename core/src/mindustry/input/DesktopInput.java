@@ -162,7 +162,7 @@ public class DesktopInput extends InputHandler{
                 }
                 lineRequests.each(this::drawOverRequest);
             }else if(isPlacing()){
-                if(block.rotate){
+                if(block.rotate && block.drawArrow){
                     drawArrow(block, cursorX, cursorY, rotation);
                 }
                 Draw.color();
@@ -225,19 +225,25 @@ public class DesktopInput extends InputHandler{
         if(!scene.hasMouse()){
             if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){
                 Unit on = selectedUnit();
+                var build = selectedControlBuild();
                 if(on != null){
                     Call.unitControl(player, on);
                     shouldShoot = false;
+                    recentRespawnTimer = 1f;
+                }else if(build != null){
+                    Call.buildingControlSelect(player, build);
+                    recentRespawnTimer = 1f;
                 }
             }
         }
 
-        if(!player.dead() && !state.isPaused() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
+        if(!player.dead() && !state.isPaused() && !scene.hasField()){
             updateMovement(player.unit());
 
-            if(Core.input.keyDown(Binding.respawn) && !player.unit().spawnedByCore() && !scene.hasField()){
-                Call.unitClear(player);
+            if(Core.input.keyTap(Binding.respawn)){
                 controlledType = null;
+                recentRespawnTimer = 1f;
+                Call.unitClear(player);
             }
         }
 
@@ -641,15 +647,17 @@ public class DesktopInput extends InputHandler{
             unit.moveAt(movement);
         }else{
             unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
+
+            //problem: actual unit rotation is controlled by velocity, but velocity is 1) unpredictable and 2) can be set to 0
             if(!movement.isZero()){
-                unit.vel.rotateTo(movement.angle(), unit.type.rotateSpeed * Math.max(Time.delta, 1));
+                unit.rotation = Angles.moveToward(unit.rotation, movement.angle(), unit.type.rotateSpeed * Math.max(Time.delta, 1));
             }
         }
 
         unit.aim(unit.type.faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation, Core.input.mouseWorld().dst(unit)).add(unit.x, unit.y));
         unit.controlWeapons(true, player.shooting && !boosted);
 
-        player.boosting = Core.input.keyDown(Binding.boost) && !movement.isZero();
+        player.boosting = Core.input.keyDown(Binding.boost);
         player.mouseX = unit.aimX();
         player.mouseY = unit.aimY();
 

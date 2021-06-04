@@ -6,6 +6,7 @@ import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.net.*;
+import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -242,11 +243,31 @@ public class EventType{
         }
     }
 
-    public static class TileChangeEvent{
-        public final Tile tile;
+    /**
+     * Called *before* a tile has changed.
+     * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
+     * Do not modify any tiles inside listeners that use this tile.
+     * */
+    public static class TilePreChangeEvent{
+        public Tile tile;
 
-        public TileChangeEvent(Tile tile){
+        public TilePreChangeEvent set(Tile tile){
             this.tile = tile;
+            return this;
+        }
+    }
+
+    /**
+     * Called *after* a tile has changed.
+     * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
+     * Do not modify any tiles inside listeners that use this tile.
+     * */
+    public static class TileChangeEvent{
+        public Tile tile;
+
+        public TileChangeEvent set(Tile tile){
+            this.tile = tile;
+            return this;
         }
     }
 
@@ -389,6 +410,17 @@ public class EventType{
 
         public ConnectionEvent(NetConnection connection){
             this.connection = connection;
+        }
+    }
+
+    /** Called when a player sends a connection packet. */
+    public static class ConnectPacketEvent{
+        public final NetConnection connection;
+        public final ConnectPacket packet;
+
+        public ConnectPacketEvent(NetConnection connection, ConnectPacket packet){
+            this.connection = connection;
+            this.packet = packet;
         }
     }
 

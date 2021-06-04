@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.types.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.ui.*;
@@ -21,7 +22,7 @@ public class OverlayRenderer{
     private static final Rect rect = new Rect();
 
     private float buildFade, unitFade;
-    private Unit lastSelect;
+    private Sized lastSelect;
 
     public void drawBottom(){
         InputHandler input = control.input;
@@ -72,27 +73,31 @@ public class OverlayRenderer{
 
         InputHandler input = control.input;
 
-        Unit select = input.selectedUnit();
+
+        Sized select = input.selectedUnit();
+        if(select == null) select = input.selectedControlBuild();
         if(!Core.input.keyDown(Binding.control)) select = null;
+
         unitFade = Mathf.lerpDelta(unitFade, Mathf.num(select != null), 0.1f);
 
         if(select != null) lastSelect = select;
         if(select == null) select = lastSelect;
-        if(select != null && select.isAI()){
+        if(select != null && (!(select instanceof Unitc u) || u.isAI())){
             Draw.mixcol(Pal.accent, 1f);
             Draw.alpha(unitFade);
+            Building build = (select instanceof BlockUnitc b ? b.tile() : select instanceof Building b ? b : null);
 
-            if(select instanceof BlockUnitc){
+            if(build != null){
                 //special selection for block "units"
-                Fill.square(select.x, select.y, ((BlockUnitc)select).tile().block.size * tilesize/2f);
-            }else{
-                Draw.rect(select.type.icon(Cicon.full), select.x(), select.y(), select.rotation() - 90);
+                Fill.square(build.x, build.y, build.block.size * tilesize/2f);
+            }else if(select instanceof Unit u){
+                Draw.rect(u.type.fullIcon, u.x, u.y, u.rotation - 90);
             }
 
             for(int i = 0; i < 4; i++){
                 float rot = i * 90f + 45f + (-Time.time) % 360f;
                 float length = select.hitSize() * 1.5f + (unitFade * 2.5f);
-                Draw.rect("select-arrow", select.x + Angles.trnsx(rot, length), select.y + Angles.trnsy(rot, length), length / 1.9f, length / 1.9f, rot - 135f);
+                Draw.rect("select-arrow", select.getX() + Angles.trnsx(rot, length), select.getY() + Angles.trnsy(rot, length), length / 1.9f, length / 1.9f, rot - 135f);
             }
 
             Draw.reset();
@@ -159,7 +164,8 @@ public class OverlayRenderer{
 
         input.drawOverSelect();
 
-        if(ui.hudfrag.blockfrag.hover() instanceof Unit unit && unit.controller() instanceof LogicAI ai && ai.controller instanceof Building build && build.isValid()){
+        if(ui.hudfrag.blockfrag.hover() instanceof Unit unit && unit.controller() instanceof LogicAI ai && ai.controller != null && ai.controller.isValid()){
+            var build = ai.controller;
             Drawf.square(build.x, build.y, build.block.size * tilesize/2f + 2f);
             if(!unit.within(build, unit.hitSize * 2f)){
                 Drawf.arrow(unit.x, unit.y, build.x, build.y, unit.hitSize *2f, 4f);
@@ -170,7 +176,7 @@ public class OverlayRenderer{
         if(input.isDroppingItem()){
             Vec2 v = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
             float size = 8;
-            Draw.rect(player.unit().item().icon(Cicon.medium), v.x, v.y, size, size);
+            Draw.rect(player.unit().item().fullIcon, v.x, v.y, size, size);
             Draw.color(Pal.accent);
             Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time, 5f, 1f));
             Draw.reset();

@@ -2,6 +2,7 @@ package mindustry.maps.filters;
 
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 import static mindustry.maps.filters.FilterOption.*;
@@ -12,6 +13,11 @@ public class ClearFilter extends GenerateFilter{
     @Override
     public FilterOption[] options(){
         return Structs.arr(new BlockOption("block", () -> block, b -> block = b, b -> oresOnly.get(b) || wallsOnly.get(b)));
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockSnow;
     }
 
     @Override

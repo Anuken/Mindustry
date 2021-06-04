@@ -30,7 +30,7 @@ public class WaveInfoDialog extends BaseDialog{
     private float updateTimer, updatePeriod = 1f;
     private WaveGraph graph = new WaveGraph();
 
-    public WaveInfoDialog(MapEditor editor){
+    public WaveInfoDialog(){
         super("@waves.title");
 
         shown(this::setup);
@@ -160,7 +160,7 @@ public class WaveInfoDialog extends BaseDialog{
                     t.margin(0).defaults().pad(3).padLeft(5f).growX().left();
                     t.button(b -> {
                         b.left();
-                        b.image(group.type.icon(Cicon.medium)).size(32f).padRight(3).scaling(Scaling.fit);
+                        b.image(group.type.uiIcon).size(32f).padRight(3).scaling(Scaling.fit);
                         b.add(group.type.localizedName).color(Pal.accent);
 
                         b.add().growX();
@@ -263,7 +263,7 @@ public class WaveInfoDialog extends BaseDialog{
                 if(type.isHidden()) continue;
                 p.button(t -> {
                     t.left();
-                    t.image(type.icon(Cicon.medium)).size(8 * 4).scaling(Scaling.fit).padRight(2f);
+                    t.image(type.uiIcon).size(8 * 4).scaling(Scaling.fit).padRight(2f);
                     t.add(type.localizedName);
                 }, () -> {
                     lastType = type;

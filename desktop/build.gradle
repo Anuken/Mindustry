@@ -18,7 +18,7 @@ task run(dependsOn: classes, type: JavaExec){
     ignoreExitValue = true
 
     if(System.getProperty("os.name").toLowerCase().contains("mac")){
-        jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
+        jvmArgs("-XstartOnFirstThread")
     }
 
     jvmArgs += "-XX:+ShowCodeDetailsInExceptionMessages"
@@ -42,6 +42,7 @@ task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     from files(sourceSets.main.output.resourcesDir)
     from {configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }}
     from files(project.assetsDir)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     archiveFileName = "${appName}.jar"
 
@@ -56,6 +57,7 @@ if(!project.ext.hasSprites()){
     dist.dependsOn ":tools:pack"
 }
 
+//this is only for local testing
 task steamtest(dependsOn: dist){
     doLast{
         copy{
@@ -70,6 +72,7 @@ task steamtest(dependsOn: dist){
     }
 }
 
+//TODO replace with jpackage templates
 PackrConfig.Platform.values().each{ platform ->
     task "packr${platform.toString()}"{
         dependsOn dist

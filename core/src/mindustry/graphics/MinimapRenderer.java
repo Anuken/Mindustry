@@ -2,7 +2,6 @@ package mindustry.graphics;
 
 import arc.*;
 import arc.graphics.*;
-import arc.graphics.Pixmap.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -36,6 +35,7 @@ public class MinimapRenderer{
 
         //make sure to call on the graphics thread
         Events.on(TileChangeEvent.class, event -> {
+            //TODO don't update when the minimap is off?
             if(!ui.editor.isShown()){
                 update(event.tile);
             }
@@ -69,7 +69,7 @@ public class MinimapRenderer{
             texture.dispose();
         }
         setZoom(4f);
-        pixmap = new Pixmap(world.width(), world.height(), Format.rgba8888);
+        pixmap = new Pixmap(world.width(), world.height());
         texture = new Texture(pixmap);
         region = new TextureRegion(texture);
     }
@@ -96,7 +96,7 @@ public class MinimapRenderer{
 
             Draw.mixcol(unit.team().color, 1f);
             float scale = Scl.scl(1f) / 2f * scaling * 32f;
-            var region = unit.type.icon(Cicon.full);
+            var region = unit.type.fullIcon;
             Draw.rect(region, x + rx, y + ry, scale, scale * (float)region.height / region.width, unit.rotation() - 90);
             Draw.reset();
         }
@@ -136,7 +136,7 @@ public class MinimapRenderer{
 
     public void updateAll(){
         for(Tile tile : world.tiles){
-            pixmap.draw(tile.x, pixmap.getHeight() - 1 - tile.y, colorFor(tile));
+            pixmap.set(tile.x, pixmap.height - 1 - tile.y, colorFor(tile));
         }
         texture.draw(pixmap);
     }
@@ -144,10 +144,18 @@ public class MinimapRenderer{
     public void update(Tile tile){
         if(world.isGenerating() || !state.isGame()) return;
 
-        int color = colorFor(world.tile(tile.x, tile.y));
-        pixmap.draw(tile.x, pixmap.getHeight() - 1 - tile.y, color);
+        if(tile.build != null && tile.isCenter()){
+            tile.getLinkedTiles(other -> {
+                if(!other.isCenter()){
+                    update(other);
+                }
+            });
+        }
 
-        Pixmaps.drawPixel(texture, tile.x, pixmap.getHeight() - 1 - tile.y, color);
+        int color = colorFor(tile);
+        pixmap.set(tile.x, pixmap.height - 1 - tile.y, color);
+
+        Pixmaps.drawPixel(texture, tile.x, pixmap.height - 1 - tile.y, color);
     }
 
     public void updateUnitArray(){

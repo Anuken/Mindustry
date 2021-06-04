@@ -36,13 +36,20 @@ public enum LogicOp{
     abs("abs", a -> Math.abs(a)),
     log("log", Math::log),
     log10("log10", Math::log10),
-    sin("sin", d -> Math.sin(d * 0.017453292519943295D)),
-    cos("cos", d -> Math.cos(d * 0.017453292519943295D)),
-    tan("tan", d -> Math.tan(d * 0.017453292519943295D)),
     floor("floor", Math::floor),
     ceil("ceil", Math::ceil),
     sqrt("sqrt", Math::sqrt),
-    rand("rand", d -> Mathf.rand.nextDouble() * d);
+    rand("rand", d -> Mathf.rand.nextDouble() * d),
+
+    sin("sin", d -> Math.sin(d * Mathf.doubleDegRad)),
+    cos("cos", d -> Math.cos(d * Mathf.doubleDegRad)),
+    tan("tan", d -> Math.tan(d * Mathf.doubleDegRad)),
+
+    asin("asin", d -> Math.asin(d) * Mathf.doubleRadDeg),
+    acos("acos", d -> Math.acos(d) * Mathf.doubleRadDeg),
+    atan("atan", d -> Math.atan(d) * Mathf.doubleRadDeg),
+
+    ;
 
     public static final LogicOp[] all = values();
 

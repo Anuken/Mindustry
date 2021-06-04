@@ -41,9 +41,9 @@ public class CoreItemsDisplay extends Table{
 
         for(Item item : content.items()){
             if(usedItems.contains(item)){
-                image(item.icon(Cicon.small)).padRight(3);
+                image(item.uiIcon).size(iconSmall).padRight(3).tooltip(t -> t.background(Styles.black6).margin(4f).add(item.localizedName).style(Styles.outlineLabel));
                 //TODO leaks garbage
-                label(() -> core == null ? "0" : UI.formatAmount(core.items.get(item))).padRight(3).left();
+                label(() -> core == null ? "0" : UI.formatAmount(core.items.get(item))).padRight(3).minWidth(52f).left();
 
                 if(++i % 4 == 0){
                     row();
