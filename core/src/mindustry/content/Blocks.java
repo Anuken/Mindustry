@@ -1034,17 +1034,17 @@ public class Blocks implements ContentList{
         //special transport blocks
 
         duct = new Duct("duct"){{
-            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 5, Items.copper, 5));
+            requirements(Category.distribution, with(Items.graphite, 4, Items.metaglass, 1));
             speed = 4f;
         }};
 
         ductRouter = new DuctRouter("duct-router"){{
-            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 10, Items.copper, 5));
+            requirements(Category.distribution, with(Items.graphite, 8, Items.metaglass, 2));
             speed = 4f;
         }};
 
         ductBridge = new DuctBridge("duct-bridge"){{
-            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 20, Items.copper, 15));
+            requirements(Category.distribution, with(Items.graphite, 16, Items.metaglass, 4));
             speed = 4f;
         }};
 
