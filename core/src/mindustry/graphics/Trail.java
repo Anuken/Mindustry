@@ -40,6 +40,7 @@ public class Trail{
             float[] items = points.items;
             int i = points.size - 3;
             float x1 = items[i], y1 = items[i + 1], w1 = items[i + 2], w = w1 * width / (points.size/3) * i/3f * 2f;
+            if(w1 <= 0.001f) return;
             Draw.rect("hcircle", x1, y1, w, w, -Mathf.radDeg * lastAngle + 180f);
             Draw.reset();
         }
@@ -56,6 +57,7 @@ public class Trail{
             float size = width / (points.size/3);
             float z1 = lastAngle;
             float z2 = -Angles.angleRad(x2, y2, lx, ly);
+            if(w1 <= 0.001f || w2 <= 0.001f) continue;
 
             float cx = Mathf.sin(z1) * i/3f * size * w1, cy = Mathf.cos(z1) * i/3f * size * w1,
                 nx = Mathf.sin(z2) * (i/3f + 1) * size * w2, ny = Mathf.cos(z2) * (i/3f + 1) * size * w2;

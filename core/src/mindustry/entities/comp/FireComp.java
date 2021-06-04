@@ -118,6 +118,8 @@ abstract class FireComp implements Timedc, Posc, Syncc, Drawc{
         Draw.z(Layer.effect);
         Draw.rect(regions[(int)animation], x, y);
         Draw.reset();
+
+        Drawf.light(x, y, 50f + Mathf.absin(5f, 5f), Pal.lightFlame, 0.6f  * Mathf.clamp(warmup / warmupDuration));
     }
 
     @Replace

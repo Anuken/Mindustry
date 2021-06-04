@@ -36,7 +36,7 @@ public class Bullets implements ContentList{
     waterShot, cryoShot, slagShot, oilShot, heavyWaterShot, heavyCryoShot, heavySlagShot, heavyOilShot,
 
     //environment, misc.
-    damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame, driverBolt;
+    damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame;
 
     @Override
     public void load(){
@@ -510,7 +510,5 @@ public class Bullets implements ContentList{
             statusDuration = 60f * 4f;
             damage = 0.2f;
         }};
-
-        driverBolt = new MassDriverBolt();
     }
 }

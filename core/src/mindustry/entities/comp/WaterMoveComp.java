@@ -15,7 +15,8 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
-//just a proof of concept
+import static mindustry.Vars.*;
+
 @Component
 abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     @Import float x, y, rotation;
@@ -32,7 +33,7 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
 
             int sign = i == 0 ? -1 : 1;
             float cx = Angles.trnsx(rotation - 90, type.trailX * sign, type.trailY) + x, cy = Angles.trnsy(rotation - 90, type.trailX * sign, type.trailY) + y;
-            t.update(cx, cy);
+            t.update(cx, cy, world.floorWorld(cx, cy).isLiquid ? 1 : 0);
         }
     }
 

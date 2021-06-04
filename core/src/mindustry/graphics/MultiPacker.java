@@ -26,6 +26,10 @@ public class MultiPacker implements Disposable{
         return null;
     }
 
+    public PixmapPacker getPacker(PageType type){
+        return packers[type.ordinal()];
+    }
+
     public boolean has(String name){
         for(var page : PageType.all){
             if(packers[page.ordinal()].getRect(name) != null){
@@ -70,8 +74,9 @@ public class MultiPacker implements Disposable{
     //main page (sprites.png) - all sprites for units, weapons, placeable blocks, effects, bullets, etc
     //environment page (sprites2.png) - all sprites for things in the environmental cache layer
     //editor page (sprites3.png) - all sprites needed for rendering in the editor, including block icons and a few minor sprites
-    //zone page (sprites4.png) - zone previews
-    //ui page (sprites5.png) - content icons, white icons and UI elements
+    //zone page (sprites4.png) - zone preview
+    //rubble page - scorch textures for unit deaths & wrecks
+    //ui page (sprites5.png) - content icons, white icons, fonts and UI elements
     public enum PageType{
         main(4096),
         environment,
