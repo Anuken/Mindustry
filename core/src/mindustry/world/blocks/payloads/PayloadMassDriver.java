@@ -444,11 +444,21 @@ public class PayloadMassDriver extends PayloadBlock{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.i(link);
             write.f(turretRotation);
             write.b((byte)state.ordinal());
+
+            write.f(reload);
+            write.f(charge);
+            write.bool(loaded);
+            write.bool(charging);
         }
 
         @Override
@@ -457,6 +467,13 @@ public class PayloadMassDriver extends PayloadBlock{
             link = read.i();
             turretRotation = read.f();
             state = PayloadDriverState.all[read.b()];
+
+            if(revision >= 1){
+                reload = read.f();
+                charge = read.f();
+                loaded = read.bool();
+                charging = read.bool();
+            }
         }
     }
 
