@@ -1375,7 +1375,7 @@ public class UnitTypes implements ContentList{
 
                     shrinkX = shrinkY = 0.7f;
 
-                    speed = 0.001f;
+                    speed = 0f;
                     collides = false;
 
                     healPercent = 15f;
@@ -1810,7 +1810,7 @@ public class UnitTypes implements ContentList{
 
                     shrinkX = shrinkY = 0f;
 
-                    speed = 0.001f;
+                    speed = 0f;
 
                     splashDamage = 50f;
                     splashDamageRadius = 40f;

@@ -4,7 +4,6 @@ import mindustry.world.blocks.power.*;
 import mindustry.world.meta.*;
 
 public class PowerSource extends PowerNode{
-
     public float powerProduction = 10000f;
 
     public PowerSource(String name){
