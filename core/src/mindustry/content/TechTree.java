@@ -53,7 +53,9 @@ public class TechTree implements ContentList{
                             node(titaniumConveyor, Seq.with(new SectorComplete(craters)), () -> {
                                 node(phaseConveyor, () -> {
                                     node(massDriver, () -> {
+                                        node(payloadPropulsionTower, () -> {
 
+                                        });
                                     });
                                 });
 
@@ -233,7 +235,9 @@ public class TechTree implements ContentList{
                                 });
 
                                 node(repairPoint, () -> {
+                                    node(repairTurret, () -> {
 
+                                    });
                                 });
                             });
                         });
@@ -412,6 +416,18 @@ public class TechTree implements ContentList{
                                     node(sei, () -> {
                                         node(omura, () -> {
 
+                                        });
+                                    });
+                                });
+                            });
+
+                            node(retusa, () -> {
+                                node(oxynoe, () -> {
+                                    node(cyclone, () -> {
+                                        node(aegires, () -> {
+                                            node(navanax, () -> {
+
+                                            });
                                         });
                                     });
                                 });

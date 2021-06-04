@@ -49,7 +49,7 @@ public class PowerGraph{
     }
 
     public float getPowerBalance(){
-        return powerBalance.mean();
+        return powerBalance.rawMean();
     }
 
     public float getLastPowerNeeded(){

@@ -721,6 +721,7 @@ public class HudFragment extends Fragment{
             t.clicked(() -> {
                 if(!player.dead() && mobile){
                     Call.unitClear(player);
+                    control.input.recentRespawnTimer = 1f;
                     control.input.controlledType = null;
                 }
             });

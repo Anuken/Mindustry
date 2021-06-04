@@ -614,8 +614,10 @@ public class MobileInput extends InputHandler implements GestureListener{
                     //control a unit/block detected on first tap of double-tap
                     if(unitTapped != null){
                         Call.unitControl(player, unitTapped);
+                        recentRespawnTimer = 1f;
                     }else if(buildingTapped != null){
                         Call.buildingControlSelect(player, buildingTapped);
+                        recentRespawnTimer = 1f;
                     }else if(!tryBeginMine(cursor)){
                         tileTapped(linked.build);
                     }

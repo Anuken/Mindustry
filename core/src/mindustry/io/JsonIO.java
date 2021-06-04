@@ -8,6 +8,7 @@ import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 
@@ -108,6 +109,18 @@ public class JsonIO{
                 if(jsonData.asString() == null) return Liquids.water;
                 Liquid i = Vars.content.getByName(ContentType.liquid, jsonData.asString());
                 return i == null ? Liquids.water : i;
+            }
+        });
+
+        json.setSerializer(Attribute.class, new Serializer<>(){
+            @Override
+            public void write(Json json, Attribute object, Class knownType){
+                json.writeValue(object.name);
+            }
+
+            @Override
+            public Attribute read(Json json, JsonValue jsonData, Class type){
+                return Attribute.get(jsonData.asString());
             }
         });
 
