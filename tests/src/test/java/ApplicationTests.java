@@ -21,7 +21,6 @@ import mindustry.net.Net;
 import mindustry.type.*;
 import mindustry.world.*;
 import org.junit.jupiter.api.*;
-import mindustry.editor.*;
 import static mindustry.Vars.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -149,7 +148,7 @@ public class ApplicationTests{
     }
 
     @Test
-    void TeamsStatusTest() {
+    void TeamsStatusTest(){
         world.loadMap(testMap);
         logic.play();
         assertTrue(state.teams.isActive(state.rules.defaultTeam));
@@ -269,8 +268,6 @@ public class ApplicationTests{
         assertTrue(state.teams.playerCores().size > 0);
     }
 
-
-
     void updateBlocks(int times){
         for(Tile tile : world.tiles){
             if(tile.build != null && tile.isCenter()){
@@ -303,8 +300,6 @@ public class ApplicationTests{
         assertTrue(world.tile(2, 1).build.liquids.currentAmount() >= 1);
         assertTrue(world.tile(2, 1).build.liquids.current() == Liquids.water);
     }
-
-
 
     @Test
     void liquidJunctionOutput(){
