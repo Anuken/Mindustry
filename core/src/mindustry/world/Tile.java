@@ -119,11 +119,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             float result = 0f;
 
             if(block.hasItems){
-                result += build.items.sum((item, amount) -> item.flammability * amount) / block.itemCapacity * Mathf.clamp(block.itemCapacity / 2.4f, 1f, 3f);
+                result += build.items.sum((item, amount) -> item.flammability * amount) / Math.max(block.itemCapacity, 1) * Mathf.clamp(block.itemCapacity / 2.4f, 1f, 3f);
             }
 
             if(block.hasLiquids){
-                result += build.liquids.sum((liquid, amount) -> liquid.flammability * amount / 1.6f) / block.liquidCapacity * Mathf.clamp(block.liquidCapacity / 30f, 1f, 2f);
+                result += build.liquids.sum((liquid, amount) -> liquid.flammability * amount / 1.6f) / Math.max(block.liquidCapacity, 1) * Mathf.clamp(block.liquidCapacity / 30f, 1f, 2f);
             }
 
             return result;

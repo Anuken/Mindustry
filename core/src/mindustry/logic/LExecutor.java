@@ -922,6 +922,7 @@ public class LExecutor{
                     v.objval instanceof Content ? "[content]" :
                     v.objval instanceof Building build ? build.block.name :
                     v.objval instanceof Unit unit ? unit.type.name :
+                    v.objval instanceof Enum<?> e ? e.name() :
                     "[object]";
 
                 exec.textBuffer.append(strValue);

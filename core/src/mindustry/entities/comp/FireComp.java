@@ -56,7 +56,7 @@ abstract class FireComp implements Timedc, Posc, Syncc, Drawc{
             return;
         }
 
-        if(time >= lifetime || tile == null){
+        if(time >= lifetime || tile == null || Float.isNaN(lifetime)){
             remove();
             return;
         }

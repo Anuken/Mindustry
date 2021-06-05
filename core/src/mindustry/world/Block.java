@@ -451,6 +451,10 @@ public class Block extends UnlockableContent{
 
     }
 
+    public boolean configSenseable(){
+        return configurations.containsKey(Item.class) || configurations.containsKey(Liquid.class);
+    }
+
     public Object nextConfig(){
         if(saveConfig && lastConfig != null){
             return lastConfig;
