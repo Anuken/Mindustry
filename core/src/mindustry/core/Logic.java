@@ -185,9 +185,11 @@ public class Logic implements ApplicationListener{
             }
         }
 
-        //heal player cores on start - fixes any potential core health increases
-        for(var entity : state.rules.defaultTeam.cores()){
-            entity.heal();
+        //heal all cores on game start
+        for(TeamData team : state.teams.getActive()){
+            for(var entity : team.cores){
+                entity.heal();
+            }
         }
     }
 
