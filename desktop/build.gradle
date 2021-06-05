@@ -1,4 +1,4 @@
-sourceSets.main.java.srcDirs = ["src/" ]
+sourceSets.main.java.srcDirs = ["src/"]
 
 project.ext.mainClassName = "mindustry.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
@@ -70,9 +70,9 @@ task steamtest(dependsOn: dist){
 }
 
 //required templates:
-//- Windows64
-//- Windows32 (not provided by Packr!)
+//- Windows32: Not provided by Packr! This uses Java 8
 //required JDKs:
+//- Windows64
 //- Linux64
 //- Mac
 platforms.each{ platform ->
