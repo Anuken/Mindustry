@@ -40,7 +40,7 @@ public class SearchBar{
         parent.pane(table -> {
             pane[0] = table;
             rebuild.get("");
-        });
+        }).get().setScrollingDisabled(true, false);
         return pane[0];
     }
 
@@ -54,9 +54,6 @@ public class SearchBar{
 
     /** Match a list item with the search query, case insensitive */
     public static boolean matches(String query, String name){
-        if(name == null || name.isEmpty()){
-            return false;
-        }
-        return name.toLowerCase().contains(query);
+        return name != null && !name.isEmpty() && name.toLowerCase().contains(query);
     }
 }

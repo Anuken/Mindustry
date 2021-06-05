@@ -24,7 +24,7 @@ public class PayloadSource extends PayloadBlock{
         size = 3;
         update = true;
         outputsPayload = true;
-        hasPower = true;
+        hasPower = false;
         rotate = true;
         configurable = true;
         //make sure to display large units.

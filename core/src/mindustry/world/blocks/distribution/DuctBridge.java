@@ -37,6 +37,7 @@ public class DuctBridge extends Block{
         group = BlockGroup.transportation;
         noUpdateDisabled = true;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
+        drawArrow = false;
     }
 
     @Override
@@ -53,6 +54,37 @@ public class DuctBridge extends Block{
     @Override
     public void changePlacementPath(Seq<Point2> points, int rotation){
         Placement.calculateNodes(points, this, rotation, (point, other) -> Math.max(Math.abs(point.x - other.x), Math.abs(point.y - other.y)) <= range);
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
+        int length = range;
+        Building found = null;
+
+        //find the link
+        for(int i = 1; i <= range; i++){
+            Tile other = world.tile(x + Geometry.d4x(rotation) * i, y + Geometry.d4y(rotation) * i);
+
+            if(other != null && other.build instanceof DuctBridgeBuild build && build.team == player.team()){
+                length = i;
+                found = other.build;
+                break;
+            }
+        }
+
+        Drawf.dashLine(Pal.placing,
+            x * tilesize + Geometry.d4[rotation].x * (tilesize / 2f + 2),
+            y * tilesize + Geometry.d4[rotation].y * (tilesize / 2f + 2),
+            x * tilesize + Geometry.d4[rotation].x * (length) * tilesize,
+            y * tilesize + Geometry.d4[rotation].y * (length) * tilesize
+        );
+
+        if(found != null){
+            Drawf.square(found.x, found.y, found.block.size * tilesize/2f + 2.5f, 0f);
+        }
+
     }
 
     public boolean positionsValid(int x1, int y1, int x2, int y2){
@@ -88,7 +120,6 @@ public class DuctBridge extends Block{
                 Draw.rect(bridgeBotRegion, cx, cy, len, tilesize, angle);
                 Draw.reset();
                 Draw.alpha(Renderer.bridgeOpacity);
-                //Draw.rect(bridgeTopRegion, cx, cy, len, tilesize, angle);
 
                 for(float i = 6f; i <= len + size * tilesize - 5f; i += 5f){
                     Draw.rect(arrowRegion, x + Geometry.d4x(rotation) * i, y + Geometry.d4y(rotation) * i, angle);

@@ -19,7 +19,7 @@ public class ShrapnelBulletType extends BulletType{
     public float serrationLenScl = 10f, serrationWidth = 4f, serrationSpacing = 8f, serrationSpaceOffset = 80f, serrationFadeOffset = 0.5f;
 
     public ShrapnelBulletType(){
-        speed = 0.01f;
+        speed = 0f;
         hitEffect = Fx.hitLancer;
         shootEffect = smokeEffect = Fx.lightningShoot;
         lifetime = 10f;
