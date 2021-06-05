@@ -270,10 +270,6 @@ public class StatValues{
                         sep(bt, "@bullet.incendiary");
                     }
 
-                    if(type.status != StatusEffects.none){
-                        sep(bt, (type.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName);
-                    }
-
                     if(type.homingPower > 0.01f){
                         sep(bt, "@bullet.homing");
                     }
@@ -284,6 +280,10 @@ public class StatValues{
 
                     if(type.fragBullet != null){
                         sep(bt, "@bullet.frag");
+                    }
+
+                    if(type.status != StatusEffects.none){
+                        sep(bt, (type.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName);
                     }
                 }).padTop(unit ? 0 : -9).left().get().background(unit ? null : Tex.underline);
 

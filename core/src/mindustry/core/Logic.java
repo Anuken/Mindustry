@@ -184,6 +184,13 @@ public class Logic implements ApplicationListener{
                 }
             }
         }
+
+        //heal all cores on game start
+        for(TeamData team : state.teams.getActive()){
+            for(var entity : team.cores){
+                entity.heal();
+            }
+        }
     }
 
     public void reset(){
