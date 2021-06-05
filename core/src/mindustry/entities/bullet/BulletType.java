@@ -401,9 +401,14 @@ public class BulletType extends Content implements Cloneable{
             //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
         }
 
-        if(lightningType == null && lightning > 0){
-            status = status == StatusEffects.none ? StatusEffects.shocked : status;
-            lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
+        if(lightning > 0){
+            if(status == StatusEffects.none){
+                status = StatusEffects.shocked;
+            }
+
+            if(lightningType == null){
+                lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
+            }
         }
     }
 
