@@ -963,7 +963,7 @@ public class Fx{
     }),
 
     overdriven = new Effect(20f, e -> {
-        color(Pal.accent);
+        color(e.color);
 
         randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
             Fill.square(e.x + x, e.y + y, e.fout() * 2.3f + 0.5f);
@@ -971,7 +971,7 @@ public class Fx{
     }),
 
     overclocked = new Effect(50f, e -> {
-        color(Pal.accent);
+        color(e.color);
 
         Fill.square(e.x, e.y, e.fslope() * 2f, 45f);
     }),
