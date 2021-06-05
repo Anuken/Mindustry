@@ -855,6 +855,7 @@ public class Fx{
         if(Fire.regions[0] == null) return;
         alpha(e.fout());
         rect(Fire.regions[((int)(e.rotation + e.fin() * Fire.frames)) % Fire.frames], e.x, e.y);
+        Drawf.light(e.x, e.y, 50f + Mathf.absin(5f, 5f), Pal.lightFlame, 0.6f  * e.fout());
     }),
 
     fire = new Effect(50f, e -> {
@@ -962,7 +963,7 @@ public class Fx{
     }),
 
     overdriven = new Effect(20f, e -> {
-        color(Pal.accent);
+        color(e.color);
 
         randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
             Fill.square(e.x + x, e.y + y, e.fout() * 2.3f + 0.5f);
@@ -970,7 +971,7 @@ public class Fx{
     }),
 
     overclocked = new Effect(50f, e -> {
-        color(Pal.accent);
+        color(e.color);
 
         Fill.square(e.x, e.y, e.fslope() * 2f, 45f);
     }),

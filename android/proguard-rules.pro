@@ -6,3 +6,4 @@
 -keep class arc.** { *; }
 -keep class net.jpountz.** { *; }
 -keep class rhino.** { *; }
+-keep class com.android.dex.** { *; }

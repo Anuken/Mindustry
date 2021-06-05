@@ -229,8 +229,10 @@ public class DesktopInput extends InputHandler{
                 if(on != null){
                     Call.unitControl(player, on);
                     shouldShoot = false;
+                    recentRespawnTimer = 1f;
                 }else if(build != null){
                     Call.buildingControlSelect(player, build);
+                    recentRespawnTimer = 1f;
                 }
             }
         }
@@ -238,9 +240,10 @@ public class DesktopInput extends InputHandler{
         if(!player.dead() && !state.isPaused() && !scene.hasField()){
             updateMovement(player.unit());
 
-            if(Core.input.keyDown(Binding.respawn)){
-                Call.unitClear(player);
+            if(Core.input.keyTap(Binding.respawn)){
                 controlledType = null;
+                recentRespawnTimer = 1f;
+                Call.unitClear(player);
             }
         }
 

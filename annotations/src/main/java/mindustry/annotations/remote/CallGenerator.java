@@ -30,6 +30,9 @@ public class CallGenerator{
             TypeSpec.Builder packet = TypeSpec.classBuilder(ent.packetClassName)
             .addModifiers(Modifier.PUBLIC);
 
+            //temporary data to deserialize later
+            packet.addField(FieldSpec.builder(byte[].class, "DATA", Modifier.PRIVATE).initializer("NODATA").build());
+
             packet.superclass(tname("mindustry.net.Packet"));
 
             //return the correct priority
@@ -41,8 +44,8 @@ public class CallGenerator{
             }
 
             //implement read & write methods
-            packet.addMethod(makeWriter(ent, serializer));
-            packet.addMethod(makeReader(ent, serializer));
+            makeWriter(packet, ent, serializer);
+            makeReader(packet, ent, serializer);
 
             //generate handlers
             if(ent.where.isClient){
@@ -87,7 +90,7 @@ public class CallGenerator{
         JavaFile.builder(packageName, spec).build().writeTo(BaseProcessor.filer);
     }
 
-    private static MethodSpec makeWriter(MethodEntry ent, ClassSerializer serializer){
+    private static void makeWriter(TypeSpec.Builder typespec, MethodEntry ent, ClassSerializer serializer){
         MethodSpec.Builder builder = MethodSpec.methodBuilder("write")
             .addParameter(Writes.class, "WRITE")
             .addModifiers(Modifier.PUBLIC).addAnnotation(Override.class);
@@ -132,13 +135,27 @@ public class CallGenerator{
             }
         }
 
-        return builder.build();
+        typespec.addMethod(builder.build());
     }
 
-    private static MethodSpec makeReader(MethodEntry ent, ClassSerializer serializer){
-        MethodSpec.Builder builder = MethodSpec.methodBuilder("read")
+    private static void makeReader(TypeSpec.Builder typespec, MethodEntry ent, ClassSerializer serializer){
+        MethodSpec.Builder readbuilder = MethodSpec.methodBuilder("read")
             .addParameter(Reads.class, "READ")
+            .addParameter(int.class, "LENGTH")
             .addModifiers(Modifier.PUBLIC).addAnnotation(Override.class);
+
+        //read only into temporary data buffer
+        readbuilder.addStatement("DATA = READ.b(LENGTH)");
+
+        typespec.addMethod(readbuilder.build());
+
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("handled")
+            .addModifiers(Modifier.PUBLIC)
+            .addAnnotation(Override.class);
+
+        //make sure data is present, begin reading it if so
+        builder.addStatement("BAIS.setBytes(DATA)");
+
         Seq<Svar> params = ent.element.params();
 
         //go through each parameter
@@ -185,7 +202,7 @@ public class CallGenerator{
             }
         }
 
-        return builder.build();
+        typespec.addMethod(builder.build());
     }
 
     /** Creates a specific variant for a method entry. */

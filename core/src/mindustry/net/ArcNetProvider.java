@@ -385,7 +385,6 @@ public class ArcNetProvider implements NetProvider{
                 return readFramework(byteBuffer);
             }else{
                 //read length int, followed by compressed lz4 data
-                //TODO not thread safe!!!
                 Packet packet = Net.newPacket(id);
                 var buffer = decompressBuffer.get();
                 int length = byteBuffer.getShort() & 0xffff;
@@ -396,7 +395,7 @@ public class ArcNetProvider implements NetProvider{
                     buffer.position(0).limit(length);
                     buffer.put(byteBuffer.array(), byteBuffer.position(), length);
                     buffer.position(0);
-                    packet.read(reads.get());
+                    packet.read(reads.get(), length);
                     //move read packets forward
                     byteBuffer.position(byteBuffer.position() + buffer.position());
                 }else{
@@ -405,7 +404,7 @@ public class ArcNetProvider implements NetProvider{
 
                     buffer.position(0);
                     buffer.limit(length);
-                    packet.read(reads.get());
+                    packet.read(reads.get(), length);
                     //move buffer forward based on bytes read by decompressor
                     byteBuffer.position(byteBuffer.position() + read);
                 }

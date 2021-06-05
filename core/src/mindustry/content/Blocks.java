@@ -1168,22 +1168,24 @@ public class Blocks implements ContentList{
             reloadTime = 200f;
             range = 440f;
             consumes.power(1.75f);
+            bullet = new MassDriverBolt();
         }};
 
         //special transport blocks
 
         duct = new Duct("duct"){{
-            requirements(Category.distribution, with(Items.graphite, 5, Items.copper, 5));
-            speed = 5f;
+            requirements(Category.distribution, with(Items.graphite, 5, Items.metaglass, 2));
+            speed = 4f;
         }};
 
         ductRouter = new DuctRouter("duct-router"){{
-            requirements(Category.distribution, with(Items.graphite, 10, Items.copper, 5));
-            speed = 5f;
+            requirements(Category.distribution, with(Items.graphite, 10, Items.metaglass, 4));
+            speed = 4f;
         }};
 
         ductBridge = new DuctBridge("duct-bridge"){{
-            requirements(Category.distribution, with(Items.graphite, 20, Items.copper, 15));
+            requirements(Category.distribution, with(Items.graphite, 20, Items.metaglass, 8));
+            speed = 4f;
         }};
 
         //endregion
@@ -2048,7 +2050,7 @@ public class Blocks implements ContentList{
             requirements(Category.units, with(Items.copper, 150, Items.lead, 130, Items.metaglass, 120));
             plans = Seq.with(
                 new UnitPlan(UnitTypes.risso, 60f * 45f, with(Items.silicon, 20, Items.metaglass, 35)),
-                new UnitPlan(UnitTypes.retusa, 60f * 60f, with(Items.silicon, 15, Items.metaglass, 25, Items.titanium, 20))
+                new UnitPlan(UnitTypes.retusa, 60f * 50f, with(Items.silicon, 15, Items.metaglass, 25, Items.titanium, 20))
             );
             size = 3;
             consumes.power(1.2f);
@@ -2090,7 +2092,8 @@ public class Blocks implements ContentList{
                 new UnitType[]{UnitTypes.poly, UnitTypes.mega},
                 new UnitType[]{UnitTypes.minke, UnitTypes.bryde},
                 new UnitType[]{UnitTypes.pulsar, UnitTypes.quasar},
-                new UnitType[]{UnitTypes.atrax, UnitTypes.spiroct}
+                new UnitType[]{UnitTypes.atrax, UnitTypes.spiroct},
+                new UnitType[]{UnitTypes.oxynoe, UnitTypes.cyerce}
             );
         }};
 
@@ -2111,7 +2114,8 @@ public class Blocks implements ContentList{
                 new UnitType[]{UnitTypes.fortress, UnitTypes.scepter},
                 new UnitType[]{UnitTypes.bryde, UnitTypes.sei},
                 new UnitType[]{UnitTypes.mega, UnitTypes.quad},
-                new UnitType[]{UnitTypes.quasar, UnitTypes.vela}
+                new UnitType[]{UnitTypes.quasar, UnitTypes.vela},
+                new UnitType[]{UnitTypes.cyerce, UnitTypes.aegires}
             );
         }};
 
@@ -2132,7 +2136,8 @@ public class Blocks implements ContentList{
                 new UnitType[]{UnitTypes.scepter, UnitTypes.reign},
                 new UnitType[]{UnitTypes.sei, UnitTypes.omura},
                 new UnitType[]{UnitTypes.quad, UnitTypes.oct},
-                new UnitType[]{UnitTypes.vela, UnitTypes.corvus}
+                new UnitType[]{UnitTypes.vela, UnitTypes.corvus},
+                new UnitType[]{UnitTypes.aegires, UnitTypes.navanax}
             );
         }};
 
@@ -2149,7 +2154,7 @@ public class Blocks implements ContentList{
             requirements(Category.units, with(Items.silicon, 70, Items.thorium, 60, Items.plastanium, 60));
             size = 2;
             length = 6f;
-            repairSpeed = 5f;
+            repairSpeed = 4f;
             repairRadius = 140f;
             powerUse = 5f;
             beamWidth = 1.1f;

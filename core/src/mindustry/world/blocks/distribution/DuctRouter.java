@@ -87,7 +87,7 @@ public class DuctRouter extends Block{
             if(current == null) return null;
 
             for(int i = -1; i <= 1; i++){
-                Building other = nearby(Mathf.mod(rotation + i + cdump, 4));
+                Building other = nearby(Mathf.mod(rotation + (((i + cdump + 1) % 3) - 1), 4));
                 if(other != null && other.team == team && other.acceptItem(this, current)){
                     return other;
                 }

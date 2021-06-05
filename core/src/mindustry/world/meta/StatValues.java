@@ -198,15 +198,10 @@ public class StatValues{
 
                 table.image(region).size(60).scaling(Scaling.bounded).right().top();
 
-                table.table(Tex.underline,  w -> {
+                table.table(Tex.underline, w -> {
                     w.left().defaults().padRight(3).left();
 
-                    if(weapon.inaccuracy > 0){
-                        sep(w, "[lightgray]" + Stat.inaccuracy.localized() + ": [white]" + (int)weapon.inaccuracy + " " + StatUnit.degrees.localized());
-                    }
-                    sep(w, "[lightgray]" + Stat.reload.localized() + ": " + (weapon.mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / weapon.reload * weapon.shots, 2));
-
-                    ammo(ObjectMap.of(unit, weapon.bullet)).display(w);
+                    weapon.addStats(unit, w);
                 }).padTop(-9).left();
                 table.row();
             }
@@ -275,10 +270,6 @@ public class StatValues{
                         sep(bt, "@bullet.incendiary");
                     }
 
-                    if(type.status != StatusEffects.none){
-                        sep(bt, (type.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName);
-                    }
-
                     if(type.homingPower > 0.01f){
                         sep(bt, "@bullet.homing");
                     }
@@ -290,6 +281,10 @@ public class StatValues{
                     if(type.fragBullet != null){
                         sep(bt, "@bullet.frag");
                     }
+
+                    if(type.status != StatusEffects.none){
+                        sep(bt, (type.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName);
+                    }
                 }).padTop(unit ? 0 : -9).left().get().background(unit ? null : Tex.underline);
 
                 table.row();
@@ -298,7 +293,6 @@ public class StatValues{
     }
 
     //for AmmoListValue
-
     private static void sep(Table table, String text){
         table.row();
         table.add(text);

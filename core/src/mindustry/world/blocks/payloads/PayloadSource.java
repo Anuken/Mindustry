@@ -24,9 +24,11 @@ public class PayloadSource extends PayloadBlock{
         size = 3;
         update = true;
         outputsPayload = true;
-        hasPower = true;
+        hasPower = false;
         rotate = true;
         configurable = true;
+        //make sure to display large units.
+        clipSize = 120;
 
         config(Block.class, (PayloadSourceBuild build, Block block) -> {
             if(canProduce(block) && build.block != block){
@@ -44,6 +46,13 @@ public class PayloadSource extends PayloadBlock{
                 build.payload = null;
                 build.scl = 0f;
             }
+        });
+
+        configClear((PayloadSourceBuild build) -> {
+            build.block = null;
+            build.unit = null;
+            build.payload = null;
+            build.scl = 0f;
         });
     }
 
