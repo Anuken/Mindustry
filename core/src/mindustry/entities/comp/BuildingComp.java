@@ -907,7 +907,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void draw(){
-        Draw.rect(block.region, x, y, block.rotate ? rotdeg() : 0);
+        if(block.variants == 0){
+            Draw.rect(block.region, x, y, block.rotate ? rotdeg() : 0);
+        }else{
+            Draw.rect(block.variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, block.variantRegions.length - 1))], x, y, block.rotate ? rotdeg() : 0);
+        }
 
         drawTeamTop();
     }
