@@ -479,7 +479,9 @@ public class Administration{
         autosave("Whether the periodically save the map when playing.", false),
         autosaveAmount("The maximum amount of autosaves. Older ones get replaced.", 10),
         autosaveSpacing("Spacing between autosaves in seconds.", 60 * 5),
-        debug("Enable debug logging", false, () -> Log.level = debug() ? LogLevel.debug : LogLevel.info);
+        debug("Enable debug logging", false, () -> Log.level = debug() ? LogLevel.debug : LogLevel.info),
+        chatPrefix("Goes before the name of the chatting player.", "[coral][["),
+        chatSuffix("Goes behind the name of the chatting player.", "[coral]]:[white] ");
 
         public static final Config[] all = values();
 

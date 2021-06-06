@@ -160,11 +160,24 @@ public class NetClient implements ApplicationListener{
         clientPacketReliable(type, contents);
     }
 
-    //called on all clients
+    @Deprecated
     @Remote(targets = Loc.server, variants = Variant.both)
     public static void sendMessage(String message, String sender, Player playersender){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message, sender);
+        }
+
+        if(playersender != null){
+            playersender.lastText(message);
+            playersender.textFadeTime(1f);
+        }
+    }
+
+    //called on all clients
+    @Remote(targets = Loc.server, variants = Variant.both)
+    public static void sendMessage(String prefix, String sender, String suffix, String message, Player playersender){
+        if(Vars.ui != null){
+            Vars.ui.chatfrag.addMessage(prefix, sender, suffix, message);
         }
 
         if(playersender != null){
@@ -219,7 +232,7 @@ public class NetClient implements ApplicationListener{
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
-            Call.sendMessage(message, colorizeName(player.id(), player.name), player);
+            Call.sendMessage(Config.chatPrefix.string(), colorizeName(player.id(), player.name), Config.chatSuffix.string(), message, player);
         }else{
 
             //a command was sent, now get the output

@@ -256,28 +256,37 @@ public class ChatFragment extends Table{
         return shown;
     }
 
+    @Deprecated
     public void addMessage(String message, String sender){
+        addMessage("[coral][[", sender, "[coral]]:[white] ", message);
+    }
+
+    public void addMessage(String prefix, String sender, String suffix, String message){
         if(sender == null && message == null) return;
-        messages.insert(0, new ChatMessage(message, sender));
+        messages.insert(0, new ChatMessage(prefix, sender, suffix, message));
 
         fadetime += 1f;
         fadetime = Math.min(fadetime, messagesShown) + 1f;
-        
+
         if(scrollPos > 0) scrollPos++;
     }
 
     private static class ChatMessage{
+        public final String prefix;
         public final String sender;
+        public final String suffix;
         public final String message;
         public final String formattedMessage;
 
-        public ChatMessage(String message, String sender){
-            this.message = message;
+        public ChatMessage(String prefix, String sender, String suffix, String message){
+            this.prefix = prefix;
             this.sender = sender;
+            this.suffix = suffix;
+            this.message = message;
             if(sender == null){ //no sender, this is a server message?
                 formattedMessage = message == null ? "" : message;
             }else{
-                formattedMessage = "[coral][[" + sender + "[coral]]:[white] " + message;
+                formattedMessage = prefix + sender + suffix + message;
             }
         }
     }
