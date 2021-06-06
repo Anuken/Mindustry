@@ -173,7 +173,7 @@ public class DuctBridge extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            int rel = this.relativeTo(source);
+            int rel = this.relativeToEdge(source.tile);
             return items.total() < itemCapacity && rel != rotation && occupied[(rel + 2) % 4] == null;
         }
     }
