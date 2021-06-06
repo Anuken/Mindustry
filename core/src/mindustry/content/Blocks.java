@@ -1625,8 +1625,8 @@ public class Blocks implements ContentList{
             );
 
             size = 2;
-            range = 180f;
-            reloadTime = 38f;
+            range = 190f;
+            reloadTime = 34f;
             restitution = 0.03f;
             ammoEjectBack = 3f;
             cooldown = 0.03f;
@@ -2043,10 +2043,11 @@ public class Blocks implements ContentList{
         payloadPropulsionTower = new PayloadMassDriver("payload-propulsion-tower"){{
             requirements(Category.units, with(Items.thorium, 300, Items.silicon, 200, Items.plastanium, 200, Items.phaseFabric, 50));
             size = 5;
-            reloadTime = 150f;
+            reloadTime = 140f;
             chargeTime = 100f;
-            range = 300f;
-            consumes.power(10f);
+            range = 500f;
+            maxPayloadSize = 3.5f;
+            consumes.power(6f);
         }};
 
         //endregion
