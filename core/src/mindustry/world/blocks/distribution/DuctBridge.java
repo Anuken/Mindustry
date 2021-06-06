@@ -53,13 +53,13 @@ public class DuctBridge extends Block{
     public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
         otherReq = null;
         otherDst = range;
+        Point2 d = Geometry.d4(req.rotation);
         list.each(other -> {
-            if(other.block == this && req != other){
-                for(int i = 1; i <= range; i++){
-                    if(req.x + (Geometry.d4x(req.rotation) * i) == other.x && req.y + (Geometry.d4y(req.rotation) * i) == other.y && i <= otherDst){
-                        otherReq = other;
-                        otherDst = i;
-                    }
+            if(other.block == this && req != other && Mathf.clamp(other.x - req.x, -1, 1) == d.x && Mathf.clamp(other.y - req.y, -1, 1) == d.y){
+                int dst = Math.max(Math.abs(other.x - req.x), Math.abs(other.y - req.y));
+                if(dst <= otherDst){
+                    otherReq = other;
+                    otherDst = dst;
                 }
             }
         });
