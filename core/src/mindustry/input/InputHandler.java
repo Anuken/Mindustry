@@ -108,7 +108,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build == null || build.items == null) return;
         build.items.set(item, amount);
     }
-    
+
     @Remote(called = Loc.server, unreliable = true)
     public static void clearItems(Building build){
         if(build == null || build.items == null) return;
