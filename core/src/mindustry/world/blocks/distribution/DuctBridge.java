@@ -16,7 +16,6 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-//TODO display range
 public class DuctBridge extends Block{
     public @Load("@-bridge") TextureRegion bridgeRegion;
     public @Load("@-bridge-bottom") TextureRegion bridgeBotRegion;
