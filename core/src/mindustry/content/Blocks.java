@@ -1592,6 +1592,7 @@ public class Blocks implements ContentList{
             rotateSpeed = 10;
 
             consumes.powerCond(3f, (TractorBeamBuild e) -> e.target != null);
+            flags = EnumSet.of(BlockFlag.turret);
         }};
 
         swarmer = new ItemTurret("swarmer"){{
