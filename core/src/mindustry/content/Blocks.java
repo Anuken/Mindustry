@@ -1652,6 +1652,7 @@ public class Blocks implements ContentList{
             shootLength = 5f;
             bulletDamage = 30f;
             reloadTime = 8f;
+            flags = EnumSet.of(BlockFlag.turret);
         }};
 
         tsunami = new LiquidTurret("tsunami"){{
