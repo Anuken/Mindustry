@@ -9,6 +9,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.async.*;
 import arc.util.noise.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -161,12 +162,7 @@ public class Generators{
                 });
             }
 
-            try{
-                exec.shutdown();
-                exec.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-            }catch(Exception e){
-                throw new RuntimeException("go away", e);
-            }
+            Threads.await(exec);
         });
 
         generate("cracks", () -> {

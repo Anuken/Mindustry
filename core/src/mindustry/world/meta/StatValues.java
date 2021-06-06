@@ -246,7 +246,7 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
                     }
 
-                    if(!unit && !Mathf.equal(type.ammoMultiplier, 1f)){
+                    if(!unit && !Mathf.equal(type.ammoMultiplier, 1f) && type.displayAmmoMultiplier){
                         sep(bt, Core.bundle.format("bullet.multiplier", (int)type.ammoMultiplier));
                     }
 

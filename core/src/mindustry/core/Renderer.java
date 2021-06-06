@@ -201,6 +201,7 @@ public class Renderer implements ApplicationListener{
 
         Draw.proj(camera);
 
+        blocks.checkChanges();
         blocks.floor.checkChanges();
         blocks.processBlocks();
 

@@ -322,7 +322,17 @@ public class HudFragment extends Fragment{
                 }
                 return max == 0f ? 0f : val / max;
             }).blink(Color.white).outline(new Color(0, 0, 0, 0.6f), 7f)).grow())
-            .fillX().width(320f).height(60f).name("boss").visible(() -> state.rules.waves && state.boss() != null).padTop(7);
+            .fillX().width(320f).height(60f).name("boss").visible(() -> state.rules.waves && state.boss() != null).padTop(7).row();
+
+            t.table(Styles.black3, p -> p.margin(4).label(() -> hudText).style(Styles.outlineLabel)).touchable(Touchable.disabled).with(p -> p.visible(() -> {
+                p.color.a = Mathf.lerpDelta(p.color.a, Mathf.num(showHudText), 0.2f);
+                if(state.isMenu()){
+                    p.color.a = 0f;
+                    showHudText = false;
+                }
+
+                return p.color.a >= 0.001f;
+            }));
         });
 
         //spawner warning
@@ -340,20 +350,6 @@ public class HudFragment extends Fragment{
             t.name = "saving";
             t.bottom().visible(() -> control.saves.isSaving());
             t.add("@saving").style(Styles.outlineLabel);
-        });
-
-        parent.fill(p -> {
-            p.name = "hudtext";
-            p.top().table(Styles.black3, t -> t.margin(4).label(() -> hudText)
-            .style(Styles.outlineLabel)).padTop(10).visible(p.color.a >= 0.001f);
-            p.update(() -> {
-                p.color.a = Mathf.lerpDelta(p.color.a, Mathf.num(showHudText), 0.2f);
-                if(state.isMenu()){
-                    p.color.a = 0f;
-                    showHudText = false;
-                }
-            });
-            p.touchable = Touchable.disabled;
         });
 
         //TODO DEBUG: rate table
