@@ -1,6 +1,7 @@
 package mindustry.world.blocks.distribution;
 
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -18,6 +19,9 @@ import static mindustry.Vars.*;
 
 //TODO display range
 public class DuctBridge extends Block{
+    private static BuildPlan otherReq;
+    private int otherDst = 0;
+
     public @Load("@-bridge") TextureRegion bridgeRegion;
     public @Load("@-bridge-bottom") TextureRegion bridgeBotRegion;
     //public @Load("@-bridge-top") TextureRegion bridgeTopRegion;
@@ -44,6 +48,26 @@ public class DuctBridge extends Block{
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(region, req.drawx(), req.drawy());
         Draw.rect(dirRegion, req.drawx(), req.drawy(), req.rotation * 90);
+    }
+
+    @Override
+    public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
+        otherReq = null;
+        otherDst = range;
+        list.each(other -> {
+            if(other.block == this && req != other){
+                for(int i = 1; i <= range; i++){
+                    if(req.x + (Geometry.d4x(req.rotation) * i) == other.x && req.y + (Geometry.d4y(req.rotation) * i) == other.y && i <= otherDst){
+                        otherReq = other;
+                        otherDst = i;
+                    }
+                }
+            }
+        });
+
+        if(otherReq != null){
+            drawBridge(req.rotation, req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy());
+        }
     }
 
     @Override
@@ -87,6 +111,27 @@ public class DuctBridge extends Block{
 
     }
 
+    public void drawBridge(int rotation, float x1, float y1, float x2, float y2){
+        Draw.alpha(Renderer.bridgeOpacity);
+        float
+        angle = Angles.angle(x1, y1, x2, y2),
+        cx = (x1 + x2)/2f,
+        cy = (y1 + y2)/2f,
+        len = Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)) - size * tilesize;
+
+        Draw.rect(bridgeRegion, cx, cy, len, tilesize, angle);
+        Draw.color(0.4f, 0.4f, 0.4f, 0.4f * Renderer.bridgeOpacity);
+        Draw.rect(bridgeBotRegion, cx, cy, len, tilesize, angle);
+        Draw.reset();
+        Draw.alpha(Renderer.bridgeOpacity);
+
+        for(float i = 6f; i <= len + size * tilesize - 5f; i += 5f){
+            Draw.rect(arrowRegion, x1 + Geometry.d4x(rotation) * i, y1 + Geometry.d4y(rotation) * i, angle);
+        }
+
+        Draw.reset();
+    }
+
     public boolean positionsValid(int x1, int y1, int x2, int y2){
         if(x1 == x2){
             return Math.abs(y1 - y2) <= range;
@@ -108,24 +153,7 @@ public class DuctBridge extends Block{
             var link = findLink();
             if(link != null){
                 Draw.z(Layer.power);
-                Draw.alpha(Renderer.bridgeOpacity);
-                float
-                angle = angleTo(link),
-                cx = (x + link.x)/2f,
-                cy = (y + link.y)/2f,
-                len = Math.max(Math.abs(x - link.x), Math.abs(y - link.y)) - size * tilesize;
-
-                Draw.rect(bridgeRegion, cx, cy, len, tilesize, angle);
-                Draw.color(0.4f, 0.4f, 0.4f, 0.4f * Renderer.bridgeOpacity);
-                Draw.rect(bridgeBotRegion, cx, cy, len, tilesize, angle);
-                Draw.reset();
-                Draw.alpha(Renderer.bridgeOpacity);
-
-                for(float i = 6f; i <= len + size * tilesize - 5f; i += 5f){
-                    Draw.rect(arrowRegion, x + Geometry.d4x(rotation) * i, y + Geometry.d4y(rotation) * i, angle);
-                }
-
-                Draw.reset();
+                drawBridge(rotation, x, y, link.x, link.y);
             }
         }
 
