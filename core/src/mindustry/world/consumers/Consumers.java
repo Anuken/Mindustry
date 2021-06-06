@@ -68,9 +68,9 @@ public class Consumers{
         return add(new ConditionalConsumePower(usage, (Boolf<Building>)cons));
     }
 
-    /** Creates a consumer that consumes a dynamic amount of power, when the condition is met. */
-    public <T extends Building> ConsumePower powerDynamic(Floatf<T> usage, Boolf<T> cons){
-        return add(new DynamicConsumePower((Floatf<Building>)usage, (Boolf<Building>)cons));
+    /** Creates a consumer that consumes a dynamic amount of power. */
+    public <T extends Building> ConsumePower powerDynamic(Floatf<T> usage){
+        return add(new DynamicConsumePower((Floatf<Building>)usage));
     }
 
     /**
