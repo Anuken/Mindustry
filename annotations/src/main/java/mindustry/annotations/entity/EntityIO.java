@@ -143,7 +143,8 @@ public class EntityIO{
                 if(sl) cont("if(!islocal)");
 
                 if(sf){
-                    st(field.name + lastSuf + " = this." + field.name);
+                    //TODO + targetSuf may not give the right result, test it
+                    st(field.name + lastSuf + " = this." + field.name + targetSuf);
                 }
 
                 io(field.type, "this." + (sf ? field.name + targetSuf : field.name) + " = ");
