@@ -457,7 +457,7 @@ public class NetClient implements ApplicationListener{
             int teams = input.readUnsignedByte();
             for(int i = 0; i < teams; i++){
                 int team = input.readUnsignedByte();
-                TeamData data = state.teams.get(Team.all[team]);
+                TeamData data = Team.all[team].data();
                 if(data.cores.any()){
                     data.cores.first().items.read(dataReads);
                 }else{

@@ -43,7 +43,7 @@ public class Logic implements ApplicationListener{
 
         Events.on(BlockBuildEndEvent.class, event -> {
             if(!event.breaking){
-                TeamData data = state.teams.get(event.team);
+                TeamData data = event.team.data();
                 Iterator<BlockPlan> it = data.blocks.iterator();
                 while(it.hasNext()){
                     BlockPlan b = it.next();

@@ -286,7 +286,7 @@ public class HudFragment extends Fragment{
                 .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time, 2f, 1f))), true,
                 () -> {
                     if(!shown || state.isPaused()) return false;
-                    if(state.isMenu() || !state.teams.get(player.team()).hasCore()){
+                    if(state.isMenu() || !player.team().data().hasCore()){
                         coreAttackTime[0] = 0f;
                         return false;
                     }

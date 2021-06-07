@@ -133,7 +133,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void deletePlans(Player player, int[] positions){
         if(netServer.admins.allowAction(player, ActionType.removePlanned, a -> a.plans = positions)){
 
-            var it = state.teams.get(player.team()).blocks.iterator();
+            var it = player.team().data().blocks.iterator();
             //O(n^2) search here; no way around it
             outer:
             while(it.hasNext()){
@@ -885,7 +885,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         removed.clear();
 
         //remove blocks to rebuild
-        Iterator<BlockPlan> broken = state.teams.get(player.team()).blocks.iterator();
+        Iterator<BlockPlan> broken = player.team().data().blocks.iterator();
         while(broken.hasNext()){
             BlockPlan req = broken.next();
             Block block = content.block(req.block);
