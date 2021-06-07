@@ -102,5 +102,9 @@
   {
     "name": "Sakura", 
     "address": ["160.16.207.141"]
+  },
+  {
+    "name": "MeowLand",
+    "address": ["34.134.111.15"]
   }
 ]
