@@ -2,6 +2,7 @@ package mindustry.core;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -11,6 +12,7 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -155,6 +157,18 @@ public class NetClient implements ApplicationListener{
     @Remote(targets = Loc.server, variants = Variant.both, unreliable = true)
     public static void clientPacketUnreliable(String type, String contents){
         clientPacketReliable(type, contents);
+    }
+
+    @Remote(variants = Variant.both, unreliable = true)
+    public static void effect(Effect effect, float x, float y, float rotation, Color color){
+        if(effect == null) return;
+
+        effect.at(x, y, rotation, color);
+    }
+
+    @Remote(variants = Variant.both)
+    public static void effectReliable(Effect effect, float x, float y, float rotation, Color color){
+        effect(effect, x, y, rotation, color);
     }
 
     //called on all clients

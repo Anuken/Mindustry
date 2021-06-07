@@ -1,11 +1,9 @@
 package mindustry.ui;
 
 import arc.*;
-import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 
@@ -20,7 +18,7 @@ public class Menus{
         menuListeners.put(id, listener);
     }
 
-    //do not invoke any of the below methods directly, use Call
+    //do not invoke any of the methods below directly, use Call
 
     @Remote(variants = Variant.both)
     public static void menu(int menuId, String title, String message, String[][] options){
@@ -82,18 +80,6 @@ public class Menus{
         if(message == null) return;
 
         ui.showLabel(message, duration, worldx, worldy);
-    }
-
-    @Remote(variants = Variant.both, unreliable = true)
-    public static void effect(Effect effect, float x, float y, float rotation, Color color){
-        if(effect == null) return;
-
-        effect.at(x, y, rotation, color);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void effectReliable(Effect effect, float x, float y, float rotation, Color color){
-        effect(effect, x, y, rotation, color);
     }
 
     @Remote(variants = Variant.both)
