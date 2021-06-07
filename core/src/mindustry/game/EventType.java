@@ -134,6 +134,18 @@ public class EventType{
         }
     }
 
+    /** Consider using Menus.registerMenu instead. */
+    public static class MenuOptionChooseEvent{
+        public final Player player;
+        public final int menuId, option;
+
+        public MenuOptionChooseEvent(Player player, int menuId, int option){
+            this.player = player;
+            this.option = option;
+            this.menuId = menuId;
+        }
+    }
+
     public static class PlayerChatEvent{
         public final Player player;
         public final String message;

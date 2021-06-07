@@ -2,7 +2,6 @@ package mindustry.core;
 
 import arc.*;
 import arc.func.*;
-import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -12,7 +11,6 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
-import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -21,7 +19,6 @@ import mindustry.gen.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.modules.*;
 
@@ -312,78 +309,6 @@ public class NetClient implements ApplicationListener{
         logic.reset();
         ui.showText("@disconnect", reason, Align.left);
         ui.loadfrag.hide();
-    }
-
-    @Remote(variants = Variant.both, unreliable = true)
-    public static void setHudText(String message){
-        if(message == null) return;
-
-        ui.hudfrag.setHudText(message);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void hideHudText(){
-        ui.hudfrag.toggleHudText(false);
-    }
-
-    /** TCP version */
-    @Remote(variants = Variant.both)
-    public static void setHudTextReliable(String message){
-        setHudText(message);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void announce(String message){
-        if(message == null) return;
-
-        ui.announce(message);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void infoMessage(String message){
-        if(message == null) return;
-
-        ui.showText("", message);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void infoPopup(String message, float duration, int align, int top, int left, int bottom, int right){
-        if(message == null) return;
-
-        ui.showInfoPopup(message, duration, align, top, left, bottom, right);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void label(String message, float duration, float worldx, float worldy){
-        if(message == null) return;
-
-        ui.showLabel(message, duration, worldx, worldy);
-    }
-
-    @Remote(variants = Variant.both, unreliable = true)
-    public static void effect(Effect effect, float x, float y, float rotation, Color color){
-        if(effect == null) return;
-
-        effect.at(x, y, rotation, color);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void effectReliable(Effect effect, float x, float y, float rotation, Color color){
-        effect(effect, x, y, rotation, color);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void infoToast(String message, float duration){
-        if(message == null) return;
-
-        ui.showInfoToast(message, duration);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void warningToast(int unicode, String text){
-        if(text == null || Fonts.icon.getData().getGlyph((char)unicode) == null) return;
-
-        ui.hudfrag.showToast(Fonts.getGlyph(Fonts.icon, (char)unicode), text);
     }
 
     @Remote(variants = Variant.both)
