@@ -9,7 +9,6 @@ import arc.scene.ui.layout.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
-import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -105,6 +104,7 @@ public abstract class FilterOption{
                     if(++i % 10 == 0) dialog.cont.row();
                 }
 
+                dialog.closeOnBack();
                 dialog.show();
             }).pad(4).margin(12f);
 

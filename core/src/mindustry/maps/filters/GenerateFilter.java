@@ -75,11 +75,16 @@ public abstract class GenerateFilter{
     /** draw any additional guides */
     public void draw(Image image){}
 
-    /** localized display name */
-    public String name(){
+    public String simpleName(){
         Class c = getClass();
         if(c.isAnonymousClass()) c = c.getSuperclass();
-        return Core.bundle.get("filter." + c.getSimpleName().toLowerCase().replace("filter", ""), c.getSimpleName().replace("Filter", ""));
+        return c.getSimpleName().toLowerCase().replace("filter", "");
+    }
+
+    /** localized display name */
+    public String name(){
+        var s = simpleName();
+        return Core.bundle.get("filter." + s);
     }
 
     public char icon(){

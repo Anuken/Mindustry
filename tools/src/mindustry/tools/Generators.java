@@ -331,7 +331,7 @@ public class Generators{
                     average.mul(1f / asum);
 
                     if(block instanceof Floor){
-                        average.mul(0.8f);
+                        average.mul(0.77f);
                     }else{
                         average.mul(1.1f);
                     }
