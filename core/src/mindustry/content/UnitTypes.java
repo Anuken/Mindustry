@@ -611,7 +611,7 @@ public class UnitTypes implements ContentList{
 
                 bullet = new LiquidBulletType(Liquids.slag){{
                     damage = 11;
-                    speed = 2.3f;
+                    speed = 2.4f;
                     drag = 0.01f;
                     shootEffect = Fx.shootSmall;
                     lifetime = 56f;

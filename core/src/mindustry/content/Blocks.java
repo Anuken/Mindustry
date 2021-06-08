@@ -372,10 +372,6 @@ public class Blocks implements ContentList{
             variants = 3;
         }};
 
-        //glowBlob = new Prop("glowblob"){{
-        //    variants = 1;
-        //}};
-
         boulder = new Prop("boulder"){{
             variants = 2;
             stone.asFloor().decoration = this;
