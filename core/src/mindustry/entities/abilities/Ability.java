@@ -26,3 +26,4 @@ public abstract class Ability implements Cloneable{
         return Core.bundle.get("ability." + getClass().getSimpleName().replace("Ability", "").toLowerCase());
     }
 }
+// new ability
