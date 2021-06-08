@@ -312,7 +312,7 @@ public class ApplicationTests{
         world.tile(2, 1).setBlock(Blocks.liquidTank, Team.sharded);
 
         updateBlocks(1);
-        assertTrue(world.tile(2, 1).build.liquids.currentAmount() >= 0);
+        assertTrue(world.tile(2, 1).build.liquids.currentAmount() > 0);
 
         world.tile(2, 1).build.liquids.clear();
 
