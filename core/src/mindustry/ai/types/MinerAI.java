@@ -75,8 +75,4 @@ public class MinerAI extends AIController{
             circle(core, unit.type.range / 1.8f);
         }
     }
-
-    @Override
-    protected void updateTargeting(){
-    }
 }
