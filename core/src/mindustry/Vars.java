@@ -32,7 +32,6 @@ import java.util.*;
 import static arc.Core.*;
 
 public class Vars implements Loadable{
-    //need to delete this
     /** Whether the game failed to launch last time. */
     public static boolean failedToLaunch = false;
     /** Whether to load locales.*/
