@@ -739,7 +739,7 @@ public class ApplicationTests{
             core.build.items.set(item, 3000);
         }
 
-        assertEquals(core.build, state.teams.get(Team.sharded).core());
+        assertEquals(core.build, Team.sharded.data().core());
     }
 
     void depositTest(Block block, Item item){

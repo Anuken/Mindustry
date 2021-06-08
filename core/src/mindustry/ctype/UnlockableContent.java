@@ -50,8 +50,8 @@ public abstract class UnlockableContent extends MappableContent{
         fullIcon =
             Core.atlas.find(getContentType().name() + "-" + name + "-full",
             Core.atlas.find(name + "-full",
-            Core.atlas.find(getContentType().name() + "-" + name,
             Core.atlas.find(name,
+            Core.atlas.find(getContentType().name() + "-" + name,
             Core.atlas.find(name + "1")))));
 
         uiIcon = Core.atlas.find(getContentType().name() + "-" + name + "-ui", fullIcon);

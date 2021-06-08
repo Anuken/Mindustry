@@ -222,7 +222,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
-        TeamData data = state.teams.get(team);
+        TeamData data = team.data();
 
         if(checkPrevious){
             //remove existing blocks that have been placed here.

@@ -71,6 +71,7 @@ public class UnitType extends UnlockableContent{
     public boolean omniMovement = true;
     public Effect fallEffect = Fx.fallSmoke;
     public Effect fallThrusterEffect = Fx.fallSmoke;
+    public Effect deathExplosionEffect = Fx.dynamicExplosion;
     public Seq<Ability> abilities = new Seq<>();
     public BlockFlag targetFlag = BlockFlag.generator;
 

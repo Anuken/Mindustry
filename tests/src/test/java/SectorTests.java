@@ -96,7 +96,7 @@ public class SectorTests{
                 assertTrue(Team.sharded.core().items.total() < 1000, "Sector must not have starting resources: " + zone);
 
                 assertTrue(hasSpawnPoint, "Sector \"" + zone.name + "\" has no spawn points.");
-                assertTrue(spawner.countSpawns() > 0 || (state.rules.attackMode && state.teams.get(state.rules.waveTeam).hasCore()), "Sector \"" + zone.name + "\" has no enemy spawn points: " + spawner.countSpawns());
+                assertTrue(spawner.countSpawns() > 0 || (state.rules.attackMode && state.rules.waveTeam.data().hasCore()), "Sector \"" + zone.name + "\" has no enemy spawn points: " + spawner.countSpawns());
             }));
         }
 
