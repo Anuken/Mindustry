@@ -14,7 +14,7 @@ public class BlendFilter extends GenerateFilter{
     @Override
     public FilterOption[] options(){
         return Structs.arr(
-        new SliderOption("radius", () -> radius, f -> radius = f, 1f, 15f),
+        new SliderOption("radius", () -> radius, f -> radius = f, 1f, 10f),
         new BlockOption("block", () -> block, b -> block = b, anyOptional),
         new BlockOption("floor", () -> floor, b -> floor = b, anyOptional),
         new BlockOption("ignore", () -> ignore, b -> ignore = b, floorsOptional)
@@ -41,7 +41,7 @@ public class BlendFilter extends GenerateFilter{
         outer:
         for(int x = -rad; x <= rad; x++){
             for(int y = -rad; y <= rad; y++){
-                if(x*x + y*y > rad) continue;
+                if(x*x + y*y > rad*rad) continue;
                 Tile tile = in.tile(in.x + x, in.y + y);
 
                 if(tile.floor() == block || tile.block() == block || tile.overlay() == block){

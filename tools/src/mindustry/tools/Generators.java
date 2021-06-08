@@ -166,7 +166,6 @@ public class Generators{
         });
 
         generate("cracks", () -> {
-            RidgedPerlin r = new RidgedPerlin(1, 3);
             for(int size = 1; size <= BlockRenderer.maxCrackSize; size++){
                 int dim = size * 32;
                 int steps = BlockRenderer.crackRegions;
@@ -177,7 +176,7 @@ public class Generators{
                     for(int x = 0; x < dim; x++){
                         for(int y = 0; y < dim; y++){
                             float dst = Mathf.dst((float)x/dim, (float)y/dim, 0.5f, 0.5f) * 2f;
-                            if(dst < 1.2f && r.getValue(x, y, 1f / 40f) - dst*(1f-fract) > 0.16f){
+                            if(dst < 1.2f && RidgedPerlin.noise2d(1, x, y, 3, 1f / 40f) - dst*(1f-fract) > 0.16f){
                                 image.setRaw(x, y, Color.whiteRgba);
                             }
                         }
@@ -485,12 +484,11 @@ public class Generators{
                     wrecks[i] = new Pixmap(image.width, image.height);
                 }
 
-                RidgedPerlin r = new RidgedPerlin(1, 3);
                 VoronoiNoise vn = new VoronoiNoise(type.id, true);
 
                 image.each((x, y) -> {
                     //add darker cracks on top
-                    boolean rValue = Math.max(r.getValue(x, y, 1f / (20f + image.width/8f)), 0) > 0.16f;
+                    boolean rValue = Math.max(RidgedPerlin.noise2d(1, x, y, 3, 1f / (20f + image.width/8f)), 0) > 0.16f;
                     //cut out random chunks with voronoi
                     boolean vval = vn.noise(x, y, 1f / (14f + image.width/40f)) > 0.47;
 
