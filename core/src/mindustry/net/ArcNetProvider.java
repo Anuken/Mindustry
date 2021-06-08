@@ -188,24 +188,22 @@ public class ArcNetProvider implements NetProvider{
 
     @Override
     public void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> invalid){
-        executor.submit(() -> {
-            try{
-                DatagramSocket socket = new DatagramSocket();
-                long time = Time.millis();
-                socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), port));
-                socket.setSoTimeout(2000);
+        try{
+            DatagramSocket socket = new DatagramSocket();
+            long time = Time.millis();
+            socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), port));
+            socket.setSoTimeout(2000);
 
-                DatagramPacket packet = packetSupplier.get();
-                socket.receive(packet);
+            DatagramPacket packet = packetSupplier.get();
+            socket.receive(packet);
 
-                ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
-                Host host = NetworkIO.readServerData((int)Time.timeSinceMillis(time), packet.getAddress().getHostAddress(), buffer);
+            ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
+            Host host = NetworkIO.readServerData((int)Time.timeSinceMillis(time), packet.getAddress().getHostAddress(), buffer);
 
-                Core.app.post(() -> valid.get(host));
-            }catch(Exception e){
-                Core.app.post(() -> invalid.get(e));
-            }
-        });
+            Core.app.post(() -> valid.get(host));
+        }catch(Exception e){
+            Core.app.post(() -> invalid.get(e));
+        }
     }
 
     @Override
