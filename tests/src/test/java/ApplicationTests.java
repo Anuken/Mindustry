@@ -302,22 +302,21 @@ public class ApplicationTests{
     }
 
     @Test
-    void oilOutputTest(){
+    void liquidClearTest(){
         world.loadMap(testMap);
         state.set(State.playing);
 
         world.tile(0, 0).setBlock(Blocks.liquidSource, Team.sharded);
         world.tile(0, 0).build.configureAny(Liquids.oil);
 
-//        world.tile(1, 1).setBlock(Blocks.liquidSource, Team.sharded);
-//        world.tile(1, 1).build.configureAny(Liquids.water);
-
         world.tile(2, 1).setBlock(Blocks.liquidTank, Team.sharded);
 
-        updateBlocks(10);
-        System.out.println(world.tile(2, 1).build.liquids.currentAmount());
-        assertTrue(world.tile(2, 1).build.liquids.currentAmount() >= 1);
-        assertTrue(world.tile(2, 1).build.liquids.current() == Liquids.oil);
+        updateBlocks(1);
+        assertTrue(world.tile(2, 1).build.liquids.currentAmount() >= 0);
+
+        world.tile(2, 1).build.liquids.clear();
+
+        assertTrue(world.tile(2, 1).build.liquids.currentAmount() == 0);
     }
 
     @Test
