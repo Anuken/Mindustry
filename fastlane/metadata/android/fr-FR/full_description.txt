@@ -1,14 +1,51 @@
-Crée des chaînes de ravitaillement pour tes défenses, produis les matériaux de construction pour aggrandir et protéger tes bâtiments contre des vagues d'ennemis. Joue avec tes amis grâce à des jeux multijoueurs co-op cross-plateformes, ou défie-les dans des parties en JcJ par équipe.
+Créer des chaînes de ravitaillement pour tes défenses, produisez des matériaux à utiliser pour vos constructions et protégez vos structures des vagues d'ennemis. Jouez avec vos amis dans des parties multijoueurs cross-plateformes en co-op ou défiez-les lors de matchs PvP en équipe.
 
-Caractéristiques:
-- 24 cartes integrées
-- Une campagne, complète avec un arbre de recherche et des zones à débloquer
-- 4 puissants boss de fin de vague à vaincre
-- Systèmes de transport d'énergie, liquides et objets
-- 19 différents types de drones, méchas et vaisseaux
-- 120+ blocs technologiques à maîtriser
-- 75+ différents blocs environnementaux
-- Multijoueur cross-plateforme via réseau local or serveurs dédiés
-- Règles de jeu personnalisables: Change le coût des structures, les stats des ennemis, les ressources de départ, fréquence des vagues et plus
-- Un éditeur puissant dotés d'outils pour générer aléatoirement des minéraux, le terrain, des décorations et appliquer une symétrie au terrain.
-- Vagues d'ennemis personnalisables
+<h2>Caractéristiques du jeu</h2>
+ 
+- Utilisez les usines de production pour créer une grande variété de matériaux avancés.
+- Défendez vos structures contre les vagues d'ennemis.
+- Jouez avec vos amis dans des jeux coopératifs multijoueurs multi plateformes, ou défiez-les dans des matchs JcJ par équipe.
+- Répartissez des liquides et relevez des défis constants, comme des départs de feu ou des raids d'avions ennemis.
+- Tirez le meilleur parti de votre production en fournissant des liquides de refroidissement et des lubrifiants en option.
+- Produisez une grande variété d'unités pour la gestion automatique de votre base ou l'assaut des bases ennemies.
+
+
+<h2>Campagne</h2>
+
+- Partez à la conquête de la planète Serpulo en progressant dans plus de 250 secteurs générés de manière procédurale et sur 16 cartes créées à la main.
+- Capturez des territoires et installez des usines pour produire des ressources pendant que vous jouez dans d'autres secteurs.
+- Défendez vos secteurs contre les invasions périodiques.
+- Coordonner la distribution des ressources entre les secteurs via des rampes de lancement.
+- Recherchez de nouveaux blocs pour alimenter votre progression.
+- Invitez vos amis à accomplir des missions ensemble.
+- Plus de 130 blocs technologiques à maîtriser.
+- 33 types différents de drones, de mechs et de vaisseaux.
+
+
+<h2>Modes de jeu</h2>
+
+- <b>Survie</b> : Construisez des tourelles pour vous défendre des ennemis dans un gameplay basé sur du tower defense. Survivez aussi longtemps que possible, en lançant éventuellement votre noyau pour utiliser vos ressources collectées pour la recherche. Préparez votre base pour des attaques intermittentes de boss aériens.
+- <b>Attaque</b> : Construisez des usines pour les unités destinées à détruire les noyaux ennemis, tout en défendant simultanément votre base contre les vagues d'unités ennemies. Créez une variété de différents types d'unités de soutien et d'unités offensives pour vous aider dans vos objectifs. Activez en option une IA qui construit des structures défensives pour un défi supplémentaire.
+- <b>PvP</b> : Affrontez d'autres joueurs dans jusqu'à 4 équipes différentes pour détruire les noyaux des autres. Créez des unités, ou attaquez directement les autres bases avec vos mechs.
+- <b>Bac à sable</b> : Jouez avec des ressources infinies et sans menace ennemie. Utilisez des blocs d'objets et de sources de liquide spécifiques au bac à sable pour tester des conceptions, et faites apparaître des ennemis sur demande.
+
+
+<h2>Jeux &amp; Cartes Personnalisés; Multijoueurs Cross-Plateformes</h2>
+
+- 16 cartes intégrées pour des jeux personnalisés, en plus de la campagne.
+- Jouez en coopération, en JcJ ou en bac à sable.
+- Rejoignez un serveur public dédié ou invitez vos amis à votre propre session privée.
+- Règles de jeu personnalisables: Modifiez le coût des blocs, les statistiques des ennemis, les objets de départ, le timing des vagues, etc.
+- Mélangez les modes de jeu: Combinez les modes de jeu PvP et PvE.
+
+<h2>Éditeur de cartes personnalisées</h2>
+
+- Peindre le terrain avec une interface utilisateur d'éditeur.
+- Modifiez et prévisualisez les structures dans en jeu.
+- Modes d'outils configurables: Modifiez le fonctionnement de chaque outil.
+- Puissant système de génération de cartes, avec de nombreux types de filtres pour la manipulation procédurale du terrain.
+- Appliquez du bruit, de la distorsion, du lissage, de l'érosion, de la symétrie, de la génération de minerai et du terrain aléatoire à vos cartes.
+- Génération de minerai aléatoire et configuré, ainsi que le placement des rivières et des tuiles de ressources.
+- Configurez la disposition des vagues ennemies.
+- Personnalisez les règles de la carte de base.
+- Utilisez plus de 80 blocs environnementaux différents.
