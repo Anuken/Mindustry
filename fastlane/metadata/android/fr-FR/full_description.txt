@@ -2,11 +2,11 @@ Créer des chaînes de ravitaillement pour tes défenses, produisez des matéria
 
 <h2>Caractéristiques du jeu</h2>
  
-- Utilisez les usines de production pour créer une grande variété de matériaux avancés.
+- Utilisez les usines de production avancés pour créer des ressources plus complexes.
 - Défendez vos structures contre les vagues d'ennemis.
 - Jouez avec vos amis dans des jeux coopératifs multijoueurs multi plateformes, ou défiez-les dans des matchs JcJ par équipe.
-- Répartissez des liquides et relevez des défis constants, comme des départs de feu ou des raids d'avions ennemis.
-- Tirez le meilleur parti de votre production en fournissant des liquides de refroidissement et des lubrifiants en option.
+- Gérez l'acheminent des liquides et combattez les incendies des raids d'avions ennemis.
+- Boostez la production en approvisionnant vos blocs de défense et de production avec des liquides de refroidissement et des lubrifiants optionnels.
 - Produisez une grande variété d'unités pour la gestion automatique de votre base ou l'assaut des bases ennemies.
 
 
@@ -24,28 +24,28 @@ Créer des chaînes de ravitaillement pour tes défenses, produisez des matéria
 
 <h2>Modes de jeu</h2>
 
-- <b>Survie</b> : Construisez des tourelles pour vous défendre des ennemis dans un gameplay basé sur du tower defense. Survivez aussi longtemps que possible, en lançant éventuellement votre noyau pour utiliser vos ressources collectées pour la recherche. Préparez votre base pour des attaques intermittentes de boss aériens.
-- <b>Attaque</b> : Construisez des usines pour les unités destinées à détruire les noyaux ennemis, tout en défendant simultanément votre base contre les vagues d'unités ennemies. Créez une variété de différents types d'unités de soutien et d'unités offensives pour vous aider dans vos objectifs. Activez en option une IA qui construit des structures défensives pour un défi supplémentaire.
+- <b>Survie</b> : Construisez des tourelles pour défendre votre base des ennemis dans un style de jeu inspiré des tower-defense. Survivez aussi longtemps que possible, avant de faire décoller votre noyau. Utilisez les ressources récoltées pour débloquer de nouvelles technologies. Préparez votre base pour les attaques de puissants boss aériens.
+- <b>Attaque</b> : Construisez des usines et produisez des unités pour détruire les noyaux ennemis, tout en défendant votre base contre les vagues d'attaque. Créez une grande variété d'unités offensives et de support pour vous aider dans vos objectifs.
 - <b>PvP</b> : Affrontez d'autres joueurs dans jusqu'à 4 équipes différentes pour détruire les noyaux des autres. Créez des unités, ou attaquez directement les autres bases avec vos mechs.
-- <b>Bac à sable</b> : Jouez avec des ressources infinies et sans menace ennemie. Utilisez des blocs d'objets et de sources de liquide spécifiques au bac à sable pour tester des conceptions, et faites apparaître des ennemis sur demande.
+- <b>Bac à sable</b> : Jouez avec des ressources infinies et sans menace ennemie. Utilisez des objets et des blocs spécifiques à ce mode de jeu tels que les sources de liquides. Testez vos designs et faites apparaître les ennemis à la demande.
 
 
 <h2>Jeux &amp; Cartes Personnalisés; Multijoueurs Cross-Plateformes</h2>
 
-- 16 cartes intégrées pour des jeux personnalisés, en plus de la campagne.
-- Jouez en coopération, en JcJ ou en bac à sable.
+- 16 cartes supplémentaires pour vos parties personnalisées en plus des cartes de la campagne.
+- Jouez en Co-op, en PvP ou en mode Bac à sable.
 - Rejoignez un serveur public dédié ou invitez vos amis à votre propre session privée.
-- Règles de jeu personnalisables: Modifiez le coût des blocs, les statistiques des ennemis, les objets de départ, le timing des vagues, etc.
-- Mélangez les modes de jeu: Combinez les modes de jeu PvP et PvE.
+- Règles de jeu personnalisables: Modifiez le coût des blocs, les statistiques des ennemis, les objets de départ, le timing des vagues, etc...
+- Mixez les modes de jeux: combinez PvP et PvE dans la même partie.
 
 <h2>Éditeur de cartes personnalisées</h2>
 
-- Peindre le terrain avec une interface utilisateur d'éditeur.
-- Modifiez et prévisualisez les structures dans en jeu.
-- Modes d'outils configurables: Modifiez le fonctionnement de chaque outil.
-- Puissant système de génération de cartes, avec de nombreux types de filtres pour la manipulation procédurale du terrain.
-- Appliquez du bruit, de la distorsion, du lissage, de l'érosion, de la symétrie, de la génération de minerai et du terrain aléatoire à vos cartes.
-- Génération de minerai aléatoire et configuré, ainsi que le placement des rivières et des tuiles de ressources.
+- Peignez le terrain grâce à une interface d'édition.
+- Éditez and prévisualisez les structures en jeu.
+- Outils d'édition configurables: choisissez comment chaque outil fonctionne.
+- Générateur de carte puissant, disposant d'un grand nombre de filtres permettant la manipulation procédurale du terrain.
+- Appliquez les effets bruit, distortion, lissage, erosion, symétrie, génération de minerais et terrain aléatoire.
+- Randomisez et configurez la génération des minerais ainsi que le placement des rivières et des tuiles de ressources.
 - Configurez la disposition des vagues ennemies.
-- Personnalisez les règles de la carte de base.
+- Personnalisez les règles de base de vos cartes
 - Utilisez plus de 80 blocs environnementaux différents.
