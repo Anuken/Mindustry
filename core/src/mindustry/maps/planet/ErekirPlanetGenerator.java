@@ -17,9 +17,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ErekirPlanetGenerator extends PlanetGenerator{
-    RidgedPerlin rid = new RidgedPerlin(1, 2);
-    RidgedPerlin crid = new RidgedPerlin(2, 3);
-
     public float scl = 2f;
     public float heightScl = 1f, octaves = 8, persistence = 0.7f, heightPow = 3f, heightMult = 1.5f;
 
@@ -91,11 +88,11 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         tile.block = tile.floor.asFloor().wall;
 
-        if(rid.getValue(position.x, position.y, position.z, 25) > 0.2){
+        if(RidgedPerlin.noise3d(1, position.x, position.y, position.z, 2, 25) > 0.2){
             tile.block = Blocks.air;
         }
 
-        if(crid.getValue(position.x, position.y + 4f, position.z, 7f) > 0.7){
+        if(RidgedPerlin.noise3d(2, position.x, position.y + 4f, position.z, 3, 7f) > 0.7){
             tile.floor = Blocks.graphiticStone;
         }
     }
@@ -175,7 +172,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             }
         });
 
-        Vars.state.rules.environment = Env.scorching | Env.terrestrial;
+        Vars.state.rules.environment = Env.scorching | Env.terrestrial | Env.groundWater;
         Schematics.placeLaunchLoadout(spawnX, spawnY);
     }
 }

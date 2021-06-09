@@ -308,6 +308,7 @@ public class Blocks implements ContentList{
         }};
 
         graphiticStone = new Floor("graphitic-stone"){{
+            attributes.set(Attribute.water, -1f);
             variants = 4;
         }};
 
