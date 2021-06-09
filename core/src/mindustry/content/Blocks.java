@@ -1853,7 +1853,7 @@ public class Blocks implements ContentList{
             }};
 
             health = 200 * size * size;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
+            consumes.add(new ConsumeCoolant(0.5f)).update(false);
         }};
 
         //endregion
