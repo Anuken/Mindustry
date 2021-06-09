@@ -393,7 +393,8 @@ public class BlockIndexer{
             blocksPresent[tile.floorID()] = true;
             blocksPresent[tile.overlayID()] = true;
         }
-        blocksPresent[tile.blockID()] = true;
+        //bounds checks only needed in very specific scenarios
+        if(tile.blockID() < blocksPresent.length) blocksPresent[tile.blockID()] = true;
     }
 
     public static class TileArray implements Iterable<Tile>{
