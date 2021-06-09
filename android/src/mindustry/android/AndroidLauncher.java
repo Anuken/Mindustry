@@ -18,7 +18,6 @@ import dalvik.system.*;
 import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.io.*;
-import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.ui.dialogs.*;
 
@@ -67,9 +66,7 @@ public class AndroidLauncher extends AndroidApplication{
 
             @Override
             public rhino.Context getScriptContext(){
-                rhino.Context result = AndroidRhinoContext.enter(((Context)AndroidLauncher.this).getCacheDir());
-                result.setClassShutter(Scripts::allowClass);
-                return result;
+                return AndroidRhinoContext.enter(getCacheDir());
             }
 
             @Override

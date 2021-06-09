@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
+import mindustry.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
@@ -64,6 +65,9 @@ public interface Platform{
             protected Context makeContext(){
                 Context ctx = super.makeContext();
                 ctx.setClassShutter(Scripts::allowClass);
+                if(Vars.mods != null){
+                    ctx.setApplicationClassLoader(Vars.mods.mainLoader());
+                }
                 return ctx;
             }
         });
