@@ -13,7 +13,6 @@ import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.power.*;
 
@@ -142,9 +141,19 @@ public class BlockRenderer{
                 Tile other = world.tile(cx, cy);
                 if(other != null){
                     darkEvents.add(other.pos());
+                    floor.recacheTile(other);
                 }
             }
         }
+    }
+
+    public void checkChanges(){
+        darkEvents.each(pos -> {
+            var tile = world.tile(pos);
+            if(tile != null){
+                tile.data = world.getWallDarkness(tile);
+            }
+        });
     }
 
     public void drawDarkness(){
@@ -156,10 +165,9 @@ public class BlockRenderer{
 
             darkEvents.each(pos -> {
                 var tile = world.tile(pos);
-                tile.data = world.getWallDarkness(tile);
                 float darkness = world.getDarkness(tile.x, tile.y);
                 //then draw the shadow
-                Draw.colorl(!tile.isDarkened() || darkness <= 0f ? 1f : 1f - Math.min((darkness + 0.5f) / 4f, 1f));
+                Draw.colorl(darkness <= 0f ? 1f : 1f - Math.min((darkness + 0.5f) / 4f, 1f));
                 Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
             });
 
@@ -186,7 +194,7 @@ public class BlockRenderer{
         }
 
         if(brokenFade > 0.001f){
-            for(BlockPlan block : state.teams.get(player.team()).blocks){
+            for(BlockPlan block : player.team().data().blocks){
                 Block b = content.block(block.block);
                 if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset, block.y * tilesize + b.offset))) continue;
 

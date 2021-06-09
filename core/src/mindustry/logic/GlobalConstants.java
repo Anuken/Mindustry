@@ -1,8 +1,10 @@
 package mindustry.logic;
 
 import arc.struct.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.entities.units.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -54,6 +56,10 @@ public class GlobalConstants{
         //store sensor constants
         for(LAccess sensor : LAccess.all){
             put("@" + sensor.name(), sensor);
+        }
+
+        for(UnitCommand cmd : UnitCommand.all){
+            put("@command" + Strings.capitalize(cmd.name()), cmd);
         }
     }
 

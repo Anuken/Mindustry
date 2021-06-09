@@ -49,7 +49,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     transient float healTime;
     private transient float resupplyTime = Mathf.random(10f);
     private transient boolean wasPlayer;
-    private transient float lastHealth;
+    private transient boolean wasHealed;
 
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
@@ -321,15 +321,22 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
+    public void heal(float amount){
+        if(health < maxHealth && amount > 0){
+            wasHealed = true;
+        }
+    }
+
+    @Override
     public void update(){
 
         type.update(self());
 
-        if(health > lastHealth && lastHealth > 0 && healTime <= -1f){
+        if(wasHealed && healTime <= -1f){
             healTime = 1f;
         }
         healTime -= Time.delta / 20f;
-        lastHealth = health;
+        wasHealed = false;
 
         //check if environment is unsupported
         if(!type.supportsEnv(state.rules.environment) && !dead){
@@ -450,7 +457,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         float power = item().charge * stack().amount * 150f;
 
         if(!spawnedByCore){
-            Damage.dynamicExplosion(x, y, flammability, explosiveness, power, bounds() / 2f, state.rules.damageExplosions, item().flammability > 1, team);
+            Damage.dynamicExplosion(x, y, flammability, explosiveness, power, bounds() / 2f, state.rules.damageExplosions, item().flammability > 1, team, type.deathExplosionEffect);
         }
 
         float shake = hitSize / 3f;

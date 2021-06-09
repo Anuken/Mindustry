@@ -60,7 +60,7 @@ public class Scripts implements Disposable{
 
     public String runConsole(String text){
         try{
-            Object o = context.evaluateString(scope, text, "console.js", 1, null);
+            Object o = context.evaluateString(scope, text, "console.js", 1);
             if(o instanceof NativeJavaObject n) o = n.unwrap();
             if(o instanceof Undefined) o = "undefined";
             return String.valueOf(o);
@@ -172,11 +172,11 @@ public class Scripts implements Disposable{
         try{
             if(currentMod != null){
                 //inject script info into file
-                context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1, null);
+                context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1);
             }
             context.evaluateString(scope,
             wrap ? "(function(){'use strict';\n" + script + "\n})();" : script,
-            file, 0, null);
+            file, 0);
             return true;
         }catch(Throwable t){
             if(currentMod != null){
@@ -224,7 +224,7 @@ public class Scripts implements Disposable{
             if(!module.exists() || module.isDirectory()) return null;
             return new ModuleSource(
                 new InputStreamReader(new ByteArrayInputStream((module.readString()).getBytes())),
-                null, new URI(moduleId), root.file().toURI(), validator);
+                new URI(moduleId), root.file().toURI(), validator);
         }
     }
 }

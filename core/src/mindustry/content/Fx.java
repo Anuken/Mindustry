@@ -1231,10 +1231,10 @@ public class Fx{
         });
     }),
 
-    shootLiquid = new Effect(40f, 80f, e -> {
-        color(e.color, Color.white, e.fout() / 6f + Mathf.randomSeedRange(e.id, 0.1f));
+    shootLiquid = new Effect(15f, 80f, e -> {
+        color(e.color);
 
-        randLenVectors(e.id, 6, e.finpow() * 60f, e.rotation, 11f, (x, y) -> {
+        randLenVectors(e.id, 2, e.finpow() * 15f, e.rotation, 11f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, 0.5f + e.fout() * 2.5f);
         });
     }),

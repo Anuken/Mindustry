@@ -47,7 +47,6 @@ public class MenuRenderer implements Disposable{
         Simplex s1 = new Simplex(offset);
         Simplex s2 = new Simplex(offset + 1);
         Simplex s3 = new Simplex(offset + 2);
-        RidgedPerlin rid = new RidgedPerlin(1 + offset, 1);
         Block[] selected = Structs.select(
             new Block[]{Blocks.sand, Blocks.sandWall},
             new Block[]{Blocks.shale, Blocks.shaleWall},
@@ -141,7 +140,7 @@ public class MenuRenderer implements Disposable{
                 }
 
                 if(tendrils){
-                    if(rid.getValue(x, y, 1f / 17f) > 0f){
+                    if(RidgedPerlin.noise2d(1 + offset, x, y, 1f / 17f) > 0f){
                         floor = Mathf.chance(0.2) ? Blocks.sporeMoss : Blocks.moss;
 
                         if(wall != Blocks.air){

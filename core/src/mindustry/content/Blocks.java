@@ -43,7 +43,7 @@ public class Blocks implements ContentList{
     regolithWall, yellowStoneWall, rhyoliteWall, carbonWall,
     graphiticStone,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, grass, salt,
-    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
+    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
 
@@ -493,32 +493,24 @@ public class Blocks implements ContentList{
             wall = sporeWall;
         }};
 
-        metalFloor = new Floor("metal-floor"){{
+        metalFloor = new MetalFloor("metal-floor"){{
             variants = 0;
+            attributes.set(Attribute.water, -1f);
         }};
 
-        metalFloorDamaged = new Floor("metal-floor-damaged"){{
-            variants = 3;
-        }};
+        metalFloorDamaged = new MetalFloor("metal-floor-damaged", 3);
 
-        metalFloor2 = new Floor("metal-floor-2"){{
-            variants = 0;
-        }};
+        metalFloor2 = new MetalFloor("metal-floor-2");
+        metalFloor3 = new MetalFloor("metal-floor-3");
+        metalFloor4 = new MetalFloor("metal-floor-4");
+        metalFloor5 = new MetalFloor("metal-floor-5");
 
-        metalFloor3 = new Floor("metal-floor-3"){{
-            variants = 0;
-        }};
-
-        metalFloor5 = new Floor("metal-floor-5"){{
-            variants = 0;
-        }};
-
-        darkPanel1 = new Floor("dark-panel-1"){{ variants = 0; }};
-        darkPanel2 = new Floor("dark-panel-2"){{ variants = 0; }};
-        darkPanel3 = new Floor("dark-panel-3"){{ variants = 0; }};
-        darkPanel4 = new Floor("dark-panel-4"){{ variants = 0; }};
-        darkPanel5 = new Floor("dark-panel-5"){{ variants = 0; }};
-        darkPanel6 = new Floor("dark-panel-6"){{ variants = 0; }};
+        darkPanel1 = new MetalFloor("dark-panel-1");
+        darkPanel2 = new MetalFloor("dark-panel-2");
+        darkPanel3 = new MetalFloor("dark-panel-3");
+        darkPanel4 = new MetalFloor("dark-panel-4");
+        darkPanel5 = new MetalFloor("dark-panel-5");
+        darkPanel6 = new MetalFloor("dark-panel-6");
 
         darkMetal = new StaticWall("dark-metal");
 
@@ -1773,8 +1765,8 @@ public class Blocks implements ContentList{
             );
 
             size = 2;
-            range = 180f;
-            reloadTime = 38f;
+            range = 190f;
+            reloadTime = 34f;
             restitution = 0.03f;
             ammoEjectBack = 3f;
             cooldown = 0.03f;
@@ -2013,7 +2005,7 @@ public class Blocks implements ContentList{
             }};
 
             health = 200 * size * size;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
+            consumes.add(new ConsumeCoolant(0.5f)).update(false);
         }};
 
         //endregion
@@ -2191,10 +2183,11 @@ public class Blocks implements ContentList{
         payloadPropulsionTower = new PayloadMassDriver("payload-propulsion-tower"){{
             requirements(Category.units, with(Items.thorium, 300, Items.silicon, 200, Items.plastanium, 200, Items.phaseFabric, 50));
             size = 5;
-            reloadTime = 150f;
+            reloadTime = 140f;
             chargeTime = 100f;
-            range = 300f;
-            consumes.power(10f);
+            range = 500f;
+            maxPayloadSize = 3.5f;
+            consumes.power(6f);
         }};
 
         //endregion

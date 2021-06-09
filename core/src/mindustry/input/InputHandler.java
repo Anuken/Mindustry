@@ -108,7 +108,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build == null || build.items == null) return;
         build.items.set(item, amount);
     }
-    
+
     @Remote(called = Loc.server, unreliable = true)
     public static void clearItems(Building build){
         if(build == null || build.items == null) return;
@@ -131,22 +131,24 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(called = Loc.both, targets = Loc.both, forward = true, unreliable = true)
     public static void deletePlans(Player player, int[] positions){
-        if(netServer.admins.allowAction(player, ActionType.removePlanned, a -> a.plans = positions)){
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.removePlanned, a -> a.plans = positions)){
+            throw new ValidateException(player, "Player cannot remove plans.");
+        }
 
-            var it = state.teams.get(player.team()).blocks.iterator();
-            //O(n^2) search here; no way around it
-            outer:
-            while(it.hasNext()){
-                BlockPlan req = it.next();
+        if(player == null) return;
 
-                for(int pos : positions){
-                    if(req.x == Point2.x(pos) && req.y == Point2.y(pos)){
-                        it.remove();
-                        continue outer;
-                    }
+        var it = player.team().data().blocks.iterator();
+        //O(n^2) search here; no way around it
+        outer:
+        while(it.hasNext()){
+            BlockPlan req = it.next();
+
+            for(int pos : positions){
+                if(req.x == Point2.x(pos) && req.y == Point2.y(pos)){
+                    it.remove();
+                    continue outer;
                 }
             }
-
         }
     }
 
@@ -885,7 +887,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         removed.clear();
 
         //remove blocks to rebuild
-        Iterator<BlockPlan> broken = state.teams.get(player.team()).blocks.iterator();
+        Iterator<BlockPlan> broken = player.team().data().blocks.iterator();
         while(broken.hasNext()){
             BlockPlan req = broken.next();
             Block block = content.block(req.block);
@@ -938,9 +940,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //check if tapped block is configurable
         if(build.block.configurable && build.interactable(player.team())){
             consumed = true;
-            if(((!frag.config.isShown() && build.shouldShowConfigure(player)) //if the config fragment is hidden, show
+            if((!frag.config.isShown() && build.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
-            || (frag.config.isShown() && frag.config.getSelectedTile().onConfigureTileTapped(build)))){
+            || (frag.config.isShown() && frag.config.getSelectedTile().onConfigureTileTapped(build))){
                 Sounds.click.at(build);
                 frag.config.showConfig(build);
             }

@@ -4,11 +4,13 @@ import mindustry.gen.*;
 
 public abstract class ConsumeLiquidBase extends Consume{
     /** amount used per frame */
-    public final float amount;
+    public float amount;
 
     public ConsumeLiquidBase(float amount){
         this.amount = amount;
     }
+
+    public ConsumeLiquidBase(){}
 
     @Override
     public ConsumeType type(){

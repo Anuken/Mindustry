@@ -117,5 +117,4 @@ public class Weathers implements ContentList{
             baseSpeed = 0.03f;
         }};
     }
-
 }

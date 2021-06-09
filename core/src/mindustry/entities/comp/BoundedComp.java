@@ -1,7 +1,6 @@
 package mindustry.entities.comp;
 
 import arc.math.*;
-import arc.math.geom.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 
@@ -12,7 +11,6 @@ abstract class BoundedComp implements Velc, Posc, Healthc, Flyingc{
     static final float warpDst = 40f;
 
     @Import float x, y;
-    @Import Vec2 vel;
 
     @Override
     public void update(){

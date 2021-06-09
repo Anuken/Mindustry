@@ -18,7 +18,6 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class SerpuloPlanetGenerator extends PlanetGenerator{
-    RidgedPerlin rid = new RidgedPerlin(1, 2);
     BaseGenerator basegen = new BaseGenerator();
     float scl = 5f;
     float waterOffset = 0.07f;
@@ -115,7 +114,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         tile.floor = getBlock(position);
         tile.block = tile.floor.asFloor().wall;
 
-        if(rid.getValue(position.x, position.y, position.z, 22) > 0.31){
+        if(RidgedPerlin.noise3d(1, position.x, position.y, position.z, 2, 22) > 0.31){
             tile.block = Blocks.air;
         }
     }

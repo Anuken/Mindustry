@@ -151,7 +151,7 @@ public class ModsDialog extends BaseDialog{
         float w = Math.min(Core.graphics.getWidth() / 1.1f, 520f);
 
         cont.clear();
-        cont.defaults().width(Math.min(Core.graphics.getWidth() / 1.2f, 520f)).pad(4);
+        cont.defaults().width(Math.min(Core.graphics.getWidth() / 1.2f, 556f)).pad(4);
         cont.add("@mod.reloadrequired").visible(mods::requiresReload).center().get().setAlignment(Align.center);
         cont.row();
 
