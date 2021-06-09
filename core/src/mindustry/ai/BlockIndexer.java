@@ -27,8 +27,6 @@ public class BlockIndexer{
     private static final Rect rect = new Rect();
     private static boolean returnBool = false;
 
-    private final IntSet intSet = new IntSet();
-
     private int quadWidth, quadHeight;
 
     /** Stores all ore quadrants on the map. Maps ID to qX to qY to a list of tiles with that ore. */
@@ -41,9 +39,9 @@ public class BlockIndexer{
     private Seq<Team> activeTeams = new Seq<>(Team.class);
     /** Maps teams to a map of flagged tiles by flag. */
     private TileArray[][] flagMap = new TileArray[Team.all.length][BlockFlag.all.length];
+    /** Counts whether a certain floor is present in the world upon load. */
+    private boolean[] blocksPresent;
 
-    /** Empty set used for returning. */
-    private TileArray emptySet = new TileArray();
     /** Array used for returning and reusing. */
     private Seq<Tile> returnArray = new Seq<>();
     /** Array used for returning and reusing. */
@@ -74,6 +72,7 @@ public class BlockIndexer{
             ores = new IntSeq[content.items().size][][];
             quadWidth = Mathf.ceil(world.width() / (float)quadrantSize);
             quadHeight = Mathf.ceil(world.height() / (float)quadrantSize);
+            blocksPresent = new boolean[content.blocks().size];
 
             for(Tile tile : world.tiles){
                 process(tile);
@@ -153,6 +152,12 @@ public class BlockIndexer{
                 seq.removeValue(pos);
             }
         }
+
+    }
+
+    /** @return whether a certain block is anywhere on this map. */
+    public boolean isBlockPresent(Block block){
+        return blocksPresent != null && blocksPresent[block.id];
     }
 
     private TileArray[] getFlagged(Team team){
@@ -383,6 +388,12 @@ public class BlockIndexer{
             }
             data.buildings.insert(tile.build);
         }
+
+        if(!tile.block().isStatic()){
+            blocksPresent[tile.floorID()] = true;
+            blocksPresent[tile.overlayID()] = true;
+        }
+        blocksPresent[tile.blockID()] = true;
     }
 
     public static class TileArray implements Iterable<Tile>{
