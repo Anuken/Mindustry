@@ -44,6 +44,7 @@ public class Scripts implements Disposable{
         context = Vars.platform.getScriptContext();
         scope = new ImporterTopLevel(context);
 
+        context.setApplicationClassLoader(Vars.mods.mainLoader);
         new RequireBuilder()
             .setModuleScriptProvider(new SoftCachingModuleScriptProvider(new ScriptModuleProvider()))
             .setSandboxed(true).createRequire(context, scope).install(scope);
