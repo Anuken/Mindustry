@@ -32,23 +32,6 @@ public class AndroidRhinoContext{
      * @return a context prepared for android
      */
     public static Context enter(File cacheDirectory){
-        if(!SecurityController.hasGlobal())
-            SecurityController.initGlobal(new SecurityController(){
-                @Override
-                public GeneratedClassLoader createClassLoader(ClassLoader classLoader, Object o){
-                    return Context.getCurrentContext().createClassLoader(classLoader);
-                }
-
-                @Override
-                public Object getDynamicSecurityDomain(Object o){
-                    return null;
-                }
-
-                @Override
-                public Object callWithDomain(Object o, Context context, Callable callable, Scriptable scriptable, Scriptable scriptable1, Object[] objects){
-                    return null;
-                }
-            });
 
         AndroidContextFactory factory;
         if(!ContextFactory.hasExplicitGlobal()){
