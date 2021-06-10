@@ -136,40 +136,6 @@ public class ApplicationTests{
     }
 
     @Test
-    void checkInitialItems() {
-        world.loadMap(testMap);
-        logic.play();
-        for(Teams.TeamData team : state.teams.getActive()){
-            if(team.hasCore()){
-                assertTrue(team.team.items().has(Items.copper), "Has copper");
-                assertEquals(200, team.team.items().get(Items.copper.id),"Copper total number equal to initial items number");
-            }
-        }
-    }
-
-    @Test
-    void TeamsStatusTest(){
-        world.loadMap(testMap);
-        logic.play();
-        assertTrue(state.teams.isActive(state.rules.defaultTeam));
-        assertTrue(state.teams.areEnemies(state.rules.defaultTeam, state.rules.waveTeam));
-        assertFalse(state.teams.canInteract(state.rules.defaultTeam, state.rules.waveTeam));
-    }
-
-    @Test
-    void alterBlockType(){
-        world.loadMap(testMap);
-        state.set(State.playing);
-
-        world.tile(0, 0).setBlock(Blocks.liquidSource);
-        world.tile(0, 0).build.configureAny(Liquids.water);
-        assertEquals(world.tile(0, 0).build.liquids.current(), Liquids.water);
-
-        world.tile(0,0).setBlock(Blocks.conveyor);
-        assertEquals(world.tile(0, 0).block(), Blocks.conveyor);
-    }
-
-    @Test
     void createMap(){
         Tiles tiles = world.resize(8, 8);
 
