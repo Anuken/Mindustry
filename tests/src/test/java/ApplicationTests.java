@@ -312,29 +312,24 @@ public class ApplicationTests{
         world.tile(2, 1).setBlock(Blocks.liquidTank, Team.sharded);
 
         updateBlocks(1);
-        assertTrue(world.tile(2, 1).build.liquids.currentAmount() > 0);
+        assertTrue(world.tile(2, 1).build.liquids.currentAmount() > 0f);
 
         world.tile(2, 1).build.liquids.clear();
 
-        assertTrue(world.tile(2, 1).build.liquids.currentAmount() == 0);
+        assertEquals(0f, world.tile(2, 1).build.liquids.currentAmount());
     }
 
     @Test
-    void liquidTest(){
+    void manuallyAddLiquidTest(){
         world.loadMap(testMap);
         state.set(State.playing);
-        double[] expectAmount = {50.0, 123.333336, 207.55554, 296.85925, 388.5343, 481.316, 574.61414, 668.15326, 761.8048, 855.5089};
-
-        world.tile(0, 0).setBlock(Blocks.liquidSource, Team.sharded);
-        world.tile(0, 0).build.configureAny(Liquids.water);
 
         world.tile(2, 1).setBlock(Blocks.liquidTank, Team.sharded);
-        float temp = 0;
-        for (int i = 0; i < 10; i++){
-            updateBlocks(1);
-            assertTrue(world.tile(2, 1).build.liquids.currentAmount() == (float)expectAmount[i]);
-            temp = world.tile(2, 1).build.liquids.currentAmount();
-        }
+        assertEquals(0f, world.tile(2, 1).build.liquids.currentAmount());
+
+        // Manually add liquid amount over the liquidTank capacity. Expect to have an amount equal to 1500f, but fail.
+        world.tile(2,1).build.liquids.add(Liquids.water,  1600f);
+        assertEquals(1500f, world.tile(2, 1).build.liquids.currentAmount());
     }
 
     @Test
