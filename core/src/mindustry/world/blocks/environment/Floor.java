@@ -78,6 +78,11 @@ public class Floor extends Block{
         super(name);
     }
 
+    public Floor(String name, int variants){
+        super(name);
+        this.variants = variants;
+    }
+
     @Override
     public void load(){
         super.load();
