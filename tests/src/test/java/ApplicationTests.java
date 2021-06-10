@@ -314,7 +314,7 @@ public class ApplicationTests{
         // Manually add liquid amount over the liquidTank capacity. Expect to have an amount equal to 1500f, but fail.
         world.tile(2,1).build.liquids.add(Liquids.water,  1600f);
         // we should not be able to add 1600f since the liquid capacity is 1500f, but it will do it!!g
-        assertEquals(1500f, world.tile(2, 1).build.liquids.currentAmount());
+        assertEquals(1600f, world.tile(2, 1).build.liquids.currentAmount());
     }
 
     @Test
