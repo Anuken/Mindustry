@@ -20,8 +20,10 @@ import mindustry.maps.*;
 import mindustry.net.Net;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.production.Drill;
 import org.junit.jupiter.api.*;
 import static mindustry.Vars.*;
+import static mindustry.type.ItemStack.with;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationTests{
@@ -283,6 +285,24 @@ public class ApplicationTests{
                 }
             }
         }
+    }
+
+    @Test
+    void oreMining(){
+        world.loadMap(testMap);
+        state.set(State.playing);
+
+        world.tile(0, 0).setOverlay(Blocks.oreCopper);
+
+        world.tile(0,0).setBlock(Blocks.mechanicalDrill, Team.sharded);
+
+        assertTrue(Blocks.mechanicalDrill.canBeBuilt());
+        assertTrue(Blocks.mechanicalDrill.canPlaceOn(world.tile(0,0), Team.sharded));
+
+        updateBlocks(10000);
+        assertEquals(10, world.tile(0,0).build.items.total());
+
+
     }
 
     @Test
