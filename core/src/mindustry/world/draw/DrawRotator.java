@@ -9,10 +9,10 @@ public class DrawRotator extends DrawBlock{
     public TextureRegion rotator, top;
 
     @Override
-    public void draw(GenericCrafterBuild entity){
-        Draw.rect(entity.block.region, entity.x, entity.y);
-        Draw.rect(rotator, entity.x, entity.y, entity.totalProgress * 2f);
-        if(top.found()) Draw.rect(top, entity.x, entity.y);
+    public void draw(GenericCrafterBuild build){
+        Draw.rect(build.block.region, build.x, build.y);
+        Draw.rect(rotator, build.x, build.y, build.totalProgress * 2f);
+        if(top.found()) Draw.rect(top, build.x, build.y);
     }
 
     @Override
