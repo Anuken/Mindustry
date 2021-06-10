@@ -320,6 +320,24 @@ public class ApplicationTests{
     }
 
     @Test
+    void liquidTest(){
+        world.loadMap(testMap);
+        state.set(State.playing);
+        double[] expectAmount = {50.0, 123.333336, 207.55554, 296.85925, 388.5343, 481.316, 574.61414, 668.15326, 761.8048, 855.5089};
+
+        world.tile(0, 0).setBlock(Blocks.liquidSource, Team.sharded);
+        world.tile(0, 0).build.configureAny(Liquids.water);
+
+        world.tile(2, 1).setBlock(Blocks.liquidTank, Team.sharded);
+        float temp = 0;
+        for (int i = 0; i < 10; i++){
+            updateBlocks(1);
+            assertTrue(world.tile(2, 1).build.liquids.currentAmount() == (float)expectAmount[i]);
+            temp = world.tile(2, 1).build.liquids.currentAmount();
+        }
+    }
+
+    @Test
     void liquidJunctionOutput(){
         world.loadMap(testMap);
         state.set(State.playing);
