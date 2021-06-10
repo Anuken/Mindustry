@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
+import mindustry.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
@@ -20,9 +21,29 @@ import static mindustry.Vars.*;
 
 public interface Platform{
 
-    /** Dynamically creates a class loader for a jar file. */
-    default ClassLoader loadJar(Fi jar, String mainClass) throws Exception{
-        return new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, getClass().getClassLoader());
+    /** Dynamically creates a class loader for a jar file. This loader must be child-first. */
+    default ClassLoader loadJar(Fi jar, ClassLoader parent) throws Exception{
+        return new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, parent){
+            @Override
+            protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException{
+                //check for loaded state
+                Class<?> loadedClass = findLoadedClass(name);
+                if(loadedClass == null){
+                    try{
+                        //try to load own class first
+                        loadedClass = findClass(name);
+                    }catch(ClassNotFoundException e){
+                        //use parent if not found
+                        loadedClass = super.loadClass(name, resolve);
+                    }
+                }
+
+                if(resolve){
+                    resolveClass(loadedClass);
+                }
+                return loadedClass;
+            }
+        };
     }
 
     /** Steam: Update lobby visibility.*/
@@ -59,6 +80,18 @@ public interface Platform{
     }
 
     default Context getScriptContext(){
+        ContextFactory.getGlobalSetter().setContextFactoryGlobal(new ContextFactory(){
+            @Override
+            protected Context makeContext(){
+                Context ctx = super.makeContext();
+                ctx.setClassShutter(Scripts::allowClass);
+                if(Vars.mods != null){
+                    ctx.setApplicationClassLoader(Vars.mods.mainLoader());
+                }
+                return ctx;
+            }
+        });
+
         Context c = Context.enter();
         c.setOptimizationLevel(9);
         return c;

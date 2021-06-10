@@ -3,6 +3,7 @@ package mindustry.entities.comp;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
@@ -11,10 +12,11 @@ import static mindustry.Vars.*;
 abstract class ShieldComp implements Healthc, Posc{
     @Import float health, hitTime, x, y, healthMultiplier;
     @Import boolean dead;
+    @Import Team team;
 
     /** Absorbs health damage. */
     float shield;
-    /** Substracts an amount from damage. */
+    /** Subtracts an amount from damage. */
     float armor;
     /** Shield opacity. */
     transient float shieldAlpha = 0f;
@@ -60,7 +62,7 @@ abstract class ShieldComp implements Healthc, Posc{
             }
 
             if(hadShields && shield <= 0.0001f){
-                Fx.unitShieldBreak.at(x, y, 0, this);
+                Fx.unitShieldBreak.at(x, y, 0, team.color, this);
             }
         }
     }

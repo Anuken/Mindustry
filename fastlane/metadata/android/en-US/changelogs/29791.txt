@@ -1,0 +1,3 @@
+[This is a truncated changelog, see Github for full notes]
+- Fixed flying unit AI
+- Made conduits/conveyors upgrades follow paths (Contributed by @Slava0135)

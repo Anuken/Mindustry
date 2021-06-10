@@ -123,7 +123,7 @@ public class Sector{
 
     @Nullable
     public TextureRegion icon(){
-        return info.icon == null ? null : Fonts.getLargeIcon(info.icon);
+        return info.contentIcon != null ? info.contentIcon.uiIcon : info.icon == null ? null : Fonts.getLargeIcon(info.icon);
     }
 
     public boolean isCaptured(){
@@ -148,7 +148,8 @@ public class Sector{
 
     /** @return the sector size, in tiles */
     public int getSize(){
-        int res = (int)(rect.radius * 3200);
+        if(planet.generator == null) return 1;
+        int res = (int)(rect.radius * planet.generator.getSizeScl());
         return res % 2 == 0 ? res : res + 1;
     }
 

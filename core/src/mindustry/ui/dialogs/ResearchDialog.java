@@ -109,6 +109,9 @@ public class ResearchDialog extends BaseDialog{
             checkNodes(root);
             treeLayout();
 
+            view.hoverNode = null;
+            view.infoTable.remove();
+            view.infoTable.clear();
         });
 
         hidden(ui.planet::setup);
@@ -292,7 +295,7 @@ public class ResearchDialog extends BaseDialog{
             infoTable.touchable = Touchable.enabled;
 
             for(TechTreeNode node : nodes){
-                ImageButton button = new ImageButton(node.node.content.icon(Cicon.medium), Styles.nodei);
+                ImageButton button = new ImageButton(node.node.content.uiIcon, Styles.nodei);
                 button.visible(() -> node.visible);
                 button.clicked(() -> {
                     if(moved) return;
@@ -339,7 +342,7 @@ public class ResearchDialog extends BaseDialog{
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
                     button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !selectable(node.node) || !canSpend(node.node) ? Tex.buttonRed : Tex.button;
 
-                    ((TextureRegionDrawable)button.getStyle().imageUp).setRegion(node.selectable ? node.node.content.icon(Cicon.medium) : Icon.lock.getRegion());
+                    ((TextureRegionDrawable)button.getStyle().imageUp).setRegion(node.selectable ? node.node.content.uiIcon : Icon.lock.getRegion());
                     button.getImage().setColor(!locked(node.node) ? Color.white : node.selectable ? Color.gray : Pal.gray);
                     button.getImage().setScaling(Scaling.bounded);
                 });
@@ -528,7 +531,7 @@ public class ResearchDialog extends BaseDialog{
                                         int reqAmount = req.amount - completed.amount;
 
                                         list.left();
-                                        list.image(req.item.icon(Cicon.small)).size(8 * 3).padRight(3);
+                                        list.image(req.item.uiIcon).size(8 * 3).padRight(3);
                                         list.add(req.item.localizedName).color(Color.lightGray);
                                         Label label = list.label(() -> " " +
                                                 UI.formatAmount(Math.min(items.get(req.item), reqAmount)) + " / "

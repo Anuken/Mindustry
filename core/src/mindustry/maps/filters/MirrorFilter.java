@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
@@ -14,12 +15,19 @@ public class MirrorFilter extends GenerateFilter{
     private final Vec2 v1 = new Vec2(), v2 = new Vec2(), v3 = new Vec2();
 
     int angle = 45;
+    boolean rotate = false;
 
     @Override
     public FilterOption[] options(){
         return Structs.arr(
-        new SliderOption("angle", () -> angle, f -> angle = (int)f, 0, 360, 45)
+        new SliderOption("angle", () -> angle, f -> angle = (int)f, 0, 360, 45),
+        new ToggleOption("rotate", () -> rotate, f -> rotate = f)
         );
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockMetalFloor5;
     }
 
     @Override
@@ -66,8 +74,8 @@ public class MirrorFilter extends GenerateFilter{
     }
 
     void mirror(Vec2 p, float x0, float y0, float x1, float y1){
-        //special case: uneven map mirrored at 45 degree angle
-        if(in.width != in.height && angle % 90 != 0){
+        //special case: uneven map mirrored at 45 degree angle (or someone might just want rotational symmetry)
+        if((in.width != in.height && angle % 90 != 0) || rotate){
             p.x = in.width - p.x - 1;
             p.y = in.height - p.y - 1;
         }else{

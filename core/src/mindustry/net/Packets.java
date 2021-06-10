@@ -7,8 +7,6 @@ import arc.util.serialization.*;
 import mindustry.core.*;
 import mindustry.io.*;
 
-import java.io.*;
-import java.nio.*;
 import java.util.zip.*;
 
 /**
@@ -45,21 +43,23 @@ public class Packets{
         kick, ban, trace, wave
     }
 
-    public static class Connect implements Packet{
+    /** Generic client connection event. */
+    public static class Connect extends Packet{
         public String addressTCP;
 
         @Override
-        public boolean isImportant(){
-            return true;
+        public int getPriority(){
+            return priorityHigh;
         }
     }
 
-    public static class Disconnect implements Packet{
+    /** Generic client disconnection event. */
+    public static class Disconnect extends Packet{
         public String reason;
 
         @Override
-        public boolean isImportant(){
-            return true;
+        public int getPriority(){
+            return priorityHigh;
         }
     }
 
@@ -67,55 +67,8 @@ public class Packets{
 
     }
 
-    public static class InvokePacket implements Packet{
-        private static ReusableByteInStream bin;
-        private static Reads read = new Reads(new DataInputStream(bin = new ReusableByteInStream()));
-
-        public byte type, priority;
-
-        public byte[] bytes;
-        public int length;
-
-        @Override
-        public void read(ByteBuffer buffer){
-            type = buffer.get();
-            priority = buffer.get();
-            short writeLength = buffer.getShort();
-            bytes = new byte[writeLength];
-            buffer.get(bytes);
-        }
-
-        @Override
-        public void write(ByteBuffer buffer){
-            buffer.put(type);
-            buffer.put(priority);
-            buffer.putShort((short)length);
-            buffer.put(bytes, 0, length);
-        }
-
-        @Override
-        public void reset(){
-            priority = 0;
-        }
-
-        @Override
-        public boolean isImportant(){
-            return priority == 1;
-        }
-
-        @Override
-        public boolean isUnimportant(){
-            return priority == 2;
-        }
-
-        public Reads reader(){
-            bin.setBytes(bytes);
-            return read;
-        }
-    }
-
     /** Marks the beginning of a stream. */
-    public static class StreamBegin implements Packet{
+    public static class StreamBegin extends Packet{
         private static int lastid;
 
         public int id = lastid++;
@@ -123,40 +76,39 @@ public class Packets{
         public byte type;
 
         @Override
-        public void write(ByteBuffer buffer){
-            buffer.putInt(id);
-            buffer.putInt(total);
-            buffer.put(type);
+        public void write(Writes buffer){
+            buffer.i(id);
+            buffer.i(total);
+            buffer.b(type);
         }
 
         @Override
-        public void read(ByteBuffer buffer){
-            id = buffer.getInt();
-            total = buffer.getInt();
-            type = buffer.get();
+        public void read(Reads buffer){
+            id = buffer.i();
+            total = buffer.i();
+            type = buffer.b();
         }
     }
 
-    public static class StreamChunk implements Packet{
+    public static class StreamChunk extends Packet{
         public int id;
         public byte[] data;
 
         @Override
-        public void write(ByteBuffer buffer){
-            buffer.putInt(id);
-            buffer.putShort((short)data.length);
-            buffer.put(data);
+        public void write(Writes buffer){
+            buffer.i(id);
+            buffer.s((short)data.length);
+            buffer.b(data);
         }
 
         @Override
-        public void read(ByteBuffer buffer){
-            id = buffer.getInt();
-            data = new byte[buffer.getShort()];
-            buffer.get(data);
+        public void read(Reads buffer){
+            id = buffer.i();
+            data = buffer.b(buffer.s());
         }
     }
 
-    public static class ConnectPacket implements Packet{
+    public static class ConnectPacket extends Packet{
         public int version;
         public String versionType;
         public Seq<String> mods;
@@ -165,40 +117,39 @@ public class Packets{
         public int color;
 
         @Override
-        public void write(ByteBuffer buffer){
-            buffer.putInt(Version.build);
+        public void write(Writes buffer){
+            buffer.i(Version.build);
             TypeIO.writeString(buffer, versionType);
             TypeIO.writeString(buffer, name);
             TypeIO.writeString(buffer, locale);
             TypeIO.writeString(buffer, usid);
 
             byte[] b = Base64Coder.decode(uuid);
-            buffer.put(b);
+            buffer.b(b);
             CRC32 crc = new CRC32();
             crc.update(Base64Coder.decode(uuid), 0, b.length);
-            buffer.putLong(crc.getValue());
+            buffer.l(crc.getValue());
 
-            buffer.put(mobile ? (byte)1 : 0);
-            buffer.putInt(color);
-            buffer.put((byte)mods.size);
+            buffer.b(mobile ? (byte)1 : 0);
+            buffer.i(color);
+            buffer.b((byte)mods.size);
             for(int i = 0; i < mods.size; i++){
                 TypeIO.writeString(buffer, mods.get(i));
             }
         }
 
         @Override
-        public void read(ByteBuffer buffer){
-            version = buffer.getInt();
+        public void read(Reads buffer){
+            version = buffer.i();
             versionType = TypeIO.readString(buffer);
             name = TypeIO.readString(buffer);
             locale = TypeIO.readString(buffer);
             usid = TypeIO.readString(buffer);
-            byte[] idbytes = new byte[16];
-            buffer.get(idbytes);
+            byte[] idbytes =  buffer.b(16);
             uuid = new String(Base64Coder.encode(idbytes));
-            mobile = buffer.get() == 1;
-            color = buffer.getInt();
-            int totalMods = buffer.get();
+            mobile = buffer.b() == 1;
+            color = buffer.i();
+            int totalMods = buffer.b();
             mods = new Seq<>(totalMods);
             for(int i = 0; i < totalMods; i++){
                 mods.add(TypeIO.readString(buffer));

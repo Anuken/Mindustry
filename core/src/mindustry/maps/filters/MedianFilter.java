@@ -3,20 +3,22 @@ package mindustry.maps.filters;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
 public class MedianFilter extends GenerateFilter{
+    private static final IntSeq blocks = new IntSeq(), floors = new IntSeq();
+
     float radius = 2;
     float percentile = 0.5f;
-    IntSeq blocks = new IntSeq(), floors = new IntSeq();
 
     @Override
     public FilterOption[] options(){
         return Structs.arr(
-        new SliderOption("radius", () -> radius, f -> radius = f, 1f, 12f),
+        new SliderOption("radius", () -> radius, f -> radius = f, 1f, 10f),
         new SliderOption("percentile", () -> percentile, f -> percentile = f, 0f, 1f)
         );
     }
@@ -24,6 +26,11 @@ public class MedianFilter extends GenerateFilter{
     @Override
     public boolean isBuffered(){
         return true;
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockSporePine;
     }
 
     @Override

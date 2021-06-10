@@ -19,7 +19,6 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class MapView extends Element implements GestureListener{
-    private MapEditor editor;
     EditorTool tool = EditorTool.pencil;
     private float offsetx, offsety;
     private float zoom = 1f;
@@ -35,8 +34,7 @@ public class MapView extends Element implements GestureListener{
     float mousex, mousey;
     EditorTool lastTool;
 
-    public MapView(MapEditor editor){
-        this.editor = editor;
+    public MapView(){
 
         for(int i = 0; i < MapEditor.brushSizes.length; i++){
             float size = MapEditor.brushSizes[i];
@@ -92,7 +90,7 @@ public class MapView extends Element implements GestureListener{
                 lasty = p.y;
                 startx = p.x;
                 starty = p.y;
-                tool.touched(editor, p.x, p.y);
+                tool.touched(p.x, p.y);
                 firstTouch.set(p);
 
                 if(tool.edit){
@@ -115,7 +113,7 @@ public class MapView extends Element implements GestureListener{
 
                 if(tool == EditorTool.line){
                     ui.editor.resetSaved();
-                    tool.touchedLine(editor, startx, starty, p.x, p.y);
+                    tool.touchedLine(startx, starty, p.x, p.y);
                 }
 
                 editor.flushOp();
@@ -136,7 +134,7 @@ public class MapView extends Element implements GestureListener{
 
                 if(drawing && tool.draggable && !(p.x == lastx && p.y == lasty)){
                     ui.editor.resetSaved();
-                    Bresenham2.line(lastx, lasty, p.x, p.y, (cx, cy) -> tool.touched(editor, cx, cy));
+                    Bresenham2.line(lastx, lasty, p.x, p.y, (cx, cy) -> tool.touched(cx, cy));
                 }
 
                 if(tool == EditorTool.line && tool.mode == 1){
@@ -243,14 +241,14 @@ public class MapView extends Element implements GestureListener{
 
         image.setImageSize(editor.width(), editor.height());
 
-        if(!ScissorStack.push(rect.set(x, y + Core.scene.marginBottom, width, height))){
+        if(!ScissorStack.push(rect.set(x + Core.scene.marginLeft, y + Core.scene.marginBottom, width, height))){
             return;
         }
 
         Draw.color(Pal.remove);
         Lines.stroke(2f);
         Lines.rect(centerx - sclwidth / 2 - 1, centery - sclheight / 2 - 1, sclwidth + 2, sclheight + 2);
-        editor.renderer.draw(centerx - sclwidth / 2, centery - sclheight / 2 + Core.scene.marginBottom, sclwidth, sclheight);
+        editor.renderer.draw(centerx - sclwidth / 2 + Core.scene.marginLeft, centery - sclheight / 2 + Core.scene.marginBottom, sclwidth, sclheight);
         Draw.reset();
 
         if(grid){

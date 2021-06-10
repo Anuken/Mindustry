@@ -14,7 +14,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
-import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
@@ -28,7 +27,21 @@ public class ItemTurret extends Turret{
 
     /** Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...] */
     public void ammo(Object... objects){
-        ammoTypes = OrderedMap.of(objects);
+        ammoTypes = ObjectMap.of(objects);
+    }
+
+    /** Makes copies of all bullets and limits their range. */
+    public void limitRange(){
+        limitRange(1f);
+    }
+
+    /** Makes copies of all bullets and limits their range. */
+    public void limitRange(float margin){
+        for(var entry : ammoTypes.copy().entries()){
+            var copy = entry.value.copy();
+            copy.lifetime = (range + margin) / copy.speed;
+            ammoTypes.put(entry.key, copy);
+        }
     }
 
     @Override
@@ -36,7 +49,7 @@ public class ItemTurret extends Turret{
         super.setStats();
 
         stats.remove(Stat.itemCapacity);
-        stats.add(Stat.ammo, new AmmoListValue<>(ammoTypes));
+        stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
     }
 
     @Override
@@ -45,7 +58,7 @@ public class ItemTurret extends Turret{
             @Override
             public void build(Building tile, Table table){
                 MultiReqImage image = new MultiReqImage();
-                content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
+                content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.uiIcon),
                 () -> tile instanceof ItemTurretBuild it && !it.ammo.isEmpty() && ((ItemEntry)it.ammo.peek()).item == item)));
 
                 table.add(image).size(8 * 4);
@@ -165,21 +178,23 @@ public class ItemTurret extends Turret{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
+            ammo.clear();
+            totalAmmo = 0;
             int amount = read.ub();
             for(int i = 0; i < amount; i++){
                 Item item = Vars.content.item(revision < 2 ? read.ub() : read.s());
                 short a = read.s();
-                totalAmmo += a;
 
                 //only add ammo if this is a valid ammo type
                 if(item != null && ammoTypes.containsKey(item)){
+                    totalAmmo += a;
                     ammo.add(new ItemEntry(item, a));
                 }
             }
         }
     }
 
-    class ItemEntry extends AmmoEntry{
+    public class ItemEntry extends AmmoEntry{
         protected Item item;
 
         ItemEntry(Item item, int amount){

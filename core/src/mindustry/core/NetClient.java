@@ -16,12 +16,11 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.net.Administration.*;
-import mindustry.net.Net.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.modules.*;
 
@@ -32,9 +31,9 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 public class NetClient implements ApplicationListener{
-    private static final float dataTimeout = 60 * 18;
-    private static final float playerSyncTime = 2;
-    public static final float viewScale = 2f;
+    private static final float dataTimeout = 60 * 20;
+    private static final float playerSyncTime = 5;
+    private static final Reads dataReads = new Reads(null);
 
     private long ping;
     private Interval timer = new Interval(5);
@@ -62,7 +61,7 @@ public class NetClient implements ApplicationListener{
         net.handleClient(Connect.class, packet -> {
             Log.info("Connecting to server: @", packet.addressTCP);
 
-            player.admin(false);
+            player.admin = false;
 
             reset();
 
@@ -92,7 +91,7 @@ public class NetClient implements ApplicationListener{
             c.mods = mods.getModStrings();
             c.mobile = mobile;
             c.versionType = Version.type;
-            c.color = player.color().rgba();
+            c.color = player.color.rgba();
             c.usid = getUsid(packet.addressTCP);
             c.uuid = platform.getUUID();
 
@@ -103,7 +102,7 @@ public class NetClient implements ApplicationListener{
                 return;
             }
 
-            net.send(c, SendMode.tcp);
+            net.send(c, true);
         });
 
         net.handleClient(Disconnect.class, packet -> {
@@ -112,19 +111,19 @@ public class NetClient implements ApplicationListener{
             connecting = false;
             logic.reset();
             platform.updateRPC();
-            player.name(Core.settings.getString("name"));
-            player.color().set(Core.settings.getInt("color-0"));
+            player.name = Core.settings.getString("name");
+            player.color.set(Core.settings.getInt("color-0"));
 
             if(quiet) return;
 
             Time.runTask(3f, ui.loadfrag::hide);
 
             if(packet.reason != null){
-                switch(packet.reason){
-                    case "closed" -> ui.showSmall("@disconnect", "@disconnect.closed");
-                    case "timeout" -> ui.showSmall("@disconnect", "@disconnect.timeout");
-                    case "error" -> ui.showSmall("@disconnect", "@disconnect.error");
-                }
+                ui.showSmall(switch(packet.reason){
+                    case "closed" -> "@disconnect.closed";
+                    case "timeout" -> "@disconnect.timeout";
+                    default -> "@disconnect.error";
+                }, "@disconnect.closed");
             }else{
                 ui.showErrorMessage("@disconnect");
             }
@@ -135,10 +134,6 @@ public class NetClient implements ApplicationListener{
             NetworkIO.loadWorld(new InflaterInputStream(data.stream));
 
             finishConnecting();
-        });
-
-        net.handleClient(InvokePacket.class, packet -> {
-            RemoteReadClient.readPacket(packet.reader(), packet.type);
         });
     }
 
@@ -162,6 +157,18 @@ public class NetClient implements ApplicationListener{
     @Remote(targets = Loc.server, variants = Variant.both, unreliable = true)
     public static void clientPacketUnreliable(String type, String contents){
         clientPacketReliable(type, contents);
+    }
+
+    @Remote(variants = Variant.both, unreliable = true)
+    public static void effect(Effect effect, float x, float y, float rotation, Color color){
+        if(effect == null) return;
+
+        effect.at(x, y, rotation, color);
+    }
+
+    @Remote(variants = Variant.both)
+    public static void effectReliable(Effect effect, float x, float y, float rotation, Color color){
+        effect(effect, x, y, rotation, color);
     }
 
     //called on all clients
@@ -236,7 +243,22 @@ public class NetClient implements ApplicationListener{
                 }else if(response.type == ResponseType.fewArguments){
                     text = "[scarlet]Too few arguments. Usage:[lightgray] " + response.command.text + "[gray] " + response.command.paramText;
                 }else{ //unknown command
-                    text = "[scarlet]Unknown command. Check [lightgray]/help[scarlet].";
+                    int minDst = 0;
+                    Command closest = null;
+
+                    for(Command command : netServer.clientCommands.getCommandList()){
+                        int dst = Strings.levenshtein(command.text, response.runCommand);
+                        if(dst < 3 && (closest == null || dst < minDst)){
+                            minDst = dst;
+                            closest = command;
+                        }
+                    }
+
+                    if(closest != null){
+                        text = "[scarlet]Unknown command. Did you mean \"[lightgray]" + closest.text + "[]\"?";
+                    }else{
+                        text = "[scarlet]Unknown command. Check [lightgray]/help[scarlet].";
+                    }
                 }
 
                 player.sendMessage(text);
@@ -279,7 +301,7 @@ public class NetClient implements ApplicationListener{
     public static void kick(KickReason reason){
         netClient.disconnectQuietly();
         logic.reset();
-        
+
         if(reason == KickReason.serverRestarting){
             ui.join.reconnect();
             return;
@@ -301,78 +323,6 @@ public class NetClient implements ApplicationListener{
         logic.reset();
         ui.showText("@disconnect", reason, Align.left);
         ui.loadfrag.hide();
-    }
-
-    @Remote(variants = Variant.both, unreliable = true)
-    public static void setHudText(String message){
-        if(message == null) return;
-
-        ui.hudfrag.setHudText(message);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void hideHudText(){
-        ui.hudfrag.toggleHudText(false);
-    }
-
-    /** TCP version */
-    @Remote(variants = Variant.both)
-    public static void setHudTextReliable(String message){
-        setHudText(message);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void announce(String message){
-        if(message == null) return;
-
-        ui.announce(message);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void infoMessage(String message){
-        if(message == null) return;
-
-        ui.showText("", message);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void infoPopup(String message, float duration, int align, int top, int left, int bottom, int right){
-        if(message == null) return;
-
-        ui.showInfoPopup(message, duration, align, top, left, bottom, right);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void label(String message, float duration, float worldx, float worldy){
-        if(message == null) return;
-
-        ui.showLabel(message, duration, worldx, worldy);
-    }
-
-    @Remote(variants = Variant.both, unreliable = true)
-    public static void effect(Effect effect, float x, float y, float rotation, Color color){
-        if(effect == null) return;
-
-        effect.at(x, y, rotation, color);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void effectReliable(Effect effect, float x, float y, float rotation, Color color){
-        effect(effect, x, y, rotation, color);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void infoToast(String message, float duration){
-        if(message == null) return;
-
-        ui.showInfoToast(message, duration);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void warningToast(int unicode, String text){
-        if(text == null || Fonts.icon.getData().getGlyph((char)unicode) == null) return;
-
-        ui.hudfrag.showToast(Fonts.getGlyph(Fonts.icon, (char)unicode), text);
     }
 
     @Remote(variants = Variant.both)
@@ -413,9 +363,9 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
-    public static void entitySnapshot(short amount, short dataLen, byte[] data){
+    public static void entitySnapshot(short amount, byte[] data){
         try{
-            netClient.byteStream.setBytes(net.decompressSnapshot(data, dataLen));
+            netClient.byteStream.setBytes(data);
             DataInputStream input = netClient.dataStream;
 
             for(int j = 0; j < amount; j++){
@@ -459,9 +409,9 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.both, priority = PacketPriority.low, unreliable = true)
-    public static void blockSnapshot(short amount, short dataLen, byte[] data){
+    public static void blockSnapshot(short amount, byte[] data){
         try{
-            netClient.byteStream.setBytes(net.decompressSnapshot(data, dataLen));
+            netClient.byteStream.setBytes(data);
             DataInputStream input = netClient.dataStream;
 
             for(int i = 0; i < amount; i++){
@@ -484,7 +434,7 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
-    public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, boolean gameOver, int timeData, short coreDataLen, byte[] coreData){
+    public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, boolean gameOver, int timeData, byte tps, byte[] coreData){
         try{
             if(wave > state.wave){
                 state.wave = wave;
@@ -496,21 +446,22 @@ public class NetClient implements ApplicationListener{
             state.wave = wave;
             state.enemies = enemies;
             state.serverPaused = paused;
+            state.serverTps = tps & 0xff;
 
             universe.updateNetSeconds(timeData);
 
-            netClient.byteStream.setBytes(net.decompressSnapshot(coreData, coreDataLen));
+            netClient.byteStream.setBytes(coreData);
             DataInputStream input = netClient.dataStream;
+            dataReads.input = input;
 
-            int cores = input.readInt();
-            for(int i = 0; i < cores; i++){
-                int pos = input.readInt();
-                Tile tile = world.tile(pos);
-
-                if(tile != null && tile.build != null){
-                    tile.build.items.read(Reads.get(input));
+            int teams = input.readUnsignedByte();
+            for(int i = 0; i < teams; i++){
+                int team = input.readUnsignedByte();
+                TeamData data = Team.all[team].data();
+                if(data.cores.any()){
+                    data.cores.first().items.read(dataReads);
                 }else{
-                    new ItemModule().read(Reads.get(input));
+                    new ItemModule().read(dataReads);
                 }
             }
 
@@ -650,7 +601,7 @@ public class NetClient implements ApplicationListener{
             player.boosting, player.shooting, ui.chatfrag.shown(), control.input.isBuilding,
             requests,
             Core.camera.position.x, Core.camera.position.y,
-            Core.camera.width * viewScale, Core.camera.height * viewScale
+            Core.camera.width, Core.camera.height
             );
         }
 

@@ -10,19 +10,19 @@ public class DrawMixer extends DrawBlock{
     public TextureRegion liquid, top, bottom;
 
     @Override
-    public void draw(GenericCrafterBuild entity){
-        float rotation = entity.block.rotate ? entity.rotdeg() : 0;
+    public void draw(GenericCrafterBuild build){
+        float rotation = build.block.rotate ? build.rotdeg() : 0;
 
-        Draw.rect(bottom, entity.x, entity.y, rotation);
+        Draw.rect(bottom, build.x, build.y, rotation);
 
-        if(entity.liquids.total() > 0.001f){
-            Draw.color(((GenericCrafter)entity.block).outputLiquid.liquid.color);
-            Draw.alpha(entity.liquids.get(((GenericCrafter)entity.block).outputLiquid.liquid) / entity.block.liquidCapacity);
-            Draw.rect(liquid, entity.x, entity.y, rotation);
+        if(build.liquids.total() > 0.001f){
+            Draw.color(((GenericCrafter)build.block).outputLiquid.liquid.color);
+            Draw.alpha(build.liquids.get(((GenericCrafter)build.block).outputLiquid.liquid) / build.block.liquidCapacity);
+            Draw.rect(liquid, build.x, build.y, rotation);
             Draw.color();
         }
 
-        Draw.rect(top, entity.x, entity.y, rotation);
+        Draw.rect(top, build.x, build.y, rotation);
     }
 
     @Override

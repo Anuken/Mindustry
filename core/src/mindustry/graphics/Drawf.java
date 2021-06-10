@@ -10,12 +10,20 @@ import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
 public class Drawf{
+
+    public static void dashLine(Color color, float x, float y, float x2, float y2){
+        int segments = (int)(Math.max(Math.abs(x - x2), Math.abs(y - y2)) / tilesize * 2);
+        Lines.stroke(3f, Pal.gray);
+        Lines.dashLine(x, y, x2, y2, segments);
+        Lines.stroke(1f, color);
+        Lines.dashLine(x, y, x2, y2, segments);
+        Draw.reset();
+    }
 
     public static void target(float x, float y, float rad, Color color){
         target(x, y, rad, 1, color);
@@ -96,7 +104,7 @@ public class Drawf{
 
     public static void shadow(float x, float y, float rad, float alpha){
         Draw.color(0, 0, 0, 0.4f * alpha);
-        Draw.rect("circle-shadow", x, y, rad, rad);
+        Draw.rect("circle-shadow", x, y, rad * Draw.xscl, rad * Draw.yscl);
         Draw.color();
     }
 
@@ -223,7 +231,7 @@ public class Drawf{
     }
 
     public static void construct(Building t, UnlockableContent content, float rotation, float progress, float speed, float time){
-        construct(t, content.icon(Cicon.full), rotation, progress, speed, time);
+        construct(t, content.fullIcon, rotation, progress, speed, time);
     }
 
     public static void construct(float x, float y, TextureRegion region, float rotation, float progress, float speed, float time){

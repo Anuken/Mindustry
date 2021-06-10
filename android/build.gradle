@@ -20,22 +20,7 @@ configurations{ natives }
 repositories{
     mavenCentral()
     maven{ url "https://maven.google.com" }
-    jcenter() //remove later once google fixes the dependency
-}
-
-dependencies{
-    implementation project(":core")
-
-    implementation arcModule("backends:backend-android")
-    implementation 'com.jakewharton.android.repackaged:dalvik-dx:9.0.0_r3'
-
-    natives "com.github.Anuken.Arc:natives-android:${getArcHash()}"
-    natives "com.github.Anuken.Arc:natives-freetype-android:${getArcHash()}"
-    natives "com.github.Anuken.Arc:natives-box2d-android:${getArcHash()}"
-
-    //android dependencies magically disappear during compilation, thanks gradle!
-    def sdkFile = new File((String)findSdkDir(), "/platforms/android-29/android.jar")
-    if(sdkFile.exists()) compileOnly files(sdkFile.absolutePath)
+    jcenter() //remove later once google/JetBrains fixes the dependency
 }
 
 task deploy(type: Copy){
@@ -47,8 +32,8 @@ task deploy(type: Copy){
 }
 
 android{
-    buildToolsVersion '29.0.3'
-    compileSdkVersion 29
+    buildToolsVersion '30.0.2'
+    compileSdkVersion 30
     sourceSets{
         main{
             manifest.srcFile 'AndroidManifest.xml'
@@ -59,9 +44,13 @@ android{
             assets.srcDirs = ['assets', 'src/main/assets', '../core/assets/']
             jniLibs.srcDirs = ['libs']
         }
+        gp{
+            java.srcDirs = ['srcgp']
+        }
 
         androidTest.setRoot('tests')
     }
+
     packagingOptions{
         exclude 'META-INF/robovm/ios/robovm.xml'
     }
@@ -73,7 +62,7 @@ android{
 
         applicationId "io.anuke.mindustry"
         minSdkVersion 14
-        targetSdkVersion 29
+        targetSdkVersion 30
         
         versionName versionNameResult
         versionCode = (System.getenv("TRAVIS_BUILD_ID") != null ? System.getenv("TRAVIS_BUILD_ID").toInteger() : vcode)
@@ -109,6 +98,14 @@ android{
         }
     }
 
+    buildTypes{
+        all{
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles("proguard-rules.pro")
+        }
+    }
+
     if(project.hasProperty("RELEASE_STORE_FILE") || System.getenv("CI") == "true"){
         buildTypes{
             release{
@@ -116,10 +113,37 @@ android{
             }
         }
     }
+
+    // Specifies one flavor dimension.
+    flavorDimensions "version"
+    productFlavors{
+        standard{
+
+        }
+        gp{
+            applicationIdSuffix ".gp"
+            versionNameSuffix "-gp"
+        }
+    }
 }
-// called every time gradle gets executed, takes the native dependencies of
-// the natives configuration, and extracts them to the proper libs/ folders
-// so they get packed with the APK.
+
+dependencies{
+    implementation project(":core")
+
+    implementation arcModule("backends:backend-android")
+    implementation 'com.jakewharton.android.repackaged:dalvik-dx:9.0.0_r3'
+
+    natives "com.github.Anuken.Arc:natives-android:${getArcHash()}"
+    natives "com.github.Anuken.Arc:natives-freetype-android:${getArcHash()}"
+
+    gpImplementation "com.google.android.gms:play-services-games:21.0.0"
+    gpImplementation "com.google.android.gms:play-services-auth:19.0.0"
+
+    //android dependencies magically disappear during compilation, thanks gradle!
+    def sdkFile = new File((String)findSdkDir(), "/platforms/android-29/android.jar")
+    if(sdkFile.exists()) compileOnly files(sdkFile.absolutePath)
+}
+
 task copyAndroidNatives(){
     configurations.natives.files.each{ jar ->
         copy{
@@ -131,29 +155,13 @@ task copyAndroidNatives(){
 }
 
 task run(type: Exec){
-    def path
-    def localProperties = project.file("../local.properties")
-    if(localProperties.exists()){
-        Properties properties = new Properties()
-        localProperties.withInputStream{ instr ->
-            properties.load(instr)
-        }
-        def sdkDir = properties.getProperty('sdk.dir')
-        if(sdkDir){
-            path = sdkDir
-        }else{
-            path = "$System.env.ANDROID_HOME"
-        }
-    }else{
-        path = "$System.env.ANDROID_HOME"
-    }
-
-    def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'io.anuke.mindustry/mindustry.android.AndroidLauncher'
+    commandLine "${findSdkDir()}/platform-tools/adb", 'shell', 'am', 'start', '-n', 'io.anuke.mindustry/mindustry.android.AndroidLauncher'
 }
 
 if(!project.ext.hasSprites()){
-    println "Scheduling sprite pack."
-    run.dependsOn ":tools:pack"
-    deploy.dependsOn ":tools:pack"
+    tasks.whenTaskAdded{ task ->
+        if(task.name == 'assembleDebug' || task.name == 'assembleRelease'){
+            task.dependsOn ":tools:pack"
+        }
+    }
 }

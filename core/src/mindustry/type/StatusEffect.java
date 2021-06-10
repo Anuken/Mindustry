@@ -10,7 +10,6 @@ import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.ui.*;
 import mindustry.world.meta.*;
 
 public class StatusEffect extends UnlockableContent{
@@ -38,6 +37,8 @@ public class StatusEffect extends UnlockableContent{
     public boolean permanent;
     /** If true, this effect will only react with other effects and cannot be applied. */
     public boolean reactive;
+    /** Whether to show this effect in the database. */
+    public boolean show = true;
     /** Tint color of effect. */
     public Color color = Color.white.cpy();
     /** Effect that happens randomly on top of the affected unit. */
@@ -47,8 +48,7 @@ public class StatusEffect extends UnlockableContent{
     /** Called on init. */
     protected Runnable initblock = () -> {};
 
-    public ObjectSet<StatusEffect> affinities = new ObjectSet<>();
-    public ObjectSet<StatusEffect> opposites = new ObjectSet<>();
+    public ObjectSet<StatusEffect> affinities = new ObjectSet<>(), opposites = new ObjectSet<>();
 
     public StatusEffect(String name){
         super(name);
@@ -65,7 +65,7 @@ public class StatusEffect extends UnlockableContent{
 
     @Override
     public boolean isHidden(){
-        return localizedName.equals(name);
+        return localizedName.equals(name) || !show;
     }
 
     @Override
@@ -76,6 +76,7 @@ public class StatusEffect extends UnlockableContent{
         if(reloadMultiplier != 1) stats.addPercent(Stat.reloadMultiplier, reloadMultiplier);
         if(buildSpeedMultiplier != 1) stats.addPercent(Stat.buildSpeedMultiplier, buildSpeedMultiplier);
         if(damage > 0) stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
+        if(damage < 0) stats.add(Stat.healing, -(damage * 60f), StatUnit.perSecond);
 
         boolean reacts = false;
 
@@ -105,11 +106,6 @@ public class StatusEffect extends UnlockableContent{
     }
 
     @Override
-    public Cicon prefDatabaseIcon(){
-        return Cicon.large;
-    }
-
-    @Override
     public boolean showUnlock(){
         return false;
     }
@@ -123,14 +119,13 @@ public class StatusEffect extends UnlockableContent{
         }
 
         if(effect != Fx.none && Mathf.chanceDelta(effectChance)){
-            Tmp.v1.rnd(unit.type.hitSize /2f);
-            effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y);
+            Tmp.v1.rnd(Mathf.range(unit.type.hitSize/2f));
+            effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, color);
         }
     }
 
     protected void trans(StatusEffect effect, TransitionHandler handler){
         transitions.put(effect, handler);
-        effect.transitions.put(this, handler);
     }
 
     protected void affinity(StatusEffect effect, TransitionHandler handler){
@@ -140,18 +135,21 @@ public class StatusEffect extends UnlockableContent{
     }
 
     protected void opposite(StatusEffect... effect){
-        opposites.addAll(effect);
-        for(StatusEffect sup : effect){
-            sup.opposites.add(this);
-            trans(sup, (unit, time, newTime, result) -> {
-                time -= newTime * 0.5f;
-                if(time > 0){
-                    result.set(this, time);
-                    return;
-                }
-                result.set(sup, newTime);
-            });
+        for(var other : effect){
+            handleOpposite(other);
+            other.handleOpposite(this);
         }
+    }
+
+    protected void handleOpposite(StatusEffect other){
+        opposites.add(other);
+        trans(other, (unit, result, time) -> {
+            result.time -= time * 0.5f;
+            if(result.time <= 0f){
+                result.time = time;
+                result.effect = other;
+            }
+        });
     }
 
     public void draw(Unit unit){
@@ -165,16 +163,16 @@ public class StatusEffect extends UnlockableContent{
     /**
      * Called when transitioning between two status effects.
      * @param to The state to transition to
-     * @param time The current status effect time
-     * @param newTime The time that the new status effect will last
+     * @param time The applies status effect time
+     * @return whether a reaction occurred
      */
-    public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result){
-        if(transitions.containsKey(to)){
-            transitions.get(to).handle(unit, time, newTime, result);
-            return result;
+    public boolean applyTransition(Unit unit, StatusEffect to, StatusEntry entry, float time){
+        var trans = transitions.get(to);
+        if(trans != null){
+            trans.handle(unit, entry, time);
+            return true;
         }
-
-        return result.set(to, newTime);
+        return false;
     }
 
     @Override
@@ -188,6 +186,6 @@ public class StatusEffect extends UnlockableContent{
     }
 
     public interface TransitionHandler{
-        void handle(Unit unit, float time, float newTime, StatusEntry result);
+        void handle(Unit unit, StatusEntry current, float time);
     }
 }

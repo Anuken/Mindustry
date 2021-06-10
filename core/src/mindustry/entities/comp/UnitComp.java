@@ -46,8 +46,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     double flag;
 
     transient Seq<Ability> abilities = new Seq<>(0);
+    transient float healTime;
     private transient float resupplyTime = Mathf.random(10f);
     private transient boolean wasPlayer;
+    private transient boolean wasHealed;
 
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
@@ -65,6 +67,16 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void aimLook(float x, float y){
         aim(x, y);
         lookAt(x, y);
+    }
+
+    /** @return approx. square size of the physical hitbox for physics */
+    public float physicSize(){
+        return hitSize * 0.7f;
+    }
+
+    /** @return whether there is solid, un-occupied ground under this unit. */
+    public boolean canLand(){
+        return !onSolid() && Units.count(x, y, physicSize(), f -> f != self() && f.isGrounded()) == 0;
     }
 
     public boolean inRange(Position other){
@@ -98,7 +110,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             return angleTo(buildPlan());
         }else if(mineTile != null){
             return angleTo(mineTile);
-        }else if(moving()){
+        }else if(moving() && type.omniMovement){
             return vel().angle();
         }
         return rotation;
@@ -114,7 +126,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(isBuilding()){
             return state.rules.infiniteResources ? Float.MAX_VALUE : Math.max(type.clipSize, type.region.width) + buildingRange + tilesize*4f;
         }
-        return Math.max(type.region.width * 2f, type.clipSize);
+        return type.clipSize;
     }
 
     @Override
@@ -146,7 +158,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                     controller instanceof FormationAI ? ctrlFormation :
                     0;
             case commanded -> controller instanceof FormationAI && isValid() ? 1 : 0;
-            case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
+            case payloadCount -> ((Object)this) instanceof Payloadc pay ? pay.payloads().size : 0;
             case size -> hitSize / tilesize;
             default -> Float.NaN;
         };
@@ -159,7 +171,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case name -> controller instanceof Player p ? p.name : null;
             case firstItem -> stack().amount == 0 ? null : item();
             case controller -> !isValid() ? null : controller instanceof LogicAI log ? log.controller : controller instanceof FormationAI form ? form.leader : this;
-            case payloadType -> self() instanceof Payloadc pay ?
+            case payloadType -> ((Object)this) instanceof Payloadc pay ?
                 (pay.payloads().isEmpty() ? null :
                 pay.payloads().peek() instanceof UnitPayload p1 ? p1.unit.type :
                 pay.payloads().peek() instanceof BuildPayload p2 ? p2.block() : null) : null;
@@ -309,9 +321,28 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
+    public void heal(float amount){
+        if(health < maxHealth && amount > 0){
+            wasHealed = true;
+        }
+    }
+
+    @Override
     public void update(){
 
         type.update(self());
+
+        if(wasHealed && healTime <= -1f){
+            healTime = 1f;
+        }
+        healTime -= Time.delta / 20f;
+        wasHealed = false;
+
+        //check if environment is unsupported
+        if(!type.supportsEnv(state.rules.environment) && !dead){
+            Call.unitCapDeath(self());
+            team.data().updateCount(type, -1);
+        }
 
         if(state.rules.unitAmmo && ammo < type.ammoCapacity - 0.0001f){
             resupplyTime += Time.delta;
@@ -336,7 +367,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             float relativeSize = state.rules.dropZoneRadius + hitSize/2f + 1f;
             for(Tile spawn : spawner.getSpawns()){
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
-                    vel().add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta));
+                    velAddNet(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta));
                 }
             }
         }
@@ -348,13 +379,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
             //standard fall smoke
             if(Mathf.chanceDelta(0.1)){
-                Tmp.v1.setToRandomDirection().scl(hitSize);
+                Tmp.v1.rnd(Mathf.range(hitSize));
                 type.fallEffect.at(x + Tmp.v1.x, y + Tmp.v1.y);
             }
 
             //thruster fall trail
             if(Mathf.chanceDelta(0.2)){
-                float offset = type.engineOffset/2f + type.engineOffset/2f*elevation;
+                float offset = type.engineOffset/2f + type.engineOffset/2f * elevation;
                 float range = Mathf.range(type.engineSize);
                 type.fallThrusterEffect.at(
                     x + Angles.trnsx(rotation + 180, offset) + Mathf.range(range),
@@ -367,7 +398,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             elevation -= type.fallSpeed * Time.delta;
 
             if(isGrounded()){
-                destroy();
+                Call.unitDestroy(id);
             }
         }
 
@@ -414,7 +445,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     /** @return a preview icon for this unit. */
     public TextureRegion icon(){
-        return type.icon(Cicon.full);
+        return type.fullIcon;
     }
 
     /** Actually destroys the unit, removing it and creating explosions. **/
@@ -426,7 +457,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         float power = item().charge * stack().amount * 150f;
 
         if(!spawnedByCore){
-            Damage.dynamicExplosion(x, y, flammability, explosiveness, power, bounds() / 2f, state.rules.damageExplosions, item().flammability > 1, team);
+            Damage.dynamicExplosion(x, y, flammability, explosiveness, power, bounds() / 2f, state.rules.damageExplosions, item().flammability > 1, team, type.deathExplosionEffect);
         }
 
         float shake = hitSize / 3f;

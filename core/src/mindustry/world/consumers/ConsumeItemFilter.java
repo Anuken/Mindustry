@@ -7,7 +7,6 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
-import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
@@ -31,7 +30,7 @@ public class ConsumeItemFilter extends Consume{
     @Override
     public void build(Building tile, Table table){
         MultiReqImage image = new MultiReqImage();
-        content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium), 1),
+        content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.uiIcon, 1),
             () -> tile.items != null && tile.items.has(item))));
 
         table.add(image).size(8 * 4);
@@ -71,6 +70,6 @@ public class ConsumeItemFilter extends Consume{
 
     @Override
     public void display(Stats stats){
-        stats.add(booster ? Stat.booster : Stat.input, new ItemFilterValue(filter));
+        stats.add(booster ? Stat.booster : Stat.input, stats.timePeriod < 0 ? StatValues.items(filter) : StatValues.items(stats.timePeriod, filter));
     }
 }

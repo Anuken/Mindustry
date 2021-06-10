@@ -6,7 +6,6 @@ import arc.graphics.g2d.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.meta.*;
@@ -48,11 +47,11 @@ public class Pump extends LiquidBlock{
 
         if(liquidDrop != null){
             float width = drawPlaceText(Core.bundle.formatFloat("bar.pumpspeed", amount * pumpAmount * 60f, 0), x, y, valid);
-            float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5;
+            float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5, s = iconSmall / 4f;
             Draw.mixcol(Color.darkGray, 1f);
-            Draw.rect(liquidDrop.icon(Cicon.small), dx, dy - 1);
+            Draw.rect(liquidDrop.fullIcon, dx, dy - 1, s, s);
             Draw.reset();
-            Draw.rect(liquidDrop.icon(Cicon.small), dx, dy);
+            Draw.rect(liquidDrop.fullIcon, dx, dy, s, s);
         }
     }
 

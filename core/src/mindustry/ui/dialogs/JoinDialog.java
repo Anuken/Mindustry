@@ -50,9 +50,7 @@ public class JoinDialog extends BaseDialog{
         addCloseButton();
 
         buttons.add().growX().width(-1);
-        if(!steam){
-            buttons.button("?", () -> ui.showInfo("@join.info")).size(60f, 64f).width(-1);
-        }
+        if(!steam) buttons.button("?", () -> ui.showInfo("@join.info")).size(60f, 64f);
 
         add = new BaseDialog("@joingame.title");
         add.cont.add("@joingame.ip").padRight(5f).left();
@@ -97,8 +95,12 @@ public class JoinDialog extends BaseDialog{
         });
 
         onResize(() -> {
-            setup();
-            refreshAll();
+            //only refresh on resize when the minimum dimension is smaller than the maximum preferred width
+            //this means that refreshes on resize will only happen for small phones that need the list to fit in portrait mode
+            if(Math.min(Core.graphics.getWidth(), Core.graphics.getHeight()) / Scl.scl() * 0.9f < 500f){
+                setup();
+                refreshAll();
+            }
         });
     }
 
@@ -362,7 +364,7 @@ public class JoinDialog extends BaseDialog{
             for(String address : group.addresses){
                 String resaddress = address.contains(":") ? address.split(":")[0] : address;
                 int resport = address.contains(":") ? Strings.parseInt(address.split(":")[1]) : port;
-                net.pingHost(resaddress, resport, res -> {
+                net.pingHostThread(resaddress, resport, res -> {
                     if(refreshes != cur) return;
                     res.port = resport;
 
@@ -402,6 +404,7 @@ public class JoinDialog extends BaseDialog{
         global.background(null);
         float w = targetWidth();
 
+        //TODO looks bad
         container.button(b -> buildServer(host, b), Styles.cleart, () -> {
             Events.fire(new ClientPreConnectEvent(host));
             if(!Core.settings.getBool("server-disclaimer", false)){

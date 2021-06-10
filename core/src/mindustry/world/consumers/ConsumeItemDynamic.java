@@ -46,7 +46,7 @@ public class ConsumeItemDynamic extends Consume{
         int i = 0;
 
         for(ItemStack stack : items.get(tile)){
-            table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
+            table.add(new ReqImage(new ItemImage(stack.item.uiIcon, stack.amount),
             () -> tile.items != null && tile.items.has(stack.item, stack.amount))).padRight(8).left();
             if(++i % 4 == 0) table.row();
         }

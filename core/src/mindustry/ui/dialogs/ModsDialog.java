@@ -127,7 +127,7 @@ public class ModsDialog extends BaseDialog{
                                 try{
                                     return d.parse(text);
                                 }catch(Exception e){
-                                    throw new RuntimeException(e);
+                                    return new Date();
                                 }
                             };
 
@@ -148,10 +148,10 @@ public class ModsDialog extends BaseDialog{
 
     void setup(){
         float h = 110f;
-        float w = mobile ? 440f : 524f;
+        float w = Math.min(Core.graphics.getWidth() / 1.1f, 520f);
 
         cont.clear();
-        cont.defaults().width(mobile ? 500 : 560f).pad(4);
+        cont.defaults().width(Math.min(Core.graphics.getWidth() / 1.2f, 556f)).pad(4);
         cont.add("@mod.reloadrequired").visible(mods::requiresReload).center().get().setAlignment(Align.center);
         cont.row();
 
@@ -365,7 +365,7 @@ public class ModsDialog extends BaseDialog{
                 d.cont.pane(cs -> {
                     int i = 0;
                     for(UnlockableContent c : all){
-                        cs.button(new TextureRegionDrawable(c.icon(Cicon.medium)), Styles.cleari, Cicon.medium.size, () -> {
+                        cs.button(new TextureRegionDrawable(c.uiIcon), Styles.cleari, iconMed, () -> {
                             ui.content.show(c);
                         }).size(50f).with(im -> {
                             var click = im.getClickListener();

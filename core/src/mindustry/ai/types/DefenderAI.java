@@ -26,7 +26,7 @@ public class DefenderAI extends AIController{
         //find unit to follow if not in rally mode
         if(command() != UnitCommand.rally){
             //Sort by max health and closer target.
-            var result = Units.closest(unit.team, x, y, Math.max(range, 400f), u -> !u.dead() && u.type != unit.type, (u, tx, ty) -> -u.maxHealth + Mathf.dst2(u.x, u.y, tx, ty) / 800f);
+            var result = Units.closest(unit.team, x, y, Math.max(range, 400f), u -> !u.dead() && u.type != unit.type, (u, tx, ty) -> -u.maxHealth + Mathf.dst2(u.x, u.y, tx, ty) / 6400f);
             if(result != null) return result;
         }
 
