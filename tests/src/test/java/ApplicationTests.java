@@ -293,16 +293,14 @@ public class ApplicationTests{
         state.set(State.playing);
 
         world.tile(0, 0).setOverlay(Blocks.oreCopper);
-
         world.tile(0,0).setBlock(Blocks.mechanicalDrill, Team.sharded);
 
         assertTrue(Blocks.mechanicalDrill.canBeBuilt());
         assertTrue(Blocks.mechanicalDrill.canPlaceOn(world.tile(0,0), Team.sharded));
 
         updateBlocks(10000);
+
         assertEquals(10, world.tile(0,0).build.items.total());
-
-
     }
 
     @Test
