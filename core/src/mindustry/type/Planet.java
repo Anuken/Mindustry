@@ -125,7 +125,8 @@ public class Planet extends UnlockableContent{
         sectors.get(index).preset = preset;
     }
 
-    public boolean isLandable(){
+    /** @return whether this planet has a sector grid to select. */
+    public boolean hasGrid(){
         return grid != null && generator != null && sectors.size > 0;
     }
 
