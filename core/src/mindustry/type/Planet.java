@@ -30,7 +30,7 @@ public class Planet extends UnlockableContent{
     /** Generator that will make the planet. Can be null for planets that don't need to be landed on. */
     public @Nullable PlanetGenerator generator;
     /** Array of sectors; directly maps to tiles in the grid. */
-    public Seq<Sector> sectors;
+    public Seq<Sector> sectors = new Seq<>();
     /** Radius of this planet's sphere. Does not take into account satellites. */
     public float radius;
     /** Atmosphere radius adjustment parameters. */
@@ -72,24 +72,11 @@ public class Planet extends UnlockableContent{
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
     protected Prov<PlanetMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2);
 
-    public Planet(String name, Planet parent, int sectorSize, float radius){
+    public Planet(String name, Planet parent, float radius){
         super(name);
 
         this.radius = radius;
         this.parent = parent;
-
-        if(sectorSize > 0){
-            grid = PlanetGrid.create(sectorSize);
-
-            sectors = new Seq<>(grid.tiles.length);
-            for(int i = 0; i < grid.tiles.length; i++){
-                sectors.add(new Sector(this, grid.tiles[i]));
-            }
-
-            sectorApproxRadius = sectors.first().tile.v.dst(sectors.first().tile.corners[0].v);
-        }else{
-            sectors = new Seq<>();
-        }
 
         //total radius is initially just the radius
         totalRadius += radius;
@@ -108,6 +95,21 @@ public class Planet extends UnlockableContent{
 
         //calculate solar system
         for(solarSystem = this; solarSystem.parent != null; solarSystem = solarSystem.parent);
+    }
+
+    public Planet(String name, Planet parent, float radius, int sectorSize){
+        this(name, parent, radius);
+
+        if(sectorSize > 0){
+            grid = PlanetGrid.create(sectorSize);
+
+            sectors.ensureCapacity(grid.tiles.length);
+            for(int i = 0; i < grid.tiles.length; i++){
+                sectors.add(new Sector(this, grid.tiles[i]));
+            }
+
+            sectorApproxRadius = sectors.first().tile.v.dst(sectors.first().tile.corners[0].v);
+        }
     }
 
     public @Nullable Sector getLastSector(){
