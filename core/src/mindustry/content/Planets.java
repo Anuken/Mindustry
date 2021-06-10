@@ -1,8 +1,12 @@
 package mindustry.content;
 
 import arc.graphics.*;
+import arc.math.geom.*;
+import arc.util.noise.*;
 import mindustry.ctype.*;
+import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
+import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.planet.*;
 import mindustry.type.*;
 
@@ -40,7 +44,35 @@ public class Planets implements ContentList{
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
             tidalLock = true;
+            orbitSpacing = 0.5f;
+            totalRadius += 2.4f;
         }};
+
+        for(int i = 0; i < 4; i++){
+            new Planet("gier-" + i, erekir, 0.1f){{
+                hasAtmosphere = false;
+                alwaysUnlocked = true;
+                sectors.add(new Sector(this, Ptile.empty));
+                camRadius = 0.43f;
+
+                //new SectorPreset(name + "-sector", this, 0){{
+
+                //}};
+
+                meshLoader = () -> new HexMesh(this, new HexMesher(){
+                    Simplex sim = new Simplex(id);
+                    @Override
+                    public float getHeight(Vec3 position){
+                        return (float)sim.octaveNoise3D(2, 0.6, 0.3f, position.x, position.y, position.z) * 13f;
+                    }
+
+                    @Override
+                    public Color getColor(Vec3 position){
+                        return Pal.gray;
+                    }
+                }, 2, Shaders.planet);
+            }};
+        }
 
         tantros = new Planet("tantros", sun, 1, 2){{
             generator = new TantrosPlanetGenerator();

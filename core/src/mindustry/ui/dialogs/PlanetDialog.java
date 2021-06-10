@@ -25,6 +25,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
+import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.input.*;
 import mindustry.io.legacy.*;
 import mindustry.maps.*;
@@ -277,6 +278,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     void lookAt(Sector sector){
+        if(sector.tile == Ptile.empty) return;
+
         planets.camPos.set(Tmp.v33.set(sector.tile.v).rotate(Vec3.Y, -sector.planet.getRotation()));
     }
 
@@ -430,7 +433,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     boolean selectable(Planet planet){
         //TODO what if any sector is selectable?
         if(mode == planetLaunch) return launchSector != null && planet != launchSector.planet;
-        return planet == planets.planet || planet.alwaysUnlocked || planet.sectors.contains(Sector::hasBase);
+        return planet == planets.planet || (planet.alwaysUnlocked && planet.isLandable()) || planet.sectors.contains(Sector::hasBase);
     }
 
     void setup(){
@@ -543,7 +546,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public void act(float delta){
         super.act(delta);
 
-        if(hovered != null && !mobile){
+        if(hovered != null && !mobile && planets.planet.hasGrid()){
             addChild(hoverLabel);
             hoverLabel.toFront();
             hoverLabel.touchable = Touchable.disabled;
@@ -595,6 +598,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         if(planets.planet.hasGrid()){
             hovered = planets.planet.getSector(planets.cam.getMouseRay(), PlanetRenderer.outlineRad);
+        }else if(planets.planet.isLandable()){
+            //always have the first sector selected.
+            //TODO better support for multiple sectors in gridless planets?
+            hovered = selected = planets.planet.sectors.first();
         }else{
             hovered = selected = null;
         }

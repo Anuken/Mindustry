@@ -246,15 +246,17 @@ public class World{
             if(sector.preset != null){
                 sector.preset.generator.generate(tiles);
                 sector.preset.rules.get(state.rules); //apply extra rules
-            }else{
+            }else if(sector.planet.generator != null){
                 sector.planet.generator.generate(tiles, sector);
+            }else{
+                throw new RuntimeException("Sector " + sector.id + " on planet " + sector.planet.name + " has no generator or preset defined. Provide a planet generator or preset map.");
             }
             //just in case
             state.rules.sector = sector;
         });
 
         //postgenerate for bases
-        if(sector.preset == null){
+        if(sector.preset == null && sector.planet.generator != null){
             sector.planet.generator.postGenerate(tiles);
         }
 

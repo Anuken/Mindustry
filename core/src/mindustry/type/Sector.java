@@ -39,7 +39,12 @@ public class Sector{
         this.planet = planet;
         this.tile = tile;
         this.plane = new Plane();
-        this.rect = makeRect();
+        //empty sector tile needs a special rect
+        if(tile.corners.length == 0){
+            rect = new SectorRect(1f, Vec3.Zero.cpy(), Vec3.Y.cpy(), Vec3.X.cpy(), 0f);
+        }else{
+            this.rect = makeRect();
+        }
         this.id = tile.id;
     }
 

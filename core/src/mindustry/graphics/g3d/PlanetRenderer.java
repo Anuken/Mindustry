@@ -77,7 +77,7 @@ public class PlanetRenderer implements Disposable{
         cam.up.set(Vec3.Y);
 
         cam.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
-        camPos.setLength(planet.radius * camLength + (zoom-1f) * planet.radius * 2);
+        camPos.setLength((planet.radius + planet.camRadius) * camLength + (zoom-1f) * (planet.radius + planet.camRadius) * 2);
         cam.position.set(planet.position).add(camPos);
         cam.lookAt(planet.position);
         cam.update();

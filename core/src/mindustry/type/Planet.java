@@ -17,8 +17,6 @@ import mindustry.maps.generators.*;
 import static mindustry.Vars.*;
 
 public class Planet extends UnlockableContent{
-    /** Default spacing between planet orbits in world units. */
-    private static final float orbitSpacing = 11f;
     /** intersect() temp var. */
     private static final Vec3 intersectResult = new Vec3();
     /** Mesh used for rendering. Created on load() - will be null on the server! */
@@ -31,8 +29,12 @@ public class Planet extends UnlockableContent{
     public @Nullable PlanetGenerator generator;
     /** Array of sectors; directly maps to tiles in the grid. */
     public Seq<Sector> sectors = new Seq<>();
+    /** Default spacing between planet orbits in world units. This is defined per-parent! */
+    public float orbitSpacing = 11f;
     /** Radius of this planet's sphere. Does not take into account satellites. */
     public float radius;
+    /** Camera radius offset. */
+    public float camRadius;
     /** Atmosphere radius adjustment parameters. */
     public float atmosphereRadIn = 0, atmosphereRadOut = 0.3f;
     /** Orbital radius around the sun. Do not change unless you know exactly what you are doing.*/
@@ -79,10 +81,10 @@ public class Planet extends UnlockableContent{
         this.parent = parent;
 
         //total radius is initially just the radius
-        totalRadius += radius;
+        totalRadius = radius;
 
         //get orbit radius by extending past the parent's total radius
-        orbitRadius = parent == null ? 0f : (parent.totalRadius + orbitSpacing + totalRadius);
+        orbitRadius = parent == null ? 0f : (parent.totalRadius + parent.orbitSpacing + totalRadius);
 
         //orbit time is based on radius [kepler's third law]
         orbitTime = Mathf.pow(orbitRadius, 1.5f) * 1000;
@@ -130,6 +132,11 @@ public class Planet extends UnlockableContent{
     /** @return whether this planet has a sector grid to select. */
     public boolean hasGrid(){
         return grid != null && generator != null && sectors.size > 0;
+    }
+
+    /** @return whether this planet has any sectors to land on. */
+    public boolean isLandable(){
+        return sectors.size > 0;
     }
 
     public void updateTotalRadius(){
