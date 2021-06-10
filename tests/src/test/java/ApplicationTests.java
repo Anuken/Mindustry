@@ -138,40 +138,6 @@ public class ApplicationTests{
     }
 
     @Test
-    void checkInitialItems() {
-        world.loadMap(testMap);
-        logic.play();
-        for(Teams.TeamData team : state.teams.getActive()){
-            if(team.hasCore()){
-                assertTrue(team.team.items().has(Items.copper), "Has copper");
-                assertEquals(200, team.team.items().get(Items.copper.id),"Copper total number equal to initial items number");
-            }
-        }
-    }
-
-    @Test
-    void TeamsStatusTest(){
-        world.loadMap(testMap);
-        logic.play();
-        assertTrue(state.teams.isActive(state.rules.defaultTeam));
-        assertTrue(state.teams.areEnemies(state.rules.defaultTeam, state.rules.waveTeam));
-        assertFalse(state.teams.canInteract(state.rules.defaultTeam, state.rules.waveTeam));
-    }
-
-    @Test
-    void alterBlockType(){
-        world.loadMap(testMap);
-        state.set(State.playing);
-
-        world.tile(0, 0).setBlock(Blocks.liquidSource);
-        world.tile(0, 0).build.configureAny(Liquids.water);
-        assertEquals(world.tile(0, 0).build.liquids.current(), Liquids.water);
-
-        world.tile(0,0).setBlock(Blocks.conveyor);
-        assertEquals(world.tile(0, 0).block(), Blocks.conveyor);
-    }
-
-    @Test
     void createMap(){
         Tiles tiles = world.resize(8, 8);
 
@@ -330,11 +296,24 @@ public class ApplicationTests{
         world.tile(2, 1).setBlock(Blocks.liquidTank, Team.sharded);
 
         updateBlocks(1);
-        assertTrue(world.tile(2, 1).build.liquids.currentAmount() > 0);
+        assertTrue(world.tile(2, 1).build.liquids.currentAmount() > 0f);
 
         world.tile(2, 1).build.liquids.clear();
 
-        assertTrue(world.tile(2, 1).build.liquids.currentAmount() == 0);
+        assertEquals(0f, world.tile(2, 1).build.liquids.currentAmount());
+    }
+
+    @Test
+    void manuallyAddLiquidTest(){
+        world.loadMap(testMap);
+        state.set(State.playing);
+
+        world.tile(2, 1).setBlock(Blocks.liquidTank, Team.sharded);
+        assertEquals(0f, world.tile(2, 1).build.liquids.currentAmount());
+
+        // Manually add liquid amount over the liquidTank capacity. Expect to have an amount equal to 1500f, but fail.
+        world.tile(2,1).build.liquids.add(Liquids.water,  1600f);
+        assertEquals(1500f, world.tile(2, 1).build.liquids.currentAmount());
     }
 
     @Test
