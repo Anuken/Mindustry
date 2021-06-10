@@ -593,7 +593,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
         }
 
-        if(planets.planet.isLandable()){
+        if(planets.planet.hasGrid()){
             hovered = planets.planet.getSector(planets.cam.getMouseRay(), PlanetRenderer.outlineRad);
         }else{
             hovered = selected = null;

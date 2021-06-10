@@ -494,24 +494,20 @@ public class Blocks implements ContentList{
             wall = sporeWall;
         }};
 
-        metalFloor = new MetalFloor("metal-floor"){{
-            variants = 0;
-            attributes.set(Attribute.water, -1f);
-        }};
+        metalFloor = new Floor("metal-floor", 0);
+        metalFloorDamaged = new Floor("metal-floor-damaged", 3);
 
-        metalFloorDamaged = new MetalFloor("metal-floor-damaged", 3);
+        metalFloor2 = new Floor("metal-floor-2", 0);
+        metalFloor3 = new Floor("metal-floor-3", 0);
+        metalFloor4 = new Floor("metal-floor-4", 0);
+        metalFloor5 = new Floor("metal-floor-5", 0);
 
-        metalFloor2 = new MetalFloor("metal-floor-2");
-        metalFloor3 = new MetalFloor("metal-floor-3");
-        metalFloor4 = new MetalFloor("metal-floor-4");
-        metalFloor5 = new MetalFloor("metal-floor-5");
-
-        darkPanel1 = new MetalFloor("dark-panel-1");
-        darkPanel2 = new MetalFloor("dark-panel-2");
-        darkPanel3 = new MetalFloor("dark-panel-3");
-        darkPanel4 = new MetalFloor("dark-panel-4");
-        darkPanel5 = new MetalFloor("dark-panel-5");
-        darkPanel6 = new MetalFloor("dark-panel-6");
+        darkPanel1 = new Floor("dark-panel-1", 0);
+        darkPanel2 = new Floor("dark-panel-2", 0);
+        darkPanel3 = new Floor("dark-panel-3", 0);
+        darkPanel4 = new Floor("dark-panel-4", 0);
+        darkPanel5 = new Floor("dark-panel-5", 0);
+        darkPanel6 = new Floor("dark-panel-6", 0);
 
         darkMetal = new StaticWall("dark-metal");
 
@@ -757,6 +753,7 @@ public class Blocks implements ContentList{
             outputLiquid = new LiquidStack(Liquids.slag, 2f);
             craftTime = 10f;
             hasLiquids = hasPower = true;
+            drawer = new DrawLiquid();
 
             consumes.power(1f);
             consumes.item(Items.scrap, 1);

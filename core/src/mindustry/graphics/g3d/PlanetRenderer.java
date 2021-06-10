@@ -149,7 +149,7 @@ public class PlanetRenderer implements Disposable{
     public void renderTransparent(Planet planet){
         if(!planet.visible()) return;
 
-        if(planet.isLandable() && planet == this.planet){
+        if(planet.hasGrid() && planet == this.planet){
             renderSectors(planet);
         }
 
