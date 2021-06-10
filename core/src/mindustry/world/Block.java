@@ -46,6 +46,7 @@ public class Block extends UnlockableContent{
     public boolean outputsPayload = false;
     public boolean acceptsPayload = false;
     public boolean outputFacing = true;
+    public boolean noSideBlend = false;
     public boolean acceptsItems = false;
 
     public int itemCapacity = 10;
