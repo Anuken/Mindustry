@@ -707,6 +707,11 @@ public class ContentParser{
                     node.objectives.addAll(parser.readValue(Objective[].class, research.get("objectives")));
                 }
 
+                //all items have a produce requirement unless already specified
+                if(object instanceof Item i && !node.objectives.contains(o -> o instanceof Produce p && p.content == i)){
+                    node.objectives.add(new Produce(i));
+                }
+
                 //remove old node from parent
                 if(node.parent != null){
                     node.parent.children.remove(node);
