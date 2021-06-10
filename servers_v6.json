@@ -1,9 +1,5 @@
 [
   {
-    "name": "RCM",
-    "address": ["185.104.248.61", "easyplay.su"]
-  },
-  {
     "name": "SMokeOfAnarchy.duckdns.org",
     "address": ["smokeofanarchy.duckdns.org:6853"]
   },
@@ -22,6 +18,10 @@
   {
     "name": "C.A.M.S.",
     "address": ["routerchain.ddns.net", "nikochio.ddns.net", "play.thedimas.pp.ua"]
+  },
+  {
+    "name": "RCM",
+    "address": ["185.104.248.61", "easyplay.su"]
   },
   {
     "name": "BE6.RUN",
