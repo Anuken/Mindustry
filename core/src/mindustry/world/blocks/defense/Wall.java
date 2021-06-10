@@ -15,8 +15,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Wall extends Block{
-    public int variants = 0;
-
     /** Lighting chance. -1 to disable */
     public float lightningChance = -1f;
     public float lightningDamage = 20f;
@@ -48,20 +46,6 @@ public class Wall extends Block{
         if(lightningChance > 0f){
             stats.add(Stat.lightningChance, lightningChance * 100f, StatUnit.percent);
             stats.add(Stat.lightningDamage, lightningDamage, StatUnit.none);
-        }
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        if(variants != 0){
-            variantRegions = new TextureRegion[variants];
-
-            for(int i = 0; i < variants; i++){
-                variantRegions[i] = Core.atlas.find(name + (i + 1));
-            }
-            region = variantRegions[0];
         }
     }
 
