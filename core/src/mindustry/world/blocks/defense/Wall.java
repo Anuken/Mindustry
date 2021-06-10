@@ -59,11 +59,7 @@ public class Wall extends Block{
 
         @Override
         public void draw(){
-            if(variants == 0){
-                Draw.rect(region, x, y);
-            }else{
-                Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], x, y);
-            }
+            super.draw();
 
             //draw flashing white overlay if enabled
             if(flashHit){

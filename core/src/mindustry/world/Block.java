@@ -863,6 +863,13 @@ public class Block extends UnlockableContent{
             mapColor.set(image.get(image.width/2, image.height/2));
         }
 
+        if(variants > 0){
+            for(int i = 0; i < variants; i++){
+                String rname = name + (i + 1);
+                packer.add(PageType.editor, "editor-" + rname, Core.atlas.getPixmap(rname));
+            }
+        }
+
         Pixmap last = null;
 
         var gen = icons();
