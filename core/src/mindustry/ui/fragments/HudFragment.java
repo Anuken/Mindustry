@@ -322,7 +322,7 @@ public class HudFragment extends Fragment{
                 }
                 return max == 0f ? 0f : val / max;
             }).blink(Color.white).outline(new Color(0, 0, 0, 0.6f), 7f)).grow())
-            .fillX().width(320f).height(60f).name("boss").visible(() -> state.rules.waves && state.boss() != null).padTop(7).row();
+            .fillX().width(320f).height(60f).name("boss").visible(() -> state.rules.waves && state.boss() != null && !(mobile && Core.graphics.isPortrait())).padTop(7).row();
 
             t.table(Styles.black3, p -> p.margin(4).label(() -> hudText).style(Styles.outlineLabel)).touchable(Touchable.disabled).with(p -> p.visible(() -> {
                 p.color.a = Mathf.lerpDelta(p.color.a, Mathf.num(showHudText), 0.2f);
