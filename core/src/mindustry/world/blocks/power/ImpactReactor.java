@@ -40,6 +40,8 @@ public class ImpactReactor extends PowerGenerator{
         hasItems = true;
         outputsPower = consumesPower = true;
         flags = EnumSet.of(BlockFlag.reactor, BlockFlag.generator);
+        lightRadius = 115f;
+        emitLight = true;
     }
 
     @Override
