@@ -151,11 +151,6 @@ public class ContentLoader{
         ColorMapper.load();
     }
 
-    public void dispose(){
-        initialize(Content::dispose);
-        clear();
-    }
-
     /** Get last piece of content created for error-handling purposes. */
     public @Nullable Content getLastAdded(){
         return lastAdded;

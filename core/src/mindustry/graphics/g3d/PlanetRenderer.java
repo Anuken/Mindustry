@@ -173,8 +173,8 @@ public class PlanetRenderer implements Disposable{
         }
 
         batch.proj(cam.combined);
-        renderOrbit(planet);
 
+        renderOrbit(planet);
     }
 
     public void renderOrbit(Planet planet){

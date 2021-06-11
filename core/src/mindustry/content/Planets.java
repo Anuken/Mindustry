@@ -1,8 +1,10 @@
 package mindustry.content;
 
 import arc.graphics.*;
+import arc.math.*;
 import arc.math.geom.*;
-import arc.util.noise.*;
+import arc.struct.*;
+import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
@@ -85,18 +87,18 @@ public class Planets implements ContentList{
                     }
                 };
 
-                meshLoader = () -> new HexMesh(this, new HexMesher(){
-                    Simplex sim = new Simplex(id);
-                    @Override
-                    public float getHeight(Vec3 position){
-                        return (float)sim.octaveNoise3D(2, 0.55, 0.45f, 5f + position.x, 5f + position.y, 5f + position.z) * 14f;
+                meshLoader = () -> {
+                    Seq<GenericMesh> meshes = new Seq<>();
+
+                    meshes.add(new NoiseMesh(this, 0, 2, Pal.gray, radius, 2, 0.55f, 0.45f, 14f));
+                    int am = Mathf.random(3, 6);
+
+                    for(int j = 0; j < am; j++){
+                        meshes.add(new MatMesh(new NoiseMesh(this, j + 1, 1, Pal.gray, 0.025f + Mathf.random(0.046f), 2, 0.6f, 0.38f, 20f), new Mat3D().setToTranslation(Tmp.v31.setToRandomDirection().setLength(Mathf.random(0.3f, 1.3f)))));
                     }
 
-                    @Override
-                    public Color getColor(Vec3 position){
-                        return Pal.gray;
-                    }
-                }, 2, Shaders.planet);
+                    return new MultiMesh(meshes.toArray(GenericMesh.class));
+                };
             }};
         }
 

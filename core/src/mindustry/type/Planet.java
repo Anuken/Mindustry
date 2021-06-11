@@ -20,7 +20,7 @@ public class Planet extends UnlockableContent{
     /** intersect() temp var. */
     private static final Vec3 intersectResult = new Vec3();
     /** Mesh used for rendering. Created on load() - will be null on the server! */
-    public @Nullable PlanetMesh mesh;
+    public @Nullable GenericMesh mesh;
     /** Position in global coordinates. Will be 0,0,0 until the Universe updates it. */
     public Vec3 position = new Vec3();
     /** Grid used for the sectors on the planet. Null if this planet can't be landed on. */
@@ -76,7 +76,7 @@ public class Planet extends UnlockableContent{
     /** Satellites orbiting this planet. */
     public Seq<Satellite> satellites = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
-    protected Prov<PlanetMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2);
+    protected Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2);
 
     public Planet(String name, Planet parent, float radius){
         super(name);
@@ -217,9 +217,6 @@ public class Planet extends UnlockableContent{
 
     /** Regenerates the planet mesh. For debugging only. */
     public void reloadMesh(){
-        if(mesh != null){
-            mesh.dispose();
-        }
         mesh = meshLoader.get();
     }
 
@@ -247,14 +244,6 @@ public class Planet extends UnlockableContent{
             updateBaseCoverage();
         }
 
-    }
-
-    @Override
-    public void dispose(){
-        if(mesh != null){
-            mesh.dispose();
-            mesh = null;
-        }
     }
 
     /** Gets a sector a tile position. */
