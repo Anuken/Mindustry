@@ -139,8 +139,6 @@ public class PlanetRenderer implements Disposable{
         //render planet at offsetted position in the world
         planet.draw(cam.combined, planet.getTransform(mat));
 
-        renderOrbit(planet);
-
         for(Planet child : planet.children){
             renderPlanet(child);
         }
@@ -173,6 +171,8 @@ public class PlanetRenderer implements Disposable{
         for(Planet child : planet.children){
             renderTransparent(child);
         }
+
+        renderOrbit(planet);
     }
 
     public void renderOrbit(Planet planet){

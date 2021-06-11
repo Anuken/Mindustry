@@ -606,7 +606,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             //autoshow
             if(wasNull){
-                Log.info("was null, updating selected");
                 updateSelected();
             }
         }else{

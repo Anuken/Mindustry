@@ -89,7 +89,7 @@ public class Planets implements ContentList{
                     Simplex sim = new Simplex(id);
                     @Override
                     public float getHeight(Vec3 position){
-                        return (float)sim.octaveNoise3D(2, 0.6, 0.3f, position.x, position.y, position.z) * 13f;
+                        return (float)sim.octaveNoise3D(2, 0.55, 0.45f, 5f + position.x, 5f + position.y, 5f + position.z) * 14f;
                     }
 
                     @Override
