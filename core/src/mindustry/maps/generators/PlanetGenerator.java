@@ -124,6 +124,11 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         return 3200;
     }
 
+    public int getSectorSize(Sector sector){
+        int res = (int)(sector.rect.radius * getSizeScl());
+        return res % 2 == 0 ? res : res + 1;
+    }
+
     public void generate(Tiles tiles, Sector sec){
         this.tiles = tiles;
         this.sector = sec;

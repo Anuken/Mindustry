@@ -45,12 +45,16 @@ public class Planet extends UnlockableContent{
     public float orbitTime;
     /** Time for the planet to perform a full revolution, in seconds. One day. */
     public float rotateTime = 24f * 60f;
+    /** Random orbit angle offset to prevent planets from starting out in a line. */
+    public float orbitOffset;
     /** Approx. radius of one sector. */
     public float sectorApproxRadius;
     /** Whether this planet is tidally locked relative to its parent - see https://en.wikipedia.org/wiki/Tidal_locking */
     public boolean tidalLock = false;
     /** Whether or not this planet is listed in the planet access UI. **/
     public boolean accessible = true;
+    /** If true, a day/night cycle is simulated. */
+    public boolean updateLighting = true;
     /** The default starting sector displayed to the map dialog. */
     public int startSector = 0;
     /** Whether the bloom render effect is enabled. */
@@ -79,6 +83,7 @@ public class Planet extends UnlockableContent{
 
         this.radius = radius;
         this.parent = parent;
+        this.orbitOffset = Mathf.randomSeed(id, 360);
 
         //total radius is initially just the radius
         totalRadius = radius;
@@ -153,9 +158,7 @@ public class Planet extends UnlockableContent{
 
     /** Calculates orbital rotation based on universe time.*/
     public float getOrbitAngle(){
-        //applies random offset to prevent planets from starting out in a line
-        float offset = Mathf.randomSeed(id, 360);
-        return (offset + universe.secondsf() / (orbitTime / 360f)) % 360f;
+        return (orbitOffset + universe.secondsf() / (orbitTime / 360f)) % 360f;
     }
 
     /** Calulates rotation on own axis based on universe time.*/

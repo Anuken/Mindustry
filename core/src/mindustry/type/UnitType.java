@@ -307,6 +307,10 @@ public class UnitType extends UnlockableContent{
             immunities.add(StatusEffects.wet);
         }
 
+        if(flying){
+            envEnabled |= Env.space;
+        }
+
         if(lightRadius == -1){
             lightRadius = Math.max(60f, hitSize * 2.3f);
         }

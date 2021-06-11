@@ -153,9 +153,7 @@ public class Sector{
 
     /** @return the sector size, in tiles */
     public int getSize(){
-        if(planet.generator == null) return 1;
-        int res = (int)(rect.radius * planet.generator.getSizeScl());
-        return res % 2 == 0 ? res : res + 1;
+        return planet.generator == null ? 1 : planet.generator.getSectorSize(this);
     }
 
     public void removeItems(ItemSeq items){

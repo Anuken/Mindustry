@@ -82,7 +82,7 @@ public class Universe{
             }
         }
 
-        if(state.hasSector()){
+        if(state.hasSector() && state.getSector().planet.updateLighting){
             //update sector light
             float light = state.getSector().getLight();
             float alpha = Mathf.clamp(Mathf.map(light, 0f, 0.8f, 0.3f, 1f));

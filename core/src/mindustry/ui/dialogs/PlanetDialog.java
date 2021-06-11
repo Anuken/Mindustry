@@ -599,9 +599,16 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(planets.planet.hasGrid()){
             hovered = planets.planet.getSector(planets.cam.getMouseRay(), PlanetRenderer.outlineRad);
         }else if(planets.planet.isLandable()){
+            boolean wasNull = selected == null;
             //always have the first sector selected.
             //TODO better support for multiple sectors in gridless planets?
             hovered = selected = planets.planet.sectors.first();
+
+            //autoshow
+            if(wasNull){
+                Log.info("was null, updating selected");
+                updateSelected();
+            }
         }else{
             hovered = selected = null;
         }
@@ -858,13 +865,17 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 if(launching){
                     stable.color.sub(0, 0, 0, 0.05f * Time.delta);
                 }else{
-                    //fade out UI when not facing selected sector
-                    Tmp.v31.set(selected.tile.v).rotate(Vec3.Y, -planets.planet.getRotation()).scl(-1f).nor();
-                    float dot = planets.cam.direction.dot(Tmp.v31);
-                    stable.color.a = Math.max(dot, 0f)*2f;
-                    if(dot*2f <= -0.1f){
-                        selected = null;
-                        updateSelected();
+                    if(!planets.planet.hasGrid()){
+                        stable.color.a = 1f;
+                    }else{
+                        //fade out UI when not facing selected sector
+                        Tmp.v31.set(selected.tile.v).rotate(Vec3.Y, -planets.planet.getRotation()).scl(-1f).nor();
+                        float dot = planets.cam.direction.dot(Tmp.v31);
+                        stable.color.a = Math.max(dot, 0f)*2f;
+                        if(dot*2f <= -0.1f){
+                            selected = null;
+                            updateSelected();
+                        }
                     }
                 }
             }

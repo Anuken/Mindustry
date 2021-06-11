@@ -4,11 +4,16 @@ import arc.graphics.*;
 import arc.math.geom.*;
 import arc.util.noise.*;
 import mindustry.ctype.*;
+import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
+import mindustry.maps.generators.*;
 import mindustry.maps.planet.*;
 import mindustry.type.*;
+import mindustry.world.meta.*;
+
+import static mindustry.Vars.*;
 
 public class Planets implements ContentList{
     public static Planet
@@ -51,13 +56,34 @@ public class Planets implements ContentList{
         for(int i = 0; i < 4; i++){
             new Planet("gier-" + i, erekir, 0.1f){{
                 hasAtmosphere = false;
+                //for testing only!
                 alwaysUnlocked = true;
+                updateLighting = false;
                 sectors.add(new Sector(this, Ptile.empty));
                 camRadius = 0.43f;
+                orbitOffset = 0f;
 
                 //new SectorPreset(name + "-sector", this, 0){{
 
                 //}};
+
+                generator = new BlankPlanetGenerator(){
+                    @Override
+                    public void generate(){
+                        pass((x, y) -> {
+                            floor = Blocks.space;
+                        });
+
+                        Schematics.placeLaunchLoadout(width/2, height/2);
+
+                        state.rules.environment = Env.space;
+                    }
+
+                    @Override
+                    public int getSectorSize(Sector sector){
+                        return 300;
+                    }
+                };
 
                 meshLoader = () -> new HexMesh(this, new HexMesher(){
                     Simplex sim = new Simplex(id);
