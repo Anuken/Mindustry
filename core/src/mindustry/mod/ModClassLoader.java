@@ -13,7 +13,10 @@ public class ModClassLoader extends ClassLoader{
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException{
         //a child may try to delegate class loading to its parent, which is *this class loader* - do not let that happen
-        if(inChild) throw new ClassNotFoundException(name);
+        if(inChild){
+            inChild = false;
+            throw new ClassNotFoundException(name);
+        }
 
         ClassNotFoundException last = null;
         int size = children.size;
