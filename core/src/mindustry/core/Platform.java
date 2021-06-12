@@ -33,7 +33,7 @@ public interface Platform{
                         loadedClass = findClass(name);
                     }catch(ClassNotFoundException e){
                         //use parent if not found
-                        loadedClass = super.loadClass(name, resolve);
+                        return parent.loadClass(name);
                     }
                 }
 
