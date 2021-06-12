@@ -16,6 +16,11 @@ public class BlockUnloader extends BlockLoader{
         return true;
     }
 
+    @Override
+    public boolean rotatedOutput(int x, int y){
+        return false;
+    }
+
     public class BlockUnloaderBuild extends BlockLoaderBuild{
 
         @Override

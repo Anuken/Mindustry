@@ -407,10 +407,10 @@ public class BulletType extends Content implements Cloneable{
             if(status == StatusEffects.none){
                 status = StatusEffects.shocked;
             }
+        }
 
-            if(lightningType == null){
-                lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
-            }
+        if(lightningType == null){
+            lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
         }
     }
 

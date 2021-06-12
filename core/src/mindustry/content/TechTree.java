@@ -709,7 +709,7 @@ public class TechTree implements ContentList{
         /** Item requirements for this content. */
         public ItemStack[] requirements;
         /** Requirements that have been fulfilled. Always the same length as the requirement array. */
-        public final ItemStack[] finishedRequirements;
+        public ItemStack[] finishedRequirements;
         /** Extra objectives needed to research this. */
         public Seq<Objective> objectives = new Seq<>();
         /** Nodes that depend on this node. */
@@ -720,14 +720,8 @@ public class TechTree implements ContentList{
 
             this.parent = parent;
             this.content = content;
-            this.requirements = requirements;
             this.depth = parent == null ? 0 : parent.depth + 1;
-            this.finishedRequirements = new ItemStack[requirements.length];
-
-            //load up the requirements that have been finished if settings are available
-            for(int i = 0; i < requirements.length; i++){
-                finishedRequirements[i] = new ItemStack(requirements[i].item, Core.settings == null ? 0 : Core.settings.getInt("req-" + content.name + "-" + requirements[i].item.name));
-            }
+            setupRequirements(requirements);
 
             var used = new ObjectSet<Content>();
 
@@ -740,6 +734,16 @@ public class TechTree implements ContentList{
 
             map.put(content, this);
             all.add(this);
+        }
+
+        public void setupRequirements(ItemStack[] requirements){
+            this.requirements = requirements;
+            this.finishedRequirements = new ItemStack[requirements.length];
+
+            //load up the requirements that have been finished if settings are available
+            for(int i = 0; i < requirements.length; i++){
+                finishedRequirements[i] = new ItemStack(requirements[i].item, Core.settings == null ? 0 : Core.settings.getInt("req-" + content.name + "-" + requirements[i].item.name));
+            }
         }
 
         /** Resets finished requirements and saves. */

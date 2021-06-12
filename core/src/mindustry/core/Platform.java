@@ -20,9 +20,29 @@ import static mindustry.Vars.*;
 
 public interface Platform{
 
-    /** Dynamically creates a class loader for a jar file. */
+    /** Dynamically creates a class loader for a jar file. This loader must be child-first. */
     default ClassLoader loadJar(Fi jar, ClassLoader parent) throws Exception{
-        return new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, parent);
+        return new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, parent){
+            @Override
+            protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException{
+                //check for loaded state
+                Class<?> loadedClass = findLoadedClass(name);
+                if(loadedClass == null){
+                    try{
+                        //try to load own class first
+                        loadedClass = findClass(name);
+                    }catch(ClassNotFoundException e){
+                        //use parent if not found
+                        loadedClass = super.loadClass(name, resolve);
+                    }
+                }
+
+                if(resolve){
+                    resolveClass(loadedClass);
+                }
+                return loadedClass;
+            }
+        };
     }
 
     /** Steam: Update lobby visibility.*/

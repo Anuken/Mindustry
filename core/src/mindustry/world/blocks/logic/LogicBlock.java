@@ -174,6 +174,7 @@ public class LogicBlock extends Block{
         public boolean active = true, valid;
         public int x, y;
         public String name;
+        Building lastBuild;
 
         public LogicLink(int x, int y, String name, boolean valid){
             this.x = x;
@@ -405,20 +406,22 @@ public class LogicBlock extends Block{
 
                     if(!l.active) continue;
 
-                    boolean valid = validLink(world.build(l.x, l.y));
-                    if(valid != l.valid){
+                    var cur = world.build(l.x, l.y);
+
+                    boolean valid = validLink(cur);
+                    if(valid != l.valid || (l.lastBuild != null && l.lastBuild != cur)){
+                        l.lastBuild = cur;
                         changed = true;
                         l.valid = valid;
                         if(valid){
-                            Building lbuild = world.build(l.x, l.y);
 
                             //this prevents conflicts
                             l.name = "";
                             //finds a new matching name after toggling
-                            l.name = findLinkName(lbuild.block);
+                            l.name = findLinkName(cur.block);
 
                             //remove redundant links
-                            links.removeAll(o -> world.build(o.x, o.y) == lbuild && o != l);
+                            links.removeAll(o -> world.build(o.x, o.y) == cur && o != l);
 
                             //break to prevent concurrent modification
                             updates = true;

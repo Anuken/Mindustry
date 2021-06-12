@@ -79,16 +79,14 @@ public class DuctBridge extends Block{
         Placement.calculateNodes(points, this, rotation, (point, other) -> Math.max(Math.abs(point.x - other.x), Math.abs(point.y - other.y)) <= range);
     }
 
-    @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid){
-        super.drawPlace(x, y, rotation, valid);
-
+    public void drawPlace(int x, int y, int rotation, boolean valid, boolean line){
         int length = range;
         Building found = null;
+        int dx = Geometry.d4x(rotation), dy = Geometry.d4y(rotation);
 
         //find the link
         for(int i = 1; i <= range; i++){
-            Tile other = world.tile(x + Geometry.d4x(rotation) * i, y + Geometry.d4y(rotation) * i);
+            Tile other = world.tile(x + dx * i, y + dy * i);
 
             if(other != null && other.build instanceof DuctBridgeBuild build && build.team == player.team()){
                 length = i;
@@ -97,17 +95,29 @@ public class DuctBridge extends Block{
             }
         }
 
-        Drawf.dashLine(Pal.placing,
-            x * tilesize + Geometry.d4[rotation].x * (tilesize / 2f + 2),
-            y * tilesize + Geometry.d4[rotation].y * (tilesize / 2f + 2),
-            x * tilesize + Geometry.d4[rotation].x * (length) * tilesize,
-            y * tilesize + Geometry.d4[rotation].y * (length) * tilesize
-        );
-
-        if(found != null){
-            Drawf.square(found.x, found.y, found.block.size * tilesize/2f + 2.5f, 0f);
+        if(line || found != null){
+            Drawf.dashLine(Pal.placing,
+            x * tilesize + dx * (tilesize / 2f + 2),
+            y * tilesize + dy * (tilesize / 2f + 2),
+            x * tilesize + dx * (length) * tilesize,
+            y * tilesize + dy * (length) * tilesize
+            );
         }
 
+        if(found != null){
+            if(line){
+                Drawf.square(found.x, found.y, found.block.size * tilesize/2f + 2.5f, 0f);
+            }else{
+                Drawf.square(found.x, found.y, 2f);
+            }
+        }
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
+        drawPlace(x, y, rotation, valid, true);
     }
 
     public void drawBridge(int rotation, float x1, float y1, float x2, float y2){
@@ -153,6 +163,41 @@ public class DuctBridge extends Block{
             if(link != null){
                 Draw.z(Layer.power);
                 drawBridge(rotation, x, y, link.x, link.y);
+            }
+        }
+
+        @Override
+        public void drawSelect(){
+            drawPlace(tile.x, tile.y, rotation, true, false);
+            //draw incoming bridges
+            for(int dir = 0; dir < 4; dir++){
+                if(dir != rotation){
+                    int dx = Geometry.d4x(dir), dy = Geometry.d4y(dir);
+                    int length = range;
+                    Building found = null;
+
+                    //find the link
+                    for(int i = 1; i <= range; i++){
+                        Tile other = world.tile(tile.x + dx * i, tile.y + dy * i);
+
+                        if(other != null && other.build instanceof DuctBridgeBuild build && build.team == player.team() && (build.rotation + 2) % 4 == dir){
+                            length = i;
+                            found = other.build;
+                            break;
+                        }
+                    }
+
+                    if(found != null){
+                        Drawf.dashLine(Pal.place,
+                        found.x - dx * (tilesize / 2f + 2),
+                        found.y - dy * (tilesize / 2f + 2),
+                        found.x - dx * (length) * tilesize,
+                        found.y - dy * (length) * tilesize
+                        );
+
+                        Drawf.square(found.x, found.y, 2f, 45f, Pal.place);
+                    }
+                }
             }
         }
 

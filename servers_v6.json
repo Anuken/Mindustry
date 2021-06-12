@@ -1,7 +1,7 @@
 [
   {
-    "name": "RCR",
-    "address": ["185.104.248.61"]
+    "name": "RCM",
+    "address": ["185.104.248.61", "easyplay.su"]
   },
   {
     "name": "SMokeOfAnarchy.duckdns.org",
@@ -21,7 +21,7 @@
   },
   {
     "name": "C.A.M.S.",
-    "address": ["routerchain.ddns.net", "nikochio.ddns.net", "easyplay.su", "play.thedimas.pp.ua"]
+    "address": ["routerchain.ddns.net", "nikochio.ddns.net", "play.thedimas.pp.ua"]
   },
   {
     "name": "BE6.RUN",
@@ -101,7 +101,7 @@
   },
   {
     "name": "Sakura", 
-    "address": ["160.16.207.141"]
+    "address": ["160.16.207.141", "160.16.207.141:21527", "160.16.207.141:31587"]
   },
   {
     "name": "MeowLand",

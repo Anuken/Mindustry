@@ -3,9 +3,7 @@ package mindustry.world.meta;
 import arc.struct.ObjectMap.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.type.*;
-import mindustry.world.blocks.environment.*;
 
 /** Hold and organizes a list of block stats. */
 public class Stats{
@@ -68,11 +66,7 @@ public class Stats{
     }
 
     public void add(Stat stat, Attribute attr, boolean floating, float scale, boolean startZero){
-        for(var block : Vars.content.blocks()
-            .select(block -> block instanceof Floor f && f.attributes.get(attr) != 0 && !(f.isLiquid && !floating))
-            .<Floor>as().with(s -> s.sort(f -> f.attributes.get(attr)))){
-            add(stat, StatValues.floorEfficiency(block, block.attributes.get(attr) * scale, startZero));
-        }
+        add(stat, StatValues.floors(attr, floating, scale, startZero));
     }
 
     /** Adds a single string value with this stat. */

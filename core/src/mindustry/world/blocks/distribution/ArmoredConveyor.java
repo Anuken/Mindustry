@@ -8,6 +8,7 @@ public class ArmoredConveyor extends Conveyor{
 
     public ArmoredConveyor(String name){
         super(name);
+        noSideBlend = true;
     }
 
     @Override

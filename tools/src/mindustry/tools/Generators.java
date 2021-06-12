@@ -220,7 +220,7 @@ public class Generators{
 
                 TextureRegion[] regions = block.getGeneratedIcons();
 
-                if(block instanceof Floor){
+                if(block.variants > 0){
                     for(TextureRegion region : block.variantRegions()){
                         GenRegion gen = (GenRegion)region;
                         if(gen.path == null) continue;

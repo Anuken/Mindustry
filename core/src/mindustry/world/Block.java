@@ -46,6 +46,7 @@ public class Block extends UnlockableContent{
     public boolean outputsPayload = false;
     public boolean acceptsPayload = false;
     public boolean outputFacing = true;
+    public boolean noSideBlend = false;
     public boolean acceptsItems = false;
 
     public int itemCapacity = 10;
@@ -77,6 +78,8 @@ public class Block extends UnlockableContent{
     public boolean solidifes;
     /** whether this is rotateable */
     public boolean rotate;
+    /** number of different variant regions to use */
+    public int variants = 0;
     /** whether to draw a rotation arrow - this does not apply to lines of blocks */
     public boolean drawArrow = true;
     /** for static blocks only: if true, tile data() is saved in world data. */
@@ -239,11 +242,11 @@ public class Block extends UnlockableContent{
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
     protected TextureRegion[] generatedIcons;
-    protected TextureRegion[] variantRegions, editorVariantRegions;
+    protected TextureRegion[] editorVariantRegions;
 
     public TextureRegion region, editorIcon;
     public @Load("@-team") TextureRegion teamRegion;
-    public TextureRegion[] teamRegions;
+    public TextureRegion[] teamRegions, variantRegions;
 
     protected static final Seq<Tile> tempTiles = new Seq<>();
     protected static final Seq<Building> tempTileEnts = new Seq<>();
@@ -263,7 +266,11 @@ public class Block extends UnlockableContent{
         if(tile.build != null){
             tile.build.draw();
         }else{
-            Draw.rect(region, tile.drawx(), tile.drawy());
+            if(variants == 0){
+                Draw.rect(region, tile.drawx(), tile.drawy());
+            }else{
+                Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.drawx(), tile.drawy());
+            }
         }
     }
 
@@ -587,7 +594,8 @@ public class Block extends UnlockableContent{
 
     protected TextureRegion[] icons(){
         //use team region in vanilla team blocks
-        return teamRegion.found() && minfo.mod == null ? new TextureRegion[]{region, teamRegions[Team.sharded.id]} : new TextureRegion[]{region};
+        TextureRegion r = variants > 0 ? Core.atlas.find(name + "1") : region;
+        return teamRegion.found() && minfo.mod == null ? new TextureRegion[]{r, teamRegions[Team.sharded.id]} : new TextureRegion[]{r};
     }
 
     public TextureRegion[] getGeneratedIcons(){
@@ -830,6 +838,15 @@ public class Block extends UnlockableContent{
         for(Team team : Team.all){
             teamRegions[team.id] = teamRegion.found() ? Core.atlas.find(name + "-team-" + team.name, teamRegion) : teamRegion;
         }
+
+        if(variants != 0){
+            variantRegions = new TextureRegion[variants];
+
+            for(int i = 0; i < variants; i++){
+                variantRegions[i] = Core.atlas.find(name + (i + 1));
+            }
+            region = variantRegions[0];
+        }
     }
 
     @Override
@@ -844,6 +861,13 @@ public class Block extends UnlockableContent{
         if(!synthetic()){
             PixmapRegion image = Core.atlas.getPixmap(fullIcon);
             mapColor.set(image.get(image.width/2, image.height/2));
+        }
+
+        if(variants > 0){
+            for(int i = 0; i < variants; i++){
+                String rname = name + (i + 1);
+                packer.add(PageType.editor, "editor-" + rname, Core.atlas.getPixmap(rname));
+            }
         }
 
         Pixmap last = null;

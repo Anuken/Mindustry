@@ -76,7 +76,7 @@ public class RepairPoint extends Block{
     public void init(){
         if(acceptCoolant){
             hasLiquids = true;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, coolantUse)).optional(true, true);
+            consumes.add(new ConsumeCoolant(coolantUse)).optional(true, true);
         }
 
         consumes.powerCond(powerUse, (RepairPointBuild entity) -> entity.target != null);

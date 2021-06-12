@@ -40,7 +40,7 @@ public class Blocks implements ContentList{
     dacite,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, grass, salt,
-    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
+    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
 
@@ -372,10 +372,6 @@ public class Blocks implements ContentList{
             variants = 3;
         }};
 
-        //glowBlob = new Prop("glowblob"){{
-        //    variants = 1;
-        //}};
-
         boulder = new Prop("boulder"){{
             variants = 2;
             stone.asFloor().decoration = this;
@@ -414,32 +410,20 @@ public class Blocks implements ContentList{
             wall = sporeWall;
         }};
 
-        metalFloor = new Floor("metal-floor"){{
-            variants = 0;
-        }};
+        metalFloor = new Floor("metal-floor", 0);
+        metalFloorDamaged = new Floor("metal-floor-damaged", 3);
 
-        metalFloorDamaged = new Floor("metal-floor-damaged"){{
-            variants = 3;
-        }};
+        metalFloor2 = new Floor("metal-floor-2", 0);
+        metalFloor3 = new Floor("metal-floor-3", 0);
+        metalFloor4 = new Floor("metal-floor-4", 0);
+        metalFloor5 = new Floor("metal-floor-5", 0);
 
-        metalFloor2 = new Floor("metal-floor-2"){{
-            variants = 0;
-        }};
-
-        metalFloor3 = new Floor("metal-floor-3"){{
-            variants = 0;
-        }};
-
-        metalFloor5 = new Floor("metal-floor-5"){{
-            variants = 0;
-        }};
-
-        darkPanel1 = new Floor("dark-panel-1"){{ variants = 0; }};
-        darkPanel2 = new Floor("dark-panel-2"){{ variants = 0; }};
-        darkPanel3 = new Floor("dark-panel-3"){{ variants = 0; }};
-        darkPanel4 = new Floor("dark-panel-4"){{ variants = 0; }};
-        darkPanel5 = new Floor("dark-panel-5"){{ variants = 0; }};
-        darkPanel6 = new Floor("dark-panel-6"){{ variants = 0; }};
+        darkPanel1 = new Floor("dark-panel-1", 0);
+        darkPanel2 = new Floor("dark-panel-2", 0);
+        darkPanel3 = new Floor("dark-panel-3", 0);
+        darkPanel4 = new Floor("dark-panel-4", 0);
+        darkPanel5 = new Floor("dark-panel-5", 0);
+        darkPanel6 = new Floor("dark-panel-6", 0);
 
         darkMetal = new StaticWall("dark-metal");
 
@@ -653,6 +637,7 @@ public class Blocks implements ContentList{
             outputLiquid = new LiquidStack(Liquids.slag, 2f);
             craftTime = 10f;
             hasLiquids = hasPower = true;
+            drawer = new DrawLiquid();
 
             consumes.power(1f);
             consumes.item(Items.scrap, 1);
@@ -1865,7 +1850,7 @@ public class Blocks implements ContentList{
             }};
 
             health = 200 * size * size;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
+            consumes.add(new ConsumeCoolant(0.5f)).update(false);
         }};
 
         //endregion

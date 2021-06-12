@@ -131,22 +131,24 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(called = Loc.both, targets = Loc.both, forward = true, unreliable = true)
     public static void deletePlans(Player player, int[] positions){
-        if(netServer.admins.allowAction(player, ActionType.removePlanned, a -> a.plans = positions)){
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.removePlanned, a -> a.plans = positions)){
+            throw new ValidateException(player, "Player cannot remove plans.");
+        }
 
-            var it = player.team().data().blocks.iterator();
-            //O(n^2) search here; no way around it
-            outer:
-            while(it.hasNext()){
-                BlockPlan req = it.next();
+        if(player == null) return;
 
-                for(int pos : positions){
-                    if(req.x == Point2.x(pos) && req.y == Point2.y(pos)){
-                        it.remove();
-                        continue outer;
-                    }
+        var it = player.team().data().blocks.iterator();
+        //O(n^2) search here; no way around it
+        outer:
+        while(it.hasNext()){
+            BlockPlan req = it.next();
+
+            for(int pos : positions){
+                if(req.x == Point2.x(pos) && req.y == Point2.y(pos)){
+                    it.remove();
+                    continue outer;
                 }
             }
-
         }
     }
 
