@@ -121,7 +121,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         });
 
         scrolled(value -> {
-            zoom = Mathf.clamp(zoom + value / 10f, 0.5f, 2f);
+            zoom = Mathf.clamp(zoom + value / 10f, planets.planet.minZoom, 2f);
         });
 
         addCaptureListener(new ElementGestureListener(){
@@ -133,7 +133,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                    lastZoom = zoom;
                }
 
-               zoom = (Mathf.clamp(initialDistance / distance * lastZoom, 0.5f, 2f));
+               zoom = (Mathf.clamp(initialDistance / distance * lastZoom, planets.planet.minZoom, 2f));
            }
 
             @Override
@@ -931,7 +931,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     from.removeItems(universe.getLaunchResources());
 
                     launching = true;
-                    zoom = 0.5f;
+                    zoom = planets.planet.minZoom;
 
                     ui.hudfrag.showLaunchDirect();
                     Time.runTask(launchDuration, () -> control.playSector(from, sector));

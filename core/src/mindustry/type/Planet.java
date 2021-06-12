@@ -35,6 +35,10 @@ public class Planet extends UnlockableContent{
     public float radius;
     /** Camera radius offset. */
     public float camRadius;
+    /** Minimum camera zoom value. */
+    public float minZoom = 0.5f;
+    /** Whether to draw the orbital circle. */
+    public boolean drawOrbit = true;
     /** Atmosphere radius adjustment parameters. */
     public float atmosphereRadIn = 0, atmosphereRadOut = 0.3f;
     /** Orbital radius around the sun. Do not change unless you know exactly what you are doing.*/

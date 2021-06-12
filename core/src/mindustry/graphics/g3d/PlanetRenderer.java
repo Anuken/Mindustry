@@ -178,7 +178,7 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void renderOrbit(Planet planet){
-        if(planet.parent == null || !planet.visible() || orbitAlpha <= 0.02f) return;
+        if(planet.parent == null || !planet.visible() || orbitAlpha <= 0.02f || !planet.drawOrbit) return;
 
         Vec3 center = planet.parent.position;
         float radius = planet.orbitRadius;
