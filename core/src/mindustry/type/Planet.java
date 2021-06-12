@@ -59,6 +59,8 @@ public class Planet extends UnlockableContent{
     public boolean accessible = true;
     /** If true, a day/night cycle is simulated. */
     public boolean updateLighting = true;
+    /** Day/night cycle parameters. */
+    public float lightSrcFrom = 0f, lightSrcTo = 0.8f, lightDstFrom = 0.3f, lightDstTo = 1f;
     /** The default starting sector displayed to the map dialog. */
     public int startSector = 0;
     /** Whether the bloom render effect is enabled. */

@@ -52,6 +52,8 @@ public class Planets implements ContentList{
             tidalLock = true;
             orbitSpacing = 0.45f;
             totalRadius += 2.6f;
+            lightSrcTo = 0.5f;
+            lightDstFrom = 0.2f;
         }};
 
         float[] offsets = {40, 0, 0, 20};
