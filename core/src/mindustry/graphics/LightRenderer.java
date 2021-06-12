@@ -191,7 +191,10 @@ public class LightRenderer{
 
         Draw.color();
         buffer.begin(Color.clear);
+        Draw.sort(false);
         Gl.blendEquationSeparate(Gl.funcAdd, Gl.max);
+        //apparently necessary
+        Blending.normal.apply();
 
         for(Runnable run : lights){
             run.run();
@@ -202,6 +205,7 @@ public class LightRenderer{
             Draw.rect(circleRegion, cir.x, cir.y, cir.radius * 2, cir.radius * 2);
         }
         Draw.reset();
+        Draw.sort(true);
         buffer.end();
         Gl.blendEquationSeparate(Gl.funcAdd, Gl.funcAdd);
 

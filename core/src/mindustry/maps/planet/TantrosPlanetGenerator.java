@@ -9,7 +9,6 @@ import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.maps.generators.*;
 import mindustry.type.*;
-import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -49,7 +48,7 @@ public class TantrosPlanetGenerator extends PlanetGenerator{
 
     @Override
     public void addWeather(Sector sector, Rules rules){
-        rules.weather.and(new WeatherEntry(Weathers.suspendParticles)).peek().always = true;
+        //no weather... yet
     }
 
     @Override

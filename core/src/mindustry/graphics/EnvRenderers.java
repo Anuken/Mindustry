@@ -22,6 +22,10 @@ public class EnvRenderers{
             ((Texture)t).setFilter(TextureFilter.linear);
         };
 
+        Color particleColor = Color.valueOf("a7c1fa");
+        float windSpeed = 0.03f, windAngle = 45f;
+        float windx = Mathf.cosDeg(windAngle) * windSpeed, windy = Mathf.sinDeg(windAngle) * windSpeed;
+
         renderer.addEnvRenderer(Env.underwater, () -> {
             Draw.draw(Layer.light + 1, () -> {
                 Draw.color(waterColor, 0.4f);
@@ -66,6 +70,18 @@ public class EnvRenderers{
                     Draw.color();
                 }
             }
+
+            //suspended particles
+            Draw.draw(Layer.weather, () -> {
+                Weather.drawParticles(Core.atlas.find("particle"), particleColor,
+                1.4f, 4f, //minmax size
+                10000f, 1f, 1f, //density
+                windx, windy, //wind vectors
+                0.5f, 1f, //minmax alpha
+                30f, 80f, //sinscl
+                1f, 7f, //sinmag
+                false);
+            });
 
             Draw.blend();
         });
