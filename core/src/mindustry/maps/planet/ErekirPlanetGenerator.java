@@ -106,7 +106,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             pass((x, y) -> {
                 if(floor != Blocks.redIce){
                     float noise = noise(x + 782, y, 7, 0.8f, 310f, 1f);
-                    if(noise > 0.67f){
+                    if(noise > 0.64f){
                         if(noise > 0.72f){
                             floor = Blocks.slag;
                         }else{

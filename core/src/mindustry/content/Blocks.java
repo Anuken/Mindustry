@@ -390,7 +390,7 @@ public class Blocks implements ContentList{
 
         yellowStoneWall = new StaticWall("yellow-stone-wall"){{
             variants = 2;
-            yellowStone.asFloor().wall = this;
+            yellowStone.asFloor().wall = slag.asFloor().wall = this;
         }};
 
         rhyoliteWall = new StaticWall("rhyolite-wall"){{
