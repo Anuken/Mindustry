@@ -26,16 +26,19 @@ public class ModClassLoader extends ClassLoader{
         ClassNotFoundException last = null;
         int size = children.size;
 
-        inChild.set(true);
         //if it doesn't exist in the main class loader, try all the children
         for(int i = 0; i < size; i++){
             try{
-                return children.get(i).loadClass(name);
+                try{
+                    inChild.set(true);
+                    return children.get(i).loadClass(name);
+                }finally{
+                    inChild.set(false);
+                }
             }catch(ClassNotFoundException e){
                 last = e;
             }
         }
-        inChild.set(false);
 
         throw (last == null ? new ClassNotFoundException(name) : last);
     }
