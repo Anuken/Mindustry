@@ -71,7 +71,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         if(ice < 0.6){
             if(result == Blocks.rhyolite || result == Blocks.yellowStone || result == Blocks.regolith){
-                return Blocks.ice;
+                return Blocks.redIce;
             }
         }
 
@@ -104,7 +104,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         if(temp > 0.7){
 
             pass((x, y) -> {
-                if(floor != Blocks.ice){
+                if(floor != Blocks.redIce){
                     float noise = noise(x + 782, y, 7, 0.8f, 310f, 1f);
                     if(noise > 0.67f){
                         if(noise > 0.72f){

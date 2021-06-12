@@ -37,10 +37,11 @@ public class Blocks implements ContentList{
 
     //environment
     air, spawn, cliff, deepwater, water, taintedWater, tar, slag, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space,
-    dacite, rhyolite, rhyoliteCrater, regolith, yellowStone, redmat, bluemat,
+    dacite, rhyolite, rhyoliteCrater, regolith, yellowStone, redIce,
+    redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     redweed, purbush, coralChunk, glowBlob, yellowCoral,
-    regolithWall, yellowStoneWall, rhyoliteWall, carbonWall,
+    regolithWall, yellowStoneWall, rhyoliteWall, carbonWall, redIceWall,
     graphiticStone,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
@@ -312,6 +313,12 @@ public class Blocks implements ContentList{
             variants = 4;
         }};
 
+        redIce = new Floor("red-ice"){{
+            dragMultiplier = 0.4f;
+            speedMultiplier = 0.9f;
+            attributes.set(Attribute.water, 0.4f);
+        }};
+
         redmat = new Floor("redmat");
         bluemat = new Floor("bluemat");
 
@@ -394,6 +401,12 @@ public class Blocks implements ContentList{
         carbonWall = new StaticWall("carbon-wall"){{
             variants = 2;
             graphiticStone.asFloor().wall = this;
+        }};
+
+
+        redIceWall = new StaticWall("red-ice-wall"){{
+            variants = 2;
+            redIce.asFloor().wall = this;
         }};
 
         sandWall = new StaticWall("sand-wall"){{
