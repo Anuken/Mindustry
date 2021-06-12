@@ -25,6 +25,7 @@ public class DrawSmelter extends DrawBlock{
     @Override
     public void load(Block block){
         top = Core.atlas.find(block.name + "-top");
+        block.clipSize = Math.max(block.clipSize, (lightRadius + lightSinMag) * 2f * block.size);
     }
 
     @Override

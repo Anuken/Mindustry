@@ -13,7 +13,6 @@ import com.android.dx.dex.cf.*;
 import com.android.dx.dex.file.DexFile;
 import com.android.dx.merge.*;
 import dalvik.system.*;
-import mindustry.*;
 import mindustry.mod.*;
 import rhino.*;
 
@@ -67,9 +66,6 @@ public class AndroidRhinoContext{
         protected Context makeContext(){
             Context ctx = super.makeContext();
             ctx.setClassShutter(Scripts::allowClass);
-            if(Vars.mods != null){
-                ctx.setApplicationClassLoader(Vars.mods.mainLoader());
-            }
             return ctx;
         }
 
