@@ -73,14 +73,16 @@ public class EnvRenderers{
 
             //suspended particles
             Draw.draw(Layer.weather, () -> {
-                Weather.drawParticles(Core.atlas.find("particle"), particleColor,
-                1.4f, 4f, //minmax size
-                10000f, 1f, 1f, //density
-                windx, windy, //wind vectors
-                0.5f, 1f, //minmax alpha
-                30f, 80f, //sinscl
-                1f, 7f, //sinmag
-                false);
+                Weather.drawParticles(
+                    Core.atlas.find("particle"), particleColor,
+                    1.4f, 4f, //minmax size
+                    10000f, 1f, 1f, //density
+                    windx, windy, //wind vectors
+                    0.5f, 1f, //minmax alpha
+                    30f, 80f, //sinscl
+                    1f, 7f, //sinmag
+                    false
+                );
             });
 
             Draw.blend();
@@ -95,17 +97,11 @@ public class EnvRenderers{
                 tex.setWrap(TextureWrap.repeat);
             }
 
-            //Draw.z(Layer.weather);
-            Draw.z(layer);
-            Weather.drawNoiseLayers(tex, scorchColor, scl, alpha, speed, 1f, 1f, 0f,
-                layers, speedl, alphal, lscl, colorl);
+            Draw.z(Layer.weather - 1);
+            Weather.drawNoiseLayers(tex, Color.scarlet, 1000f, 0.2f, 0.4f, 1f, 1f, 0f,
+            4, -1.3f, 0.7f, 0.8f, 0.9f);
             Draw.reset();
         });
     }
-
-    public static Color scorchColor = Color.scarlet;
-    public static float scl = 1000f, lscl = 0.8f, alpha = 0.2f, speed = 0.4f, speedl = -1.3f, colorl = 0.9f, alphal = 0.7f;
-    public static int layers = 4;
-    public static float layer = Layer.weather - 1;
 
 }
