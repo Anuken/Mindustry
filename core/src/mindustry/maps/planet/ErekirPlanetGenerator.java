@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 
 public class ErekirPlanetGenerator extends PlanetGenerator{
     public float scl = 2f;
-    public float heightScl = 1f, octaves = 8, persistence = 0.7f, heightPow = 3f, heightMult = 1.5f;
+    public float heightScl = 0.9f, octaves = 8, persistence = 0.7f, heightPow = 3f, heightMult = 1.6f;
 
     Block[][] arr = {
     {Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.basalt}

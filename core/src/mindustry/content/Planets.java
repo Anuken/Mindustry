@@ -44,7 +44,7 @@ public class Planets implements ContentList{
 
         erekir = new Planet("erekir", sun, 1, 2){{
             generator = new ErekirPlanetGenerator();
-            meshLoader = () -> new HexMesh(this, 4);
+            meshLoader = () -> new HexMesh(this, 5);
             atmosphereColor = Color.valueOf("f07218");
             startSector = 10;
             atmosphereRadIn = 0.02f;
@@ -67,10 +67,6 @@ public class Planets implements ContentList{
                 minZoom = 0.6f;
                 drawOrbit = false;
                 orbitOffset = offsets[fi];
-
-                //new SectorPreset(name + "-sector", this, 0){{
-
-                //}};
 
                 generator = new BlankPlanetGenerator(){
                     @Override
