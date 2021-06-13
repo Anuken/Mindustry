@@ -61,6 +61,8 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
     @Override
     public void init(){
+        emitLight = true;
+        lightRadius = 65f * size;
         if(!defaults){
             setDefaults();
         }
