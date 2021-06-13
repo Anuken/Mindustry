@@ -92,6 +92,8 @@ public class ConstructBlock extends Block{
 
         Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
+
+        Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
     }
 
     static boolean shouldPlay(){
@@ -123,8 +125,6 @@ public class ConstructBlock extends Block{
         if(tile.build != null){
             tile.build.placed();
         }
-
-        Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
     }
 
     @Override
@@ -259,7 +259,9 @@ public class ConstructBlock extends Block{
 
             if(progress >= 1f || state.rules.infiniteResources){
                 if(lastBuilder == null) lastBuilder = builder;
-                constructed(tile, current, lastBuilder, (byte)rotation, builder.team, config);
+                if(!net.client()){
+                    constructed(tile, current, lastBuilder, (byte)rotation, builder.team, config);
+                }
             }
         }
 
