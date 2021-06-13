@@ -752,8 +752,8 @@ public class ContentParser{
         var out = ClassMap.classes.get(!base.isEmpty() && Character.isLowerCase(base.charAt(0)) ? Strings.capitalize(base) : base);
         if(out != null) return (Class<T>)out;
 
-        //try to resolve it as a raw class name if it's allowed
-        if(base.indexOf('.') != -1 && Scripts.allowClass(base)){
+        //try to resolve it as a raw class name
+        if(base.indexOf('.') != -1){
             try{
                 return (Class<T>)Class.forName(base);
             }catch(Exception ignored){
