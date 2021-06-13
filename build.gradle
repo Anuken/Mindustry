@@ -430,6 +430,8 @@ project(":tests"){
     }
 
     test{
+        //fork every test so mods don't interact with each other
+        forkEvery = 1
         useJUnitPlatform()
         workingDir = new File("../core/assets")
         testLogging{

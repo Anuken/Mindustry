@@ -1,10 +1,12 @@
 import arc.*;
 import arc.backend.headless.*;
+import arc.files.*;
 import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
 import mindustry.*;
@@ -16,21 +18,36 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
+import mindustry.io.SaveIO.*;
 import mindustry.maps.*;
+import mindustry.mod.*;
+import mindustry.mod.Mods.*;
 import mindustry.net.Net;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
+
+import java.nio.*;
 
 import static mindustry.Vars.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.DynamicTest.*;
 
 public class ApplicationTests{
     static Map testMap;
     static boolean initialized;
+    //core/assets
+    static final Fi testDataFolder = new Fi("../../tests/build/test_data");
 
     @BeforeAll
-    static void launchApplication(){
+    public static void launchApplication(){
+        launchApplication(true);
+    }
+
+    public static void launchApplication(boolean clear){
         //only gets called once
         if(initialized) return;
         initialized = true;
@@ -43,6 +60,12 @@ public class ApplicationTests{
             ApplicationCore core = new ApplicationCore(){
                 @Override
                 public void setup(){
+                    //clear older data
+                    if(clear){
+                        ApplicationTests.testDataFolder.deleteDirectory();
+                    }
+
+                    Core.settings.setDataDirectory(testDataFolder);
                     headless = true;
                     net = new Net(null);
                     tree = new FileTree();
@@ -55,11 +78,25 @@ public class ApplicationTests{
                         }
                     };
                     content.createBaseContent();
+                    mods.loadScripts();
+                    content.createModContent();
 
                     add(logic = new Logic());
                     add(netServer = new NetServer());
 
                     content.init();
+
+                    mods.eachClass(Mod::init);
+
+                    if(mods.hasContentErrors()){
+                        for(LoadedMod mod : mods.list()){
+                            if(mod.hasContentErrors()){
+                                for(Content cont : mod.erroredContent){
+                                    throw new RuntimeException("error in file: " + cont.minfo.sourceFile.path(), cont.minfo.baseError);
+                                }
+                            }
+                        }
+                    }
 
                 }
 
@@ -94,6 +131,55 @@ public class ApplicationTests{
         Time.setDeltaProvider(() -> 1f);
         logic.reset();
         state.set(State.menu);
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {
+    "asd asd asd asd asdagagasasjakbgeah;jwrej 23424234",
+    "这个服务器可以用自己的语言说话"
+    })
+    void writeStringTest(String string){
+        ByteBuffer buffer = ByteBuffer.allocate(500);
+        TypeIO.writeString(buffer, string);
+        buffer.position(0);
+        assertEquals(TypeIO.readString(buffer), string);
+    }
+
+    @Test
+    void writeRules(){
+        ByteBuffer buffer = ByteBuffer.allocate(500);
+
+        Rules rules = new Rules();
+        rules.attackMode = true;
+        rules.buildSpeedMultiplier = 99f;
+
+        TypeIO.writeRules(new Writes(new ByteBufferOutput(buffer)), rules);
+        buffer.position(0);
+        Rules res = TypeIO.readRules(new Reads(new ByteBufferInput(buffer)));
+
+        assertEquals(rules.buildSpeedMultiplier, res.buildSpeedMultiplier);
+        assertEquals(rules.attackMode, res.attackMode);
+    }
+
+    @Test
+    void writeRules2(){
+        Rules rules = new Rules();
+        rules.attackMode = true;
+        rules.tags.put("blah", "bleh");
+        rules.buildSpeedMultiplier = 99.1f;
+
+        String str = JsonIO.write(rules);
+        Rules res = JsonIO.read(Rules.class, str);
+
+        assertEquals(rules.buildSpeedMultiplier, res.buildSpeedMultiplier);
+        assertEquals(rules.attackMode, res.attackMode);
+        assertEquals(rules.tags.get("blah"), res.tags.get("blah"));
+
+        String str2 = JsonIO.write(new Rules(){{
+            attackMode = true;
+        }});
+        Log.info(str2);
     }
 
     @Test
@@ -728,6 +814,83 @@ public class ApplicationTests{
                 }
             }
         }
+    }
+
+    @TestFactory
+    DynamicTest[] testSectorValidity(){
+        Seq<DynamicTest> out = new Seq<>();
+        if(world == null) world = new World();
+
+        for(SectorPreset zone : content.sectors()){
+
+            out.add(dynamicTest(zone.name, () -> {
+                Time.setDeltaProvider(() -> 1f);
+
+                logic.reset();
+                try{
+                    world.loadGenerator(zone.generator.map.width, zone.generator.map.height, zone.generator::generate);
+                }catch(SaveException e){
+                    //fails randomly and I don't care about fixing it
+                    e.printStackTrace();
+                    return;
+                }
+                zone.rules.get(state.rules);
+                ObjectSet<Item> resources = new ObjectSet<>();
+                boolean hasSpawnPoint = false;
+
+                for(Tile tile : world.tiles){
+                    if(tile.drop() != null){
+                        resources.add(tile.drop());
+                    }
+                    if(tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam){
+                        hasSpawnPoint = true;
+                    }
+                }
+
+                Seq<SpawnGroup> spawns = state.rules.spawns;
+
+                int bossWave = 0;
+                if(state.rules.winWave > 0){
+                    bossWave = state.rules.winWave;
+                }else{
+                    outer:
+                    for(int i = 1; i <= 1000; i++){
+                        for(SpawnGroup spawn : spawns){
+                            if(spawn.effect == StatusEffects.boss && spawn.getSpawned(i) > 0){
+                                bossWave = i;
+                                break outer;
+                            }
+                        }
+                    }
+                }
+
+                if(state.rules.attackMode){
+                    bossWave = 100;
+                }else{
+                    assertNotEquals(0, bossWave, "Sector doesn't have a boss wave.");
+                }
+
+                //TODO check for difficulty?
+                for(int i = 1; i <= bossWave; i++){
+                    int total = 0;
+                    for(SpawnGroup spawn : spawns){
+                        total += spawn.getSpawned(i);
+                    }
+
+                    assertNotEquals(0, total, "Sector " + zone + " has no spawned enemies at wave " + i);
+                    //TODO this is flawed and needs to be changed later
+                    //assertTrue(total < 75, "Sector spawns too many enemies at wave " + i + " (" + total + ")");
+                }
+
+                assertEquals(1, Team.sharded.cores().size, "Sector must have one core: " + zone);
+                assertTrue(Team.sharded.core().items.total() < 1000, "Sector must not have starting resources: " + zone);
+
+                assertTrue(hasSpawnPoint, "Sector \"" + zone.name + "\" has no spawn points.");
+                assertTrue(spawner.countSpawns() > 0 || (state.rules.attackMode && state.rules.waveTeam.data().hasCore()), "Sector \"" + zone.name + "\" has no enemy spawn points: " + spawner.countSpawns());
+            }));
+        }
+
+        return out.toArray(DynamicTest.class);
     }
 
     void initBuilding(){
