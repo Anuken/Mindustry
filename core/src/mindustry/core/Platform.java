@@ -79,8 +79,6 @@ public interface Platform{
     }
 
     default Context getScriptContext(){
-        ContextFactory.getGlobalSetter().setContextFactoryGlobal(new ContextFactory());
-
         Context c = Context.enter();
         c.setOptimizationLevel(9);
         return c;
