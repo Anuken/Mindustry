@@ -1,5 +1,0 @@
-- Kötü biçimlendirilmiş eski modlar için yedek mod yüklemesi eklendi
-- Sonsuz yapı alanı düzeltildi
-- Patlama reaktörlerinin sunucularda çekirdeği patlatabilmeleri düzeltildi
-- Geriye doğru akan sıvı köprüleri düzeltildi
-- Bazı çeviriler güncellendi
