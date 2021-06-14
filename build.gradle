@@ -196,12 +196,7 @@ allprojects{
 
     tasks.withType(JavaCompile){
         targetCompatibility = 8
-        //TODO fix dynamically, this is a hack
-        if(System.getProperty("user.name") == "anuke"){
-            sourceCompatibility = JavaVersion.VERSION_15
-        }else{
-            sourceCompatibility = JavaVersion.VERSION_14
-        }
+        sourceCompatibility = JavaVersion.VERSION_16
         options.encoding = "UTF-8"
         options.compilerArgs += ["-Xlint:deprecation"]
         dependsOn clearCache
