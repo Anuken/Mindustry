@@ -3,7 +3,7 @@ name: Tests
 on: [push, workflow_dispatch]
 
 jobs:
-  buildJava14:
+  runPush:
     runs-on: ubuntu-latest
 
     steps:

@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  buildJava14:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
