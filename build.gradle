@@ -219,18 +219,13 @@ configure(project(":annotations")){
 //compile with java 8 compatibility for everything except the annotation project
 configure(subprojects - project(":annotations")){
     tasks.withType(JavaCompile){
-        options.compilerArgs.addAll(['--release', '8', '--enable-preview'])
-
-        doFirst{
-            options.compilerArgs = options.compilerArgs.findAll{it != '--enable-preview' }
-        }
+        options.compilerArgs.addAll(['--release', '8'])
     }
 
     tasks.withType(Javadoc){
         options{
             addStringOption('Xdoclint:none', '-quiet')
-            addBooleanOption('-enable-preview', true)
-            addStringOption('-release', '14')
+            addStringOption('-release', '16')
         }
     }
 }
@@ -297,9 +292,8 @@ project(":core"){
 
     kapt{
         javacOptions{
-            option("-source", "14")
+            option("-source", "16")
             option("-target", "1.8")
-            option("--enable-preview")
         }
     }
 
