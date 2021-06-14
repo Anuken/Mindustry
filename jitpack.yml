@@ -10,4 +10,4 @@ install:
   - echo $JAVA_HOME
   - echo $PATH
   - ./gradlew publishToMavenLocal
-  - sed -i 's/ --illegal-access=permit//' dest.properties #remove extra flags after compilation
+  - sed -i 's/ --illegal-access=permit//' gradle.properties #remove extra flags after compilation
