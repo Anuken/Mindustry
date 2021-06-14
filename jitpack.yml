@@ -5,9 +5,5 @@ before_install:
   - source install-jdk.sh --feature 16
   - jshell --version
 install:
-  - java --version
-  - javac --version
-  - echo $JAVA_HOME
-  - echo $PATH
   - ./gradlew publishToMavenLocal
   - sed -i 's/ --illegal-access=permit//' gradle.properties #remove extra flags after compilation
