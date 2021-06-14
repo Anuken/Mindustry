@@ -7,5 +7,6 @@ before_install:
 install:
   - java --version
   - javac --version
-  - ./gradlew --stop
-  - ./gradlew build publishToMavenLocal
+  - echo $JAVA_HOME
+  - echo $PATH
+  - ./gradlew publishToMavenLocal
