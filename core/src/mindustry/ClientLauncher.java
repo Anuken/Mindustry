@@ -83,7 +83,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Fonts.loadDefaultFont();
 
         //load fallback atlas if max texture size is below 4096
-        assets.load(new AssetDescriptor<>(maxTextureSize >= 4096  ? "sprites/sprites.aatls" : "sprites/fallback/sprites.aatls", TextureAtlas.class)).loaded = t -> atlas = (TextureAtlas)t;
+        assets.load(new AssetDescriptor<>(maxTextureSize >= 4096 ? "sprites/sprites.aatls" : "sprites/fallback/sprites.aatls", TextureAtlas.class)).loaded = t -> atlas = (TextureAtlas)t;
         assets.loadRun("maps", Map.class, () -> maps.loadPreviews());
 
         Musics.load();
