@@ -103,19 +103,19 @@ public abstract class GenerateFilter{
     //TODO would be nice if these functions used the seed and ditched "in" completely; simplex should be stateless
 
     protected float noise(GenerateInput in, float scl, float mag){
-        return (float)in.noise.octaveNoise2D(1f, 0f, 1f / scl, in.x, in.y) * mag;
+        return (float)Simplex.noise2d(seed, 1f, 0f, 1f / scl, in.x, in.y) * mag;
     }
 
     protected float noise(GenerateInput in, float scl, float mag, float octaves, float persistence){
-        return (float)in.noise.octaveNoise2D(octaves, persistence, 1f / scl, in.x, in.y) * mag;
+        return (float)Simplex.noise2d(seed, octaves, persistence, 1f / scl, in.x, in.y) * mag;
     }
 
     protected float rnoise(float x, float y, float scl, float mag){
-        return RidgedPerlin.noise2d(seed + 1, (int)(x), (int)(y), 1f / scl) * mag;
+        return Ridged.noise2d(seed + 1, (int)(x), (int)(y), 1f / scl) * mag;
     }
 
     protected float rnoise(float x, float y, int octaves, float scl, float falloff, float mag){
-        return RidgedPerlin.noise2d(seed + 1, (int)(x), (int)(y), octaves, falloff, 1f / scl) * mag;
+        return Ridged.noise2d(seed + 1, (int)(x), (int)(y), octaves, falloff, 1f / scl) * mag;
     }
 
     protected float chance(int x, int y){
@@ -131,7 +131,6 @@ public abstract class GenerateFilter{
         /** output parameters */
         public Block floor, block, overlay;
 
-        Simplex noise = new Simplex();
         TileProvider buffer;
 
         public void set(int x, int y, Block block, Block floor, Block overlay){
@@ -146,7 +145,6 @@ public abstract class GenerateFilter{
             this.buffer = buffer;
             this.width = width;
             this.height = height;
-            noise.setSeed(filter.seed);
         }
 
         Tile tile(float x, float y){

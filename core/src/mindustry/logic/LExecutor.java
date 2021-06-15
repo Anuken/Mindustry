@@ -28,9 +28,6 @@ import static mindustry.Vars.*;
 public class LExecutor{
     public static final int maxInstructions = 1000;
 
-    //for noise operations
-    public static final Simplex noise = new Simplex();
-
     //special variables
     public static final int
     varCounter = 0,

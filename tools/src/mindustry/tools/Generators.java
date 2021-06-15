@@ -176,7 +176,7 @@ public class Generators{
                     for(int x = 0; x < dim; x++){
                         for(int y = 0; y < dim; y++){
                             float dst = Mathf.dst((float)x/dim, (float)y/dim, 0.5f, 0.5f) * 2f;
-                            if(dst < 1.2f && RidgedPerlin.noise2d(1, x, y, 3, 1f / 40f) - dst*(1f-fract) > 0.16f){
+                            if(dst < 1.2f && Ridged.noise2d(1, x, y, 3, 1f / 40f) - dst*(1f-fract) > 0.16f){
                                 image.setRaw(x, y, Color.whiteRgba);
                             }
                         }
@@ -488,7 +488,7 @@ public class Generators{
 
                 image.each((x, y) -> {
                     //add darker cracks on top
-                    boolean rValue = Math.max(RidgedPerlin.noise2d(1, x, y, 3, 1f / (20f + image.width/8f)), 0) > 0.16f;
+                    boolean rValue = Math.max(Ridged.noise2d(1, x, y, 3, 1f / (20f + image.width/8f)), 0) > 0.16f;
                     //cut out random chunks with voronoi
                     boolean vval = vn.noise(x, y, 1f / (14f + image.width/40f)) > 0.47;
 
@@ -601,14 +601,11 @@ public class Generators{
 
     /** Generates a scorch pixmap based on parameters. Thread safe, unless multiple scorch generators are running in parallel. */
     public static class ScorchGenerator{
-        private static final Simplex sim = new Simplex();
-
         public int size = 80, seed = 0, color = Color.whiteRgba;
         public double scale = 18, pow = 2, octaves = 4, pers = 0.4, add = 2, nscl = 4.5f;
 
         public Pixmap generate(){
             Pixmap pix = new Pixmap(size, size);
-            sim.setSeed(seed);
 
             pix.each((x, y) -> {
                 double dst = Mathf.dst(x, y, size/2, size/2) / (size / 2f);
@@ -621,7 +618,7 @@ public class Generators{
         }
 
         private double noise(float angle){
-            return Math.pow(sim.octaveNoise2D(octaves, pers, 1 / scale, Angles.trnsx(angle, size/2f) + size/2f, Angles.trnsy(angle, size/2f) + size/2f), pow);
+            return Math.pow(Simplex.noise2d(seed, octaves, pers, 1 / scale, Angles.trnsx(angle, size/2f) + size/2f, Angles.trnsy(angle, size/2f) + size/2f), pow);
         }
     }
 
