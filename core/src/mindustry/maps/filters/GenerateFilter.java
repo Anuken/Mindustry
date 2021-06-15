@@ -12,8 +12,8 @@ import mindustry.gen.*;
 import mindustry.world.*;
 
 public abstract class GenerateFilter{
-    protected transient float o = (float)(Math.random() * 10000000.0);
-    protected transient int seed;
+    public int seed = 0;
+
     protected transient GenerateInput in;
 
     public void apply(Tiles tiles, GenerateInput in){
@@ -93,7 +93,7 @@ public abstract class GenerateFilter{
 
     /** set the seed to a random number */
     public void randomize(){
-        seed = Mathf.random(99999999);
+        seed = Mathf.random(999999999);
     }
 
     /** @return whether this filter needs a read/write buffer (e.g. not a 1:1 tile mapping). */
@@ -109,19 +109,19 @@ public abstract class GenerateFilter{
     //utility generation functions
 
     protected float noise(float x, float y, float scl, float mag){
-        return (float)in.noise.octaveNoise2D(1f, 0f, 1f / scl, x + o, y + o) * mag;
+        return (float)in.noise.octaveNoise2D(1f, 0f, 1f / scl, x, y) * mag;
     }
 
     protected float noise(float x, float y, float scl, float mag, float octaves, float persistence){
-        return (float)in.noise.octaveNoise2D(octaves, persistence, 1f / scl, x + o, y + o) * mag;
+        return (float)in.noise.octaveNoise2D(octaves, persistence, 1f / scl, x, y) * mag;
     }
 
     protected float rnoise(float x, float y, float scl, float mag){
-        return RidgedPerlin.noise2d(seed + 1, (int)(x + o), (int)(y + o), 1f / scl) * mag;
+        return RidgedPerlin.noise2d(seed + 1, (int)(x), (int)(y), 1f / scl) * mag;
     }
 
     protected float rnoise(float x, float y, int octaves, float scl, float falloff, float mag){
-        return RidgedPerlin.noise2d(seed + 1, (int)(x + o), (int)(y + o), octaves, falloff, 1f / scl) * mag;
+        return RidgedPerlin.noise2d(seed + 1, (int)(x), (int)(y), octaves, falloff, 1f / scl) * mag;
     }
 
     protected float chance(){

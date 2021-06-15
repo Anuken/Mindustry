@@ -1,6 +1,5 @@
 package mindustry.maps.filters;
 
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -13,12 +12,12 @@ public class BlendFilter extends GenerateFilter{
 
     @Override
     public FilterOption[] options(){
-        return Structs.arr(
-        new SliderOption("radius", () -> radius, f -> radius = f, 1f, 10f),
-        new BlockOption("block", () -> block, b -> block = b, anyOptional),
-        new BlockOption("floor", () -> floor, b -> floor = b, anyOptional),
-        new BlockOption("ignore", () -> ignore, b -> ignore = b, floorsOptional)
-        );
+        return new FilterOption[]{
+            new SliderOption("radius", () -> radius, f -> radius = f, 1f, 10f),
+            new BlockOption("block", () -> block, b -> block = b, anyOptional),
+            new BlockOption("floor", () -> floor, b -> floor = b, anyOptional),
+            new BlockOption("ignore", () -> ignore, b -> ignore = b, floorsOptional)
+        };
     }
 
     @Override

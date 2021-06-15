@@ -3,6 +3,7 @@ package mindustry.editor;
 import arc.*;
 import arc.scene.ui.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.game.*;
 import mindustry.io.*;
@@ -73,8 +74,12 @@ public class MapInfoDialog extends BaseDialog{
             t.row();
             t.add("@editor.generation").padRight(8).left();
             t.button("@edit", () -> {
-                generate.show(Vars.maps.readFilters(editor.tags.get("genfilters", "")),
-                filters -> editor.tags.put("genfilters", JsonIO.write(filters)));
+                generate.show(maps.readFilters(editor.tags.get("genfilters", "")),
+                filters -> {
+                    //reset seed to 0 so it is not written
+                    filters.each(f -> f.seed = 0);
+                    editor.tags.put("genfilters", JsonIO.write(filters));
+                });
                 hide();
             }).left().width(200f);
 

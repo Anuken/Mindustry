@@ -340,6 +340,7 @@ public class MapGenerateDialog extends BaseDialog{
                 if(filter.isPost() && applied) continue;
 
                 p.button((icon == '\0' ? "" : icon + " ") + filter.name(), Styles.cleart, () -> {
+                    filter.randomize();
                     filters.add(filter);
                     rebuildFilters();
                     update();

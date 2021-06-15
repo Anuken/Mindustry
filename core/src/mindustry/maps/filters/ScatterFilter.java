@@ -1,6 +1,5 @@
 package mindustry.maps.filters;
 
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -13,12 +12,12 @@ public class ScatterFilter extends GenerateFilter{
 
     @Override
     public FilterOption[] options(){
-        return Structs.arr(
-        new SliderOption("chance", () -> chance, f -> chance = f, 0f, 1f),
-        new BlockOption("flooronto", () -> flooronto, b -> flooronto = b, floorsOptional),
-        new BlockOption("floor", () -> floor, b -> floor = b, floorsOptional),
-        new BlockOption("block", () -> block, b -> block = b, wallsOresOptional)
-        );
+        return new FilterOption[]{
+            new SliderOption("chance", () -> chance, f -> chance = f, 0f, 1f),
+            new BlockOption("flooronto", () -> flooronto, b -> flooronto = b, floorsOptional),
+            new BlockOption("floor", () -> floor, b -> floor = b, floorsOptional),
+            new BlockOption("block", () -> block, b -> block = b, wallsOresOptional)
+        };
     }
 
     @Override

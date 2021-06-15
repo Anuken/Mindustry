@@ -1,7 +1,6 @@
 package mindustry.maps.filters;
 
 import arc.struct.*;
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.maps.filters.FilterOption.*;
@@ -13,9 +12,9 @@ public class EnemySpawnFilter extends GenerateFilter{
 
     @Override
     public FilterOption[] options(){
-        return Structs.arr(
-        new SliderOption("amount", () -> amount, f -> amount = (int)f, 1, 10).display()
-        );
+        return new SliderOption[]{
+            new SliderOption("amount", () -> amount, f -> amount = (int)f, 1, 10).display()
+        };
     }
 
     @Override

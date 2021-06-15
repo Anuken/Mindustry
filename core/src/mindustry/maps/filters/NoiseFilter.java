@@ -1,6 +1,5 @@
 package mindustry.maps.filters;
 
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -13,15 +12,15 @@ public class NoiseFilter extends GenerateFilter{
 
     @Override
     public FilterOption[] options(){
-        return Structs.arr(
-        new SliderOption("scale", () -> scl, f -> scl = f, 1f, 500f),
-        new SliderOption("threshold", () -> threshold, f -> threshold = f, 0f, 1f),
-        new SliderOption("octaves", () -> octaves, f -> octaves = f, 1f, 10f),
-        new SliderOption("falloff", () -> falloff, f -> falloff = f, 0f, 1f),
-        new BlockOption("target", () -> target, b -> target = b, anyOptional),
-        new BlockOption("floor", () -> floor, b -> floor = b, floorsOptional),
-        new BlockOption("wall", () -> block, b -> block = b, wallsOptional)
-        );
+        return new FilterOption[]{
+            new SliderOption("scale", () -> scl, f -> scl = f, 1f, 500f),
+            new SliderOption("threshold", () -> threshold, f -> threshold = f, 0f, 1f),
+            new SliderOption("octaves", () -> octaves, f -> octaves = f, 1f, 10f),
+            new SliderOption("falloff", () -> falloff, f -> falloff = f, 0f, 1f),
+            new BlockOption("target", () -> target, b -> target = b, anyOptional),
+            new BlockOption("floor", () -> floor, b -> floor = b, floorsOptional),
+            new BlockOption("wall", () -> block, b -> block = b, wallsOptional)
+        };
     }
 
     @Override
