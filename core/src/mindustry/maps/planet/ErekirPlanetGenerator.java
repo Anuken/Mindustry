@@ -17,16 +17,14 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ErekirPlanetGenerator extends PlanetGenerator{
+    static final int seed = 2;
+
     public float scl = 2f;
     public float heightScl = 0.9f, octaves = 8, persistence = 0.7f, heightPow = 3f, heightMult = 1.6f;
 
     Block[][] arr = {
     {Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.basalt}
     };
-
-    {
-        noise.setSeed(2);
-    }
 
     @Override
     public void generateSector(Sector sector){
@@ -50,11 +48,11 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
     }
 
     float rawHeight(Vec3 position){
-        return (float)noise.octaveNoise3D(octaves, persistence, 1f/heightScl, 10f + position.x, 10f + position.y, 10f + position.z);
+        return (float)Simplex.noise3d(seed, octaves, persistence, 1f/heightScl, 10f + position.x, 10f + position.y, 10f + position.z);
     }
 
     float rawTemp(Vec3 position){
-        return position.dst(0, 0, 1)*2.2f - (float)noise.octaveNoise3D(8, 0.54f, 1.4f, 10f + position.x, 10f + position.y, 10f + position.z) * 2.9f;
+        return position.dst(0, 0, 1)*2.2f - (float)Simplex.noise3d(seed, 8, 0.54f, 1.4f, 10f + position.x, 10f + position.y, 10f + position.z) * 2.9f;
     }
 
     Block getBlock(Vec3 position){
@@ -63,7 +61,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         float height = rawHeight(position);
         Tmp.v31.set(position);
         position = Tmp.v33.set(position).scl(scl);
-        float temp = (float)noise.octaveNoise3D(8, 0.6, 1f/2f, 10f + position.x, 10f + position.y + 99f, 10f + position.z);
+        float temp = (float)Simplex.noise3d(seed, 8, 0.6, 1f/2f, 10f + position.x, 10f + position.y + 99f, 10f + position.z);
         height *= 1.2f;
         height = Mathf.clamp(height);
 
@@ -88,11 +86,11 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         tile.block = tile.floor.asFloor().wall;
 
-        if(RidgedPerlin.noise3d(1, position.x, position.y, position.z, 2, 25) > 0.2){
+        if(Ridged.noise3d(1, position.x, position.y, position.z, 2, 25) > 0.2){
             tile.block = Blocks.air;
         }
 
-        if(RidgedPerlin.noise3d(2, position.x, position.y + 4f, position.z, 3, 7f) > 0.7){
+        if(Ridged.noise3d(2, position.x, position.y + 4f, position.z, 3, 7f) > 0.7){
             tile.floor = Blocks.graphiticStone;
         }
     }
