@@ -59,12 +59,12 @@ public class ParticleEffect extends Effect{
 
             Angles.randLenVectors(e.id, particles, length * fin + baseLength, e.rotation, cone, (x, y) -> {
                 Lines.lineAngle(ox + x, oy + y, Mathf.angle(x, y), len);
-                Drawf.light(ox + x, oy + y, len * lightScl, lightColor, lightOpacity);
+                Drawf.light(ox + x, oy + y, len * lightScl, lightColor, lightOpacity* Draw.getColor().a);
             });
         }else{
             Angles.randLenVectors(e.id, particles, length * fin + baseLength, e.rotation, cone, (x, y) -> {
                 Draw.rect(tex, ox + x, oy + y, rad, rad, e.rotation + offset + e.time * spin);
-                Drawf.light(ox + x, oy + y, rad * lightScl, lightColor, lightOpacity);
+                Drawf.light(ox + x, oy + y, rad * lightScl, lightColor, lightOpacity * Draw.getColor().a);
             });
         }
     }
