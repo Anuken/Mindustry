@@ -33,7 +33,7 @@ public class OreMedianFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(){
+    public void apply(GenerateInput in){
         if(in.overlay == Blocks.spawn) return;
 
         int cx = (in.x / 2) * 2;

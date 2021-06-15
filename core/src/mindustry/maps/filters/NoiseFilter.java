@@ -29,8 +29,8 @@ public class NoiseFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(){
-        float noise = noise(in.x, in.y, scl, 1f, octaves, falloff);
+    public void apply(GenerateInput in){
+        float noise = noise(in, scl, 1f, octaves, falloff);
 
         if(noise > threshold && (target == Blocks.air || in.floor == target || in.block == target)){
             if(floor != Blocks.air) in.floor = floor;

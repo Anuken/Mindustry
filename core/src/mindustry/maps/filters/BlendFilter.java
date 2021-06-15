@@ -31,7 +31,7 @@ public class BlendFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(){
+    public void apply(GenerateInput in){
         if(in.floor == block || block == Blocks.air || in.floor == ignore || (!floor.isFloor() && (in.block == block || in.block == ignore))) return;
 
         int rad = (int)radius;

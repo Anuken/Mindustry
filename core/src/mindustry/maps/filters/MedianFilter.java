@@ -33,7 +33,7 @@ public class MedianFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(){
+    public void apply(GenerateInput in){
         int rad = (int)radius;
         blocks.clear();
         floors.clear();

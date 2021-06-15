@@ -22,7 +22,7 @@ public class ClearFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(){
+    public void apply(GenerateInput in){
 
         if(in.block == block){
             in.block = Blocks.air;

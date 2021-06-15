@@ -26,8 +26,8 @@ public class DistortFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(){
-        Tile tile = in.tile(in.x + noise(in.x, in.y, scl, mag) - mag / 2f, in.y + noise(in.x, in.y, scl, mag) - mag / 2f);
+    public void apply(GenerateInput in){
+        Tile tile = in.tile(in.x + noise(in, scl, mag) - mag / 2f, in.y + noise(in, scl, mag) - mag / 2f);
 
         in.floor = tile.floor();
         if(!tile.block().synthetic() && !in.block.synthetic()) in.block = tile.block();

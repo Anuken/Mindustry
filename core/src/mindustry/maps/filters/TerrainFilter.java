@@ -31,8 +31,8 @@ public class TerrainFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(){
-        float noise = noise(in.x, in.y, scl, magnitude, octaves, falloff) + Mathf.dst((float)in.x / in.width, (float)in.y / in.height, 0.5f, 0.5f) * circleScl;
+    public void apply(GenerateInput in){
+        float noise = noise(in, scl, magnitude, octaves, falloff) + Mathf.dst((float)in.x / in.width, (float)in.y / in.height, 0.5f, 0.5f) * circleScl;
 
         if(floor != Blocks.air){
             in.floor = floor;

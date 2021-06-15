@@ -30,7 +30,7 @@ public class RiverNoiseFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(){
+    public void apply(GenerateInput in){
         float noise = rnoise(in.x, in.y, (int)octaves, scl, falloff, 1f);
 
         if(noise >= threshold){
