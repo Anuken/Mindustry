@@ -289,7 +289,7 @@ public class BaseAI{
                     }
 
                     Tile o = world.tile(tile.x + p.x, tile.y + p.y);
-                    if(o != null && (o.block() instanceof PayloadBlock || o.block() instanceof PayloadConveyor)){
+                    if(o != null && (o.block() instanceof PayloadBlock || o.block() instanceof PayloadConveyor || o.block() instanceof ShockMine)){
                         continue outer;
                     }
 

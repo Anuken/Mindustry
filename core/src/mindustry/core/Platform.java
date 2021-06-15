@@ -79,15 +79,6 @@ public interface Platform{
     }
 
     default Context getScriptContext(){
-        ContextFactory.getGlobalSetter().setContextFactoryGlobal(new ContextFactory(){
-            @Override
-            protected Context makeContext(){
-                Context ctx = super.makeContext();
-                ctx.setClassShutter(Scripts::allowClass);
-                return ctx;
-            }
-        });
-
         Context c = Context.enter();
         c.setOptimizationLevel(9);
         return c;

@@ -164,7 +164,7 @@ public class MapGenerateDialog extends BaseDialog{
             for(int x = 0; x < editor.width(); x++){
                 for(int y = 0; y < editor.height(); y++){
                     Tile tile = editor.tile(x, y);
-                    input.apply(x, y, tile.block(), tile.floor(), tile.overlay());
+                    input.set(x, y, tile.block(), tile.floor(), tile.overlay());
                     filter.apply(input);
                     writeTiles[x + y*world.width()] = PackTile.get(input.block.id, input.floor.id, input.overlay.id);
                 }
@@ -340,6 +340,7 @@ public class MapGenerateDialog extends BaseDialog{
                 if(filter.isPost() && applied) continue;
 
                 p.button((icon == '\0' ? "" : icon + " ") + filter.name(), Styles.cleart, () -> {
+                    filter.randomize();
                     filters.add(filter);
                     rebuildFilters();
                     update();
@@ -419,7 +420,7 @@ public class MapGenerateDialog extends BaseDialog{
                     pixmap.each((px, py) -> {
                         int x = px * scaling, y = py * scaling;
                         long tile = buffer1[px + py * w];
-                        input.apply(x, y, content.block(PackTile.block(tile)), content.block(PackTile.floor(tile)), content.block(PackTile.overlay(tile)));
+                        input.set(x, y, content.block(PackTile.block(tile)), content.block(PackTile.floor(tile)), content.block(PackTile.overlay(tile)));
                         filter.apply(input);
                         buffer2[px + py * w] = PackTile.get(input.block.id, input.floor.id, input.overlay.id);
                     });

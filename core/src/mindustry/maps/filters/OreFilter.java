@@ -1,6 +1,5 @@
 package mindustry.maps.filters;
 
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -13,14 +12,14 @@ public class OreFilter extends GenerateFilter{
 
     @Override
     public FilterOption[] options(){
-        return Structs.arr(
-        new SliderOption("scale", () -> scl, f -> scl = f, 1f, 500f),
-        new SliderOption("threshold", () -> threshold, f -> threshold = f, 0f, 1f),
-        new SliderOption("octaves", () -> octaves, f -> octaves = f, 1f, 10f),
-        new SliderOption("falloff", () -> falloff, f -> falloff = f, 0f, 1f),
-        new BlockOption("ore", () -> ore, b -> ore = b, oresOnly),
-        new BlockOption("target", () -> target, b -> target = b, oresFloorsOptional)
-        );
+        return new FilterOption[]{
+            new SliderOption("scale", () -> scl, f -> scl = f, 1f, 500f),
+            new SliderOption("threshold", () -> threshold, f -> threshold = f, 0f, 1f),
+            new SliderOption("octaves", () -> octaves, f -> octaves = f, 1f, 10f),
+            new SliderOption("falloff", () -> falloff, f -> falloff = f, 0f, 1f),
+            new BlockOption("ore", () -> ore, b -> ore = b, oresOnly),
+            new BlockOption("target", () -> target, b -> target = b, oresFloorsOptional)
+        };
     }
 
     @Override
@@ -29,8 +28,8 @@ public class OreFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(){
-        float noise = noise(in.x, in.y, scl, 1f, octaves, falloff);
+    public void apply(GenerateInput in){
+        float noise = noise(in, scl, 1f, octaves, falloff);
 
         if(noise > threshold && in.overlay != Blocks.spawn && (target == Blocks.air || in.floor == target || in.overlay == target) && in.floor.asFloor().hasSurface()){
             in.overlay = ore;

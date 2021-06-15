@@ -62,13 +62,6 @@ public class AndroidRhinoContext{
             initApplicationClassLoader(createClassLoader(AndroidContextFactory.class.getClassLoader()));
         }
 
-        @Override
-        protected Context makeContext(){
-            Context ctx = super.makeContext();
-            ctx.setClassShutter(Scripts::allowClass);
-            return ctx;
-        }
-
         /**
          * Create a ClassLoader which is able to deal with bytecode
          * @param parent the parent of the create classloader

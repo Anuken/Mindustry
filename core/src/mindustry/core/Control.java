@@ -323,13 +323,14 @@ public class Control implements ApplicationListener, Loadable{
             if(slot != null && !clearSectors){
 
                 try{
+                    boolean hadNoCore = !sector.info.hasCore;
                     reloader.begin();
                     slot.load();
                     slot.setAutosave(true);
                     state.rules.sector = sector;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
-                    if(state.rules.defaultTeam.cores().isEmpty()){
+                    if(state.rules.defaultTeam.cores().isEmpty() || hadNoCore){
 
                         //no spawn set -> delete the sector save
                         if(sector.info.spawnPosition == 0){
