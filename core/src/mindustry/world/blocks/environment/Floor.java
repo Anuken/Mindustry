@@ -4,7 +4,6 @@ import arc.*;
 import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -15,15 +14,12 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
 public class Floor extends Block{
-    /** number of different variant regions to use */
-    public int variants = 3;
     /** edge fallback, used mainly for ores */
     public String edge = "stone";
     /** Multiplies unit velocity by this when walked on. */
@@ -50,8 +46,6 @@ public class Floor extends Block{
     public @Nullable Liquid liquidDrop = null;
     /** Multiplier for pumped liquids, used for deep water. */
     public float liquidMultiplier = 1f;
-    /** item that drops from this block, used for drills */
-    public @Nullable Item itemDrop = null;
     /** whether this block can be drowned in */
     public boolean isLiquid;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
@@ -80,6 +74,12 @@ public class Floor extends Block{
 
     public Floor(String name){
         super(name);
+        variants = 3;
+    }
+
+    public Floor(String name, int variants){
+        super(name);
+        this.variants = variants;
     }
 
     @Override
@@ -89,7 +89,6 @@ public class Floor extends Block{
         //load variant regions for drawing
         if(variants > 0){
             variantRegions = new TextureRegion[variants];
-
             for(int i = 0; i < variants; i++){
                 variantRegions[i] = Core.atlas.find(name + (i + 1));
             }
@@ -97,7 +96,6 @@ public class Floor extends Block{
             variantRegions = new TextureRegion[1];
             variantRegions[0] = Core.atlas.find(name);
         }
-
         int size = (int)(tilesize / Draw.scl);
         if(Core.atlas.has(name + "-edge")){
             edges = Core.atlas.find(name + "-edge").split(size, size);
@@ -119,7 +117,7 @@ public class Floor extends Block{
         if(wall == null) wall = Blocks.air;
 
         if(decoration == Blocks.air){
-            decoration = content.blocks().min(b -> b instanceof Boulder && b.minfo.mod == null && b.breakable ? mapColor.diff(b.mapColor) : Float.POSITIVE_INFINITY);
+            decoration = content.blocks().min(b -> b instanceof Prop && b.minfo.mod == null && b.breakable ? mapColor.diff(b.mapColor) : Float.POSITIVE_INFINITY);
         }
 
         if(isLiquid && walkEffect == Fx.none){
@@ -134,29 +132,19 @@ public class Floor extends Block{
     @Override
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
-        packer.add(PageType.editor, "editor-" + name, Core.atlas.getPixmap((AtlasRegion)icon(Cicon.full)).crop());
+        packer.add(PageType.editor, "editor-" + name, Core.atlas.getPixmap(fullIcon));
 
         if(blendGroup != this){
             return;
         }
 
-        if(variants > 0){
-            for(int i = 0; i < variants; i++){
-                String rname = name + (i + 1);
-                packer.add(PageType.editor, "editor-" + rname, Core.atlas.getPixmap(rname).crop());
-            }
-        }
-
-        Color color = new Color();
-        Color color2 = new Color();
-        PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)icons()[0]);
+        PixmapRegion image = Core.atlas.getPixmap(icons()[0]);
         PixmapRegion edge = Core.atlas.getPixmap("edge-stencil");
         Pixmap result = new Pixmap(edge.width, edge.height);
 
         for(int x = 0; x < edge.width; x++){
             for(int y = 0; y < edge.height; y++){
-                edge.getPixel(x, y, color);
-                result.draw(x, y, color.mul(color2.set(image.getPixel(x % image.width, y % image.height))));
+                result.set(x, y, Color.muli(edge.get(x, y), image.get(x % image.width, y % image.height)));
             }
         }
 

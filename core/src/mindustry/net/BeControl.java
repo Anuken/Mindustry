@@ -7,6 +7,7 @@ import arc.func.*;
 import arc.util.*;
 import arc.util.async.*;
 import arc.util.serialization.*;
+import mindustry.*;
 import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -39,7 +40,7 @@ public class BeControl{
     public BeControl(){
         if(active()){
             Timer.schedule(() -> {
-                if(checkUpdates && !mobile){
+                if(Vars.clientLoaded && checkUpdates && !mobile){
                     checkUpdate(t -> {});
                 }
             }, updateInterval, updateInterval);

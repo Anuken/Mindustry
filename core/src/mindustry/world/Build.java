@@ -35,6 +35,13 @@ public class Build{
 
         int rotation = tile.build != null ? tile.build.rotation : 0;
         Block previous = tile.block();
+
+        //instantly deconstruct if necessary
+        if(previous.instantDeconstruct){
+            ConstructBlock.deconstructFinish(tile, previous, unit);
+            return;
+        }
+
         Block sub = ConstructBlock.get(previous.size);
 
         Seq<Building> prevBuild = new Seq<>(1);
@@ -74,6 +81,14 @@ public class Build{
             Fx.rotateBlock.at(tile.build.x, tile.build.y, tile.build.block.size);
             return;
         }
+
+        //break all props in the way
+        tile.getLinkedTilesAs(result, out -> {
+            if(out.block != Blocks.air && out.block.alwaysReplace){
+                out.block.breakEffect.at(out.drawx(), out.drawy(), out.block.size, out.block.mapColor);
+                out.remove();
+            }
+        });
 
         Block previous = tile.block();
         Block sub = ConstructBlock.get(result.size);
@@ -159,7 +174,7 @@ public class Build{
                         //this could be buggy and abuse-able, so I'm not enabling it yet
                         //note that this requires a change in BuilderComp as well
                         //(type == check.block() && check.centerX() == x && check.centerY() == y && check.build != null && check.build.health < check.build.maxHealth - 0.0001f) ||
-                        (check.build instanceof ConstructBuild build && build.cblock == type && check.centerX() == tile.x && check.centerY() == tile.y)) && //same type in construction
+                        (check.build instanceof ConstructBuild build && build.current == type && check.centerX() == tile.x && check.centerY() == tile.y)) && //same type in construction
                     type.bounds(tile.x, tile.y, Tmp.r1).grow(0.01f).contains(check.block.bounds(check.centerX(), check.centerY(), Tmp.r2))) || //no replacement
                 (type.requiresWater && check.floor().liquidDrop != Liquids.water) //requires water but none found
                 ) return false;

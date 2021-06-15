@@ -156,7 +156,7 @@ public class WaveSpawner{
         }
 
         if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam)){
-            for(Building core : state.teams.get(state.rules.waveTeam).cores){
+            for(Building core : state.rules.waveTeam.data().cores){
                 cons.get(core.x, core.y);
             }
         }

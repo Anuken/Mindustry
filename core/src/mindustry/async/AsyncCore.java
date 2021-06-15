@@ -10,19 +10,14 @@ import static mindustry.Vars.*;
 
 public class AsyncCore{
     //all processes to be executed each frame
-    private final Seq<AsyncProcess> processes = Seq.with(
+    public final Seq<AsyncProcess> processes = Seq.with(
         new PhysicsProcess()
     );
 
     //futures to be awaited
     private final Seq<Future<?>> futures = new Seq<>();
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(processes.size, r -> {
-        Thread thread = new Thread(r, "AsyncLogic-Thread");
-        thread.setDaemon(true);
-        thread.setUncaughtExceptionHandler((t, e) -> Core.app.post(() -> { throw new RuntimeException(e); }));
-        return thread;
-    });
+    private ExecutorService executor;
 
     public AsyncCore(){
         Events.on(WorldLoadEvent.class, e -> {
@@ -48,6 +43,16 @@ public class AsyncCore{
             }
 
             futures.clear();
+
+            //init executor with size of potentially-modified process list
+            if(executor == null){
+                executor = Executors.newFixedThreadPool(processes.size, r -> {
+                    Thread thread = new Thread(r, "AsyncLogic-Thread");
+                    thread.setDaemon(true);
+                    thread.setUncaughtExceptionHandler((t, e) -> Core.app.post(() -> { throw new RuntimeException(e); }));
+                    return thread;
+                });
+            }
 
             //submit all tasks
             for(AsyncProcess p : processes){

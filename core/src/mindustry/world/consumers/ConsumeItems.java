@@ -6,7 +6,6 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
-import mindustry.world.meta.values.*;
 
 public class ConsumeItems extends Consume{
     public final ItemStack[] items;
@@ -22,7 +21,7 @@ public class ConsumeItems extends Consume{
 
     @Override
     public void applyItemFilter(Bits filter){
-        for(ItemStack stack : items){
+        for(var stack : items){
             filter.set(stack.item.id);
         }
     }
@@ -36,10 +35,10 @@ public class ConsumeItems extends Consume{
     public void build(Building tile, Table table){
         table.table(c -> {
             int i = 0;
-            for(ItemStack stack : items){
-                c.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
+            for(var stack : items){
+                c.add(new ReqImage(new ItemImage(stack.item.uiIcon, stack.amount),
                 () -> tile.items != null && tile.items.has(stack.item, stack.amount))).padRight(8);
-                if(++i % 4 == 0) table.row();
+                if(++i % 4 == 0) c.row();
             }
         }).left();
     }
@@ -56,7 +55,7 @@ public class ConsumeItems extends Consume{
 
     @Override
     public void trigger(Building entity){
-        for(ItemStack stack : items){
+        for(var stack : items){
             entity.items.remove(stack);
         }
     }
@@ -68,6 +67,6 @@ public class ConsumeItems extends Consume{
 
     @Override
     public void display(Stats stats){
-        stats.add(booster ? Stat.booster : Stat.input, new ItemListValue(items));
+        stats.add(booster ? Stat.booster : Stat.input, stats.timePeriod < 0 ? StatValues.items(items) : StatValues.items(stats.timePeriod, items));
     }
 }

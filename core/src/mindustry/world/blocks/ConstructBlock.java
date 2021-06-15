@@ -16,8 +16,8 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.modules.*;
@@ -54,7 +54,7 @@ public class ConstructBlock extends Block{
     @Remote(called = Loc.server)
     public static void deconstructFinish(Tile tile, Block block, Unit builder){
         Team team = tile.team();
-        Fx.breakBlock.at(tile.drawx(), tile.drawy(), block.size);
+        block.breakEffect.at(tile.drawx(), tile.drawy(), block.size, block.mapColor);
         Events.fire(new BlockBuildEndEvent(tile, builder, team, true, null));
         tile.remove();
         if(shouldPlay()) Sounds.breaks.at(tile, calcPitch(false));
@@ -92,6 +92,8 @@ public class ConstructBlock extends Block{
 
         Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
+
+        Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
     }
 
     static boolean shouldPlay(){
@@ -123,8 +125,6 @@ public class ConstructBlock extends Block{
         if(tile.build != null){
             tile.build.placed();
         }
-
-        Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
     }
 
     @Override
@@ -133,43 +133,36 @@ public class ConstructBlock extends Block{
     }
 
     public class ConstructBuild extends Building{
-        /**
-         * The recipe of the block that is being constructed.
-         * If there is no recipe for this block, as is the case with rocks, 'previous' is used.
-         */
-        public @Nullable Block cblock;
+        /** The recipe of the block that is being (de)constructed. Never null. */
+        public Block current = Blocks.air;
+        /** The block that used to be here. Never null. */
+        public Block previous = Blocks.air;
+        /** Buildings that previously occupied this location. */
         public @Nullable Seq<Building> prevBuild;
 
         public float progress = 0;
         public float buildCost;
-        /**
-         * The block that used to be here.
-         * If a non-recipe block is being deconstructed, this is the block that is being deconstructed.
-         */
-        public Block previous;
         public @Nullable Object lastConfig;
+        public @Nullable Unit lastBuilder;
         public boolean wasConstructing, activeDeconstruct;
         public float constructColor;
-
-        @Nullable
-        public Unit lastBuilder;
 
         private float[] accumulator;
         private float[] totalAccumulator;
 
         @Override
         public String getDisplayName(){
-            return Core.bundle.format("block.constructing", cblock == null ? previous.localizedName : cblock.localizedName);
+            return Core.bundle.format("block.constructing", current.localizedName);
         }
 
         @Override
         public TextureRegion getDisplayIcon(){
-            return (cblock == null ? previous : cblock).icon(Cicon.full);
+            return current.fullIcon;
         }
 
         @Override
         public boolean checkSolid(){
-            return (cblock != null && cblock.solid) || previous == null || previous.solid;
+            return current.solid || previous.solid;
         }
 
         @Override
@@ -180,12 +173,18 @@ public class ConstructBlock extends Block{
         @Override
         public void tapped(){
             //if the target is constructable, begin constructing
-            if(cblock != null){
+            if(current.isPlaceable()){
                 if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
                     control.input.isBuilding = true;
                 }
-                player.unit().addBuild(new BuildPlan(tile.x, tile.y, rotation, cblock, lastConfig), false);
+                player.unit().addBuild(new BuildPlan(tile.x, tile.y, rotation, current, lastConfig), false);
             }
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return Mathf.clamp(progress);
+            return super.sense(sensor);
         }
 
         @Override
@@ -199,29 +198,33 @@ public class ConstructBlock extends Block{
 
         @Override
         public void updateTile(){
+            //auto-remove air blocks
+            if(current == Blocks.air){
+                remove();
+            }
+
             constructColor = Mathf.lerpDelta(constructColor, activeDeconstruct ? 1f : 0f, 0.2f);
             activeDeconstruct = false;
         }
 
         @Override
         public void draw(){
-            if(!(previous == null || cblock == null || previous == cblock) && Core.atlas.isFound(previous.icon(Cicon.full))){
-                Draw.rect(previous.icon(Cicon.full), x, y, previous.rotate ? rotdeg() : 0);
+            //do not draw air
+            if(current == Blocks.air) return;
+
+            if(previous != current && previous != Blocks.air && previous.fullIcon.found()){
+                Draw.rect(previous.fullIcon, x, y, previous.rotate ? rotdeg() : 0);
             }
 
             Draw.draw(Layer.blockBuilding, () -> {
                 Draw.color(Pal.accent, Pal.remove, constructColor);
 
-                Block target = cblock == null ? previous : cblock;
+                for(TextureRegion region : current.getGeneratedIcons()){
+                    Shaders.blockbuild.region = region;
+                    Shaders.blockbuild.progress = progress;
 
-                if(target != null){
-                    for(TextureRegion region : target.getGeneratedIcons()){
-                        Shaders.blockbuild.region = region;
-                        Shaders.blockbuild.progress = progress;
-
-                        Draw.rect(region, x, y, target.rotate ? rotdeg() : 0);
-                        Draw.flush();
-                    }
+                    Draw.rect(region, x, y, current.rotate ? rotdeg() : 0);
+                    Draw.flush();
                 }
 
                 Draw.color();
@@ -231,10 +234,6 @@ public class ConstructBlock extends Block{
         public void construct(Unit builder, @Nullable Building core, float amount, Object config){
             wasConstructing = true;
             activeDeconstruct = false;
-            if(cblock == null){
-                kill();
-                return;
-            }
 
             if(builder.isPlayer()){
                 lastBuilder = builder;
@@ -242,14 +241,14 @@ public class ConstructBlock extends Block{
 
             lastConfig = config;
 
-            if(cblock.requirements.length != accumulator.length || totalAccumulator.length != cblock.requirements.length){
-                setConstruct(previous, cblock);
+            if(current.requirements.length != accumulator.length || totalAccumulator.length != current.requirements.length){
+                setConstruct(previous, current);
             }
 
             float maxProgress = core == null || team.rules().infiniteResources ? amount : checkRequired(core.items, amount, false);
 
-            for(int i = 0; i < cblock.requirements.length; i++){
-                int reqamount = Math.round(state.rules.buildCostMultiplier * cblock.requirements[i].amount);
+            for(int i = 0; i < current.requirements.length; i++){
+                int reqamount = Math.round(state.rules.buildCostMultiplier * current.requirements[i].amount);
                 accumulator[i] += Math.min(reqamount * maxProgress, reqamount - totalAccumulator[i] + 0.00001f); //add min amount progressed to the accumulator
                 totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * maxProgress, reqamount);
             }
@@ -260,16 +259,19 @@ public class ConstructBlock extends Block{
 
             if(progress >= 1f || state.rules.infiniteResources){
                 if(lastBuilder == null) lastBuilder = builder;
-                constructed(tile, cblock, lastBuilder, (byte)rotation, builder.team, config);
+                if(!net.client()){
+                    constructed(tile, current, lastBuilder, (byte)rotation, builder.team, config);
+                }
             }
         }
 
-        public void deconstruct(Unit builder, @Nullable Building core, float amount){
+        public void deconstruct(Unit builder, @Nullable CoreBuild core, float amount){
             //reset accumulated resources when switching modes
             if(wasConstructing){
                 Arrays.fill(accumulator, 0);
                 Arrays.fill(totalAccumulator, 0);
             }
+
             wasConstructing = false;
             activeDeconstruct = true;
             float deconstructMultiplier = state.rules.deconstructRefundMultiplier;
@@ -278,55 +280,53 @@ public class ConstructBlock extends Block{
                 lastBuilder = builder;
             }
 
-            if(cblock != null){
-                ItemStack[] requirements = cblock.requirements;
-                if(requirements.length != accumulator.length || totalAccumulator.length != requirements.length){
-                    setDeconstruct(cblock);
-                }
+            ItemStack[] requirements = current.requirements;
+            if(requirements.length != accumulator.length || totalAccumulator.length != requirements.length){
+                setDeconstruct(current);
+            }
 
-                //make sure you take into account that you can't deconstruct more than there is deconstructed
-                float clampedAmount = Math.min(amount, progress);
+            //make sure you take into account that you can't deconstruct more than there is deconstructed
+            float clampedAmount = Math.min(amount, progress);
 
-                for(int i = 0; i < requirements.length; i++){
-                    int reqamount = Math.round(state.rules.buildCostMultiplier * requirements[i].amount);
-                    accumulator[i] += Math.min(clampedAmount * deconstructMultiplier * reqamount, deconstructMultiplier * reqamount - totalAccumulator[i]); //add scaled amount progressed to the accumulator
-                    totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * clampedAmount * deconstructMultiplier, reqamount);
+            for(int i = 0; i < requirements.length; i++){
+                int reqamount = Math.round(state.rules.buildCostMultiplier * requirements[i].amount);
+                accumulator[i] += Math.min(clampedAmount * deconstructMultiplier * reqamount, deconstructMultiplier * reqamount - totalAccumulator[i]); //add scaled amount progressed to the accumulator
+                totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * clampedAmount * deconstructMultiplier, reqamount);
 
-                    int accumulated = (int)(accumulator[i]); //get amount
+                int accumulated = (int)(accumulator[i]); //get amount
 
-                    if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
-                        if(core != null && requirements[i].item.unlockedNow()){ //only accept items that are unlocked
-                            int accepting = Math.min(accumulated, ((CoreBuild)core).storageCapacity - core.items.get(requirements[i].item));
-                            //transfer items directly, as this is not production.
-                            core.items.add(requirements[i].item, accepting);
-                            accumulator[i] -= accepting;
-                        }else{
-                            accumulator[i] -= accumulated;
-                        }
+                if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
+                    if(core != null && requirements[i].item.unlockedNow()){ //only accept items that are unlocked
+                        int accepting = Math.min(accumulated, core.storageCapacity - core.items.get(requirements[i].item));
+                        //transfer items directly, as this is not production.
+                        core.items.add(requirements[i].item, accepting);
+                        accumulator[i] -= accepting;
+                    }else{
+                        accumulator[i] -= accumulated;
                     }
                 }
             }
 
             progress = Mathf.clamp(progress - amount);
 
-            if(progress <= (previous == null ? 0 : previous.deconstructThreshold) || state.rules.infiniteResources){
+            if(progress <= current.deconstructThreshold || state.rules.infiniteResources){
                 if(lastBuilder == null) lastBuilder = builder;
-                Call.deconstructFinish(tile, this.cblock == null ? previous : this.cblock, lastBuilder);
+                Call.deconstructFinish(tile, this.current, lastBuilder);
             }
         }
 
         private float checkRequired(ItemModule inventory, float amount, boolean remove){
             float maxProgress = amount;
 
-            for(int i = 0; i < cblock.requirements.length; i++){
-                int sclamount = Math.round(state.rules.buildCostMultiplier * cblock.requirements[i].amount);
+            for(int i = 0; i < current.requirements.length; i++){
+                int sclamount = Math.round(state.rules.buildCostMultiplier * current.requirements[i].amount);
                 int required = (int)(accumulator[i]); //calculate items that are required now
 
-                if(inventory.get(cblock.requirements[i].item) == 0 && sclamount != 0){
+                if(inventory.get(current.requirements[i].item) == 0 && sclamount != 0){
                     maxProgress = 0f;
                 }else if(required > 0){ //if this amount is positive...
                     //calculate how many items it can actually use
-                    int maxUse = Math.min(required, inventory.get(cblock.requirements[i].item));
+                    int maxUse = Math.min(required, inventory.get(current.requirements[i].item));
                     //get this as a fraction
                     float fraction = maxUse / (float)required;
 
@@ -337,7 +337,7 @@ public class ConstructBlock extends Block{
 
                     //remove stuff that is actually used
                     if(remove){
-                        inventory.remove(cblock.requirements[i].item, maxUse);
+                        inventory.remove(current.requirements[i].item, maxUse);
                     }
                 }
                 //else, no items are required yet, so just keep going
@@ -351,13 +351,15 @@ public class ConstructBlock extends Block{
         }
 
         public void setConstruct(Block previous, Block block){
+            if(block == null) return;
+
             this.constructColor = 0f;
             this.wasConstructing = true;
-            this.cblock = block;
+            this.current = block;
             this.previous = previous;
+            this.buildCost = block.buildCost * state.rules.buildCostMultiplier;
             this.accumulator = new float[block.requirements.length];
             this.totalAccumulator = new float[block.requirements.length];
-            this.buildCost = block.buildCost * state.rules.buildCostMultiplier;
         }
 
         public void setDeconstruct(Block previous){
@@ -367,12 +369,8 @@ public class ConstructBlock extends Block{
             this.wasConstructing = false;
             this.previous = previous;
             this.progress = 1f;
-            if(previous.buildCost >= 0.01f){
-                this.cblock = previous;
-                this.buildCost = previous.buildCost * state.rules.buildCostMultiplier;
-            }else{
-                this.buildCost = 20f; //default no-requirement build cost is 20
-            }
+            this.current = previous;
+            this.buildCost = previous.buildCost * state.rules.buildCostMultiplier;
             this.accumulator = new float[previous.requirements.length];
             this.totalAccumulator = new float[previous.requirements.length];
         }
@@ -381,8 +379,8 @@ public class ConstructBlock extends Block{
         public void write(Writes write){
             super.write(write);
             write.f(progress);
-            write.s(previous == null ? -1 : previous.id);
-            write.s(cblock == null ? -1 : cblock.id);
+            write.s(previous.id);
+            write.s(current.id);
 
             if(accumulator == null){
                 write.b(-1);
@@ -413,13 +411,12 @@ public class ConstructBlock extends Block{
             }
 
             if(pid != -1) previous = content.block(pid);
-            if(rid != -1) cblock = content.block(rid);
+            if(rid != -1) current = content.block(rid);
 
-            if(cblock != null){
-                buildCost = cblock.buildCost * state.rules.buildCostMultiplier;
-            }else{
-                buildCost = 20f;
-            }
+            if(previous == null) previous = Blocks.air;
+            if(current == null) current = Blocks.air;
+
+            buildCost = current.buildCost * state.rules.buildCostMultiplier;
         }
     }
 }

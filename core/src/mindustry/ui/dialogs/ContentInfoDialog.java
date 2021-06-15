@@ -8,6 +8,8 @@ import mindustry.ctype.*;
 import mindustry.graphics.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class ContentInfoDialog extends BaseDialog{
 
     public ContentInfoDialog(){
@@ -26,9 +28,7 @@ public class ContentInfoDialog extends BaseDialog{
         content.checkStats();
 
         table.table(title1 -> {
-            var size = content.prefDatabaseIcon();
-
-            title1.image(content.icon(size)).size(size.size).scaling(Scaling.fit);
+            title1.image(content.uiIcon).size(iconXLarge).scaling(Scaling.fit);
             title1.add("[accent]" + content.localizedName).padLeft(5);
         });
 
@@ -67,7 +67,7 @@ public class ContentInfoDialog extends BaseDialog{
             for(Stat stat : map.keys()){
                 table.table(inset -> {
                     inset.left();
-                    inset.add("[lightgray]" + stat.localized() + ":[] ").left();
+                    inset.add("[lightgray]" + stat.localized() + ":[] ").left().top();
                     Seq<StatValue> arr = map.get(stat);
                     for(StatValue value : arr){
                         value.display(inset);

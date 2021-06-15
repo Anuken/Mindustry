@@ -5,6 +5,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.gen.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 
@@ -25,6 +26,11 @@ public class OreMedianFilter extends GenerateFilter{
     @Override
     public boolean isBuffered(){
         return true;
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockOreLead;
     }
 
     @Override

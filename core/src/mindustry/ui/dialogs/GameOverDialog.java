@@ -5,7 +5,6 @@ import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
@@ -31,7 +30,7 @@ public class GameOverDialog extends BaseDialog{
     }
 
     void rebuild(){
-        title.setText(state.isCampaign() ? "@sector.curlost" : "@gameover");
+        title.setText(state.isCampaign() ? Core.bundle.format("sector.lost", state.getSector().name()) : "@gameover");
         buttons.clear();
         cont.clear();
 
@@ -66,7 +65,7 @@ public class GameOverDialog extends BaseDialog{
                         if(state.stats.itemsDelivered.get(item, 0) > 0){
                             t.table(items -> {
                                 items.add("    [lightgray]" + state.stats.itemsDelivered.get(item, 0));
-                                items.image(item.icon(Cicon.small)).size(8 * 3).pad(4);
+                                items.image(item.uiIcon).size(8 * 3).pad(4);
                             }).left().row();
                         }
                     }

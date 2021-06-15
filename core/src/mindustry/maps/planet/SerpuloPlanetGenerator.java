@@ -18,7 +18,6 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class SerpuloPlanetGenerator extends PlanetGenerator{
-    RidgedPerlin rid = new RidgedPerlin(1, 2);
     BaseGenerator basegen = new BaseGenerator();
     float scl = 5f;
     float waterOffset = 0.07f;
@@ -115,7 +114,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         tile.floor = getBlock(position);
         tile.block = tile.floor.asFloor().wall;
 
-        if(rid.getValue(position.x, position.y, position.z, 22) > 0.32){
+        if(RidgedPerlin.noise3d(1, position.x, position.y, position.z, 2, 22) > 0.31){
             tile.block = Blocks.air;
         }
     }
@@ -162,12 +161,11 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             }
 
             void connect(Room to){
-                if(connected.contains(to)) return;
+                if(!connected.add(to)) return;
 
-                connected.add(to);
-                float nscl = rand.random(20f, 60f);
-                int stroke = rand.random(4, 12);
-                brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + noise(tile.x, tile.y, 1, 1, 1f / nscl) * 60, Astar.manhattan), stroke);
+                float nscl = rand.random(100f, 140f);
+                int stroke = rand.random(3, 9);
+                brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + noise(tile.x, tile.y, 2, 0.4, 1f / nscl) * 500, Astar.manhattan), stroke);
             }
         }
 
@@ -219,7 +217,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                 for(int j = 0; j < enemySpawns; j++){
                     float enemyOffset = rand.range(60f);
                     Tmp.v1.set(cx - width/2, cy - height/2).rotate(180f + enemyOffset).add(width/2, height/2);
-                    Room espawn = new Room((int)Tmp.v1.x, (int)Tmp.v1.y, rand.random(8, 15));
+                    Room espawn = new Room((int)Tmp.v1.x, (int)Tmp.v1.y, rand.random(8, 16));
                     roomseq.add(espawn);
                     enemies.add(espawn);
                 }

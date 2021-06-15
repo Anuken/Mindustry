@@ -79,15 +79,18 @@ public class ScriptMainGenerator{
         "mindustry.entities.abilities",
         "mindustry.ai.types",
         "mindustry.type.weather",
+        "mindustry.type.weapons",
         "mindustry.game.Objectives",
         "mindustry.world.blocks",
-        "mindustry.world.draw"
+        "mindustry.world.draw",
+        "mindustry.type"
         );
 
         String classTemplate = "package mindustry.mod;\n" +
         "\n" +
         "import arc.struct.*;\n" +
         "/** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */\n" +
+        "@SuppressWarnings(\"deprecation\")\n" +
         "public class ClassMap{\n" +
         "    public static final ObjectMap<String, Class<?>> classes = new ObjectMap<>();\n" +
         "    \n" +

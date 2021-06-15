@@ -9,6 +9,7 @@ import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
 import java.util.*;
@@ -69,6 +70,8 @@ public class SectorInfo{
     public @Nullable String name;
     /** Displayed icon. */
     public @Nullable String icon;
+    /** Displayed icon, as content. */
+    public @Nullable UnlockableContent contentIcon;
     /** Version of generated waves. When it doesn't match, new waves are generated. */
     public int waveVersion = -1;
     /** Whether this sector was indicated to the player or not. */
@@ -190,6 +193,13 @@ public class SectorInfo{
         production.each((item, stat) -> {
             stat.mean = Math.min(stat.mean, rawProduction.get(item, ExportStat::new).mean);
         });
+
+        var pads = indexer.getAllied(state.rules.defaultTeam, BlockFlag.launchPad);
+
+        //disable export when launch pads are disabled, or there aren't any active ones
+        if(pads.size() == 0 || !Seq.with(pads).contains(t -> t.build.consValid())){
+            export.clear();
+        }
 
         if(state.rules.sector != null){
             state.rules.sector.saveInfo();

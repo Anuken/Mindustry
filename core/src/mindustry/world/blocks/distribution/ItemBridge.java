@@ -23,7 +23,6 @@ import static mindustry.Vars.*;
 public class ItemBridge extends Block{
     private static BuildPlan otherReq;
 
-    public final int timerTransport = timers++;
     public int range;
     public float transportTime = 2f;
     public @Load("@-end") TextureRegion endRegion;
@@ -38,7 +37,6 @@ public class ItemBridge extends Block{
         update = true;
         solid = true;
         hasPower = true;
-        expanded = true;
         itemCapacity = 10;
         configurable = true;
         hasItems = true;
@@ -95,14 +93,12 @@ public class ItemBridge extends Block{
 
         Tile link = findLink(x, y);
 
-        Lines.stroke(2f, Pal.placing);
         for(int i = 0; i < 4; i++){
-            Lines.dashLine(
+            Drawf.dashLine(Pal.placing,
             x * tilesize + Geometry.d4[i].x * (tilesize / 2f + 2),
             y * tilesize + Geometry.d4[i].y * (tilesize / 2f + 2),
-            x * tilesize + Geometry.d4[i].x * (range + 0.5f) * tilesize,
-            y * tilesize + Geometry.d4[i].y * (range + 0.5f) * tilesize,
-            range);
+            x * tilesize + Geometry.d4[i].x * (range) * tilesize,
+            y * tilesize + Geometry.d4[i].y * (range) * tilesize);
         }
 
         Draw.reset();
@@ -150,6 +146,12 @@ public class ItemBridge extends Block{
     }
 
     @Override
+    public void init(){
+        super.init();
+        clipSize = Math.max(clipSize, (range + 0.5f) * tilesize * 2);
+    }
+
+    @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
         for(int i = 0; i < plans.size - 1; i++){
             var cur = plans.get(i);
@@ -167,18 +169,20 @@ public class ItemBridge extends Block{
 
     public class ItemBridgeBuild extends Building{
         public int link = -1;
+        //TODO awful
         public IntSet incoming = new IntSet();
         public float uptime;
         public float time;
         public float time2;
         public float cycleSpeed = 1f;
+        public float transportCounter;
 
         @Override
         public void playerPlaced(Object config){
             super.playerPlaced(config);
 
             Tile link = findLink(tile.x, tile.y);
-            if(linkValid(tile, link) && !proximity.contains(link.build)){
+            if(linkValid(tile, link) && this.link != link.pos() && !proximity.contains(link.build)){
                 link.build.configure(tile.pos());
             }
 
@@ -286,7 +290,7 @@ public class ItemBridge extends Block{
 
             Tile other = world.tile(link);
             if(!linkValid(tile, other)){
-                dump();
+                doDump();
                 uptime = 0f;
             }else{
                 ((ItemBridgeBuild)other.build).incoming.add(tile.pos());
@@ -301,20 +305,27 @@ public class ItemBridge extends Block{
             }
         }
 
+        public void doDump(){
+            //allow dumping multiple times per frame
+            dumpAccumulate();
+        }
+
         public void updateTransport(Building other){
-            if(uptime >= 0.5f && timer(timerTransport, transportTime)){
+            boolean any = false;
+            transportCounter += edelta();
+            while(transportCounter >= transportTime){
                 Item item = items.take();
                 if(item != null && other.acceptItem(this, item)){
                     other.handleItem(this, item);
-                    cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f); //TODO this is kinda broken, because lerping only happens on a timer
-                }else{
-                    cycleSpeed = Mathf.lerpDelta(cycleSpeed, 1f, 0.01f);
-                    if(item != null){
-                        items.add(item, 1);
-                        items.undoFlow(item);
-                    }
+                    any = true;
+                }else if(item != null){
+                    items.add(item, 1);
+                    items.undoFlow(item);
                 }
+                transportCounter -= transportTime;
             }
+
+            cycleSpeed = Mathf.lerpDelta(cycleSpeed, any ? 4f : 1f, any ? 0.05f : 0.01f);
         }
 
         @Override
