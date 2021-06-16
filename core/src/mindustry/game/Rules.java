@@ -68,6 +68,8 @@ public class Rules{
     public float deconstructRefundMultiplier = 0.5f;
     /** No-build zone around enemy core radius. */
     public float enemyCoreBuildRadius = 400f;
+    /** If true, no-build zones are calculated based on the closest core. */
+    public boolean polygonCoreProtection = false;
     /** Radius around enemy wave drop zones.*/
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
