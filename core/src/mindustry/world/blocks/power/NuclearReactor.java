@@ -138,7 +138,7 @@ public class NuclearReactor extends PowerGenerator{
             Effect.shake(6f, 16f, x, y);
             Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
 
-            explodeEffect.at(x, y);
+            explodeEffect.at(x, y, Mathf.random(360f));
         }
 
         @Override

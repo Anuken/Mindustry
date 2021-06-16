@@ -17,6 +17,9 @@ public class Pal{
     reactorPurple = Color.valueOf("bf92f9"),
     reactorPurple2 = Color.valueOf("8a73c6"),
 
+    impactPlasma1 = Color.valueOf("ffd06b"),
+    impactPlasma2 = Color.valueOf("ff361b"),
+
     spore = Color.valueOf("7457ce"),
 
     shield = Color.valueOf("ffd37f").a(0.7f),
