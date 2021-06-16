@@ -28,6 +28,7 @@ public class ImpactReactor extends PowerGenerator{
     public int explosionDamage = 1900;
 
     public Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
+    public Effect explodeEffect = Fx.explosion, smokeEffect = Fx.impactsmoke;
 
     public @Load("@-bottom") TextureRegion bottomRegion;
     public @Load(value = "@-plasma-#", length = 4) TextureRegion[] plasmaRegions;
@@ -153,14 +154,14 @@ public class ImpactReactor extends PowerGenerator{
             for(int i = 0; i < 20; i++){
                 Time.run(Mathf.random(80), () -> {
                     Tmp.v1.rnd(Mathf.random(40f));
-                    Fx.explosion.at(Tmp.v1.x + x, Tmp.v1.y + y);
+                    explodeEffect.at(Tmp.v1.x + x, Tmp.v1.y + y);
                 });
             }
 
             for(int i = 0; i < 70; i++){
                 Time.run(Mathf.random(90), () -> {
                     Tmp.v1.rnd(Mathf.random(120f));
-                    Fx.impactsmoke.at(Tmp.v1.x + x, Tmp.v1.y + y);
+                    smokeEffect.at(Tmp.v1.x + x, Tmp.v1.y + y);
                 });
             }
         }
