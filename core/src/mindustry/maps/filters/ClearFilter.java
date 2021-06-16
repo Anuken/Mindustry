@@ -1,6 +1,5 @@
 package mindustry.maps.filters;
 
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -12,7 +11,9 @@ public class ClearFilter extends GenerateFilter{
 
     @Override
     public FilterOption[] options(){
-        return Structs.arr(new BlockOption("block", () -> block, b -> block = b, b -> oresOnly.get(b) || wallsOnly.get(b)));
+        return new BlockOption[]{
+            new BlockOption("block", () -> block, b -> block = b, b -> oresOnly.get(b) || wallsOnly.get(b))
+        };
     }
 
     @Override
@@ -21,7 +22,7 @@ public class ClearFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(){
+    public void apply(GenerateInput in){
 
         if(in.block == block){
             in.block = Blocks.air;

@@ -12,17 +12,17 @@ import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 
 public class MirrorFilter extends GenerateFilter{
-    private final Vec2 v1 = new Vec2(), v2 = new Vec2(), v3 = new Vec2();
+    private static final Vec2 v1 = new Vec2(), v2 = new Vec2(), v3 = new Vec2();
 
     int angle = 45;
     boolean rotate = false;
 
     @Override
     public FilterOption[] options(){
-        return Structs.arr(
-        new SliderOption("angle", () -> angle, f -> angle = (int)f, 0, 360, 45),
-        new ToggleOption("rotate", () -> rotate, f -> rotate = f)
-        );
+        return new FilterOption[]{
+            new SliderOption("angle", () -> angle, f -> angle = (int)f, 0, 360, 45),
+            new ToggleOption("rotate", () -> rotate, f -> rotate = f)
+        };
     }
 
     @Override
@@ -31,7 +31,7 @@ public class MirrorFilter extends GenerateFilter{
     }
 
     @Override
-    protected void apply(){
+    public void apply(GenerateInput in){
         v1.trnsExact(angle - 90, 1f);
         v2.set(v1).scl(-1f);
 
@@ -41,7 +41,7 @@ public class MirrorFilter extends GenerateFilter{
         v3.set(in.x, in.y);
 
         if(!left(v1, v2, v3)){
-            mirror(v3, v1.x, v1.y, v2.x, v2.y);
+            mirror(in.width, in.height, v3, v1.x, v1.y, v2.x, v2.y);
             Tile tile = in.tile(v3.x, v3.y);
             in.floor = tile.floor();
             if(!tile.block().synthetic()){
@@ -73,11 +73,11 @@ public class MirrorFilter extends GenerateFilter{
         Draw.reset();
     }
 
-    void mirror(Vec2 p, float x0, float y0, float x1, float y1){
+    void mirror(int width, int height, Vec2 p, float x0, float y0, float x1, float y1){
         //special case: uneven map mirrored at 45 degree angle (or someone might just want rotational symmetry)
-        if((in.width != in.height && angle % 90 != 0) || rotate){
-            p.x = in.width - p.x - 1;
-            p.y = in.height - p.y - 1;
+        if((width != height && angle % 90 != 0) || rotate){
+            p.x = width - p.x - 1;
+            p.y = height - p.y - 1;
         }else{
             float dx = x1 - x0;
             float dy = y1 - y0;

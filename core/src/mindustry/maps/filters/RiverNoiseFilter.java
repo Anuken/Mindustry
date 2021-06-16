@@ -1,6 +1,5 @@
 package mindustry.maps.filters;
 
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -13,16 +12,16 @@ public class RiverNoiseFilter extends GenerateFilter{
 
     @Override
     public FilterOption[] options(){
-        return Structs.arr(
-        new SliderOption("scale", () -> scl, f -> scl = f, 1f, 500f),
-        new SliderOption("threshold", () -> threshold, f -> threshold = f, -1f, 1f),
-        new SliderOption("threshold2", () -> threshold2, f -> threshold2 = f, -1f, 1f),
-        new SliderOption("octaves", () -> octaves, f -> octaves = f, 1f, 10f),
-        new SliderOption("falloff", () -> falloff, f -> falloff = f, 0f, 1f),
-        new BlockOption("block", () -> block, b -> block = b, wallsOnly),
-        new BlockOption("floor", () -> floor, b -> floor = b, floorsOnly),
-        new BlockOption("floor2", () -> floor2, b -> floor2 = b, floorsOnly)
-        );
+        return new FilterOption[]{
+            new SliderOption("scale", () -> scl, f -> scl = f, 1f, 500f),
+            new SliderOption("threshold", () -> threshold, f -> threshold = f, -1f, 1f),
+            new SliderOption("threshold2", () -> threshold2, f -> threshold2 = f, -1f, 1f),
+            new SliderOption("octaves", () -> octaves, f -> octaves = f, 1f, 10f),
+            new SliderOption("falloff", () -> falloff, f -> falloff = f, 0f, 1f),
+            new BlockOption("block", () -> block, b -> block = b, wallsOnly),
+            new BlockOption("floor", () -> floor, b -> floor = b, floorsOnly),
+            new BlockOption("floor2", () -> floor2, b -> floor2 = b, floorsOnly)
+        };
     }
 
     @Override
@@ -31,7 +30,7 @@ public class RiverNoiseFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(){
+    public void apply(GenerateInput in){
         float noise = rnoise(in.x, in.y, (int)octaves, scl, falloff, 1f);
 
         if(noise >= threshold){
