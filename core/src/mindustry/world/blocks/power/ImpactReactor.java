@@ -150,7 +150,6 @@ public class ImpactReactor extends PowerGenerator{
 
             Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
 
-
             explodeEffect.at(x, y, Mathf.random(360f));
         }
 
