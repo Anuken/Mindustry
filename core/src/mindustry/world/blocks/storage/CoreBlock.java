@@ -195,6 +195,20 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
+        public void created(){
+            super.created();
+
+            Events.fire(new CoreChangeEvent(this));
+        }
+
+        @Override
+        public void changeTeam(Team next){
+            super.changeTeam(next);
+
+            Events.fire(new CoreChangeEvent(this));
+        }
+
+        @Override
         public double sense(LAccess sensor){
             if(sensor == LAccess.itemCapacity) return storageCapacity;
             return super.sense(sensor);
@@ -260,6 +274,8 @@ public class CoreBlock extends StorageBlock{
                     spawner.getSpawns().add(tile);
                 }
             }
+
+            Events.fire(new CoreChangeEvent(this));
         }
 
         @Override

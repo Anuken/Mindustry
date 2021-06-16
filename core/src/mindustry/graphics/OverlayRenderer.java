@@ -28,22 +28,24 @@ public class OverlayRenderer{
     private float buildFade, unitFade;
     private Sized lastSelect;
     private Seq<CoreEdge> cedges = new Seq<>();
-    private int lastCores = -1;
+    private boolean updatedCores;
 
     public OverlayRenderer(){
         Events.on(WorldLoadEvent.class, e -> {
-            cedges.clear();
-            lastCores = -1;
+            updatedCores = true;
+        });
+
+        Events.on(CoreChangeEvent.class, e -> {
+            updatedCores = true;
         });
     }
 
     private void updateCoreEdges(){
-        int count = state.teams.active.sum(t -> t.cores.size);
-        if(count == lastCores){
+        if(!updatedCores){
             return;
         }
 
-        lastCores = count;
+        updatedCores = false;
         cedges.clear();
 
         Seq<Vec2> pos = new Seq<>();
@@ -55,6 +57,7 @@ public class OverlayRenderer{
             }
         }
 
+        //if this is laggy, it could be shoved in another thread.
         var result = Voronoi.generate(pos.toArray(Vec2.class), 0, world.unitWidth(), 0, world.unitHeight());
         for(var edge : result){
             cedges.add(new CoreEdge(edge.x1, edge.y1, edge.x2, edge.y2, teams.get(edge.site1).team, teams.get(edge.site2).team));
