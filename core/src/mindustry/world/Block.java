@@ -229,6 +229,8 @@ public class Block extends UnlockableContent{
     public boolean instantDeconstruct = false;
     /** Effect for breaking the block. Passes size as rotation. */
     public Effect breakEffect = Fx.breakBlock;
+    /** Effect for destroying the block. */
+    public Effect destroyEffect = Fx.dynamicExplosion;
     /** Multiplier for cost of research in tech tree. */
     public float researchCostMultiplier = 1;
     /** Whether this block has instant transfer.*/
