@@ -26,6 +26,7 @@ public class ImpactReactor extends PowerGenerator{
     public float itemDuration = 60f;
     public int explosionRadius = 23;
     public int explosionDamage = 1900;
+    public Effect explodeEffect = Fx.impactReactorExplosion;
 
     public Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
 
@@ -137,32 +138,14 @@ public class ImpactReactor extends PowerGenerator{
         public void onDestroyed(){
             super.onDestroyed();
 
-            if(warmup < 0.4f || !state.rules.reactorExplosions) return;
+            if(warmup < 0.3f || !state.rules.reactorExplosions) return;
 
             Sounds.explosionbig.at(tile);
 
-            Effect.shake(6f, 16f, x, y);
-            Fx.impactShockwave.at(x, y);
-            for(int i = 0; i < 6; i++){
-                Time.run(Mathf.random(80), () -> Fx.impactcloud.at(x, y));
-            }
-
             Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
 
-
-            for(int i = 0; i < 20; i++){
-                Time.run(Mathf.random(80), () -> {
-                    Tmp.v1.rnd(Mathf.random(40f));
-                    Fx.explosion.at(Tmp.v1.x + x, Tmp.v1.y + y);
-                });
-            }
-
-            for(int i = 0; i < 70; i++){
-                Time.run(Mathf.random(90), () -> {
-                    Tmp.v1.rnd(Mathf.random(120f));
-                    Fx.impactsmoke.at(Tmp.v1.x + x, Tmp.v1.y + y);
-                });
-            }
+            Effect.shake(6f, 16f, x, y);
+            explodeEffect.at(x, y);
         }
 
         @Override
