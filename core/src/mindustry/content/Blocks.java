@@ -730,6 +730,7 @@ public class Blocks implements ContentList{
             solid = true;
             outputsLiquid = true;
             drawer = new DrawMixer();
+            envEnabled = Env.any;
 
             consumes.power(1f);
             consumes.item(Items.titanium);

@@ -36,6 +36,9 @@ public class Wall extends Block{
         buildCostMultiplier = 6f;
         canOverdrive = false;
         drawDisabled = false;
+
+        //it's a wall of course it's supported everywhere
+        envEnabled = Env.any;
     }
 
     @Override

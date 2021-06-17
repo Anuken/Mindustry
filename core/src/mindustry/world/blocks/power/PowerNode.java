@@ -45,6 +45,7 @@ public class PowerNode extends PowerBlock{
         swapDiagonalPlacement = true;
         schematicPriority = -10;
         drawDisabled = false;
+        envEnabled |= Env.space;
 
         config(Integer.class, (entity, value) -> {
             PowerModule power = entity.power;

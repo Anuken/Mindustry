@@ -6,15 +6,10 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
-import mindustry.game.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
-import mindustry.maps.generators.*;
 import mindustry.maps.planet.*;
 import mindustry.type.*;
-import mindustry.world.meta.*;
-
-import static mindustry.Vars.*;
 
 public class Planets implements ContentList{
     public static Planet
@@ -70,23 +65,7 @@ public class Planets implements ContentList{
                 drawOrbit = false;
                 orbitOffset = offsets[fi];
 
-                generator = new BlankPlanetGenerator(){
-                    @Override
-                    public void generate(){
-                        pass((x, y) -> {
-                            floor = Blocks.space;
-                        });
-
-                        Schematics.placeLaunchLoadout(width/2, height/2);
-
-                        state.rules.environment = Env.space;
-                    }
-
-                    @Override
-                    public int getSectorSize(Sector sector){
-                        return 300;
-                    }
-                };
+                generator = new AsteroidGenerator();
 
                 meshLoader = () -> {
                     Seq<GenericMesh> meshes = new Seq<>();

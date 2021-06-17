@@ -19,6 +19,7 @@ public class LiquidBlock extends Block{
         hasLiquids = true;
         group = BlockGroup.liquids;
         outputsLiquid = true;
+        envEnabled |= Env.space | Env.underwater;
     }
 
     @Override

@@ -14,6 +14,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -37,6 +38,8 @@ public class BeamDrill extends Block{
         update = true;
         solid = true;
         drawArrow = false;
+
+        envEnabled |= Env.space;
     }
 
     @Override

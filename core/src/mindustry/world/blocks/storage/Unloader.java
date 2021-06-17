@@ -28,6 +28,7 @@ public class Unloader extends Block{
         itemCapacity = 0;
         noUpdateDisabled = true;
         unloadable = false;
+        envEnabled = Env.any;
 
         config(Item.class, (UnloaderBuild tile, Item item) -> tile.sortItem = item);
         configClear((UnloaderBuild tile) -> tile.sortItem = null);

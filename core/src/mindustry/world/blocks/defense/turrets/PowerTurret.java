@@ -12,6 +12,7 @@ public class PowerTurret extends Turret{
     public PowerTurret(String name){
         super(name);
         hasPower = true;
+        envEnabled |= Env.space;
     }
 
     @Override
