@@ -16,12 +16,13 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
     public void generate(){
         int seed = state.rules.sector.planet.id;
         int sx = width/2, sy = height/2;
+        Rand rand = new Rand(seed);
 
         pass((x, y) -> {
             floor = Blocks.space;
 
-            if(Simplex.noise2d(seed, 5, 0.6f, 1f/ 100f, x, y) + Mathf.dst(x, y, sx, sy) / (float)width / 2f > 0.7f){
-                floor = Blocks.stone;
+            if(Simplex.noise2d(seed, 5, 0.5f, 1f / 120f, x, y) - Mathf.dst(x, y, sx, sy) / (width/2f) > 0f){
+                floor = rand.chance(0.02) ? Blocks.craters : Blocks.stone;
             }
         });
 

@@ -17,6 +17,7 @@ public class SwitchBlock extends Block{
         drawDisabled = false;
         autoResetEnabled = false;
         group = BlockGroup.logic;
+        envEnabled = Env.any;
 
         config(Boolean.class, (SwitchBuild entity, Boolean b) -> entity.enabled = b);
     }

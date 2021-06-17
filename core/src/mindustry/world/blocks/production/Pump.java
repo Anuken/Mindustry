@@ -20,6 +20,7 @@ public class Pump extends LiquidBlock{
         super(name);
         group = BlockGroup.liquids;
         floating = true;
+        envEnabled = Env.terrestrial;
     }
 
     @Override

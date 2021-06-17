@@ -59,6 +59,8 @@ public class RepairPoint extends Block{
         outlineIcon = true;
         //yeah, this isn't the same thing, but it's close enough
         group = BlockGroup.projectors;
+
+        envEnabled |= Env.space;
     }
 
     @Override
