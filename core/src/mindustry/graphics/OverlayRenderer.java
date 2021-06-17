@@ -5,14 +5,18 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.entities.*;
+import mindustry.game.EventType.*;
+import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.input.*;
-import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
 
@@ -23,6 +27,42 @@ public class OverlayRenderer{
 
     private float buildFade, unitFade;
     private Sized lastSelect;
+    private Seq<CoreEdge> cedges = new Seq<>();
+    private boolean updatedCores;
+
+    public OverlayRenderer(){
+        Events.on(WorldLoadEvent.class, e -> {
+            updatedCores = true;
+        });
+
+        Events.on(CoreChangeEvent.class, e -> {
+            updatedCores = true;
+        });
+    }
+
+    private void updateCoreEdges(){
+        if(!updatedCores){
+            return;
+        }
+
+        updatedCores = false;
+        cedges.clear();
+
+        Seq<Vec2> pos = new Seq<>();
+        Seq<CoreBuild> teams = new Seq<>();
+        for(TeamData team : state.teams.active){
+            for(CoreBuild b : team.cores){
+                teams.add(b);
+                pos.add(new Vec2(b.x, b.y));
+            }
+        }
+
+        //if this is laggy, it could be shoved in another thread.
+        var result = Voronoi.generate(pos.toArray(Vec2.class), 0, world.unitWidth(), 0, world.unitHeight());
+        for(var edge : result){
+            cedges.add(new CoreEdge(edge.x1, edge.y1, edge.x2, edge.y2, teams.get(edge.site1).team, teams.get(edge.site2).team));
+        }
+    }
 
     public void drawBottom(){
         InputHandler input = control.input;
@@ -117,15 +157,32 @@ public class OverlayRenderer{
         Lines.stroke(buildFade * 2f);
 
         if(buildFade > 0.005f){
-            state.teams.eachEnemyCore(player.team(), core -> {
-                float dst = core.dst(player);
-                if(dst < state.rules.enemyCoreBuildRadius * 2.2f){
-                    Draw.color(Color.darkGray);
-                    Lines.circle(core.x, core.y - 2, state.rules.enemyCoreBuildRadius);
-                    Draw.color(Pal.accent, core.team.color, 0.5f + Mathf.absin(Time.time, 10f, 0.5f));
-                    Lines.circle(core.x, core.y, state.rules.enemyCoreBuildRadius);
+            if(state.rules.polygonCoreProtection){
+                updateCoreEdges();
+                Draw.color(Pal.accent);
+
+                for(int i = 0; i < 2; i++){
+                    float offset = (i == 0 ? -2f : 0f);
+                    for(CoreEdge edge : cedges){
+                        Team displayed = edge.displayed();
+                        if(displayed != null){
+                            Draw.color(i == 0 ? Color.darkGray : Tmp.c1.set(displayed.color).lerp(Pal.accent, Mathf.absin(Time.time, 10f, 0.2f)));
+                            Lines.line(edge.x1, edge.y1 + offset, edge.x2, edge.y2 + offset);
+                        }
+                    }
                 }
-            });
+
+                Draw.color();
+            }else{
+                state.teams.eachEnemyCore(player.team(), core -> {
+                    if(Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(core.x, core.y, state.rules.enemyCoreBuildRadius * 2f))){
+                        Draw.color(Color.darkGray);
+                        Lines.circle(core.x, core.y - 2, state.rules.enemyCoreBuildRadius);
+                        Draw.color(Pal.accent, core.team.color, 0.5f + Mathf.absin(Time.time, 10f, 0.5f));
+                        Lines.circle(core.x, core.y, state.rules.enemyCoreBuildRadius);
+                    }
+                });
+            }
         }
 
         Lines.stroke(2f);
@@ -190,6 +247,30 @@ public class OverlayRenderer{
                 Draw.reset();
 
             }
+        }
+    }
+
+    private static class CoreEdge{
+        float x1, y1, x2, y2;
+        Team t1, t2;
+
+        public CoreEdge(float x1, float y1, float x2, float y2, Team t1, Team t2){
+            this.x1 = x1;
+            this.y1 = y1;
+            this.x2 = x2;
+            this.y2 = y2;
+            this.t1 = t1;
+            this.t2 = t2;
+        }
+
+        @Nullable
+        Team displayed(){
+            return
+                t1 == t2 ? null :
+                t1 == player.team() ? t2 :
+                t2 == player.team() ? t1 :
+                t2.id == 0 ? t1 :
+                t1.id < t2.id && t1.id != 0 ? t1 : t2;
         }
     }
 }

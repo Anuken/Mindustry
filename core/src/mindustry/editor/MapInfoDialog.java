@@ -7,6 +7,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.game.*;
 import mindustry.io.*;
+import mindustry.maps.filters.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
@@ -74,7 +75,11 @@ public class MapInfoDialog extends BaseDialog{
             t.row();
             t.add("@editor.generation").padRight(8).left();
             t.button("@edit", () -> {
-                generate.show(maps.readFilters(editor.tags.get("genfilters", "")),
+                //randomize so they're not all the same seed
+                var res = maps.readFilters(editor.tags.get("genfilters", ""));
+                res.each(GenerateFilter::randomize);
+
+                generate.show(res,
                 filters -> {
                     //reset seed to 0 so it is not written
                     filters.each(f -> f.seed = 0);
