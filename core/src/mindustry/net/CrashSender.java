@@ -26,14 +26,15 @@ public class CrashSender{
 
     public static String createReport(String error){
         String report = "Mindustry has crashed. How unfortunate.\n";
-        if(mods.list().size == 0 && Version.build != -1){
+        if(mods != null && mods.list().size == 0 && Version.build != -1){
             report += "Report this at " + Vars.reportIssueURL + "\n\n";
         }
-        return report + "Version: " + Version.combined() + (Vars.headless ? " (Server)" : "") + "\n"
+        return report
+            + "Version: " + Version.combined() + (Vars.headless ? " (Server)" : "") + "\n"
             + "OS: " + System.getProperty("os.name") + " x" + (OS.is64Bit ? "64" : "32") + "\n"
             + "Java Version: " + System.getProperty("java.version") + "\n"
             + "Java Architecture: " + System.getProperty("sun.arch.data.model") + "\n"
-            + mods.list().size + " Mods" + (mods.list().isEmpty() ? "" : ": " + mods.list().toString(", ", mod -> mod.name + ":" + mod.meta.version))
+            + (mods == null ? "<no mod init>" : mods.list().size + " Mods" + (mods.list().isEmpty() ? "" : ": " + mods.list().toString(", ", mod -> mod.name + ":" + mod.meta.version)))
             + "\n\n" + error;
     }
 
