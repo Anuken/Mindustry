@@ -38,6 +38,7 @@ public class LoadRenderer implements Disposable{
     private FxProcessor fx;
     private WindowedMean renderTimes = new WindowedMean(20);
     private BloomFilter bloom;
+    private boolean renderStencil = true;
     private long lastFrameTime;
 
     {
@@ -45,7 +46,12 @@ public class LoadRenderer implements Disposable{
         try{
             fx = new FxProcessor(Format.rgba8888, 2, 2, false, true);
         }catch(Exception e){
-            fx = new FxProcessor(Format.rgb565, 2, 2, false, true);
+            try{
+                fx = new FxProcessor(Format.rgb565, 2, 2, false, true);
+            }catch(Exception awful){
+                renderStencil = false;
+                fx = new FxProcessor(Format.rgba8888, 2, 2, false, false);
+            }
         }
 
         //vignetting is probably too much
@@ -179,7 +185,7 @@ public class LoadRenderer implements Disposable{
         Lines.poly(w/2, h/2, 4, rad);
         Lines.poly(w/2, h/2, 4, rad2);
 
-        if(assets.isLoaded("tech")){
+        if(assets.isLoaded("tech") && renderStencil){
             Font font = assets.get("tech");
             font.getData().markupEnabled = true;
 
