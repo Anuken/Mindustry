@@ -742,6 +742,7 @@ public class Blocks implements ContentList{
             hasItems = true;
             hasPower = true;
             outputItem = new ItemStack(Items.pyratite, 1);
+            envEnabled |= Env.space;
 
             size = 2;
 
@@ -755,6 +756,7 @@ public class Blocks implements ContentList{
             hasPower = true;
             outputItem = new ItemStack(Items.blastCompound, 1);
             size = 2;
+            envEnabled |= Env.space;
 
             consumes.items(with(Items.pyratite, 1, Items.sporePod, 1));
             consumes.power(0.40f);

@@ -16,6 +16,7 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
         hasLiquids = true;
         outputsLiquid = true;
         group = BlockGroup.liquids;
+        envEnabled = Env.any;
     }
 
     public class LiquidExtendingBridgeBuild extends ExtendingItemBridgeBuild{
