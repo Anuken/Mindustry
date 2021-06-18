@@ -476,6 +476,7 @@ public class LoadRenderer implements Disposable{
             name.contains("maps") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "system";
 
             Font font = assets.get("tech");
+            font.getData().markupEnabled = true;
             font.setColor(Pal.accent);
             Draw.color(Color.black);
             font.draw(red + "[[[[ " + key + " ]]\n" + orange + "<" + Version.modifier + "  " + (Version.build == 0 ? "[init]" : Version.buildString()) + ">", w/2f, h/2f + 110*s, Align.center);
