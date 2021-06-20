@@ -48,6 +48,7 @@ public class MassDriver extends Block{
         hasPower = true;
         outlineIcon = true;
         sync = true;
+        envEnabled |= Env.space;
 
         //point2 is relative
         config(Point2.class, (MassDriverBuild tile, Point2 point) -> tile.link = Point2.pack(point.x + tile.tileX(), point.y + tile.tileY()));

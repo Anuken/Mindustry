@@ -40,8 +40,8 @@ public class Blocks implements ContentList{
     redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     redweed, purbush, coralChunk, glowBlob, yellowCoral,
-    regolithWall, yellowStoneWall, rhyoliteWall, carbonWall, redIceWall,
-    graphiticStone,
+    regolithWall, yellowStoneWall, rhyoliteWall, carbonWall, redIceWall, ferricStoneWall,
+    ferricStone, ferricCraters, graphiticStone,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
@@ -312,6 +312,16 @@ public class Blocks implements ContentList{
             variants = 4;
         }};
 
+        ferricStone = new Floor("ferric-stone"){{
+            attributes.set(Attribute.water, -1f);
+        }};
+
+        ferricCraters = new Floor("ferric-craters"){{
+            variants = 3;
+            attributes.set(Attribute.water, -1f);
+            blendGroup = ferricStone;
+        }};
+
         redIce = new Floor("red-ice"){{
             dragMultiplier = 0.4f;
             speedMultiplier = 0.9f;
@@ -349,67 +359,52 @@ public class Blocks implements ContentList{
 
         shale = new Floor("shale"){{
             variants = 3;
-            attributes.set(Attribute.oil, 1f);
+            attributes.set(Attribute.oil, 1.2f);
         }};
 
-        stoneWall = new StaticWall("stone-wall"){{
-            variants = 2;
-        }};
+        stoneWall = new StaticWall("stone-wall");
 
-        sporeWall = new StaticWall("spore-wall"){{
-            variants = 2;
-        }};
+        sporeWall = new StaticWall("spore-wall");
 
-        dirtWall = new StaticWall("dirt-wall"){{
-            variants = 2;
-        }};
+        dirtWall = new StaticWall("dirt-wall");
 
-        daciteWall = new StaticWall("dacite-wall"){{
-            variants = 2;
-        }};
+        daciteWall = new StaticWall("dacite-wall");
 
         iceWall = new StaticWall("ice-wall"){{
-            variants = 2;
             iceSnow.asFloor().wall = this;
         }};
 
-        snowWall = new StaticWall("snow-wall"){{
-            variants = 2;
-        }};
+        snowWall = new StaticWall("snow-wall");
 
         duneWall = new StaticWall("dune-wall"){{
-            variants = 2;
             basalt.asFloor().wall = darksandWater.asFloor().wall = darksandTaintedWater.asFloor().wall = this;
         }};
 
         regolithWall = new StaticWall("regolith-wall"){{
-            variants = 2;
             regolith.asFloor().wall = this;
         }};
 
         yellowStoneWall = new StaticWall("yellow-stone-wall"){{
-            variants = 2;
             yellowStone.asFloor().wall = slag.asFloor().wall = this;
         }};
 
         rhyoliteWall = new StaticWall("rhyolite-wall"){{
-            variants = 2;
             rhyolite.asFloor().wall = rhyoliteCrater.asFloor().wall = this;
         }};
 
         carbonWall = new StaticWall("carbon-wall"){{
-            variants = 2;
             graphiticStone.asFloor().wall = this;
         }};
 
+        ferricStoneWall = new StaticWall("ferric-stone-wall"){{
+            ferricStone.asFloor().wall = this;
+        }};
 
         redIceWall = new StaticWall("red-ice-wall"){{
-            variants = 2;
             redIce.asFloor().wall = this;
         }};
 
         sandWall = new StaticWall("sand-wall"){{
-            variants = 2;
             sandWater.asFloor().wall = water.asFloor().wall = deepwater.asFloor().wall = this;
         }};
 
@@ -417,21 +412,13 @@ public class Blocks implements ContentList{
 
         shrubs = new StaticWall("shrubs");
 
-        shaleWall = new StaticWall("shale-wall"){{
-            variants = 2;
-        }};
+        shaleWall = new StaticWall("shale-wall");
 
-        sporePine = new StaticTree("spore-pine"){{
-            variants = 0;
-        }};
+        sporePine = new StaticTree("spore-pine");
 
-        snowPine = new StaticTree("snow-pine"){{
-            variants = 0;
-        }};
+        snowPine = new StaticTree("snow-pine");
 
-        pine = new StaticTree("pine"){{
-            variants = 0;
-        }};
+        pine = new StaticTree("pine");
 
         whiteTreeDead = new TreeBlock("white-tree-dead");
 
