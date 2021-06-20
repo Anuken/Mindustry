@@ -212,7 +212,7 @@ public class CustomRulesDialog extends BaseDialog{
         main.table(t -> {
             t.left();
             t.add(text).left().padRight(5);
-            t.field((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseInt(s)))
+            t.field((integer ? prov.get() : prov.get()) + "", s -> cons.get(Strings.parseInt(s)))
                     .padRight(100f)
                     .valid(f -> Strings.parseInt(f) >= min && Strings.parseInt(f) <= max).width(120f).left().addInputDialog();
         }).padTop(0);

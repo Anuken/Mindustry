@@ -48,11 +48,11 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
     }
 
     float rawHeight(Vec3 position){
-        return (float)Simplex.noise3d(seed, octaves, persistence, 1f/heightScl, 10f + position.x, 10f + position.y, 10f + position.z);
+        return Simplex.noise3d(seed, octaves, persistence, 1f/heightScl, 10f + position.x, 10f + position.y, 10f + position.z);
     }
 
     float rawTemp(Vec3 position){
-        return position.dst(0, 0, 1)*2.2f - (float)Simplex.noise3d(seed, 8, 0.54f, 1.4f, 10f + position.x, 10f + position.y, 10f + position.z) * 2.9f;
+        return position.dst(0, 0, 1)*2.2f - Simplex.noise3d(seed, 8, 0.54f, 1.4f, 10f + position.x, 10f + position.y, 10f + position.z) * 2.9f;
     }
 
     Block getBlock(Vec3 position){
@@ -61,7 +61,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         float height = rawHeight(position);
         Tmp.v31.set(position);
         position = Tmp.v33.set(position).scl(scl);
-        float temp = (float)Simplex.noise3d(seed, 8, 0.6, 1f/2f, 10f + position.x, 10f + position.y + 99f, 10f + position.z);
+        float temp = Simplex.noise3d(seed, 8, 0.6, 1f/2f, 10f + position.x, 10f + position.y + 99f, 10f + position.z);
         height *= 1.2f;
         height = Mathf.clamp(height);
 

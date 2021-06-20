@@ -14,7 +14,7 @@ public class NoiseMesh extends HexMesh{
         this.mesh =  MeshBuilder.buildHex(new HexMesher(){
             @Override
             public float getHeight(Vec3 position){
-                return (float)Simplex.noise3d(planet.id + seed, octaves, persistence, scale, 5f + position.x, 5f + position.y, 5f + position.z) * mag;
+                return Simplex.noise3d(planet.id + seed, octaves, persistence, scale, 5f + position.x, 5f + position.y, 5f + position.z) * mag;
             }
 
             @Override

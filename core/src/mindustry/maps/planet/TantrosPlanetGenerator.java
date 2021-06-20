@@ -36,7 +36,7 @@ public class TantrosPlanetGenerator extends PlanetGenerator{
 
     @Override
     public Color getColor(Vec3 position){
-        float depth = (float)Simplex.noise3d(seed, 2, 0.56, 1.7f, position.x, position.y, position.z) / 2f;
+        float depth = Simplex.noise3d(seed, 2, 0.56, 1.7f, position.x, position.y, position.z) / 2f;
         return c1.write(out).lerp(c2, Mathf.clamp(Mathf.round(depth, 0.15f))).a(0.6f);
     }
 
@@ -91,14 +91,14 @@ public class TantrosPlanetGenerator extends PlanetGenerator{
     }
 
     float rawHeight(Vec3 position){
-        return (float)Simplex.noise3d(seed, 8, 0.7f, 1f, position.x, position.y, position.z);
+        return Simplex.noise3d(seed, 8, 0.7f, 1f, position.x, position.y, position.z);
     }
 
     Block getBlock(Vec3 position){
         float height = rawHeight(position);
         Tmp.v31.set(position);
         position = Tmp.v33.set(position).scl(2f);
-        float temp = (float)Simplex.noise3d(seed, 8, 0.6, 1f/2f, position.x, position.y + 99f, position.z);
+        float temp = Simplex.noise3d(seed, 8, 0.6, 1f/2f, position.x, position.y + 99f, position.z);
         height *= 1.2f;
         height = Mathf.clamp(height);
 

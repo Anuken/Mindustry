@@ -417,23 +417,7 @@ public class SchematicsDialog extends BaseDialog{
 
                     int cols = (int)Math.min(20, Core.graphics.getWidth() / 52f);
 
-                    /*
-                    int i = 0;
-                    for(var key : defaultIcons){
-                        var value = Icon.icons.get(key);
-
-                        t.button(value, Styles.cleari, () -> {
-                            sector.info.icon = key;
-                            sector.info.contentIcon = null;
-                            sector.saveInfo();
-                            hide();
-                            updateSelected();
-                        }).checked(key.equals(sector.info.icon));
-
-                        if(++i % cols == 0) t.row();
-                    }*/
-
-                    int i = 0;
+                    int i;
 
                     for(ContentType ctype : defaultContentIcons){
                         t.row();

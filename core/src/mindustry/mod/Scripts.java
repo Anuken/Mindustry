@@ -7,7 +7,6 @@ import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
 import arc.func.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
@@ -18,7 +17,6 @@ import rhino.module.provider.*;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
 import java.util.regex.*;
 
 public class Scripts implements Disposable{

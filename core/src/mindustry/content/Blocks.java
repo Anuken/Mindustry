@@ -39,7 +39,7 @@ public class Blocks implements ContentList{
     dacite, rhyolite, rhyoliteCrater, regolith, yellowStone, redIce,
     redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
-    redweed, purbush, coralChunk, glowBlob, yellowCoral,
+    redweed, purbush, coralChunk, yellowCoral,
     regolithWall, yellowStoneWall, rhyoliteWall, carbonWall, redIceWall, ferricStoneWall,
     ferricStone, ferricCraters, graphiticStone,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, grass, salt,
@@ -450,10 +450,6 @@ public class Blocks implements ContentList{
         coralChunk = new StaticCoralWall("coralchunk"){{
 
         }};
-
-        //glowBlob = new Prop("glowblob"){{
-        //    variants = 1;
-        //}};
 
         boulder = new Prop("boulder"){{
             variants = 2;

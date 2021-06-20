@@ -3,7 +3,6 @@ package mindustry.editor;
 import arc.*;
 import arc.scene.ui.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.*;
 import mindustry.game.*;
 import mindustry.io.*;

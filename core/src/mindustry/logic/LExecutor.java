@@ -4,7 +4,6 @@ import arc.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.noise.*;
 import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
