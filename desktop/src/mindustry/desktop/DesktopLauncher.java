@@ -322,7 +322,9 @@ public class DesktopLauncher extends ClientLauncher{
 
             presence.largeImageKey = "logo";
 
-            DiscordRPC.send(presence);
+            try{
+                DiscordRPC.send(presence);
+            }catch(Exception ignored){}
         }
 
         if(steam){
