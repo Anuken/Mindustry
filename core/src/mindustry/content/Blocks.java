@@ -1848,6 +1848,7 @@ public class Blocks implements ContentList{
                 ammoMultiplier = 1f;
                 
                 status = StatusEffects.melting;
+                statusDuration = 60 * 9f;
             }};
 
             health = 200 * size * size;
