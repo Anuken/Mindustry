@@ -83,6 +83,41 @@ public abstract class BasicGenerator implements WorldGenerator{
         });
     }
 
+    public void ore(Block dest, Block src, float i, float thresh){
+        pass((x, y) -> {
+            if(floor != src) return;
+
+            if(Math.abs(0.5f - noise(x, y + i*999, 2, 0.7, (40 + i * 2))) > 0.26f * thresh &&
+            Math.abs(0.5f - noise(x, y - i*999, 1, 1, (30 + i * 4))) > 0.37f * thresh){
+                ore = dest;
+            }
+        });
+    }
+
+    public void oreAround(Block ore, Block wall, int radius, float scl, float thresh){
+        for(Tile tile : tiles){
+            int x = tile.x, y = tile.y;
+
+            if(tile.block() == Blocks.air && tile.floor().hasSurface() && noise(x, y + ore.id*999, scl, 1f) > thresh){
+                boolean found = false;
+
+                outer:
+                for(int dx = x-radius; dx <= x+radius; dx++){
+                    for(int dy = y-radius; dy <= y+radius; dy++){
+                        if(Mathf.within(dx, dy, x, y, radius + 0.001f) && tiles.in(dx, dy) && tiles.get(dx, dy).block() == wall){
+                            found = true;
+                            break outer;
+                        }
+                    }
+                }
+
+                if(found){
+                    tile.setOverlay(ore);
+                }
+            }
+        }
+    }
+
     public void terrain(Block dst, float scl, float mag, float cmag){
         pass((x, y) -> {
             double rocks = noise(x, y, 5, 0.5, scl) * mag
@@ -243,6 +278,21 @@ public abstract class BasicGenerator implements WorldGenerator{
             tile.setBlock(block);
             tile.setOverlay(ore);
         }
+    }
+
+    public void decoration(float chance){
+        pass((x, y) -> {
+            for(int i = 0; i < 4; i++){
+                Tile near = world.tile(x + Geometry.d4[i].x, y + Geometry.d4[i].y);
+                if(near != null && near.block() != Blocks.air){
+                    return;
+                }
+            }
+
+            if(rand.chance(chance) && floor.asFloor().hasSurface() && block == Blocks.air){
+                block = floor.asFloor().decoration;
+            }
+        });
     }
 
     public void brush(Seq<Tile> path, int rad){

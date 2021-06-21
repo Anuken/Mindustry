@@ -42,7 +42,8 @@ public class Blocks implements ContentList{
     redweed, purbush, coralChunk, yellowCoral,
     regolithWall, yellowStoneWall, rhyoliteWall, carbonWall, redIceWall, ferricStoneWall,
     ferricStone, ferricCraters, graphiticStone,
-    iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, grass, salt,
+    iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
+    shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, ferricBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
@@ -475,6 +476,11 @@ public class Blocks implements ContentList{
 
         basaltBoulder = new Prop("basalt-boulder"){{
             variants = 2;
+        }};
+
+        ferricBoulder = new Prop("ferric-boulder"){{
+            variants = 2;
+            ferricStone.asFloor().decoration = this;
         }};
 
         moss = new Floor("moss"){{

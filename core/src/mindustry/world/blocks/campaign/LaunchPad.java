@@ -115,10 +115,6 @@ public class LaunchPad extends Block{
                 Draw.reset();
             }
 
-            float cooldown = Mathf.clamp(launchCounter / (90f));
-
-            Draw.mixcol(lightColor, 1f - cooldown);
-
             Draw.rect(podRegion, x, y);
 
             Draw.reset();
