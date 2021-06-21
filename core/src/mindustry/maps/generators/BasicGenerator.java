@@ -118,6 +118,56 @@ public abstract class BasicGenerator implements WorldGenerator{
         }
     }
 
+    public void wallOre(Block src, Block dest, float scl, float thresh){
+        boolean overlay = dest.isOverlay();
+        pass((x, y) -> {
+            if(block != Blocks.air){
+                boolean empty = false;
+                for(Point2 p : Geometry.d8){
+                    Tile other = tiles.get(x + p.x, y + p.y);
+                    if(other != null && other.block() == Blocks.air){
+                        empty = true;
+                        break;
+                    }
+                }
+
+                if(empty && noise(x + 78, y, 4, 0.7f, scl, 1f) > thresh && block == src){
+                    if(overlay){
+                        ore = dest;
+                    }else{
+                        block = dest;
+                    }
+                }
+            }
+        });
+    }
+
+    public void cliffs(){
+        for(Tile tile : tiles){
+            if(!tile.block().isStatic() || tile.block() == Blocks.cliff) continue;
+
+            int rotation = 0;
+            for(int i = 0; i < 8; i++){
+                Tile other = world.tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
+                if(other != null && !other.block().isStatic()){
+                    rotation |= (1 << i);
+                }
+            }
+
+            if(rotation != 0){
+                tile.setBlock(Blocks.cliff);
+            }
+
+            tile.data = (byte)rotation;
+        }
+
+        for(Tile tile : tiles){
+            if(tile.block() != Blocks.cliff && tile.block().isStatic()){
+                tile.setBlock(Blocks.air);
+            }
+        }
+    }
+
     public void terrain(Block dst, float scl, float mag, float cmag){
         pass((x, y) -> {
             double rocks = noise(x, y, 5, 0.5, scl) * mag

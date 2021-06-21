@@ -15,7 +15,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
     //TODO nonstatic
     public static int min = 20, max = 28, octaves = 2, foct = 3;
     public static float radMin = 12f, radMax = 60f, persistence = 0.4f, scale = 30f, mag = 0.46f, thresh = 1f;
-    public static float fmag = 0.6f, fscl = 50f, fper = 0.6f;
+    public static float fmag = 0.59f, fscl = 50f, fper = 0.6f;
     public static float iceChance = 0.05f, carbonChance = 0.1f;
 
     Rand rand;
@@ -30,7 +30,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
 
         for(int x = ax - radius; x <= ax + radius; x++){
             for(int y = ay - radius; y <= ay + radius; y++){
-                if(tiles.in(x, y) &&  Mathf.dst(x, y, ax, ay) / (radius) + Simplex.noise2d(seed, octaves, persistence, 1f / scale, x, y) * mag < thresh){
+                if(tiles.in(x, y) &&  Mathf.dst(x, y, ax, ay) / radius + Simplex.noise2d(seed, octaves, persistence, 1f / scale, x, y) * mag < thresh){
                     tiles.getn(x, y).setFloor(floor);
                 }
             }
@@ -68,7 +68,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
         //random noise stone
         pass((x, y) -> {
             if(floor != Blocks.space){
-                if(Ridged.noise2d(seed, x, y, foct, fper, 1f / fscl) > fmag){
+                if(Ridged.noise2d(seed, x, y, foct, fper, 1f / fscl) - Ridged.noise2d(seed, x, y, 1, 1f, 5f)/2.7f > fmag){
                     floor = Blocks.stone;
                 }
             }
@@ -100,10 +100,32 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
         decoration(0.013f);
 
         //lead generates around stone walls
-        oreAround(Blocks.oreLead, Blocks.stoneWall, 3, 69f, 0.6f);
+        oreAround(Blocks.oreLead, Blocks.stoneWall, 3, 70f, 0.6f);
 
         //copper only generates on ferric stone
         ore(Blocks.oreCopper, Blocks.ferricStone, 5f, 0.8f);
+
+        wallOre(Blocks.carbonWall, Blocks.graphiticWall, 35f, 0.57f);
+
+        //TODO
+        //wallOre(Blocks.iceWall, Blocks.wallOreBeryl, 35f, 0.57f);
+
+        //TODO:
+        //- thorium - cores?
+        //- copper maybe should not exist
+        //- consider replacing certain ores with something else
+        //- sand source - olivine/pyroxene
+        //- beryllium in walls
+
+        //titanium
+        pass((x, y) -> {
+            if(floor != Blocks.stone) return;
+            int i = 4;
+
+            if(Math.abs(0.5f - noise(x, y + i*999 - x*1.5f, 2, 0.65, (60 + i * 2))) > 0.26f * 1f){
+                ore = Blocks.oreTitanium;
+            }
+        });
 
         Schematics.placeLaunchLoadout(sx, sy);
 

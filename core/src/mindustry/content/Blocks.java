@@ -1998,6 +1998,7 @@ public class Blocks implements ContentList{
                 length = 200f;
                 hitEffect = Fx.hitMeltdown;
                 hitColor = Pal.meltdownHit;
+                status = StatusEffects.melting;
                 drawSize = 420f;
 
                 incendChance = 0.4f;
