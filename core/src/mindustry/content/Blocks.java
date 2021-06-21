@@ -1846,6 +1846,8 @@ public class Blocks implements ContentList{
                 incendSpread = 5f;
                 incendAmount = 1;
                 ammoMultiplier = 1f;
+                
+                status = StatusEffects.melting;
             }};
 
             health = 200 * size * size;
