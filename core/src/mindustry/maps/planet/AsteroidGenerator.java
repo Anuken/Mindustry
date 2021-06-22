@@ -18,6 +18,8 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
     public static float fmag = 0.5f, fscl = 50f, fper = 0.6f;
     public static float iceChance = 0.05f, carbonChance = 0.1f, berylChance = 0.1f;
 
+    public float thoriumScl = 1f, copperScale = 1f, leadScale = 1f, graphiteScale = 1f, berylliumScale = 1f;
+
     Rand rand;
     int seed;
 
@@ -98,25 +100,25 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
             if(floor == Blocks.stone && rand.chance(0.02)) floor = Blocks.craters;
         });
 
-        decoration(0.015f);
+        decoration(0.017f);
 
         //lead generates around stone walls
-        oreAround(Blocks.oreLead, Blocks.stoneWall, 3, 70f, 0.6f);
+        oreAround(Blocks.oreLead, Blocks.stoneWall, 3, 70f, 0.6f * leadScale);
 
         //copper only generates on ferric stone
-        ore(Blocks.oreCopper, Blocks.ferricStone, 5f, 0.8f);
+        ore(Blocks.oreCopper, Blocks.ferricStone, 5f, 0.8f * copperScale);
 
-        wallOre(Blocks.carbonWall, Blocks.graphiticWall, 35f, 0.57f);
+        //thorium only generates on beryllic stone
+        ore(Blocks.oreThorium, Blocks.beryllicStone, 4f, 0.9f * thoriumScl);
 
-        //TODO
-        wallOre(Blocks.beryllicStoneWall, Blocks.wallOreBeryl, 50f, 0.62f);
+        wallOre(Blocks.carbonWall, Blocks.graphiticWall, 35f, 0.57f * graphiteScale);
+
+        wallOre(Blocks.beryllicStoneWall, Blocks.wallOreBeryl, 50f, 0.62f * berylliumScale);
 
         //TODO:
-        //- thorium - cores?
         //- copper maybe should not exist
         //- consider replacing certain ores with something else
-        //- sand source - olivine/pyroxene
-        //- beryllium in walls
+        //- sand source - olivine/pyroxene?
 
         //titanium
         pass((x, y) -> {
