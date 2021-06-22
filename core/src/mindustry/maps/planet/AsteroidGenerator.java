@@ -26,7 +26,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
     void asteroid(int ax, int ay, int radius){
         Floor floor = (
             rand.chance(iceChance) ? Blocks.ice :
-            rand.chance(carbonChance) ? Blocks.graphiticStone :
+            rand.chance(carbonChance) ? Blocks.carbonStone :
             rand.chance(berylChance) ? Blocks.beryllicStone :
             Blocks.ferricStone
         ).asFloor();

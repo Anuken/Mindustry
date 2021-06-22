@@ -69,14 +69,18 @@ public class Planets implements ContentList{
 
                 meshLoader = () -> {
                     Seq<GenericMesh> meshes = new Seq<>();
-                    Color color = Color.valueOf("57504b");
+                    Color color = Blocks.ferricStoneWall.mapColor;
                     Rand rand = new Rand(2);
 
                     meshes.add(new NoiseMesh(this, 0, 2, color, radius, 2, 0.55f, 0.45f, 14f));
                     int am = rand.random(3, 7);
 
+                    //TODO gier variants with different names and different resource distributions
                     for(int j = 0; j < am; j++){
-                        meshes.add(new MatMesh(new NoiseMesh(this, j + 1, 1, color, 0.022f + rand.random(0.039f), 2, 0.6f, 0.38f, 20f), new Mat3D().setToTranslation(Tmp.v31.setToRandomDirection(rand).setLength(rand.random(0.44f, 1.4f)))));
+                        meshes.add(new MatMesh(
+                            new NoiseMesh(this, j + 1, 1, 0.022f + rand.random(0.039f), 2, 0.6f, 0.38f, 20f,
+                                color, Blocks.carbonWall.mapColor, 3, 0.6f, 0.38f, 0.6f),
+                            new Mat3D().setToTranslation(Tmp.v31.setToRandomDirection(rand).setLength(rand.random(0.44f, 1.4f)))));
                     }
 
                     return new MultiMesh(meshes.toArray(GenericMesh.class));

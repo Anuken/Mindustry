@@ -91,7 +91,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         }
 
         if(Ridged.noise3d(2, position.x, position.y + 4f, position.z, 3, 7f) > 0.7){
-            tile.floor = Blocks.graphiticStone;
+            tile.floor = Blocks.carbonStone;
         }
     }
 

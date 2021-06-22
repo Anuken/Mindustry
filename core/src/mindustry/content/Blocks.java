@@ -41,7 +41,7 @@ public class Blocks implements ContentList{
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     redweed, purbush, coralChunk, yellowCoral,
     regolithWall, yellowStoneWall, rhyoliteWall, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall,
-    ferricStone, ferricCraters, graphiticStone, beryllicStone,
+    ferricStone, ferricCraters, carbonStone, beryllicStone,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
@@ -307,7 +307,7 @@ public class Blocks implements ContentList{
             attributes.set(Attribute.water, -1f);
         }};
 
-        graphiticStone = new Floor("graphitic-stone"){{
+        carbonStone = new Floor("carbon-stone"){{
             attributes.set(Attribute.water, -1f);
             variants = 4;
         }};
@@ -397,7 +397,7 @@ public class Blocks implements ContentList{
         }};
 
         carbonWall = new StaticWall("carbon-wall"){{
-            graphiticStone.asFloor().wall = this;
+            carbonStone.asFloor().wall = this;
         }};
 
         ferricStoneWall = new StaticWall("ferric-stone-wall"){{
@@ -487,7 +487,7 @@ public class Blocks implements ContentList{
 
         carbonBoulder = new Prop("carbon-boulder"){{
             variants = 2;
-            graphiticStone.asFloor().decoration = this;
+            carbonStone.asFloor().decoration = this;
         }};
 
         ferricBoulder = new Prop("ferric-boulder"){{
