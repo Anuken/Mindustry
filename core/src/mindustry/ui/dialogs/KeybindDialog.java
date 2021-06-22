@@ -72,7 +72,6 @@ public class KeybindDialog extends Dialog{
             }
 
             if(sections.length != 1){
-                //TODO toggle style
                 TextButton button = new TextButton(bundle.get("section." + section.name + ".name", Strings.capitalize(section.name))/*, "toggle"*/);
                 if(section.equals(this.section))
                     button.toggle();
