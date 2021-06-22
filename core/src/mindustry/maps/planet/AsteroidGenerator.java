@@ -15,8 +15,8 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
     //TODO nonstatic
     public static int min = 20, max = 28, octaves = 2, foct = 3;
     public static float radMin = 12f, radMax = 60f, persistence = 0.4f, scale = 30f, mag = 0.46f, thresh = 1f;
-    public static float fmag = 0.59f, fscl = 50f, fper = 0.6f;
-    public static float iceChance = 0.05f, carbonChance = 0.1f;
+    public static float fmag = 0.5f, fscl = 50f, fper = 0.6f;
+    public static float iceChance = 0.05f, carbonChance = 0.1f, berylChance = 0.1f;
 
     Rand rand;
     int seed;
@@ -25,6 +25,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
         Floor floor = (
             rand.chance(iceChance) ? Blocks.ice :
             rand.chance(carbonChance) ? Blocks.graphiticStone :
+            rand.chance(berylChance) ? Blocks.beryllicStone :
             Blocks.ferricStone
         ).asFloor();
 
@@ -76,7 +77,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
 
         //walls at insides
         pass((x, y) -> {
-            if(floor == Blocks.space || Ridged.noise2d(seed + 1, x, y, 3, 0.5f, 1f / 60f) > 0.38f || Mathf.within(x, y, sx, sy, 20 + Ridged.noise2d(seed, x, y, 3, 0.5f, 1f / 30f) * 6f)) return;
+            if(floor == Blocks.space || Ridged.noise2d(seed + 1, x, y, 4, 0.7f, 1f / 60f) > 0.45f || Mathf.within(x, y, sx, sy, 20 + Ridged.noise2d(seed, x, y, 3, 0.5f, 1f / 30f) * 6f)) return;
 
             int radius = 6;
             for(int dx = x - radius; dx <= x + radius; dx++){
@@ -97,7 +98,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
             if(floor == Blocks.stone && rand.chance(0.02)) floor = Blocks.craters;
         });
 
-        decoration(0.013f);
+        decoration(0.015f);
 
         //lead generates around stone walls
         oreAround(Blocks.oreLead, Blocks.stoneWall, 3, 70f, 0.6f);
@@ -108,7 +109,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
         wallOre(Blocks.carbonWall, Blocks.graphiticWall, 35f, 0.57f);
 
         //TODO
-        //wallOre(Blocks.iceWall, Blocks.wallOreBeryl, 35f, 0.57f);
+        wallOre(Blocks.beryllicStoneWall, Blocks.wallOreBeryl, 50f, 0.62f);
 
         //TODO:
         //- thorium - cores?

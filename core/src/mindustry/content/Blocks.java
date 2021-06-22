@@ -40,10 +40,10 @@ public class Blocks implements ContentList{
     redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     redweed, purbush, coralChunk, yellowCoral,
-    regolithWall, yellowStoneWall, rhyoliteWall, carbonWall, redIceWall, ferricStoneWall,
-    ferricStone, ferricCraters, graphiticStone,
+    regolithWall, yellowStoneWall, rhyoliteWall, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall,
+    ferricStone, ferricCraters, graphiticStone, beryllicStone,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
-    shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, ferricBoulder,
+    shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
@@ -53,7 +53,6 @@ public class Blocks implements ContentList{
 
     //wall ores
     wallOreBeryl, graphiticWall,
-    berylWall, //TODO remove?
 
     //crafting
     siliconSmelter, siliconCrucible, siliconArcFurnace, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -323,6 +322,10 @@ public class Blocks implements ContentList{
             blendGroup = ferricStone;
         }};
 
+        beryllicStone = new Floor("beryllic-stone"){{
+            variants = 4;
+        }};
+
         redIce = new Floor("red-ice"){{
             dragMultiplier = 0.4f;
             speedMultiplier = 0.9f;
@@ -399,6 +402,10 @@ public class Blocks implements ContentList{
 
         ferricStoneWall = new StaticWall("ferric-stone-wall"){{
             ferricStone.asFloor().wall = this;
+        }};
+
+        beryllicStoneWall = new StaticWall("beryllic-stone-wall"){{
+            beryllicStone.asFloor().wall = this;
         }};
 
         redIceWall = new StaticWall("red-ice-wall"){{
@@ -478,9 +485,19 @@ public class Blocks implements ContentList{
             variants = 2;
         }};
 
+        carbonBoulder = new Prop("carbon-boulder"){{
+            variants = 2;
+            graphiticStone.asFloor().decoration = this;
+        }};
+
         ferricBoulder = new Prop("ferric-boulder"){{
             variants = 2;
             ferricStone.asFloor().decoration = this;
+        }};
+
+        beryllicBoulder = new Prop("beryllic-boulder"){{
+            variants = 2;
+            beryllicStone.asFloor().decoration = this;
         }};
 
         moss = new Floor("moss"){{
@@ -555,10 +572,6 @@ public class Blocks implements ContentList{
         //region wall ore
 
         wallOreBeryl = new WallOreBlock(Items.beryllium);
-
-        berylWall = new StaticWall("beryl-wall"){{
-            itemDrop = Items.beryllium;
-        }};
 
         graphiticWall = new StaticWall("graphitic-wall"){{
             itemDrop = Items.graphite;
