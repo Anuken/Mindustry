@@ -106,5 +106,9 @@
   {
     "name": "MeowLand",
     "address": ["34.134.111.15"]
+  },
+  {
+    "name": "[accent]Mindustry [red]Reborn",
+    "address": ["mindustry.me", "mindustry.me:1000", "mindustry.me:2000", "mindustry.me:3000"]
   }
 ]
