@@ -390,7 +390,6 @@ public class Generators{
             }
         });
 
-        //TODO broken, freezes
         generate("unit-icons", () -> content.units().each(type -> {
             if(type.isHidden()) return; //hidden units don't generate
 

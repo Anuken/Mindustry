@@ -324,7 +324,6 @@ public class ModsDialog extends BaseDialog{
             if(showImport) dialog.buttons.button("@mods.browser.reinstall", Icon.download, () -> githubImportMod(mod.getRepo(), mod.isJava()));
         }
 
-        //TODO improve this menu later
         dialog.cont.pane(desc -> {
             desc.center();
             desc.defaults().padTop(10).left();

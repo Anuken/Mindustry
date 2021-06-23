@@ -4,7 +4,6 @@ import arc.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.noise.*;
 import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
@@ -538,7 +537,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             Object obj = exec.obj(target);
             if(obj instanceof Building b && b.team == exec.team && exec.linkIds.contains(b.id)){
-                if(type.isObj && exec.var(p1).isobj){ //TODO may break logic?
+                if(type.isObj && exec.var(p1).isobj){
                     b.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
                 }else{
                     b.control(type, exec.num(p1), exec.num(p2), exec.num(p3), exec.num(p4));
@@ -765,7 +764,6 @@ public class LExecutor{
             Var v = exec.var(to);
             Var f = exec.var(from);
 
-            //TODO error out when the from-value is a constant
             if(!v.constant){
                 if(f.isobj){
                     v.objval = f.objval;

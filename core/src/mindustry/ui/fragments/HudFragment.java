@@ -267,6 +267,7 @@ public class HudFragment extends Fragment{
         //core info
         parent.fill(t -> {
             t.top();
+            t.visible(() -> shown);
 
             t.name = "coreinfo";
 
