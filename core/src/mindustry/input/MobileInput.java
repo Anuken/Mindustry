@@ -270,6 +270,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 b.button(Icon.save, style, this::showSchematicSave).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 b.button(Icon.cancel, style, () -> {
                     selectRequests.clear();
+                    lastSchematic = null;
                 });
                 b.row();
                 b.button(Icon.flipX, style, () -> flipRequests(selectRequests, true));
