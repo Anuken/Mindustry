@@ -297,7 +297,7 @@ public class BulletType extends Content implements Cloneable{
         }
     }
 
-    /** Called when the bullet reaches the end of its lifetime of is destroyed by something external. */
+    /** Called when the bullet reaches the end of its lifetime or is destroyed by something external. */
     public void despawned(Bullet b){
         if(despawnHit){
             hit(b);
