@@ -1,5 +1,6 @@
 package mindustry.content;
 
+import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -10,6 +11,7 @@ import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.planet.*;
 import mindustry.type.*;
+import mindustry.world.*;
 
 public class Planets implements ContentList{
     public static Planet
@@ -20,7 +22,7 @@ public class Planets implements ContentList{
 
     @Override
     public void load(){
-        sun = new Planet("sun", null, 2){{
+        sun = new Planet("sun", null, 4){{
             bloom = true;
             accessible = false;
 
@@ -45,48 +47,26 @@ public class Planets implements ContentList{
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
             tidalLock = true;
-            orbitSpacing = 0.45f;
+            orbitSpacing = 2f;
             totalRadius += 2.6f;
             lightSrcTo = 0.5f;
             lightDstFrom = 0.2f;
         }};
 
-        float[] offsets = {40, 0, 0, 20};
-        for(int i = 0; i < 4; i++){
-            int fi = i;
-            new Planet("gier-" + i, erekir, 0.12f){{
-                hasAtmosphere = false;
-                //for testing only!
-                alwaysUnlocked = true;
-                updateLighting = false;
-                sectors.add(new Sector(this, Ptile.empty));
-                camRadius = 0.68f;
-                minZoom = 0.6f;
-                drawOrbit = false;
-                orbitOffset = offsets[fi];
+        makeAsteroid("gier", erekir, Blocks.ferricStoneWall, Blocks.carbonWall, 0.4f, 7, 1f, gen -> {
+            gen.min = 25;
+            gen.max = 35;
+            gen.carbonChance = 0.6f;
+            gen.iceChance = 0f;
+            gen.berylChance = 0.1f;
+        });
 
-                generator = new AsteroidGenerator();
-
-                meshLoader = () -> {
-                    Seq<GenericMesh> meshes = new Seq<>();
-                    Color color = Blocks.ferricStoneWall.mapColor;
-                    Rand rand = new Rand(2);
-
-                    meshes.add(new NoiseMesh(this, 0, 2, color, radius, 2, 0.55f, 0.45f, 14f));
-                    int am = rand.random(3, 7);
-
-                    //TODO gier variants with different names and different resource distributions
-                    for(int j = 0; j < am; j++){
-                        meshes.add(new MatMesh(
-                            new NoiseMesh(this, j + 1, 1, 0.022f + rand.random(0.039f), 2, 0.6f, 0.38f, 20f,
-                                color, Blocks.carbonWall.mapColor, 3, 0.6f, 0.38f, 0.6f),
-                            new Mat3D().setToTranslation(Tmp.v31.setToRandomDirection(rand).setLength(rand.random(0.44f, 1.4f)))));
-                    }
-
-                    return new MultiMesh(meshes.toArray(GenericMesh.class));
-                };
-            }};
-        }
+        makeAsteroid("notva", sun, Blocks.ferricStoneWall, Blocks.beryllicStoneWall, 0.55f, 9, 1.3f, gen -> {
+            gen.berylChance = 0.8f;
+            gen.iceChance = 0f;
+            gen.carbonChance = 0.01f;
+            gen.max += 2;
+        });
 
         tantros = new Planet("tantros", sun, 1, 2){{
             generator = new TantrosPlanetGenerator();
@@ -106,5 +86,49 @@ public class Planets implements ContentList{
             startSector = 15;
             alwaysUnlocked = true;
         }};
+
+        makeAsteroid("verlius", sun, Blocks.stoneWall, Blocks.iceWall, 0.5f, 12, 2f, gen -> {
+            gen.berylChance = 0f;
+            gen.iceChance = 0.6f;
+            gen.carbonChance = 0.1f;
+            gen.ferricChance = 0f;
+        });
     }
+
+    private void makeAsteroid(String name, Planet parent, Block base, Block tint, float tintThresh, int pieces, float scale, Cons<AsteroidGenerator> cgen){
+        new Planet(name, parent, 0.12f){{
+            hasAtmosphere = false;
+            alwaysUnlocked = true; //for testing only!
+            updateLighting = false;
+            sectors.add(new Sector(this, Ptile.empty));
+            camRadius = 0.68f * scale;
+            minZoom = 0.6f;
+            drawOrbit = false;
+
+            generator = new AsteroidGenerator();
+            cgen.get((AsteroidGenerator)generator);
+
+            meshLoader = () -> {
+                Seq<GenericMesh> meshes = new Seq<>();
+                Color color = base.mapColor;
+                Rand rand = new Rand(id + 2);
+
+                meshes.add(new NoiseMesh(
+                    this, 0, 2, radius, 2, 0.55f, 0.45f, 14f,
+                    color, tint.mapColor, 3, 0.6f, 0.38f, tintThresh
+                ));
+
+                for(int j = 0; j < pieces; j++){
+                    meshes.add(new MatMesh(
+                        new NoiseMesh(this, j + 1, 1, 0.022f + rand.random(0.039f) * scale, 2, 0.6f, 0.38f, 20f,
+                        color, tint.mapColor, 3, 0.6f, 0.38f, tintThresh),
+                        new Mat3D().setToTranslation(Tmp.v31.setToRandomDirection(rand).setLength(rand.random(0.44f, 1.4f) * scale)))
+                    );
+                }
+
+                return new MultiMesh(meshes.toArray(GenericMesh.class));
+            };
+        }};
+    }
+
 }

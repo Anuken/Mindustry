@@ -12,11 +12,10 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class AsteroidGenerator extends BlankPlanetGenerator{
-    //TODO nonstatic
-    public static int min = 20, max = 28, octaves = 2, foct = 3;
-    public static float radMin = 12f, radMax = 60f, persistence = 0.4f, scale = 30f, mag = 0.46f, thresh = 1f;
-    public static float fmag = 0.5f, fscl = 50f, fper = 0.6f;
-    public static float iceChance = 0.05f, carbonChance = 0.1f, berylChance = 0.1f;
+    public int min = 20, max = 30, octaves = 2, foct = 3;
+    public float radMin = 12f, radMax = 60f, persistence = 0.4f, scale = 30f, mag = 0.46f, thresh = 1f;
+    public float fmag = 0.5f, fscl = 50f, fper = 0.6f;
+    public float stoneChance = 0f, iceChance = 0f, carbonChance = 0f, berylChance = 0f, ferricChance = 1f;
 
     public float thoriumScl = 1f, copperScale = 1f, leadScale = 1f, graphiteScale = 1f, berylliumScale = 1f;
 
@@ -28,7 +27,8 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
             rand.chance(iceChance) ? Blocks.ice :
             rand.chance(carbonChance) ? Blocks.carbonStone :
             rand.chance(berylChance) ? Blocks.beryllicStone :
-            Blocks.ferricStone
+            rand.chance(ferricChance) ? Blocks.ferricStone :
+            Blocks.stone
         ).asFloor();
 
         for(int x = ax - radius; x <= ax + radius; x++){
