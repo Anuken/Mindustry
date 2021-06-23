@@ -423,7 +423,7 @@ public class SettingsMenuDialog extends Dialog{
             }
         });
 
-        //iOS (and possible Android) devices do not support linear filtering well, so disable it
+        //iOS (and possibly Android) devices do not support linear filtering well, so disable it
         if(!ios){
             graphics.checkPref("linear", !mobile, b -> {
                 for(Texture tex : Core.atlas.getTextures()){
