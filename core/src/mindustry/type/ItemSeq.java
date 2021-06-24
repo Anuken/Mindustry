@@ -55,6 +55,21 @@ public class ItemSeq implements Iterable<ItemStack>, JsonSerializable{
         return out;
     }
 
+    public ItemStack[] toArray(){
+        int count = 0;
+        for(int value : values){
+            if(value != 0) count++;
+        }
+        ItemStack[] result = new ItemStack[count];
+        int index = 0;
+        for(int i = 0; i < values.length; i++){
+            if(values[i] != 0){
+                result[index ++] = new ItemStack(Vars.content.item(i), values[i]);
+            }
+        }
+        return result;
+    }
+
     public void min(int number){
         for(Item item : Vars.content.items()){
             set(item, Math.min(get(item), number));
@@ -88,6 +103,12 @@ public class ItemSeq implements Iterable<ItemStack>, JsonSerializable{
 
     public void add(ItemModule itemModule){
         itemModule.each(this::add);
+    }
+
+    public void add(ItemStack[] stacks){
+        for(var s : stacks){
+            add(s);
+        }
     }
 
     public void add(ItemSeq seq){

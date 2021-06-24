@@ -5,6 +5,7 @@ import arc.util.io.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -31,6 +32,16 @@ public class BuildPayload implements Payload{
     public void place(Tile tile, int rotation){
         tile.setBlock(build.block, build.team, rotation, () -> build);
         build.dropped();
+    }
+
+    @Override
+    public ItemStack[] requirements(){
+        return build.block.requirements;
+    }
+
+    @Override
+    public float buildTime(){
+        return build.block.buildCost;
     }
 
     @Override

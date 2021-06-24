@@ -96,7 +96,7 @@ public class Blocks implements ContentList{
     repairPoint, repairTurret, resupplyPoint,
 
     //payloads
-    payloadConveyor, payloadRouter, payloadPropulsionTower,
+    payloadConveyor, payloadRouter, payloadPropulsionTower, payloadDeconstructor, blockForge, blockLoader, blockUnloader,
 
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
@@ -105,10 +105,7 @@ public class Blocks implements ContentList{
     launchPad, payloadLaunchPad, interplanetaryAccelerator,
 
     //nuclear?
-    nuclearWarhead, warheadAssembler, ballisticSilo, //TODO
-
-    //misc experimental
-    blockForge, blockLoader, blockUnloader
+    nuclearWarhead, warheadAssembler, ballisticSilo //TODO
     ;
 
     @Override
@@ -2206,6 +2203,35 @@ public class Blocks implements ContentList{
             consumes.power(6f);
         }};
 
+        payloadDeconstructor = new PayloadDeconstructor("payload-deconstructor"){{
+            requirements(Category.units, with(Items.graphite, 30, Items.silicon, 30, Items.copper, 30));
+            itemCapacity = 200;
+            consumes.power(1f);
+            size = 5;
+            deconstructSpeed = 2f;
+        }};
+
+        blockForge = new BlockForge("block-forge"){{
+            requirements(Category.units, BuildVisibility.debugOnly, with(Items.thorium, 100));
+            hasPower = true;
+            consumes.power(2f);
+            size = 3;
+        }};
+
+        blockLoader = new BlockLoader("block-loader"){{
+            requirements(Category.units, BuildVisibility.debugOnly, with(Items.thorium, 100));
+            hasPower = true;
+            consumes.power(2f);
+            size = 3;
+        }};
+
+        blockUnloader = new BlockUnloader("block-unloader"){{
+            requirements(Category.units, BuildVisibility.debugOnly, with(Items.thorium, 100));
+            hasPower = true;
+            consumes.power(2f);
+            size = 3;
+        }};
+
         //endregion
         //region sandbox
 
@@ -2388,30 +2414,6 @@ public class Blocks implements ContentList{
             displaySize = 176;
 
             size = 6;
-        }};
-
-        //endregion
-        //region experimental
-
-        blockForge = new BlockForge("block-forge"){{
-            requirements(Category.units, BuildVisibility.debugOnly, with(Items.thorium, 100));
-            hasPower = true;
-            consumes.power(2f);
-            size = 3;
-        }};
-
-        blockLoader = new BlockLoader("block-loader"){{
-            requirements(Category.units, BuildVisibility.debugOnly, with(Items.thorium, 100));
-            hasPower = true;
-            consumes.power(2f);
-            size = 3;
-        }};
-
-        blockUnloader = new BlockUnloader("block-unloader"){{
-            requirements(Category.units, BuildVisibility.debugOnly, with(Items.thorium, 100));
-            hasPower = true;
-            consumes.power(2f);
-            size = 3;
         }};
 
         //endregion

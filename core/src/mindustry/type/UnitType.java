@@ -127,7 +127,9 @@ public class UnitType extends UnlockableContent{
         softShadowRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion;
     public TextureRegion[] wreckRegions;
 
+    protected float maxBuildTime = -1f;
     protected @Nullable ItemStack[] cachedRequirements;
+    protected @Nullable ItemStack[] totalRequirements;
 
     public UnitType(String name){
         super(name);
@@ -460,25 +462,70 @@ public class UnitType extends UnlockableContent{
         }
     }
 
+    /** @return the time required to build this unit, as a maximum value that takes into account reconstructors */
+    public float getBuildTime(){
+        getTotalRequirements();
+        return maxBuildTime;
+    }
+
+    /** @return all items needed to build this unit, including reconstructor steps. */
+    public ItemStack[] getTotalRequirements(){
+        if(totalRequirements == null){
+            UnitType[] ret = {null};
+            float[] timeret = {0f};
+            ItemStack[] result = getRequirements(ret, timeret);
+
+            //prevents stack overflow if requirements are circular and result != null
+            totalRequirements = ItemStack.empty;
+
+            if(result != null){
+                maxBuildTime = timeret[0];
+                ItemSeq total = new ItemSeq();
+
+                total.add(result);
+                if(ret[0] != null){
+                    total.add(ret[0].getTotalRequirements());
+                    maxBuildTime = Math.max(ret[0].maxBuildTime, maxBuildTime);
+                }
+                totalRequirements = total.toArray();
+            }
+        }
+        return totalRequirements;
+    }
+
+    /** @return item requirements based on reconstructors or factories found; returns previous unit in array if provided */
+    public @Nullable ItemStack[] getRequirements(@Nullable UnitType[] prevReturn, @Nullable float[] timeReturn){
+        var rec = (Reconstructor)content.blocks().find(b -> b instanceof Reconstructor re && re.upgrades.contains(u -> u[1] == this));
+
+        if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems ci){
+            if(prevReturn != null){
+                prevReturn[0] = rec.upgrades.find(u -> u[1] == this)[0];
+            }
+            if(timeReturn != null){
+                timeReturn[0] = rec.constructTime;
+            }
+            return ci.items;
+        }else{
+            var factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory uf && uf.plans.contains(p -> p.unit == this));
+            if(factory != null){
+
+                var plan = factory.plans.find(p -> p.unit == this);
+                if(timeReturn != null){
+                    timeReturn[0] = plan.time;
+                }
+                return plan.requirements;
+            }
+        }
+        return null;
+    }
+
     @Override
     public ItemStack[] researchRequirements(){
         if(cachedRequirements != null){
             return cachedRequirements;
         }
 
-        ItemStack[] stacks = null;
-
-        //calculate costs based on reconstructors or factories found
-        Block rec = content.blocks().find(b -> b instanceof Reconstructor re && re.upgrades.contains(u -> u[1] == this));
-
-        if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems ci){
-            stacks = ci.items;
-        }else{
-            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory uf && uf.plans.contains(p -> p.unit == this));
-            if(factory != null){
-                stacks = factory.plans.find(p -> p.unit == this).requirements;
-            }
-        }
+        ItemStack[] stacks = getRequirements(null, null);
 
         if(stacks != null){
             ItemStack[] out = new ItemStack[stacks.length];

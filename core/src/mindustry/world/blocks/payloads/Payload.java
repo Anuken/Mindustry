@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -24,6 +25,12 @@ public interface Payload extends Position{
 
     float x();
     float y();
+
+    /** @return the items needed to make this payload; may be empty. */
+    ItemStack[] requirements();
+
+    /** @return the time taken to build this payload. */
+    float buildTime();
 
     /** @return whether this payload was dumped. */
     default boolean dump(){

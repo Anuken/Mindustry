@@ -12,6 +12,7 @@ import mindustry.entities.EntityCollisions.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 
 public class UnitPayload implements Payload{
     public static final float deactiveDuration = 40f;
@@ -21,6 +22,16 @@ public class UnitPayload implements Payload{
 
     public UnitPayload(Unit unit){
         this.unit = unit;
+    }
+
+    @Override
+    public ItemStack[] requirements(){
+        return unit.type.getTotalRequirements();
+    }
+
+    @Override
+    public float buildTime(){
+        return unit.type.getBuildTime();
     }
 
     @Override
