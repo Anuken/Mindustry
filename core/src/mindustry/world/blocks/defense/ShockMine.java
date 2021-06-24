@@ -3,6 +3,7 @@ package mindustry.world.blocks.defense;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
@@ -20,7 +21,8 @@ public class ShockMine extends Block{
     public int tendrils = 6;
     public Color lightningColor = Pal.lancerLaser;
     public int shots = 6;
-    public BulletType bullet;
+    public float inaccuracy = 0f;
+    public @Nullable BulletType bullet;
     public float teamAlpha = 0.3f;
     public @Load("@-team-top") TextureRegion teamRegion;
 
@@ -66,7 +68,7 @@ public class ShockMine extends Block{
             }
             if(bullet != null){
                 for(int i = 0; i < shots; i++){
-                    bullet.create(this, x, y, Mathf.random(360f));
+                    bullet.create(this, x, y, (360f / shots) * i + Mathf.random(inaccuracy));
                 }
             }
         }
