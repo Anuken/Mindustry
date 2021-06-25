@@ -24,9 +24,9 @@ repositories{
 task deploy(type: Copy){
     dependsOn "assembleRelease"
 
-    from "build/outputs/apk/release/android-release.apk"
+    from "build/outputs/apk/standard/release/android-standard-release.apk"
     into "../deploy/"
-    rename("android-release.apk", "${generateDeployName('android')}.apk")
+    rename("android-standard-release.apk", "${generateDeployName('android')}.apk")
 }
 
 android{

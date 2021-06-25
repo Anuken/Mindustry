@@ -38,7 +38,6 @@ public enum Gamemode{
         rules.infiniteResources = true;
         rules.editor = true;
         rules.waves = false;
-        rules.enemyCoreBuildRadius = 0f;
         rules.waveTimer = false;
     });
 
