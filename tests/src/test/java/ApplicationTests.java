@@ -116,7 +116,6 @@ public class ApplicationTests{
                 Thread.sleep(10);
             }
 
-
             Block block = content.getByName(ContentType.block, "build2");
             assertEquals("build2", block == null ? null : block.name, "2x2 construct block doesn't exist?");
         }catch(Throwable r){
