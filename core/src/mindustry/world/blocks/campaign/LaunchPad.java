@@ -153,7 +153,7 @@ public class LaunchPad extends Block{
         public void display(Table table){
             super.display(table);
 
-            if(!state.isCampaign()) return;
+            if(!state.isCampaign() || net.client()) return;
 
             table.row();
             table.label(() -> {
