@@ -16,7 +16,13 @@ buildscript{
     }
 
     dependencies{
-        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.11'
+        //use local, patched robovm gradle plugin if possible
+        if(file("robovm-gradle-plugin.jar").exists()){
+            classpath files("robovm-gradle-plugin.jar")
+        }else{
+            classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.13'
+        }
+
         classpath "com.github.Anuken.Arc:packer:$arcHash"
         classpath "com.github.Anuken.Arc:arc-core:$arcHash"
     }
