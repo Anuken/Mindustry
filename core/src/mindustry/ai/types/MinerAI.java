@@ -31,7 +31,7 @@ public class MinerAI extends AIController{
             //core full of the target item, do nothing
             if(targetItem != null && core.acceptStack(targetItem, 1, unit) == 0){
                 unit.clearItem();
-                unit.mineTile =null;
+                unit.mineTile = null;
                 return;
             }
 
