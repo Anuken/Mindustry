@@ -285,7 +285,7 @@ public class ServerControl implements ApplicationListener{
             info("Stopped server.");
         });
 
-        handler.register("host", "[mapname] [mode]", "Open the server. Will default to survival and a random map if not specified.", arg -> {
+        handler.register("host", "[mode] [mapname...]", "Open the server. Will default to survival and a random map if not specified.", arg -> {
             if(state.is(State.playing)){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
@@ -295,21 +295,21 @@ public class ServerControl implements ApplicationListener{
 
             Gamemode preset = Gamemode.survival;
 
-            if(arg.length > 1){
+            if(arg.length > 0){
                 try{
-                    preset = Gamemode.valueOf(arg[1]);
+                    preset = Gamemode.valueOf(arg[0]);
                 }catch(IllegalArgumentException e){
-                    err("No gamemode '@' found.", arg[1]);
+                    err("No gamemode '@' found.", arg[0]);
                     return;
                 }
             }
 
             Map result;
-            if(arg.length > 0){
-                result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
+            if(arg.length > 1){
+                result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[1].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[1]));
 
                 if(result == null){
-                    err("No map with name '@' found.", arg[0]);
+                    err("No map with name '@' found.", arg[1]);
                     return;
                 }
             }else{
