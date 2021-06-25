@@ -3,6 +3,14 @@
     "address": "mindustry.us.to"
   },
   {
+    "name": "mindustry.pl",
+    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl:6966"]
+  },
+  {
+    "name": "[accent]Mindustry [red]Reborn",
+    "address": "mindustry.me:7000"
+  },
+  {
     "name": "Omega",
     "address": "157.90.180.53:25777"
   }
