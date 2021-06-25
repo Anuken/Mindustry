@@ -2046,10 +2046,10 @@ public class UnitTypes implements ContentList{
 
             buildSpeed = 3f;
 
-            abilities.add(new EnergyFieldAbility(35f, 65f, 180f){{
-                repair = 35f;
+            abilities.add(new EnergyFieldAbility(40f, 65f, 180f){{
+                repair = 40f;
                 statusDuration = 60f * 6f;
-                maxTargets = 25;
+                maxTargets = 30;
             }});
 
             for(float mountY : new float[]{-18f, 14}){
