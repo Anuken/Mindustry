@@ -17,5 +17,9 @@
   {
     "name": "MeowLand",
     "address": "34.134.111.15"
+  },
+  {
+    "name": "Mindurka",
+    "address": ["mindurka.tk", "mindurka.tk:4000"] 
   }
 ]
