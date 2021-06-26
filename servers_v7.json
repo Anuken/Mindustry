@@ -12,6 +12,6 @@
   },
   {
     "name": "Mindurka",
-    "address": "mindurka.tk, mindurka.tk:4000"
+    "address": ["mindurka.tk, mindurka.tk:4000"]
   }
 ]
