@@ -13,5 +13,9 @@
   {
     "name": "Omega",
     "address": "157.90.180.53:25777"
+  },
+  {
+    "name": "MeowLand",
+    "address": "34.134.111.15"
   }
 ]
