@@ -116,7 +116,6 @@ public class ApplicationTests{
                 Thread.sleep(10);
             }
 
-
             Block block = content.getByName(ContentType.block, "build2");
             assertEquals("build2", block == null ? null : block.name, "2x2 construct block doesn't exist?");
         }catch(Throwable r){
@@ -182,7 +181,7 @@ public class ApplicationTests{
 
     @Test
     void serverListJson(){
-        String[] files = {"servers.json", "servers_be.json", "servers_v6.json"};
+        String[] files = {"servers_v6.json", "servers_v7.json", "servers_be.json"};
 
         for(String file : files){
             try{

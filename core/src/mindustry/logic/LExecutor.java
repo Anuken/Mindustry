@@ -1023,6 +1023,26 @@ public class LExecutor{
         }
     }
 
+    public static class LookupI implements LInstruction{
+        public int dest;
+        public int from;
+        public ContentType type;
+
+        public LookupI(int dest, int from, ContentType type){
+            this.dest = dest;
+            this.from = from;
+            this.type = type;
+        }
+
+        public LookupI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            exec.setobj(dest, constants.lookupContent(type, exec.numi(from)));
+        }
+    }
+
 
     //endregion
 }

@@ -7,6 +7,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.LCanvas.*;
@@ -662,8 +663,7 @@ public class LStatements{
         }
     }
 
-    //TODO untested
-    //@RegisterStatement("wait")
+    @RegisterStatement("wait")
     public static class WaitStatement extends LStatement{
         public String value = "0.5";
 
@@ -681,6 +681,42 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new WaitI(builder.var(value));
+        }
+    }
+
+    @RegisterStatement("lookup")
+    public static class LookupStatement extends LStatement{
+        public ContentType type = ContentType.item;
+        public String result = "result", id = "0";
+
+        @Override
+        public void build(Table table){
+            fields(table, result, str -> result = str);
+
+            table.add(" = lookup ");
+
+            row(table);
+
+            table.button(b -> {
+                b.label(() -> type.name());
+                b.clicked(() -> showSelect(b, GlobalConstants.lookableContent, type, o -> {
+                    type = o;
+                }));
+            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
+
+            table.add(" # ");
+
+            fields(table, id, str -> id = str);
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicOperations;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new LookupI(builder.var(result), builder.var(id), type);
         }
     }
 

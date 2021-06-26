@@ -4,6 +4,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import org.junit.jupiter.api.*;
 
+import static mindustry.Vars.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 //grabs a version-locked exotic-mod commit and makes sure its content is parsed correctly
@@ -23,7 +24,7 @@ public class ModTestExotic extends GenericModTest{
         assertNotNull(type, "A mod unit must be loaded.");
         assertTrue(type.weapons.size > 0, "A mod unit must have a weapon.");
 
-        Vars.world.loadMap(ApplicationTests.testMap);
+        Vars.world.loadMap(maps.loadInternalMap("groundZero"));
 
         Unit unit = type.spawn(0, 0);
 
