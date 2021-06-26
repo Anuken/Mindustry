@@ -154,7 +154,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 Events.fireWrap(event.getClass(), event, listener -> {
                     try{
                         listener.get(event);
-                    }catch(NoSuchFieldError | NoSuchMethodError error){
+                    }catch(NoSuchFieldError | NoSuchMethodError | NoClassDefFoundError error){
                         Log.err(error);
                     }
 

@@ -3,6 +3,10 @@
     "address": "mindustry.us.to"
   },
   {
+    "name": "mindustry.pl",
+    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl:6966"]
+  },
+  {
     "name": "[accent]Mindustry [red]Reborn",
     "address": "mindustry.me:7000"
   },
@@ -11,7 +15,11 @@
     "address": "157.90.180.53:25777"
   },
   {
+    "name": "MeowLand",
+    "address": "34.134.111.15"
+  },
+  {
     "name": "Mindurka",
-    "address": ["mindurka.tk", "mindurka.tk:4000"]
+    "address": ["mindurka.tk", "mindurka.tk:4000"] 
   }
 ]

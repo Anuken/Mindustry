@@ -1589,13 +1589,13 @@ public class Blocks implements ContentList{
             shots = 4;
             burstSpacing = 5;
             inaccuracy = 10f;
-            range = 210f;
+            range = 215f;
             xRand = 6f;
             size = 2;
             health = 300 * size * size;
             shootSound = Sounds.missile;
 
-            limitRange(2f);
+            limitRange(5f);
         }};
 
         salvo = new ItemTurret("salvo"){{
