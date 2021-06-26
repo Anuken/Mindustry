@@ -97,7 +97,7 @@ public class Net{
 
             if(e instanceof BufferUnderflowException || e instanceof BufferOverflowException){
                 error = Core.bundle.get("error.io");
-            }else if(error.equals("mismatch")){
+            }else if(error.equals("mismatch") || (e instanceof IndexOutOfBoundsException && e.getStackTrace()[0].getClassName().contains("java.nio"))){
                 error = Core.bundle.get("error.mismatch");
             }else if(error.contains("port out of range") || error.contains("invalid argument") || (error.contains("invalid") && error.contains("address")) || Strings.neatError(e).contains("address associated")){
                 error = Core.bundle.get("error.invalidaddress");
