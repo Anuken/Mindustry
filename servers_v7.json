@@ -21,5 +21,9 @@
   {
     "name": "Mindurka",
     "address": ["mindurka.tk", "mindurka.tk:4000"] 
+  },
+  {
+    "name": "Chaotic Neutral",
+    "address": ["c-n.ddns.net:5555", "c-n.ddns.net:6666"]
   }
 ]
