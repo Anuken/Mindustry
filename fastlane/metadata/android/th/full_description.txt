@@ -1,0 +1,52 @@
+Create elaborate supply chains of conveyor belts to feed ammo into your turrets, produce materials to use for building, and defend your structures from waves of enemies. Play with your friends in cross-platform multiplayer co-op games, or challenge them in team-based PvP matches.
+
+<h2>Gameplay Features</h2>
+ 
+- Use production blocks to create a wide variety of advanced materials
+- Defend your structures from waves of enemies
+- Play with your friends in cross-platform multiplayer co-op games, or challenge them in team-based PvP matches
+- Distribute liquids and fight constant challenges, like outbreaks of fire or enemy flier raids
+- Get the most out of your production by supplying optional coolant and lubricant
+- Produce a wide variety of units for automatic management of your base or assault on enemy bases
+
+
+<h2>Campaign</h2>
+
+- Conquer the planet Serpulo as you advance through 250+ procedurally generated sectors and 16 hand-made maps
+- Capture territory and set up factories to produce resources while you play other sectors
+- Defend your sectors from periodic invasions
+- Coordinate resource distribution between sectors via launch pads
+- Research new blocks to fuel progress
+- Invite your friends to complete missions together
+- 130+ technology blocks to master
+- 33 different types of drones, mechs and ships
+
+
+<h2>Gamemodes</h2>
+
+- <b>Survival</b>: Build turrets to defend from enemies in tower-defense based gameplay. Survive as long as possible, optionally launching your core to use your collected resources for research. Prepare your base for intermittent attacks from airborne bosses.
+- <b>Attack</b>: Build factories for units to destroy the enemy cores, while simultaneously defending your base from waves of enemy units. Create a variety of different types of support and offensive unit to assist you in your goals. Optionally enable an AI that builds defensive structures to an extra challenge.
+- <b>PvP</b>: Compete with other players on up to 4 different teams to destroy each other's cores. Create units, or attack other bases directly with your mechs.
+- <b>Sandbox</b>: Play around with infinite resources and no enemy threat. Use sandbox-specific item and liquid source blocks to test out designs, and spawn in enemies on request.
+
+
+<h2>Custom Games &amp; Cross-Platform Multiplayer</h2>
+
+- 16 built in maps for custom games, in addition to campaign
+- Play co-op, PvP or sandbox
+- Join a public dedicated server, or invite friends to your own private session
+- Customizable game rules: Change block costs, enemy stats, starting items, wave timing and more
+- Mix &amp; match gamemodes: Combine PvP and PvE gamemodes together
+
+
+<h2>Custom Map Editor</h2>
+
+- Paint terrain with an editor UI
+- Edit and preview structures in-game
+- Configurable tool modes: Change how each tool functions
+- Powerful map generation system, with many different types of filters for procedural manipulation of terrain
+- Apply noise, distortion, smoothing, erosion, symmetry, ore generation and random terrain to your maps
+- Randomize and configure ore generation, as well as placement of river and resource tiles
+- Configure enemy wave layouts
+- Customize base map rules
+- Use 80+ different environmental blocks
