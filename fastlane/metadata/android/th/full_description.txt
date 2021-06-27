@@ -12,31 +12,31 @@
 
 <h2>แคมเปญ</h2>
 
-- ยืดครองดาวเซอร์ปูโล่ขณะที่คุณก้าวผ่าน 250+ เซ็กเตอร์ที่กำเนิดตามขั้นตอนและ 16 ด่านสำคัญที่สร้างด้วยมือ
-- Capture territory and set up factories to produce resources while you play other sectors
-- Defend your sectors from periodic invasions
-- Coordinate resource distribution between sectors via launch pads
-- Research new blocks to fuel progress
-- Invite your friends to complete missions together
-- 130+ technology blocks to master
-- 33 different types of drones, mechs and ships
+- ยืดครองดาวเซอร์ปูโล่ขณะที่คุณก้าวผ่าน 250+ เซ็กเตอร์ที่สร้างตามขั้นตอนและ 16 ด่านสำคัญที่สร้างด้วยมือ
+- ยืดครองพื้นที่และตั้งโรงงานต่างๆ เพื่อผลิตทรัพยากรระหว่างที่คุณเล่นเซ็กเตอร์อื่น
+- ปกป้องเซ็กเตอร์จากการโจมตีของศัตรูเป็นระยะๆ
+- แจกจ่ายทรัพยากรระหว่างเซ็กเตอร์ด้วยฐานส่งของ
+- วิจัยสิ่งก่อสร้างต่างๆ เพื่อพัฒนาความคืบหน้า
+- ชวนเพื่อนมาทำภารกิจด้วยกัน
+- 130+ บล็อกเทคโนโลยีให้วิจัย
+- 33 ชนิดของโดรน เม็กและยานที่แตกต่างกันไป
 
 
-<h2>Gamemodes</h2>
+<h2>เกมโหมด</h2>
 
-- <b>Survival</b>: Build turrets to defend from enemies in tower-defense based gameplay. Survive as long as possible, optionally launching your core to use your collected resources for research. Prepare your base for intermittent attacks from airborne bosses.
-- <b>Attack</b>: Build factories for units to destroy the enemy cores, while simultaneously defending your base from waves of enemy units. Create a variety of different types of support and offensive unit to assist you in your goals. Optionally enable an AI that builds defensive structures to an extra challenge.
-- <b>PvP</b>: Compete with other players on up to 4 different teams to destroy each other's cores. Create units, or attack other bases directly with your mechs.
-- <b>Sandbox</b>: Play around with infinite resources and no enemy threat. Use sandbox-specific item and liquid source blocks to test out designs, and spawn in enemies on request.
+- <b>เอาชีวิตรอด</b>: สร้างป้อมปืนเพื่อป้องกันศัตรูในการเล่นรูปแบบ Tower-defense เอาชีวิตรอดให้ได้นานที่สุด ส่งแกนกลางของคุณไปยังเซ็กเตอร์ข้างๆ เพื่อขยายอาณาเขต เตรียมฐานให้พร้อมสำหรับการ์เดียนที่จะประกฏตัวมาอย่างไม่ทันได้ตั้งตัว
+- <b>โจมตี</b>: สร้างโรงงานยูนิตมาเพื่อทำลายแกนกลางศัตรูระหว่างที่ป้องกันฐานทัพของคุณจากคลื่นของศัตรูในเวลาเดียวกัน สร้างยูนิตที่หลากหลายทั้งช่วยเหลือและโจมตีเพื่อช่วยให้คุณสำเร็จเป้าหมายเร็วขึ้น อาจเปิด AI ที่สร้างสิ่งป้องกันต่างๆ เพื่อให้ท้าทายมากขึ้น
+- <b>PvP</b>: ต่อสู้กับผู้เล่นอื่นที่มีได้มากถึง 4 ทีมเพื่อทำลายแกนกลางของคู่แข่ง สร้างยูนิตให้มันโจมตี หรือควบคุมมันด้วยตนเองเพื่อโจมตีโดยตรง
+- <b>อิสระ</b>: เล่นได้อย่างไม่มีที่สิ้นสุดด้วยทรัพยากรที่ไม่จำกัดและไม่มีภัยศัตรู ใช้บล็อกจุดกำเนิดไอเท็มและของเหลวที่มีเฉพาะโหมดนี้เพื่อทดสอบการออกแบบต่างๆ และกำเนิดศัตรูได้เมื่อต้องการ
 
 
-<h2>Custom Games &amp; Cross-Platform Multiplayer</h2>
+<h2>เกมที่กำหนดเอง &amp; เล่นหลายคนข้ามแพลตฟอร์ม</h2>
 
-- 16 built in maps for custom games, in addition to campaign
-- Play co-op, PvP or sandbox
-- Join a public dedicated server, or invite friends to your own private session
-- Customizable game rules: Change block costs, enemy stats, starting items, wave timing and more
-- Mix &amp; match gamemodes: Combine PvP and PvE gamemodes together
+- 16 แมพติดตัวสำหรับเกมที่กำหนดเอง นอกเหนือจากแคมเปญ
+- เล่น co-op เกมอิสระหรือเกม PvP
+- เข้าร่วมเซิร์ฟเวอร์ของชุมชน หรือชวนเพื่อนมาเล่นในเซสซั่นของคุณเอง
+- กฏเกมที่ปรับแต่งได้: เปลี่ยนราคาสิ่งก่อสร้าง ค่าพลังศัตรู ทรัพยากรเริ่มต้น เวลานับถอยหลังคลื่น และอีกมากมาย
+- Mix &amp; จับคู่เกมโหมด: รวมPvP และ PvE เข้าด้วยกัน
 
 
 <h2>Custom Map Editor</h2>
