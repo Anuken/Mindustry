@@ -1,1 +1,1 @@
-A factory-based sandbox tower defense game.
+เกมป้องกันหอคอยแบบอิสระโดยพึ่งพาโรงงานเป็นส่วนใหญ่
