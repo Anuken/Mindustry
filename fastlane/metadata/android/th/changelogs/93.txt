@@ -1,0 +1,11 @@
+- Added new spawn animations w/ progress bar and names
+- Added configurable server whitelist based on player UUID
+- Added many new events for plugins
+- Added core land animation
+- Added player limit for servers
+- Added gamemode display for server/save lists
+- Added new filechooser for Android, fixes file access on Android 10
+- Added core storage space increase via adjacent vaults or containers
+- Made unloader be able to take items from any block
+- Improved votekick sensitivity
+- Fixed many various bugs

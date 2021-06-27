@@ -1,0 +1,12 @@
+- Fixed zone exploit caused by import of zone saves
+- Reverted to old file chooser when possible [Android]
+- New multithreaded pathfinding implementation
+- Made attack command have units move toward enemy spawnpoints in survival
+- Made votekick still tempban people after disconnection
+- Added 'rally' command to  command center, replaces old patrol command
+- Added full Android keyboard support, completely removes any touch input, adds desktop keys
+- Added ability to rotate lines while placing [Desktop] [Contributed by Synray]
+- Added votekick button
+- Added display of power capacity in power graphs
+- Added armored conveyors - more armor than titanium, don't accept items from sides
+- Added message blocks - editable text
