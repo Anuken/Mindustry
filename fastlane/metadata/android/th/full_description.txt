@@ -1,18 +1,18 @@
-Create elaborate supply chains of conveyor belts to feed ammo into your turrets, produce materials to use for building, and defend your structures from waves of enemies. Play with your friends in cross-platform multiplayer co-op games, or challenge them in team-based PvP matches.
+สร้างทางสายพานอันซับซ้อนเพื่อมาเติมกระสุนให้กับป้อมปืน ผลิตวัสดุเพื่อมาสร้างสิ่งก่อสร้าง และปกป้องฐานทัพจากคลื่นศัตรู เล่นกับเพื่อนข้ามแพลตฟอร์มในโหมด co-op หรือท้าทายเพื่อนในโหมด PvP แบบทีม
 
-<h2>Gameplay Features</h2>
+<h2>ฟีเจอร์ของเกม</h2>
  
-- Use production blocks to create a wide variety of advanced materials
-- Defend your structures from waves of enemies
-- Play with your friends in cross-platform multiplayer co-op games, or challenge them in team-based PvP matches
-- Distribute liquids and fight constant challenges, like outbreaks of fire or enemy flier raids
-- Get the most out of your production by supplying optional coolant and lubricant
-- Produce a wide variety of units for automatic management of your base or assault on enemy bases
+- สร้างโรงงานต่างๆ เพื่อผลิตวัสดุที่หลากหลาย
+- ปกป้องฐานทัพจากคลื่นของศัตรู
+- เล่นกับเพื่อนข้ามแพลตฟอร์มในโหมด co-op หรือท้าทายพวกเขาในโหมด PvP แบบทีม
+- แจกจ่ายของเหลวและสู้กับความท้าทายอย่างต่อเนื่องดั่งไฟอันร้อนแรงหรือฝูงบินจู่โจม
+- ขยายการผลิตของคุณให้มากขึ้นด้วยการใส่สารหล่อเย็นหรือวัสดุหล่อลื่น
+- ผลิตยูนิตหลากหลายชนิดเพื่ออำนวยความสะดวกต่างๆ หรือนำมันไปจู่โจมฐานทัพศัตรู
 
 
-<h2>Campaign</h2>
+<h2>แคมเปญ</h2>
 
-- Conquer the planet Serpulo as you advance through 250+ procedurally generated sectors and 16 hand-made maps
+- ยืดครองดาวเซอร์ปูโล่ขณะที่คุณก้าวผ่าน 250+ เซ็กเตอร์ที่กำเนิดตามขั้นตอนและ 16 ด่านสำคัญที่สร้างด้วยมือ
 - Capture territory and set up factories to produce resources while you play other sectors
 - Defend your sectors from periodic invasions
 - Coordinate resource distribution between sectors via launch pads
