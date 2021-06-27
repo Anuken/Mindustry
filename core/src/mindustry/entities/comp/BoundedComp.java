@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.math.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 
@@ -24,7 +25,7 @@ abstract class BoundedComp implements Velc, Posc, Healthc, Flyingc{
             if(x > world.unitWidth()) dx -= (x - world.unitWidth())/warpDst;
             if(y > world.unitHeight()) dy -= (y - world.unitHeight())/warpDst;
 
-            velAddNet(dx, dy);
+            velAddNet(dx * Time.delta, dy * Time.delta);
         }
 
         //clamp position if not flying
