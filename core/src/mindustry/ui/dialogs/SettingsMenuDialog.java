@@ -423,12 +423,17 @@ public class SettingsMenuDialog extends Dialog{
             }
         });
 
-        graphics.checkPref("linear", !mobile, b -> {
-            for(Texture tex : Core.atlas.getTextures()){
-                TextureFilter filter = b ? TextureFilter.linear : TextureFilter.nearest;
-                tex.setFilter(filter, filter);
-            }
-        });
+        //iOS (and possibly Android) devices do not support linear filtering well, so disable it
+        if(!ios){
+            graphics.checkPref("linear", !mobile, b -> {
+                for(Texture tex : Core.atlas.getTextures()){
+                    TextureFilter filter = b ? TextureFilter.linear : TextureFilter.nearest;
+                    tex.setFilter(filter, filter);
+                }
+            });
+        }else{
+            settings.put("linear", false);
+        }
 
         if(Core.settings.getBool("linear")){
             for(Texture tex : Core.atlas.getTextures()){

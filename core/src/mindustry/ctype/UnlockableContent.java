@@ -126,6 +126,10 @@ public abstract class UnlockableContent extends MappableContent{
         return true;
     }
 
+    public boolean logicVisible(){
+        return !isHidden();
+    }
+
     /** Makes this piece of content unlocked; if it already unlocked, nothing happens. */
     public void unlock(){
         if(!unlocked && !alwaysUnlocked){

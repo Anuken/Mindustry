@@ -174,21 +174,12 @@ public class ModsDialog extends BaseDialog{
                         dialog.hide();
 
                         platform.showMultiFileChooser(file -> {
-                            Runnable go = () -> {
-                                try{
-                                    mods.importMod(file);
-                                    setup();
-                                }catch(IOException e){
-                                    ui.showException(e);
-                                    e.printStackTrace();
-                                }
-                            };
-
-                            //show unsafe jar file warning
-                            if(file.extEquals("jar")){
-                                ui.showConfirm("@warning", "@mod.jarwarn", go);
-                            }else{
-                                go.run();
+                            try{
+                                mods.importMod(file);
+                                setup();
+                            }catch(IOException e){
+                                ui.showException(e);
+                                Log.err(e);
                             }
                         }, "zip", "jar");
                     }).margin(12f);
@@ -333,7 +324,6 @@ public class ModsDialog extends BaseDialog{
             if(showImport) dialog.buttons.button("@mods.browser.reinstall", Icon.download, () -> githubImportMod(mod.getRepo(), mod.isJava()));
         }
 
-        //TODO improve this menu later
         dialog.cont.pane(desc -> {
             desc.center();
             desc.defaults().padTop(10).left();
@@ -529,10 +519,7 @@ public class ModsDialog extends BaseDialog{
 
     private void githubImportMod(String repo, boolean isJava){
         if(isJava){
-            ui.showConfirm("@warning", "@mod.jarwarn", () -> {
-                ui.loadfrag.show();
-                githubImportJavaMod(repo);
-            });
+            githubImportJavaMod(repo);
         }else{
             ui.loadfrag.show();
             Core.net.httpGet(ghApi + "/repos/" + repo, res -> {

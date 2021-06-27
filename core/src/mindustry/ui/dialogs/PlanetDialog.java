@@ -240,7 +240,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         dialog.add("@sectors.captured");
     }
 
-    //TODO
+    //TODO unimplemented, cutscene needed
     public void showPlanetLaunch(Sector sector, Cons<Sector> listener){
         selected = null;
         hovered = null;

@@ -17,7 +17,6 @@
             android:usesCleartextTraffic="true"
             android:appCategory="game"
             android:label="@string/app_name"
-            android:theme="@style/ArcTheme"
             android:fullBackupContent="@xml/backup_rules">
         <meta-data android:name="android.max_aspect" android:value="2.1"/>
         <activity

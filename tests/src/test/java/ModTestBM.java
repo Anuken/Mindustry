@@ -24,7 +24,7 @@ public class ModTestBM extends GenericModTest{
         assertNotNull(type, "A mod block must be loaded.");
         assertSame(type.buildVisibility, BuildVisibility.shown, "A mod block must be buildable.");
 
-        world.loadMap(ApplicationTests.testMap);
+        world.loadMap(maps.loadInternalMap("groundZero"));
         Tile t = world.tile(3, 3);
 
         t.setBlock(type);

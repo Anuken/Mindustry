@@ -1,7 +1,6 @@
 package mindustry.maps.filters;
 
 import arc.math.*;
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -14,16 +13,16 @@ public class TerrainFilter extends GenerateFilter{
 
     @Override
     public FilterOption[] options(){
-        return Structs.arr(
-        new SliderOption("scale", () -> scl, f -> scl = f, 1f, 500f),
-        new SliderOption("mag", () -> magnitude, f -> magnitude = f, 0f, 2f),
-        new SliderOption("threshold", () -> threshold, f -> threshold = f, 0f, 1f),
-        new SliderOption("circle-scale", () -> circleScl, f -> circleScl = f, 0f, 3f),
-        new SliderOption("octaves", () -> octaves, f -> octaves = f, 1f, 10f),
-        new SliderOption("falloff", () -> falloff, f -> falloff = f, 0f, 1f),
-        new BlockOption("floor", () -> floor, b -> floor = b, floorsOptional),
-        new BlockOption("wall", () -> block, b -> block = b, wallsOnly)
-        );
+        return new FilterOption[]{
+            new SliderOption("scale", () -> scl, f -> scl = f, 1f, 500f),
+            new SliderOption("mag", () -> magnitude, f -> magnitude = f, 0f, 2f),
+            new SliderOption("threshold", () -> threshold, f -> threshold = f, 0f, 1f),
+            new SliderOption("circle-scale", () -> circleScl, f -> circleScl = f, 0f, 3f),
+            new SliderOption("octaves", () -> octaves, f -> octaves = f, 1f, 10f),
+            new SliderOption("falloff", () -> falloff, f -> falloff = f, 0f, 1f),
+            new BlockOption("floor", () -> floor, b -> floor = b, floorsOptional),
+            new BlockOption("wall", () -> block, b -> block = b, wallsOnly)
+        };
     }
 
     @Override
@@ -32,8 +31,8 @@ public class TerrainFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(){
-        float noise = noise(in.x, in.y, scl, magnitude, octaves, falloff) + Mathf.dst((float)in.x / in.width, (float)in.y / in.height, 0.5f, 0.5f) * circleScl;
+    public void apply(GenerateInput in){
+        float noise = noise(in, scl, magnitude, octaves, falloff) + Mathf.dst((float)in.x / in.width, (float)in.y / in.height, 0.5f, 0.5f) * circleScl;
 
         if(floor != Blocks.air){
             in.floor = floor;

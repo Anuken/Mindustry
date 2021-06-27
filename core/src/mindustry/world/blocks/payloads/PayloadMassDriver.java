@@ -184,6 +184,7 @@ public class PayloadMassDriver extends PayloadBlock{
             if(current != null &&
                 !(
                     current instanceof PayloadDriverBuild entity &&
+                    current.isValid() &&
                     entity.consValid() && entity.block == block &&
                     entity.link == pos() && within(current, range)
                 )){
