@@ -1,6 +1,7 @@
 package mindustry.world.blocks.production;
 
 import arc.graphics.g2d.*;
+import arc.math.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -67,6 +68,8 @@ public class Fracker extends SolidPump{
                 super.updateTile();
                 accumulator += delta() * efficiency();
             }else{
+                warmup = Mathf.lerpDelta(warmup, 0f, 0.02f);
+                lastPump = 0f;
                 dumpLiquid(result);
             }
         }

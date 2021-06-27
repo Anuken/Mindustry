@@ -33,5 +33,9 @@
   {
     "name": "XCore",
     "address": "35.202.253.94"
+  },
+  {
+    "name": "Obvilion Network",
+    "address": "obvilionnetwork.ru:7004"
   }
 ]
