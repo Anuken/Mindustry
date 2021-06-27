@@ -1,0 +1,6 @@
+- Optimized and cleaned up conveyors
+- Made unloaders take items from blocks in equal amounts
+- Added server categories (Partially contributed by @Quezler)
+- Added require() function for scripts (Contributed by @DeltaNedas)
+- Added color gradient for battery status (Contributed by @Arkanic (eventually))
+- Changed script loading: For mods with more than one script file, the main file must be named "main.js" and must require() other files to run them

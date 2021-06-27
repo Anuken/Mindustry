@@ -1,0 +1,5 @@
+- Fixed most formatted numbers being missing from Spanish translation
+- Fixed wave timer being extremely slow at high TPS with multithreading enabled
+- Fixed scrolling on player menu causing the whole screen to pan
+- Updated Polish translation
+- Updated Russian translation with new text (Thanks to @Prosta4okua)

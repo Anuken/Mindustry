@@ -1,0 +1,2 @@
+Fixed multiplayer not syncing positions and shots correctly on certain networks or situations.
+Various other bugfixes.

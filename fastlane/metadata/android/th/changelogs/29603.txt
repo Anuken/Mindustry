@@ -1,0 +1,9 @@
+- Fixed incorrect line numbers in script errors
+- Fixed black screen caused by bloom on some devices
+- Fixed some music issues with sound playing at 0% [Android]
+- Fixed client IDs resetting
+- Fixed data resetting between specific versions [Android]
+- Added server categories (Partially contributed by @Quezler)
+- Added require() function for scripts (Contributed by @DeltaNedas)
+- Optimized and cleaned up conveyors
+- Tweaked power block palette

@@ -1,0 +1,6 @@
+[This is a truncated changelog, see Github for full notes]
+- Fixed negative numbers not displaying properly in power nodes
+- Fixed mod minVersion parsing
+- Fixed mods disappearing after import [Android]
+- Disabled duplicate IP prevention system
+- Added mod browser sort order button
