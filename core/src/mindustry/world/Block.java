@@ -843,7 +843,7 @@ public class Block extends UnlockableContent{
         //load specific team regions
         teamRegions = new TextureRegion[Team.all.length];
         for(Team team : Team.all){
-            teamRegions[team.id] = teamRegion.found() ? Core.atlas.find(name + "-team-" + team.name, teamRegion) : teamRegion;
+            teamRegions[team.id] = teamRegion.found() && team.hasPalette ? Core.atlas.find(name + "-team-" + team.name, teamRegion) : teamRegion;
         }
 
         if(variants != 0){
