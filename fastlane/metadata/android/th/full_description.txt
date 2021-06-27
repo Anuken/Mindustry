@@ -36,17 +36,17 @@
 - เล่น co-op เกมอิสระหรือเกม PvP
 - เข้าร่วมเซิร์ฟเวอร์ของชุมชน หรือชวนเพื่อนมาเล่นในเซสซั่นของคุณเอง
 - กฏเกมที่ปรับแต่งได้: เปลี่ยนราคาสิ่งก่อสร้าง ค่าพลังศัตรู ทรัพยากรเริ่มต้น เวลานับถอยหลังคลื่น และอีกมากมาย
-- Mix &amp; จับคู่เกมโหมด: รวมPvP และ PvE เข้าด้วยกัน
+- Mix &amp; จับคู่เกมโหมด: รวม PvP และ PvE เข้าด้วยกัน
 
 
-<h2>Custom Map Editor</h2>
+<h2>ตัวแก้ไขแมพที่กำหนดเอง</h2>
 
-- Paint terrain with an editor UI
-- Edit and preview structures in-game
-- Configurable tool modes: Change how each tool functions
-- Powerful map generation system, with many different types of filters for procedural manipulation of terrain
-- Apply noise, distortion, smoothing, erosion, symmetry, ore generation and random terrain to your maps
-- Randomize and configure ore generation, as well as placement of river and resource tiles
-- Configure enemy wave layouts
-- Customize base map rules
-- Use 80+ different environmental blocks
+- ระบายพื้นที่ด้วย UI ของตัวแก้ไข
+- แก้ไขและดูสิ่งก่อสร้างในเกม
+- โหมดเครื่องมือที่ปรับแต่งได้: เปลี่ยนวิธีการทำงานของแต่ละเครื่องมือ
+- ระบบการเจนเนอเรทแมพที่ทรงพลัง ด้วยตัวกรองมากมายสำหรับการควบคุมพื้นที่ตามขั้นตอน
+- ใส่นอยส์ บิดเบือน เรียบลื่น กัดเซาะ สมมาตร การกำเนิดแร่และพื้นที่แบบสุ่มในแมพของคุณ
+- สุ่มและปรับแต่งการกำเนิดของแร่ รวมถึงการเกิดของแม่น้ำและช่องทรัพยากร
+- ปรับแต่งรูปแบบคลื่นของศัตรูตามใจชอบ
+- ปรับแต่งกฎแมพฐานทัพ
+- ใช้ 80+ บล็อกธรรมชาติที่แตกต่างกันไป
