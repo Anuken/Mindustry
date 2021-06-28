@@ -148,6 +148,8 @@ public class Vars implements Loadable{
     public static int maxTextureSize = 2048;
     /** Whether to show the core landing animation. */
     public static boolean showLandAnimation = true;
+    /** Whether to check for memory use before taking screenshots. */
+    public static boolean checkScreenshotMemory = true;
     /** Whether to prompt the user to confirm exiting. */
     public static boolean confirmExit = true;
     /** if true, UI is not drawn */

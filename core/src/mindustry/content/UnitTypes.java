@@ -2113,7 +2113,7 @@ public class UnitTypes implements ContentList{
 
                         bullet = new ContinuousLaserBulletType(){{
                             maxRange = 90f;
-                            damage = 26f;
+                            damage = 27f;
                             length = 95f;
                             hitEffect = Fx.hitMeltHeal;
                             drawSize = 200f;
@@ -2144,7 +2144,7 @@ public class UnitTypes implements ContentList{
                 x = 70f/4f;
                 y = -26f/4f;
 
-                reload = 70f;
+                reload = 65f;
                 shake = 3f;
                 rotateSpeed = 2f;
                 shadow = 30f;
@@ -2161,7 +2161,7 @@ public class UnitTypes implements ContentList{
                     timeIncrease = 3f;
                     timeDuration = 60f * 20f;
                     powerDamageScl = 3f;
-                    damage = 50;
+                    damage = 60;
                     hitColor = lightColor = Pal.heal;
                     lightRadius = 70f;
                     clipSize = 250f;
@@ -2177,7 +2177,7 @@ public class UnitTypes implements ContentList{
                     trailWidth = 6f;
                     trailColor = Pal.heal;
                     trailInterval = 3f;
-                    splashDamage = 60f;
+                    splashDamage = 70f;
                     splashDamageRadius = rad;
                     hitShake = 4f;
                     trailRotation = true;
