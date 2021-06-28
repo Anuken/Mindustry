@@ -7,6 +7,10 @@
     "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl:6966"]
   },
   {
+    "name": "C.A.M.S.",
+    "address": ["baseduser.eu.org:6569", "v7.thedimas.pp.ua"]
+  }
+  {
     "name": "hexpvp.ml",
     "address": "hexpvp.ml"
   },
@@ -32,7 +36,7 @@
   },
   {
     "name": "XCore",
-    "address": "35.202.253.94"
+    "address": "178.170.47.34:28110"
   },
   {
     "name": "Obvilion Network",
