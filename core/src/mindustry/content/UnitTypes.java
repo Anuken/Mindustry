@@ -572,7 +572,7 @@ public class UnitTypes implements ContentList{
                     speed = 1f;
                     splashDamageRadius = 60f;
                     instantDisappear = true;
-                    splashDamage = 88f;
+                    splashDamage = 90f;
                     killShooter = true;
                     hittable = false;
                     collidesAir = true;
