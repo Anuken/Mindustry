@@ -1,1 +1,1 @@
-An open-ended tower-defense game with a focus on resource management.
+เกมป้องกันหอคอยแบบปลายเปิดที่เน้นเรื่องการจัดการทรัพยากร
