@@ -109,7 +109,7 @@ public class LiquidTurret extends Turret{
                         var fire = Fires.get(x + tile.x, y + tile.y);
                         float dst = fire == null ? 0 : dst2(fire);
                         //do not extinguish fires on other team blocks
-                        if(other != null && fire != null && dst <= range * range && (result == null || dst < mindst) && (other.build == null || other.team() == team)){
+                        if(other != null && fire != null && Fires.has(other.x, other.y) && dst <= range * range && (result == null || dst < mindst) && (other.build == null || other.team() == team)){
                             result = fire;
                             mindst = dst;
                         }
