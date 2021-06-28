@@ -1990,7 +1990,7 @@ public class Blocks implements ContentList{
             requirements(Category.units, with(Items.silicon, 90, Items.thorium, 80, Items.plastanium, 80));
             size = 2;
             length = 6f;
-            repairSpeed = 3.25f;
+            repairSpeed = 3f;
             repairRadius = 140f;
             powerUse = 5f;
             beamWidth = 1.1f;
