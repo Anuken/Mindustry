@@ -581,7 +581,7 @@ public class UnitTypes implements ContentList{
         }};
 
         atrax = new UnitType("atrax"){{
-            speed = 0.5f;
+            speed = 0.54f;
             drag = 0.4f;
             hitSize = 13f;
             rotateSpeed = 3f;
@@ -621,7 +621,7 @@ public class UnitTypes implements ContentList{
         }};
 
         spiroct = new UnitType("spiroct"){{
-            speed = 0.45f;
+            speed = 0.48f;
             drag = 0.4f;
             hitSize = 15f;
             rotateSpeed = 3f;
