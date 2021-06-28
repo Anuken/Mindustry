@@ -664,7 +664,7 @@ public class UnitType extends UnlockableContent{
         if(unit.item() != null && unit.itemTime > 0.01f){
             float size = (itemSize + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime;
 
-            Draw.mixcol(Pal.accent, Mathf.absin(Time.time, 5f, 0.5f));
+            Draw.mixcol(Pal.accent, Mathf.absin(Time.time, 5f, 0.1f));
             Draw.rect(unit.item().fullIcon,
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),

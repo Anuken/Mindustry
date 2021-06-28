@@ -12,6 +12,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.storage.*;
 
 import static mindustry.Vars.*;
 
@@ -69,7 +70,7 @@ public class PayloadSource extends PayloadBlock{
     }
 
     public boolean canProduce(Block b){
-        return b.isVisible() && b.size < size;
+        return b.isVisible() && b.size < size && !(b instanceof CoreBlock);
     }
 
     public boolean canProduce(UnitType t){

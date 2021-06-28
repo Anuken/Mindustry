@@ -61,7 +61,6 @@ public class Administration{
         });
 
         //block interaction rate limit
-        //TODO when someone disconnects, a different player is mistakenly kicked for spamming actions
         addActionFilter(action -> {
             if(action.type != ActionType.breakBlock &&
                 action.type != ActionType.placeBlock &&

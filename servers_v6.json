@@ -21,7 +21,7 @@
   },
   {
     "name": "C.A.M.S.",
-    "address": ["routerchain.ddns.net", "nikochio.ddns.net", "play.thedimas.pp.ua"]
+    "address": ["baseduser.eu.org:6568", "nikochio.ddns.net", "play.thedimas.pp.ua"]
   },
   {
     "name": "BE6.RUN",
@@ -65,7 +65,7 @@
   },
   {
     "name": "Korea",
-    "address": ["mindustry.kr"]
+    "address": ["mindustry.kr", "mindustry.initd.kr"]
   },
   {
     "name": "hexpvp.ml",

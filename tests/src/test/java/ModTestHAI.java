@@ -4,6 +4,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import org.junit.jupiter.api.*;
 
+import static mindustry.Vars.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 //grabs a version-locked Heavy Armaments Industries commit and makes sure it initializes correctly
@@ -22,7 +23,7 @@ public class ModTestHAI extends GenericModTest{
         assertNotNull(type, "A mod unit must be loaded.");
         assertTrue(type.weapons.size > 0, "A mod unit must have a weapon.");
 
-        Vars.world.loadMap(ApplicationTests.testMap);
+        Vars.world.loadMap(maps.loadInternalMap("groundZero"));
 
         Unit unit = type.spawn(0, 0);
 

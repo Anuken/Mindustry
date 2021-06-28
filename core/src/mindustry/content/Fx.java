@@ -854,7 +854,7 @@ public class Fx{
     fireRemove = new Effect(70f, e -> {
         if(Fire.regions[0] == null) return;
         alpha(e.fout());
-        rect(Fire.regions[((int)(e.rotation + e.fin() * Fire.frames)) % Fire.frames], e.x, e.y);
+        rect(Fire.regions[((int)(e.rotation + e.fin() * Fire.frames)) % Fire.frames], e.x + Mathf.randomSeedRange((int)e.y, 2), e.y + Mathf.randomSeedRange((int)e.x, 2));
         Drawf.light(e.x, e.y, 50f + Mathf.absin(5f, 5f), Pal.lightFlame, 0.6f  * e.fout());
     }),
 

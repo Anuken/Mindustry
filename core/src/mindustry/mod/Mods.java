@@ -39,7 +39,7 @@ public class Mods implements Loadable{
 
     private int totalSprites;
     private MultiPacker packer;
-    private ModClassLoader mainLoader = new ModClassLoader();
+    private ModClassLoader mainLoader = new ModClassLoader(getClass().getClassLoader());
 
     Seq<LoadedMod> mods = new Seq<>();
     private ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();

@@ -33,7 +33,6 @@ public class ParticleWeather extends Weather{
         region = Core.atlas.find(particleRegion);
 
         //load noise texture
-        //TODO mod support
         if(drawNoise && Core.assets != null){
             Core.assets.load("sprites/" + noisePath + ".png", Texture.class);
         }

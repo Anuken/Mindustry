@@ -70,8 +70,6 @@ public class JsonIO{
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
 
-        //TODO this is terrible
-
         json.setSerializer(Sector.class, new Serializer<>(){
             @Override
             public void write(Json json, Sector object, Class knownType){

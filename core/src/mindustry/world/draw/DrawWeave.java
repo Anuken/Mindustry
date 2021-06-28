@@ -38,6 +38,6 @@ public class DrawWeave extends DrawBlock{
 
     @Override
     public TextureRegion[] icons(Block block){
-        return new TextureRegion[]{bottom, block.region, weave};
+        return new TextureRegion[]{bottom, weave, block.region};
     }
 }

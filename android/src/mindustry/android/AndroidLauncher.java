@@ -84,9 +84,9 @@ public class AndroidLauncher extends AndroidApplication{
                             try{
                                 //try to load own class first
                                 loadedClass = findClass(name);
-                            }catch(ClassNotFoundException e){
+                            }catch(ClassNotFoundException | NoClassDefFoundError e){
                                 //use parent if not found
-                                loadedClass = super.loadClass(name, resolve);
+                                return parent.loadClass(name);
                             }
                         }
 

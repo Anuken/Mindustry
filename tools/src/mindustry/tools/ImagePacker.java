@@ -14,6 +14,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.logic.*;
 import mindustry.world.blocks.*;
 
 import java.io.*;
@@ -86,7 +87,8 @@ public class ImagePacker{
         Time.mark();
         Generators.run();
         Log.info("&ly[Generator]&lc Total time to generate: &lg@&lcms", Time.elapsed());
-        //Log.info("&ly[Generator]&lc Total images created: &lg@", Image.total());
+
+        //write icons to icons.properties
 
         //format:
         //character-ID=contentname:texture-name
@@ -118,6 +120,74 @@ public class ImagePacker{
         }
 
         writer.close();
+
+        //now, write the IDs to logicids.dat
+
+        //don't write to the file unless I'm packing, because logic IDs rarely change and I don't want merge conflicts from PRs
+        if(!OS.username.equals("anuke")) return;
+
+        //format: ([content type (byte)] [content count (short)] (repeat [name (string)])) until EOF
+        Fi logicidfile = Fi.get("../../../assets/logicids.dat");
+
+        Seq<UnlockableContent> lookupCont = new Seq<>();
+
+        for(ContentType t : GlobalConstants.lookableContent){
+            lookupCont.addAll(Vars.content.<UnlockableContent>getBy(t).select(UnlockableContent::logicVisible));
+        }
+
+        ObjectIntMap<UnlockableContent>[] registered = new ObjectIntMap[ContentType.all.length];
+        IntMap<UnlockableContent>[] idToContent = new IntMap[ContentType.all.length];
+
+        for(int i = 0; i < ContentType.all.length; i++){
+            registered[i] = new ObjectIntMap<>();
+            idToContent[i] = new IntMap<>();
+        }
+
+        if(logicidfile.exists()){
+            try(DataInputStream in = new DataInputStream(logicidfile.readByteStream())){
+                for(ContentType ctype : GlobalConstants.lookableContent){
+                    short amount = in.readShort();
+                    for(int i = 0; i < amount; i++){
+                        String name = in.readUTF();
+                        UnlockableContent fetched = Vars.content.getByName(ctype, name);
+                        if(fetched != null){
+                            registered[ctype.ordinal()].put(fetched, i);
+                            idToContent[ctype.ordinal()].put(i, fetched);
+                        }
+                    }
+                }
+            }
+        }
+
+        //map stuff that hasn't been mapped yet
+        for(UnlockableContent c : lookupCont){
+            int ctype = c.getContentType().ordinal();
+            if(!registered[ctype].containsKey(c)){
+                int nextId = 0;
+                //find next ID - this is O(N) but content counts are so low that I don't really care
+                //checking the last ID doesn't work because there might be "holes"
+                for(UnlockableContent other : lookupCont){
+                    if(!idToContent[ctype].containsKey(other.id + 1)){
+                        nextId = other.id + 1;
+                        break;
+                    }
+                }
+
+                idToContent[ctype].put(nextId, c);
+                registered[ctype].put(c, nextId);
+            }
+        }
+
+        //write the resulting IDs
+        try(DataOutputStream out = new DataOutputStream(logicidfile.write(false, 2048))){
+            for(ContentType t : GlobalConstants.lookableContent){
+                Seq<UnlockableContent> all = idToContent[t.ordinal()].values().toArray().sort(u -> registered[t.ordinal()].get(u));
+                out.writeShort(all.size);
+                for(UnlockableContent u : all){
+                    out.writeUTF(u.name);
+                }
+            }
+        }
     }
 
     static String texname(UnlockableContent c){
