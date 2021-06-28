@@ -17,7 +17,6 @@ import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 
 import java.util.*;
 
@@ -147,7 +146,7 @@ public class BlockInventoryFragment extends Fragment{
                 HandCursorListener l = new HandCursorListener();
                 l.enabled = canPick;
 
-                Element image = itemImage(item.icon(Cicon.xlarge), () -> {
+                Element image = itemImage(item.uiIcon, () -> {
                     if(tile == null || !tile.isValid()){
                         return "";
                     }

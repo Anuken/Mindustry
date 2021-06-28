@@ -369,7 +369,7 @@ public class Administration{
         ObjectSet<PlayerInfo> result = new ObjectSet<>();
 
         for(PlayerInfo info : playerInfo.values()){
-            if(info.lastName.equalsIgnoreCase(name) || (info.names.contains(name, false))
+            if(info.lastName.equalsIgnoreCase(name) || info.names.contains(name, false)
             || Strings.stripColors(Strings.stripColors(info.lastName)).equals(name)
             || info.ips.contains(name, false) || info.id.equals(name)){
                 result.add(info);
@@ -617,6 +617,9 @@ public class Administration{
         /** valid for unit-type events only, and even in that case may be null. */
         public @Nullable Unit unit;
 
+        /** valid only for removePlanned events only; contains packed positions. */
+        public @Nullable int[] plans;
+
         public PlayerAction set(Player player, ActionType type, Tile tile){
             this.player = player;
             this.type = type;
@@ -641,11 +644,12 @@ public class Administration{
             tile = null;
             block = null;
             unit = null;
+            plans = null;
         }
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, command
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned
     }
 
 }

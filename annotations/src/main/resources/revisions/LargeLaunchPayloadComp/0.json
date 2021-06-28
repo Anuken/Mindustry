@@ -1,0 +1,1 @@
+{fields:[{name:lifetime,type:float},{name:payload,type:mindustry.world.blocks.payloads.Payload},{name:team,type:mindustry.game.Team},{name:time,type:float},{name:x,type:float},{name:y,type:float}]}

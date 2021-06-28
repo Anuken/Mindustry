@@ -174,6 +174,7 @@ public class LogicBlock extends Block{
         public boolean active = true, valid;
         public int x, y;
         public String name;
+        Building lastBuild;
 
         public LogicLink(int x, int y, String name, boolean valid){
             this.x = x;
@@ -197,14 +198,15 @@ public class LogicBlock extends Block{
         public Seq<LogicLink> links = new Seq<>();
         public boolean checkedDuplicates = false;
 
-        public void readCompressed(byte[] data, boolean relative){
-            DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
+        /** Block of code to run after load. */
+        public @Nullable Runnable loadBlock;
 
-            try{
+        public void readCompressed(byte[] data, boolean relative){
+            try(DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)))){
                 int version = stream.read();
 
                 int bytelen = stream.readInt();
-                if(bytelen > maxByteLen) throw new RuntimeException("Malformed logic data! Length: " + bytelen);
+                if(bytelen > maxByteLen) throw new IOException("Malformed logic data! Length: " + bytelen);
                 byte[] bytes = new byte[bytelen];
                 stream.readFully(bytes);
 
@@ -242,8 +244,8 @@ public class LogicBlock extends Block{
                 }
 
                 updateCode(new String(bytes, charset));
-            }catch(IOException e){
-                Log.err(e);
+            }catch(Exception ignored){
+                //invalid logic doesn't matter here
             }
         }
 
@@ -351,11 +353,8 @@ public class LogicBlock extends Block{
 
                     executor.load(asm);
                 }catch(Exception e){
-                    Log.err("Failed to compile logic program @", code);
-                    Log.err(e);
-
                     //handle malformed code and replace it with nothing
-                    executor.load("");
+                    executor.load(code = "");
                 }
             }
         }
@@ -373,6 +372,12 @@ public class LogicBlock extends Block{
 
         @Override
         public void updateTile(){
+            //load up code from read()
+            if(loadBlock != null){
+                loadBlock.run();
+                loadBlock = null;
+            }
+
             executor.team = team;
 
             if(!checkedDuplicates){
@@ -401,20 +406,22 @@ public class LogicBlock extends Block{
 
                     if(!l.active) continue;
 
-                    boolean valid = validLink(world.build(l.x, l.y));
-                    if(valid != l.valid){
+                    var cur = world.build(l.x, l.y);
+
+                    boolean valid = validLink(cur);
+                    if(valid != l.valid || (l.lastBuild != null && l.lastBuild != cur)){
+                        l.lastBuild = cur;
                         changed = true;
                         l.valid = valid;
                         if(valid){
-                            Building lbuild = world.build(l.x, l.y);
 
                             //this prevents conflicts
                             l.name = "";
                             //finds a new matching name after toggling
-                            l.name = findLinkName(lbuild.block);
+                            l.name = findLinkName(cur.block);
 
                             //remove redundant links
-                            links.removeAll(o -> world.build(o.x, o.y) == lbuild && o != l);
+                            links.removeAll(o -> world.build(o.x, o.y) == cur && o != l);
 
                             //break to prevent concurrent modification
                             updates = true;
@@ -448,9 +455,9 @@ public class LogicBlock extends Block{
         }
 
         public Seq<LogicLink> relativeConnections(){
-            Seq<LogicLink> copy = new Seq<>(links.size);
-            for(LogicLink l : links){
-                LogicLink c = l.copy();
+            var copy = new Seq<LogicLink>(links.size);
+            for(var l : links){
+                var c = l.copy();
                 c.x -= tileX();
                 c.y -= tileY();
                 copy.add(c);
@@ -583,8 +590,7 @@ public class LogicBlock extends Block{
             //skip memory, it isn't used anymore
             read.skip(memory * 8);
 
-            updateCode(code, false, asm -> {
-
+            loadBlock = () -> updateCode(code, false, asm -> {
                 //load up the variables that were stored
                 for(int i = 0; i < varcount; i++){
                     BVar dest = asm.getVar(names[i]);
@@ -593,6 +599,7 @@ public class LogicBlock extends Block{
                     }
                 }
             });
+
         }
     }
 }

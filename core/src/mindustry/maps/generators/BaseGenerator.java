@@ -15,6 +15,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.meta.*;
@@ -103,7 +104,7 @@ public class BaseGenerator{
                         Tile o = tiles.get(tile.x + p.x, tile.y + p.y);
 
                         //do not block payloads
-                        if(o != null && (o.block() instanceof PayloadConveyor || o.block() instanceof PayloadAcceptor)){
+                        if(o != null && (o.block() instanceof PayloadConveyor || o.block() instanceof PayloadBlock)){
                             return;
                         }
                     }

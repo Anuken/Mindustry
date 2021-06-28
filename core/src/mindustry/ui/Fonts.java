@@ -3,14 +3,11 @@ package mindustry.ui;
 import arc.*;
 import arc.Graphics.Cursor.*;
 import arc.assets.*;
-import arc.assets.loaders.*;
-import arc.assets.loaders.resolvers.*;
 import arc.files.*;
 import arc.freetype.*;
 import arc.freetype.FreeTypeFontGenerator.*;
 import arc.freetype.FreetypeFontLoader.*;
 import arc.graphics.*;
-import arc.graphics.Pixmap.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.Font.*;
@@ -54,6 +51,10 @@ public class Fonts{
 
     public static String getUnicodeStr(String content){
         return stringIcons.get(content, "");
+    }
+
+    public static boolean hasUnicodeStr(String content){
+        return stringIcons.containsKey(content);
     }
 
     /** Called from a static context to make the cursor appear immediately upon startup.*/
@@ -160,10 +161,9 @@ public class Fonts{
     public static void loadDefaultFont(){
         int max = Gl.getInt(Gl.maxTextureSize);
 
-        UI.packer = new PixmapPacker(max >= 4096 ? 4096 : 2048, 2048, Format.rgba8888, 2, true);
-        FileHandleResolver resolver = new InternalFileHandleResolver();
-        Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
-        Core.assets.setLoader(Font.class, null, new FreetypeFontLoader(resolver){
+        UI.packer = new PixmapPacker(max >= 4096 ? 4096 : 2048, 2048, 2, true);
+        Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(Core.files::internal));
+        Core.assets.setLoader(Font.class, null, new FreetypeFontLoader(Core.files::internal){
             ObjectSet<FreeTypeFontParameter> scaled = new ObjectSet<>();
 
             @Override
@@ -197,7 +197,7 @@ public class Fonts{
             size = 18;
         }})).loaded = f -> {
             Fonts.tech = (Font)f;
-            ((Font)f).getData().down *= 1.5f;
+            Fonts.tech.getData().down *= 1.5f;
         };
     }
 
@@ -214,13 +214,16 @@ public class Fonts{
         for(AtlasRegion region : regions){
             //get new pack rect
             page.setDirty(false);
-            Rect rect = UI.packer.pack(region.name + (region.splits != null ? ".9" : ""), atlas.getPixmap(region));
+            Rect rect = UI.packer.pack(region.name, atlas.getPixmap(region), region.splits, region.pads);
+
             //set new texture
             region.texture = UI.packer.getPages().first().getTexture();
             //set its new position
             region.set((int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
             //add old texture
             atlas.getTextures().add(region.texture);
+            //clear it
+            region.pixmapRegion = null;
         }
 
         //remove old texture, it will no longer be used

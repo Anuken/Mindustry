@@ -12,7 +12,6 @@ import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
@@ -30,7 +29,7 @@ public class MenuRenderer implements Disposable{
     private float time = 0f;
     private float flyerRot = 45f;
     private int flyers = Mathf.chance(0.2) ? Mathf.random(35) : Mathf.random(15);
-    private UnitType flyerType = Structs.select(UnitTypes.flare, UnitTypes.flare, UnitTypes.horizon, UnitTypes.mono, UnitTypes.poly, UnitTypes.mega, UnitTypes.zenith);
+    private UnitType flyerType = content.units().select(u -> u.hitSize <= 20f && u.flying && u.region.found()).random();
 
     public MenuRenderer(){
         Time.mark();
@@ -42,13 +41,10 @@ public class MenuRenderer implements Disposable{
     private void generate(){
         world.beginMapLoad();
         Tiles tiles = world.resize(width, height);
-        Seq<Block> ores = content.blocks().select(b -> b instanceof OreBlock);
+        Seq<Block> ores = content.blocks().select(b -> b instanceof OreBlock && !(b instanceof WallOreBlock));
         shadows = new FrameBuffer(width, height);
         int offset = Mathf.random(100000);
-        Simplex s1 = new Simplex(offset);
-        Simplex s2 = new Simplex(offset + 1);
-        Simplex s3 = new Simplex(offset + 2);
-        RidgedPerlin rid = new RidgedPerlin(1 + offset, 1);
+        int s1 = offset, s2 = offset + 1, s3 = offset + 2;
         Block[] selected = Structs.select(
             new Block[]{Blocks.sand, Blocks.sandWall},
             new Block[]{Blocks.shale, Blocks.shaleWall},
@@ -87,27 +83,27 @@ public class MenuRenderer implements Disposable{
                 Block ore = Blocks.air;
                 Block wall = Blocks.air;
 
-                if(s1.octaveNoise2D(3, 0.5, 1/20.0, x, y) > 0.5){
+                if(Simplex.noise2d(s1, 3, 0.5, 1/20.0, x, y) > 0.5){
                     wall = walld;
                 }
 
-                if(s3.octaveNoise2D(3, 0.5, 1/20.0, x, y) > 0.5){
+                if(Simplex.noise2d(s3, 3, 0.5, 1/20.0, x, y) > 0.5){
                     floor = floord2;
                     if(wall != Blocks.air){
                         wall = walld2;
                     }
                 }
 
-                if(s2.octaveNoise2D(3, 0.3, 1/30.0, x, y) > tr1){
+                if(Simplex.noise2d(s2, 3, 0.3, 1/30.0, x, y) > tr1){
                     ore = ore1;
                 }
 
-                if(s2.octaveNoise2D(2, 0.2, 1/15.0, x, y+99999) > tr2){
+                if(Simplex.noise2d(s2, 2, 0.2, 1/15.0, x, y+99999) > tr2){
                     ore = ore2;
                 }
 
                 if(doheat){
-                    double heat = s3.octaveNoise2D(4, 0.6, 1 / 50.0, x, y + 9999);
+                    double heat = Simplex.noise2d(s3, 4, 0.6, 1 / 50.0, x, y + 9999);
                     double base = 0.65;
 
                     if(heat > base){
@@ -128,7 +124,7 @@ public class MenuRenderer implements Disposable{
                 if(tech){
                     int mx = x % secSize, my = y % secSize;
                     int sclx = x / secSize, scly = y / secSize;
-                    if(s1.octaveNoise2D(2, 1f / 10f, 0.5f, sclx, scly) > 0.4f && (mx == 0 || my == 0 || mx == secSize - 1 || my == secSize - 1)){
+                    if(Simplex.noise2d(s1, 2, 1f / 10f, 0.5f, sclx, scly) > 0.4f && (mx == 0 || my == 0 || mx == secSize - 1 || my == secSize - 1)){
                         floor = Blocks.darkPanel3;
                         if(Mathf.dst(mx, my, secSize/2, secSize/2) > secSize/2f + 1){
                             floor = Blocks.darkPanel4;
@@ -142,7 +138,7 @@ public class MenuRenderer implements Disposable{
                 }
 
                 if(tendrils){
-                    if(rid.getValue(x, y, 1f / 17f) > 0f){
+                    if(Ridged.noise2d(1 + offset, x, y, 1f / 17f) > 0f){
                         floor = Mathf.chance(0.2) ? Blocks.sporeMoss : Blocks.moss;
 
                         if(wall != Blocks.air){
@@ -239,7 +235,7 @@ public class MenuRenderer implements Disposable{
     private void drawFlyers(){
         Draw.color(0f, 0f, 0f, 0.4f);
 
-        TextureRegion icon = flyerType.icon(Cicon.full);
+        TextureRegion icon = flyerType.fullIcon;
 
         float size = Math.max(icon.width, icon.height) * Draw.scl * 1.6f;
 
@@ -275,10 +271,12 @@ public class MenuRenderer implements Disposable{
         float offset = -100f;
 
         for(int i = 0; i < flyers; i++){
-            Tmp.v1.trns(flyerRot, time * (2f + flyerType.speed));
+            Tmp.v1.trns(flyerRot, time * (flyerType.speed));
 
-            cons.get((Mathf.randomSeedRange(i, range) + Tmp.v1.x + Mathf.absin(time + Mathf.randomSeedRange(i + 2, 500), 10f, 3.4f) + offset) % (tw + Mathf.randomSeed(i + 5, 0, 500)),
-            (Mathf.randomSeedRange(i + 1, range) + Tmp.v1.y + Mathf.absin(time + Mathf.randomSeedRange(i + 3, 500), 10f, 3.4f) + offset) % th);
+            cons.get(
+            (Mathf.randomSeedRange(i, range) + Tmp.v1.x + Mathf.absin(time + Mathf.randomSeedRange(i + 2, 500), 10f, 3.4f) + offset) % (tw + Mathf.randomSeed(i + 5, 0, 500)),
+            (Mathf.randomSeedRange(i + 1, range) + Tmp.v1.y + Mathf.absin(time + Mathf.randomSeedRange(i + 3, 500), 10f, 3.4f) + offset) % th
+            );
         }
     }
 

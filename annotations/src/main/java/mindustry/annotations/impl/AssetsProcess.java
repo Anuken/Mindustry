@@ -43,7 +43,7 @@ public class AssetsProcess extends BaseProcessor{
 
         texIcons.each((key, val) -> {
             String[] split = val.split("\\|");
-            String name = Strings.kebabToCamel(split[1]).replace("Medium", "").replace("Icon", "");
+            String name = Strings.kebabToCamel(split[1]).replace("Medium", "").replace("Icon", "").replace("Ui", "");
             if(SourceVersion.isKeyword(name) || name.equals("char")) name += "i";
 
             ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).addJavadoc(String.format("\\u%04x", Integer.parseInt(key))).initializer("'" + ((char)Integer.parseInt(key)) + "'").build());

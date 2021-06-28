@@ -12,12 +12,9 @@ import mindustry.gen.*;
 import mindustry.world.*;
 
 public abstract class GenerateFilter{
-    protected transient float o = (float)(Math.random() * 10000000.0);
-    protected transient long seed;
-    protected transient GenerateInput in;
+    public int seed = 0;
 
     public void apply(Tiles tiles, GenerateInput in){
-        this.in = in;
 
         if(isBuffered()){
             //buffer of tiles used, each tile packed into a long struct
@@ -26,8 +23,8 @@ public abstract class GenerateFilter{
             for(int i = 0; i < tiles.width * tiles.height; i++){
                 Tile tile = tiles.geti(i);
 
-                in.apply(tile.x, tile.y, tile.block(), tile.floor(), tile.overlay());
-                apply();
+                in.set(tile.x, tile.y, tile.block(), tile.floor(), tile.overlay());
+                apply(in);
 
                 buffer[i] = PackTile.get(in.block.id, in.floor.id, in.overlay.id);
             }
@@ -48,8 +45,8 @@ public abstract class GenerateFilter{
             }
         }else{
             for(Tile tile : tiles){
-                in.apply(tile.x, tile.y, tile.block(), tile.floor(), tile.overlay());
-                apply();
+                in.set(tile.x, tile.y, tile.block(), tile.floor(), tile.overlay());
+                apply(in);
 
                 tile.setFloor(in.floor.asFloor());
                 tile.setOverlay(!in.floor.asFloor().hasSurface() && in.overlay.asFloor().needsSurface ? Blocks.air : in.overlay);
@@ -61,30 +58,34 @@ public abstract class GenerateFilter{
         }
     }
 
-    public final void apply(GenerateInput in){
-        this.in = in;
-        apply();
-    }
-
     /** @return a new array of options for configuring this filter */
     public abstract FilterOption[] options();
 
     /** apply the actual filter on the input */
-    protected void apply(){}
+    public void apply(GenerateInput in){}
 
     /** draw any additional guides */
     public void draw(Image image){}
 
-    /** localized display name */
-    public String name(){
+    public String simpleName(){
         Class c = getClass();
         if(c.isAnonymousClass()) c = c.getSuperclass();
-        return Core.bundle.get("filter." + c.getSimpleName().toLowerCase().replace("filter", ""), c.getSimpleName().replace("Filter", ""));
+        return c.getSimpleName().toLowerCase().replace("filter", "");
+    }
+
+    /** localized display name */
+    public String name(){
+        var s = simpleName();
+        return Core.bundle.get("filter." + s);
+    }
+
+    public char icon(){
+        return '\0';
     }
 
     /** set the seed to a random number */
     public void randomize(){
-        seed = Mathf.random(99999999);
+        seed = Mathf.random(999999999);
     }
 
     /** @return whether this filter needs a read/write buffer (e.g. not a 1:1 tile mapping). */
@@ -99,20 +100,26 @@ public abstract class GenerateFilter{
 
     //utility generation functions
 
-    protected float noise(float x, float y, float scl, float mag){
-        return (float)in.noise.octaveNoise2D(1f, 0f, 1f / scl, x + o, y + o) * mag;
+    //TODO would be nice if these functions used the seed and ditched "in" completely; simplex should be stateless
+
+    protected float noise(GenerateInput in, float scl, float mag){
+        return (float)Simplex.noise2d(seed, 1f, 0f, 1f / scl, in.x, in.y) * mag;
     }
 
-    protected float noise(float x, float y, float scl, float mag, float octaves, float persistence){
-        return (float)in.noise.octaveNoise2D(octaves, persistence, 1f / scl, x + o, y + o) * mag;
+    protected float noise(GenerateInput in, float scl, float mag, float octaves, float persistence){
+        return (float)Simplex.noise2d(seed, octaves, persistence, 1f / scl, in.x, in.y) * mag;
     }
 
     protected float rnoise(float x, float y, float scl, float mag){
-        return in.pnoise.getValue((int)(x + o), (int)(y + o), 1f / scl) * mag;
+        return Ridged.noise2d(seed + 1, (int)(x), (int)(y), 1f / scl) * mag;
     }
 
-    protected float chance(){
-        return Mathf.randomSeed(Pack.longInt(in.x, in.y + (int)seed));
+    protected float rnoise(float x, float y, int octaves, float scl, float falloff, float mag){
+        return Ridged.noise2d(seed + 1, (int)(x), (int)(y), octaves, falloff, 1f / scl) * mag;
+    }
+
+    protected float chance(int x, int y){
+        return Mathf.randomSeed(Pack.longInt(x, y + seed));
     }
 
     /** an input for generating at a certain coordinate. should only be instantiated once. */
@@ -124,11 +131,9 @@ public abstract class GenerateFilter{
         /** output parameters */
         public Block floor, block, overlay;
 
-        Simplex noise = new Simplex();
-        RidgedPerlin pnoise = new RidgedPerlin(0, 1);
         TileProvider buffer;
 
-        public void apply(int x, int y, Block block, Block floor, Block overlay){
+        public void set(int x, int y, Block block, Block floor, Block overlay){
             this.floor = floor;
             this.block = block;
             this.overlay = overlay;
@@ -140,8 +145,6 @@ public abstract class GenerateFilter{
             this.buffer = buffer;
             this.width = width;
             this.height = height;
-            noise.setSeed(filter.seed);
-            pnoise.setSeed((int)(filter.seed + 1));
         }
 
         Tile tile(float x, float y){

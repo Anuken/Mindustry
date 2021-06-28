@@ -23,7 +23,6 @@ import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.world.*;
-import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
 import java.net.*;
@@ -38,8 +37,8 @@ public class NetServer implements ApplicationListener{
     private static final int maxSnapshotSize = 800, timerBlockSync = 0, serverSyncTime = 200;
     private static final float blockSyncTime = 60 * 6;
     private static final FloatBuffer fbuffer = FloatBuffer.allocate(20);
+    private static final Writes dataWrites = new Writes(null);
     private static final Vec2 vector = new Vec2();
-    private static final Rect viewport = new Rect();
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
     private static final float correctDist = tilesize * 14f;
 
@@ -101,6 +100,8 @@ public class NetServer implements ApplicationListener{
                 packet.uuid = con.address.substring("steam:".length());
             }
 
+            Events.fire(new ConnectPacketEvent(con, packet));
+
             con.connectTime = Time.millis();
 
             String uuid = packet.uuid;
@@ -109,8 +110,7 @@ public class NetServer implements ApplicationListener{
             crc.update(buuid, 0, 8);
             ByteBuffer buff = ByteBuffer.allocate(8);
             buff.put(buuid, 8, 8);
-            buff.position(0);
-            if(crc.getValue() != buff.getLong()){
+            if(crc.getValue() != buff.getLong(0)){
                 con.kick(KickReason.clientOutdated);
                 return;
             }
@@ -183,7 +183,7 @@ public class NetServer implements ApplicationListener{
             boolean preventDuplicates = headless && netServer.admins.isStrict();
 
             if(preventDuplicates){
-                if(Groups.player.contains(p -> p.name.trim().equalsIgnoreCase(packet.name.trim()))){
+                if(Groups.player.contains(p -> Strings.stripColors(p.name).trim().equalsIgnoreCase(Strings.stripColors(packet.name).trim()))){
                     con.kick(KickReason.nameInUse);
                     return;
                 }
@@ -252,22 +252,6 @@ public class NetServer implements ApplicationListener{
             platform.updateRPC();
 
             Events.fire(new PlayerConnect(player));
-        });
-
-        net.handleServer(InvokePacket.class, (con, packet) -> {
-            if(con.player == null || con.kicked) return;
-
-            try{
-                RemoteReadServer.readPacket(packet.reader(), packet.type, con.player);
-            }catch(ValidateException e){
-                debug("Validation failed for '@': @", e.player, e.getMessage());
-            }catch(RuntimeException e){
-                if(e.getCause() instanceof ValidateException v){
-                    debug("Validation failed for '@': @", v.player, v.getMessage());
-                }else{
-                    throw e;
-                }
-            }
         });
 
         registerCommands();
@@ -351,7 +335,7 @@ public class NetServer implements ApplicationListener{
                 votes += d;
                 voted.addAll(player.uuid(), admins.getInfo(player.uuid()).lastIP);
 
-                Call.sendMessage(Strings.format("[lightgray]@[lightgray] has voted on kicking[orange] @[].[accent] (@/@)\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
+                Call.sendMessage(Strings.format("[lightgray]@[lightgray] has voted on kicking[orange] @[lightgray].[accent] (@/@)\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
                     player.name, target.name, votes, votesRequired()));
 
                 checkPass();
@@ -444,7 +428,7 @@ public class NetServer implements ApplicationListener{
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
                 if(player.isLocal()){
-                    player.sendMessage("Local players can't vote. Kick the player yourself instead.");
+                    player.sendMessage("[scarlet]Local players can't vote. Kick the player yourself instead.");
                     return;
                 }
 
@@ -659,7 +643,7 @@ public class NetServer implements ApplicationListener{
         if(!player.dead()){
             Unit unit = player.unit();
 
-            long elapsed = Time.timeSinceMillis(con.lastReceivedClientTime);
+            long elapsed = Math.min(Time.timeSinceMillis(con.lastReceivedClientTime), 1500);
             float maxSpeed = unit.realSpeed();
 
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.2f;
@@ -847,8 +831,7 @@ public class NetServer implements ApplicationListener{
 
             if(syncStream.size() > maxSnapshotSize){
                 dataStream.close();
-                byte[] stateBytes = syncStream.toByteArray();
-                Call.blockSnapshot(sent, (short)stateBytes.length, net.compressSnapshot(stateBytes));
+                Call.blockSnapshot(sent, syncStream.toByteArray());
                 sent = 0;
                 syncStream.reset();
             }
@@ -856,31 +839,30 @@ public class NetServer implements ApplicationListener{
 
         if(sent > 0){
             dataStream.close();
-            byte[] stateBytes = syncStream.toByteArray();
-            Call.blockSnapshot(sent, (short)stateBytes.length, net.compressSnapshot(stateBytes));
+            Call.blockSnapshot(sent, syncStream.toByteArray());
         }
     }
 
     public void writeEntitySnapshot(Player player) throws IOException{
+        byte tps = (byte)Math.min(Core.graphics.getFramesPerSecond(), 255);
         syncStream.reset();
-        int sum = state.teams.present.sum(t -> t.cores.size);
+        int activeTeams = (byte)state.teams.present.count(t -> t.cores.size > 0);
 
-        dataStream.writeInt(sum);
+        dataStream.writeByte(activeTeams);
+        dataWrites.output = dataStream;
 
+        //block data isn't important, just send the items for each team, they're synced across cores
         for(TeamData data : state.teams.present){
-            for(CoreBuild entity : data.cores){
-                dataStream.writeInt(entity.tile.pos());
-                entity.items.write(Writes.get(dataStream));
+            if(data.cores.size > 0){
+                dataStream.writeByte(data.team.id);
+                data.cores.first().items.write(dataWrites);
             }
         }
 
         dataStream.close();
-        byte[] stateBytes = syncStream.toByteArray();
 
         //write basic state data.
-        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver, universe.seconds(), (short)stateBytes.length, net.compressSnapshot(stateBytes));
-
-        viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
+        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver, universe.seconds(), tps, syncStream.toByteArray());
 
         syncStream.reset();
 
@@ -896,8 +878,7 @@ public class NetServer implements ApplicationListener{
 
             if(syncStream.size() > maxSnapshotSize){
                 dataStream.close();
-                byte[] syncBytes = syncStream.toByteArray();
-                Call.entitySnapshot(player.con, (short)sent, (short)syncBytes.length, net.compressSnapshot(syncBytes));
+                Call.entitySnapshot(player.con, (short)sent, syncStream.toByteArray());
                 sent = 0;
                 syncStream.reset();
             }
@@ -906,8 +887,7 @@ public class NetServer implements ApplicationListener{
         if(sent > 0){
             dataStream.close();
 
-            byte[] syncBytes = syncStream.toByteArray();
-            Call.entitySnapshot(player.con, (short)sent, (short)syncBytes.length, net.compressSnapshot(syncBytes));
+            Call.entitySnapshot(player.con, (short)sent, syncStream.toByteArray());
         }
 
     }

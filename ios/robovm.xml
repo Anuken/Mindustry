@@ -19,12 +19,7 @@
     <forceLinkClasses>
         <pattern>net.jpountz.lz4.**</pattern>
         <pattern>arc.scene.**</pattern>
-        <pattern>mindustry.gen.Call</pattern>
-        <pattern>mindustry.net.**</pattern>
-        <pattern>mindustry.world.blocks.**</pattern>
-        <pattern>mindustry.logic.**</pattern>
-        <pattern>mindustry.world.blocks.**</pattern>
-        <pattern>mindustry.entities.effect.**</pattern>
+        <pattern>mindustry.**</pattern>
         <pattern>com.android.okhttp.HttpHandler</pattern>
         <pattern>com.android.okhttp.HttpsHandler</pattern>
         <pattern>com.android.org.conscrypt.**</pattern>

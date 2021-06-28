@@ -4,9 +4,9 @@ import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.entities.comp.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
@@ -21,6 +21,7 @@ public class Units{
     private static Unit result;
     private static float cdist;
     private static boolean boolResult;
+    private static int intResult;
 
     @Remote(called = Loc.server)
     public static void unitCapDeath(Unit unit){
@@ -76,7 +77,7 @@ public class Units{
         if((team == state.rules.waveTeam && !state.rules.pvp) || (state.isCampaign() && team == state.rules.waveTeam)){
             return Integer.MAX_VALUE;
         }
-        return Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + indexer.getExtraUnits(team) : state.rules.unitCap);
+        return Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + team.data().unitCap : state.rules.unitCap);
     }
 
     /** @return whether this player can interact with a specific tile. if either of these are null, returns true.*/
@@ -139,21 +140,26 @@ public class Units{
         return boolResult;
     }
 
-    /** Returns the neareset damaged tile. */
+    /** Returns the nearest damaged tile. */
     public static Building findDamagedTile(Team team, float x, float y){
         return Geometry.findClosest(x, y, indexer.getDamaged(team));
     }
 
-    /** Returns the neareset ally tile in a range. */
+    /** Returns the nearest ally tile in a range. */
     public static Building findAllyTile(Team team, float x, float y, float range, Boolf<Building> pred){
         return indexer.findTile(team, x, y, range, pred);
     }
 
-    /** Returns the neareset enemy tile in a range. */
+    /** Returns the nearest enemy tile in a range. */
     public static Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
         if(team == Team.derelict) return null;
 
         return indexer.findEnemyTile(team, x, y, range, pred);
+    }
+
+    /** Iterates through all buildings in a range. */
+    public static void nearbyBuildings(float x, float y, float range, Cons<Building> cons){
+        indexer.allBuildings(x, y, range, cons);
     }
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
@@ -200,7 +206,7 @@ public class Units{
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
             if(e.dead() || !predicate.get(e) || e.team == Team.derelict) return;
 
-            float dst2 = e.dst2(x, y);
+            float dst2 = e.dst2(x, y) - (e.hitSize * e.hitSize);
             if(dst2 < range*range && (result == null || dst2 < cdist)){
                 result = e;
                 cdist = dst2;
@@ -303,13 +309,40 @@ public class Units{
         return result;
     }
 
+    /** @return whether any units exist in this square (centered) */
+    public static int count(float x, float y, float size, Boolf<Unit> filter){
+        return count(x - size/2f, y - size/2f, size, size, filter);
+    }
+
+    /** @return whether any units exist in this rectangle */
+    public static int count(float x, float y, float width, float height, Boolf<Unit> filter){
+        intResult = 0;
+        Groups.unit.intersect(x, y, width, height, v -> {
+            if(filter.get(v)){
+                intResult ++;
+            }
+        });
+        return intResult;
+    }
+
+    /** @return whether any units exist in this rectangle */
+    public static boolean any(float x, float y, float width, float height, Boolf<Unit> filter){
+        return count(x, y, width, height, filter) > 0;
+    }
+
     /** Iterates over all units in a rectangle. */
-    public static void nearby(Team team, float x, float y, float width, float height, Cons<Unit> cons){
-        team.data().tree().intersect(x, y, width, height, cons);
+    public static void nearby(@Nullable Team team, float x, float y, float width, float height, Cons<Unit> cons){
+        if(team != null){
+            team.data().tree().intersect(x, y, width, height, cons);
+        }else{
+            for(var other : state.teams.getActive()){
+                other.tree().intersect(x, y, width, height, cons);
+            }
+        }
     }
 
     /** Iterates over all units in a circle around this position. */
-    public static void nearby(Team team, float x, float y, float radius, Cons<Unit> cons){
+    public static void nearby(@Nullable Team team, float x, float y, float radius, Cons<Unit> cons){
         nearby(team, x - radius, y - radius, radius*2f, radius*2f, unit -> {
             if(unit.within(x, y, radius + unit.hitSize/2f)){
                 cons.get(unit);
@@ -335,6 +368,15 @@ public class Units{
                 nearby(data.items[i].team, x, y, width, height, cons);
             }
         }
+    }
+
+    /** Iterates over all units that are enemies of this team. */
+    public static void nearbyEnemies(Team team, float x, float y, float radius, Cons<Unit> cons){
+        nearbyEnemies(team, x - radius, y - radius, radius * 2f, radius * 2f, u -> {
+            if(u.within(x, y, radius + u.hitSize/2f)){
+                cons.get(u);
+            }
+        });
     }
 
     /** Iterates over all units that are enemies of this team. */

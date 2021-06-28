@@ -2,9 +2,9 @@ package mindustry.maps.filters;
 
 import arc.math.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.gen.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 
@@ -16,10 +16,10 @@ public class OreMedianFilter extends GenerateFilter{
 
     @Override
     public FilterOption[] options(){
-        return Structs.arr(
-        new SliderOption("radius", () -> radius, f -> radius = f, 1f, 12f),
-        new SliderOption("percentile", () -> percentile, f -> percentile = f, 0f, 1f)
-        );
+        return new SliderOption[]{
+            new SliderOption("radius", () -> radius, f -> radius = f, 1f, 12f),
+            new SliderOption("percentile", () -> percentile, f -> percentile = f, 0f, 1f)
+        };
     }
 
     @Override
@@ -28,7 +28,12 @@ public class OreMedianFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(){
+    public char icon(){
+        return Iconc.blockOreLead;
+    }
+
+    @Override
+    public void apply(GenerateInput in){
         if(in.overlay == Blocks.spawn) return;
 
         int cx = (in.x / 2) * 2;
