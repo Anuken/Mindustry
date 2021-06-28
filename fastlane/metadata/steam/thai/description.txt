@@ -1,65 +1,66 @@
 [img]{STEAM_APP_IMAGE}/extras/ezgif-4-0e70c282f775.gif[/img]
 
-[h2]Gameplay[/h2]
+[h2]การเล่น[/h2]
 
 [list]
-[*] Create elaborate supply chains of conveyor belts to feed ammo into your turrets and produce materials to use for building
-[*] Use production blocks to create a wide variety of advanced materials
-[*] Defend your structures from waves of enemies
-[*] Play with your friends in cross-platform multiplayer co-op games, or challenge them in team-based PvP matches
-[*] Distribute liquids and fight constant challenges, like outbreaks of fire or enemy flier raids
-[*] Get the most out of your production by supplying optional coolant and lubricant
-[*] Produce a wide variety of units for automatic management of your base or assault on enemy bases
+[*] สร้างทางสายพานอันซับซ้อนเพื่อมาเติมกระสุนให้กับป้อมปืน ผลิตวัสดุเพื่อมาสร้างสิ่งก่อสร้างต่างๆ
+[*] ใช้บล็อกโรงงานเพื่อผลิตวัสดุขั้นสูงหลากหลายชนิด
+[*] ปกป้องฐานทัพจากคลื่นศัตรู
+[*] เล่นกับเพื่อนข้ามแพลตฟอร์มในโหมด co-op หรือท้าทายพวกเขาในโหมด PvP แบบทีม
+[*] แจกจ่ายของเหลวและสู้กับความท้าทายอย่างต่อเนื่องดั่งไฟอันร้อนแรงหรือฝูงบินจู่โจม
+[*] ขยายการผลิตของคุณให้มากขึ้นด้วยการใส่สารหล่อเย็นหรือวัสดุหล่อลื่น
+[*] ผลิตยูนิตหลากหลายชนิดเพื่ออำนวยความสะดวกต่างๆ หรือนำมันไปจู่โจมฐานทัพศัตรู
 [/list]
 
 [img]{STEAM_APP_IMAGE}/extras/ezgif-1-8679abe089cd.gif[/img]
 
-[h2]Campaign[/h2]
+[h2]แคมเปญ[/h2]
 
 [list]
-[*] Conquer the planet Serpulo as you advance through 250+ procedurally generated sectors and 16 hand-made maps
-[*] Capture territory and set up factories to produce resources while you play other sectors
-[*] Defend your sectors from periodic invasions
-[*] Coordinate resource distribution between sectors via launch pads
-[*] Research new blocks to fuel progress
-[*] Invite your friends to complete missions together
-[*] 130+ technology blocks to master
-[*] 33 different types of drones, mechs and ships
-[*] 50+ achievements to complete
+[*] ยืดครองดาวเซอร์ปูโล่ขณะที่คุณก้าวผ่าน 250+ เซ็กเตอร์ที่สร้างตามขั้นตอนและ 16 ด่านสำคัญที่สร้างด้วยมือ
+[*] ยืดครองพื้นที่และตั้งโรงงานต่างๆ เพื่อผลิตทรัพยากรระหว่างที่คุณเล่นเซ็กเตอร์อื่น
+[*] ปกป้องเซ็กเตอร์จากการโจมตีของศัตรูเป็นระยะๆ
+[*] แจกจ่ายทรัพยากรระหว่างเซ็กเตอร์ด้วยฐานส่งของ
+[*] วิจัยสิ่งก่อสร้างต่างๆ เพื่อพัฒนาความคืบหน้า
+[*] ชวนเพื่อนมาทำภารกิจด้วยกัน
+[*] 130+ บล็อกเทคโนโลยีให้วิจัย
+[*] 33 ชนิดของโดรน เม็กและยานที่แตกต่างกันไป
+[*] 50+ ความสำเร็จให้ทำ
 [/list]
 
-[h2]Gamemodes[/h2]
+[h2]เกมโหมด[/h2]
 
 [list]
-[*] [b]Survival[/b]: Build turrets to defend from enemies in tower-defense based gameplay. Survive as long as possible, optionally launching your core to use your collected resources for research. Prepare your base for intermittent attacks from airborne bosses.
-[*] [b]Attack[/b]: Build factories for units to destroy the enemy cores, while simultaneously defending your base from waves of enemy units. Create a variety of different types of support and offensive unit to assist you in your goals. Optionally enable an AI that builds defensive structures to an extra challenge.
-[*] [b]PvP[/b]: Compete with other players on up to 4 different teams to destroy each other's cores. Create units, or attack other bases directly with your mechs.
-[*] [b]Sandbox[/b]: Play around with infinite resources and no enemy threat. Use sandbox-specific item and liquid source blocks to test out designs, and spawn in enemies on request.
+[*] [b]เอาชีวิตรอด[/b]: สร้างป้อมปืนเพื่อป้องกันศัตรูในการเล่นรูปแบบป้องกันหอคอย เอาชีวิตรอดให้ได้นานที่สุด ส่งแกนกลางของคุณไปยังเซ็กเตอร์ข้างๆ เพื่อขยายอาณาเขต เตรียมฐานให้พร้อมสำหรับการ์เดียนที่จะประกฏตัวมาอย่างไม่ทันได้ตั้งตัว
+[*] [b]โจมตี[/b]: สร้างโรงงานยูนิตมาเพื่อทำลายแกนกลางศัตรูระหว่างที่ป้องกันฐานทัพของคุณจากคลื่นของศัตรูในเวลาเดียวกัน สร้างยูนิตที่หลากหลายทั้งช่วยเหลือและโจมตีเพื่อช่วยให้คุณสำเร็จเป้าหมายเร็วขึ้น อาจเปิด AI ที่สร้างสิ่งป้องกันต่างๆ เพื่อให้ท้าทายมากขึ้น
+[*] [b]PvP[/b]: ต่อสู้กับผู้เล่นอื่นที่มีได้มากถึง 4 ทีมเพื่อทำลายแกนกลางของคู่แข่ง สร้างยูนิตให้มันโจมตี หรือควบคุมมันด้วยตนเองเพื่อโจมตีโดยตรง
+[*] [b]อิสระ[/b]: เล่นได้อย่างไม่มีที่สิ้นสุดด้วยทรัพยากรที่ไม่จำกัดและไม่มีภัยศัตรู ใช้บล็อกจุดกำเนิดไอเท็มและของเหลวที่มีเฉพาะโหมดนี้เพื่อทดสอบการออกแบบต่างๆ และกำเนิดศัตรูได้เมื่อต้องการ
+
 [/list]
 
 [img]{STEAM_APP_IMAGE}/extras/2020-11-30_10-46-02.gif[/img]
 
-[h2]Custom Games & Cross-Platform Multiplayer[/h2]
+[h2]เกมที่กำหนดเอง & เล่นหลายคนข้ามแพลตฟอร์ม[/h2]
 
 [list]
-[*] 16 built in maps for custom games, in addition to campaign
-[*] Play co-op, PvP or sandbox
-[*] Join a public dedicated server, or invite friends to your own private session
-[*] Customizable game rules: Change block costs, enemy stats, starting items, wave timing and more
-[*] Mix & match gamemodes: Combine PvP and PvE gamemodes together
+[*] แมพติดตัวสำหรับเกมที่กำหนดเอง นอกเหนือจากแคมเปญ
+[*] เล่น co-op เกมอิสระหรือเกม PvP
+[*] เข้าร่วมเซิร์ฟเวอร์ของชุมชน หรือชวนเพื่อนมาเล่นในเซสซั่นของคุณเอง
+[*] กฏเกมที่ปรับแต่งได้: เปลี่ยนราคาสิ่งก่อสร้าง ค่าพลังศัตรู ทรัพยากรเริ่มต้น เวลานับถอยหลังคลื่น และอีกมากมาย
+[*] ผสม & จับคู่เกมโหมด: รวม PvP และ PvE เข้าด้วยกัน
 [/list]
 
-[h2]Custom Map Editor[/h2]
+[h2]ตัวแก้ไขแมพที่กำหนดเอง[/h2]
 
 [list]
-[*] Paint terrain with an editor UI
-[*] Edit and preview structures in-game
-[*] Configurable tool modes: Change how each tool functions
-[*] Powerful map generation system, with many different types of filters for procedural manipulation of terrain
-[*] Apply noise, distortion, smoothing, erosion, symmetry, ore generation and random terrain to your maps
-[*] Randomize and configure ore generation, as well as placement of river and resource tiles
-[*] Configure enemy wave layouts
-[*] Share exported maps on the Steam Workshop
-[*] Customize base map rules
-[*] Use 80+ different environmental blocks
+[*] ระบายพื้นที่ด้วย UI ของตัวแก้ไข
+[*] แก้ไขและดูสิ่งก่อสร้างในเกม
+[*] โหมดเครื่องมือที่ปรับแต่งได้: เปลี่ยนวิธีการทำงานของแต่ละเครื่องมือ
+[*] ระบบการเจนเนอเรทแมพที่ทรงพลัง ด้วยตัวกรองมากมายสำหรับการควบคุมพื้นที่ตามขั้นตอน
+[*] ใส่นอยส์ บิดเบือน เรียบลื่น กัดเซาะ สมมาตร การกำเนิดแร่และพื้นที่แบบสุ่มในแมพของคุณ
+[*] สุ่มและปรับแต่งการกำเนิดของแร่ รวมถึงการเกิดของแม่น้ำและช่องทรัพยากร
+[*] ปรับแต่งรูปแบบคลื่นของศัตรูตามใจชอบ
+[*] แชร์แมพที่ส่งออกไปในเวิร์กช็อป
+[*] ปรับแต่งกฎแมพฐานทัพ
+[*] ใช้ 80+ บล็อกธรรมชาติที่แตกต่างกันไป
 [/list]
