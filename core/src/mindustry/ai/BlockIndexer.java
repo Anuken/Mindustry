@@ -285,7 +285,7 @@ public class BlockIndexer{
         for(int i = 0; i < activeTeams.size; i++){
             Team enemy = activeTeams.items[i];
 
-            if(enemy == team || team == Team.derelict) continue;
+            if(enemy == team || (team == Team.derelict && !state.rules.coreCapture)) continue;
 
             Building entity = indexer.findTile(enemy, x, y, range, pred, true);
             if(entity != null){
@@ -360,7 +360,7 @@ public class BlockIndexer{
     private void process(Tile tile){
         var team = tile.team();
         //only process entity changes with centered tiles
-        if(tile.isCenter() && team != Team.derelict){
+        if(tile.isCenter() && tile.build != null){
             var data = team.data();
             if(tile.block().flags.size() > 0 && tile.isCenter()){
                 TileArray[] map = getFlagged(team);
