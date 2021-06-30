@@ -600,7 +600,7 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("whitelist", "[add/remove] [ID]", "Add / remove players from the whitelist using their ID.", arg -> {
+        handler.register("whitelist", "[add/remove] [ID]", "Add/remove players from the whitelist using their ID.", arg -> {
             if(arg.length == 0){
                 Seq<PlayerInfo> whitelist = netServer.admins.getWhitelisted();
         		
@@ -630,7 +630,7 @@ public class ServerControl implements ApplicationListener{
                         }
                     }
                 }else{
-                    Log.err("Invalid arguments");
+                    Log.err("Please provide a valid player ID");
                 }
             }
         });
