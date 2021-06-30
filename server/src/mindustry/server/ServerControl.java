@@ -600,8 +600,8 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("whitelist", "[add/remove] [ID]", "Only members of the whitelist can connect to the server.", arg -> {
-            if (arg.length == 0) {
+        handler.register("whitelist", "[add/remove] [ID]", "Add / remove players from the whitelist using their ID.", arg -> {
+            if(arg.length == 0){
                 Seq<PlayerInfo> whitelist = netServer.admins.getWhitelisted();
         		
                 if(whitelist.isEmpty()){
@@ -617,19 +617,16 @@ public class ServerControl implements ApplicationListener{
                     if(info == null){
                         Log.err("Player ID not found. You must use the ID displayed when a player joins a server.");
                     }else{
-                        switch(arg[0]){
-                            case "add":
-                                netServer.admins.whitelist(arg[1]);
-                                Log.info("Player '@' has been whitelisted.", info.lastName);
-                                break;
-        				
-                            case "remove":
-                                netServer.admins.unwhitelist(arg[1]);
-                                Log.info("Player '@' has been un-whitelisted.", info.lastName);
-                                break;
-        				
-                            default:
-                                Log.err("Invalid arguments");
+                        if(arg[0].equals("add"){
+                            netServer.admins.whitelist(arg[1]);
+                            Log.info("Player '@' has been whitelisted.", info.lastName);
+                        
+                        }else if(arg[0].equals("remove"){
+                            netServer.admins.unwhitelist(arg[1]);
+                            Log.info("Player '@' has been un-whitelisted.", info.lastName);
+                        
+                        }else{
+                            Log.err("Invalid arguments");
                         }
                     }
                 }else{
