@@ -45,6 +45,7 @@ public class Separator extends Block{
         public float progress;
         public float totalProgress;
         public float warmup;
+        public int seed = Mathf.random(0, Integer.MAX_VALUE - 1);
 
         @Override
         public boolean shouldAmbientSound(){
@@ -91,7 +92,7 @@ public class Separator extends Block{
                 int sum = 0;
                 for(ItemStack stack : results) sum += stack.amount;
 
-                int i = Mathf.random(sum);
+                int i = Mathf.randomSeed(seed++, 0, sum);
                 int count = 0;
                 Item item = null;
 
@@ -122,10 +123,16 @@ public class Separator extends Block{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.f(progress);
             write.f(warmup);
+            write.i(seed);
         }
 
         @Override
@@ -133,6 +140,7 @@ public class Separator extends Block{
             super.read(read, revision);
             progress = read.f();
             warmup = read.f();
+            if(revision == 1) seed = read.i();
         }
     }
 }
