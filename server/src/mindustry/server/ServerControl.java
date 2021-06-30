@@ -601,21 +601,23 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("whitelist", "[add/remove] [ID]", "Only members of the whitelist can connect to the server.", arg -> {
-        	if (arg.length == 0) {
-        		Seq<PlayerInfo> whitelist = netServer.admins.getWhitelisted();
+            if (arg.length == 0) {
+        	    Seq<PlayerInfo> whitelist = netServer.admins.getWhitelisted();
         		
-        		if(whitelist.isEmpty()) Log.info("No whitelisted players found.");
-        		else {
+        		if(whitelist.isEmpty()){
+                    Log.info("No whitelisted players found.");
+                }else{
         			Log.info("Whitelist:");
         			whitelist.each(p -> Log.info("- Name: @ / UUID: @", p.lastName, p.id));
         		}
-        	} else {
-        		if (arg.length == 2) {
+        	}else{
+        		if(arg.length == 2){
         			PlayerInfo info = netServer.admins.getInfoOptional(arg[1]);
         		    
-        			if(info == null) Log.err("Player ID not found. You must use the ID displayed when a player joins a server.");
-        		    else {
-        		    	switch (arg[0]) {
+        			if(info == null){
+                        Log.err("Player ID not found. You must use the ID displayed when a player joins a server.");
+                    }else{
+        		    	switch(arg[0]){
         					case "add":
         		            	netServer.admins.whitelist(arg[1]);
         		            	Log.info("Player '@' has been whitelisted.", info.lastName);
@@ -630,7 +632,9 @@ public class ServerControl implements ApplicationListener{
         						Log.err("Invalid arguments");
         		    	}
         			}
-        		} else Log.err("Invalid arguments");
+        		}else{
+                    Log.err("Invalid arguments");
+                }
         	}
         });
 
