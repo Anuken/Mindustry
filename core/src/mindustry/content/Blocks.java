@@ -51,7 +51,7 @@ public class Blocks implements ContentList{
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
-    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadVoid, payloadSource, illuminator,
+    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator,
 
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
@@ -1610,7 +1610,7 @@ public class Blocks implements ContentList{
 
             size = 2;
             range = 190f;
-            reloadTime = 34f;
+            reloadTime = 31f;
             restitution = 0.03f;
             ammoEjectBack = 3f;
             cooldown = 0.03f;
@@ -1978,7 +1978,7 @@ public class Blocks implements ContentList{
         }};
 
         repairPoint = new RepairPoint("repair-point"){{
-            requirements(Category.units, with(Items.lead, 20, Items.copper, 20, Items.silicon, 15));
+            requirements(Category.units, with(Items.lead, 25, Items.copper, 25, Items.silicon, 20));
             repairSpeed = 0.5f;
             repairRadius = 65f;
             beamWidth = 0.73f;
@@ -1987,16 +1987,16 @@ public class Blocks implements ContentList{
         }};
 
         repairTurret = new RepairPoint("repair-turret"){{
-            requirements(Category.units, with(Items.silicon, 70, Items.thorium, 60, Items.plastanium, 60));
+            requirements(Category.units, with(Items.silicon, 90, Items.thorium, 80, Items.plastanium, 80));
             size = 2;
             length = 6f;
-            repairSpeed = 4f;
+            repairSpeed = 3f;
             repairRadius = 140f;
             powerUse = 5f;
             beamWidth = 1.1f;
             pulseRadius = 6.1f;
-            coolantUse = 0.15f;
-            coolantMultiplier = 1.7f;
+            coolantUse = 0.16f;
+            coolantMultiplier = 1.5f;
             acceptCoolant = true;
         }};
 
@@ -2068,12 +2068,12 @@ public class Blocks implements ContentList{
             alwaysUnlocked = true;
         }};
 
-        payloadVoid = new PayloadVoid("payload-void"){{
+        payloadSource = new PayloadSource("payload-source"){{
             requirements(Category.units, BuildVisibility.sandboxOnly, with());
             size = 5;
         }};
 
-        payloadSource = new PayloadSource("payload-source"){{
+        payloadVoid = new PayloadVoid("payload-void"){{
             requirements(Category.units, BuildVisibility.sandboxOnly, with());
             size = 5;
         }};

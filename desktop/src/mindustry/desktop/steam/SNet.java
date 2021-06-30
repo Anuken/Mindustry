@@ -88,8 +88,12 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                                 net.handleException(t);
                             }
                         }
-                    }catch(SteamException e){
-                        Log.err(e);
+                    }catch(Exception e){
+                        if(net.server()){
+                            Log.err(e);
+                        }else{
+                            net.showError(e);
+                        }
                     }
                 }
             }
