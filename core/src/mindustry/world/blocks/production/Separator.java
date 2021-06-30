@@ -30,6 +30,7 @@ public class Separator extends Block{
         solid = true;
         hasItems = true;
         hasLiquids = true;
+        sync = true;
     }
 
     @Override
