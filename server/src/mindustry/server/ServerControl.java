@@ -617,11 +617,11 @@ public class ServerControl implements ApplicationListener{
                     if(info == null){
                         Log.err("Player ID not found. You must use the ID displayed when a player joins a server.");
                     }else{
-                        if(arg[0].equals("add"){
+                        if(arg[0].equals("add")){
                             netServer.admins.whitelist(arg[1]);
                             Log.info("Player '@' has been whitelisted.", info.lastName);
                         
-                        }else if(arg[0].equals("remove"){
+                        }else if(arg[0].equals("remove")){
                             netServer.admins.unwhitelist(arg[1]);
                             Log.info("Player '@' has been un-whitelisted.", info.lastName);
                         
