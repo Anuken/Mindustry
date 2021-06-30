@@ -46,7 +46,12 @@ public class Separator extends Block{
         public float progress;
         public float totalProgress;
         public float warmup;
-        public int seed = Mathf.random(0, Integer.MAX_VALUE - 1);
+        public int seed;
+
+        @Override
+        public void created(){
+            seed = Mathf.randomSeed(tile.pos(), 0, Integer.MAX_VALUE - 1);
+        }
 
         @Override
         public boolean shouldAmbientSound(){
