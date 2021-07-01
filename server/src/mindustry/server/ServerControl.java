@@ -602,7 +602,7 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("whitelist", "[add/remove] [ID]", "Add/remove players from the whitelist using their ID.", arg -> {
             if(arg.length == 0){
-                var whitelist = netServer.admins.getWhitelisted();
+                Seq<PlayerInfo> whitelist = netServer.admins.getWhitelisted();
 
                 if(whitelist.isEmpty()){
                     info("No whitelisted players found.");
@@ -633,6 +633,7 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        //TODO should be a config, not a separate command.
         handler.register("shuffle", "[none/all/custom/builtin]", "Set map shuffling mode.", arg -> {
             if(arg.length == 0){
                 info("Shuffle mode current set to '@'.", maps.getShuffleMode());
