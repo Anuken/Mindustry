@@ -70,9 +70,9 @@ public class PayloadDeconstructor extends PayloadBlock{
                 //TODO shadow
                 //TODO looks really bad
                 Draw.draw(Layer.blockOver, () -> {
-                    Drawf.construct(x, y, deconstructing.icon(), Pal.remove, 0f, 1f - progress, speedScl, time);
+                    Drawf.construct(x, y, deconstructing.icon(), Pal.remove, 0f, 1f - progress, 1f - progress, time);
                     Draw.color(Pal.remove);
-                    Draw.alpha(speedScl);
+                    Draw.alpha(1f);
 
                     Lines.lineAngleCenter(x + Mathf.sin(time, 20f, Vars.tilesize / 2f * block.size - 2f), y, 90, block.size * Vars.tilesize - 4f);
 
