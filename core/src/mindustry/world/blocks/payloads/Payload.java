@@ -23,6 +23,7 @@ public interface Payload extends Position{
     float size();
 
     float x();
+
     float y();
 
     /** @return whether this payload was dumped. */
