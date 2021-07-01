@@ -106,5 +106,9 @@
   {
     "name": "MeowLand",
     "address": ["34.134.111.15"]
+  },
+  {
+    "name": "M-DE",
+    "address": ["mindustry.inc.li", "mindustry.inc.li:6568"]
   }
 ]
