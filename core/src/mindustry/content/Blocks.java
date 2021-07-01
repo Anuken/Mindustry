@@ -2204,9 +2204,9 @@ public class Blocks implements ContentList{
         }};
 
         payloadDeconstructor = new PayloadDeconstructor("payload-deconstructor"){{
-            requirements(Category.units, with(Items.graphite, 30, Items.silicon, 30, Items.copper, 30));
-            itemCapacity = 200;
-            consumes.power(1f);
+            requirements(Category.units, with(Items.thorium, 250, Items.silicon, 200, Items.graphite, 250));
+            itemCapacity = 250;
+            consumes.power(3f);
             size = 5;
             deconstructSpeed = 2f;
         }};

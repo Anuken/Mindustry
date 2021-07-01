@@ -162,6 +162,11 @@ public class PayloadDeconstructor extends PayloadBlock{
         }
 
         @Override
+        public boolean shouldConsume(){
+            return deconstructing != null && enabled;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
 
