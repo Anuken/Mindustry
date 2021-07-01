@@ -7,9 +7,12 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.ui.*;
 
 public class PayloadDeconstructor extends PayloadBlock{
-    public float deconstructSpeed = 2f;
+    public float maxPayloadSize = 4;
+    public float deconstructSpeed = 2.5f;
+    public int dumpRate = 4;
 
     public PayloadDeconstructor(String name){
         super(name);
@@ -30,6 +33,13 @@ public class PayloadDeconstructor extends PayloadBlock{
     @Override
     public TextureRegion[] icons(){
         return new TextureRegion[]{region, topRegion};
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+
+        bars.add("progress", (PayloadDeconstructorBuild e) -> new Bar("bar.progress", Pal.ammo, () -> e.progress));
     }
 
     public class PayloadDeconstructorBuild extends PayloadBlockBuild<Payload>{
@@ -58,6 +68,7 @@ public class PayloadDeconstructor extends PayloadBlock{
                 //deconstructing.draw();
 
                 //TODO shadow
+                //TODO looks really bad
                 Draw.draw(Layer.blockOver, () -> {
                     Drawf.construct(x, y, deconstructing.icon(), Pal.remove, 0f, 1f - progress, speedScl, time);
                     Draw.color(Pal.remove);
@@ -80,13 +91,20 @@ public class PayloadDeconstructor extends PayloadBlock{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
-            return deconstructing == null && super.acceptPayload(source, payload) && payload.requirements().length > 0;
+            return deconstructing == null && super.acceptPayload(source, payload) && payload.requirements().length > 0 && payload.fits(maxPayloadSize);
         }
 
         @Override
         public void updateTile(){
-            //always dump items
-            dumpAccumulate();
+            if(items.total() > 0){
+                for(int i = 0; i < dumpRate; i++){
+                    dumpAccumulate();
+                }
+            }
+
+            if(deconstructing == null){
+                progress = 0f;
+            }
 
             if(deconstructing != null){
                 var reqs = deconstructing.requirements();

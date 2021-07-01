@@ -127,7 +127,7 @@ public class UnitType extends UnlockableContent{
         softShadowRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion;
     public TextureRegion[] wreckRegions;
 
-    protected float maxBuildTime = -1f;
+    protected float buildTime = -1f;
     protected @Nullable ItemStack[] cachedRequirements;
     protected @Nullable ItemStack[] totalRequirements;
 
@@ -462,10 +462,10 @@ public class UnitType extends UnlockableContent{
         }
     }
 
-    /** @return the time required to build this unit, as a maximum value that takes into account reconstructors */
+    /** @return the time required to build this unit, as a value that takes into account reconstructors */
     public float getBuildTime(){
         getTotalRequirements();
-        return maxBuildTime;
+        return buildTime;
     }
 
     /** @return all items needed to build this unit, including reconstructor steps. */
@@ -479,15 +479,17 @@ public class UnitType extends UnlockableContent{
             totalRequirements = ItemStack.empty;
 
             if(result != null){
-                maxBuildTime = timeret[0];
                 ItemSeq total = new ItemSeq();
 
                 total.add(result);
                 if(ret[0] != null){
                     total.add(ret[0].getTotalRequirements());
-                    maxBuildTime = Math.max(ret[0].maxBuildTime, maxBuildTime);
                 }
                 totalRequirements = total.toArray();
+            }
+
+            for(var stack : totalRequirements){
+                buildTime += stack.item.cost * stack.amount;
             }
         }
         return totalRequirements;
