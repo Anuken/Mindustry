@@ -83,7 +83,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Fonts.loadDefaultFont();
 
         //load fallback atlas if max texture size is below 4096
-        assets.load(new AssetDescriptor<>(maxTextureSize >= 4096  ? "sprites/sprites.aatls" : "sprites/fallback/sprites.aatls", TextureAtlas.class)).loaded = t -> atlas = (TextureAtlas)t;
+        assets.load(new AssetDescriptor<>(maxTextureSize >= 4096 ? "sprites/sprites.aatls" : "sprites/fallback/sprites.aatls", TextureAtlas.class)).loaded = t -> atlas = (TextureAtlas)t;
         assets.loadRun("maps", Map.class, () -> maps.loadPreviews());
 
         Musics.load();
@@ -149,7 +149,16 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 }
                 mods.eachClass(Mod::init);
                 finished = true;
-                Events.fire(new ClientLoadEvent());
+                var event = new ClientLoadEvent();
+                //a temporary measure for compatibility with certain mods
+                Events.fireWrap(event.getClass(), event, listener -> {
+                    try{
+                        listener.get(event);
+                    }catch(NoSuchFieldError | NoSuchMethodError | NoClassDefFoundError error){
+                        Log.err(error);
+                    }
+
+                });
                 clientLoaded = true;
                 super.resize(graphics.getWidth(), graphics.getHeight());
                 app.post(() -> app.post(() -> app.post(() -> app.post(() -> {

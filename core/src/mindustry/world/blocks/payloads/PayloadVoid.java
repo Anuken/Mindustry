@@ -19,6 +19,7 @@ public class PayloadVoid extends PayloadBlock{
         update = true;
         rotate = false;
         size = 3;
+        payloadSpeed = 1.2f;
         //make sure to display large units.
         clipSize = 120;
     }
@@ -28,7 +29,7 @@ public class PayloadVoid extends PayloadBlock{
         return new TextureRegion[]{region, topRegion};
     }
 
-    public class BlockLoaderBuild extends PayloadBlockBuild<Payload>{
+    public class PayloadVoidBuild extends PayloadBlockBuild<Payload>{
 
         @Override
         public void draw(){

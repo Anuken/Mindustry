@@ -48,7 +48,7 @@ public class NetServer implements ApplicationListener{
         if(state.rules.pvp){
             //find team with minimum amount of players and auto-assign player to that.
             TeamData re = state.teams.getActive().min(data -> {
-                if((state.rules.waveTeam == data.team && state.rules.waves) || !data.team.active()) return Integer.MAX_VALUE;
+                if((state.rules.waveTeam == data.team && state.rules.waves) || !data.team.active() || data.team == Team.derelict) return Integer.MAX_VALUE;
 
                 int count = 0;
                 for(Player other : players){
@@ -335,7 +335,7 @@ public class NetServer implements ApplicationListener{
                 votes += d;
                 voted.addAll(player.uuid(), admins.getInfo(player.uuid()).lastIP);
 
-                Call.sendMessage(Strings.format("[lightgray]@[lightgray] has voted on kicking[orange] @[].[accent] (@/@)\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
+                Call.sendMessage(Strings.format("[lightgray]@[lightgray] has voted on kicking[orange] @[lightgray].[accent] (@/@)\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
                     player.name, target.name, votes, votesRequired()));
 
                 checkPass();
@@ -470,6 +470,10 @@ public class NetServer implements ApplicationListener{
                 if(Time.timeSinceMillis(player.getInfo().lastSyncTime) < 1000 * 5){
                     player.sendMessage("[scarlet]You may only /sync every 5 seconds.");
                     return;
+                }
+
+                if(!player.dead() && player.unit().isCommanding()){
+                    player.unit().clearCommand();
                 }
 
                 player.getInfo().lastSyncTime = Time.millis();

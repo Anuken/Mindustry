@@ -247,12 +247,12 @@ public class Control implements ApplicationListener, Loadable{
         saves.load();
     }
 
-    /** Automatically unlocks things with no requirements. */
+    /** Automatically unlocks things with no requirements and no locked parents. */
     void checkAutoUnlocks(){
         if(net.client()) return;
 
         for(TechNode node : TechTree.all){
-            if(!node.content.unlocked() && node.requirements.length == 0 && !node.objectives.contains(o -> !o.complete())){
+            if(!node.content.unlocked() && (node.parent == null || node.parent.content.unlocked()) && node.requirements.length == 0 && !node.objectives.contains(o -> !o.complete())){
                 node.content.unlock();
             }
         }
@@ -323,13 +323,14 @@ public class Control implements ApplicationListener, Loadable{
             if(slot != null && !clearSectors){
 
                 try{
+                    boolean hadNoCore = !sector.info.hasCore;
                     reloader.begin();
                     slot.load();
                     slot.setAutosave(true);
                     state.rules.sector = sector;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
-                    if(state.rules.defaultTeam.cores().isEmpty()){
+                    if(state.rules.defaultTeam.cores().isEmpty() || hadNoCore){
 
                         //no spawn set -> delete the sector save
                         if(sector.info.spawnPosition == 0){

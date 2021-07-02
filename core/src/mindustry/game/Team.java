@@ -97,7 +97,7 @@ public class Team implements Comparable<Team>{
     }
 
     public boolean isEnemy(Team other){
-        return state.teams.areEnemies(this, other);
+        return this != other;
     }
 
     public Seq<CoreBuild> cores(){

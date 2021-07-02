@@ -9,6 +9,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.async.*;
 import arc.util.noise.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -161,16 +162,10 @@ public class Generators{
                 });
             }
 
-            try{
-                exec.shutdown();
-                exec.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-            }catch(Exception e){
-                throw new RuntimeException("go away", e);
-            }
+            Threads.await(exec);
         });
 
         generate("cracks", () -> {
-            RidgedPerlin r = new RidgedPerlin(1, 3);
             for(int size = 1; size <= BlockRenderer.maxCrackSize; size++){
                 int dim = size * 32;
                 int steps = BlockRenderer.crackRegions;
@@ -181,7 +176,7 @@ public class Generators{
                     for(int x = 0; x < dim; x++){
                         for(int y = 0; y < dim; y++){
                             float dst = Mathf.dst((float)x/dim, (float)y/dim, 0.5f, 0.5f) * 2f;
-                            if(dst < 1.2f && r.getValue(x, y, 1f / 40f) - dst*(1f-fract) > 0.16f){
+                            if(dst < 1.2f && Ridged.noise2d(1, x, y, 3, 1f / 40f) - dst*(1f-fract) > 0.16f){
                                 image.setRaw(x, y, Color.whiteRgba);
                             }
                         }
@@ -225,7 +220,7 @@ public class Generators{
 
                 TextureRegion[] regions = block.getGeneratedIcons();
 
-                if(block instanceof Floor){
+                if(block.variants > 0 || block instanceof Floor){
                     for(TextureRegion region : block.variantRegions()){
                         GenRegion gen = (GenRegion)region;
                         if(gen.path == null) continue;
@@ -335,7 +330,7 @@ public class Generators{
                     average.mul(1f / asum);
 
                     if(block instanceof Floor){
-                        average.mul(0.8f);
+                        average.mul(0.77f);
                     }else{
                         average.mul(1.1f);
                     }
@@ -395,7 +390,6 @@ public class Generators{
             }
         });
 
-        //TODO broken, freezes
         generate("unit-icons", () -> content.units().each(type -> {
             if(type.isHidden()) return; //hidden units don't generate
 
@@ -489,12 +483,11 @@ public class Generators{
                     wrecks[i] = new Pixmap(image.width, image.height);
                 }
 
-                RidgedPerlin r = new RidgedPerlin(1, 3);
                 VoronoiNoise vn = new VoronoiNoise(type.id, true);
 
                 image.each((x, y) -> {
                     //add darker cracks on top
-                    boolean rValue = Math.max(r.getValue(x, y, 1f / (20f + image.width/8f)), 0) > 0.16f;
+                    boolean rValue = Math.max(Ridged.noise2d(1, x, y, 3, 1f / (20f + image.width/8f)), 0) > 0.16f;
                     //cut out random chunks with voronoi
                     boolean vval = vn.noise(x, y, 1f / (14f + image.width/40f)) > 0.47;
 
@@ -607,14 +600,11 @@ public class Generators{
 
     /** Generates a scorch pixmap based on parameters. Thread safe, unless multiple scorch generators are running in parallel. */
     public static class ScorchGenerator{
-        private static final Simplex sim = new Simplex();
-
         public int size = 80, seed = 0, color = Color.whiteRgba;
         public double scale = 18, pow = 2, octaves = 4, pers = 0.4, add = 2, nscl = 4.5f;
 
         public Pixmap generate(){
             Pixmap pix = new Pixmap(size, size);
-            sim.setSeed(seed);
 
             pix.each((x, y) -> {
                 double dst = Mathf.dst(x, y, size/2, size/2) / (size / 2f);
@@ -627,7 +617,7 @@ public class Generators{
         }
 
         private double noise(float angle){
-            return Math.pow(sim.octaveNoise2D(octaves, pers, 1 / scale, Angles.trnsx(angle, size/2f) + size/2f, Angles.trnsy(angle, size/2f) + size/2f), pow);
+            return Math.pow(Simplex.noise2d(seed, octaves, pers, 1 / scale, Angles.trnsx(angle, size/2f) + size/2f, Angles.trnsy(angle, size/2f) + size/2f), pow);
         }
     }
 

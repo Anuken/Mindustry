@@ -53,7 +53,7 @@ public class WaveGraph extends Table{
 
                     for(int i = 0; i < values.length; i++){
                         int val = values[i][type.id];
-                        float cx = graphX + i*spacing, cy = 2f + graphY + val * (graphH - 4f) / max;
+                        float cx = graphX + i*spacing, cy = graphY + val * graphH / max;
                         Lines.linePoint(cx, cy);
                     }
 
@@ -69,7 +69,7 @@ public class WaveGraph extends Table{
                         sum += values[i][type.id];
                     }
 
-                    float cx = graphX + i*spacing, cy = 2f + graphY + sum * (graphH - 4f) / maxTotal;
+                    float cx = graphX + i*spacing, cy = graphY + sum * graphH / maxTotal;
                     Lines.linePoint(cx, cy);
                 }
 
@@ -84,7 +84,7 @@ public class WaveGraph extends Table{
                         sum += (type.health) * values[i][type.id];
                     }
 
-                    float cx = graphX + i*spacing, cy = 2f + graphY + sum * (graphH - 4f) / maxHealth;
+                    float cx = graphX + i*spacing, cy = graphY + sum * graphH / maxHealth;
                     Lines.linePoint(cx, cy);
                 }
 
@@ -92,29 +92,29 @@ public class WaveGraph extends Table{
             }
 
             //how many numbers can fit here
-            float totalMarks = (height - offsetY - getMarginBottom() *2f - 1f) / (lay.height * 2);
+            float totalMarks = (graphH - getMarginBottom() *2f) / (lay.height * 2);
 
             int markSpace = Math.max(1, Mathf.ceil(max / totalMarks));
 
             Draw.color(Color.lightGray);
             for(int i = 0; i < max; i += markSpace){
-                float cy = 2f + y + i * (height - 4f) / max + offsetY, cx = x + offsetX;
+                float cy = graphY + i * graphH / max, cx = graphX;
                 //Lines.line(cx, cy, cx + len, cy);
 
                 lay.setText(font, "" + i);
 
-                font.draw("" + i, cx, cy + lay.height/2f - Scl.scl(3f), Align.right);
+                font.draw("" + i, cx, cy + lay.height/2f, Align.right);
             }
 
             float len = Scl.scl(4f);
             font.setColor(Color.lightGray);
 
             for(int i = 0; i < values.length; i++){
-                float cy = y + fh, cx = x + graphW / (values.length - 1) * i + offsetX;
+                float cy = y + fh, cx = graphX + graphW / (values.length - 1) * i;
 
                 Lines.line(cx, cy, cx, cy + len);
                 if(i == values.length/2){
-                    font.draw("" + (i + from + 1), cx, cy - 2f, Align.center);
+                    font.draw("" + (i + from + 1), cx, cy - Scl.scl(2f), Align.center);
                 }
             }
             font.setColor(Color.white);

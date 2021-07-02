@@ -121,6 +121,11 @@ public class ContentParser{
             return sound;
         });
         put(Objectives.Objective.class, (type, data) -> {
+            if(data.isString()){
+                var cont = locateAny(data.asString());
+                if(cont == null) throw new IllegalArgumentException("Unknown objective content: " + data.asString());
+                return new Research((UnlockableContent)cont);
+            }
             var oc = resolve(data.getString("type", ""), SectorComplete.class);
             data.remove("type");
             Objectives.Objective obj = make(oc);
@@ -228,6 +233,7 @@ public class ContentParser{
                             case "item" -> block.consumes.item(find(ContentType.item, child.asString()));
                             case "items" -> block.consumes.add((Consume)parser.readValue(ConsumeItems.class, child));
                             case "liquid" -> block.consumes.add((Consume)parser.readValue(ConsumeLiquid.class, child));
+                            case "coolant" -> block.consumes.add((Consume)parser.readValue(ConsumeCoolant.class, child));
                             case "power" -> {
                                 if(child.isNumber()){
                                     block.consumes.power(child.asFloat());
@@ -543,6 +549,16 @@ public class ContentParser{
         return first != null ? first : Vars.content.getByName(type, currentMod.name + "-" + name);
     }
 
+    private <T extends MappableContent> T locateAny(String name){
+        for(ContentType t : ContentType.all){
+            var out = locate(t, name);
+            if(out != null){
+                return (T)out;
+            }
+        }
+        return null;
+    }
+
     <T> T make(Class<T> type){
         try{
             Constructor<T> cons = type.getDeclaredConstructor();
@@ -679,18 +695,31 @@ public class ContentParser{
                 lastNode.remove();
             }
 
-            TechNode node = new TechNode(null, unlock, customRequirements == null ? unlock.researchRequirements() : customRequirements);
+            TechNode node = new TechNode(null, unlock, customRequirements == null ? ItemStack.empty : customRequirements);
             LoadedMod cur = currentMod;
 
             postreads.add(() -> {
                 currentContent = unlock;
                 currentMod = cur;
 
+                //add custom objectives
+                if(research.has("objectives")){
+                    node.objectives.addAll(parser.readValue(Objective[].class, research.get("objectives")));
+                }
+
+                //all items have a produce requirement unless already specified
+                if(object instanceof Item i && !node.objectives.contains(o -> o instanceof Produce p && p.content == i)){
+                    node.objectives.add(new Produce(i));
+                }
+
                 //remove old node from parent
                 if(node.parent != null){
                     node.parent.children.remove(node);
                 }
 
+                if(customRequirements == null){
+                    node.setupRequirements(unlock.researchRequirements());
+                }
 
                 //find parent node.
                 TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName));
@@ -723,8 +752,8 @@ public class ContentParser{
         var out = ClassMap.classes.get(!base.isEmpty() && Character.isLowerCase(base.charAt(0)) ? Strings.capitalize(base) : base);
         if(out != null) return (Class<T>)out;
 
-        //try to resolve it as a raw class name if it's allowed
-        if(base.indexOf('.') != -1 && Scripts.allowClass(base)){
+        //try to resolve it as a raw class name
+        if(base.indexOf('.') != -1){
             try{
                 return (Class<T>)Class.forName(base);
             }catch(Exception ignored){

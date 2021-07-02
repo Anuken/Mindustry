@@ -120,7 +120,7 @@ public class StatusEffect extends UnlockableContent{
 
         if(effect != Fx.none && Mathf.chanceDelta(effectChance)){
             Tmp.v1.rnd(Mathf.range(unit.type.hitSize/2f));
-            effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y);
+            effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, color);
         }
     }
 

@@ -222,7 +222,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
-        TeamData data = state.teams.get(team);
+        TeamData data = team.data();
 
         if(checkPrevious){
             //remove existing blocks that have been placed here.
@@ -907,7 +907,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void draw(){
-        Draw.rect(block.region, x, y, block.rotate ? rotdeg() : 0);
+        if(block.variants == 0){
+            Draw.rect(block.region, x, y, block.rotate ? rotdeg() : 0);
+        }else{
+            Draw.rect(block.variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, block.variantRegions.length - 1))], x, y, block.rotate ? rotdeg() : 0);
+        }
 
         drawTeamTop();
     }
@@ -1055,7 +1059,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             });
         }
 
-        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, state.rules.damageExplosions);
+        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, state.rules.damageExplosions, block.destroyEffect);
 
         if(!floor().solid && !floor().isLiquid){
             Effect.rubble(x, y, block.size);
@@ -1399,7 +1403,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return switch(sensor){
             case type -> block;
             case firstItem -> items == null ? null : items.first();
-            case config -> block.configurations.containsKey(Item.class) || block.configurations.containsKey(Liquid.class) ? config() : null;
+            case config -> block.configSenseable() ? config() : null;
             case payloadType -> getPayload() instanceof UnitPayload p1 ? p1.unit.type : getPayload() instanceof BuildPayload p2 ? p2.block() : null;
             default -> noSensed;
         };

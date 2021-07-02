@@ -112,7 +112,6 @@ public class LCanvas extends Table{
 
             jumps.cullable = false;
         }).grow().get();
-        //pane.setClip(false);
         pane.setFlickScroll(false);
 
         //load old scroll percent

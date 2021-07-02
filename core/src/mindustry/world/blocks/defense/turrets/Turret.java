@@ -116,7 +116,7 @@ public class Turret extends ReloadTurret{
     public void init(){
         if(acceptCoolant && !consumes.has(ConsumeType.liquid)){
             hasLiquids = true;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, coolantUsage)).update(false).boost();
+            consumes.add(new ConsumeCoolant(coolantUsage)).update(false).boost();
         }
         
         if(shootLength < 0) shootLength = size * tilesize / 2f;

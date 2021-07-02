@@ -2,7 +2,6 @@ package mindustry.entities.comp;
 
 import arc.func.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -22,11 +21,16 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Import Team team;
     @Import Entityc owner;
     @Import float x, y, damage;
+    @Import Vec2 vel;
 
     IntSeq collided = new IntSeq(6);
     Object data;
     BulletType type;
     float fdata;
+
+    @ReadOnly
+    private float rotation;
+
     transient boolean absorbed, hit;
     transient @Nullable Trail trail;
 
@@ -149,17 +153,20 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         type.drawLight(self());
     }
 
+    public void initVel(float angle, float amount){
+        vel.trns(angle, amount);
+        rotation = angle;
+    }
+
     /** Sets the bullet's rotation in degrees. */
     @Override
     public void rotation(float angle){
-        vel().setAngle(angle);
+        vel.setAngle(rotation = angle);
     }
 
     /** @return the bullet's rotation. */
     @Override
     public float rotation(){
-        float angle = Mathf.atan2(vel().x, vel().y) * Mathf.radiansToDegrees;
-        if(angle < 0) angle += 360;
-        return angle;
+        return vel.isZero(0.001f) ? rotation : vel.angle();
     }
 }

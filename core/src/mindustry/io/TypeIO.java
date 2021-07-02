@@ -588,6 +588,30 @@ public class TypeIO{
         return new TraceInfo(readString(read), readString(read), read.b() == 1, read.b() == 1, read.i(), read.i());
     }
 
+    public static void writeStrings(Writes write, String[][] strings){
+        write.b(strings.length);
+        for(String[] string : strings){
+            write.b(string.length);
+            for(String s : string){
+                writeString(write, s);
+            }
+        }
+    }
+
+    public static String[][] readStrings(Reads read){
+        int rows = read.ub();
+
+        String[][] strings = new String[rows][];
+        for(int i = 0; i < rows; i++){
+            int columns = read.ub();
+            strings[i] = new String[columns];
+            for(int j = 0; j < columns; j++){
+                strings[i][j] = readString(read);
+            }
+        }
+        return strings;
+    }
+
     public static void writeStringData(DataOutput buffer, String string) throws IOException{
         if(string != null){
             byte[] bytes = string.getBytes(charset);

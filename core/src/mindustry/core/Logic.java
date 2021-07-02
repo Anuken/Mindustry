@@ -43,7 +43,7 @@ public class Logic implements ApplicationListener{
 
         Events.on(BlockBuildEndEvent.class, event -> {
             if(!event.breaking){
-                TeamData data = state.teams.get(event.team);
+                TeamData data = event.team.data();
                 Iterator<BlockPlan> it = data.blocks.iterator();
                 while(it.hasNext()){
                     BlockPlan b = it.next();
@@ -184,6 +184,13 @@ public class Logic implements ApplicationListener{
                 }
             }
         }
+
+        //heal all cores on game start
+        for(TeamData team : state.teams.getActive()){
+            for(var entity : team.cores){
+                entity.heal();
+            }
+        }
     }
 
     public void reset(){
@@ -240,11 +247,11 @@ public class Logic implements ApplicationListener{
                 Events.fire(new GameOverEvent(state.rules.waveTeam));
             }else if(state.rules.attackMode){
                 //count # of teams alive
-                int countAlive = state.teams.getActive().count(TeamData::hasCore);
+                int countAlive = state.teams.getActive().count(t -> t.hasCore() && t.team != Team.derelict);
 
                 if((countAlive <= 1 || (!state.rules.pvp && state.rules.defaultTeam.core() == null)) && !state.gameOver){
                     //find team that won
-                    TeamData left = state.teams.getActive().find(TeamData::hasCore);
+                    TeamData left = state.teams.getActive().find(t -> t.hasCore() && t.team != Team.derelict);
                     Events.fire(new GameOverEvent(left == null ? Team.derelict : left.team));
                     state.gameOver = true;
                 }

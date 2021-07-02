@@ -209,7 +209,7 @@ public class SoundControl{
 
     /** Whether to play dark music.*/
     protected boolean isDark(){
-        if(state.teams.get(player.team()).hasCore() && state.teams.get(player.team()).core().healthf() < 0.85f){
+        if(player.team().data().hasCore() && player.team().data().core().healthf() < 0.85f){
             //core damaged -> dark
             return true;
         }

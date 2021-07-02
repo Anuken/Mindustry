@@ -1,7 +1,7 @@
 [
   {
-    "name": "RCR",
-    "address": ["185.104.248.61"]
+    "name": "RCM",
+    "address": ["185.104.248.61", "easyplay.su"]
   },
   {
     "name": "SMokeOfAnarchy.duckdns.org",
@@ -21,7 +21,7 @@
   },
   {
     "name": "C.A.M.S.",
-    "address": ["routerchain.ddns.net", "nikochio.ddns.net", "easyplay.su", "play.thedimas.pp.ua"]
+    "address": ["baseduser.eu.org:6568", "nikochio.ddns.net", "play.thedimas.pp.ua"]
   },
   {
     "name": "BE6.RUN",
@@ -65,7 +65,7 @@
   },
   {
     "name": "Korea",
-    "address": ["mindustry.kr"]
+    "address": ["mindustry.kr", "mindustry.initd.kr"]
   },
   {
     "name": "hexpvp.ml",
@@ -89,7 +89,7 @@
   },
   {
     "name": "MD Community",
-    "address": ["46.17.104.254", "46.17.104.254:4000"]
+    "address": ["mindurka.tk", "mindurka.tk:4000"]
   },
   {
     "name": "Mindustry.Party",
@@ -101,6 +101,14 @@
   },
   {
     "name": "Sakura", 
-    "address": ["160.16.207.141"]
+    "address": ["160.16.207.141", "160.16.207.141:21527", "160.16.207.141:31587", "160.16.207.141:26810"]
+  },
+  {
+    "name": "MeowLand",
+    "address": ["34.134.111.15"]
+  },
+  {
+    "name": "M-DE",
+    "address": ["mindustry.inc.li", "mindustry.inc.li:6568"]
   }
 ]

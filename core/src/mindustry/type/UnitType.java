@@ -71,6 +71,7 @@ public class UnitType extends UnlockableContent{
     public boolean omniMovement = true;
     public Effect fallEffect = Fx.fallSmoke;
     public Effect fallThrusterEffect = Fx.fallSmoke;
+    public Effect deathExplosionEffect = Fx.dynamicExplosion;
     public Seq<Ability> abilities = new Seq<>();
     public BlockFlag targetFlag = BlockFlag.generator;
 
@@ -254,7 +255,7 @@ public class UnitType extends UnlockableContent{
 
         stats.add(Stat.health, health);
         stats.add(Stat.armor, armor);
-        stats.add(Stat.speed, speed);
+        stats.add(Stat.speed, speed * 60f / tilesize, StatUnit.tilesSecond);
         stats.add(Stat.size, hitSize / tilesize, StatUnit.blocksSquared);
         stats.add(Stat.itemCapacity, itemCapacity);
         stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
@@ -612,7 +613,7 @@ public class UnitType extends UnlockableContent{
         if(unit.item() != null && unit.itemTime > 0.01f){
             float size = (itemSize + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime;
 
-            Draw.mixcol(Pal.accent, Mathf.absin(Time.time, 5f, 0.5f));
+            Draw.mixcol(Pal.accent, Mathf.absin(Time.time, 5f, 0.1f));
             Draw.rect(unit.item().fullIcon,
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),

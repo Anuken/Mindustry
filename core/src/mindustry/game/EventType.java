@@ -9,6 +9,7 @@ import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 public class EventType{
 
@@ -131,6 +132,18 @@ public class EventType{
 
         public ClientPreConnectEvent(Host host){
             this.host = host;
+        }
+    }
+
+    /** Consider using Menus.registerMenu instead. */
+    public static class MenuOptionChooseEvent{
+        public final Player player;
+        public final int menuId, option;
+
+        public MenuOptionChooseEvent(Player player, int menuId, int option){
+            this.player = player;
+            this.option = option;
+            this.menuId = menuId;
         }
     }
 
@@ -268,6 +281,15 @@ public class EventType{
         public TileChangeEvent set(Tile tile){
             this.tile = tile;
             return this;
+        }
+    }
+
+    /** Called when a core block is placed/removed or its team is changed. */
+    public static class CoreChangeEvent{
+        public CoreBuild core;
+
+        public CoreChangeEvent(CoreBuild core){
+            this.core = core;
         }
     }
 

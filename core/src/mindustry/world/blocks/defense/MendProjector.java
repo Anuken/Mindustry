@@ -34,6 +34,8 @@ public class MendProjector extends Block{
         group = BlockGroup.projectors;
         hasPower = true;
         hasItems = true;
+        emitLight = true;
+        lightRadius = 50f;
     }
 
     @Override
@@ -129,7 +131,7 @@ public class MendProjector extends Block{
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, 50f * smoothEfficiency, baseColor, 0.7f * smoothEfficiency);
+            Drawf.light(team, x, y, lightRadius * smoothEfficiency, baseColor, 0.7f * smoothEfficiency);
         }
 
         @Override

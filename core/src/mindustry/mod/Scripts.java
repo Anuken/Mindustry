@@ -22,21 +22,11 @@ import java.util.*;
 import java.util.regex.*;
 
 public class Scripts implements Disposable{
-    private static final Seq<String> blacklist = Seq.with(".net.", "java.net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
-        "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
-        ".awt", "socket", "classloader", "oracle", "invoke", "java.util.function", "java.util.stream", "org.", "mod.classmap");
-    private static final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "jdk.proxy", "mindustry.gen.",
-        "mindustry.logic.", "mindustry.async.", "saveio", "systemcursor", "filetreeinitevent", "asyncexecutor");
-
     private final Context context;
     private final Scriptable scope;
     private boolean errored;
 
     LoadedMod currentMod = null;
-
-    public static boolean allowClass(String type){
-        return !blacklist.contains(t -> type.toLowerCase(Locale.ROOT).contains(t)) || whitelist.contains(t -> type.toLowerCase(Locale.ROOT).contains(t));
-    }
 
     public Scripts(){
         Time.mark();
@@ -60,7 +50,7 @@ public class Scripts implements Disposable{
 
     public String runConsole(String text){
         try{
-            Object o = context.evaluateString(scope, text, "console.js", 1, null);
+            Object o = context.evaluateString(scope, text, "console.js", 1);
             if(o instanceof NativeJavaObject n) o = n.unwrap();
             if(o instanceof Undefined) o = "undefined";
             return String.valueOf(o);
@@ -172,11 +162,11 @@ public class Scripts implements Disposable{
         try{
             if(currentMod != null){
                 //inject script info into file
-                context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1, null);
+                context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1);
             }
             context.evaluateString(scope,
             wrap ? "(function(){'use strict';\n" + script + "\n})();" : script,
-            file, 0, null);
+            file, 0);
             return true;
         }catch(Throwable t){
             if(currentMod != null){
@@ -224,7 +214,7 @@ public class Scripts implements Disposable{
             if(!module.exists() || module.isDirectory()) return null;
             return new ModuleSource(
                 new InputStreamReader(new ByteArrayInputStream((module.readString()).getBytes())),
-                null, new URI(moduleId), root.file().toURI(), validator);
+                new URI(moduleId), root.file().toURI(), validator);
         }
     }
 }

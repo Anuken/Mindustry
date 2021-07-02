@@ -1,0 +1,45 @@
+[
+  {
+    "address": "mindustry.us.to"
+  },
+  {
+    "name": "mindustry.pl",
+    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl:6966"]
+  },
+  {
+    "name": "C.A.M.S.",
+    "address": ["baseduser.eu.org:6569", "v7.thedimas.pp.ua"]
+  }
+  {
+    "name": "hexpvp.ml",
+    "address": "hexpvp.ml"
+  },
+  {
+    "name": "[accent]Mindustry [red]Reborn",
+    "address": "mindustry.me:7000"
+  },
+  {
+    "name": "Omega",
+    "address": "157.90.180.53:25777"
+  },
+  {
+    "name": "MeowLand",
+    "address": "34.134.111.15"
+  },
+  {
+    "name": "Mindurka",
+    "address": ["mindurka.tk", "mindurka.tk:4000"] 
+  },
+  {
+    "name": "Chaotic Neutral",
+    "address": ["c-n.ddns.net:5555", "c-n.ddns.net:6666"]
+  },
+  {
+    "name": "XCore",
+    "address": ["35.202.253.94" , "35.202.253.94:2000"]
+  },
+  {
+    "name": "Obvilion Network",
+    "address": "obvilionnetwork.ru:7004"
+  }
+]

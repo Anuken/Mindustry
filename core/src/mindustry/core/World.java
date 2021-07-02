@@ -6,7 +6,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.math.geom.Geometry.*;
 import arc.struct.*;
-import arc.struct.ObjectIntMap.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
@@ -21,7 +20,6 @@ import mindustry.maps.*;
 import mindustry.maps.filters.*;
 import mindustry.maps.filters.GenerateFilter.*;
 import mindustry.type.*;
-import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.legacy.*;
@@ -336,7 +334,7 @@ public class World{
                     ui.showErrorMessage("@map.nospawn.pvp");
                 }
             }else if(checkRules.attackMode){ //attack maps need two cores to be valid
-                invalidMap = state.teams.get(state.rules.waveTeam).noCores();
+                invalidMap = state.rules.waveTeam.data().noCores();
                 if(invalidMap){
                     ui.showErrorMessage("@map.nospawn.attack");
                 }

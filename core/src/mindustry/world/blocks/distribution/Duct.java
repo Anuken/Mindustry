@@ -38,6 +38,7 @@ public class Duct extends Block implements Autotiler{
         itemCapacity = 1;
         noUpdateDisabled = true;
         rotate = true;
+        noSideBlend = true;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
     }
 
@@ -147,7 +148,7 @@ public class Duct extends Block implements Autotiler{
         @Override
         public boolean acceptItem(Building source, Item item){
             return current == null && items.total() == 0 &&
-                (source.block instanceof Duct || Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == rotation);
+                ((source.block.rotate && source.front() == this && source.block.hasItems) || Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == rotation);
         }
 
         @Override

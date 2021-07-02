@@ -11,6 +11,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.async.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -201,6 +202,7 @@ public class Renderer implements ApplicationListener{
 
         Draw.proj(camera);
 
+        blocks.checkChanges();
         blocks.floor.checkChanges();
         blocks.processBlocks();
 
@@ -354,7 +356,7 @@ public class Renderer implements ApplicationListener{
         int w = world.width() * tilesize, h = world.height() * tilesize;
         int memory = w * h * 4 / 1024 / 1024;
 
-        if(memory >= (mobile ? 65 : 120)){
+        if(Vars.checkScreenshotMemory && memory >= (mobile ? 65 : 120)){
             ui.showInfo("@screenshot.invalid");
             return;
         }

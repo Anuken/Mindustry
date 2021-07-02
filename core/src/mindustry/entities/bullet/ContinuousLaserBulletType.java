@@ -23,7 +23,8 @@ public class ContinuousLaserBulletType extends BulletType{
     public boolean largeHit = true;
 
     public ContinuousLaserBulletType(float damage){
-        super(0.001f, damage);
+        this.damage = damage;
+        this.speed = 0f;
 
         hitEffect = Fx.hitBeam;
         despawnEffect = Fx.none;

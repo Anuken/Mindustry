@@ -97,7 +97,6 @@ public class FloorRenderer{
 
     /** Queues up a cache change for a tile. Only runs in render loop. */
     public void recacheTile(Tile tile){
-        //TODO will be faster it the position also specified the layer to be recached
         //recaching all layers may not be necessary
         recacheSet.add(Point2.pack(tile.x / chunksize, tile.y / chunksize));
     }
@@ -168,7 +167,6 @@ public class FloorRenderer{
         shader.setUniformi("u_texture", 0);
 
         //only ever use the base environment texture
-        //TODO show error texture for anything else
         texture.bind(0);
 
         //enable all mesh attributes

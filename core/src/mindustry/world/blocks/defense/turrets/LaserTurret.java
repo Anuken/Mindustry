@@ -19,7 +19,7 @@ public class LaserTurret extends PowerTurret{
         super(name);
         canOverdrive = false;
 
-        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.01f)).update(false);
+        consumes.add(new ConsumeCoolant(0.01f)).update(false);
         coolantMultiplier = 1f;
     }
 

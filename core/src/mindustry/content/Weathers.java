@@ -109,6 +109,7 @@ public class Weathers implements ContentList{
             particleRegion = "particle";
             statusGround = false;
             useWindVector = true;
+            hidden = true;
             sizeMax = 4f;
             sizeMin = 1.4f;
             minAlpha = 0.5f;
@@ -117,5 +118,4 @@ public class Weathers implements ContentList{
             baseSpeed = 0.03f;
         }};
     }
-
 }

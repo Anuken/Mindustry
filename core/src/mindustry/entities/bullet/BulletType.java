@@ -163,6 +163,8 @@ public class BulletType extends Content implements Cloneable{
     public float puddleAmount = 5f;
     public Liquid puddleLiquid = Liquids.water;
 
+    public boolean displayAmmoMultiplier = true;
+
     public float lightRadius = -1f;
     public float lightOpacity = 0.3f;
     public Color lightColor = Pal.powerLight;
@@ -295,7 +297,7 @@ public class BulletType extends Content implements Cloneable{
         }
     }
 
-    /** Called when the bullet reaches the end of its lifetime of is destroyed by something external. */
+    /** Called when the bullet reaches the end of its lifetime or is destroyed by something external. */
     public void despawned(Bullet b){
         if(despawnHit){
             hit(b);
@@ -401,6 +403,12 @@ public class BulletType extends Content implements Cloneable{
             //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
         }
 
+        if(lightning > 0){
+            if(status == StatusEffects.none){
+                status = StatusEffects.shocked;
+            }
+        }
+
         if(lightningType == null){
             lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
         }
@@ -445,7 +453,7 @@ public class BulletType extends Content implements Cloneable{
         bullet.owner = owner;
         bullet.team = team;
         bullet.time = 0f;
-        bullet.vel.trns(angle, speed * velocityScl);
+        bullet.initVel(angle, speed * velocityScl);
         if(backMove){
             bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
         }else{
@@ -462,7 +470,7 @@ public class BulletType extends Content implements Cloneable{
         }
         bullet.add();
 
-        if(keepVelocity && owner instanceof Velc v) bullet.vel.add(v.vel().x, v.vel().y);
+        if(keepVelocity && owner instanceof Velc v) bullet.vel.add(v.vel());
         return bullet;
     }
 

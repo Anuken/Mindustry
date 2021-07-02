@@ -1,17 +1,16 @@
 sourceSets.main.java.srcDirs = ["src/"]
 
 
-
 import arc.files.Fi
 import arc.graphics.Color
 import arc.graphics.Pixmap
 import arc.packer.TexturePacker
 import arc.struct.IntIntMap
 import arc.struct.IntMap
+import arc.util.async.Threads
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
 def genFolder = "../core/assets-raw/sprites_out/generated/"
 def doAntialias = !project.hasProperty("disableAntialias")
@@ -224,12 +223,7 @@ task pack(dependsOn: [classes, configurations.runtimeClasspath]){
             }
         }
 
-        executor.shutdown()
-        try{
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)
-        }catch(InterruptedException e){
-            e.printStackTrace()
-        }
+        Threads.await(executor)
 
         println "Time taken for AA: ${(System.currentTimeMillis() - ms) / 1000f}"
 

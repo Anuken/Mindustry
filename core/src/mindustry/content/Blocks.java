@@ -16,7 +16,6 @@ import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.environment.*;
-import mindustry.world.blocks.experimental.*;
 import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.logic.*;
@@ -40,7 +39,7 @@ public class Blocks implements ContentList{
     dacite,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, grass, salt,
-    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
+    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
 
@@ -52,7 +51,7 @@ public class Blocks implements ContentList{
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
-    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadVoid, payloadSource, illuminator,
+    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator,
 
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
@@ -372,10 +371,6 @@ public class Blocks implements ContentList{
             variants = 3;
         }};
 
-        //glowBlob = new Prop("glowblob"){{
-        //    variants = 1;
-        //}};
-
         boulder = new Prop("boulder"){{
             variants = 2;
             stone.asFloor().decoration = this;
@@ -414,32 +409,20 @@ public class Blocks implements ContentList{
             wall = sporeWall;
         }};
 
-        metalFloor = new Floor("metal-floor"){{
-            variants = 0;
-        }};
+        metalFloor = new Floor("metal-floor", 0);
+        metalFloorDamaged = new Floor("metal-floor-damaged", 3);
 
-        metalFloorDamaged = new Floor("metal-floor-damaged"){{
-            variants = 3;
-        }};
+        metalFloor2 = new Floor("metal-floor-2", 0);
+        metalFloor3 = new Floor("metal-floor-3", 0);
+        metalFloor4 = new Floor("metal-floor-4", 0);
+        metalFloor5 = new Floor("metal-floor-5", 0);
 
-        metalFloor2 = new Floor("metal-floor-2"){{
-            variants = 0;
-        }};
-
-        metalFloor3 = new Floor("metal-floor-3"){{
-            variants = 0;
-        }};
-
-        metalFloor5 = new Floor("metal-floor-5"){{
-            variants = 0;
-        }};
-
-        darkPanel1 = new Floor("dark-panel-1"){{ variants = 0; }};
-        darkPanel2 = new Floor("dark-panel-2"){{ variants = 0; }};
-        darkPanel3 = new Floor("dark-panel-3"){{ variants = 0; }};
-        darkPanel4 = new Floor("dark-panel-4"){{ variants = 0; }};
-        darkPanel5 = new Floor("dark-panel-5"){{ variants = 0; }};
-        darkPanel6 = new Floor("dark-panel-6"){{ variants = 0; }};
+        darkPanel1 = new Floor("dark-panel-1", 0);
+        darkPanel2 = new Floor("dark-panel-2", 0);
+        darkPanel3 = new Floor("dark-panel-3", 0);
+        darkPanel4 = new Floor("dark-panel-4", 0);
+        darkPanel5 = new Floor("dark-panel-5", 0);
+        darkPanel6 = new Floor("dark-panel-6", 0);
 
         darkMetal = new StaticWall("dark-metal");
 
@@ -653,6 +636,7 @@ public class Blocks implements ContentList{
             outputLiquid = new LiquidStack(Liquids.slag, 2f);
             craftTime = 10f;
             hasLiquids = hasPower = true;
+            drawer = new DrawLiquid();
 
             consumes.power(1f);
             consumes.item(Items.scrap, 1);
@@ -1034,17 +1018,17 @@ public class Blocks implements ContentList{
         //special transport blocks
 
         duct = new Duct("duct"){{
-            requirements(Category.distribution, with(Items.graphite, 4, Items.metaglass, 1));
+            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 5, Items.metaglass, 2));
             speed = 4f;
         }};
 
         ductRouter = new DuctRouter("duct-router"){{
-            requirements(Category.distribution, with(Items.graphite, 8, Items.metaglass, 2));
+            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 10, Items.metaglass, 4));
             speed = 4f;
         }};
 
         ductBridge = new DuctBridge("duct-bridge"){{
-            requirements(Category.distribution, with(Items.graphite, 16, Items.metaglass, 4));
+            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 20, Items.metaglass, 8));
             speed = 4f;
         }};
 
@@ -1605,13 +1589,13 @@ public class Blocks implements ContentList{
             shots = 4;
             burstSpacing = 5;
             inaccuracy = 10f;
-            range = 210f;
+            range = 215f;
             xRand = 6f;
             size = 2;
             health = 300 * size * size;
             shootSound = Sounds.missile;
 
-            limitRange(2f);
+            limitRange(5f);
         }};
 
         salvo = new ItemTurret("salvo"){{
@@ -1625,8 +1609,8 @@ public class Blocks implements ContentList{
             );
 
             size = 2;
-            range = 180f;
-            reloadTime = 38f;
+            range = 190f;
+            reloadTime = 31f;
             restitution = 0.03f;
             ammoEjectBack = 3f;
             cooldown = 0.03f;
@@ -1865,7 +1849,7 @@ public class Blocks implements ContentList{
             }};
 
             health = 200 * size * size;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
+            consumes.add(new ConsumeCoolant(0.5f)).update(false);
         }};
 
         //endregion
@@ -1994,25 +1978,25 @@ public class Blocks implements ContentList{
         }};
 
         repairPoint = new RepairPoint("repair-point"){{
-            requirements(Category.units, with(Items.lead, 20, Items.copper, 20, Items.silicon, 15));
-            repairSpeed = 0.5f;
-            repairRadius = 65f;
+            requirements(Category.units, with(Items.lead, 30, Items.copper, 30, Items.silicon, 20));
+            repairSpeed = 0.45f;
+            repairRadius = 60f;
             beamWidth = 0.73f;
             powerUse = 1f;
             pulseRadius = 5f;
         }};
 
         repairTurret = new RepairPoint("repair-turret"){{
-            requirements(Category.units, with(Items.silicon, 70, Items.thorium, 60, Items.plastanium, 60));
+            requirements(Category.units, with(Items.silicon, 90, Items.thorium, 80, Items.plastanium, 60));
             size = 2;
             length = 6f;
-            repairSpeed = 4f;
-            repairRadius = 140f;
+            repairSpeed = 3f;
+            repairRadius = 145f;
             powerUse = 5f;
             beamWidth = 1.1f;
             pulseRadius = 6.1f;
-            coolantUse = 0.15f;
-            coolantMultiplier = 1.7f;
+            coolantUse = 0.16f;
+            coolantMultiplier = 1.6f;
             acceptCoolant = true;
         }};
 
@@ -2043,10 +2027,11 @@ public class Blocks implements ContentList{
         payloadPropulsionTower = new PayloadMassDriver("payload-propulsion-tower"){{
             requirements(Category.units, with(Items.thorium, 300, Items.silicon, 200, Items.plastanium, 200, Items.phaseFabric, 50));
             size = 5;
-            reloadTime = 150f;
+            reloadTime = 140f;
             chargeTime = 100f;
-            range = 300f;
-            consumes.power(10f);
+            range = 500f;
+            maxPayloadSize = 3.5f;
+            consumes.power(6f);
         }};
 
         //endregion
@@ -2083,12 +2068,12 @@ public class Blocks implements ContentList{
             alwaysUnlocked = true;
         }};
 
-        payloadVoid = new PayloadVoid("payload-void"){{
+        payloadSource = new PayloadSource("payload-source"){{
             requirements(Category.units, BuildVisibility.sandboxOnly, with());
             size = 5;
         }};
 
-        payloadSource = new PayloadSource("payload-source"){{
+        payloadVoid = new PayloadVoid("payload-void"){{
             requirements(Category.units, BuildVisibility.sandboxOnly, with());
             size = 5;
         }};

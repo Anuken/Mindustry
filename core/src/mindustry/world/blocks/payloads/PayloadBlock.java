@@ -13,7 +13,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class PayloadBlock extends Block{
-    public float payloadSpeed = 0.5f, payloadRotateSpeed = 5f;
+    public float payloadSpeed = 0.7f, payloadRotateSpeed = 5f;
 
     public @Load(value = "@-top", fallback = "factory-top-@size") TextureRegion topRegion;
     public @Load(value = "@-out", fallback = "factory-out-@size") TextureRegion outRegion;
