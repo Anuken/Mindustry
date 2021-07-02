@@ -1,9 +1,9 @@
-[This is a truncated changelog, see Github for full notes]
-- Various minor bugfixes
-- Made water extractor use metaglass for building, to be consistent with pumps
-- Added automatic conveyor/conduit bridging over obstacles
-- Added 'defender' AI for Oct; follows nearby units
-- Cores can now replace most transport blocks; turrets can now replace each other
+[นี่คือบันทึกการเปลี่ยนแปลงที่ถูกตัดทอน โปรดดู Github สำหรับบันทึกฉบับเต็ม]
+- แก้ไขบัคเล็กๆ มากมาย
+- ทำให้เครื่องขุดน้ำบาดาลใช้กระจกเมต้าในการก่อสร้าง เพื่อให้เหมือนกับปั้ม
+- เพิ่มการต่อสายพาน/ท่อน้ำข้ามสิ่งกีดขวางโดยอัตโนมัติ
+- เพิ่ม AI 'ผู้คุ้มครอง' ให้กับอ็อคก์; บินตามยูนิตรอบข้าง
+- แกนกลางสามารถแทนที่บล็อกได้แทบทุกชนิดแล้ว; ป้อมปืนสามารถแทนที่ป้อมปืนด้วยกันเองได้
 - Improved bridge & power node linking previews
-- Buffed Segment & Vela
-- Logic: More hints
+- เพิ่มพลังให้กับเซ็กเมนต์และเวล่า
+- ลอจิก: เพิ่มคำแนะนำมาอีก
