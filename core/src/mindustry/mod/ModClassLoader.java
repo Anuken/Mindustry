@@ -11,6 +11,10 @@ public class ModClassLoader extends ClassLoader{
         }
     };
 
+    public ModClassLoader(ClassLoader parent){
+        super(parent);
+    }
+
     public void addChild(ClassLoader child){
         children.add(child);
     }

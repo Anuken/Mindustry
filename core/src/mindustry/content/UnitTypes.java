@@ -87,7 +87,7 @@ public class UnitTypes implements ContentList{
         mace = new UnitType("mace"){{
             speed = 0.45f;
             hitSize = 10f;
-            health = 530;
+            health = 540;
             armor = 4f;
 
             immunities.add(StatusEffects.burning);
@@ -96,7 +96,7 @@ public class UnitTypes implements ContentList{
                 top = false;
                 shootSound = Sounds.flame;
                 shootY = 2f;
-                reload = 12f;
+                reload = 11f;
                 recoil = 1f;
                 ejectEffect = Fx.none;
                 bullet = new BulletType(4.1f, 32f){{
@@ -572,7 +572,7 @@ public class UnitTypes implements ContentList{
                     speed = 1f;
                     splashDamageRadius = 60f;
                     instantDisappear = true;
-                    splashDamage = 88f;
+                    splashDamage = 90f;
                     killShooter = true;
                     hittable = false;
                     collidesAir = true;
@@ -581,7 +581,7 @@ public class UnitTypes implements ContentList{
         }};
 
         atrax = new UnitType("atrax"){{
-            speed = 0.5f;
+            speed = 0.54f;
             drag = 0.4f;
             hitSize = 13f;
             rotateSpeed = 3f;
@@ -621,7 +621,7 @@ public class UnitTypes implements ContentList{
         }};
 
         spiroct = new UnitType("spiroct"){{
-            speed = 0.45f;
+            speed = 0.48f;
             drag = 0.4f;
             hitSize = 15f;
             rotateSpeed = 3f;
@@ -1125,10 +1125,10 @@ public class UnitTypes implements ContentList{
             BulletType fragBullet = new FlakBulletType(4f, 5){{
                 shootEffect = Fx.shootBig;
                 ammoMultiplier = 4f;
-                splashDamage = 50f;
+                splashDamage = 60f;
                 splashDamageRadius = 25f;
                 collidesGround = true;
-                lifetime = 38f;
+                lifetime = 47f;
 
                 status = StatusEffects.blasted;
                 statusDuration = 60f;
@@ -1148,12 +1148,12 @@ public class UnitTypes implements ContentList{
                 rotate = true;
 
                 bullet = new LaserBulletType(){{
-                    damage = 100f;
+                    damage = 110f;
                     sideAngle = 20f;
                     sideWidth = 1.5f;
                     sideLength = 80f;
                     width = 25f;
-                    length = 200f;
+                    length = 230f;
                     shootEffect = Fx.shockwave;
                     colors = new Color[]{Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
                 }};
@@ -2113,7 +2113,7 @@ public class UnitTypes implements ContentList{
 
                         bullet = new ContinuousLaserBulletType(){{
                             maxRange = 90f;
-                            damage = 26f;
+                            damage = 27f;
                             length = 95f;
                             hitEffect = Fx.hitMeltHeal;
                             drawSize = 200f;
@@ -2144,7 +2144,7 @@ public class UnitTypes implements ContentList{
                 x = 70f/4f;
                 y = -26f/4f;
 
-                reload = 70f;
+                reload = 65f;
                 shake = 3f;
                 rotateSpeed = 2f;
                 shadow = 30f;
@@ -2161,7 +2161,7 @@ public class UnitTypes implements ContentList{
                     timeIncrease = 3f;
                     timeDuration = 60f * 20f;
                     powerDamageScl = 3f;
-                    damage = 50;
+                    damage = 60;
                     hitColor = lightColor = Pal.heal;
                     lightRadius = 70f;
                     clipSize = 250f;
@@ -2177,7 +2177,7 @@ public class UnitTypes implements ContentList{
                     trailWidth = 6f;
                     trailColor = Pal.heal;
                     trailInterval = 3f;
-                    splashDamage = 60f;
+                    splashDamage = 70f;
                     splashDamageRadius = rad;
                     hitShake = 4f;
                     trailRotation = true;

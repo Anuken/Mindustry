@@ -30,7 +30,7 @@ public interface Payload extends Position{
         return false;
     }
 
-    /** @return whether this payload fits in a given size. 2.5 is the max for a standard 3x3 conveyor. */
+    /** @return whether this payload fits in a given size. 3 is the max for a standard 3x3 conveyor. */
     default boolean fits(float s){
         return size() / tilesize <= s;
     }

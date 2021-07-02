@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
 
 @Component
 abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
-    @Import float x, y, rotation;
+    @Import float x, y, rotation, speedMultiplier;
     @Import UnitType type;
 
     private transient Trail tleft = new Trail(1), tright = new Trail(1);
@@ -74,7 +74,7 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     @Replace
     public float floorSpeedMultiplier(){
         Floor on = isFlying() ? Blocks.air.asFloor() : floorOn();
-        return on.isDeep() ? 1.3f : 1f;
+        return (on.isDeep() ? 1.3f : 1f) * speedMultiplier;
     }
 
     public boolean onLiquid(){

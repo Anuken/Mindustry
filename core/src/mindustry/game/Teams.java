@@ -49,7 +49,7 @@ public class Teams{
 
     public boolean eachEnemyCore(Team team, Boolf<CoreBuild> ret){
         for(TeamData data : active){
-            if(areEnemies(team, data.team)){
+            if(team != data.team){
                 for(CoreBuild tile : data.cores){
                     if(ret.get(tile)){
                         return true;
@@ -62,7 +62,7 @@ public class Teams{
 
     public void eachEnemyCore(Team team, Cons<Building> ret){
         for(TeamData data : active){
-            if(areEnemies(team, data.team)){
+            if(team != data.team){
                 for(Building tile : data.cores){
                     ret.get(tile);
                 }
@@ -89,11 +89,6 @@ public class Teams{
     public boolean isActive(Team team){
         //the enemy wave team is always active
         return get(team).active();
-    }
-
-    /** Returns whether {@param other} is an enemy of {@param #team}. */
-    public boolean areEnemies(Team team, Team other){
-        return team != other;
     }
 
     public boolean canInteract(Team team, Team other){
@@ -216,7 +211,7 @@ public class Teams{
             Seq<Team> enemies = new Seq<>();
 
             for(TeamData other : active){
-                if(areEnemies(data.team, other.team)){
+                if(data.team != other.team){
                     enemies.add(other.team);
                 }
             }

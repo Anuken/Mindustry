@@ -21,7 +21,7 @@
   },
   {
     "name": "C.A.M.S.",
-    "address": ["routerchain.ddns.net", "nikochio.ddns.net", "play.thedimas.pp.ua"]
+    "address": ["baseduser.eu.org:6568", "nikochio.ddns.net", "play.thedimas.pp.ua"]
   },
   {
     "name": "BE6.RUN",
@@ -101,10 +101,14 @@
   },
   {
     "name": "Sakura", 
-    "address": ["160.16.207.141", "160.16.207.141:21527", "160.16.207.141:31587"]
+    "address": ["160.16.207.141", "160.16.207.141:21527", "160.16.207.141:31587", "160.16.207.141:26810"]
   },
   {
     "name": "MeowLand",
     "address": ["34.134.111.15"]
+  },
+  {
+    "name": "M-DE",
+    "address": ["mindustry.inc.li", "mindustry.inc.li:6568"]
   }
 ]
