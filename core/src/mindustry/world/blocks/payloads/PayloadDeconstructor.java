@@ -74,7 +74,7 @@ public class PayloadDeconstructor extends PayloadBlock{
                     Draw.color(Pal.remove);
                     Draw.alpha(1f);
 
-                    Lines.lineAngleCenter(x + Mathf.sin(time, 20f, Vars.tilesize / 2f * block.size - 2f), y, 90, block.size * Vars.tilesize - 4f);
+                    Lines.lineAngleCenter(x + Mathf.sin(time, 20f, Vars.tilesize / 2f * block.size - 3f), y, 90, block.size * Vars.tilesize - 6f);
 
                     Draw.reset();
                 });
@@ -153,7 +153,7 @@ public class PayloadDeconstructor extends PayloadBlock{
                     deconstructing = null;
                     accum = null;
                 }
-            }else if(moveInPayload(false) && payload != null && cons.valid()){
+            }else if(moveInPayload(false) && payload != null){
                 accum = new float[payload.requirements().length];
                 deconstructing = payload;
                 payload = null;
