@@ -1,3 +1,3 @@
-[This is a truncated changelog, see Github for full notes]
-- Fixed crash when using chat as server host
-- Added support for parsing weather JSON
+[นี่คือบันทึกการเปลี่ยนแปลงที่ถูกตัดทอน โปรดดู Github สำหรับบันทึกฉบับเต็ม]
+- แก้ไขแครชเมื่อใช้แชทเป็นโฮสต์
+- เพิ่มการรองรับสำหรับการแยกวิเคราะห์สภาพอากาศแบบ JSON
