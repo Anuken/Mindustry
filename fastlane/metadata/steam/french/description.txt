@@ -15,13 +15,13 @@ Créez des chaînes d'approvisionnement complexes pour alimenter vos tourelles e
 [h2]Campagne[/h2]
 
 [list]
-[*] Avancez à travers les 12 zones rejouables de la campagne.
+[*] Capturez la planète Serpulo à travers 250+ secteurs à génération procédurale et 16 carte conçues à la main.
 [*] Récoltez and accumulez les resources.
 [*] Recherchez de nouveaux blocs et faites progresser les technologies à votre disposition.
 [*] Missions et objectifs variés.
 [*] Invitez vos amis pour terminer les missions ensemble.
-[*] 120+ blocs technologiques à maîtriser.
-[*] 19 types de drones, mechs et vaisseaux.
+[*] 130+ blocs technologiques à maîtriser.
+[*] 33 types de drones, mechas et vaisseaux.
 [*] 50+ succès à débloquer.
 [/list]
 
@@ -30,14 +30,14 @@ Créez des chaînes d'approvisionnement complexes pour alimenter vos tourelles e
 [list]
 [*] [b]Survie[/b]: Construisez des tourelles pour défendre votre base des ennemis dans un style de jeu inspiré des tower-defense. Survivez aussi longtemps que possible, avant de faire décoller votre noyau. Utilisez les ressources récoltées pour débloquer de nouvelles technologies. Préparez votre base pour les attaques de puissants boss aériens.
 [*] [b]Attaque[/b]: Construisez des usines et produisez des unités pour détruire les noyaux ennemis, tout en défendant votre base contre les vagues d'attaque. Créez une grande variété d'unités offensives et de support pour vous aider dans vos objectifs.
-[*] [b]PvP[/b]: Affrontez d'autres joueurs. Constituez jusqu'à 4 équipes différentes et tentez de détruire les noyaux adverses. Créez des unités d'assaut ou attaquez directement les autres bases avec vos mechs.
+[*] [b]PvP[/b]: Affrontez d'autres joueurs. Constituez jusqu'à 4 équipes différentes et tentez de détruire les noyaux adverses. Créez des unités d'assaut ou attaquez directement les autres bases avec vos mechas.
 [*] [b]Bac à sable[/b]: Jouez avec des ressources infinies et aucune menace ennemie. Utilisez des objets et des blocs spécifiques à ce mode de jeu tels que les sources de liquides. Testez vos designs et faites apparaître les ennemis à la demande.
 [/list]
 
 [h2]Parties Multijoueurs Cross-Platformes Personnalisées[/h2]
 
 [list]
-[*] 12 cartes supplémentaires pour vos parties personnalisées en plus des cartes de la campagne.
+[*] 16 cartes supplémentaires pour vos parties personnalisées en plus des cartes de la campagne.
 [*] Jouez en Co-op, en PvP ou en mode Bac à sable.
 [*] Rejoignez un serveur dédié public, ou invitez vos amis dans vos propres sessions privées.
 [*] Personnalisez les règles de jeu: changez les coûts des blocs, les stats des ennemis, les ressources de départs, le timing des vagues...
@@ -56,5 +56,5 @@ Créez des chaînes d'approvisionnement complexes pour alimenter vos tourelles e
 [*] Configurez la disposition des vagues d'ennemis.
 [*] Partagez vos cartes sur le Workshop Steam.
 [*] Personnalisez les règles de base de vos cartes.
-[*] 75+ blocs environnementaux différents.
+[*] 80+ blocs environnementaux différents.
 [/list]
