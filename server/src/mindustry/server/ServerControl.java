@@ -344,14 +344,17 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("maps", "Display all available maps.", arg -> {
+        handler.register("maps", "[all] [full]", "Display available maps. 'all' to include default maps. 'full' to show full map names.", arg -> {
+            boolean all = Arrays.asList(arg).contains("all");
+            boolean full = Arrays.asList(arg).contains("full");
             if(!maps.all().isEmpty()){
                 info("Maps:");
-                for(Map map : maps.all()){
+                for(Map map : all ? maps.all() : maps.customMaps()){
+                    String mapName = (full ? map.name() : Strings.stripColors(map.name())).replace(' ', '_');
                     if(map.custom){
-                        info("  @ (@): &fiCustom / @x@", map.name().replace(' ', '_'), map.file.name(), map.width, map.height);
+                        info("  @ (@): &fiCustom / @x@", mapName, map.file.name(), map.width, map.height);
                     }else{
-                        info("  @: &fiDefault / @x@", map.name().replace(' ', '_'), map.width, map.height);
+                        info("  @: &fiDefault / @x@", mapName, map.width, map.height);
                     }
                 }
             }else{
