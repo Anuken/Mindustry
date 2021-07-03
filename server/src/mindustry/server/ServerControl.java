@@ -662,7 +662,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("nextmap", "<mapname...>", "Set the next map to be played after a game-over. Overrides shuffling.", arg -> {
-            Map res = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
+            Map res = maps.all().find(map -> Strings.stripColors(map.name().replace('_', ' ')).equalsIgnoreCase(Strings.stripColors(arg[0]).replace('_', ' ')));
             if(res != null){
                 nextMapOverride = res;
                 info("Next map set to '@'.", res.name());
