@@ -259,7 +259,16 @@ public class ServerControl implements ApplicationListener{
     }
 
     protected void registerCommands(){
-        handler.register("help", "Displays this command list.", arg -> {
+        handler.register("help", "[command]", "Displays this command list.", arg -> {
+            if (arg.length > 0){
+                Command command = handler.getCommandList().find(c -> c.text.equalsIgnoreCase(arg[0]));
+                if (command == null) err("Command " + arg[0] + " not found!");
+                else {
+                    info(command.text + ":");
+                    info("  &b&lb " + command.text + (command.paramText.isEmpty() ? "" : " &lc&fi") + command.paramText + "&fr - &lw" + command.description);
+                }
+                return;
+            }
             info("Commands:");
             for(Command command : handler.getCommandList()){
                 info("  &b&lb " + command.text + (command.paramText.isEmpty() ? "" : " &lc&fi") + command.paramText + "&fr - &lw" + command.description);
