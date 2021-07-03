@@ -15,7 +15,7 @@ Créez des chaînes d'approvisionnement complexes pour alimenter vos tourelles e
 [h2]Campagne[/h2]
 
 [list]
-[*] Capturez la planète Serpulo à travers 250+ secteurs à génération procédurale et 16 carte conçues à la main.
+[*] Capturez la planète Serpulo à travers 250+ secteurs à génération procédurale et 16 cartes conçues à la main.
 [*] Récoltez and accumulez les resources.
 [*] Recherchez de nouveaux blocs et faites progresser les technologies à votre disposition.
 [*] Missions et objectifs variés.
