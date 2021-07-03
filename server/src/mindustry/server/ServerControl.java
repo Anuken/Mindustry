@@ -259,7 +259,7 @@ public class ServerControl implements ApplicationListener{
     }
 
     protected void registerCommands(){
-        handler.register("help", "[command]", "Displays this command list.", arg -> {
+        handler.register("help", "[command]", "Display the command list, or get help for a specific command.", arg -> {
             if (arg.length > 0){
                 Command command = handler.getCommandList().find(c -> c.text.equalsIgnoreCase(arg[0]));
                 if (command == null) err("Command " + arg[0] + " not found!");
