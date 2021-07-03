@@ -163,9 +163,9 @@ public class ServerControl implements ApplicationListener{
         Events.on(GameOverEvent.class, event -> {
             if(inExtraRound) return;
             if(state.rules.waves){
-                info("Game over! Reached wave @ with @ players online on map @.", state.wave, Groups.player.size(), Strings.capitalize(state.map.name()));
+                info("Game over! Reached wave @ with @ players online on map @.", state.wave, Groups.player.size(), Strings.capitalize(Strings.stripColors(state.map.name())));
             }else{
-                info("Game over! Team @ is victorious with @ players online on map @.", event.winner.name, Groups.player.size(), Strings.capitalize(state.map.name()));
+                info("Game over! Team @ is victorious with @ players online on map @.", event.winner.name, Groups.player.size(), Strings.capitalize(Strings.stripColors(state.map.name())));
             }
 
             //set next map to be played
@@ -174,14 +174,14 @@ public class ServerControl implements ApplicationListener{
             if(map != null){
                 Call.infoMessage((state.rules.pvp
                 ? "[accent]The " + event.winner.name + " team is victorious![]\n" : "[scarlet]Game over![]\n")
-                + "\nNext selected map:[accent] " + map.name() + "[]"
+                + "\nNext selected map:[accent] " + Strings.stripColors(map.name()) + "[]"
                 + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
                 "\nNew game begins in " + roundExtraTime + " seconds.");
 
                 state.gameOver = true;
                 Call.updateGameOver(event.winner);
 
-                info("Selected next map to be @.", map.name());
+                info("Selected next map to be @.", Strings.stripColors(map.name()));
 
                 play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
             }else{
@@ -378,7 +378,7 @@ public class ServerControl implements ApplicationListener{
                 info("Status: &rserver closed");
             }else{
                 info("Status:");
-                info("  Playing on map &fi@ / Wave @", Strings.capitalize(state.map.name()), state.wave);
+                info("  Playing on map &fi@ / Wave @", Strings.capitalize(Strings.stripColors(state.map.name())), state.wave);
 
                 if(state.rules.waves){
                     info("  @ enemies.", state.enemies);
@@ -665,7 +665,7 @@ public class ServerControl implements ApplicationListener{
             Map res = maps.all().find(map -> Strings.stripColors(map.name().replace('_', ' ')).equalsIgnoreCase(Strings.stripColors(arg[0]).replace('_', ' ')));
             if(res != null){
                 nextMapOverride = res;
-                info("Next map set to '@'.", res.name());
+                info("Next map set to '@'.", Strings.stripColors(res.name()));
             }else{
                 err("No map '@' found.", arg[0]);
             }
