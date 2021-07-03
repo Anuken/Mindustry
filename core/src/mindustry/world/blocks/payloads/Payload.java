@@ -20,6 +20,8 @@ public interface Payload extends Position{
     /** draws this payload at a position. */
     void draw();
 
+    void drawShadow(float alpha);
+
     /** @return hitbox size of the payload. */
     float size();
 

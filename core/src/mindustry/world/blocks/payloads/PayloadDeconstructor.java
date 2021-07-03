@@ -65,16 +65,15 @@ public class PayloadDeconstructor extends PayloadBlock{
                 deconstructing.set(x + payVector.x, y + payVector.y, payRotation);
 
                 Draw.z(Layer.blockOver);
-                //deconstructing.draw();
+                deconstructing.drawShadow(1f - progress);
 
-                //TODO shadow
                 //TODO looks really bad
                 Draw.draw(Layer.blockOver, () -> {
-                    Drawf.construct(x, y, deconstructing.icon(), Pal.remove, 0f, 1f - progress, 1f - progress, time);
+                    Drawf.construct(x, y, deconstructing.icon(), Pal.remove, payRotation - 90f, 1f - progress, 1f - progress, time);
                     Draw.color(Pal.remove);
                     Draw.alpha(1f);
 
-                    Lines.lineAngleCenter(x + Mathf.sin(time, 20f, Vars.tilesize / 2f * block.size - 3f), y, 90, block.size * Vars.tilesize - 6f);
+                    Lines.lineAngleCenter(x + Mathf.sin(time, 20f, Vars.tilesize / 2f * block.size - 3f), y, 90f, block.size * Vars.tilesize - 6f);
 
                     Draw.reset();
                 });
@@ -105,6 +104,8 @@ public class PayloadDeconstructor extends PayloadBlock{
             if(deconstructing == null){
                 progress = 0f;
             }
+
+            payRotation = Angles.moveToward(payRotation, 90f, payloadRotateSpeed * edelta());
 
             if(deconstructing != null){
                 var reqs = deconstructing.requirements();

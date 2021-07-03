@@ -105,6 +105,14 @@ public class UnitPayload implements Payload{
     }
 
     @Override
+    public void drawShadow(float alpha){
+        //TODO should not happen
+        if(unit.type == null) return;
+
+        unit.type.drawSoftShadow(unit, alpha);
+    }
+
+    @Override
     public void draw(){
         //TODO should not happen
         if(unit.type == null) return;

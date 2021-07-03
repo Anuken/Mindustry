@@ -73,8 +73,13 @@ public class BuildPayload implements Payload{
     }
 
     @Override
+    public void drawShadow(float alpha){
+        Drawf.shadow(build.x, build.y, build.block.size * tilesize * 2f, alpha);
+    }
+
+    @Override
     public void draw(){
-        Drawf.shadow(build.x, build.y, build.block.size * tilesize * 2f);
+        drawShadow(1f);
         Draw.rect(build.block.fullIcon, build.x, build.y);
     }
 
