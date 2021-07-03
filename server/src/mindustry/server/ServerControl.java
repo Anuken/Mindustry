@@ -315,7 +315,7 @@ public class ServerControl implements ApplicationListener{
 
             Map result;
             if(arg.length > 0){
-                result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
+                result = maps.all().find(map -> Strings.stripColors(map.name().replace('_', ' ')).equalsIgnoreCase(Strings.stripColors(arg[0]).replace('_', ' ')));
 
                 if(result == null){
                     err("No map with name '@' found.", arg[0]);
