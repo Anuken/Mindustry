@@ -422,7 +422,7 @@ public class Maps{
     }
 
     private void writeCache(Map map) throws IOException{
-        try(DataOutputStream stream = new DataOutputStream(map.cacheFile().write(false, Streams.DEFAULT_BUFFER_SIZE))){
+        try(DataOutputStream stream = new DataOutputStream(map.cacheFile().write(false, Streams.defaultBufferSize))){
             stream.write(0);
             stream.writeInt(map.spawns);
             stream.write(map.teams.size);
@@ -434,7 +434,7 @@ public class Maps{
     }
 
     private void readCache(Map map) throws IOException{
-        try(DataInputStream stream = new DataInputStream(map.cacheFile().read(Streams.DEFAULT_BUFFER_SIZE))){
+        try(DataInputStream stream = new DataInputStream(map.cacheFile().read(Streams.defaultBufferSize))){
             stream.read(); //version
             map.spawns = stream.readInt();
             int teamsize = stream.readByte();

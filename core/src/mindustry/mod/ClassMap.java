@@ -1,8 +1,6 @@
 package mindustry.mod;
 
 import arc.struct.*;
-import mindustry.world.blocks.payloads.*;
-
 /** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */
 @SuppressWarnings("deprecation")
 public class ClassMap{
@@ -167,21 +165,21 @@ public class ClassMap{
         classes.put("StackConveyor", mindustry.world.blocks.distribution.StackConveyor.class);
         classes.put("StackConveyorBuild", mindustry.world.blocks.distribution.StackConveyor.StackConveyorBuild.class);
         classes.put("AirBlock", mindustry.world.blocks.environment.AirBlock.class);
-        classes.put("Bush", mindustry.world.blocks.environment.Bush.class);
         classes.put("Cliff", mindustry.world.blocks.environment.Cliff.class);
         classes.put("DoubleOverlayFloor", mindustry.world.blocks.environment.DoubleOverlayFloor.class);
         classes.put("Floor", mindustry.world.blocks.environment.Floor.class);
         classes.put("OreBlock", mindustry.world.blocks.environment.OreBlock.class);
         classes.put("OverlayFloor", mindustry.world.blocks.environment.OverlayFloor.class);
         classes.put("Prop", mindustry.world.blocks.environment.Prop.class);
+        classes.put("SeaBush", mindustry.world.blocks.environment.SeaBush.class);
+        classes.put("Seaweed", mindustry.world.blocks.environment.Seaweed.class);
         classes.put("ShallowLiquid", mindustry.world.blocks.environment.ShallowLiquid.class);
         classes.put("SpawnBlock", mindustry.world.blocks.environment.SpawnBlock.class);
-        classes.put("StaticClusterWall", mindustry.world.blocks.environment.StaticClusterWall.class);
+        classes.put("StaticCoralWall", mindustry.world.blocks.environment.StaticCoralWall.class);
         classes.put("StaticTree", mindustry.world.blocks.environment.StaticTree.class);
         classes.put("StaticWall", mindustry.world.blocks.environment.StaticWall.class);
         classes.put("TreeBlock", mindustry.world.blocks.environment.TreeBlock.class);
         classes.put("WallOreBlock", mindustry.world.blocks.environment.WallOreBlock.class);
-        classes.put("WavingProp", mindustry.world.blocks.environment.WavingProp.class);
         classes.put("WobbleProp", mindustry.world.blocks.environment.WobbleProp.class);
         classes.put("BlockForge", mindustry.world.blocks.experimental.BlockForge.class);
         classes.put("BlockForgeBuild", mindustry.world.blocks.experimental.BlockForge.BlockForgeBuild.class);
@@ -236,6 +234,8 @@ public class ClassMap{
         classes.put("Payload", mindustry.world.blocks.payloads.Payload.class);
         classes.put("PayloadBlock", mindustry.world.blocks.payloads.PayloadBlock.class);
         classes.put("PayloadBlockBuild", mindustry.world.blocks.payloads.PayloadBlock.PayloadBlockBuild.class);
+        classes.put("PayloadDeconstructor", mindustry.world.blocks.payloads.PayloadDeconstructor.class);
+        classes.put("PayloadDeconstructorBuild", mindustry.world.blocks.payloads.PayloadDeconstructor.PayloadDeconstructorBuild.class);
         classes.put("PayloadMassDriver", mindustry.world.blocks.payloads.PayloadMassDriver.class);
         classes.put("PayloadDriverBuild", mindustry.world.blocks.payloads.PayloadMassDriver.PayloadDriverBuild.class);
         classes.put("PayloadDriverState", mindustry.world.blocks.payloads.PayloadMassDriver.PayloadDriverState.class);
