@@ -34,7 +34,7 @@ public class Net{
     private final ObjectMap<Class<?>, Cons> clientListeners = new ObjectMap<>();
     private final ObjectMap<Class<?>, Cons2<NetConnection, Object>> serverListeners = new ObjectMap<>();
     private final IntMap<StreamBuilder> streams = new IntMap<>();
-    private final ExecutorService pingExecutor = Threads.executor(Math.max(Runtime.getRuntime().availableProcessors(), 6));
+    private final ExecutorService pingExecutor = Threads.cachedExecutor();
 
     private final NetProvider provider;
 
@@ -324,13 +324,6 @@ public class Net{
      */
     public void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> failed){
         pingExecutor.submit(() -> provider.pingHost(address, port, valid, failed));
-    }
-
-    /**
-     * Pings a host in an new thread. If an error occurred, failed() should be called with the exception.
-     */
-    public void pingHostThread(String address, int port, Cons<Host> valid, Cons<Exception> failed){
-        Threads.daemon(() -> provider.pingHost(address, port, valid, failed));
     }
 
     /**
