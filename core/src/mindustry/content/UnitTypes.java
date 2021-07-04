@@ -2225,6 +2225,7 @@ public class UnitTypes implements ContentList{
             defaultController = BuilderAI::new;
             isCounted = false;
 
+            lowAltitude = true;
             flying = true;
             mineSpeed = 6.5f;
             mineTier = 1;
@@ -2262,6 +2263,7 @@ public class UnitTypes implements ContentList{
             defaultController = BuilderAI::new;
             isCounted = false;
 
+            lowAltitude = true;
             flying = true;
             mineSpeed = 7f;
             mineTier = 1;
@@ -2304,6 +2306,7 @@ public class UnitTypes implements ContentList{
             defaultController = BuilderAI::new;
             isCounted = false;
 
+            lowAltitude = true;
             flying = true;
             mineSpeed = 8f;
             mineTier = 2;
