@@ -1,6 +1,7 @@
 package mindustry.tools;
 
 import arc.*;
+import arc.Net.*;
 import arc.files.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -18,7 +19,6 @@ public class FontGenerator{
     //E000 to F8FF
     public static void main(String[] args){
         Net net = Core.net = new Net();
-        net.setBlock(true);
         Fi folder = Fi.get("core/assets-raw/fontgen/out/");
         folder.mkdirs();
 
@@ -29,7 +29,7 @@ public class FontGenerator{
         Log.info("Zip...");
 
         String session = folder.child("session").readString();
-        net.httpGet("https://fontello.com/" + session + "/get", result -> {
+        net.http(new HttpRequest().method(HttpMethod.GET).url("https://fontello.com/" + session + "/get").block(true), result -> {
             try{
                 Streams.copy(result.getResultAsStream(), folder.child("font.zip").write());
             }catch(IOException e){

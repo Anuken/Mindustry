@@ -9,6 +9,7 @@ import arc.util.async.*;
 import mindustry.gen.*;
 import mindustry.net.Packets.*;
 import mindustry.net.Streamable.*;
+import net.jpountz.lz4.*;
 
 import java.io.*;
 import java.nio.*;
@@ -33,7 +34,7 @@ public class Net{
     private final ObjectMap<Class<?>, Cons> clientListeners = new ObjectMap<>();
     private final ObjectMap<Class<?>, Cons2<NetConnection, Object>> serverListeners = new ObjectMap<>();
     private final IntMap<StreamBuilder> streams = new IntMap<>();
-    private final ExecutorService pingExecutor = Threads.executor(Math.max(Runtime.getRuntime().availableProcessors(), 6));
+    private final ExecutorService pingExecutor = Threads.cachedExecutor();
 
     private final NetProvider provider;
 
@@ -97,7 +98,7 @@ public class Net{
 
             if(e instanceof BufferUnderflowException || e instanceof BufferOverflowException){
                 error = Core.bundle.get("error.io");
-            }else if(error.equals("mismatch") || (e instanceof IndexOutOfBoundsException && e.getStackTrace()[0].getClassName().contains("java.nio"))){
+            }else if(error.equals("mismatch") || e instanceof LZ4Exception || (e instanceof IndexOutOfBoundsException && e.getStackTrace()[0].getClassName().contains("java.nio"))){
                 error = Core.bundle.get("error.mismatch");
             }else if(error.contains("port out of range") || error.contains("invalid argument") || (error.contains("invalid") && error.contains("address")) || Strings.neatError(e).contains("address associated")){
                 error = Core.bundle.get("error.invalidaddress");
@@ -323,13 +324,6 @@ public class Net{
      */
     public void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> failed){
         pingExecutor.submit(() -> provider.pingHost(address, port, valid, failed));
-    }
-
-    /**
-     * Pings a host in an new thread. If an error occurred, failed() should be called with the exception.
-     */
-    public void pingHostThread(String address, int port, Cons<Host> valid, Cons<Exception> failed){
-        Threads.daemon(() -> provider.pingHost(address, port, valid, failed));
     }
 
     /**

@@ -375,7 +375,7 @@ public class JoinDialog extends BaseDialog{
             for(String address : group.addresses){
                 String resaddress = address.contains(":") ? address.split(":")[0] : address;
                 int resport = address.contains(":") ? Strings.parseInt(address.split(":")[1]) : port;
-                net.pingHostThread(resaddress, resport, res -> {
+                net.pingHost(resaddress, resport, res -> {
                     if(refreshes != cur) return;
                     res.port = resport;
 

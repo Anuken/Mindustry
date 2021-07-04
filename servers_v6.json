@@ -97,14 +97,22 @@
   },
   {
     "name": "TSR", 
-    "address": ["fifr4.quackhost.uk:20131"]
+    "address": ["de15-3.falix.gg:27422"]
   },
   {
     "name": "Sakura", 
-    "address": ["160.16.207.141", "160.16.207.141:21527", "160.16.207.141:31587"]
+    "address": ["160.16.207.141", "160.16.207.141:21527", "160.16.207.141:31587", "160.16.207.141:26810"]
   },
   {
     "name": "MeowLand",
     "address": ["34.134.111.15"]
+  },
+  {
+    "name": "M-DE",
+    "address": ["mindustry.inc.li", "mindustry.inc.li:6568"]
+  },
+  {
+    "name": "Hungarian",
+    "address": ["magyarmindustry.tk"]
   }
 ]

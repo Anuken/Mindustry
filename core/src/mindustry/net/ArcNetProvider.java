@@ -391,15 +391,7 @@ public class ArcNetProvider implements NetProvider{
                 //no compression, copy over buffer
                 if(compression == 0){
                     buffer.position(0).limit(length);
-                    if(byteBuffer.hasArray()){
-                        buffer.put(byteBuffer.array(), byteBuffer.position(), length);
-                    }else{
-                        byte[] readcopy = new byte[length];
-                        int pos = byteBuffer.position();
-                        byteBuffer.get(readcopy);
-                        byteBuffer.position(pos);
-                        buffer.put(readcopy);
-                    }
+                    buffer.put(byteBuffer.array(), byteBuffer.position(), length);
                     buffer.position(0);
                     packet.read(reads.get(), length);
                     //move read packets forward
