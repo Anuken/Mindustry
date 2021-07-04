@@ -97,7 +97,7 @@
   },
   {
     "name": "TSR", 
-    "address": ["fifr4.quackhost.uk:20131"]
+    "address": ["de15-3.falix.gg:27422"]
   },
   {
     "name": "Sakura", 
@@ -110,5 +110,9 @@
   {
     "name": "M-DE",
     "address": ["mindustry.inc.li", "mindustry.inc.li:6568"]
+  },
+  {
+    "name": "Hungarian",
+    "address": ["magyarmindustry.tk"]
   }
 ]

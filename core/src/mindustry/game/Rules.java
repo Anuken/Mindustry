@@ -114,22 +114,6 @@ public class Rules{
     /** special tags for additional info. */
     public StringMap tags = new StringMap();
 
-    /** A team-specific ruleset. */
-    public static class TeamRule{
-        /** Whether to use building AI. */
-        public boolean ai;
-        /** TODO Tier of blocks/designs that the AI uses for building. [0, 1] */
-        public float aiTier = 1f;
-        /** Whether, when AI is enabled, ships should be spawned from the core. */
-        public boolean aiCoreSpawn = true;
-        /** If true, blocks don't require power or resources. */
-        public boolean cheat;
-        /** If true, resources are not consumed when building. */
-        public boolean infiniteResources;
-        /** If true, this team has infinite unit ammo. */
-        public boolean infiniteAmmo;
-    }
-
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */
     public Rules copy(){
         return JsonIO.copy(this);
@@ -148,6 +132,22 @@ public class Rules{
         }else{
             return Gamemode.survival;
         }
+    }
+
+    /** A team-specific ruleset. */
+    public static class TeamRule{
+        /** Whether to use building AI. */
+        public boolean ai;
+        /** TODO Tier of blocks/designs that the AI uses for building. [0, 1] */
+        public float aiTier = 1f;
+        /** Whether, when AI is enabled, ships should be spawned from the core. */
+        public boolean aiCoreSpawn = true;
+        /** If true, blocks don't require power or resources. */
+        public boolean cheat;
+        /** If true, resources are not consumed when building. */
+        public boolean infiniteResources;
+        /** If true, this team has infinite unit ammo. */
+        public boolean infiniteAmmo;
     }
 
     /** A simple map for storing TeamRules in an efficient way without hashing. */

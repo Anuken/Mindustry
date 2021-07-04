@@ -14,9 +14,7 @@ public class GenericModTest{
     static void grabMod(String url){
         //clear older mods
         ApplicationTests.testDataFolder.deleteDirectory();
-        Core.net = new Net();
-        Core.net.setBlock(true);
-        Core.net.http(new HttpRequest().url(url).method(HttpMethod.GET), httpResponse -> {
+        new Net().http(new HttpRequest().block(true).url(url).method(HttpMethod.GET), httpResponse -> {
             try{
                 ApplicationTests.testDataFolder.child("mods").child("test_mod." + (url.endsWith("jar") ? "jar" : "zip")).writeBytes(Streams.copyBytes(httpResponse.getResultAsStream()));
             }catch(IOException e){
