@@ -350,7 +350,7 @@ public class ServerControl implements ApplicationListener{
             if(!maps.all().isEmpty()){
                 info("Maps:");
                 for(Map map : all ? maps.all() : maps.customMaps()){
-                    String mapName = (full ? map.name() : Strings.stripColors(map.name())).replace(' ', '_');
+                    String mapName = Strings.stripColors(map.name()).replace(' ', '_');
                     if(map.custom){
                         info("  @ (@): &fiCustom / @x@", mapName, map.file.name(), map.width, map.height);
                     }else{
