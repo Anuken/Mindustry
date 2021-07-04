@@ -110,5 +110,9 @@
   {
     "name": "M-DE",
     "address": ["mindustry.inc.li", "mindustry.inc.li:6568"]
+  },
+  {
+    "name": "Hungarian",
+    "address": ["magyarmindustry.tk"]
   }
 ]
