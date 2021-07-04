@@ -345,9 +345,8 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("maps", "[all] [full]", "Display available maps. 'all' to include default maps. 'full' to show full map names.", arg -> {
-            boolean all = Arrays.asList(arg).contains("all");
-            boolean full = Arrays.asList(arg).contains("full");
+        handler.register("maps", "[all]", "Display available maps. 'all' to include default maps.", arg -> {
+            boolean all = arg.length > 0 && arg[0].equalsIgnoreCase("all");
             if(!maps.all().isEmpty()){
                 info("Maps:");
                 for(Map map : all ? maps.all() : maps.customMaps()){
