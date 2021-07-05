@@ -198,7 +198,5 @@ public class PayloadDeconstructor extends PayloadBlock{
             }
             deconstructing = Payload.read(read);
         }
-
-
     }
 }

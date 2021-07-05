@@ -749,6 +749,11 @@ public class UnitType extends UnlockableContent{
         if(unit.isBoss()){
             Draw.mixcol(unit.team.color, Mathf.absin(7f, 1f));
         }
+
+        Floor floor = unit.isFlying() ? Blocks.air.asFloor() : unit.floorOn();
+        if(floor.isLiquid){
+            Draw.color(Color.white, floor.mapColor, unit.drownTime() * 0.4f);
+        }
     }
 
     public void drawOutline(Unit unit){
