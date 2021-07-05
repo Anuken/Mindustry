@@ -69,7 +69,7 @@ public class PayloadDeconstructor extends PayloadBlock{
 
                 //TODO looks really bad
                 Draw.draw(Layer.blockOver, () -> {
-                    Drawf.construct(x, y, deconstructing.icon(), Pal.remove, payRotation - 90f, 1f - progress, 1f - progress, time);
+                    Drawf.construct(x, y, deconstructing.icon(), Pal.remove, deconstructing instanceof BuildPayload ? 0f : payRotation - 90f, 1f - progress, 1f - progress, time);
                     Draw.color(Pal.remove);
                     Draw.alpha(1f);
 
