@@ -345,16 +345,28 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("maps", "[all]", "Display available maps. 'all' to include default maps.", arg -> {
-            boolean all = arg.length > 0 && arg[0].equalsIgnoreCase("all");
+        handler.register("maps", "[all/custom/default]", "Display available maps. Displays only custom maps by default.", arg -> {
+            boolean custom = arg.length == 0 || arg[0].equals("custom") || arg[0].equals("all");
+            boolean def = arg.length > 0 && (arg[0].equals("default") || arg[0].equals("all"));
+
             if(!maps.all().isEmpty()){
-                info("Maps:");
-                for(Map map : all ? maps.all() : maps.customMaps()){
-                    String mapName = Strings.stripColors(map.name()).replace(' ', '_');
-                    if(map.custom){
-                        info("  @ (@): &fiCustom / @x@", mapName, map.file.name(), map.width, map.height);
-                    }else{
-                        info("  @: &fiDefault / @x@", mapName, map.width, map.height);
+                Seq<Map> all = new Seq<>();
+
+                if(custom) all.addAll(maps.customMaps());
+                if(def) all.addAll(maps.defaultMaps());
+
+                if(all.isEmpty()){
+                    info("No custom maps loaded. &fiTo display built-in maps, use the \"@\" argument.", "all");
+                }else{
+                    info("Maps:");
+
+                    for(Map map : all){
+                        String mapName = Strings.stripColors(map.name()).replace(' ', '_');
+                        if(map.custom){
+                            info("  @ (@): &fiCustom / @x@", mapName, map.file.name(), map.width, map.height);
+                        }else{
+                            info("  @: &fiDefault / @x@", mapName, map.width, map.height);
+                        }
                     }
                 }
             }else{
