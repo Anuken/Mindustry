@@ -324,6 +324,7 @@ public class Blocks implements ContentList{
         }};
 
         redIce = new Floor("red-ice"){{
+            //TODO red ice boulder
             dragMultiplier = 0.4f;
             speedMultiplier = 0.9f;
             attributes.set(Attribute.water, 0.4f);
@@ -333,6 +334,7 @@ public class Blocks implements ContentList{
         bluemat = new Floor("bluemat");
 
         grass = new Floor("grass"){{
+            //TODO grass needs a bush? classic had grass bushes.
             attributes.set(Attribute.water, 0.1f);
         }};
 
@@ -361,6 +363,18 @@ public class Blocks implements ContentList{
         shale = new Floor("shale"){{
             variants = 3;
             attributes.set(Attribute.oil, 1.2f);
+        }};
+
+        moss = new Floor("moss"){{
+            variants = 3;
+            attributes.set(Attribute.spores, 0.15f);
+            wall = sporePine;
+        }};
+
+        sporeMoss = new Floor("spore-moss"){{
+            variants = 3;
+            attributes.set(Attribute.spores, 0.3f);
+            wall = sporeWall;
         }};
 
         stoneWall = new StaticWall("stone-wall");
@@ -435,10 +449,11 @@ public class Blocks implements ContentList{
 
         redweed = new Seaweed("redweed"){{
             variants = 3;
+            redmat.asFloor().decoration = this;
         }};
 
         purbush = new SeaBush("pur-bush"){{
-
+            bluemat.asFloor().decoration = this;
         }};
 
         yellowCoral = new SeaBush("yellowcoral"){{
@@ -458,7 +473,7 @@ public class Blocks implements ContentList{
 
         boulder = new Prop("boulder"){{
             variants = 2;
-            stone.asFloor().decoration = this;
+            stone.asFloor().decoration = craters.asFloor().decoration = charr.asFloor().decoration = this;
         }};
 
         snowBoulder = new Prop("snow-boulder"){{
@@ -468,18 +483,22 @@ public class Blocks implements ContentList{
 
         shaleBoulder = new Prop("shale-boulder"){{
             variants = 2;
+            shale.asFloor().decoration = this;
         }};
 
         sandBoulder = new Prop("sand-boulder"){{
             variants = 2;
+            sand.asFloor().decoration = this;
         }};
 
         daciteBoulder = new Prop("dacite-boulder"){{
             variants = 2;
+            dacite.asFloor().decoration = this;
         }};
 
         basaltBoulder = new Prop("basalt-boulder"){{
             variants = 2;
+            basalt.asFloor().decoration = hotrock.asFloor().decoration = darksand.asFloor().decoration = magmarock.asFloor().decoration = this;
         }};
 
         carbonBoulder = new Prop("carbon-boulder"){{
@@ -489,24 +508,12 @@ public class Blocks implements ContentList{
 
         ferricBoulder = new Prop("ferric-boulder"){{
             variants = 2;
-            ferricStone.asFloor().decoration = this;
+            ferricStone.asFloor().decoration = ferricCraters.asFloor().decoration = this;
         }};
 
         beryllicBoulder = new Prop("beryllic-boulder"){{
             variants = 2;
             beryllicStone.asFloor().decoration = this;
-        }};
-
-        moss = new Floor("moss"){{
-            variants = 3;
-            attributes.set(Attribute.spores, 0.15f);
-            wall = sporePine;
-        }};
-
-        sporeMoss = new Floor("spore-moss"){{
-            variants = 3;
-            attributes.set(Attribute.spores, 0.3f);
-            wall = sporeWall;
         }};
 
         metalFloor = new Floor("metal-floor", 0);

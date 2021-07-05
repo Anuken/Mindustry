@@ -116,10 +116,6 @@ public class Floor extends Block{
         //keep default value if not found...
         if(wall == null) wall = Blocks.air;
 
-        if(decoration == Blocks.air){
-            decoration = content.blocks().min(b -> b instanceof Prop && b.minfo.mod == null && b.breakable ? mapColor.diff(b.mapColor) : Float.POSITIVE_INFINITY);
-        }
-
         if(isLiquid && walkEffect == Fx.none){
             walkEffect = Fx.ripple;
         }

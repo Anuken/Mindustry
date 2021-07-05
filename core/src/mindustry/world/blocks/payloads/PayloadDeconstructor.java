@@ -21,6 +21,7 @@ public class PayloadDeconstructor extends PayloadBlock{
         acceptsPayload = true;
         update = true;
         rotate = false;
+        solid = true;
         size = 5;
         payloadSpeed = 1f;
         //make sure to display large units.
