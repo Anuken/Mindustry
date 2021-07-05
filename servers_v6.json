@@ -28,10 +28,6 @@
     "address": ["be6.run", "mindustrycn.top"]
   },
   {
-    "name": "io",
-    "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000", "mindustry.io.community:4000"]
-  },
-  {
     "name": "ECAN",
     "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
   },
