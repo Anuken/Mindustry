@@ -41,5 +41,9 @@
   {
     "name": "Obvilion Network",
     "address": "obvilionnetwork.ru:7004"
+  },
+  {
+    "name": "io",
+    "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000"]
   }
 ]
