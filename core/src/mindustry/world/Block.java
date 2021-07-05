@@ -223,8 +223,6 @@ public class Block extends UnlockableContent{
     public BuildVisibility buildVisibility = BuildVisibility.hidden;
     /** Multiplier for speed of building this block. */
     public float buildCostMultiplier = 1f;
-    /** Build completion at which deconstruction finishes. */
-    public float deconstructThreshold = 0f;
     /** If true, this block deconstructs immediately. Instant deconstruction implies no resource refund. */
     public boolean instantDeconstruct = false;
     /** Effect for breaking the block. Passes size as rotation. */

@@ -13,7 +13,6 @@ public class Prop extends Block{
         alwaysReplace = true;
         instantDeconstruct = true;
         
-        deconstructThreshold = 0.35f;
         breakEffect = Fx.breakProp;
     }
 

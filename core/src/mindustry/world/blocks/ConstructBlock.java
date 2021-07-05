@@ -309,7 +309,7 @@ public class ConstructBlock extends Block{
 
             progress = Mathf.clamp(progress - amount);
 
-            if(progress <= current.deconstructThreshold || state.rules.infiniteResources){
+            if(state.rules.infiniteResources){
                 if(lastBuilder == null) lastBuilder = builder;
                 Call.deconstructFinish(tile, this.current, lastBuilder);
             }
