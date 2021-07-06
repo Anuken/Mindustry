@@ -2155,6 +2155,7 @@ public class UnitTypes implements ContentList{
                 bullet = new EmpBulletType(){{
                     float rad = 100f;
 
+                    scaleVelocity = true;
                     lightOpacity = 0.7f;
                     unitDamageScl = 0.8f;
                     healPercent = 20f;
