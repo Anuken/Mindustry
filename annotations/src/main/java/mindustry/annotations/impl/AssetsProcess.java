@@ -87,14 +87,14 @@ public class AssetsProcess extends BaseProcessor{
             filename = filename.substring(0, filename.indexOf("."));
 
             String sfilen = filename;
-            String dtype = p.name().endsWith(".9.png") ? "arc.scene.style.NinePatchDrawable" : "arc.scene.style.TextureRegionDrawable";
+            String dtype = "arc.scene.style.Drawable";
 
             String varname = capitalize(sfilen);
 
             if(SourceVersion.isKeyword(varname)) varname += "s";
 
             type.addField(ClassName.bestGuess(dtype), varname, Modifier.STATIC, Modifier.PUBLIC);
-            load.addStatement(varname + " = (" + dtype + ")arc.Core.atlas.drawable($S)", sfilen);
+            load.addStatement(varname + " = arc.Core.atlas.drawable($S)", sfilen);
         });
 
         for(Element elem : elements){
