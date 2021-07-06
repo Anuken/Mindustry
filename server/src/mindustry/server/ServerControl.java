@@ -966,33 +966,37 @@ public class ServerControl implements ApplicationListener{
     }
 
     private void handleCommandString(String line){
-        CommandResponse response = handler.handleMessage(line);
+        try{
+            CommandResponse response = handler.handleMessage(line);
 
-        if(response.type == ResponseType.unknownCommand){
+            if(response.type == ResponseType.unknownCommand){
 
-            int minDst = 0;
-            Command closest = null;
+                int minDst = 0;
+                Command closest = null;
 
-            for(Command command : handler.getCommandList()){
-                int dst = Strings.levenshtein(command.text, response.runCommand);
-                if(dst < 3 && (closest == null || dst < minDst)){
-                    minDst = dst;
-                    closest = command;
+                for(Command command : handler.getCommandList()){
+                    int dst = Strings.levenshtein(command.text, response.runCommand);
+                    if(dst < 3 && (closest == null || dst < minDst)){
+                        minDst = dst;
+                        closest = command;
+                    }
                 }
-            }
 
-            if(closest != null && !closest.text.equals("yes")){
-                err("Command not found. Did you mean \"" + closest.text + "\"?");
-                suggested = line.replace(response.runCommand, closest.text);
-            }else{
-                err("Invalid command. Type 'help' for help.");
+                if(closest != null && !closest.text.equals("yes")){
+                    err("Command not found. Did you mean \"" + closest.text + "\"?");
+                    suggested = line.replace(response.runCommand, closest.text);
+                }else{
+                    err("Invalid command. Type 'help' for help.");
+                }
+            }else if(response.type == ResponseType.fewArguments){
+                err("Too few command arguments. Usage: " + response.command.text + " " + response.command.paramText);
+            }else if(response.type == ResponseType.manyArguments){
+                err("Too many command arguments. Usage: " + response.command.text + " " + response.command.paramText);
+            }else if(response.type == ResponseType.valid){
+                suggested = null;
             }
-        }else if(response.type == ResponseType.fewArguments){
-            err("Too few command arguments. Usage: " + response.command.text + " " + response.command.paramText);
-        }else if(response.type == ResponseType.manyArguments){
-            err("Too many command arguments. Usage: " + response.command.text + " " + response.command.paramText);
-        }else if(response.type == ResponseType.valid){
-            suggested = null;
+        }catch(RuntimeException e){
+            err("An exception occurred while running the command", e);
         }
     }
 
