@@ -17,7 +17,9 @@ public class Attribute{
     /** Oil content. Used for  oil extractor yield. */
     oil = add("oil"),
     /** Light coverage. Negative values decrease solar panel efficiency. */
-    light = add("light");
+    light = add("light"),
+    /** Silicate content. Used for sand extraction. */
+    silicate = add("silicate");
 
     public final int id;
     public final String name;

@@ -81,7 +81,7 @@ public class Blocks implements ContentList{
 
     //production
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
-    beamDrill,
+    cliffCrusher, beamDrill,
 
     //storage
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
@@ -377,7 +377,9 @@ public class Blocks implements ContentList{
             wall = sporeWall;
         }};
 
-        stoneWall = new StaticWall("stone-wall");
+        stoneWall = new StaticWall("stone-wall"){{
+            attributes.set(Attribute.silicate, 1f);
+        }};
 
         sporeWall = new StaticWall("spore-wall");
 
@@ -413,10 +415,12 @@ public class Blocks implements ContentList{
 
         ferricStoneWall = new StaticWall("ferric-stone-wall"){{
             ferricStone.asFloor().wall = this;
+            attributes.set(Attribute.silicate, 0.5f);
         }};
 
         beryllicStoneWall = new StaticWall("beryllic-stone-wall"){{
             beryllicStone.asFloor().wall = this;
+            attributes.set(Attribute.silicate, 1.2f);
         }};
 
         redIceWall = new StaticWall("red-ice-wall"){{
@@ -1509,8 +1513,17 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.water, 0.15f);
         }};
 
+        cliffCrusher = new WallCrafter("cliff-crusher"){{
+            requirements(Category.production, with(Items.copper, 10));
+            consumes.power(0.2f);
+
+            size = 2;
+            attribute = Attribute.silicate;
+            output = Items.sand;
+        }};
+
         beamDrill = new BeamDrill("beam-drill"){{
-            requirements(Category.production, with(Items.copper, 150));
+            requirements(Category.production, with(Items.copper, 10));
             consumes.power(0.2f);
             tier = 4;
             size = 2;

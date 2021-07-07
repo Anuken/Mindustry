@@ -62,7 +62,7 @@ public class Pump extends LiquidBlock{
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile, Team team){
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
         if(isMultiblock()){
             Liquid last = null;
             for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
