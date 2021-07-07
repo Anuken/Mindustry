@@ -15,7 +15,6 @@ import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
@@ -54,8 +53,6 @@ public class Floor extends Block{
     public Block blendGroup = this;
     /** Effect displayed when randomly updated. */
     public Effect updateEffect = Fx.none;
-    /** Array of affinities to certain things. */
-    public Attributes attributes = new Attributes();
     /** Whether this ore generates in maps by default. */
     public boolean oreDefault = false;
     /** Ore generation params. */

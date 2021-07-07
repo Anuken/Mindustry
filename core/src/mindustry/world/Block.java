@@ -25,6 +25,7 @@ import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
@@ -112,6 +113,8 @@ public class Block extends UnlockableContent{
     public boolean useColor = true;
     /** item that drops from this block, used for drills */
     public @Nullable Item itemDrop = null;
+    /** Array of affinities to certain things. */
+    public Attributes attributes = new Attributes();
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
