@@ -39,6 +39,8 @@ public class Styles{
     public static TreeStyle defaultTree;
 
     public static void load(){
+        var whiteui = (TextureRegionDrawable)Tex.whiteui;
+
         black = whiteui.tint(0f, 0f, 0f, 1f);
         black9 = whiteui.tint(0f, 0f, 0f, 0.9f);
         black8 = whiteui.tint(0f, 0f, 0f, 0.8f);

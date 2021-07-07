@@ -423,7 +423,7 @@ public class ModsDialog extends BaseDialog{
 
                             //textures are only requested when the rendering happens; this assists with culling
                             if(!textureCache.containsKey(repo)){
-                                textureCache.put(repo, last = Tex.nomap.getRegion());
+                                textureCache.put(repo, last = Core.atlas.find("nomap"));
                                 Core.net.httpGet("https://raw.githubusercontent.com/Anuken/MindustryMods/master/icons/" + repo.replace("/", "_"), res -> {
                                     if(res.getStatus() == HttpStatus.OK){
                                         Pixmap pix = new Pixmap(res.getResult());

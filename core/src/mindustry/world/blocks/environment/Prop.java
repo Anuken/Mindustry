@@ -12,8 +12,6 @@ public class Prop extends Block{
         breakable = true;
         alwaysReplace = true;
         instantDeconstruct = true;
-        
-        deconstructThreshold = 0.35f;
         breakEffect = Fx.breakProp;
     }
 

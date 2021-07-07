@@ -163,9 +163,9 @@ public class ServerControl implements ApplicationListener{
         Events.on(GameOverEvent.class, event -> {
             if(inExtraRound) return;
             if(state.rules.waves){
-                info("Game over! Reached wave @ with @ players online on map @.", state.wave, Groups.player.size(), Strings.capitalize(state.map.name()));
+                info("Game over! Reached wave @ with @ players online on map @.", state.wave, Groups.player.size(), Strings.capitalize(Strings.stripColors(state.map.name())));
             }else{
-                info("Game over! Team @ is victorious with @ players online on map @.", event.winner.name, Groups.player.size(), Strings.capitalize(state.map.name()));
+                info("Game over! Team @ is victorious with @ players online on map @.", event.winner.name, Groups.player.size(), Strings.capitalize(Strings.stripColors(state.map.name())));
             }
 
             //set next map to be played
@@ -174,14 +174,14 @@ public class ServerControl implements ApplicationListener{
             if(map != null){
                 Call.infoMessage((state.rules.pvp
                 ? "[accent]The " + event.winner.name + " team is victorious![]\n" : "[scarlet]Game over![]\n")
-                + "\nNext selected map:[accent] " + map.name() + "[]"
+                + "\nNext selected map:[accent] " + Strings.stripColors(map.name()) + "[]"
                 + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
                 "\nNew game begins in " + roundExtraTime + " seconds.");
 
                 state.gameOver = true;
                 Call.updateGameOver(event.winner);
 
-                info("Selected next map to be @.", map.name());
+                info("Selected next map to be @.", Strings.stripColors(map.name()));
 
                 play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
             }else{
@@ -259,10 +259,20 @@ public class ServerControl implements ApplicationListener{
     }
 
     protected void registerCommands(){
-        handler.register("help", "Displays this command list.", arg -> {
-            info("Commands:");
-            for(Command command : handler.getCommandList()){
-                info("  &b&lb " + command.text + (command.paramText.isEmpty() ? "" : " &lc&fi") + command.paramText + "&fr - &lw" + command.description);
+        handler.register("help", "[command]", "Display the command list, or get help for a specific command.", arg -> {
+            if(arg.length > 0){
+                Command command = handler.getCommandList().find(c -> c.text.equalsIgnoreCase(arg[0]));
+                if(command == null){
+                    err("Command " + arg[0] + " not found!");
+                }else{
+                    info(command.text + ":");
+                    info("  &b&lb " + command.text + (command.paramText.isEmpty() ? "" : " &lc&fi") + command.paramText + "&fr - &lw" + command.description);
+                }
+            }else{
+                info("Commands:");
+                for(Command command : handler.getCommandList()){
+                    info("  &b&lb " + command.text + (command.paramText.isEmpty() ? "" : " &lc&fi") + command.paramText + "&fr - &lw" + command.description);
+                }
             }
         });
 
@@ -306,7 +316,7 @@ public class ServerControl implements ApplicationListener{
 
             Map result;
             if(arg.length > 0){
-                result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
+                result = maps.all().find(map -> Strings.stripColors(map.name().replace('_', ' ')).equalsIgnoreCase(Strings.stripColors(arg[0]).replace('_', ' ')));
 
                 if(result == null){
                     err("No map with name '@' found.", arg[0]);
@@ -335,14 +345,28 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("maps", "Display all available maps.", arg -> {
+        handler.register("maps", "[all/custom/default]", "Display available maps. Displays only custom maps by default.", arg -> {
+            boolean custom = arg.length == 0 || arg[0].equals("custom") || arg[0].equals("all");
+            boolean def = arg.length > 0 && (arg[0].equals("default") || arg[0].equals("all"));
+
             if(!maps.all().isEmpty()){
-                info("Maps:");
-                for(Map map : maps.all()){
-                    if(map.custom){
-                        info("  @ (@): &fiCustom / @x@", map.name().replace(' ', '_'), map.file.name(), map.width, map.height);
-                    }else{
-                        info("  @: &fiDefault / @x@", map.name().replace(' ', '_'), map.width, map.height);
+                Seq<Map> all = new Seq<>();
+
+                if(custom) all.addAll(maps.customMaps());
+                if(def) all.addAll(maps.defaultMaps());
+
+                if(all.isEmpty()){
+                    info("No custom maps loaded. &fiTo display built-in maps, use the \"@\" argument.", "all");
+                }else{
+                    info("Maps:");
+
+                    for(Map map : all){
+                        String mapName = Strings.stripColors(map.name()).replace(' ', '_');
+                        if(map.custom){
+                            info("  @ (@): &fiCustom / @x@", mapName, map.file.name(), map.width, map.height);
+                        }else{
+                            info("  @: &fiDefault / @x@", mapName, map.width, map.height);
+                        }
                     }
                 }
             }else{
@@ -366,7 +390,7 @@ public class ServerControl implements ApplicationListener{
                 info("Status: &rserver closed");
             }else{
                 info("Status:");
-                info("  Playing on map &fi@ / Wave @", Strings.capitalize(state.map.name()), state.wave);
+                info("  Playing on map &fi@ / Wave @", Strings.capitalize(Strings.stripColors(state.map.name())), state.wave);
 
                 if(state.rules.waves){
                     info("  @ enemies.", state.enemies);
@@ -650,10 +674,10 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("nextmap", "<mapname...>", "Set the next map to be played after a game-over. Overrides shuffling.", arg -> {
-            Map res = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
+            Map res = maps.all().find(map -> Strings.stripColors(map.name().replace('_', ' ')).equalsIgnoreCase(Strings.stripColors(arg[0]).replace('_', ' ')));
             if(res != null){
                 nextMapOverride = res;
-                info("Next map set to '@'.", res.name());
+                info("Next map set to '@'.", Strings.stripColors(res.name()));
             }else{
                 err("No map '@' found.", arg[0]);
             }
