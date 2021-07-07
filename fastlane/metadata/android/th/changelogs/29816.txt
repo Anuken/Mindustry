@@ -1,8 +1,8 @@
-[This is a truncated changelog, see Github for full notes]
-- Fixed enemy power nodes getting linked w/ allied ones, leading to buggy power behavior
-- Fixed chat not working when paused
-- Fixed 128+ cores on map breaking servers
-- Fixed editor breaking building links on resize
-- Made turrets/units take enemy hitbox size into account when targeting
-- Made builder/repair AI flee from enemies when idle
-- Mods: Many various bugfixes for json effects
+[นี่คือบันทึกการเปลี่ยนแปลงที่ถูกตัดทอน โปรดดู Github สำหรับบันทึกฉบับเต็ม]
+- แก้ไขตัวจ่ายพลังงานของศัตรูสามารถเชื่อมต่อกับของพวกพ้องได้ ทำให้เกิดพฤติกรรมของพลังงานที่แปลก
+- แก้ไขแชททำงานไม่ได้เมื่อหยุดชั่วคราว
+- แก้ไขมีแกนกลาง 128+ แกนบนแมพทำให้เซิร์ฟเวอร์พัง
+- แก้ไขตัวแก้ไขทำลายการเชื่อมต่อของสิ่งก่อสร้างเมื่อปรับขนาด
+- ทำให้ป้อมปืน/ยูนิตใช้ขนาด hitbox ของศัตรูในการคำนวณเมื่อเล็งเป้าหมาย
+- ทำให้ AI สร้าง/ซ่อมแซมหนีศัตรูเมื่ออยู่เฉยๆ
+- ม็อด: แก้ไขบั๊กมากมายสำหรับเอฟเฟกต์แบบ json
