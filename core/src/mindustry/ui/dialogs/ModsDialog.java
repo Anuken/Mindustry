@@ -1,7 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.Net.*;
+import arc.util.Http.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
@@ -104,6 +104,8 @@ public class ModsDialog extends BaseDialog{
 
         if(Strings.getCauses(error).contains(t -> t.getMessage() != null && (t.getMessage().contains("trust anchor") || t.getMessage().contains("SSL") || t.getMessage().contains("protocol")))){
             ui.showErrorMessage("@feature.unsupported");
+        }else if(error instanceof HttpStatusException st){
+            ui.showErrorMessage(Core.bundle.format("connectfail", Strings.capitalize(st.status.toString().toLowerCase())));
         }else{
             ui.showException(error);
         }
@@ -111,33 +113,27 @@ public class ModsDialog extends BaseDialog{
 
     void getModList(Cons<Seq<ModListing>> listener){
         if(modList == null){
-            Core.net.httpGet("https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", response -> {
+            Http.get("https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", response -> {
                 String strResult = response.getResultAsString();
-                var status = response.getStatus();
 
                 Core.app.post(() -> {
-                    if(status != HttpStatus.OK){
-                        ui.showErrorMessage(Core.bundle.format("connectfail", status));
-                    }else{
-                        try{
-                            modList = JsonIO.json.fromJson(Seq.class, ModListing.class, strResult);
+                    try{
+                        modList = JsonIO.json.fromJson(Seq.class, ModListing.class, strResult);
 
-                            var d = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                            Func<String, Date> parser = text -> {
-                                try{
-                                    return d.parse(text);
-                                }catch(Exception e){
-                                    return new Date();
-                                }
-                            };
+                        var d = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                        Func<String, Date> parser = text -> {
+                            try{
+                                return d.parse(text);
+                            }catch(Exception e){
+                                return new Date();
+                            }
+                        };
 
-                            modList.sortComparing(m -> parser.get(m.lastUpdated)).reverse();
-                            listener.get(modList);
-                        }catch(Exception e){
-                            e.printStackTrace();
-                            ui.showException(e);
-                        }
-
+                        modList.sortComparing(m -> parser.get(m.lastUpdated)).reverse();
+                        listener.get(modList);
+                    }catch(Exception e){
+                        e.printStackTrace();
+                        ui.showException(e);
                     }
                 });
             }, error -> Core.app.post(() -> modError(error)));
@@ -423,21 +419,19 @@ public class ModsDialog extends BaseDialog{
 
                             //textures are only requested when the rendering happens; this assists with culling
                             if(!textureCache.containsKey(repo)){
-                                textureCache.put(repo, last = Tex.nomap.getRegion());
-                                Core.net.httpGet("https://raw.githubusercontent.com/Anuken/MindustryMods/master/icons/" + repo.replace("/", "_"), res -> {
-                                    if(res.getStatus() == HttpStatus.OK){
-                                        Pixmap pix = new Pixmap(res.getResult());
-                                        Core.app.post(() -> {
-                                            try{
-                                                var tex = new Texture(pix);
-                                                tex.setFilter(TextureFilter.linear);
-                                                textureCache.put(repo, new TextureRegion(tex));
-                                                pix.dispose();
-                                            }catch(Exception e){
-                                                Log.err(e);
-                                            }
-                                        });
-                                    }
+                                textureCache.put(repo, last = Core.atlas.find("nomap"));
+                                Http.get("https://raw.githubusercontent.com/Anuken/MindustryMods/master/icons/" + repo.replace("/", "_"), res -> {
+                                    Pixmap pix = new Pixmap(res.getResult());
+                                    Core.app.post(() -> {
+                                        try{
+                                            var tex = new Texture(pix);
+                                            tex.setFilter(TextureFilter.linear);
+                                            textureCache.put(repo, new TextureRegion(tex));
+                                            pix.dispose();
+                                        }catch(Exception e){
+                                            Log.err(e);
+                                        }
+                                    });
                                 }, err -> {});
                             }
 
@@ -522,19 +516,17 @@ public class ModsDialog extends BaseDialog{
             githubImportJavaMod(repo);
         }else{
             ui.loadfrag.show();
-            Core.net.httpGet(ghApi + "/repos/" + repo, res -> {
-                if(checkError(res)){
-                    var json = Jval.read(res.getResultAsString());
-                    String mainBranch = json.getString("default_branch");
-                    String language = json.getString("language", "<none>");
+            Http.get(ghApi + "/repos/" + repo, res -> {
+                var json = Jval.read(res.getResultAsString());
+                String mainBranch = json.getString("default_branch");
+                String language = json.getString("language", "<none>");
 
-                    //this is a crude heuristic for class mods; only required for direct github import
-                    //TODO make a more reliable way to distinguish java mod repos
-                    if(language.equals("Java") || language.equals("Kotlin")){
-                        githubImportJavaMod(repo);
-                    }else{
-                        githubImportBranch(mainBranch, repo, this::showStatus);
-                    }
+                //this is a crude heuristic for class mods; only required for direct github import
+                //TODO make a more reliable way to distinguish java mod repos
+                if(language.equals("Java") || language.equals("Kotlin")){
+                    githubImportJavaMod(repo);
+                }else{
+                    githubImportBranch(mainBranch, repo);
                 }
             }, this::importFail);
         }
@@ -542,62 +534,33 @@ public class ModsDialog extends BaseDialog{
 
     private void githubImportJavaMod(String repo){
         //grab latest release
-        Core.net.httpGet(ghApi + "/repos/" + repo + "/releases/latest", res -> {
-            if(checkError(res)){
-                var json = Jval.read(res.getResultAsString());
-                var assets = json.get("assets").asArray();
+        Http.get(ghApi + "/repos/" + repo + "/releases/latest", res -> {
+            var json = Jval.read(res.getResultAsString());
+            var assets = json.get("assets").asArray();
 
-                //prioritize dexed jar, as that's what Sonnicon's mod template outputs
-                var dexedAsset = assets.find(j -> j.getString("name").startsWith("dexed") && j.getString("name").endsWith(".jar"));
-                var asset = dexedAsset == null ? assets.find(j -> j.getString("name").endsWith(".jar")) : dexedAsset;
+            //prioritize dexed jar, as that's what Sonnicon's mod template outputs
+            var dexedAsset = assets.find(j -> j.getString("name").startsWith("dexed") && j.getString("name").endsWith(".jar"));
+            var asset = dexedAsset == null ? assets.find(j -> j.getString("name").endsWith(".jar")) : dexedAsset;
 
-                if(asset != null){
-                    //grab actual file
-                    var url = asset.getString("browser_download_url");
-                    Core.net.httpGet(url, result -> {
-                        if(checkError(result)){
-                            handleMod(repo, result);
-                        }
-                    }, this::importFail);
-                }else{
-                    throw new ArcRuntimeException("No JAR file found in releases. Make sure you have a valid jar file in the mod's latest Github Release.");
-                }
+            if(asset != null){
+                //grab actual file
+                var url = asset.getString("browser_download_url");
+
+                Http.get(url, result -> handleMod(repo, result), this::importFail);
+            }else{
+                throw new ArcRuntimeException("No JAR file found in releases. Make sure you have a valid jar file in the mod's latest Github Release.");
             }
         }, this::importFail);
     }
 
-    private boolean checkError(HttpResponse res){
-        if(res.getStatus() == HttpStatus.OK){
-            return true;
-        }else{
-            showStatus(res.getStatus());
-            return false;
-        }
-    }
-
-    private void showStatus(HttpStatus status){
-        Core.app.post(() -> {
-            ui.showErrorMessage(Core.bundle.format("connectfail", Strings.capitalize(status.toString().toLowerCase())));
-            ui.loadfrag.hide();
-        });
-    }
-
-    private void githubImportBranch(String branch, String repo, Cons<HttpStatus> err){
-        Core.net.httpGet(ghApi + "/repos/" + repo + "/zipball/" + branch, loc -> {
-            if(loc.getStatus() == HttpStatus.OK){
-                if(loc.getHeader("Location") != null){
-                    Core.net.httpGet(loc.getHeader("Location"), result -> {
-                        if(result.getStatus() != HttpStatus.OK){
-                            err.get(result.getStatus());
-                        }else{
-                            handleMod(repo, result);
-                        }
-                    }, this::importFail);
-                }else{
-                    handleMod(repo, loc);
-                }
+    private void githubImportBranch(String branch, String repo){
+        Http.get(ghApi + "/repos/" + repo + "/zipball/" + branch, loc -> {
+            if(loc.getHeader("Location") != null){
+                Http.get(loc.getHeader("Location"), result -> {
+                    handleMod(repo, result);
+                }, this::importFail);
             }else{
-                err.get(loc.getStatus());
+                handleMod(repo, loc);
             }
          }, this::importFail);
     }

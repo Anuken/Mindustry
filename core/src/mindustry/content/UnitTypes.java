@@ -120,7 +120,7 @@ public class UnitTypes implements ContentList{
             hitSize = 13f;
             rotateSpeed = 3f;
             targetAir = false;
-            health = 820;
+            health = 900;
             armor = 9f;
             mechFrontSway = 0.55f;
 
@@ -133,15 +133,15 @@ public class UnitTypes implements ContentList{
                 shake = 2f;
                 ejectEffect = Fx.casing2;
                 shootSound = Sounds.artillery;
-                bullet = new ArtilleryBulletType(2f, 8, "shell"){{
+                bullet = new ArtilleryBulletType(2f, 20, "shell"){{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
                     lifetime = 120f;
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
-                    splashDamageRadius = 30f;
-                    splashDamage = 60f;
+                    splashDamageRadius = 35f;
+                    splashDamage = 80f;
                     backColor = Pal.bulletYellowBack;
                     frontColor = Pal.bulletYellow;
                 }};
@@ -2155,6 +2155,7 @@ public class UnitTypes implements ContentList{
                 bullet = new EmpBulletType(){{
                     float rad = 100f;
 
+                    scaleVelocity = true;
                     lightOpacity = 0.7f;
                     unitDamageScl = 0.8f;
                     healPercent = 20f;

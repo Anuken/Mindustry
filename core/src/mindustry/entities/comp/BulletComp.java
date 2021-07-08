@@ -44,6 +44,13 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         }
     }
 
+    //bullets always considered local
+    @Override
+    @Replace
+    public boolean isLocal(){
+        return true;
+    }
+
     @Override
     public void add(){
         type.init(self());

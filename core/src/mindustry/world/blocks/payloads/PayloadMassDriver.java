@@ -34,7 +34,7 @@ public class PayloadMassDriver extends PayloadBlock{
     public Sound shootSound = Sounds.shootBig;
     public float shake = 3f;
 
-    public Effect transferEffect = new Effect(11f, 300f, e -> {
+    public Effect transferEffect = new Effect(11f, 600f, e -> {
         if(!(e.data instanceof PayloadMassDriverData data)) return;
         Tmp.v1.set(data.x, data.y).lerp(data.ox, data.oy, Interp.sineIn.apply(e.fin()));
         data.payload.set(Tmp.v1.x, Tmp.v1.y, e.rotation);

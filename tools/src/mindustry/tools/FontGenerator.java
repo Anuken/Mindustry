@@ -1,12 +1,8 @@
 package mindustry.tools;
 
-import arc.*;
-import arc.Net.*;
 import arc.files.*;
 import arc.util.*;
 import arc.util.io.*;
-
-import java.io.*;
 
 /* icon font pipeline:
  1. take set of pre-defined icons and SVGs
@@ -18,7 +14,6 @@ public class FontGenerator{
 
     //E000 to F8FF
     public static void main(String[] args){
-        Net net = Core.net = new Net();
         Fi folder = Fi.get("core/assets-raw/fontgen/out/");
         folder.mkdirs();
 
@@ -29,13 +24,10 @@ public class FontGenerator{
         Log.info("Zip...");
 
         String session = folder.child("session").readString();
-        net.http(new HttpRequest().method(HttpMethod.GET).url("https://fontello.com/" + session + "/get").block(true), result -> {
-            try{
-                Streams.copy(result.getResultAsStream(), folder.child("font.zip").write());
-            }catch(IOException e){
-                throw new RuntimeException(e);
-            }
-        }, Log::err);
+
+        Http.get("https://fontello.com/" + session + "/get").block(result -> {
+            Streams.copy(result.getResultAsStream(), folder.child("font.zip").write());
+        });
 
         Log.info("Icon font...");
 
@@ -49,9 +41,9 @@ public class FontGenerator{
         //TODO this is broken
 
         Log.info(OS.exec("fontforge", "-script",
-            Fi.get("core/assets-raw/fontgen/merge.pe").absolutePath(),
-            Fi.get("core/assets/fonts/font.woff").absolutePath(),
-            Fi.get("core/assets-raw/fontgen/out/font.woff").absolutePath())
+        Fi.get("core/assets-raw/fontgen/merge.pe").absolutePath(),
+        Fi.get("core/assets/fonts/font.woff").absolutePath(),
+        Fi.get("core/assets-raw/fontgen/out/font.woff").absolutePath())
         );
 
         Log.info("Done.");

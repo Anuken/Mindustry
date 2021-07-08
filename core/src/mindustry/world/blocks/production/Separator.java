@@ -128,19 +128,17 @@ public class Separator extends Block{
             return !consumes.itemFilters.get(item.id);
         }
 
-        //TODO write seed in 128 release, don't write it now for compatibility with 127.x
-        //@Override
-        //public byte version(){
-        //    return 1;
-        //}
+        @Override
+        public byte version(){
+            return 1;
+        }
 
         @Override
         public void write(Writes write){
             super.write(write);
             write.f(progress);
             write.f(warmup);
-            //TODO see above
-            //write.i(seed);
+            write.i(seed);
         }
 
         @Override
@@ -148,8 +146,7 @@ public class Separator extends Block{
             super.read(read, revision);
             progress = read.f();
             warmup = read.f();
-            //TODO see above
-            //if(revision == 1) seed = read.i();
+            if(revision == 1) seed = read.i();
         }
     }
 }

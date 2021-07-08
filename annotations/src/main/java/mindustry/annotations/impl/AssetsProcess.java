@@ -87,18 +87,18 @@ public class AssetsProcess extends BaseProcessor{
             filename = filename.substring(0, filename.indexOf("."));
 
             String sfilen = filename;
-            String dtype = p.name().endsWith(".9.png") ? "arc.scene.style.NinePatchDrawable" : "arc.scene.style.TextureRegionDrawable";
+            String dtype = "arc.scene.style.Drawable";
 
             String varname = capitalize(sfilen);
 
             if(SourceVersion.isKeyword(varname)) varname += "s";
 
             type.addField(ClassName.bestGuess(dtype), varname, Modifier.STATIC, Modifier.PUBLIC);
-            load.addStatement(varname + " = (" + dtype + ")arc.Core.atlas.drawable($S)", sfilen);
+            load.addStatement(varname + " = arc.Core.atlas.drawable($S)", sfilen);
         });
 
         for(Element elem : elements){
-            Seq.with(((TypeElement)elem).getEnclosedElements()).each(e -> e.getKind() == ElementKind.FIELD, field -> {
+            Seq.with(elem.getEnclosedElements()).each(e -> e.getKind() == ElementKind.FIELD, field -> {
                 String fname = field.getSimpleName().toString();
                 if(fname.startsWith("default")){
                     loadStyles.addStatement("arc.Core.scene.addStyle(" + field.asType().toString() + ".class, mindustry.ui.Styles." + fname + ")");
@@ -124,7 +124,7 @@ public class AssetsProcess extends BaseProcessor{
             String name = p.nameWithoutExtension();
 
             if(names.contains(name)){
-                BaseProcessor.err("Duplicate file name: " + p.toString() + "!");
+                BaseProcessor.err("Duplicate file name: " + p + "!");
             }else{
                 names.add(name);
             }

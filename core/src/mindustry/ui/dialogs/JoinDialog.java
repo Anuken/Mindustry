@@ -1,7 +1,6 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.Net.*;
 import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
@@ -533,38 +532,27 @@ public class JoinDialog extends BaseDialog{
         Log.info("Fetching community servers at @", url);
 
         //get servers
-        Core.net.httpGet(url, result -> {
-            try{
-                if(result.getStatus() != HttpStatus.OK){
-                    Log.warn("Failed to fetch community servers: @", result.getStatus());
-                    return;
+        Http.get(url)
+        .error(t -> Log.err("Failed to fetch community servers", t))
+        .submit(result -> {
+            Jval val = Jval.read(result.getResultAsString());
+            Seq<ServerGroup> servers = new Seq<>();
+            val.asArray().each(child -> {
+                String name = child.getString("name", "");
+                String[] addresses;
+                if(child.has("addresses") || (child.has("address") && child.get("address").isArray())){
+                    addresses = (child.has("addresses") ? child.get("addresses") : child.get("address")).asArray().map(Jval::asString).toArray(String.class);
+                }else{
+                    addresses = new String[]{child.getString("address", "<invalid>")};
                 }
-
-                Jval val = Jval.read(result.getResultAsString());
-                Core.app.post(() -> {
-                    try{
-                        defaultServers.clear();
-                        val.asArray().each(child -> {
-                            String name = child.getString("name", "");
-                            String[] addresses;
-                            if(child.has("addresses") || (child.has("address") && child.get("address").isArray())){
-                                addresses = (child.has("addresses") ? child.get("addresses") : child.get("address")).asArray().map(Jval::asString).toArray(String.class);
-                            }else{
-                                addresses = new String[]{child.getString("address", "<invalid>")};
-                            }
-                            defaultServers.add(new ServerGroup(name, addresses));
-                        });
-                        Log.info("Fetched @ community servers.", defaultServers.size);
-                    }catch(Throwable e){
-                        Log.err("Failed to parse community servers.");
-                        Log.err(e);
-                    }
-                });
-            }catch(Throwable e){
-                Log.err("Failed to fetch community servers.");
-                Log.err(e);
-            }
-        }, Log::err);
+                servers.add(new ServerGroup(name, addresses));
+            });
+            //modify default servers on main thread
+            Core.app.post(() -> {
+                defaultServers.addAll(servers);
+                Log.info("Fetched @ community servers.", defaultServers.size);
+            });
+        });
     }
 
     private void saveServers(){

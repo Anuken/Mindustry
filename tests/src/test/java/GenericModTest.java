@@ -1,5 +1,4 @@
-import arc.*;
-import arc.Net.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import org.junit.jupiter.api.*;
@@ -14,13 +13,13 @@ public class GenericModTest{
     static void grabMod(String url){
         //clear older mods
         ApplicationTests.testDataFolder.deleteDirectory();
-        new Net().http(new HttpRequest().block(true).url(url).method(HttpMethod.GET), httpResponse -> {
+        Http.get(url).error(Assertions::fail).block(httpResponse -> {
             try{
                 ApplicationTests.testDataFolder.child("mods").child("test_mod." + (url.endsWith("jar") ? "jar" : "zip")).writeBytes(Streams.copyBytes(httpResponse.getResultAsStream()));
             }catch(IOException e){
                 Assertions.fail(e);
             }
-        }, Assertions::fail);
+        });
 
         ApplicationTests.launchApplication(false);
     }
