@@ -1,8 +1,8 @@
-[This is a truncated changelog, see Github for full notes]
-- Fixed logic blocks resetting state on map load or connection changes
-- Fixed "#" in any logic string breaking instructions
-- Fixed crawlers not exploding next to cores
-- Fixed certain status effect combinations not triggering damage
-- Fixed waves being infinitely skippable when game is paused
-- Fixed constructed blocks sometimes having low health on servers'
-- Fixed enemy core items not syncing
+[นี่คือบันทึกการเปลี่ยนแปลงที่ถูกตัดทอน โปรดดู Github สำหรับบันทึกฉบับเต็ม]
+- แก้ไขบล็อกลอจิกรึเซ็ตสถานะเมื่อโหลดแมพหรือเปลี่ยนการเชื่อมต่อ
+- แก้ไข "#" ในสตริงลอจิกอะไรก็ได้ทำให้คำสั่งพัง
+- แก้ไขยูนิตครอว์เลอร์ไม่ระเบิดเมื่ออยู่ติดกับแกนกลาง
+- แก้ไขคอมโบเอฟเฟกต์สถานะบางอย่างไม่ทำดาเมจ
+- แก้ไขคลื่นสามารถข้ามได้อย่างไม่สิ้นสุดเมื่อหยุดเกมชั่วคราว
+- แก้ไขบล็อกที่สร้างแล้วบางทีก็มีพลังชีวิตน้อยในเซิร์ฟเวอร์
+- แก้ไขไอเท็มในแกนกลางของศัตรูไม่ซิงค์กัน

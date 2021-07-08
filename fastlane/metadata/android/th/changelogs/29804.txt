@@ -1,6 +1,6 @@
-[This is a truncated changelog, see Github for full notes]
-- Fixed negative numbers not displaying properly in power nodes
-- Fixed mod minVersion parsing
-- Fixed mods disappearing after import [Android]
-- Disabled duplicate IP prevention system
-- Added mod browser sort order button
+[นี่คือบันทึกการเปลี่ยนแปลงที่ถูกตัดทอน โปรดดู Github สำหรับบันทึกฉบับเต็ม]
+- แก้ไขเลขติดลบแสดงไม่ถูกต้องในตัวจ่ายพลังงาน
+- แก้ไขการแยกวิเคราะห์ minVersion ของม็อด
+- แก้ไขม็อดหายไปเมื่อนำเข้า [แอนดรอยด์]
+- ปิดใช้งานระบบป้องกัน IP ซ้ำ
+- เพิ่มปุ่มแยกตามประเภทในเครื่องค้นหาม็อด
