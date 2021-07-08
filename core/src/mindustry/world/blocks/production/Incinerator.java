@@ -9,6 +9,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 public class Incinerator extends Block{
     public Effect effect = Fx.fuelburn;
@@ -32,6 +33,11 @@ public class Incinerator extends Block{
             }else{
                 heat = Mathf.lerpDelta(heat, 0f, 0.02f);
             }
+        }
+
+        @Override
+        public BlockStatus status(){
+            return heat > 0.5f ? BlockStatus.active : BlockStatus.noInput;
         }
 
         @Override
