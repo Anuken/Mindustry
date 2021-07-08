@@ -12,19 +12,27 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class WallCrafter extends Block{
+    static int idx = 0;
+
     public @Load("@-top") TextureRegion topRegion;
+    public @Load("@-rotator-bottom") TextureRegion rotatorBottomRegion;
+    public @Load("@-rotator") TextureRegion rotatorRegion;
 
     /** Time to produce one item at 100% efficiency. */
-    public float drillTime = 200f;
+    public float drillTime = 150f;
     /** Effect randomly played while drilling. */
-    public Effect updateEffect = Fx.mineSmall;
+    public Effect updateEffect = Fx.mineWallSmall;
+    public float updateEffectChance = 0.02f;
+    public float rotateSpeed = 2f;
     /** Attribute to check for wall output. */
     public Attribute attribute = Attribute.silicate;
 
@@ -44,6 +52,9 @@ public class WallCrafter extends Block{
     @Override
     public void setBars(){
         super.setBars();
+
+        bars.add("drillspeed", (WallCrafterBuild e) ->
+            new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(e.lastEfficiency * 60 / drillTime, 2)), () -> Pal.ammo, () -> e.warmup));
     }
 
     @Override
@@ -77,16 +88,16 @@ public class WallCrafter extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        float eff = getEfficiency(x, y, rotation, null);
+        float eff = getEfficiency(x, y, rotation, null, null);
 
         drawPlaceText(Core.bundle.formatFloat("bar.drillspeed", 60f / drillTime * eff, 2), x, y, valid);
     }
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
-        return getEfficiency(tile.x, tile.y, rotation, null) > 0;
+        return getEfficiency(tile.x, tile.y, rotation, null, null) > 0;
     }
 
-    float getEfficiency(int tx, int ty, int rotation, @Nullable Cons<Tile> ctile){
+    float getEfficiency(int tx, int ty, int rotation, @Nullable Cons<Tile> ctile, @Nullable Intc2 cpos){
         float eff = 0f;
         int cornerX = tx - (size-1)/2, cornerY = ty - (size-1)/2, s = size;
 
@@ -112,6 +123,10 @@ public class WallCrafter extends Block{
                 }
             }
 
+            if(cpos != null){
+                cpos.get(rx, ry);
+            }
+
             Tile other = world.tile(rx, ry);
             if(other != null && other.solid()){
                 float at = other.block().attributes.get(attribute);
@@ -125,8 +140,7 @@ public class WallCrafter extends Block{
     }
 
     public class WallCrafterBuild extends Building{
-        public float time;
-        public float warmup;
+        public float time, warmup, totalTime, lastEfficiency;
 
         @Override
         public void updateTile(){
@@ -139,19 +153,23 @@ public class WallCrafter extends Block{
 
             float eff = getEfficiency(tile.x, tile.y, rotation, dest -> {
                 //TODO make not chance based?
-                if(cons && Mathf.chanceDelta(0.05 * warmup)){
+                if(cons && Mathf.chanceDelta(updateEffectChance * warmup)){
                     updateEffect.at(
-                        dest.worldx() + Mathf.range(3f) - dx,
-                        dest.worldy() + Mathf.range(3f) - dy,
-                        output.color
+                        dest.worldx() + Mathf.range(3f) - dx * tilesize,
+                        dest.worldy() + Mathf.range(3f) - dy * tilesize,
+                        Tmp.c1.set(dest.block().mapColor).mul(1f)
                     );
                 }
-            });
+            }, null);
+
+            lastEfficiency = eff * timeScale * efficiency();
 
             if(cons && (time += edelta() * eff) >= drillTime){
                 items.add(output, 1);
                 time %= drillTime;
             }
+
+            totalTime += edelta() * warmup;
 
             if(timer(timerDump, dumpTime)){
                 dump();
@@ -168,6 +186,17 @@ public class WallCrafter extends Block{
             //TODO draw spinner drill thingies
             Draw.rect(block.region, x, y);
             Draw.rect(topRegion, x, y, rotdeg());
+            float ds = 0.6f, dx = Geometry.d4x(rotation) * ds, dy = Geometry.d4y(rotation) * ds;
+
+            int bs = (rotation == 0 || rotation == 3) ? 1 : -1;
+            idx = 0;
+            getEfficiency(tile.x, tile.y, rotation, null, (cx, cy) -> {
+                int sign = idx++ >= size/2 && size % 2 == 0 ? -1 : 1;
+                float vx = (cx - dx) * tilesize, vy = (cy - dy) * tilesize;
+                Draw.z(Layer.blockOver);
+                Draw.rect(rotatorBottomRegion, vx, vy, totalTime * rotateSpeed * sign * bs);
+                Draw.rect(rotatorRegion, vx, vy);
+            });
         }
     }
 }

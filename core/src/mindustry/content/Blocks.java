@@ -395,6 +395,7 @@ public class Blocks implements ContentList{
 
         duneWall = new StaticWall("dune-wall"){{
             basalt.asFloor().wall = darksandWater.asFloor().wall = darksandTaintedWater.asFloor().wall = this;
+            attributes.set(Attribute.silicate, 2f);
         }};
 
         regolithWall = new StaticWall("regolith-wall"){{
@@ -411,6 +412,7 @@ public class Blocks implements ContentList{
 
         carbonWall = new StaticWall("carbon-wall"){{
             carbonStone.asFloor().wall = this;
+            attributes.set(Attribute.silicate, 0.7f);
         }};
 
         ferricStoneWall = new StaticWall("ferric-stone-wall"){{
@@ -429,6 +431,7 @@ public class Blocks implements ContentList{
 
         sandWall = new StaticWall("sand-wall"){{
             sandWater.asFloor().wall = water.asFloor().wall = deepwater.asFloor().wall = this;
+            attributes.set(Attribute.silicate, 2f);
         }};
 
         saltWall = new StaticWall("salt-wall");
@@ -1515,8 +1518,9 @@ public class Blocks implements ContentList{
 
         cliffCrusher = new WallCrafter("cliff-crusher"){{
             requirements(Category.production, with(Items.copper, 10));
-            consumes.power(0.2f);
+            consumes.power(0.9f);
 
+            drillTime = 110f;
             size = 2;
             attribute = Attribute.silicate;
             output = Items.sand;

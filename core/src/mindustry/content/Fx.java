@@ -1689,6 +1689,13 @@ public class Fx{
         Lines.spikes(e.x, e.y, e.fin() * 5f, 2, 8);
     }),
 
+    mineWallSmall = new Effect(50, e -> {
+        color(e.color, Color.darkGray, e.fin());
+        randLenVectors(e.id, 2, e.fin() * 6f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() + 0.5f);
+        });
+    }),
+
     mineSmall = new Effect(30, e -> {
         color(e.color, Color.lightGray, e.fin());
         randLenVectors(e.id, 3, e.fin() * 5f, (x, y) -> {
