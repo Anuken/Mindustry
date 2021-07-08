@@ -148,7 +148,7 @@ public class WallCrafter extends Block{
 
             boolean cons = shouldConsume();
 
-            warmup = Mathf.lerpDelta(warmup, Mathf.num(consValid()), 0.1f);
+            warmup = Mathf.approachDelta(warmup, Mathf.num(consValid()), 1f / 40f);
             float dx = Geometry.d4x(rotation) * 0.5f, dy = Geometry.d4y(rotation) * 0.5f;
 
             float eff = getEfficiency(tile.x, tile.y, rotation, dest -> {
@@ -157,7 +157,7 @@ public class WallCrafter extends Block{
                     updateEffect.at(
                         dest.worldx() + Mathf.range(3f) - dx * tilesize,
                         dest.worldy() + Mathf.range(3f) - dy * tilesize,
-                        Tmp.c1.set(dest.block().mapColor).mul(1f)
+                        dest.block().mapColor
                     );
                 }
             }, null);

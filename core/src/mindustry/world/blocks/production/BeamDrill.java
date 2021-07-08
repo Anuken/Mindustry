@@ -162,7 +162,7 @@ public class BeamDrill extends Block{
             if(lasers[0] == null) updateLasers();
             boolean cons = shouldConsume();
 
-            warmup = Mathf.lerpDelta(warmup, Mathf.num(consValid()), 0.1f);
+            warmup = Mathf.approachDelta(warmup, Mathf.num(consValid()), 1f / 60f);
             lastItem = null;
             boolean multiple = false;
 
