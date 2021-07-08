@@ -1,9 +1,0 @@
-This is a small update. Not much new content, mostly bugfixes.
-The next planned update will focus on the campaign, and will likely take much longer.
-
-- Bugfixes
-- Added team color for command center (Contributed by Voz-Duh)
-- Cleaned up certain sprites to match V6 style (Partially contributed by Voz-Duh)
-- Added support for Java-based mods on Android (mostly undocumented for now)
-- Added 2x2 high capacity memory bank for logic processors
-- Balancing
