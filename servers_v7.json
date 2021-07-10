@@ -9,7 +9,7 @@
   {
     "name": "C.A.M.S.",
     "address": ["baseduser.eu.org:6569", "v7.thedimas.pp.ua"]
-  }
+  },
   {
     "name": "hexpvp.ml",
     "address": "hexpvp.ml"
@@ -20,7 +20,7 @@
   },
   {
     "name": "Omega",
-    "address": "157.90.180.53:25777"
+    "address": ["157.90.180.53:25777", "redstonneur1256.ml"]
   },
   {
     "name": "MeowLand",
@@ -45,5 +45,9 @@
   {
     "name": "io",
     "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000"]
+  },
+  {
+    "name": "Korea",
+    "address": ["mindustry.kr"]
   }
 ]

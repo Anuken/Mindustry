@@ -8,10 +8,6 @@
     "address": ["smokeofanarchy.duckdns.org:6853"]
   },
   {
-    "name": "mindustry.pl",
-    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl", "mindustry.pl:6966"]
-  },
-  {
     "name": "{AA}",
     "address": ["aamindustry.play.ai", "aamindustry.play.ai:6571", "aamindustry.play.ai:6572", "aamindustry.play.ai:6573", "aamindustry.play.ai:6574"]
   },
@@ -24,16 +20,12 @@
     "address": ["baseduser.eu.org:6568", "nikochio.ddns.net", "play.thedimas.pp.ua"]
   },
   {
-    "name": "BE6.RUN",
-    "address": ["be6.run", "mindustrycn.top"]
-  },
-  {
     "name": "ECAN",
     "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
   },
   {
     "name": "Chaotic Neutral",
-    "address": ["Chaotic-Neutral.ddns.net:1111", "Chaotic-Neutral.ddns.net:2222", "Chaotic-Neutral.ddns.net:5555", "Chaotic-Neutral.ddns.net:6666", "Chaotic-Neutral.ddns.net:7777"]
+    "address": ["Chaotic-Neutral.ddns.net:1111", "Chaotic-Neutral.ddns.net:2222", "Chaotic-Neutral.ddns.net:7777"]
   },
   {
     "name": "Ranked",
@@ -61,11 +53,7 @@
   },
   {
     "name": "Korea",
-    "address": ["mindustry.kr", "mindustry.initd.kr"]
-  },
-  {
-    "name": "hexpvp.ml",
-    "address": ["hexpvp.ml"]
+    "address": ["mindustry.initd.kr"]
   },
   {
     "name": "Omega",
@@ -73,7 +61,7 @@
   },
   {
     "name": "md.obvilionnetwork.ru",
-    "address": ["obvilionnetwork.ru", "obvilionnetwork.ru:7001", "obvilionnetwork.ru:7002", "obvilionnetwork.ru:7003"]
+    "address": ["obvilionnetwork.ru", "obvilionnetwork.ru:7001", "obvilionnetwork.ru:7002"]
   },
   {
     "name": "Mindustry PLAY",
@@ -82,10 +70,6 @@
   {
     "name": "Nydus",
     "address": ["v6.mindustry.nydus.app:6566"]
-  },
-  {
-    "name": "MD Community",
-    "address": ["mindurka.tk", "mindurka.tk:4000"]
   },
   {
     "name": "Mindustry.Party",
