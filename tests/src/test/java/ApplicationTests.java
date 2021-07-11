@@ -21,6 +21,7 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.*;
+import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
@@ -134,6 +135,7 @@ public class ApplicationTests{
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {
+    "a",
     "asd asd asd asd asdagagasasjakbgeah;jwrej 23424234",
     "这个服务器可以用自己的语言说话",
     "\uD83D\uDEA3"
@@ -161,6 +163,28 @@ public class ApplicationTests{
         pack.handled();
 
         assertEquals(string, pack.message);
+
+        buffer.position(0);
+        Writes writes = new Writes(new ByteBufferOutput(buffer));
+        TypeIO.writeString(writes, string);
+
+        buffer.position(0);
+
+        assertEquals(string, TypeIO.readString(new Reads(new ByteBufferInput(buffer))));
+
+        buffer.position(0);
+        ConnectPacket con = new ConnectPacket();
+        con.name = string;
+        con.uuid = "AAAAAAAA";
+        con.usid = "AAAAAAAA";
+        con.mods = new Seq<>();
+        con.write(new Writes(new ByteBufferOutput(buffer)));
+
+        con.name = "INVALID";
+        buffer.position(0);
+        con.read(new Reads(new ByteBufferInput(buffer)));
+
+        assertEquals(string, con.name);
     }
 
     @Test
