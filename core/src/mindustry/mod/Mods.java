@@ -87,7 +87,7 @@ public class Mods implements Loadable{
     /** Imports an external mod file. Folders are not supported here. */
     public LoadedMod importMod(Fi file) throws IOException{
         //for some reason, android likes to add colons to file names, e.g. primary:ExampleJavaMod.jar, which breaks dexing
-        String baseName = file.nameWithoutExtension().replace(':', '_');
+        String baseName = file.nameWithoutExtension().replace(':', '_').replace(' ', '_');
         String finalName = baseName;
         //find a name to prevent any name conflicts
         int count = 1;
