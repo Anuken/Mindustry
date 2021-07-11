@@ -15,7 +15,8 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 public class GenericCrafter extends Block{
-    public @Nullable ItemStack outputItem; //Keep for backwards compatibility
+    /** @deprecated use outputItems instead, outputItem would likely be removed eventually **/
+    public @Nullable ItemStack outputItem;
     public @Nullable ItemStack[] outputItems;
     public @Nullable LiquidStack outputLiquid;
 
