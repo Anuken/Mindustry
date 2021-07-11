@@ -686,21 +686,22 @@ public class SettingsMenuDialog extends Dialog{
 
                 slider.setValue(settings.getInt(name));
 
-                Label label = new Label(title);
+                Label label = new Label("");
                 slider.changed(() -> {
                     settings.put(name, (int)slider.getValue());
-                    label.setText(title + ": " + sp.get((int)slider.getValue()));
+                    label.setText(sp.get((int)slider.getValue()));
                 });
 
                 slider.change();
 
                 table.table(t -> {
                     t.left().defaults().left();
-                    t.add(label).minWidth(label.getPrefWidth() / Scl.scl(1f) + 50);
+                    t.add(title + ":").padRight(30);
                     if(Core.graphics.isPortrait()){
                         t.row();
                     }
                     t.add(slider).width(180);
+                    t.add(label).padLeft(15);
                 }).left().padTop(3);
 
                 table.row();
