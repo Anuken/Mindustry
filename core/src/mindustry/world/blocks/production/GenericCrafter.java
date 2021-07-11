@@ -15,7 +15,8 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 public class GenericCrafter extends Block{
-    public @Nullable ItemStack outputItem;
+    public @Nullable ItemStack outputItem; //Keep for backwards compatibility
+    public @Nullable ItemStack[] outputItems;
     public @Nullable LiquidStack outputLiquid;
 
     public float craftTime = 80;
@@ -45,7 +46,9 @@ public class GenericCrafter extends Block{
         super.setStats();
         stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
 
-        if(outputItem != null){
+        if(outputItems != null){
+            stats.add(Stat.output, StatValues.items(craftTime, outputItems));
+        }else if(outputItem != null){
             stats.add(Stat.output, StatValues.items(craftTime, outputItem));
         }
 
@@ -119,10 +122,12 @@ public class GenericCrafter extends Block{
             if(progress >= 1f){
                 consume();
 
-                if(outputItem != null){
-                    for(int i = 0; i < outputItem.amount; i++){
-                        offload(outputItem.item);
+                if(outputItems != null){
+                    for(ItemStack output : outputItems){
+                        produceItem(output);
                     }
+                }else if(outputItem != null){
+                    produceItem(outputItem);
                 }
 
                 if(outputLiquid != null){
@@ -133,12 +138,27 @@ public class GenericCrafter extends Block{
                 progress %= 1f;
             }
 
-            if(outputItem != null && timer(timerDump, dumpTime / timeScale)){
-                dump(outputItem.item);
+            if(timer(timerDump, dumpTime / timeScale)){
+                if(outputItems != null){
+                    for(ItemStack output : outputItems){
+                        if(items.has(output.item)){
+                            dump(output.item);
+                            break;
+                        }
+                    }
+                }else if(outputItem != null){
+                    dump(outputItem.item);
+                }
             }
 
             if(outputLiquid != null){
                 dumpLiquid(outputLiquid.liquid);
+            }
+        }
+
+        public void produceItem(ItemStack item){
+            for(int i = 0; i < item.amount; i++){
+                offload(item.item);
             }
         }
 
