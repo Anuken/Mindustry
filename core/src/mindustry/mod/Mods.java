@@ -303,7 +303,7 @@ public class Mods implements Loadable{
     private PageType getPage(Fi file){
         String path = file.path();
         return
-            path.contains("sprites/environment") ? PageType.environment :
+            path.contains("sprites/blocks/environment") ? PageType.environment :
             path.contains("sprites/editor") ? PageType.editor :
             path.contains("sprites/rubble") ? PageType.editor :
             path.contains("sprites/ui") ? PageType.ui :
