@@ -141,13 +141,11 @@ public class GenericCrafter extends Block{
                 progress %= 1f;
             }
 
-            if(timer(timerDump, dumpTime / timeScale)){
-                if(outputItems != null){
-                    for(ItemStack output : outputItems){
-                        if(items.has(output.item)){
-                            dump(output.item);
-                            break;
-                        }
+            if(outputItems != null && timer(timerDump, dumpTime / timeScale)){
+                for(ItemStack output : outputItems){
+                    if(items.has(output.item)){
+                        dump(output.item);
+                        break;
                     }
                 }
             }
