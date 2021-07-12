@@ -1,2 +1,0 @@
-- Fixed broken blocks increasing exponentially, leading to runaway memory usage/lag
-- Fixed incorrect planet dialog layout on certain devices
