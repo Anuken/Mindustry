@@ -6,6 +6,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.input.*;
+import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
@@ -686,23 +687,21 @@ public class SettingsMenuDialog extends Dialog{
 
                 slider.setValue(settings.getInt(name));
 
-                Label label = new Label(title);
+                Label value = new Label("");
+                value.setStyle(Styles.outlineLabel);
+                value.touchable = Touchable.disabled;
+
                 slider.changed(() -> {
                     settings.put(name, (int)slider.getValue());
-                    label.setText(title + ": " + sp.get((int)slider.getValue()));
+                    value.setText(title + ": " + sp.get((int)slider.getValue()));
                 });
+
+                value.setAlignment(Align.center);
+                value.setWrap(true);
 
                 slider.change();
 
-                table.table(t -> {
-                    t.left().defaults().left();
-                    t.add(label).minWidth(label.getPrefWidth() / Scl.scl(1f) + 50);
-                    if(Core.graphics.isPortrait()){
-                        t.row();
-                    }
-                    t.add(slider).width(180);
-                }).left().padTop(3);
-
+                table.stack(slider, value).width(420f).left().padTop(4);
                 table.row();
             }
         }

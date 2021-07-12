@@ -2047,7 +2047,6 @@ public class UnitTypes implements ContentList{
             buildSpeed = 3f;
 
             abilities.add(new EnergyFieldAbility(35f, 65f, 180f){{
-                repair = 35f;
                 statusDuration = 60f * 6f;
                 maxTargets = 25;
             }});

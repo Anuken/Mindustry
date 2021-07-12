@@ -3,12 +3,15 @@ package mindustry.maps.filters;
 
 import arc.*;
 import arc.func.*;
+import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -35,7 +38,7 @@ public abstract class FilterOption{
         final Floatc setter;
         final float min, max, step;
 
-        boolean display;
+        boolean display = true;
 
         SliderOption(String name, Floatp getter, Floatc setter, float min, float max){
             this(name, getter, setter, min, max, (max - min) / 200);
@@ -57,19 +60,27 @@ public abstract class FilterOption{
 
         @Override
         public void build(Table table){
+            Label label;
             if(!display){
-                table.add("@filter.option." + name);
+                label = new Label("@filter.option." + name);
             }else{
-                table.label(() -> Core.bundle.get("filter.option." + name) + ": " + (int)getter.get());
+                label = new Label(() -> Core.bundle.get("filter.option." + name) + ": " + Strings.autoFixed(getter.get(), 2));
             }
-            table.row();
-            Slider slider = table.slider(min, max, step, setter).growX().get();
+            label.setWrap(true);
+            label.setAlignment(Align.center);
+            label.touchable = Touchable.disabled;
+            label.setStyle(Styles.outlineLabel);
+
+            Slider slider = new Slider(min, max, step, false);
+            slider.moved(setter);
             slider.setValue(getter.get());
             if(updateEditorOnChange){
                 slider.changed(changed);
             }else{
                 slider.released(changed);
             }
+
+            table.stack(slider, label).colspan(2).pad(3).growX().row();
         }
     }
 
