@@ -15,7 +15,6 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 public class GenericCrafter extends Block{
-    /** @deprecated use outputItems instead, outputItem would likely be removed eventually **/
     public @Nullable ItemStack outputItem;
     public @Nullable ItemStack[] outputItems;
     public @Nullable LiquidStack outputLiquid;
@@ -49,8 +48,6 @@ public class GenericCrafter extends Block{
 
         if(outputItems != null){
             stats.add(Stat.output, StatValues.items(craftTime, outputItems));
-        }else if(outputItem != null){
-            stats.add(Stat.output, StatValues.items(craftTime, outputItem));
         }
 
         if(outputLiquid != null){
@@ -68,6 +65,9 @@ public class GenericCrafter extends Block{
     @Override
     public void init(){
         outputsLiquid = outputLiquid != null;
+        if(outputItems == null && outputItem != null){
+            outputItems = new ItemStack[]{outputItem};
+        }
         super.init();
     }
 
@@ -78,7 +78,7 @@ public class GenericCrafter extends Block{
 
     @Override
     public boolean outputsItems(){
-        return outputItem != null;
+        return outputItems != null;
     }
 
     public class GenericCrafterBuild extends Building{
@@ -99,8 +99,12 @@ public class GenericCrafter extends Block{
 
         @Override
         public boolean shouldConsume(){
-            if(outputItem != null && items.get(outputItem.item) + outputItem.amount > itemCapacity){
-                return false;
+            if(outputItems != null){
+                for(ItemStack output : outputItems){
+                    if(items.get(output.item) + output.amount > itemCapacity){
+                        return false;
+                    }
+                }
             }
             return (outputLiquid == null || !(liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.001f)) && enabled;
         }
@@ -127,8 +131,6 @@ public class GenericCrafter extends Block{
                     for(ItemStack output : outputItems){
                         produceItem(output);
                     }
-                }else if(outputItem != null){
-                    produceItem(outputItem);
                 }
 
                 if(outputLiquid != null){
@@ -147,8 +149,6 @@ public class GenericCrafter extends Block{
                             break;
                         }
                     }
-                }else if(outputItem != null){
-                    dump(outputItem.item);
                 }
             }
 
