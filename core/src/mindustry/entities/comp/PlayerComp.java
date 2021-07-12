@@ -51,13 +51,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return unit.canBuild();
     }
 
-    public @Nullable
-    CoreBuild closestCore(){
+    public @Nullable CoreBuild closestCore(){
         return state.teams.closestCore(x, y, team);
     }
 
-    public @Nullable
-    CoreBuild core(){
+    public @Nullable CoreBuild core(){
         return team.core();
     }
 
@@ -238,6 +236,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     void kick(KickReason reason){
         con.kick(reason);
+    }
+
+    void kick(KickReason reason, long duration){
+        con.kick(reason, duration);
     }
 
     void kick(String reason){

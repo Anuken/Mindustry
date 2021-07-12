@@ -1,7 +1,6 @@
 package mindustry.net;
 
 import arc.*;
-import arc.Net.*;
 import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
@@ -150,12 +149,12 @@ public class CrashSender{
             Log.info("Sending crash report.");
 
             //post to crash report URL, exit code indicates send success
-            new arc.Net().http(new HttpRequest().block(true).method(HttpMethod.POST).content(value.toJson(OutputType.json)).url(Vars.crashReportURL), r -> {
-                Log.info("Crash sent successfully.");
-                System.exit(1);
-            }, t -> {
+            Http.post(Vars.crashReportURL, value.toJson(OutputType.json)).error(t -> {
                 Log.info("Crash report not sent.");
                 System.exit(-1);
+            }).block(r -> {
+                Log.info("Crash sent successfully.");
+                System.exit(1);
             });
 
             ret();

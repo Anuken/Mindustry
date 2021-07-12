@@ -20,7 +20,8 @@ import mindustry.io.SaveIO.*;
 import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
-import mindustry.net.Net;
+import mindustry.net.*;
+import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 
+import java.io.*;
 import java.nio.*;
 
 import static mindustry.Vars.*;
@@ -133,14 +135,56 @@ public class ApplicationTests{
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {
+    "a",
     "asd asd asd asd asdagagasasjakbgeah;jwrej 23424234",
-    "这个服务器可以用自己的语言说话"
+    "这个服务器可以用自己的语言说话",
+    "\uD83D\uDEA3"
     })
     void writeStringTest(String string){
         ByteBuffer buffer = ByteBuffer.allocate(500);
         TypeIO.writeString(buffer, string);
         buffer.position(0);
         assertEquals(TypeIO.readString(buffer), string);
+
+        ByteArrayOutputStream ba = new ByteArrayOutputStream();
+
+        TypeIO.writeString(new Writes(new DataOutputStream(ba)), string);
+        assertEquals(TypeIO.readString(new Reads(new DataInputStream(new ByteArrayInputStream(ba.toByteArray())))), string);
+
+        SendChatMessageCallPacket pack = new SendChatMessageCallPacket();
+        pack.message = string;
+
+        buffer.position(0);
+        pack.write(new Writes(new ByteBufferOutput(buffer)));
+        int len = buffer.position();
+        buffer.position(0);
+        pack.message = "INVALID";
+        pack.read(new Reads(new ByteBufferInput(buffer)), len);
+        pack.handled();
+
+        assertEquals(string, pack.message);
+
+        buffer.position(0);
+        Writes writes = new Writes(new ByteBufferOutput(buffer));
+        TypeIO.writeString(writes, string);
+
+        buffer.position(0);
+
+        assertEquals(string, TypeIO.readString(new Reads(new ByteBufferInput(buffer))));
+
+        buffer.position(0);
+        ConnectPacket con = new ConnectPacket();
+        con.name = string;
+        con.uuid = "AAAAAAAA";
+        con.usid = "AAAAAAAA";
+        con.mods = new Seq<>();
+        con.write(new Writes(new ByteBufferOutput(buffer)));
+
+        con.name = "INVALID";
+        buffer.position(0);
+        con.read(new Reads(new ByteBufferInput(buffer)));
+
+        assertEquals(string, con.name);
     }
 
     @Test
