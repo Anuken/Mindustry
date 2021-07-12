@@ -2,6 +2,7 @@ package mindustry.ui;
 
 import arc.graphics.g2d.*;
 import arc.scene.*;
+import arc.scene.ui.layout.*;
 import mindustry.graphics.*;
 
 public class WarningBar extends Element{
@@ -27,7 +28,7 @@ public class WarningBar extends Element{
             rx + barWidth, y
             );
         }
-        Lines.stroke(3f);
+        Lines.stroke(Scl.scl(3f));
         Lines.line(x, y, x + width, y);
         Lines.line(x, y + height, x + width, y + height);
 
