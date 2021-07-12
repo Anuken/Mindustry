@@ -80,9 +80,7 @@ public class ModsDialog extends BaseDialog{
         }
 
         shown(this::setup);
-        if(mobile){
-            onResize(this::setup);
-        }
+        onResize(this::setup);
 
         Events.on(ResizeEvent.class, event -> {
             if(currentContent != null){
@@ -144,10 +142,10 @@ public class ModsDialog extends BaseDialog{
 
     void setup(){
         float h = 110f;
-        float w = Math.min(Core.graphics.getWidth() / 1.1f, 520f);
+        float w = Math.min(Core.graphics.getWidth() / Scl.scl(1.05f), 520f);
 
         cont.clear();
-        cont.defaults().width(Math.min(Core.graphics.getWidth() / 1.2f, 556f)).pad(4);
+        cont.defaults().width(Math.min(Core.graphics.getWidth() / Scl.scl(1.05f), 556f)).pad(4);
         cont.add("@mod.reloadrequired").visible(mods::requiresReload).center().get().setAlignment(Align.center);
         cont.row();
 
