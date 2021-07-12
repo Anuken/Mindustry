@@ -133,8 +133,8 @@ public class LaunchPad extends Block{
         public void updateTile(){
             if(!state.isCampaign()) return;
 
-            //launch when full and base conditions are met
-            if(items.total() >= itemCapacity && efficiency() >= 1f && (launchCounter += edelta()) >= launchTime){
+            //increment launchCounter then launch when full and base conditions are met
+            if((launchCounter += edelta()) >= launchTime && items.total() >= itemCapacity){
                 launchSound.at(x, y);
                 LaunchPayload entity = LaunchPayload.create();
                 items.each((item, amount) -> entity.stacks.add(new ItemStack(item, amount)));
