@@ -143,7 +143,7 @@ public class StatValues{
                             }
                         }
                     }else{
-                        c.add("@none.found");
+                        c.add("@none.inmap");
                     }
                 }else{
                     c.add("@stat.showinmap");

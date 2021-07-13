@@ -106,7 +106,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Sets up all the necessary variables, but does not add this entity anywhere. */
     public Building create(Block block, Team team){
-        this.tile = emptyTile;
         this.block = block;
         this.team = team;
 
