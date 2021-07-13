@@ -15,7 +15,10 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 public class GenericCrafter extends Block{
+    /** Written to outputItems as a single-element array if outputItems is null. */
     public @Nullable ItemStack outputItem;
+    /** Overwrites outputItem if not null. */
+    public @Nullable ItemStack[] outputItems;
     public @Nullable LiquidStack outputLiquid;
 
     public float craftTime = 80;
@@ -45,8 +48,8 @@ public class GenericCrafter extends Block{
         super.setStats();
         stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
 
-        if(outputItem != null){
-            stats.add(Stat.output, StatValues.items(craftTime, outputItem));
+        if(outputItems != null){
+            stats.add(Stat.output, StatValues.items(craftTime, outputItems));
         }
 
         if(outputLiquid != null){
@@ -64,6 +67,9 @@ public class GenericCrafter extends Block{
     @Override
     public void init(){
         outputsLiquid = outputLiquid != null;
+        if(outputItems == null && outputItem != null){
+            outputItems = new ItemStack[]{outputItem};
+        }
         super.init();
     }
 
@@ -74,7 +80,7 @@ public class GenericCrafter extends Block{
 
     @Override
     public boolean outputsItems(){
-        return outputItem != null;
+        return outputItems != null;
     }
 
     public class GenericCrafterBuild extends Building{
@@ -95,8 +101,12 @@ public class GenericCrafter extends Block{
 
         @Override
         public boolean shouldConsume(){
-            if(outputItem != null && items.get(outputItem.item) + outputItem.amount > itemCapacity){
-                return false;
+            if(outputItems != null){
+                for(ItemStack output : outputItems){
+                    if(items.get(output.item) + output.amount > itemCapacity){
+                        return false;
+                    }
+                }
             }
             return (outputLiquid == null || !(liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.001f)) && enabled;
         }
@@ -119,9 +129,11 @@ public class GenericCrafter extends Block{
             if(progress >= 1f){
                 consume();
 
-                if(outputItem != null){
-                    for(int i = 0; i < outputItem.amount; i++){
-                        offload(outputItem.item);
+                if(outputItems != null){
+                    for(ItemStack output : outputItems){
+                        for(int i = 0; i < output.amount; i++){
+                            offload(output.item);
+                        }
                     }
                 }
 
@@ -133,8 +145,10 @@ public class GenericCrafter extends Block{
                 progress %= 1f;
             }
 
-            if(outputItem != null && timer(timerDump, dumpTime / timeScale)){
-                dump(outputItem.item);
+            if(outputItems != null && timer(timerDump, dumpTime / timeScale)){
+                for(ItemStack output : outputItems){
+                    dump(output.item);
+                }
             }
 
             if(outputLiquid != null){
