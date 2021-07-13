@@ -6,9 +6,8 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -19,6 +18,8 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class BeamDrill extends Block{
+    protected Rand rand = new Rand();
+
     public @Load("drill-laser") TextureRegion laser;
     public @Load("drill-laser-end") TextureRegion laserEnd;
     public @Load("@-top") TextureRegion topRegion;
@@ -26,9 +27,13 @@ public class BeamDrill extends Block{
     public float drillTime = 200f;
     public int range = 5;
     public int tier = 1;
-    public float laserWidth = 0.7f;
-    /** Effect randomly played while drilling. */
-    public Effect updateEffect = Fx.mineSmall;
+    public float laserWidth = 0.65f;
+
+    public Color sparkColor = Color.valueOf("fd9e81"), glowColor = Color.white;
+    public float glowIntensity = 0.2f, pulseIntensity = 0.07f;
+    public float glowScl = 3f;
+    public int sparks = 12;
+    public float sparkRange = 10f, sparkLife = 27f, sparkRecurrence = 4f, sparkSpread = 45f, sparkSize = 3.5f;
 
     public BeamDrill(String name){
         super(name);
@@ -44,7 +49,7 @@ public class BeamDrill extends Block{
 
     @Override
     public void init(){
-        clipSize = Math.max(clipSize, size * tilesize + (range + 1) * tilesize);
+        clipSize = Math.max(clipSize, size * tilesize + (range + 2) * tilesize);
         super.init();
     }
 
@@ -165,13 +170,14 @@ public class BeamDrill extends Block{
             warmup = Mathf.approachDelta(warmup, Mathf.num(consValid()), 1f / 60f);
             lastItem = null;
             boolean multiple = false;
+            int dx = Geometry.d4x(rotation), dy = Geometry.d4y(rotation), ddx = Geometry.d4x(rotation + 1), ddy = Geometry.d4y(rotation + 1);
 
             //update facing tiles
             for(int p = 0; p < size; p++){
                 Point2 l = lasers[p];
                 Tile dest = null;
                 for(int i = 0; i < range; i++){
-                    int rx = l.x + Geometry.d4x(rotation)*i, ry = l.y + Geometry.d4y(rotation)*i;
+                    int rx = l.x + dx*i, ry = l.y + dy*i;
                     Tile other = world.tile(rx, ry);
                     if(other != null){
                         if(other.solid()){
@@ -189,9 +195,6 @@ public class BeamDrill extends Block{
                 }
 
                 facing[p] = dest;
-                if(cons && dest != null && Mathf.chanceDelta(0.05 * warmup)){
-                    updateEffect.at(dest.worldx() + Mathf.range(4f), dest.worldy() + Mathf.range(4f), dest.wallDrop().color);
-                }
             }
 
             //when multiple items are present, count that as no item
@@ -226,18 +229,41 @@ public class BeamDrill extends Block{
             Draw.rect(block.region, x, y);
             Draw.rect(topRegion, x, y, rotdeg());
 
-            Draw.z(Layer.power - 1);
             var dir = Geometry.d4(rotation);
+            int ddx = Geometry.d4x(rotation + 1), ddy = Geometry.d4y(rotation + 1);
 
             for(int i = 0; i < size; i++){
                 Tile face = facing[i];
                 if(face != null){
                     Point2 p = lasers[i];
-                    Drawf.laser(team, laser, laserEnd, (p.x - dir.x/2f) * tilesize, (p.y - dir.y/2f) * tilesize,
-                        face.worldx() - (dir.x/2f)*(tilesize), face.worldy() - (dir.y/2f)*(tilesize),
-                    (laserWidth + Mathf.absin(Time.time + i*4 + (id%20)*6, 3f, 0.07f)) * warmup);
+                    float lx = face.worldx() - (dir.x/2f)*tilesize, ly = face.worldy() - (dir.y/2f)*tilesize;
+
+                    Draw.z(Layer.power - 1);
+                    Draw.mixcol(glowColor, Mathf.absin(Time.time + i*5 + id*9, glowScl, glowIntensity));
+                    Drawf.laser(team, laser, laserEnd,
+                        (p.x - dir.x/2f) * tilesize,
+                        (p.y - dir.y/2f) * tilesize,
+                        lx, ly,
+                        (laserWidth + Mathf.absin(Time.time + i*5 + id*9, glowScl, pulseIntensity)) * warmup);
+                    Draw.mixcol();
+
+                    Draw.z(Layer.effect);
+                    Lines.stroke(warmup);
+                    rand.setState(i, id);
+                    Color col = face.wallDrop().color;
+                    for(int j = 0; j < 16; j++){
+                        float fin = (Time.time / sparkLife + rand.random(sparkRecurrence + 1f)) % sparkRecurrence;
+                        float or = rand.range(2f);
+                        Tmp.v1.set(sparkRange * fin, 0).rotate(rotdeg() + rand.range(sparkSpread));
+
+                        Draw.color(sparkColor, col, fin);
+                        float px = Tmp.v1.x, py = Tmp.v1.y;
+                        if(fin <= 1f) Lines.lineAngle(lx + px + or * ddx, ly + py + or * ddy, Angles.angle(px, py), Mathf.slope(fin) * sparkSize);
+                    }
+                    Draw.reset();
                 }
             }
+            Draw.blend();
             Draw.reset();
         }
 
@@ -251,6 +277,27 @@ public class BeamDrill extends Block{
             for(int i = 0; i < size; i++){
                 if(lasers[i] == null) lasers[i] = new Point2();
                 getLaserPos(tileX(), tileY(), rotation, i, lasers[i]);
+            }
+        }
+
+        @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.f(time);
+            write.f(warmup);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            if(revision >= 1){
+                time = read.f();
+                warmup = read.f();
             }
         }
     }
