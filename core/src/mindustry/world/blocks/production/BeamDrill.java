@@ -19,8 +19,8 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class BeamDrill extends Block{
-    public @Load("minelaser") TextureRegion laser;
-    public @Load("minelaser-end") TextureRegion laserEnd;
+    public @Load("drill-laser") TextureRegion laser;
+    public @Load("drill-laser-end") TextureRegion laserEnd;
     public @Load("@-top") TextureRegion topRegion;
 
     public float drillTime = 200f;
