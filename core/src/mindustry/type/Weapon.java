@@ -285,8 +285,7 @@ public class Weapon implements Cloneable{
         can && //must be able to shoot
         (!useAmmo || unit.ammo > 0 || !state.rules.unitAmmo || unit.team.rules().infiniteAmmo) && //check ammo
         (!alternate || mount.side == flipSprite) &&
-        //TODO checking for velocity this way isn't entirely correct
-        (unit.vel.len() >= mount.weapon.minShootVelocity || (net.active() && !unit.isLocal())) && //check velocity requirements
+        unit.vel.len() >= mount.weapon.minShootVelocity && //check velocity requirements
         mount.reload <= 0.0001f && //reload has to be 0
         Angles.within(rotate ? mount.rotation : unit.rotation, mount.targetRotation, mount.weapon.shootCone) //has to be within the cone
         ){
