@@ -106,7 +106,7 @@ public class BlockIndexer{
 
     public void removeIndex(Tile tile){
         var team = tile.team();
-        if(team != Team.derelict && tile.isCenter()){
+        if(tile.build != null && tile.isCenter()){
             var flags = tile.block().flags;
             var data = team.data();
 
