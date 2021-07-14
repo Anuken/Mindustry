@@ -598,7 +598,7 @@ public class Generators{
         });
     }
 
-    /** Generates a scorch pixmap based on parameters. Thread safe, unless multiple scorch generators are running in parallel. */
+    /** Generates a scorch pixmap based on parameters. Thread safe. */
     public static class ScorchGenerator{
         public int size = 80, seed = 0, color = Color.whiteRgba;
         public double scale = 18, pow = 2, octaves = 4, pers = 0.4, add = 2, nscl = 4.5f;
