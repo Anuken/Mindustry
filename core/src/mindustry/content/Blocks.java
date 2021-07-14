@@ -235,7 +235,6 @@ public class Blocks implements ContentList{
         magmarock = new Floor("magmarock"){{
             attributes.set(Attribute.heat, 0.75f);
             attributes.set(Attribute.water, -0.75f);
-            updateEffect = Fx.magmasmoke;
             blendGroup = basalt;
 
             emitLight = true;
