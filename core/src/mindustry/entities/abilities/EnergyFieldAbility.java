@@ -1,6 +1,7 @@
 package mindustry.entities.abilities;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -19,6 +20,7 @@ public class EnergyFieldAbility extends Ability{
     public float damage = 1, reload = 100, range = 60;
     public Effect healEffect = Fx.heal, hitEffect = Fx.hitLaserBlast, damageEffect = Fx.chainLightning;
     public StatusEffect status = StatusEffects.electrified;
+    public Sound shootSound = Sounds.spark;
     public float statusDuration = 60f * 6f;
     public float x, y;
     public boolean hitBuildings = true;
@@ -137,6 +139,10 @@ public class EnergyFieldAbility extends Ability{
                     damageEffect.at(rx, ry, 0f, color, other);
                     hitEffect.at(rx, ry, unit.angleTo(other), color);
                 }
+            }
+
+            if(anyNearby){
+                shootSound.at(unit);
             }
 
             timer = 0f;

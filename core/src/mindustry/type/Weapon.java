@@ -249,7 +249,7 @@ public class Weapon implements Cloneable{
                 unit.vel.add(Tmp.v1.trns(unit.rotation + 180f, mount.bullet.type.recoil));
                 if(shootSound != Sounds.none && !headless){
                     if(mount.sound == null) mount.sound = new SoundLoop(shootSound, 1f);
-                    mount.sound.update(x, y, true);
+                    mount.sound.update(bulletX, bulletY, true);
                 }
             }
         }else{
@@ -323,6 +323,9 @@ public class Weapon implements Cloneable{
                 Time.run(sequenceNum * shotDelay + firstShotDelay, () -> {
                     if(!unit.isAdded()) return;
                     mount.bullet = bullet(unit, shootX + unit.x - baseX, shootY + unit.y - baseY, f + Mathf.range(inaccuracy), lifeScl);
+                    if(!continuous){
+                        shootSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
+                    }
                 });
                 sequenceNum++;
             });
