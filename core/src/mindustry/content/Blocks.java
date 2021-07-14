@@ -368,6 +368,7 @@ public class Blocks implements ContentList{
 
         sporeCluster = new Prop("spore-cluster"){{
             variants = 3;
+            breakSound = Sounds.plantBreak;
         }};
 
         boulder = new Prop("boulder"){{
