@@ -13,7 +13,7 @@ public class GenericModTest{
     static void grabMod(String url){
         //clear older mods
         ApplicationTests.testDataFolder.deleteDirectory();
-        Http.get(url).error(Assertions::fail).block(httpResponse -> {
+        Http.get(url).error(Assertions::fail).timeout(20000).block(httpResponse -> {
             try{
                 ApplicationTests.testDataFolder.child("mods").child("test_mod." + (url.endsWith("jar") ? "jar" : "zip")).writeBytes(Streams.copyBytes(httpResponse.getResultAsStream()));
             }catch(IOException e){

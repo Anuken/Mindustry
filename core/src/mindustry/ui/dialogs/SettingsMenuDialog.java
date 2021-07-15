@@ -6,6 +6,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.input.*;
+import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
@@ -286,7 +287,8 @@ public class SettingsMenuDialog extends Dialog{
         sound.sliderPref("sfxvol", bundle.get("setting.sfxvol.name", "SFX Volume"), 100, 0, 100, 1, i -> i + "%");
         sound.sliderPref("ambientvol", bundle.get("setting.ambientvol.name", "Ambient Volume"), 100, 0, 100, 1, i -> i + "%");
 
-        game.screenshakePref();
+        game.sliderPref("saveinterval", 60, 10, 5 * 120, 10, i -> Core.bundle.format("setting.seconds", i));
+
         if(mobile){
             game.checkPref("autotarget", true);
             game.checkPref("keyboard", false, val -> {
@@ -307,7 +309,6 @@ public class SettingsMenuDialog extends Dialog{
                 control.setInput(new MobileInput());
             }
         }*/
-        game.sliderPref("saveinterval", 60, 10, 5 * 120, 10, i -> Core.bundle.format("setting.seconds", i));
 
         if(!mobile){
             game.checkPref("crashreport", true);
@@ -350,6 +351,8 @@ public class SettingsMenuDialog extends Dialog{
             Core.settings.put("uiscalechanged", s != lastUiScale[0]);
             return s + "%";
         });
+
+        graphics.sliderPref("screenshake", 4, 0, 8, i -> (i / 4f) + "x");
         graphics.sliderPref("fpscap", 240, 15, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
         graphics.sliderPref("lasersopacity", 100, 0, 100, 5, s -> {
@@ -559,10 +562,6 @@ public class SettingsMenuDialog extends Dialog{
             rebuild();
         }
 
-        public void screenshakePref(){
-            sliderPref("screenshake", bundle.get("setting.screenshake.name", "Screen Shake"), 4, 0, 8, i -> (i / 4f) + "x");
-        }
-
         public SliderSetting sliderPref(String name, String title, int def, int min, int max, StringProcessor s){
             return sliderPref(name, title, def, min, max, 1, s);
         }
@@ -686,23 +685,21 @@ public class SettingsMenuDialog extends Dialog{
 
                 slider.setValue(settings.getInt(name));
 
-                Label label = new Label(title);
+                Label value = new Label("");
+                value.setStyle(Styles.outlineLabel);
+                value.touchable = Touchable.disabled;
+
                 slider.changed(() -> {
                     settings.put(name, (int)slider.getValue());
-                    label.setText(title + ": " + sp.get((int)slider.getValue()));
+                    value.setText(title + ": " + sp.get((int)slider.getValue()));
                 });
+
+                value.setAlignment(Align.center);
+                value.setWrap(true);
 
                 slider.change();
 
-                table.table(t -> {
-                    t.left().defaults().left();
-                    t.add(label).minWidth(label.getPrefWidth() / Scl.scl(1f) + 50);
-                    if(Core.graphics.isPortrait()){
-                        t.row();
-                    }
-                    t.add(slider).width(180);
-                }).left().padTop(3);
-
+                table.stack(slider, value).width(Math.min(Core.graphics.getWidth() / 1.2f, 460f)).left().padTop(4);
                 table.row();
             }
         }

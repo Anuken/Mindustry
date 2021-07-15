@@ -1780,6 +1780,7 @@ public class UnitTypes implements ContentList{
                 shots = 3;
                 shotDelay = 7f;
                 x = y = shootX = shootY = 0f;
+                shootSound = Sounds.mineDeploy;
 
                 bullet = new BasicBulletType(){{
                     sprite = "mine-bullet";
@@ -2047,7 +2048,6 @@ public class UnitTypes implements ContentList{
             buildSpeed = 3f;
 
             abilities.add(new EnergyFieldAbility(35f, 65f, 180f){{
-                repair = 35f;
                 statusDuration = 60f * 6f;
                 maxTargets = 25;
             }});
@@ -2151,6 +2151,8 @@ public class UnitTypes implements ContentList{
                 shootY = 7f;
                 recoil = 4f;
                 cooldownTime = reload - 10f;
+                //TODO better sound
+                shootSound = Sounds.laser;
 
                 bullet = new EmpBulletType(){{
                     float rad = 100f;
@@ -2183,6 +2185,7 @@ public class UnitTypes implements ContentList{
                     hitShake = 4f;
                     trailRotation = true;
                     status = StatusEffects.electrified;
+                    hitSound = Sounds.plasmaboom;
 
                     trailEffect = new Effect(16f, e -> {
                         color(Pal.heal);

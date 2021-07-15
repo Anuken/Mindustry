@@ -1,6 +1,7 @@
 package mindustry.entities.abilities;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -16,14 +17,15 @@ import mindustry.type.*;
 public class EnergyFieldAbility extends Ability{
     private static final Seq<Healthc> all = new Seq<>();
 
-    public float damage = 1, repair = 20f, reload = 100, range = 60;
+    public float damage = 1, reload = 100, range = 60;
     public Effect healEffect = Fx.heal, hitEffect = Fx.hitLaserBlast, damageEffect = Fx.chainLightning;
     public StatusEffect status = StatusEffects.electrified;
+    public Sound shootSound = Sounds.spark;
     public float statusDuration = 60f * 6f;
     public float x, y;
     public boolean hitBuildings = true;
     public int maxTargets = 25;
-    public float healPercent = 3f;
+    public float healPercent = 2.5f;
 
     public float layer = Layer.bullet - 0.001f, blinkScl = 20f;
     public float effectRadius = 5f, sectorRad = 0.14f, rotateSpeed = 0.5f;
@@ -137,6 +139,10 @@ public class EnergyFieldAbility extends Ability{
                     damageEffect.at(rx, ry, 0f, color, other);
                     hitEffect.at(rx, ry, unit.angleTo(other), color);
                 }
+            }
+
+            if(anyNearby){
+                shootSound.at(unit);
             }
 
             timer = 0f;

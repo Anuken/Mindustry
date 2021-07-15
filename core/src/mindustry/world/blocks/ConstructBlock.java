@@ -47,7 +47,7 @@ public class ConstructBlock extends Block{
 
     /** Returns a ConstructBlock by size. */
     public static ConstructBlock get(int size){
-        if(size > maxBlockSize) throw new IllegalArgumentException("No. Don't place ConstructBlock of size greater than " + maxBlockSize);
+        if(size > maxBlockSize) throw new IllegalArgumentException("No. Don't place ConstructBlocks of size greater than " + maxBlockSize);
         return consBlocks[size - 1];
     }
 
@@ -57,7 +57,7 @@ public class ConstructBlock extends Block{
         block.breakEffect.at(tile.drawx(), tile.drawy(), block.size, block.mapColor);
         Events.fire(new BlockBuildEndEvent(tile, builder, team, true, null));
         tile.remove();
-        if(shouldPlay()) Sounds.breaks.at(tile, calcPitch(false));
+        if(shouldPlay()) block.breakSound.at(tile, calcPitch(false));
     }
 
     @Remote(called = Loc.server)

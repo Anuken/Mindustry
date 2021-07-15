@@ -119,12 +119,13 @@ platforms.each{ platform ->
                     "--removelibs", "$rootDir/desktop/build/packr/desktop.jar".toString()
                 ]
 
+                args += "--vmargs"
+
                 if(platform == "MacOS"){
-                    args += ["--vmargs", "XstartOnFirstThread"] as String[]
-                }else{
-                    //TODO unneeded for windows?
-                    args += ["--vmargs", "Dhttps.protocols=TLSv1.2,TLSv1.1,TLSv1"]
+                    args += "XstartOnFirstThread"
                 }
+
+                args += "Dhttps.protocols=TLSv1.2,TLSv1.1,TLSv1"
 
                 exec{
                     commandLine args.toList()
