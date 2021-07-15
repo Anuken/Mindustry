@@ -32,7 +32,7 @@ public class BeamDrill extends Block{
     public Color sparkColor = Color.valueOf("fd9e81"), glowColor = Color.white;
     public float glowIntensity = 0.2f, pulseIntensity = 0.07f;
     public float glowScl = 3f;
-    public int sparks = 12;
+    public int sparks = 11;
     public float sparkRange = 10f, sparkLife = 27f, sparkRecurrence = 4f, sparkSpread = 45f, sparkSize = 3.5f;
 
     public BeamDrill(String name){
@@ -251,7 +251,7 @@ public class BeamDrill extends Block{
                     Lines.stroke(warmup);
                     rand.setState(i, id);
                     Color col = face.wallDrop().color;
-                    for(int j = 0; j < 16; j++){
+                    for(int j = 0; j < sparks; j++){
                         float fin = (Time.time / sparkLife + rand.random(sparkRecurrence + 1f)) % sparkRecurrence;
                         float or = rand.range(2f);
                         Tmp.v1.set(sparkRange * fin, 0).rotate(rotdeg() + rand.range(sparkSpread));

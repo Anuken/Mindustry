@@ -60,7 +60,7 @@ public class CrashSender{
             }catch(Throwable ignored){}
 
             //don't create crash logs for custom builds, as it's expected
-            if(Version.build == -1 || (System.getProperty("user.name").equals("anuke") && "release".equals(Version.modifier))){
+            if(Version.build == -1 || (System.getProperty("user.name").equals("anuke") && !"steam".equals(Version.modifier))){
                 ret();
             }
 
