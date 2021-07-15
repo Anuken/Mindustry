@@ -77,7 +77,7 @@ public class Links{
             - [ ] **I have updated to the latest release (https://github.com/Anuken/Mindustry/releases) to make sure my issue has not been fixed.**
             - [ ] **I have searched the closed and open issues to make sure that this problem has not already been reported.**
             """,
-            OS.isAndroid ? "Android " + Core.app.getVersion() : (System.getProperty("os.name") + (OS.is64Bit ? " x64" : " x32")),
+            OS.isAndroid ? "Android " + Core.app.getVersion() : (OS.osName + " x" + OS.osArchBits),
             Version.combined(),
             Vars.mods.list().any() ? Vars.mods.list().select(LoadedMod::enabled).map(l -> l.meta.author + "/" + l.name + ":" + l.meta.version) : "none"));
     }
