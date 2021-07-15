@@ -29,18 +29,17 @@ public class CrashSender{
             report += "Report this at " + Vars.reportIssueURL + "\n\n";
         }
         return report
-            + "Version: " + Version.combined() + (Vars.headless ? " (Server)" : "") + "\n"
-            + "OS: " + System.getProperty("os.name") + " x" + (OS.is64Bit ? "64" : "32") + "\n"
-            + "Java Version: " + System.getProperty("java.version") + "\n"
-            + "Java Architecture: " + System.getProperty("sun.arch.data.model") + "\n"
-            + (mods == null ? "<no mod init>" : mods.list().size + " Mods" + (mods.list().isEmpty() ? "" : ": " + mods.list().toString(", ", mod -> mod.name + ":" + mod.meta.version)))
-            + "\n\n" + error;
+        + "Version: " + Version.combined() + (Vars.headless ? " (Server)" : "") + "\n"
+        + "OS: " + OS.osName + " x" + (OS.osArchBits) + " (" + OS.osArch + ")\n"
+        + "Java Version: " + OS.javaVersion + "\n"
+        + (mods == null ? "<no mod init>" : mods.list().size + " Mods" + (mods.list().isEmpty() ? "" : ": " + mods.list().toString(", ", mod -> mod.name + ":" + mod.meta.version)))
+        + "\n\n" + error;
     }
 
     public static void log(Throwable exception){
         try{
             Core.settings.getDataDirectory().child("crashes").child("crash_" + System.currentTimeMillis() + ".txt")
-                .writeString(createReport(Strings.neatError(exception)));
+            .writeString(createReport(Strings.neatError(exception)));
         }catch(Throwable ignored){
         }
     }
@@ -60,7 +59,7 @@ public class CrashSender{
             }catch(Throwable ignored){}
 
             //don't create crash logs for custom builds, as it's expected
-            if(Version.build == -1 || (System.getProperty("user.name").equals("anuke") && "release".equals(Version.modifier))){
+            if(Version.build == -1 || (OS.username.equals("anuke") && !"steam".equals(Version.modifier))){
                 ret();
             }
 
@@ -141,10 +140,10 @@ public class CrashSender{
             ex(() -> value.addChild("server", new JsonValue(fs)));
             ex(() -> value.addChild("players", new JsonValue(Groups.player.size())));
             ex(() -> value.addChild("state", new JsonValue(Vars.state.getState().name())));
-            ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name") + "x" + (OS.is64Bit ? "64" : "32"))));
+            ex(() -> value.addChild("os", new JsonValue(OS.osName + " x" + OS.osArchBits + " " + OS.osVersion)));
             ex(() -> value.addChild("trace", new JsonValue(parseException(exception))));
-            ex(() -> value.addChild("javaVersion", new JsonValue(System.getProperty("java.version"))));
-            ex(() -> value.addChild("javaArch", new JsonValue(System.getProperty("sun.arch.data.model"))));
+            ex(() -> value.addChild("javaVersion", new JsonValue(OS.javaVersion)));
+            ex(() -> value.addChild("javaArch", new JsonValue(OS.osArchBits)));
 
             Log.info("Sending crash report.");
 
