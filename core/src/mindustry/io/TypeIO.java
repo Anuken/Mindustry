@@ -633,7 +633,7 @@ public class TypeIO{
         }
     }
 
-    /** Representes a building that has not been resolved yet. */
+    /** Represents a building that has not been resolved yet. */
     public static class BuildingBox{
         public int pos;
 
