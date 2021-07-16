@@ -49,6 +49,7 @@ public class Logic implements ApplicationListener{
                     BlockPlan b = it.next();
                     Block block = content.block(b.block);
                     if(event.tile.block().bounds(event.tile.x, event.tile.y, Tmp.r1).overlaps(block.bounds(b.x, b.y, Tmp.r2))){
+                        b.removed = true;
                         it.remove();
                     }
                 }

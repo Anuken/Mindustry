@@ -320,6 +320,7 @@ public class Teams{
     public static class BlockPlan{
         public final short x, y, rotation, block;
         public final Object config;
+        public boolean removed;
 
         public BlockPlan(int x, int y, short rotation, short block, Object config){
             this.x = (short)x;
