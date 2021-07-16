@@ -32,8 +32,28 @@ import mindustry.ui.fragments.*;
 import static arc.scene.actions.Actions.*;
 import static mindustry.Vars.*;
 
+import java.util.Arrays;
+
 public class UI implements ApplicationListener, Loadable{
-    public static String billions, millions, thousands;
+    private static final long[] power10s = {
+        1L, 10L, 100L,
+        1_000L, 10_000L, 100_000L,
+        1_000_000L, 10_000_000L, 100_000_000L,
+        1_000_000_000L, 10_000_000_000L, 100_000_000_000L,
+        1_000_000_000_000L, 10_000_000_000_000L, 100_000_000_000_000L,
+        1_000_000_000_000_000L, 10_000_000_000_000_000L, 100_000_000_000_000_000L,
+        1_000_000_000_000_000_000L,
+    };
+    private static final String[] numericSIUnits = {
+        null, null, null, 
+        "k", null, null,
+        "M", null, null,
+        "G", null, null,
+        "T", null, null,
+        "P", null, null,
+        "E", null, null,
+    };
+    private static String[] numericUnits = new String[20];
 
     public static PixmapPacker packer;
 
@@ -154,9 +174,19 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void init(){
-        billions = Core.bundle.get("unit.billions");
-        millions = Core.bundle.get("unit.millions");
-        thousands = Core.bundle.get("unit.thousands");
+        String[] units = Core.bundle.get("unit.numeric", "").split(",");
+        if(units.length == 0){
+            units = new String[10];
+            units[3] = Core.bundle.get("unit.thousands");
+            units[6] = Core.bundle.get("unit.millions");
+            units[9] = Core.bundle.get("unit.billions");
+        }
+        for(int index = 0; index < units.length; index++){
+            String unit = units[index];
+            if(unit != null && !unit.isEmpty()){
+                numericUnits[index] = units[index].trim();
+            }
+        }
 
         menuGroup = new WidgetGroup();
         hudGroup = new WidgetGroup();
@@ -579,22 +609,64 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public static String formatAmount(long number){
+        return formatAmount(number, 1);
+    }
+
+    public static String formatAmount(long number, int decimalPlaces){
+        return formatAmount(number, decimalPlaces, false);
+    }
+
+    public static String formatAmount(long number, boolean si){
+        return formatAmount(number, si ? 0 : 1, si);
+    }
+
+    public static String formatAmount(long number, int decimalPlaces, boolean si){
         //prevent overflow
         if(number == Long.MIN_VALUE) number ++;
 
         long mag = Math.abs(number);
         String sign = number < 0 ? "-" : "";
-        if(mag >= 1_000_000_000){
-            return sign + Strings.fixed(mag / 1_000_000_000f, 1) + "[gray]" + billions+ "[]";
-        }else if(mag >= 1_000_000){
-            return sign + Strings.fixed(mag / 1_000_000f, 1) + "[gray]" +millions + "[]";
-        }else if(mag >= 10_000){
-            return number / 1000 + "[gray]" + thousands + "[]";
-        }else if(mag >= 1000){
-            return sign + Strings.fixed(mag / 1000f, 1) + "[gray]" + thousands + "[]";
-        }else{
-            return number + "";
+
+        int unit = 0;
+        String unitString = null;
+        long value = number;
+        if(value >= 10_000_000_000_000_000L){
+            unit += 16;
+            value /= 10_000_000_000_000_000L;
         }
+        if(value >= 100_000_000L){
+            unit += 8;
+            value /= 100_000_000L;
+        }
+        if(value >= 10_000L){
+            unit += 4;
+            value /= 10_000L;
+        }
+        if(value >= 100L){
+            unit += 2;
+            value /= 100L;
+        }
+        if(value >= 10L){
+            unit += 1;
+        }
+        while(unit >= 0){
+            if(si){
+                if(numericSIUnits[unit] != null){
+                    unitString = numericSIUnits[unit];
+                    break;
+                }
+            }else{
+                if(numericUnits[unit] != null){
+                    unitString = numericUnits[unit];
+                    break;
+                }
+            }
+            unit--;
+        }
+        if(unitString != null){
+            return sign + Strings.fixed(mag / (float)power10s[unit], decimalPlaces) + "[gray]" + unitString + "[]";
+        }
+        return number + "";
     }
 
     public static int roundAmount(int number){

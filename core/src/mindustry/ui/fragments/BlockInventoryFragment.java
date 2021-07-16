@@ -151,7 +151,7 @@ public class BlockInventoryFragment extends Fragment{
                     if(tile == null || !tile.isValid()){
                         return "";
                     }
-                    return round(tile.items.get(item));
+                    return ui.formatAmount(tile.items.get(item), true);
                 });
                 image.addListener(l);
 
@@ -195,17 +195,6 @@ public class BlockInventoryFragment extends Fragment{
             table.actions(Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
         }else{
             table.setScale(1f, 1f);
-        }
-    }
-
-    private String round(float f){
-        f = (int)f;
-        if(f >= 1000000){
-            return (int)(f / 1000000f) + "[gray]" + UI.millions;
-        }else if(f >= 1000){
-            return (int)(f / 1000) + UI.thousands;
-        }else{
-            return (int)f + "";
         }
     }
 
