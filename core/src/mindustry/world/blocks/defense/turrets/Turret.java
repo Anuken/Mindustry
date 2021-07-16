@@ -396,7 +396,7 @@ public class Turret extends ReloadTurret{
                     tr.trns(rotation, shootLength);
                     recoil = recoilAmount;
                     heat = 1f;
-                    bullet(type, rotation + Mathf.range(inaccuracy));
+                    bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
                     effects();
                     charging = false;
                 });
@@ -410,7 +410,7 @@ public class Turret extends ReloadTurret{
                         recoil = recoilAmount;
 
                         tr.trns(rotation, shootLength, Mathf.range(xRand));
-                        bullet(type, rotation + Mathf.range(inaccuracy));
+                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - shots / 2f) * spread);
                         effects();
                         useAmmo();
                         recoil = recoilAmount;
@@ -425,12 +425,12 @@ public class Turret extends ReloadTurret{
                     float i = (shotCounter % shots) - (shots-1)/2f;
 
                     tr.trns(rotation - 90, spread * i + Mathf.range(xRand), shootLength);
-                    bullet(type, rotation + Mathf.range(inaccuracy));
+                    bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
                 }else{
                     tr.trns(rotation, shootLength, Mathf.range(xRand));
 
                     for(int i = 0; i < shots; i++){
-                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - (int)(shots / 2f)) * spread);
+                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - shots / 2f) * spread);
                     }
                 }
 
