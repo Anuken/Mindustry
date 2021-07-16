@@ -159,6 +159,22 @@ public class NetClient implements ApplicationListener{
         clientPacketReliable(type, contents);
     }
 
+    //TODO enable in build 129
+    /*
+    @Remote(variants = Variant.both, unreliable = true)
+    public static void sound(Sound sound, float volume, float pitch, float pan){
+        if(sound == null) return;
+
+        sound.play(volume * Core.settings.getInt("sfxvol") / 100f, pitch, pan);
+    }
+
+    @Remote(variants = Variant.both, unreliable = true)
+    public static void soundAt(Sound sound, float x, float y, float volume, float pitch){
+        if(sound == null) return;
+
+        sound.at(x, y, pitch, volume);
+    }*/
+
     @Remote(variants = Variant.both, unreliable = true)
     public static void effect(Effect effect, float x, float y, float rotation, Color color){
         if(effect == null) return;

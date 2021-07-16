@@ -1,5 +1,6 @@
 package mindustry.io;
 
+import arc.audio.*;
 import arc.graphics.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -499,6 +500,15 @@ public class TypeIO{
     public static Item readItem(Reads read){
         short id = read.s();
         return id == -1 ? null : content.item(id);
+    }
+
+    //note that only the standard sound constants in Sounds are supported; modded sounds are not.
+    public static void writeSound(Writes write, Sound sound){
+        write.s(Sounds.getSoundId(sound));
+    }
+
+    public static Sound readSound(Reads read){
+        return Sounds.getSound(read.s());
     }
 
     public static void writeWeather(Writes write, Weather item){
