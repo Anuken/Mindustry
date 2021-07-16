@@ -54,6 +54,7 @@ public class UI implements ApplicationListener, Loadable{
         "E", null, null,
     };
     private static String[] numericUnits = new String[20];
+    public static boolean useSIUnits;
 
     public static PixmapPacker packer;
 
@@ -187,6 +188,7 @@ public class UI implements ApplicationListener, Loadable{
                 numericUnits[index] = units[index].trim();
             }
         }
+        useSIUnits = Core.settings.getBool("siunits", false);
 
         menuGroup = new WidgetGroup();
         hudGroup = new WidgetGroup();
@@ -613,7 +615,7 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public static String formatAmount(long number, int decimalPlaces){
-        return formatAmount(number, decimalPlaces, false);
+        return formatAmount(number, decimalPlaces, useSIUnits);
     }
 
     public static String formatAmount(long number, boolean si){
