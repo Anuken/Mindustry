@@ -426,6 +426,9 @@ public class Blocks implements ContentList{
 
         darkMetal = new StaticWall("dark-metal");
 
+        Seq.with(metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6)
+        .each(b -> b.asFloor().wall = darkMetal);
+
         pebbles = new DoubleOverlayFloor("pebbles");
 
         tendrils = new OverlayFloor("tendrils");

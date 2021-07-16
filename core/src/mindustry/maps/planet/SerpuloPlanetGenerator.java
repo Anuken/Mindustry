@@ -244,8 +244,6 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         cells(1);
         distort(10f, 6f);
 
-        inverseFloodFill(tiles.getn(spawn.x, spawn.y));
-
         Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreLead);
         float poles = Math.abs(sector.tile.v.y);
         float nmag = 0.5f;
@@ -295,6 +293,8 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         trimDark();
 
         median(2);
+
+        inverseFloodFill(tiles.getn(spawn.x, spawn.y));
 
         tech();
 
