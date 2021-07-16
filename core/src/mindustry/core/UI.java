@@ -51,9 +51,9 @@ public class UI implements ApplicationListener, Loadable{
         "G", null, null,
         "T", null, null,
         "P", null, null,
-        "E", null, null,
+        "E",
     };
-    private static String[] numericUnits = new String[20];
+    private static String[] numericUnits = new String[19];
     public static boolean useSIUnits;
 
     public static PixmapPacker packer;
@@ -182,7 +182,8 @@ public class UI implements ApplicationListener, Loadable{
             units[6] = Core.bundle.get("unit.millions");
             units[9] = Core.bundle.get("unit.billions");
         }
-        for(int index = 0; index < units.length; index++){
+        int unitsCount = Math.min(units.length, numericUnits.length);
+        for(int index = 0; index < unitsCount; index++){
             String unit = units[index];
             if(unit != null && !unit.isEmpty()){
                 numericUnits[index] = units[index].trim();
