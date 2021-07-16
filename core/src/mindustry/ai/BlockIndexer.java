@@ -48,6 +48,7 @@ public class BlockIndexer{
     private Seq<Building> breturnArray = new Seq<>(Building.class);
 
     public BlockIndexer(){
+        clearFlags();
 
         Events.on(TilePreChangeEvent.class, event -> {
             removeIndex(event.tile);
@@ -62,11 +63,7 @@ public class BlockIndexer{
             flagMap = new TileArray[Team.all.length][BlockFlag.all.length];
             activeTeams = new Seq<>(Team.class);
 
-            for(int i = 0; i < flagMap.length; i++){
-                for(int j = 0; j < BlockFlag.all.length; j++){
-                    flagMap[i][j] = new TileArray();
-                }
-            }
+            clearFlags();
 
             allOres.clear();
             ores = new IntSeq[content.items().size][][];
@@ -158,6 +155,14 @@ public class BlockIndexer{
     /** @return whether a certain block is anywhere on this map. */
     public boolean isBlockPresent(Block block){
         return blocksPresent != null && blocksPresent[block.id];
+    }
+
+    private void clearFlags(){
+        for(int i = 0; i < flagMap.length; i++){
+            for(int j = 0; j < BlockFlag.all.length; j++){
+                flagMap[i][j] = new TileArray();
+            }
+        }
     }
 
     private TileArray[] getFlagged(Team team){
