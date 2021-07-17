@@ -685,21 +685,21 @@ public class SettingsMenuDialog extends Dialog{
 
                 slider.setValue(settings.getInt(name));
 
-                Label value = new Label("");
-                value.setStyle(Styles.outlineLabel);
-                value.touchable = Touchable.disabled;
+                Label value = new Label("", Styles.outlineLabel);
+                Table content = new Table();
+                content.add(title, Styles.outlineLabel).left().growX().wrap();
+                content.add(value).padLeft(10f).right();
+                content.margin(3f, 33.5f, 3f, 33.5f);
+                content.touchable = Touchable.disabled;
 
                 slider.changed(() -> {
                     settings.put(name, (int)slider.getValue());
-                    value.setText(title + ": " + sp.get((int)slider.getValue()));
+                    value.setText(sp.get((int)slider.getValue()));
                 });
-
-                value.setAlignment(Align.center);
-                value.setWrap(true);
 
                 slider.change();
 
-                table.stack(slider, value).width(Math.min(Core.graphics.getWidth() / 1.2f, 460f)).left().padTop(4);
+                table.stack(slider, content).width(Math.min(Core.graphics.getWidth() / 1.2f, 460f)).left().padTop(4f);
                 table.row();
             }
         }
