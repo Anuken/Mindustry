@@ -158,7 +158,7 @@ public class MapGenerateDialog extends BaseDialog{
         long[] writeTiles = new long[editor.width() * editor.height()];
 
         for(GenerateFilter filter : filters){
-            input.begin(filter, editor.width(), editor.height(), editor::tile);
+            input.begin(editor.width(), editor.height(), editor::tile);
 
             //write to buffer
             for(int x = 0; x < editor.width(); x++){
@@ -414,7 +414,7 @@ public class MapGenerateDialog extends BaseDialog{
                 }
 
                 for(var filter : copy){
-                    input.begin(filter, editor.width(), editor.height(), (x, y) -> unpack(buffer1[Mathf.clamp(x / scaling, 0, pixmap.width -1) + w* Mathf.clamp(y / scaling, 0, pixmap.height -1)]));
+                    input.begin(editor.width(), editor.height(), (x, y) -> unpack(buffer1[Mathf.clamp(x / scaling, 0, pixmap.width -1) + w* Mathf.clamp(y / scaling, 0, pixmap.height -1)]));
 
                     //read from buffer1 and write to buffer2
                     pixmap.each((px, py) -> {

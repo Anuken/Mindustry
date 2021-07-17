@@ -9,7 +9,7 @@ import static mindustry.Vars.*;
 
 @Component
 abstract class BoundedComp implements Velc, Posc, Healthc, Flyingc{
-    static final float warpDst = 40f;
+    static final float warpDst = 30f;
 
     @Import float x, y;
 

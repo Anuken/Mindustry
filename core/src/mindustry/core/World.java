@@ -525,8 +525,7 @@ public class World{
 
     private class Context implements WorldContext{
 
-        Context(){
-        }
+        Context(){}
 
         @Override
         public Tile tile(int index){
@@ -579,7 +578,7 @@ public class World{
 
                 for(GenerateFilter filter : filters){
                     filter.randomize();
-                    input.begin(filter, width(), height(), (x, y) -> tiles.getn(x, y));
+                    input.begin(width(), height(), (x, y) -> tiles.getn(x, y));
                     filter.apply(tiles, input);
                 }
             }

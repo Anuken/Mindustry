@@ -75,8 +75,7 @@ public abstract class GenerateFilter{
 
     /** localized display name */
     public String name(){
-        var s = simpleName();
-        return Core.bundle.get("filter." + s);
+        return Core.bundle.get("filter." + simpleName());
     }
 
     public char icon(){
@@ -99,8 +98,6 @@ public abstract class GenerateFilter{
     }
 
     //utility generation functions
-
-    //TODO would be nice if these functions used the seed and ditched "in" completely; simplex should be stateless
 
     protected float noise(GenerateInput in, float scl, float mag){
         return Simplex.noise2d(seed, 1f, 0f, 1f / scl, in.x, in.y) * mag;
@@ -141,7 +138,7 @@ public abstract class GenerateFilter{
             this.y = y;
         }
 
-        public void begin(GenerateFilter filter, int width, int height, TileProvider buffer){
+        public void begin(int width, int height, TileProvider buffer){
             this.buffer = buffer;
             this.width = width;
             this.height = height;
