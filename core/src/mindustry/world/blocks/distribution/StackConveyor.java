@@ -104,6 +104,7 @@ public class StackConveyor extends Block implements Autotiler{
         public int link = -1;
         public float cooldown;
         public Item lastItem;
+        public float velocityScl;
 
         boolean proxUpdating = false;
 
@@ -209,8 +210,11 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public void updateTile(){
+            //let the stack keep its highest acceleration
+            velocityScl = Math.max(timeScale, velocityScl);
+
             //reel in crater
-            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed * edelta(), 0f, recharge);
+            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed * (efficiency() * Time.delta * velocityScl), 0f, recharge);
 
             //indicates empty state
             if(link == -1) return;
@@ -238,12 +242,17 @@ public class StackConveyor extends Block implements Autotiler{
                             e.items.add(items);
                             e.lastItem = lastItem;
                             e.link = tile.pos();
+                            e.velocityScl = velocityScl;
                             //▲ to | from ▼
                             link = -1;
                             items.clear();
 
                             cooldown = recharge;
                             e.cooldown = 1;
+                            velocityScl = 1;
+                        }else{
+                            //bumped into another
+                            velocityScl = 1;
                         }
                     }
                 }
@@ -321,11 +330,17 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
 
             write.i(link);
             write.f(cooldown);
+            write.f(velocityScl);
         }
 
         @Override
@@ -334,6 +349,7 @@ public class StackConveyor extends Block implements Autotiler{
 
             link = read.i();
             cooldown = read.f();
+            if(revision >= 1) velocityScl = read.f();
         }
     }
 }
