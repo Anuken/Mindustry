@@ -70,6 +70,7 @@ public enum Stat{
 
     speedIncrease(StatCat.function),
     repairTime(StatCat.function),
+    repairSpeed(StatCat.function),
     range(StatCat.function),
     shootRange(StatCat.function),
     inaccuracy(StatCat.function),

@@ -1,5 +1,0 @@
-[This is a truncated changelog, see Github for full notes]
-Yeah, it's another hotfix. I missed these during earlier testing.
-
-- Fixed research deadlock caused by blocks requiring optional inputs as research
-- Possible fix for "Unsupported combination of formats" startup error

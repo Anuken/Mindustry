@@ -1,5 +1,6 @@
 package mindustry.entities.comp;
 
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
@@ -12,16 +13,24 @@ import static mindustry.Vars.*;
 abstract class VelComp implements Posc{
     @Import float x, y;
 
-    //TODO @SyncLocal this? does it even need to be sent?
-    transient final Vec2 vel = new Vec2();
+    @SyncLocal Vec2 vel = new Vec2();
+
     transient float drag = 0f;
 
     //velocity needs to be called first, as it affects delta and lastPosition
     @MethodPriority(-1)
     @Override
     public void update(){
-        move(vel.x * Time.delta, vel.y * Time.delta);
-        vel.scl(Math.max(1f - drag * Time.delta, 0));
+        //do not update velocity on the client at all, unless it's non-interpolated
+        //velocity conflicts with interpolation.
+        if(!net.client() || isLocal()){
+            float px = x, py = y;
+            move(vel.x * Time.delta, vel.y * Time.delta);
+            if(Mathf.equal(px, x)) vel.x = 0;
+            if(Mathf.equal(py, y)) vel.y = 0;
+
+            vel.scl(Math.max(1f - drag * Time.delta, 0));
+        }
     }
 
     /** @return function to use for check solid state. if null, no checking is done. */
@@ -45,6 +54,10 @@ abstract class VelComp implements Posc{
         return !vel.isZero(0.01f);
     }
 
+    void move(Vec2 v){
+        move(v.x, v.y);
+    }
+
     void move(float cx, float cy){
         SolidPred check = solidity();
 
@@ -53,6 +66,22 @@ abstract class VelComp implements Posc{
         }else{
             x += cx;
             y += cy;
+        }
+    }
+
+    void velAddNet(Vec2 v){
+        vel.add(v);
+        if(isRemote()){
+            x += v.x;
+            y += v.y;
+        }
+    }
+
+    void velAddNet(float vx, float vy){
+        vel.add(vx, vy);
+        if(isRemote()){
+            x += vx;
+            y += vy;
         }
     }
 }

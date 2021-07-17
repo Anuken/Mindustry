@@ -8,6 +8,7 @@ import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 
@@ -69,8 +70,6 @@ public class JsonIO{
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
 
-        //TODO this is terrible
-
         json.setSerializer(Sector.class, new Serializer<>(){
             @Override
             public void write(Json json, Sector object, Class knownType){
@@ -108,6 +107,18 @@ public class JsonIO{
                 if(jsonData.asString() == null) return Liquids.water;
                 Liquid i = Vars.content.getByName(ContentType.liquid, jsonData.asString());
                 return i == null ? Liquids.water : i;
+            }
+        });
+
+        json.setSerializer(Attribute.class, new Serializer<>(){
+            @Override
+            public void write(Json json, Attribute object, Class knownType){
+                json.writeValue(object.name);
+            }
+
+            @Override
+            public Attribute read(Json json, JsonValue jsonData, Class type){
+                return Attribute.get(jsonData.asString());
             }
         });
 
@@ -192,11 +203,12 @@ public class JsonIO{
         json.setSerializer(UnlockableContent.class, new Serializer<>(){
             @Override
             public void write(Json json, UnlockableContent object, Class knownType){
-                json.writeValue(object.name);
+                json.writeValue(object == null ? null : object.name);
             }
 
             @Override
             public UnlockableContent read(Json json, JsonValue jsonData, Class type){
+                if(jsonData.isNull()) return null;
                 String str = jsonData.asString();
                 Item item = Vars.content.getByName(ContentType.item, str);
                 Liquid liquid = Vars.content.getByName(ContentType.liquid, str);

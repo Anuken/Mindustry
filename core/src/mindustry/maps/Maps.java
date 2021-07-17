@@ -29,9 +29,9 @@ import static mindustry.Vars.*;
 
 public class Maps{
     /** List of all built-in maps. Filenames only. */
-    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "archipelago", "debrisField", "veins", "glacier"};
+    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "archipelago", "debrisField", "veins", "glacier", "passage"};
     /** Maps tagged as PvP */
-    static final String[] pvpMaps = {"veins", "glacier"};
+    static final String[] pvpMaps = {"veins", "glacier", "passage"};
     /** All maps stored in an ordered array. */
     private Seq<Map> maps = new Seq<>();
     /** Serializer for meta. */
@@ -217,7 +217,7 @@ public class Maps{
                 }
 
                 Pixmap pix = MapIO.generatePreview(world.tiles);
-                executor.submit(() -> map.previewFile().writePNG(pix));
+                executor.submit(() -> map.previewFile().writePng(pix));
                 writeCache(map);
 
                 map.texture = new Texture(pix);
@@ -409,7 +409,7 @@ public class Maps{
             map.texture = new Texture(pix);
             executor.submit(() -> {
                 try{
-                    map.previewFile().writePNG(pix);
+                    map.previewFile().writePng(pix);
                     writeCache(map);
                 }catch(Exception e){
                     e.printStackTrace();
@@ -422,7 +422,7 @@ public class Maps{
     }
 
     private void writeCache(Map map) throws IOException{
-        try(DataOutputStream stream = new DataOutputStream(map.cacheFile().write(false, Streams.DEFAULT_BUFFER_SIZE))){
+        try(DataOutputStream stream = new DataOutputStream(map.cacheFile().write(false, Streams.defaultBufferSize))){
             stream.write(0);
             stream.writeInt(map.spawns);
             stream.write(map.teams.size);
@@ -434,7 +434,7 @@ public class Maps{
     }
 
     private void readCache(Map map) throws IOException{
-        try(DataInputStream stream = new DataInputStream(map.cacheFile().read(Streams.DEFAULT_BUFFER_SIZE))){
+        try(DataInputStream stream = new DataInputStream(map.cacheFile().read(Streams.defaultBufferSize))){
             stream.read(); //version
             map.spawns = stream.readInt();
             int teamsize = stream.readByte();

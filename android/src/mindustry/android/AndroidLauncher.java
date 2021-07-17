@@ -33,6 +33,9 @@ public class AndroidLauncher extends AndroidApplication{
     FileChooser chooser;
     Runnable permCallback;
 
+    Object gpService;
+    Class<?> serviceClass;
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
@@ -50,7 +53,7 @@ public class AndroidLauncher extends AndroidApplication{
         });
 
         super.onCreate(savedInstanceState);
-        if(doubleScaleTablets && isTablet(this.getContext())){
+        if(doubleScaleTablets && isTablet(this)){
             Scl.setAddition(0.5f);
         }
 
@@ -63,7 +66,7 @@ public class AndroidLauncher extends AndroidApplication{
 
             @Override
             public rhino.Context getScriptContext(){
-                return AndroidRhinoContext.enter(getContext().getCacheDir());
+                return AndroidRhinoContext.enter(getCacheDir());
             }
 
             @Override
@@ -71,8 +74,28 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
-            public ClassLoader loadJar(Fi jar, String mainClass) throws Exception{
-                return new DexClassLoader(jar.file().getPath(), getFilesDir().getPath(), null, getClassLoader());
+            public ClassLoader loadJar(Fi jar, ClassLoader parent) throws Exception{
+                return new DexClassLoader(jar.file().getPath(), getFilesDir().getPath(), null, parent){
+                    @Override
+                    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException{
+                        //check for loaded state
+                        Class<?> loadedClass = findLoadedClass(name);
+                        if(loadedClass == null){
+                            try{
+                                //try to load own class first
+                                loadedClass = findClass(name);
+                            }catch(ClassNotFoundException | NoClassDefFoundError e){
+                                //use parent if not found
+                                return parent.loadClass(name);
+                            }
+                        }
+
+                        if(resolve){
+                            resolveClass(loadedClass);
+                        }
+                        return loadedClass;
+                    }
+                };
             }
 
             @Override
@@ -165,8 +188,19 @@ public class AndroidLauncher extends AndroidApplication{
 
         try{
             //new external folder
-            Fi data = Core.files.absolute(getContext().getExternalFilesDir(null).getAbsolutePath());
+            Fi data = Core.files.absolute(((Context)this).getExternalFilesDir(null).getAbsolutePath());
             Core.settings.setDataDirectory(data);
+
+            //delete unused cache folder to free up space
+            try{
+                Fi cache = Core.settings.getDataDirectory().child("cache");
+                if(cache.exists()){
+                    cache.deleteDirectory();
+                }
+            }catch(Throwable t){
+                Log.err("Failed to delete cached folder", t);
+            }
+
 
             //move to internal storage if there's no file indicating that it moved
             if(!Core.files.local("files_moved").exists()){
@@ -205,6 +239,24 @@ public class AndroidLauncher extends AndroidApplication{
             if(permCallback != null){
                 Core.app.post(permCallback);
                 permCallback = null;
+            }
+        }
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        //TODO enable once GPGS is set up on the GP console
+        if(false && getPackageName().endsWith(".gp")){
+            try{
+                if(gpService == null){
+                    serviceClass = Class.forName("mindustry.android.GPGameService");
+                    gpService = serviceClass.getConstructor().newInstance();
+                }
+                serviceClass.getMethod("onResume", Context.class).invoke(gpService, this);
+            }catch(Exception e){
+                Log.err("Failed to update Google Play Services", e);
             }
         }
     }

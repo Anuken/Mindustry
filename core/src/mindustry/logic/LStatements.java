@@ -7,6 +7,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.LCanvas.*;
@@ -15,6 +16,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
 import static mindustry.logic.LCanvas.*;
 import static mindustry.world.blocks.logic.LogicDisplay.*;
 
@@ -484,7 +486,7 @@ public class LStatements{
                             int c = 0;
                             for(Item item : Vars.content.items()){
                                 if(!item.unlockedNow()) continue;
-                                i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
+                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
                                     stype("@" + item.name);
                                     hide.run();
                                 }).size(40f);
@@ -498,7 +500,7 @@ public class LStatements{
                             int c = 0;
                             for(Liquid item : Vars.content.liquids()){
                                 if(!item.unlockedNow()) continue;
-                                i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
+                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
                                     stype("@" + item.name);
                                     hide.run();
                                 }).size(40f);
@@ -661,8 +663,7 @@ public class LStatements{
         }
     }
 
-    //TODO untested
-    //@RegisterStatement("wait")
+    @RegisterStatement("wait")
     public static class WaitStatement extends LStatement{
         public String value = "0.5";
 
@@ -680,6 +681,42 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new WaitI(builder.var(value));
+        }
+    }
+
+    @RegisterStatement("lookup")
+    public static class LookupStatement extends LStatement{
+        public ContentType type = ContentType.item;
+        public String result = "result", id = "0";
+
+        @Override
+        public void build(Table table){
+            fields(table, result, str -> result = str);
+
+            table.add(" = lookup ");
+
+            row(table);
+
+            table.button(b -> {
+                b.label(() -> type.name());
+                b.clicked(() -> showSelect(b, GlobalConstants.lookableContent, type, o -> {
+                    type = o;
+                }));
+            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
+
+            table.add(" # ");
+
+            fields(table, id, str -> id = str);
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicOperations;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new LookupI(builder.var(result), builder.var(id), type);
         }
     }
 
@@ -785,11 +822,11 @@ public class LStatements{
                         int c = 0;
                         for(UnitType item : Vars.content.units()){
                             if(!item.unlockedNow() || item.isHidden()) continue;
-                            i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
+                            i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
                                 type = "@" + item.name;
                                 field.setText(type);
                                 hide.run();
-                            }).size(40f).get().resizeImage(Cicon.small.size);
+                            }).size(40f);
 
                             if(++c % 6 == 0) i.row();
                         }
@@ -948,11 +985,11 @@ public class LStatements{
                                     int c = 0;
                                     for(Item item : Vars.content.items()){
                                         if(!item.unlockedNow()) continue;
-                                        i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
+                                        i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
                                             ore = "@" + item.name;
                                             rebuild(table);
                                             hide.run();
-                                        }).size(40f).get().resizeImage(Cicon.small.size);
+                                        }).size(40f);
 
                                         if(++c % 6 == 0) i.row();
                                     }

@@ -2,7 +2,6 @@ package mindustry.io;
 
 import arc.files.*;
 import arc.graphics.*;
-import arc.graphics.Pixmap.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.io.*;
@@ -84,8 +83,8 @@ public class MapIO{
 
                     int c = colorFor(block(), Blocks.air, Blocks.air, team());
                     if(c != black){
-                        walls.draw(x, floors.getHeight() - 1 - y, c);
-                        floors.draw(x, floors.getHeight() - 1 - y + 1, shade);
+                        walls.setRaw(x, floors.height - 1 - y, c);
+                        floors.set(x, floors.height - 1 - y + 1, shade);
                     }
                 }
             };
@@ -112,7 +111,7 @@ public class MapIO{
                         for(int dx = 0; dx < size; dx++){
                             for(int dy = 0; dy < size; dy++){
                                 int drawx = tile.x + dx + offsetx, drawy = tile.y + dy + offsety;
-                                walls.draw(drawx, floors.getHeight() - 1 - drawy, c);
+                                walls.set(drawx, floors.height - 1 - drawy, c);
                             }
                         }
 
@@ -132,9 +131,9 @@ public class MapIO{
                 @Override
                 public Tile create(int x, int y, int floorID, int overlayID, int wallID){
                     if(overlayID != 0){
-                        floors.draw(x, floors.getHeight() - 1 - y, colorFor(Blocks.air, Blocks.air, content.block(overlayID), Team.derelict));
+                        floors.set(x, floors.height - 1 - y, colorFor(Blocks.air, Blocks.air, content.block(overlayID), Team.derelict));
                     }else{
-                        floors.draw(x, floors.getHeight() - 1 - y, colorFor(Blocks.air, content.block(floorID), Blocks.air, Team.derelict));
+                        floors.set(x, floors.height - 1 - y, colorFor(Blocks.air, content.block(floorID), Blocks.air, Team.derelict));
                     }
                     if(content.block(overlayID) == Blocks.spawn){
                         map.spawns ++;
@@ -143,7 +142,7 @@ public class MapIO{
                 }
             }));
 
-            floors.drawPixmap(walls, 0, 0);
+            floors.draw(walls, true);
             walls.dispose();
             return floors;
         }finally{
@@ -152,11 +151,11 @@ public class MapIO{
     }
 
     public static Pixmap generatePreview(Tiles tiles){
-        Pixmap pixmap = new Pixmap(tiles.width, tiles.height, Format.rgba8888);
-        for(int x = 0; x < pixmap.getWidth(); x++){
-            for(int y = 0; y < pixmap.getHeight(); y++){
+        Pixmap pixmap = new Pixmap(tiles.width, tiles.height);
+        for(int x = 0; x < pixmap.width; x++){
+            for(int y = 0; y < pixmap.height; y++){
                 Tile tile = tiles.getn(x, y);
-                pixmap.draw(x, pixmap.getHeight() - 1 - y, colorFor(tile.block(), tile.floor(), tile.overlay(), tile.team()));
+                pixmap.set(x, pixmap.height - 1 - y, colorFor(tile.block(), tile.floor(), tile.overlay(), tile.team()));
             }
         }
         return pixmap;
@@ -175,14 +174,14 @@ public class MapIO{
             //while synthetic blocks are possible, most of their data is lost, so in order to avoid questions like
             //"why is there air under my drill" and "why are all my conveyors facing right", they are disabled
             int color = tile.block().hasColor && !tile.block().synthetic() ? tile.block().mapColor.rgba() : tile.floor().mapColor.rgba();
-            pix.draw(tile.x, tiles.height - 1 - tile.y, color);
+            pix.set(tile.x, tiles.height - 1 - tile.y, color);
         }
         return pix;
     }
 
     public static void readImage(Pixmap pixmap, Tiles tiles){
         for(Tile tile : tiles){
-            int color = pixmap.getPixel(tile.x, pixmap.getHeight() - 1 - tile.y);
+            int color = pixmap.get(tile.x, pixmap.height - 1 - tile.y);
             Block block = ColorMapper.get(color);
 
             if(block.isFloor()){

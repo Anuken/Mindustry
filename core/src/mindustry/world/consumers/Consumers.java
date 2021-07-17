@@ -68,6 +68,11 @@ public class Consumers{
         return add(new ConditionalConsumePower(usage, (Boolf<Building>)cons));
     }
 
+    /** Creates a consumer that consumes a dynamic amount of power. */
+    public <T extends Building> ConsumePower powerDynamic(Floatf<T> usage){
+        return add(new DynamicConsumePower((Floatf<Building>)usage));
+    }
+
     /**
      * Creates a consumer which stores power.
      * @param powerCapacity The maximum capacity in power units.

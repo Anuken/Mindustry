@@ -119,9 +119,11 @@ public class Pathfinder implements Runnable{
             }
         }
 
+        int tid = tile.getTeamID();
+
         return PathTile.get(
             tile.build == null || !solid || tile.block() instanceof CoreBlock ? 0 : Math.min((int)(tile.build.health / 40), 80),
-            tile.getTeamID(),
+            tid == 0 && tile.build != null && state.rules.coreCapture ? 255 : tid, //use teamid = 255 when core capture is enabled to mark out derelict structures
             solid,
             tile.floor().isLiquid,
             tile.staticDarkness() >= 2 || (tile.floor().solid && tile.block() == Blocks.air),

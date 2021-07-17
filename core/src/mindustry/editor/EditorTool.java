@@ -9,11 +9,12 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.world.*;
+import static mindustry.Vars.*;
 
 public enum EditorTool{
     zoom(KeyCode.v),
     pick(KeyCode.i){
-        public void touched(MapEditor editor, int x, int y){
+        public void touched(int x, int y){
             if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
 
             Tile tile = editor.tile(x, y);
@@ -23,7 +24,7 @@ public enum EditorTool{
     line(KeyCode.l, "replace", "orthogonal"){
 
         @Override
-        public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2){
+        public void touchedLine(int x1, int y1, int x2, int y2){
             //straight
             if(mode == 1){
                 if(Math.abs(x2 - x1) > Math.abs(y2 - y1)){
@@ -51,7 +52,7 @@ public enum EditorTool{
         }
 
         @Override
-        public void touched(MapEditor editor, int x, int y){
+        public void touched(int x, int y){
             if(mode == -1){
                 //normal mode
                 editor.drawBlocks(x, y);
@@ -75,7 +76,7 @@ public enum EditorTool{
         }
 
         @Override
-        public void touched(MapEditor editor, int x, int y){
+        public void touched(int x, int y){
             editor.drawCircle(x, y, tile -> {
                 if(mode == -1){
                     //erase block
@@ -95,13 +96,13 @@ public enum EditorTool{
         IntSeq stack = new IntSeq();
 
         @Override
-        public void touched(MapEditor editor, int x, int y){
+        public void touched(int x, int y){
             if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
             Tile tile = editor.tile(x, y);
 
             if(editor.drawBlock.isMultiblock()){
                 //don't fill multiblocks, thanks
-                pencil.touched(editor, x, y);
+                pencil.touched(x, y);
                 return;
             }
 
@@ -133,19 +134,19 @@ public enum EditorTool{
                 }
 
                 //replace only when the mode is 0 using the specified functions
-                fill(editor, x, y, mode == 0, tester, setter);
+                fill(x, y, mode == 0, tester, setter);
             }else if(mode == 1){ //mode 1 is team fill
 
                 //only fill synthetic blocks, it's meaningless otherwise
                 if(tile.synthetic()){
                     Team dest = tile.team();
                     if(dest == editor.drawTeam) return;
-                    fill(editor, x, y, false, t -> t.getTeamID() == dest.id && t.synthetic(), t -> t.setTeam(editor.drawTeam));
+                    fill(x, y, false, t -> t.getTeamID() == dest.id && t.synthetic(), t -> t.setTeam(editor.drawTeam));
                 }
             }
         }
 
-        void fill(MapEditor editor, int x, int y, boolean replace, Boolf<Tile> tester, Cons<Tile> filler){
+        void fill(int x, int y, boolean replace, Boolf<Tile> tester, Cons<Tile> filler){
             int width = editor.width(), height = editor.height();
 
             if(replace){
@@ -215,7 +216,7 @@ public enum EditorTool{
         }
 
         @Override
-        public void touched(MapEditor editor, int x, int y){
+        public void touched(int x, int y){
 
             //floor spray
             if(editor.drawBlock.isFloor()){
@@ -263,7 +264,7 @@ public enum EditorTool{
         this.key = code;
     }
 
-    public void touched(MapEditor editor, int x, int y){}
+    public void touched(int x, int y){}
 
-    public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2){}
+    public void touchedLine(int x1, int y1, int x2, int y2){}
 }

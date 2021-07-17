@@ -11,6 +11,7 @@ public class ItemVoid extends Block{
         super(name);
         group = BlockGroup.transportation;
         update = solid = acceptsItems = true;
+        envEnabled = Env.any;
     }
 
     public class ItemVoidBuild extends Building{

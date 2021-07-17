@@ -21,10 +21,10 @@ import static mindustry.entities.Puddles.*;
 @Component(base = true)
 abstract class PuddleComp implements Posc, Puddlec, Drawc{
     private static final int maxGeneration = 2;
-    private static final Color tmp = new Color();
     private static final Rect rect = new Rect(), rect2 = new Rect();
     private static int seeds;
 
+    @Import int id;
     @Import float x, y;
 
     transient float accepting, updateTime, lastRipple;
@@ -92,13 +92,13 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
     public void draw(){
         Draw.z(Layer.debris - 1);
 
-        seeds = id();
+        seeds = id;
         boolean onLiquid = tile.floor().isLiquid;
         float f = Mathf.clamp(amount / (maxLiquid / 1.5f));
         float smag = onLiquid ? 0.8f : 0f;
         float sscl = 25f;
 
-        Draw.color(tmp.set(liquid.color).shiftValue(-0.05f));
+        Draw.color(Tmp.c1.set(liquid.color).shiftValue(-0.05f));
         Fill.circle(x + Mathf.sin(Time.time + seeds * 532, sscl, smag), y + Mathf.sin(Time.time + seeds * 53, sscl, smag), f * 8f);
         Angles.randLenVectors(id(), 3, f * 6f, (ex, ey) -> {
             Fill.circle(x + ex + Mathf.sin(Time.time + seeds * 532, sscl, smag),

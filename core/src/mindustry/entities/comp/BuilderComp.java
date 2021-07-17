@@ -20,6 +20,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.util.*;
 
@@ -69,7 +70,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             }
         }
 
-        Building core = core();
+        var core = core();
 
         //nothing to build.
         if(buildPlan() == null) return;
@@ -109,7 +110,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
                 plans.removeFirst();
                 return;
             }
-        }else if((tile.team() != team && tile.team() != Team.derelict) || (!current.breaking && (cb.cblock != current.block || cb.tile != current.tile()))){
+        }else if((tile.team() != team && tile.team() != Team.derelict) || (!current.breaking && (cb.current != current.block || cb.tile != current.tile()))){
             plans.removeFirst();
             return;
         }
