@@ -103,11 +103,11 @@ public abstract class GenerateFilter{
     //TODO would be nice if these functions used the seed and ditched "in" completely; simplex should be stateless
 
     protected float noise(GenerateInput in, float scl, float mag){
-        return (float)Simplex.noise2d(seed, 1f, 0f, 1f / scl, in.x, in.y) * mag;
+        return Simplex.noise2d(seed, 1f, 0f, 1f / scl, in.x, in.y) * mag;
     }
 
     protected float noise(GenerateInput in, float scl, float mag, float octaves, float persistence){
-        return (float)Simplex.noise2d(seed, octaves, persistence, 1f / scl, in.x, in.y) * mag;
+        return Simplex.noise2d(seed, octaves, persistence, 1f / scl, in.x, in.y) * mag;
     }
 
     protected float rnoise(float x, float y, float scl, float mag){
