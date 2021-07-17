@@ -1,8 +1,0 @@
-[This is a truncated changelog, see Github for full notes]
-- Slightly increased Lancer build cost
-- Double-tapping now enters a campaign map (Contributed by @joshuaptfan)
-- Minor logic memory optimizations - block/sensor constants are no longer stored in every processor
-- Doubled surge smelter item capacity
-- Made Fungal Pass slightly easier
-- Fixed some rare crashes
-- Fixed unit spawn shockwave appearing too late

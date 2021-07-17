@@ -52,22 +52,22 @@ public class Puddles{
         Puddle p = map.get(tile.pos());
         if(p == null){
             Puddle puddle = Puddle.create();
-            puddle.tile(tile);
-            puddle.liquid(liquid);
-            puddle.amount(amount);
-            puddle.generation(generation);
+            puddle.tile = tile;
+            puddle.liquid = liquid;
+            puddle.amount = amount;
+            puddle.generation = generation;
             puddle.set((tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
             puddle.add();
             map.put(tile.pos(), puddle);
-        }else if(p.liquid() == liquid){
-            p.accepting(Math.max(amount, p.accepting()));
+        }else if(p.liquid == liquid){
+            p.accepting = Math.max(amount, p.accepting);
 
-            if(generation == 0 && p.lastRipple <= Time.time - 40f && p.amount() >= maxLiquid / 2f){
-                Fx.ripple.at((tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f, 1f, p.liquid().color);
+            if(generation == 0 && p.lastRipple <= Time.time - 40f && p.amount >= maxLiquid / 2f){
+                Fx.ripple.at((tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f, 1f, p.liquid.color);
                 p.lastRipple = Time.time;
             }
         }else{
-            p.amount(p.amount() + reactPuddle(p.liquid(), liquid, amount, p.tile(), (p.x() + source.worldx())/2f, (p.y() + source.worldy())/2f));
+            p.amount += reactPuddle(p.liquid, liquid, amount, p.tile, (p.x + source.worldx())/2f, (p.y + source.worldy())/2f);
         }
     }
 

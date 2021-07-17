@@ -13,6 +13,7 @@ import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.payloads.*;
@@ -63,6 +64,7 @@ public class Reconstructor extends UnitBlock{
 
     @Override
     public void setStats(){
+        stats.timePeriod = constructTime;
         super.setStats();
 
         stats.add(Stat.productionTime, constructTime / 60f, StatUnit.seconds);
@@ -71,12 +73,12 @@ public class Reconstructor extends UnitBlock{
             for(var upgrade : upgrades){
                 float size = 8 * 3;
                 if(upgrade[0].unlockedNow() && upgrade[1].unlockedNow()){
-                    table.image(upgrade[0].icon(Cicon.small)).size(size).padRight(4).padLeft(10).scaling(Scaling.fit).right();
+                    table.image(upgrade[0].uiIcon).size(size).padRight(4).padLeft(10).scaling(Scaling.fit).right();
                     table.add(upgrade[0].localizedName).left();
 
                     table.add("[lightgray] -> ");
 
-                    table.image(upgrade[1].icon(Cicon.small)).size(size).padRight(4).scaling(Scaling.fit);
+                    table.image(upgrade[1].uiIcon).size(size).padRight(4).scaling(Scaling.fit);
                     table.add(upgrade[1].localizedName).left();
                     table.row();
                 }
@@ -105,6 +107,11 @@ public class Reconstructor extends UnitBlock{
 
         public float fraction(){
             return progress / constructTime;
+        }
+
+        @Override
+        public boolean acceptUnitPayload(Unit unit){
+            return hasUpgrade(unit.type);
         }
 
         @Override
@@ -147,7 +154,7 @@ public class Reconstructor extends UnitBlock{
             if(constructing() && hasArrived()){
                 Draw.draw(Layer.blockOver, () -> {
                     Draw.alpha(1f - progress/ constructTime);
-                    Draw.rect(payload.unit.type.icon(Cicon.full), x, y, payload.rotation() - 90);
+                    Draw.rect(payload.unit.type.fullIcon, x, y, payload.rotation() - 90);
                     Draw.reset();
                     Drawf.construct(this, upgrade(payload.unit.type), payload.rotation() - 90f, progress / constructTime, speedScl, time);
                 });
@@ -191,6 +198,12 @@ public class Reconstructor extends UnitBlock{
 
             speedScl = Mathf.lerpDelta(speedScl, Mathf.num(valid), 0.05f);
             time += edelta() * speedScl * state.rules.unitBuildSpeedMultiplier;
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return Mathf.clamp(fraction());
+            return super.sense(sensor);
         }
 
         @Override

@@ -7,6 +7,8 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class ConsumeLiquid extends ConsumeLiquidBase{
     public final Liquid liquid;
 
@@ -26,7 +28,7 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
 
     @Override
     public void build(Building tile, Table table){
-        table.add(new ReqImage(liquid.icon(Cicon.medium), () -> valid(tile))).size(8 * 4);
+        table.add(new ReqImage(liquid.uiIcon, () -> valid(tile))).size(iconMed).top().left();
     }
 
     @Override

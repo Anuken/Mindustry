@@ -3,17 +3,20 @@ package mindustry.core;
 import arc.*;
 import arc.files.*;
 import arc.graphics.*;
+import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
+import arc.util.async.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
-import mindustry.ui.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static arc.Core.*;
@@ -35,6 +38,8 @@ public class Renderer implements ApplicationListener{
     public boolean animateShields, drawWeather = true, drawStatus;
     /** minZoom = zooming out, maxZoom = zooming in */
     public float minZoom = 1.5f, maxZoom = 6f;
+    public Seq<EnvRenderer> envRenderers = new Seq<>();
+    public TextureRegion[] bubbles = new TextureRegion[16], splashes = new TextureRegion[12];
 
     private @Nullable CoreBuild landCore;
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
@@ -51,6 +56,10 @@ public class Renderer implements ApplicationListener{
         shaketime = Math.max(shaketime, duration);
     }
 
+    public void addEnvRenderer(int mask, Runnable render){
+        envRenderers.add(new EnvRenderer(mask, render));
+    }
+
     @Override
     public void init(){
         planets = new PlanetRenderer();
@@ -59,9 +68,18 @@ public class Renderer implements ApplicationListener{
             setupBloom();
         }
 
-        Events.on(WorldLoadEvent.class, e -> {
+        Events.run(Trigger.newGame, () -> {
             landCore = player.bestCore();
         });
+
+        EnvRenderers.init();
+        for(int i = 0; i < bubbles.length; i++) bubbles[i] = atlas.find("bubble-" + i);
+        for(int i = 0; i < splashes.length; i++) splashes[i] = atlas.find("splash-" + i);
+
+        assets.load("sprites/clouds.png", Texture.class).loaded = t -> {
+            ((Texture)t).setWrap(TextureWrap.repeat);
+            ((Texture)t).setFilter(TextureFilter.linear);
+        };
     }
 
     @Override
@@ -77,7 +95,9 @@ public class Renderer implements ApplicationListener{
         drawStatus = Core.settings.getBool("blockstatus");
 
         if(landTime > 0){
-            landTime -= Time.delta;
+            if(!state.isPaused()){
+                landTime -= Time.delta;
+            }
             landscale = Interp.pow5In.apply(minZoomScl, Scl.scl(4f), 1f - landTime / Fx.coreLand.lifetime);
             camerascale = landscale;
             weatherAlpha = 0f;
@@ -182,6 +202,7 @@ public class Renderer implements ApplicationListener{
 
         Draw.proj(camera);
 
+        blocks.checkChanges();
         blocks.floor.checkChanges();
         blocks.processBlocks();
 
@@ -204,6 +225,13 @@ public class Renderer implements ApplicationListener{
 
         Draw.drawRange(Layer.blockBuilding, () -> Draw.shader(Shaders.blockbuild, true), Draw::shader);
 
+        //render all matching environments
+        for(var renderer : envRenderers){
+            if((renderer.env & state.rules.environment) == renderer.env){
+                renderer.renderer.run();
+            }
+        }
+
         if(state.rules.lighting){
             Draw.draw(Layer.light, lights::draw);
         }
@@ -214,8 +242,8 @@ public class Renderer implements ApplicationListener{
 
         if(bloom != null){
             bloom.resize(graphics.getWidth() / 4, graphics.getHeight() / 4);
-            Draw.draw(Layer.bullet - 0.01f, bloom::capture);
-            Draw.draw(Layer.effect + 0.01f, bloom::render);
+            Draw.draw(Layer.bullet - 0.02f, bloom::capture);
+            Draw.draw(Layer.effect + 0.02f, bloom::render);
         }
 
         Draw.draw(Layer.plans, overlays::drawBottom);
@@ -252,24 +280,38 @@ public class Renderer implements ApplicationListener{
 
     private void drawLanding(){
         CoreBuild entity = landCore == null ? player.bestCore() : landCore;
+        //var clouds = assets.get("sprites/clouds.png", Texture.class);
         if(landTime > 0 && entity != null){
-            float fract = landTime / Fx.coreLand.lifetime;
+            float fout = landTime / Fx.coreLand.lifetime;
 
-            TextureRegion reg = entity.block.icon(Cicon.full);
+            //TODO clouds
+            /*
+            float scaling = 10000f;
+            float sscl = 1f + fout*1.5f;
+            float offset = -0.38f;
+
+            Tmp.tr1.set(clouds);
+            Tmp.tr1.set((camera.position.x - camera.width/2f * sscl) / scaling, (camera.position.y - camera.height/2f * sscl) / scaling, (camera.position.x + camera.width/2f * sscl) / scaling, (camera.position.y + camera.height/2f * sscl) / scaling);
+            Draw.alpha(Mathf.slope(Mathf.clamp(((1f - fout) + offset)/(1f + offset))));
+            Draw.mixcol(Pal.spore, 0.5f);
+            Draw.rect(Tmp.tr1, camera.position.x, camera.position.y, camera.width, camera.height);
+            Draw.reset();*/
+
+            TextureRegion reg = entity.block.fullIcon;
             float scl = Scl.scl(4f) / camerascale;
-            float s = reg.width * Draw.scl * scl * 4f * fract;
+            float s = reg.width * Draw.scl * scl * 4f * fout;
 
             Draw.color(Pal.lightTrail);
             Draw.rect("circle-shadow", entity.x, entity.y, s, s);
 
-            Angles.randLenVectors(1, (1f- fract), 100, 1000f * scl * (1f-fract), (x, y, fin, fout) -> {
-                Lines.stroke(scl * fin);
-                Lines.lineAngle(entity.x + x, entity.y + y, Mathf.angle(x, y), (fin * 20 + 1f) * scl);
+            Angles.randLenVectors(1, (1f- fout), 100, 1000f * scl * (1f-fout), (x, y, ffin, ffout) -> {
+                Lines.stroke(scl * ffin);
+                Lines.lineAngle(entity.x + x, entity.y + y, Mathf.angle(x, y), (ffin * 20 + 1f) * scl);
             });
 
             Draw.color();
-            Draw.mixcol(Color.white, fract);
-            Draw.rect(reg, entity.x, entity.y, reg.width * Draw.scl * scl, reg.height * Draw.scl * scl, fract * 135f);
+            Draw.mixcol(Color.white, fout);
+            Draw.rect(reg, entity.x, entity.y, reg.width * Draw.scl * scl, reg.height * Draw.scl * scl, fout * 135f);
 
             Draw.reset();
         }
@@ -314,7 +356,7 @@ public class Renderer implements ApplicationListener{
         int w = world.width() * tilesize, h = world.height() * tilesize;
         int memory = w * h * 4 / 1024 / 1024;
 
-        if(memory >= (mobile ? 65 : 120)){
+        if(Vars.checkScreenshotMemory && memory >= (mobile ? 65 : 120)){
             ui.showInfo("@screenshot.invalid");
             return;
         }
@@ -330,25 +372,39 @@ public class Renderer implements ApplicationListener{
         camera.position.y = h / 2f + tilesize / 2f;
         buffer.begin();
         draw();
+        Draw.flush();
+        byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
         buffer.end();
         disableUI = false;
         camera.width = vpW;
         camera.height = vpH;
         camera.position.set(px, py);
-        buffer.begin();
-        byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
-        for(int i = 0; i < lines.length; i += 4){
-            lines[i + 3] = (byte)255;
-        }
-        buffer.end();
-        Pixmap fullPixmap = new Pixmap(w, h, Pixmap.Format.rgba8888);
-        Buffers.copy(lines, 0, fullPixmap.getPixels(), lines.length);
-        Fi file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
-        PixmapIO.writePNG(file, fullPixmap);
-        fullPixmap.dispose();
-        ui.showInfoFade(Core.bundle.format("screenshot", file.toString()));
         drawWeather = true;
-
         buffer.dispose();
+
+        Threads.thread(() -> {
+            for(int i = 0; i < lines.length; i += 4){
+                lines[i + 3] = (byte)255;
+            }
+            Pixmap fullPixmap = new Pixmap(w, h);
+            Buffers.copy(lines, 0, fullPixmap.pixels, lines.length);
+            Fi file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
+            PixmapIO.writePng(file, fullPixmap);
+            fullPixmap.dispose();
+            app.post(() -> ui.showInfoFade(Core.bundle.format("screenshot", file.toString())));
+        });
     }
+
+    public static class EnvRenderer{
+        /** Environment bitmask; must match env exactly when and-ed. */
+        public final int env;
+        /** Rendering callback. */
+        public final Runnable renderer;
+
+        public EnvRenderer(int env, Runnable renderer){
+            this.env = env;
+            this.renderer = renderer;
+        }
+    }
+
 }

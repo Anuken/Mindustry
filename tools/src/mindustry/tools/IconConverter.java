@@ -17,7 +17,6 @@ public class IconConverter{
         Fi.get("fontgen/icon_parts").deleteDirectory();
         Fi[] list = new Fi("icons").list();
 
-        ArcNativesLoader.load();
         Seq<Fi> files = new Seq<>();
 
         for(Fi img : list){
@@ -42,25 +41,25 @@ public class IconConverter{
     }
 
     void convert(Pixmap pixmap, Fi output){
-        boolean[][] grid = new boolean[pixmap.getWidth()][pixmap.getHeight()];
+        boolean[][] grid = new boolean[pixmap.width][pixmap.height];
 
-        for(int x = 0; x < pixmap.getWidth(); x++){
-            for(int y = 0; y < pixmap.getHeight(); y++){
-                grid[x][pixmap.getHeight() - 1 - y] = !Pixmaps.empty(pixmap.getPixel(x, y));
+        for(int x = 0; x < pixmap.width; x++){
+            for(int y = 0; y < pixmap.height; y++){
+                grid[x][pixmap.height - 1 - y] = !pixmap.empty(x, y);
             }
         }
 
         float xscl = 1f, yscl = 1f;//resolution / (float)pixmap.getWidth(), yscl = resolution / (float)pixmap.getHeight();
         float scl = xscl;
 
-        width = pixmap.getWidth();
-        height = pixmap.getHeight();
+        width = pixmap.width;
+        height = pixmap.height;
 
-        out.append("<svg width=\"").append(pixmap.getWidth()).append("\" height=\"").append(pixmap.getHeight()).append("\">\n");
+        out.append("<svg width=\"").append(pixmap.width).append("\" height=\"").append(pixmap.height).append("\">\n");
 
-        for(int x = -1; x < pixmap.getWidth(); x++){
-            for(int y = -1; y < pixmap.getHeight(); y++){
-                int index = index(x, y, pixmap.getWidth(), pixmap.getHeight(), grid);
+        for(int x = -1; x < pixmap.width; x++){
+            for(int y = -1; y < pixmap.height; y++){
+                int index = index(x, y, pixmap.width, pixmap.height, grid);
 
                 float leftx = x * xscl, boty = y * yscl, rightx = x * xscl + xscl, topy = y * xscl + yscl,
                 midx = x * xscl + xscl / 2f, midy = y * yscl + yscl / 2f;

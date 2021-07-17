@@ -1,6 +1,7 @@
 package mindustry.world.blocks.production;
 
 import arc.graphics.g2d.*;
+import arc.math.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -18,10 +19,12 @@ public class Fracker extends SolidPump{
         hasItems = true;
         ambientSound = Sounds.drill;
         ambientSoundVolume = 0.03f;
+        envRequired |= Env.groundOil;
     }
 
     @Override
     public void setStats(){
+        stats.timePeriod = itemUseTime;
         super.setStats();
 
         stats.add(Stat.productionTime, itemUseTime / 60f, StatUnit.seconds);
@@ -65,6 +68,8 @@ public class Fracker extends SolidPump{
                 super.updateTile();
                 accumulator += delta() * efficiency();
             }else{
+                warmup = Mathf.lerpDelta(warmup, 0f, 0.02f);
+                lastPump = 0f;
                 dumpLiquid(result);
             }
         }

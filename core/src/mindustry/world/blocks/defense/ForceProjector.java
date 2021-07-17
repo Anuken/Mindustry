@@ -31,7 +31,6 @@ public class ForceProjector extends Block{
     public float cooldownNormal = 1.75f;
     public float cooldownLiquid = 1.5f;
     public float cooldownBrokenBase = 0.35f;
-    public float basePowerDraw = 0.2f;
     public @Load("@-top") TextureRegion topRegion;
 
     static ForceBuild paramEntity;
@@ -40,7 +39,7 @@ public class ForceProjector extends Block{
             trait.absorb();
             Fx.absorb.at(trait);
             paramEntity.hit = 1f;
-            paramEntity.buildup += trait.damage() * paramEntity.warmup;
+            paramEntity.buildup += trait.damage();
         }
     };
 
@@ -54,7 +53,13 @@ public class ForceProjector extends Block{
         hasItems = true;
         ambientSound = Sounds.shield;
         ambientSoundVolume = 0.08f;
-        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).boost().update(false);
+        consumes.add(new ConsumeCoolant(0.1f)).boost().update(false);
+    }
+
+    @Override
+    public void init(){
+        clipSize = Math.max(clipSize, (radius + phaseRadiusBoost + 3f) * 2f);
+        super.init();
     }
 
     @Override
@@ -70,10 +75,10 @@ public class ForceProjector extends Block{
 
     @Override
     public void setStats(){
+        stats.timePeriod = phaseUseTime;
         super.setStats();
         stats.add(Stat.shieldHealth, shieldHealth, StatUnit.none);
         stats.add(Stat.cooldownTime, (int) (shieldHealth / cooldownBrokenBase / 60f), StatUnit.seconds);
-        stats.add(Stat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
         stats.add(Stat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
         stats.add(Stat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
     }
@@ -94,20 +99,10 @@ public class ForceProjector extends Block{
     public class ForceBuild extends Building implements Ranged{
         public boolean broken = true;
         public float buildup, radscl, hit, warmup, phaseHeat;
-        public ForceDraw drawer;
 
         @Override
         public float range(){
             return realRadius();
-        }
-
-        @Override
-        public void created(){
-            super.created();
-            drawer = ForceDraw.create();
-            drawer.build = this;
-            drawer.set(x, y);
-            drawer.add();
         }
 
         @Override
@@ -120,7 +115,6 @@ public class ForceProjector extends Block{
             float radius = realRadius();
             if(!broken && radius > 1f) Fx.forceShrink.at(x, y, radius, team.color);
             super.onRemoved();
-            drawer.remove();
         }
 
         @Override
@@ -188,10 +182,6 @@ public class ForceProjector extends Block{
         public void draw(){
             super.draw();
 
-            if(drawer != null){
-                drawer.set(x, y);
-            }
-
             if(buildup > 0f){
                 Draw.alpha(buildup / shieldHealth * 0.75f);
                 Draw.blend(Blending.additive);
@@ -199,6 +189,8 @@ public class ForceProjector extends Block{
                 Draw.blend();
                 Draw.reset();
             }
+            
+            drawShield();
         }
 
         public void drawShield(){
@@ -242,23 +234,6 @@ public class ForceProjector extends Block{
             radscl = read.f();
             warmup = read.f();
             phaseHeat = read.f();
-        }
-    }
-
-    @EntityDef(value = {ForceDrawc.class}, serialize = false)
-    @Component(base = true)
-    abstract class ForceDrawComp implements Drawc{
-        transient ForceBuild build;
-
-        @Override
-        public void draw(){
-            build.drawShield();
-        }
-
-        @Replace
-        @Override
-        public float clipSize(){
-            return build.realRadius() * 3f;
         }
     }
 }

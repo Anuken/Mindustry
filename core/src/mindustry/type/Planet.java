@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 
 public class Planet extends UnlockableContent{
     /** Default spacing between planet orbits in world units. */
-    private static final float orbitSpacing = 9f;
+    private static final float orbitSpacing = 11f;
     /** intersect() temp var. */
     private static final Vec3 intersectResult = new Vec3();
     /** Mesh used for rendering. Created on load() - will be null on the server! */
@@ -125,7 +125,8 @@ public class Planet extends UnlockableContent{
         sectors.get(index).preset = preset;
     }
 
-    public boolean isLandable(){
+    /** @return whether this planet has a sector grid to select. */
+    public boolean hasGrid(){
         return grid != null && generator != null && sectors.size > 0;
     }
 
@@ -152,7 +153,7 @@ public class Planet extends UnlockableContent{
     public float getRotation(){
         //tidally locked planets always face toward parents
         if(tidalLock){
-            return getOrbitAngle();
+            return -getOrbitAngle() + 90;
         }
         //random offset for more variability
         float offset = Mathf.randomSeed(id+1, 360);
@@ -202,8 +203,18 @@ public class Planet extends UnlockableContent{
         return mat.setToTranslation(position).rotate(Vec3.Y, getRotation());
     }
 
+    /** Regenerates the planet mesh. For debugging only. */
+    public void reloadMesh(){
+        if(mesh != null){
+            mesh.dispose();
+        }
+        mesh = meshLoader.get();
+    }
+
     @Override
     public void load(){
+        super.load();
+
         mesh = meshLoader.get();
     }
 

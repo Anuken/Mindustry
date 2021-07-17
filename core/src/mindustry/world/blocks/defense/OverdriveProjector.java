@@ -39,6 +39,8 @@ public class OverdriveProjector extends Block{
         hasPower = true;
         hasItems = true;
         canOverdrive = false;
+        emitLight = true;
+        lightRadius = 50f;
     }
 
     @Override
@@ -57,6 +59,7 @@ public class OverdriveProjector extends Block{
 
     @Override
     public void setStats(){
+        stats.timePeriod = useTime;
         super.setStats();
 
         stats.add(Stat.speedIncrease, (int)(100f * speedBoost), StatUnit.percent);
@@ -88,7 +91,7 @@ public class OverdriveProjector extends Block{
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, 50f * smoothEfficiency, baseColor, 0.7f * smoothEfficiency);
+            Drawf.light(team, x, y, lightRadius * smoothEfficiency, baseColor, 0.7f * smoothEfficiency);
         }
 
         @Override

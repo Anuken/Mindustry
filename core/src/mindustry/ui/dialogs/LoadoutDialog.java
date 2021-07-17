@@ -111,7 +111,7 @@ public class LoadoutDialog extends BaseDialog{
                     ui.showInfo(Core.bundle.format("configure.invalid", capacity));
                 })).size(bsize);
 
-                t.image(stack.item.icon(Cicon.small)).size(8 * 3).padRight(4).padLeft(4);
+                t.image(stack.item.uiIcon).size(8 * 3).padRight(4).padLeft(4);
                 t.label(() -> stack.amount + "").left().width(90f);
             }).pad(2).left().fillX();
 

@@ -7,9 +7,9 @@ import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
 import arc.func.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
+import arc.util.io.*;
 import mindustry.*;
 import mindustry.mod.Mods.*;
 import rhino.*;
@@ -18,33 +18,19 @@ import rhino.module.provider.*;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
 import java.util.regex.*;
 
 public class Scripts implements Disposable{
-    private static final Seq<String> blacklist = Seq.with(".net.", "java.net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
-        "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
-        ".awt", "socket", "classloader", "oracle", "invoke", "java.util.function", "java.util.stream", "org.", "mod.classmap");
-    private static final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "jdk.proxy1", "mindustry.gen.",
-        "mindustry.logic.", "mindustry.async.", "saveio", "systemcursor", "filetreeinitevent");
-
     private final Context context;
     private final Scriptable scope;
     private boolean errored;
-    LoadedMod currentMod = null;
 
-    public static boolean allowClass(String type){
-        return !blacklist.contains(t -> type.toLowerCase(Locale.ROOT).contains(t)) || whitelist.contains(t -> type.toLowerCase(Locale.ROOT).contains(t));
-    }
+    LoadedMod currentMod = null;
 
     public Scripts(){
         Time.mark();
 
         context = Vars.platform.getScriptContext();
-        context.setClassShutter(Scripts::allowClass);
-        context.getWrapFactory().setJavaPrimitiveWrap(false);
-        context.setLanguageVersion(Context.VERSION_ES6);
-
         scope = new ImporterTopLevel(context);
 
         new RequireBuilder()
@@ -63,7 +49,7 @@ public class Scripts implements Disposable{
 
     public String runConsole(String text){
         try{
-            Object o = context.evaluateString(scope, text, "console.js", 1, null);
+            Object o = context.evaluateString(scope, text, "console.js", 1);
             if(o instanceof NativeJavaObject n) o = n.unwrap();
             if(o instanceof Undefined) o = "undefined";
             return String.valueOf(o);
@@ -144,7 +130,7 @@ public class Scripts implements Disposable{
 
     /** writeFile but for a byte[] */
     public void writeBinFile(String purpose, String ext, byte[] contents){
-        if(contents == null) contents = new byte[0];
+        if(contents == null) contents = Streams.emptyBytes;
         final byte[] fContents = contents;
         selectFile(false, purpose, ext, fi -> fi.writeBytes(fContents));
     }
@@ -175,11 +161,11 @@ public class Scripts implements Disposable{
         try{
             if(currentMod != null){
                 //inject script info into file
-                context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1, null);
+                context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1);
             }
             context.evaluateString(scope,
             wrap ? "(function(){'use strict';\n" + script + "\n})();" : script,
-            file, 0, null);
+            file, 0);
             return true;
         }catch(Throwable t){
             if(currentMod != null){
@@ -196,7 +182,7 @@ public class Scripts implements Disposable{
     }
 
     private class ScriptModuleProvider extends UrlModuleSourceProvider{
-        private Pattern directory = Pattern.compile("^(.+?)/(.+)");
+        private final Pattern directory = Pattern.compile("^(.+?)/(.+)");
 
         public ScriptModuleProvider(){
             super(null, null);
@@ -227,7 +213,7 @@ public class Scripts implements Disposable{
             if(!module.exists() || module.isDirectory()) return null;
             return new ModuleSource(
                 new InputStreamReader(new ByteArrayInputStream((module.readString()).getBytes())),
-                null, new URI(moduleId), root.file().toURI(), validator);
+                new URI(moduleId), root.file().toURI(), validator);
         }
     }
 }

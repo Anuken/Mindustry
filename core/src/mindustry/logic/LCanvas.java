@@ -112,7 +112,6 @@ public class LCanvas extends Table{
 
             jumps.cullable = false;
         }).grow().get();
-        //pane.setClip(false);
         pane.setFlickScroll(false);
 
         //load old scroll percent
@@ -182,7 +181,7 @@ public class LCanvas extends Table{
             float dst = Math.min(y - this.y, Core.graphics.getHeight() - y);
             if(dst < Scl.scl(100f)){ //scroll margin
                 int sign = Mathf.sign(Core.graphics.getHeight()/2f - y);
-                pane.setScrollY(pane.getScrollY() + sign * Scl.scl(15f));
+                pane.setScrollY(pane.getScrollY() + sign * Scl.scl(15f) * Time.delta);
             }
         }
     }

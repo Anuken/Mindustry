@@ -3,7 +3,6 @@ package mindustry.ctype;
 import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
-import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -30,8 +29,10 @@ public abstract class UnlockableContent extends MappableContent{
     public boolean inlineDescription = true;
     /** Special logic icon ID. */
     public int iconId = 0;
-    /** Icons by Cicon ID.*/
-    protected TextureRegion[] cicons = new TextureRegion[Cicon.all.length];
+    /** Icon of the content to use in UI. */
+    public TextureRegion uiIcon;
+    /** Icon of the full content. Unscaled.*/
+    public TextureRegion fullIcon;
     /** Unlock state. Loaded from settings. Do not modify outside of the constructor. */
     protected boolean unlocked;
 
@@ -44,9 +45,27 @@ public abstract class UnlockableContent extends MappableContent{
         this.unlocked = Core.settings != null && Core.settings.getBool(this.name + "-unlocked", false);
     }
 
+    @Override
+    public void loadIcon(){
+        fullIcon =
+            Core.atlas.find(getContentType().name() + "-" + name + "-full",
+            Core.atlas.find(name + "-full",
+            Core.atlas.find(name,
+            Core.atlas.find(getContentType().name() + "-" + name,
+            Core.atlas.find(name + "1")))));
+
+        uiIcon = Core.atlas.find(getContentType().name() + "-" + name + "-ui", fullIcon);
+    }
+
     /** @return the tech node for this content. may be null. */
     public @Nullable TechNode node(){
         return TechTree.get(this);
+    }
+
+    /** Use fullIcon / uiIcon instead! This will be removed. */
+    @Deprecated
+    public TextureRegion icon(Cicon icon){
+        return icon == Cicon.full ? fullIcon : uiIcon;
     }
 
     public String displayDescription(){
@@ -65,7 +84,10 @@ public abstract class UnlockableContent extends MappableContent{
     public void setStats(){
     }
 
-    /** Generate any special icons for this content. Called asynchronously.*/
+    /**
+     * Generate any special icons for this content. Called synchronously.
+     * No regions are loaded at this point; grab pixmaps from the packer.
+     * */
     @CallSuper
     public void createIcons(MultiPacker packer){
 
@@ -80,33 +102,13 @@ public abstract class UnlockableContent extends MappableContent{
         return Fonts.getUnicodeStr(name);
     }
 
-    /** Returns a specific content icon, or the region {contentType}-{name} if not found.*/
-    public TextureRegion icon(Cicon icon){
-        if(cicons[icon.ordinal()] == null){
-            cicons[icon.ordinal()] =
-                Core.atlas.find(getContentType().name() + "-" + name + "-" + icon.name(),
-                Core.atlas.find(getContentType().name() + "-" + name + "-full",
-                Core.atlas.find(name + "-" + icon.name(),
-                Core.atlas.find(name + "-full",
-                Core.atlas.find(name,
-                Core.atlas.find(getContentType().name() + "-" + name,
-                Core.atlas.find(name + "1")))))));
-        }
-        return cicons[icon.ordinal()];
-    }
-
-    public Cicon prefDatabaseIcon(){
-        return Cicon.xlarge;
+    public boolean hasEmoji(){
+        return Fonts.hasUnicodeStr(name);
     }
 
     /** Iterates through any implicit dependencies of this content.
      * For blocks, this would be the items required to build it. */
     public void getDependencies(Cons<UnlockableContent> cons){
-
-    }
-
-    /** This should show all necessary info about this content in the specified table. */
-    public void display(Table table){
 
     }
 
@@ -122,6 +124,10 @@ public abstract class UnlockableContent extends MappableContent{
     /** @return whether to show a notification toast when this is unlocked */
     public boolean showUnlock(){
         return true;
+    }
+
+    public boolean logicVisible(){
+        return !isHidden();
     }
 
     /** Makes this piece of content unlocked; if it already unlocked, nothing happens. */
@@ -144,7 +150,7 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     public boolean unlocked(){
-        if(net != null && net.client()) return unlocked || alwaysUnlocked || state.rules.researched.contains(name);
+        if(net != null && net.client()) return alwaysUnlocked || state.rules.researched.contains(name);
         return unlocked || alwaysUnlocked;
     }
 

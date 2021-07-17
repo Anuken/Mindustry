@@ -1,21 +1,17 @@
 package mindustry.entities.comp;
 
-import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.entities.bullet.*;
-import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.blocks.defense.Wall.*;
 
 import static mindustry.Vars.*;
 
@@ -25,12 +21,18 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Import Team team;
     @Import Entityc owner;
     @Import float x, y, damage;
+    @Import Vec2 vel;
 
     IntSeq collided = new IntSeq(6);
     Object data;
     BulletType type;
     float fdata;
+
+    @ReadOnly
+    private float rotation;
+
     transient boolean absorbed, hit;
+    transient @Nullable Trail trail;
 
     @Override
     public void getCollisions(Cons<QuadTree> consumer){
@@ -42,9 +44,11 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         }
     }
 
+    //bullets always considered local
     @Override
-    public void drawBullets(){
-        type.draw(self());
+    @Replace
+    public boolean isLocal(){
+        return true;
     }
 
     @Override
@@ -54,13 +58,17 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     @Override
     public void remove(){
-        type.despawned(self());
+        //'despawned' only counts when the bullet is killed externally or reaches the end of life
+        if(!hit){
+            type.despawned(self());
+        }
+        type.removed(self());
         collided.clear();
     }
 
     @Override
     public float damageMultiplier(){
-        if(owner instanceof Unit) return ((Unit)owner).damageMultiplier() * state.rules.unitDamageMultiplier;
+        if(owner instanceof Unit u) return u.damageMultiplier() * state.rules.unitDamageMultiplier;
         if(owner instanceof Building) return state.rules.blockDamageMultiplier;
 
         return 1f;
@@ -80,8 +88,8 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Replace
     @Override
     public boolean collides(Hitboxc other){
-        return type.collides && (other instanceof Teamc && ((Teamc)other).team() != team)
-            && !(other instanceof Flyingc && !((Flyingc)other).checkTarget(type.collidesAir, type.collidesGround))
+        return type.collides && (other instanceof Teamc t && t.team() != team)
+            && !(other instanceof Flyingc f && !f.checkTarget(type.collidesAir, type.collidesGround))
             && !(type.pierce && collided.contains(other.id())); //prevent multiple collisions
     }
 
@@ -89,24 +97,16 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Override
     public void collision(Hitboxc other, float x, float y){
         type.hit(self(), x, y);
-        float health = 0f;
-
-        if(other instanceof Healthc h){
-            health = h.health();
-        }
 
         //must be last.
         if(!type.pierce){
+            hit = true;
             remove();
         }else{
             collided.add(other.id());
         }
 
-        type.hitEntity(self(), other, health);
-
-        if(owner instanceof WallBuild && player != null && team == player.team() && other instanceof Unit unit && unit.dead){
-            Events.fire(Trigger.phaseDeflectHit);
-        }
+        type.hitEntity(self(), other, other instanceof Healthc h ? h.health() : 0f);
     }
 
     @Override
@@ -130,6 +130,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
                     if(remove || type.collidesTeam){
                         if(!type.pierceBuilding){
+                            hit = true;
                             remove();
                         }else{
                             collided.add(tile.id);
@@ -146,29 +147,33 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         }
 
         if(type.pierceCap != -1 && collided.size >= type.pierceCap){
+            hit = true;
             remove();
         }
     }
 
     @Override
     public void draw(){
-        Draw.z(Layer.bullet);
+        Draw.z(type.layer);
 
         type.draw(self());
         type.drawLight(self());
     }
 
+    public void initVel(float angle, float amount){
+        vel.trns(angle, amount);
+        rotation = angle;
+    }
+
     /** Sets the bullet's rotation in degrees. */
     @Override
     public void rotation(float angle){
-        vel().setAngle(angle);
+        vel.setAngle(rotation = angle);
     }
 
     /** @return the bullet's rotation. */
     @Override
     public float rotation(){
-        float angle = Mathf.atan2(vel().x, vel().y) * Mathf.radiansToDegrees;
-        if(angle < 0) angle += 360;
-        return angle;
+        return vel.isZero(0.001f) ? rotation : vel.angle();
     }
 }

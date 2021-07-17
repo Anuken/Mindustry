@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
  * Any expected power amount (produced, consumed, buffered) should be affected by FakeThreadHandler.fakeDelta but status should not!
  */
 public class ItemLiquidGeneratorTests extends PowerTestFixture{
-
     private ItemLiquidGenerator generator;
     private Tile tile;
     private ItemLiquidGeneratorBuild entity;

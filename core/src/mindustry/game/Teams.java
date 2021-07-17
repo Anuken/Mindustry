@@ -1,6 +1,7 @@
 package mindustry.game;
 
 import arc.func.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.Queue;
 import arc.struct.*;
@@ -26,8 +27,8 @@ public class Teams{
     public Seq<TeamData> active = new Seq<>();
     /** Teams with block or unit presence. */
     public Seq<TeamData> present = new Seq<>(TeamData.class);
-    /** Current boss unit. */
-    public @Nullable Unit boss;
+    /** Current boss units. */
+    public Seq<Unit> bosses = new Seq<>();
 
     public Teams(){
         active.add(get(Team.crux));
@@ -49,7 +50,7 @@ public class Teams{
 
     public boolean eachEnemyCore(Team team, Boolf<CoreBuild> ret){
         for(TeamData data : active){
-            if(areEnemies(team, data.team)){
+            if(team != data.team){
                 for(CoreBuild tile : data.cores){
                     if(ret.get(tile)){
                         return true;
@@ -62,7 +63,7 @@ public class Teams{
 
     public void eachEnemyCore(Team team, Cons<Building> ret){
         for(TeamData data : active){
-            if(areEnemies(team, data.team)){
+            if(team != data.team){
                 for(Building tile : data.cores){
                     ret.get(tile);
                 }
@@ -91,11 +92,6 @@ public class Teams{
         return get(team).active();
     }
 
-    /** Returns whether {@param other} is an enemy of {@param #team}. */
-    public boolean areEnemies(Team team, Team other){
-        return team != other;
-    }
-
     public boolean canInteract(Team team, Team other){
         return team == other || other == Team.derelict;
     }
@@ -117,7 +113,6 @@ public class Teams{
         if(data.active() && !active.contains(data)){
             active.add(data);
             updateEnemies();
-            indexer.updateTeamIndex(data.team);
         }
     }
 
@@ -145,7 +140,7 @@ public class Teams{
 
     public void updateTeamStats(){
         present.clear();
-        boss = null;
+        bosses.clear();
 
         for(Team team : Team.all){
             TeamData data = team.data();
@@ -172,16 +167,17 @@ public class Teams{
         }
 
         //update presence flag.
-        Groups.build.each( b -> b.team.data().presentFlag = true);
+        Groups.build.each(b -> b.team.data().presentFlag = true);
 
         for(Unit unit : Groups.unit){
+            if(unit.type == null) continue;
             TeamData data = unit.team.data();
             data.tree().insert(unit);
             data.units.add(unit);
             data.presentFlag = true;
 
             if(unit.team == state.rules.waveTeam && unit.isBoss()){
-                boss = unit;
+                bosses.add(unit);
             }
 
             if(data.unitsByType == null || data.unitsByType.length <= unit.type.id){
@@ -216,7 +212,7 @@ public class Teams{
             Seq<Team> enemies = new Seq<>();
 
             for(TeamData other : active){
-                if(areEnemies(data.team, other.team)){
+                if(data.team != other.team){
                     enemies.add(other.team);
                 }
             }
@@ -241,12 +237,17 @@ public class Teams{
         /** Target items to mine. */
         public Seq<Item> mineItems = Seq.with(Items.copper, Items.lead, Items.titanium, Items.thorium);
 
+        /** Quadtree for all buildings of this team. Null if not active. */
+        @Nullable
+        public QuadTree<Building> buildings;
+        /** Current unit cap. Do not modify externally. */
+        public int unitCap;
         /** Total unit count. */
         public int unitCount;
         /** Counts for each type of unit. Do not access directly. */
         @Nullable
         public int[] typeCounts;
-        /** Quadtree for units of this type. Do not access directly. */
+        /** Quadtree for units of this team. Do not access directly. */
         @Nullable
         public QuadTree<Unit> tree;
         /** Units of this team. Updated each frame. */
@@ -258,6 +259,34 @@ public class Teams{
         public TeamData(Team team){
             this.team = team;
             this.ai = new BaseAI(this);
+        }
+
+        /** Destroys this team's presence on the map, killing part of its buildings and converting everything to 'derelict'. */
+        public void destroyToDerelict(){
+
+            //grab all buildings from quadtree.
+            var builds = new Seq<Building>();
+            if(buildings != null){
+                buildings.getObjects(builds);
+            }
+
+            //convert all team tiles to neutral, randomly killing them
+            for(var b : builds){
+                //TODO this may cause a lot of packet spam, optimize?
+                Call.setTeam(b, Team.derelict);
+
+                if(Mathf.chance(0.25)){
+                    Time.run(Mathf.random(0f, 60f * 6f), b::kill);
+                }
+            }
+
+            //kill all units randomly
+            units.each(u -> Time.run(Mathf.random(0f, 60f * 5f), () -> {
+                //ensure unit hasn't switched teams for whatever reason
+                if(u.team == team){
+                    u.kill();
+                }
+            }));
         }
 
         @Nullable
@@ -320,6 +349,7 @@ public class Teams{
     public static class BlockPlan{
         public final short x, y, rotation, block;
         public final Object config;
+        public boolean removed;
 
         public BlockPlan(int x, int y, short rotation, short block, Object config){
             this.x = (short)x;
@@ -327,6 +357,17 @@ public class Teams{
             this.rotation = rotation;
             this.block = block;
             this.config = config;
+        }
+
+        @Override
+        public String toString(){
+            return "BlockPlan{" +
+            "x=" + x +
+            ", y=" + y +
+            ", rotation=" + rotation +
+            ", block=" + block +
+            ", config=" + config +
+            '}';
         }
     }
 }

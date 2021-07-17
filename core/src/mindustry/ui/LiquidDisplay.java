@@ -7,6 +7,8 @@ import arc.util.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 /** An ItemDisplay, but for liquids. */
 public class LiquidDisplay extends Table{
     public final Liquid liquid;
@@ -19,14 +21,14 @@ public class LiquidDisplay extends Table{
         this.perSecond = perSecond;
 
         add(new Stack(){{
-            add(new Image(liquid.icon(Cicon.medium)));
+            add(new Image(liquid.uiIcon));
 
             if(amount != 0){
                 Table t = new Table().left().bottom();
                 t.add(Strings.autoFixed(amount, 2)).style(Styles.outlineLabel);
                 add(t);
             }
-        }}).size(8 * 4).padRight(3  + (amount != 0 && Strings.autoFixed(amount, 2).length() > 2 ? 8 : 0));
+        }}).size(iconMed).padRight(3  + (amount != 0 && Strings.autoFixed(amount, 2).length() > 2 ? 8 : 0));
 
         if(perSecond){
             add(StatUnit.perSecond.localized()).padLeft(2).padRight(5).color(Color.lightGray).style(Styles.outlineLabel);
