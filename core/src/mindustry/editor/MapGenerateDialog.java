@@ -15,6 +15,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
+import mindustry.maps.*;
 import mindustry.maps.filters.*;
 import mindustry.maps.filters.GenerateFilter.*;
 import mindustry.ui.*;
@@ -26,12 +27,6 @@ import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class MapGenerateDialog extends BaseDialog{
-    final Prov<GenerateFilter>[] filterTypes = new Prov[]{
-        NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new,
-        RiverNoiseFilter::new, OreFilter::new, OreMedianFilter::new, MedianFilter::new,
-        BlendFilter::new, MirrorFilter::new, ClearFilter::new, CoreSpawnFilter::new,
-        EnemySpawnFilter::new, SpawnPathFilter::new
-    };
     final boolean applied;
 
     Pixmap pixmap;
@@ -333,7 +328,7 @@ public class MapGenerateDialog extends BaseDialog{
             p.marginRight(14);
             p.defaults().size(195f, 56f);
             int i = 0;
-            for(var gen : filterTypes){
+            for(var gen : Maps.allFilterTypes){
                 var filter = gen.get();
                 var icon = filter.icon();
 
