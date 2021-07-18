@@ -179,7 +179,7 @@ public class UI implements ApplicationListener, Loadable{
         if(units.isEmpty()){
             numericUnits = numericSIUnits;
         }else{
-            String[] array = units.split("\\s*,\\s*");
+            String[] array = units.split("\\s*,\\s*", 20);
             int maxIndex = Math.min(array.length, numericUnits.length);
             for(int index = 0; index < maxIndex; index++){
                 String item = array[index];
