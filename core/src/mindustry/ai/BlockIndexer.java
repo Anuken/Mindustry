@@ -288,6 +288,7 @@ public class BlockIndexer{
 
     public Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
         Building target = null;
+        float targetDist = 0;
 
         for(int i = 0; i < activeTeams.size; i++){
             Team enemy = activeTeams.items[i];
@@ -296,7 +297,16 @@ public class BlockIndexer{
             Building candidate = indexer.findTile(enemy, x, y, range, pred, true);
             if(candidate == null) continue;
 
-            if(target == null || candidate.block.priority.ordinal() > target.block.priority.ordinal()) target = candidate;
+            //if a block has the same priority, the closer one should be targeted
+            float dist = candidate.dst(x, y) - candidate.hitSize() / 2f;
+            if(target == null ||
+            //if its closer and is at least equal priority
+            (dist < targetDist && candidate.block.priority.ordinal() >= target.block.priority.ordinal()) ||
+            // block has higher priority (so range doesnt matter)
+            (candidate.block.priority.ordinal() > target.block.priority.ordinal())){
+                target = candidate;
+                targetDist = dist;
+            }
         }
 
         return target;
