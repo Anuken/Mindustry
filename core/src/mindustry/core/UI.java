@@ -175,18 +175,17 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void init(){
-        String[] units = Core.bundle.get("unit.numeric", "").split(",");
-        if(units.length == 0){
-            units = new String[10];
-            units[3] = Core.bundle.get("unit.thousands");
-            units[6] = Core.bundle.get("unit.millions");
-            units[9] = Core.bundle.get("unit.billions");
-        }
-        int unitsCount = Math.min(units.length, numericUnits.length);
-        for(int index = 0; index < unitsCount; index++){
-            String unit = units[index];
-            if(unit != null && !unit.isEmpty()){
-                numericUnits[index] = units[index].trim();
+        String units = Core.bundle.get("unit.numeric", "").trim();
+        if(units.isEmpty()){
+            numericUnits = numericSIUnits;
+        }else{
+            String[] array = units.split("\\s*,\\s*");
+            int maxIndex = Math.min(array.length, numericUnits.length);
+            for(int index = 0; index < maxIndex; index++){
+                String item = array[index];
+                if(!item.isEmpty()){
+                    numericUnits[index] = item;
+                }
             }
         }
         useSIUnits = Core.settings.getBool("siunits", false);
