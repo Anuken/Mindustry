@@ -211,13 +211,12 @@ public class BlockIndexer{
     }
 
     public boolean eachBlock(@Nullable Team team, float wx, float wy, float range, Boolf<Building> pred, Cons<Building> cons){
-        returnBool = false;
+        breturnArray.clear();
 
         if(team == null){
             allBuildings(wx, wy, range, b -> {
                 if(pred.get(b)){
-                    returnBool = true;
-                    cons.get(b);
+                    breturnArray.add(b);
                 }
             });
         }else{
@@ -225,13 +224,20 @@ public class BlockIndexer{
             if(buildings == null) return false;
             buildings.intersect(wx - range, wy - range, range*2f, range*2f, b -> {
                 if(b.within(wx, wy, range + b.hitSize() / 2f) && pred.get(b)){
-                    returnBool = true;
-                    cons.get(b);
+                    breturnArray.add(b);
                 }
             });
         }
 
-        return returnBool;
+        int size = breturnArray.size;
+        var items = breturnArray.items;
+        for(int i = 0; i < size; i++){
+            cons.get(items[i]);
+            items[i] = null;
+        }
+        breturnArray.size = 0;
+
+        return size > 0;
     }
 
     /** Get all enemy blocks with a flag. */
@@ -274,16 +280,24 @@ public class BlockIndexer{
     }
 
     public void allBuildings(float x, float y, float range, Cons<Building> cons){
+        breturnArray.clear();
         for(int i = 0; i < activeTeams.size; i++){
             Team team = activeTeams.items[i];
             var buildings = team.data().buildings;
             if(buildings == null) continue;
-            buildings.intersect(x - range, y - range, range*2f, range*2f, b -> {
-                if(b.within(x, y, range + b.hitSize()/2f)){
-                    cons.get(b);
-                }
-            });
+            buildings.intersect(x - range, y - range, range*2f, range*2f, breturnArray);
         }
+
+        var items = breturnArray.items;
+        int size = breturnArray.size;
+        for(int i = 0; i < size; i++){
+            var b = items[i];
+            if(b.within(x, y, range + b.hitSize()/2f)){
+                cons.get(b);
+            }
+            items[i] = null;
+        }
+        breturnArray.size = 0;
     }
 
     public Building findEnemyTile(@Nullable Team team, float x, float y, float range, Boolf<Building> pred){
