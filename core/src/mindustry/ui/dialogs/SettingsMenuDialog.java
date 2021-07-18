@@ -283,9 +283,9 @@ public class SettingsMenuDialog extends Dialog{
     }
 
     void addSettings(){
-        sound.sliderPref("musicvol", bundle.get("setting.musicvol.name", "Music Volume"), 100, 0, 100, 1, i -> i + "%");
-        sound.sliderPref("sfxvol", bundle.get("setting.sfxvol.name", "SFX Volume"), 100, 0, 100, 1, i -> i + "%");
-        sound.sliderPref("ambientvol", bundle.get("setting.ambientvol.name", "Ambient Volume"), 100, 0, 100, 1, i -> i + "%");
+        sound.sliderPref("musicvol", bundle.get("setting.musicvol.name", "Music Volume"), bundle.getOrNull("setting.musicvol.description"), 100, 0, 100, 1, i -> i + "%");
+        sound.sliderPref("sfxvol", bundle.get("setting.sfxvol.name", "SFX Volume"), bundle.getOrNull("setting.sfxvol.description"), 100, 0, 100, 1, i -> i + "%");
+        sound.sliderPref("ambientvol", bundle.get("setting.ambientvol.name", "Ambient Volume"), bundle.getOrNull("setting.ambientvol.description"), 100, 0, 100, 1, i -> i + "%");
 
         game.sliderPref("saveinterval", 60, 10, 5 * 120, 10, i -> Core.bundle.format("setting.seconds", i));
 
@@ -562,13 +562,13 @@ public class SettingsMenuDialog extends Dialog{
             rebuild();
         }
 
-        public SliderSetting sliderPref(String name, String title, int def, int min, int max, StringProcessor s){
-            return sliderPref(name, title, def, min, max, 1, s);
+        public SliderSetting sliderPref(String name, String title, @Nullable String hint, int def, int min, int max, StringProcessor s){
+            return sliderPref(name, title, hint, def, min, max, 1, s);
         }
 
-        public SliderSetting sliderPref(String name, String title, int def, int min, int max, int step, StringProcessor s){
+        public SliderSetting sliderPref(String name, String title, @Nullable String hint, int def, int min, int max, int step, StringProcessor s){
             SliderSetting res;
-            list.add(res = new SliderSetting(name, title, def, min, max, step, s));
+            list.add(res = new SliderSetting(name, title, hint, def, min, max, step, s));
             settings.defaults(name, def);
             rebuild();
             return res;
@@ -580,34 +580,34 @@ public class SettingsMenuDialog extends Dialog{
 
         public SliderSetting sliderPref(String name, int def, int min, int max, int step, StringProcessor s){
             SliderSetting res;
-            list.add(res = new SliderSetting(name, bundle.get("setting." + name + ".name"), def, min, max, step, s));
+            list.add(res = new SliderSetting(name, bundle.get("setting." + name + ".name"), bundle.getOrNull("setting." + name + ".description"), def, min, max, step, s));
             settings.defaults(name, def);
             rebuild();
             return res;
         }
 
-        public void checkPref(String name, String title, boolean def){
-            list.add(new CheckSetting(name, title, def, null));
+        public void checkPref(String name, String title, @Nullable String hint, boolean def){
+            list.add(new CheckSetting(name, title, hint, def, null));
             settings.defaults(name, def);
             rebuild();
         }
 
-        public void checkPref(String name, String title, boolean def, Boolc changed){
-            list.add(new CheckSetting(name, title, def, changed));
+        public void checkPref(String name, String title, @Nullable String hint, boolean def, Boolc changed){
+            list.add(new CheckSetting(name, title, hint, def, changed));
             settings.defaults(name, def);
             rebuild();
         }
 
         /** Localized title. */
         public void checkPref(String name, boolean def){
-            list.add(new CheckSetting(name, bundle.get("setting." + name + ".name"), def, null));
+            list.add(new CheckSetting(name, bundle.get("setting." + name + ".name"), bundle.getOrNull("setting." + name + ".description"), def, null));
             settings.defaults(name, def);
             rebuild();
         }
 
         /** Localized title. */
         public void checkPref(String name, boolean def, Boolc changed){
-            list.add(new CheckSetting(name, bundle.get("setting." + name + ".name"), def, changed));
+            list.add(new CheckSetting(name, bundle.get("setting." + name + ".name"), bundle.getOrNull("setting." + name + ".description"), def, changed));
             settings.defaults(name, def);
             rebuild();
         }
@@ -632,6 +632,9 @@ public class SettingsMenuDialog extends Dialog{
             public String name;
             public String title;
 
+            @Nullable
+            public String hint;
+
             public abstract void add(SettingsTable table);
         }
 
@@ -639,9 +642,10 @@ public class SettingsMenuDialog extends Dialog{
             boolean def;
             Boolc changed;
 
-            CheckSetting(String name, String title, boolean def, Boolc changed){
+            CheckSetting(String name, String title, @Nullable String hint, boolean def, Boolc changed){
                 this.name = name;
                 this.title = title;
+                this.hint = hint;
                 this.def = def;
                 this.changed = changed;
             }
@@ -660,8 +664,13 @@ public class SettingsMenuDialog extends Dialog{
                 });
 
                 box.left();
-                table.add(box).left().padTop(3f);
+                table.add(box).left().padTop(4f);
                 table.row();
+
+                if(hint != null){
+                    table.add("[lightgray]" + hint).left().pad(0f, 36f, 4f, 0f).growX().wrap();
+                    table.row();
+                }
             }
         }
 
@@ -669,9 +678,10 @@ public class SettingsMenuDialog extends Dialog{
             int def, min, max, step;
             StringProcessor sp;
 
-            SliderSetting(String name, String title, int def, int min, int max, int step, StringProcessor s){
+            SliderSetting(String name, String title, @Nullable String hint, int def, int min, int max, int step, StringProcessor s){
                 this.name = name;
                 this.title = title;
+                this.hint = hint;
                 this.def = def;
                 this.min = min;
                 this.max = max;
@@ -701,6 +711,11 @@ public class SettingsMenuDialog extends Dialog{
 
                 table.stack(slider, value).width(Math.min(Core.graphics.getWidth() / 1.2f, 460f)).left().padTop(4);
                 table.row();
+
+                if(hint != null){
+                    table.add("[lightgray]" + hint).left().pad(0f, 36f, 4f, 0f).growX().wrap();
+                    table.row();
+                }
             }
         }
 
