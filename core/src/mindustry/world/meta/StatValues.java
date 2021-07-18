@@ -306,7 +306,7 @@ public class StatValues{
                     }
 
                     if(type.healPercent > 0f){
-                        sep(bt, Core.bundle.format("bullet.healpercent", (int)type.healPercent));
+                        sep(bt, Core.bundle.format("bullet.healpercent", Strings.autoFixed(type.healPercent, 2)));
                     }
 
                     if(type.pierce || type.pierceCap != -1){
