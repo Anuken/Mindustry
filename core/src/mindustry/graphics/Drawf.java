@@ -274,4 +274,13 @@ public class Drawf{
 
         Draw.reset();
     }
+    
+    /** Draws a sprite that should be lightwise correct. Provided sprite must be symmetrical. */
+    public static void spinSprite(TextureRegion region, float x, float y, float r){
+        r = Mathf.mod(r, 90f);
+        Draw.rect(region, x, y, r);
+        Draw.alpha(r / 90f);
+        Draw.rect(region, x, y, r - 90f);
+        Draw.alpha(1f);
+    }
 }
