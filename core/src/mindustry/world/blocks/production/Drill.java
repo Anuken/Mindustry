@@ -315,8 +315,11 @@ public class Drill extends Block{
                 Draw.color();
             }
 
-            if(drawSpinSprite) Drawf.spinSprite(rotatorRegion, x, y, timeDrilled * rotateSpeed);
-            else Draw.rect(rotatorRegion, x, y, timeDrilled * rotateSpeed);
+            if(drawSpinSprite){
+                Drawf.spinSprite(rotatorRegion, x, y, timeDrilled * rotateSpeed);
+            }else{
+                Draw.rect(rotatorRegion, x, y, timeDrilled * rotateSpeed);
+            }
 
             Draw.rect(topRegion, x, y);
 
