@@ -89,7 +89,7 @@ public class SolidPump extends Pump{
         public void draw(){
             Draw.rect(region, x, y);
             Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
-            Draw.rect(rotatorRegion, x, y, pumpTime * rotateSpeed);
+            Drawf.spinSprite(rotatorRegion, x, y, pumpTime * rotateSpeed);
             Draw.rect(topRegion, x, y);
         }
 
