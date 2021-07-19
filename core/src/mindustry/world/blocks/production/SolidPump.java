@@ -108,7 +108,7 @@ public class SolidPump extends Pump{
                 lastPump = maxPump;
                 warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
                 if(Mathf.chance(delta() * updateEffectChance))
-                    updateEffect.at(getX() + Mathf.range(size * 2f), getY() + Mathf.range(size * 2f));
+                    updateEffect.at(x + Mathf.range(size * 2f), y + Mathf.range(size * 2f));
             }else{
                 warmup = Mathf.lerpDelta(warmup, 0f, 0.02f);
                 lastPump = 0f;
