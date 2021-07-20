@@ -29,13 +29,15 @@ public class FileChooser extends BaseDialog{
     private Boolf<Fi> filter;
     private Cons<Fi> selectListener;
     private boolean open;
+    private String defaultName;
 
-    public FileChooser(String title, Boolf<Fi> filter, boolean open, Cons<Fi> result){
+    public FileChooser(String title, String defaultName, Boolf<Fi> filter, boolean open, Cons<Fi> result){
         super(title);
         setFillParent(true);
         this.open = open;
         this.filter = filter;
         this.selectListener = result;
+        this.defaultName = defaultName;
 
         if(!lastDirectory.exists()){
             lastDirectory = homeDirectory;
@@ -58,6 +60,10 @@ public class FileChooser extends BaseDialog{
         addCloseListener();
     }
 
+    public FileChooser(String title, Boolf<Fi> filter, boolean open, Cons<Fi> result) {
+        this(title, "", filter, open, result);
+    }
+
     private void setupWidgets(){
         cont.margin(-10);
 
@@ -65,6 +71,7 @@ public class FileChooser extends BaseDialog{
 
         filefield = new TextField();
         filefield.setOnlyFontChars(false);
+        filefield.setText(defaultName);
         if(!open) filefield.addInputDialog();
         filefield.setDisabled(open);
 

@@ -27,6 +27,8 @@ import mindustry.input.*;
 import mindustry.ui.*;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.zip.*;
 
 import static arc.Core.*;
@@ -183,7 +185,11 @@ public class SettingsMenuDialog extends Dialog{
                     }
                     platform.shareFile(file);
                 }else{
-                    platform.showFileChooser(false, "zip", file -> {
+                    SimpleDateFormat saveDate = new SimpleDateFormat("yyyy-MM-dd_kk-mm-ss");
+                    Date now = new Date();
+                    String defaultName = saveDate.format(now);
+                    defaultName += "_mindustry_save";
+                    platform.showFileChooser(false, defaultName, "@save", "zip", file -> {
                         try{
                             exportData(file);
                             ui.showInfo("@data.exported");
