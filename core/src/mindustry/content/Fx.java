@@ -1526,11 +1526,10 @@ public class Fx{
         });
     }),
 
-    redgeneratespark = new Effect(18, e -> {
-        randLenVectors(e.id, 5, e.fin() * 8f, (x, y) -> {
-            float len = e.fout() * 4f;
-            color(Pal.redSpark, Color.gray, e.fin());
-            Fill.circle(e.x + x, e.y + y, len/2f);
+    redgeneratespark = new Effect(80, e -> {
+        color(Pal.redSpark, Color.gray, e.fin());
+        randLenVectors(e.id, 2, e.finpow() * 9f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fslope() * 1.8f);
         });
     }),
 
