@@ -614,7 +614,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                 int[] i = {0};
 
-                stats.each((item, stat) -> {
+                for(var item : content.items()){
+                    var stat = stats.get(item);
+                    if(stat == null) continue;
                     int total = (int)(stat.mean * 60 * scl);
                     if(total > 1){
                         t.image(item.uiIcon).padRight(3);
@@ -623,7 +625,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             t.row();
                         }
                     }
-                });
+                }
 
                 if(t.getChildren().any()){
                     c.add(name).left().row();
@@ -657,6 +659,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             //export
             display.get(sector.info.export, "@sectors.export");
+
+            //import
+            if(sector.hasBase()){
+                display.get(sector.info.importStats(), "@sectors.import");
+            }
 
             ItemSeq items = sector.items();
 
