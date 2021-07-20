@@ -79,7 +79,7 @@ public class Items implements ContentList{
         }};
 
         sporePod = new Item("spore-pod", Color.valueOf("7457ce")){{
-            flammability = 1.15f;
+            flammability = 0.9f;
         }};
 
         blastCompound = new Item("blast-compound", Color.valueOf("ff795e")){{
