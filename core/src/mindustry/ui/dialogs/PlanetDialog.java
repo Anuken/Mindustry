@@ -739,7 +739,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                 updateSelected();
                             }).checked(sector.info.icon == null);
 
-                            int cols = (int)Math.min(20, Core.graphics.getWidth() / 52f);
+                            int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
 
                             int i = 1;
                             for(var key : defaultIcons){
