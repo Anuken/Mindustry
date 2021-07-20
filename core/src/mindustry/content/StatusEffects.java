@@ -47,7 +47,6 @@ public class StatusEffects implements ContentList{
 
                 affinity(blasted, ((unit, result, time) -> {
                     unit.damagePierce(transitionDamage);
-                    result.set(freezing, time);
                 }));
             });
         }};
@@ -75,7 +74,6 @@ public class StatusEffects implements ContentList{
                     if(unit.team == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
-                    result.set(wet, time);
                 }));
                 opposite(burning, melting);
             });

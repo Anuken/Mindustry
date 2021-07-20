@@ -120,7 +120,7 @@ public class UnitTypes implements ContentList{
             hitSize = 13f;
             rotateSpeed = 3f;
             targetAir = false;
-            health = 820;
+            health = 900;
             armor = 9f;
             mechFrontSway = 0.55f;
 
@@ -133,15 +133,15 @@ public class UnitTypes implements ContentList{
                 shake = 2f;
                 ejectEffect = Fx.casing2;
                 shootSound = Sounds.artillery;
-                bullet = new ArtilleryBulletType(2f, 8, "shell"){{
+                bullet = new ArtilleryBulletType(2f, 20, "shell"){{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
                     lifetime = 120f;
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
-                    splashDamageRadius = 30f;
-                    splashDamage = 60f;
+                    splashDamageRadius = 35f;
+                    splashDamage = 80f;
                     backColor = Pal.bulletYellowBack;
                     frontColor = Pal.bulletYellow;
                 }};
@@ -1780,6 +1780,7 @@ public class UnitTypes implements ContentList{
                 shots = 3;
                 shotDelay = 7f;
                 x = y = shootX = shootY = 0f;
+                shootSound = Sounds.mineDeploy;
 
                 bullet = new BasicBulletType(){{
                     sprite = "mine-bullet";
@@ -2047,7 +2048,6 @@ public class UnitTypes implements ContentList{
             buildSpeed = 3f;
 
             abilities.add(new EnergyFieldAbility(35f, 65f, 180f){{
-                repair = 35f;
                 statusDuration = 60f * 6f;
                 maxTargets = 25;
             }});
@@ -2151,10 +2151,13 @@ public class UnitTypes implements ContentList{
                 shootY = 7f;
                 recoil = 4f;
                 cooldownTime = reload - 10f;
+                //TODO better sound
+                shootSound = Sounds.laser;
 
                 bullet = new EmpBulletType(){{
                     float rad = 100f;
 
+                    scaleVelocity = true;
                     lightOpacity = 0.7f;
                     unitDamageScl = 0.8f;
                     healPercent = 20f;
@@ -2182,6 +2185,7 @@ public class UnitTypes implements ContentList{
                     hitShake = 4f;
                     trailRotation = true;
                     status = StatusEffects.electrified;
+                    hitSound = Sounds.plasmaboom;
 
                     trailEffect = new Effect(16f, e -> {
                         color(Pal.heal);

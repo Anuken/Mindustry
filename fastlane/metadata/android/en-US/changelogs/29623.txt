@@ -1,4 +1,0 @@
-- Updated feature suggestion link
-- Updated translations
-- Fixed modified player name persisting after server is exited
-- Added solar power multiplier rule

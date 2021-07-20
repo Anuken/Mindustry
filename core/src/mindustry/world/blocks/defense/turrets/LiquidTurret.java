@@ -85,7 +85,7 @@ public class LiquidTurret extends Turret{
 
         @Override
         public boolean shouldActiveSound(){
-            return wasShooting;
+            return wasShooting && enabled;
         }
 
         @Override

@@ -7,9 +7,9 @@ import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
 import arc.func.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
+import arc.util.io.*;
 import mindustry.*;
 import mindustry.mod.Mods.*;
 import rhino.*;
@@ -18,7 +18,6 @@ import rhino.module.provider.*;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
 import java.util.regex.*;
 
 public class Scripts implements Disposable{
@@ -131,7 +130,7 @@ public class Scripts implements Disposable{
 
     /** writeFile but for a byte[] */
     public void writeBinFile(String purpose, String ext, byte[] contents){
-        if(contents == null) contents = new byte[0];
+        if(contents == null) contents = Streams.emptyBytes;
         final byte[] fContents = contents;
         selectFile(false, purpose, ext, fi -> fi.writeBytes(fContents));
     }
@@ -183,7 +182,7 @@ public class Scripts implements Disposable{
     }
 
     private class ScriptModuleProvider extends UrlModuleSourceProvider{
-        private Pattern directory = Pattern.compile("^(.+?)/(.+)");
+        private final Pattern directory = Pattern.compile("^(.+?)/(.+)");
 
         public ScriptModuleProvider(){
             super(null, null);

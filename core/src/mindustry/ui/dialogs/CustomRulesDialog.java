@@ -142,6 +142,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
         check("@rules.schematic", b -> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
         check("@rules.coreincinerates", b -> rules.coreIncinerates = b, () -> rules.coreIncinerates);
+        check("@rules.cleanupdeadteams", b -> rules.cleanupDeadTeams = b, () -> rules.cleanupDeadTeams, () -> rules.pvp);
         number("@rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
         number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, 0.001f, 50f);
         number("@rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
@@ -212,7 +213,7 @@ public class CustomRulesDialog extends BaseDialog{
         main.table(t -> {
             t.left();
             t.add(text).left().padRight(5);
-            t.field((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseInt(s)))
+            t.field((integer ? prov.get() : prov.get()) + "", s -> cons.get(Strings.parseInt(s)))
                     .padRight(100f)
                     .valid(f -> Strings.parseInt(f) >= min && Strings.parseInt(f) <= max).width(120f).left().addInputDialog();
         }).padTop(0);

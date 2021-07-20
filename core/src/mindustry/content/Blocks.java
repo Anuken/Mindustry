@@ -235,7 +235,6 @@ public class Blocks implements ContentList{
         magmarock = new Floor("magmarock"){{
             attributes.set(Attribute.heat, 0.75f);
             attributes.set(Attribute.water, -0.75f);
-            updateEffect = Fx.magmasmoke;
             blendGroup = basalt;
 
             emitLight = true;
@@ -369,6 +368,7 @@ public class Blocks implements ContentList{
 
         sporeCluster = new Prop("spore-cluster"){{
             variants = 3;
+            breakSound = Sounds.plantBreak;
         }};
 
         boulder = new Prop("boulder"){{
@@ -425,6 +425,9 @@ public class Blocks implements ContentList{
         darkPanel6 = new Floor("dark-panel-6", 0);
 
         darkMetal = new StaticWall("dark-metal");
+
+        Seq.with(metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6)
+        .each(b -> b.asFloor().wall = darkMetal);
 
         pebbles = new DoubleOverlayFloor("pebbles");
 
@@ -659,12 +662,12 @@ public class Blocks implements ContentList{
         }};
 
         disassembler = new Separator("disassembler"){{
-            requirements(Category.crafting, with(Items.graphite, 140, Items.titanium, 100, Items.silicon, 150, Items.surgeAlloy, 70));
+            requirements(Category.crafting, with(Items.plastanium, 40, Items.titanium, 100, Items.silicon, 150, Items.thorium, 80));
             results = with(
                 Items.sand, 4,
                 Items.graphite, 2,
                 Items.titanium, 2,
-                Items.thorium, 1
+                Items.thorium, 2
             );
             hasPower = true;
             craftTime = 15f;
@@ -1012,7 +1015,6 @@ public class Blocks implements ContentList{
             reloadTime = 200f;
             range = 440f;
             consumes.power(1.75f);
-            bullet = new MassDriverBolt();
         }};
 
         //special transport blocks
@@ -1385,14 +1387,14 @@ public class Blocks implements ContentList{
             requirements(Category.effect, with(Items.titanium, 250, Items.thorium, 125));
             size = 3;
             itemCapacity = 1000;
-            health = size * size * 55;
+            health = size * size * 60;
         }};
 
         container = new StorageBlock("container"){{
             requirements(Category.effect, with(Items.titanium, 100));
             size = 2;
             itemCapacity = 300;
-            health = size * size * 55;
+            health = size * size * 60;
         }};
 
         unloader = new Unloader("unloader"){{

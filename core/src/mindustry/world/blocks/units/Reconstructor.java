@@ -64,6 +64,7 @@ public class Reconstructor extends UnitBlock{
 
     @Override
     public void setStats(){
+        stats.timePeriod = constructTime;
         super.setStats();
 
         stats.add(Stat.productionTime, constructTime / 60f, StatUnit.seconds);

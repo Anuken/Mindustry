@@ -86,7 +86,8 @@ public class Mods implements Loadable{
 
     /** Imports an external mod file. Folders are not supported here. */
     public LoadedMod importMod(Fi file) throws IOException{
-        String baseName = file.nameWithoutExtension();
+        //for some reason, android likes to add colons to file names, e.g. primary:ExampleJavaMod.jar, which breaks dexing
+        String baseName = file.nameWithoutExtension().replace(':', '_').replace(' ', '_');
         String finalName = baseName;
         //find a name to prevent any name conflicts
         int count = 1;
@@ -300,12 +301,12 @@ public class Mods implements Loadable{
     }
 
     private PageType getPage(Fi file){
-        String parent = file.parent().name();
+        String path = file.path();
         return
-            parent.equals("environment") ? PageType.environment :
-            parent.equals("editor") ? PageType.editor :
-            parent.equals("rubble") ? PageType.editor :
-            parent.equals("ui") || file.parent().parent().name().equals("ui") ? PageType.ui :
+            path.contains("sprites/blocks/environment") ? PageType.environment :
+            path.contains("sprites/editor") ? PageType.editor :
+            path.contains("sprites/rubble") ? PageType.editor :
+            path.contains("sprites/ui") ? PageType.ui :
             PageType.main;
     }
 

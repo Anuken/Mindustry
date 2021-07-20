@@ -41,6 +41,7 @@ public class Drawf{
         Draw.reset();
     }
 
+    /** Sets Draw.z to the text layer, and returns the previous layer. */
     public static float text(){
         float z = Draw.z();
         if(renderer.pixelator.enabled()){
@@ -273,5 +274,14 @@ public class Drawf{
         Lines.lineAngleCenter(t.x + Mathf.sin(time, 20f, Vars.tilesize / 2f * t.block.size - 2f), t.y, 90, t.block.size * Vars.tilesize - 4f);
 
         Draw.reset();
+    }
+    
+    /** Draws a sprite that should be light-wise correct, when rotated. Provided sprite must be symmetrical in shape. */
+    public static void spinSprite(TextureRegion region, float x, float y, float r){
+        r = Mathf.mod(r, 90f);
+        Draw.rect(region, x, y, r);
+        Draw.alpha(r / 90f);
+        Draw.rect(region, x, y, r - 90f);
+        Draw.alpha(1f);
     }
 }

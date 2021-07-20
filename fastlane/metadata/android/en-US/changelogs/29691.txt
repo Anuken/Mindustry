@@ -1,9 +1,0 @@
-- Improved icons
-- Improved unit rotation visuals when moving and building/mining
-- Decreased command limit of early game flying units to reduce PvP rushing
-- Made core units unlock on spawn
-- Switched to a new, unified audio framework for all platforms
-- Added new sound effects and loops
-- Added new music
-- Added community server groups with optional titles and a hide button
-- Added editor search bar (Contributed by @summetdev)

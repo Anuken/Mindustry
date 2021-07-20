@@ -93,7 +93,7 @@ public class BulletType extends Content implements Cloneable{
     public boolean collides = true;
     /** Whether velocity is inherited from the shooter. */
     public boolean keepVelocity = true;
-    /** Whether to scale velocity to disappear at the target position. Used for artillery. */
+    /** Whether to scale lifetime (not actually velocity!) to disappear at the target position. Used for artillery. */
     public boolean scaleVelocity;
     /** Whether this bullet can be hit by point defense. */
     public boolean hittable = true;
@@ -232,8 +232,8 @@ public class BulletType extends Content implements Cloneable{
         }
 
         if(entity instanceof Unit unit){
-            Tmp.v3.set(unit).sub(b.x, b.y).nor().scl(knockback * 80f);
-            if(impact) Tmp.v3.setAngle(b.rotation());
+            Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f);
+            if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
             unit.impulse(Tmp.v3);
             unit.apply(status, statusDuration);
         }
