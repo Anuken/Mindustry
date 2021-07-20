@@ -265,10 +265,9 @@ public class SectorInfo{
         return map;
     }
 
-
     /** @return a newly allocated map with import statistics. Use sparingly. */
+    //TODO this can be a float map
     public ObjectMap<Item, ExportStat> importStats(){
-        //build empty import stats
         ObjectMap<Item, ExportStat> imports = new ObjectMap<>();
         //for all sectors on all planets that have bases and export to this sector
         for(Planet planet : content.planets()){
