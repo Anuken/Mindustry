@@ -712,7 +712,7 @@ public class Blocks implements ContentList{
 
         coalCentrifuge = new GenericCrafter("coal-centrifuge"){{
             requirements(Category.crafting, with(Items.titanium, 20, Items.graphite, 40, Items.lead, 30));
-            craftEffect = Fx.smeltsmoke;
+            craftEffect = Fx.coalSmeltsmoke;
             outputItem = new ItemStack(Items.coal, 1);
             craftTime = 30f;
             size = 2;

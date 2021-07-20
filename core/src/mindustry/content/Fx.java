@@ -1622,6 +1622,13 @@ public class Fx{
         });
     }),
 
+    coalSmeltsmoke = new Effect(40f, e -> {
+        randLenVectors(e.id, 0.2f + e.fin(), 4, 6.3f, (x, y, fin, out) -> {
+            color(Color.darkGray, Pal.coalBlack, e.finpowdown());
+            Fill.circle(e.x + x, e.y + y, out * 2f + 0.25f);
+        });
+    }),
+
     formsmoke = new Effect(40, e -> {
         randLenVectors(e.id, 6, 5f + e.fin() * 8f, (x, y) -> {
             color(Pal.plasticSmoke, Color.lightGray, e.fin());
