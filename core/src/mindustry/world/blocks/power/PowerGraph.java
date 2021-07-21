@@ -19,7 +19,7 @@ public class PowerGraph{
     private final Seq<Building> all = new Seq<>(false);
 
     private final WindowedMean powerBalance = new WindowedMean(60);
-    private float lastPowerProduced, lastPowerNeeded, lastPowerStored;
+    private float lastPowerProduced, lastPowerNeeded, lastPowerStored, lastBatteryUsed;
     private float lastScaledPowerIn, lastScaledPowerOut, lastCapacity;
     //diodes workaround for correct energy production info
     private float energyDelta = 0f;
@@ -80,6 +80,10 @@ public class PowerGraph{
             return 1f;
         }
         return Mathf.clamp(lastPowerProduced / lastPowerNeeded);
+    }
+
+    public float getBatteryUsedFraction(){
+        return Mathf.zero(lastPowerStored) ? 0f : lastBatteryUsed / lastPowerStored;
     }
 
     /** @return multiplier of speed at which resources should be consumed for power generation. */
@@ -228,6 +232,7 @@ public class PowerGraph{
         lastScaledPowerOut = powerNeeded / Time.delta;
         lastCapacity = getTotalBatteryCapacity();
         lastPowerStored = getBatteryStored();
+        lastBatteryUsed = 0f;
 
         powerBalance.add((lastPowerProduced - lastPowerNeeded + energyDelta) / Time.delta);
         energyDelta = 0f;
@@ -236,9 +241,9 @@ public class PowerGraph{
 
             if(!Mathf.equal(powerNeeded, powerProduced)){
                 if(powerNeeded > powerProduced){
-                    float powerBatteryUsed = useBatteries(powerNeeded - powerProduced);
-                    powerProduced += powerBatteryUsed;
-                    lastPowerProduced += powerBatteryUsed;
+                    lastBatteryUsed = useBatteries(powerNeeded - powerProduced);
+                    powerProduced += lastBatteryUsed;
+                    lastPowerProduced += lastBatteryUsed;
                 }else if(powerProduced > powerNeeded){
                     powerProduced -= chargeBatteries(powerProduced - powerNeeded);
                 }
