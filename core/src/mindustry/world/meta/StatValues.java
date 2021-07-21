@@ -96,7 +96,7 @@ public class StatValues{
             for(int i = 0; i < list.size; i++){
                 Item item = list.get(i);
 
-                table.add(timePeriod <= 0 ? new ItemDisplay(item) : new ItemDisplay(item, 0, timePeriod, true)).padRight(5);
+                table.add(timePeriod <= 0 ? new ItemDisplay(item) : new ItemDisplay(item, 1, timePeriod, true)).padRight(5);
 
                 if(i != list.size - 1){
                     table.add("/");
