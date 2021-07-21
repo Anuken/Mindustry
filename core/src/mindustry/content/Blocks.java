@@ -304,7 +304,7 @@ public class Blocks implements ContentList{
 
         shale = new Floor("shale"){{
             variants = 3;
-            attributes.set(Attribute.oil, 1f);
+            attributes.set(Attribute.oil, 1.6f);
         }};
 
         stoneWall = new StaticWall("stone-wall"){{
@@ -712,7 +712,7 @@ public class Blocks implements ContentList{
 
         coalCentrifuge = new GenericCrafter("coal-centrifuge"){{
             requirements(Category.crafting, with(Items.titanium, 20, Items.graphite, 40, Items.lead, 30));
-            craftEffect = Fx.smeltsmoke;
+            craftEffect = Fx.coalSmeltsmoke;
             outputItem = new ItemStack(Items.coal, 1);
             craftTime = 30f;
             size = 2;
@@ -1161,6 +1161,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.copper, 40, Items.graphite, 35, Items.lead, 50, Items.silicon, 35, Items.metaglass, 40));
             powerProduction = 1.8f;
             generateEffect = Fx.redgeneratespark;
+            effectChance = 0.013f;
             size = 2;
             floating = true;
             ambientSound = Sounds.hum;

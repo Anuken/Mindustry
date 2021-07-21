@@ -300,19 +300,30 @@ public class BlockIndexer{
         breturnArray.size = 0;
     }
 
-    public Building findEnemyTile(@Nullable Team team, float x, float y, float range, Boolf<Building> pred){
+    public Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
+        Building target = null;
+        float targetDist = 0;
+
         for(int i = 0; i < activeTeams.size; i++){
             Team enemy = activeTeams.items[i];
-
             if(enemy == team || (team == Team.derelict && !state.rules.coreCapture)) continue;
 
-            Building entity = indexer.findTile(enemy, x, y, range, pred, true);
-            if(entity != null){
-                return entity;
+            Building candidate = indexer.findTile(enemy, x, y, range, pred, true);
+            if(candidate == null) continue;
+
+            //if a block has the same priority, the closer one should be targeted
+            float dist = candidate.dst(x, y) - candidate.hitSize() / 2f;
+            if(target == null ||
+            //if its closer and is at least equal priority
+            (dist < targetDist && candidate.block.priority.ordinal() >= target.block.priority.ordinal()) ||
+            // block has higher priority (so range doesnt matter)
+            (candidate.block.priority.ordinal() > target.block.priority.ordinal())){
+                target = candidate;
+                targetDist = dist;
             }
         }
 
-        return null;
+        return target;
     }
 
     public Building findTile(Team team, float x, float y, float range, Boolf<Building> pred){

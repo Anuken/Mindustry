@@ -3,12 +3,15 @@ package mindustry.world.blocks.power;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.logic.*;
 import mindustry.world.*;
 
@@ -25,6 +28,7 @@ public class LightBlock extends Block{
         update = true;
         configurable = true;
         saveConfig = true;
+        swapDiagonalPlacement = true;
 
         config(Integer.class, (LightBuild tile, Integer value) -> tile.color = value);
     }
@@ -34,6 +38,19 @@ public class LightBlock extends Block{
         lightRadius = radius;
         emitLight = true;
         super.init();
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, radius * 0.75f, Pal.placing);
+    }
+
+    @Override
+    public void changePlacementPath(Seq<Point2> points, int rotation){
+        var placeRadius2 = Mathf.pow(radius * 0.7f / tilesize, 2f) * 3;
+        Placement.calculateNodes(points, this, rotation, (point, other) -> point.dst2(other) <= placeRadius2);
     }
 
     public class LightBuild extends Building{

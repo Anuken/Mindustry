@@ -80,6 +80,10 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         remove();
     }
 
+    public boolean hasCollided(int id){
+        return collided.size != 0 && !collided.contains(id);
+    }
+
     @Replace
     public float clipSize(){
         return type.drawSize;
@@ -90,7 +94,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     public boolean collides(Hitboxc other){
         return type.collides && (other instanceof Teamc t && t.team() != team)
             && !(other instanceof Flyingc f && !f.checkTarget(type.collidesAir, type.collidesGround))
-            && !(type.pierce && collided.contains(other.id())); //prevent multiple collisions
+            && !(type.pierce && hasCollided(other.id())); //prevent multiple collisions
     }
 
     @MethodPriority(100)
@@ -116,16 +120,16 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         if(type.collidesTiles && type.collides && type.collidesGround){
             world.raycastEach(World.toTile(lastX()), World.toTile(lastY()), tileX(), tileY(), (x, y) -> {
 
-                Building tile = world.build(x, y);
-                if(tile == null || !isAdded()) return false;
+                Building build = world.build(x, y);
+                if(build == null || !isAdded()) return false;
 
-                if(tile.collide(self()) && type.testCollision(self(), tile) && !tile.dead() && (type.collidesTeam || tile.team != team) && !(type.pierceBuilding && collided.contains(tile.id))){
+                if(build.collide(self()) && type.testCollision(self(), build) && !build.dead() && (type.collidesTeam || build.team != team) && !(type.pierceBuilding && hasCollided(build.id))){
                     boolean remove = false;
 
-                    float health = tile.health;
+                    float health = build.health;
 
-                    if(tile.team != team){
-                        remove = tile.collision(self());
+                    if(build.team != team){
+                        remove = build.collision(self());
                     }
 
                     if(remove || type.collidesTeam){
@@ -133,11 +137,11 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
                             hit = true;
                             remove();
                         }else{
-                            collided.add(tile.id);
+                            collided.add(build.id);
                         }
                     }
 
-                    type.hitTile(self(), tile, health, true);
+                    type.hitTile(self(), build, health, true);
 
                     return !type.pierceBuilding;
                 }

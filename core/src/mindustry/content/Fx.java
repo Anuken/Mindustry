@@ -1526,11 +1526,10 @@ public class Fx{
         });
     }),
 
-    redgeneratespark = new Effect(18, e -> {
-        randLenVectors(e.id, 5, e.fin() * 8f, (x, y) -> {
-            float len = e.fout() * 4f;
-            color(Pal.redSpark, Color.gray, e.fin());
-            Fill.circle(e.x + x, e.y + y, len/2f);
+    redgeneratespark = new Effect(80, e -> {
+        color(Pal.redSpark, Color.gray, e.fin());
+        randLenVectors(e.id, 2, e.finpow() * 9f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fslope() * 1.8f);
         });
     }),
 
@@ -1619,6 +1618,13 @@ public class Fx{
         randLenVectors(e.id, 6, 4f + e.fin() * 5f, (x, y) -> {
             color(Color.white, e.color, e.fin());
             Fill.square(e.x + x, e.y + y, 0.5f + e.fout() * 2f, 45);
+        });
+    }),
+
+    coalSmeltsmoke = new Effect(40f, e -> {
+        randLenVectors(e.id, 0.2f + e.fin(), 4, 6.3f, (x, y, fin, out) -> {
+            color(Color.darkGray, Pal.coalBlack, e.finpowdown());
+            Fill.circle(e.x + x, e.y + y, out * 2f + 0.25f);
         });
     }),
 

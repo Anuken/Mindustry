@@ -560,10 +560,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         }
                     }
 
-                    t.top();
-                    t.add("@editor.brush");
+                    var label = new Label("@editor.brush");
+                    label.setAlignment(Align.center);
+                    label.touchable = Touchable.disabled;
+
+                    t.top().stack(slider, label).width(size * 3f - 20).padTop(4f);
                     t.row();
-                    t.add(slider).width(size * 3f - 20).padTop(4f);
                 }).padTop(5).growX().top();
 
                 mid.row();

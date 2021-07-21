@@ -263,7 +263,7 @@ public class CustomRulesDialog extends BaseDialog{
 
             rebuild[0] = () -> {
                 base.clearChildren();
-                int cols = Math.max(1, Core.graphics.getWidth() / 460);
+                int cols = Math.max(1, (int)(Core.graphics.getWidth() / Scl.scl(450)));
                 int idx = 0;
 
                 for(WeatherEntry entry : rules.weather){
