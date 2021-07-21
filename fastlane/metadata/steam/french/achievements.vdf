@@ -34,7 +34,7 @@
 		"NEW_ACHIEVEMENT_20_20_NAME"	"Un Désastre Spectaculaire"
 		"NEW_ACHIEVEMENT_20_20_DESC"	"Provoquer l'explosion d'un Réacteur à Thorium en le faisant surchauffer."
 		"NEW_ACHIEVEMENT_20_21_NAME"	"Cartographe"
-		"NEW_ACHIEVEMENT_20_21_DESC"	"Créer une nouvelle carte 10 fois."
+		"NEW_ACHIEVEMENT_20_21_DESC"	"Créer 10 nouvelles cartes."
 		"NEW_ACHIEVEMENT_20_22_NAME"	"Navigateur"
 		"NEW_ACHIEVEMENT_20_22_DESC"	"Télécharger une carte sur le Workshop."
 		"NEW_ACHIEVEMENT_20_23_NAME"	"Créateur"
@@ -110,6 +110,6 @@
 		"NEW_ACHIEVEMENT_26_1_NAME"	"Victoire Assurée"
 		"NEW_ACHIEVEMENT_26_1_DESC"	"Capturer un secteur pendant que vous jouez dans un autre."
 		"NEW_ACHIEVEMENT_26_2_NAME"	"Petit Empire"
-		"NEW_ACHIEVEMENT_26_2_DESC"	"Contrôller 10 secteurs à la fois."
+		"NEW_ACHIEVEMENT_26_2_DESC"	"Contrôler 10 secteurs à la fois."
 	}
 }
