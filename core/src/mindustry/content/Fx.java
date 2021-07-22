@@ -1526,12 +1526,16 @@ public class Fx{
         });
     }),
 
-    redgeneratespark = new Effect(80, e -> {
-        color(Pal.redSpark, Color.gray, e.fin());
-        randLenVectors(e.id, 2, e.finpow() * 9f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fslope() * 1.8f);
-        });
-    }),
+    redgeneratespark = new Effect(90, e -> {
+        color(Pal.redSpark);
+        alpha(e.fslope());
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 2; i++){
+            v.trns(rand.random(360f), rand.random(e.finpow() * 9f)).add(e.x, e.y);
+            Fill.circle(v.x, v.y, rand.random(1.4f, 2.4f));
+        }
+    }).layer(Layer.bullet - 1f),
 
     generatespark = new Effect(18, e -> {
         randLenVectors(e.id, 5, e.fin() * 8f, (x, y) -> {
