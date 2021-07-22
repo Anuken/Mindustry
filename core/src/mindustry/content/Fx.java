@@ -1532,7 +1532,7 @@ public class Fx{
 
         rand.setSeed(e.id);
         for(int i = 0; i < 2; i++){
-            v.set(e.finpow() * 9f * rand.nextFloat(), 0).rotate(rand.random(360f)).add(e.x, e.y);
+            v.trns(rand.random(360f), rand.random(e.finpow() * 9f)).add(e.x, e.y);
             Fill.circle(v.x, v.y, rand.random(1.4f, 2.4f));
         }
     }).layer(Layer.bullet - 1f),
