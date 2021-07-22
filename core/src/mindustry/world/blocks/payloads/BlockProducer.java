@@ -34,7 +34,14 @@ public abstract class BlockProducer extends PayloadBlock{
 
     @Override
     public TextureRegion[] icons(){
-        return new TextureRegion[]{region, outRegion};
+        return new TextureRegion[]{region, outRegion, topRegion};
+    }
+
+    @Override
+    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
+        Draw.rect(region, req.drawx(), req.drawy());
+        Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
+        Draw.rect(topRegion, req.drawx(), req.drawy());
     }
 
     @Override
@@ -42,12 +49,6 @@ public abstract class BlockProducer extends PayloadBlock{
         super.setBars();
 
         bars.add("progress", (BlockProducerBuild entity) -> new Bar("bar.progress", Pal.ammo, () -> entity.recipe() == null ? 0f : (entity.progress / entity.recipe().buildCost)));
-    }
-
-    @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        Draw.rect(region, req.drawx(), req.drawy());
-        Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
     }
     
     public abstract class BlockProducerBuild extends PayloadBlockBuild<BuildPayload>{
@@ -126,6 +127,9 @@ public abstract class BlockProducer extends PayloadBlock{
             }
 
             drawPayload();
+
+            Draw.z(Layer.blockBuilding + 1.1f);
+            Draw.rect(topRegion, x, y);
         }
 
         @Override

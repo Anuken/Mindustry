@@ -1,14 +1,16 @@
 package mindustry.world.blocks.experimental;
 
+import mindustry.world.blocks.payloads.*;
+
 @Deprecated
-public class BlockForge extends mindustry.world.blocks.payloads.BlockForge{
+public class BlockForge extends Constructor{
 
     public BlockForge(String name){
         super(name);
     }
 
     @Deprecated
-    public class BlockForgeBuild extends mindustry.world.blocks.payloads.BlockForge.BlockForgeBuild{
+    public class BlockForgeBuild extends Constructor.BlockForgeBuild{
 
     }
 }

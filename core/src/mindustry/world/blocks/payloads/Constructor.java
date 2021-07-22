@@ -13,17 +13,17 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 /** Configurable BlockProducer variant. */
-public class BlockForge extends BlockProducer{
+public class Constructor extends BlockProducer{
     public float buildSpeed = 0.4f;
     public int minBlockSize = 1, maxBlockSize = 2;
 
-    public BlockForge(String name){
+    public Constructor(String name){
         super(name);
 
         size = 3;
         configurable = true;
 
-        config(Block.class, (BlockForgeBuild tile, Block block) -> {
+        config(Block.class, (ConstructorBuild tile, Block block) -> {
             if(tile.recipe != block) tile.progress = 0f;
             if(canProduce(block)){
                 tile.recipe = block;
@@ -42,7 +42,7 @@ public class BlockForge extends BlockProducer{
         return b.isVisible() && b.size >= minBlockSize && b.size <= maxBlockSize;
     }
     
-    public class BlockForgeBuild extends BlockProducerBuild{
+    public class ConstructorBuild extends BlockProducerBuild{
         public @Nullable Block recipe;
 
         @Override
@@ -52,7 +52,7 @@ public class BlockForge extends BlockProducer{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.blocks().select(BlockForge.this::canProduce), () -> recipe, this::configure);
+            ItemSelection.buildTable(table, content.blocks().select(Constructor.this::canProduce), () -> recipe, this::configure);
         }
 
         @Override
