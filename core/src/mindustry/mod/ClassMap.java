@@ -223,7 +223,6 @@ public class ClassMap{
         classes.put("BallisticSilo", mindustry.world.blocks.payloads.BallisticSilo.class);
         classes.put("BallisticSiloBuild", mindustry.world.blocks.payloads.BallisticSilo.BallisticSiloBuild.class);
         classes.put("BlockForge", Constructor.class);
-        classes.put("BlockForgeBuild", Constructor.BlockForgeBuild.class);
         classes.put("BlockLoader", mindustry.world.blocks.payloads.BlockLoader.class);
         classes.put("BlockLoaderBuild", mindustry.world.blocks.payloads.BlockLoader.BlockLoaderBuild.class);
         classes.put("BlockProducer", mindustry.world.blocks.payloads.BlockProducer.class);

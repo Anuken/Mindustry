@@ -175,6 +175,7 @@ public class Shaders{
     public static class BlockBuildShader extends LoadShader{
         public float progress;
         public TextureRegion region = new TextureRegion();
+        public float time;
 
         public BlockBuildShader(){
             super("blockbuild", "default");
@@ -185,7 +186,7 @@ public class Shaders{
             setUniformf("u_progress", progress);
             setUniformf("u_uv", region.u, region.v);
             setUniformf("u_uv2", region.u2, region.v2);
-            setUniformf("u_time", Time.time);
+            setUniformf("u_time", time);
             setUniformf("u_texsize", region.texture.width, region.texture.height);
         }
     }

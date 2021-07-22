@@ -96,7 +96,7 @@ public class Blocks implements ContentList{
     repairPoint, repairTurret, resupplyPoint,
 
     //payloads
-    payloadConveyor, payloadRouter, payloadPropulsionTower, deconstructor, constructor, blockLoader, blockUnloader,
+    payloadConveyor, payloadRouter, payloadPropulsionTower, deconstructor, constructor, largeConstructor, blockLoader, blockUnloader,
 
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
@@ -2240,10 +2240,19 @@ public class Blocks implements ContentList{
         }};
 
         constructor = new Constructor("constructor"){{
-            requirements(Category.units, BuildVisibility.debugOnly, with(Items.thorium, 100));
+            requirements(Category.units, with(Items.thorium, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;
+        }};
+
+        largeConstructor = new Constructor("large-constructor"){{
+            requirements(Category.units, with(Items.thorium, 100));
+            hasPower = true;
+            consumes.power(2f);
+            maxBlockSize = 4;
+            minBlockSize = 3;
+            size = 5;
         }};
 
         blockLoader = new BlockLoader("block-loader"){{

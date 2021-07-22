@@ -52,7 +52,8 @@ public abstract class SaveFileReader{
     "snowrock", "snow-boulder",
     "cliffs", "stone-wall", 
 
-    "cryofluidmixer", "cryofluid-mixer"
+    "cryofluidmixer", "cryofluid-mixer",
+    "block-forge", "constructor"
     );
 
     protected final ReusableByteOutStream byteOutput = new ReusableByteOutStream();

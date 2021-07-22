@@ -110,6 +110,7 @@ public abstract class BlockProducer extends PayloadBlock{
 
                     for(TextureRegion region : recipe.getGeneratedIcons()){
                         Shaders.blockbuild.region = region;
+                        Shaders.blockbuild.time = time;
                         Shaders.blockbuild.progress = progress / recipe.buildCost;
 
                         Draw.rect(region, x, y, recipe.rotate ? rotdeg() : 0);

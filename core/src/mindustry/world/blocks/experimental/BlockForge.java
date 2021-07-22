@@ -2,6 +2,7 @@ package mindustry.world.blocks.experimental;
 
 import mindustry.world.blocks.payloads.*;
 
+/** @deprecated use Constructor instead. */
 @Deprecated
 public class BlockForge extends Constructor{
 
@@ -10,7 +11,7 @@ public class BlockForge extends Constructor{
     }
 
     @Deprecated
-    public class BlockForgeBuild extends Constructor.BlockForgeBuild{
+    public class BlockForgeBuild extends Constructor.ConstructorBuild{
 
     }
 }
