@@ -2,6 +2,8 @@ package mindustry.mod;
 
 import arc.struct.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.blocks.payloads.PayloadLoader.*;
+import mindustry.world.blocks.payloads.PayloadUnloader.*;
 
 /** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */
 @SuppressWarnings("deprecation")
@@ -223,12 +225,12 @@ public class ClassMap{
         classes.put("BallisticSilo", mindustry.world.blocks.payloads.BallisticSilo.class);
         classes.put("BallisticSiloBuild", mindustry.world.blocks.payloads.BallisticSilo.BallisticSiloBuild.class);
         classes.put("BlockForge", Constructor.class);
-        classes.put("BlockLoader", mindustry.world.blocks.payloads.BlockLoader.class);
-        classes.put("BlockLoaderBuild", mindustry.world.blocks.payloads.BlockLoader.BlockLoaderBuild.class);
+        classes.put("BlockLoader", PayloadLoader.class);
+        classes.put("BlockLoaderBuild", PayloadLoaderBuild.class);
         classes.put("BlockProducer", mindustry.world.blocks.payloads.BlockProducer.class);
         classes.put("BlockProducerBuild", mindustry.world.blocks.payloads.BlockProducer.BlockProducerBuild.class);
-        classes.put("BlockUnloader", mindustry.world.blocks.payloads.BlockUnloader.class);
-        classes.put("BlockUnloaderBuild", mindustry.world.blocks.payloads.BlockUnloader.BlockUnloaderBuild.class);
+        classes.put("BlockUnloader", PayloadUnloader.class);
+        classes.put("BlockUnloaderBuild", PayloadUnloaderBuild.class);
         classes.put("BuildPayload", mindustry.world.blocks.payloads.BuildPayload.class);
         classes.put("NuclearWarhead", mindustry.world.blocks.payloads.NuclearWarhead.class);
         classes.put("NuclearWarheadBuild", mindustry.world.blocks.payloads.NuclearWarhead.NuclearWarheadBuild.class);

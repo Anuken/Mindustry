@@ -11,7 +11,7 @@ import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class BlockLoader extends PayloadBlock{
+public class PayloadLoader extends PayloadBlock{
     public final int timerLoad = timers++;
 
     public float loadTime = 2f;
@@ -19,7 +19,7 @@ public class BlockLoader extends PayloadBlock{
     public float liquidsLoaded = 40f;
     public int maxBlockSize = 2;
 
-    public BlockLoader(String name){
+    public PayloadLoader(String name){
         super(name);
  
         hasItems = true;
@@ -46,7 +46,7 @@ public class BlockLoader extends PayloadBlock{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", (BlockLoaderBuild entity) -> new Bar(() -> Core.bundle.format("bar.items", entity.payload == null ? 0 : entity.payload.build.items.total()), () -> Pal.items, entity::fraction));
+        bars.add("progress", (PayloadLoaderBuild entity) -> new Bar(() -> Core.bundle.format("bar.items", entity.payload == null ? 0 : entity.payload.build.items.total()), () -> Pal.items, entity::fraction));
     }
 
     @Override
@@ -57,7 +57,7 @@ public class BlockLoader extends PayloadBlock{
         Draw.rect(topRegion, req.drawx(), req.drawy());
     }
 
-    public class BlockLoaderBuild extends PayloadBlockBuild<BuildPayload>{
+    public class PayloadLoaderBuild extends PayloadBlockBuild<BuildPayload>{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){

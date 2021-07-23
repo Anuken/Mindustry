@@ -5,10 +5,10 @@ import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
-public class BlockUnloader extends BlockLoader{
+public class PayloadUnloader extends PayloadLoader{
     public int offloadSpeed = 4;
 
-    public BlockUnloader(String name){
+    public PayloadUnloader(String name){
         super(name);
     }
 
@@ -22,7 +22,7 @@ public class BlockUnloader extends BlockLoader{
         return false;
     }
 
-    public class BlockUnloaderBuild extends BlockLoaderBuild{
+    public class PayloadUnloaderBuild extends PayloadLoaderBuild{
 
         @Override
         public boolean acceptItem(Building source, Item item){

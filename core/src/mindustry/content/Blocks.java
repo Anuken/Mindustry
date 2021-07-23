@@ -2255,14 +2255,14 @@ public class Blocks implements ContentList{
             size = 5;
         }};
 
-        payloadLoader = new BlockLoader("payload-loader"){{
+        payloadLoader = new PayloadLoader("payload-loader"){{
             requirements(Category.units, with(Items.thorium, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
-        payloadUnloader = new BlockUnloader("payload-unloader"){{
+        payloadUnloader = new PayloadUnloader("payload-unloader"){{
             requirements(Category.units, with(Items.thorium, 100));
             hasPower = true;
             consumes.power(2f);
