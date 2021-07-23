@@ -6,6 +6,7 @@ import mindustry.type.*;
 import static mindustry.Vars.*;
 
 public class BlockUnloader extends BlockLoader{
+    public int offloadSpeed = 4;
 
     public BlockUnloader(String name){
         super(name);
@@ -29,12 +30,17 @@ public class BlockUnloader extends BlockLoader{
         }
 
         @Override
+        public boolean acceptLiquid(Building source, Liquid liquid){
+            return false;
+        }
+
+        @Override
         public void updateTile(){
             if(shouldExport()){
                 moveOutPayload();
             }else if(moveInPayload()){
 
-                //load up items
+                //unload items
                 if(payload.block().hasItems && !full()){
                     if(efficiency() > 0.01f && timer(timerLoad, loadTime / efficiency())){
                         //load up items a set amount of times
@@ -50,9 +56,24 @@ public class BlockUnloader extends BlockLoader{
                         }
                     }
                 }
+
+                //unload liquids
+                //TODO tile is null may crash
+                if(payload.block().hasLiquids && payload.build.liquids.currentAmount() >= 0.01f &&
+                    (liquids.current() == payload.build.liquids.current() || liquids.currentAmount() <= 0.2f)){
+                    var liq = payload.build.liquids.current();
+                    float remaining = liquidCapacity - liquids.currentAmount();
+                    float flow = Math.min(Math.min(liquidsLoaded * delta(), remaining), payload.build.liquids.currentAmount());
+
+                    liquids.add(liq, flow);
+                    payload.build.liquids.remove(liq, flow);
+                }
             }
 
-            dump();
+            dumpLiquid(liquids.current());
+            for(int i = 0; i < offloadSpeed; i++){
+                dumpAccumulate();
+            }
         }
 
         public boolean full(){
@@ -61,7 +82,10 @@ public class BlockUnloader extends BlockLoader{
 
         @Override
         public boolean shouldExport(){
-            return payload != null && (payload.block().hasItems && payload.build.items.empty());
+            return payload != null && (
+                (!payload.block().hasItems || payload.build.items.empty()) &&
+                (!payload.block().hasLiquids || payload.build.liquids.currentAmount() <= 0.001f)
+            );
         }
     }
 }

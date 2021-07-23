@@ -96,7 +96,7 @@ public class Blocks implements ContentList{
     repairPoint, repairTurret, resupplyPoint,
 
     //payloads
-    payloadConveyor, payloadRouter, payloadPropulsionTower, deconstructor, constructor, largeConstructor, blockLoader, blockUnloader,
+    payloadConveyor, payloadRouter, payloadPropulsionTower, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
 
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
@@ -110,7 +110,7 @@ public class Blocks implements ContentList{
 
     /** @deprecated use the blocks with proper names, */
     @Deprecated
-    public static Block blockForge;
+    public static Block blockForge, blockLoader, blockUnloader;
 
     @Override
     public void load(){
@@ -2255,22 +2255,24 @@ public class Blocks implements ContentList{
             size = 5;
         }};
 
-        blockLoader = new BlockLoader("block-loader"){{
-            requirements(Category.units, BuildVisibility.debugOnly, with(Items.thorium, 100));
+        payloadLoader = new BlockLoader("payload-loader"){{
+            requirements(Category.units, with(Items.thorium, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
-        blockUnloader = new BlockUnloader("block-unloader"){{
-            requirements(Category.units, BuildVisibility.debugOnly, with(Items.thorium, 100));
+        payloadUnloader = new BlockUnloader("payload-unloader"){{
+            requirements(Category.units, with(Items.thorium, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
         //TODO deprecated
-        blockForge = deconstructor;
+        blockForge = constructor;
+        blockLoader = payloadLoader;
+        blockUnloader = payloadUnloader;
 
         //endregion
         //region sandbox
