@@ -279,7 +279,7 @@ public class UnitType extends UnlockableContent{
 
         if(mineTier >= 1){
             stats.addPercent(Stat.mineSpeed, mineSpeed);
-            stats.add(Stat.mineTier, StatValues.blocks(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= mineTier && !f.playerUnmineable));
+            stats.add(Stat.mineTier, StatValues.blocks(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= mineTier && (!f.playerUnmineable || Core.settings.getBool("doubletapmine"))));
         }
         if(buildSpeed > 0){
             stats.addPercent(Stat.buildSpeed, buildSpeed);
