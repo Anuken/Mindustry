@@ -28,6 +28,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "conduit-bottom-#") TextureRegion[] botRegions;
+    public @Load("@-cap") TextureRegion capRegion;
 
     public boolean leaks = true;
 
@@ -83,6 +84,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public class ConduitBuild extends LiquidBuild implements ChainedBuilding{
         public float smoothLiquid;
         public int blendbits, xscl, yscl, blending;
+        public boolean capped;
 
         @Override
         public void draw(){
@@ -104,6 +106,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
             Draw.scl(xscl, yscl);
             drawAt(x, y, blendbits, rotation, SliceMode.none);
             Draw.reset();
+
+            if(capped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg());
         }
 
         protected void drawAt(float x, float y, int bits, float rotation, SliceMode slice){
@@ -124,6 +128,9 @@ public class Conduit extends LiquidBlock implements Autotiler{
             xscl = bits[1];
             yscl = bits[2];
             blending = bits[4];
+
+            Building next = front();
+            capped = next == null || next.team != team || !next.block.hasLiquids;
         }
 
         @Override

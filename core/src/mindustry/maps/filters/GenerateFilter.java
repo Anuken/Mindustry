@@ -75,8 +75,7 @@ public abstract class GenerateFilter{
 
     /** localized display name */
     public String name(){
-        var s = simpleName();
-        return Core.bundle.get("filter." + s);
+        return Core.bundle.get("filter." + simpleName());
     }
 
     public char icon(){

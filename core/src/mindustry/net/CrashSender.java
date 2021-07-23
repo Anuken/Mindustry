@@ -29,17 +29,17 @@ public class CrashSender{
             report += "Report this at " + Vars.reportIssueURL + "\n\n";
         }
         return report
-            + "Version: " + Version.combined() + (Vars.headless ? " (Server)" : "") + "\n"
-            + "OS: " + OS.osName + " x" + (OS.osArchBits) + " (" + OS.osArch + ")\n"
-            + "Java Version: " + OS.javaVersion + "\n"
-            + (mods == null ? "<no mod init>" : mods.list().size + " Mods" + (mods.list().isEmpty() ? "" : ": " + mods.list().toString(", ", mod -> mod.name + ":" + mod.meta.version)))
-            + "\n\n" + error;
+        + "Version: " + Version.combined() + (Vars.headless ? " (Server)" : "") + "\n"
+        + "OS: " + OS.osName + " x" + (OS.osArchBits) + " (" + OS.osArch + ")\n"
+        + "Java Version: " + OS.javaVersion + "\n"
+        + (mods == null ? "<no mod init>" : mods.list().size + " Mods" + (mods.list().isEmpty() ? "" : ": " + mods.list().toString(", ", mod -> mod.name + ":" + mod.meta.version)))
+        + "\n\n" + error;
     }
 
     public static void log(Throwable exception){
         try{
             Core.settings.getDataDirectory().child("crashes").child("crash_" + System.currentTimeMillis() + ".txt")
-                .writeString(createReport(Strings.neatError(exception)));
+            .writeString(createReport(Strings.neatError(exception)));
         }catch(Throwable ignored){
         }
     }

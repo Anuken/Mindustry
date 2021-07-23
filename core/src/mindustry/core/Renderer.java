@@ -7,6 +7,7 @@ import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -45,6 +46,7 @@ public class Renderer implements ApplicationListener{
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
     private float targetscale = Scl.scl(4), camerascale = targetscale, landscale, landTime, weatherAlpha, minZoomScl = Scl.scl(0.01f);
     private float shakeIntensity, shaketime;
+    private Vec2 camShakeOffset = new Vec2();
 
     public Renderer(){
         camera = new Camera();
@@ -112,12 +114,25 @@ public class Renderer implements ApplicationListener{
             landTime = 0f;
             graphics.clear(Color.black);
         }else{
-            updateShake(0.75f);
+            if(shaketime > 0){
+                float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * 0.75f;
+                camShakeOffset.setToRandomDirection().scl(Mathf.random(intensity));
+                camera.position.add(camShakeOffset);
+                shakeIntensity -= 0.25f * Time.delta;
+                shaketime -= Time.delta;
+                shakeIntensity = Mathf.clamp(shakeIntensity, 0f, 100f);
+            }else{
+                camShakeOffset.setZero();
+                shakeIntensity = 0f;
+            }
+
             if(pixelator.enabled()){
                 pixelator.drawPixelate();
             }else{
                 draw();
             }
+
+            camera.position.sub(camShakeOffset);
         }
     }
 
@@ -169,18 +184,6 @@ public class Renderer implements ApplicationListener{
                 bloom.dispose();
                 bloom = null;
             }
-        }
-    }
-
-    void updateShake(float scale){
-        if(shaketime > 0){
-            float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * scale;
-            camera.position.add(Mathf.range(intensity), Mathf.range(intensity));
-            shakeIntensity -= 0.25f * Time.delta;
-            shaketime -= Time.delta;
-            shakeIntensity = Mathf.clamp(shakeIntensity, 0f, 100f);
-        }else{
-            shakeIntensity = 0f;
         }
     }
 

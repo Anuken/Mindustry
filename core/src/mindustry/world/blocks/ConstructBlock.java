@@ -41,6 +41,7 @@ public class ConstructBlock extends Block{
         health = 20;
         consumesTap = true;
         solidifes = true;
+        inEditor = false;
         consBlocks[size - 1] = this;
         sync = true;
     }

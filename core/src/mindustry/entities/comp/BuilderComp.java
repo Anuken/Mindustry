@@ -178,7 +178,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         //requests that you have at least *started* are considered
         if(state.rules.infiniteResources || team.rules().infiniteResources || request.breaking || core == null || request.isRotation(team)) return false;
 
-        return (request.stuck && !core.items.has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items.has(i.item) && Mathf.round(i.amount * state.rules.buildCostMultiplier) > 0) && !request.initialized);
+        return (request.stuck && !core.items.has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items.has(i.item, Math.min(i.amount, 15)) && Mathf.round(i.amount * state.rules.buildCostMultiplier) > 0) && !request.initialized);
     }
 
     void removeBuild(int x, int y, boolean breaking){

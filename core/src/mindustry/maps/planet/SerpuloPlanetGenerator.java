@@ -162,12 +162,27 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                 connected.add(this);
             }
 
+            void con(int x1, int y1, int x2, int y2){
+                float nscl = rand.random(100f, 140f) * 6f;
+                int stroke = rand.random(3, 9);
+                brush(pathfind(x1, y1, x2, y2, tile -> (tile.solid() ? 50f : 0f) + noise(tile.x, tile.y, 2, 0.4f, 1f / nscl) * 500, Astar.manhattan), stroke);
+            }
+
             void connect(Room to){
                 if(!connected.add(to)) return;
 
-                float nscl = rand.random(100f, 140f);
-                int stroke = rand.random(3, 9);
-                brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + noise(tile.x, tile.y, 2, 0.4, 1f / nscl) * 500, Astar.manhattan), stroke);
+                Vec2 midpoint = Tmp.v1.set(to.x, to.y).add(x, y).scl(0.5f);
+                rand.nextFloat();
+
+                //add randomized offset to avoid straight lines
+                midpoint.add(Tmp.v2.setToRandomDirection(rand).scl(Tmp.v1.dst(x, y)));
+
+                midpoint.sub(width/2f, height/2f).limit(width / 2f / Mathf.sqrt3).add(width/2f, height/2f);
+
+                int mx = (int)midpoint.x, my = (int)midpoint.y;
+
+                con(x, y, mx, my);
+                con(mx, my, to.x, to.y);
             }
         }
 
@@ -244,8 +259,6 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         cells(1);
         distort(10f, 6f);
 
-        inverseFloodFill(tiles.getn(spawn.x, spawn.y));
-
         Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreLead);
         float poles = Math.abs(sector.tile.v.y);
         float nmag = 0.5f;
@@ -295,6 +308,8 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         trimDark();
 
         median(2);
+
+        inverseFloodFill(tiles.getn(spawn.x, spawn.y));
 
         tech();
 

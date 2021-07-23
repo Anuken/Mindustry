@@ -527,8 +527,7 @@ public class World{
 
     private class Context implements WorldContext{
 
-        Context(){
-        }
+        Context(){}
 
         @Override
         public Tile tile(int index){

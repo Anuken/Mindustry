@@ -41,6 +41,7 @@ public class Drawf{
         Draw.reset();
     }
 
+    /** Sets Draw.z to the text layer, and returns the previous layer. */
     public static float text(){
         float z = Draw.z();
         if(renderer.pixelator.enabled()){
@@ -203,20 +204,24 @@ public class Drawf{
         Draw.color();
     }
 
-    public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float scale){
-        laser(team, line, edge, x, y, x2, y2, Mathf.angle(x2 - x, y2 - y), scale);
-    }
-
     public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2){
-        laser(team, line, edge, x, y, x2, y2, Mathf.angle(x2 - x, y2 - y), 1f);
+        laser(team, line, edge, edge, x, y, x2, y2, 1f);
     }
 
-    public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float rotation, float scale){
-        float scl = 8f * scale * Draw.scl;
-        float vx = Mathf.cosDeg(rotation) * scl, vy = Mathf.sinDeg(rotation) * scl;
+    public static void laser(Team team, TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2){
+        laser(team, line, start, end, x, y, x2, y2, 1f);
+    }
 
-        Draw.rect(edge, x, y, edge.width * scale * Draw.scl, edge.height * scale * Draw.scl, rotation + 180);
-        Draw.rect(edge, x2, y2, edge.width * scale * Draw.scl, edge.height * scale * Draw.scl, rotation);
+    public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float scale){
+        laser(team, line, edge, edge, x, y, x2, y2, scale);
+    }
+
+    public static void laser(Team team, TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale){
+        float scl = 8f * scale * Draw.scl, rot = Mathf.angle(x2 - x, y2 - y);
+        float vx = Mathf.cosDeg(rot) * scl, vy = Mathf.sinDeg(rot) * scl;
+
+        Draw.rect(start, x, y, start.width * scale * Draw.scl, start.height * scale * Draw.scl, rot + 180);
+        Draw.rect(end, x2, y2, end.width * scale * Draw.scl, end.height * scale * Draw.scl, rot);
 
         Lines.stroke(12f * scale);
         Lines.line(line, x + vx, y + vy, x2 - vx, y2 - vy, false);
@@ -273,5 +278,14 @@ public class Drawf{
         Lines.lineAngleCenter(t.x + Mathf.sin(time, 20f, Vars.tilesize / 2f * t.block.size - 2f), t.y, 90, t.block.size * Vars.tilesize - 4f);
 
         Draw.reset();
+    }
+    
+    /** Draws a sprite that should be light-wise correct, when rotated. Provided sprite must be symmetrical in shape. */
+    public static void spinSprite(TextureRegion region, float x, float y, float r){
+        r = Mathf.mod(r, 90f);
+        Draw.rect(region, x, y, r);
+        Draw.alpha(r / 90f);
+        Draw.rect(region, x, y, r - 90f);
+        Draw.alpha(1f);
     }
 }
