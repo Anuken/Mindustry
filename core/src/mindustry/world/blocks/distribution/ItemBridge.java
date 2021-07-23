@@ -406,7 +406,7 @@ public class ItemBridge extends Block{
 
             if(!(liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f)) return false;
 
-            if(linked(source)) return true;
+            if(tile == null || linked(source)) return true;
 
             if(linkValid(tile, other)){
                 int rel = relativeTo(other.x, other.y);
