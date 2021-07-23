@@ -59,20 +59,22 @@ public class MobileInput extends InputHandler implements GestureListener{
     /** Current place mode. */
     public PlaceMode mode = none;
     /** Whether no recipe was available when switching to break mode. */
-    public Block lastBlock;
+    public @Nullable Block lastBlock;
     /** Last placed request. Used for drawing block overlay. */
-    public BuildPlan lastPlaced;
+    public @Nullable BuildPlan lastPlaced;
     /** Down tracking for panning. */
     public boolean down = false;
     /** Whether manual shooting (point with finger) is enabled. */
     public boolean manualShooting = false;
 
     /** Current thing being shot at. */
-    public Teamc target;
+    public @Nullable Teamc target;
     /** Payload target being moved to. Can be a position (for dropping), or a unit/block. */
-    public Position payloadTarget;
+    public @Nullable Position payloadTarget;
     /** Unit last tapped, or null if last tap was not on a unit. */
-    public Unit unitTapped;
+    public @Nullable Unit unitTapped;
+    /** Control building last tapped. */
+    public @Nullable Building buildingTapped;
 
     //region utility methods
 
@@ -86,7 +88,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             Building tile = world.buildWorld(x, y);
 
-            if((tile != null && player.team().isEnemy(tile.team) && tile.team != Team.derelict) || (tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged())){
+            if((tile != null && player.team().isEnemy(tile.team) && (tile.team != Team.derelict || state.rules.coreCapture)) || (tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged())){
                 player.unit().mineTile = null;
                 target = tile;
             }
@@ -268,6 +270,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 b.button(Icon.save, style, this::showSchematicSave).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 b.button(Icon.cancel, style, () -> {
                     selectRequests.clear();
+                    lastSchematic = null;
                 });
                 b.row();
                 b.button(Icon.flipX, style, () -> flipRequests(selectRequests, true));
@@ -362,7 +365,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
 
             //draw last placed request
-            if(!request.breaking && request == lastPlaced && request.block != null){
+            if(!request.breaking && request == lastPlaced && request.block != null && request.block.drawArrow){
                 Draw.mixcol();
                 request.block.drawPlace(tile.x, tile.y, rotation, validPlace(tile.x, tile.y, request.block, rotation));
             }
@@ -530,7 +533,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 }else{
                     Building build = world.buildWorld(pos.x, pos.y);
 
-                    if(build != null && build.team == player.team() && pay.canPickup(build)){
+                    if(build != null && build.team == player.team() && (pay.canPickup(build) || build.getPayload() != null && pay.canPickupPayload(build.getPayload()))){
                         payloadTarget = build;
                     }else if(pay.hasPayload()){
                         //drop off at position
@@ -612,6 +615,10 @@ public class MobileInput extends InputHandler implements GestureListener{
                     //control a unit/block detected on first tap of double-tap
                     if(unitTapped != null){
                         Call.unitControl(player, unitTapped);
+                        recentRespawnTimer = 1f;
+                    }else if(buildingTapped != null){
+                        Call.buildingControlSelect(player, buildingTapped);
+                        recentRespawnTimer = 1f;
                     }else if(!tryBeginMine(cursor)){
                         tileTapped(linked.build);
                     }
@@ -620,6 +627,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
 
             unitTapped = selectedUnit();
+            buildingTapped = selectedControlBuild();
             //prevent mining if placing/breaking blocks
             if(!tryStopMine() && !canTapPlayer(worldx, worldy) && !tileTapped(linked.build) && mode == none && !Core.settings.getBool("doubletapmine")){
                 tryBeginMine(cursor);
@@ -722,7 +730,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             //When in line mode, pan when near screen edges automatically
             if(Core.input.isTouched(0)){
-               autoPan();
+                autoPan();
             }
 
             int lx = tileX(Core.input.mouseX()), ly = tileY(Core.input.mouseY());
@@ -851,8 +859,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         boolean omni = unit.type.omniMovement;
         boolean allowHealing = type.canHeal;
-        boolean validHealTarget = allowHealing && target instanceof Building && ((Building)target).isValid() && target.team() == unit.team &&
-            ((Building)target).damaged() && target.within(unit, type.range);
+        boolean validHealTarget = allowHealing && target instanceof Building b && b.isValid() && target.team() == unit.team && b.damaged() && target.within(unit, type.range);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
 
         //reset target if:
@@ -885,7 +892,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 if(payloadTarget instanceof Vec2 && pay.hasPayload()){
                     //vec -> dropping something
                     tryDropPayload();
-                }else if(payloadTarget instanceof Building build && pay.canPickup(build)){
+                }else if(payloadTarget instanceof Building build && build.team == unit.team){
                     //building -> picking building up
                     Call.requestBuildPayload(player, build);
                 }else if(payloadTarget instanceof Unit other && pay.canPickup(other)){
@@ -907,13 +914,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             unit.vel.approachDelta(Vec2.ZERO, unit.speed() * type.accel / 2f);
         }
 
-        float expansion = 3f;
-
         unit.hitbox(rect);
-        rect.x -= expansion;
-        rect.y -= expansion;
-        rect.width += expansion * 2f;
-        rect.height += expansion * 2f;
+        rect.grow(6f);
 
         player.boosting = collisions.overlapsTile(rect) || !unit.within(targetPos, 85f);
 
@@ -922,7 +924,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
             if(!movement.isZero()){
-                unit.vel.rotateTo(movement.angle(), unit.type.rotateSpeed * Math.max(Time.delta, 1));
+                unit.rotation = Angles.moveToward(unit.rotation, movement.angle(), unit.type.rotateSpeed * Math.max(Time.delta, 1));
             }
         }
 
@@ -936,7 +938,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }else if(target == null){
                 player.shooting = false;
                 if(Core.settings.getBool("autotarget") && !(player.unit() instanceof BlockUnitUnit u && u.tile() instanceof ControlBlock c && !c.shouldAutoTarget())){
-                    target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.team != Team.derelict, u -> u.team != Team.derelict);
+                    target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.checkTarget(type.targetAir, type.targetGround), u -> type.targetGround);
 
                     if(allowHealing && target == null){
                         target = Geometry.findClosest(unit.x, unit.y, indexer.getDamaged(Team.sharded));

@@ -132,6 +132,7 @@ public class EntityProcess extends BaseProcessor{
                     .build())).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
                 }
 
+                //generate interface getters and setters for all "standard" fields
                 for(Svar field : component.fields().select(e -> !e.is(Modifier.STATIC) && !e.is(Modifier.PRIVATE) && !e.has(Import.class))){
                     String cname = field.name();
 
@@ -273,7 +274,10 @@ public class EntityProcess extends BaseProcessor{
                     name += "Entity";
                 }
 
-                if(ann.legacy()){
+                boolean legacy = ann.legacy();
+
+                if(legacy){
+                    baseClass = tname(packageName + "." + name);
                     name += "Legacy" + Strings.capitalize(type.name());
                 }
 
@@ -338,7 +342,8 @@ public class EntityProcess extends BaseProcessor{
                         boolean isVisible = !f.is(Modifier.STATIC) && !f.is(Modifier.PRIVATE) && !f.has(ReadOnly.class);
 
                         //add the field only if it isn't visible or it wasn't implemented by the base class
-                        if(!isShadowed || !isVisible){
+                        //legacy classes have no extra fields
+                        if((!isShadowed || !isVisible) && !legacy){
                             builder.addField(spec);
                         }
 
@@ -348,7 +353,7 @@ public class EntityProcess extends BaseProcessor{
                         allFields.add(f);
 
                         //add extra sync fields
-                        if(f.has(SyncField.class) && isSync){
+                        if(f.has(SyncField.class) && isSync && !legacy){
                             if(!f.tname().toString().equals("float")) err("All SyncFields must be of type float", f);
 
                             syncedFields.add(f);
@@ -442,11 +447,14 @@ public class EntityProcess extends BaseProcessor{
                         }
                     }
 
+                    boolean specialIO = false;
+
                     if(hasIO){
                         //SPECIAL CASE: I/O code
                         //note that serialization is generated even for non-serializing entities for manual usage
                         if((first.name().equals("read") || first.name().equals("write"))){
                             io.write(mbuilder, first.name().equals("write"));
+                            specialIO = true;
                         }
 
                         //SPECIAL CASE: sync I/O code
@@ -525,7 +533,9 @@ public class EntityProcess extends BaseProcessor{
                         mbuilder.addStatement("mindustry.gen.Groups.queueFree(($T)this)", Poolable.class);
                     }
 
-                    builder.addMethod(mbuilder.build());
+                    if(!legacy || specialIO){
+                        builder.addMethod(mbuilder.build());
+                    }
                 }
 
                 //add pool reset method and implement Poolable
@@ -560,7 +570,7 @@ public class EntityProcess extends BaseProcessor{
                 .returns(tname(packageName + "." + name))
                 .addStatement(ann.pooled() ? "return Pools.obtain($L.class, " +name +"::new)" : "return new $L()", name).build());
 
-                definitions.add(new EntityDefinition(packageName + "." + name, builder, type, typeIsBase ? null : baseClass, components, groups, allFieldSpecs));
+                definitions.add(new EntityDefinition(packageName + "." + name, builder, type, typeIsBase ? null : baseClass, components, groups, allFieldSpecs, legacy));
             }
 
             //generate groups
@@ -665,11 +675,28 @@ public class EntityProcess extends BaseProcessor{
             //build mapping class for sync IDs
             TypeSpec.Builder idBuilder = TypeSpec.classBuilder("EntityMapping").addModifiers(Modifier.PUBLIC)
             .addField(FieldSpec.builder(TypeName.get(Prov[].class), "idMap", Modifier.PUBLIC, Modifier.STATIC).initializer("new Prov[256]").build())
+
             .addField(FieldSpec.builder(ParameterizedTypeName.get(ClassName.get(ObjectMap.class),
                 tname(String.class), tname(Prov.class)),
                 "nameMap", Modifier.PUBLIC, Modifier.STATIC).initializer("new ObjectMap<>()").build())
+
+            .addField(FieldSpec.builder(ParameterizedTypeName.get(ClassName.get(IntMap.class), tname(String.class)),
+                "customIdMap", Modifier.PUBLIC, Modifier.STATIC).initializer("new IntMap<>()").build())
+
+            .addMethod(MethodSpec.methodBuilder("register").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(TypeName.get(int.class))
+                .addParameter(String.class, "name").addParameter(Prov.class, "constructor")
+                .addStatement("int next = arc.util.Structs.indexOf(idMap, v -> v == null)")
+                .addStatement("idMap[next] = constructor")
+                .addStatement("nameMap.put(name, constructor)")
+                .addStatement("customIdMap.put(next, name)")
+                .addStatement("return next")
+                .addJavadoc("Use this method for obtaining a classId for custom modded unit types. Only call this once for each type. Modded types should return this id in their overridden classId method.")
+                .build())
+
             .addMethod(MethodSpec.methodBuilder("map").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(TypeName.get(Prov.class)).addParameter(int.class, "id").addStatement("return idMap[id]").build())
+
             .addMethod(MethodSpec.methodBuilder("map").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(TypeName.get(Prov.class)).addParameter(String.class, "name").addStatement("return nameMap.get(name)").build());
 
@@ -698,11 +725,6 @@ public class EntityProcess extends BaseProcessor{
         }else{
             //round 3: generate actual classes and implement interfaces
 
-            //write base classes
-            for(TypeSpec.Builder b : baseClasses){
-                write(b, imports.asArray());
-            }
-
             //implement each definition
             for(EntityDefinition def : definitions){
 
@@ -725,6 +747,14 @@ public class EntityProcess extends BaseProcessor{
 
                     def.builder.addSuperinterface(inter.tname());
 
+                    if(def.legacy) continue;
+
+                    @Nullable TypeSpec.Builder superclass = null;
+
+                    if(def.extend != null){
+                        superclass = baseClasses.find(b -> (packageName + "." + Reflect.get(b, "name")).equals(def.extend.toString()));
+                    }
+
                     //generate getter/setter for each method
                     for(Smethod method : inter.methods()){
                         String var = method.name();
@@ -732,14 +762,36 @@ public class EntityProcess extends BaseProcessor{
                         //make sure it's a real variable AND that the component doesn't already implement it somewhere with custom logic
                         if(field == null || methodNames.contains(method.simpleString())) continue;
 
+                        MethodSpec result = null;
+
                         //getter
                         if(!method.isVoid()){
-                            def.builder.addMethod(MethodSpec.overriding(method.e).addStatement("return " + var).build());
+                            result = MethodSpec.overriding(method.e).addStatement("return " + var).build();
                         }
 
                         //setter
                         if(method.isVoid() && !Seq.with(field.annotations).contains(f -> f.type.toString().equals("@mindustry.annotations.Annotations.ReadOnly"))){
-                            def.builder.addMethod(MethodSpec.overriding(method.e).addStatement("this." + var + " = " + var).build());
+                            result = MethodSpec.overriding(method.e).addStatement("this." + var + " = " + var).build();
+                        }
+
+                        //add getter/setter to parent class, if possible. when this happens, skip adding getters setters *here* because they are defined in the superclass.
+                        if(result != null && superclass != null){
+                            FieldSpec superField = Seq.with(superclass.fieldSpecs).find(f -> f.name.equals(var));
+
+                            //found the right field, try to check for the method already existing now
+                            if(superField != null){
+                                MethodSpec fr = result;
+                                MethodSpec targetMethod = Seq.with(superclass.methodSpecs).find(m -> m.name.equals(var) && m.returnType.equals(fr.returnType));
+                                //if the method isn't added yet, add it. in any case, skip.
+                                if(targetMethod == null){
+                                    superclass.addMethod(result);
+                                }
+                                continue;
+                            }
+                        }
+
+                        if(result != null){
+                            def.builder.addMethod(result);
                         }
                     }
                 }
@@ -747,8 +799,16 @@ public class EntityProcess extends BaseProcessor{
                 write(def.builder, imports.asArray());
             }
 
+            //write base classes last
+            for(TypeSpec.Builder b : baseClasses){
+                write(b, imports.asArray());
+            }
+
+            //TODO nulls were an awful idea
             //store nulls
             TypeSpec.Builder nullsBuilder = TypeSpec.classBuilder("Nulls").addModifiers(Modifier.PUBLIC).addModifiers(Modifier.FINAL);
+            //TODO should be dynamic
+            ObjectSet<String> nullList = ObjectSet.with("unit");
 
             //create mock types of all components
             for(Stype interf : allInterfaces){
@@ -767,6 +827,12 @@ public class EntityProcess extends BaseProcessor{
 
                 //create null builder
                 String baseName = interf.name().substring(0, interf.name().length() - 1);
+
+                //prevent Nulls bloat
+                if(!nullList.contains(Strings.camelize(baseName))){
+                    continue;
+                }
+
                 String className = "Null" + baseName;
                 TypeSpec.Builder nullBuilder = TypeSpec.classBuilder(className)
                 .addModifiers(Modifier.FINAL);
@@ -900,7 +966,7 @@ public class EntityProcess extends BaseProcessor{
     }
 
     String createName(Selement<?> elem){
-        Seq<Stype> comps = types(elem.annotation(EntityDef.class), EntityDef::value).map(this::interfaceToComp);;
+        Seq<Stype> comps = types(elem.annotation(EntityDef.class), EntityDef::value).map(this::interfaceToComp);
         comps.sortComparing(Selement::name);
         return comps.toString("", s -> s.name().replace("Comp", ""));
     }
@@ -944,9 +1010,10 @@ public class EntityProcess extends BaseProcessor{
         final Selement naming;
         final String name;
         final @Nullable TypeName extend;
+        final boolean legacy;
         int classID;
 
-        public EntityDefinition(String name, Builder builder, Selement naming, TypeName extend, Seq<Stype> components, Seq<GroupDefinition> groups, Seq<FieldSpec> fieldSpec){
+        public EntityDefinition(String name, Builder builder, Selement naming, TypeName extend, Seq<Stype> components, Seq<GroupDefinition> groups, Seq<FieldSpec> fieldSpec, boolean legacy){
             this.builder = builder;
             this.name = name;
             this.naming = naming;
@@ -954,6 +1021,7 @@ public class EntityProcess extends BaseProcessor{
             this.components = components;
             this.extend = extend;
             this.fieldSpecs = fieldSpec;
+            this.legacy = legacy;
         }
 
         @Override

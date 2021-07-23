@@ -29,6 +29,8 @@ public class Effect{
     public float lifetime = 50f;
     /** Clip size. */
     public float clip;
+    /** If true, parent unit is data are followed. */
+    public boolean followParent;
 
     public float layer = Layer.effect;
     public float layerDuration;
@@ -52,6 +54,11 @@ public class Effect{
     }
 
     public void init(){}
+
+    public Effect followParent(boolean follow){
+        followParent = follow;
+        return this;
+    }
 
     public Effect layer(float l){
         layer = l;
@@ -134,27 +141,23 @@ public class Effect{
     }
 
     public static void create(Effect effect, float x, float y, float rotation, Color color, Object data){
-        if(headless || effect == Fx.none) return;
-        if(Core.settings.getBool("effects")){
-            Rect view = Core.camera.bounds(Tmp.r1);
-            Rect pos = Tmp.r2.setSize(effect.clip).setCenter(x, y);
+        if(headless || effect == Fx.none || !Core.settings.getBool("effects")) return;
 
-            if(view.overlaps(pos)){
-                if(!effect.initialized){
-                    effect.initialized = true;
-                    effect.init();
-                }
-
-                EffectState entity = EffectState.create();
-                entity.effect = effect;
-                entity.rotation = rotation;
-                entity.data = (data);
-                entity.lifetime = (effect.lifetime);
-                entity.set(x, y);
-                entity.color.set(color);
-                if(data instanceof Posc) entity.parent = ((Posc)data);
-                entity.add();
+        if(Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(x, y, effect.clip))){
+            if(!effect.initialized){
+                effect.initialized = true;
+                effect.init();
             }
+
+            EffectState entity = EffectState.create();
+            entity.effect = effect;
+            entity.rotation = rotation;
+            entity.data = data;
+            entity.lifetime = effect.lifetime;
+            entity.set(x, y);
+            entity.color.set(color);
+            if(effect.followParent && data instanceof Posc p) entity.parent = p;
+            entity.add();
         }
     }
 

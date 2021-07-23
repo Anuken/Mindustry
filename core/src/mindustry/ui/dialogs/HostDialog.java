@@ -64,7 +64,7 @@ public class HostDialog extends BaseDialog{
         Time.runTask(5f, () -> {
             try{
                 net.host(Vars.port);
-                player.admin(true);
+                player.admin = true;
 
                 if(steam){
                     Core.app.post(() -> Core.settings.getBoolOnce("steampublic3", () -> {

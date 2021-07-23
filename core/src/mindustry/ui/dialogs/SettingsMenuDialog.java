@@ -2,9 +2,11 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.files.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.input.*;
+import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
@@ -28,13 +30,13 @@ import java.io.*;
 import java.util.zip.*;
 
 import static arc.Core.*;
-import static mindustry.Vars.net;
 import static mindustry.Vars.*;
 
-public class SettingsMenuDialog extends SettingsDialog{
+public class SettingsMenuDialog extends Dialog{
     public SettingsTable graphics;
     public SettingsTable game;
     public SettingsTable sound;
+    public SettingsTable main;
 
     private Table prefs;
     private Table menu;
@@ -42,6 +44,11 @@ public class SettingsMenuDialog extends SettingsDialog{
     private boolean wasPaused;
 
     public SettingsMenuDialog(){
+        super(bundle.get("settings", "Settings"));
+        addCloseButton();
+
+        cont.add(main = new SettingsTable());
+
         hidden(() -> {
             Sounds.back.play();
             if(state.isGame()){
@@ -58,6 +65,15 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
 
             rebuildMenu();
+        });
+
+        Events.on(ResizeEvent.class, event -> {
+            if(isShown() && Core.scene.getDialog() == this){
+                graphics.rebuild();
+                sound.rebuild();
+                game.rebuild();
+                updateScrollFocus();
+            }
         });
 
         setFillParent(true);
@@ -222,29 +238,8 @@ public class SettingsMenuDialog extends SettingsDialog{
             }).marginLeft(4);
         });
 
-        ScrollPane pane = new ScrollPane(prefs);
-        pane.addCaptureListener(new InputListener(){
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                Element actor = pane.hit(x, y, true);
-                if(actor instanceof Slider){
-                    pane.setFlickScroll(false);
-                    return true;
-                }
-
-                return super.touchDown(event, x, y, pointer, button);
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
-                pane.setFlickScroll(true);
-                super.touchUp(event, x, y, pointer, button);
-            }
-        });
-        pane.setFadeScrollBars(false);
-
         row();
-        add(pane).grow().top();
+        pane(prefs).grow().top();
         row();
         add(buttons).fillX();
 
@@ -289,16 +284,21 @@ public class SettingsMenuDialog extends SettingsDialog{
     }
 
     void addSettings(){
-        sound.sliderPref("musicvol", bundle.get("setting.musicvol.name", "Music Volume"), 100, 0, 100, 1, i -> i + "%");
-        sound.sliderPref("sfxvol", bundle.get("setting.sfxvol.name", "SFX Volume"), 100, 0, 100, 1, i -> i + "%");
-        sound.sliderPref("ambientvol", bundle.get("setting.ambientvol.name", "Ambient Volume"), 100, 0, 100, 1, i -> i + "%");
+        sound.sliderPref("musicvol", 100, 0, 100, 1, i -> i + "%");
+        sound.sliderPref("sfxvol", 100, 0, 100, 1, i -> i + "%");
+        sound.sliderPref("ambientvol", 100, 0, 100, 1, i -> i + "%");
 
-        game.screenshakePref();
+        game.sliderPref("saveinterval", 60, 10, 5 * 120, 10, i -> Core.bundle.format("setting.seconds", i));
+
         if(mobile){
             game.checkPref("autotarget", true);
-            game.checkPref("keyboard", false, val -> control.setInput(val ? new DesktopInput() : new MobileInput()));
+            game.checkPref("keyboard", false, val -> {
+                control.setInput(val ? new DesktopInput() : new MobileInput());
+                input.setUseKeyboard(val);
+            });
             if(Core.settings.getBool("keyboard")){
                 control.setInput(new DesktopInput());
+                input.setUseKeyboard(true);
             }
         }
         //the issue with touchscreen support on desktop is that:
@@ -310,7 +310,6 @@ public class SettingsMenuDialog extends SettingsDialog{
                 control.setInput(new MobileInput());
             }
         }*/
-        game.sliderPref("saveinterval", 60, 10, 5 * 120, 10, i -> Core.bundle.format("setting.seconds", i));
 
         if(!mobile){
             game.checkPref("crashreport", true);
@@ -346,12 +345,15 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         }
 
+        int[] lastUiScale = {settings.getInt("uiscale", 100)};
+
         graphics.sliderPref("uiscale", 100, 25, 300, 25, s -> {
-            if(ui.settings != null){
-                Core.settings.put("uiscalechanged", true);
-            }
+            //if the user changed their UI scale, but then put it back, don't consider it 'changed'
+            Core.settings.put("uiscalechanged", s != lastUiScale[0]);
             return s + "%";
         });
+
+        graphics.sliderPref("screenshake", 4, 0, 8, i -> (i / 4f) + "x");
         graphics.sliderPref("fpscap", 240, 15, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
         graphics.sliderPref("lasersopacity", 100, 0, 100, 5, s -> {
@@ -412,15 +414,12 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("indicators", true);
         graphics.checkPref("showweather", true);
         graphics.checkPref("animatedwater", true);
+
         if(Shaders.shield != null){
             graphics.checkPref("animatedshields", !mobile);
         }
 
-        //if(!ios){
-            graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
-        //}else{
-        //    Core.settings.put("bloom", false);
-        //}
+        graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
 
         graphics.checkPref("pixelate", false, val -> {
             if(val){
@@ -428,12 +427,17 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        graphics.checkPref("linear", !mobile, b -> {
-            for(Texture tex : Core.atlas.getTextures()){
-                TextureFilter filter = b ? TextureFilter.linear : TextureFilter.nearest;
-                tex.setFilter(filter, filter);
-            }
-        });
+        //iOS (and possibly Android) devices do not support linear filtering well, so disable it
+        if(!ios){
+            graphics.checkPref("linear", !mobile, b -> {
+                for(Texture tex : Core.atlas.getTextures()){
+                    TextureFilter filter = b ? TextureFilter.linear : TextureFilter.nearest;
+                    tex.setFilter(filter, filter);
+                }
+            });
+        }else{
+            settings.put("linear", false);
+        }
 
         if(Core.settings.getBool("linear")){
             for(Texture tex : Core.atlas.getTextures()){
@@ -537,5 +541,166 @@ public class SettingsMenuDialog extends SettingsDialog{
                 }
             }
         });
+    }
+
+    public interface StringProcessor{
+        String get(int i);
+    }
+
+    public static class SettingsTable extends Table{
+        protected Seq<Setting> list = new Seq<>();
+
+        public SettingsTable(){
+            left();
+        }
+
+        public Seq<Setting> getSettings(){
+            return list;
+        }
+
+        public void pref(Setting setting){
+            list.add(setting);
+            rebuild();
+        }
+
+        public SliderSetting sliderPref(String name, int def, int min, int max, StringProcessor s){
+            return sliderPref(name, def, min, max, 1, s);
+        }
+
+        public SliderSetting sliderPref(String name, int def, int min, int max, int step, StringProcessor s){
+            SliderSetting res;
+            list.add(res = new SliderSetting(name, def, min, max, step, s));
+            settings.defaults(name, def);
+            rebuild();
+            return res;
+        }
+
+        public void checkPref(String name, boolean def){
+            list.add(new CheckSetting(name, def, null));
+            settings.defaults(name, def);
+            rebuild();
+        }
+
+        public void checkPref(String name, boolean def, Boolc changed){
+            list.add(new CheckSetting(name, def, changed));
+            settings.defaults(name, def);
+            rebuild();
+        }
+
+        void rebuild(){
+            clearChildren();
+
+            for(Setting setting : list){
+                setting.add(this);
+            }
+
+            button(bundle.get("settings.reset", "Reset to Defaults"), () -> {
+                for(Setting setting : list){
+                    if(setting.name == null || setting.title == null) continue;
+                    settings.put(setting.name, settings.getDefault(setting.name));
+                }
+                rebuild();
+            }).margin(14).width(240f).pad(6);
+        }
+
+        public abstract static class Setting{
+            public String name;
+            public String title;
+            public @Nullable String description;
+
+            Setting(String name){
+                this.name = name;
+                title = bundle.get("setting." + name + ".name");
+                description = bundle.getOrNull("setting." + name + ".description");
+            }
+
+            public abstract void add(SettingsTable table);
+
+            public void addDesc(Element elem){
+                if(description == null) return;
+
+                elem.addListener(new Tooltip(t -> t.background(Styles.black8).margin(4f).add(description).color(Color.lightGray)){
+                    {
+                        allowMobile = true;
+                    }
+                    @Override
+                    protected void setContainerPosition(Element element, float x, float y){
+                        this.targetActor = element;
+                        Vec2 pos = element.localToStageCoordinates(Tmp.v1.set(0, 0));
+                        container.pack();
+                        container.setPosition(pos.x, pos.y, Align.topLeft);
+                        container.setOrigin(0, element.getHeight());
+                    }
+                });
+            }
+        }
+
+        public static class CheckSetting extends Setting{
+            boolean def;
+            Boolc changed;
+
+            CheckSetting(String name, boolean def, Boolc changed){
+                super(name);
+                this.def = def;
+                this.changed = changed;
+            }
+
+            @Override
+            public void add(SettingsTable table){
+                CheckBox box = new CheckBox(title);
+
+                box.update(() -> box.setChecked(settings.getBool(name)));
+
+                box.changed(() -> {
+                    settings.put(name, box.isChecked());
+                    if(changed != null){
+                        changed.get(box.isChecked());
+                    }
+                });
+
+                box.left();
+                addDesc(table.add(box).left().padTop(3f).get());
+                table.row();
+            }
+        }
+
+        public static class SliderSetting extends Setting{
+            int def, min, max, step;
+            StringProcessor sp;
+
+            SliderSetting(String name, int def, int min, int max, int step, StringProcessor s){
+                super(name);
+                this.def = def;
+                this.min = min;
+                this.max = max;
+                this.step = step;
+                this.sp = s;
+            }
+
+            @Override
+            public void add(SettingsTable table){
+                Slider slider = new Slider(min, max, step, false);
+
+                slider.setValue(settings.getInt(name));
+
+                Label value = new Label("", Styles.outlineLabel);
+                Table content = new Table();
+                content.add(title, Styles.outlineLabel).left().growX().wrap();
+                content.add(value).padLeft(10f).right();
+                content.margin(3f, 33f, 3f, 33f);
+                content.touchable = Touchable.disabled;
+
+                slider.changed(() -> {
+                    settings.put(name, (int)slider.getValue());
+                    value.setText(sp.get((int)slider.getValue()));
+                });
+
+                slider.change();
+
+                addDesc(table.stack(slider, content).width(Math.min(Core.graphics.getWidth() / 1.2f, 460f)).left().padTop(4f).get());
+                table.row();
+            }
+        }
+
     }
 }

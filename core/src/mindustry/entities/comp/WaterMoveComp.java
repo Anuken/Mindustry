@@ -15,10 +15,11 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
-//just a proof of concept
+import static mindustry.Vars.*;
+
 @Component
 abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
-    @Import float x, y, rotation;
+    @Import float x, y, rotation, speedMultiplier;
     @Import UnitType type;
 
     private transient Trail tleft = new Trail(1), tright = new Trail(1);
@@ -32,7 +33,7 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
 
             int sign = i == 0 ? -1 : 1;
             float cx = Angles.trnsx(rotation - 90, type.trailX * sign, type.trailY) + x, cy = Angles.trnsy(rotation - 90, type.trailX * sign, type.trailY) + y;
-            t.update(cx, cy);
+            t.update(cx, cy, world.floorWorld(cx, cy).isLiquid ? 1 : 0);
         }
     }
 
@@ -73,7 +74,7 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     @Replace
     public float floorSpeedMultiplier(){
         Floor on = isFlying() ? Blocks.air.asFloor() : floorOn();
-        return on.isDeep() ? 1.3f : 1f;
+        return (on.isDeep() ? 1.3f : 1f) * speedMultiplier;
     }
 
     public boolean onLiquid(){

@@ -12,13 +12,15 @@ public class LightningBulletType extends BulletType{
     public int lightningLength = 25, lightningLengthRand = 0;
 
     public LightningBulletType(){
-        super(0.0001f, 1f);
-
+        damage = 1f;
+        speed = 0f;
         lifetime = 1;
         despawnEffect = Fx.none;
         hitEffect = Fx.hitLancer;
         keepVelocity = false;
         hittable = false;
+        //for stats
+        status = StatusEffects.shocked;
     }
 
     @Override

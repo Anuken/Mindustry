@@ -1,6 +1,0 @@
-- Fixed "host game" crash, as well as some other prominent bugs
-- Logic: Breaking change: All coordinates are now in tiles, not in "world units"
-- Logic: Added sensors for ammo (units/turrets)
-- Campaign: Added research button in mobile multiplayer (check pause menu)
-- Campaign: Added tech tree sharing in multiplayer - only the host can research
-- Campaign: Re-added sector invasions, any sector near an enemy base can be invaded

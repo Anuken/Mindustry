@@ -10,12 +10,12 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class Unloader extends Block{
     public float speed = 1f;
-    public final int timerUnload = timers++;
 
     public Unloader(String name){
         super(name);
@@ -34,6 +34,12 @@ public class Unloader extends Block{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+        stats.add(Stat.speed, 60f / speed, StatUnit.itemsSecond);
+    }
+
+    @Override
     public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
         drawRequestConfigCenter(req, req.config, "unloader-center");
     }
@@ -45,6 +51,7 @@ public class Unloader extends Block{
     }
 
     public class UnloaderBuild extends Building{
+        public float unloadTimer = 0f;
         public Item sortItem = null;
         public Building dumpingTo;
         public int offset = 0;
@@ -52,7 +59,8 @@ public class Unloader extends Block{
 
         @Override
         public void updateTile(){
-            if(timer(timerUnload, speed / timeScale)){
+            if((unloadTimer += delta()) >= speed){
+                boolean any = false;
                 if(rotations == null || rotations.length != proximity.size){
                     rotations = new int[proximity.size];
                 }
@@ -72,6 +80,7 @@ public class Unloader extends Block{
                         //remove item if it's dumped correctly
                         if(put(item)){
                             other.items.remove(item, 1);
+                            any = true;
 
                             if(sortItem == null){
                                 rotations[pos] = item.id + 1;
@@ -82,6 +91,12 @@ public class Unloader extends Block{
                             rotations[pos] = other.items.nextIndex(rotations[pos]);
                         }
                     }
+                }
+
+                if(any){
+                    unloadTimer %= speed;
+                }else{
+                    unloadTimer = Math.min(unloadTimer, speed);
                 }
 
                 if(proximity.size > 0){

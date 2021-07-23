@@ -20,6 +20,9 @@ import mindustry.world.blocks.*;
 import static mindustry.Vars.*;
 
 public class Weather extends UnlockableContent{
+    /** Global random variable used for rendering. */
+    public static final Rand rand = new Rand();
+
     /** Default duration of this weather event in ticks. */
     public float duration = 10f * Time.toMinutes;
     public float opacityMultiplier = 1f;
@@ -27,9 +30,9 @@ public class Weather extends UnlockableContent{
     public Sound sound = Sounds.none;
     public float soundVol = 0.1f, soundVolMin = 0f;
     public float soundVolOscMag = 0f, soundVolOscScl = 20f;
+    public boolean hidden = false;
 
     //internals
-    public Rand rand = new Rand();
     public Prov<WeatherState> type = WeatherState::create;
     public StatusEffect status = StatusEffects.none;
     public float statusDuration = 60f * 2;
@@ -108,12 +111,13 @@ public class Weather extends UnlockableContent{
 
     }
 
-    public void drawParticles(TextureRegion region, Color color,
+    public static void drawParticles(TextureRegion region, Color color,
                               float sizeMin, float sizeMax,
                               float density, float intensity, float opacity,
                               float windx, float windy,
                               float minAlpha, float maxAlpha,
-                              float sinSclMin, float sinSclMax, float sinMagMin, float sinMagMax){
+                              float sinSclMin, float sinSclMax, float sinMagMin, float sinMagMax,
+                              boolean randomParticleRotation){
         rand.setSeed(0);
         Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
         Tmp.r1.grow(sizeMax * 1.5f);
@@ -128,6 +132,7 @@ public class Weather extends UnlockableContent{
             float x = (rand.random(0f, world.unitWidth()) + Time.time * windx * scl2);
             float y = (rand.random(0f, world.unitHeight()) + Time.time * windy * scl);
             float alpha = rand.random(minAlpha, maxAlpha);
+            float rotation = randomParticleRotation ? rand.random(0f, 360f) : 0f;
 
             x += Mathf.sin(y, rand.random(sinSclMin, sinSclMax), rand.random(sinMagMin, sinMagMax));
 
@@ -140,12 +145,13 @@ public class Weather extends UnlockableContent{
 
             if(Tmp.r3.setCentered(x, y, size).overlaps(Tmp.r2)){
                 Draw.alpha(alpha * opacity);
-                Draw.rect(region, x, y, size, size);
+                Draw.rect(region, x, y, size, size, rotation);
             }
         }
     }
 
-    public void drawRain(float sizeMin, float sizeMax, float xspeed, float yspeed, float density, float intensity, float stroke, Color color){
+    public static void drawRain(float sizeMin, float sizeMax, float xspeed, float yspeed, float density, float intensity, float stroke, Color color){
+        rand.setSeed(0);
         float padding = sizeMax*0.9f;
 
         Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
@@ -178,12 +184,13 @@ public class Weather extends UnlockableContent{
         }
     }
 
-    public void drawSplashes(TextureRegion[] splashes, float padding, float density, float intensity, float opacity, float timeScale, float stroke, Color color, Liquid splasher){
+    public static void drawSplashes(TextureRegion[] splashes, float padding, float density, float intensity, float opacity, float timeScale, float stroke, Color color, Liquid splasher){
         Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
         Tmp.r1.grow(padding);
         Core.camera.bounds(Tmp.r2);
         int total = (int)(Tmp.r1.area() / density * intensity) / 2;
         Lines.stroke(stroke);
+        rand.setSeed(0);
 
         float t = Time.time / timeScale;
 
@@ -224,7 +231,21 @@ public class Weather extends UnlockableContent{
         }
     }
 
-    public void drawNoise(Texture noise, Color color, float noisescl, float opacity, float baseSpeed, float intensity, float vwindx, float vwindy, float offset){
+    public static void drawNoiseLayers(Texture noise, Color color, float noisescl, float opacity, float baseSpeed, float intensity, float vwindx, float vwindy,
+                                       int layers, float layerSpeedM , float layerAlphaM, float layerSclM, float layerColorM){
+        float sspeed = 1f, sscl = 1f, salpha = 1f, offset = 0f;
+        Color col = Tmp.c1.set(color);
+        for(int i = 0; i < layers; i++){
+            drawNoise(noise, col, noisescl * sscl, salpha * opacity, sspeed * baseSpeed, intensity, vwindx, vwindy, offset);
+            sspeed *= layerSpeedM;
+            salpha *= layerAlphaM;
+            sscl *= layerSclM;
+            offset += 0.29f;
+            col.mul(layerColorM);
+        }
+    }
+
+    public static void drawNoise(Texture noise, Color color, float noisescl, float opacity, float baseSpeed, float intensity, float vwindx, float vwindy, float offset){
         Draw.alpha(opacity);
         Draw.tint(color);
 
@@ -323,14 +344,12 @@ public class Weather extends UnlockableContent{
         public void draw(){
             if(renderer.weatherAlpha() > 0.0001f && renderer.drawWeather && Core.settings.getBool("showweather")){
                 Draw.draw(Layer.weather, () -> {
-                    weather.rand.setSeed(0);
                     Draw.alpha(renderer.weatherAlpha() * opacity * weather.opacityMultiplier);
                     weather.drawOver(self());
                     Draw.reset();
                 });
 
                 Draw.draw(Layer.debris, () -> {
-                    weather.rand.setSeed(0);
                     Draw.alpha(renderer.weatherAlpha() * opacity * weather.opacityMultiplier);
                     weather.drawUnder(self());
                     Draw.reset();

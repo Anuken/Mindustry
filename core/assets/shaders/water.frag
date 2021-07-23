@@ -14,7 +14,6 @@ const float mth = 7.0;
 void main(){
 
 	vec2 c = v_texCoords;
-
 	vec2 v = vec2(1.0/u_resolution.x, 1.0/u_resolution.y);
 	vec2 coords = vec2(c.x / v.x + u_campos.x, c.y / v.y + u_campos.y);
 

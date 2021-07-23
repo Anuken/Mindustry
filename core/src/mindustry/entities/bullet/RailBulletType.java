@@ -16,6 +16,7 @@ public class RailBulletType extends BulletType{
     public float updateEffectSeg = 20f;
 
     public RailBulletType(){
+        speed = 0f;
         pierceBuilding = true;
         pierce = true;
         reflectable = false;
@@ -23,7 +24,6 @@ public class RailBulletType extends BulletType{
         despawnEffect = Fx.none;
         collides = false;
         lifetime = 1f;
-        speed = 0.01f;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class RailBulletType extends BulletType{
         Damage.collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), length, false, false);
         float resultLen = b.fdata;
 
-        Vec2 nor = Tmp.v1.set(b.vel).nor();
+        Vec2 nor = Tmp.v1.trns(b.rotation(), 1f).nor();
         for(float i = 0; i <= resultLen; i += updateEffectSeg){
             updateEffect.at(b.x + nor.x * i, b.y + nor.y * i, b.rotation());
         }
@@ -69,8 +69,9 @@ public class RailBulletType extends BulletType{
     }
 
     @Override
-    public void hitEntity(Bullet b, Hitboxc entity, float initialHealth){
-        handle(b, entity, initialHealth);
+    public void hitEntity(Bullet b, Hitboxc entity, float health){
+        super.hitEntity(b, entity, health);
+        handle(b, entity, health);
     }
 
     @Override

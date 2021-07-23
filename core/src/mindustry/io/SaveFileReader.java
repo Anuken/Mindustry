@@ -102,8 +102,8 @@ public abstract class SaveFileReader{
         if(!isByte){
             output.writeInt(length);
         }else{
-            if(length > Short.MAX_VALUE){
-                throw new IOException("Byte write length exceeded: " + length + " > " + Short.MAX_VALUE);
+            if(length > 65535){
+                throw new IOException("Byte write length exceeded: " + length + " > 65535");
             }
             output.writeShort(length);
         }

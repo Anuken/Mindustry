@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ai.formations.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
@@ -29,7 +30,7 @@ abstract class CommanderComp implements Entityc, Posc{
     transient float minFormationSpeed;
 
     public void update(){
-        if(controlling.isEmpty()){
+        if(controlling.isEmpty() && !Vars.net.client()){
             formation = null;
         }
 
@@ -63,7 +64,7 @@ abstract class CommanderComp implements Entityc, Posc{
 
         units.clear();
 
-        Units.nearby(team, x, y, 150f, u -> {
+        Units.nearby(team, x, y, type.commandRadius, u -> {
             if(u.isAI() && include.get(u) && u != self() && u.type.flying == type.flying && u.hitSize <= hitSize * 1.1f){
                 units.add(u);
             }
@@ -82,7 +83,7 @@ abstract class CommanderComp implements Entityc, Posc{
         clearCommand();
         units.shuffle();
 
-        float spacing = hitSize * 0.8f;
+        float spacing = hitSize * 0.9f;
         minFormationSpeed = type.speed;
 
         controlling.addAll(units);

@@ -20,9 +20,12 @@ import mindustry.world.*;
 import mindustry.world.meta.*;
 
 public class CommandCenter extends Block{
+    public final int timerEffect = timers ++;
+
     public TextureRegionDrawable[] commandRegions = new TextureRegionDrawable[UnitCommand.all.length];
     public Color topColor = null, bottomColor = Color.valueOf("5e5e5e");
     public Effect effect = Fx.commandSend;
+    public float effectSize = 150f;
 
     public CommandCenter(String name){
         super(name);
@@ -32,11 +35,17 @@ public class CommandCenter extends Block{
         solid = true;
         configurable = true;
         drawDisabled = false;
+        logicConfigurable = true;
 
         config(UnitCommand.class, (CommandBuild build, UnitCommand command) -> {
-            build.team.data().command = command;
-            effect.at(build);
-            Events.fire(new CommandIssueEvent(build, command));
+            if(build.team.data().command != command){
+                build.team.data().command = command;
+                //do not spam effect
+                if(build.timer(timerEffect, 60f)){
+                    effect.at(build, effectSize);
+                }
+                Events.fire(new CommandIssueEvent(build, command));
+            }
         });
     }
 
@@ -49,6 +58,11 @@ public class CommandCenter extends Block{
                 commandRegions[cmd.ordinal()] = Vars.ui.getIcon("command" + Strings.capitalize(cmd.name()), "cancel");
             }
         }
+    }
+
+    @Override
+    public boolean configSenseable(){
+        return true;
     }
 
     public class CommandBuild extends Building{

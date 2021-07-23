@@ -156,7 +156,7 @@ public class WaveSpawner{
         }
 
         if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam)){
-            for(Building core : state.teams.get(state.rules.waveTeam).cores){
+            for(Building core : state.rules.waveTeam.data().cores){
                 cons.get(core.x, core.y);
             }
         }
@@ -180,6 +180,7 @@ public class WaveSpawner{
     private void spawnEffect(Unit unit){
         unit.rotation = unit.angleTo(world.width()/2f * tilesize, world.height()/2f * tilesize);
         unit.apply(StatusEffects.unmoving, 30f);
+        unit.apply(StatusEffects.invincible, 60f);
         unit.add();
 
         Call.spawnEffect(unit.x, unit.y, unit.rotation, unit.type);

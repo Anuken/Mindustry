@@ -16,6 +16,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 
 public class LCanvas extends Table{
@@ -112,7 +113,6 @@ public class LCanvas extends Table{
 
             jumps.cullable = false;
         }).grow().get();
-        //pane.setClip(false);
         pane.setFlickScroll(false);
 
         //load old scroll percent
@@ -182,7 +182,7 @@ public class LCanvas extends Table{
             float dst = Math.min(y - this.y, Core.graphics.getHeight() - y);
             if(dst < Scl.scl(100f)){ //scroll margin
                 int sign = Mathf.sign(Core.graphics.getHeight()/2f - y);
-                pane.setScrollY(pane.getScrollY() + sign * Scl.scl(15f));
+                pane.setScrollY(pane.getScrollY() + sign * Scl.scl(15f) * Time.delta);
             }
         }
     }
@@ -396,11 +396,20 @@ public class LCanvas extends Table{
         }
 
         public void copy(){
+            st.saveUI();
             LStatement copy = st.copy();
+
+            if(copy instanceof JumpStatement st && st.destIndex != -1){
+                int index = statements.getChildren().indexOf(this);
+                if(index != -1 && index < st.destIndex){
+                    st.destIndex ++;
+                }
+            }
+
             if(copy != null){
                 StatementElem s = new StatementElem(copy);
 
-                statements.addChildAfter(StatementElem.this,s);
+                statements.addChildAfter(StatementElem.this, s);
                 statements.layout();
                 copy.elem = s;
                 copy.setupUI();

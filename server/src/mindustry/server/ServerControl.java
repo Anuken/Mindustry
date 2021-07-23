@@ -66,7 +66,7 @@ public class ServerControl implements ApplicationListener{
             "bans", "",
             "admins", "",
             "shufflemode", "custom",
-            "globalrules", "{reactorExplosions: false}"
+            "globalrules", "{reactorExplosions: false, logicUnitBuild: false}"
         );
 
         //update log level
@@ -163,9 +163,9 @@ public class ServerControl implements ApplicationListener{
         Events.on(GameOverEvent.class, event -> {
             if(inExtraRound) return;
             if(state.rules.waves){
-                info("Game over! Reached wave @ with @ players online on map @.", state.wave, Groups.player.size(), Strings.capitalize(state.map.name()));
+                info("Game over! Reached wave @ with @ players online on map @.", state.wave, Groups.player.size(), Strings.capitalize(Strings.stripColors(state.map.name())));
             }else{
-                info("Game over! Team @ is victorious with @ players online on map @.", event.winner.name, Groups.player.size(), Strings.capitalize(state.map.name()));
+                info("Game over! Team @ is victorious with @ players online on map @.", event.winner.name, Groups.player.size(), Strings.capitalize(Strings.stripColors(state.map.name())));
             }
 
             //set next map to be played
@@ -174,14 +174,14 @@ public class ServerControl implements ApplicationListener{
             if(map != null){
                 Call.infoMessage((state.rules.pvp
                 ? "[accent]The " + event.winner.name + " team is victorious![]\n" : "[scarlet]Game over![]\n")
-                + "\nNext selected map:[accent] " + map.name() + "[]"
+                + "\nNext selected map:[accent] " + Strings.stripColors(map.name()) + "[]"
                 + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
                 "\nNew game begins in " + roundExtraTime + " seconds.");
 
                 state.gameOver = true;
                 Call.updateGameOver(event.winner);
 
-                info("Selected next map to be @.", map.name());
+                info("Selected next map to be @.", Strings.stripColors(map.name()));
 
                 play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
             }else{
@@ -259,16 +259,26 @@ public class ServerControl implements ApplicationListener{
     }
 
     protected void registerCommands(){
-        handler.register("help", "Displays this command list.", arg -> {
-            info("Commands:");
-            for(Command command : handler.getCommandList()){
-                info("  &b&lb " + command.text + (command.paramText.isEmpty() ? "" : " &lc&fi") + command.paramText + "&fr - &lw" + command.description);
+        handler.register("help", "[command]", "Display the command list, or get help for a specific command.", arg -> {
+            if(arg.length > 0){
+                Command command = handler.getCommandList().find(c -> c.text.equalsIgnoreCase(arg[0]));
+                if(command == null){
+                    err("Command " + arg[0] + " not found!");
+                }else{
+                    info(command.text + ":");
+                    info("  &b&lb " + command.text + (command.paramText.isEmpty() ? "" : " &lc&fi") + command.paramText + "&fr - &lw" + command.description);
+                }
+            }else{
+                info("Commands:");
+                for(Command command : handler.getCommandList()){
+                    info("  &b&lb " + command.text + (command.paramText.isEmpty() ? "" : " &lc&fi") + command.paramText + "&fr - &lw" + command.description);
+                }
             }
         });
 
         handler.register("version", "Displays server version info.", arg -> {
             info("Version: Mindustry @-@ @ / build @", Version.number, Version.modifier, Version.type, Version.build + (Version.revision == 0 ? "" : "." + Version.revision));
-            info("Java Version: @", System.getProperty("java.version"));
+            info("Java Version: @", OS.javaVersion);
         });
 
         handler.register("exit", "Exit the server application.", arg -> {
@@ -306,7 +316,7 @@ public class ServerControl implements ApplicationListener{
 
             Map result;
             if(arg.length > 0){
-                result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
+                result = maps.all().find(map -> Strings.stripColors(map.name().replace('_', ' ')).equalsIgnoreCase(Strings.stripColors(arg[0]).replace('_', ' ')));
 
                 if(result == null){
                     err("No map with name '@' found.", arg[0]);
@@ -335,11 +345,29 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("maps", "Display all available maps.", arg -> {
+        handler.register("maps", "[all/custom/default]", "Display available maps. Displays only custom maps by default.", arg -> {
+            boolean custom = arg.length == 0 || arg[0].equals("custom") || arg[0].equals("all");
+            boolean def = arg.length > 0 && (arg[0].equals("default") || arg[0].equals("all"));
+
             if(!maps.all().isEmpty()){
-                info("Maps:");
-                for(Map map : maps.all()){
-                    info("  @: &fi@ / @x@", map.name(), map.custom ? "Custom" : "Default", map.width, map.height);
+                Seq<Map> all = new Seq<>();
+
+                if(custom) all.addAll(maps.customMaps());
+                if(def) all.addAll(maps.defaultMaps());
+
+                if(all.isEmpty()){
+                    info("No custom maps loaded. &fiTo display built-in maps, use the \"@\" argument.", "all");
+                }else{
+                    info("Maps:");
+
+                    for(Map map : all){
+                        String mapName = Strings.stripColors(map.name()).replace(' ', '_');
+                        if(map.custom){
+                            info("  @ (@): &fiCustom / @x@", mapName, map.file.name(), map.width, map.height);
+                        }else{
+                            info("  @: &fiDefault / @x@", mapName, map.width, map.height);
+                        }
+                    }
                 }
             }else{
                 info("No maps found.");
@@ -362,7 +390,7 @@ public class ServerControl implements ApplicationListener{
                 info("Status: &rserver closed");
             }else{
                 info("Status:");
-                info("  Playing on map &fi@ / Wave @", Strings.capitalize(state.map.name()), state.wave);
+                info("  Playing on map &fi@ / Wave @", Strings.capitalize(Strings.stripColors(state.map.name())), state.wave);
 
                 if(state.rules.waves){
                     info("  @ enemies.", state.enemies);
@@ -554,7 +582,7 @@ public class ServerControl implements ApplicationListener{
                             return;
                         }
                     }else if(c.isString()){
-                        c.set(arg[1]);
+                        c.set(arg[1].replace("\\n", "\n"));
                     }
 
                     info("@ set to @.", c.name(), c.get());
@@ -591,43 +619,45 @@ public class ServerControl implements ApplicationListener{
                     netServer.admins.removeSubnetBan(arg[1]);
                     info("Unbanned @**", arg[1]);
                 }else{
-                    err("Incorrect usage. You must provide add/remove as the second argument.");
+                    err("Incorrect usage. Provide add/remove as the second argument.");
                 }
             }
         });
 
-        handler.register("whitelisted", "List the entire whitelist.", arg -> {
-            if(netServer.admins.getWhitelisted().isEmpty()){
-                info("No whitelisted players found.");
-                return;
-            }
+        handler.register("whitelist", "[add/remove] [ID]", "Add/remove players from the whitelist using their ID.", arg -> {
+            if(arg.length == 0){
+                Seq<PlayerInfo> whitelist = netServer.admins.getWhitelisted();
 
-            info("Whitelist:");
-            netServer.admins.getWhitelisted().each(p -> info("- @", p.lastName));
+                if(whitelist.isEmpty()){
+                    info("No whitelisted players found.");
+                }else{
+                    info("Whitelist:");
+                    whitelist.each(p -> info("- Name: @ / UUID: @", p.lastName, p.id));
+                }
+            }else{
+                if(arg.length == 2){
+                    PlayerInfo info = netServer.admins.getInfoOptional(arg[1]);
+
+                    if(info == null){
+                        err("Player ID not found. You must use the ID displayed when a player joins a server.");
+                    }else{
+                        if(arg[0].equals("add")){
+                            netServer.admins.whitelist(arg[1]);
+                            info("Player '@' has been whitelisted.", info.lastName);
+                        }else if(arg[0].equals("remove")){
+                            netServer.admins.unwhitelist(arg[1]);
+                            info("Player '@' has been un-whitelisted.", info.lastName);
+                        }else{
+                            err("Incorrect usage. Provide add/remove as the second argument.");
+                        }
+                    }
+                }else{
+                    err("Incorrect usage. Provide an ID to add or remove.");
+                }
+            }
         });
 
-        handler.register("whitelist-add", "<ID>", "Add a player to the whitelist by ID.", arg -> {
-            PlayerInfo info = netServer.admins.getInfoOptional(arg[0]);
-            if(info == null){
-                err("Player ID not found. You must use the ID displayed when a player joins a server.");
-                return;
-            }
-
-            netServer.admins.whitelist(arg[0]);
-            info("Player '@' has been whitelisted.", info.lastName);
-        });
-
-        handler.register("whitelist-remove", "<ID>", "Remove a player to the whitelist by ID.", arg -> {
-            PlayerInfo info = netServer.admins.getInfoOptional(arg[0]);
-            if(info == null){
-                err("Player ID not found. You must use the ID displayed when a player joins a server.");
-                return;
-            }
-
-            netServer.admins.unwhitelist(arg[0]);
-            info("Player '@' has been un-whitelisted.", info.lastName);
-        });
-
+        //TODO should be a config, not a separate command.
         handler.register("shuffle", "[none/all/custom/builtin]", "Set map shuffling mode.", arg -> {
             if(arg.length == 0){
                 info("Shuffle mode current set to '@'.", maps.getShuffleMode());
@@ -644,10 +674,10 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("nextmap", "<mapname...>", "Set the next map to be played after a game-over. Overrides shuffling.", arg -> {
-            Map res = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
+            Map res = maps.all().find(map -> Strings.stripColors(map.name().replace('_', ' ')).equalsIgnoreCase(Strings.stripColors(arg[0]).replace('_', ' ')));
             if(res != null){
                 nextMapOverride = res;
-                info("Next map set to '@'.", res.name());
+                info("Next map set to '@'.", Strings.stripColors(res.name()));
             }else{
                 err("No map '@' found.", arg[0]);
             }

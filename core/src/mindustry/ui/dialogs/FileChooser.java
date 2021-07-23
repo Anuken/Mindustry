@@ -20,8 +20,8 @@ public class FileChooser extends BaseDialog{
     private static final Fi homeDirectory = Core.files.absolute(Core.files.getExternalStoragePath());
     static Fi lastDirectory = Core.files.absolute(Core.settings.getString("lastDirectory", homeDirectory.absolutePath()));
 
-    private Table files;
     Fi directory = lastDirectory;
+    private Table files;
     private ScrollPane pane;
     private TextField navigation, filefield;
     private TextButton ok;
@@ -36,6 +36,10 @@ public class FileChooser extends BaseDialog{
         this.open = open;
         this.filter = filter;
         this.selectListener = result;
+
+        if(!lastDirectory.exists()){
+            lastDirectory = homeDirectory;
+        }
 
         onResize(() -> {
             cont.clear();

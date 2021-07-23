@@ -1,8 +1,7 @@
 package mindustry.annotations.remote;
 
 import mindustry.annotations.Annotations.*;
-
-import javax.lang.model.element.ExecutableElement;
+import mindustry.annotations.util.*;
 
 /** Class that repesents a remote method to be constructed and put into a class. */
 public class MethodEntry{
@@ -10,6 +9,8 @@ public class MethodEntry{
     public final String className;
     /** Fully qualified target method to call. */
     public final String targetMethod;
+    /** Simple name of the generated packet class. */
+    public final String packetClassName;
     /** Whether this method can be called on a client/server. */
     public final Loc where;
     /**
@@ -26,12 +27,13 @@ public class MethodEntry{
     /** Unique method ID. */
     public final int id;
     /** The element method associated with this entry. */
-    public final ExecutableElement element;
+    public final Smethod element;
     /** The assigned packet priority. Only used in clients. */
     public final PacketPriority priority;
 
-    public MethodEntry(String className, String targetMethod, Loc where, Variant target,
-                       Loc local, boolean unreliable, boolean forward, int id, ExecutableElement element, PacketPriority priority){
+    public MethodEntry(String className, String targetMethod, String packetClassName, Loc where, Variant target,
+                       Loc local, boolean unreliable, boolean forward, int id, Smethod element, PacketPriority priority){
+        this.packetClassName = packetClassName;
         this.className = className;
         this.forward = forward;
         this.targetMethod = targetMethod;

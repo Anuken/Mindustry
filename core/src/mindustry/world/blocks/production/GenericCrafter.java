@@ -8,19 +8,26 @@ import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 public class GenericCrafter extends Block{
+    /** Written to outputItems as a single-element array if outputItems is null. */
     public @Nullable ItemStack outputItem;
+    /** Overwrites outputItem if not null. */
+    public @Nullable ItemStack[] outputItems;
     public @Nullable LiquidStack outputLiquid;
 
     public float craftTime = 80;
     public Effect craftEffect = Fx.none;
     public Effect updateEffect = Fx.none;
     public float updateEffectChance = 0.04f;
+    public float warmupSpeed = 0.019f;
+    /** Only used for legacy cultivator blocks. */
+    public boolean legacyReadWarmup = false;
 
     public DrawBlock drawer = new DrawBlock();
 
@@ -37,11 +44,12 @@ public class GenericCrafter extends Block{
 
     @Override
     public void setStats(){
+        stats.timePeriod = craftTime;
         super.setStats();
         stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
 
-        if(outputItem != null){
-            stats.add(Stat.output, outputItem);
+        if(outputItems != null){
+            stats.add(Stat.output, StatValues.items(craftTime, outputItems));
         }
 
         if(outputLiquid != null){
@@ -59,6 +67,9 @@ public class GenericCrafter extends Block{
     @Override
     public void init(){
         outputsLiquid = outputLiquid != null;
+        if(outputItems == null && outputItem != null){
+            outputItems = new ItemStack[]{outputItem};
+        }
         super.init();
     }
 
@@ -69,7 +80,7 @@ public class GenericCrafter extends Block{
 
     @Override
     public boolean outputsItems(){
-        return outputItem != null;
+        return outputItems != null;
     }
 
     public class GenericCrafterBuild extends Building{
@@ -83,9 +94,19 @@ public class GenericCrafter extends Block{
         }
 
         @Override
+        public void drawLight(){
+            super.drawLight();
+            drawer.drawLight(this);
+        }
+
+        @Override
         public boolean shouldConsume(){
-            if(outputItem != null && items.get(outputItem.item) >= itemCapacity){
-                return false;
+            if(outputItems != null){
+                for(ItemStack output : outputItems){
+                    if(items.get(output.item) + output.amount > itemCapacity){
+                        return false;
+                    }
+                }
             }
             return (outputLiquid == null || !(liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.001f)) && enabled;
         }
@@ -96,21 +117,23 @@ public class GenericCrafter extends Block{
 
                 progress += getProgressIncrease(craftTime);
                 totalProgress += delta();
-                warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
+                warmup = Mathf.approachDelta(warmup, 1f, warmupSpeed);
 
                 if(Mathf.chanceDelta(updateEffectChance)){
-                    updateEffect.at(getX() + Mathf.range(size * 4f), getY() + Mathf.range(size * 4));
+                    updateEffect.at(x + Mathf.range(size * 4f), y + Mathf.range(size * 4));
                 }
             }else{
-                warmup = Mathf.lerp(warmup, 0f, 0.02f);
+                warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
             }
 
             if(progress >= 1f){
                 consume();
 
-                if(outputItem != null){
-                    for(int i = 0; i < outputItem.amount; i++){
-                        offload(outputItem.item);
+                if(outputItems != null){
+                    for(ItemStack output : outputItems){
+                        for(int i = 0; i < output.amount; i++){
+                            offload(output.item);
+                        }
                     }
                 }
 
@@ -122,13 +145,21 @@ public class GenericCrafter extends Block{
                 progress %= 1f;
             }
 
-            if(outputItem != null && timer(timerDump, dumpTime)){
-                dump(outputItem.item);
+            if(outputItems != null && timer(timerDump, dumpTime / timeScale)){
+                for(ItemStack output : outputItems){
+                    dump(output.item);
+                }
             }
 
             if(outputLiquid != null){
                 dumpLiquid(outputLiquid.liquid);
             }
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return Mathf.clamp(progress);
+            return super.sense(sensor);
         }
 
         @Override
@@ -146,6 +177,7 @@ public class GenericCrafter extends Block{
             super.write(write);
             write.f(progress);
             write.f(warmup);
+            if(legacyReadWarmup) write.f(0f);
         }
 
         @Override
@@ -153,6 +185,7 @@ public class GenericCrafter extends Block{
             super.read(read, revision);
             progress = read.f();
             warmup = read.f();
+            if(legacyReadWarmup) read.f();
         }
     }
 }

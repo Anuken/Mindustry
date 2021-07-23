@@ -60,6 +60,8 @@ public class Turret extends ReloadTurret{
     public float minRange = 0f;
     public float burstSpacing = 0;
     public boolean alternate = false;
+    /** If true, this turret will accurately target moving targets with respect to charge time. */
+    public boolean accurateDelay = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
 
@@ -93,12 +95,6 @@ public class Turret extends ReloadTurret{
 
     public Turret(String name){
         super(name);
-        priority = TargetPriority.turret;
-        update = true;
-        solid = true;
-        group = BlockGroup.turrets;
-        flags = EnumSet.of(BlockFlag.turret);
-        outlineIcon = true;
         liquidCapacity = 20f;
     }
 
@@ -112,7 +108,7 @@ public class Turret extends ReloadTurret{
         super.setStats();
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
-        stats.add(Stat.reload, 60f / (reloadTime + 1) * (alternate ? 1 : shots), StatUnit.none);
+        stats.add(Stat.reload, 60f / (reloadTime) * (alternate ? 1 : shots), StatUnit.perSecond);
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
@@ -122,7 +118,7 @@ public class Turret extends ReloadTurret{
     public void init(){
         if(acceptCoolant && !consumes.has(ConsumeType.liquid)){
             hasLiquids = true;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, coolantUsage)).update(false).boost();
+            consumes.add(new ConsumeCoolant(coolantUsage)).update(false).boost();
         }
         
         if(shootLength < 0) shootLength = size * tilesize / 2f;
@@ -150,7 +146,7 @@ public class Turret extends ReloadTurret{
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
-        public BlockUnitc unit = Nulls.blockUnit;
+        public @Nullable BlockUnitc unit;
         public boolean wasShooting, charging;
 
         @Override
@@ -161,7 +157,7 @@ public class Turret extends ReloadTurret{
 
         @Override
         public void control(LAccess type, double p1, double p2, double p3, double p4){
-            if(type == LAccess.shoot && !unit.isPlayer()){
+            if(type == LAccess.shoot && (unit == null || !unit.isPlayer())){
                 targetPos.set(World.unconv((float)p1), World.unconv((float)p2));
                 logicControlTime = logicControlCooldown;
                 logicShooting = !Mathf.zero(p3);
@@ -172,7 +168,7 @@ public class Turret extends ReloadTurret{
 
         @Override
         public void control(LAccess type, Object p1, double p2, double p3, double p4){
-            if(type == LAccess.shootp && !unit.isPlayer()){
+            if(type == LAccess.shootp && (unit == null || !unit.isPlayer())){
                 logicControlTime = logicControlCooldown;
                 logicShooting = !Mathf.zero(p2);
 
@@ -193,16 +189,21 @@ public class Turret extends ReloadTurret{
                 case shootX -> World.conv(targetPos.x);
                 case shootY -> World.conv(targetPos.y);
                 case shooting -> isShooting() ? 1 : 0;
+                case progress -> Mathf.clamp(reload / reloadTime);
                 default -> super.sense(sensor);
             };
         }
 
         public boolean isShooting(){
-            return (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
+            return (isControlled() ? (unit != null && unit.isShooting()) : logicControlled() ? logicShooting : target != null);
         }
 
         @Override
         public Unit unit(){
+            if(unit == null){
+                unit = (BlockUnitc)UnitTypes.block.create(team);
+                unit.tile(this);
+            }
             return (Unit)unit;
         }
 
@@ -211,17 +212,22 @@ public class Turret extends ReloadTurret{
         }
 
         public boolean isActive(){
-            return target != null || wasShooting;
+            return (target != null || wasShooting) && enabled;
         }
 
         public void targetPosition(Posc pos){
             if(!hasAmmo() || pos == null) return;
             BulletType bullet = peekAmmo();
-            float speed = bullet.speed;
-            //slow bullets never intersect
-            if(speed < 0.1f) speed = 9999999f;
 
-            targetPos.set(Predict.intercept(this, pos, speed));
+            var offset = Tmp.v1.setZero();
+
+            //when delay is accurate, assume unit has moved by chargeTime already
+            if(accurateDelay && pos instanceof Hitboxc h){
+                offset.set(h.deltaX(), h.deltaY()).scl(chargeTime / Time.delta);
+            }
+
+            targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed <= 0.01f ? 99999999f : bullet.speed));
+
             if(targetPos.isZero()){
                 targetPos.set(pos);
             }
@@ -253,10 +259,12 @@ public class Turret extends ReloadTurret{
             recoil = Mathf.lerpDelta(recoil, 0f, restitution);
             heat = Mathf.lerpDelta(heat, 0f, cooldown);
 
-            unit.health(health);
-            unit.rotation(rotation);
-            unit.team(team);
-            unit.set(x, y);
+            if(unit != null){
+                unit.health(health);
+                unit.rotation(rotation);
+                unit.team(team);
+                unit.set(x, y);
+            }
 
             if(logicControlTime > 0){
                 logicControlTime -= Time.delta;
@@ -359,14 +367,14 @@ public class Turret extends ReloadTurret{
         }
 
         protected void updateShooting(){
-            if(reload >= reloadTime){
+            reload += delta() * peekAmmo().reloadMultiplier * baseReloadSpeed();
+
+            if(reload >= reloadTime && !charging){
                 BulletType type = peekAmmo();
 
                 shoot(type);
 
-                reload = 0f;
-            }else{
-                reload += delta() * peekAmmo().reloadMultiplier * baseReloadSpeed();
+                reload %= reloadTime;
             }
         }
 
