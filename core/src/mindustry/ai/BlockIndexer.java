@@ -306,7 +306,7 @@ public class BlockIndexer{
 
         for(int i = 0; i < activeTeams.size; i++){
             Team enemy = activeTeams.items[i];
-            if(enemy == team || (team == Team.derelict && !state.rules.coreCapture)) continue;
+            if(enemy == team || (enemy == Team.derelict && !state.rules.coreCapture)) continue;
 
             Building candidate = indexer.findTile(enemy, x, y, range, pred, true);
             if(candidate == null) continue;
