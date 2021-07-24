@@ -29,7 +29,7 @@ public class MassDriver extends Block{
     public int minDistribute = 10;
     public float knockback = 4f;
     public float reloadTime = 100f;
-    public MassDriverBolt bullet;
+    public MassDriverBolt bullet = new MassDriverBolt();
     public float bulletSpeed = 5.5f;
     public float bulletLifetime = 200f;
     public Effect shootEffect = Fx.shootBig2;
@@ -59,7 +59,7 @@ public class MassDriver extends Block{
         super.setStats();
 
         stats.add(Stat.shootRange, range / tilesize, StatUnit.blocks);
-        stats.add(Stat.reload, 60f / reloadTime, StatUnit.none);
+        stats.add(Stat.reload, 60f / reloadTime, StatUnit.perSecond);
     }
 
     @Override

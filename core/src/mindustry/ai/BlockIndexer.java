@@ -48,6 +48,7 @@ public class BlockIndexer{
     private Seq<Building> breturnArray = new Seq<>(Building.class);
 
     public BlockIndexer(){
+        clearFlags();
 
         Events.on(TilePreChangeEvent.class, event -> {
             removeIndex(event.tile);
@@ -62,11 +63,7 @@ public class BlockIndexer{
             flagMap = new TileArray[Team.all.length][BlockFlag.all.length];
             activeTeams = new Seq<>(Team.class);
 
-            for(int i = 0; i < flagMap.length; i++){
-                for(int j = 0; j < BlockFlag.all.length; j++){
-                    flagMap[i][j] = new TileArray();
-                }
-            }
+            clearFlags();
 
             allOres.clear();
             ores = new IntSeq[content.items().size][][];
@@ -160,6 +157,14 @@ public class BlockIndexer{
         return blocksPresent != null && blocksPresent[block.id];
     }
 
+    private void clearFlags(){
+        for(int i = 0; i < flagMap.length; i++){
+            for(int j = 0; j < BlockFlag.all.length; j++){
+                flagMap[i][j] = new TileArray();
+            }
+        }
+    }
+
     private TileArray[] getFlagged(Team team){
         return flagMap[team.id];
     }
@@ -206,13 +211,12 @@ public class BlockIndexer{
     }
 
     public boolean eachBlock(@Nullable Team team, float wx, float wy, float range, Boolf<Building> pred, Cons<Building> cons){
-        returnBool = false;
+        breturnArray.clear();
 
         if(team == null){
             allBuildings(wx, wy, range, b -> {
                 if(pred.get(b)){
-                    returnBool = true;
-                    cons.get(b);
+                    breturnArray.add(b);
                 }
             });
         }else{
@@ -220,13 +224,20 @@ public class BlockIndexer{
             if(buildings == null) return false;
             buildings.intersect(wx - range, wy - range, range*2f, range*2f, b -> {
                 if(b.within(wx, wy, range + b.hitSize() / 2f) && pred.get(b)){
-                    returnBool = true;
-                    cons.get(b);
+                    breturnArray.add(b);
                 }
             });
         }
 
-        return returnBool;
+        int size = breturnArray.size;
+        var items = breturnArray.items;
+        for(int i = 0; i < size; i++){
+            cons.get(items[i]);
+            items[i] = null;
+        }
+        breturnArray.size = 0;
+
+        return size > 0;
     }
 
     /** Get all enemy blocks with a flag. */
@@ -269,31 +280,50 @@ public class BlockIndexer{
     }
 
     public void allBuildings(float x, float y, float range, Cons<Building> cons){
+        breturnArray.clear();
         for(int i = 0; i < activeTeams.size; i++){
             Team team = activeTeams.items[i];
             var buildings = team.data().buildings;
             if(buildings == null) continue;
-            buildings.intersect(x - range, y - range, range*2f, range*2f, b -> {
-                if(b.within(x, y, range + b.hitSize()/2f)){
-                    cons.get(b);
-                }
-            });
+            buildings.intersect(x - range, y - range, range*2f, range*2f, breturnArray);
         }
+
+        var items = breturnArray.items;
+        int size = breturnArray.size;
+        for(int i = 0; i < size; i++){
+            var b = items[i];
+            if(b.within(x, y, range + b.hitSize()/2f)){
+                cons.get(b);
+            }
+            items[i] = null;
+        }
+        breturnArray.size = 0;
     }
 
-    public Building findEnemyTile(@Nullable Team team, float x, float y, float range, Boolf<Building> pred){
+    public Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
+        Building target = null;
+        float targetDist = 0;
+
         for(int i = 0; i < activeTeams.size; i++){
             Team enemy = activeTeams.items[i];
-
             if(enemy == team || (team == Team.derelict && !state.rules.coreCapture)) continue;
 
-            Building entity = indexer.findTile(enemy, x, y, range, pred, true);
-            if(entity != null){
-                return entity;
+            Building candidate = indexer.findTile(enemy, x, y, range, pred, true);
+            if(candidate == null) continue;
+
+            //if a block has the same priority, the closer one should be targeted
+            float dist = candidate.dst(x, y) - candidate.hitSize() / 2f;
+            if(target == null ||
+            //if its closer and is at least equal priority
+            (dist < targetDist && candidate.block.priority.ordinal() >= target.block.priority.ordinal()) ||
+            // block has higher priority (so range doesnt matter)
+            (candidate.block.priority.ordinal() > target.block.priority.ordinal())){
+                target = candidate;
+                targetDist = dist;
             }
         }
 
-        return null;
+        return target;
     }
 
     public Building findTile(Team team, float x, float y, float range, Boolf<Building> pred){

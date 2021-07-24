@@ -70,6 +70,8 @@ public class Rules{
     public float enemyCoreBuildRadius = 400f;
     /** If true, no-build zones are calculated based on the closest core. */
     public boolean polygonCoreProtection = false;
+    /** If true, dead teams in PvP automatically have their blocks & units converted to derelict upon death. */
+    public boolean cleanupDeadTeams = true;
     /** Radius around enemy wave drop zones.*/
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */

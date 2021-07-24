@@ -415,32 +415,14 @@ public class SchematicsDialog extends BaseDialog{
                     t.marginRight(19f);
                     t.defaults().size(48f);
 
-                    int cols = (int)Math.min(20, Core.graphics.getWidth() / 52f);
-
-                    /*
-                    int i = 0;
-                    for(var key : defaultIcons){
-                        var value = Icon.icons.get(key);
-
-                        t.button(value, Styles.cleari, () -> {
-                            sector.info.icon = key;
-                            sector.info.contentIcon = null;
-                            sector.saveInfo();
-                            hide();
-                            updateSelected();
-                        }).checked(key.equals(sector.info.icon));
-
-                        if(++i % cols == 0) t.row();
-                    }*/
-
-                    int i = 0;
+                    int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
 
                     for(ContentType ctype : defaultContentIcons){
                         t.row();
                         t.image().colspan(cols).growX().width(Float.NEGATIVE_INFINITY).height(3f).color(Pal.accent);
                         t.row();
 
-                        i = 0;
+                        int i = 0;
                         for(UnlockableContent u : content.getBy(ctype).<UnlockableContent>as()){
                             if(!u.isHidden() && u.unlockedNow() && u.hasEmoji() && !tags.contains(u.emoji())){
                                 t.button(new TextureRegionDrawable(u.uiIcon), Styles.cleari, iconMed, () -> {
