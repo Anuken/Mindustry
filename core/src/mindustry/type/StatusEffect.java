@@ -152,6 +152,10 @@ public class StatusEffect extends UnlockableContent{
         });
     }
 
+    public void draw(Unit unit, float time){
+        draw(unit); //Backwards compatibility
+    }
+
     public void draw(Unit unit){
 
     }
