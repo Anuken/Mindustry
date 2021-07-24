@@ -9,6 +9,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -176,6 +177,14 @@ public class AIController implements UnitController{
 
     protected @Nullable Tile getClosestSpawner(){
         return Geometry.findClosest(unit.x, unit.y, Vars.spawner.getSpawns());
+    }
+
+    protected void unloadPayloads(){
+        if(unit instanceof Payloadc pay && pay.hasPayload() && target instanceof Building && pay.payloads().peek() instanceof UnitPayload){
+            if(target.within(unit, Math.max(unit.type().range + 1f, 75f))){
+                pay.dropLastPayload();
+            }
+        }
     }
 
     protected void circle(Position target, float circleLength){

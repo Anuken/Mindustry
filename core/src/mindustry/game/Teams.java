@@ -1,6 +1,7 @@
 package mindustry.game;
 
 import arc.func.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.Queue;
 import arc.struct.*;
@@ -260,6 +261,34 @@ public class Teams{
             this.ai = new BaseAI(this);
         }
 
+        /** Destroys this team's presence on the map, killing part of its buildings and converting everything to 'derelict'. */
+        public void destroyToDerelict(){
+
+            //grab all buildings from quadtree.
+            var builds = new Seq<Building>();
+            if(buildings != null){
+                buildings.getObjects(builds);
+            }
+
+            //convert all team tiles to neutral, randomly killing them
+            for(var b : builds){
+                //TODO this may cause a lot of packet spam, optimize?
+                Call.setTeam(b, Team.derelict);
+
+                if(Mathf.chance(0.25)){
+                    Time.run(Mathf.random(0f, 60f * 6f), b::kill);
+                }
+            }
+
+            //kill all units randomly
+            units.each(u -> Time.run(Mathf.random(0f, 60f * 5f), () -> {
+                //ensure unit hasn't switched teams for whatever reason
+                if(u.team == team){
+                    u.kill();
+                }
+            }));
+        }
+
         @Nullable
         public Seq<Unit> unitCache(UnitType type){
             if(unitsByType == null || unitsByType.length <= type.id || unitsByType[type.id] == null) return null;
@@ -320,6 +349,7 @@ public class Teams{
     public static class BlockPlan{
         public final short x, y, rotation, block;
         public final Object config;
+        public boolean removed;
 
         public BlockPlan(int x, int y, short rotation, short block, Object config){
             this.x = (short)x;

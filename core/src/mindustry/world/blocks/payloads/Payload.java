@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -46,6 +47,12 @@ public interface Payload extends Position{
 
     /** @return icon describing the contents. */
     TextureRegion icon();
+
+    /** @deprecated use icon() instead. */
+    @Deprecated
+    default TextureRegion icon(Cicon icon){
+        return icon();
+    }
 
     @Override
     default float getX(){

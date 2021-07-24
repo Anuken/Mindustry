@@ -184,7 +184,7 @@ public class Units{
         }
     }
 
-    /** Returns the closest target enemy. First, units are checked, then tile entities. */
+    /** Returns the closest target enemy. First, units are checked, then buildings. */
     public static Teamc bestTarget(Team team, float x, float y, float range, Boolf<Unit> unitPred, Boolf<Building> tilePred, Sortf sort){
         if(team == Team.derelict) return null;
 

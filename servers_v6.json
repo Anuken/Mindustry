@@ -45,7 +45,7 @@
   },
   {
     "name": "ALEX",
-    "address": ["alexmindustryhub.ddns.net:6568", "alexmindustry.ddns.net:6568", "alexmindustry.ddns.net:6569", "alexmindustryattac.ddns.net:25800","alexmindustryturbo.ddns.net:25854","alexmindustryhex.ddns.net:25587"]
+    "address": ["alexmindustryhub.ddns.net:6568", "alexmindustry.ddns.net:25586", "alexmindustry.ddns.net:25587", "alexmindustryattac.ddns.net:25800","alexmindustryturbo.ddns.net:25581","alexmindustryhex.ddns.net:25583"]
   },
   {
     "name": "Minty [subzero]",
@@ -57,7 +57,7 @@
   },
   {
     "name": "Omega",
-    "address": ["178.170.47.34:20204", "157.90.213.2:30308", "157.90.180.53:25738"] 
+    "address": ["178.170.47.34:20204", "157.90.213.2:30308", "157.90.180.53:25738", "185.86.230.61:25578"] 
   },
   {
     "name": "md.obvilionnetwork.ru",
@@ -93,6 +93,10 @@
   },
   {
     "name": "Hungarian",
-    "address": ["magyarmindustry.tk"]
+    "address": ["magyarmindustry.tk", "148.251.175.124:25601"]
+  },
+  {
+    "name": "Xpdustry",
+    "address": ["xpdustry.fr"]
   }
 ]

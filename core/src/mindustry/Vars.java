@@ -24,10 +24,8 @@ import mindustry.logic.*;
 import mindustry.maps.Map;
 import mindustry.maps.*;
 import mindustry.mod.*;
-import mindustry.net.Net;
 import mindustry.net.*;
 import mindustry.service.*;
-import mindustry.world.*;
 
 import java.io.*;
 import java.nio.charset.*;
@@ -113,8 +111,6 @@ public class Vars implements Loadable{
     public static final float tilePayload = tilesize * tilesize;
     /** icon sizes for UI */
     public static final float iconXLarge = 8*6f, iconLarge = 8*5f, iconMed = 8*4f, iconSmall = 8*3f;
-    /** tile used in certain situations, instead of null */
-    public static Tile emptyTile;
     /** for map generator dialog */
     public static boolean updateEditorOnChange = false;
     /** all choosable player colors in join/host dialog */
@@ -278,7 +274,6 @@ public class Vars implements Loadable{
         schematicDirectory = dataDirectory.child("schematics/");
         bebuildDirectory = dataDirectory.child("be_builds/");
         emptyMap = new Map(new StringMap());
-        emptyTile = null;
 
         if(tree == null) tree = new FileTree();
         if(mods == null) mods = new Mods();

@@ -235,7 +235,6 @@ public class Blocks implements ContentList{
         magmarock = new Floor("magmarock"){{
             attributes.set(Attribute.heat, 0.75f);
             attributes.set(Attribute.water, -0.75f);
-            updateEffect = Fx.magmasmoke;
             blendGroup = basalt;
 
             emitLight = true;
@@ -305,7 +304,7 @@ public class Blocks implements ContentList{
 
         shale = new Floor("shale"){{
             variants = 3;
-            attributes.set(Attribute.oil, 1f);
+            attributes.set(Attribute.oil, 1.6f);
         }};
 
         stoneWall = new StaticWall("stone-wall"){{
@@ -369,6 +368,7 @@ public class Blocks implements ContentList{
 
         sporeCluster = new Prop("spore-cluster"){{
             variants = 3;
+            breakSound = Sounds.plantBreak;
         }};
 
         boulder = new Prop("boulder"){{
@@ -425,6 +425,9 @@ public class Blocks implements ContentList{
         darkPanel6 = new Floor("dark-panel-6", 0);
 
         darkMetal = new StaticWall("dark-metal");
+
+        Seq.with(metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6)
+        .each(b -> b.asFloor().wall = darkMetal);
 
         pebbles = new DoubleOverlayFloor("pebbles");
 
@@ -709,7 +712,7 @@ public class Blocks implements ContentList{
 
         coalCentrifuge = new GenericCrafter("coal-centrifuge"){{
             requirements(Category.crafting, with(Items.titanium, 20, Items.graphite, 40, Items.lead, 30));
-            craftEffect = Fx.smeltsmoke;
+            craftEffect = Fx.coalSmeltsmoke;
             outputItem = new ItemStack(Items.coal, 1);
             craftTime = 30f;
             size = 2;
@@ -1012,7 +1015,6 @@ public class Blocks implements ContentList{
             reloadTime = 200f;
             range = 440f;
             consumes.power(1.75f);
-            bullet = new MassDriverBolt();
         }};
 
         //special transport blocks
@@ -1159,6 +1161,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.copper, 40, Items.graphite, 35, Items.lead, 50, Items.silicon, 35, Items.metaglass, 40));
             powerProduction = 1.8f;
             generateEffect = Fx.redgeneratespark;
+            effectChance = 0.011f;
             size = 2;
             floating = true;
             ambientSound = Sounds.hum;
@@ -1385,14 +1388,14 @@ public class Blocks implements ContentList{
             requirements(Category.effect, with(Items.titanium, 250, Items.thorium, 125));
             size = 3;
             itemCapacity = 1000;
-            health = size * size * 55;
+            health = size * size * 60;
         }};
 
         container = new StorageBlock("container"){{
             requirements(Category.effect, with(Items.titanium, 100));
             size = 2;
             itemCapacity = 300;
-            health = size * size * 55;
+            health = size * size * 60;
         }};
 
         unloader = new Unloader("unloader"){{

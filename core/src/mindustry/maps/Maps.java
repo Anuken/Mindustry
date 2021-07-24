@@ -24,23 +24,30 @@ import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
 
 import java.io.*;
+import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 
 public class Maps{
+    /** All generation filter types. */
+    public static Prov<GenerateFilter>[] allFilterTypes = new Prov[]{
+    NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new,
+    RiverNoiseFilter::new, OreFilter::new, OreMedianFilter::new, MedianFilter::new,
+    BlendFilter::new, MirrorFilter::new, ClearFilter::new, CoreSpawnFilter::new,
+    EnemySpawnFilter::new, SpawnPathFilter::new
+    };
+
     /** List of all built-in maps. Filenames only. */
     private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "archipelago", "debrisField", "veins", "glacier", "passage"};
     /** Maps tagged as PvP */
-    static final String[] pvpMaps = {"veins", "glacier", "passage"};
+    private static String[] pvpMaps = {"veins", "glacier", "passage"};
+
     /** All maps stored in an ordered array. */
     private Seq<Map> maps = new Seq<>();
-    /** Serializer for meta. */
-    private Json json = new Json();
-
     private ShuffleMode shuffleMode = ShuffleMode.all;
     private @Nullable MapProvider shuffler;
 
-    private AsyncExecutor executor = new AsyncExecutor(2);
+    private ExecutorService executor = Threads.executor(3);
     private ObjectSet<Map> previewList = new ObjectSet<>();
 
     public ShuffleMode getShuffleMode(){
@@ -352,20 +359,20 @@ public class Maps{
         if(groups == null) return "[]";
 
         StringWriter buffer = new StringWriter();
-        json.setWriter(new JsonWriter(buffer));
+        JsonIO.json.setWriter(new JsonWriter(buffer));
 
-        json.writeArrayStart();
+        JsonIO.json.writeArrayStart();
         for(int i = 0; i < groups.size; i++){
-            json.writeObjectStart(SpawnGroup.class, SpawnGroup.class);
-            groups.get(i).write(json);
-            json.writeObjectEnd();
+            JsonIO.json.writeObjectStart(SpawnGroup.class, SpawnGroup.class);
+            groups.get(i).write(JsonIO.json);
+            JsonIO.json.writeObjectEnd();
         }
-        json.writeArrayEnd();
+        JsonIO.json.writeArrayEnd();
         return buffer.toString();
     }
 
     public Seq<SpawnGroup> readWaves(String str){
-        return str == null ? null : str.equals("[]") ? new Seq<>() : Seq.with(json.fromJson(SpawnGroup[].class, str));
+        return str == null ? null : str.equals("[]") ? new Seq<>() : Seq.with(JsonIO.json.fromJson(SpawnGroup[].class, str));
     }
 
     public void loadPreviews(){

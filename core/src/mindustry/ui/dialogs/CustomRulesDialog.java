@@ -142,6 +142,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
         check("@rules.schematic", b -> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
         check("@rules.coreincinerates", b -> rules.coreIncinerates = b, () -> rules.coreIncinerates);
+        check("@rules.cleanupdeadteams", b -> rules.cleanupDeadTeams = b, () -> rules.cleanupDeadTeams, () -> rules.pvp);
         number("@rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
         number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, 0.001f, 50f);
         number("@rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
@@ -262,7 +263,7 @@ public class CustomRulesDialog extends BaseDialog{
 
             rebuild[0] = () -> {
                 base.clearChildren();
-                int cols = Math.max(1, Core.graphics.getWidth() / 460);
+                int cols = Math.max(1, (int)(Core.graphics.getWidth() / Scl.scl(450)));
                 int idx = 0;
 
                 for(WeatherEntry entry : rules.weather){

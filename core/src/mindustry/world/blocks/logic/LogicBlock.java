@@ -249,18 +249,6 @@ public class LogicBlock extends Block{
             }
         }
 
-        @Override
-        public void onProximityAdded(){
-            super.onProximityAdded();
-
-            //unbox buildings after reading
-            for(var v : executor.vars){
-                if(v.objval instanceof BuildingBox b){
-                    v.objval = world.build(b.pos);
-                }
-            }
-        }
-
         public String findLinkName(Block block){
             String bname = getLinkName(block);
             Bits taken = new Bits(links.size);
@@ -595,7 +583,7 @@ public class LogicBlock extends Block{
                 for(int i = 0; i < varcount; i++){
                     BVar dest = asm.getVar(names[i]);
                     if(dest != null && !dest.constant){
-                        dest.value = values[i];
+                        dest.value = values[i] instanceof BuildingBox box ? world.build(box.pos) : values[i];
                     }
                 }
             });

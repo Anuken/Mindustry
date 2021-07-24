@@ -1,11 +1,13 @@
 package mindustry.io;
 
+import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
+import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -215,6 +217,12 @@ public class JsonIO{
                 return item != null ? item : liquid;
             }
         });
+
+        //use short names for all filter types
+        for(var filter : Maps.allFilterTypes){
+            var i = filter.get();
+            json.addClassTag(Strings.camelize(i.getClass().getSimpleName().replace("Filter", "")), i.getClass());
+        }
     }
 
     static class CustomJson extends Json{

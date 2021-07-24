@@ -232,8 +232,8 @@ public class BulletType extends Content implements Cloneable{
         }
 
         if(entity instanceof Unit unit){
-            Tmp.v3.set(unit).sub(b.x, b.y).nor().scl(knockback * 80f);
-            if(impact) Tmp.v3.setAngle(b.rotation());
+            Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f);
+            if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
             unit.impulse(Tmp.v3);
             unit.apply(status, statusDuration);
         }
@@ -371,7 +371,7 @@ public class BulletType extends Content implements Cloneable{
                     e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team,
                     t -> collidesGround && (t.team != b.team || t.damaged()));
             }else{
-                target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> e.checkTarget(collidesAir, collidesGround), t -> collidesGround);
+                target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id), t -> collidesGround && !b.hasCollided(t.id));
             }
 
             if(target != null){

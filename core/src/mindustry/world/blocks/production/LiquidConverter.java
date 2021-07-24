@@ -49,7 +49,7 @@ public class LiquidConverter extends GenericCrafter{
 
             if(cons.valid()){
                 if(Mathf.chanceDelta(updateEffectChance)){
-                    updateEffect.at(getX() + Mathf.range(size * 4f), getY() + Mathf.range(size * 4));
+                    updateEffect.at(x + Mathf.range(size * 4f), y + Mathf.range(size * 4));
                 }
 
                 warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);

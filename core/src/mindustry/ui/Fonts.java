@@ -203,7 +203,7 @@ public class Fonts{
 
     /** Merges the UI and font atlas together for better performance. */
     public static void mergeFontAtlas(TextureAtlas atlas){
-        //grab all textures from the ui page, remove all the regions assigned to it, then copy them over to Fonts.packer and replace the texture in this atlas.
+        //grab all textures from the ui page, remove all the regions assigned to it, then copy them over to UI.packer and replace the texture in this atlas.
 
         //grab old UI texture and regions...
         Texture texture = atlas.find("logo").texture;
@@ -236,8 +236,12 @@ public class Fonts{
     }
 
     public static TextureRegionDrawable getGlyph(Font font, char glyph){
-        Glyph g = font.getData().getGlyph(glyph);
-        if(g == null) throw new IllegalArgumentException("No glyph: " + glyph + " (" + (int)glyph + ")");
+        Glyph found = font.getData().getGlyph(glyph);
+        if(found == null){
+            Log.warn("No icon found for glyph: @ (@)", glyph, (int)glyph);
+            found = font.getData().getGlyph('F');
+        }
+        Glyph g = found;
 
         float size = Math.max(g.width, g.height);
         TextureRegionDrawable draw = new TextureRegionDrawable(new TextureRegion(font.getRegion().texture, g.u, g.v2, g.u2, g.v)){

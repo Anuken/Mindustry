@@ -17,7 +17,7 @@ public class LogicAI extends AIController{
     /** Minimum delay between item transfers. */
     public static final float transferDelay = 60f * 1.5f;
     /** Time after which the unit resets its controlled and reverts to a normal unit. */
-    public static final float logicControlTimeout = 10f * 60f;
+    public static final float logicControlTimeout = 60f * 10f;
 
     public LUnitControl control = LUnitControl.idle;
     public float moveX, moveY, moveRad;

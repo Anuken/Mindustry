@@ -1,10 +1,7 @@
 [
   {
-    "address": "mindustry.us.to"
-  },
-  {
     "name": "mindustry.pl",
-    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl:6966"]
+    "address": ["46.105.36.238:6000", "46.105.36.238:6666", "46.105.36.238:6966"]
   },
   {
     "name": "C.A.M.S.",
@@ -20,15 +17,15 @@
   },
   {
     "name": "Omega",
-    "address": ["157.90.180.53:25777", "redstonneur1256.ml"]
+    "address": ["185.86.230.61:25571", "185.86.230.61:25570", "185.86.230.62:25572"]
   },
   {
     "name": "MeowLand",
     "address": ["34.134.111.15", "fifr4.quackhost.uk:21013", "34.134.111.15:4000", "34.134.111.15:7000"]
   },
   {
-    "name": "Mindurka",
-    "address": ["mindurka.tk", "mindurka.tk:4000"] 
+    "name": "[cyan]DarkDustry",
+    "address": ["darkdustry.ml", "darkdustry.ml:7000", "darkdustry.ml:8000"] 
   },
   {
     "name": "Chaotic Neutral",
