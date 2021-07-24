@@ -120,30 +120,25 @@ abstract class StatusComp implements Posc, Flyingc{
 
         if(statuses.isEmpty()) return;
 
-        int index = 0;
+        for(StatusEntry e : statuses){
+            e.time = Math.max(e.time - Time.delta, 0);
 
-        while(index < statuses.size){
-            StatusEntry entry = statuses.get(index++);
-
-            entry.time = Math.max(entry.time - Time.delta, 0);
-
-            if(entry.effect == null || (entry.time <= 0 && !entry.effect.permanent)){
-                Pools.free(entry);
-                index --;
-                statuses.remove(index);
+            if(e.effect == null || (e.time <= 0 && !e.effect.permanent)){
+                Pools.free(e);
+                statuses.remove(e);
             }else{
-                applied.set(entry.effect.id);
+                applied.set(e.effect.id);
 
-                speedMultiplier *= entry.effect.speedMultiplier;
-                healthMultiplier *= entry.effect.healthMultiplier;
-                damageMultiplier *= entry.effect.damageMultiplier;
-                reloadMultiplier *= entry.effect.reloadMultiplier;
-                buildSpeedMultiplier *= entry.effect.buildSpeedMultiplier;
-                dragMultiplier *= entry.effect.dragMultiplier;
+                speedMultiplier *= e.effect.speedMultiplier;
+                healthMultiplier *= e.effect.healthMultiplier;
+                damageMultiplier *= e.effect.damageMultiplier;
+                reloadMultiplier *= e.effect.reloadMultiplier;
+                buildSpeedMultiplier *= e.effect.buildSpeedMultiplier;
+                dragMultiplier *= e.effect.dragMultiplier;
 
-                disarmed |= entry.effect.disarm;
+                disarmed |= e.effect.disarm;
 
-                entry.effect.update(self(), entry.time);
+                e.effect.update(self(), e.time);
             }
         }
     }
