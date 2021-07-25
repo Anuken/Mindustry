@@ -79,7 +79,6 @@ public class AIController implements UnitController{
         return Units.invalidateTarget(target, unit.team, unit.x, unit.y);
     }
 
-
     protected void pathfind(int pathTarget){
         int costType = unit.pathType();
 
@@ -97,7 +96,7 @@ public class AIController implements UnitController{
         boolean ret = retarget();
 
         if(ret){
-            target = findTarget(unit.x, unit.y, unit.range(), unit.type.targetAir, unit.type.targetGround);
+            target = findMainTarget(unit.x, unit.y, unit.range(), unit.type.targetAir, unit.type.targetGround);
         }
 
         if(invalid(target)){
@@ -165,6 +164,10 @@ public class AIController implements UnitController{
 
     protected boolean retarget(){
         return timer.get(timerTarget, target == null ? 40 : 90);
+    }
+
+    protected Teamc findMainTarget(float x, float y, float range, boolean air, boolean ground){
+        return findTarget(x, y, range, air, ground);
     }
 
     protected Teamc findTarget(float x, float y, float range, boolean air, boolean ground){

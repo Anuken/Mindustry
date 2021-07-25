@@ -73,7 +73,10 @@ public class UnitType extends UnlockableContent{
     public Effect fallThrusterEffect = Fx.fallSmoke;
     public Effect deathExplosionEffect = Fx.dynamicExplosion;
     public Seq<Ability> abilities = new Seq<>();
-    public BlockFlag targetFlag = BlockFlag.generator;
+    /** Flags to target based on priority. Null indicates that the closest target should be found. The closest enemy core is used as a fallback. */
+    public BlockFlag[] targetFlags = {null};
+    /** targetFlags, as an override for "non-AI" teams. By default, units of this type will rush the core. */
+    public BlockFlag[] playerTargetFlags = {BlockFlag.core, null};
 
     public Color outlineColor = Pal.darkerMetal;
     public int outlineRadius = 3;

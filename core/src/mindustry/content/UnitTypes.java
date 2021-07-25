@@ -928,6 +928,7 @@ public class UnitTypes implements ContentList{
             engineOffset = 5.5f;
             range = 140f;
             targetAir = false;
+            targetFlags = new BlockFlag[]{BlockFlag.generator, null};
             commandLimit = 4;
             circleTarget = true;
             hitSize = 7;
@@ -961,7 +962,7 @@ public class UnitTypes implements ContentList{
             range = 140f;
             faceTarget = false;
             armor = 3f;
-            targetFlag = BlockFlag.factory;
+            targetFlags = new BlockFlag[]{BlockFlag.factory, null};
             commandLimit = 5;
             circleTarget = true;
 
@@ -999,6 +1000,7 @@ public class UnitTypes implements ContentList{
             lowAltitude = true;
             armor = 5f;
 
+            targetFlags = new BlockFlag[]{BlockFlag.launchPad, BlockFlag.storage, BlockFlag.battery, null};
             engineOffset = 12f;
             engineSize = 3f;
 
@@ -1045,7 +1047,7 @@ public class UnitTypes implements ContentList{
             engineOffset = 21;
             engineSize = 5.3f;
             hitSize = 46f;
-            targetFlag = BlockFlag.battery;
+            targetFlags = new BlockFlag[]{BlockFlag.generator, BlockFlag.core, null};
 
             BulletType missiles = new MissileBulletType(2.7f, 14){{
                 width = 8f;
@@ -1120,7 +1122,7 @@ public class UnitTypes implements ContentList{
             hitSize = 58f;
             destructibleWreck = false;
             armor = 13f;
-            targetFlag = BlockFlag.reactor;
+            targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.core, null};
 
             BulletType fragBullet = new FlakBulletType(4f, 5){{
                 shootEffect = Fx.shootBig;
@@ -1333,7 +1335,7 @@ public class UnitTypes implements ContentList{
             buildBeamOffset = 23;
             range = 140f;
             targetAir = false;
-            targetFlag = BlockFlag.battery;
+            targetFlags = new BlockFlag[]{BlockFlag.battery, BlockFlag.factory, null};
 
             ammoType = AmmoTypes.powerHigh;
 

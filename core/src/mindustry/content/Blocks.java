@@ -2032,7 +2032,7 @@ public class Blocks implements ContentList{
             size = 5;
             reloadTime = 140f;
             chargeTime = 100f;
-            range = 500f;
+            range = 600f;
             maxPayloadSize = 3.5f;
             consumes.power(6f);
         }};

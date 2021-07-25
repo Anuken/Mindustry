@@ -1071,7 +1071,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public String getDisplayName(){
-        return block.localizedName;
+        return team == Team.derelict ?  
+            block.localizedName + "\n" + Core.bundle.get("block.derelict"):
+            block.localizedName;
     }
 
     public TextureRegion getDisplayIcon(){

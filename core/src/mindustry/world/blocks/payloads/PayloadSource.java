@@ -30,6 +30,7 @@ public class PayloadSource extends PayloadBlock{
         configurable = true;
         //make sure to display large units.
         clipSize = 120;
+        noUpdateDisabled = true;
 
         config(Block.class, (PayloadSourceBuild build, Block block) -> {
             if(canProduce(block) && build.block != block){
