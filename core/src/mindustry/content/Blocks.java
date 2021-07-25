@@ -964,15 +964,20 @@ public class Blocks implements ContentList{
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
             requirements(Category.distribution, with(Items.lead, 6, Items.copper, 6));
+            fadeIn = moveArrows = false;
             range = 4;
             speed = 74f;
+            arrowSpacing = 6f;
             bufferCapacity = 14;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
             requirements(Category.distribution, with(Items.phaseFabric, 5, Items.silicon, 7, Items.lead, 10, Items.graphite, 10));
             range = 12;
+            arrowPeriod = 0.9f;
+            arrowTimeScl = 2.75f;
             hasPower = true;
+            pulse = true;
             consumes.power(0.30f);
         }};
 
@@ -1095,8 +1100,10 @@ public class Blocks implements ContentList{
             requirements(Category.liquid, with(Items.graphite, 2, Items.metaglass, 2));
         }};
 
-        bridgeConduit = new LiquidExtendingBridge("bridge-conduit"){{
+        bridgeConduit = new LiquidBridge("bridge-conduit"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 8));
+            fadeIn = moveArrows = false;
+            arrowSpacing = 6f;
             range = 4;
             hasPower = false;
         }};
@@ -1104,8 +1111,11 @@ public class Blocks implements ContentList{
         phaseConduit = new LiquidBridge("phase-conduit"){{
             requirements(Category.liquid, with(Items.phaseFabric, 5, Items.silicon, 7, Items.metaglass, 20, Items.titanium, 10));
             range = 12;
+            arrowPeriod = 0.9f;
+            arrowTimeScl = 2.75f;
             hasPower = true;
             canOverdrive = false;
+            pulse = true;
             consumes.power(0.30f);
         }};
 
