@@ -115,10 +115,6 @@ public class LaunchPad extends Block{
                 Draw.reset();
             }
 
-            float cooldown = Mathf.clamp(launchCounter / (90f));
-
-            Draw.mixcol(lightColor, 1f - cooldown);
-
             Draw.rect(podRegion, x, y);
 
             Draw.reset();
@@ -133,8 +129,8 @@ public class LaunchPad extends Block{
         public void updateTile(){
             if(!state.isCampaign()) return;
 
-            //launch when full and base conditions are met
-            if(items.total() >= itemCapacity && efficiency() >= 1f && (launchCounter += edelta()) >= launchTime){
+            //increment launchCounter then launch when full and base conditions are met
+            if((launchCounter += edelta()) >= launchTime && items.total() >= itemCapacity){
                 launchSound.at(x, y);
                 LaunchPayload entity = LaunchPayload.create();
                 items.each((item, amount) -> entity.stacks.add(new ItemStack(item, amount)));
@@ -160,7 +156,7 @@ public class LaunchPad extends Block{
                 Sector dest = state.rules.sector == null ? null : state.rules.sector.info.getRealDestination();
 
                 return Core.bundle.format("launch.destination",
-                    dest == null ? Core.bundle.get("sectors.nonelaunch") :
+                    dest == null || !dest.hasBase() ? Core.bundle.get("sectors.nonelaunch") :
                     "[accent]" + dest.name());
             }).pad(4).wrap().width(200f).left();
         }

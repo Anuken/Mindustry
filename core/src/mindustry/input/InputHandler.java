@@ -145,6 +145,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             for(int pos : positions){
                 if(req.x == Point2.x(pos) && req.y == Point2.y(pos)){
+                    req.removed = true;
                     it.remove();
                     continue outer;
                 }
@@ -229,7 +230,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Unit unit = player.unit();
 
-        if(build != null && build.team == unit.team
+        if(build != null && state.teams.canInteract(unit.team, build.team)
         && unit.within(build, tilesize * build.block.size * 1.2f + tilesize * 5f)){
 
             //pick up block's payload
@@ -509,7 +510,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }else{
             Building build = world.buildWorld(pay.x(), pay.y());
 
-            if(build != null && build.team == unit.team){
+            if(build != null && state.teams.canInteract(unit.team, build.team)){
                 Call.requestBuildPayload(player, build);
             }
         }
@@ -893,6 +894,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Block block = content.block(req.block);
             if(block.bounds(req.x, req.y, Tmp.r2).overlaps(Tmp.r1)){
                 removed.add(Point2.pack(req.x, req.y));
+                req.removed = true;
                 broken.remove();
             }
         }
@@ -1025,7 +1027,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return !Core.scene.hasMouse()
             && tile.drop() != null
             && player.unit().validMine(tile)
-            && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
+            && !((!Core.settings.getBool("doubletapmine") && tile.floor().playerUnmineable) && tile.overlay().itemDrop == null)
             && player.unit().acceptsItem(tile.drop())
             && tile.block() == Blocks.air;
     }
@@ -1242,12 +1244,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             diagonal = !diagonal;
         }
 
+        int endRotation = -1;
         if(diagonal){
             var start = world.build(startX, startY);
             var end = world.build(endX, endY);
             if(block != null && start instanceof ChainedBuilding && end instanceof ChainedBuilding
                     && block.canReplace(end.block) && block.canReplace(start.block)){
                 points = Placement.upgradeLine(startX, startY, endX, endY);
+                endRotation = end.rotation;
             }else{
                 points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
             }
@@ -1281,6 +1285,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 int result = baseRotation;
                 if(next != null){
                     result = Tile.relativeTo(point.x, point.y, next.x, next.y);
+                }else if(endRotation != -1){
+                    result = endRotation;
                 }else if(block.conveyorPlacement && i > 0){
                     Point2 prev = points.get(i - 1);
                     result = Tile.relativeTo(prev.x, prev.y, point.x, point.y);

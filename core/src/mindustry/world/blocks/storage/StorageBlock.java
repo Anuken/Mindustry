@@ -84,6 +84,12 @@ public class StorageBlock extends Block{
         }
 
         @Override
+        public int explosionItemCap(){
+            //when linked to a core, containers/vaults are made significantly less explosive.
+            return linkedCore != null ? Math.min(itemCapacity/60, 6) : itemCapacity;
+        }
+
+        @Override
         public void drawSelect(){
             if(linkedCore != null){
                 linkedCore.drawSelect();

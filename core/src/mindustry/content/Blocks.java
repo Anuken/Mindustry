@@ -235,7 +235,6 @@ public class Blocks implements ContentList{
         magmarock = new Floor("magmarock"){{
             attributes.set(Attribute.heat, 0.75f);
             attributes.set(Attribute.water, -0.75f);
-            updateEffect = Fx.magmasmoke;
             blendGroup = basalt;
 
             emitLight = true;
@@ -305,7 +304,7 @@ public class Blocks implements ContentList{
 
         shale = new Floor("shale"){{
             variants = 3;
-            attributes.set(Attribute.oil, 1f);
+            attributes.set(Attribute.oil, 1.6f);
         }};
 
         stoneWall = new StaticWall("stone-wall"){{
@@ -369,6 +368,7 @@ public class Blocks implements ContentList{
 
         sporeCluster = new Prop("spore-cluster"){{
             variants = 3;
+            breakSound = Sounds.plantBreak;
         }};
 
         boulder = new Prop("boulder"){{
@@ -425,6 +425,9 @@ public class Blocks implements ContentList{
         darkPanel6 = new Floor("dark-panel-6", 0);
 
         darkMetal = new StaticWall("dark-metal");
+
+        Seq.with(metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6)
+        .each(b -> b.asFloor().wall = darkMetal);
 
         pebbles = new DoubleOverlayFloor("pebbles");
 
@@ -659,12 +662,12 @@ public class Blocks implements ContentList{
         }};
 
         disassembler = new Separator("disassembler"){{
-            requirements(Category.crafting, with(Items.graphite, 140, Items.titanium, 100, Items.silicon, 150, Items.surgeAlloy, 70));
+            requirements(Category.crafting, with(Items.plastanium, 40, Items.titanium, 100, Items.silicon, 150, Items.thorium, 80));
             results = with(
                 Items.sand, 4,
                 Items.graphite, 2,
                 Items.titanium, 2,
-                Items.thorium, 1
+                Items.thorium, 2
             );
             hasPower = true;
             craftTime = 15f;
@@ -709,7 +712,7 @@ public class Blocks implements ContentList{
 
         coalCentrifuge = new GenericCrafter("coal-centrifuge"){{
             requirements(Category.crafting, with(Items.titanium, 20, Items.graphite, 40, Items.lead, 30));
-            craftEffect = Fx.smeltsmoke;
+            craftEffect = Fx.coalSmeltsmoke;
             outputItem = new ItemStack(Items.coal, 1);
             craftTime = 30f;
             size = 2;
@@ -1012,7 +1015,6 @@ public class Blocks implements ContentList{
             reloadTime = 200f;
             range = 440f;
             consumes.power(1.75f);
-            bullet = new MassDriverBolt();
         }};
 
         //special transport blocks
@@ -1159,6 +1161,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.copper, 40, Items.graphite, 35, Items.lead, 50, Items.silicon, 35, Items.metaglass, 40));
             powerProduction = 1.8f;
             generateEffect = Fx.redgeneratespark;
+            effectChance = 0.011f;
             size = 2;
             floating = true;
             ambientSound = Sounds.hum;
@@ -1978,25 +1981,25 @@ public class Blocks implements ContentList{
         }};
 
         repairPoint = new RepairPoint("repair-point"){{
-            requirements(Category.units, with(Items.lead, 25, Items.copper, 25, Items.silicon, 20));
-            repairSpeed = 0.5f;
-            repairRadius = 65f;
+            requirements(Category.units, with(Items.lead, 30, Items.copper, 30, Items.silicon, 20));
+            repairSpeed = 0.45f;
+            repairRadius = 60f;
             beamWidth = 0.73f;
             powerUse = 1f;
             pulseRadius = 5f;
         }};
 
         repairTurret = new RepairPoint("repair-turret"){{
-            requirements(Category.units, with(Items.silicon, 90, Items.thorium, 80, Items.plastanium, 80));
+            requirements(Category.units, with(Items.silicon, 90, Items.thorium, 80, Items.plastanium, 60));
             size = 2;
             length = 6f;
             repairSpeed = 3f;
-            repairRadius = 140f;
+            repairRadius = 145f;
             powerUse = 5f;
             beamWidth = 1.1f;
             pulseRadius = 6.1f;
             coolantUse = 0.16f;
-            coolantMultiplier = 1.5f;
+            coolantMultiplier = 1.6f;
             acceptCoolant = true;
         }};
 
@@ -2029,7 +2032,7 @@ public class Blocks implements ContentList{
             size = 5;
             reloadTime = 140f;
             chargeTime = 100f;
-            range = 500f;
+            range = 600f;
             maxPayloadSize = 3.5f;
             consumes.power(6f);
         }};

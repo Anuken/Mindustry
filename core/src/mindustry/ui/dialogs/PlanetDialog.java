@@ -603,34 +603,33 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         selectAlpha = Mathf.lerpDelta(selectAlpha, Mathf.num(planets.zoom < 1.9f), 0.1f);
     }
 
+    void displayItems(Table c, float scl, ObjectMap<Item, ExportStat> stats, String name){
+        Table t = new Table().left();
+
+        int i = 0;
+        for(var item : content.items()){
+            var stat = stats.get(item);
+            if(stat == null) continue;
+            int total = (int)(stat.mean * 60 * scl);
+            if(total > 1){
+                t.image(item.uiIcon).padRight(3);
+                t.add(UI.formatAmount(total) + " " + Core.bundle.get("unit.perminute")).color(Color.lightGray).padRight(3);
+                if(++i % 3 == 0){
+                    t.row();
+                }
+            }
+        }
+
+        if(t.getChildren().any()){
+            c.add(name).left().row();
+            c.add(t).padLeft(10f).left().row();
+        }
+    }
+
     void showStats(Sector sector){
         BaseDialog dialog = new BaseDialog(sector.name());
 
         dialog.cont.pane(c -> {
-            Cons2<ObjectMap<Item, ExportStat>, String> display = (stats, name) -> {
-                Table t = new Table().left();
-
-                float scl = sector.getProductionScale();
-
-                int[] i = {0};
-
-                stats.each((item, stat) -> {
-                    int total = (int)(stat.mean * 60 * scl);
-                    if(total > 1){
-                        t.image(item.uiIcon).padRight(3);
-                        t.add(UI.formatAmount(total) + " " + Core.bundle.get("unit.perminute")).color(Color.lightGray).padRight(3);
-                        if(++i[0] % 3 == 0){
-                            t.row();
-                        }
-                    }
-                });
-
-                if(t.getChildren().any()){
-                    c.add(name).left().row();
-                    c.add(t).padLeft(10f).left().row();
-                }
-            };
-
             c.defaults().padBottom(5);
 
             c.add(Core.bundle.get("sectors.time") + " [accent]" + sector.save.getPlayTime()).left().row();
@@ -653,10 +652,15 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
 
             //production
-            display.get(sector.info.production, "@sectors.production");
+            displayItems(c, sector.getProductionScale(), sector.info.production, "@sectors.production");
 
             //export
-            display.get(sector.info.export, "@sectors.export");
+            displayItems(c, sector.getProductionScale(), sector.info.export, "@sectors.export");
+
+            //import
+            if(sector.hasBase()){
+                displayItems(c, 1f, sector.info.importStats(), "@sectors.import");
+            }
 
             ItemSeq items = sector.items();
 
@@ -735,7 +739,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                 updateSelected();
                             }).checked(sector.info.icon == null);
 
-                            int cols = (int)Math.min(20, Core.graphics.getWidth() / 52f);
+                            int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
 
                             int i = 1;
                             for(var key : defaultIcons){

@@ -52,8 +52,6 @@ public class Floor extends Block{
     public boolean playerUnmineable = false;
     /** Group of blocks that this block does not draw edges on. */
     public Block blendGroup = this;
-    /** Effect displayed when randomly updated. */
-    public Effect updateEffect = Fx.none;
     /** Array of affinities to certain things. */
     public Attributes attributes = new Attributes();
     /** Whether this ore generates in maps by default. */

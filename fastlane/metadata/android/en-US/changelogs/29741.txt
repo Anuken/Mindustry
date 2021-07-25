@@ -1,5 +1,0 @@
-[This is a truncated changelog, see Github for full notes]
-- Fixed two rare crashes
-- Made units depend on their production materials in tech tree
-- Made conveyors replaceable by distributors
-- Translation updates

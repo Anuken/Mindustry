@@ -14,7 +14,7 @@ public class Attribute{
     spores = add("spores"),
     /** Water content. Used for water extractor yield. */
     water = add("water"),
-    /** Oil content. Used for  oil extractor yield. */
+    /** Oil content. Used for oil extractor yield. */
     oil = add("oil"),
     /** Light coverage. Negative values decrease solar panel efficiency. */
     light = add("light");

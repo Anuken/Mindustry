@@ -14,7 +14,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
@@ -247,7 +246,7 @@ public class Conveyor extends Block implements Autotiler{
 
                 if(ys[i] > nextMax) ys[i] = nextMax;
                 if(ys[i] > 0.5 && i > 0) mid = i - 1;
-                xs[i] = Mathf.approachDelta(xs[i], 0, speed*2);
+                xs[i] = Mathf.approach(xs[i], 0, moved*2);
 
                 if(ys[i] >= 1f && pass(ids[i])){
                     //align X position if passing forwards
@@ -263,7 +262,7 @@ public class Conveyor extends Block implements Autotiler{
             }
 
             if(minitem < itemSpace + (blendbits == 1 ? 0.3f : 0f)){
-                clogHeat = Mathf.lerpDelta(clogHeat, 1f, 0.02f);
+                clogHeat = Mathf.approachDelta(clogHeat, 1f, 1f / 60f);
             }else{
                 clogHeat = 0f;
             }

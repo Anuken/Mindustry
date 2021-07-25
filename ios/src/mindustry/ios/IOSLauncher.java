@@ -219,7 +219,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                 if(SaveIO.isSaveValid(file)){
                     try{
-                        SaveMeta meta = SaveIO.getMeta(new DataInputStream(new InflaterInputStream(file.read(Streams.DEFAULT_BUFFER_SIZE))));
+                        SaveMeta meta = SaveIO.getMeta(new DataInputStream(new InflaterInputStream(file.read(Streams.defaultBufferSize))));
                         if(meta.tags.containsKey("name")){
                             //is map
                             if(!ui.editor.isShown()){

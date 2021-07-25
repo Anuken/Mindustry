@@ -180,6 +180,7 @@ public class WaveSpawner{
     private void spawnEffect(Unit unit){
         unit.rotation = unit.angleTo(world.width()/2f * tilesize, world.height()/2f * tilesize);
         unit.apply(StatusEffects.unmoving, 30f);
+        unit.apply(StatusEffects.invincible, 60f);
         unit.add();
 
         Call.spawnEffect(unit.x, unit.y, unit.rotation, unit.type);

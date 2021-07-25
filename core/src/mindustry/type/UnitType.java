@@ -255,7 +255,7 @@ public class UnitType extends UnlockableContent{
 
         stats.add(Stat.health, health);
         stats.add(Stat.armor, armor);
-        stats.add(Stat.speed, speed);
+        stats.add(Stat.speed, speed * 60f / tilesize, StatUnit.tilesSecond);
         stats.add(Stat.size, hitSize / tilesize, StatUnit.blocksSquared);
         stats.add(Stat.itemCapacity, itemCapacity);
         stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
@@ -279,7 +279,7 @@ public class UnitType extends UnlockableContent{
 
         if(mineTier >= 1){
             stats.addPercent(Stat.mineSpeed, mineSpeed);
-            stats.add(Stat.mineTier, StatValues.blocks(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= mineTier && !f.playerUnmineable));
+            stats.add(Stat.mineTier, StatValues.blocks(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= mineTier && (!f.playerUnmineable || Core.settings.getBool("doubletapmine"))));
         }
         if(buildSpeed > 0){
             stats.addPercent(Stat.buildSpeed, buildSpeed);

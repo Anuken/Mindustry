@@ -45,7 +45,7 @@ public class AttributeCrafter extends GenericCrafter{
 
         @Override
         public float efficiency(){
-            return (baseEfficiency + Math.min(maxBoost, boostScale * attrsum)) * super.efficiency();
+            return (baseEfficiency + Math.min(maxBoost, boostScale * attrsum) + attribute.env()) * super.efficiency();
         }
 
         @Override
