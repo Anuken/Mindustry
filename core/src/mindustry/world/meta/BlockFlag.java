@@ -20,9 +20,6 @@ public enum BlockFlag{
     battery,
     /** Any reactor block. */
     reactor,
-    /** This flag is unused, and will be removed. */
-    @Deprecated
-    unitModifier,
     /** Blocks that extinguishes fires. */
     extinguisher,
     /** Just a launch pad. */
