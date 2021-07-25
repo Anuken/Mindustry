@@ -432,6 +432,11 @@ public class Schematics implements Loadable{
                 if(seq.contains(t -> !t.block().alwaysReplace && !t.synthetic())){
                     return;
                 }
+                for(var t : seq){
+                    if(t.block() != Blocks.air){
+                        t.remove();
+                    }
+                }
             }
 
             tile.setBlock(st.block, team, st.rotation);

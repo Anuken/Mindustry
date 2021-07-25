@@ -41,7 +41,9 @@ public class UnitType extends UnlockableContent{
 
     /** If true, the unit is always at elevation 1. */
     public boolean flying;
+    /** Creates a new instance of this unit class. */
     public Prov<? extends Unit> constructor;
+    /** The default AI controller to assign on creation. */
     public Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
 
     /** Environmental flags that are *all* required for this unit to function. 0 = any environment */

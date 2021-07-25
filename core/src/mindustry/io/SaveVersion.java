@@ -363,7 +363,7 @@ public abstract class SaveVersion extends SaveFileReader{
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
             readChunk(stream, true, in -> {
-                byte typeid = in.readByte();
+                int typeid = in.readUnsignedByte();
                 if(mapping[typeid] == null){
                     in.skipBytes(lastRegionLength - 1);
                     return;
