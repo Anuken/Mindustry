@@ -20,7 +20,6 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.units.*;
 import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
@@ -32,13 +31,7 @@ public class CoreBlock extends StorageBlock{
 
     public UnitType unitType = UnitTypes.alpha;
 
-    public final int timerResupply = timers++;
-
-    public int ammoAmount = 5;
-    public float resupplyRate = 10f;
-    public float resupplyRange = 60f;
     public float captureInvicibility = 60f * 15f;
-    public Item resupplyItem = Items.copper;
 
     public CoreBlock(String name){
         super(name);
@@ -240,13 +233,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void updateTile(){
-
             iframes -= Time.delta;
-
-            //resupply nearby units
-            if(items.has(resupplyItem) && timer(timerResupply, resupplyRate) && ResupplyPoint.resupply(this, resupplyRange, ammoAmount, resupplyItem.color)){
-                items.remove(resupplyItem, 1);
-            }
         }
 
         @Override

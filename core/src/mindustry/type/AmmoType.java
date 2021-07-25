@@ -10,6 +10,7 @@ public class AmmoType extends Content{
     public String icon = Iconc.itemCopper + "";
     public Color color = Pal.ammo;
     public Color barColor = Pal.ammo;
+    public float range = 85f;
 
     public AmmoType(char icon, Color color){
         this.icon = icon + "";

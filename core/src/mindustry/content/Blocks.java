@@ -2003,17 +2003,6 @@ public class Blocks implements ContentList{
             acceptCoolant = true;
         }};
 
-        resupplyPoint = new ResupplyPoint("resupply-point"){{
-            requirements(Category.units, BuildVisibility.ammoOnly, with(Items.lead, 20, Items.copper, 15, Items.silicon, 15));
-
-            size = 2;
-            range = 80f;
-            itemCapacity = 20;
-            ammoAmount = 5;
-
-            consumes.item(Items.copper, 1);
-        }};
-
         //endregion
         //region payloads
 

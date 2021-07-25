@@ -18,8 +18,6 @@ public enum BlockFlag{
     rally,
     /** Block that stored power for resupply. */
     battery,
-    /** Block used for resupply. */
-    resupply,
     /** Any reactor block. */
     reactor,
     /** This flag is unused, and will be removed. */
@@ -33,5 +31,5 @@ public enum BlockFlag{
     public final static BlockFlag[] all = values();
 
     /** Values for logic only. Filters out some internal flags. */
-    public final static BlockFlag[] allLogic = {core, storage, generator, turret, factory, repair, rally, battery, resupply, reactor};
+    public final static BlockFlag[] allLogic = {core, storage, generator, turret, factory, repair, rally, battery, reactor};
 }

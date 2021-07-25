@@ -70,8 +70,10 @@ public class Block extends UnlockableContent{
     public boolean update;
     /** whether this block has health and can be destroyed */
     public boolean destructible;
-    /** whether unloaders work on this block*/
+    /** whether unloaders work on this block */
     public boolean unloadable = true;
+    /** whether units can resupply by taking items from this block */
+    public boolean allowResupply = false;
     /** whether this is solid */
     public boolean solid;
     /** whether this block CAN be solid. */

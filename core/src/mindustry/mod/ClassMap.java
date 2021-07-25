@@ -325,8 +325,6 @@ public class ClassMap{
         classes.put("ReconstructorBuild", mindustry.world.blocks.units.Reconstructor.ReconstructorBuild.class);
         classes.put("RepairPoint", mindustry.world.blocks.units.RepairPoint.class);
         classes.put("RepairPointBuild", mindustry.world.blocks.units.RepairPoint.RepairPointBuild.class);
-        classes.put("ResupplyPoint", mindustry.world.blocks.units.ResupplyPoint.class);
-        classes.put("ResupplyPointBuild", mindustry.world.blocks.units.ResupplyPoint.ResupplyPointBuild.class);
         classes.put("UnitBlock", mindustry.world.blocks.units.UnitBlock.class);
         classes.put("UnitBuild", mindustry.world.blocks.units.UnitBlock.UnitBuild.class);
         classes.put("UnitFactory", mindustry.world.blocks.units.UnitFactory.class);

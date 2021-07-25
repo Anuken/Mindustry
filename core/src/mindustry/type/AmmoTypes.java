@@ -1,12 +1,10 @@
 package mindustry.type;
 
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.*;
-import mindustry.world.meta.*;
 
 public class AmmoTypes implements ContentList{
     public static AmmoType
@@ -14,6 +12,8 @@ public class AmmoTypes implements ContentList{
     power,
     powerHigh,
     copper,
+    graphite,
+    coal,
     thorium;
 
     @Override
@@ -22,6 +22,8 @@ public class AmmoTypes implements ContentList{
         power = new PowerAmmoType(1000);
         powerHigh = new PowerAmmoType(2000);
         copper = new ItemAmmoType(Items.copper);
+        graphite = new ItemAmmoType(Items.graphite);
+        coal = new ItemAmmoType(Items.coal);
         thorium = new ItemAmmoType(Items.thorium);
     }
 
@@ -40,31 +42,29 @@ public class AmmoTypes implements ContentList{
 
         @Override
         public void resupply(Unit unit){
-            float range = unit.hitSize + 60f;
-            Tile closest = Vars.indexer.findClosestFlag(unit.x, unit.y, unit.team, BlockFlag.battery);
+            float range = unit.hitSize + this.range;
 
-            if(closest != null && closest.build != null && unit.within(closest.build, range) && closest.build.power != null){
-                var build = closest.build;
+            Building build = Units.closestBuilding(unit.team, unit.x, unit.y, range, u -> u.block.hasPower && u.block.consumes.getPower().buffered);
 
-                if(build.block.consumes.hasPower() && build.block.consumes.getPower().buffered){
-                    float amount = closest.build.power.status * build.block.consumes.getPower().capacity;
-                    float powerPerAmmo = totalPower / unit.type.ammoCapacity;
-                    float ammoRequired = unit.type.ammoCapacity - unit.ammo;
-                    float powerRequired = ammoRequired * powerPerAmmo;
-                    float powerTaken = Math.min(amount, powerRequired);
+            if(build != null){
+                float amount = build.power.status * build.block.consumes.getPower().capacity;
+                float powerPerAmmo = totalPower / unit.type.ammoCapacity;
+                float ammoRequired = unit.type.ammoCapacity - unit.ammo;
+                float powerRequired = ammoRequired * powerPerAmmo;
+                float powerTaken = Math.min(amount, powerRequired);
 
-                    if(powerTaken > 1){
-                        closest.build.power.status -= powerTaken / build.block.consumes.getPower().capacity;
-                        unit.ammo += powerTaken / powerPerAmmo;
+                if(powerTaken > 1){
+                    build.power.status -= powerTaken / build.block.consumes.getPower().capacity;
+                    unit.ammo += powerTaken / powerPerAmmo;
 
-                        Fx.itemTransfer.at(build.x, build.y, Math.max(powerTaken / 100f, 1f), Pal.power, unit);
-                    }
+                    Fx.itemTransfer.at(build.x, build.y, Math.max(powerTaken / 100f, 1f), Pal.power, unit);
                 }
             }
         }
     }
 
     public static class ItemAmmoType extends AmmoType{
+        public int ammoPerItem = 15;
         public Item item;
 
         public ItemAmmoType(Item item){
@@ -73,6 +73,22 @@ public class AmmoTypes implements ContentList{
         }
 
         public ItemAmmoType(){
+        }
+
+        @Override
+        public void resupply(Unit unit){
+            //do not resupply when it would waste resources
+            if(unit.type.ammoCapacity - unit.ammo < ammoPerItem) return;
+
+            float range = unit.hitSize + this.range;
+
+            Building build = Units.closestBuilding(unit.team, unit.x, unit.y, range, u -> u.block.allowResupply && u.items.has(item));
+
+            if(build != null){
+                Fx.itemTransfer.at(build.x, build.y, ammoPerItem / 2f, item.color, unit);
+                unit.ammo = Math.min(unit.ammo + ammoPerItem, unit.type.ammoCapacity);
+                build.items.remove(item, 1);
+            }
         }
 
         @Override

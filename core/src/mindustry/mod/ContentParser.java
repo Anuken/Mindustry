@@ -29,6 +29,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
+import mindustry.type.AmmoTypes.*;
 import mindustry.type.weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.units.*;
@@ -92,6 +93,16 @@ public class ContentParser{
             var bc = resolve(data.getString("type", ""), BasicBulletType.class);
             data.remove("type");
             BulletType result = make(bc);
+            readFields(result, data);
+            return result;
+        });
+        put(AmmoType.class, (type, data) -> {
+            if(data.isString()){
+                return field(AmmoTypes.class, data);
+            }
+            var bc = resolve(data.getString("type", ""), ItemAmmoType.class);
+            data.remove("type");
+            AmmoType result = make(bc);
             readFields(result, data);
             return result;
         });
@@ -346,6 +357,16 @@ public class ContentParser{
             if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
 
             return new SectorPreset(name, locate(ContentType.planet, value.getString("planet", "serpulo")), value.getInt("sector"));
+        },
+        ContentType.ammo, (TypeParser<AmmoType>)(mod, name, value) -> {
+            if(value.isString()){
+                return (AmmoType)field(AmmoTypes.class, value.asString());
+            }
+
+            AmmoType item = make(resolve(value.getString("type", null), ItemAmmoType.class));
+            currentContent = item;
+            read(() -> readFields(item, value));
+            return item;
         }
     );
 
@@ -746,7 +767,7 @@ public class ContentParser{
     /** Tries to resolve a class from the class type map. */
     <T> Class<T> resolve(String base, Class<T> def){
         //no base class specified
-        if(base.isEmpty() && def != null) return def;
+        if((base == null || base.isEmpty()) && def != null) return def;
 
         //return mapped class if found in the global map
         var out = ClassMap.classes.get(!base.isEmpty() && Character.isLowerCase(base.charAt(0)) ? Strings.capitalize(base) : base);

@@ -22,6 +22,7 @@ public class Units{
     private static float cdist;
     private static boolean boolResult;
     private static int intResult;
+    private static Building buildResult;
 
     @Remote(called = Loc.server)
     public static void unitCapDeath(Unit unit){
@@ -155,6 +156,26 @@ public class Units{
         if(team == Team.derelict) return null;
 
         return indexer.findEnemyTile(team, x, y, range, pred);
+    }
+
+    /** @return the closest building of the provided team that matches the predicate. */
+    public static @Nullable Building closestBuilding(Team team, float wx, float wy, float range, Boolf<Building> pred){
+        buildResult = null;
+        cdist = 0f;
+
+        var buildings = team.data().buildings;
+        if(buildings == null) return null;
+        buildings.intersect(wx - range, wy - range, range*2f, range*2f, b -> {
+            if(pred.get(b)){
+                float dst = b.dst(wx, wy) - b.hitSize()/2f;
+                if(dst <= range && (buildResult == null || dst <= cdist)){
+                    cdist = dst;
+                    buildResult = b;
+                }
+            }
+        });
+
+        return buildResult;
     }
 
     /** Iterates through all buildings in a range. */
