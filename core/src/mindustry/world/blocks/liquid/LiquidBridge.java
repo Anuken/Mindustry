@@ -1,7 +1,6 @@
 package mindustry.world.blocks.liquid;
 
 import mindustry.gen.*;
-import mindustry.type.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.meta.*;
 
@@ -20,7 +19,7 @@ public class LiquidBridge extends ItemBridge{
 
         @Override
         public void updateTransport(Building other){
-            if(warmup >= 0.5f){
+            if(warmup >= 0.25f){
                 moved |= moveLiquid(other, liquids.current()) > 0.05f;
             }
         }
@@ -28,11 +27,6 @@ public class LiquidBridge extends ItemBridge{
         @Override
         public void doDump(){
             dumpLiquid(liquids.current(), 1f);
-        }
-
-        @Override
-        public boolean acceptItem(Building source, Item item){
-            return false;
         }
     }
 }

@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.struct.IntSet.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -177,8 +176,7 @@ public class ItemBridge extends Block{
 
     public class ItemBridgeBuild extends Building{
         public int link = -1;
-        //TODO awful
-        public IntSet incoming = new IntSet();
+        public IntSeq incoming = new IntSeq(false, 4);
         public float warmup;
         public float time;
         public boolean wasMoved, moved;
@@ -278,13 +276,15 @@ public class ItemBridge extends Block{
         }
 
         public void checkIncoming(){
-            IntSetIterator it = incoming.iterator();
-            while(it.hasNext){
-                int i = it.next();
+            int idx = 0;
+            while(idx < incoming.size){
+                int i = incoming.items[idx];
                 Tile other = world.tile(i);
                 if(!linkValid(tile, other, false) || ((ItemBridgeBuild)other.build).link != tile.pos()){
-                    it.remove();
+                    incoming.removeIndex(idx);
+                    idx --;
                 }
+                idx ++;
             }
         }
 
@@ -304,7 +304,11 @@ public class ItemBridge extends Block{
                 doDump();
                 warmup = 0f;
             }else{
-                ((ItemBridgeBuild)other.build).incoming.add(tile.pos());
+                var inc = ((ItemBridgeBuild)other.build).incoming;
+                int pos = tile.pos();
+                if(!inc.contains(pos)){
+                    inc.add(pos);
+                }
 
                 warmup = Mathf.approachDelta(warmup, efficiency(), 1f / 30f);
                 updateTransport(other.build);
@@ -382,22 +386,7 @@ public class ItemBridge extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            if(team != source.team) return false;
-
-            Tile other = world.tile(link);
-
-            if(items.total() >= itemCapacity) return false;
-
-            if(linked(source)) return true;
-
-            if(linkValid(tile, other)){
-                int rel = relativeTo(other);
-                int rel2 = relativeTo(Edges.getFacingEdge(source, this));
-
-                return rel != rel2;
-            }
-
-            return false;
+            return hasItems && team == source.team && items.total() < itemCapacity && checkAccept(source, world.tile(link));
         }
 
         @Override
@@ -407,16 +396,17 @@ public class ItemBridge extends Block{
 
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
-            if(team != source.team || !hasLiquids) return false;
+            return
+                hasLiquids && team == source.team &&
+                (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f) &&
+                checkAccept(source, world.tile(link));
+        }
 
-            Tile other = world.tile(link);
-
-            if(!(liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f)) return false;
-
+        protected boolean checkAccept(Building source, Tile other){
             if(linked(source)) return true;
 
             if(linkValid(tile, other)){
-                int rel = relativeTo(other.x, other.y);
+                int rel = relativeTo(other);
                 int rel2 = relativeTo(Edges.getFacingEdge(source, this));
 
                 return rel != rel2;
@@ -440,10 +430,8 @@ public class ItemBridge extends Block{
                 Tile edge = Edges.getFacingEdge(to.tile, tile);
                 int i = relativeTo(edge.x, edge.y);
 
-                IntSetIterator it = incoming.iterator();
-
-                while(it.hasNext){
-                    int v = it.next();
+                for(int j = 0; j < incoming.size; j++){
+                    int v = incoming.items[j];
                     if(relativeTo(Point2.x(v), Point2.y(v)) == i){
                         return false;
                     }
@@ -469,7 +457,7 @@ public class ItemBridge extends Block{
 
         @Override
         public byte version(){
-            return 1; //TODO write cycleSpeed, 1
+            return 1;
         }
 
         @Override
@@ -479,10 +467,8 @@ public class ItemBridge extends Block{
             write.f(warmup);
             write.b(incoming.size);
 
-            IntSetIterator it = incoming.iterator();
-
-            while(it.hasNext){
-                write.i(it.next());
+            for(int i = 0; i < incoming.size; i++){
+                write.i(incoming.items[i]);
             }
 
             write.bool(wasMoved || moved);
