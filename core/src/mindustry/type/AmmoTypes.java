@@ -44,7 +44,7 @@ public class AmmoTypes implements ContentList{
         public void resupply(Unit unit){
             float range = unit.hitSize + this.range;
 
-            Building build = Units.closestBuilding(unit.team, unit.x, unit.y, range, u -> u.block.hasPower && u.block.consumes.getPower().buffered);
+            Building build = Units.closestBuilding(unit.team, unit.x, unit.y, range, u -> u.block.consumes.hasPower() && u.block.consumes.getPower().buffered);
 
             if(build != null){
                 float amount = build.power.status * build.block.consumes.getPower().capacity;
