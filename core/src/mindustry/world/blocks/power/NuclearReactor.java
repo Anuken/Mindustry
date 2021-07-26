@@ -30,7 +30,11 @@ public class NuclearReactor extends PowerGenerator{
     public Color lightColor = Color.valueOf("7f19ea");
     public Color coolColor = new Color(1, 1, 1, 0f);
     public Color hotColor = Color.valueOf("ff9575a3");
-    public Effect explodeEffect = Fx.reactorExplosion;
+    public Effect explodeEffect = Fx.reactorExplosion; 
+    public Attribute attribute = Attribute.heat;
+    public float baseEfficiency = 1f;
+    public float boostScale = 0.5f;
+    public float maxBoost = 1f;
     /** ticks to consume 1 fuel */
     public float itemDuration = 120;
     /** heating per frame * fullness */
@@ -59,9 +63,16 @@ public class NuclearReactor extends PowerGenerator{
     }
 
     @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        drawPlaceText(Core.bundle.format("bar.efficiency",
+        (int)((baseEfficiency + Math.min(maxBoost, boostScale * sumAttribute(attribute, x, y) / 9)) * 100f)), x, y, valid);
+    }
+
+    @Override
     public void setStats(){
         super.setStats();
 
+        stats.add(Stat.affinities, attribute, boostScale);
         if(hasItems){
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
@@ -75,6 +86,19 @@ public class NuclearReactor extends PowerGenerator{
 
     public class NuclearReactorBuild extends GeneratorBuild{
         public float heat;
+        public float attrsum;
+
+        @Override
+        public float efficiency(){
+            return (baseEfficiency + Math.min(maxBoost, boostScale * attrsum) + attribute.env()) * super.efficiency();
+        }
+
+        @Override
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
+
+            attrsum = sumAttribute(attribute, tile.x, tile.y) / 9;
+        }
 
         @Override
         public void updateTile(){
@@ -83,12 +107,12 @@ public class NuclearReactor extends PowerGenerator{
 
             int fuel = items.get(item);
             float fullness = (float)fuel / itemCapacity;
-            productionEfficiency = fullness;
+            productionEfficiency = fullness * efficiency();
 
             if(fuel > 0 && enabled){
-                heat += fullness * heating * Math.min(delta(), 4f);
+                heat += fullness * heating * Math.min(delta(), 4f) * efficiency();
 
-                if(timer(timerFuel, itemDuration / timeScale)){
+                if(timer(timerFuel, (itemDuration + 60f - efficiency() * 60f) / timeScale)){
                     consume();
                 }
             }else{
@@ -99,8 +123,8 @@ public class NuclearReactor extends PowerGenerator{
 
             if(heat > 0){
                 float maxUsed = Math.min(liquids.get(liquid), heat / coolantPower);
-                heat -= maxUsed * coolantPower;
-                liquids.remove(liquid, maxUsed);
+                liquids.remove(liquid, maxUsed * (heat * 0.5f + 0.5f) * 0.4f);
+                heat -= (maxUsed * coolantPower * 0.4f + (1.1f - attrsum) * 0.001f) * (heat * 0.5f + 0.5f);
             }
 
             if(heat > smokeThreshold){
@@ -182,3 +206,4 @@ public class NuclearReactor extends PowerGenerator{
         }
     }
 }
+
