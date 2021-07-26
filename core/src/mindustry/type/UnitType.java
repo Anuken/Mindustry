@@ -384,9 +384,9 @@ public class UnitType extends UnlockableContent{
 
         //dynamically create ammo capacity based on firing rate
         if(ammoCapacity < 0){
-            float shotsPerSecond = weapons.sumf(w -> 60f / w.reload);
+            float shotsPerSecond = weapons.sumf(w -> w.useAmmo ? 60f / w.reload : 0f);
             //duration of continuous fire without reload
-            float targetSeconds = 30;
+            float targetSeconds = 35;
 
             ammoCapacity = Math.max(1, (int)(shotsPerSecond * targetSeconds));
         }

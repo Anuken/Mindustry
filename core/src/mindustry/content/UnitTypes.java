@@ -2055,6 +2055,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 1.4f;
             rotateShooting = false;
             ammoType = AmmoTypes.powerHigh;
+            ammoCapacity = 40;
 
             //clip size is massive due to energy field
             clipSize = 250f;
