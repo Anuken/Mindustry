@@ -1862,6 +1862,13 @@ public class Fx{
         Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
     }),
 
+    coreLandDust = new Effect(100f, e -> {
+        color(e.color, e.fout(0.1f));
+        rand.setSeed(e.id);
+        Tmp.v1.trns(e.rotation, e.finpow() * 90f * rand.random(0.2f, 1f));
+        Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 8f * rand.random(0.6f, 1f) * e.fout(0.2f));
+    }).layer(Layer.block + 1f),
+
     unitShieldBreak = new Effect(35, e -> {
         if(!(e.data instanceof Unitc)) return;
 
@@ -1955,8 +1962,5 @@ public class Fx{
         }
 
         Lines.endLine();
-    }).followParent(false),
-
-    coreLand = new Effect(120f, e -> {
-    });
+    }).followParent(false);
 }

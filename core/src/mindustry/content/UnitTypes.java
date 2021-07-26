@@ -421,14 +421,14 @@ public class UnitTypes implements ContentList{
             mechStepShake = 0.15f;
             ammoType = AmmoTypes.powerHigh;
 
-            speed = 0.39f;
+            speed = 0.4f;
             boostMultiplier = 2.2f;
             engineOffset = 12f;
             engineSize = 6f;
             lowAltitude = true;
             riseSpeed = 0.02f;
 
-            health = 7500f;
+            health = 8000f;
             armor = 9f;
             canBoost = true;
             landShake = 4f;
@@ -453,8 +453,8 @@ public class UnitTypes implements ContentList{
                 cooldownTime = 200f;
 
                 bullet = new ContinuousLaserBulletType(){{
-                    damage = 30f;
-                    length = 175f;
+                    damage = 32f;
+                    length = 180f;
                     hitEffect = Fx.hitMeltHeal;
                     drawSize = 420f;
                     lifetime = 160f;

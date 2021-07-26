@@ -36,7 +36,6 @@ import java.text.*;
 import java.util.*;
 
 import static arc.Core.*;
-import static mindustry.Vars.net;
 import static mindustry.Vars.*;
 
 /**
@@ -195,7 +194,7 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.run(Trigger.newGame, () -> {
-            Building core = player.bestCore();
+            var core = player.bestCore();
 
             if(core == null) return;
 
@@ -203,6 +202,8 @@ public class Control implements ApplicationListener, Loadable{
             player.set(core);
 
             if(showLandAnimation){
+                //delay player respawn so animation can play.
+                player.deathTimer = -70f;
                 //TODO this sounds pretty bad due to conflict
                 if(settings.getInt("musicvol") > 0){
                     Musics.land.stop();
@@ -211,14 +212,14 @@ public class Control implements ApplicationListener, Loadable{
                 }
 
                 app.post(() -> ui.hudfrag.showLand());
-                renderer.zoomIn(Fx.coreLand.lifetime);
-                app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block));
+                renderer.showLaunch();
 
-                Time.run(Fx.coreLand.lifetime, () -> {
+                Time.run(coreLandDuration, () -> {
                     Fx.launch.at(core);
                     Effect.shake(5f, 5f, core);
+                    core.thrusterTime = 1f;
 
-                    if(state.isCampaign()){
+                    if(state.isCampaign() && Vars.showSectorLandInfo){
                         ui.announce("[accent]" + state.rules.sector.name() + "\n" +
                         (state.rules.sector.info.resources.any() ? "[lightgray]" + bundle.get("sectors.resources") + "[white] " +
                         state.rules.sector.info.resources.toString(" ", u -> u.emoji()) : ""), 5);
@@ -328,6 +329,7 @@ public class Control implements ApplicationListener, Loadable{
                     slot.load();
                     slot.setAutosave(true);
                     state.rules.sector = sector;
+                    state.rules.cloudColor = sector.planet.landCloudColor;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
                     if(state.rules.defaultTeam.cores().isEmpty() || hadNoCore){

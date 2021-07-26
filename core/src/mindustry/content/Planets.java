@@ -2,6 +2,7 @@ package mindustry.content;
 
 import arc.graphics.*;
 import mindustry.ctype.*;
+import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.maps.planet.*;
 import mindustry.type.*;
@@ -38,6 +39,7 @@ public class Planets implements ContentList{
             atmosphereRadOut = 0.3f;
             startSector = 15;
             alwaysUnlocked = true;
+            landCloudColor = Pal.spore.cpy().a(0.5f);
         }};
     }
 }

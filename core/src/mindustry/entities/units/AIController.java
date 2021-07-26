@@ -6,6 +6,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -154,6 +155,7 @@ public class AIController implements UnitController{
     }
 
     protected Teamc targetFlag(float x, float y, BlockFlag flag, boolean enemy){
+        if(unit.team == Team.derelict) return null;
         Tile target = Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getAllied(unit.team, flag));
         return target == null ? null : target.build;
     }
