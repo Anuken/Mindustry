@@ -358,7 +358,7 @@ public class Renderer implements ApplicationListener{
 
                 Tmp.v1.setLength((block.size * tilesize/2f + 1f)*scl + strength*0.5f + offset);
                 Draw.color(Color.white);
-                Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, 3f * strength);
+                Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, 3.5f * strength);
             }
 
             drawThrusters(block, x, y, rotation, frame);
