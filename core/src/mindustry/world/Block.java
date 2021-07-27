@@ -793,6 +793,11 @@ public class Block extends UnlockableContent{
         }
 
         clipSize = Math.max(clipSize, size * tilesize);
+        
+        //only kept to ensure compatibility with v6 mods.
+        if(expanded){
+            clipSize += tilesize * 10f;
+        }
 
         if(emitLight){
             clipSize = Math.max(clipSize, lightRadius * 2f);
