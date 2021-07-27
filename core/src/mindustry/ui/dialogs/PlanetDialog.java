@@ -913,6 +913,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }else{
                 CoreBlock block = from.info.bestCoreType instanceof CoreBlock b ? b : (CoreBlock)Blocks.coreShard;
 
+                //TODO load launchFrom sector right before launching so animation is correct
                 loadouts.show(block, from, () -> {
                     from.removeItems(universe.getLastLoadout().requirements());
                     from.removeItems(universe.getLaunchResources());
@@ -923,7 +924,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     //TODO
                     renderer.showLaunch();
                     hide();
-                    Time.runTask(launchDuration, () -> control.playSector(from, sector));
+                    //run with less delay, as the loading animation is delayed by several frames
+                    Time.runTask(coreLandDuration - 8f, () -> control.playSector(from, sector));
                 });
             }
         }else if(mode == select){

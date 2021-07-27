@@ -103,8 +103,6 @@ public class Vars implements Loadable{
     public static final float invasionGracePeriod = 20;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.1f;
-    /** launch animation duration */
-    public static final float launchDuration = 140f;
     /** land animation duration */
     public static final float coreLandDuration = 150f;
     /** size of tiles in units */

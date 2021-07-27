@@ -31,7 +31,7 @@ public class Renderer implements ApplicationListener{
     private static final float cloudScaling = 1700f, cfinScl = -2f, cfinOffset = 0.3f, calphaFinOffset = 0.25f;
     private static final float[] cloudAlphas = {0, 0.5f, 1f, 0.1f, 0, 0f};
     private static final float cloudAlpha = 0.81f;
-    private static final float[] thrusterSize = {0f, 0f, 0f, 0f, 0.3f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 0f};
+    private static final float[] thrusterSizes = {0f, 0f, 0f, 0f, 0.3f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 0f};
     private static final Interp landInterp = Interp.pow3;
 
     public final BlockRenderer blocks = new BlockRenderer();
@@ -70,7 +70,7 @@ public class Renderer implements ApplicationListener{
     //current duration of screen shake
     shakeTime;
     //for landTime > 0: if true, core is currently *launching*, otherwise landing.
-    private boolean isLaunching;
+    private boolean launching;
     private Vec2 camShakeOffset = new Vec2();
 
     public Renderer(){
@@ -129,7 +129,9 @@ public class Renderer implements ApplicationListener{
             if(!state.isPaused()){
                 landTime -= Time.delta;
             }
-            camerascale = landInterp.apply(minZoomScl, Scl.scl(4f), 1f - landTime / coreLandDuration);
+            float fin = landTime / coreLandDuration;
+            if(!launching) fin = 1f - fin;
+            camerascale = landInterp.apply(minZoomScl, Scl.scl(4f), fin);
             weatherAlpha = 0f;
 
             //snap camera to cutscene core regardless of player input
@@ -312,7 +314,8 @@ public class Renderer implements ApplicationListener{
     }
 
     void updateLandParticles(){
-        float tsize = Mathf.sample(thrusterSize, (landTime + 35f) / coreLandDuration);
+        float time = launching ? coreLandDuration - landTime : landTime;
+        float tsize = Mathf.sample(thrusterSizes, (time + 35f) / coreLandDuration);
 
         landPTimer += tsize * Time.delta;
         if(landCore != null && landPTimer >= 1f){
@@ -331,9 +334,12 @@ public class Renderer implements ApplicationListener{
         var clouds = assets.get("sprites/clouds.png", Texture.class);
         if(landTime > 0 && build != null){
             float fout = landTime / coreLandDuration;
+
+            if(launching) fout = 1f - fout;
+
             float fin = 1f - fout;
 
-            //core
+            //draw core
             var block = (CoreBlock)build.block;
             TextureRegion reg = block.fullIcon;
             float scl = Scl.scl(4f) / camerascale;
@@ -341,7 +347,15 @@ public class Renderer implements ApplicationListener{
             float s = reg.width * Draw.scl * scl * 3.6f * Interp.pow2Out.apply(fout);
             float rotation = Interp.pow2In.apply(fout) * 135f, x = build.x + Mathf.range(shake), y = build.y + Mathf.range(shake);
             float thrustOpen = 0.25f;
-            float frame = fin >= thrustOpen ? 1f : fin / thrustOpen;
+            float thrusterFrame = fin >= thrustOpen ? 1f : fin / thrustOpen;
+            float thrusterSize = Mathf.sample(thrusterSizes, fin);
+
+            //when launching, thrusters stay out the entire time.
+            if(launching){
+                Interp i = Interp.pow2Out;
+                thrusterFrame = i.apply(Mathf.clamp(fout*13f));
+                thrusterSize = i.apply(Mathf.clamp(fout*9f));
+            }
 
             Draw.color(Pal.lightTrail);
             //TODO spikier heat
@@ -351,20 +365,20 @@ public class Renderer implements ApplicationListener{
 
             float pfin = Interp.pow3Out.apply(fin), pf = Interp.pow2In.apply(fout);
 
-            //particles
+            //draw particles
             Angles.randLenVectors(1, pfin, 100, 800f * scl * pfin, (ax, ay, ffin, ffout) -> {
                 Lines.stroke(scl * ffin * pf * 3f);
                 Lines.lineAngle(build.x + ax, build.y + ay, Mathf.angle(ax, ay), (ffin * 20 + 1f) * scl);
             });
 
             Draw.color();
-            Draw.mixcol(Color.white, Interp.pow2In.apply(fout));
+            Draw.mixcol(Color.white, Interp.pow5In.apply(fout));
             Draw.scl(scl);
 
             Draw.alpha(1f);
 
-            //thruster flame
-            float strength = (1f + (block.size - 3)/2.5f) * scl * Mathf.sample(thrusterSize, fin) * (0.95f + Mathf.absin(2f, 0.1f));
+            //draw thruster flame
+            float strength = (1f + (block.size - 3)/2.5f) * scl * thrusterSize * (0.95f + Mathf.absin(2f, 0.1f));
             float offset = (block.size - 3) * 3f * scl;
 
             for(int i = 0; i < 4; i++){
@@ -379,12 +393,12 @@ public class Renderer implements ApplicationListener{
                 Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, 3.5f * strength);
             }
 
-            drawThrusters(block, x, y, rotation, frame);
+            drawThrusters(block, x, y, rotation, thrusterFrame);
 
             Drawf.spinSprite(block.region, x, y, rotation);
 
-            Draw.alpha(Interp.pow4In.apply(frame));
-            drawThrusters(block, x, y, rotation, frame);
+            Draw.alpha(Interp.pow4In.apply(thrusterFrame));
+            drawThrusters(block, x, y, rotation, thrusterFrame);
             Draw.alpha(1f);
 
             Drawf.spinSprite(block.teamRegions[build.team.id], x, y, rotation);
@@ -393,8 +407,8 @@ public class Renderer implements ApplicationListener{
 
             Draw.reset();
 
+            //draw clouds
             if(state.rules.cloudColor.a > 0.0001f){
-                //clouds
                 float scaling = cloudScaling;
                 float sscl = Math.max(1f + Mathf.clamp(fin + cfinOffset)* cfinScl, 0f) * camerascale;
 
@@ -472,16 +486,18 @@ public class Renderer implements ApplicationListener{
     }
 
     public void showLanding(){
-        isLaunching = false;
+        launching = false;
         camerascale = minZoomScl;
         landTime = coreLandDuration;
         cloudSeed = Mathf.random(1f);
     }
 
     public void showLaunch(){
-        isLaunching = true;
+        Vars.ui.hudfrag.showLaunch();
+        launching = true;
         landCore = player.team().core();
         cloudSeed = Mathf.random(1f);
+        landTime = coreLandDuration;
         //TODO other stuff.
     }
 

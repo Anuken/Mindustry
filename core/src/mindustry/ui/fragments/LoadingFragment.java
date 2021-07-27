@@ -45,6 +45,10 @@ public class LoadingFragment extends Fragment{
         });
     }
 
+    public void toFront(){
+        table.toFront();
+    }
+
     public void setProgress(Floatp progress){
         bar.reset(0f);
         bar.visible = true;
