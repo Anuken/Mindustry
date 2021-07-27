@@ -32,6 +32,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.storage.*;
 
+import static arc.Core.*;
 import static mindustry.Vars.*;
 import static mindustry.graphics.g3d.PlanetRenderer.*;
 import static mindustry.ui.dialogs.PlanetDialog.Mode.*;
@@ -913,19 +914,38 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }else{
                 CoreBlock block = from.info.bestCoreType instanceof CoreBlock b ? b : (CoreBlock)Blocks.coreShard;
 
-                //TODO load launchFrom sector right before launching so animation is correct
                 loadouts.show(block, from, () -> {
+                    var schemCore = universe.getLastLoadout().findCore();
                     from.removeItems(universe.getLastLoadout().requirements());
                     from.removeItems(universe.getLaunchResources());
 
-                    launching = true;
-                    zoom = 0.5f;
+                    if(settings.getBool("skipcoreanimation")){
+                        //just... go there
+                        control.playSector(from, sector);
+                        //hide only after load screen is shown
+                        Time.runTask(8f, this::hide);
+                    }else{
+                        //hide immediately so launch sector is visible
+                        hide();
 
-                    //TODO
-                    renderer.showLaunch();
-                    hide();
-                    //run with less delay, as the loading animation is delayed by several frames
-                    Time.runTask(coreLandDuration - 8f, () -> control.playSector(from, sector));
+                        //allow planet dialog to finish hiding before actually launching
+                        Time.runTask(5f, () -> {
+                            Runnable doLaunch = () -> {
+                                renderer.showLaunch(schemCore);
+                                //run with less delay, as the loading animation is delayed by several frames
+                                Time.runTask(coreLandDuration - 8f, () -> control.playSector(from, sector));
+                            };
+
+                            //load launchFrom sector right before launching so animation is correct
+                            if(!from.isBeingPlayed()){
+                                //run *after* the loading animation is done
+                                Time.runTask(9f, doLaunch);
+                                control.playSector(from);
+                            }else{
+                                doLaunch.run();
+                            }
+                        });
+                    }
                 });
             }
         }else if(mode == select){

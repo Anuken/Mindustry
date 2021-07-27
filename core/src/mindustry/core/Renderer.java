@@ -51,6 +51,7 @@ public class Renderer implements ApplicationListener{
     public TextureRegion[] bubbles = new TextureRegion[16], splashes = new TextureRegion[12];
 
     private @Nullable CoreBuild landCore;
+    private @Nullable CoreBlock launchCoreType;
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
     private float
     //seed for cloud visuals, 0-1
@@ -340,7 +341,7 @@ public class Renderer implements ApplicationListener{
             float fin = 1f - fout;
 
             //draw core
-            var block = (CoreBlock)build.block;
+            var block = launching && launchCoreType != null ? launchCoreType : (CoreBlock)build.block;
             TextureRegion reg = block.fullIcon;
             float scl = Scl.scl(4f) / camerascale;
             float shake = 0f;
@@ -373,6 +374,15 @@ public class Renderer implements ApplicationListener{
 
             Draw.color();
             Draw.mixcol(Color.white, Interp.pow5In.apply(fout));
+
+            //accent tint indicating that the core was just constructed
+            if(launching){
+                float f = Mathf.clamp(1f - fout * 12f);
+                if(f > 0.001f){
+                    Draw.mixcol(Pal.accent, f);
+                }
+            }
+
             Draw.scl(scl);
 
             Draw.alpha(1f);
@@ -492,13 +502,16 @@ public class Renderer implements ApplicationListener{
         cloudSeed = Mathf.random(1f);
     }
 
-    public void showLaunch(){
+    public void showLaunch(CoreBlock coreType){
         Vars.ui.hudfrag.showLaunch();
+        launchCoreType = coreType;
         launching = true;
         landCore = player.team().core();
         cloudSeed = Mathf.random(1f);
         landTime = coreLandDuration;
-        //TODO other stuff.
+        if(landCore != null){
+            Fx.coreLaunchConstruct.at(landCore.x, landCore.y, coreType.size);
+        }
     }
 
     public void takeMapScreenshot(){

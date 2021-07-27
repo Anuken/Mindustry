@@ -201,7 +201,7 @@ public class Control implements ApplicationListener, Loadable{
             camera.position.set(core);
             player.set(core);
 
-            if(showLandAnimation){
+            if(!settings.getBool("skipcoreanimation")){
                 //delay player respawn so animation can play.
                 player.deathTimer = -80f;
                 //TODO this sounds pretty bad due to conflict
@@ -542,6 +542,11 @@ public class Control implements ApplicationListener, Loadable{
             var core = state.rules.defaultTeam.core();
             if(!net.client() && core != null && state.isCampaign()){
                 core.items.each((i, a) -> i.unlock());
+            }
+
+            //cannot launch while paused
+            if(state.is(State.paused) && renderer.isCutscene()){
+                state.set(State.playing);
             }
 
             if(Core.input.keyTap(Binding.pause) && !renderer.isCutscene() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){

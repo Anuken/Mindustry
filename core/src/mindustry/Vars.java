@@ -103,8 +103,8 @@ public class Vars implements Loadable{
     public static final float invasionGracePeriod = 20;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.1f;
-    /** land animation duration */
-    public static final float coreLandDuration = 150f;
+    /** land/launch animation duration */
+    public static final float coreLandDuration = 160f;
     /** size of tiles in units */
     public static final int tilesize = 8;
     /** size of one tile payload (^2) */
@@ -142,10 +142,6 @@ public class Vars implements Loadable{
     public static boolean clientLoaded = false;
     /** max GL texture size */
     public static int maxTextureSize = 2048;
-    /** Whether to show the core landing animation. */
-    public static boolean showLandAnimation = true;
-    /** Whether to show the campaign core launch animation. */
-    public static boolean showLaunchAnimation = true;
     /** Whether to show sector info upon landing. */
     public static boolean showSectorLandInfo = true;
     /** Whether to check for memory use before taking screenshots. */
