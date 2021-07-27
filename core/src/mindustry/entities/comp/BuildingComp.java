@@ -1102,7 +1102,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             table.row();
             table.table(this::displayConsumption).growX();
 
-            boolean displayFlow = (block.category == Category.distribution || block.category == Category.liquid) && Core.settings.getBool("flow") && block.displayFlow;
+            boolean displayFlow = (block.category == Category.distribution || block.category == Category.liquid) && block.displayFlow;
 
             if(displayFlow){
                 String ps = " " + StatUnit.perSecond.localized();

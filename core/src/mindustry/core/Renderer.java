@@ -375,23 +375,25 @@ public class Renderer implements ApplicationListener{
 
             Draw.reset();
 
-            //clouds
-            float scaling = cloudScaling;
-            float sscl = Math.max(1f + Mathf.clamp(fin + cfinOffset)* cfinScl, 0f) * landscale;
+            if(state.rules.cloudColor.a > 0.0001f){
+                //clouds
+                float scaling = cloudScaling;
+                float sscl = Math.max(1f + Mathf.clamp(fin + cfinOffset)* cfinScl, 0f) * landscale;
 
-            Tmp.tr1.set(clouds);
-            Tmp.tr1.set(
-            (camera.position.x - camera.width/2f * sscl) / scaling,
-            (camera.position.y - camera.height/2f * sscl) / scaling,
-            (camera.position.x + camera.width/2f * sscl) / scaling,
-            (camera.position.y + camera.height/2f * sscl) / scaling);
+                Tmp.tr1.set(clouds);
+                Tmp.tr1.set(
+                (camera.position.x - camera.width/2f * sscl) / scaling,
+                (camera.position.y - camera.height/2f * sscl) / scaling,
+                (camera.position.x + camera.width/2f * sscl) / scaling,
+                (camera.position.y + camera.height/2f * sscl) / scaling);
 
-            Tmp.tr1.scroll(10f * cloudSeed, 10f * cloudSeed);
+                Tmp.tr1.scroll(10f * cloudSeed, 10f * cloudSeed);
 
-            Draw.alpha(Mathf.sample(cloudAlphas, fin + calphaFinOffset) * cloudAlpha);
-            Draw.mixcol(state.rules.cloudColor, state.rules.cloudColor.a);
-            Draw.rect(Tmp.tr1, camera.position.x, camera.position.y, camera.width, camera.height);
-            Draw.reset();
+                Draw.alpha(Mathf.sample(cloudAlphas, fin + calphaFinOffset) * cloudAlpha);
+                Draw.mixcol(state.rules.cloudColor, state.rules.cloudColor.a);
+                Draw.rect(Tmp.tr1, camera.position.x, camera.position.y, camera.width, camera.height);
+                Draw.reset();
+            }
         }
     }
 
