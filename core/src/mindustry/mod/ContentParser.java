@@ -29,7 +29,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
-import mindustry.type.AmmoTypes.*;
+import mindustry.type.ammo.*;
 import mindustry.type.weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.units.*;
@@ -97,9 +97,12 @@ public class ContentParser{
             return result;
         });
         put(AmmoType.class, (type, data) -> {
-            if(data.isString()){
-                return field(AmmoTypes.class, data);
-            }
+            //string -> item
+            //if liquid ammo support is added, this should scan for liquids as well
+            if(data.isString()) return find(ContentType.item, data.asString());
+            //number -> power
+            if(data.isNumber()) return new PowerAmmoType(data.asFloat());
+
             var bc = resolve(data.getString("type", ""), ItemAmmoType.class);
             data.remove("type");
             AmmoType result = make(bc);
@@ -357,16 +360,6 @@ public class ContentParser{
             if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
 
             return new SectorPreset(name, locate(ContentType.planet, value.getString("planet", "serpulo")), value.getInt("sector"));
-        },
-        ContentType.ammo, (TypeParser<AmmoType>)(mod, name, value) -> {
-            if(value.isString()){
-                return (AmmoType)field(AmmoTypes.class, value.asString());
-            }
-
-            AmmoType item = make(resolve(value.getString("type", null), ItemAmmoType.class));
-            currentContent = item;
-            read(() -> readFields(item, value));
-            return item;
         }
     );
 

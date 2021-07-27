@@ -921,6 +921,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     zoom = 0.5f;
 
                     ui.hudfrag.showLaunchDirect();
+                    //TODO animation; 140 is fine
                     Time.runTask(launchDuration, () -> control.playSector(from, sector));
                 });
             }

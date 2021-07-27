@@ -24,6 +24,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.type.ammo.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -97,7 +98,7 @@ public class UnitType extends UnlockableContent{
 
     public int itemCapacity = -1;
     public int ammoCapacity = -1;
-    public AmmoType ammoType = AmmoTypes.copper;
+    public AmmoType ammoType = new ItemAmmoType(Items.copper);
     public int mineTier = -1;
     public float buildSpeed = -1f, mineSpeed = 1f;
     public Sound mineSound = Sounds.minebeam;
@@ -195,7 +196,7 @@ public class UnitType extends UnlockableContent{
             bars.row();
 
             if(state.rules.unitAmmo){
-                bars.add(new Bar(ammoType.icon + " " + Core.bundle.get("stat.ammo"), ammoType.barColor, () -> unit.ammo / ammoCapacity));
+                bars.add(new Bar(ammoType.icon() + " " + Core.bundle.get("stat.ammo"), ammoType.barColor(), () -> unit.ammo / ammoCapacity));
                 bars.row();
             }
 

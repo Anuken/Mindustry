@@ -146,6 +146,8 @@ public class Vars implements Loadable{
     public static int maxTextureSize = 2048;
     /** Whether to show the core landing animation. */
     public static boolean showLandAnimation = true;
+    /** Whether to show the campaign core launch animation. */
+    public static boolean showLaunchAnimation = true;
     /** Whether to show sector info upon landing. */
     public static boolean showSectorLandInfo = true;
     /** Whether to check for memory use before taking screenshots. */

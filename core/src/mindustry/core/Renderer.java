@@ -453,7 +453,7 @@ public class Renderer implements ApplicationListener{
         clampScale();
     }
 
-    public void showLaunch(){
+    public void showLanding(){
         landscale = minZoomScl;
         landTime = coreLandDuration;
         cloudSeed = Mathf.random(1f);

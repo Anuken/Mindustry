@@ -553,19 +553,6 @@ public class HudFragment extends Fragment{
         Core.scene.add(image);
     }
 
-    public void showLaunch(){
-        Image image = new Image();
-        image.color.a = 0f;
-        image.setFillParent(true);
-        image.actions(Actions.fadeIn(40f / 60f));
-        image.update(() -> {
-            if(state.isMenu()){
-                image.remove();
-            }
-        });
-        Core.scene.add(image);
-    }
-
     public void showLand(){
         Image image = new Image();
         image.color.a = 1f;
@@ -726,7 +713,7 @@ public class HudFragment extends Fragment{
             t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
             t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
             t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> {
-                b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type.ammoType.color : Pal.health);
+                b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type.ammoType.color() : Pal.health);
             });
 
             t.getChildren().get(1).toFront();

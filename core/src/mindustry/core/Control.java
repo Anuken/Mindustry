@@ -203,7 +203,7 @@ public class Control implements ApplicationListener, Loadable{
 
             if(showLandAnimation){
                 //delay player respawn so animation can play.
-                player.deathTimer = -70f;
+                player.deathTimer = -80f;
                 //TODO this sounds pretty bad due to conflict
                 if(settings.getInt("musicvol") > 0){
                     Musics.land.stop();
@@ -212,7 +212,7 @@ public class Control implements ApplicationListener, Loadable{
                 }
 
                 app.post(() -> ui.hudfrag.showLand());
-                renderer.showLaunch();
+                renderer.showLanding();
 
                 Time.run(coreLandDuration, () -> {
                     Fx.launch.at(core);
