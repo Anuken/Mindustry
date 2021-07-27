@@ -920,8 +920,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     launching = true;
                     zoom = 0.5f;
 
-                    ui.hudfrag.showLaunchDirect();
-                    //TODO animation; 140 is fine
+                    //TODO
+                    renderer.showLaunch();
+                    hide();
                     Time.runTask(launchDuration, () -> control.playSector(from, sector));
                 });
             }

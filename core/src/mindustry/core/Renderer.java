@@ -44,6 +44,7 @@ public class Renderer implements ApplicationListener{
     public @Nullable Bloom bloom;
     public FrameBuffer effectBuffer = new FrameBuffer();
     public boolean animateShields, drawWeather = true, drawStatus;
+    public float weatherAlpha;
     /** minZoom = zooming out, maxZoom = zooming in */
     public float minZoom = 1.5f, maxZoom = 6f;
     public Seq<EnvRenderer> envRenderers = new Seq<>();
@@ -51,9 +52,25 @@ public class Renderer implements ApplicationListener{
 
     private @Nullable CoreBuild landCore;
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
-    private float cloudSeed = 0f;
-    private float targetscale = Scl.scl(4), camerascale = targetscale, landscale, landTime, landPTimer, weatherAlpha, minZoomScl = Scl.scl(0.01f);
-    private float shakeIntensity, shaketime;
+    private float
+    //seed for cloud visuals, 0-1
+    cloudSeed = 0f,
+    //target camera scale that is lerp-ed to
+    targetscale = Scl.scl(4),
+    //current actual camera scale
+    camerascale = targetscale,
+    //minimum camera zoom value for landing/launching; constant TODO make larger?
+    minZoomScl = Scl.scl(0.02f),
+    //starts at coreLandDuration, ends at 0. if positive, core is landing.
+    landTime,
+    //timer for core landing particles
+    landPTimer,
+    //intensity for screen shake
+    shakeIntensity,
+    //current duration of screen shake
+    shakeTime;
+    //for landTime > 0: if true, core is currently *launching*, otherwise landing.
+    private boolean isLaunching;
     private Vec2 camShakeOffset = new Vec2();
 
     public Renderer(){
@@ -63,7 +80,7 @@ public class Renderer implements ApplicationListener{
 
     public void shake(float intensity, float duration){
         shakeIntensity = Math.max(shakeIntensity, intensity);
-        shaketime = Math.max(shaketime, duration);
+        shakeTime = Math.max(shakeTime, duration);
     }
 
     public void addEnvRenderer(int mask, Runnable render){
@@ -112,9 +129,13 @@ public class Renderer implements ApplicationListener{
             if(!state.isPaused()){
                 landTime -= Time.delta;
             }
-            landscale = landInterp.apply(minZoomScl, Scl.scl(4f), 1f - landTime / coreLandDuration);
-            camerascale = landscale;
+            camerascale = landInterp.apply(minZoomScl, Scl.scl(4f), 1f - landTime / coreLandDuration);
             weatherAlpha = 0f;
+
+            //snap camera to cutscene core regardless of player input
+            if(landCore != null){
+                camera.position.set(landCore);
+            }
         }else{
             weatherAlpha = Mathf.lerpDelta(weatherAlpha, 1f, 0.08f);
         }
@@ -126,12 +147,12 @@ public class Renderer implements ApplicationListener{
             landTime = 0f;
             graphics.clear(Color.black);
         }else{
-            if(shaketime > 0){
+            if(shakeTime > 0){
                 float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * 0.75f;
                 camShakeOffset.setToRandomDirection().scl(Mathf.random(intensity));
                 camera.position.add(camShakeOffset);
                 shakeIntensity -= 0.25f * Time.delta;
-                shaketime -= Time.delta;
+                shakeTime -= Time.delta;
                 shakeIntensity = Mathf.clamp(shakeIntensity, 0f, 100f);
             }else{
                 camShakeOffset.setZero();
@@ -148,16 +169,13 @@ public class Renderer implements ApplicationListener{
         }
     }
 
-    public boolean isLanding(){
+    /** @return whether a launch/land cutscene is playing. */
+    public boolean isCutscene(){
         return landTime > 0;
     }
 
-    public float weatherAlpha(){
-        return weatherAlpha;
-    }
-
     public float landScale(){
-        return landTime > 0 ? landscale : 1f;
+        return landTime > 0 ? camerascale : 1f;
     }
 
     @Override
@@ -290,7 +308,7 @@ public class Renderer implements ApplicationListener{
     }
 
     private void drawBackground(){
-
+        //nothing to draw currently
     }
 
     void updateLandParticles(){
@@ -378,7 +396,7 @@ public class Renderer implements ApplicationListener{
             if(state.rules.cloudColor.a > 0.0001f){
                 //clouds
                 float scaling = cloudScaling;
-                float sscl = Math.max(1f + Mathf.clamp(fin + cfinOffset)* cfinScl, 0f) * landscale;
+                float sscl = Math.max(1f + Mathf.clamp(fin + cfinOffset)* cfinScl, 0f) * camerascale;
 
                 Tmp.tr1.set(clouds);
                 Tmp.tr1.set(
@@ -454,9 +472,17 @@ public class Renderer implements ApplicationListener{
     }
 
     public void showLanding(){
-        landscale = minZoomScl;
+        isLaunching = false;
+        camerascale = minZoomScl;
         landTime = coreLandDuration;
         cloudSeed = Mathf.random(1f);
+    }
+
+    public void showLaunch(){
+        isLaunching = true;
+        landCore = player.team().core();
+        cloudSeed = Mathf.random(1f);
+        //TODO other stuff.
     }
 
     public void takeMapScreenshot(){

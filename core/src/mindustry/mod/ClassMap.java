@@ -1,8 +1,6 @@
 package mindustry.mod;
 
 import arc.struct.*;
-import mindustry.type.ammo.*;
-
 /** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */
 @SuppressWarnings("deprecation")
 public class ClassMap{
@@ -54,8 +52,6 @@ public class ClassMap{
         classes.put("Research", mindustry.game.Objectives.Research.class);
         classes.put("SectorComplete", mindustry.game.Objectives.SectorComplete.class);
         classes.put("AmmoType", mindustry.type.AmmoType.class);
-        classes.put("ItemAmmoType", ItemAmmoType.class);
-        classes.put("PowerAmmoType", PowerAmmoType.class);
         classes.put("Category", mindustry.type.Category.class);
         classes.put("ErrorContent", mindustry.type.ErrorContent.class);
         classes.put("Item", mindustry.type.Item.class);
@@ -75,6 +71,8 @@ public class ClassMap{
         classes.put("Weapon", mindustry.type.Weapon.class);
         classes.put("Weather", mindustry.type.Weather.class);
         classes.put("WeatherEntry", mindustry.type.Weather.WeatherEntry.class);
+        classes.put("ItemAmmoType", mindustry.type.ammo.ItemAmmoType.class);
+        classes.put("PowerAmmoType", mindustry.type.ammo.PowerAmmoType.class);
         classes.put("PointDefenseWeapon", mindustry.type.weapons.PointDefenseWeapon.class);
         classes.put("RepairBeamWeapon", mindustry.type.weapons.RepairBeamWeapon.class);
         classes.put("HealBeamMount", mindustry.type.weapons.RepairBeamWeapon.HealBeamMount.class);
