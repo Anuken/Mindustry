@@ -341,7 +341,11 @@ project(":core"){
                 }
             }
             def changelogs = file("../fastlane/metadata/android/en-US/changelogs/")
-            new File(changelogs, androidVersion + ".txt").text = (result)
+            try{
+                new File(changelogs, androidVersion + ".txt").text = (result)
+            }catch(Exception e){
+                e.printStackTrace()
+            }
         }
     }
 
