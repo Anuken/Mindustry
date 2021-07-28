@@ -96,7 +96,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
 
         if(!(tile.build instanceof ConstructBuild cb)){
             if(!current.initialized && !current.breaking && Build.validPlace(current.block, team, current.x, current.y, current.rotation)){
-                boolean hasAll = infinite || current.isRotation(team) || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item));
+                boolean hasAll = infinite || current.isRotation(team) || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item, Mathf.round(i.amount * state.rules.buildCostMultiplier)));
 
                 if(hasAll){
                     Call.beginPlace(self(), current.block, team, current.x, current.y, current.rotation);
