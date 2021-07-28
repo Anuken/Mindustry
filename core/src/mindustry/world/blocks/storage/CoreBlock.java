@@ -29,8 +29,8 @@ public class CoreBlock extends StorageBlock{
     //hacky way to pass item modules between methods
     private static ItemModule nextItems;
 
-    public @Load("@-thruster1") TextureRegion thruster1; //top right
-    public @Load("@-thruster2") TextureRegion thruster2; //bot left
+    public @Load(value = "@-thruster1", fallback = "clear-effect") TextureRegion thruster1; //top right
+    public @Load(value = "@-thruster2", fallback = "clear-effect") TextureRegion thruster2; //bot left
     public float thrusterLength = 14f/4f;
 
     public UnitType unitType = UnitTypes.alpha;
