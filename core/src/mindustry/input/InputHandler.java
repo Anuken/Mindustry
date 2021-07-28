@@ -356,7 +356,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Events.fire(new TapEvent(player, tile));
     }
 
-    @Remote(targets = Loc.both, called = Loc.both, forward = true)
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void buildingControlSelect(Player player, Building build){
         if(player == null || build == null || player.dead()) return;
 

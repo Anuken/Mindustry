@@ -657,8 +657,8 @@ public class Blocks implements ContentList{
             craftTime = 35f;
             size = 2;
 
-            consumes.power(1f);
-            consumes.liquid(Liquids.slag, 0.07f);
+            consumes.power(1.1f);
+            consumes.liquid(Liquids.slag, 4f / 60f);
         }};
 
         disassembler = new Separator("disassembler"){{

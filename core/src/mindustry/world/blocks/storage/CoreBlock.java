@@ -248,7 +248,7 @@ public class CoreBlock extends StorageBlock{
         @Override
         public void onControlSelect(Player player){
             Fx.spawn.at(player);
-            if(net.client()){
+            if(net.client() && player == Vars.player){
                 control.input.controlledType = null;
             }
 
