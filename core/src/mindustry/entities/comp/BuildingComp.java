@@ -418,9 +418,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         unit.remove();
         grabber.get(new UnitPayload(unit));
         Fx.unitDrop.at(unit);
-        if(Vars.net.client()){
-            Vars.netClient.clearRemovedEntity(unit.id);
-        }
     }
 
     public boolean canUnload(){
