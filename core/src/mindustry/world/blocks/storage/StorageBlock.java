@@ -41,7 +41,7 @@ public class StorageBlock extends Block{
     }
 
     public class StorageBuild extends Building{
-        protected @Nullable Building linkedCore;
+        public @Nullable Building linkedCore;
 
         @Override
         public boolean acceptItem(Building source, Item item){
@@ -114,11 +114,6 @@ public class StorageBlock extends Block{
         @Override
         public boolean canPickup(){
             return linkedCore == null;
-        }
-        
-        @Nullable
-        public Building getLinkedCore(){
-            return linkedCore;
         }
     }
 }
