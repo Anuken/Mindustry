@@ -292,13 +292,15 @@ public class SettingsMenuDialog extends Dialog{
 
         if(mobile){
             game.checkPref("autotarget", true);
-            game.checkPref("keyboard", false, val -> {
-                control.setInput(val ? new DesktopInput() : new MobileInput());
-                input.setUseKeyboard(val);
-            });
-            if(Core.settings.getBool("keyboard")){
-                control.setInput(new DesktopInput());
-                input.setUseKeyboard(true);
+            if(!ios){
+                game.checkPref("keyboard", false, val -> {
+                    control.setInput(val ? new DesktopInput() : new MobileInput());
+                    input.setUseKeyboard(val);
+                });
+                if(Core.settings.getBool("keyboard")){
+                    control.setInput(new DesktopInput());
+                    input.setUseKeyboard(true);
+                }
             }
         }
         //the issue with touchscreen support on desktop is that:
@@ -446,11 +448,11 @@ public class SettingsMenuDialog extends Dialog{
             }
         }
 
+        graphics.checkPref("skipcoreanimation", false);
+
         if(!mobile){
             Core.settings.put("swapdiagonal", false);
         }
-
-        graphics.checkPref("flow", true);
     }
 
     public void exportData(Fi file) throws IOException{

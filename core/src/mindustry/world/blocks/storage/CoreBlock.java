@@ -20,7 +20,6 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.units.*;
 import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
@@ -30,15 +29,13 @@ public class CoreBlock extends StorageBlock{
     //hacky way to pass item modules between methods
     private static ItemModule nextItems;
 
+    public @Load(value = "@-thruster1", fallback = "clear-effect") TextureRegion thruster1; //top right
+    public @Load(value = "@-thruster2", fallback = "clear-effect") TextureRegion thruster2; //bot left
+    public float thrusterLength = 14f/4f;
+
     public UnitType unitType = UnitTypes.alpha;
 
-    public final int timerResupply = timers++;
-
-    public int ammoAmount = 5;
-    public float resupplyRate = 10f;
-    public float resupplyRange = 60f;
     public float captureInvicibility = 60f * 15f;
-    public Item resupplyItem = Items.copper;
 
     public CoreBlock(String name){
         super(name);
@@ -183,6 +180,35 @@ public class CoreBlock extends StorageBlock{
         public boolean noEffect = false;
         public Team lastDamage = Team.derelict;
         public float iframes = -1f;
+        public float thrusterTime = 0f;
+
+        @Override
+        public void draw(){
+            //draw thrusters when just landed
+            if(thrusterTime > 0){
+                float frame = thrusterTime;
+
+                Draw.alpha(1f);
+                drawThrusters(frame);
+                Draw.rect(block.region, x, y);
+                Draw.alpha(Interp.pow4In.apply(frame));
+                drawThrusters(frame);
+                Draw.reset();
+
+                drawTeamTop();
+            }else{
+                super.draw();
+            }
+        }
+
+        public void drawThrusters(float frame){
+            float length = thrusterLength * (frame - 1f) - 1f/4f;
+            for(int i = 0; i < 4; i++){
+                var reg = i >= 2 ? thruster2 : thruster1;
+                float dx = Geometry.d4x[i] * length, dy = Geometry.d4y[i] * length;
+                Draw.rect(reg, x + dx, y + dy, i * 90);
+            }
+        }
 
         @Override
         public void damage(@Nullable Team source, float damage){
@@ -222,7 +248,7 @@ public class CoreBlock extends StorageBlock{
         @Override
         public void onControlSelect(Player player){
             Fx.spawn.at(player);
-            if(net.client()){
+            if(net.client() && player == Vars.player){
                 control.input.controlledType = null;
             }
 
@@ -240,13 +266,8 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void updateTile(){
-
             iframes -= Time.delta;
-
-            //resupply nearby units
-            if(items.has(resupplyItem) && timer(timerResupply, resupplyRate) && ResupplyPoint.resupply(this, resupplyRange, ammoAmount, resupplyItem.color)){
-                items.remove(resupplyItem, 1);
-            }
+            thrusterTime -= Time.delta/90f;
         }
 
         @Override

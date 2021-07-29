@@ -96,6 +96,11 @@ public class Team implements Comparable<Team>{
         return state.teams.isActive(this);
     }
 
+    /** @return whether this team is solely comprised of AI, with no players. */
+    public boolean isAI(){
+        return state.rules.waves && this == state.rules.waveTeam;
+    }
+
     public boolean isEnemy(Team other){
         return this != other;
     }

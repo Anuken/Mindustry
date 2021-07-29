@@ -29,6 +29,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
+import mindustry.type.ammo.*;
 import mindustry.type.weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.units.*;
@@ -92,6 +93,19 @@ public class ContentParser{
             var bc = resolve(data.getString("type", ""), BasicBulletType.class);
             data.remove("type");
             BulletType result = make(bc);
+            readFields(result, data);
+            return result;
+        });
+        put(AmmoType.class, (type, data) -> {
+            //string -> item
+            //if liquid ammo support is added, this should scan for liquids as well
+            if(data.isString()) return find(ContentType.item, data.asString());
+            //number -> power
+            if(data.isNumber()) return new PowerAmmoType(data.asFloat());
+
+            var bc = resolve(data.getString("type", ""), ItemAmmoType.class);
+            data.remove("type");
+            AmmoType result = make(bc);
             readFields(result, data);
             return result;
         });
@@ -746,7 +760,7 @@ public class ContentParser{
     /** Tries to resolve a class from the class type map. */
     <T> Class<T> resolve(String base, Class<T> def){
         //no base class specified
-        if(base.isEmpty() && def != null) return def;
+        if((base == null || base.isEmpty()) && def != null) return def;
 
         //return mapped class if found in the global map
         var out = ClassMap.classes.get(!base.isEmpty() && Character.isLowerCase(base.charAt(0)) ? Strings.capitalize(base) : base);

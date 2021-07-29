@@ -22,7 +22,11 @@ if(new File(settingsDir, 'local.properties').exists()){
 if(System.getenv("JITPACK") == "true") hasSdk = false
 
 if(hasSdk){
-	include 'android'
+    //hack: pretend the Android module doesn't exist when imported through IntelliJ
+    //why? because IntelliJ chokes on the new version of the Android plugin
+    if(!System.getProperty("jna.tmpdir")?.contains("JetBrains")){
+        include 'android'
+    }
 }else{
     println("No Android SDK found. Skipping Android module.")
 }

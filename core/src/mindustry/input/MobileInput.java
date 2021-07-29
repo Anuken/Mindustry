@@ -681,7 +681,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        if(!player.dead() && !state.isPaused()){
+        if(!player.dead() && !state.isPaused() && !renderer.isCutscene()){
             updateMovement(player.unit());
         }
 
@@ -822,7 +822,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 shiftDeltaX %= tilesize;
                 shiftDeltaY %= tilesize;
             }
-        }else if(!renderer.isLanding()){
+        }else{
             //pan player
             Core.camera.position.x -= deltaX;
             Core.camera.position.y -= deltaY;

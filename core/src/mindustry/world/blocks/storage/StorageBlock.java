@@ -22,6 +22,7 @@ public class StorageBlock extends Block{
         destructible = true;
         group = BlockGroup.transportation;
         flags = EnumSet.of(BlockFlag.storage);
+        allowResupply = true;
     }
 
     @Override

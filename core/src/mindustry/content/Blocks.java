@@ -657,8 +657,8 @@ public class Blocks implements ContentList{
             craftTime = 35f;
             size = 2;
 
-            consumes.power(1f);
-            consumes.liquid(Liquids.slag, 0.07f);
+            consumes.power(1.1f);
+            consumes.liquid(Liquids.slag, 4f / 60f);
         }};
 
         disassembler = new Separator("disassembler"){{
@@ -964,15 +964,20 @@ public class Blocks implements ContentList{
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
             requirements(Category.distribution, with(Items.lead, 6, Items.copper, 6));
+            fadeIn = moveArrows = false;
             range = 4;
             speed = 74f;
+            arrowSpacing = 6f;
             bufferCapacity = 14;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
             requirements(Category.distribution, with(Items.phaseFabric, 5, Items.silicon, 7, Items.lead, 10, Items.graphite, 10));
             range = 12;
+            arrowPeriod = 0.9f;
+            arrowTimeScl = 2.75f;
             hasPower = true;
+            pulse = true;
             consumes.power(0.30f);
         }};
 
@@ -1095,8 +1100,10 @@ public class Blocks implements ContentList{
             requirements(Category.liquid, with(Items.graphite, 2, Items.metaglass, 2));
         }};
 
-        bridgeConduit = new LiquidExtendingBridge("bridge-conduit"){{
+        bridgeConduit = new LiquidBridge("bridge-conduit"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 8));
+            fadeIn = moveArrows = false;
+            arrowSpacing = 6f;
             range = 4;
             hasPower = false;
         }};
@@ -1104,8 +1111,11 @@ public class Blocks implements ContentList{
         phaseConduit = new LiquidBridge("phase-conduit"){{
             requirements(Category.liquid, with(Items.phaseFabric, 5, Items.silicon, 7, Items.metaglass, 20, Items.titanium, 10));
             range = 12;
+            arrowPeriod = 0.9f;
+            arrowTimeScl = 2.75f;
             hasPower = true;
             canOverdrive = false;
+            pulse = true;
             consumes.power(0.30f);
         }};
 
@@ -1367,6 +1377,7 @@ public class Blocks implements ContentList{
             health = 3500;
             itemCapacity = 9000;
             size = 4;
+            thrusterLength = 34/4f;
 
             unitCapModifier = 16;
             researchCostMultiplier = 0.07f;
@@ -1379,6 +1390,7 @@ public class Blocks implements ContentList{
             health = 6000;
             itemCapacity = 13000;
             size = 5;
+            thrusterLength = 40/4f;
 
             unitCapModifier = 24;
             researchCostMultiplier = 0.11f;
@@ -1592,7 +1604,7 @@ public class Blocks implements ContentList{
             shots = 4;
             burstSpacing = 5;
             inaccuracy = 10f;
-            range = 215f;
+            range = 235f;
             xRand = 6f;
             size = 2;
             health = 300 * size * size;
@@ -2001,17 +2013,6 @@ public class Blocks implements ContentList{
             coolantUse = 0.16f;
             coolantMultiplier = 1.6f;
             acceptCoolant = true;
-        }};
-
-        resupplyPoint = new ResupplyPoint("resupply-point"){{
-            requirements(Category.units, BuildVisibility.ammoOnly, with(Items.lead, 20, Items.copper, 15, Items.silicon, 15));
-
-            size = 2;
-            range = 80f;
-            itemCapacity = 20;
-            ammoAmount = 5;
-
-            consumes.item(Items.copper, 1);
         }};
 
         //endregion

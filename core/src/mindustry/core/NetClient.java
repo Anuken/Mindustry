@@ -1,6 +1,7 @@
 package mindustry.core;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
@@ -159,8 +160,6 @@ public class NetClient implements ApplicationListener{
         clientPacketReliable(type, contents);
     }
 
-    //TODO enable in build 129
-    /*
     @Remote(variants = Variant.both, unreliable = true)
     public static void sound(Sound sound, float volume, float pitch, float pan){
         if(sound == null) return;
@@ -173,7 +172,7 @@ public class NetClient implements ApplicationListener{
         if(sound == null) return;
 
         sound.at(x, y, pitch, volume);
-    }*/
+    }
 
     @Remote(variants = Variant.both, unreliable = true)
     public static void effect(Effect effect, float x, float y, float rotation, Color color){

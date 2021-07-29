@@ -24,6 +24,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.type.ammo.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -41,7 +42,9 @@ public class UnitType extends UnlockableContent{
 
     /** If true, the unit is always at elevation 1. */
     public boolean flying;
+    /** Creates a new instance of this unit class. */
     public Prov<? extends Unit> constructor;
+    /** The default AI controller to assign on creation. */
     public Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
 
     /** Environmental flags that are *all* required for this unit to function. 0 = any environment */
@@ -73,7 +76,10 @@ public class UnitType extends UnlockableContent{
     public Effect fallThrusterEffect = Fx.fallSmoke;
     public Effect deathExplosionEffect = Fx.dynamicExplosion;
     public Seq<Ability> abilities = new Seq<>();
-    public BlockFlag targetFlag = BlockFlag.generator;
+    /** Flags to target based on priority. Null indicates that the closest target should be found. The closest enemy core is used as a fallback. */
+    public BlockFlag[] targetFlags = {null};
+    /** targetFlags, as an override for "non-AI" teams. By default, units of this type will rush the core. */
+    public BlockFlag[] playerTargetFlags = {BlockFlag.core, null};
 
     public Color outlineColor = Pal.darkerMetal;
     public int outlineRadius = 3;
@@ -84,9 +90,6 @@ public class UnitType extends UnlockableContent{
     public float legSplashDamage = 0f, legSplashRange = 5;
     public boolean flipBackLegs = true;
 
-    public int ammoResupplyAmount = 10;
-    public float ammoResupplyRange = 100f;
-
     public float mechSideSway = 0.54f, mechFrontSway = 0.1f;
     public float mechStride = -1f;
     public float mechStepShake = -1f;
@@ -95,7 +98,7 @@ public class UnitType extends UnlockableContent{
 
     public int itemCapacity = -1;
     public int ammoCapacity = -1;
-    public AmmoType ammoType = AmmoTypes.copper;
+    public AmmoType ammoType = new ItemAmmoType(Items.copper);
     public int mineTier = -1;
     public float buildSpeed = -1f, mineSpeed = 1f;
     public Sound mineSound = Sounds.minebeam;
@@ -193,7 +196,7 @@ public class UnitType extends UnlockableContent{
             bars.row();
 
             if(state.rules.unitAmmo){
-                bars.add(new Bar(ammoType.icon + " " + Core.bundle.get("stat.ammo"), ammoType.barColor, () -> unit.ammo / ammoCapacity));
+                bars.add(new Bar(ammoType.icon() + " " + Core.bundle.get("stat.ammo"), ammoType.barColor(), () -> unit.ammo / ammoCapacity));
                 bars.row();
             }
 
@@ -382,9 +385,9 @@ public class UnitType extends UnlockableContent{
 
         //dynamically create ammo capacity based on firing rate
         if(ammoCapacity < 0){
-            float shotsPerSecond = weapons.sumf(w -> 60f / w.reload);
+            float shotsPerSecond = weapons.sumf(w -> w.useAmmo ? 60f / w.reload : 0f);
             //duration of continuous fire without reload
-            float targetSeconds = 30;
+            float targetSeconds = 35;
 
             ammoCapacity = Math.max(1, (int)(shotsPerSecond * targetSeconds));
         }

@@ -55,6 +55,8 @@ public class Planet extends UnlockableContent{
     public boolean bloom = false;
     /** Whether this planet is displayed. */
     public boolean visible = true;
+    /** Tint of clouds displayed when landing. */
+    public Color landCloudColor = new Color(1f, 1f, 1f, 0.5f);
     /** For suns, this is the color that shines on other planets. Does nothing for children. */
     public Color lightColor = Color.white.cpy();
     /** Atmosphere tint for landable planets. */

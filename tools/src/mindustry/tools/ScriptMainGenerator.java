@@ -80,6 +80,7 @@ public class ScriptMainGenerator{
         "mindustry.ai.types",
         "mindustry.type.weather",
         "mindustry.type.weapons",
+        "mindustry.type.ammo",
         "mindustry.game.Objectives",
         "mindustry.world.blocks",
         "mindustry.world.draw",
