@@ -496,12 +496,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void handlePayload(Building source, Payload payload){
 
     }
-    
-    /** Called by various payload blocks making changes to this building, which is in a BuildPayload. Note that some fields of this building may be null. */
-    public void asPayload(Building holder, BuildPayload self){
-        
-    }
-
 
     /**
      * Tries moving a payload forwards.
