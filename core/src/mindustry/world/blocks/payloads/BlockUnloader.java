@@ -44,7 +44,6 @@ public class BlockUnloader extends BlockLoader{
                                     Item item = content.item(i);
                                     payload.build.items.remove(item, 1);
                                     items.add(item, 1);
-                                    payload.build.asPayload(this, payload);
                                     break;
                                 }
                             }
