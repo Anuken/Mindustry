@@ -31,7 +31,13 @@ public class BlockUnloader extends BlockLoader{
         @Override
         public void updateTile(){
             if(shouldExport()){
-                moveOutPayload();
+                //one-use, disposable block
+                if(payload.block().instantDeconstruct){
+                    payload.block().destroyEffect.at(this, payload.block().size / 2f); //full math for the rotation is size * tilesize / 2f / 8f, according to dynamicExplosion.
+                    payload = null;
+                }else{
+                    moveOutPayload();
+                }
             }else if(moveInPayload()){
 
                 //load up items
