@@ -115,5 +115,10 @@ public class StorageBlock extends Block{
         public boolean canPickup(){
             return linkedCore == null;
         }
+        
+        @Nullable
+        public Building getLinkedCore(){
+            return linkedCore;
+        }
     }
 }
