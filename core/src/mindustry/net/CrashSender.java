@@ -6,19 +6,14 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import arc.util.serialization.*;
-import arc.util.serialization.JsonValue.*;
-import arc.util.serialization.JsonWriter.*;
 import mindustry.*;
 import mindustry.core.*;
-import mindustry.gen.*;
 
 import java.io.*;
 import java.text.*;
 import java.util.*;
 
 import static arc.Core.*;
-import static mindustry.Vars.net;
 import static mindustry.Vars.*;
 
 public class CrashSender{
@@ -126,6 +121,9 @@ public class CrashSender{
             }catch(Throwable ignored){
             }
 
+            //disabled until further notice.
+            /*
+
             JsonValue value = new JsonValue(ValueType.object);
 
             boolean fn = netActive, fs = netServer;
@@ -144,7 +142,7 @@ public class CrashSender{
             ex(() -> value.addChild("trace", new JsonValue(parseException(exception))));
             ex(() -> value.addChild("javaVersion", new JsonValue(OS.javaVersion)));
             ex(() -> value.addChild("javaArch", new JsonValue(OS.osArchBits)));
-
+            
             Log.info("Sending crash report.");
 
             //post to crash report URL, exit code indicates send success
@@ -154,7 +152,7 @@ public class CrashSender{
             }).block(r -> {
                 Log.info("Crash sent successfully.");
                 System.exit(1);
-            });
+            });*/
 
             ret();
         }catch(Throwable death){

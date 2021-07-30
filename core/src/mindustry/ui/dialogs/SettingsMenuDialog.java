@@ -392,6 +392,7 @@ public class SettingsMenuDialog extends Dialog{
             });
 
             Core.graphics.setVSync(Core.settings.getBool("vsync"));
+
             if(Core.settings.getBool("fullscreen")){
                 Core.app.post(() -> Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode()));
             }
