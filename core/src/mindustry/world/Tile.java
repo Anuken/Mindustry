@@ -675,7 +675,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         build.health = health;
 
         if(build.damaged()){
-            indexer.notifyTileDamaged(build);
+            indexer.notifyBuildDamaged(build);
         }
     }
 
