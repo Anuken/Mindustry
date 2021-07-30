@@ -108,7 +108,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     /**
-     * Returns the flammability of the  Used for fire calculations.
+     * Returns the flammability of the tile. Used for fire calculations.
      * Takes flammability of floor liquid into account.
      */
     public float getFlammability(){
