@@ -107,8 +107,10 @@ public class Bar extends Element{
         }
 
         Draw.colorl(0.1f);
+        Draw.alpha(parentAlpha);
         bar.draw(x, y, width, height);
         Draw.color(color, blinkColor, blink);
+        Draw.alpha(parentAlpha);
 
         Drawable top = Tex.barTop;
         float topWidth = width * value;
@@ -128,7 +130,7 @@ public class Bar extends Element{
         GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         lay.setText(font, name);
 
-        font.setColor(Color.white);
+        font.setColor(1f, 1f, 1f, parentAlpha);
         font.draw(name, x + width / 2f - lay.width / 2f, y + height / 2f + lay.height / 2f + 1);
 
         Pools.free(lay);

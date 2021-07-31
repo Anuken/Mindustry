@@ -38,7 +38,7 @@ public class LoadingFragment extends Fragment{
 
             text("@loading");
 
-            bar = t.add(new Bar()).pad(3).size(500f, 40f).visible(false).get();
+            bar = t.add(new Bar()).pad(3).padTop(6).size(500f, 40f).visible(false).get();
             t.row();
             button = t.button("@cancel", () -> {}).pad(20).size(250f, 70f).visible(false).get();
             table = t;

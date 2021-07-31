@@ -36,6 +36,7 @@ import static mindustry.Vars.*;
 public class ModsDialog extends BaseDialog{
     private ObjectMap<String, TextureRegion> textureCache = new ObjectMap<>();
 
+    private float modImportProgress;
     private String searchtxt = "";
     private @Nullable Seq<ModListing> modList;
     private boolean orderDate = false;
@@ -488,11 +489,16 @@ public class ModsDialog extends BaseDialog{
     private void handleMod(String repo, HttpResponse result){
         try{
             Fi file = tmpDirectory.child(repo.replace("/", "") + ".zip");
-            Streams.copy(result.getResultAsStream(), file.write(false));
+            long len = result.getContentLength();
+            Floatc cons = len <= 0 ? f -> {} : p -> modImportProgress = p;
+
+            Streams.copyProgress(result.getResultAsStream(), file.write(false), len, 4096, cons);
+
             var mod = mods.importMod(file);
             mod.setRepo(repo);
             file.delete();
             Core.app.post(() -> {
+
                 try{
                     setup();
                     ui.loadfrag.hide();
@@ -510,10 +516,13 @@ public class ModsDialog extends BaseDialog{
     }
 
     private void githubImportMod(String repo, boolean isJava){
+        modImportProgress = 0f;
+        ui.loadfrag.show("@downloading");
+        ui.loadfrag.setProgress(() -> modImportProgress);
+
         if(isJava){
             githubImportJavaMod(repo);
         }else{
-            ui.loadfrag.show();
             Http.get(ghApi + "/repos/" + repo, res -> {
                 var json = Jval.read(res.getResultAsString());
                 String mainBranch = json.getString("default_branch");
