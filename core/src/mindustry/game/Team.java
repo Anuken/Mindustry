@@ -32,9 +32,9 @@ public class Team implements Comparable<Team>{
             Color.valueOf("ffd37f"), Color.valueOf("eab678"), Color.valueOf("d4816b")),
         crux = new Team(2, "crux", Color.valueOf("f25555"),
             Color.valueOf("fc8e6c"), Color.valueOf("f25555"), Color.valueOf("a04553")),
-        green = new Team(3, "green", Color.valueOf("54d67d")),
-        purple = new Team(4, "purple", Color.valueOf("995bb0")),
-        blue = new Team(5, "blue", Color.valueOf("5a4deb"));
+        green = new Team(3, "green", Color.valueOf("54d67d"), Color.valueOf("96f58c"), Color.valueOf("54d67d"), Color.valueOf("28785c")),
+        purple = new Team(4, "purple", Color.valueOf("995bb0"), Color.valueOf("f08dd5"), Color.valueOf("995bb0"), Color.valueOf("312c63")),
+        blue = new Team(5, "blue", Color.valueOf("554deb"), Color.valueOf("80aaff"), Color.valueOf("554deb"), Color.valueOf("3f207d"));
 
     static{
         Mathf.rand.setSeed(8);
