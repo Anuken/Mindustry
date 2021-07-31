@@ -68,6 +68,10 @@ public class Bar extends Element{
         return this;
     }
 
+    public void flash(){
+        blink = 1f;
+    }
+
     public Bar blink(Color color){
         blinkColor.set(color);
         return this;
