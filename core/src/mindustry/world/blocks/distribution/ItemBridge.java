@@ -178,7 +178,7 @@ public class ItemBridge extends Block{
         public int link = -1;
         public IntSeq incoming = new IntSeq(false, 4);
         public float warmup;
-        public float time, timeSpeed;
+        public float time = 10f, timeSpeed;
         public boolean wasMoved, moved;
         public float transportCounter;
 
@@ -354,6 +354,8 @@ public class ItemBridge extends Block{
             if(pulse){
                 Draw.color(Color.white, Color.black, Mathf.absin(Time.time, 6f, 0.07f));
             }
+
+            float warmup = hasPower ? this.warmup : 1f;
 
             Draw.alpha((fadeIn ? Math.max(warmup, 0.25f) : 1f) * Renderer.bridgeOpacity);
 
