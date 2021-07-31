@@ -21,6 +21,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 
 import java.util.*;
@@ -155,6 +156,12 @@ public class Fonts{
                 }
             }
         });
+
+        for(Team team : Team.baseTeams){
+            if(Core.atlas.has("team-" + team.name)){
+                team.emoji = stringIcons.get(team.name, "");
+            }
+        }
     }
 
     /** Called from a static context for use in the loading screen.*/

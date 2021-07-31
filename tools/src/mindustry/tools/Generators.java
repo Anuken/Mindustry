@@ -390,6 +390,19 @@ public class Generators{
             }
         });
 
+        generate("team-icons", () -> {
+            for(Team team : Team.all){
+                if(has("team-" + team.name)){
+                    int rgba = team == Team.derelict ? Color.valueOf("b7b8c9").rgba() : team.color.rgba();
+                    Pixmap base = get("team-" + team.name);
+                    base.each((x, y) -> base.setRaw(x, y, Color.muli(base.getRaw(x, y), rgba)));
+
+                    delete("team-" + team.name);
+                    save(base.outline(Pal.gray, 3), "../ui/team-" + team.name);
+                }
+            }
+        });
+
         generate("unit-icons", () -> content.units().each(type -> {
             if(type.isHidden()) return; //hidden units don't generate
 

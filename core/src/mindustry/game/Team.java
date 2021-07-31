@@ -17,6 +17,7 @@ public class Team implements Comparable<Team>{
     public final int id;
     public final Color color;
     public final Color[] palette;
+    public String emoji = "";
     public boolean hasPalette;
     public String name;
 
