@@ -130,7 +130,7 @@ public class Fx{
         Fill.circle(x, y, e.fslope() * 1.5f * size);
     }),
 
-    pointBeam = new Effect(25f, e -> {
+    pointBeam = new Effect(25f, 300f, e -> {
         if(!(e.data instanceof Position)) return;
 
         Position pos = e.data();
