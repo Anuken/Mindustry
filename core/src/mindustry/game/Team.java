@@ -17,6 +17,7 @@ public class Team implements Comparable<Team>{
     public final int id;
     public final Color color;
     public final Color[] palette;
+    public final int[] palettei = new int[3];
     public String emoji = "";
     public boolean hasPalette;
     public String name;
@@ -61,6 +62,10 @@ public class Team implements Comparable<Team>{
         palette[0] = color;
         palette[1] = color.cpy().mul(0.75f);
         palette[2] = color.cpy().mul(0.5f);
+
+        for(int i = 0; i < 3; i++){
+            palettei[i] = palette[i].rgba();
+        }
     }
 
     /** Specifies a 3-color team palette. */
@@ -70,6 +75,9 @@ public class Team implements Comparable<Team>{
         palette[0] = pal1;
         palette[1] = pal2;
         palette[2] = pal3;
+        for(int i = 0; i < 3; i++){
+            palettei[i] = palette[i].rgba();
+        }
         hasPalette = true;
     }
 

@@ -244,7 +244,7 @@ public class Generators{
                             teamr.each((x, y) -> {
                                 int color = teamr.getRaw(x, y);
                                 int index = color == 0xffffffff ? 0 : color == 0xdcc6c6ff ? 1 : color == 0x9d7f7fff ? 2 : -1;
-                                out.setRaw(x, y, index == -1 ? teamr.getRaw(x, y) : team.palette[index].rgba());
+                                out.setRaw(x, y, index == -1 ? teamr.getRaw(x, y) : team.palettei[index]);
                             });
                             save(out, block.name + "-team-" + team.name);
 
