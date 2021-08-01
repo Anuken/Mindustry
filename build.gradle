@@ -341,10 +341,10 @@ project(":core"){
                 }
             }
             def changelogs = file("../fastlane/metadata/android/en-US/changelogs/")
+            changelogs.mkdirs()
             try{
                 new File(changelogs, androidVersion + ".txt").text = (result)
-            }catch(Exception e){
-                e.printStackTrace()
+            }catch(Exception ignored){
             }
         }
     }
