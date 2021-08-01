@@ -93,12 +93,19 @@ public class PausedDialog extends BaseDialog{
     }
 
     void showQuitConfirm(){
-        ui.showConfirm("@confirm", "@quit.confirm", () -> {
+        Runnable quit = () -> {
             wasClient = net.client();
             if(net.client()) netClient.disconnectQuietly();
             runExitSave();
             hide();
-        });
+        };
+
+        if(confirmExit){
+            ui.showConfirm("@confirm", "@quit.confirm", quit);
+        }else{
+            quit.run();
+        }
+
     }
 
     public void runExitSave(){

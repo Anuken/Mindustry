@@ -12,10 +12,18 @@ import mindustry.world.meta.*;
 
 public class ThermalGenerator extends PowerGenerator{
     public Effect generateEffect = Fx.none;
+    public float effectChance = 0.05f;
     public Attribute attribute = Attribute.heat;
 
     public ThermalGenerator(String name){
         super(name);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+        //proper light clipping
+        clipSize = Math.max(clipSize, 45f * size * 2f * 2f);
     }
 
     @Override
@@ -27,6 +35,8 @@ public class ThermalGenerator extends PowerGenerator{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
         drawPlaceText(Core.bundle.formatFloat("bar.efficiency", sumAttribute(attribute, x, y) * 100, 1), x, y, valid);
     }
 
@@ -43,14 +53,14 @@ public class ThermalGenerator extends PowerGenerator{
         public void updateTile(){
             productionEfficiency = sum + attribute.env();
 
-            if(productionEfficiency > 0.1f && Mathf.chance(0.05 * delta())){
+            if(productionEfficiency > 0.1f && Mathf.chanceDelta(effectChance)){
                 generateEffect.at(x + Mathf.range(3f), y + Mathf.range(3f));
             }
         }
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, (40f + Mathf.absin(10f, 5f)) * productionEfficiency * size, Color.scarlet, 0.4f);
+            Drawf.light(team, x, y, (40f + Mathf.absin(10f, 5f)) * Math.min(productionEfficiency, 2f) * size, Color.scarlet, 0.4f);
         }
 
         @Override

@@ -1,5 +1,6 @@
 package mindustry.world.blocks.defense.turrets;
 
+import arc.struct.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -27,13 +28,16 @@ public class BaseTurret extends Block{
         update = true;
         solid = true;
         outlineIcon = true;
+        priority = TargetPriority.turret;
+        group = BlockGroup.turrets;
+        flags = EnumSet.of(BlockFlag.turret);
     }
 
     @Override
     public void init(){
         if(acceptCoolant && !consumes.has(ConsumeType.liquid)){
             hasLiquids = true;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.2f)).update(false).boost();
+            consumes.add(new ConsumeCoolant(0.2f)).update(false).boost();
         }
 
         super.init();
@@ -41,6 +45,8 @@ public class BaseTurret extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.placing);
     }
 

@@ -6,8 +6,10 @@ import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.net.*;
+import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 public class EventType{
 
@@ -133,6 +135,18 @@ public class EventType{
         }
     }
 
+    /** Consider using Menus.registerMenu instead. */
+    public static class MenuOptionChooseEvent{
+        public final Player player;
+        public final int menuId, option;
+
+        public MenuOptionChooseEvent(Player player, int menuId, int option){
+            this.player = player;
+            this.option = option;
+            this.menuId = menuId;
+        }
+    }
+
     public static class PlayerChatEvent{
         public final Player player;
         public final String message;
@@ -242,11 +256,40 @@ public class EventType{
         }
     }
 
-    public static class TileChangeEvent{
-        public final Tile tile;
+    /**
+     * Called *before* a tile has changed.
+     * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
+     * Do not modify any tiles inside listeners that use this tile.
+     * */
+    public static class TilePreChangeEvent{
+        public Tile tile;
 
-        public TileChangeEvent(Tile tile){
+        public TilePreChangeEvent set(Tile tile){
             this.tile = tile;
+            return this;
+        }
+    }
+
+    /**
+     * Called *after* a tile has changed.
+     * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
+     * Do not modify any tiles inside listeners that use this tile.
+     * */
+    public static class TileChangeEvent{
+        public Tile tile;
+
+        public TileChangeEvent set(Tile tile){
+            this.tile = tile;
+            return this;
+        }
+    }
+
+    /** Called when a core block is placed/removed or its team is changed. */
+    public static class CoreChangeEvent{
+        public CoreBuild core;
+
+        public CoreChangeEvent(CoreBuild core){
+            this.core = core;
         }
     }
 
@@ -383,6 +426,26 @@ public class EventType{
         }
     }
 
+    /** Called when a connection is established to a client. */
+    public static class ConnectionEvent{
+        public final NetConnection connection;
+
+        public ConnectionEvent(NetConnection connection){
+            this.connection = connection;
+        }
+    }
+
+    /** Called when a player sends a connection packet. */
+    public static class ConnectPacketEvent{
+        public final NetConnection connection;
+        public final ConnectPacket packet;
+
+        public ConnectPacketEvent(NetConnection connection, ConnectPacket packet){
+            this.connection = connection;
+            this.packet = packet;
+        }
+    }
+
     /** Called after connecting; when a player receives world data and is ready to play.*/
     public static class PlayerJoin{
         public final Player player;
@@ -410,18 +473,24 @@ public class EventType{
     }
     
     public static class PlayerBanEvent{
+        @Nullable
         public final Player player;
+        public final String uuid;
 
-        public PlayerBanEvent(Player player){
+        public PlayerBanEvent(Player player, String uuid){
             this.player = player;
+            this.uuid = uuid;
         }
     }
     
     public static class PlayerUnbanEvent{
+        @Nullable
         public final Player player;
+        public final String uuid;
 
-        public PlayerUnbanEvent(Player player){
+        public PlayerUnbanEvent(Player player, String uuid){
             this.player = player;
+            this.uuid = uuid;
         }
     }
     

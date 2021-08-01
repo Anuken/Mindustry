@@ -45,13 +45,52 @@ public abstract class LStatement{
         tooltip(label, text);
     }
 
+    protected String sanitize(String value){
+        if(value.length() == 0){
+            return "";
+        }else if(value.length() == 1){
+            if(value.charAt(0) == '"' || value.charAt(0) == ';' || value.charAt(0) == ' '){
+                return "invalid";
+            }
+        }else{
+            StringBuilder res = new StringBuilder(value.length());
+            if(value.charAt(0) == '"' && value.charAt(value.length() - 1) == '"'){
+                res.append('\"');
+                //strip out extra quotes
+                for(int i = 1; i < value.length() - 1; i++){
+                    if(value.charAt(i) == '"'){
+                        res.append('\'');
+                    }else{
+                        res.append(value.charAt(i));
+                    }
+                }
+                res.append('\"');
+            }else{
+                //otherwise, strip out semicolons, spaces and quotes
+                for(int i = 0; i < value.length(); i++){
+                    char c = value.charAt(i);
+                    res.append(switch(c){
+                        case ';' -> 's';
+                        case '"' -> '\'';
+                        case ' ' -> '_';
+                        default -> c;
+                    });
+                }
+            }
+
+            return res.toString();
+        }
+
+        return value;
+    }
+
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
-        return table.field(value, Styles.nodeField, setter)
+        return table.field(value, Styles.nodeField, s -> setter.get(sanitize(s)))
             .size(144f, 40f).pad(2f).color(table.color).maxTextLength(LAssembler.maxTokenLength).addInputDialog();
     }
 
     protected Cell<TextField> fields(Table table, String desc, String value, Cons<String> setter){
-        table.add(desc).padLeft(10).left().self(this::param);;
+        table.add(desc).padLeft(10).left().self(this::param);
         return field(table, value, setter).width(85f).padRight(10).left();
     }
 
@@ -144,7 +183,7 @@ public abstract class LStatement{
     public void afterRead(){}
 
     public void write(StringBuilder builder){
-        LogicIO.write(this,builder);
+        LogicIO.write(this, builder);
     }
 
     public void setupUI(){

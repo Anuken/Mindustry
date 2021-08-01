@@ -1,5 +1,6 @@
 package mindustry.world.blocks.defense.turrets;
 
+import arc.struct.*;
 import mindustry.entities.bullet.*;
 import mindustry.logic.*;
 import mindustry.world.meta.*;
@@ -16,7 +17,7 @@ public class PowerTurret extends Turret{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(Stat.damage, shootType.damage, StatUnit.none);
+        stats.add(Stat.ammo, StatValues.ammo(ObjectMap.of(this, shootType)));
     }
 
     @Override
@@ -29,7 +30,9 @@ public class PowerTurret extends Turret{
 
         @Override
         public void updateTile(){
-            unit.ammo(power.status * unit.type().ammoCapacity);
+            if(unit != null){
+                unit.ammo(power.status * unit.type().ammoCapacity);
+            }
 
             super.updateTile();
         }

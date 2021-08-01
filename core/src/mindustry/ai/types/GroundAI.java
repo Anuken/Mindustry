@@ -8,8 +8,6 @@ import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-import java.util.*;
-
 import static mindustry.Vars.*;
 
 public class GroundAI extends AIController{
@@ -19,12 +17,16 @@ public class GroundAI extends AIController{
 
         Building core = unit.closestEnemyCore();
 
-        if(core != null && unit.within(core, unit.range() / 1.1f + core.block.size * tilesize / 2f)){
+        if(core != null && unit.within(core, unit.range() / 1.3f + core.block.size * tilesize / 2f)){
             target = core;
-            Arrays.fill(targets, core);
+            for(var mount : unit.mounts){
+                if(mount.weapon.controllable && mount.weapon.bullet.collidesGround){
+                    mount.target = core;
+                }
+            }
         }
 
-        if((core == null || !unit.within(core, unit.range() * 0.5f)) && command() == UnitCommand.attack){
+        if((core == null || !unit.within(core, unit.type.range * 0.5f)) && command() == UnitCommand.attack){
             boolean move = true;
 
             if(state.rules.waves && unit.team == state.rules.defaultTeam){
@@ -43,8 +45,8 @@ public class GroundAI extends AIController{
             }
         }
 
-        if(unit.type.canBoost && !unit.onSolid()){
-            unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
+        if(unit.type.canBoost && unit.elevation > 0.001f && !unit.onSolid()){
+            unit.elevation = Mathf.approachDelta(unit.elevation, 0f, unit.type.riseSpeed);
         }
 
         if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type.rotateShooting){

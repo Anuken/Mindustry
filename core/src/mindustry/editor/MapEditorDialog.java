@@ -33,8 +33,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class MapEditorDialog extends Dialog implements Disposable{
-    public final MapEditor editor;
-
     private MapView view;
     private MapInfoDialog infoDialog;
     private MapLoadDialog loadDialog;
@@ -53,10 +51,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         background(Styles.black);
 
-        editor = new MapEditor();
-        view = new MapView(editor);
-        infoDialog = new MapInfoDialog(editor);
-        generateDialog = new MapGenerateDialog(editor, true);
+        view = new MapView();
+        infoDialog = new MapInfoDialog();
+        generateDialog = new MapGenerateDialog(true);
 
         menu = new BaseDialog("@menu");
         menu.addCloseButton();
@@ -120,7 +117,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             "@editor.exportimage", "@editor.exportimage.description", Icon.fileImage,
                 (Runnable)() -> platform.export(editor.tags.get("name", "unknown"), "png", file -> {
                     Pixmap out = MapIO.writeImage(editor.tiles());
-                    file.writePNG(out);
+                    file.writePng(out);
                     out.dispose();
                 })));
         });
@@ -173,7 +170,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             menu.hide();
         }).size(swidth * 2f + 10, 60f);
 
-        resizeDialog = new MapResizeDialog(editor, (x, y) -> {
+        resizeDialog = new MapResizeDialog((x, y) -> {
             if(!(editor.width() == x && editor.height() == y)){
                 ui.loadAnd(() -> {
                     editor.resize(x, y);
@@ -563,10 +560,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         }
                     }
 
-                    t.top();
-                    t.add("@editor.brush");
+                    var label = new Label("@editor.brush");
+                    label.setAlignment(Align.center);
+                    label.touchable = Touchable.disabled;
+
+                    t.top().stack(slider, label).width(size * 3f - 20).padTop(4f);
                     t.row();
-                    t.add(slider).width(size * 3f - 20).padTop(4f);
                 }).padTop(5).growX().top();
 
                 mid.row();
@@ -639,7 +638,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 for(int x = 0; x < editor.width(); x++){
                     for(int y = 0; y < editor.height(); y++){
                         Tile tile = editor.tile(x, y);
-                        if(tile.block().breakable && tile.block() instanceof Boulder){
+                        if(tile.block().breakable && tile.block() instanceof Prop){
                             tile.setBlock(Blocks.air);
                             editor.renderer.updatePoint(x, y);
                         }
@@ -714,7 +713,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         int i = 0;
 
         for(Block block : blocksOut){
-            TextureRegion region = block.icon(Cicon.medium);
+            TextureRegion region = block.uiIcon;
 
             if(!Core.atlas.isFound(region) || !block.inEditor
                     || block.buildVisibility == BuildVisibility.debugOnly

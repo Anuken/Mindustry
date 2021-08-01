@@ -26,8 +26,10 @@ import mindustry.entities.effect.*;
 import mindustry.game.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
+import mindustry.type.ammo.*;
 import mindustry.type.weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.units.*;
@@ -59,6 +61,8 @@ public class ContentParser{
             return result;
         });
         put(Interp.class, (type, data) -> field(Interp.class, data));
+        put(CacheLayer.class, (type, data) -> field(CacheLayer.class, data));
+        put(Attribute.class, (type, data) -> Attribute.get(data.asString()));
         put(Schematic.class, (type, data) -> {
             Object result = fieldOpt(Loadouts.class, data);
             if(result != null){
@@ -92,6 +96,19 @@ public class ContentParser{
             readFields(result, data);
             return result;
         });
+        put(AmmoType.class, (type, data) -> {
+            //string -> item
+            //if liquid ammo support is added, this should scan for liquids as well
+            if(data.isString()) return find(ContentType.item, data.asString());
+            //number -> power
+            if(data.isNumber()) return new PowerAmmoType(data.asFloat());
+
+            var bc = resolve(data.getString("type", ""), ItemAmmoType.class);
+            data.remove("type");
+            AmmoType result = make(bc);
+            readFields(result, data);
+            return result;
+        });
         put(DrawBlock.class, (type, data) -> {
             if(data.isString()){
                 //try to instantiate
@@ -118,6 +135,11 @@ public class ContentParser{
             return sound;
         });
         put(Objectives.Objective.class, (type, data) -> {
+            if(data.isString()){
+                var cont = locateAny(data.asString());
+                if(cont == null) throw new IllegalArgumentException("Unknown objective content: " + data.asString());
+                return new Research((UnlockableContent)cont);
+            }
             var oc = resolve(data.getString("type", ""), SectorComplete.class);
             data.remove("type");
             Objectives.Objective obj = make(oc);
@@ -132,7 +154,9 @@ public class ContentParser{
             return obj;
         });
         put(Weapon.class, (type, data) -> {
-            Weapon weapon = new Weapon();
+            var oc = resolve(data.getString("type", ""), Weapon.class);
+            data.remove("type");
+            var weapon = make(oc);
             readFields(weapon, data);
             weapon.name = currentMod.name + "-" + weapon.name;
             return weapon;
@@ -223,6 +247,7 @@ public class ContentParser{
                             case "item" -> block.consumes.item(find(ContentType.item, child.asString()));
                             case "items" -> block.consumes.add((Consume)parser.readValue(ConsumeItems.class, child));
                             case "liquid" -> block.consumes.add((Consume)parser.readValue(ConsumeLiquid.class, child));
+                            case "coolant" -> block.consumes.add((Consume)parser.readValue(ConsumeCoolant.class, child));
                             case "power" -> {
                                 if(child.isNumber()){
                                     block.consumes.power(child.asFloat());
@@ -291,6 +316,7 @@ public class ContentParser{
 
                 if(value.has("controller")){
                     unit.defaultController = supply(resolve(value.getString("controller"), FlyingAI.class));
+                    value.remove("controller");
                 }
 
                 //read extra default waves
@@ -316,15 +342,25 @@ public class ContentParser{
                 readBundle(ContentType.weather, name, value);
             }else{
                 readBundle(ContentType.weather, name, value);
-                item = make(resolve(getType(value), ParticleWeather.class));
+                item = make(resolve(getType(value), ParticleWeather.class), mod + "-" + name);
+                value.remove("type");
             }
             currentContent = item;
             read(() -> readFields(item, value));
             return item;
         },
         ContentType.item, parser(ContentType.item, Item::new),
-        ContentType.liquid, parser(ContentType.liquid, Liquid::new)
-        //ContentType.sector, parser(ContentType.sector, SectorPreset::new)
+        ContentType.liquid, parser(ContentType.liquid, Liquid::new),
+        ContentType.status, parser(ContentType.status, StatusEffect::new),
+        ContentType.sector, (TypeParser<SectorPreset>)(mod, name, value) -> {
+            if(value.isString()){
+                return locate(ContentType.sector, name);
+            }
+
+            if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
+
+            return new SectorPreset(name, locate(ContentType.planet, value.getString("planet", "serpulo")), value.getInt("sector"));
+        }
     );
 
     private Prov<Unit> unitType(JsonValue value){
@@ -434,6 +470,7 @@ public class ContentParser{
         try{
             run.run();
         }catch(Throwable t){
+            Log.err(t);
             //don't overwrite double errors
             markError(currentContent, t);
         }
@@ -524,6 +561,16 @@ public class ContentParser{
     private <T extends MappableContent> T locate(ContentType type, String name){
         T first = Vars.content.getByName(type, name); //try vanilla replacement
         return first != null ? first : Vars.content.getByName(type, currentMod.name + "-" + name);
+    }
+
+    private <T extends MappableContent> T locateAny(String name){
+        for(ContentType t : ContentType.all){
+            var out = locate(t, name);
+            if(out != null){
+                return (T)out;
+            }
+        }
+        return null;
     }
 
     <T> T make(Class<T> type){
@@ -662,18 +709,31 @@ public class ContentParser{
                 lastNode.remove();
             }
 
-            TechNode node = new TechNode(null, unlock, customRequirements == null ? unlock.researchRequirements() : customRequirements);
+            TechNode node = new TechNode(null, unlock, customRequirements == null ? ItemStack.empty : customRequirements);
             LoadedMod cur = currentMod;
 
             postreads.add(() -> {
                 currentContent = unlock;
                 currentMod = cur;
 
+                //add custom objectives
+                if(research.has("objectives")){
+                    node.objectives.addAll(parser.readValue(Objective[].class, research.get("objectives")));
+                }
+
+                //all items have a produce requirement unless already specified
+                if(object instanceof Item i && !node.objectives.contains(o -> o instanceof Produce p && p.content == i)){
+                    node.objectives.add(new Produce(i));
+                }
+
                 //remove old node from parent
                 if(node.parent != null){
                     node.parent.children.remove(node);
                 }
 
+                if(customRequirements == null){
+                    node.setupRequirements(unlock.researchRequirements());
+                }
 
                 //find parent node.
                 TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName));
@@ -700,25 +760,21 @@ public class ContentParser{
     /** Tries to resolve a class from the class type map. */
     <T> Class<T> resolve(String base, Class<T> def){
         //no base class specified
-        if(base.isEmpty() && def != null) return def;
+        if((base == null || base.isEmpty()) && def != null) return def;
 
         //return mapped class if found in the global map
         var out = ClassMap.classes.get(!base.isEmpty() && Character.isLowerCase(base.charAt(0)) ? Strings.capitalize(base) : base);
         if(out != null) return (Class<T>)out;
 
-        //try to resolve it as a raw class name if it's allowed
-        if(base.indexOf('.') != -1 && Scripts.allowClass(base)){
+        //try to resolve it as a raw class name
+        if(base.indexOf('.') != -1){
             try{
                 return (Class<T>)Class.forName(base);
             }catch(Exception ignored){
-                //try to load from a mod's class loader
-                for(LoadedMod mod : mods.mods){
-                    if(mod.loader != null){
-                        try{
-                            return (Class<T>)Class.forName(base, true, mod.loader);
-                        }catch(Exception ignore){}
-                    }
-                }
+                //try to use mod class loader
+                try{
+                    return (Class<T>)Class.forName(base, true, mods.mainLoader());
+                }catch(Exception ignore){}
             }
         }
 

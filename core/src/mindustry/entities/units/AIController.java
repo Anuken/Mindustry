@@ -6,9 +6,11 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -23,8 +25,6 @@ public class AIController implements UnitController{
 
     /** main target that is being faced */
     protected Teamc target;
-    /** targets for each weapon */
-    protected Teamc[] targets = {};
 
     {
         timer.reset(0, Mathf.random(40f));
@@ -80,7 +80,6 @@ public class AIController implements UnitController{
         return Units.invalidateTarget(target, unit.team, unit.x, unit.y);
     }
 
-
     protected void pathfind(int pathTarget){
         int costType = unit.pathType();
 
@@ -90,17 +89,15 @@ public class AIController implements UnitController{
 
         if(tile == targetTile || (costType == Pathfinder.costNaval && !targetTile.floor().isLiquid)) return;
 
-        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.speed()));
+        unit.moveAt(vec.trns(unit.angleTo(targetTile.worldx(), targetTile.worldy()), unit.speed()));
     }
 
     protected void updateWeapons(){
-        if(targets.length != unit.mounts.length) targets = new Teamc[unit.mounts.length];
-
         float rotation = unit.rotation - 90;
         boolean ret = retarget();
 
         if(ret){
-            target = findTarget(unit.x, unit.y, unit.range(), unit.type.targetAir, unit.type.targetGround);
+            target = findMainTarget(unit.x, unit.y, unit.range(), unit.type.targetAir, unit.type.targetGround);
         }
 
         if(invalid(target)){
@@ -109,39 +106,39 @@ public class AIController implements UnitController{
 
         unit.isShooting = false;
 
-        for(int i = 0; i < targets.length; i++){
-            WeaponMount mount = unit.mounts[i];
+        for(var mount : unit.mounts){
             Weapon weapon = mount.weapon;
+
+            //let uncontrollable weapons do their own thing
+            if(!weapon.controllable) continue;
 
             float mountX = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y),
                 mountY = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y);
 
             if(unit.type.singleTarget){
-                targets[i] = target;
+                mount.target = target;
             }else{
                 if(ret){
-                    targets[i] = findTarget(mountX, mountY, weapon.bullet.range(), weapon.bullet.collidesAir, weapon.bullet.collidesGround);
+                    mount.target = findTarget(mountX, mountY, weapon.bullet.range(), weapon.bullet.collidesAir, weapon.bullet.collidesGround);
                 }
 
-                if(checkTarget(targets[i], mountX, mountY, weapon.bullet.range())){
-                    targets[i] = null;
+                if(checkTarget(mount.target, mountX, mountY, weapon.bullet.range())){
+                    mount.target = null;
                 }
             }
 
             boolean shoot = false;
 
-            if(targets[i] != null){
-                shoot = targets[i].within(mountX, mountY, weapon.bullet.range()) && shouldShoot();
+            if(mount.target != null){
+                shoot = mount.target.within(mountX, mountY, weapon.bullet.range() + (mount.target instanceof Sized s ? s.hitSize()/2f : 0f)) && shouldShoot();
 
-                Vec2 to = Predict.intercept(unit, targets[i], weapon.bullet.speed);
+                Vec2 to = Predict.intercept(unit, mount.target, weapon.bullet.speed);
                 mount.aimX = to.x;
                 mount.aimY = to.y;
             }
 
-            mount.shoot = shoot;
-            mount.rotate = shoot;
+            unit.isShooting |= (mount.shoot = mount.rotate = shoot);
 
-            unit.isShooting |= shoot;
             if(shoot){
                 unit.aimX = mount.aimX;
                 unit.aimY = mount.aimY;
@@ -158,6 +155,7 @@ public class AIController implements UnitController{
     }
 
     protected Teamc targetFlag(float x, float y, BlockFlag flag, boolean enemy){
+        if(unit.team == Team.derelict) return null;
         Tile target = Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getAllied(unit.team, flag));
         return target == null ? null : target.build;
     }
@@ -170,6 +168,10 @@ public class AIController implements UnitController{
         return timer.get(timerTarget, target == null ? 40 : 90);
     }
 
+    protected Teamc findMainTarget(float x, float y, float range, boolean air, boolean ground){
+        return findTarget(x, y, range, air, ground);
+    }
+
     protected Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
         return target(x, y, range, air, ground);
     }
@@ -180,6 +182,14 @@ public class AIController implements UnitController{
 
     protected @Nullable Tile getClosestSpawner(){
         return Geometry.findClosest(unit.x, unit.y, Vars.spawner.getSpawns());
+    }
+
+    protected void unloadPayloads(){
+        if(unit instanceof Payloadc pay && pay.hasPayload() && target instanceof Building && pay.payloads().peek() instanceof UnitPayload){
+            if(target.within(unit, Math.max(unit.type().range + 1f, 75f))){
+                pay.dropLastPayload();
+            }
+        }
     }
 
     protected void circle(Position target, float circleLength){

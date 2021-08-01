@@ -6,20 +6,21 @@ import arc.struct.*;
 import mindustry.*;
 import mindustry.game.*;
 import mindustry.io.*;
+import mindustry.maps.filters.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
+import static mindustry.Vars.*;
+
 public class MapInfoDialog extends BaseDialog{
-    private final MapEditor editor;
     private final WaveInfoDialog waveInfo;
     private final MapGenerateDialog generate;
     private final CustomRulesDialog ruleInfo = new CustomRulesDialog();
 
-    public MapInfoDialog(MapEditor editor){
+    public MapInfoDialog(){
         super("@editor.mapinfo");
-        this.editor = editor;
-        this.waveInfo = new WaveInfoDialog(editor);
-        this.generate = new MapGenerateDialog(editor, false);
+        this.waveInfo = new WaveInfoDialog();
+        this.generate = new MapGenerateDialog(false);
 
         addCloseButton();
 
@@ -73,8 +74,16 @@ public class MapInfoDialog extends BaseDialog{
             t.row();
             t.add("@editor.generation").padRight(8).left();
             t.button("@edit", () -> {
-                generate.show(Vars.maps.readFilters(editor.tags.get("genfilters", "")),
-                filters -> editor.tags.put("genfilters", JsonIO.write(filters)));
+                //randomize so they're not all the same seed
+                var res = maps.readFilters(editor.tags.get("genfilters", ""));
+                res.each(GenerateFilter::randomize);
+
+                generate.show(res,
+                filters -> {
+                    //reset seed to 0 so it is not written
+                    filters.each(f -> f.seed = 0);
+                    editor.tags.put("genfilters", JsonIO.write(filters));
+                });
                 hide();
             }).left().width(200f);
 

@@ -23,7 +23,8 @@ public class ContinuousLaserBulletType extends BulletType{
     public boolean largeHit = true;
 
     public ContinuousLaserBulletType(float damage){
-        super(0.001f, damage);
+        this.damage = damage;
+        this.speed = 0f;
 
         hitEffect = Fx.hitBeam;
         despawnEffect = Fx.none;
@@ -35,6 +36,7 @@ public class ContinuousLaserBulletType extends BulletType{
         incendSpread = 5;
         incendChance = 0.4f;
         lightColor = Color.orange;
+        impact = true;
         keepVelocity = false;
         collides = false;
         pierce = true;
@@ -47,6 +49,11 @@ public class ContinuousLaserBulletType extends BulletType{
     }
 
     @Override
+    public float continuousDamage(){
+        return damage / 5f * 60f;
+    }
+
+    @Override
     public float estimateDPS(){
         //assume firing duration is about 100 by default, may not be accurate there's no way of knowing in this method
         //assume it pierces 3 blocks/units
@@ -55,7 +62,7 @@ public class ContinuousLaserBulletType extends BulletType{
 
     @Override
     public float range(){
-        return length;
+        return Math.max(length, maxRange);
     }
 
     @Override

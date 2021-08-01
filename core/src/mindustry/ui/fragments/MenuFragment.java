@@ -24,12 +24,6 @@ public class MenuFragment extends Fragment{
     private Button currentMenu;
     private MenuRenderer renderer;
 
-    public MenuFragment(){
-        Events.on(DisposeEvent.class, event -> {
-            renderer.dispose();
-        });
-    }
-
     @Override
     public void build(Group parent){
         renderer = new MenuRenderer();
@@ -126,7 +120,6 @@ public class MenuFragment extends Fragment{
                 table.add(tools);
 
                 table.add(mods);
-                //if(platform.canDonate()) table.add(donate);
                 if(!ios) table.add(exit);
             }).colspan(4);
         }else{
@@ -145,7 +138,6 @@ public class MenuFragment extends Fragment{
                 table.defaults().set(container.defaults());
 
                 table.add(mods);
-                //if(platform.canDonate()) table.add(donate);
                 if(!ios) table.add(exit);
             }).colspan(2);
         }

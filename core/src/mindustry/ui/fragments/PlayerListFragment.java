@@ -83,13 +83,15 @@ public class PlayerListFragment extends Fragment{
         Groups.player.copy(players);
 
         players.sort(Structs.comps(Structs.comparing(Player::team), Structs.comparingBool(p -> !p.admin)));
+        if(sField.getText().length() > 0){
+            players.filter(p -> Strings.stripColors(p.name().toLowerCase()).contains(sField.getText().toLowerCase()));
+        }
 
         for(var user : players){
             found = true;
             NetConnection connection = user.con;
 
             if(connection == null && net.server() && !user.isLocal()) return;
-            if(sField.getText().length() > 0 && !user.name().toLowerCase().contains(sField.getText().toLowerCase()) && !Strings.stripColors(user.name().toLowerCase()).contains(sField.getText().toLowerCase())) return;
 
             Table button = new Table();
             button.left();

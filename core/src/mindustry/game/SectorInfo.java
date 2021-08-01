@@ -9,6 +9,7 @@ import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
 import java.util.*;
@@ -54,7 +55,7 @@ public class SectorInfo{
     /** Waves this sector can survive if under attack. Based on wave in info. <0 means uncalculated. */
     public int wavesSurvived = -1;
     /** Time between waves. */
-    public float waveSpacing = 60 * 60 * 2;
+    public float waveSpacing = 2 * Time.toMinutes;
     /** Damage dealt to sector. */
     public float damage;
     /** How many waves have passed while the player was away. */
@@ -69,6 +70,8 @@ public class SectorInfo{
     public @Nullable String name;
     /** Displayed icon. */
     public @Nullable String icon;
+    /** Displayed icon, as content. */
+    public @Nullable UnlockableContent contentIcon;
     /** Version of generated waves. When it doesn't match, new waves are generated. */
     public int waveVersion = -1;
     /** Whether this sector was indicated to the player or not. */
@@ -112,11 +115,6 @@ public class SectorInfo{
     /** Updates export statistics. */
     public void handleItemExport(Item item, int amount){
         export.get(item, ExportStat::new).counter += amount;
-    }
-
-    /** Subtracts from export statistics. */
-    public void handleItemImport(Item item, int amount){
-        export.get(item, ExportStat::new).counter -= amount;
     }
 
     public float getExport(Item item){
@@ -191,6 +189,13 @@ public class SectorInfo{
             stat.mean = Math.min(stat.mean, rawProduction.get(item, ExportStat::new).mean);
         });
 
+        var pads = indexer.getAllied(state.rules.defaultTeam, BlockFlag.launchPad);
+
+        //disable export when launch pads are disabled, or there aren't any active ones
+        if(pads.size() == 0 || !Seq.with(pads).contains(t -> t.build.consValid())){
+            export.clear();
+        }
+
         if(state.rules.sector != null){
             state.rules.sector.saveInfo();
         }
@@ -258,6 +263,25 @@ public class SectorInfo{
         ObjectFloatMap<Item> map = new ObjectFloatMap<>();
         export.each((item, value) -> map.put(item, value.mean));
         return map;
+    }
+
+    /** @return a newly allocated map with import statistics. Use sparingly. */
+    //TODO this can be a float map
+    public ObjectMap<Item, ExportStat> importStats(){
+        ObjectMap<Item, ExportStat> imports = new ObjectMap<>();
+        //for all sectors on all planets that have bases and export to this sector
+        for(Planet planet : content.planets()){
+            for(Sector sector : planet.sectors){
+                Sector dest = sector.info.getRealDestination();
+                if(sector.hasBase() && sector.info != this && dest != null && dest.info == this){
+                    //add their exports to our imports
+                    sector.info.export.each((item, stat) -> {
+                        imports.get(item, ExportStat::new).mean += stat.mean;
+                    });
+                }
+            }
+        }
+        return imports;
     }
 
     public static class ExportStat{

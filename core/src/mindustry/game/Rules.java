@@ -10,6 +10,8 @@ import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
 /**
  * Defines current rules on how the game should function.
@@ -34,6 +36,8 @@ public class Rules{
     public boolean editor = false;
     /** Whether a gameover can happen at all. Set this to false to implement custom gameover conditions. */
     public boolean canGameOver = true;
+    /** Whether cores change teams when they are destroyed. */
+    public boolean coreCapture = false;
     /** Whether reactors can explode and damage other blocks. */
     public boolean reactorExplosions = true;
     /** Whether schematics are allowed. */
@@ -64,6 +68,10 @@ public class Rules{
     public float deconstructRefundMultiplier = 0.5f;
     /** No-build zone around enemy core radius. */
     public float enemyCoreBuildRadius = 400f;
+    /** If true, no-build zones are calculated based on the closest core. */
+    public boolean polygonCoreProtection = false;
+    /** If true, dead teams in PvP automatically have their blocks & units converted to derelict upon death. */
+    public boolean cleanupDeadTeams = true;
     /** Radius around enemy wave drop zones.*/
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
@@ -72,6 +80,10 @@ public class Rules{
     public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
     public int unitCap = 0;
+    /** Environmental flags that dictate visuals & how blocks function. */
+    public int environment = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater;
+    /** Attributes of the environment. */
+    public Attributes attributes = new Attributes();
     /** Sector for saves that have them. */
     public @Nullable Sector sector;
     /** Spawn layout. */
@@ -97,28 +109,14 @@ public class Rules{
     public Team defaultTeam = Team.sharded;
     /** team of the enemy in waves/sectors. */
     public Team waveTeam = Team.crux;
+    /** color of clouds that is displayed when the player is landing */
+    public Color cloudColor = new Color(0f, 0f, 0f, 0f);
     /** name of the custom mode that this ruleset describes, or null. */
     public @Nullable String modeName;
     /** Whether cores incinerate items when full, just like in the campaign. */
     public boolean coreIncinerates = false;
     /** special tags for additional info. */
     public StringMap tags = new StringMap();
-
-    /** A team-specific ruleset. */
-    public static class TeamRule{
-        /** Whether to use building AI. */
-        public boolean ai;
-        /** TODO Tier of blocks/designs that the AI uses for building. [0, 1] */
-        public float aiTier = 1f;
-        /** Whether, when AI is enabled, ships should be spawned from the core. */
-        public boolean aiCoreSpawn = true;
-        /** If true, blocks don't require power or resources. */
-        public boolean cheat;
-        /** If true, resources are not consumed when building. */
-        public boolean infiniteResources;
-        /** If true, this team has infinite unit ammo. */
-        public boolean infiniteAmmo;
-    }
 
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */
     public Rules copy(){
@@ -138,6 +136,22 @@ public class Rules{
         }else{
             return Gamemode.survival;
         }
+    }
+
+    /** A team-specific ruleset. */
+    public static class TeamRule{
+        /** Whether to use building AI. */
+        public boolean ai;
+        /** TODO Tier of blocks/designs that the AI uses for building. [0, 1] */
+        public float aiTier = 1f;
+        /** Whether, when AI is enabled, ships should be spawned from the core. */
+        public boolean aiCoreSpawn = true;
+        /** If true, blocks don't require power or resources. */
+        public boolean cheat;
+        /** If true, resources are not consumed when building. */
+        public boolean infiniteResources;
+        /** If true, this team has infinite unit ammo. */
+        public boolean infiniteAmmo;
     }
 
     /** A simple map for storing TeamRules in an efficient way without hashing. */

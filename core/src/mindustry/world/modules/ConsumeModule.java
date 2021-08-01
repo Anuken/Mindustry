@@ -66,6 +66,10 @@ public class ConsumeModule extends BlockModule{
         return valid && entity.shouldConsume() && entity.enabled;
     }
 
+    public boolean canConsume(){
+        return valid && entity.enabled;
+    }
+
     public boolean optionalValid(){
         return valid() && optionalValid && entity.enabled;
     }
