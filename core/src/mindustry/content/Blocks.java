@@ -1297,6 +1297,7 @@ public class Blocks implements ContentList{
             drillEffect = Fx.mineHuge;
             rotateSpeed = 6f;
             warmupSpeed = 0.01f;
+            itemCapacity = 20;
 
             //more than the laser drill
             liquidBoostIntensity = 1.8f;
