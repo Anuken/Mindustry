@@ -633,6 +633,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         dialog.cont.pane(c -> {
             c.defaults().padBottom(5);
 
+            if(sector.preset != null){
+            c.add(sector.preset.displayDescription() + "\n").left().row();
+            }
+
             c.add(Core.bundle.get("sectors.time") + " [accent]" + sector.save.getPlayTime()).left().row();
 
             if(sector.info.waves && sector.hasBase()){
