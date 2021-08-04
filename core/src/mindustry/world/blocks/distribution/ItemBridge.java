@@ -178,7 +178,7 @@ public class ItemBridge extends Block{
         public int link = -1;
         public IntSeq incoming = new IntSeq(false, 4);
         public float warmup;
-        public float time = 10f, timeSpeed;
+        public float time = -8f, timeSpeed;
         public boolean wasMoved, moved;
         public float transportCounter;
 
