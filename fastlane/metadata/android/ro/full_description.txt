@@ -3,7 +3,7 @@
 <h2>Funcțiile Jocului</h2>
  
 - Construiește clădiri pt a fabrica o mare varietate de materiale avansate
-- Apara-ți baza de inamici
+- Apără-ți baza de inamici
 - Joacă cu prietenii pe multiplayer în co-op sau provoacă-i la un meci PvP
 - Distribuie lichide și luptă împotriva amenințărilor constante, cum ar fi incendiile devastatoare sau raidurile inamice
 - Eficientizează-ți producția folosind lichid de răcire și lubrifiante
