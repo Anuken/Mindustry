@@ -20,7 +20,6 @@ import static mindustry.entities.Puddles.*;
 @EntityDef(value = {Puddlec.class}, pooled = true)
 @Component(base = true)
 abstract class PuddleComp implements Posc, Puddlec, Drawc{
-    private static final int maxGeneration = 2;
     private static final Rect rect = new Rect(), rect2 = new Rect();
     private static int seeds;
 
@@ -29,7 +28,6 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
 
     transient float accepting, updateTime, lastRipple;
     float amount;
-    int generation;
     Tile tile;
     Liquid liquid;
 
@@ -39,22 +37,23 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
 
     @Override
     public void update(){
-        //update code
         float addSpeed = accepting > 0 ? 3f : 0f;
 
         amount -= Time.delta * (1f - liquid.viscosity) / (5f + addSpeed);
         amount += accepting;
         accepting = 0f;
 
-        if(amount >= maxLiquid / 1.5f && generation < maxGeneration){
+        if(amount >= maxLiquid / 1.5f){
             float deposited = Math.min((amount - maxLiquid / 1.5f) / 4f, 0.3f) * Time.delta;
+            int targets = 0;
             for(Point2 point : Geometry.d4){
                 Tile other = world.tile(tile.x + point.x, tile.y + point.y);
                 if(other != null && other.block() == Blocks.air){
-                    Puddles.deposit(other, tile, liquid, deposited, generation + 1);
-                    amount -= deposited / 2f; //tweak to speed up/slow down Puddle propagation
+                    targets ++;
+                    Puddles.deposit(other, tile, liquid, deposited, false);
                 }
             }
+            amount -= deposited * targets;
         }
 
         amount = Mathf.clamp(amount, 0, maxLiquid);
