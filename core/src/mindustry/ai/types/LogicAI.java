@@ -102,7 +102,7 @@ public class LogicAI extends AIController{
         }
 
         //look where moving if there's nothing to aim at
-        if(!shoot){
+        if(!shoot || !unit.type.omniMovement){
             unit.lookAt(unit.prefRotation());
         }else if(unit.hasWeapons() && unit.mounts.length > 0 && !unit.mounts[0].weapon.ignoreRotation){ //if there is, look at the object
             unit.lookAt(unit.mounts[0].aimX, unit.mounts[0].aimY);
@@ -131,7 +131,13 @@ public class LogicAI extends AIController{
         //do not move when infinite vectors are used.
         if(vec.isNaN() || vec.isInfinite()) return;
 
-        unit.approach(vec);
+        if(unit.type.omniMovement){
+            unit.approach(vec);
+        }else{
+            unit.rotateMove(vec);
+        }
+
+
     }
 
     @Override
