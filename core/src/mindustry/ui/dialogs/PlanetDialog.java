@@ -769,10 +769,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                             t.button(Icon.none, Styles.clearTogglei, () -> {
                                 sector.info.icon = null;
+                                sector.info.contentIcon = null;
                                 sector.saveInfo();
                                 hide();
                                 updateSelected();
-                            }).checked(sector.info.icon == null);
+                            }).checked(sector.info.icon == null && sector.info.contentIcon == null);
 
                             int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
 
@@ -780,7 +781,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             for(var key : defaultIcons){
                                 var value = Icon.icons.get(key);
 
-                                t.button(value, Styles.cleari, () -> {
+                                t.button(value, Styles.clearTogglei, () -> {
                                     sector.info.icon = key;
                                     sector.info.contentIcon = null;
                                     sector.saveInfo();
@@ -799,7 +800,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                 i = 0;
                                 for(UnlockableContent u : content.getBy(ctype).<UnlockableContent>as()){
                                     if(!u.isHidden() && u.unlocked()){
-                                        t.button(new TextureRegionDrawable(u.uiIcon), Styles.cleari, iconMed, () -> {
+                                        t.button(new TextureRegionDrawable(u.uiIcon), Styles.clearTogglei, iconMed, () -> {
                                             sector.info.icon = null;
                                             sector.info.contentIcon = u;
                                             sector.saveInfo();
