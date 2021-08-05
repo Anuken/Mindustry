@@ -33,11 +33,16 @@ public class MinimapRenderer{
             updateAll();
         });
 
-        //make sure to call on the graphics thread
         Events.on(TileChangeEvent.class, event -> {
             //TODO don't update when the minimap is off?
             if(!ui.editor.isShown()){
                 update(event.tile);
+            }
+        });
+
+        Events.on(BuildTeamChangeEvent.class, event -> {
+            if(!ui.editor.isShown()){
+                update(event.build.tile);
             }
         });
     }
