@@ -1046,7 +1046,7 @@ public class Blocks implements ContentList{
 
         mechanicalPump = new Pump("mechanical-pump"){{
             requirements(Category.liquid, with(Items.copper, 15, Items.metaglass, 10));
-            pumpAmount = 0.11f;
+            pumpAmount = 7f / 60f;
         }};
 
         rotaryPump = new Pump("rotary-pump"){{
@@ -1337,14 +1337,13 @@ public class Blocks implements ContentList{
             maxBoost = 2f;
 
             consumes.power(80f / 60f);
-            consumes.liquid(Liquids.water, 20f / 60f);
+            consumes.liquid(Liquids.water, 18f / 60f);
         }};
 
         oilExtractor = new Fracker("oil-extractor"){{
             requirements(Category.production, with(Items.copper, 150, Items.graphite, 175, Items.lead, 115, Items.thorium, 115, Items.silicon, 75));
             result = Liquids.oil;
             updateEffect = Fx.pulverize;
-            liquidCapacity = 50f;
             updateEffectChance = 0.05f;
             pumpAmount = 0.25f;
             size = 3;
