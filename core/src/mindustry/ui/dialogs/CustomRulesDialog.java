@@ -28,87 +28,93 @@ public class CustomRulesDialog extends BaseDialog{
     private Table main;
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
-    private BaseDialog banDialog;
 
     public CustomRulesDialog(){
         super("@mode.custom");
 
         loadoutDialog = new LoadoutDialog();
-        banDialog = new BaseDialog("@bannedblocks");
-        banDialog.addCloseButton();
-
-        banDialog.shown(this::rebuildBanned);
-        banDialog.buttons.button("@addall", Icon.add, () -> {
-            rules.bannedBlocks.addAll(content.blocks().select(Block::canBeBuilt));
-            rebuildBanned();
-        }).size(180, 64f);
-
-        banDialog.buttons.button("@clear", Icon.trash, () -> {
-            rules.bannedBlocks.clear();
-            rebuildBanned();
-        }).size(180, 64f);
 
         setFillParent(true);
         shown(this::setup);
         addCloseButton();
     }
 
-    private void rebuildBanned(){
-        float previousScroll = banDialog.cont.getChildren().isEmpty() ? 0f : ((ScrollPane)banDialog.cont.getChildren().first()).getScrollY();
-        banDialog.cont.clear();
-        banDialog.cont.pane(t -> {
-            t.margin(10f);
+    private <T extends UnlockableContent> void showBanned(String title, ContentType type, ObjectSet<T> set, Boolf<T> pred){
+        BaseDialog bd = new BaseDialog(title);
+        bd.addCloseButton();
 
-            if(rules.bannedBlocks.isEmpty()){
-                t.add("@empty");
-            }
+        Runnable[] rebuild = {null};
 
-            Seq<Block> array = Seq.with(rules.bannedBlocks);
-            array.sort();
+        rebuild[0] = () -> {
+            float previousScroll = bd.cont.getChildren().isEmpty() ? 0f : ((ScrollPane)bd.cont.getChildren().first()).getScrollY();
+            bd.cont.clear();
+            bd.cont.pane(t -> {
+                t.margin(10f);
 
-            int cols = mobile && Core.graphics.isPortrait() ? 1 : mobile ? 2 : 3;
-            int i = 0;
-
-            for(Block block : array){
-                t.table(Tex.underline, b -> {
-                    b.left().margin(4f);
-                    b.image(block.uiIcon).size(iconMed).padRight(3);
-                    b.add(block.localizedName).color(Color.lightGray).padLeft(3).growX().left().wrap();
-
-                    b.button(Icon.cancel, Styles.clearPartiali, () -> {
-                       rules.bannedBlocks.remove(block);
-                       rebuildBanned();
-                    }).size(70f).pad(-4f).padLeft(0f);
-                }).size(300f, 70f).padRight(5);
-
-                if(++i % cols == 0){
-                    t.row();
+                if(set.isEmpty()){
+                    t.add("@empty");
                 }
-            }
-        }).get().setScrollYForce(previousScroll);
-        banDialog.cont.row();
-        banDialog.cont.button("@add", Icon.add, () -> {
-            BaseDialog dialog = new BaseDialog("@add");
-            dialog.cont.pane(t -> {
-                t.left().margin(14f);
-                int[] i = {0};
-                content.blocks().each(b -> !rules.bannedBlocks.contains(b) && b.canBeBuilt(), b -> {
-                    int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
-                    t.button(new TextureRegionDrawable(b.uiIcon), Styles.cleari, iconMed, () -> {
-                        rules.bannedBlocks.add(b);
-                        rebuildBanned();
-                        dialog.hide();
-                    }).size(60f);
 
-                    if(++i[0] % cols == 0){
+                Seq<T> array = set.asArray();
+                array.sort();
+
+                int cols = mobile && Core.graphics.isPortrait() ? 1 : mobile ? 2 : 3;
+                int i = 0;
+
+                for(T con : array){
+                    t.table(Tex.underline, b -> {
+                        b.left().margin(4f);
+                        b.image(con.uiIcon).size(iconMed).padRight(3);
+                        b.add(con.localizedName).color(Color.lightGray).padLeft(3).growX().left().wrap();
+
+                        b.button(Icon.cancel, Styles.clearPartiali, () -> {
+                            set.remove(con);
+                            rebuild[0].run();
+                        }).size(70f).pad(-4f).padLeft(0f);
+                    }).size(300f, 70f).padRight(5);
+
+                    if(++i % cols == 0){
                         t.row();
                     }
-                });
-            });
+                }
+            }).get().setScrollYForce(previousScroll);
+            bd.cont.row();
+            bd.cont.button("@add", Icon.add, () -> {
+                BaseDialog dialog = new BaseDialog("@add");
+                dialog.cont.pane(t -> {
+                    t.left().margin(14f);
+                    int[] i = {0};
+                    content.<T>getBy(type).each(b -> !set.contains(b) && pred.get(b), b -> {
+                        int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
+                        t.button(new TextureRegionDrawable(b.uiIcon), Styles.cleari, iconMed, () -> {
+                            set.add(b);
+                            rebuild[0].run();
+                            dialog.hide();
+                        }).size(60f);
 
-            dialog.addCloseButton();
-            dialog.show();
-        }).size(300f, 64f);
+                        if(++i[0] % cols == 0){
+                            t.row();
+                        }
+                    });
+                });
+
+                dialog.addCloseButton();
+                dialog.show();
+            }).size(300f, 64f);
+        };
+
+        bd.shown(rebuild[0]);
+        bd.buttons.button("@addall", Icon.add, () -> {
+            set.addAll(content.<T>getBy(type).select(pred));
+            rebuild[0].run();
+        }).size(180, 64f);
+
+        bd.buttons.button("@clear", Icon.trash, () -> {
+            set.clear();
+            rebuild[0].run();
+        }).size(180, 64f);
+
+        bd.show();
     }
 
     public void show(Rules rules, Prov<Rules> resetter){
@@ -157,7 +163,7 @@ public class CustomRulesDialog extends BaseDialog{
         )).left().width(300f);
         main.row();
 
-        main.button("@bannedblocks", banDialog::show).left().width(300f);
+        main.button("@bannedblocks", () -> showBanned("@bannedblocks", ContentType.block, rules.bannedBlocks, Block::canBeBuilt)).left().width(300f);
         main.row();
 
         title("@rules.title.unit");
@@ -166,6 +172,9 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.unitcap", true, f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
         number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0.001f, 50f);
+
+        main.button("@bannedunits", () -> showBanned("@bannedunits", ContentType.unit, rules.bannedUnits, u -> !u.isHidden())).left().width(300f);
+        main.row();
 
         title("@rules.title.enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);

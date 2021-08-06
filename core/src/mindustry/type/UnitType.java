@@ -233,6 +233,10 @@ public class UnitType extends UnlockableContent{
         return (envEnabled & env) != 0 && (envDisabled & env) == 0 && (envRequired == 0 || (envRequired & env) == envRequired);
     }
 
+    public boolean isBanned(){
+        return state.rules.bannedUnits.contains(this);
+    }
+
     @Override
     public void getDependencies(Cons<UnlockableContent> cons){
         //units require reconstructors being researched

@@ -40,11 +40,7 @@ public class MinimapRenderer{
             }
         });
 
-        Events.on(BuildTeamChangeEvent.class, event -> {
-            if(!ui.editor.isShown()){
-                update(event.build.tile);
-            }
-        });
+        Events.on(BuildTeamChangeEvent.class, event -> update(event.build.tile));
     }
 
     public Pixmap getPixmap(){
