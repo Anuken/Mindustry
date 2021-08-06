@@ -117,7 +117,7 @@ public class Blocks implements ContentList{
             new ConstructBlock(i);
         }
 
-        deepwater = new Floor("deepwater"){{
+        deepwater = new Floor("deep-water"){{
             speedMultiplier = 0.2f;
             variants = 0;
             liquidDrop = Liquids.water;
@@ -130,7 +130,7 @@ public class Blocks implements ContentList{
             albedo = 0.5f;
         }};
 
-        water = new Floor("water"){{
+        water = new Floor("shallow-water"){{
             speedMultiplier = 0.5f;
             variants = 0;
             status = StatusEffects.wet;
@@ -184,7 +184,7 @@ public class Blocks implements ContentList{
             cacheLayer = CacheLayer.tar;
         }};
 
-        slag = new Floor("slag"){{
+        slag = new Floor("molten-slag"){{
             drownTime = 150f;
             status = StatusEffects.melting;
             statusDuration = 240f;
@@ -209,7 +209,7 @@ public class Blocks implements ContentList{
 
         stone = new Floor("stone");
 
-        craters = new Floor("craters"){{
+        craters = new Floor("crater-stone"){{
             variants = 3;
             blendGroup = stone;
         }};
