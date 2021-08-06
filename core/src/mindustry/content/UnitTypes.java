@@ -935,6 +935,8 @@ public class UnitTypes implements ContentList{
             engineOffset = 5.5f;
             range = 140f;
             targetAir = false;
+            //as default AI, flares are not very useful in core rushes, they attack nothing in the way
+            playerTargetFlags = new BlockFlag[]{null};
             targetFlags = new BlockFlag[]{BlockFlag.generator, null};
             commandLimit = 4;
             circleTarget = true;
@@ -969,6 +971,8 @@ public class UnitTypes implements ContentList{
             range = 140f;
             faceTarget = false;
             armor = 3f;
+            //do not rush core, attack closest
+            playerTargetFlags = new BlockFlag[]{null};
             targetFlags = new BlockFlag[]{BlockFlag.factory, null};
             commandLimit = 5;
             circleTarget = true;
@@ -1006,6 +1010,7 @@ public class UnitTypes implements ContentList{
             range = 140f;
             hitSize = 20f;
             lowAltitude = true;
+            forceMultiTarget = true;
             armor = 5f;
 
             targetFlags = new BlockFlag[]{BlockFlag.launchPad, BlockFlag.storage, BlockFlag.battery, null};

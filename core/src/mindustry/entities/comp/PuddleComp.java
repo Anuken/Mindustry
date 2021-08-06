@@ -41,7 +41,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
     @Import int id;
     @Import float x, y;
 
-    transient float accepting, updateTime, lastRipple;
+    transient float accepting, updateTime, lastRipple = Time.time + Mathf.random(40f);
     float amount;
     Tile tile;
     Liquid liquid;
@@ -73,7 +73,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
 
         amount = Mathf.clamp(amount, 0, maxLiquid);
 
-        if(amount <= 0f){
+        if(amount <= 0f || Puddles.get(tile) != self()){
             remove();
         }
 

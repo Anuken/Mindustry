@@ -121,6 +121,7 @@ public class UnitType extends UnlockableContent{
     public boolean canHeal = false;
     /** If true, all weapons will attack the same target. */
     public boolean singleTarget = false;
+    public boolean forceMultiTarget = false;
 
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;
@@ -319,7 +320,7 @@ public class UnitType extends UnlockableContent{
         }
 
         clipSize = Math.max(clipSize, lightRadius * 1.1f);
-        singleTarget = weapons.size <= 1;
+        singleTarget = weapons.size <= 1 && !forceMultiTarget;
 
         if(itemCapacity < 0){
             itemCapacity = Math.max(Mathf.round((int)(hitSize * 4.3), 10), 10);
