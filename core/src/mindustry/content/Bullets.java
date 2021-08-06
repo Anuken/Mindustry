@@ -342,11 +342,14 @@ public class Bullets implements ContentList{
             lifetime = 60f;
         }};
 
-        standardDenseBig = new BasicBulletType(7f, 55, "bullet"){{
-            hitSize = 5;
+        standardDenseBig = new BasicBulletType(7.5f, 50, "bullet"){{
+            hitSize = 4.8f;
             width = 15f;
             height = 21f;
             shootEffect = Fx.shootBig;
+            ammoMultiplier = 4;
+            reloadMultiplier = 1.7f;
+            knockback = 0.3f;
         }};
 
         standardThoriumBig = new BasicBulletType(8f, 80, "bullet"){{
@@ -359,7 +362,7 @@ public class Bullets implements ContentList{
             knockback = 0.7f;
         }};
 
-        standardIncendiaryBig = new BasicBulletType(7f, 60, "bullet"){{
+        standardIncendiaryBig = new BasicBulletType(7f, 70, "bullet"){{
             hitSize = 5;
             width = 16f;
             height = 21f;
@@ -370,7 +373,8 @@ public class Bullets implements ContentList{
             makeFire = true;
             pierceCap = 2;
             pierceBuilding = true;
-            knockback = 0.7f;            
+            knockback = 0.7f;
+            ammoMultiplier = 3;
         }};
 
         fireball = new BulletType(1f, 4){

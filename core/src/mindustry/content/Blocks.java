@@ -83,7 +83,7 @@ public class Blocks implements ContentList{
     commandCenter,
     groundFactory, airFactory, navalFactory,
     additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor,
-    repairPoint, repairTurret, resupplyPoint,
+    repairPoint, repairTurret,
 
     //payloads
     payloadConveyor, payloadRouter, payloadPropulsionTower,
