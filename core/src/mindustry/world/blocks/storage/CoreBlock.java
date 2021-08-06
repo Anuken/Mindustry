@@ -302,7 +302,13 @@ public class CoreBlock extends StorageBlock{
         @Override
         public void afterDestroyed(){
             if(state.rules.coreCapture){
-                tile.setNet(block, lastDamage, 0);
+                if(!net.client()){
+                    tile.setBlock(block, lastDamage);
+                }
+
+                //delay so clients don't destroy it afterwards
+                Core.app.post(() -> tile.setNet(block, lastDamage, 0));
+
                 //building does not exist on client yet
                 if(!net.client()){
                     //core is invincible for several seconds to prevent recapture
