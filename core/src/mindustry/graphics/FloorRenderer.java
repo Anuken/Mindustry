@@ -281,10 +281,13 @@ public class FloorRenderer{
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize && tilex < world.width(); tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize && tiley < world.height(); tiley++){
                 Tile tile = world.rawTile(tilex, tiley);
+                boolean wall = tile.block().cacheLayer != CacheLayer.normal;
 
-                if(tile.block().cacheLayer != CacheLayer.normal){
+                if(wall){
                     used.add(tile.block().cacheLayer);
-                }else{
+                }
+
+                if(!wall || world.isAccessible(tilex, tiley)){
                     used.add(tile.floor().cacheLayer);
                 }
             }

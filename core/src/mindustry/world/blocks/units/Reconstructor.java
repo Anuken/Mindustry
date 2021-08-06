@@ -116,11 +116,28 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
-            return this.payload == null
-                && (this.enabled || source == this)
-                && relativeTo(source) != rotation
-                && payload instanceof UnitPayload pay
-                && hasUpgrade(pay.unit.type);
+            if(!(this.payload == null
+            && (this.enabled || source == this)
+            && relativeTo(source) != rotation
+            && payload instanceof UnitPayload pay)){
+                return false;
+            }
+
+            var upgrade = upgrade(pay.unit.type);
+
+            if(upgrade != null){
+                if(!upgrade.unlockedNow()){
+                    //flash "not researched"
+                    pay.showOverlay(Icon.tree);
+                }
+
+                if(upgrade.isBanned()){
+                    //flash an X, meaning 'banned'
+                    pay.showOverlay(Icon.cancel);
+                }
+            }
+
+            return upgrade != null && upgrade.unlockedNow() && !upgrade.isBanned();
         }
 
         @Override
@@ -224,7 +241,7 @@ public class Reconstructor extends UnitBlock{
 
         public boolean hasUpgrade(UnitType type){
             UnitType t = upgrade(type);
-            return t != null && t.unlockedNow();
+            return t != null && t.unlockedNow() && !type.isBanned();
         }
 
         public UnitType upgrade(UnitType type){

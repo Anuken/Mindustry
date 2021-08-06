@@ -33,10 +33,9 @@ public class SWorkshop implements SteamUGCCallback{
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getSubscribedItems(ids);
 
-        Seq<Fi> folders = Seq.with(ids).map(f -> {
-            ugc.getItemInstallInfo(f, info);
-            return new Fi(info.getFolder());
-        }).select(f -> f != null && f.list().length > 0);
+        Seq<Fi> folders = Seq.with(ids)
+            .map(f -> !ugc.getItemInstallInfo(f, info) || info.getFolder() == null ? null : new Fi(info.getFolder()))
+            .select(f -> f != null && f.list().length > 0);
 
         workshopFiles.put(Map.class, folders.select(f -> f.list().length == 1 && f.list()[0].extension().equals(mapExtension)).map(f -> f.list()[0]));
         workshopFiles.put(Schematic.class, folders.select(f -> f.list().length == 1 && f.list()[0].extension().equals(schematicExtension)).map(f -> f.list()[0]));

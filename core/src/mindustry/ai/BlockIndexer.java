@@ -13,7 +13,6 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 import java.util.*;
@@ -32,7 +31,7 @@ public class BlockIndexer{
     /** Stores all ore quadrants on the map. Maps ID to qX to qY to a list of tiles with that ore. */
     private IntSeq[][][] ores;
     /** Stores all damaged tile entities by team. */
-    private ObjectSet<Building>[] damagedTiles = new ObjectSet[Team.all.length];
+    private Seq<Building>[] damagedTiles = new Seq[Team.all.length];
     /** All ores available on this map. */
     private ObjectSet<Item> allOres = new ObjectSet<>();
     /** Stores teams that are present here as tiles. */
@@ -59,7 +58,7 @@ public class BlockIndexer{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            damagedTiles = new ObjectSet[Team.all.length];
+            damagedTiles = new Seq[Team.all.length];
             flagMap = new TileArray[Team.all.length][BlockFlag.all.length];
             activeTeams = new Seq<>(Team.class);
 
@@ -73,10 +72,6 @@ public class BlockIndexer{
 
             for(Tile tile : world.tiles){
                 process(tile);
-
-                if(tile.build != null && tile.build.damaged()){
-                    notifyTileDamaged(tile.build);
-                }
 
                 var drop = tile.drop();
 
@@ -104,6 +99,7 @@ public class BlockIndexer{
     public void removeIndex(Tile tile){
         var team = tile.team();
         if(tile.build != null && tile.isCenter()){
+            var build = tile.build;
             var flags = tile.block().flags;
             var data = team.data();
 
@@ -118,7 +114,15 @@ public class BlockIndexer{
 
             //unregister building from building quadtree
             if(data.buildings != null){
-                data.buildings.remove(tile.build);
+                data.buildings.remove(build);
+            }
+
+            //is no longer registered
+            build.wasDamaged = false;
+
+            //unregister damaged buildings
+            if(build.damaged() && damagedTiles[team.id] != null){
+                damagedTiles[team.id].remove(build);
             }
         }
     }
@@ -175,25 +179,12 @@ public class BlockIndexer{
     }
 
     /** Returns all damaged tiles by team. */
-    public ObjectSet<Building> getDamaged(Team team){
-        breturnArray.clear();
-
+    public Seq<Building> getDamaged(Team team){
         if(damagedTiles[team.id] == null){
-            damagedTiles[team.id] = new ObjectSet<>();
+            return damagedTiles[team.id] = new Seq<>(false);
         }
 
-        ObjectSet<Building> set = damagedTiles[team.id];
-        for(Building build : set){
-            if((!build.isValid() || build.team != team || !build.damaged()) || build.block instanceof ConstructBlock){
-                breturnArray.add(build);
-            }
-        }
-
-        for(Building tile : breturnArray){
-            set.remove(tile);
-        }
-
-        return set;
+        return damagedTiles[team.id];
     }
 
     /** Get all allied blocks with a flag. */
@@ -271,12 +262,22 @@ public class BlockIndexer{
         return returnArray;
     }
 
-    public void notifyTileDamaged(Building entity){
-        if(damagedTiles[entity.team.id] == null){
-            damagedTiles[entity.team.id] = new ObjectSet<>();
+    public void notifyBuildHealed(Building build){
+        if(build.wasDamaged && !build.damaged() && damagedTiles[build.team.id] != null){
+            damagedTiles[build.team.id].remove(build);
+            build.wasDamaged = false;
+        }
+    }
+
+    public void notifyBuildDamaged(Building build){
+        if(build.wasDamaged || !build.damaged()) return;
+
+        if(damagedTiles[build.team.id] == null){
+            damagedTiles[build.team.id] = new Seq<>(false);
         }
 
-        damagedTiles[entity.team.id].add(entity);
+        damagedTiles[build.team.id].add(build);
+        build.wasDamaged = true;
     }
 
     public void allBuildings(float x, float y, float range, Cons<Building> cons){
@@ -417,6 +418,8 @@ public class BlockIndexer{
                 data.buildings = new QuadTree<>(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
             }
             data.buildings.insert(tile.build);
+
+            notifyBuildDamaged(tile.build);
         }
 
         if(!tile.block().isStatic()){

@@ -11,6 +11,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.ui.*;
 import mindustry.world.modules.*;
@@ -124,6 +125,13 @@ public class Sector{
     @Nullable
     public TextureRegion icon(){
         return info.contentIcon != null ? info.contentIcon.uiIcon : info.icon == null ? null : Fonts.getLargeIcon(info.icon);
+    }
+
+    @Nullable
+    public String iconChar(){
+        if(info.contentIcon != null) return info.contentIcon.emoji();
+        if(info.icon != null) return Iconc.codes.get(info.icon) + "";
+        return null;
     }
 
     public boolean isCaptured(){

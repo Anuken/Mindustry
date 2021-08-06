@@ -2,6 +2,7 @@ package mindustry.async;
 
 import arc.*;
 import arc.struct.*;
+import arc.util.async.*;
 import mindustry.game.EventType.*;
 
 import java.util.concurrent.*;
@@ -49,7 +50,7 @@ public class AsyncCore{
                 executor = Executors.newFixedThreadPool(processes.size, r -> {
                     Thread thread = new Thread(r, "AsyncLogic-Thread");
                     thread.setDaemon(true);
-                    thread.setUncaughtExceptionHandler((t, e) -> Core.app.post(() -> { throw new RuntimeException(e); }));
+                    thread.setUncaughtExceptionHandler((t, e) -> Threads.throwAppException(e));
                     return thread;
                 });
             }

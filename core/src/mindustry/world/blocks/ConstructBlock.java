@@ -84,6 +84,11 @@ public class ConstructBlock extends Block{
             if(builder != null && builder.getControllerName() != null){
                 tile.build.lastAccessed = builder.getControllerName();
             }
+
+            //make sure block indexer knows it's damaged
+            if(tile.build.damaged()){
+                indexer.notifyBuildDamaged(tile.build);
+            }
         }
 
         //last builder was this local client player, call placed()

@@ -17,6 +17,8 @@ public class Team implements Comparable<Team>{
     public final int id;
     public final Color color;
     public final Color[] palette;
+    public final int[] palettei = new int[3];
+    public String emoji = "";
     public boolean hasPalette;
     public String name;
 
@@ -31,9 +33,9 @@ public class Team implements Comparable<Team>{
             Color.valueOf("ffd37f"), Color.valueOf("eab678"), Color.valueOf("d4816b")),
         crux = new Team(2, "crux", Color.valueOf("f25555"),
             Color.valueOf("fc8e6c"), Color.valueOf("f25555"), Color.valueOf("a04553")),
-        green = new Team(3, "green", Color.valueOf("54d67d")),
-        purple = new Team(4, "purple", Color.valueOf("995bb0")),
-        blue = new Team(5, "blue", Color.valueOf("5a4deb"));
+        green = new Team(3, "green", Color.valueOf("54d67d"), Color.valueOf("96f58c"), Color.valueOf("54d67d"), Color.valueOf("28785c")),
+        purple = new Team(4, "purple", Color.valueOf("995bb0"), Color.valueOf("f08dd5"), Color.valueOf("995bb0"), Color.valueOf("312c63")),
+        blue = new Team(5, "blue", Color.valueOf("554deb"), Color.valueOf("80aaff"), Color.valueOf("554deb"), Color.valueOf("3f207d"));
 
     static{
         Mathf.rand.setSeed(8);
@@ -60,6 +62,10 @@ public class Team implements Comparable<Team>{
         palette[0] = color;
         palette[1] = color.cpy().mul(0.75f);
         palette[2] = color.cpy().mul(0.5f);
+
+        for(int i = 0; i < 3; i++){
+            palettei[i] = palette[i].rgba();
+        }
     }
 
     /** Specifies a 3-color team palette. */
@@ -69,6 +75,9 @@ public class Team implements Comparable<Team>{
         palette[0] = pal1;
         palette[1] = pal2;
         palette[2] = pal3;
+        for(int i = 0; i < 3; i++){
+            palettei[i] = palette[i].rgba();
+        }
         hasPalette = true;
     }
 

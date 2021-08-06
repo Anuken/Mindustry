@@ -29,8 +29,8 @@ public class CoreBlock extends StorageBlock{
     //hacky way to pass item modules between methods
     private static ItemModule nextItems;
 
-    public @Load("@-thruster1") TextureRegion thruster1; //top right
-    public @Load("@-thruster2") TextureRegion thruster2; //bot left
+    public @Load(value = "@-thruster1", fallback = "clear-effect") TextureRegion thruster1; //top right
+    public @Load(value = "@-thruster2", fallback = "clear-effect") TextureRegion thruster2; //bot left
     public float thrusterLength = 14f/4f;
 
     public UnitType unitType = UnitTypes.alpha;
@@ -302,7 +302,13 @@ public class CoreBlock extends StorageBlock{
         @Override
         public void afterDestroyed(){
             if(state.rules.coreCapture){
-                tile.setNet(block, lastDamage, 0);
+                if(!net.client()){
+                    tile.setBlock(block, lastDamage);
+                }
+
+                //delay so clients don't destroy it afterwards
+                Core.app.post(() -> tile.setNet(block, lastDamage, 0));
+
                 //building does not exist on client yet
                 if(!net.client()){
                     //core is invincible for several seconds to prevent recapture
