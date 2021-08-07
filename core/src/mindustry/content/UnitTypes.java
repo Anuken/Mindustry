@@ -413,7 +413,7 @@ public class UnitTypes implements ContentList{
         vela = new UnitType("vela"){{
             hitSize = 24f;
 
-            rotateSpeed = 1.6f;
+            rotateSpeed = 1.7f;
             canDrown = false;
             mechFrontSway = 1f;
             buildSpeed = 3f;
@@ -422,7 +422,7 @@ public class UnitTypes implements ContentList{
             mechStepShake = 0.15f;
             ammoType = new PowerAmmoType(2500);
 
-            speed = 0.4f;
+            speed = 0.44f;
             boostMultiplier = 2.2f;
             engineOffset = 12f;
             engineSize = 6f;
@@ -1335,7 +1335,7 @@ public class UnitTypes implements ContentList{
         quad = new UnitType("quad"){{
             armor = 8f;
             health = 6000;
-            speed = 1.4f;
+            speed = 1.3f;
             rotateSpeed = 2f;
             accel = 0.05f;
             drag = 0.017f;
