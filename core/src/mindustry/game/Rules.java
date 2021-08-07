@@ -50,7 +50,7 @@ public class Rules{
     public boolean unitAmmo = false;
     /** Whether cores add to unit limit */
     public boolean unitCapVariable = true;
-    /** How fast unit pads build units. */
+    /** How fast unit contructors build units. */
     public float unitBuildSpeedMultiplier = 1f;
     /** How much damage any other units deal. */
     public float unitDamageMultiplier = 1f;
@@ -150,6 +150,8 @@ public class Rules{
         public boolean aiCoreSpawn = true;
         /** If true, blocks don't require power or resources. */
         public boolean cheat;
+        /** How much damage wave team units deal */
+        public float enemyDamageMultiplier = 1f;
         /** If true, resources are not consumed when building. */
         public boolean infiniteResources;
         /** If true, this team has infinite unit ammo. */

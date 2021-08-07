@@ -182,6 +182,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.corecapture", b -> rules.coreCapture = b, () -> rules.coreCapture);
         check("@rules.polygoncoreprotection", b -> rules.polygonCoreProtection = b, () -> rules.polygonCoreProtection);
         number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200), () -> !rules.polygonCoreProtection);
+        number("@rules.enemydamagemultiplier", f -> rules.teams.get(rules.waveTeam).enemyDamageMultiplier = f, () -> rules.teams.get(rules.waveTeam).enemyDamageMultiplier);
 
         title("@rules.title.environment");
         check("@rules.explosions", b -> rules.damageExplosions = b, () -> rules.damageExplosions);
