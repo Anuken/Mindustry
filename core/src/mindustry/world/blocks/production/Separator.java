@@ -8,6 +8,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
@@ -121,6 +122,12 @@ public class Separator extends Block{
             if(timer(timerDump, dumpTime)){
                 dump();
             }
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return progress;
+            return super.sense(sensor);
         }
 
         @Override
