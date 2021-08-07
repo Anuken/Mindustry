@@ -113,6 +113,7 @@ public class Bullets implements ContentList{
             splashDamageRadius = 25f * 0.75f;
             splashDamage = 35f;
             status = StatusEffects.burning;
+            statusDuration = 60f * 12f;
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             makeFire = true;
@@ -132,7 +133,6 @@ public class Bullets implements ContentList{
             frontColor = Pal.missileYellow;
 
             status = StatusEffects.blasted;
-            statusDuration = 60f;
         }};
 
         flakGlassFrag = new BasicBulletType(3f, 5, "bullet"){{
@@ -177,7 +177,7 @@ public class Bullets implements ContentList{
             width = 6f;
             height = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 22f * 1.5f;
+            splashDamage = 25f * 1.5f;
             splashDamageRadius = 20f;
             fragBullet = flakGlassFrag;
             fragBullets = 6;
@@ -432,13 +432,13 @@ public class Bullets implements ContentList{
             hittable = false;
         }};
 
-        pyraFlame = new BulletType(3.35f, 25f){{
-            ammoMultiplier = 4f;
+        pyraFlame = new BulletType(4f, 45f){{
+            ammoMultiplier = 6f;
             hitSize = 7f;
             lifetime = 18f;
             pierce = true;
             collidesAir = false;
-            statusDuration = 60f * 6;
+            statusDuration = 60f * 10;
             shootEffect = Fx.shootPyraFlame;
             hitEffect = Fx.hitFlameSmall;
             despawnEffect = Fx.none;
