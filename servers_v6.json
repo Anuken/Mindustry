@@ -98,5 +98,9 @@
   {
     "name": "Xpdustry",
     "address": ["xpdustry.fr"]
+  },
+  { 
+    "name": "Avolition",
+    "address": ["avolition.life", "avolition.life:6568"]
   }
 ]
