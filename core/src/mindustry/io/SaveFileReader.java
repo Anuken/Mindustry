@@ -50,7 +50,11 @@ public abstract class SaveFileReader{
     "holostone-wall", "dacite-wall",
     "rock", "boulder",
     "snowrock", "snow-boulder",
-    "cliffs", "stone-wall", 
+    "cliffs", "stone-wall",
+    "craters", "crater-stone",
+    "deepwater", "deep-water",
+    "water", "shallow-water",
+    "slag", "molten-slag",
 
     "cryofluidmixer", "cryofluid-mixer"
     );

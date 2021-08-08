@@ -113,6 +113,7 @@ public class Bullets implements ContentList{
             splashDamageRadius = 25f * 0.75f;
             splashDamage = 35f;
             status = StatusEffects.burning;
+            statusDuration = 60f * 12f;
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             makeFire = true;
@@ -132,7 +133,6 @@ public class Bullets implements ContentList{
             frontColor = Pal.missileYellow;
 
             status = StatusEffects.blasted;
-            statusDuration = 60f;
         }};
 
         flakGlassFrag = new BasicBulletType(3f, 5, "bullet"){{
@@ -177,7 +177,7 @@ public class Bullets implements ContentList{
             width = 6f;
             height = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 22f * 1.5f;
+            splashDamage = 25f * 1.5f;
             splashDamageRadius = 20f;
             fragBullet = flakGlassFrag;
             fragBullets = 6;
@@ -342,11 +342,14 @@ public class Bullets implements ContentList{
             lifetime = 60f;
         }};
 
-        standardDenseBig = new BasicBulletType(7f, 55, "bullet"){{
-            hitSize = 5;
+        standardDenseBig = new BasicBulletType(7.5f, 50, "bullet"){{
+            hitSize = 4.8f;
             width = 15f;
             height = 21f;
             shootEffect = Fx.shootBig;
+            ammoMultiplier = 4;
+            reloadMultiplier = 1.7f;
+            knockback = 0.3f;
         }};
 
         standardThoriumBig = new BasicBulletType(8f, 80, "bullet"){{
@@ -359,7 +362,7 @@ public class Bullets implements ContentList{
             knockback = 0.7f;
         }};
 
-        standardIncendiaryBig = new BasicBulletType(7f, 60, "bullet"){{
+        standardIncendiaryBig = new BasicBulletType(7f, 70, "bullet"){{
             hitSize = 5;
             width = 16f;
             height = 21f;
@@ -370,7 +373,8 @@ public class Bullets implements ContentList{
             makeFire = true;
             pierceCap = 2;
             pierceBuilding = true;
-            knockback = 0.7f;            
+            knockback = 0.7f;
+            ammoMultiplier = 3;
         }};
 
         fireball = new BulletType(1f, 4){
@@ -428,13 +432,13 @@ public class Bullets implements ContentList{
             hittable = false;
         }};
 
-        pyraFlame = new BulletType(3.35f, 25f){{
-            ammoMultiplier = 4f;
+        pyraFlame = new BulletType(4f, 45f){{
+            ammoMultiplier = 6f;
             hitSize = 7f;
             lifetime = 18f;
             pierce = true;
             collidesAir = false;
-            statusDuration = 60f * 6;
+            statusDuration = 60f * 10;
             shootEffect = Fx.shootPyraFlame;
             hitEffect = Fx.hitFlameSmall;
             despawnEffect = Fx.none;

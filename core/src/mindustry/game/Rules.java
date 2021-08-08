@@ -94,6 +94,8 @@ public class Rules{
     public Seq<WeatherEntry> weather = new Seq<>(1);
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
+    /** Units that cannot be built. */
+    public ObjectSet<UnitType> bannedUnits = new ObjectSet<>();
     /** Reveals blocks normally hidden by build visibility. */
     public ObjectSet<Block> revealedBlocks = new ObjectSet<>();
     /** Unlocked content names. Only used in multiplayer when the campaign is enabled. */

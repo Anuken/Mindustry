@@ -922,10 +922,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(omni){
             unit.moveAt(movement);
         }else{
-            unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
-            if(!movement.isZero()){
-                unit.rotation = Angles.moveToward(unit.rotation, movement.angle(), unit.type.rotateSpeed * Math.max(Time.delta, 1));
-            }
+            unit.rotateMove(movement);
         }
 
         //update shooting if not building + not mining

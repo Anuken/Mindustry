@@ -83,7 +83,7 @@ public class Blocks implements ContentList{
     commandCenter,
     groundFactory, airFactory, navalFactory,
     additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor,
-    repairPoint, repairTurret, resupplyPoint,
+    repairPoint, repairTurret,
 
     //payloads
     payloadConveyor, payloadRouter, payloadPropulsionTower,
@@ -117,7 +117,7 @@ public class Blocks implements ContentList{
             new ConstructBlock(i);
         }
 
-        deepwater = new Floor("deepwater"){{
+        deepwater = new Floor("deep-water"){{
             speedMultiplier = 0.2f;
             variants = 0;
             liquidDrop = Liquids.water;
@@ -130,7 +130,7 @@ public class Blocks implements ContentList{
             albedo = 0.5f;
         }};
 
-        water = new Floor("water"){{
+        water = new Floor("shallow-water"){{
             speedMultiplier = 0.5f;
             variants = 0;
             status = StatusEffects.wet;
@@ -184,7 +184,7 @@ public class Blocks implements ContentList{
             cacheLayer = CacheLayer.tar;
         }};
 
-        slag = new Floor("slag"){{
+        slag = new Floor("molten-slag"){{
             drownTime = 150f;
             status = StatusEffects.melting;
             statusDuration = 240f;
@@ -209,7 +209,7 @@ public class Blocks implements ContentList{
 
         stone = new Floor("stone");
 
-        craters = new Floor("craters"){{
+        craters = new Floor("crater-stone"){{
             variants = 3;
             blendGroup = stone;
         }};
@@ -1046,7 +1046,7 @@ public class Blocks implements ContentList{
 
         mechanicalPump = new Pump("mechanical-pump"){{
             requirements(Category.liquid, with(Items.copper, 15, Items.metaglass, 10));
-            pumpAmount = 0.11f;
+            pumpAmount = 7f / 60f;
         }};
 
         rotaryPump = new Pump("rotary-pump"){{
@@ -1337,14 +1337,13 @@ public class Blocks implements ContentList{
             maxBoost = 2f;
 
             consumes.power(80f / 60f);
-            consumes.liquid(Liquids.water, 20f / 60f);
+            consumes.liquid(Liquids.water, 18f / 60f);
         }};
 
         oilExtractor = new Fracker("oil-extractor"){{
             requirements(Category.production, with(Items.copper, 150, Items.graphite, 175, Items.lead, 115, Items.thorium, 115, Items.silicon, 75));
             result = Liquids.oil;
             updateEffect = Fx.pulverize;
-            liquidCapacity = 50f;
             updateEffectChance = 0.05f;
             pumpAmount = 0.25f;
             size = 3;

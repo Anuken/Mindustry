@@ -115,9 +115,8 @@ public class KeybindDialog extends Dialog{
                 }
             }).disabled(sectionControls.get(section, 0) + 1 >= devices.size).size(40);
 
-            table.add(stable).colspan(4);
+            //table.add(stable).colspan(4).row();
 
-            table.row();
             table.add().height(10);
             table.row();
             if(section.device.type() == DeviceType.controller){

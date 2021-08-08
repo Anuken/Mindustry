@@ -887,7 +887,7 @@ public class Block extends UnlockableContent{
         }
 
         //generate paletted team regions
-        if(teamRegion.found()){
+        if(teamRegion != null && teamRegion.found()){
             for(Team team : Team.all){
                 //if there's an override, don't generate anything
                 if(team.hasPalette && !Core.atlas.has(name + "-team-" + team.name)){

@@ -284,6 +284,21 @@ public class EventType{
         }
     }
 
+    /**
+     * Called after a building's team changes.
+     * Event object is reused, do not nest!
+     * */
+    public static class BuildTeamChangeEvent{
+        public Team previous;
+        public Building build;
+
+        public BuildTeamChangeEvent set(Team previous, Building build){
+            this.build = build;
+            this.previous = previous;
+            return this;
+        }
+    }
+
     /** Called when a core block is placed/removed or its team is changed. */
     public static class CoreChangeEvent{
         public CoreBuild core;
