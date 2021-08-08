@@ -16,12 +16,12 @@ public class Puddles{
 
     /** Deposits a Puddle between tile and source. */
     public static void deposit(Tile tile, Tile source, Liquid liquid, float amount){
-        deposit(tile, source, liquid, amount, 0);
+        deposit(tile, source, liquid, amount, true);
     }
 
     /** Deposits a Puddle at a tile. */
     public static void deposit(Tile tile, Liquid liquid, float amount){
-        deposit(tile, tile, liquid, amount, 0);
+        deposit(tile, tile, liquid, amount, true);
     }
 
     /** Returns the Puddle on the specified tile. May return null. */
@@ -29,7 +29,7 @@ public class Puddles{
         return map.get(tile.pos());
     }
 
-    public static void deposit(Tile tile, Tile source, Liquid liquid, float amount, int generation){
+    public static void deposit(Tile tile, Tile source, Liquid liquid, float amount, boolean initial){
         if(tile == null) return;
 
         if(tile.floor().isLiquid && !canStayOn(liquid, tile.floor().liquidDrop)){
@@ -38,16 +38,14 @@ public class Puddles{
 
             Puddle p = map.get(tile.pos());
 
-            if(generation == 0 && p != null && p.lastRipple <= Time.time - 40f){
+            if(initial && p != null && p.lastRipple <= Time.time - 40f){
                 Fx.ripple.at((tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f, 1f, tile.floor().liquidDrop.color);
                 p.lastRipple = Time.time;
             }
             return;
         }
 
-        if(tile.floor().solid){
-            return;
-        }
+        if(tile.floor().solid) return;
 
         Puddle p = map.get(tile.pos());
         if(p == null){
@@ -55,14 +53,13 @@ public class Puddles{
             puddle.tile = tile;
             puddle.liquid = liquid;
             puddle.amount = amount;
-            puddle.generation = generation;
             puddle.set((tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
             puddle.add();
             map.put(tile.pos(), puddle);
         }else if(p.liquid == liquid){
             p.accepting = Math.max(amount, p.accepting);
 
-            if(generation == 0 && p.lastRipple <= Time.time - 40f && p.amount >= maxLiquid / 2f){
+            if(initial && p.lastRipple <= Time.time - 40f && p.amount >= maxLiquid / 2f){
                 Fx.ripple.at((tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f, 1f, p.liquid.color);
                 p.lastRipple = Time.time;
             }

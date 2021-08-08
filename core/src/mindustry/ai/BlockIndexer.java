@@ -181,7 +181,7 @@ public class BlockIndexer{
     /** Returns all damaged tiles by team. */
     public Seq<Building> getDamaged(Team team){
         if(damagedTiles[team.id] == null){
-            return damagedTiles[team.id] = new Seq<>();
+            return damagedTiles[team.id] = new Seq<>(false);
         }
 
         return damagedTiles[team.id];

@@ -1,0 +1,1 @@
+{version:1,fields:[{name:amount,type:float},{name:liquid,type:mindustry.type.Liquid},{name:tile,type:mindustry.world.Tile},{name:x,type:float},{name:y,type:float}]}

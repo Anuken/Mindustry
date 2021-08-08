@@ -371,11 +371,25 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         if(selectAlpha > 0.001f){
+
+
             for(Sector sec : planet.sectors){
                 if(sec.hasBase()){
                     for(Sector enemy : sec.near()){
                         if(enemy.hasEnemyBase()){
                             planets.drawArc(planet, enemy.tile.v, sec.tile.v, Team.crux.color.write(Tmp.c2).a(selectAlpha), Color.clear, 0.24f, 110f, 25);
+                        }
+                    }
+
+
+                    if(selected != null && selected != sec && selected.hasBase()){
+                        //imports
+                        if(sec.info.getRealDestination() == selected && sec.info.anyExports()){
+                            planets.drawArc(planet, sec.tile.v, selected.tile.v, Color.gray.write(Tmp.c2).a(selectAlpha), Pal.accent, 0.4f, 90f, 25);
+                        }
+                        //exports
+                        if(selected.info.getRealDestination() == sec && selected.info.anyExports()){
+                            planets.drawArc(planet, selected.tile.v, sec.tile.v, Pal.place.write(Tmp.c2).a(selectAlpha), Pal.accent, 0.4f, 90f, 25);
                         }
                     }
                 }
@@ -605,6 +619,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     void displayItems(Table c, float scl, ObjectMap<Item, ExportStat> stats, String name){
+        displayItems(c, scl, stats, name, t -> {});
+    }
+
+    void displayItems(Table c, float scl, ObjectMap<Item, ExportStat> stats, String name, Cons<Table> builder){
         Table t = new Table().left();
 
         int i = 0;
@@ -622,8 +640,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         if(t.getChildren().any()){
-            c.add(name).left().row();
-            c.add(t).padLeft(10f).left().row();
+            c.defaults().left();
+            c.add(name).row();
+            builder.get(c);
+            c.add(t).padLeft(10f).row();
         }
     }
 
@@ -632,6 +652,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         dialog.cont.pane(c -> {
             c.defaults().padBottom(5);
+
+            if(sector.preset != null && sector.preset.description != null){
+                c.add(sector.preset.displayDescription()).left().row();
+            }
 
             c.add(Core.bundle.get("sectors.time") + " [accent]" + sector.save.getPlayTime()).left().row();
 
@@ -656,11 +680,21 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             displayItems(c, sector.getProductionScale(), sector.info.production, "@sectors.production");
 
             //export
-            displayItems(c, sector.getProductionScale(), sector.info.export, "@sectors.export");
+            displayItems(c, sector.getProductionScale(), sector.info.export, "@sectors.export", t -> {
+                if(sector.info.destination != null){
+                    String ic = sector.info.destination.iconChar();
+                    t.add(Iconc.rightOpen + " " + (ic == null || ic.isEmpty() ? "" : ic + " ") + sector.info.destination.name()).padLeft(10f).row();
+                }
+            });
 
             //import
             if(sector.hasBase()){
-                displayItems(c, 1f, sector.info.importStats(), "@sectors.import");
+                displayItems(c, 1f, sector.info.importStats(sector.planet), "@sectors.import", t -> {
+                    sector.info.eachImport(sector.planet, other -> {
+                        String ic = other.iconChar();
+                        t.add(Iconc.rightOpen + " " + (ic == null || ic.isEmpty() ? "" : ic + " ") + other.name()).padLeft(10f).row();
+                    });
+                });
             }
 
             ItemSeq items = sector.items();
@@ -735,10 +769,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                             t.button(Icon.none, Styles.clearTogglei, () -> {
                                 sector.info.icon = null;
+                                sector.info.contentIcon = null;
                                 sector.saveInfo();
                                 hide();
                                 updateSelected();
-                            }).checked(sector.info.icon == null);
+                            }).checked(sector.info.icon == null && sector.info.contentIcon == null);
 
                             int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
 
@@ -746,7 +781,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             for(var key : defaultIcons){
                                 var value = Icon.icons.get(key);
 
-                                t.button(value, Styles.cleari, () -> {
+                                t.button(value, Styles.clearTogglei, () -> {
                                     sector.info.icon = key;
                                     sector.info.contentIcon = null;
                                     sector.saveInfo();
@@ -765,7 +800,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                 i = 0;
                                 for(UnlockableContent u : content.getBy(ctype).<UnlockableContent>as()){
                                     if(!u.isHidden() && u.unlocked()){
-                                        t.button(new TextureRegionDrawable(u.uiIcon), Styles.cleari, iconMed, () -> {
+                                        t.button(new TextureRegionDrawable(u.uiIcon), Styles.clearTogglei, iconMed, () -> {
                                             sector.info.icon = null;
                                             sector.info.contentIcon = u;
                                             sector.saveInfo();
