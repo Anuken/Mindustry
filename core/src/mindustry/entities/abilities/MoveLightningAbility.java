@@ -22,8 +22,8 @@ public class MoveLightningAbility extends Ability{
     public float minSpeed = 0.8f, maxSpeed = 1.2f;
     /** Lightning color */
     public Color color = Color.valueOf("a9d8ff");
-    /** Shifts where the lightning spawns along the Y axis */
-    public float offset = 0f;
+    /** Shifts the lightning spawn location */
+    public float offsetX = 0f, offsetY = 0f;
     /** Jittering heat sprite like the shield on v5 Javelin */
     public String heatRegion = "error";
     /** Bullet type that is fired. Can be null */
@@ -34,24 +34,28 @@ public class MoveLightningAbility extends Ability{
     public Effect shootEffect = Fx.sparkShoot;
     public Sound shootSound = Sounds.spark;
     
+    protected float side = 1f;
+    
     MoveLightningAbility(){}
     
-    public MoveLightningAbility(float damage, int length, float chance, float offset, float minSpeed, float maxSpeed, Color color, String heatRegion){
+    public MoveLightningAbility(float damage, int length, float chance, float offsetX, float offsetY, float minSpeed, float maxSpeed, Color color, String heatRegion){
         this.damage = damage;
         this.length = length;
         this.chance = chance;
-        this.offset = offset;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
         this.minSpeed = minSpeed;
         this.maxSpeed = maxSpeed;
         this.color = color;
         this.heatRegion = heatRegion;
     }
     
-    public MoveLightningAbility(float damage, int length, float chance, float offset, float minSpeed, float maxSpeed, Color color){
+    public MoveLightningAbility(float damage, int length, float chance, float offsetX, float offsetY, float minSpeed, float maxSpeed, Color color){
         this.damage = damage;
         this.length = length;
         this.chance = chance;
-        this.offset = offset;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
         this.minSpeed = minSpeed;
         this.maxSpeed = maxSpeed;
         this.color = color;
@@ -61,7 +65,7 @@ public class MoveLightningAbility extends Ability{
     public void update(Unit unit){
         float scl = Mathf.clamp((unit.vel().len() - minSpeed) / (maxSpeed - minSpeed));
         if(Mathf.chance(Time.delta * chance * scl)){
-            float x = unit.x + Angles.trnsx(unit.rotation, offset, 0), y = unit.y + Angles.trnsy(unit.rotation, offset, 0);
+            float x = unit.x + Angles.trnsx(unit.rotation, offsetY, offsetX * side), y = unit.y + Angles.trnsy(unit.rotation, offsetY, offsetX * side);
 
             shootEffect.at(x, y, unit.rotation, color);
             shootSound.at(unit);
@@ -73,6 +77,8 @@ public class MoveLightningAbility extends Ability{
             if(bullet != null){
                 bullet.create(unit, unit.team, x, y, unit.rotation + bulletAngle + Mathf.range(bulletSpread));
             }
+            
+            side *= -1f;
         }
     }
     
