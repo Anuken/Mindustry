@@ -23,7 +23,7 @@ public class MoveLightningAbility extends Ability{
     /** Lightning color */
     public Color color = Color.valueOf("a9d8ff");
     /** Shifts the lightning spawn location */
-    public float offsetX = 0f, offset = 0f;
+    public float offsetX = 0f, offsetY = 0f;
     /** Jittering heat sprite like the shield on v5 Javelin */
     public String heatRegion = "error";
     /** Bullet type that is fired. Can be null */
@@ -38,27 +38,28 @@ public class MoveLightningAbility extends Ability{
     
     MoveLightningAbility(){}
     
-    public MoveLightningAbility(float damage, int length, float chance, float offsetX, float offset, float minSpeed, float maxSpeed, Color color, String heatRegion){
-        this.damage = damage;
-        this.length = length;
-        this.chance = chance;
-        this.offsetX = offsetX;
-        this.offset = offset;
-        this.minSpeed = minSpeed;
-        this.maxSpeed = maxSpeed;
-        this.color = color;
+    public MoveLightningAbility(float damage, int length, float chance, float offsetX, float offsetY, float minSpeed, float maxSpeed, Color color, String heatRegion){
+        this(damage, length, chance, offsetX, offsetY, minSpeed, maxSpeed, color);
         this.heatRegion = heatRegion;
     }
     
-    public MoveLightningAbility(float damage, int length, float chance, float offsetX, float offset, float minSpeed, float maxSpeed, Color color){
+    public MoveLightningAbility(float damage, int length, float chance, float offset, float minSpeed, float maxSpeed, Color color, String heatRegion){
+        this(damage, length, chance, 0f, offset, minSpeed, maxSpeed, color, heatRegion);
+    }
+    
+    public MoveLightningAbility(float damage, int length, float chance, float offsetX, float offsetY, float minSpeed, float maxSpeed, Color color){
         this.damage = damage;
         this.length = length;
         this.chance = chance;
         this.offsetX = offsetX;
-        this.offset = offset;
+        this.offsetY = offsetY;
         this.minSpeed = minSpeed;
         this.maxSpeed = maxSpeed;
         this.color = color;
+    }
+    
+    public MoveLightningAbility(float damage, int length, float chance, float offset, float minSpeed, float maxSpeed, Color color){
+        this(damage, length, chance, 0f, offset, minSpeed, maxSpeed, color);
     }
     
     @Override
