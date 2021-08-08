@@ -101,10 +101,10 @@ public class UnitTypes implements ContentList{
                 reload = 11f;
                 recoil = 1f;
                 ejectEffect = Fx.none;
-                bullet = new BulletType(4.1f, 32f){{
+                bullet = new BulletType(4.1f, 35f){{
                     ammoMultiplier = 3f;
                     hitSize = 7f;
-                    lifetime = 12f;
+                    lifetime = 13f;
                     pierce = true;
                     statusDuration = 60f * 4;
                     shootEffect = Fx.shootSmallFlame;
@@ -344,7 +344,7 @@ public class UnitTypes implements ContentList{
 
                 bullet = new LightningBulletType(){{
                     lightningColor = hitColor = Pal.heal;
-                    damage = 12f;
+                    damage = 14f;
                     lightningLength = 7;
                     lightningLengthRand = 7;
                     shootEffect = Fx.shootHeal;

@@ -1,17 +1,9 @@
 package mindustry.content;
 
 import arc.graphics.*;
-import arc.graphics.g2d.*;
-import arc.math.*;
-import arc.util.*;
 import mindustry.ctype.*;
-import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.*;
-
-import static mindustry.Vars.*;
 
 public class Bullets implements ContentList{
     public static BulletType
@@ -377,47 +369,9 @@ public class Bullets implements ContentList{
             ammoMultiplier = 3;
         }};
 
-        fireball = new BulletType(1f, 4){
-            {
-                pierce = true;
-                collidesTiles = false;
-                collides = false;
-                drag = 0.03f;
-                hitEffect = despawnEffect = Fx.none;
-            }
+        fireball = new FireBulletType(1f, 4);
 
-            @Override
-            public void init(Bullet b){
-                b.vel.setLength(0.6f + Mathf.random(2f));
-            }
-
-            @Override
-            public void draw(Bullet b){
-                Draw.color(Pal.lightFlame, Pal.darkFlame, Color.gray, b.fin());
-                Fill.circle(b.x, b.y, 3f * b.fout());
-                Draw.reset();
-            }
-
-            @Override
-            public void update(Bullet b){
-                if(Mathf.chance(0.04 * Time.delta)){
-                    Tile tile = world.tileWorld(b.x, b.y);
-                    if(tile != null){
-                        Fires.create(tile);
-                    }
-                }
-
-                if(Mathf.chance(0.1 * Time.delta)){
-                    Fx.fireballsmoke.at(b.x, b.y);
-                }
-
-                if(Mathf.chance(0.1 * Time.delta)){
-                    Fx.ballfire.at(b.x, b.y);
-                }
-            }
-        };
-
-        basicFlame = new BulletType(3.35f, 16f){{
+        basicFlame = new BulletType(3.35f, 17f){{
             ammoMultiplier = 3f;
             hitSize = 7f;
             lifetime = 18f;
@@ -432,7 +386,7 @@ public class Bullets implements ContentList{
             hittable = false;
         }};
 
-        pyraFlame = new BulletType(4f, 45f){{
+        pyraFlame = new BulletType(4f, 50f){{
             ammoMultiplier = 6f;
             hitSize = 7f;
             lifetime = 18f;

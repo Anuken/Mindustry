@@ -48,7 +48,7 @@ public class DuctRouter extends Block{
         Draw.rect(topRegion, req.drawx(), req.drawy(), req.rotation * 90);
     }
 
-    public class DuctBuild extends Building{
+    public class DuctRouterBuild extends Building{
         public float progress;
         public @Nullable Item current;
 
