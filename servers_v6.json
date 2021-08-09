@@ -98,5 +98,9 @@
   {
     "name": "Xpdustry",
     "address": ["xpdustry.fr"]
+  },
+  {
+    "name": "CreateDustry",
+    "address": ["144.76.120.74:18645"]
   }
 ]
