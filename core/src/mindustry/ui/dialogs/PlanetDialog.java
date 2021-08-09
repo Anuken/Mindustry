@@ -385,11 +385,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     if(selected != null && selected != sec && selected.hasBase()){
                         //imports
                         if(sec.info.getRealDestination() == selected && sec.info.anyExports()){
-                            planets.drawArc(planet, sec.tile.v, selected.tile.v, Color.gray.write(Tmp.c2).a(selectAlpha), Pal.accent, 0.4f, 90f, 25);
+                            planets.drawArc(planet, sec.tile.v, selected.tile.v, Color.gray.write(Tmp.c2).a(selectAlpha), Pal.accent.write(Tmp.c3).a(selectAlpha), 0.4f, 90f, 25);
                         }
                         //exports
                         if(selected.info.getRealDestination() == sec && selected.info.anyExports()){
-                            planets.drawArc(planet, selected.tile.v, sec.tile.v, Pal.place.write(Tmp.c2).a(selectAlpha), Pal.accent, 0.4f, 90f, 25);
+                            planets.drawArc(planet, selected.tile.v, sec.tile.v, Pal.place.write(Tmp.c2).a(selectAlpha), Pal.accent.write(Tmp.c3).a(selectAlpha), 0.4f, 90f, 25);
                         }
                     }
                 }
