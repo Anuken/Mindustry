@@ -51,7 +51,7 @@ public abstract class SaveFileReader{
     "rock", "boulder",
     "snowrock", "snow-boulder",
     "cliffs", "stone-wall",
-    "craters", "crater-stone",
+    "craters", "stone-craters",
     "deepwater", "deep-water",
     "water", "shallow-water",
     "slag", "molten-slag",

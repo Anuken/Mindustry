@@ -209,7 +209,7 @@ public class Blocks implements ContentList{
 
         stone = new Floor("stone");
 
-        craters = new Floor("crater-stone"){{
+        craters = new Floor("stone-craters"){{
             variants = 3;
             blendGroup = stone;
         }};
