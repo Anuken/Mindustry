@@ -87,7 +87,7 @@ public class Pump extends LiquidBlock{
         public void draw(){
             Draw.rect(name, x, y);
 
-            Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
+            Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
         }
 
         @Override

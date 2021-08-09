@@ -408,7 +408,8 @@ public abstract class SaveVersion extends SaveFileReader{
 
             for(int j = 0; j < total; j++){
                 String name = stream.readUTF();
-                map[type.ordinal()][j] = content.getByName(type, fallback.get(name, name));
+                //fallback only for blocks
+                map[type.ordinal()][j] = content.getByName(type, type == ContentType.block ? fallback.get(name, name) : name);
             }
         }
 
