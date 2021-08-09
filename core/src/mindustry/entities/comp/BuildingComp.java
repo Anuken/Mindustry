@@ -160,7 +160,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public final void readBase(Reads read){
-        health = read.f();
+        //cap health by block health in case of nerfs
+        health = Math.min(read.f(), block.health);
         byte rot = read.b();
         team = Team.get(read.b());
 
