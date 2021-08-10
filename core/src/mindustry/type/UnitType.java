@@ -42,6 +42,8 @@ public class UnitType extends UnlockableContent{
 
     /** If true, the unit is always at elevation 1. */
     public boolean flying;
+    /** If `flying` and this is true, the unit can appear on the title screen */
+    public boolean onTitleScreen = true;
     /** Creates a new instance of this unit class. */
     public Prov<? extends Unit> constructor;
     /** The default AI controller to assign on creation. */

@@ -13,6 +13,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.ui.*;
 
 import static arc.Core.*;
 
@@ -72,7 +73,7 @@ public class KeybindDialog extends Dialog{
             }
 
             if(sections.length != 1){
-                TextButton button = new TextButton(bundle.get("section." + section.name + ".name", Strings.capitalize(section.name))/*, "toggle"*/);
+                TextButton button = new TextButton(bundle.get("section." + section.name + ".name", Strings.capitalize(section.name)));
                 if(section.equals(this.section))
                     button.toggle();
 
@@ -115,9 +116,9 @@ public class KeybindDialog extends Dialog{
                 }
             }).disabled(sectionControls.get(section, 0) + 1 >= devices.size).size(40);
 
-            table.add(stable).colspan(4);
+            //no alternate devices until further notice
+            //table.add(stable).colspan(4).row();
 
-            table.row();
             table.add().height(10);
             table.row();
             if(section.device.type() == DeviceType.controller){
@@ -127,6 +128,7 @@ public class KeybindDialog extends Dialog{
             table.row();
 
             String lastCategory = null;
+            var tstyle = Styles.defaultt;
 
             for(KeyBind keybind : keybinds.getKeybinds()){
                 if(lastCategory != keybind.category() && keybind.category() != null){
@@ -149,7 +151,7 @@ public class KeybindDialog extends Dialog{
                         table.add(axt).left().minWidth(90).padRight(20);
                     }
 
-                    table.button(bundle.get("settings.rebind", "Rebind"), () -> {
+                    table.button("@settings.rebind", tstyle, () -> {
                         rebindAxis = true;
                         rebindMin = true;
                         openDialog(section, keybind);
@@ -160,13 +162,13 @@ public class KeybindDialog extends Dialog{
                     table.add(keybinds.get(section, keybind).key.toString(),
                     style.keyColor).left().minWidth(90).padRight(20);
 
-                    table.button(bundle.get("settings.rebind", "Rebind"), () -> {
+                    table.button("@settings.rebind", tstyle, () -> {
                         rebindAxis = false;
                         rebindMin = false;
                         openDialog(section, keybind);
                     }).width(130f);
                 }
-                table.button(bundle.get("settings.resetKey", "Reset"), () -> {
+                table.button("@settings.resetKey", tstyle, () -> {
                     keybinds.resetToDefault(section, keybind);
                     setup();
                 }).width(130f);
@@ -175,7 +177,7 @@ public class KeybindDialog extends Dialog{
 
             table.visible(() -> this.section.equals(section));
 
-            table.button(bundle.get("settings.reset", "Reset to Defaults"), () -> {
+            table.button("@settings.reset", () -> {
                 keybinds.resetToDefaults();
                 setup();
             }).colspan(4).padTop(4).fill();

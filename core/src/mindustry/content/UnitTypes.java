@@ -101,10 +101,10 @@ public class UnitTypes implements ContentList{
                 reload = 11f;
                 recoil = 1f;
                 ejectEffect = Fx.none;
-                bullet = new BulletType(4.1f, 32f){{
+                bullet = new BulletType(4.1f, 35f){{
                     ammoMultiplier = 3f;
                     hitSize = 7f;
-                    lifetime = 12f;
+                    lifetime = 13f;
                     pierce = true;
                     statusDuration = 60f * 4;
                     shootEffect = Fx.shootSmallFlame;
@@ -344,7 +344,7 @@ public class UnitTypes implements ContentList{
 
                 bullet = new LightningBulletType(){{
                     lightningColor = hitColor = Pal.heal;
-                    damage = 12f;
+                    damage = 14f;
                     lightningLength = 7;
                     lightningLengthRand = 7;
                     shootEffect = Fx.shootHeal;
@@ -413,7 +413,7 @@ public class UnitTypes implements ContentList{
         vela = new UnitType("vela"){{
             hitSize = 24f;
 
-            rotateSpeed = 1.6f;
+            rotateSpeed = 1.7f;
             canDrown = false;
             mechFrontSway = 1f;
             buildSpeed = 3f;
@@ -422,14 +422,14 @@ public class UnitTypes implements ContentList{
             mechStepShake = 0.15f;
             ammoType = new PowerAmmoType(2500);
 
-            speed = 0.4f;
+            speed = 0.44f;
             boostMultiplier = 2.2f;
             engineOffset = 12f;
             engineSize = 6f;
             lowAltitude = true;
             riseSpeed = 0.02f;
 
-            health = 8000f;
+            health = 8200f;
             armor = 9f;
             canBoost = true;
             landShake = 4f;
@@ -454,7 +454,7 @@ public class UnitTypes implements ContentList{
                 cooldownTime = 200f;
 
                 bullet = new ContinuousLaserBulletType(){{
-                    damage = 32f;
+                    damage = 35f;
                     length = 180f;
                     hitEffect = Fx.hitMeltHeal;
                     drawSize = 420f;
@@ -1335,7 +1335,7 @@ public class UnitTypes implements ContentList{
         quad = new UnitType("quad"){{
             armor = 8f;
             health = 6000;
-            speed = 1.4f;
+            speed = 1.3f;
             rotateSpeed = 2f;
             accel = 0.05f;
             drag = 0.017f;

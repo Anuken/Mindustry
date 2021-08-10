@@ -78,6 +78,8 @@ public class SectorInfo{
     public int waveVersion = -1;
     /** Whether this sector was indicated to the player or not. */
     public boolean shown = false;
+    /** Temporary seq for last imported items. Do not use. */
+    public transient ItemSeq lastImported = new ItemSeq();
 
     /** Special variables for simulation. */
     public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope, bossHealth, bossDps, curEnemyHealth, curEnemyDps;

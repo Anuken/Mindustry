@@ -41,6 +41,12 @@ public class FlyingAI extends AIController{
 
     @Override
     protected Teamc findMainTarget(float x, float y, float range, boolean air, boolean ground){
+        var core = targetFlag(x, y, BlockFlag.core, true);
+
+        if(core != null && Mathf.within(x, y, core.getX(), core.getY(), range)){
+            return core;
+        }
+
         for(var flag : unit.team.isAI() ? unit.type.targetFlags : unit.type.playerTargetFlags){
             if(flag == null){
                 Teamc result = target(x, y, range, air, ground);
@@ -50,7 +56,8 @@ public class FlyingAI extends AIController{
                 if(result != null) return result;
             }
         }
-        return targetFlag(x, y, BlockFlag.core, true);
+
+        return core;
     }
 
     protected void attack(float circleLength){

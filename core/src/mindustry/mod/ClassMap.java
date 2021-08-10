@@ -31,6 +31,7 @@ public class ClassMap{
         classes.put("BulletType", mindustry.entities.bullet.BulletType.class);
         classes.put("ContinuousLaserBulletType", mindustry.entities.bullet.ContinuousLaserBulletType.class);
         classes.put("EmpBulletType", mindustry.entities.bullet.EmpBulletType.class);
+        classes.put("FireBulletType", mindustry.entities.bullet.FireBulletType.class);
         classes.put("FlakBulletType", mindustry.entities.bullet.FlakBulletType.class);
         classes.put("LaserBoltBulletType", mindustry.entities.bullet.LaserBoltBulletType.class);
         classes.put("LaserBulletType", mindustry.entities.bullet.LaserBulletType.class);
@@ -140,7 +141,7 @@ public class ClassMap{
         classes.put("DuctBridge", mindustry.world.blocks.distribution.DuctBridge.class);
         classes.put("DuctBridgeBuild", mindustry.world.blocks.distribution.DuctBridge.DuctBridgeBuild.class);
         classes.put("DuctRouter", mindustry.world.blocks.distribution.DuctRouter.class);
-        classes.put("DuctBuild", mindustry.world.blocks.distribution.DuctRouter.DuctBuild.class);
+        classes.put("DuctRouterBuild", mindustry.world.blocks.distribution.DuctRouter.DuctRouterBuild.class);
         classes.put("ExtendingItemBridge", mindustry.world.blocks.distribution.ExtendingItemBridge.class);
         classes.put("ExtendingItemBridgeBuild", mindustry.world.blocks.distribution.ExtendingItemBridge.ExtendingItemBridgeBuild.class);
         classes.put("ItemBridge", mindustry.world.blocks.distribution.ItemBridge.class);
