@@ -50,7 +50,7 @@ public class Rules{
     public boolean unitAmmo = false;
     /** Whether cores add to unit limit */
     public boolean unitCapVariable = true;
-    /** How fast unit pads build units. */
+    /** How fast unit factories build units. */
     public float unitBuildSpeedMultiplier = 1f;
     /** How much damage any other units deal. */
     public float unitDamageMultiplier = 1f;
