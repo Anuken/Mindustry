@@ -386,7 +386,7 @@ public class Bullets implements ContentList{
             hittable = false;
         }};
 
-        pyraFlame = new BulletType(4f, 50f){{
+        pyraFlame = new BulletType(4f, 55f){{
             ammoMultiplier = 6f;
             hitSize = 7f;
             lifetime = 18f;

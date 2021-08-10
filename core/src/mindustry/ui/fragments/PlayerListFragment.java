@@ -20,7 +20,7 @@ public class PlayerListFragment extends Fragment{
     public Table content = new Table().marginRight(13f).marginLeft(13f);
     private boolean visible = false;
     private Interval timer = new Interval();
-    private TextField sField;
+    private TextField search;
     private Seq<Player> players = new Seq<>();
 
     @Override
@@ -47,12 +47,9 @@ public class PlayerListFragment extends Fragment{
             cont.table(Tex.buttonTrans, pane -> {
                 pane.label(() -> Core.bundle.format(Groups.player.size() == 1 ? "players.single" : "players", Groups.player.size()));
                 pane.row();
-                sField = pane.field(null, text -> {
-                    rebuild();
-                }).grow().pad(8).get();
-                sField.name = "search";
-                sField.setMaxLength(maxNameLength);
-                sField.setMessageText(Core.bundle.format("players.search"));
+
+                search = pane.field(null, text -> rebuild()).grow().pad(8).name("search").maxTextLength(maxNameLength).get();
+                search.setMessageText(Core.bundle.get("players.search"));
 
                 pane.row();
                 pane.pane(content).grow().get().setScrollingDisabled(true, false);
@@ -83,8 +80,8 @@ public class PlayerListFragment extends Fragment{
         Groups.player.copy(players);
 
         players.sort(Structs.comps(Structs.comparing(Player::team), Structs.comparingBool(p -> !p.admin)));
-        if(sField.getText().length() > 0){
-            players.filter(p -> Strings.stripColors(p.name().toLowerCase()).contains(sField.getText().toLowerCase()));
+        if(search.getText().length() > 0){
+            players.filter(p -> Strings.stripColors(p.name().toLowerCase()).contains(search.getText().toLowerCase()));
         }
 
         for(var user : players){
@@ -181,7 +178,7 @@ public class PlayerListFragment extends Fragment{
             rebuild();
         }else{
             Core.scene.setKeyboardFocus(null);
-            sField.clearText();
+            search.clearText();
         }
     }
 
