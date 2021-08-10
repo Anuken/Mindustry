@@ -1847,13 +1847,13 @@ public class Blocks implements ContentList{
             range = 195f;
             reloadTime = 90f;
             firingMoveFract = 0.5f;
-            shootDuration = 220f;
+            shootDuration = 230f;
             powerUse = 17f;
             shootSound = Sounds.laserbig;
             loopSound = Sounds.beam;
             loopSoundVolume = 2f;
 
-            shootType = new ContinuousLaserBulletType(70){{
+            shootType = new ContinuousLaserBulletType(75){{
                 length = 200f;
                 hitEffect = Fx.hitMeltdown;
                 hitColor = Pal.meltdownHit;
