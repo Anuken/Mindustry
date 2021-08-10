@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
+import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.planet.*;
@@ -85,6 +86,7 @@ public class Planets implements ContentList{
             atmosphereRadOut = 0.3f;
             startSector = 15;
             alwaysUnlocked = true;
+            landCloudColor = Pal.spore.cpy().a(0.5f);
         }};
 
         makeAsteroid("verlius", sun, Blocks.stoneWall, Blocks.iceWall, 0.5f, 12, 2f, gen -> {

@@ -13,7 +13,9 @@ import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
@@ -50,14 +52,24 @@ public class DatabaseDialog extends BaseDialog{
             table.table(list -> {
                 list.left();
 
-                int cols = Mathf.clamp((Core.graphics.getWidth() - 30) / (32 + 10), 1, 18);
+                int cols = (int)Mathf.clamp((Core.graphics.getWidth() - Scl.scl(30)) / Scl.scl(32 + 10), 1, 22);
                 int count = 0;
 
                 for(int i = 0; i < array.size; i++){
                     UnlockableContent unlock = (UnlockableContent)array.get(i);
 
                     Image image = unlocked(unlock) ? new Image(unlock.uiIcon).setScaling(Scaling.fit) : new Image(Icon.lock, Pal.gray);
-                    list.add(image).size(8 * 4).pad(3);
+
+                    //banned cross
+                    if(state.isGame() && (unlock instanceof UnitType u && u.isBanned() || unlock instanceof Block b && state.rules.bannedBlocks.contains(b))){
+                        list.stack(image, new Image(Icon.cancel){{
+                            setColor(Color.scarlet);
+                            touchable = Touchable.disabled;
+                        }}).size(8 * 4).pad(3);
+                    }else{
+                        list.add(image).size(8 * 4).pad(3);
+                    }
+
                     ClickListener listener = new ClickListener();
                     image.addListener(listener);
                     if(!mobile && unlocked(unlock)){

@@ -193,8 +193,14 @@ public class PayloadBlock extends Block{
         }
 
         public void dumpPayload(){
+            //translate payload forward slightly
+            float tx = Angles.trnsx(payload.rotation(), 0.1f), ty = Angles.trnsy(payload.rotation(), 0.1f);
+            payload.set(payload.x() + tx, payload.y() + ty, payload.rotation());
+
             if(payload.dump()){
                 payload = null;
+            }else{
+                payload.set(payload.x() - tx, payload.y() - ty, payload.rotation());
             }
         }
 

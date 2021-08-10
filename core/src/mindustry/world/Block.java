@@ -71,8 +71,10 @@ public class Block extends UnlockableContent{
     public boolean update;
     /** whether this block has health and can be destroyed */
     public boolean destructible;
-    /** whether unloaders work on this block*/
+    /** whether unloaders work on this block */
     public boolean unloadable = true;
+    /** whether units can resupply by taking items from this block */
+    public boolean allowResupply = false;
     /** whether this is solid */
     public boolean solid;
     /** whether this block CAN be solid. */
@@ -431,7 +433,7 @@ public class Block extends UnlockableContent{
             boolean buffered = cons.buffered;
             float capacity = cons.capacity;
 
-            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.status * capacity) ? "<ERROR>" : (int)(entity.power.status * capacity)) :
+            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.status * capacity) ? "<ERROR>" : UI.formatAmount((int)(entity.power.status * capacity))) :
                 Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.zero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status));
         }
 
@@ -794,6 +796,11 @@ public class Block extends UnlockableContent{
         }
 
         clipSize = Math.max(clipSize, size * tilesize);
+        
+        //only kept to ensure compatibility with v6 mods.
+        if(expanded){
+            clipSize += tilesize * 10f;
+        }
 
         if(emitLight){
             clipSize = Math.max(clipSize, lightRadius * 2f);
@@ -879,6 +886,36 @@ public class Block extends UnlockableContent{
             for(int i = 0; i < variants; i++){
                 String rname = name + (i + 1);
                 packer.add(PageType.editor, "editor-" + rname, Core.atlas.getPixmap(rname));
+            }
+        }
+
+        //generate paletted team regions
+        if(teamRegion != null && teamRegion.found()){
+            for(Team team : Team.all){
+                //if there's an override, don't generate anything
+                if(team.hasPalette && !Core.atlas.has(name + "-team-" + team.name)){
+                    var base = Core.atlas.getPixmap(teamRegion);
+                    Pixmap out = new Pixmap(base.width, base.height);
+
+                    for(int x = 0; x < base.width; x++){
+                        for(int y = 0; y < base.height; y++){
+                            int color = base.get(x, y);
+                            int index = color == 0xffffffff ? 0 : color == 0xdcc6c6ff ? 1 : color == 0x9d7f7fff ? 2 : -1;
+                            out.setRaw(x, y, index == -1 ? base.get(x, y) : team.palettei[index]);
+                        }
+                    }
+
+                    if(Core.settings.getBool("linear")){
+                        Pixmaps.bleed(out);
+                    }
+
+                    packer.add(PageType.main, name + "-team-" + team.name, out);
+                }
+            }
+
+            teamRegions = new TextureRegion[Team.all.length];
+            for(Team team : Team.all){
+                teamRegions[team.id] = teamRegion.found() && team.hasPalette ? Core.atlas.find(name + "-team-" + team.name, teamRegion) : teamRegion;
             }
         }
 

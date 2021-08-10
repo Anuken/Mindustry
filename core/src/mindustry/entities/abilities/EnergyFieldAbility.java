@@ -14,6 +14,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 
+import static mindustry.Vars.*;
+
 public class EnergyFieldAbility extends Ability{
     private static final Seq<Healthc> all = new Seq<>();
 
@@ -31,6 +33,7 @@ public class EnergyFieldAbility extends Ability{
     public float effectRadius = 5f, sectorRad = 0.14f, rotateSpeed = 0.5f;
     public int sectors = 5;
     public Color color = Pal.heal;
+    public boolean useAmmo = true;
 
     protected float timer, curStroke;
     protected boolean anyNearby = false;
@@ -88,8 +91,7 @@ public class EnergyFieldAbility extends Ability{
 
         curStroke = Mathf.lerpDelta(curStroke, anyNearby ? 1 : 0, 0.09f);
 
-        if((timer += Time.delta) >= reload){
-
+        if((timer += Time.delta) >= reload && (!useAmmo || unit.ammo > 0 || !state.rules.unitAmmo)){
             Tmp.v1.trns(unit.rotation - 90, x, y).add(unit.x, unit.y);
             float rx = Tmp.v1.x, ry = Tmp.v1.y;
             anyNearby = false;
@@ -131,7 +133,11 @@ public class EnergyFieldAbility extends Ability{
                     }
                 }else{
                     anyNearby = true;
-                    other.damage(damage);
+                    if(other instanceof Building b){
+                        b.damage(unit.team, damage);
+                    }else{
+                        other.damage(damage);
+                    }
                     if(other instanceof Statusc s){
                         s.apply(status, statusDuration);
                     }
@@ -143,6 +149,10 @@ public class EnergyFieldAbility extends Ability{
 
             if(anyNearby){
                 shootSound.at(unit);
+
+                if(useAmmo && state.rules.unitAmmo){
+                    unit.ammo --;
+                }
             }
 
             timer = 0f;

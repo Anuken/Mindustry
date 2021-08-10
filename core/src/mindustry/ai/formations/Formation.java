@@ -175,16 +175,6 @@ public class Formation{
         return -1;
     }
 
-    // debug
-    public SlotAssignment getSlotAssignmentAt(int index){
-        return slotAssignments.get(index);
-    }
-
-    // debug
-    public int getSlotAssignmentCount(){
-        return slotAssignments.size;
-    }
-
     /** Writes new slot locations to each member */
     public void updateSlots(){
         positionOffset.set(anchor);

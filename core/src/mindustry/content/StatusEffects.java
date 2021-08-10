@@ -69,12 +69,12 @@ public class StatusEffects implements ContentList{
             transitionDamage = 14;
 
             init(() -> {
-                affinity(shocked, ((unit, result, time) -> {
+                affinity(shocked, (unit, result, time) -> {
                     unit.damagePierce(transitionDamage);
                     if(unit.team == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
-                }));
+                });
                 opposite(burning, melting);
             });
         }};
@@ -96,11 +96,11 @@ public class StatusEffects implements ContentList{
 
             init(() -> {
                 opposite(wet, freezing);
-                affinity(tarred, ((unit, result, time) -> {
+                affinity(tarred, (unit, result, time) -> {
                     unit.damagePierce(8f);
                     Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
                     result.set(melting, Math.min(time + result.time, 200f));
-                }));
+                });
             });
         }};
 
@@ -133,8 +133,8 @@ public class StatusEffects implements ContentList{
             effect = Fx.oily;
 
             init(() -> {
-                affinity(melting, ((unit, result, time) -> result.set(melting, result.time + time)));
-                affinity(burning, ((unit, result, time) -> result.set(burning, result.time + time)));
+                affinity(melting, (unit, result, time) -> result.set(melting, result.time + time));
+                affinity(burning, (unit, result, time) -> result.set(burning, result.time + time));
             });
         }};
 

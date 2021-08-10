@@ -93,7 +93,7 @@ public class Blocks implements ContentList{
     commandCenter,
     groundFactory, airFactory, navalFactory,
     additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor,
-    repairPoint, repairTurret, resupplyPoint,
+    repairPoint, repairTurret,
 
     //payloads
     payloadConveyor, payloadRouter, payloadPropulsionTower, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
@@ -131,7 +131,7 @@ public class Blocks implements ContentList{
             new ConstructBlock(i);
         }
 
-        deepwater = new Floor("deepwater"){{
+        deepwater = new Floor("deep-water"){{
             speedMultiplier = 0.2f;
             variants = 0;
             liquidDrop = Liquids.water;
@@ -144,7 +144,7 @@ public class Blocks implements ContentList{
             albedo = 0.5f;
         }};
 
-        water = new Floor("water"){{
+        water = new Floor("shallow-water"){{
             speedMultiplier = 0.5f;
             variants = 0;
             status = StatusEffects.wet;
@@ -198,7 +198,7 @@ public class Blocks implements ContentList{
             cacheLayer = CacheLayer.tar;
         }};
 
-        slag = new Floor("slag"){{
+        slag = new Floor("molten-slag"){{
             drownTime = 150f;
             status = StatusEffects.melting;
             statusDuration = 240f;
@@ -223,7 +223,7 @@ public class Blocks implements ContentList{
 
         stone = new Floor("stone");
 
-        craters = new Floor("craters"){{
+        craters = new Floor("crater-stone"){{
             variants = 3;
             blendGroup = stone;
         }};
@@ -806,8 +806,8 @@ public class Blocks implements ContentList{
             craftTime = 35f;
             size = 2;
 
-            consumes.power(1f);
-            consumes.liquid(Liquids.slag, 0.07f);
+            consumes.power(1.1f);
+            consumes.liquid(Liquids.slag, 4f / 60f);
         }};
 
         disassembler = new Separator("disassembler"){{
@@ -851,7 +851,9 @@ public class Blocks implements ContentList{
             craftTime = 40f;
             updateEffect = Fx.pulverizeSmall;
             hasItems = hasPower = true;
-            drawer = new DrawRotator();
+            drawer = new DrawRotator(){{
+                drawSpinSprite = true;
+            }};
             ambientSound = Sounds.grinding;
             ambientSoundVolume = 0.025f;
 
@@ -1142,15 +1144,20 @@ public class Blocks implements ContentList{
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
             requirements(Category.distribution, with(Items.lead, 6, Items.copper, 6));
+            fadeIn = moveArrows = false;
             range = 4;
             speed = 74f;
+            arrowSpacing = 6f;
             bufferCapacity = 14;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
             requirements(Category.distribution, with(Items.phaseFabric, 5, Items.silicon, 7, Items.lead, 10, Items.graphite, 10));
             range = 12;
+            arrowPeriod = 0.9f;
+            arrowTimeScl = 2.75f;
             hasPower = true;
+            pulse = true;
             consumes.power(0.30f);
         }};
 
@@ -1217,7 +1224,7 @@ public class Blocks implements ContentList{
 
         mechanicalPump = new Pump("mechanical-pump"){{
             requirements(Category.liquid, with(Items.copper, 15, Items.metaglass, 10));
-            pumpAmount = 0.11f;
+            pumpAmount = 7f / 60f;
         }};
 
         rotaryPump = new Pump("rotary-pump"){{
@@ -1273,8 +1280,10 @@ public class Blocks implements ContentList{
             requirements(Category.liquid, with(Items.graphite, 2, Items.metaglass, 2));
         }};
 
-        bridgeConduit = new LiquidExtendingBridge("bridge-conduit"){{
+        bridgeConduit = new LiquidBridge("bridge-conduit"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 8));
+            fadeIn = moveArrows = false;
+            arrowSpacing = 6f;
             range = 4;
             hasPower = false;
         }};
@@ -1282,8 +1291,11 @@ public class Blocks implements ContentList{
         phaseConduit = new LiquidBridge("phase-conduit"){{
             requirements(Category.liquid, with(Items.phaseFabric, 5, Items.silicon, 7, Items.metaglass, 20, Items.titanium, 10));
             range = 12;
+            arrowPeriod = 0.9f;
+            arrowTimeScl = 2.75f;
             hasPower = true;
             canOverdrive = false;
+            pulse = true;
             consumes.power(0.30f);
         }};
 
@@ -1463,6 +1475,7 @@ public class Blocks implements ContentList{
             drillEffect = Fx.mineHuge;
             rotateSpeed = 6f;
             warmupSpeed = 0.01f;
+            itemCapacity = 20;
 
             //more than the laser drill
             liquidBoostIntensity = 1.8f;
@@ -1502,14 +1515,13 @@ public class Blocks implements ContentList{
             maxBoost = 2f;
 
             consumes.power(80f / 60f);
-            consumes.liquid(Liquids.water, 20f / 60f);
+            consumes.liquid(Liquids.water, 18f / 60f);
         }};
 
         oilExtractor = new Fracker("oil-extractor"){{
             requirements(Category.production, with(Items.copper, 150, Items.graphite, 175, Items.lead, 115, Items.thorium, 115, Items.silicon, 75));
             result = Liquids.oil;
             updateEffect = Fx.pulverize;
-            liquidCapacity = 50f;
             updateEffectChance = 0.05f;
             pumpAmount = 0.25f;
             size = 3;
@@ -1563,6 +1575,7 @@ public class Blocks implements ContentList{
             health = 3500;
             itemCapacity = 9000;
             size = 4;
+            thrusterLength = 34/4f;
 
             unitCapModifier = 16;
             researchCostMultiplier = 0.07f;
@@ -1575,6 +1588,7 @@ public class Blocks implements ContentList{
             health = 6000;
             itemCapacity = 13000;
             size = 5;
+            thrusterLength = 40/4f;
 
             unitCapModifier = 24;
             researchCostMultiplier = 0.11f;
@@ -1584,14 +1598,14 @@ public class Blocks implements ContentList{
             requirements(Category.effect, with(Items.titanium, 250, Items.thorium, 125));
             size = 3;
             itemCapacity = 1000;
-            health = size * size * 60;
+            health = size * size * 55;
         }};
 
         container = new StorageBlock("container"){{
             requirements(Category.effect, with(Items.titanium, 100));
             size = 2;
             itemCapacity = 300;
-            health = size * size * 60;
+            health = size * size * 55;
         }};
 
         unloader = new Unloader("unloader"){{
@@ -1788,7 +1802,7 @@ public class Blocks implements ContentList{
             shots = 4;
             burstSpacing = 5;
             inaccuracy = 10f;
-            range = 215f;
+            range = 235f;
             xRand = 6f;
             size = 2;
             health = 300 * size * size;
@@ -2029,13 +2043,13 @@ public class Blocks implements ContentList{
             range = 195f;
             reloadTime = 90f;
             firingMoveFract = 0.5f;
-            shootDuration = 220f;
+            shootDuration = 230f;
             powerUse = 17f;
             shootSound = Sounds.laserbig;
             loopSound = Sounds.beam;
             loopSoundVolume = 2f;
 
-            shootType = new ContinuousLaserBulletType(70){{
+            shootType = new ContinuousLaserBulletType(75){{
                 length = 200f;
                 hitEffect = Fx.hitMeltdown;
                 hitColor = Pal.meltdownHit;
@@ -2200,17 +2214,6 @@ public class Blocks implements ContentList{
             acceptCoolant = true;
         }};
 
-        resupplyPoint = new ResupplyPoint("resupply-point"){{
-            requirements(Category.units, BuildVisibility.ammoOnly, with(Items.lead, 20, Items.copper, 15, Items.silicon, 15));
-
-            size = 2;
-            range = 80f;
-            itemCapacity = 20;
-            ammoAmount = 5;
-
-            consumes.item(Items.copper, 1);
-        }};
-
         //endregion
         //region payloads
 
@@ -2229,7 +2232,7 @@ public class Blocks implements ContentList{
             size = 5;
             reloadTime = 140f;
             chargeTime = 100f;
-            range = 500f;
+            range = 600f;
             maxPayloadSize = 3.5f;
             consumes.power(6f);
         }};

@@ -143,11 +143,12 @@ public class LiquidModule extends BlockModule{
         int count = legacy ? read.ub() : read.s();
 
         for(int j = 0; j < count; j++){
-            int liquidid = legacy ? read.ub() : read.s();
+            Liquid liq = content.liquid(legacy ? read.ub() : read.s());
+            int liquidid = liq.id;
             float amount = read.f();
             liquids[liquidid] = amount;
             if(amount > 0){
-                current = content.liquid(liquidid);
+                current = liq;
             }
             this.total += amount;
         }

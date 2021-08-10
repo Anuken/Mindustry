@@ -22,6 +22,7 @@ public class StorageBlock extends Block{
         destructible = true;
         group = BlockGroup.transportation;
         flags = EnumSet.of(BlockFlag.storage);
+        allowResupply = true;
         envEnabled = Env.any;
     }
 
@@ -41,7 +42,7 @@ public class StorageBlock extends Block{
     }
 
     public class StorageBuild extends Building{
-        protected @Nullable Building linkedCore;
+        public @Nullable Building linkedCore;
 
         @Override
         public boolean acceptItem(Building source, Item item){

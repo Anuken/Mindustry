@@ -15,6 +15,7 @@ import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
@@ -38,6 +39,7 @@ public class PlacementFragment extends Fragment{
     Block menuHoverBlock;
     Displayable hover;
     Object lastDisplayState;
+    Team lastTeam;
     boolean wasHovered;
     Table blockTable, toggler, topTable;
     ScrollPane blockPane;
@@ -283,13 +285,14 @@ public class PlacementFragment extends Fragment{
 
                         //don't refresh unnecessarily
                         //refresh only when the hover state changes, or the displayed block changes
-                        if(wasHovered == isHovered && lastDisplayState == displayState) return;
+                        if(wasHovered == isHovered && lastDisplayState == displayState && lastTeam == player.team()) return;
 
                         topTable.clear();
                         topTable.top().left().margin(5);
 
                         lastDisplayState = displayState;
                         wasHovered = isHovered;
+                        lastTeam = player.team();
 
                         //show details of selected block, with costs
                         if(displayBlock != null){

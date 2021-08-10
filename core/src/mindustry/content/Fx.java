@@ -130,7 +130,7 @@ public class Fx{
         Fill.circle(x, y, e.fslope() * 1.5f * size);
     }),
 
-    pointBeam = new Effect(25f, e -> {
+    pointBeam = new Effect(25f, 300f, e -> {
         if(!(e.data instanceof Position)) return;
 
         Position pos = e.data();
@@ -182,6 +182,16 @@ public class Fx{
         color(Pal.accent);
         stroke(3f - e.fin() * 2f);
         Lines.square(e.x, e.y, tilesize / 2f * e.rotation + e.fin() * 3f);
+    }),
+
+    coreLaunchConstruct = new Effect(35, e -> {
+        color(Pal.accent);
+        stroke(4f - e.fin() * 3f);
+        Lines.square(e.x, e.y, tilesize / 2f * e.rotation * 1.2f + e.fin() * 5f);
+
+        randLenVectors(e.id, 5 + (int)(e.rotation * 5), e.rotation * 3f + (tilesize * e.rotation) * e.finpow() * 1.5f, (x, y) -> {
+            Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * (4f + e.rotation));
+        });
     }),
 
     tapBlock = new Effect(12, e -> {
@@ -1628,7 +1638,7 @@ public class Fx{
     coalSmeltsmoke = new Effect(40f, e -> {
         randLenVectors(e.id, 0.2f + e.fin(), 4, 6.3f, (x, y, fin, out) -> {
             color(Color.darkGray, Pal.coalBlack, e.finpowdown());
-            Fill.circle(e.x + x, e.y + y, out * 2f + 0.25f);
+            Fill.circle(e.x + x, e.y + y, out * 2f + 0.35f);
         });
     }),
 
@@ -1869,6 +1879,13 @@ public class Fx{
         Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
     }),
 
+    coreLandDust = new Effect(100f, e -> {
+        color(e.color, e.fout(0.1f));
+        rand.setSeed(e.id);
+        Tmp.v1.trns(e.rotation, e.finpow() * 90f * rand.random(0.2f, 1f));
+        Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 8f * rand.random(0.6f, 1f) * e.fout(0.2f));
+    }).layer(Layer.block + 1f),
+
     unitShieldBreak = new Effect(35, e -> {
         if(!(e.data instanceof Unitc)) return;
 
@@ -1962,8 +1979,5 @@ public class Fx{
         }
 
         Lines.endLine();
-    }).followParent(false),
-
-    coreLand = new Effect(120f, e -> {
-    });
+    }).followParent(false);
 }

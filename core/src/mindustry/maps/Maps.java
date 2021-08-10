@@ -420,6 +420,8 @@ public class Maps{
                     writeCache(map);
                 }catch(Exception e){
                     e.printStackTrace();
+                }finally{
+                    pix.dispose();
                 }
             });
         }catch(Exception e){

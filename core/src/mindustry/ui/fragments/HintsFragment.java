@@ -12,6 +12,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.input.*;
@@ -54,6 +55,12 @@ public class HintsFragment extends Fragment{
                     hints.remove(hint);
                 }else if(hint != null){
                     display(hint);
+                }else{
+                    //moused over a derelict structure
+                    var build = world.buildWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
+                    if(build != null && build.team == Team.derelict){
+                        events.add("derelictmouse");
+                    }
                 }
             }
         });
@@ -157,6 +164,7 @@ public class HintsFragment extends Fragment{
         conveyorPathfind(() -> control.input.block == Blocks.titaniumConveyor, () -> Core.input.keyRelease(Binding.diagonal_placement) || (mobile && Core.settings.getBool("swapdiagonal"))),
         boost(visibleDesktop, () -> !player.dead() && player.unit().type.canBoost, () -> Core.input.keyDown(Binding.boost)),
         blockInfo(() -> true, () -> ui.content.isShown()),
+        derelict(() -> ui.hints.events.contains("derelictmouse"), () -> false),
         command(() -> state.rules.defaultTeam.data().units.size > 3 && !net.active(), () -> player.unit().isCommanding()),
         payloadPickup(() -> !player.unit().dead && player.unit() instanceof Payloadc p && p.payloads().isEmpty(), () -> player.unit() instanceof Payloadc p && p.payloads().any()),
         payloadDrop(() -> !player.unit().dead && player.unit() instanceof Payloadc p && p.payloads().any(), () -> player.unit() instanceof Payloadc p && p.payloads().isEmpty()),

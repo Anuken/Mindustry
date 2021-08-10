@@ -681,7 +681,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        if(!player.dead() && !state.isPaused()){
+        if(!player.dead() && !state.isPaused() && !renderer.isCutscene()){
             updateMovement(player.unit());
         }
 
@@ -822,7 +822,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 shiftDeltaX %= tilesize;
                 shiftDeltaY %= tilesize;
             }
-        }else if(!renderer.isLanding()){
+        }else{
             //pan player
             Core.camera.position.x -= deltaX;
             Core.camera.position.y -= deltaY;
@@ -922,10 +922,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(omni){
             unit.moveAt(movement);
         }else{
-            unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
-            if(!movement.isZero()){
-                unit.rotation = Angles.moveToward(unit.rotation, movement.angle(), unit.type.rotateSpeed * Math.max(Time.delta, 1));
-            }
+            unit.rotateMove(movement);
         }
 
         //update shooting if not building + not mining

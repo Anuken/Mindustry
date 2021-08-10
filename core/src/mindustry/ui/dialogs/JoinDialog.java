@@ -271,7 +271,7 @@ public class JoinDialog extends BaseDialog{
 
         hosts.clear();
 
-        section("@servers.local", local, false);
+        section(steam ? "@servers.local.steam" : "@servers.local", local, false);
         section("@servers.remote", remote, false);
         section("@servers.global", global, true);
 

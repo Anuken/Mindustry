@@ -214,7 +214,8 @@ public class JsonIO{
                 String str = jsonData.asString();
                 Item item = Vars.content.getByName(ContentType.item, str);
                 Liquid liquid = Vars.content.getByName(ContentType.liquid, str);
-                return item != null ? item : liquid;
+                Block block = Vars.content.getByName(ContentType.block, str);
+                return item != null ? item : liquid == null ? block : liquid;
             }
         });
 

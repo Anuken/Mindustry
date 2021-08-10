@@ -81,7 +81,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     }
 
     public boolean hasCollided(int id){
-        return collided.size != 0 && !collided.contains(id);
+        return collided.size != 0 && collided.contains(id);
     }
 
     @Replace

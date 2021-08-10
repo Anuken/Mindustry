@@ -244,7 +244,7 @@ public class Generators{
                             teamr.each((x, y) -> {
                                 int color = teamr.getRaw(x, y);
                                 int index = color == 0xffffffff ? 0 : color == 0xdcc6c6ff ? 1 : color == 0x9d7f7fff ? 2 : -1;
-                                out.setRaw(x, y, index == -1 ? teamr.getRaw(x, y) : team.palette[index].rgba());
+                                out.setRaw(x, y, index == -1 ? teamr.getRaw(x, y) : team.palettei[index]);
                             });
                             save(out, block.name + "-team-" + team.name);
 
@@ -387,6 +387,19 @@ public class Generators{
 
                 saveScaled(base, item.name + "-icon-logic", logicIconSize);
                 save(base, "../ui/" + item.getContentType().name() + "-" + item.name + "-ui");
+            }
+        });
+
+        generate("team-icons", () -> {
+            for(Team team : Team.all){
+                if(has("team-" + team.name)){
+                    int rgba = team == Team.derelict ? Color.valueOf("b7b8c9").rgba() : team.color.rgba();
+                    Pixmap base = get("team-" + team.name);
+                    base.each((x, y) -> base.setRaw(x, y, Color.muli(base.getRaw(x, y), rgba)));
+
+                    delete("team-" + team.name);
+                    save(base.outline(Pal.gray, 3), "../ui/team-" + team.name);
+                }
             }
         });
 

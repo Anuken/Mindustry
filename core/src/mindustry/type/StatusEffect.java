@@ -43,12 +43,12 @@ public class StatusEffect extends UnlockableContent{
     public Color color = Color.white.cpy();
     /** Effect that happens randomly on top of the affected unit. */
     public Effect effect = Fx.none;
+    /** Affinity & opposite values for stat displays. */
+    public ObjectSet<StatusEffect> affinities = new ObjectSet<>(), opposites = new ObjectSet<>();
     /** Transition handler map. */
     protected ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
     /** Called on init. */
     protected Runnable initblock = () -> {};
-
-    public ObjectSet<StatusEffect> affinities = new ObjectSet<>(), opposites = new ObjectSet<>();
 
     public StatusEffect(String name){
         super(name);
@@ -150,6 +150,10 @@ public class StatusEffect extends UnlockableContent{
                 result.effect = other;
             }
         });
+    }
+
+    public void draw(Unit unit, float time){
+        draw(unit); //Backwards compatibility
     }
 
     public void draw(Unit unit){
