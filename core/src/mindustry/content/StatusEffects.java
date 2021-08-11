@@ -21,7 +21,7 @@ public class StatusEffects implements ContentList{
 
         burning = new StatusEffect("burning"){{
             color = Color.valueOf("ffc455");
-            damage = 0.12f; //over 8 seconds, this would be ~60 damage
+            damage = 0.167f;
             effect = Fx.burning;
             transitionDamage = 8f;
 

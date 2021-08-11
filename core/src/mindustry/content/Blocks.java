@@ -1853,7 +1853,7 @@ public class Blocks implements ContentList{
             loopSound = Sounds.beam;
             loopSoundVolume = 2f;
 
-            shootType = new ContinuousLaserBulletType(75){{
+            shootType = new ContinuousLaserBulletType(78){{
                 length = 200f;
                 hitEffect = Fx.hitMeltdown;
                 hitColor = Pal.meltdownHit;

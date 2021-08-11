@@ -30,8 +30,11 @@ public class Pixelator implements Disposable{
         py = Core.camera.position.y;
         Core.camera.position.set((int)px + ((int)(camera.width) % 2 == 0 ? 0 : 0.5f), (int)py + ((int)(camera.height) % 2 == 0 ? 0 : 0.5f));
 
-        int w = (int)(Core.camera.width * renderer.landScale());
-        int h = (int)(Core.camera.height * renderer.landScale());
+        int w = (int)Core.camera.width, h = (int)Core.camera.height;
+        if(renderer.isCutscene()){
+            w = (int)(Core.camera.width * renderer.landScale() / renderer.getScale());
+            h = (int)(Core.camera.height * renderer.landScale() / renderer.getScale());
+        }
 
         buffer.resize(w, h);
 
