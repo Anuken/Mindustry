@@ -2033,7 +2033,7 @@ public class Blocks implements ContentList{
         payloadPropulsionTower = new PayloadMassDriver("payload-propulsion-tower"){{
             requirements(Category.units, with(Items.thorium, 300, Items.silicon, 200, Items.plastanium, 200, Items.phaseFabric, 50));
             size = 5;
-            reloadTime = 140f;
+            reloadTime = 130f;
             chargeTime = 100f;
             range = 1000f;
             maxPayloadSize = 3.5f;
