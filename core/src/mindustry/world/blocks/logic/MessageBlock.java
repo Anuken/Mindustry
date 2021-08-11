@@ -93,7 +93,7 @@ public class MessageBlock extends Block{
                         multiline = true;
                         maxLength = maxTextLength;
                         accepted = str -> {
-                            if (!str.equals(text)) configure(str);
+                            if(!str.equals(text)) configure(str);
                         };
                     }});
                 }else{
@@ -114,7 +114,7 @@ public class MessageBlock extends Block{
                     });
                     a.setMaxLength(maxTextLength);
                     dialog.buttons.button("@ok", () -> {
-                        if (!a.getText().equals(message.toString())) configure(a.getText());
+                        if(!a.getText().equals(message.toString())) configure(a.getText());
                         dialog.hide();
                     }).size(130f, 60f);
                     dialog.update(() -> {
