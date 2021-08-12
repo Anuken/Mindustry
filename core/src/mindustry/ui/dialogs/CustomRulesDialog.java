@@ -211,7 +211,6 @@ public class CustomRulesDialog extends BaseDialog{
             boolean[] shown = {false};
             Table wasMain = main;
 
-
             main.button("[#" + team.color +  "]" + team.localized() + (team.emoji.isEmpty() ? "" : "[] " + team.emoji), Icon.downOpen, Styles.togglet, () -> {
                 shown[0] = !shown[0];
             }).marginLeft(14f).width(260f).height(55f).checked(a -> shown[0]).row();
@@ -224,10 +223,14 @@ public class CustomRulesDialog extends BaseDialog{
                 number("@rules.blockhealthmultiplier", f -> teams.blockHealthMultiplier = f, () -> teams.blockHealthMultiplier);
                 number("@rules.blockdamagemultiplier", f -> teams.blockDamageMultiplier = f, () -> teams.blockDamageMultiplier);
 
+                check("@rules.buildai", b -> teams.ai = b, () -> teams.ai, () -> team != rules.defaultTeam);
+                number("@rules.aitier", false, f -> teams.aiTier = f, () -> teams.aiTier, () -> teams.ai, 0, 1);
+
+                check("@rules.infiniteresources", b -> teams.infiniteResources = b, () -> teams.infiniteResources);
+                number("@rules.buildspeedmultiplier", f -> teams.buildSpeedMultiplier = f, () -> teams.buildSpeedMultiplier, 0.001f, 50f);
+
                 number("@rules.unitdamagemultiplier", f -> teams.unitDamageMultiplier = f, () -> teams.unitDamageMultiplier);
                 number("@rules.unitbuildspeedmultiplier", f -> teams.unitBuildSpeedMultiplier = f, () -> teams.unitBuildSpeedMultiplier, 0.001f, 50f);
-
-                number("@rules.buildspeedmultiplier", f -> teams.buildSpeedMultiplier = f, () -> teams.buildSpeedMultiplier, 0.001f, 50f);
 
                 main = wasMain;
             }, () -> shown[0]).growX().row();
