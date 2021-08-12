@@ -98,5 +98,9 @@
   {
     "name": "Xpdustry",
     "address": ["xpdustry.fr"]
+  },
+  {
+    "name": "#Español",
+    "address": ["168.119.36.188:41445"]
   }
 ]
