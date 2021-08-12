@@ -326,8 +326,8 @@ public class World{
         invalidMap = false;
 
         if(!headless){
-            if(state.teams.playerCores().size == 0 && !checkRules.pvp){
-                ui.showErrorMessage("@map.nospawn");
+            if(state.teams.cores(checkRules.defaultTeam).size == 0 && !checkRules.pvp){
+                ui.showErrorMessage(Core.bundle.format("map.nospawn", checkRules.defaultTeam.color, checkRules.defaultTeam.localized()));
                 invalidMap = true;
             }else if(checkRules.pvp){ //pvp maps need two cores to be valid
                 if(state.teams.getActive().count(TeamData::hasCore) < 2){
@@ -337,7 +337,7 @@ public class World{
             }else if(checkRules.attackMode){ //attack maps need two cores to be valid
                 invalidMap = state.rules.waveTeam.data().noCores();
                 if(invalidMap){
-                    ui.showErrorMessage("@map.nospawn.attack");
+                    ui.showErrorMessage(Core.bundle.format("map.nospawn.attack", checkRules.waveTeam.color, checkRules.waveTeam.localized()));
                 }
             }
         }else{
