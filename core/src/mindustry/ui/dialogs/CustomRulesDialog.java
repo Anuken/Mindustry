@@ -13,6 +13,7 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
+import mindustry.game.Rules.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -200,6 +201,50 @@ public class CustomRulesDialog extends BaseDialog{
         }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f).row();
 
         main.button("@rules.weather", this::weatherDialog).width(250f).left().row();
+
+        title("@rules.title.teams");
+
+        team("@rules.playerteam", t -> rules.defaultTeam = t, () -> rules.defaultTeam);
+        team("@rules.enemyteam", t -> rules.waveTeam = t, () -> rules.waveTeam);
+
+        for(Team team : Team.baseTeams){
+            boolean[] shown = {false};
+            Table wasMain = main;
+
+
+            main.button("[#" + team.color +  "]" + team.localized() + (team.emoji.isEmpty() ? "" : "[] " + team.emoji), Icon.downOpen, Styles.togglet, () -> {
+                shown[0] = !shown[0];
+            }).marginLeft(14f).width(260f).height(55f).checked(a -> shown[0]).row();
+
+            main.collapser(t -> {
+                t.left().defaults().fillX().left().pad(5);
+                main = t;
+                TeamRule teams = rules.teams.get(team);
+
+                number("@rules.blockhealthmultiplier", f -> teams.blockHealthMultiplier = f, () -> teams.blockHealthMultiplier);
+                number("@rules.blockdamagemultiplier", f -> teams.blockDamageMultiplier = f, () -> teams.blockDamageMultiplier);
+
+                number("@rules.unitdamagemultiplier", f -> teams.unitDamageMultiplier = f, () -> teams.unitDamageMultiplier);
+                number("@rules.unitbuildspeedmultiplier", f -> teams.unitBuildSpeedMultiplier = f, () -> teams.unitBuildSpeedMultiplier, 0.001f, 50f);
+
+                number("@rules.buildspeedmultiplier", f -> teams.buildSpeedMultiplier = f, () -> teams.buildSpeedMultiplier, 0.001f, 50f);
+
+                main = wasMain;
+            }, () -> shown[0]).growX().row();
+        }
+    }
+
+    void team(String text, Cons<Team> cons, Prov<Team> prov){
+        main.table(t -> {
+            t.left();
+            t.add(text).left().padRight(5);
+
+            for(Team team : Team.baseTeams){
+                t.button(Tex.whiteui, Styles.clearTogglei, 38f, () -> {
+                    cons.get(team);
+                }).pad(1f).checked(b -> prov.get() == team).size(60f).tooltip(team.localized()).with(i -> i.getStyle().imageUpColor = team.color);
+            }
+        }).padTop(0).row();
     }
 
     void number(String text, Floatc cons, Floatp prov){
@@ -218,15 +263,15 @@ public class CustomRulesDialog extends BaseDialog{
         number(text, false, cons, prov, condition, 0, Float.MAX_VALUE);
     }
 
+    //TODO integer param unused
     void number(String text, boolean integer, Intc cons, Intp prov, int min, int max){
         main.table(t -> {
             t.left();
             t.add(text).left().padRight(5);
-            t.field((integer ? prov.get() : prov.get()) + "", s -> cons.get(Strings.parseInt(s)))
+            t.field((prov.get()) + "", s -> cons.get(Strings.parseInt(s)))
                     .padRight(100f)
                     .valid(f -> Strings.parseInt(f) >= min && Strings.parseInt(f) <= max).width(120f).left().addInputDialog();
-        }).padTop(0);
-        main.row();
+        }).padTop(0).row();
     }
 
     void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition, float min, float max){
