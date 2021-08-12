@@ -140,6 +140,26 @@ public class Rules{
         }
     }
 
+    public float unitBuildSpeed(Team team){
+        return unitBuildSpeedMultiplier * teams.get(team).unitBuildSpeedMultiplier;
+    }
+
+    public float unitDamage(Team team){
+        return unitDamageMultiplier * teams.get(team).unitDamageMultiplier;
+    }
+
+    public float blockHealth(Team team){
+        return blockHealthMultiplier * teams.get(team).blockHealthMultiplier;
+    }
+
+    public float blockDamage(Team team){
+        return blockDamageMultiplier * teams.get(team).blockDamageMultiplier;
+    }
+
+    public float buildSpeed(Team team){
+        return buildSpeedMultiplier * teams.get(team).buildSpeedMultiplier;
+    }
+
     /** A team-specific ruleset. */
     public static class TeamRule{
         /** Whether to use building AI. */
@@ -154,6 +174,19 @@ public class Rules{
         public boolean infiniteResources;
         /** If true, this team has infinite unit ammo. */
         public boolean infiniteAmmo;
+
+        /** How fast unit factories build units. */
+        public float unitBuildSpeedMultiplier = 1f;
+        /** How much damage any other units deal. */
+        public float unitDamageMultiplier = 1f;
+        /** How much health blocks start with. */
+        public float blockHealthMultiplier = 1f;
+        /** How much damage blocks (turrets) deal. */
+        public float blockDamageMultiplier = 1f;
+        /** Multiplier for building speed. */
+        public float buildSpeedMultiplier = 1f;
+
+        //build cost disabled due to technical complexity
     }
 
     /** A simple map for storing TeamRules in an efficient way without hashing. */

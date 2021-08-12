@@ -197,7 +197,7 @@ public class Reconstructor extends UnitBlock{
                     if(moveInPayload()){
                         if(consValid()){
                             valid = true;
-                            progress += edelta() * state.rules.unitBuildSpeedMultiplier;
+                            progress += edelta() * state.rules.unitBuildSpeed(team);
                         }
 
                         //upgrade the unit
@@ -214,7 +214,7 @@ public class Reconstructor extends UnitBlock{
             }
 
             speedScl = Mathf.lerpDelta(speedScl, Mathf.num(valid), 0.05f);
-            time += edelta() * speedScl * state.rules.unitBuildSpeedMultiplier;
+            time += edelta() * speedScl * state.rules.unitBuildSpeed(team);
         }
 
         @Override
