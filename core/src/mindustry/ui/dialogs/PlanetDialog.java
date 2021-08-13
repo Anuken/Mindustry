@@ -130,7 +130,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
                 if(event.targetActor == PlanetDialog.this){
-                    zoom = Mathf.clamp(zoom + y / 10f, 0.5f, 2f);
+                    zoom = Mathf.clamp(zoom + amountY / 10f, 0.5f, 2f);
                 }
                 return true;
             }
