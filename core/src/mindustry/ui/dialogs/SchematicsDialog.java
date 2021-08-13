@@ -69,7 +69,7 @@ public class SchematicsDialog extends BaseDialog{
             searchField = s.field(search, res -> {
                 search = res;
                 rebuildPane.run();
-            }).growX().get();
+            }).growX().addInputDialog().get();
         }).fillX().padBottom(4);
 
         cont.row();
