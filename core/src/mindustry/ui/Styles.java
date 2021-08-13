@@ -357,7 +357,7 @@ public class Styles{
         }};
 
         defaultField = new TextFieldStyle(){{
-            font = Fonts.chat;
+            font = Fonts.def;
             fontColor = Color.white;
             disabledFontColor = Color.gray;
             disabledBackground = underlineDisabled;
@@ -370,7 +370,7 @@ public class Styles{
         }};
 
         nodeField = new TextFieldStyle(){{
-            font = Fonts.chat;
+            font = Fonts.def;
             fontColor = Color.white;
             disabledFontColor = Color.gray;
             disabledBackground = underlineDisabled;
@@ -383,7 +383,7 @@ public class Styles{
         }};
 
         areaField = new TextFieldStyle(){{
-            font = Fonts.chat;
+            font = Fonts.def;
             fontColor = Color.white;
             disabledFontColor = Color.gray;
             selection = Tex.selection;
@@ -394,7 +394,7 @@ public class Styles{
         }};
 
         nodeArea = new TextFieldStyle(){{
-            font = Fonts.chat;
+            font = Fonts.def;
             fontColor = Color.white;
             disabledFontColor = Color.gray;
             selection = Tex.selection;
