@@ -96,7 +96,7 @@ public class Net{
             String type = t.getClass().toString().toLowerCase();
             boolean isError = false;
 
-            if(e instanceof BufferUnderflowException || e instanceof BufferOverflowException){
+            if(e instanceof BufferUnderflowException || e instanceof BufferOverflowException || e.getCause() instanceof EOFException){
                 error = Core.bundle.get("error.io");
             }else if(error.equals("mismatch") || e instanceof LZ4Exception || (e instanceof IndexOutOfBoundsException && e.getStackTrace()[0].getClassName().contains("java.nio"))){
                 error = Core.bundle.get("error.mismatch");
@@ -272,6 +272,10 @@ public class Net{
                 throw new RuntimeException("Received stream chunk without a StreamBegin beforehand!");
             }
             builder.add(c.data);
+
+            ui.loadfrag.setProgress(builder.progress());
+            netClient.resetTimeout();
+
             if(builder.isDone()){
                 streams.remove(builder.id);
                 handleClientReceived(builder.build());

@@ -17,7 +17,7 @@ import static mindustry.Vars.*;
 
 /** Controls playback of multiple audio tracks.*/
 public class SoundControl{
-    protected static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.6f, musicWaveChance = 0.46f;
+    protected static final float finTime = 120f, foutTime = 120f, musicInterval = 3f * Time.toMinutes, musicChance = 0.6f, musicWaveChance = 0.46f;
 
     /** normal, ambient music, plays at any time */
     public Seq<Music> ambientMusic = Seq.with();
@@ -130,7 +130,12 @@ public class SoundControl{
                 Core.audio.soundBus.play();
                 setupFilters();
             }else{
-                Core.audio.soundBus.replay();
+                //stopping a single audio bus stops everything else, yay!
+                Core.audio.soundBus.stop();
+                //play music bus again, as it was stopped above
+                Core.audio.musicBus.play();
+
+                Core.audio.soundBus.play();
             }
         }
 

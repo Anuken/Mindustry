@@ -57,7 +57,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
     float rawHeight(Vec3 position){
         position = Tmp.v33.set(position).scl(scl);
-        return (Mathf.pow((float)Simplex.noise3d(seed, 7, 0.5f, 1f/3f, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
+        return (Mathf.pow(Simplex.noise3d(seed, 7, 0.5f, 1f/3f, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
     }
 
     @Override
@@ -127,12 +127,12 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         position = Tmp.v33.set(position).scl(scl);
         float rad = scl;
         float temp = Mathf.clamp(Math.abs(position.y * 2f) / (rad));
-        float tnoise = (float)Simplex.noise3d(seed, 7, 0.56, 1f/3f, position.x, position.y + 999f, position.z);
+        float tnoise = Simplex.noise3d(seed, 7, 0.56, 1f/3f, position.x, position.y + 999f, position.z);
         temp = Mathf.lerp(temp, tnoise, 0.5f);
         height *= 1.2f;
         height = Mathf.clamp(height);
 
-        float tar = (float)Simplex.noise3d(seed, 4, 0.55f, 1f/2f, position.x, position.y + 999f, position.z) * 0.3f + Tmp.v31.dst(0, 0, 1f) * 0.2f;
+        float tar = Simplex.noise3d(seed, 4, 0.55f, 1f/2f, position.x, position.y + 999f, position.z) * 0.3f + Tmp.v31.dst(0, 0, 1f) * 0.2f;
 
         Block res = arr[Mathf.clamp((int)(temp * arr.length), 0, arr[0].length - 1)][Mathf.clamp((int)(height * arr[0].length), 0, arr[0].length - 1)];
         if(tar > 0.5f){
@@ -145,7 +145,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     @Override
     protected float noise(float x, float y, double octaves, double falloff, double scl, double mag){
         Vec3 v = sector.rect.project(x, y).scl(5f);
-        return (float)Simplex.noise3d(seed, octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float)mag;
+        return Simplex.noise3d(seed, octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float)mag;
     }
 
     @Override
@@ -162,12 +162,27 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                 connected.add(this);
             }
 
+            void con(int x1, int y1, int x2, int y2){
+                float nscl = rand.random(100f, 140f) * 6f;
+                int stroke = rand.random(3, 9);
+                brush(pathfind(x1, y1, x2, y2, tile -> (tile.solid() ? 50f : 0f) + noise(tile.x, tile.y, 2, 0.4f, 1f / nscl) * 500, Astar.manhattan), stroke);
+            }
+
             void connect(Room to){
                 if(!connected.add(to)) return;
 
-                float nscl = rand.random(100f, 140f);
-                int stroke = rand.random(3, 9);
-                brush(pathfind(x, y, to.x, to.y, tile -> (tile.solid() ? 5f : 0f) + noise(tile.x, tile.y, 2, 0.4, 1f / nscl) * 500, Astar.manhattan), stroke);
+                Vec2 midpoint = Tmp.v1.set(to.x, to.y).add(x, y).scl(0.5f);
+                rand.nextFloat();
+
+                //add randomized offset to avoid straight lines
+                midpoint.add(Tmp.v2.setToRandomDirection(rand).scl(Tmp.v1.dst(x, y)));
+
+                midpoint.sub(width/2f, height/2f).limit(width / 2f / Mathf.sqrt3).add(width/2f, height/2f);
+
+                int mx = (int)midpoint.x, my = (int)midpoint.y;
+
+                con(x, y, mx, my);
+                con(mx, my, to.x, to.y);
             }
         }
 
@@ -244,8 +259,6 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         cells(1);
         distort(10f, 6f);
 
-        inverseFloodFill(tiles.getn(spawn.x, spawn.y));
-
         Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreLead);
         float poles = Math.abs(sector.tile.v.y);
         float nmag = 0.5f;
@@ -295,6 +308,8 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         trimDark();
 
         median(2);
+
+        inverseFloodFill(tiles.getn(spawn.x, spawn.y));
 
         tech();
 

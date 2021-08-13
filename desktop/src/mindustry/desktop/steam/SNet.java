@@ -312,6 +312,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             for(int i = 0; i < matches; i++){
                 try{
                     SteamID lobby = smat.getLobbyByIndex(i);
+                    if(smat.getLobbyData(lobby, "hidden").equals("true")) continue;
                     String mode = smat.getLobbyData(lobby, "gamemode");
                     //make sure versions are equal, don't list incompatible lobbies
                     if(mode == null || mode.isEmpty() || (Version.build != -1 && Strings.parseInt(smat.getLobbyData(lobby, "version"), -1) != Version.build)) continue;

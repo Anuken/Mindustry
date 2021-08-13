@@ -30,6 +30,7 @@ public class OreBlock extends OverlayFloor{
     /** For mod use only!*/
     public OreBlock(String name){
         super(name);
+        this.useColor = true;
         variants = 3;
     }
 

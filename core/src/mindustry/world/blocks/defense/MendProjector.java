@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 public class MendProjector extends Block{
     public final int timerUse = timers++;
     public Color baseColor = Color.valueOf("84f491");
-    public Color phaseColor = Color.valueOf("ffd59e");
+    public Color phaseColor = baseColor;
     public @Load("@-top") TextureRegion topRegion;
     public float reload = 250f;
     public float range = 60f;
@@ -91,7 +91,7 @@ public class MendProjector extends Block{
                 float realRange = range + phaseHeat * phaseRangeBoost;
                 charge = 0f;
 
-                indexer.eachBlock(this, realRange, other -> other.damaged(), other -> {
+                indexer.eachBlock(this, realRange, Building::damaged, other -> {
                     other.heal(other.maxHealth() * (healPercent + phaseHeat * phaseBoost) / 100f * efficiency());
                     Fx.healBlockFull.at(other.x, other.y, other.block.size, baseColor);
                 });

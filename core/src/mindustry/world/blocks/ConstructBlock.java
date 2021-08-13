@@ -41,13 +41,14 @@ public class ConstructBlock extends Block{
         health = 20;
         consumesTap = true;
         solidifes = true;
+        inEditor = false;
         consBlocks[size - 1] = this;
         sync = true;
     }
 
     /** Returns a ConstructBlock by size. */
     public static ConstructBlock get(int size){
-        if(size > maxBlockSize) throw new IllegalArgumentException("No. Don't place ConstructBlock of size greater than " + maxBlockSize);
+        if(size > maxBlockSize) throw new IllegalArgumentException("No. Don't place ConstructBlocks of size greater than " + maxBlockSize);
         return consBlocks[size - 1];
     }
 
@@ -57,7 +58,7 @@ public class ConstructBlock extends Block{
         block.breakEffect.at(tile.drawx(), tile.drawy(), block.size, block.mapColor);
         Events.fire(new BlockBuildEndEvent(tile, builder, team, true, null));
         tile.remove();
-        if(shouldPlay()) Sounds.breaks.at(tile, calcPitch(false));
+        if(shouldPlay()) block.breakSound.at(tile, calcPitch(false));
     }
 
     @Remote(called = Loc.server)
@@ -82,6 +83,11 @@ public class ConstructBlock extends Block{
 
             if(builder != null && builder.getControllerName() != null){
                 tile.build.lastAccessed = builder.getControllerName();
+            }
+
+            //make sure block indexer knows it's damaged
+            if(tile.build.damaged()){
+                indexer.notifyBuildDamaged(tile.build);
             }
         }
 

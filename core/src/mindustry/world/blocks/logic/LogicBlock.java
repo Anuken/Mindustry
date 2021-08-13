@@ -174,7 +174,7 @@ public class LogicBlock extends Block{
         public boolean active = true, valid;
         public int x, y;
         public String name;
-        Building lastBuild;
+        public Building lastBuild;
 
         public LogicLink(int x, int y, String name, boolean valid){
             this.x = x;
@@ -246,18 +246,6 @@ public class LogicBlock extends Block{
                 updateCode(new String(bytes, charset));
             }catch(Exception ignored){
                 //invalid logic doesn't matter here
-            }
-        }
-
-        @Override
-        public void onProximityAdded(){
-            super.onProximityAdded();
-
-            //unbox buildings after reading
-            for(var v : executor.vars){
-                if(v.objval instanceof BuildingBox b){
-                    v.objval = world.build(b.pos);
-                }
             }
         }
 
@@ -409,7 +397,8 @@ public class LogicBlock extends Block{
                     var cur = world.build(l.x, l.y);
 
                     boolean valid = validLink(cur);
-                    if(valid != l.valid || (l.lastBuild != null && l.lastBuild != cur)){
+                    if(l.lastBuild == null) l.lastBuild = cur;
+                    if(valid != l.valid || l.lastBuild != cur){
                         l.lastBuild = cur;
                         changed = true;
                         l.valid = valid;
@@ -595,7 +584,7 @@ public class LogicBlock extends Block{
                 for(int i = 0; i < varcount; i++){
                     BVar dest = asm.getVar(names[i]);
                     if(dest != null && !dest.constant){
-                        dest.value = values[i];
+                        dest.value = values[i] instanceof BuildingBox box ? world.build(box.pos) : values[i];
                     }
                 }
             });

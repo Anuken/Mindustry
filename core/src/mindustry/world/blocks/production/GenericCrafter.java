@@ -120,7 +120,7 @@ public class GenericCrafter extends Block{
                 warmup = Mathf.approachDelta(warmup, 1f, warmupSpeed);
 
                 if(Mathf.chanceDelta(updateEffectChance)){
-                    updateEffect.at(getX() + Mathf.range(size * 4f), getY() + Mathf.range(size * 4));
+                    updateEffect.at(x + Mathf.range(size * 4f), y + Mathf.range(size * 4));
                 }
             }else{
                 warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);

@@ -149,7 +149,7 @@ public class UnitFactory extends UnitBlock{
 
         @Override
         public void buildConfiguration(Table table){
-            Seq<UnitType> units = Seq.with(plans).map(u -> u.unit).filter(u -> u.unlockedNow());
+            Seq<UnitType> units = Seq.with(plans).map(u -> u.unit).filter(u -> u.unlockedNow() && !u.isBanned());
 
             if(units.any()){
                 ItemSelection.buildTable(table, units, () -> currentPlan == -1 ? null : plans.get(currentPlan).unit, unit -> configure(plans.indexOf(u -> u.unit == unit)));
@@ -213,8 +213,8 @@ public class UnitFactory extends UnitBlock{
             }
 
             if(consValid() && currentPlan != -1){
-                time += edelta() * speedScl * Vars.state.rules.unitBuildSpeedMultiplier;
-                progress += edelta() * Vars.state.rules.unitBuildSpeedMultiplier;
+                time += edelta() * speedScl * Vars.state.rules.unitBuildSpeed(team);
+                progress += edelta() * Vars.state.rules.unitBuildSpeed(team);
                 speedScl = Mathf.lerpDelta(speedScl, 1f, 0.05f);
             }else{
                 speedScl = Mathf.lerpDelta(speedScl, 0f, 0.05f);
@@ -224,6 +224,12 @@ public class UnitFactory extends UnitBlock{
 
             if(currentPlan != -1 && payload == null){
                 UnitPlan plan = plans.get(currentPlan);
+
+                //make sure to reset plan when the unit got banned after placement
+                if(plan.unit.isBanned()){
+                    currentPlan = -1;
+                    return;
+                }
 
                 if(progress >= plan.time && consValid()){
                     progress %= 1f;

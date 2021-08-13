@@ -12,6 +12,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.input.*;
@@ -47,13 +48,19 @@ public class HintsFragment extends Fragment{
                 }else if(!current.show()){ //current became hidden
                     hide();
                 }
-            }else if(hints.size > 0){
+            }else if(hints.size > 0 && !renderer.isCutscene()){
                 //check one hint each frame to see if it should be shown.
                 Hint hint = hints.find(Hint::show);
                 if(hint != null && hint.complete()){
                     hints.remove(hint);
                 }else if(hint != null){
                     display(hint);
+                }else{
+                    //moused over a derelict structure
+                    var build = world.buildWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
+                    if(build != null && build.team == Team.derelict){
+                        events.add("derelictmouse");
+                    }
                 }
             }
         });
@@ -156,7 +163,8 @@ public class HintsFragment extends Fragment{
         schematicSelect(visibleDesktop, () -> ui.hints.placedBlocks.contains(Blocks.router), () -> Core.input.keyRelease(Binding.schematic_select) || Core.input.keyTap(Binding.pick)),
         conveyorPathfind(() -> control.input.block == Blocks.titaniumConveyor, () -> Core.input.keyRelease(Binding.diagonal_placement) || (mobile && Core.settings.getBool("swapdiagonal"))),
         boost(visibleDesktop, () -> !player.dead() && player.unit().type.canBoost, () -> Core.input.keyDown(Binding.boost)),
-        blockInfo(() -> true, () -> ui.content.isShown()),
+        blockInfo(() -> !(state.isCampaign() && state.rules.sector == SectorPresets.groundZero.sector && state.wave < 3), () -> ui.content.isShown()),
+        derelict(() -> ui.hints.events.contains("derelictmouse"), () -> false),
         command(() -> state.rules.defaultTeam.data().units.size > 3 && !net.active(), () -> player.unit().isCommanding()),
         payloadPickup(() -> !player.unit().dead && player.unit() instanceof Payloadc p && p.payloads().isEmpty(), () -> player.unit() instanceof Payloadc p && p.payloads().any()),
         payloadDrop(() -> !player.unit().dead && player.unit() instanceof Payloadc p && p.payloads().any(), () -> player.unit() instanceof Payloadc p && p.payloads().isEmpty()),

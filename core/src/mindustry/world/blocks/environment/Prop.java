@@ -4,15 +4,18 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import mindustry.content.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 public class Prop extends Block{
+
     public Prop(String name){
         super(name);
         breakable = true;
         alwaysReplace = true;
         instantDeconstruct = true;
         breakEffect = Fx.breakProp;
+        breakSound = Sounds.rockBreak;
     }
 
     @Override

@@ -126,6 +126,7 @@ platforms.each{ platform ->
                 }
 
                 args += "Dhttps.protocols=TLSv1.2,TLSv1.1,TLSv1"
+                args += "XX:+ShowCodeDetailsInExceptionMessages"
 
                 exec{
                     commandLine args.toList()

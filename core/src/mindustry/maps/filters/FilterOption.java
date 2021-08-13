@@ -3,6 +3,7 @@ package mindustry.maps.filters;
 
 import arc.*;
 import arc.func.*;
+import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
@@ -60,16 +61,19 @@ public abstract class FilterOption{
 
         @Override
         public void build(Table table){
-            Label label;
+            Element base;
             if(!display){
-                label = new Label("@filter.option." + name);
+                Label l = new Label("@filter.option." + name);
+                l.setWrap(true);
+                l.setStyle(Styles.outlineLabel);
+                base = l;
             }else{
-                label = new Label(() -> Core.bundle.get("filter.option." + name) + ": " + Strings.autoFixed(getter.get(), 2));
+                Table t = new Table().marginLeft(11f).marginRight(11f);
+                base = t;
+                t.add("@filter.option." + name).growX().wrap().style(Styles.outlineLabel);
+                t.label(() -> Strings.autoFixed(getter.get(), 2)).style(Styles.outlineLabel).right().labelAlign(Align.right).padLeft(6);
             }
-            label.setWrap(true);
-            label.setAlignment(Align.center);
-            label.touchable = Touchable.disabled;
-            label.setStyle(Styles.outlineLabel);
+            base.touchable = Touchable.disabled;
 
             Slider slider = new Slider(min, max, step, false);
             slider.moved(setter);
@@ -80,7 +84,7 @@ public abstract class FilterOption{
                 slider.released(changed);
             }
 
-            table.stack(slider, label).colspan(2).pad(3).growX().row();
+            table.stack(slider, base).colspan(2).pad(3).growX().row();
         }
     }
 

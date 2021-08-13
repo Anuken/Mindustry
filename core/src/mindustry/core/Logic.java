@@ -49,6 +49,7 @@ public class Logic implements ApplicationListener{
                     BlockPlan b = it.next();
                     Block block = content.block(b.block);
                     if(event.tile.block().bounds(event.tile.x, event.tile.y, Tmp.r1).overlaps(block.bounds(b.x, b.y, Tmp.r2))){
+                        b.removed = true;
                         it.remove();
                     }
                 }
@@ -128,25 +129,7 @@ public class Logic implements ApplicationListener{
 
         Events.on(SectorCaptureEvent.class, e -> {
             if(!net.client() && e.sector == state.getSector() && e.sector.isBeingPlayed()){
-                for(Tile tile : world.tiles){
-                    //convert all blocks to neutral, randomly killing them
-                    if(tile.isCenter() && tile.build != null && tile.build.team == state.rules.waveTeam){
-                        Building b = tile.build;
-                        Call.setTeam(b, Team.derelict);
-                        Time.run(Mathf.random(0f, 60f * 6f), () -> {
-                            if(Mathf.chance(0.25)){
-                                b.kill();
-                            }
-                        });
-                    }
-                }
-
-                //kill all units
-                Groups.unit.each(u -> {
-                    if(u.team == state.rules.waveTeam){
-                        Time.run(Mathf.random(0f, 60f * 5f), u::kill);
-                    }
-                });
+                state.rules.waveTeam.data().destroyToDerelict();
             }
         });
 
@@ -162,6 +145,12 @@ public class Logic implements ApplicationListener{
             }
         });
 
+        //listen to core changes; if all cores have been destroyed, set to derelict.
+        Events.on(CoreChangeEvent.class, e -> Core.app.post(() -> {
+            if(state.rules.cleanupDeadTeams && state.rules.pvp && !e.core.isAdded() && e.core.team != Team.derelict && e.core.team.cores().isEmpty()){
+                e.core.team.data().destroyToDerelict();
+            }
+        }));
     }
 
     /** Adds starting items, resets wave time, and sets state to playing. */

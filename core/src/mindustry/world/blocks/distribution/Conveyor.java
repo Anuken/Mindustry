@@ -14,7 +14,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
@@ -32,6 +31,8 @@ public class Conveyor extends Block implements Autotiler{
 
     public float speed = 0f;
     public float displayedSpeed = 0f;
+
+    public @Nullable Block junctionReplacement, bridgeReplacement;
 
     public Conveyor(String name){
         super(name);
@@ -54,6 +55,14 @@ public class Conveyor extends Block implements Autotiler{
         
         //have to add a custom calculated speed, since the actual movement speed is apparently not linear
         stats.add(Stat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        if(junctionReplacement == null) junctionReplacement = Blocks.junction;
+        if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge)) bridgeReplacement = Blocks.itemBridge;
     }
 
     @Override
@@ -80,7 +89,9 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
-        Placement.calculateBridges(plans, (ItemBridge)Blocks.itemBridge);
+        if(bridgeReplacement == null) return;
+
+        Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement);
     }
 
     @Override
@@ -95,12 +106,14 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
+        if(junctionReplacement == null) return this;
+
         Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof Conveyor || req.block instanceof Junction));
         return cont.get(Geometry.d4(req.rotation)) &&
             cont.get(Geometry.d4(req.rotation - 2)) &&
             req.tile() != null &&
             req.tile().block() instanceof Conveyor &&
-            Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? Blocks.junction : this;
+            Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? junctionReplacement : this;
     }
 
     public class ConveyorBuild extends Building implements ChainedBuilding{
@@ -247,7 +260,7 @@ public class Conveyor extends Block implements Autotiler{
 
                 if(ys[i] > nextMax) ys[i] = nextMax;
                 if(ys[i] > 0.5 && i > 0) mid = i - 1;
-                xs[i] = Mathf.approachDelta(xs[i], 0, speed*2);
+                xs[i] = Mathf.approach(xs[i], 0, moved*2);
 
                 if(ys[i] >= 1f && pass(ids[i])){
                     //align X position if passing forwards
@@ -263,7 +276,7 @@ public class Conveyor extends Block implements Autotiler{
             }
 
             if(minitem < itemSpace + (blendbits == 1 ? 0.3f : 0f)){
-                clogHeat = Mathf.lerpDelta(clogHeat, 1f, 0.02f);
+                clogHeat = Mathf.approachDelta(clogHeat, 1f, 1f / 60f);
             }else{
                 clogHeat = 0f;
             }

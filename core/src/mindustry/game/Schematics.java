@@ -114,6 +114,7 @@ public class Schematics implements Loadable{
         target.tiles.addAll(newSchematic.tiles);
         target.width = newSchematic.width;
         target.height = newSchematic.height;
+        newSchematic.labels = target.labels;
         newSchematic.tags.putAll(target.tags);
         newSchematic.file = target.file;
 
@@ -431,6 +432,11 @@ public class Schematics implements Loadable{
                 tile.getLinkedTilesAs(st.block, seq);
                 if(seq.contains(t -> !t.block().alwaysReplace && !t.synthetic())){
                     return;
+                }
+                for(var t : seq){
+                    if(t.block() != Blocks.air){
+                        t.remove();
+                    }
                 }
             }
 

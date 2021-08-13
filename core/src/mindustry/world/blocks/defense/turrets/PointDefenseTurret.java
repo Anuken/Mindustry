@@ -51,7 +51,7 @@ public class PointDefenseTurret extends ReloadTurret{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.reload, 60f / reloadTime, StatUnit.none);
+        stats.add(Stat.reload, 60f / reloadTime, StatUnit.perSecond);
     }
 
     public class PointDefenseBuild extends ReloadTurretBuild{

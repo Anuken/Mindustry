@@ -6,6 +6,7 @@ public class Pal{
     public static Color
 
     thoriumPink = Color.valueOf("f9a3c7"),
+    coalBlack = Color.valueOf("272727"),
 
     items = Color.valueOf("2ea756"),
     command = Color.valueOf("eab678"),

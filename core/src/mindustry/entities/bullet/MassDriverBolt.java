@@ -13,7 +13,7 @@ import static mindustry.Vars.*;
 public class MassDriverBolt extends BulletType{
 
     public MassDriverBolt(){
-        super(1f, 50);
+        super(1f, 75);
         collidesTiles = false;
         lifetime = 1f;
         despawnEffect = Fx.smeltsmoke;

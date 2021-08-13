@@ -626,7 +626,7 @@ public class Mods implements Loadable{
             try{
                 //this binds the content but does not load it entirely
                 Content loaded = parser.parse(l.mod, l.file.nameWithoutExtension(), l.file.readString("UTF-8"), l.file, l.type);
-                Log.debug("[@] Loaded '@'.", l.mod.meta.name, (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
+                Log.debug("[@] Loaded '@'.", l.mod.meta.name, (loaded instanceof UnlockableContent u ? u.localizedName : loaded));
             }catch(Throwable e){
                 if(current != content.getLastAdded() && content.getLastAdded() != null){
                     parser.markError(content.getLastAdded(), l.mod, l.file, e);
@@ -723,7 +723,7 @@ public class Mods implements Loadable{
 
             if(!metaf.exists()){
                 Log.warn("Mod @ doesn't have a '[mod/plugin].[h]json' file, skipping.", sourceFile);
-                throw new IllegalArgumentException("Invalid file: No mod.json found.");
+                throw new ModLoadException("Invalid file: No mod.json found.");
             }
 
             ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaf.readString()).toString(Jformat.plain));
@@ -750,7 +750,7 @@ public class Mods implements Loadable{
                     //unload
                     mods.remove(other);
                 }else{
-                    throw new IllegalArgumentException("A mod with the name '" + baseName + "' is already imported.");
+                    throw new ModLoadException("A mod with the name '" + baseName + "' is already imported.");
                 }
             }
 
@@ -779,12 +779,23 @@ public class Mods implements Loadable{
                 (meta.getMinMajor() >= 105 || headless)
             ){
                 if(ios){
-                    throw new IllegalArgumentException("Java class mods are not supported on iOS.");
+                    throw new ModLoadException("Java class mods are not supported on iOS.");
                 }
 
                 loader = platform.loadJar(sourceFile, mainLoader);
                 mainLoader.addChild(loader);
                 Class<?> main = Class.forName(mainClass, true, loader);
+
+                //detect mods that incorrectly package mindustry in the jar
+                if((main.getSuperclass().getName().equals("mindustry.mod.Plugin") || main.getSuperclass().getName().equals("mindustry.mod.Mod")) &&
+                    main.getSuperclass().getClassLoader() != Mod.class.getClassLoader()){
+                    throw new ModLoadException(
+                        "This mod/plugin has loaded Mindustry dependencies from its own class loader. " +
+                        "You are incorrectly including Mindustry dependencies in the mod JAR - " +
+                        "make sure Mindustry is declared as `compileOnly` in Gradle, and that the JAR is created with `runtimeClasspath`!"
+                    );
+                }
+
                 metas.put(main, meta);
                 mainMod = (Mod)main.getDeclaredConstructor().newInstance();
             }else{
@@ -1014,6 +1025,12 @@ public class Mods implements Loadable{
                     ", hidden=" + hidden +
                     ", repo=" + repo +
                     '}';
+        }
+    }
+
+    public static class ModLoadException extends RuntimeException{
+        public ModLoadException(String message){
+            super(message);
         }
     }
 

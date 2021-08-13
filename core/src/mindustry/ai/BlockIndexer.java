@@ -13,7 +13,6 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 import java.util.*;
@@ -32,7 +31,7 @@ public class BlockIndexer{
     /** Stores all ore quadrants on the map. Maps ID to qX to qY to a list of tiles with that ore. */
     private IntSeq[][][] ores;
     /** Stores all damaged tile entities by team. */
-    private ObjectSet<Building>[] damagedTiles = new ObjectSet[Team.all.length];
+    private Seq<Building>[] damagedTiles = new Seq[Team.all.length];
     /** All ores available on this map. */
     private ObjectSet<Item> allOres = new ObjectSet<>();
     /** Stores teams that are present here as tiles. */
@@ -48,6 +47,7 @@ public class BlockIndexer{
     private Seq<Building> breturnArray = new Seq<>(Building.class);
 
     public BlockIndexer(){
+        clearFlags();
 
         Events.on(TilePreChangeEvent.class, event -> {
             removeIndex(event.tile);
@@ -58,15 +58,11 @@ public class BlockIndexer{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            damagedTiles = new ObjectSet[Team.all.length];
+            damagedTiles = new Seq[Team.all.length];
             flagMap = new TileArray[Team.all.length][BlockFlag.all.length];
             activeTeams = new Seq<>(Team.class);
 
-            for(int i = 0; i < flagMap.length; i++){
-                for(int j = 0; j < BlockFlag.all.length; j++){
-                    flagMap[i][j] = new TileArray();
-                }
-            }
+            clearFlags();
 
             allOres.clear();
             ores = new IntSeq[content.items().size][][];
@@ -76,10 +72,6 @@ public class BlockIndexer{
 
             for(Tile tile : world.tiles){
                 process(tile);
-
-                if(tile.build != null && tile.build.damaged()){
-                    notifyTileDamaged(tile.build);
-                }
 
                 var drop = tile.drop();
 
@@ -106,7 +98,8 @@ public class BlockIndexer{
 
     public void removeIndex(Tile tile){
         var team = tile.team();
-        if(team != Team.derelict && tile.isCenter()){
+        if(tile.build != null && tile.isCenter()){
+            var build = tile.build;
             var flags = tile.block().flags;
             var data = team.data();
 
@@ -121,7 +114,15 @@ public class BlockIndexer{
 
             //unregister building from building quadtree
             if(data.buildings != null){
-                data.buildings.remove(tile.build);
+                data.buildings.remove(build);
+            }
+
+            //is no longer registered
+            build.wasDamaged = false;
+
+            //unregister damaged buildings
+            if(build.damaged() && damagedTiles[team.id] != null){
+                damagedTiles[team.id].remove(build);
             }
         }
     }
@@ -160,6 +161,14 @@ public class BlockIndexer{
         return blocksPresent != null && blocksPresent[block.id];
     }
 
+    private void clearFlags(){
+        for(int i = 0; i < flagMap.length; i++){
+            for(int j = 0; j < BlockFlag.all.length; j++){
+                flagMap[i][j] = new TileArray();
+            }
+        }
+    }
+
     private TileArray[] getFlagged(Team team){
         return flagMap[team.id];
     }
@@ -170,25 +179,12 @@ public class BlockIndexer{
     }
 
     /** Returns all damaged tiles by team. */
-    public ObjectSet<Building> getDamaged(Team team){
-        breturnArray.clear();
-
+    public Seq<Building> getDamaged(Team team){
         if(damagedTiles[team.id] == null){
-            damagedTiles[team.id] = new ObjectSet<>();
+            return damagedTiles[team.id] = new Seq<>(false);
         }
 
-        ObjectSet<Building> set = damagedTiles[team.id];
-        for(Building build : set){
-            if((!build.isValid() || build.team != team || !build.damaged()) || build.block instanceof ConstructBlock){
-                breturnArray.add(build);
-            }
-        }
-
-        for(Building tile : breturnArray){
-            set.remove(tile);
-        }
-
-        return set;
+        return damagedTiles[team.id];
     }
 
     /** Get all allied blocks with a flag. */
@@ -206,13 +202,12 @@ public class BlockIndexer{
     }
 
     public boolean eachBlock(@Nullable Team team, float wx, float wy, float range, Boolf<Building> pred, Cons<Building> cons){
-        returnBool = false;
+        breturnArray.clear();
 
         if(team == null){
             allBuildings(wx, wy, range, b -> {
                 if(pred.get(b)){
-                    returnBool = true;
-                    cons.get(b);
+                    breturnArray.add(b);
                 }
             });
         }else{
@@ -220,13 +215,20 @@ public class BlockIndexer{
             if(buildings == null) return false;
             buildings.intersect(wx - range, wy - range, range*2f, range*2f, b -> {
                 if(b.within(wx, wy, range + b.hitSize() / 2f) && pred.get(b)){
-                    returnBool = true;
-                    cons.get(b);
+                    breturnArray.add(b);
                 }
             });
         }
 
-        return returnBool;
+        int size = breturnArray.size;
+        var items = breturnArray.items;
+        for(int i = 0; i < size; i++){
+            cons.get(items[i]);
+            items[i] = null;
+        }
+        breturnArray.size = 0;
+
+        return size > 0;
     }
 
     /** Get all enemy blocks with a flag. */
@@ -260,40 +262,69 @@ public class BlockIndexer{
         return returnArray;
     }
 
-    public void notifyTileDamaged(Building entity){
-        if(damagedTiles[entity.team.id] == null){
-            damagedTiles[entity.team.id] = new ObjectSet<>();
+    public void notifyBuildHealed(Building build){
+        if(build.wasDamaged && !build.damaged() && damagedTiles[build.team.id] != null){
+            damagedTiles[build.team.id].remove(build);
+            build.wasDamaged = false;
+        }
+    }
+
+    public void notifyBuildDamaged(Building build){
+        if(build.wasDamaged || !build.damaged()) return;
+
+        if(damagedTiles[build.team.id] == null){
+            damagedTiles[build.team.id] = new Seq<>(false);
         }
 
-        damagedTiles[entity.team.id].add(entity);
+        damagedTiles[build.team.id].add(build);
+        build.wasDamaged = true;
     }
 
     public void allBuildings(float x, float y, float range, Cons<Building> cons){
+        breturnArray.clear();
         for(int i = 0; i < activeTeams.size; i++){
             Team team = activeTeams.items[i];
             var buildings = team.data().buildings;
             if(buildings == null) continue;
-            buildings.intersect(x - range, y - range, range*2f, range*2f, b -> {
-                if(b.within(x, y, range + b.hitSize()/2f)){
-                    cons.get(b);
-                }
-            });
+            buildings.intersect(x - range, y - range, range*2f, range*2f, breturnArray);
         }
+
+        var items = breturnArray.items;
+        int size = breturnArray.size;
+        for(int i = 0; i < size; i++){
+            var b = items[i];
+            if(b.within(x, y, range + b.hitSize()/2f)){
+                cons.get(b);
+            }
+            items[i] = null;
+        }
+        breturnArray.size = 0;
     }
 
-    public Building findEnemyTile(@Nullable Team team, float x, float y, float range, Boolf<Building> pred){
+    public Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
+        Building target = null;
+        float targetDist = 0;
+
         for(int i = 0; i < activeTeams.size; i++){
             Team enemy = activeTeams.items[i];
+            if(enemy == team || (enemy == Team.derelict && !state.rules.coreCapture)) continue;
 
-            if(enemy == team || (team == Team.derelict && !state.rules.coreCapture)) continue;
+            Building candidate = indexer.findTile(enemy, x, y, range, pred, true);
+            if(candidate == null) continue;
 
-            Building entity = indexer.findTile(enemy, x, y, range, pred, true);
-            if(entity != null){
-                return entity;
+            //if a block has the same priority, the closer one should be targeted
+            float dist = candidate.dst(x, y) - candidate.hitSize() / 2f;
+            if(target == null ||
+            //if its closer and is at least equal priority
+            (dist < targetDist && candidate.block.priority.ordinal() >= target.block.priority.ordinal()) ||
+            // block has higher priority (so range doesnt matter)
+            (candidate.block.priority.ordinal() > target.block.priority.ordinal())){
+                target = candidate;
+                targetDist = dist;
             }
         }
 
-        return null;
+        return target;
     }
 
     public Building findTile(Team team, float x, float y, float range, Boolf<Building> pred){
@@ -387,6 +418,8 @@ public class BlockIndexer{
                 data.buildings = new QuadTree<>(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
             }
             data.buildings.insert(tile.build);
+
+            notifyBuildDamaged(tile.build);
         }
 
         if(!tile.block().isStatic()){

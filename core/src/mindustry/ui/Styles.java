@@ -26,8 +26,8 @@ import static mindustry.gen.Tex.*;
 public class Styles{
     //TODO all these names are inconsistent and not descriptive
     public static Drawable black, black9, black8, black6, black3, black5, none, flatDown, flatOver, accentDrawable;
-    public static ButtonStyle defaultb, waveb, modsb;
-    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, nonet, infot, clearPartialt, clearTogglet, logicTogglet, clearToggleMenut, togglet, transt, fullTogglet, logict;
+    public static ButtonStyle defaultb, waveb, modsb, underlineb;
+    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, nonet, infot, clearPartialt, clearTogglet, logicTogglet, clearToggleMenut, togglet, transt, fullTogglet, squareTogglet, logict;
     public static ImageButtonStyle defaulti, nodei, righti, emptyi, emptytogglei, selecti, logici, geni, colori, accenti, cleari, clearFulli, clearPartiali, clearPartial2i, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
     public static ScrollPaneStyle defaultPane, horizontalPane, smallPane, nonePane;
     public static KeybindDialog.KeybindDialogStyle defaultKeybindDialog;
@@ -62,7 +62,14 @@ public class Styles{
         modsb = new ButtonStyle(){{
             down = flatOver;
             up = underline;
-            over = underlineWhite;
+            over = underline2;
+        }};
+
+        underlineb = new ButtonStyle(){{
+            down = flatOver;
+            up = sideline;
+            over = sidelineOver;
+            checked = flatOver;
         }};
         
         waveb = new ButtonStyle(){{
@@ -192,6 +199,16 @@ public class Styles{
             checked = flatOver;
             down = flatOver;
             up = black;
+            over = flatOver;
+            disabled = black;
+            disabledFontColor = Color.gray;
+        }};
+        squareTogglet = new TextButtonStyle(){{
+            font = Fonts.def;
+            fontColor = Color.white;
+            checked = flatOver;
+            down = flatOver;
+            up = pane;
             over = flatOver;
             disabled = black;
             disabledFontColor = Color.gray;
@@ -340,7 +357,7 @@ public class Styles{
         }};
 
         defaultField = new TextFieldStyle(){{
-            font = Fonts.chat;
+            font = Fonts.def;
             fontColor = Color.white;
             disabledFontColor = Color.gray;
             disabledBackground = underlineDisabled;
@@ -353,7 +370,7 @@ public class Styles{
         }};
 
         nodeField = new TextFieldStyle(){{
-            font = Fonts.chat;
+            font = Fonts.def;
             fontColor = Color.white;
             disabledFontColor = Color.gray;
             disabledBackground = underlineDisabled;
@@ -366,7 +383,7 @@ public class Styles{
         }};
 
         areaField = new TextFieldStyle(){{
-            font = Fonts.chat;
+            font = Fonts.def;
             fontColor = Color.white;
             disabledFontColor = Color.gray;
             selection = Tex.selection;
@@ -377,7 +394,7 @@ public class Styles{
         }};
 
         nodeArea = new TextFieldStyle(){{
-            font = Fonts.chat;
+            font = Fonts.def;
             fontColor = Color.white;
             disabledFontColor = Color.gray;
             selection = Tex.selection;

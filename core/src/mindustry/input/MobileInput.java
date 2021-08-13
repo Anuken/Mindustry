@@ -88,7 +88,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             Building tile = world.buildWorld(x, y);
 
-            if((tile != null && player.team().isEnemy(tile.team) && tile.team != Team.derelict) || (tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged())){
+            if((tile != null && player.team().isEnemy(tile.team) && (tile.team != Team.derelict || state.rules.coreCapture)) || (tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged())){
                 player.unit().mineTile = null;
                 target = tile;
             }
@@ -681,7 +681,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        if(!player.dead() && !state.isPaused()){
+        if(!player.dead() && !state.isPaused() && !renderer.isCutscene()){
             updateMovement(player.unit());
         }
 
@@ -822,7 +822,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 shiftDeltaX %= tilesize;
                 shiftDeltaY %= tilesize;
             }
-        }else if(!renderer.isLanding()){
+        }else{
             //pan player
             Core.camera.position.x -= deltaX;
             Core.camera.position.y -= deltaY;
@@ -922,10 +922,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(omni){
             unit.moveAt(movement);
         }else{
-            unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
-            if(!movement.isZero()){
-                unit.rotation = Angles.moveToward(unit.rotation, movement.angle(), unit.type.rotateSpeed * Math.max(Time.delta, 1));
-            }
+            unit.rotateMove(movement);
         }
 
         //update shooting if not building + not mining
@@ -938,7 +935,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }else if(target == null){
                 player.shooting = false;
                 if(Core.settings.getBool("autotarget") && !(player.unit() instanceof BlockUnitUnit u && u.tile() instanceof ControlBlock c && !c.shouldAutoTarget())){
-                    target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.team != Team.derelict, u -> u.team != Team.derelict);
+                    target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.checkTarget(type.targetAir, type.targetGround), u -> type.targetGround);
 
                     if(allowHealing && target == null){
                         target = Geometry.findClosest(unit.x, unit.y, indexer.getDamaged(Team.sharded));

@@ -363,6 +363,7 @@ public class PowerNode extends PowerBlock{
         @Override
         public void dropped(){
             power.links.clear();
+            updatePowerGraph();
         }
 
         @Override

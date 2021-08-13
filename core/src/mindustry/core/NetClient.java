@@ -1,6 +1,7 @@
 package mindustry.core;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
@@ -160,6 +161,20 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.both, unreliable = true)
+    public static void sound(Sound sound, float volume, float pitch, float pan){
+        if(sound == null) return;
+
+        sound.play(volume * Core.settings.getInt("sfxvol") / 100f, pitch, pan);
+    }
+
+    @Remote(variants = Variant.both, unreliable = true)
+    public static void soundAt(Sound sound, float x, float y, float volume, float pitch){
+        if(sound == null) return;
+
+        sound.at(x, y, pitch, volume);
+    }
+
+    @Remote(variants = Variant.both, unreliable = true)
     public static void effect(Effect effect, float x, float y, float rotation, Color color){
         if(effect == null) return;
 
@@ -274,6 +289,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(called = Loc.client, variants = Variant.one)
     public static void connect(String ip, int port){
+        if(!steam && ip.startsWith("steam:")) return;
         netClient.disconnectQuietly();
         logic.reset();
 
@@ -489,6 +505,11 @@ public class NetClient implements ApplicationListener{
                 timeoutTime = 0f;
             }
         }
+    }
+
+    /** Resets the world data timeout counter. */
+    public void resetTimeout(){
+        timeoutTime = 0f;
     }
 
     public boolean isConnecting(){

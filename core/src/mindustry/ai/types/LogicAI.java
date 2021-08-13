@@ -17,7 +17,7 @@ public class LogicAI extends AIController{
     /** Minimum delay between item transfers. */
     public static final float transferDelay = 60f * 1.5f;
     /** Time after which the unit resets its controlled and reverts to a normal unit. */
-    public static final float logicControlTimeout = 10f * 60f;
+    public static final float logicControlTimeout = 60f * 10f;
 
     public LUnitControl control = LUnitControl.idle;
     public float moveX, moveY, moveRad;
@@ -102,7 +102,7 @@ public class LogicAI extends AIController{
         }
 
         //look where moving if there's nothing to aim at
-        if(!shoot){
+        if(!shoot || !unit.type.omniMovement){
             unit.lookAt(unit.prefRotation());
         }else if(unit.hasWeapons() && unit.mounts.length > 0 && !unit.mounts[0].weapon.ignoreRotation){ //if there is, look at the object
             unit.lookAt(unit.mounts[0].aimX, unit.mounts[0].aimY);
@@ -131,7 +131,13 @@ public class LogicAI extends AIController{
         //do not move when infinite vectors are used.
         if(vec.isNaN() || vec.isInfinite()) return;
 
-        unit.approach(vec);
+        if(unit.type.omniMovement){
+            unit.approach(vec);
+        }else{
+            unit.rotateMove(vec);
+        }
+
+
     }
 
     @Override

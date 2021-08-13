@@ -1,1 +1,1 @@
-L'industrie au service de ce tower defense.
+Un tower-defense ouvert, axé sur la gestion des ressources.

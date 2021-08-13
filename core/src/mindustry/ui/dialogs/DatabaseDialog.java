@@ -13,11 +13,15 @@ import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
 public class DatabaseDialog extends BaseDialog{
+    private TextField search;
+    private Table all = new Table();
 
     public DatabaseDialog(){
         super("@database");
@@ -26,38 +30,58 @@ public class DatabaseDialog extends BaseDialog{
         addCloseButton();
         shown(this::rebuild);
         onResize(this::rebuild);
+
+        all.margin(20).marginTop(0f);
+
+        cont.table(s -> {
+            s.image(Icon.zoom).padRight(8);
+            search = s.field(null, text -> rebuild()).growX().get();
+            search.setMessageText(Core.bundle.get("players.search"));
+        }).fillX().padBottom(4).row();
+
+        cont.pane(all);
     }
 
     void rebuild(){
-        cont.clear();
-
-        Table table = new Table();
-        table.margin(20);
-        ScrollPane pane = new ScrollPane(table);
+        all.clear();
+        var text = search.getText();
 
         Seq<Content>[] allContent = Vars.content.getContentMap();
 
         for(int j = 0; j < allContent.length; j++){
             ContentType type = ContentType.all[j];
 
-            Seq<Content> array = allContent[j].select(c -> c instanceof UnlockableContent u && (!u.isHidden() || u.node() != null));
+            Seq<Content> array = allContent[j]
+                .select(c -> c instanceof UnlockableContent u &&
+                    (!u.isHidden() || u.node() != null) &&
+                    (text.isEmpty() || u.localizedName.toLowerCase().contains(text.toLowerCase())));
             if(array.size == 0) continue;
 
-            table.add("@content." + type.name() + ".name").growX().left().color(Pal.accent);
-            table.row();
-            table.image().growX().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent);
-            table.row();
-            table.table(list -> {
+            all.add("@content." + type.name() + ".name").growX().left().color(Pal.accent);
+            all.row();
+            all.image().growX().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent);
+            all.row();
+            all.table(list -> {
                 list.left();
 
-                int cols = Mathf.clamp((Core.graphics.getWidth() - 30) / (32 + 10), 1, 18);
+                int cols = (int)Mathf.clamp((Core.graphics.getWidth() - Scl.scl(30)) / Scl.scl(32 + 10), 1, 22);
                 int count = 0;
 
                 for(int i = 0; i < array.size; i++){
                     UnlockableContent unlock = (UnlockableContent)array.get(i);
 
                     Image image = unlocked(unlock) ? new Image(unlock.uiIcon).setScaling(Scaling.fit) : new Image(Icon.lock, Pal.gray);
-                    list.add(image).size(8 * 4).pad(3);
+
+                    //banned cross
+                    if(state.isGame() && (unlock instanceof UnitType u && u.isBanned() || unlock instanceof Block b && state.rules.bannedBlocks.contains(b))){
+                        list.stack(image, new Image(Icon.cancel){{
+                            setColor(Color.scarlet);
+                            touchable = Touchable.disabled;
+                        }}).size(8 * 4).pad(3);
+                    }else{
+                        list.add(image).size(8 * 4).pad(3);
+                    }
+
                     ClickListener listener = new ClickListener();
                     image.addListener(listener);
                     if(!mobile && unlocked(unlock)){
@@ -82,10 +106,12 @@ public class DatabaseDialog extends BaseDialog{
                     }
                 }
             }).growX().left().padBottom(10);
-            table.row();
+            all.row();
         }
 
-        cont.add(pane);
+        if(all.getChildren().isEmpty()){
+            all.add("@none.found");
+        }
     }
 
     boolean unlocked(UnlockableContent content){

@@ -363,7 +363,7 @@ public abstract class SaveVersion extends SaveFileReader{
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
             readChunk(stream, true, in -> {
-                byte typeid = in.readByte();
+                int typeid = in.readUnsignedByte();
                 if(mapping[typeid] == null){
                     in.skipBytes(lastRegionLength - 1);
                     return;
@@ -408,7 +408,8 @@ public abstract class SaveVersion extends SaveFileReader{
 
             for(int j = 0; j < total; j++){
                 String name = stream.readUTF();
-                map[type.ordinal()][j] = content.getByName(type, fallback.get(name, name));
+                //fallback only for blocks
+                map[type.ordinal()][j] = content.getByName(type, type == ContentType.block ? fallback.get(name, name) : name);
             }
         }
 

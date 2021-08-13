@@ -363,6 +363,9 @@ public class LExecutor{
                 float x1 = World.unconv(exec.numf(p1)), y1 = World.unconv(exec.numf(p2)), d1 = World.unconv(exec.numf(p3));
 
                 switch(type){
+                    case idle -> {
+                        ai.control = type;
+                    }
                     case move, stop, approach -> {
                         ai.control = type;
                         ai.moveX = x1;

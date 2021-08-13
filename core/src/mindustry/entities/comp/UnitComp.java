@@ -59,6 +59,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         vel.approachDelta(vector, type.accel * realSpeed());
     }
 
+    public void rotateMove(Vec2 vec){
+        moveAt(Tmp.v2.trns(rotation, vec.len()));
+
+        if(!vec.isZero()){
+            rotation = Angles.moveToward(rotation, vec.angle(), type.rotateSpeed * Math.max(Time.delta, 1));
+        }
+    }
+
     public void aimLook(Position pos){
         aim(pos);
         lookAt(pos);
@@ -125,6 +133,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public float clipSize(){
         if(isBuilding()){
             return state.rules.infiniteResources ? Float.MAX_VALUE : Math.max(type.clipSize, type.region.width) + buildingRange + tilesize*4f;
+        }
+        if(mining()){
+            return type.clipSize + type.miningRange;
         }
         return type.clipSize;
     }

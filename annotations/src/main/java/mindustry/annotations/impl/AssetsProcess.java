@@ -1,5 +1,7 @@
 package mindustry.annotations.impl;
 
+import arc.*;
+import arc.audio.*;
 import arc.files.*;
 import arc.scene.style.*;
 import arc.struct.*;
@@ -118,9 +120,31 @@ public class AssetsProcess extends BaseProcessor{
     void processSounds(String classname, String path, String rtype) throws Exception{
         TypeSpec.Builder type = TypeSpec.classBuilder(classname).addModifiers(Modifier.PUBLIC);
         MethodSpec.Builder loadBegin = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        CodeBlock.Builder staticb = CodeBlock.builder();
+
+        type.addField(FieldSpec.builder(IntMap.class, "idToSound", Modifier.STATIC, Modifier.PRIVATE).initializer("new IntMap()").build());
+        type.addField(FieldSpec.builder(ObjectIntMap.class, "soundToId", Modifier.STATIC, Modifier.PRIVATE).initializer("new ObjectIntMap()").build());
+
+        type.addMethod(MethodSpec.methodBuilder("getSoundId")
+        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        .addParameter(Sound.class, "sound")
+        .returns(int.class)
+        .addStatement("return soundToId.get(sound, -1)").build());
+
+        type.addMethod(MethodSpec.methodBuilder("getSound")
+        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        .addParameter(int.class, "id")
+        .returns(Sound.class)
+        .addStatement("return (Sound)idToSound.get(id, () -> Sounds.none)").build());
 
         HashSet<String> names = new HashSet<>();
-        Fi.get(path).walk(p -> {
+        Seq<Fi> files = new Seq<>();
+        Fi.get(path).walk(files::add);
+
+        files.sortComparing(Fi::name);
+        int id = 0;
+
+        for(Fi p : files){
             String name = p.nameWithoutExtension();
 
             if(names.contains(name)){
@@ -133,14 +157,20 @@ public class AssetsProcess extends BaseProcessor{
 
             String filepath =  path.substring(path.lastIndexOf("/") + 1) + p.path().substring(p.path().lastIndexOf(path) + path.length());
 
-            String filename = "\"" + filepath + "\"";
-            loadBegin.addStatement("arc.Core.assets.load(" + filename + ", " + rtype + ".class).loaded = a -> " + name + " = (" + rtype + ")a", filepath, filepath.replace(".ogg", ".mp3"));
+            staticb.addStatement("soundToId.put($L, $L)", name, id);
 
-            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new arc.audio." + rtype.substring(rtype.lastIndexOf(".") + 1) + "()").build());
-        });
+            loadBegin.addStatement("$T.assets.load($S, $L.class).loaded = a -> { $L = ($L)a; soundToId.put(a, $L); idToSound.put($L, a); }",
+                Core.class, filepath, rtype, name, rtype, id, id);
+
+            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new " + rtype + "()").build());
+
+            id ++;
+        }
+
+        type.addStaticBlock(staticb.build());
 
         if(classname.equals("Sounds")){
-            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "none", Modifier.STATIC, Modifier.PUBLIC).initializer("new arc.audio." + rtype.substring(rtype.lastIndexOf(".") + 1) + "()").build());
+            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "none", Modifier.STATIC, Modifier.PUBLIC).initializer("new " + rtype + "()").build());
         }
 
         type.addMethod(loadBegin.build());

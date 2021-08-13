@@ -6,10 +6,14 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class DefenderAI extends AIController{
 
     @Override
     public void updateMovement(){
+        unloadPayloads();
+
         if(target != null){
             moveTo(target, (target instanceof Sized s ? s.hitSize()/2f * 1.1f : 0f) + unit.hitSize/2f + 15f, 50f);
             unit.lookAt(target);
@@ -23,6 +27,7 @@ public class DefenderAI extends AIController{
     
     @Override
     protected Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
+
         //find unit to follow if not in rally mode
         if(command() != UnitCommand.rally){
             //Sort by max health and closer target.
@@ -34,6 +39,14 @@ public class DefenderAI extends AIController{
         var block = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
         if(block != null) return block;
         //return core if found
-        return unit.closestCore();
+        var core = unit.closestCore();
+        if(core != null) return core;
+
+        //for enemies, target the enemy core.
+        if(state.rules.waves && unit.team == state.rules.waveTeam){
+            return unit.closestEnemyCore();
+        }
+
+        return null;
     }
 }

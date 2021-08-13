@@ -15,6 +15,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
+import mindustry.maps.*;
 import mindustry.maps.filters.*;
 import mindustry.maps.filters.GenerateFilter.*;
 import mindustry.ui.*;
@@ -26,12 +27,6 @@ import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class MapGenerateDialog extends BaseDialog{
-    final Prov<GenerateFilter>[] filterTypes = new Prov[]{
-        NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new,
-        RiverNoiseFilter::new, OreFilter::new, OreMedianFilter::new, MedianFilter::new,
-        BlendFilter::new, MirrorFilter::new, ClearFilter::new, CoreSpawnFilter::new,
-        EnemySpawnFilter::new, SpawnPathFilter::new
-    };
     final boolean applied;
 
     Pixmap pixmap;
@@ -158,7 +153,7 @@ public class MapGenerateDialog extends BaseDialog{
         long[] writeTiles = new long[editor.width() * editor.height()];
 
         for(GenerateFilter filter : filters){
-            input.begin(filter, editor.width(), editor.height(), editor::tile);
+            input.begin(editor.width(), editor.height(), editor::tile);
 
             //write to buffer
             for(int x = 0; x < editor.width(); x++){
@@ -333,7 +328,7 @@ public class MapGenerateDialog extends BaseDialog{
             p.marginRight(14);
             p.defaults().size(195f, 56f);
             int i = 0;
-            for(var gen : filterTypes){
+            for(var gen : Maps.allFilterTypes){
                 var filter = gen.get();
                 var icon = filter.icon();
 
@@ -414,7 +409,7 @@ public class MapGenerateDialog extends BaseDialog{
                 }
 
                 for(var filter : copy){
-                    input.begin(filter, editor.width(), editor.height(), (x, y) -> unpack(buffer1[Mathf.clamp(x / scaling, 0, pixmap.width -1) + w* Mathf.clamp(y / scaling, 0, pixmap.height -1)]));
+                    input.begin(editor.width(), editor.height(), (x, y) -> unpack(buffer1[Mathf.clamp(x / scaling, 0, pixmap.width -1) + w* Mathf.clamp(y / scaling, 0, pixmap.height -1)]));
 
                     //read from buffer1 and write to buffer2
                     pixmap.each((px, py) -> {

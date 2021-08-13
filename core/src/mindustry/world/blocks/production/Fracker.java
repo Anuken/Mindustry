@@ -53,7 +53,7 @@ public class Fracker extends SolidPump{
 
             Drawf.liquid(liquidRegion, x, y, liquids.get(result) / liquidCapacity, result.color);
 
-            Draw.rect(rotatorRegion, x, y, pumpTime);
+            Drawf.spinSprite(rotatorRegion, x, y, pumpTime);
             Draw.rect(topRegion, x, y);
         }
 

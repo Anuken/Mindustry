@@ -55,7 +55,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Log.info("[GL] Max texture size: @", maxTextureSize);
         Log.info("[GL] Using @ context.", gl30 != null ? "OpenGL 3" : "OpenGL 2");
         if(maxTextureSize < 4096) Log.warn("[GL] Your maximum texture size is below the recommended minimum of 4096. This will cause severe performance issues.");
-        Log.info("[JAVA] Version: @", System.getProperty("java.version"));
+        Log.info("[JAVA] Version: @", OS.javaVersion);
 
         Time.setDeltaProvider(() -> {
             float result = Core.graphics.getDeltaTime() * 60f;

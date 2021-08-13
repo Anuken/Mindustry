@@ -60,6 +60,7 @@ public class PayloadMassDriver extends PayloadBlock{
         sync = true;
         rotate = true;
         outputsPayload = true;
+        group = BlockGroup.units;
 
         //point2 is relative
         config(Point2.class, (PayloadDriverBuild tile, Point2 point) -> tile.link = Point2.pack(point.x + tile.tileX(), point.y + tile.tileY()));

@@ -287,6 +287,7 @@ public class World{
             if(liquid != null) content.add(liquid);
         }
 
+        state.rules.cloudColor = sector.planet.landCloudColor;
         sector.info.resources = content.asArray();
         sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
         sector.saveInfo();
@@ -325,8 +326,8 @@ public class World{
         invalidMap = false;
 
         if(!headless){
-            if(state.teams.playerCores().size == 0 && !checkRules.pvp){
-                ui.showErrorMessage("@map.nospawn");
+            if(state.teams.cores(checkRules.defaultTeam).size == 0 && !checkRules.pvp){
+                ui.showErrorMessage(Core.bundle.format("map.nospawn", checkRules.defaultTeam.color, checkRules.defaultTeam.localized()));
                 invalidMap = true;
             }else if(checkRules.pvp){ //pvp maps need two cores to be valid
                 if(state.teams.getActive().count(TeamData::hasCore) < 2){
@@ -336,7 +337,7 @@ public class World{
             }else if(checkRules.attackMode){ //attack maps need two cores to be valid
                 invalidMap = state.rules.waveTeam.data().noCores();
                 if(invalidMap){
-                    ui.showErrorMessage("@map.nospawn.attack");
+                    ui.showErrorMessage(Core.bundle.format("map.nospawn.attack", checkRules.waveTeam.color, checkRules.waveTeam.localized()));
                 }
             }
         }else{
@@ -525,8 +526,7 @@ public class World{
 
     private class Context implements WorldContext{
 
-        Context(){
-        }
+        Context(){}
 
         @Override
         public Tile tile(int index){
@@ -579,7 +579,7 @@ public class World{
 
                 for(GenerateFilter filter : filters){
                     filter.randomize();
-                    input.begin(filter, width(), height(), (x, y) -> tiles.getn(x, y));
+                    input.begin(width(), height(), (x, y) -> tiles.getn(x, y));
                     filter.apply(tiles, input);
                 }
             }

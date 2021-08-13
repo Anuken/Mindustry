@@ -278,7 +278,7 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("version", "Displays server version info.", arg -> {
             info("Version: Mindustry @-@ @ / build @", Version.number, Version.modifier, Version.type, Version.build + (Version.revision == 0 ? "" : "." + Version.revision));
-            info("Java Version: @", System.getProperty("java.version"));
+            info("Java Version: @", OS.javaVersion);
         });
 
         handler.register("exit", "Exit the server application.", arg -> {
@@ -380,6 +380,8 @@ public class ServerControl implements ApplicationListener{
             maps.reload();
             if(maps.all().size > beforeMaps){
                 info("@ new map(s) found and reloaded.", maps.all().size - beforeMaps);
+            }else if(maps.all().size < beforeMaps){
+                info("@ old map(s) deleted.", beforeMaps - maps.all().size);
             }else{
                 info("Maps reloaded.");
             }
