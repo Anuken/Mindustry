@@ -880,6 +880,16 @@ public class Fx{
         Drawf.light(Team.derelict, e.x, e.y, 20f * e.fslope(), Pal.lightFlame, 0.5f);
     }),
 
+    fireHit = new Effect(35f, e -> {
+        color(Pal.lightFlame, Pal.darkFlame, e.fin());
+
+        randLenVectors(e.id, 3, 2f + e.fin() * 10f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.2f + e.fout() * 1.6f);
+        });
+
+        color();
+    }),
+
     fireSmoke = new Effect(35f, e -> {
         color(Color.gray);
 

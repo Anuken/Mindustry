@@ -3,6 +3,7 @@ package mindustry.content;
 import arc.graphics.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.effect.*;
 import mindustry.graphics.*;
 
 public class Bullets implements ContentList{
@@ -110,6 +111,7 @@ public class Bullets implements ContentList{
             backColor = Pal.lightOrange;
             makeFire = true;
             trailEffect = Fx.incendTrail;
+            ammoMultiplier = 4f;
         }};
 
         artilleryExplosive = new ArtilleryBulletType(2f, 20, "shell"){{
@@ -120,7 +122,7 @@ public class Bullets implements ContentList{
             collidesTiles = false;
             ammoMultiplier = 4f;
             splashDamageRadius = 45f * 0.75f;
-            splashDamage = 50f;
+            splashDamage = 55f;
             backColor = Pal.missileYellowBack;
             frontColor = Pal.missileYellow;
 
@@ -317,20 +319,26 @@ public class Bullets implements ContentList{
         standardHoming = new BasicBulletType(3f, 12, "bullet"){{
             width = 7f;
             height = 9f;
-            homingPower = 0.08f;
+            homingPower = 0.1f;
             reloadMultiplier = 1.5f;
             ammoMultiplier = 5;
             lifetime = 60f;
         }};
 
-        standardIncendiary = new BasicBulletType(3.2f, 11, "bullet"){{
+        standardIncendiary = new BasicBulletType(3.2f, 16, "bullet"){{
             width = 10f;
             height = 12f;
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             status = StatusEffects.burning;
+            hitEffect = new MultiEffect(Fx.hitBulletSmall, Fx.fireHit);
+
+            ammoMultiplier = 5;
+
+            splashDamage = 10f;
+            splashDamageRadius = 22f;
+
             makeFire = true;
-            inaccuracy = 3f;
             lifetime = 60f;
         }};
 
@@ -361,12 +369,15 @@ public class Bullets implements ContentList{
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             status = StatusEffects.burning;
+            hitEffect = new MultiEffect(Fx.hitBulletSmall, Fx.fireHit);
             shootEffect = Fx.shootBig;
             makeFire = true;
             pierceCap = 2;
             pierceBuilding = true;
-            knockback = 0.7f;
+            knockback = 0.6f;
             ammoMultiplier = 3;
+            splashDamage = 15f;
+            splashDamageRadius = 24f;
         }};
 
         fireball = new FireBulletType(1f, 4);
@@ -386,7 +397,7 @@ public class Bullets implements ContentList{
             hittable = false;
         }};
 
-        pyraFlame = new BulletType(4f, 50f){{
+        pyraFlame = new BulletType(4f, 60f){{
             ammoMultiplier = 6f;
             hitSize = 7f;
             lifetime = 18f;

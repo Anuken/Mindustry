@@ -1378,10 +1378,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void damage(float damage){
         if(dead()) return;
 
-        if(Mathf.zero(state.rules.blockHealthMultiplier)){
+        float dm = state.rules.blockHealth(team);
+
+        if(Mathf.zero(dm)){
             damage = health + 1;
         }else{
-            damage /= state.rules.blockHealthMultiplier;
+            damage /= dm;
         }
 
         Call.tileDamage(self(), health - handleDamage(damage));

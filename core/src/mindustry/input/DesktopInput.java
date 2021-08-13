@@ -646,13 +646,6 @@ public class DesktopInput extends InputHandler{
             unit.moveAt(movement);
         }else{
             unit.rotateMove(movement);
-
-            unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
-
-            //problem: actual unit rotation is controlled by velocity, but velocity is 1) unpredictable and 2) can be set to 0
-            if(!movement.isZero()){
-                unit.rotation = Angles.moveToward(unit.rotation, movement.angle(), unit.type.rotateSpeed * Math.max(Time.delta, 1));
-            }
         }
 
         unit.aim(unit.type.faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation, Core.input.mouseWorld().dst(unit)).add(unit.x, unit.y));

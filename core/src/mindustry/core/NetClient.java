@@ -507,6 +507,11 @@ public class NetClient implements ApplicationListener{
         }
     }
 
+    /** Resets the world data timeout counter. */
+    public void resetTimeout(){
+        timeoutTime = 0f;
+    }
+
     public boolean isConnecting(){
         return connecting;
     }

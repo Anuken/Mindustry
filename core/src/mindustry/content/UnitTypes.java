@@ -1137,7 +1137,7 @@ public class UnitTypes implements ContentList{
             hitSize = 58f;
             destructibleWreck = false;
             armor = 13f;
-            targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.core, null};
+            targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
             ammoType = new ItemAmmoType(Items.thorium);
 
             BulletType fragBullet = new FlakBulletType(4f, 5){{

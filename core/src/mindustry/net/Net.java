@@ -272,6 +272,10 @@ public class Net{
                 throw new RuntimeException("Received stream chunk without a StreamBegin beforehand!");
             }
             builder.add(c.data);
+
+            ui.loadfrag.setProgress(builder.progress());
+            netClient.resetTimeout();
+
             if(builder.isDone()){
                 streams.remove(builder.id);
                 handleClientReceived(builder.build());

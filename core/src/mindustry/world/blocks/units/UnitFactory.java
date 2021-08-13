@@ -213,8 +213,8 @@ public class UnitFactory extends UnitBlock{
             }
 
             if(consValid() && currentPlan != -1){
-                time += edelta() * speedScl * Vars.state.rules.unitBuildSpeedMultiplier;
-                progress += edelta() * Vars.state.rules.unitBuildSpeedMultiplier;
+                time += edelta() * speedScl * Vars.state.rules.unitBuildSpeed(team);
+                progress += edelta() * Vars.state.rules.unitBuildSpeed(team);
                 speedScl = Mathf.lerpDelta(speedScl, 1f, 0.05f);
             }else{
                 speedScl = Mathf.lerpDelta(speedScl, 0f, 0.05f);

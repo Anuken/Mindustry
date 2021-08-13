@@ -1975,7 +1975,7 @@ public class Blocks implements ContentList{
                     despawnEffect = Fx.instBomb;
                     trailSpacing = 20f;
                     damage = 1350;
-                    buildingDamageMultiplier = 0.25f;
+                    buildingDamageMultiplier = 0.2f;
                     speed = brange;
                     hitShake = 6f;
                     ammoMultiplier = 1f;
@@ -2049,7 +2049,7 @@ public class Blocks implements ContentList{
             loopSound = Sounds.beam;
             loopSoundVolume = 2f;
 
-            shootType = new ContinuousLaserBulletType(75){{
+            shootType = new ContinuousLaserBulletType(78){{
                 length = 200f;
                 hitEffect = Fx.hitMeltdown;
                 hitColor = Pal.meltdownHit;
@@ -2230,9 +2230,9 @@ public class Blocks implements ContentList{
         payloadPropulsionTower = new PayloadMassDriver("payload-propulsion-tower"){{
             requirements(Category.units, with(Items.thorium, 300, Items.silicon, 200, Items.plastanium, 200, Items.phaseFabric, 50));
             size = 5;
-            reloadTime = 140f;
+            reloadTime = 130f;
             chargeTime = 100f;
-            range = 600f;
+            range = 1000f;
             maxPayloadSize = 3.5f;
             consumes.power(6f);
         }};
