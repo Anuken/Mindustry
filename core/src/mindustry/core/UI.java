@@ -261,6 +261,7 @@ public class UI implements ApplicationListener, Loadable{
                 this.numeric = inumeric;
                 this.maxLength = textLength;
                 this.accepted = confirmed;
+                this.allowEmpty = false;
             }});
         }else{
             new Dialog(titleText){{

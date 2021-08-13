@@ -572,7 +572,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 s.field(searchText, t -> {
                     searchText = t;
                     readd[0].run();
-                }).growX().height(50f).addInputDialog();
+                }).growX().height(50f);
             }).growX().row();
 
             Table con = p.table().growX().get();

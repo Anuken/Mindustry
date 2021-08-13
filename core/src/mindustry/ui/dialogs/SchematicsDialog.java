@@ -69,7 +69,7 @@ public class SchematicsDialog extends BaseDialog{
             searchField = s.field(search, res -> {
                 search = res;
                 rebuildPane.run();
-            }).growX().addInputDialog().get();
+            }).growX().get();
         }).fillX().padBottom(4);
 
         cont.row();
@@ -164,12 +164,12 @@ public class SchematicsDialog extends BaseDialog{
                                     cont.table(tags -> buildTags(s, tags, false)).maxWidth(400f).fillX().left().row();
 
                                     cont.margin(30).add("@name").padRight(6f);
-                                    TextField nameField = cont.field(s.name(), null).size(400f, 55f).addInputDialog().left().get();
+                                    TextField nameField = cont.field(s.name(), null).size(400f, 55f).left().get();
 
                                     cont.row();
 
                                     cont.margin(30).add("@editor.description").padRight(6f);
-                                    TextField descField = cont.area(s.description(), Styles.areaField, t -> {}).size(400f, 140f).left().addInputDialog().get();
+                                    TextField descField = cont.area(s.description(), Styles.areaField, t -> {}).size(400f, 140f).left().get();
 
                                     Runnable accept = () -> {
                                         s.tags.put("name", nameField.getText());
