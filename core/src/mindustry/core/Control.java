@@ -383,6 +383,8 @@ public class Control implements ApplicationListener, Loadable{
                         Groups.fire.clear();
                         Groups.puddle.clear();
 
+                        //reset to 0, so replaced cores don't count
+                        state.rules.defaultTeam.data().unitCap = 0;
                         Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
                         //set up camera/player locations
