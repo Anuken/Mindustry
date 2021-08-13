@@ -48,12 +48,12 @@ public class HintsFragment extends Fragment{
                 }else if(!current.show()){ //current became hidden
                     hide();
                 }
-            }else if(hints.size > 0 && !renderer.isCutscene()){
+            }else if(hints.size > 0){
                 //check one hint each frame to see if it should be shown.
                 Hint hint = hints.find(Hint::show);
                 if(hint != null && hint.complete()){
                     hints.remove(hint);
-                }else if(hint != null){
+                }else if(hint != null && !renderer.isCutscene() && state.isGame() && control.saves.getTotalPlaytime() > 8000){
                     display(hint);
                 }else{
                     //moused over a derelict structure
@@ -92,7 +92,7 @@ public class HintsFragment extends Fragment{
         hints.sort(Hint::order);
 
         Hint first = hints.find(Hint::show);
-        if(first != null){
+        if(first != null && !renderer.isCutscene() && state.isGame()){
             hints.remove(first);
             display(first);
         }

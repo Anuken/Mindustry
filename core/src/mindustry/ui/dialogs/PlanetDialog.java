@@ -531,7 +531,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }),
 
         new Table(c -> {
-            if(!(graphics.isPortrait() && mobile) && planets.planet.sectors.contains(Sector::hasBase)){
+            c.visible(() -> !(graphics.isPortrait() && mobile));
+            if(planets.planet.sectors.contains(Sector::hasBase)){
                 int attacked = planets.planet.sectors.count(Sector::isAttacked);
 
                 //sector notifications & search
@@ -557,7 +558,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         })).grow();
     }
 
-    //TODO
     void rebuildList(){
         notifs.clear();
 
