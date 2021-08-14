@@ -462,7 +462,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             player.unit().updateBuilding(isBuilding);
         }
 
-        if(player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && player.unit().ammo <= 0){
+        if(player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && !player.team().rules().infiniteAmmo && player.unit().ammo <= 0){
             player.unit().type.weapons.first().noAmmoSound.at(player.unit());
         }
 

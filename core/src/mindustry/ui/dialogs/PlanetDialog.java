@@ -63,7 +63,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public boolean showed = false, sectorsShown;
     public String searchText = "";
 
-    public Table sectorTop = new Table(), notifs;
+    public Table sectorTop = new Table(), notifs = new Table();
     public Label hoverLabel = new Label("");
 
     public PlanetDialog(){
@@ -559,6 +559,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     void rebuildList(){
+        if(notifs == null) return;
+
         notifs.clear();
 
         var all = planets.planet.sectors.select(Sector::hasBase);
