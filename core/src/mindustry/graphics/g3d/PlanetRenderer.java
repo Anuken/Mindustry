@@ -136,8 +136,12 @@ public class PlanetRenderer implements Disposable{
     public void renderPlanet(Planet planet){
         if(!planet.visible()) return;
 
-        //render planet at offsetted position in the world
-        planet.draw(cam.combined, planet.getTransform(mat));
+        cam.update();
+
+        if(cam.frustum.containsSphere(planet.position, planet.clipRadius)){
+            //render planet at offsetted position in the world
+            planet.draw(cam.combined, planet.getTransform(mat));
+        }
 
         renderOrbit(planet);
 
@@ -153,7 +157,7 @@ public class PlanetRenderer implements Disposable{
             renderSectors(planet);
         }
 
-        if(planet.parent != null && planet.hasAtmosphere && Core.settings.getBool("atmosphere")){
+        if(cam.frustum.containsSphere(planet.position, planet.clipRadius) && planet.parent != null && planet.hasAtmosphere && Core.settings.getBool("atmosphere")){
             Gl.depthMask(false);
 
             Blending.additive.apply();
