@@ -539,7 +539,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 c.top().right();
                 c.defaults().width(280f);
 
-                c.button(bundle.get("sectorlist") +
+                c.button(bundle.get("content.sector.name") +
                     (attacked == 0 ? "" : "\n[red]⚠[lightgray] " + bundle.format("sectorlist.attacked", "[red]" + attacked + "[]")),
                     Icon.downOpen, Styles.squareTogglet, () -> sectorsShown = !sectorsShown)
                 .height(60f).checked(b -> {
