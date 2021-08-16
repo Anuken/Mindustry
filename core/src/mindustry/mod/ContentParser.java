@@ -81,7 +81,15 @@ public class ContentParser{
             if(result != null){
                 return result;
             }
-            StatusEffect effect = new StatusEffect(currentMod.name + "-" + data.getString("name"));
+            StatusEffect effect;
+            if(data.isString()){
+                String prefix = currentMod != null ? currentMod.name + "-" : "";
+                effect = Vars.content.getByName(ContentType.status, prefix + data.asString());
+                if(effect != null) return effect;
+                effect = Vars.content.getByName(ContentType.status, data.asString());
+                if(effect != null) return effect;
+            }
+            effect = new StatusEffect(currentMod.name + "-" + data.getString("name"));
             readFields(effect, data);
             return effect;
         });
