@@ -274,6 +274,7 @@ public class Net{
             builder.add(c.data);
 
             ui.loadfrag.setProgress(builder.progress());
+            ui.loadfrag.snapProgress();
             netClient.resetTimeout();
 
             if(builder.isDone()){
