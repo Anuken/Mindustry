@@ -36,8 +36,11 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Block extends UnlockableContent{
+    /** If true, buildings have an ItemModule. */
     public boolean hasItems;
+    /** If true, buildings have a LiquidModule. */
     public boolean hasLiquids;
+    /** If true, buildings have a PowerModule. */
     public boolean hasPower;
 
     public boolean outputsLiquid = false;
@@ -45,8 +48,6 @@ public class Block extends UnlockableContent{
     public boolean outputsPower = false;
     public boolean outputsPayload = false;
     public boolean acceptsPayload = false;
-    public boolean outputFacing = true;
-    public boolean noSideBlend = false;
     public boolean acceptsItems = false;
 
     public int itemCapacity = 10;
@@ -56,6 +57,11 @@ public class Block extends UnlockableContent{
     public final BlockBars bars = new BlockBars();
     public final Consumers consumes = new Consumers();
 
+    /** If true, this block outputs to its facing direction, when applicable.
+     * Used for blending calculations. */
+    public boolean outputFacing = true;
+    /** if true, this block does not accept input from the sides (used for armored conveyors) */
+    public boolean noSideBlend = false;
     /** whether to display flow rate */
     public boolean displayFlow = true;
     /** whether this block is visible in the editor */
