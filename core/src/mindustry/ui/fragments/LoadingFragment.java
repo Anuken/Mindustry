@@ -65,7 +65,6 @@ public class LoadingFragment extends Fragment{
         if(!bar.visible){
             setProgress(() -> progValue);
         }
-
     }
 
     public void setButton(Runnable listener){
