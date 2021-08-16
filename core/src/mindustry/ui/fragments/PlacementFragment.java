@@ -192,8 +192,10 @@ public class PlacementFragment extends Fragment{
         }
 
         if(Core.input.keyTap(Binding.block_info)){
-            Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block;
-            if(displayBlock != null){
+            var h = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            Block hovering = h == null ? null : h instanceof ConstructBuild c ? c.current : h.block;
+            Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block != null ? input.block : hovering;
+            if(displayBlock != null && state.isCampaign() ? displayBlock.unlocked() :  displayBlock != null){
                 ui.content.show(displayBlock);
                 Events.fire(new BlockInfoEvent());
             }
