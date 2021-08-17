@@ -620,7 +620,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             };
 
             readd[0].run();
-        }).grow().get().setScrollingDisabled(true, false);
+        }).grow().scrollX(false);
     }
 
     @Override

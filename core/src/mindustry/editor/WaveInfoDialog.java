@@ -129,7 +129,7 @@ public class WaveInfoDialog extends BaseDialog{
 
         cont.clear();
         cont.stack(new Table(Tex.clear, main -> {
-            main.pane(t -> table = t).growX().growY().padRight(8f).get().setScrollingDisabled(true, false);
+            main.pane(t -> table = t).growX().growY().padRight(8f).scrollX(false);
             main.row();
             main.button("@add", () -> {
                 if(groups == null) groups = new Seq<>();

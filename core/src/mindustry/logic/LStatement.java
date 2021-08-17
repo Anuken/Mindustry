@@ -175,7 +175,7 @@ public abstract class LStatement{
         t.top().pane(inner -> {
             inner.top();
             hideCons.get(inner, hide);
-        }).pad(0f).top().get().setScrollingDisabled(true, false);
+        }).pad(0f).top().scrollX(false);
 
         t.pack();
     }

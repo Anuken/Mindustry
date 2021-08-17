@@ -97,7 +97,7 @@ public class SchematicsDialog extends BaseDialog{
                     }
                 };
                 rebuildTags.run();
-            }).fillX().height(tagh).get().setScrollingDisabled(false, true);
+            }).fillX().height(tagh).scrollY(false);
 
             in.button(Icon.pencilSmall, () -> {
                 showAllTags();
@@ -246,7 +246,7 @@ public class SchematicsDialog extends BaseDialog{
             };
 
             rebuildPane.run();
-        }).grow().get().setScrollingDisabled(true, false);
+        }).grow().scrollX(false);
     }
 
     public void showInfo(Schematic schematic){
@@ -573,7 +573,7 @@ public class SchematicsDialog extends BaseDialog{
                 });
             }
 
-        }).fillX().left().height(tagh).get().setScrollingDisabled(false, true);
+        }).fillX().left().height(tagh).scrollY(false);
 
         t.button(Icon.addSmall, () -> {
             var dialog = new BaseDialog("@schematic.addtag");

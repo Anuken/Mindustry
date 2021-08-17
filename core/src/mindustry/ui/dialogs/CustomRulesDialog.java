@@ -126,7 +126,7 @@ public class CustomRulesDialog extends BaseDialog{
 
     void setup(){
         cont.clear();
-        cont.pane(m -> main = m).get().setScrollingDisabled(true, false);
+        cont.pane(m -> main = m).scrollX(false);
         main.margin(10f);
         main.button("@settings.reset", () -> {
             rules = resetter.get();

@@ -131,7 +131,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
             }
 
 
-        }).growX().get().setScrollingDisabled(true, false);
+        }).growX().scrollX(false);
 
         cont.row();
         cont.pane(items);
