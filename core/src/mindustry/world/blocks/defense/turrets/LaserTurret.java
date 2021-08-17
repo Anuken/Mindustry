@@ -38,8 +38,8 @@ public class LaserTurret extends PowerTurret{
     }
 
     public class LaserTurretBuild extends PowerTurretBuild{
-        Bullet bullet;
-        float bulletLife;
+        public Bullet bullet;
+        public float bulletLife;
 
         @Override
         protected void updateCooling(){

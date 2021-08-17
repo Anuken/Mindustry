@@ -111,7 +111,7 @@ public class SuicideAI extends GroundAI{
     }
 
     @Override
-    protected Teamc target(float x, float y, float range, boolean air, boolean ground){
+    public Teamc target(float x, float y, float range, boolean air, boolean ground){
         return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground &&
             !(t.block instanceof Conveyor || t.block instanceof Conduit)); //do not target conveyors/conduits
     }

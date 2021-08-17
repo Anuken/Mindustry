@@ -16,9 +16,9 @@ public class BuilderAI extends AIController{
     public static float buildRadius = 1500, retreatDst = 110f, fleeRange = 370f, retreatDelay = Time.toSeconds * 2f;
 
     boolean found = false;
+    float retreatTimer;
     @Nullable Unit following;
     @Nullable Teamc enemy;
-    float retreatTimer;
     @Nullable BlockPlan lastPlan;
 
     @Override

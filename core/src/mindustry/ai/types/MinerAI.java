@@ -14,7 +14,7 @@ public class MinerAI extends AIController{
     Tile ore;
 
     @Override
-    protected void updateMovement(){
+    public void updateMovement(){
         Building core = unit.closestCore();
 
         if(!(unit.canMine()) || core == null) return;
