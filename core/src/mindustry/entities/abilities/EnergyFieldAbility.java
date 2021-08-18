@@ -150,8 +150,8 @@ public class EnergyFieldAbility extends Ability{
             if(anyNearby){
                 shootSound.at(unit);
 
-                if(useAmmo && state.rules.unitAmmo){
-                    unit.ammo --;
+                if(useAmmo && state.rules.unitAmmo && !unit.team.rules().infiniteAmmo){
+                    unit.ammo -= state.rules.ammoConsumption(unit.team);
                 }
             }
 

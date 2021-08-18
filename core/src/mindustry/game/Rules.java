@@ -66,6 +66,8 @@ public class Rules{
     public float buildSpeedMultiplier = 1f;
     /** Multiplier for percentage of materials refunded when deconstructing. */
     public float deconstructRefundMultiplier = 0.5f;
+    /** Multiplier for ammo consumption on units. */
+    public float ammoConsumptionMultiplier = 1f;
     /** No-build zone around enemy core radius. */
     public float enemyCoreBuildRadius = 400f;
     /** If true, no-build zones are calculated based on the closest core. */
@@ -160,6 +162,10 @@ public class Rules{
         return buildSpeedMultiplier * teams.get(team).buildSpeedMultiplier;
     }
 
+    public float ammoConsumption(Team team){
+        return ammoConsumptionMultiplier * teams.get(team).ammoConsumptionMultiplier;
+    }
+
     public int unitCap(Team team){
         return unitCap + teams.get(team).unitCap;
     }
@@ -191,6 +197,8 @@ public class Rules{
         public float blockDamageMultiplier = 1f;
         /** Multiplier for building speed. */
         public float buildSpeedMultiplier = 1f;
+        /** Multiplier for ammo consumption on units. */
+        public float ammoConsumptionMultiplier = 1f;
         /** Base unit cap. Can still be increased by blocks. */
         public int unitCap = 0;
 

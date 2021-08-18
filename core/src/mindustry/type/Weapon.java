@@ -293,9 +293,9 @@ public class Weapon implements Cloneable{
 
             mount.reload = reload;
 
-            if(useAmmo){
-                unit.ammo--;
-                if(unit.ammo < 0) unit.ammo = 0;
+            if(useAmmo && !unit.team.rules().infiniteAmmo){
+                unit.ammo -= state.rules.ammoConsumption(unit.team);
+                Math.max(unit.ammo, 0);
             }
         }
     }
