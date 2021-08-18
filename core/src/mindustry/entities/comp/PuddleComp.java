@@ -42,7 +42,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
     @Import float x, y;
     @Import boolean added;
 
-    transient float accepting, updateTime, lastRipple = Time.time + Mathf.random(40f);
+    transient float accepting, updateTime, lastRipple = Time.time + Mathf.random(40f), effectTime = Mathf.random(50f);
     float amount;
     Tile tile;
     Liquid liquid;
@@ -99,6 +99,14 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
             }
 
             updateTime = 40f;
+        }
+
+        if(!headless && liquid.particleEffect != Fx.none){
+            if((effectTime += Time.delta) >= liquid.particleSpacing){
+                float size = Mathf.clamp(amount / (maxLiquid / 1.5f)) * 4f;
+                liquid.particleEffect.at(x + Mathf.range(size), y + Mathf.range(size));
+                effectTime = 0f;
+            }
         }
 
         updateTime -= Time.delta;

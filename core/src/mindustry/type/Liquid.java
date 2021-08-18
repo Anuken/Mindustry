@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.entities.*;
 import mindustry.world.meta.*;
 
 public class Liquid extends UnlockableContent{
@@ -25,6 +26,10 @@ public class Liquid extends UnlockableContent{
     public float explosiveness;
     /** The associated status effect. */
     public StatusEffect effect = StatusEffects.none;
+    /** Effect shown in puddles. */
+    public Effect particleEffect = Fx.none;
+    /** Particle effect rate spacing in ticks. */
+    public float particleSpacing = 60f;
 
     public Liquid(String name, Color color){
         super(name);

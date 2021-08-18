@@ -1,11 +1,17 @@
 package mindustry.content;
 
 import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
 import mindustry.ctype.*;
+import mindustry.entities.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 
+import static arc.graphics.g2d.Draw.*;
+
 public class Liquids implements ContentList{
-    public static Liquid water, slag, oil, cryofluid, neoplasm, rovazide;
+    public static Liquid water, slag, oil, cryofluid, neoplasm;
 
     @Override
     public void load(){
@@ -44,11 +50,17 @@ public class Liquids implements ContentList{
             temperature = 0.54f;
             viscosity = 0.65f;
             flammability = 0.1f;
-        }};
 
-        //rovazide = new Liquid("rovafuel", Color.valueOf("9dde68")){{
-        //    flammability = 1.5f;
-        //    explosiveness = 3f;
-        //}};
+            Color from = Color.valueOf("f98f4a"), to = Color.valueOf("9e172c");
+
+            //TODO could probably be improved...
+            particleSpacing = 65f;
+            particleEffect = new Effect(40f, e -> {
+                e.lifetime = Mathf.randomSeed(e.id + 2, 80f, 200f) * 3.2f;
+                color(from, to, Mathf.randomSeed(e.id, 1f));
+
+                Fill.circle(e.x, e.y, e.fslope() * Mathf.randomSeed(e.id + 1, 0.6f, 2.4f));
+            }).layer(Layer.debris - 0.5f);
+        }};
     }
 }
