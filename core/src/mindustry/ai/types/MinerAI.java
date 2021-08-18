@@ -9,12 +9,12 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class MinerAI extends AIController{
-    boolean mining = true;
-    Item targetItem;
-    Tile ore;
+    public boolean mining = true;
+    public Item targetItem;
+    public Tile ore;
 
     @Override
-    protected void updateMovement(){
+    public void updateMovement(){
         Building core = unit.closestCore();
 
         if(!(unit.canMine()) || core == null) return;

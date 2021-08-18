@@ -52,7 +52,7 @@ public class PlayerListFragment extends Fragment{
                 search.setMessageText(Core.bundle.get("players.search"));
 
                 pane.row();
-                pane.pane(content).grow().get().setScrollingDisabled(true, false);
+                pane.pane(content).grow().scrollX(false);
                 pane.row();
 
                 pane.table(menu -> {

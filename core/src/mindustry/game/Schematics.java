@@ -33,6 +33,7 @@ import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 
 import java.io.*;
@@ -449,6 +450,10 @@ public class Schematics implements Loadable{
 
             if(st.block instanceof Drill){
                 tile.getLinkedTiles(t -> t.setOverlay(resource));
+            }
+
+            if(tile.build instanceof CoreBuild cb){
+                state.teams.registerCore(cb);
             }
         });
     }

@@ -67,7 +67,7 @@ public class JoinDialog extends BaseDialog{
 
         TextField field = add.cont.field(Core.settings.getString("ip"), text -> {
             Core.settings.put("ip", text);
-        }).size(320f, 54f).maxTextLength(100).addInputDialog().get();
+        }).size(320f, 54f).maxTextLength(100).get();
 
         add.cont.row();
         add.buttons.defaults().size(140f, 60f).pad(4f);
@@ -287,7 +287,7 @@ public class JoinDialog extends BaseDialog{
             t.field(Core.settings.getString("name"), text -> {
                 player.name(text);
                 Core.settings.put("name", text);
-            }).grow().pad(8).addInputDialog(maxNameLength);
+            }).grow().pad(8).maxTextLength(maxNameLength);
 
             ImageButton button = t.button(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new PaletteDialog().show(color -> {

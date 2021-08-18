@@ -27,7 +27,6 @@ import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.input.*;
-import mindustry.io.legacy.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -65,7 +64,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public boolean showed = false, sectorsShown;
     public String searchText = "";
 
-    public Table sectorTop = new Table(), notifs;
+    public Table sectorTop = new Table(), notifs = new Table();
     public Label hoverLabel = new Label("");
 
     public PlanetDialog(){
@@ -131,7 +130,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
                 if(event.targetActor == PlanetDialog.this){
-                    zoom = Mathf.clamp(zoom + y / 10f, planets.planet.minZoom, 2f);
+                    zoom = Mathf.clamp(zoom + amountY / 10f, planets.planet.minZoom, 2f);
                 }
                 return true;
             }
@@ -164,16 +163,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(net.client()){
             ui.showInfo("@map.multiplayer");
             return this;
-        }
-
-        //load legacy research
-        if(Core.settings.has("unlocks") && !Core.settings.has("junction-unlocked")){
-            Core.app.post(() -> {
-                ui.showCustomConfirm("@research", "@research.legacy", "@research.load", "@research.discard", () -> {
-                    LegacyIO.readResearch();
-                    Core.settings.remove("unlocks");
-                }, () -> Core.settings.remove("unlocks"));
-            });
         }
 
         rebuildButtons();
@@ -545,7 +534,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }),
 
         new Table(c -> {
-            if(!(graphics.isPortrait() && mobile) && planets.planet.sectors.contains(Sector::hasBase)){
+            c.visible(() -> !(graphics.isPortrait() && mobile));
+            if(planets.planet.sectors.contains(Sector::hasBase)){
                 int attacked = planets.planet.sectors.count(Sector::isAttacked);
 
                 //sector notifications & search
@@ -571,8 +561,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         })).grow();
     }
 
-    //TODO
     void rebuildList(){
+        if(notifs == null) return;
+
         notifs.clear();
 
         var all = planets.planet.sectors.select(Sector::hasBase);
@@ -586,7 +577,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 s.field(searchText, t -> {
                     searchText = t;
                     readd[0].run();
-                }).growX().height(50f).addInputDialog();
+                }).growX().height(50f);
             }).growX().row();
 
             Table con = p.table().growX().get();
@@ -632,7 +623,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             };
 
             readd[0].run();
-        }).grow().get().setScrollingDisabled(true, false);
+        }).grow().scrollX(false);
     }
 
     @Override

@@ -126,7 +126,7 @@ public class CustomRulesDialog extends BaseDialog{
 
     void setup(){
         cont.clear();
-        cont.pane(m -> main = m).get().setScrollingDisabled(true, false);
+        cont.pane(m -> main = m).scrollX(false);
         main.margin(10f);
         main.button("@settings.reset", () -> {
             rules = resetter.get();
@@ -273,7 +273,7 @@ public class CustomRulesDialog extends BaseDialog{
             t.add(text).left().padRight(5);
             t.field((prov.get()) + "", s -> cons.get(Strings.parseInt(s)))
                     .padRight(100f)
-                    .valid(f -> Strings.parseInt(f) >= min && Strings.parseInt(f) <= max).width(120f).left().addInputDialog();
+                    .valid(f -> Strings.parseInt(f) >= min && Strings.parseInt(f) <= max).width(120f).left();
         }).padTop(0).row();
     }
 
@@ -285,7 +285,7 @@ public class CustomRulesDialog extends BaseDialog{
             t.field((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseFloat(s)))
             .padRight(100f)
             .update(a -> a.setDisabled(!condition.get()))
-            .valid(f -> Strings.canParsePositiveFloat(f) && Strings.parseFloat(f) >= min && Strings.parseFloat(f) <= max).width(120f).left().addInputDialog();
+            .valid(f -> Strings.canParsePositiveFloat(f) && Strings.parseFloat(f) >= min && Strings.parseFloat(f) <= max).width(120f).left();
         }).padTop(0);
         main.row();
     }
@@ -309,7 +309,7 @@ public class CustomRulesDialog extends BaseDialog{
     Cell<TextField> field(Table table, float value, Floatc setter){
         return table.field(Strings.autoFixed(value, 2), v -> setter.get(Strings.parseFloat(v)))
             .valid(Strings::canParsePositiveFloat)
-            .size(90f, 40f).pad(2f).addInputDialog();
+            .size(90f, 40f).pad(2f);
     }
 
     void weatherDialog(){

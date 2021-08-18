@@ -21,6 +21,7 @@ import static mindustry.Vars.*;
 public class WaveSpawner{
     private static final float margin = 40f, coreMargin = tilesize * 2f, maxSteps = 30;
 
+    private int tmpCount;
     private Seq<Tile> spawns = new Seq<>();
     private boolean spawning = false;
     private boolean any = false;
@@ -160,6 +161,18 @@ public class WaveSpawner{
                 cons.get(core.x, core.y);
             }
         }
+    }
+
+    public int countGroundSpawns(){
+        tmpCount = 0;
+        eachGroundSpawn((x, y) -> tmpCount ++);
+        return tmpCount;
+    }
+
+    public int countFlyerSpawns(){
+        tmpCount = 0;
+        eachFlyerSpawn((x, y) -> tmpCount ++);
+        return tmpCount;
     }
 
     public boolean isSpawning(){

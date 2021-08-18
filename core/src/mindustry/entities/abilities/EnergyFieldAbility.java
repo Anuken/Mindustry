@@ -10,6 +10,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -105,7 +106,11 @@ public class EnergyFieldAbility extends Ability{
             });
 
             if(hitBuildings){
-                Units.nearbyBuildings(rx, ry, range, all::add);
+                Units.nearbyBuildings(rx, ry, range, b -> {
+                    if(b.team != Team.derelict || state.rules.coreCapture){
+                        all.add(b);
+                    }
+                });
             }
 
             all.sort(h -> h.dst2(rx, ry));

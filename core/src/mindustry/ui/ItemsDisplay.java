@@ -50,7 +50,7 @@ public class ItemsDisplay extends Table{
                         label.actions(Actions.color(Color.white, 0.75f, Interp.fade));
                     }
                 }
-            }).get().setScrollingDisabled(true, false), false).setDuration(0.3f);
+            }).scrollX(false), false).setDuration(0.3f);
 
             c.button("@globalitems", Icon.downOpen, Styles.clearTogglet, col::toggle).update(t -> {
                 t.setChecked(col.isCollapsed());

@@ -21,10 +21,10 @@ import java.net.*;
 import java.util.regex.*;
 
 public class Scripts implements Disposable{
-    private final Context context;
-    private final Scriptable scope;
-    private boolean errored;
+    public final Context context;
+    public final Scriptable scope;
 
+    private boolean errored;
     LoadedMod currentMod = null;
 
     public Scripts(){

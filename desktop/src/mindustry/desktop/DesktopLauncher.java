@@ -11,6 +11,7 @@ import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Log.*;
 import arc.util.serialization.*;
 import com.codedisaster.steamworks.*;
 import mindustry.*;
@@ -43,6 +44,9 @@ public class DesktopLauncher extends ClientLauncher{
                 //enable gl3 with command-line argument
                 if(Structs.contains(arg, "-gl3")){
                     gl30 = true;
+                }
+                if(Structs.contains(arg, "-debug")){
+                    Log.level = LogLevel.debug;
                 }
                 setWindowIcon(FileType.internal, "icons/icon_64.png");
             }});

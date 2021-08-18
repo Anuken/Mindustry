@@ -151,7 +151,7 @@ public class Build{
                 if(closest != null && closest.team != team){
                     return false;
                 }
-            }else if(state.teams.eachEnemyCore(team, core -> Mathf.dst(x * tilesize + type.offset, y * tilesize + type.offset, core.x, core.y) < state.rules.enemyCoreBuildRadius + type.size * tilesize / 2f)){
+            }else if(state.teams.anyEnemyCoresWithin(team, x * tilesize + type.offset, y * tilesize + type.offset, state.rules.enemyCoreBuildRadius + tilesize)){
                 return false;
             }
         }

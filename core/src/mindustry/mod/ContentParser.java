@@ -77,9 +77,10 @@ public class ContentParser{
             }
         });
         put(StatusEffect.class, (type, data) -> {
-            Object result = fieldOpt(StatusEffects.class, data);
-            if(result != null){
-                return result;
+            if(data.isString()){
+                StatusEffect result = locate(ContentType.status, data.asString());
+                if(result != null) return result;
+                throw new IllegalArgumentException("Unknown status effect: '" + data.asString() + "'");
             }
             StatusEffect effect = new StatusEffect(currentMod.name + "-" + data.getString("name"));
             readFields(effect, data);
@@ -99,7 +100,7 @@ public class ContentParser{
         put(AmmoType.class, (type, data) -> {
             //string -> item
             //if liquid ammo support is added, this should scan for liquids as well
-            if(data.isString()) return find(ContentType.item, data.asString());
+            if(data.isString()) return new ItemAmmoType(find(ContentType.item, data.asString()));
             //number -> power
             if(data.isNumber()) return new PowerAmmoType(data.asFloat());
 

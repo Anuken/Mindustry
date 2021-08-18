@@ -23,11 +23,9 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class PowerNode extends PowerBlock{
-    protected static boolean returnValue = false;
     protected static BuildPlan otherReq;
-
-    protected final static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     protected static int returnInt = 0;
+    protected final static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
 
     public @Load("laser") TextureRegion laser;
     public @Load("laser-end") TextureRegion laserEnd;
@@ -132,6 +130,13 @@ public class PowerNode extends PowerBlock{
 
         stats.add(Stat.powerRange, laserRange, StatUnit.blocks);
         stats.add(Stat.powerConnections, maxNodes, StatUnit.none);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        clipSize = Math.max(clipSize, laserRange * tilesize);
     }
 
     @Override
