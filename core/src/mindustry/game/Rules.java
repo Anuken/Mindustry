@@ -179,7 +179,7 @@ public class Rules{
         /** If true, this team has infinite unit ammo. */
         public boolean infiniteAmmo;
         /** Whether cores add to unit limit */
-        public boolean unitCapVariable = true;
+        public boolean unitCapVariable;
 
         /** How fast unit factories build units. */
         public float unitBuildSpeedMultiplier = 1f;
