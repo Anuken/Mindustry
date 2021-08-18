@@ -1258,6 +1258,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         damage(damage);
     }
 
+    public boolean insulated(){
+        return block.insulated;
+    }
+
+    public boolean absorbLasers(){
+        return block.absorbLasers;
+    }
+
     /** Changes this building's team in a safe manner. */
     public void changeTeam(Team next){
         Team last = this.team;

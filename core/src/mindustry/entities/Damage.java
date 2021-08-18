@@ -97,7 +97,7 @@ public class Damage{
         tmpBuilding = null;
 
         boolean found = world.raycast(World.toTile(x1), World.toTile(y1), World.toTile(x2), World.toTile(y2),
-        (x, y) -> (tmpBuilding = world.build(x, y)) != null && tmpBuilding.team != team && tmpBuilding.block.absorbLasers);
+        (x, y) -> (tmpBuilding = world.build(x, y)) != null && tmpBuilding.team != team && tmpBuilding.absorbLasers());
 
         return found ? tmpBuilding : null;
     }
@@ -108,7 +108,7 @@ public class Damage{
         furthest = null;
 
         boolean found = world.raycast(b.tileX(), b.tileY(), World.toTile(b.x + Tmp.v1.x), World.toTile(b.y + Tmp.v1.y),
-        (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team && furthest.block().absorbLasers);
+        (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team && (furthest.build != null ? furthest.build.absorbLasers() : furthest.block().absorbLasers));
 
         return found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
     }

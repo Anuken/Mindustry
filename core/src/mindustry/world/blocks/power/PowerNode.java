@@ -341,7 +341,7 @@ public class PowerNode extends PowerBlock{
     public static boolean insulated(int x, int y, int x2, int y2){
         return world.raycast(x, y, x2, y2, (wx, wy) -> {
             Building tile = world.build(wx, wy);
-            return tile != null && tile.block.insulated;
+            return tile != null && tile.insulated();
         });
     }
 
@@ -382,7 +382,7 @@ public class PowerNode extends PowerBlock{
                 if(other.power.links.size == 0){
                     int[] total = {0};
                     getPotentialLinks(tile, team, link -> {
-                        if(!insulated(this, link) && total[0]++ < maxNodes){
+                        if(!PowerNode.insulated(this, link) && total[0]++ < maxNodes){
                             configure(link.pos());
                         }
                     });
