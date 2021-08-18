@@ -114,7 +114,7 @@ public class EnergyFieldAbility extends Ability{
             }
 
             all.sort(h -> h.dst2(rx, ry));
-            int len = Math.min(all.size, maxTargets);//
+            int len = Math.min(all.size, maxTargets);
             for(int i = 0; i < len; i++){
                 Healthc other = all.get(i);
 
