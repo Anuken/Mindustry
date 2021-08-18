@@ -234,7 +234,7 @@ public class Shaders{
             super(frag);
 
             Core.assets.load("sprites/space.png", Texture.class).loaded = t -> {
-                texture = (Texture)t;
+                texture = t;
                 texture.setFilter(TextureFilter.linear);
                 texture.setWrap(TextureWrap.mirroredRepeat);
             };
@@ -273,8 +273,8 @@ public class Shaders{
 
         public void loadNoise(){
             Core.assets.load("sprites/" + textureName() + ".png", Texture.class).loaded = t -> {
-                ((Texture)t).setFilter(TextureFilter.linear);
-                ((Texture)t).setWrap(TextureWrap.repeat);
+                t.setFilter(TextureFilter.linear);
+                t.setWrap(TextureWrap.repeat);
             };
         }
 

@@ -105,8 +105,8 @@ public class Renderer implements ApplicationListener{
         for(int i = 0; i < splashes.length; i++) splashes[i] = atlas.find("splash-" + i);
 
         assets.load("sprites/clouds.png", Texture.class).loaded = t -> {
-            ((Texture)t).setWrap(TextureWrap.repeat);
-            ((Texture)t).setFilter(TextureFilter.linear);
+            t.setWrap(TextureWrap.repeat);
+            t.setFilter(TextureFilter.linear);
         };
     }
 
