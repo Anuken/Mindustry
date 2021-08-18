@@ -5,8 +5,6 @@ import arc.func.*;
 import arc.util.*;
 import mindustry.maps.*;
 
-import static mindustry.Vars.*;
-
 /** Defines preset rule sets. */
 public enum Gamemode{
     survival(rules -> {
@@ -25,7 +23,7 @@ public enum Gamemode{
 
         rules.waveSpacing = 2f * Time.toMinutes;
         rules.teams.get(rules.waveTeam).infiniteResources = true;
-    }, map -> map.teams.contains(state.rules.waveTeam.id)),
+    }, map -> map.teams.size > 1),
     pvp(rules -> {
         rules.pvp = true;
         rules.enemyCoreBuildRadius = 600f;
