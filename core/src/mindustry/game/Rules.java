@@ -160,6 +160,10 @@ public class Rules{
         return buildSpeedMultiplier * teams.get(team).buildSpeedMultiplier;
     }
 
+    public int unitCap(Team team){
+        return unitCap + teams.get(team).unitCap;
+    }
+
     /** A team-specific ruleset. */
     public static class TeamRule{
         /** Whether to use building AI. */
@@ -174,6 +178,8 @@ public class Rules{
         public boolean infiniteResources;
         /** If true, this team has infinite unit ammo. */
         public boolean infiniteAmmo;
+        /** Whether cores add to unit limit */
+        public boolean unitCapVariable = true;
 
         /** How fast unit factories build units. */
         public float unitBuildSpeedMultiplier = 1f;
@@ -185,6 +191,8 @@ public class Rules{
         public float blockDamageMultiplier = 1f;
         /** Multiplier for building speed. */
         public float buildSpeedMultiplier = 1f;
+        /** Base unit cap. Can still be increased by blocks. */
+        public int unitCap = 0;
 
         //build cost disabled due to technical complexity
     }
