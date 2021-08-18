@@ -295,7 +295,7 @@ public class Weapon implements Cloneable{
 
             if(useAmmo && !unit.team.rules().infiniteAmmo){
                 unit.ammo -= state.rules.ammoConsumption(unit.team);
-                if(unit.ammo < 0) unit.ammo = 0;
+                unit.ammo = Math.max(unit.ammo, 0);
             }
         }
     }
