@@ -443,7 +443,7 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean unlocked(Block block){
-        return block.unlockedNow();
+        return block.unlockedNow() && block.placeablePlayer;
     }
 
     boolean hasInfoBox(){
