@@ -76,6 +76,23 @@ public class AIController implements UnitController{
         }
     }
 
+    /** For ground units: Looks at the target, or the movement position. Does not apply to non-omni units. */
+    public void faceTarget(){
+        if(unit.type.omniMovement || unit instanceof Mechc){
+            if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type.rotateShooting && unit.type.hasWeapons()){
+                unit.lookAt(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
+            }else if(unit.moving()){
+                unit.lookAt(unit.vel().angle());
+            }
+        }
+    }
+
+    public void faceMovement(){
+        if((unit.type.omniMovement || unit instanceof Mechc) && unit.moving()){
+            unit.lookAt(unit.vel().angle());
+        }
+    }
+
     public boolean invalid(Teamc target){
         return Units.invalidateTarget(target, unit.team, unit.x, unit.y);
     }
@@ -89,7 +106,7 @@ public class AIController implements UnitController{
 
         if(tile == targetTile || (costType == Pathfinder.costNaval && !targetTile.floor().isLiquid)) return;
 
-        unit.moveAt(vec.trns(unit.angleTo(targetTile.worldx(), targetTile.worldy()), unit.speed()));
+        unit.movePref(vec.trns(unit.angleTo(targetTile.worldx(), targetTile.worldy()), unit.speed()));
     }
 
     public void updateWeapons(){
