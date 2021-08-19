@@ -363,7 +363,7 @@ public class Turret extends ReloadTurret{
             if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot){
                 ammo.pop();
             }
-            return ammo.size > 0 && ammo.peek().amount >= ammoPerShot;
+            return ammo.size > 0 && ammo.peek().amount >= ammoPerShot || cheating();
         }
 
         protected void updateShooting(){

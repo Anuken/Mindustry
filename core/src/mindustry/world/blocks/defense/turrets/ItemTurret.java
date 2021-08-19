@@ -86,7 +86,7 @@ public class ItemTurret extends Turret{
             super.onProximityAdded();
 
             //add first ammo item to cheaty blocks so they can shoot properly
-            if(cheating() && ammo.size > 0){
+            if(cheating() && ammo.size <= 0){
                 handleItem(this, ammoTypes.entries().next().key);
             }
         }

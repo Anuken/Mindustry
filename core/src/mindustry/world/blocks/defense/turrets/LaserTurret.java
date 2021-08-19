@@ -69,7 +69,7 @@ public class LaserTurret extends PowerTurret{
 
                 float used = (cheating() ? maxUsed * Time.delta : Math.min(liquids.get(liquid), maxUsed * Time.delta));
                 reload -= used * liquid.heatCapacity * coolantMultiplier;
-                liquids.remove(liquid, used);
+                if(!cheating()) liquids.remove(liquid, used);
 
                 if(Mathf.chance(0.06 * used)){
                     coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));

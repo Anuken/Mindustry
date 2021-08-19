@@ -34,7 +34,7 @@ public class ReloadTurret extends BaseTurret{
 
                 float used = Math.min(liquids.get(liquid), maxUsed * Time.delta) * baseReloadSpeed();
                 reload += used * liquid.heatCapacity * coolantMultiplier;
-                liquids.remove(liquid, used);
+                if(!cheating()) liquids.remove(liquid, used);
 
                 if(Mathf.chance(0.06 * used)){
                     coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));

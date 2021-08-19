@@ -90,6 +90,11 @@ public class LiquidTurret extends Turret{
 
         @Override
         public void updateTile(){
+            //add first liquid ammo to cheaty blocks so they can shoot properly
+            if(cheating() && liquids.get(liquids.current()) <= 0){
+                handleLiquid(this, ammoTypes.entries().next().key, 2.5f);
+            }
+
             if(unit != null){
                 unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
             }
