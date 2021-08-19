@@ -474,14 +474,20 @@ public class LExecutor{
                     case getBlock -> {
                         float range = Math.max(unit.range(), buildingRange);
                         if(!unit.within(x1, y1, range)){
-                            exec.setobj(p3, null);
                             exec.setobj(p4, null);
+                            exec.setobj(p5, null);
                         }else{
-                            Tile tile = world.tileWorld(x1, y1);
-                            //any environmental solid block is returned as StoneWall, aka "@solid"
-                            Block block = tile == null ? null : !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
-                            exec.setobj(p3, block);
-                            exec.setobj(p4, tile != null && tile.build != null ? tile.build : null);
+                            if(exec.bool(p3)){
+                                Block floor = world.floorWorld(x1,y1);
+                                exec.setobj(p4, floor);
+                                exec.setobj(p5, null);
+                            }else{
+                                Tile tile = world.tileWorld(x1, y1);
+                                //any environmental solid block is returned as StoneWall, aka "@solid"
+                                Block block = tile == null ? null : !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
+                                exec.setobj(p4, block);
+                                exec.setobj(p5, tile != null && tile.build != null ? tile.build : null);
+                            }
                         }
                     }
                     case itemDrop -> {
