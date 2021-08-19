@@ -11,6 +11,7 @@ import static mindustry.entities.Puddles.*;
 
 public class CellLiquid extends Liquid{
     public Color colorFrom = Color.white.cpy(), colorTo = Color.white.cpy();
+    public int cells = 8;
 
     public CellLiquid(String name, Color color){
         super(name, color);
@@ -33,7 +34,7 @@ public class CellLiquid extends Liquid{
         float length = Math.max(f, 0.3f) * 9f;
 
         rand.setSeed(id);
-        for(int i = 0; i < 8; i++){
+        for(int i = 0; i < cells; i++){
             Tmp.v1.trns(rand.random(360f), rand.random(length));
             float vx = x + Tmp.v1.x, vy = y + Tmp.v1.y;
 

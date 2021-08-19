@@ -24,7 +24,7 @@ import static arc.math.Angles.*;
 import static mindustry.Vars.*;
 
 public class UnitTypes implements ContentList{
-    //region definitions
+    //region standard
 
     //mech
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, scepter, reign, vela;
@@ -64,6 +64,12 @@ public class UnitTypes implements ContentList{
 
     //special block unit type
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
+
+    //endregion
+
+    //region neoplasm
+
+    public static @EntityDef({Unitc.class, Crawlc.class}) UnitType scuttler;
 
     //endregion
 
@@ -2393,6 +2399,16 @@ public class UnitTypes implements ContentList{
                 return true;
             }
         };
+
+        //endregion
+        //region neoplasm
+
+        scuttler = new UnitType("scuttler"){{
+            hitSize = 30f;
+            omniMovement = false;
+            rotateSpeed = 1f;
+            drawCell = false;
+        }};
 
         //endregion
     }
