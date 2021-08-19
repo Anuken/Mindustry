@@ -202,15 +202,20 @@ public class BlockIndexer{
     }
 
     public boolean eachBlock(@Nullable Team team, float wx, float wy, float range, Boolf<Building> pred, Cons<Building> cons){
-        breturnArray.clear();
 
         if(team == null){
+            returnBool = false;
+
             allBuildings(wx, wy, range, b -> {
                 if(pred.get(b)){
-                    breturnArray.add(b);
+                    returnBool = true;
+                    cons.get(b);
                 }
             });
+            return returnBool;
         }else{
+            breturnArray.clear();
+
             var buildings = team.data().buildings;
             if(buildings == null) return false;
             buildings.intersect(wx - range, wy - range, range*2f, range*2f, b -> {
