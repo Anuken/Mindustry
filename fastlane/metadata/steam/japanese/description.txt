@@ -27,38 +27,38 @@
 [*] 50種類以上の実績をコンプリートしましょう
 [/list]
 
-[h2]Gamemodes[/h2]
+[h2]ゲームモード[/h2]
 
 [list]
-[*] [b]Survival[/b]: Build turrets to defend from enemies in tower-defense based gameplay. Survive as long as possible, optionally launching your core to use your collected resources for research. Prepare your base for intermittent attacks from airborne bosses.
-[*] [b]Attack[/b]: Build factories for units to destroy the enemy cores, while simultaneously defending your base from waves of enemy units. Create a variety of different types of support and offensive unit to assist you in your goals. Optionally enable an AI that builds defensive structures to an extra challenge.
-[*] [b]PvP[/b]: Compete with other players on up to 4 different teams to destroy each other's cores. Create units, or attack other bases directly with your mechs.
-[*] [b]Sandbox[/b]: Play around with infinite resources and no enemy threat. Use sandbox-specific item and liquid source blocks to test out designs, and spawn in enemies on request.
+[*] [b]サバイバル[/b]: タワーディフェンス型のゲームで、タレットを建てて敵から守りましょう。できるだけ長く生き残るために、コアを起動して、集めた資源を研究に使いましょう。空を飛ぶボスからの攻撃に備えて、基地を準備しましょう。
+[*] [b]アタック[/b]: 工場を建設し敵のコアを破壊しましょう。同時に、敵襲から自分のコアも守りましょう。様々な種類の攻撃ユニットや支援ユニットがあなたをサポートしてくれます。防衛施設を建設する敵の AI オプションを有効にすれば更に難易度が上がります。
+[*] [b]PvP[/b]: 最大4チームで戦い、他のチームのコアを破壊する事を目指します。ユニットを製造するか、敵の基地をタレットで直接狙いましょう。
+[*] [b]サンドボックス[/b]: リソースは無限で襲撃する敵もいません。サンドボックス用のアイテムソース・液体ソースを利用してデザインを見たり、必要に応じて敵を召喚して防衛能力を確かめたりする事もできます。
 [/list]
 
 [img]{STEAM_APP_IMAGE}/extras/2020-11-30_10-46-02.gif[/img]
 
-[h2]Custom Games & Cross-Platform Multiplayer[/h2]
+[h2]カスタムゲーム & クロスプラットフォームマルチプレイ[/h2]
 
 [list]
-[*] 16 built in maps for custom games, in addition to campaign
-[*] Play co-op, PvP or sandbox
-[*] Join a public dedicated server, or invite friends to your own private session
-[*] Customizable game rules: Change block costs, enemy stats, starting items, wave timing and more
-[*] Mix & match gamemodes: Combine PvP and PvE gamemodes together
+[*] キャンペーンモードに加え、カスタムゲーム用に 16 のマップを用意しています。
+[*] 協力モードもよし、対戦もよし、サンドボックスもよし。
+[*] 公開サーバーに参加したり、友達とプライベートセッションを楽しんだり。
+[*] ゲームルールを変更する事もできます：建設コスト、敵のスタッツ、開始時のアイテム、ウェーブの間隔等…
+[*] ミックスゲームモード: PvP と PvE を同時にやる事も…！？
 [/list]
 
-[h2]Custom Map Editor[/h2]
+[h2]マップエディター[/h2]
 
 [list]
-[*] Paint terrain with an editor UI
-[*] Edit and preview structures in-game
-[*] Configurable tool modes: Change how each tool functions
-[*] Powerful map generation system, with many different types of filters for procedural manipulation of terrain
-[*] Apply noise, distortion, smoothing, erosion, symmetry, ore generation and random terrain to your maps
-[*] Randomize and configure ore generation, as well as placement of river and resource tiles
-[*] Configure enemy wave layouts
-[*] Share exported maps on the Steam Workshop
-[*] Customize base map rules
-[*] Use 80+ different environmental blocks
+[*] エディターを使って地形を作りましょう。
+[*] ゲーム内で建築物を編集する事もできます。
+[*] ツールモードを変更する事で様々なツールを使えます。
+[*] 地形を自由に自動的に生成する為のマップ生成システムをご用意しています。
+[*] ノイズ、歪み、スムージング、侵食、対称化、鉱石生成を駆使し、ランダムな地形を生成していきましょう。
+[*] 鉱石や川の生成もランダムに行う事ができます。
+[*] 敵のウェーブを設定する事も可能です。
+[*] 完成したマップは Steam Workshop で公開しましょう！
+[*] マップ別にルールを設定する事もできます。
+[*] 地形用のブロックは80個以上！
 [/list]
