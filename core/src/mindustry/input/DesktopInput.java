@@ -421,15 +421,11 @@ public class DesktopInput extends InputHandler{
             schemY = rawCursorY;
         }
 
-        if(Core.input.keyTap(Binding.schematic_menu) && !Core.scene.hasKeyboard()){
-            if(selectRequests.isEmpty()){
-                if(ui.schematics.isShown()){
-                    ui.schematics.hide();
-                }else{
-                    ui.schematics.show();
-                }
+        if(Core.input.keyTap(Binding.schematic_menu) && selectRequests.isEmpty() && !Core.scene.hasKeyboard()){
+            if(ui.schematics.isShown()){
+                ui.schematics.hide();
             }else{
-                this.showSchematicSave();
+                ui.schematics.show();
             }
         }
 
@@ -449,6 +445,10 @@ public class DesktopInput extends InputHandler{
         }
 
         if(!selectRequests.isEmpty()){
+            if(Core.input.keyTap(Binding.schematic_menu) && !(lastSchematic == null || lastSchematic.file != null)){
+                this.showSchematicSave();
+            }
+
             if(Core.input.keyTap(Binding.schematic_flip_x)){
                 flipRequests(selectRequests, true);
             }
