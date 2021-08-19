@@ -1,13 +1,22 @@
 package mindustry.type;
 
 import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.world.meta.*;
 
+import static mindustry.entities.Puddles.*;
+
 public class Liquid extends UnlockableContent{
+    protected static final Rand rand = new Rand();
+
     /** Color used in pipes and on the ground. */
     public Color color;
     /** Color used in bars. */
@@ -47,6 +56,34 @@ public class Liquid extends UnlockableContent{
 
     public Color barColor(){
         return barColor == null ? color : barColor;
+    }
+
+    /** Draws a puddle of this liquid on the floor. */
+    public void drawPuddle(Puddle puddle){
+        float amount = puddle.amount, x = puddle.x, y = puddle.y;
+        float f = Mathf.clamp(amount / (maxLiquid / 1.5f));
+        float smag = puddle.tile.floor().isLiquid ? 0.8f : 0f, sscl = 25f;
+
+        Draw.color(Tmp.c1.set(color).shiftValue(-0.05f));
+        Fill.circle(x + Mathf.sin(Time.time + id * 532, sscl, smag), y + Mathf.sin(Time.time + id * 53, sscl, smag), f * 8f);
+
+        float length = f * 6f;
+        rand.setSeed(id);
+        for(int i = 0; i < 3; i++){
+            Tmp.v1.trns(rand.random(360f), rand.random(length));
+            float vx = x + Tmp.v1.x, vy = y + Tmp.v1.y;
+
+            Fill.circle(
+            vx + Mathf.sin(Time.time + i * 532, sscl, smag),
+            vy + Mathf.sin(Time.time + i * 53, sscl, smag),
+            f * 5f);
+        }
+
+        Draw.color();
+
+        if(lightColor.a > 0.001f && f > 0){
+            Drawf.light(Team.derelict, x, y, 30f * f, lightColor, color.a * f * 0.8f);
+        }
     }
 
     @Override
