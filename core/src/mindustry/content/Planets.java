@@ -106,6 +106,7 @@ public class Planets implements ContentList{
             camRadius = 0.68f * scale;
             minZoom = 0.6f;
             drawOrbit = false;
+            clipRadius = 2f;
 
             generator = new AsteroidGenerator();
             cgen.get((AsteroidGenerator)generator);
