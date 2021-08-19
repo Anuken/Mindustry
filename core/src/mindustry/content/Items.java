@@ -103,7 +103,7 @@ public class Items implements ContentList{
             radioactivity = 1.5f;
         }};
 
-        dormantCyst = new Item("dormant-cyst", Color.valueOf("a5221c")){{
+        dormantCyst = new Item("dormant-cyst", Color.valueOf("df824d")){{
             flammability = 0.1f;
         }};
     }

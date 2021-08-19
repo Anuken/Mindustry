@@ -54,12 +54,12 @@ public class Liquids implements ContentList{
             Color from = Color.valueOf("f98f4a"), to = Color.valueOf("9e172c");
 
             //TODO could probably be improved...
-            particleSpacing = 65f;
+            particleSpacing = 70f;
             particleEffect = new Effect(40f, e -> {
                 e.lifetime = Mathf.randomSeed(e.id + 2, 80f, 200f) * 3.2f;
                 color(from, to, Mathf.randomSeed(e.id, 1f));
 
-                Fill.circle(e.x, e.y, e.fslope() * Mathf.randomSeed(e.id + 1, 0.6f, 2.4f));
+                Fill.circle(e.x, e.y, e.fslope() * Mathf.randomSeed(e.id + 1, 0.6f, 2.5f));
             }).layer(Layer.debris - 0.5f);
         }};
     }
