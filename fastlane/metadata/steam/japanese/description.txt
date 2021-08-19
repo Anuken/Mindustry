@@ -1,31 +1,30 @@
 [img]{STEAM_APP_IMAGE}/extras/ezgif-4-0e70c282f775.gif[/img]
 
-[h2]Gameplay[/h2]
+[h2]ゲームについて[/h2]
 
 [list]
-[*] Create elaborate supply chains of conveyor belts to feed ammo into your turrets and produce materials to use for building
-[*] Use production blocks to create a wide variety of advanced materials
-[*] Defend your structures from waves of enemies
-[*] Play with your friends in cross-platform multiplayer co-op games, or challenge them in team-based PvP matches
-[*] Distribute liquids and fight constant challenges, like outbreaks of fire or enemy flier raids
-[*] Get the most out of your production by supplying optional coolant and lubricant
-[*] Produce a wide variety of units for automatic management of your base or assault on enemy bases
+[*] ベルトコンベアで緻密なサプライチェーンを作成し、弾薬をタレットに送り込んだり、建築する為の資材を生産したりするゲームです。
+[*] 敵の襲撃から建造物を守ってください。
+[*] クロスプラットフォームでのマルチプレイに対応。友達と協力して遊んだり、もしくはチームに分かれて PvP で戦う事ができます。
+[*] 液体を分配して火災や敵の空襲に立ち向かいましょう。
+[*] 冷却水や潤滑剤を供給することで、生産効率を高める事ができます。
+[*] 多種多様なユニットを生産し、自分の基地を自動管理させたり、敵基地を攻撃したりしましょう。
 [/list]
 
 [img]{STEAM_APP_IMAGE}/extras/ezgif-1-8679abe089cd.gif[/img]
 
-[h2]Campaign[/h2]
+[h2]キャンペーンモード[/h2]
 
 [list]
-[*] Conquer the planet Serpulo as you advance through 250+ procedurally generated sectors and 16 hand-made maps
-[*] Capture territory and set up factories to produce resources while you play other sectors
-[*] Defend your sectors from periodic invasions
-[*] Coordinate resource distribution between sectors via launch pads
-[*] Research new blocks to fuel progress
-[*] Invite your friends to complete missions together
-[*] 130+ technology blocks to master
-[*] 33 different types of drones, mechs and ships
-[*] 50+ achievements to complete
+[*] 250以上もの自動的に生成されたセクターや、16のマップで構成された惑星「セルプロ」を攻略しましょう。
+[*] 領土を獲得し、工場を設立して資源を生成しながら他のセクターも同時に制圧していきましょう。
+[*] 定期的に来る敵の侵略から自分のセクターを守り抜いて下さい。
+[*] 発射台を使用して、各セクターに効率よく資源を配分していきましょう。
+[*] 研究を進めてセクターを進化させていきましょう。
+[*] 友達を呼んで一緒に攻略する事もできます。
+[*] 130種類以上ものブロックを使いこなしていきましょう。
+[*] 33種類ものドローン・ロボット・船が登場！
+[*] 50種類以上の実績をコンプリートしましょう
 [/list]
 
 [h2]Gamemodes[/h2]
