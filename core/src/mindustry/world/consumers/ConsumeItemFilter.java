@@ -43,7 +43,6 @@ public class ConsumeItemFilter extends Consume{
 
     @Override
     public void update(Building entity){
-
     }
 
     @Override
