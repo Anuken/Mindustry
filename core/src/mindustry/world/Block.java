@@ -100,6 +100,8 @@ public class Block extends UnlockableContent{
     public boolean requiresWater = false;
     /** whether this block can be placed on any liquids, anywhere */
     public boolean placeableLiquid = false;
+    /** whether this block can be placed directly by the player via PlacementFragment */
+    public boolean placeablePlayer = true;
     /** whether this floor can be placed on. */
     public boolean placeableOn = true;
     /** whether this block has insulating properties. */
