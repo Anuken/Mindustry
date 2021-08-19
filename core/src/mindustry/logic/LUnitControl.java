@@ -16,7 +16,7 @@ public enum LUnitControl{
     mine("x", "y"),
     flag("value"),
     build("x", "y", "block", "rotation", "config"),
-    getBlock("x", "y", "type", "building"),
+    getBlock("x", "y", "floor", "type", "building"),
     within("x", "y", "radius", "result");
 
     public final String[] params;
