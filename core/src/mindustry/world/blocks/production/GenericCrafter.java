@@ -103,7 +103,7 @@ public class GenericCrafter extends Block{
         public boolean shouldConsume(){
             if(outputItems != null){
                 for(ItemStack output : outputItems){
-                    if(items.get(output.item) + output.amount > itemCapacity){
+                    if(items.get(output.item) + output.amount >= itemCapacity){
                         return false;
                     }
                 }
