@@ -167,7 +167,7 @@ public class BeControl{
         }
     }
 
-    private void download(String furl, Fi dest, Intc length, Floatc progressor, Boolp canceled, Runnable done, Cons<Throwable> error){
+    public void download(String furl, Fi dest, Intc length, Floatc progressor, Boolp canceled, Runnable done, Cons<Throwable> error){
         executor.submit(() -> {
             try{
                 HttpURLConnection con = (HttpURLConnection)new URL(furl).openConnection();
