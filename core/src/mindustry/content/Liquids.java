@@ -14,6 +14,8 @@ public class Liquids implements ContentList{
             heatCapacity = 0.4f;
             alwaysUnlocked = true;
             effect = StatusEffects.wet;
+            boilPoint = 0.5f;
+            gasColor = Color.grays(0.9f);
         }};
 
         slag = new Liquid("slag", Color.valueOf("ffa166")){{

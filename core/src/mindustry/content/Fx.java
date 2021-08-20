@@ -900,6 +900,24 @@ public class Fx{
         });
     }),
 
+    vapor = new Effect(110f, e -> {
+        color(e.color);
+        alpha(e.fout());
+
+        randLenVectors(e.id, 3, 2f + e.finpow() * 11f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.6f + e.fin() * 5f);
+        });
+    }),
+
+    vaporSmall = new Effect(50f, e -> {
+        color(e.color);
+        alpha(e.fout());
+
+        randLenVectors(e.id, 4, 2f + e.finpow() * 5f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 1f + e.fin() * 4f);
+        });
+    }),
+
     fireballsmoke = new Effect(25f, e -> {
         color(Color.gray);
 

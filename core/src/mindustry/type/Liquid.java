@@ -19,6 +19,8 @@ public class Liquid extends UnlockableContent{
 
     /** Color used in pipes and on the ground. */
     public Color color;
+    /** Color of this liquid in gas form. */
+    public Color gasColor = Color.lightGray.cpy();
     /** Color used in bars. */
     public @Nullable Color barColor;
     /** Color used to draw lights. Note that the alpha channel is used to dictate brightness. */
@@ -39,6 +41,10 @@ public class Liquid extends UnlockableContent{
     public Effect particleEffect = Fx.none;
     /** Particle effect rate spacing in ticks. */
     public float particleSpacing = 60f;
+    /** Temperature at which this liquid vaporizes. This isn't just boiling. */
+    public float boilPoint = 2f;
+    /** Effect when this liquid vaporizes. */
+    public Effect vaporEffect = Fx.vapor;
 
     public Liquid(String name, Color color){
         super(name);
@@ -48,6 +54,11 @@ public class Liquid extends UnlockableContent{
     /** For modding only.*/
     public Liquid(String name){
         this(name, new Color(Color.black));
+    }
+
+    /** @return true if this liquid will boil in this global environment. */
+    public boolean willBoil(){
+        return Attribute.heat.env() >= boilPoint;
     }
 
     public boolean canExtinguish(){
