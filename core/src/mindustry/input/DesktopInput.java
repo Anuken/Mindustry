@@ -448,7 +448,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(!selectRequests.isEmpty()){
-            if(Core.input.keyTap(Binding.schematic_menu) && !(lastSchematic == null || lastSchematic.file != null)){
+            if(Core.input.keyTap(Binding.schematic_menu) && !(Core.input.keyDown(Binding.control) || lastSchematic == null || lastSchematic.file != null)){
                 this.showSchematicSave();
             }else if(Core.input.keyTap(Binding.schematic_menu)){
                 if(ui.schematics.isShown()){
