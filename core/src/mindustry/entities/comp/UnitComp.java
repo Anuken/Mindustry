@@ -179,7 +179,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                     0;
             case commanded -> controller instanceof FormationAI && isValid() ? 1 : 0;
             case payloadCount -> ((Object)this) instanceof Payloadc pay ? pay.payloads().size : 0;
-            case payloadCapacity -> type.payloadCapacity != 8 ? type.payloadCapacity / tilePayload : 0;
+            case payloadCapacity -> this instanceof Payloadc ? type.payloadCapacity / tilePayload : 0;
             case size -> hitSize / tilesize;
             default -> Float.NaN;
         };
