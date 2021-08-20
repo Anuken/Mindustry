@@ -26,7 +26,7 @@ public class Bullets implements ContentList{
     standardDenseBig, standardThoriumBig, standardIncendiaryBig,
 
     //liquid
-    waterShot, cryoShot, slagShot, oilShot, heavyWaterShot, heavyCryoShot, heavySlagShot, heavyOilShot,
+    waterShot, cryoShot, slagShot, oilShot, heavyWaterShot, heavyCryoShot, heavySlagShot, heavyOilShot, spaceLiquid,
 
     //environment, misc.
     damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame;
@@ -475,6 +475,11 @@ public class Bullets implements ContentList{
             ammoMultiplier = 0.4f;
             statusDuration = 60f * 4f;
             damage = 0.2f;
+        }};
+
+        spaceLiquid = new SpaceLiquidBulletType(){{
+            knockback = 0.7f;
+            drag = 0.01f;
         }};
     }
 }

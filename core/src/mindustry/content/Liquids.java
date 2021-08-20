@@ -32,6 +32,8 @@ public class Liquids implements ContentList{
             heatCapacity = 0.7f;
             barColor = Color.valueOf("6b675f");
             effect = StatusEffects.tarred;
+            boilPoint = 0.65f;
+            gasColor = Color.grays(0.4f);
         }};
 
         cryofluid = new Liquid("cryofluid", Color.valueOf("6ecdec")){{
