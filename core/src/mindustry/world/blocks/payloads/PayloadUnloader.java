@@ -37,7 +37,13 @@ public class PayloadUnloader extends PayloadLoader{
         @Override
         public void updateTile(){
             if(shouldExport()){
-                moveOutPayload();
+                //one-use, disposable block
+                if(payload.build.items.empty() && payload.block().instantDeconstruct){
+                    payload.block().breakEffect.at(this, payload.block().size);
+                    payload = null;
+                }else{
+                    moveOutPayload();
+                }
             }else if(moveInPayload()){
 
                 //unload items
