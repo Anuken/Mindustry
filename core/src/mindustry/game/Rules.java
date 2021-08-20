@@ -81,7 +81,7 @@ public class Rules{
     /** Base unit cap. Can still be increased by blocks. */
     public int unitCap = 0;
     /** Environmental flags that dictate visuals & how blocks function. */
-    public int environment = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater;
+    public int environment = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
     /** Attributes of the environment. */
     public Attributes attributes = new Attributes();
     /** Sector for saves that have them. */
@@ -138,6 +138,10 @@ public class Rules{
         }else{
             return Gamemode.survival;
         }
+    }
+
+    public boolean hasEnv(int env){
+        return (environment & env) != 0;
     }
 
     public float unitBuildSpeed(Team team){
