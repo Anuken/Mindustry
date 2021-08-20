@@ -75,7 +75,7 @@ public class OverdriveProjector extends Block{
     @Override
     public void setBars(){
         super.setBars();
-        if((int)(entity.realBoost() * 100) <= 100){
+        if((int)(realBoost() * 100) <= 100){
             bars.add("boost", (OverdriveBuild entity) -> new Bar(() -> Core.bundle.format("bar.boost", 0), () -> Pal.accent, () -> entity.realBoost() / (hasBoost ? speedBoost + speedBoostPhase : speedBoost)));
         }else{
             bars.add("boost", (OverdriveBuild entity) -> new Bar(() -> Core.bundle.format("bar.boost", (int)(entity.realBoost() * 100 - 100)), () -> Pal.accent, () -> entity.realBoost() / (hasBoost ? speedBoost + speedBoostPhase : speedBoost)));
