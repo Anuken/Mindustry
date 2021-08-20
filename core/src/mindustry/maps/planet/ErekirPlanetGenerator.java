@@ -5,7 +5,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.noise.*;
-import mindustry.*;
 import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.game.*;
@@ -170,7 +169,9 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             }
         });
 
-        Vars.state.rules.environment = Env.scorching | Env.terrestrial | Env.groundWater;
+        //it is very hot
+        state.rules.attributes.set(Attribute.heat, 0.8f);
+        state.rules.environment = Env.scorching | Env.terrestrial | Env.groundWater;
         Schematics.placeLaunchLoadout(spawnX, spawnY);
     }
 }

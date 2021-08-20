@@ -98,7 +98,7 @@ public class EnvRenderers{
             }
 
             Draw.z(Layer.weather - 1);
-            Weather.drawNoiseLayers(tex, Color.scarlet, 1000f, 0.2f, 0.4f, 1f, 1f, 0f,
+            Weather.drawNoiseLayers(tex, Color.scarlet, 1000f, 0.24f, 0.4f, 1f, 1f, 0f,
             4, -1.3f, 0.7f, 0.8f, 0.9f);
             Draw.reset();
         });

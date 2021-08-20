@@ -52,6 +52,8 @@ public class Planets implements ContentList{
             totalRadius += 2.6f;
             lightSrcTo = 0.5f;
             lightDstFrom = 0.2f;
+            //TODO
+            alwaysUnlocked = true;
         }};
 
         makeAsteroid("gier", erekir, Blocks.ferricStoneWall, Blocks.carbonWall, 0.4f, 7, 1f, gen -> {

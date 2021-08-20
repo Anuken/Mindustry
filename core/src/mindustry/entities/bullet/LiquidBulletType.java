@@ -17,7 +17,7 @@ public class LiquidBulletType extends BulletType{
     public Liquid liquid;
     public float puddleSize = 6f;
     public float orbSize = 3f;
-    public float boilTime = 15f;
+    public float boilTime = 5f;
 
     public LiquidBulletType(@Nullable Liquid liquid){
         super(3.5f, 0);
