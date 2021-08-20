@@ -73,7 +73,7 @@ public class Blocks implements ContentList{
     duct, ductRouter, ductBridge,
 
     //liquid
-    mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
+    mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidContainer, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
 
     //power
     combustionGenerator, thermalGenerator, steamGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
@@ -1269,8 +1269,14 @@ public class Blocks implements ContentList{
             liquidCapacity = 20f;
         }};
 
+        liquidContainer = new LiquidRouter("liquid-container"){{
+            requirements(Category.liquid, with(Items.titanium, 15, Items.metaglass, 15));
+            liquidCapacity = 600f;
+            size = 2;
+        }};
+
         liquidTank = new LiquidRouter("liquid-tank"){{
-            requirements(Category.liquid, with(Items.titanium, 25, Items.metaglass, 25));
+            requirements(Category.liquid, with(Items.titanium, 30, Items.metaglass, 30));
             size = 3;
             liquidCapacity = 1500f;
             health = 500;
