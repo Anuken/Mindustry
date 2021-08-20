@@ -39,6 +39,8 @@ public class Liquids implements ContentList{
             temperature = 0.25f;
             effect = StatusEffects.freezing;
             lightColor = Color.valueOf("0097f5").a(0.2f);
+            boilPoint = 0.55f;
+            gasColor = Color.valueOf("c1e8f5");
         }};
 
         neoplasm = new CellLiquid("neoplasm", Color.valueOf("e05438")){{
