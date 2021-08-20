@@ -1270,15 +1270,15 @@ public class Blocks implements ContentList{
         }};
 
         liquidContainer = new LiquidRouter("liquid-container"){{
-            requirements(Category.liquid, with(Items.titanium, 15, Items.metaglass, 15));
-            liquidCapacity = 600f;
+            requirements(Category.liquid, with(Items.titanium, 10, Items.metaglass, 15));
+            liquidCapacity = 700f;
             size = 2;
         }};
 
         liquidTank = new LiquidRouter("liquid-tank"){{
-            requirements(Category.liquid, with(Items.titanium, 30, Items.metaglass, 30));
+            requirements(Category.liquid, with(Items.titanium, 30, Items.metaglass, 40));
             size = 3;
-            liquidCapacity = 1500f;
+            liquidCapacity = 1800f;
             health = 500;
         }};
 
