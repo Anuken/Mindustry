@@ -447,7 +447,7 @@ public class LExecutor{
                         }
                     }
                     case build -> {
-                        if(state.rules.logicUnitBuild && unit.canBuild() && exec.obj(p3) instanceof Block block){
+                        if(state.rules.logicUnitBuild && unit.canBuild() && exec.obj(p3) instanceof Block block && block.canBeBuilt()){
                             int x = World.toTile(x1 - block.offset/tilesize), y = World.toTile(y1 - block.offset/tilesize);
                             int rot = exec.numi(p4);
 
