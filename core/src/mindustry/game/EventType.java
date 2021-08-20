@@ -411,14 +411,20 @@ public class EventType{
         }
     }
 
-    /** Called when a unit is created in a reconstructor or factory. */
+    /** Called when a unit is created in a reconstructor, factory or other unit. */
     public static class UnitCreateEvent{
         public final Unit unit;
-        public final Building spawner;
+        public final @Nullable Building spawner;
+        public final @Nullable Unit spawnerUnit;
 
-        public UnitCreateEvent(Unit unit, Building spawner){
+        public UnitCreateEvent(Unit unit, Building spawner, Unit spawnerUnit){
             this.unit = unit;
             this.spawner = spawner;
+            this.spawnerUnit = spawnerUnit;
+        }
+
+        public UnitCreateEvent(Unit unit, Building spawner){
+            this(unit, spawner, null);
         }
     }
 

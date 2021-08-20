@@ -919,11 +919,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         player.boosting = collisions.overlapsTile(rect) || !unit.within(targetPos, 85f);
 
-        if(omni){
-            unit.moveAt(movement);
-        }else{
-            unit.rotateMove(movement);
-        }
+        unit.movePref(movement);
 
         //update shooting if not building + not mining
         if(!player.unit().activelyBuilding() && player.unit().mineTile == null){

@@ -51,6 +51,15 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     private transient boolean wasPlayer;
     private transient boolean wasHealed;
 
+    /** Move based on preferred unit movement type. */
+    public void movePref(Vec2 movement){
+        if(type.omniMovement){
+            moveAt(movement);
+        }else{
+            rotateMove(movement);
+        }
+    }
+
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
     }
