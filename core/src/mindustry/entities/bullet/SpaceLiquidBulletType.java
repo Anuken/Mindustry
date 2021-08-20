@@ -19,19 +19,8 @@ public class SpaceLiquidBulletType extends BulletType{
         hitEffect = Fx.none;
         smokeEffect = Fx.none;
         shootEffect = Fx.none;
-        drag = 0.001f;
-    }
-
-    @Override
-    public float range(){
-        return speed * lifetime / 2f;
-    }
-
-    @Override
-    public void update(Bullet b){
-        super.update(b);
-
-        if(!(b.data instanceof Liquid liquid)) return;
+        drag = 0.002f;
+        hittable = false;
     }
 
     @Override
@@ -44,12 +33,5 @@ public class SpaceLiquidBulletType extends BulletType{
         Fill.circle(b.x, b.y, Interp.pow3Out.apply(b.fslope()) * orbSize);
 
         Draw.reset();
-    }
-
-    @Override
-    public void despawned(Bullet b){
-        super.despawned(b);
-
-        if(!(b.data instanceof Liquid liquid)) return;
     }
 }
