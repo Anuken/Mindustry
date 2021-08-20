@@ -410,14 +410,14 @@ public class ModsDialog extends BaseDialog{
             browserTable.clear();
             int i = 0;
 
-            Seq<ModListing> listings = rlistings;
+            var listings = rlistings;
             if(!orderDate){
                 listings = rlistings.copy();
                 listings.sortComparing(m1 -> -m1.stars);
             }
 
             for(ModListing mod : listings){
-                if((mod.hasJava && Vars.ios) || !searchtxt.isEmpty() && !mod.repo.toLowerCase().contains(searchtxt.toLowerCase()) || (Vars.ios && mod.hasScripts)) continue;
+                if((mod.hasJava && Vars.ios) || (!Strings.matches(searchtxt, mod.name) && !Strings.matches(searchtxt, mod.repo)) || (Vars.ios && mod.hasScripts)) continue;
 
                 float s = 64f;
 
