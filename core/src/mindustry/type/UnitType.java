@@ -132,8 +132,9 @@ public class UnitType extends UnlockableContent{
     public float segmentSpacing = 2f;
     public float segmentScl = 4f, segmentPhase = 5f;
     public float segmentRotSpeed = 1f, segmentMaxRot = 30f;
-    public float crawlSlowdown = 0.45f;
-    public float crawlSlowdownFrac = 0.4f;
+    public float crawlSlowdown = 0.5f;
+    public float crawlDamage = 0.5f;
+    public float crawlSlowdownFrac = 0.55f;
 
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;
@@ -897,7 +898,8 @@ public class UnitType extends UnlockableContent{
         Unit unit = (Unit)crawl;
         applyColor(unit);
 
-        for(int p = 0; p < 2; p++){
+        //change to 2 TODO
+        for(int p = 0; p < 1; p++){
             TextureRegion[] regions = p == 0 ? segmentOutlineRegions : segmentRegions;
 
             for(int i = 0; i < segments; i++){
@@ -906,6 +908,14 @@ public class UnitType extends UnlockableContent{
                 //at segment 0, rotation = segmentRot, but at the last segment it is rotation
                 float rot = Mathf.slerp(crawl.segmentRot(), unit.rotation, i / (float)(segments - 1));
                 float tx = Angles.trnsx(rot, trns), ty = Angles.trnsy(rot, trns);
+
+
+                //shadow
+                Draw.color(0f, 0f, 0f, 0.2f);
+                Draw.rect(regions[i], unit.x + tx + 2f, unit.y + ty - 2f, rot - 90);
+
+                applyColor(unit);
+
 
                 //TODO merge outlines?
                 Draw.rect(regions[i], unit.x + tx, unit.y + ty, rot - 90);

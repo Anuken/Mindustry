@@ -414,7 +414,7 @@ public class Generators{
                 type.loadIcon();
                 type.init();
 
-                Func<Pixmap, Pixmap> outline = i -> i.outline(Pal.darkerMetal, 3);
+                Func<Pixmap, Pixmap> outline = i -> i.outline(type.outlineColor, 3);
                 Cons<TextureRegion> outliner = t -> {
                     if(t != null && t.found()){
                         replace(t, outline.get(get(t)));

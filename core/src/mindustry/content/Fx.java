@@ -313,10 +313,10 @@ public class Fx{
         Lines.poly(e.x, e.y, 4, 13f * e.fout());
     }).layer(Layer.debris),
 
-    crawlDust = new Effect(30, e -> {
-        color(Tmp.c1.set(e.color).mul(1.1f));
+    crawlDust = new Effect(35, e -> {
+        color(Tmp.c1.set(e.color).mul(1.6f));
         randLenVectors(e.id, 2, 10f * e.finpow(), (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fslope() * 3f + 0.3f);
+            Fill.circle(e.x + x, e.y + y, e.fslope() * 4f + 0.3f);
         });
     }).layer(Layer.debris),
 

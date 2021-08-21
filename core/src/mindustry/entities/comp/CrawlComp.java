@@ -2,12 +2,14 @@ package mindustry.entities.comp;
 
 import arc.math.*;
 import arc.math.geom.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.EntityCollisions.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -20,6 +22,7 @@ import static mindustry.Vars.*;
 abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
     @Import float x, y, speedMultiplier, rotation, hitSize;
     @Import UnitType type;
+    @Import Team team;
     @Import Vec2 vel;
 
     //TODO segments
@@ -70,6 +73,10 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
 
                             if(t.solid()){
                                 solids ++;
+                            }
+
+                            if(t.build != null && t.build.team != team){
+                                t.build.damage(team, type.crawlDamage * Time.delta);
                             }
 
                             if(Mathf.chanceDelta(0.04)){

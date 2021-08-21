@@ -103,6 +103,8 @@ public class Pal{
 	
     adminChat = Color.valueOf("ff4000"),
 
+    neoplasmOutline = Color.valueOf("2e191d"),
+
     logicBlocks = Color.valueOf("d4816b"),
     logicControl = Color.valueOf("6bb2b2"),
     logicOperations = Color.valueOf("877bad"),
