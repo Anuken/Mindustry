@@ -326,7 +326,7 @@ public class Turret extends ReloadTurret{
         }
 
         protected boolean canHeal(){
-            return hasAmmo() && targetHealing && peekAmmo().collidesTeam && peekAmmo().healPercent > 0;
+            return targetHealing && hasAmmo() && peekAmmo().collidesTeam && peekAmmo().healPercent > 0;
         }
 
         protected void findTarget(){
@@ -336,7 +336,7 @@ public class Turret extends ReloadTurret{
                 target = Units.bestTarget(team, x, y, range, e -> !e.dead() && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> true, unitSort);
 
                 if(target == null && canHeal()){
-                    target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != self());
+                    target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);
                 }
             }
         }
