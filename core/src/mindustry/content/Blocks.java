@@ -509,6 +509,8 @@ public class Blocks implements ContentList{
             hasPower = true;
             hasLiquids = false;
             drawer = new DrawSmelter(Color.valueOf("ffef99"));
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.07f;
 
             consumes.items(with(Items.coal, 1, Items.sand, 2));
             consumes.power(0.50f);
@@ -525,6 +527,8 @@ public class Blocks implements ContentList{
             itemCapacity = 30;
             boostScale = 0.15f;
             drawer = new DrawSmelter(Color.valueOf("ffef99"));
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.07f;
 
             consumes.items(with(Items.coal, 4, Items.sand, 6, Items.pyratite, 1));
             consumes.power(4f);
@@ -538,6 +542,8 @@ public class Blocks implements ContentList{
             size = 2;
             hasPower = hasItems = true;
             drawer = new DrawSmelter(Color.valueOf("ffc099"));
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.07f;
 
             consumes.items(with(Items.lead, 1, Items.sand, 1));
             consumes.power(0.60f);

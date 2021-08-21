@@ -14,7 +14,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
 import static mindustry.Vars.*;
@@ -171,9 +170,8 @@ public class WaveInfoDialog extends BaseDialog{
                             t.remove();
                             updateWaves();
                         }).pad(-6).size(46f).padRight(-12f);
-                    }, () -> showUpdate(group)).height(46f).pad(-6f).padBottom(0f);
+                    }, () -> showUpdate(group)).height(46f).pad(-6f).padBottom(0f).row();
 
-                    t.row();
                     t.table(spawns -> {
                         spawns.field("" + (group.begin + 1), TextFieldFilter.digitsOnly, text -> {
                             if(Strings.canParsePositiveInt(text)){
@@ -191,8 +189,8 @@ public class WaveInfoDialog extends BaseDialog{
                                 updateWaves();
                             }
                         }).width(100f).get().setMessageText("∞");
-                    });
-                    t.row();
+                    }).row();
+
                     t.table(p -> {
                         p.add("@waves.every").padRight(4);
                         p.field(group.spacing + "", TextFieldFilter.digitsOnly, text -> {
@@ -202,9 +200,8 @@ public class WaveInfoDialog extends BaseDialog{
                             }
                         }).width(100f);
                         p.add("@waves.waves").padLeft(4);
-                    });
+                    }).row();
 
-                    t.row();
                     t.table(a -> {
                         a.field(group.unitAmount + "", TextFieldFilter.digitsOnly, text -> {
                             if(Strings.canParsePositiveInt(text)){
@@ -221,8 +218,19 @@ public class WaveInfoDialog extends BaseDialog{
                             }
                         }).width(80f);
                         a.add("@waves.perspawn").padLeft(4);
-                    });
-                    t.row();
+                    }).row();
+
+                    t.table(a -> {
+                        a.field(group.max + "", TextFieldFilter.digitsOnly, text -> {
+                            if(Strings.canParsePositiveInt(text)){
+                                group.max = Strings.parseInt(text);
+                                updateWaves();
+                            }
+                        }).width(80f);
+
+                        a.add("@waves.max").padLeft(5);
+                    }).row();
+
                     t.table(a -> {
                         a.field((int)group.shields + "", TextFieldFilter.digitsOnly, text -> {
                             if(Strings.canParsePositiveInt(text)){
@@ -239,9 +247,8 @@ public class WaveInfoDialog extends BaseDialog{
                             }
                         }).width(80f);
                         a.add("@waves.shields").padLeft(4);
-                    });
+                    }).row();
 
-                    t.row();
                     t.check("@waves.guardian", b -> group.effect = (b ? StatusEffects.boss : null)).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss)).padBottom(8f);
                 }).width(340f).pad(8);
 

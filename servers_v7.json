@@ -13,7 +13,7 @@
   },
   {
     "name": "Omega",
-    "address": ["yeet.mindustry.me:2345", "yeet.mindustry.me:2076", "yeet.mindustry.me:2222","yeet.mindustry.me:6567", "yeet.mindustry.me:2054", "yeet.mindustry.me:3512"]
+    "address": ["yeet.mindustry.me:6567", "yeet.mindustry.me:2345", "n3.mindustry.me:4444","n2.mindustry.me:4040", "n2.mindustry.me:4002", "n2.mindustry.me:4001"]
   },
   {
     "name": "MeowLand",
@@ -29,11 +29,11 @@
   },
   {
     "name": "XCore",
-    "address": ["35.202.253.94" , "35.202.253.94:2000"]
+    "address": ["35.202.253.94", "35.202.253.94:2000"]
   },
   {
     "name": "Obvilion Network",
-    "address": "obvilionnetwork.ru:7004"
+    "address": ["obvilionnetwork.ru:7004", "obvilionnetwork.ru:7005"]
   },
   {
     "name": "io",

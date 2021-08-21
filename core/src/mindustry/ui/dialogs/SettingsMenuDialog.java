@@ -301,6 +301,8 @@ public class SettingsMenuDialog extends Dialog{
                     control.setInput(new DesktopInput());
                     input.setUseKeyboard(true);
                 }
+            }else{
+                Core.settings.put("keyboard", false);
             }
         }
         //the issue with touchscreen support on desktop is that:

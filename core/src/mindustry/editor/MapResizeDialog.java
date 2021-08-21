@@ -15,6 +15,8 @@ public class MapResizeDialog extends BaseDialog{
 
     public MapResizeDialog(Intc2 cons){
         super("@editor.resizemap");
+
+        closeOnBack();
         shown(() -> {
             cont.clear();
             width = editor.width();

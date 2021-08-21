@@ -172,13 +172,19 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(BlockDestroyEvent.class, e -> {
             if(e.tile.team() == player.team()){
-                state.stats.buildingsDestroyed++;
+                state.stats.buildingsDestroyed ++;
             }
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
             if(e.unit.team() != player.team()){
-                state.stats.enemyUnitsDestroyed++;
+                state.stats.enemyUnitsDestroyed ++;
+            }
+        });
+
+        Events.on(UnitCreateEvent.class, e -> {
+            if(e.unit.team == state.rules.defaultTeam){
+                state.stats.unitsCreated++;
             }
         });
 

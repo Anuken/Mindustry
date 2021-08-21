@@ -7,6 +7,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -40,6 +41,7 @@ public class UnitSpawnAbility extends Ability{
             Unit u = this.unit.create(unit.team);
             u.set(x, y);
             u.rotation = unit.rotation;
+            Events.fire(new UnitCreateEvent(u, null, unit));
             if(!Vars.net.client()){
                 u.add();
             }

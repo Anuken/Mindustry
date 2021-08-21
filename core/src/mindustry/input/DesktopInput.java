@@ -642,11 +642,7 @@ public class DesktopInput extends InputHandler{
             unit.lookAt(unit.prefRotation());
         }
 
-        if(omni){
-            unit.moveAt(movement);
-        }else{
-            unit.rotateMove(movement);
-        }
+        unit.movePref(movement);
 
         unit.aim(unit.type.faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation, Core.input.mouseWorld().dst(unit)).add(unit.x, unit.y));
         unit.controlWeapons(true, player.shooting && !boosted);
