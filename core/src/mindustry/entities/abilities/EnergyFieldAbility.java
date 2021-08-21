@@ -26,10 +26,7 @@ public class EnergyFieldAbility extends Ability{
     public Sound shootSound = Sounds.spark;
     public float statusDuration = 60f * 6f;
     public float x, y;
-    public boolean hitBuildings = true;
-    public boolean hitUnits = true;
-    public boolean targetGround = true;
-    public boolean targetAir = true;
+    public boolean targetGround = true, targetAir = true, hitBuildings = true, hitUnits = true;
     public int maxTargets = 25;
     public float healPercent = 2.5f;
 
