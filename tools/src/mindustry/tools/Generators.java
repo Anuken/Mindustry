@@ -409,6 +409,7 @@ public class Generators{
             ObjectSet<String> outlined = new ObjectSet<>();
 
             try{
+                Unit sample = type.constructor.get();
                 type.load();
                 type.loadIcon();
                 type.init();
@@ -430,14 +431,26 @@ public class Generators{
                 outliner.get(type.footRegion);
                 outliner.get(type.legBaseRegion);
                 outliner.get(type.baseJointRegion);
-                if(type.constructor.get() instanceof Legsc) outliner.get(type.legRegion);
+                if(sample instanceof Legsc) outliner.get(type.legRegion);
 
-                Pixmap image = outline.get(get(type.region));
+                Pixmap image = type.segments > 0 ? get(type.segmentRegions[0]) : outline.get(get(type.region));
+
+                //draw each extra segment on top before it is saved as outline
+                if(sample instanceof Crawlc){
+                    for(int i = 0; i < type.segments; i++){
+                        save(outline.get(get(type.segmentRegions[i])), type.name + "-segment-outline" + i);
+
+                        if(i > 0){
+                            drawCenter(image, get(type.segmentRegions[i]));
+                        }
+                    }
+                    save(image, type.name);
+                }
 
                 save(image, type.name + "-outline");
 
                 //draw mech parts
-                if(type.constructor.get() instanceof Mechc){
+                if(sample instanceof Mechc){
                     drawCenter(image, get(type.baseRegion));
                     drawCenter(image, get(type.legRegion));
                     drawCenter(image, get(type.legRegion).flipX());
@@ -456,14 +469,16 @@ public class Generators{
                 }
 
                 //draw base region on top to mask weapons
-                image.draw(get(type.region), true);
+                if(type.drawBody) image.draw(get(type.region), true);
                 int baseColor = Color.valueOf("ffa665").rgba();
 
-                Pixmap baseCell = get(type.cellRegion);
-                Pixmap cell = new Pixmap(type.cellRegion.width, type.cellRegion.height);
-                cell.each((x, y) -> cell.set(x, y, Color.muli(baseCell.getRaw(x, y), baseColor)));
+                if(type.drawCell){
+                    Pixmap baseCell = get(type.cellRegion);
+                    Pixmap cell = new Pixmap(type.cellRegion.width, type.cellRegion.height);
+                    cell.each((x, y) -> cell.set(x, y, Color.muli(baseCell.getRaw(x, y), baseColor)));
 
-                image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2, true);
+                    image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2, true);
+                }
 
                 for(Weapon weapon : type.weapons){
                     weapon.load();

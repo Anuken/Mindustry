@@ -2412,10 +2412,16 @@ public class UnitTypes implements ContentList{
         //region neoplasm
 
         scuttler = new UnitType("scuttler"){{
-            hitSize = 30f;
+            hitSize = 44f;
             omniMovement = false;
-            rotateSpeed = 1f;
+            rotateSpeed = 2f;
             drawCell = false;
+            segments = 4;
+            drawBody = false;
+
+            segmentScl = 4f;
+            segmentPhase = 5f;
+            speed = 1f;
         }};
 
         //endregion

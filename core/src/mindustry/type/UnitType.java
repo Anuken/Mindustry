@@ -118,7 +118,7 @@ public class UnitType extends UnlockableContent{
     public float itemOffsetY = 3f;
     public float lightRadius = -1f, lightOpacity = 0.6f;
     public Color lightColor = Pal.powerLight;
-    public boolean drawCell = true, drawItems = true, drawShields = true;
+    public boolean drawCell = true, drawItems = true, drawShields = true, drawBody = true;
     public int trailLength = 3;
     public float trailX = 4f, trailY = -3f, trailScl = 1f;
     /** Whether the unit can heal blocks. Initialized in init() */
@@ -127,6 +127,14 @@ public class UnitType extends UnlockableContent{
     public boolean singleTarget = false;
     public boolean forceMultiTarget = false;
 
+    //for crawlers
+    public int segments = 0;
+    public float segmentSpacing = 2f;
+    public float segmentScl = 4f, segmentPhase = 5f;
+    public float segmentRotSpeed = 1f, segmentMaxRot = 30f;
+    public float crawlSlowdown = 0.45f;
+    public float crawlSlowdownFrac = 0.4f;
+
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;
 
@@ -134,6 +142,7 @@ public class UnitType extends UnlockableContent{
     public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion,
         softShadowRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion;
     public TextureRegion[] wreckRegions;
+    public TextureRegion[] segmentRegions, segmentOutlineRegions;
 
     protected float buildTime = -1f;
     protected @Nullable ItemStack[] cachedRequirements;
@@ -442,6 +451,13 @@ public class UnitType extends UnlockableContent{
             wreckRegions[i] = Core.atlas.find(name + "-wreck" + i);
         }
 
+        segmentRegions = new TextureRegion[segments];
+        segmentOutlineRegions = new TextureRegion[segments];
+        for(int i = 0; i < segments; i++){
+            segmentRegions[i] = Core.atlas.find(name + "-segment" + i);
+            segmentOutlineRegions[i] = Core.atlas.find(name + "-segment-outline" + i);
+        }
+
         clipSize = Math.max(region.width * 2f, clipSize);
     }
 
@@ -603,10 +619,14 @@ public class UnitType extends UnlockableContent{
 
         Draw.z(z);
 
-        drawOutline(unit);
+        if(unit instanceof Crawlc c){
+            drawCrawl(c);
+        }
+
+        if(drawBody) drawOutline(unit);
         drawWeaponOutlines(unit);
         if(engineSize > 0) drawEngine(unit);
-        drawBody(unit);
+        if(drawBody) drawBody(unit);
         if(drawCell) drawCell(unit);
         drawWeapons(unit);
         if(drawItems) drawItems(unit);
@@ -871,6 +891,26 @@ public class UnitType extends UnlockableContent{
         }
 
         Draw.reset();
+    }
+
+    public void drawCrawl(Crawlc crawl){
+        Unit unit = (Unit)crawl;
+        applyColor(unit);
+
+        for(int p = 0; p < 2; p++){
+            TextureRegion[] regions = p == 0 ? segmentOutlineRegions : segmentRegions;
+
+            for(int i = 0; i < segments; i++){
+                float trns = Mathf.sin(crawl.crawlTime() + i * segmentPhase, segmentScl, segmentSpacing);
+
+                //at segment 0, rotation = segmentRot, but at the last segment it is rotation
+                float rot = Mathf.slerp(crawl.segmentRot(), unit.rotation, i / (float)(segments - 1));
+                float tx = Angles.trnsx(rot, trns), ty = Angles.trnsy(rot, trns);
+
+                //TODO merge outlines?
+                Draw.rect(regions[i], unit.x + tx, unit.y + ty, rot - 90);
+            }
+        }
     }
 
     public void drawMech(Mechc mech){

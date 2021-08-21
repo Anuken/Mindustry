@@ -313,6 +313,13 @@ public class Fx{
         Lines.poly(e.x, e.y, 4, 13f * e.fout());
     }).layer(Layer.debris),
 
+    crawlDust = new Effect(30, e -> {
+        color(Tmp.c1.set(e.color).mul(1.1f));
+        randLenVectors(e.id, 2, 10f * e.finpow(), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fslope() * 3f + 0.3f);
+        });
+    }).layer(Layer.debris),
+
     landShock = new Effect(12, e -> {
         color(Pal.lancerLaser);
         stroke(e.fout() * 3f);
