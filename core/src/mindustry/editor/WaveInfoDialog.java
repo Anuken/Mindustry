@@ -14,6 +14,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
 import java.util.*;
@@ -174,8 +175,8 @@ public class WaveInfoDialog extends BaseDialog{
 
                         b.add().growX();
 
-                        b.button(Icon.unitsSmall, () -> showUpdate(group)).pad(-6).size(46f);
-                        b.button(Icon.cancel, () -> {
+                        b.button(Icon.unitsSmall, Styles.emptyi, () -> showUpdate(group)).pad(-6).size(46f);
+                        b.button(Icon.cancel, Styles.emptyi, () -> {
                             groups.remove(group);
                             table.getCell(t).pad(0f);
                             t.remove();
