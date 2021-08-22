@@ -70,6 +70,12 @@ public class WaveInfoDialog extends BaseDialog{
                 buildGroups();
                 dialog.hide();
             }));
+            dialog.cont.row();
+            dialog.cont.button("@clear", () -> ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
+                groups.clear();
+                buildGroups();
+                dialog.hide();
+            }));
             dialog.show();
         }).size(270f, 64f);
 
