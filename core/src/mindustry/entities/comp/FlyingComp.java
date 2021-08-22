@@ -17,7 +17,7 @@ import static mindustry.Vars.*;
 abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     private static final Vec2 tmp1 = new Vec2(), tmp2 = new Vec2();
 
-    @Import float x, y, speedMultiplier;
+    @Import float x, y, speedMultiplier, hitSize;
     @Import Vec2 vel;
     @Import UnitType type;
 
@@ -47,7 +47,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     //TODO
     @Nullable
     Floor drownFloor(){
-        return null;
+        return canDrown() ? floorOn() : null;
     }
 
     void landed(){
@@ -95,13 +95,17 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
             }
         }
 
-        //TODO separate method?
-        //TODO drown eligibility, store drown color.
-        if(canDrown() && floor.isLiquid && floor.drownTime > 0){
+        updateDrowning();
+    }
+
+    public void updateDrowning(){
+        Floor floor = drownFloor();
+
+        if(floor != null && floor.isLiquid && floor.drownTime > 0){
             lastDrownFloor = floor;
             drownTime += Time.delta / floor.drownTime / type.drownTimeMultiplier;
             if(Mathf.chanceDelta(0.05f)){
-                floor.drownUpdateEffect.at(x, y, 1f, floor.mapColor);
+                floor.drownUpdateEffect.at(x, y, hitSize, floor.mapColor);
             }
 
             if(drownTime >= 0.999f && !net.client()){

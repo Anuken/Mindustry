@@ -25,6 +25,7 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
     @Import Team team;
     @Import Vec2 vel;
 
+    transient Floor lastDeepFloor;
     //TODO segments
     transient float lastCrawlSlowdown = 1f;
     transient float segmentRot, crawlTime;
@@ -56,12 +57,19 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
     }
 
     @Override
+    @Replace
+    public Floor drownFloor(){
+        return lastDeepFloor;
+    }
+
+    @Override
     public void update(){
         if(moving()){
             segmentRot = Angles.moveToward(segmentRot, rotation, type.segmentRotSpeed);
 
             int radius = (int)Math.max(0, hitSize / tilesize);
-            int count = 0, solids = 0;
+            int count = 0, solids = 0, deeps = 0;
+            lastDeepFloor = null;
 
             //calculate tiles under this unit, and apply slowdown + particle effects
             for(int cx = -radius; cx <= radius; cx++){
@@ -73,6 +81,11 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
 
                             if(t.solid()){
                                 solids ++;
+                            }
+
+                            if(t.floor().isDeep()){
+                                deeps ++;
+                                lastDeepFloor = t.floor();
                             }
 
                             if(t.build != null && t.build.team != team){
@@ -87,6 +100,11 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
                         }
                     }
                 }
+            }
+
+            //when most blocks under this unit cannot be drowned in, do not drown
+            if((float)deeps / count < 0.75f){
+                lastDeepFloor = null;
             }
 
             lastCrawlSlowdown = Mathf.lerp(1f, type.crawlSlowdown, Mathf.clamp((float)solids / count / type.crawlSlowdownFrac));

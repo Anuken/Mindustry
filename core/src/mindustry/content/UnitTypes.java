@@ -503,7 +503,6 @@ public class UnitTypes implements ContentList{
             legTrns = 0.58f;
             hovering = true;
             visualElevation = 0.2f;
-            allowLegStep = true;
             ammoType = new PowerAmmoType(4000);
             groundLayer = Layer.legUnit;
 
@@ -593,7 +592,7 @@ public class UnitTypes implements ContentList{
         }};
 
         atrax = new UnitType("atrax"){{
-            speed = 0.54f;
+            speed = 0.56f;
             drag = 0.4f;
             hitSize = 13f;
             rotateSpeed = 3f;
@@ -609,7 +608,6 @@ public class UnitTypes implements ContentList{
             armor = 3f;
             ammoType = new ItemAmmoType(Items.coal);
 
-            allowLegStep = true;
             visualElevation = 0.2f;
             groundLayer = Layer.legUnit - 1f;
 
@@ -623,8 +621,8 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.flame;
 
                 bullet = new LiquidBulletType(Liquids.slag){{
-                    damage = 11;
-                    speed = 2.4f;
+                    damage = 13;
+                    speed = 2.5f;
                     drag = 0.009f;
                     shootEffect = Fx.shootSmall;
                     lifetime = 57f;
@@ -634,11 +632,11 @@ public class UnitTypes implements ContentList{
         }};
 
         spiroct = new UnitType("spiroct"){{
-            speed = 0.48f;
+            speed = 0.5f;
             drag = 0.4f;
             hitSize = 15f;
             rotateSpeed = 3f;
-            health = 910;
+            health = 940;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
             legCount = 6;
             legLength = 13f;
@@ -651,7 +649,6 @@ public class UnitTypes implements ContentList{
 
             buildSpeed = 0.75f;
 
-            allowLegStep = true;
             visualElevation = 0.3f;
             groundLayer = Layer.legUnit;
 
@@ -669,7 +666,7 @@ public class UnitTypes implements ContentList{
                 bullet = new SapBulletType(){{
                     sapStrength = 0.5f;
                     length = 75f;
-                    damage = 20;
+                    damage = 23;
                     shootEffect = Fx.shootSmall;
                     hitColor = color = Color.valueOf("bf92f9");
                     despawnEffect = Fx.none;
@@ -689,7 +686,7 @@ public class UnitTypes implements ContentList{
                 bullet = new SapBulletType(){{
                     sapStrength = 0.8f;
                     length = 40f;
-                    damage = 16;
+                    damage = 18;
                     shootEffect = Fx.shootSmall;
                     hitColor = color = Color.valueOf("bf92f9");
                     despawnEffect = Fx.none;
@@ -724,16 +721,16 @@ public class UnitTypes implements ContentList{
 
             legSplashDamage = 32;
             legSplashRange = 30;
+            drownTimeMultiplier = 2f;
 
             hovering = true;
-            allowLegStep = true;
             visualElevation = 0.65f;
             groundLayer = Layer.legUnit;
 
             BulletType sapper = new SapBulletType(){{
                 sapStrength = 0.85f;
                 length = 55f;
-                damage = 37;
+                damage = 40;
                 shootEffect = Fx.shootSmall;
                 hitColor = color = Color.valueOf("bf92f9");
                 despawnEffect = Fx.none;
@@ -811,6 +808,7 @@ public class UnitTypes implements ContentList{
             lightRadius = 140f;
 
             rotateSpeed = 1.9f;
+            drownTimeMultiplier = 3f;
 
             legCount = 8;
             legMoveSpace = 0.8f;
@@ -829,7 +827,6 @@ public class UnitTypes implements ContentList{
             legSplashRange = 60;
 
             hovering = true;
-            allowLegStep = true;
             visualElevation = 0.95f;
             groundLayer = Layer.legUnit;
 

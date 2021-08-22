@@ -71,7 +71,9 @@ public class UnitType extends UnlockableContent{
     public int commandLimit = 8;
     public float commandRadius = 150f;
     public float visualElevation = -1f;
-    public boolean allowLegStep = false;
+    /** If true and this is a legged unit, this unit can walk over blocks. */
+    public boolean allowLegStep = true;
+    /** If true, this unit cannot drown, and will not be affected by the floor under it. */
     public boolean hovering = false;
     public boolean omniMovement = true;
     public Effect fallEffect = Fx.fallSmoke;
@@ -840,14 +842,16 @@ public class UnitType extends UnlockableContent{
 
     public <T extends Unit & Legsc> void drawLegs(T unit){
         applyColor(unit);
+        Tmp.c3.set(Draw.getMixColor());
 
         Leg[] legs = unit.legs();
 
         float ssize = footRegion.width * Draw.scl * 1.5f;
         float rotation = unit.baseRotation();
+        float invDrown = 1f - unit.drownTime;
 
         for(Leg leg : legs){
-            Drawf.shadow(leg.base.x, leg.base.y, ssize);
+            Drawf.shadow(leg.base.x, leg.base.y, ssize, invDrown);
         }
 
         //legs are drawn front first
@@ -863,12 +867,14 @@ public class UnitType extends UnlockableContent{
             Tmp.v1.set(leg.base).sub(leg.joint).inv().setLength(legExtension);
 
             if(leg.moving && visualElevation > 0){
-                float scl = visualElevation;
+                float scl = visualElevation * invDrown;
                 float elev = Mathf.slope(1f - leg.stage) * scl;
                 Draw.color(Pal.shadow);
                 Draw.rect(footRegion, leg.base.x + shadowTX * elev, leg.base.y + shadowTY * elev, position.angleTo(leg.base));
                 Draw.color();
             }
+
+            Draw.mixcol(Tmp.c3, Tmp.c3.a);
 
             Draw.rect(footRegion, leg.base.x, leg.base.y, position.angleTo(leg.base));
 

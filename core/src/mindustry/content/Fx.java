@@ -1835,7 +1835,7 @@ public class Fx{
     bubble = new Effect(20, e -> {
         color(Tmp.c1.set(e.color).shiftValue(0.1f));
         stroke(e.fout() + 0.2f);
-        randLenVectors(e.id, 2, 8f, (x, y) -> {
+        randLenVectors(e.id, 2, e.rotation * 0.9f, (x, y) -> {
             Lines.circle(e.x + x, e.y + y, 1f + e.fin() * 3f);
         });
     }),
