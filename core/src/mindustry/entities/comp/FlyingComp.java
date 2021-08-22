@@ -48,6 +48,10 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
         return canDrown() ? floorOn() : null;
     }
 
+    boolean emitWalkSound(){
+        return true;
+    }
+
     void landed(){
 
     }
@@ -59,7 +63,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
 
     void moveAt(Vec2 vector, float acceleration){
         Vec2 t = tmp1.set(vector); //target vector
-        tmp2.set(t).sub(vel).limit(acceleration * vector.len() * Time.delta * floorSpeedMultiplier()); //delta vector
+        tmp2.set(t).sub(vel).limit(acceleration * vector.len() * Time.delta); //delta vector
         vel.add(tmp2);
     }
 
@@ -87,7 +91,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
                 floor.walkEffect.at(x, y, hitSize() / 8f, floor.mapColor);
                 splashTimer = 0f;
 
-                if(!(this instanceof WaterMovec)){
+                if(emitWalkSound()){
                     floor.walkSound.at(x, y, Mathf.random(floor.walkSoundPitchMin, floor.walkSoundPitchMax), floor.walkSoundVolume);
                 }
             }

@@ -623,7 +623,7 @@ public class DesktopInput extends InputHandler{
     protected void updateMovement(Unit unit){
         boolean omni = unit.type.omniMovement;
 
-        float speed = unit.realSpeed();
+        float speed = unit.speed();
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());

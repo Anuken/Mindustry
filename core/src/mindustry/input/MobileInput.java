@@ -872,7 +872,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         targetPos.set(Core.camera.position);
         float attractDst = 15f;
 
-        float speed = unit.realSpeed();
+        float speed = unit.speed();
         float range = unit.hasWeapons() ? unit.range() : 0f;
         float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
