@@ -62,13 +62,13 @@ public class OverdriveProjector extends Block{
         stats.timePeriod = useTime;
         super.setStats();
 
-        stats.add(Stat.speedIncrease, (int)(100f * speedBoost), StatUnit.percent);
+        stats.add(Stat.speedIncrease, ("+" + (int)(speedBoost * 100f - 100)), StatUnit.percent);
         stats.add(Stat.range, range / tilesize, StatUnit.blocks);
         stats.add(Stat.productionTime, useTime / 60f, StatUnit.seconds);
 
         if(hasBoost){
             stats.add(Stat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
-            stats.add(Stat.boostEffect, (int)((speedBoost + speedBoostPhase) * 100f), StatUnit.percent);
+            stats.add(Stat.boostEffect, ("+" + (int)((speedBoost + speedBoostPhase) * 100f - 100)), StatUnit.percent);
         }
     }
 
