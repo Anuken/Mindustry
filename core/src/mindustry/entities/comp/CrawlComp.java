@@ -46,7 +46,7 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
     public float floorSpeedMultiplier(){
         Floor on = isFlying() ? Blocks.air.asFloor() : floorOn();
         //TODO take into account extra blocks
-        return on.speedMultiplier * speedMultiplier * lastCrawlSlowdown;
+        return (on.isDeep() ? 0.45f : on.speedMultiplier) * speedMultiplier * lastCrawlSlowdown;
     }
 
     @Override

@@ -819,7 +819,6 @@ public class UnitTypes implements ContentList{
             legExtension = -20;
             legBaseOffset = 8f;
             landShake = 1f;
-            legSpeed = 0.1f;
             legLengthScl = 0.93f;
             rippleScale = 3f;
             legSpeed = 0.19f;
@@ -2416,6 +2415,7 @@ public class UnitTypes implements ContentList{
             hitSize = 40f;
             omniMovement = false;
             rotateSpeed = 1.7f;
+            drownTimeMultiplier = 4f;
             drawCell = false;
             segments = 4;
             drawBody = false;

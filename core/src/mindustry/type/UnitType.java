@@ -112,6 +112,7 @@ public class UnitType extends UnlockableContent{
     public float dpsEstimate = -1;
     public float clipSize = -1;
     public boolean canDrown = true;
+    public float drownTimeMultiplier = 1f;
     public float engineOffset = 5f, engineSize = 2.5f;
     public float strafePenalty = 0.5f;
     public float hitSize = 6f;
@@ -795,9 +796,8 @@ public class UnitType extends UnlockableContent{
             Draw.mixcol(unit.team.color, Mathf.absin(7f, 1f));
         }
 
-        Floor floor = unit.isFlying() ? Blocks.air.asFloor() : unit.floorOn();
-        if(floor.isLiquid){
-            Draw.color(Color.white, floor.mapColor, unit.drownTime() * 0.4f);
+        if(unit.drownTime > 0 && unit.lastDrownFloor != null){
+            Draw.color(Color.white, unit.lastDrownFloor.mapColor, unit.drownTime * 0.4f);
         }
     }
 
@@ -953,8 +953,8 @@ public class UnitType extends UnlockableContent{
 
         Draw.mixcol(Color.white, unit.hitTime);
 
-        if(floor.isLiquid){
-            Draw.color(Color.white, floor.mapColor, unit.drownTime() * 0.4f);
+        if(unit.lastDrownFloor != null){
+            Draw.color(Color.white, unit.lastDrownFloor.mapColor, unit.drownTime * 0.4f);
         }else{
             Draw.color(Color.white);
         }
@@ -969,8 +969,8 @@ public class UnitType extends UnlockableContent{
         Tmp.c1.set(Color.white).lerp(Pal.heal, Mathf.clamp(unit.healTime - unit.hitTime));
         Draw.mixcol(Tmp.c1, Math.max(unit.hitTime, Mathf.clamp(unit.healTime)));
 
-        if(unit.drownTime > 0 && unit.floorOn().isDeep()){
-            Draw.mixcol(unit.floorOn().mapColor, unit.drownTime * 0.8f);
+        if(unit.drownTime > 0 && unit.lastDrownFloor != null){
+            Draw.mixcol(unit.lastDrownFloor.mapColor, unit.drownTime * 0.85f);
         }
     }
 
