@@ -21,7 +21,7 @@
   },
   {
     "name": "[cyan]DarkDustry",
-    "address": ["darkdustry.ml", "darkdustry.ml:7000", "darkdustry.ml:8000"] 
+    "address": ["darkdustry.ml", "darkdustry.ml:3000", "darkdustry.ml:7000", "darkdustry.ml:8000"] 
   },
   {
     "name": "Chaotic Neutral",
@@ -37,7 +37,7 @@
   },
   {
     "name": "io",
-    "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000"]
+    "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000", "mindustry.io.community:4000", "mindustry.io.community:5000"]
   },
   {
     "name": "Korea",
