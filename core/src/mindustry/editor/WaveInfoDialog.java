@@ -153,6 +153,7 @@ public class WaveInfoDialog extends BaseDialog{
         table.margin(10f);
 
         if(groups != null){
+            groups.sort(Comparator.comparing(g -> g.type.health));
 
             for(SpawnGroup group : groups){
                 table.table(Tex.button, t -> {
