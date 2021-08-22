@@ -16,12 +16,15 @@ import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.*;
 
 public class WaveInfoDialog extends BaseDialog{
     private int displayed = 20;
     Seq<SpawnGroup> groups = new Seq<>();
+    private SpawnGroup expandedGroup;
 
     private Table table;
     private int start = 0;
@@ -177,84 +180,86 @@ public class WaveInfoDialog extends BaseDialog{
                         buildGroups();
                     }).height(46f).pad(-6f).padBottom(0f).row();
 
-                    t.table(spawns -> {
-                        spawns.field("" + (group.begin + 1), TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePositiveInt(text)){
-                                group.begin = Strings.parseInt(text) - 1;
-                                updateWaves();
-                            }
-                        }).width(100f);
-                        spawns.add("@waves.to").padLeft(4).padRight(4);
-                        spawns.field(group.end == never ? "" : (group.end + 1) + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePositiveInt(text)){
-                                group.end = Strings.parseInt(text) - 1;
-                                updateWaves();
-                            }else if(text.isEmpty()){
-                                group.end = never;
-                                updateWaves();
-                            }
-                        }).width(100f).get().setMessageText("∞");
-                    }).row();
+                    if(expandedGroup == group){
+                        t.table(spawns -> {
+                            spawns.field("" + (group.begin + 1), TextFieldFilter.digitsOnly, text -> {
+                                if(Strings.canParsePositiveInt(text)){
+                                    group.begin = Strings.parseInt(text) - 1;
+                                    updateWaves();
+                                }
+                            }).width(100f);
+                            spawns.add("@waves.to").padLeft(4).padRight(4);
+                            spawns.field(group.end == never ? "" : (group.end + 1) + "", TextFieldFilter.digitsOnly, text -> {
+                                if(Strings.canParsePositiveInt(text)){
+                                    group.end = Strings.parseInt(text) - 1;
+                                    updateWaves();
+                                }else if(text.isEmpty()){
+                                    group.end = never;
+                                    updateWaves();
+                                }
+                            }).width(100f).get().setMessageText("∞");
+                        }).row();
 
-                    t.table(p -> {
-                        p.add("@waves.every").padRight(4);
-                        p.field(group.spacing + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePositiveInt(text) && Strings.parseInt(text) > 0){
-                                group.spacing = Strings.parseInt(text);
-                                updateWaves();
-                            }
-                        }).width(100f);
-                        p.add("@waves.waves").padLeft(4);
-                    }).row();
+                        t.table(p -> {
+                            p.add("@waves.every").padRight(4);
+                            p.field(group.spacing + "", TextFieldFilter.digitsOnly, text -> {
+                                if(Strings.canParsePositiveInt(text) && Strings.parseInt(text) > 0){
+                                    group.spacing = Strings.parseInt(text);
+                                    updateWaves();
+                                }
+                            }).width(100f);
+                            p.add("@waves.waves").padLeft(4);
+                        }).row();
 
-                    t.table(a -> {
-                        a.field(group.unitAmount + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePositiveInt(text)){
-                                group.unitAmount = Strings.parseInt(text);
-                                updateWaves();
-                            }
-                        }).width(80f);
+                        t.table(a -> {
+                            a.field(group.unitAmount + "", TextFieldFilter.digitsOnly, text -> {
+                                if(Strings.canParsePositiveInt(text)){
+                                    group.unitAmount = Strings.parseInt(text);
+                                    updateWaves();
+                                }
+                            }).width(80f);
 
-                        a.add(" + ");
-                        a.field(Strings.fixed(Math.max((Mathf.zero(group.unitScaling) ? 0 : 1f / group.unitScaling), 0), 2), TextFieldFilter.floatsOnly, text -> {
-                            if(Strings.canParsePositiveFloat(text)){
-                                group.unitScaling = 1f / Strings.parseFloat(text);
-                                updateWaves();
-                            }
-                        }).width(80f);
-                        a.add("@waves.perspawn").padLeft(4);
-                    }).row();
+                            a.add(" + ");
+                            a.field(Strings.fixed(Math.max((Mathf.zero(group.unitScaling) ? 0 : 1f / group.unitScaling), 0), 2), TextFieldFilter.floatsOnly, text -> {
+                                if(Strings.canParsePositiveFloat(text)){
+                                    group.unitScaling = 1f / Strings.parseFloat(text);
+                                    updateWaves();
+                                }
+                            }).width(80f);
+                            a.add("@waves.perspawn").padLeft(4);
+                        }).row();
 
-                    t.table(a -> {
-                        a.field(group.max + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePositiveInt(text)){
-                                group.max = Strings.parseInt(text);
-                                updateWaves();
-                            }
-                        }).width(80f);
+                        t.table(a -> {
+                            a.field(group.max + "", TextFieldFilter.digitsOnly, text -> {
+                                if(Strings.canParsePositiveInt(text)){
+                                    group.max = Strings.parseInt(text);
+                                    updateWaves();
+                                }
+                            }).width(80f);
 
-                        a.add("@waves.max").padLeft(5);
-                    }).row();
+                            a.add("@waves.max").padLeft(5);
+                        }).row();
 
-                    t.table(a -> {
-                        a.field((int)group.shields + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePositiveInt(text)){
-                                group.shields = Strings.parseInt(text);
-                                updateWaves();
-                            }
-                        }).width(80f);
+                        t.table(a -> {
+                            a.field((int)group.shields + "", TextFieldFilter.digitsOnly, text -> {
+                                if(Strings.canParsePositiveInt(text)){
+                                    group.shields = Strings.parseInt(text);
+                                    updateWaves();
+                                }
+                            }).width(80f);
 
-                        a.add(" + ");
-                        a.field((int)group.shieldScaling + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePositiveInt(text)){
-                                group.shieldScaling = Strings.parseInt(text);
-                                updateWaves();
-                            }
-                        }).width(80f);
-                        a.add("@waves.shields").padLeft(4);
-                    }).row();
+                            a.add(" + ");
+                            a.field((int)group.shieldScaling + "", TextFieldFilter.digitsOnly, text -> {
+                                if(Strings.canParsePositiveInt(text)){
+                                    group.shieldScaling = Strings.parseInt(text);
+                                    updateWaves();
+                                }
+                            }).width(80f);
+                            a.add("@waves.shields").padLeft(4);
+                        }).row();
 
-                    t.check("@waves.guardian", b -> group.effect = (b ? StatusEffects.boss : null)).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss)).padBottom(8f);
+                        t.check("@waves.guardian", b -> group.effect = (b ? StatusEffects.boss : null)).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss)).padBottom(8f);
+                    }
                 }).width(340f).pad(8);
 
                 table.row();
