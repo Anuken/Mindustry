@@ -135,7 +135,7 @@ public class EntityCollisions{
 
     public static boolean waterSolid(int x, int y){
         Tile tile = world.tile(x, y);
-        return tile == null || (tile.solid() || !tile.floor().isLiquid);
+        return tile == null || tile.solid() || !tile.floor().isLiquid;
     }
 
     public static boolean solid(int x, int y){
