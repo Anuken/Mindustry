@@ -172,7 +172,10 @@ public class WaveInfoDialog extends BaseDialog{
                             t.remove();
                             updateWaves();
                         }).pad(-6).size(46f).padRight(-12f);
-                    }, () -> showUpdate(group)).height(46f).pad(-6f).padBottom(0f).row();
+                    }, () -> {
+                        expandedGroup = expandedGroup == group ? null : group;
+                        buildGroups();
+                    }).height(46f).pad(-6f).padBottom(0f).row();
 
                     t.table(spawns -> {
                         spawns.field("" + (group.begin + 1), TextFieldFilter.digitsOnly, text -> {
