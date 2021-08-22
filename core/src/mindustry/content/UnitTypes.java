@@ -163,7 +163,6 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 2.1f;
             health = 9000;
             armor = 10f;
-            canDrown = false;
             mechFrontSway = 1f;
             ammoType = new ItemAmmoType(Items.thorium);
 
@@ -421,13 +420,13 @@ public class UnitTypes implements ContentList{
             hitSize = 24f;
 
             rotateSpeed = 1.7f;
-            canDrown = false;
             mechFrontSway = 1f;
             buildSpeed = 3f;
 
             mechStepParticles = true;
             mechStepShake = 0.15f;
             ammoType = new PowerAmmoType(2500);
+            drownTimeMultiplier = 4f;
 
             speed = 0.44f;
             boostMultiplier = 2.2f;
@@ -494,6 +493,7 @@ public class UnitTypes implements ContentList{
             armor = 9f;
             landShake = 1.5f;
             rotateSpeed = 1.5f;
+            drownTimeMultiplier = 6f;
 
             commandLimit = 8;
 

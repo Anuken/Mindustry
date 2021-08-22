@@ -139,7 +139,7 @@ public class Blocks implements ContentList{
             isLiquid = true;
             status = StatusEffects.wet;
             statusDuration = 120f;
-            drownTime = 140f;
+            drownTime = 200f;
             cacheLayer = CacheLayer.water;
             albedo = 0.5f;
         }};
@@ -160,7 +160,7 @@ public class Blocks implements ContentList{
             variants = 0;
             status = StatusEffects.wet;
             statusDuration = 140f;
-            drownTime = 120f;
+            drownTime = 200f;
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
@@ -188,7 +188,7 @@ public class Blocks implements ContentList{
         }};
 
         tar = new Floor("tar"){{
-            drownTime = 150f;
+            drownTime = 230f;
             status = StatusEffects.tarred;
             statusDuration = 240f;
             speedMultiplier = 0.19f;
@@ -199,7 +199,7 @@ public class Blocks implements ContentList{
         }};
 
         slag = new Floor("molten-slag"){{
-            drownTime = 150f;
+            drownTime = 230f;
             status = StatusEffects.melting;
             statusDuration = 240f;
             speedMultiplier = 0.19f;
