@@ -487,13 +487,22 @@ public class LExecutor{
                     case itemDrop -> {
                         if(ai.itemTimer > 0) return;
 
-                        Building build = exec.building(p1);
-                        int dropped = Math.min(unit.stack.amount, exec.numi(p2));
-                        if(build != null && build.team == unit.team && build.isValid() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
-                            int accepted = build.acceptStack(unit.item(), dropped, unit);
-                            if(accepted > 0){
-                                Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
-                                ai.itemTimer = LogicAI.transferDelay;
+                        //clear item when dropping to @air
+                        if(exec.obj(p1) == Blocks.air){
+                            //only server-side; no need to call anything, as items are synced in snapshots
+                            if(!net.client()){
+                                unit.clearItem();
+                            }
+                            ai.itemTimer = LogicAI.transferDelay;
+                        }else{
+                            Building build = exec.building(p1);
+                            int dropped = Math.min(unit.stack.amount, exec.numi(p2));
+                            if(build != null && build.team == unit.team && build.isValid() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
+                                int accepted = build.acceptStack(unit.item(), dropped, unit);
+                                if(accepted > 0){
+                                    Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
+                                    ai.itemTimer = LogicAI.transferDelay;
+                                }
                             }
                         }
                     }
