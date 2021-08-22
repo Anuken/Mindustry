@@ -291,6 +291,7 @@ public class WaveInfoDialog extends BaseDialog{
                 if(++i % 3 == 0) p.row();
             }
         });
+        dialog.addCloseButton();
         dialog.show();
     }
 
