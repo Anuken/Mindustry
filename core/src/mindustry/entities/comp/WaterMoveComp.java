@@ -27,13 +27,14 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
 
     @Override
     public void update(){
+        boolean flying = isFlying();
         for(int i = 0; i < 2; i++){
             Trail t = i == 0 ? tleft : tright;
             t.length = type.trailLength;
 
             int sign = i == 0 ? -1 : 1;
             float cx = Angles.trnsx(rotation - 90, type.trailX * sign, type.trailY) + x, cy = Angles.trnsy(rotation - 90, type.trailX * sign, type.trailY) + y;
-            t.update(cx, cy, world.floorWorld(cx, cy).isLiquid ? 1 : 0);
+            t.update(cx, cy, world.floorWorld(cx, cy).isLiquid && !flying ? 1 : 0);
         }
     }
 
@@ -69,6 +70,13 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     @Override
     public SolidPred solidity(){
         return isFlying() ? null : EntityCollisions::waterSolid;
+    }
+
+    @Replace
+    @Override
+    public boolean onSolid(){
+        Tile tile = tileOn();
+        return tile == null || tile.solid() || EntityCollisions.waterSolid(tile.x, tile.y);
     }
 
     @Replace
