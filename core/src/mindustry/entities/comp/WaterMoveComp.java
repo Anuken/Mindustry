@@ -75,8 +75,7 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     @Replace
     @Override
     public boolean onSolid(){
-        Tile tile = tileOn();
-        return tile == null || tile.solid() || EntityCollisions.waterSolid(tile.x, tile.y);
+        return EntityCollisions.waterSolid(tileX(), tileY());
     }
 
     @Replace
