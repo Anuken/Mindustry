@@ -165,6 +165,7 @@ public class WaveInfoDialog extends BaseDialog{
 
                         b.add().growX();
 
+                        b.button(Icon.unitsSmall, () -> showUpdate(group)).pad(-6).size(46f);
                         b.button(Icon.cancel, () -> {
                             groups.remove(group);
                             table.getCell(t).pad(0f);
