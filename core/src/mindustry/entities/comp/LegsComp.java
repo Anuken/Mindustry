@@ -50,10 +50,18 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         resetLegs();
     }
 
+    @Override
+    public void unloaded(){
+        resetLegs(1f);
+    }
+
     public void resetLegs(){
+        resetLegs(type.legLength);
+    }
+
+    public void resetLegs(float legLength){
         float rot = baseRotation;
         int count = type.legCount;
-        float legLength = type.legLength;
 
         this.legs = new Leg[count];
 

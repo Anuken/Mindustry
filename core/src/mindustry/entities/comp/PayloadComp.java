@@ -122,6 +122,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         //decrement count to prevent double increment
         if(!u.isAdded()) u.team.data().updateCount(u.type, -1);
         u.add();
+        u.unloaded();
 
         return true;
     }

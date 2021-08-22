@@ -72,7 +72,7 @@ public class UnitType extends UnlockableContent{
     public float commandRadius = 150f;
     public float visualElevation = -1f;
     /** If true and this is a legged unit, this unit can walk over blocks. */
-    public boolean allowLegStep = true;
+    public boolean allowLegStep = false;
     /** If true, this unit cannot drown, and will not be affected by the floor under it. */
     public boolean hovering = false;
     public boolean omniMovement = true;
@@ -326,6 +326,8 @@ public class UnitType extends UnlockableContent{
         if(constructor == null) throw new IllegalArgumentException("no constructor set up for unit '" + name + "'");
 
         Unit example = constructor.get();
+
+        allowLegStep = example instanceof Legsc;
 
         //water preset
         if(example instanceof WaterMovec){

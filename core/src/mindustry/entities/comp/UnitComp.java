@@ -51,6 +51,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     private transient boolean wasPlayer;
     private transient boolean wasHealed;
 
+    /** Called when this unit was unloaded from a factory or spawn point. */
+    public void unloaded(){
+
+    }
+
     /** Move based on preferred unit movement type. */
     public void movePref(Vec2 movement){
         if(type.omniMovement){

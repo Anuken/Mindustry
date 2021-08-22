@@ -105,7 +105,7 @@ public class UnitPayload implements Payload{
             if(solid.solid(tx, ty)) return false;
         }
 
-        //cannnot dump when there's a lot of overlap going on
+        //cannot dump when there's a lot of overlap going on
         if(!unit.type.flying && Units.count(unit.x, unit.y, unit.physicSize(), o -> o.isGrounded() && (o.type.allowLegStep == unit.type.allowLegStep)) > 0){
             return false;
         }
@@ -116,6 +116,7 @@ public class UnitPayload implements Payload{
         //prevents stacking
         unit.vel.add(Mathf.range(0.5f), Mathf.range(0.5f));
         unit.add();
+        unit.unloaded();
         Events.fire(new UnitUnloadEvent(unit));
 
         return true;
