@@ -2083,11 +2083,15 @@ public class Blocks implements ContentList{
         payloadSource = new PayloadSource("payload-source"){{
             requirements(Category.units, BuildVisibility.sandboxOnly, with());
             size = 5;
+            alwaysUnlocked = true;
+            group = BlockGroup.units;
         }};
 
         payloadVoid = new PayloadVoid("payload-void"){{
             requirements(Category.units, BuildVisibility.sandboxOnly, with());
             size = 5;
+            alwaysUnlocked = true;
+            group = BlockGroup.units;
         }};
 
         //TODO move
