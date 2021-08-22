@@ -17,7 +17,6 @@ import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
-//TODO
 @Component
 abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
     @Import float x, y, speedMultiplier, rotation, hitSize;
@@ -26,7 +25,6 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
     @Import Vec2 vel;
 
     transient Floor lastDeepFloor;
-    //TODO segments
     transient float lastCrawlSlowdown = 1f;
     transient float segmentRot, crawlTime;
 
@@ -88,6 +86,7 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
                                 lastDeepFloor = t.floor();
                             }
 
+                            //TODO area damage to units
                             if(t.build != null && t.build.team != team){
                                 t.build.damage(team, type.crawlDamage * Time.delta);
                             }

@@ -592,7 +592,7 @@ public class UnitTypes implements ContentList{
         }};
 
         atrax = new UnitType("atrax"){{
-            speed = 0.56f;
+            speed = 0.57f;
             drag = 0.4f;
             hitSize = 13f;
             rotateSpeed = 3f;
@@ -632,7 +632,7 @@ public class UnitTypes implements ContentList{
         }};
 
         spiroct = new UnitType("spiroct"){{
-            speed = 0.5f;
+            speed = 0.52f;
             drag = 0.4f;
             hitSize = 15f;
             rotateSpeed = 3f;
@@ -699,7 +699,7 @@ public class UnitTypes implements ContentList{
 
         arkyid = new UnitType("arkyid"){{
             drag = 0.1f;
-            speed = 0.6f;
+            speed = 0.62f;
             hitSize = 23f;
             health = 8000;
             armor = 6f;
