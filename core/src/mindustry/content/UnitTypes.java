@@ -170,6 +170,7 @@ public class UnitTypes implements ContentList{
             mechStepParticles = true;
             mechStepShake = 0.15f;
             singleTarget = true;
+            drownTimeMultiplier = 4f;
 
             weapons.add(
             new Weapon("scepter-weapon"){{
@@ -227,7 +228,7 @@ public class UnitTypes implements ContentList{
             armor = 14f;
             mechStepParticles = true;
             mechStepShake = 0.75f;
-            canDrown = false;
+            drownTimeMultiplier = 6f;
             mechFrontSway = 1.9f;
             mechSideSway = 0.6f;
             ammoType = new ItemAmmoType(Items.thorium);

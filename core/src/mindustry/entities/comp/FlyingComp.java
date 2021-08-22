@@ -44,9 +44,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
         return isGrounded() && !hovering;
     }
 
-    //TODO
-    @Nullable
-    Floor drownFloor(){
+    @Nullable Floor drownFloor(){
         return canDrown() ? floorOn() : null;
     }
 
