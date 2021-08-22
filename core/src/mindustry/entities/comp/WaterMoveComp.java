@@ -44,6 +44,13 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
         return Pathfinder.costNaval;
     }
 
+    //don't want obnoxious splashing
+    @Override
+    @Replace
+    public boolean emitWalkSound(){
+        return false;
+    }
+
     @Override
     public void add(){
         tleft.clear();

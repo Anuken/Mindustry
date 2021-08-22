@@ -41,6 +41,10 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
         return isGrounded() && !hovering;
     }
 
+    boolean emitWalkSound(){
+        return true;
+    }
+
     void landed(){
 
     }
@@ -80,7 +84,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
                 floor.walkEffect.at(x, y, hitSize() / 8f, floor.mapColor);
                 splashTimer = 0f;
 
-                if(!(this instanceof WaterMovec)){
+                if(emitWalkSound()){
                     floor.walkSound.at(x, y, Mathf.random(floor.walkSoundPitchMin, floor.walkSoundPitchMax), floor.walkSoundVolume);
                 }
             }
