@@ -696,7 +696,7 @@ public class UnitType extends UnlockableContent{
 
     public void drawShadow(Unit unit){
         Draw.color(Pal.shadow);
-        float e = Math.max(unit.elevation, visualElevation);
+        float e = Math.max(unit.elevation, visualElevation) * (1f - unit.drownTime);
         Draw.rect(shadowRegion, unit.x + shadowTX * e, unit.y + shadowTY * e, unit.rotation - 90);
         Draw.color();
     }
@@ -907,7 +907,7 @@ public class UnitType extends UnlockableContent{
         applyColor(unit);
 
         //change to 2 TODO
-        for(int p = 0; p < 1; p++){
+        for(int p = 0; p < 2; p++){
             TextureRegion[] regions = p == 0 ? segmentOutlineRegions : segmentRegions;
 
             for(int i = 0; i < segments; i++){
@@ -920,7 +920,7 @@ public class UnitType extends UnlockableContent{
 
                 //shadow
                 Draw.color(0f, 0f, 0f, 0.2f);
-                Draw.rect(regions[i], unit.x + tx + 2f, unit.y + ty - 2f, rot - 90);
+                //Draw.rect(regions[i], unit.x + tx + 2f, unit.y + ty - 2f, rot - 90);
 
                 applyColor(unit);
 

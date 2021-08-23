@@ -65,7 +65,7 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
         if(moving()){
             segmentRot = Angles.moveToward(segmentRot, rotation, type.segmentRotSpeed);
 
-            int radius = (int)Math.max(0, hitSize / tilesize);
+            int radius = (int)Math.max(0, hitSize / tilesize * 2f);
             int count = 0, solids = 0, deeps = 0;
             lastDeepFloor = null;
 
@@ -91,7 +91,7 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
                                 t.build.damage(team, type.crawlDamage * Time.delta);
                             }
 
-                            if(Mathf.chanceDelta(0.04)){
+                            if(Mathf.chanceDelta(0.025)){
                                 Fx.crawlDust.at(t.worldx(), t.worldy(), t.floor().mapColor);
                             }
                         }else{

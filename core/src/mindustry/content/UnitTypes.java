@@ -2410,7 +2410,7 @@ public class UnitTypes implements ContentList{
 
         scuttler = new UnitType("scuttler"){{
             outlineColor = Pal.neoplasmOutline;
-            hitSize = 40f;
+            hitSize = 48f;
             omniMovement = false;
             rotateSpeed = 1.7f;
             drownTimeMultiplier = 4f;
