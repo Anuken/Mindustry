@@ -42,10 +42,10 @@ public class PhysicsProcess implements AsyncProcess{
 
             if(entity.physref == null){
                 PhysicsBody body = new PhysicsBody();
-                body.x = entity.x();
-                body.y = entity.y();
+                body.x = entity.x;
+                body.y = entity.y;
                 body.mass = entity.mass();
-                body.radius = entity.hitSize() / 2f;
+                body.radius = entity.hitSize / 2f;
 
                 PhysicRef ref = new PhysicRef(entity, body);
                 refs.add(ref);

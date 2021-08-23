@@ -232,7 +232,7 @@ public class MapGenerateDialog extends BaseDialog{
                 }else{
                     Core.scene.setScrollFocus(null);
                 }
-            }).grow().uniformX().get().setScrollingDisabled(true, false);
+            }).grow().uniformX().scrollX(false);
         }).grow();
 
         buffer1 = create();
@@ -350,7 +350,7 @@ public class MapGenerateDialog extends BaseDialog{
                 update();
                 selection.hide();
             }).with(Table::left).get().getLabelCell().growX().left().padLeft(5).labelAlign(Align.left);
-        }).get().setScrollingDisabled(true, false);
+        }).scrollX(false);
 
         selection.addCloseButton();
         selection.show();

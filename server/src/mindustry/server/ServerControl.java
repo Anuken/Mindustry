@@ -287,7 +287,6 @@ public class ServerControl implements ApplicationListener{
             Core.app.exit();
         });
 
-
         handler.register("stop", "Stop hosting the server.", arg -> {
             net.closeServer();
             if(lastTask != null) lastTask.cancel();
@@ -380,6 +379,8 @@ public class ServerControl implements ApplicationListener{
             maps.reload();
             if(maps.all().size > beforeMaps){
                 info("@ new map(s) found and reloaded.", maps.all().size - beforeMaps);
+            }else if(maps.all().size < beforeMaps){
+                info("@ old map(s) deleted.", beforeMaps - maps.all().size);
             }else{
                 info("Maps reloaded.");
             }

@@ -84,6 +84,11 @@ public class ConstructBlock extends Block{
             if(builder != null && builder.getControllerName() != null){
                 tile.build.lastAccessed = builder.getControllerName();
             }
+
+            //make sure block indexer knows it's damaged
+            if(tile.build.damaged()){
+                indexer.notifyBuildDamaged(tile.build);
+            }
         }
 
         //last builder was this local client player, call placed()
@@ -297,7 +302,7 @@ public class ConstructBlock extends Block{
                 int accumulated = (int)(accumulator[i]); //get amount
 
                 if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
-                    if(core != null && requirements[i].item.unlockedNow()){ //only accept items that are unlocked
+                    if(core != null && requirements[i].item.unlockedNowHost()){ //only accept items that are unlocked
                         int accepting = Math.min(accumulated, core.storageCapacity - core.items.get(requirements[i].item));
                         //transfer items directly, as this is not production.
                         core.items.add(requirements[i].item, accepting);

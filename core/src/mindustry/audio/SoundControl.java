@@ -130,7 +130,12 @@ public class SoundControl{
                 Core.audio.soundBus.play();
                 setupFilters();
             }else{
-                Core.audio.soundBus.replay();
+                //stopping a single audio bus stops everything else, yay!
+                Core.audio.soundBus.stop();
+                //play music bus again, as it was stopped above
+                Core.audio.musicBus.play();
+
+                Core.audio.soundBus.play();
             }
         }
 

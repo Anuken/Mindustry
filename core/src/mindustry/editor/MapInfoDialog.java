@@ -38,7 +38,7 @@ public class MapInfoDialog extends BaseDialog{
 
             TextField name = t.field(tags.get("name", ""), text -> {
                 tags.put("name", text);
-            }).size(400, 55f).addInputDialog(50).get();
+            }).size(400, 55f).maxTextLength(50).get();
             name.setMessageText("@unknown");
 
             t.row();
@@ -46,7 +46,7 @@ public class MapInfoDialog extends BaseDialog{
 
             TextArea description = t.area(tags.get("description", ""), Styles.areaField, text -> {
                 tags.put("description", text);
-            }).size(400f, 140f).addInputDialog(1000).get();
+            }).size(400f, 140f).maxTextLength(1000).get();
 
             t.row();
             t.add("@editor.author").padRight(8).left();
@@ -54,7 +54,7 @@ public class MapInfoDialog extends BaseDialog{
             TextField author = t.field(tags.get("author", Core.settings.getString("mapAuthor", "")), text -> {
                 tags.put("author", text);
                 Core.settings.put("mapAuthor", text);
-            }).size(400, 55f).addInputDialog(50).get();
+            }).size(400, 55f).maxTextLength(50).get();
             author.setMessageText("@unknown");
 
             t.row();

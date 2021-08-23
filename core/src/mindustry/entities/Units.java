@@ -143,7 +143,7 @@ public class Units{
 
     /** Returns the nearest damaged tile. */
     public static Building findDamagedTile(Team team, float x, float y){
-        return Geometry.findClosest(x, y, indexer.getDamaged(team));
+        return indexer.getDamaged(team).min(b -> b.dst2(x, y));
     }
 
     /** Returns the nearest ally tile in a range. */

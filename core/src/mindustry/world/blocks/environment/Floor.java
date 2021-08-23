@@ -28,7 +28,7 @@ public class Floor extends Block{
     public float dragMultiplier = 1f;
     /** Damage taken per tick on this tile. */
     public float damageTaken = 0f;
-    /** How many ticks it takes to drown on this. */
+    /** How many ticks it takes to drown on this. 0 to disable. */
     public float drownTime = 0f;
     /** Effect when walking on this floor. */
     public Effect walkEffect = Fx.none;
@@ -42,11 +42,11 @@ public class Floor extends Block{
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect. */
     public float statusDuration = 60f;
-    /** liquids that drop from this block, used for pumps */
+    /** liquids that drop from this block, used for pumps. */
     public @Nullable Liquid liquidDrop = null;
     /** Multiplier for pumped liquids, used for deep water. */
     public float liquidMultiplier = 1f;
-    /** whether this block can be drowned in */
+    /** whether this block is liquid. */
     public boolean isLiquid;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;

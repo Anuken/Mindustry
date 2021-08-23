@@ -19,7 +19,8 @@ import static mindustry.Vars.*;
 public class Effect{
     private static final float shakeFalloff = 10000f;
     private static final EffectContainer container = new EffectContainer();
-    private static final Seq<Effect> all = new Seq<>();
+
+    public static final Seq<Effect> all = new Seq<>();
 
     private boolean initialized;
 

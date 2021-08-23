@@ -379,15 +379,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot control a unit.");
         }
 
-        //TODO problem:
-        //1. server send snapshot
-        //2. client requests to control unit, becomes unit locally
-        //3. snapshot arrives, client now thinks they're in the old unit (!!!)
-        //4. server gets packet that player is in the right unit
-        //5. server sends snapshot
-        //6. client gets snapshot, realizes that they are actually in the unit they selected
-        //7. client gets switched to new unit -> rubberbanding (!!!)
-
         //clear player unit when they possess a core
         if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
@@ -404,6 +395,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(!player.dead()){
                 Fx.unitSpirit.at(player.x, player.y, 0f, unit);
             }
+        }else if(net.server()){
+            //reject forwarding the packet if the unit was dead, AI or team
+            throw new ValidateException(player, "Player attempted to control invalid unit.");
         }
 
         Events.fire(new UnitControlEvent(player, unit));
@@ -454,11 +448,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void update(){
         player.typing = ui.chatfrag.shown();
 
+        if(player.dead()){
+            droppingItem = false;
+        }
+
         if(player.isBuilder()){
             player.unit().updateBuilding(isBuilding);
         }
 
-        if(player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && player.unit().ammo <= 0){
+        if(player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && !player.team().rules().infiniteAmmo && player.unit().ammo <= 0){
             player.unit().type.weapons.first().noAmmoSound.at(player.unit());
         }
 

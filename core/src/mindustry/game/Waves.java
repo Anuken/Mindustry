@@ -261,12 +261,22 @@ public class Waves{
     }
 
     public static Seq<SpawnGroup> generate(float difficulty, Rand rand, boolean attack){
+        return generate(difficulty, rand, attack, false);
+    }
+
+    public static Seq<SpawnGroup> generate(float difficulty, Rand rand, boolean attack, boolean airOnly){
         UnitType[][] species = {
         {dagger, mace, fortress, scepter, reign},
         {nova, pulsar, quasar, vela, corvus},
         {crawler, atrax, spiroct, arkyid, toxopid},
         {flare, horizon, zenith, rand.chance(0.5) ? quad : antumbra, rand.chance(0.1) ? quad : eclipse}
         };
+
+        if(airOnly){
+            species = Structs.filter(UnitType[].class, species, v -> v[0].flying);
+        }
+
+        UnitType[][] fspec = species;
 
         //required progression:
         //- extra periodic patterns
@@ -281,7 +291,7 @@ public class Waves{
 
         Intc createProgression = start -> {
             //main sequence
-            UnitType[] curSpecies = Structs.random(species);
+            UnitType[] curSpecies = Structs.random(fspec);
             int curTier = 0;
 
             for(int i = start; i < cap;){
@@ -326,7 +336,7 @@ public class Waves{
 
                 //small chance to switch species
                 if(rand.chance(0.3)){
-                    curSpecies = Structs.random(species);
+                    curSpecies = Structs.random(fspec);
                 }
             }
         };

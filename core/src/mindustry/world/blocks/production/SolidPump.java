@@ -48,7 +48,7 @@ public class SolidPump extends Pump{
         bars.add("efficiency", (SolidPumpBuild entity) -> new Bar(() -> Core.bundle.formatFloat("bar.pumpspeed",
         entity.lastPump / Time.delta * 60, 1),
         () -> Pal.ammo,
-        () -> entity.warmup));
+        () -> entity.warmup * entity.efficiency()));
     }
 
     @Override
@@ -114,7 +114,7 @@ public class SolidPump extends Pump{
                 lastPump = 0f;
             }
 
-            pumpTime += warmup * delta();
+            pumpTime += warmup * edelta();
 
             dumpLiquid(result);
         }

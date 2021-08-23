@@ -90,7 +90,6 @@ importPackage(Packages.mindustry.editor)
 importPackage(Packages.mindustry.entities)
 importPackage(Packages.mindustry.entities.abilities)
 importPackage(Packages.mindustry.entities.bullet)
-importPackage(Packages.mindustry.entities.comp)
 importPackage(Packages.mindustry.entities.effect)
 importPackage(Packages.mindustry.entities.units)
 importPackage(Packages.mindustry.game)
@@ -157,6 +156,7 @@ const ResearchEvent = Packages.mindustry.game.EventType.ResearchEvent
 const UnlockEvent = Packages.mindustry.game.EventType.UnlockEvent
 const StateChangeEvent = Packages.mindustry.game.EventType.StateChangeEvent
 const CoreChangeEvent = Packages.mindustry.game.EventType.CoreChangeEvent
+const BuildTeamChangeEvent = Packages.mindustry.game.EventType.BuildTeamChangeEvent
 const TileChangeEvent = Packages.mindustry.game.EventType.TileChangeEvent
 const TilePreChangeEvent = Packages.mindustry.game.EventType.TilePreChangeEvent
 const GameOverEvent = Packages.mindustry.game.EventType.GameOverEvent

@@ -101,10 +101,10 @@ public class UnitTypes implements ContentList{
                 reload = 11f;
                 recoil = 1f;
                 ejectEffect = Fx.none;
-                bullet = new BulletType(4.1f, 32f){{
+                bullet = new BulletType(4.1f, 35f){{
                     ammoMultiplier = 3f;
                     hitSize = 7f;
-                    lifetime = 12f;
+                    lifetime = 13f;
                     pierce = true;
                     statusDuration = 60f * 4;
                     shootEffect = Fx.shootSmallFlame;
@@ -344,7 +344,7 @@ public class UnitTypes implements ContentList{
 
                 bullet = new LightningBulletType(){{
                     lightningColor = hitColor = Pal.heal;
-                    damage = 12f;
+                    damage = 14f;
                     lightningLength = 7;
                     lightningLengthRand = 7;
                     shootEffect = Fx.shootHeal;
@@ -413,7 +413,7 @@ public class UnitTypes implements ContentList{
         vela = new UnitType("vela"){{
             hitSize = 24f;
 
-            rotateSpeed = 1.6f;
+            rotateSpeed = 1.7f;
             canDrown = false;
             mechFrontSway = 1f;
             buildSpeed = 3f;
@@ -422,14 +422,14 @@ public class UnitTypes implements ContentList{
             mechStepShake = 0.15f;
             ammoType = new PowerAmmoType(2500);
 
-            speed = 0.4f;
+            speed = 0.44f;
             boostMultiplier = 2.2f;
             engineOffset = 12f;
             engineSize = 6f;
             lowAltitude = true;
             riseSpeed = 0.02f;
 
-            health = 8000f;
+            health = 8200f;
             armor = 9f;
             canBoost = true;
             landShake = 4f;
@@ -454,7 +454,7 @@ public class UnitTypes implements ContentList{
                 cooldownTime = 200f;
 
                 bullet = new ContinuousLaserBulletType(){{
-                    damage = 32f;
+                    damage = 35f;
                     length = 180f;
                     hitEffect = Fx.hitMeltHeal;
                     drawSize = 420f;
@@ -935,6 +935,8 @@ public class UnitTypes implements ContentList{
             engineOffset = 5.5f;
             range = 140f;
             targetAir = false;
+            //as default AI, flares are not very useful in core rushes, they attack nothing in the way
+            playerTargetFlags = new BlockFlag[]{null};
             targetFlags = new BlockFlag[]{BlockFlag.generator, null};
             commandLimit = 4;
             circleTarget = true;
@@ -969,6 +971,8 @@ public class UnitTypes implements ContentList{
             range = 140f;
             faceTarget = false;
             armor = 3f;
+            //do not rush core, attack closest
+            playerTargetFlags = new BlockFlag[]{null};
             targetFlags = new BlockFlag[]{BlockFlag.factory, null};
             commandLimit = 5;
             circleTarget = true;
@@ -1006,6 +1010,7 @@ public class UnitTypes implements ContentList{
             range = 140f;
             hitSize = 20f;
             lowAltitude = true;
+            forceMultiTarget = true;
             armor = 5f;
 
             targetFlags = new BlockFlag[]{BlockFlag.launchPad, BlockFlag.storage, BlockFlag.battery, null};
@@ -1132,7 +1137,7 @@ public class UnitTypes implements ContentList{
             hitSize = 58f;
             destructibleWreck = false;
             armor = 13f;
-            targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.core, null};
+            targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
             ammoType = new ItemAmmoType(Items.thorium);
 
             BulletType fragBullet = new FlakBulletType(4f, 5){{
@@ -1330,7 +1335,7 @@ public class UnitTypes implements ContentList{
         quad = new UnitType("quad"){{
             armor = 8f;
             health = 6000;
-            speed = 1.4f;
+            speed = 1.3f;
             rotateSpeed = 2f;
             accel = 0.05f;
             drag = 0.017f;
@@ -1493,15 +1498,13 @@ public class UnitTypes implements ContentList{
             trailY = -4f;
             trailScl = 1.9f;
 
-            abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 6, 60f * 6f, 60f));
-
             weapons.add(new Weapon("mount-weapon"){{
-                reload = 15f;
+                reload = 10f;
                 x = 5f;
                 y = 3.5f;
                 rotate = true;
                 rotateSpeed = 5f;
-                inaccuracy = 10f;
+                inaccuracy = 8f;
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.shoot;
                 bullet = Bullets.flakLead;
@@ -1517,7 +1520,15 @@ public class UnitTypes implements ContentList{
                 shake = 1.5f;
                 ejectEffect = Fx.casing2;
                 shootSound = Sounds.bang;
-                bullet = Bullets.artilleryDense;
+                bullet = new ArtilleryBulletType(3f, 20, "shell"){{
+                    hitEffect = Fx.flakExplosion;
+                    knockback = 0.8f;
+                    lifetime = 80f;
+                    width = height = 11f;
+                    collidesTiles = false;
+                    splashDamageRadius = 30f * 0.75f;
+                    splashDamage = 40f;
+                }};
             }});
         }};
 
@@ -1784,7 +1795,7 @@ public class UnitTypes implements ContentList{
                 shootY = 6f;
                 beamWidth = 0.8f;
                 mirror = false;
-                repairSpeed = 0.7f;
+                repairSpeed = 0.75f;
 
                 bullet = new BulletType(){{
                     maxRange = 120f;
@@ -1830,8 +1841,8 @@ public class UnitTypes implements ContentList{
 
                     speed = 0f;
 
-                    splashDamage = 50f;
-                    splashDamageRadius = 40f;
+                    splashDamage = 55f;
+                    splashDamageRadius = 45f;
                 }};
             }});
         }};
@@ -1851,6 +1862,8 @@ public class UnitTypes implements ContentList{
             trailY = -4f;
             trailScl = 1.9f;
             ammoType = new ItemAmmoType(Items.coal);
+
+            abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 6, 60f * 6f, 60f));
 
             buildSpeed = 2f;
 

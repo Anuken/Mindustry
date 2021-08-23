@@ -96,7 +96,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
 
         if(!(tile.build instanceof ConstructBuild cb)){
             if(!current.initialized && !current.breaking && Build.validPlace(current.block, team, current.x, current.y, current.rotation)){
-                boolean hasAll = infinite || current.isRotation(team) || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item, Mathf.round(i.amount * state.rules.buildCostMultiplier)));
+                boolean hasAll = infinite || current.isRotation(team) || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item, Math.min(Mathf.round(i.amount * state.rules.buildCostMultiplier), 1)));
 
                 if(hasAll){
                     Call.beginPlace(self(), current.block, team, current.x, current.y, current.rotation);
@@ -124,11 +124,13 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             return;
         }
 
+        float bs = 1f / entity.buildCost * Time.delta * type.buildSpeed * buildSpeedMultiplier * state.rules.buildSpeed(team);
+
         //otherwise, update it.
         if(current.breaking){
-            entity.deconstruct(self(), core, 1f / entity.buildCost * Time.delta * type.buildSpeed * buildSpeedMultiplier * state.rules.buildSpeedMultiplier);
+            entity.deconstruct(self(), core, bs);
         }else{
-            entity.construct(self(), core, 1f / entity.buildCost * Time.delta * type.buildSpeed * buildSpeedMultiplier * state.rules.buildSpeedMultiplier, current.config);
+            entity.construct(self(), core, bs, current.config);
         }
 
         current.stuck = Mathf.equal(current.progress, entity.progress);

@@ -45,6 +45,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     transient String lastText = "";
     transient float textFadeTime;
     transient private Unit lastReadUnit = Nulls.unit;
+    transient private int wrongReadUnits;
     transient @Nullable Unit justSwitchFrom, justSwitchTo;
 
     public boolean isBuilder(){
@@ -104,9 +105,15 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         //reason: we know the server is lying here, essentially skip the unit snapshot because we know the client's information is more recent
         if(isLocal() && unit == justSwitchFrom && justSwitchFrom != null && justSwitchTo != null){
             unit = justSwitchTo;
+            //if several snapshots have passed and this unit is still incorrect, something's wrong
+            if(++wrongReadUnits >= 2){
+                justSwitchFrom = null;
+                wrongReadUnits = 0;
+            }
         }else{
             justSwitchFrom = null;
             justSwitchTo = null;
+            wrongReadUnits = 0;
         }
 
         //simulate a unit change after sync

@@ -284,6 +284,21 @@ public class EventType{
         }
     }
 
+    /**
+     * Called after a building's team changes.
+     * Event object is reused, do not nest!
+     * */
+    public static class BuildTeamChangeEvent{
+        public Team previous;
+        public Building build;
+
+        public BuildTeamChangeEvent set(Team previous, Building build){
+            this.build = build;
+            this.previous = previous;
+            return this;
+        }
+    }
+
     /** Called when a core block is placed/removed or its team is changed. */
     public static class CoreChangeEvent{
         public CoreBuild core;
@@ -396,14 +411,20 @@ public class EventType{
         }
     }
 
-    /** Called when a unit is created in a reconstructor or factory. */
+    /** Called when a unit is created in a reconstructor, factory or other unit. */
     public static class UnitCreateEvent{
         public final Unit unit;
-        public final Building spawner;
+        public final @Nullable Building spawner;
+        public final @Nullable Unit spawnerUnit;
 
-        public UnitCreateEvent(Unit unit, Building spawner){
+        public UnitCreateEvent(Unit unit, Building spawner, Unit spawnerUnit){
             this.unit = unit;
             this.spawner = spawner;
+            this.spawnerUnit = spawnerUnit;
+        }
+
+        public UnitCreateEvent(Unit unit, Building spawner){
+            this(unit, spawner, null);
         }
     }
 

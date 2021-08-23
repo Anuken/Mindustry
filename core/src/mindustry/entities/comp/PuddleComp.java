@@ -1,5 +1,6 @@
 package mindustry.entities.comp;
 
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -20,16 +21,29 @@ import static mindustry.entities.Puddles.*;
 @EntityDef(value = {Puddlec.class}, pooled = true)
 @Component(base = true)
 abstract class PuddleComp implements Posc, Puddlec, Drawc{
-    private static final int maxGeneration = 2;
     private static final Rect rect = new Rect(), rect2 = new Rect();
     private static int seeds;
 
+    private static Puddle paramPuddle;
+    private static Cons<Unit> unitCons = unit -> {
+        if(unit.isGrounded() && !unit.hovering){
+            unit.hitbox(rect2);
+            if(rect.overlaps(rect2)){
+                unit.apply(paramPuddle.liquid.effect, 60 * 2);
+
+                if(unit.vel.len2() > 0.1f * 0.1f){
+                    Fx.ripple.at(unit.x, unit.y, unit.type.rippleScale, paramPuddle.liquid.color);
+                }
+            }
+        }
+    };
+
     @Import int id;
     @Import float x, y;
+    @Import boolean added;
 
-    transient float accepting, updateTime, lastRipple;
+    transient float accepting, updateTime, lastRipple = Time.time + Mathf.random(40f);
     float amount;
-    int generation;
     Tile tile;
     Liquid liquid;
 
@@ -39,46 +53,48 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
 
     @Override
     public void update(){
-        //update code
         float addSpeed = accepting > 0 ? 3f : 0f;
 
         amount -= Time.delta * (1f - liquid.viscosity) / (5f + addSpeed);
         amount += accepting;
         accepting = 0f;
 
-        if(amount >= maxLiquid / 1.5f && generation < maxGeneration){
+        if(amount >= maxLiquid / 1.5f){
             float deposited = Math.min((amount - maxLiquid / 1.5f) / 4f, 0.3f) * Time.delta;
+            int targets = 0;
             for(Point2 point : Geometry.d4){
                 Tile other = world.tile(tile.x + point.x, tile.y + point.y);
                 if(other != null && other.block() == Blocks.air){
-                    Puddles.deposit(other, tile, liquid, deposited, generation + 1);
-                    amount -= deposited / 2f; //tweak to speed up/slow down Puddle propagation
+                    targets ++;
+                    Puddles.deposit(other, tile, liquid, deposited, false);
                 }
             }
+            amount -= deposited * targets;
         }
 
         amount = Mathf.clamp(amount, 0, maxLiquid);
 
         if(amount <= 0f){
             remove();
+            return;
+        }
+
+        if(Puddles.get(tile) != self() && added){
+            //force removal without pool free
+            Groups.all.remove(self());
+            Groups.draw.remove(self());
+            Groups.puddle.remove(self());
+            added = false;
+            return;
         }
 
         //effects-only code
         if(amount >= maxLiquid / 2f && updateTime <= 0f){
-            Units.nearby(rect.setSize(Mathf.clamp(amount / (maxLiquid / 1.5f)) * 10f).setCenter(x, y), unit -> {
-                if(unit.isGrounded() && !unit.hovering){
-                    unit.hitbox(rect2);
-                    if(rect.overlaps(rect2)){
-                        unit.apply(liquid.effect, 60 * 2);
+            paramPuddle = self();
 
-                        if(unit.vel.len() > 0.1){
-                            Fx.ripple.at(unit.x, unit.y, unit.type.rippleScale, liquid.color);
-                        }
-                    }
-                }
-            });
+            Units.nearby(rect.setSize(Mathf.clamp(amount / (maxLiquid / 1.5f)) * 10f).setCenter(x, y), unitCons);
 
-            if(liquid.temperature > 0.7f && (tile.build != null) && Mathf.chance(0.5)){
+            if(liquid.temperature > 0.7f && tile.build != null && Mathf.chance(0.5)){
                 Fires.create(tile);
             }
 

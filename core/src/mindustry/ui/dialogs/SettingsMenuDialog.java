@@ -301,6 +301,8 @@ public class SettingsMenuDialog extends Dialog{
                     control.setInput(new DesktopInput());
                     input.setUseKeyboard(true);
                 }
+            }else{
+                Core.settings.put("keyboard", false);
             }
         }
         //the issue with touchscreen support on desktop is that:
@@ -356,7 +358,7 @@ public class SettingsMenuDialog extends Dialog{
         });
 
         graphics.sliderPref("screenshake", 4, 0, 8, i -> (i / 4f) + "x");
-        graphics.sliderPref("fpscap", 240, 15, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
+        graphics.sliderPref("fpscap", 240, 10, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
         graphics.sliderPref("lasersopacity", 100, 0, 100, 5, s -> {
             if(ui.settings != null){
@@ -369,6 +371,12 @@ public class SettingsMenuDialog extends Dialog{
         if(!mobile){
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
             graphics.checkPref("fullscreen", false, b -> {
+                if(b && settings.getBool("borderlesswindow")){
+                    Core.graphics.setWindowedMode(Core.graphics.getWidth(), Core.graphics.getHeight());
+                    settings.put("borderlesswindow", false);
+                    graphics.rebuild();
+                }
+
                 if(b){
                     Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode());
                 }else{
@@ -376,15 +384,23 @@ public class SettingsMenuDialog extends Dialog{
                 }
             });
 
-            graphics.checkPref("borderlesswindow", false, b -> Core.graphics.setUndecorated(b));
+            graphics.checkPref("borderlesswindow", false, b -> {
+                if(b && settings.getBool("fullscreen")){
+                    Core.graphics.setWindowedMode(Core.graphics.getWidth(), Core.graphics.getHeight());
+                    settings.put("fullscreen", false);
+                    graphics.rebuild();
+                }
+                Core.graphics.setBorderless(b);
+            });
 
             Core.graphics.setVSync(Core.settings.getBool("vsync"));
+
             if(Core.settings.getBool("fullscreen")){
                 Core.app.post(() -> Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode()));
             }
 
             if(Core.settings.getBool("borderlesswindow")){
-                Core.app.post(() -> Core.graphics.setUndecorated(true));
+                Core.app.post(() -> Core.graphics.setBorderless(true));
             }
         }else if(!ios){
             graphics.checkPref("landscape", false, b -> {
@@ -589,7 +605,7 @@ public class SettingsMenuDialog extends Dialog{
             rebuild();
         }
 
-        void rebuild(){
+        public void rebuild(){
             clearChildren();
 
             for(Setting setting : list){
@@ -610,9 +626,10 @@ public class SettingsMenuDialog extends Dialog{
             public String title;
             public @Nullable String description;
 
-            Setting(String name){
+            public Setting(String name){
                 this.name = name;
-                title = bundle.get("setting." + name + ".name");
+                String winkey = "setting." + name + ".name.windows";
+                title = OS.isWindows && bundle.has(winkey) ? bundle.get(winkey) : bundle.get("setting." + name + ".name");
                 description = bundle.getOrNull("setting." + name + ".description");
             }
 
@@ -641,7 +658,7 @@ public class SettingsMenuDialog extends Dialog{
             boolean def;
             Boolc changed;
 
-            CheckSetting(String name, boolean def, Boolc changed){
+            public CheckSetting(String name, boolean def, Boolc changed){
                 super(name);
                 this.def = def;
                 this.changed = changed;
@@ -670,7 +687,7 @@ public class SettingsMenuDialog extends Dialog{
             int def, min, max, step;
             StringProcessor sp;
 
-            SliderSetting(String name, int def, int min, int max, int step, StringProcessor s){
+            public SliderSetting(String name, int def, int min, int max, int step, StringProcessor s){
                 super(name);
                 this.def = def;
                 this.min = min;

@@ -130,7 +130,7 @@ public class Fx{
         Fill.circle(x, y, e.fslope() * 1.5f * size);
     }),
 
-    pointBeam = new Effect(25f, e -> {
+    pointBeam = new Effect(25f, 300f, e -> {
         if(!(e.data instanceof Position)) return;
 
         Position pos = e.data();
@@ -391,12 +391,6 @@ public class Fx{
         color(Pal.heal);
         stroke(e.fout() * 2f);
         Lines.circle(e.x, e.y, 2f + e.finpow() * 7f);
-    }),
-
-    healDenamic = new Effect(11, e -> {
-        color(Pal.heal);
-        stroke(e.fout() * 2f);
-        Lines.circle(e.x, e.y, 2f + e.finpow() * e.rotation);
     }),
 
     shieldWave = new Effect(22, e -> {
@@ -880,6 +874,16 @@ public class Fx{
         Drawf.light(Team.derelict, e.x, e.y, 20f * e.fslope(), Pal.lightFlame, 0.5f);
     }),
 
+    fireHit = new Effect(35f, e -> {
+        color(Pal.lightFlame, Pal.darkFlame, e.fin());
+
+        randLenVectors(e.id, 3, 2f + e.fin() * 10f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.2f + e.fout() * 1.6f);
+        });
+
+        color();
+    }),
+
     fireSmoke = new Effect(35f, e -> {
         color(Color.gray);
 
@@ -990,7 +994,9 @@ public class Fx{
         float length = 20f * e.finpow();
         float size = 7f * e.fout();
 
-        rect(((Item)e.data).fullIcon, e.x + trnsx(e.rotation, length), e.y + trnsy(e.rotation, length), size, size);
+        if(!(e.data instanceof Item item)) return;
+
+        rect(item.fullIcon, e.x + trnsx(e.rotation, length), e.y + trnsy(e.rotation, length), size, size);
     }),
 
     shockwave = new Effect(10f, 80f, e -> {
@@ -1877,7 +1883,7 @@ public class Fx{
         rand.setSeed(e.id);
         Tmp.v1.trns(e.rotation, e.finpow() * 90f * rand.random(0.2f, 1f));
         Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 8f * rand.random(0.6f, 1f) * e.fout(0.2f));
-    }).layer(Layer.block + 1f),
+    }).layer(Layer.groundUnit + 1f),
 
     unitShieldBreak = new Effect(35, e -> {
         if(!(e.data instanceof Unitc)) return;
