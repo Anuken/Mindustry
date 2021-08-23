@@ -142,7 +142,9 @@ public class WaveInfoDialog extends BaseDialog{
             main.row();
             main.button("@add", () -> {
                 if(groups == null) groups = new Seq<>();
-                groups.add(new SpawnGroup(lastType));
+                SpawnGroup newGroup = new SpawnGroup(lastType);
+                groups.add(newGroup);
+                expandedGroup = newGroup;
                 buildGroups();
             }).growX().height(70f);
         }), new Label("@waves.none"){{
