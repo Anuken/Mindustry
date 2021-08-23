@@ -18,8 +18,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
-import java.util.*;
-
 import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.*;
 
@@ -167,7 +165,7 @@ public class WaveInfoDialog extends BaseDialog{
         table.margin(10f);
 
         if(groups != null){
-            groups.sort(Comparator.comparing(g -> g.begin));
+            groups.sort(g -> g.begin);
 
             for(SpawnGroup group : groups){
                 table.table(Tex.button, t -> {
