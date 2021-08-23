@@ -145,6 +145,7 @@ public class WaveInfoDialog extends BaseDialog{
                 SpawnGroup newGroup = new SpawnGroup(lastType);
                 groups.add(newGroup);
                 expandedGroup = newGroup;
+                showUpdate(newGroup);
                 buildGroups();
             }).growX().height(70f);
         }), new Label("@waves.none"){{
