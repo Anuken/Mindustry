@@ -54,18 +54,21 @@ public class MenuFragment extends Fragment{
         if(mobile){
             parent.fill(c -> c.bottom().left().button("", Styles.infot, ui.about::show).size(84, 45).name("info"));
             parent.fill(c -> c.bottom().right().button("", Styles.discordt, ui.discord::show).size(84, 45).name("discord"));
-        }else if(becontrol.active()){
-            parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {
-                ui.loadfrag.show();
-                becontrol.checkUpdate(result -> {
-                    ui.loadfrag.hide();
-                    if(!result){
-                        ui.showInfo("@be.noupdates");
-                    }
-                });
-            }).size(200, 60).name("becheck").update(t -> {
-                t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white);
-            }));
+        }else{
+            parent.fill(c -> c.bottom().left().button("@schematics", Icon.paste, ui.schematics::show).size(180, 60).name("schematics"));
+            if(becontrol.active()){
+                parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {
+                    ui.loadfrag.show();
+                    becontrol.checkUpdate(result -> {
+                        ui.loadfrag.hide();
+                        if(!result){
+                            ui.showInfo("@be.noupdates");
+                        }
+                    });
+                }).size(200, 60).name("becheck").update(t -> {
+                    t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white);
+                }));
+            }
         }
 
         String versionText = ((Version.build == -1) ? "[#fc8140aa]" : "[#ffffffba]") + Version.combined();
@@ -165,8 +168,6 @@ public class MenuFragment extends Fragment{
                 ),
                 new Buttoni("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("@workshop", Icon.steam, platform::openWorkshop) : null,
                 new Buttoni("@mods", Icon.book, ui.mods::show),
-                //not enough space for this button
-                //new Buttoni("@schematics", Icon.paste, ui.schematics::show),
                 new Buttoni("@settings", Icon.settings, ui.settings::show),
                 new Buttoni("@about.button", Icon.info, ui.about::show),
                 new Buttoni("@quit", Icon.exit, Core.app::exit)
