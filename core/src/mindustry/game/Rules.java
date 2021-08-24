@@ -63,7 +63,7 @@ public class Rules{
     /** Multiplier for buildings resource cost. */
     public float buildCostMultiplier = 1f;
     /** Multiplier for building speed. */
-    public float buildSpeedMultiplier = 1f;
+    public float blockBuildSpeedMultiplier = 1f;
     /** Multiplier for percentage of materials refunded when deconstructing. */
     public float deconstructRefundMultiplier = 0.5f;
     /** No-build zone around enemy core radius. */
@@ -157,7 +157,7 @@ public class Rules{
     }
 
     public float buildSpeed(Team team){
-        return buildSpeedMultiplier * teams.get(team).buildSpeedMultiplier;
+        return blockBuildSpeedMultiplier * teams.get(team).blockBuildSpeedMultiplier;
     }
 
     /** A team-specific ruleset. */
@@ -184,7 +184,7 @@ public class Rules{
         /** How much damage blocks (turrets) deal. */
         public float blockDamageMultiplier = 1f;
         /** Multiplier for building speed. */
-        public float buildSpeedMultiplier = 1f;
+        public float blockBuildSpeedMultiplier = 1f;
 
         //build cost disabled due to technical complexity
     }
