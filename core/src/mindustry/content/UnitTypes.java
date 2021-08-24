@@ -436,18 +436,7 @@ public class UnitTypes implements ContentList{
             immunities = ObjectSet.with(StatusEffects.burning);
 
             commandLimit = 8;
-
-            weapons.add(new RepairBeamWeapon("repair-beam-weapon-center-large"){{
-                x = 44 / 4f;
-                y = -30f / 4f;
-                shootY = 6f;
-                beamWidth = 0.8f;
-                repairSpeed = 1.4f;
-
-                bullet = new BulletType(){{
-                    maxRange = 120f;
-                }};
-            }});
+            singleTarget = true;
 
             weapons.add(new Weapon("vela-weapon"){{
                 mirror = false;
@@ -490,6 +479,18 @@ public class UnitTypes implements ContentList{
 
                 shootStatus = StatusEffects.slow;
                 shootStatusDuration = bullet.lifetime + firstShotDelay;
+            }});
+
+            weapons.add(new RepairBeamWeapon("repair-beam-weapon-center-large"){{
+                x = 44 / 4f;
+                y = -30f / 4f;
+                shootY = 6f;
+                beamWidth = 0.8f;
+                repairSpeed = 1.4f;
+
+                bullet = new BulletType(){{
+                    maxRange = 120f;
+                }};
             }});
         }};
 
