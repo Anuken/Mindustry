@@ -193,13 +193,13 @@ public class ApplicationTests{
 
         Rules rules = new Rules();
         rules.attackMode = true;
-        rules.buildSpeedMultiplier = 99f;
+        rules.blockBuildSpeedMultiplier = 99f;
 
         TypeIO.writeRules(new Writes(new ByteBufferOutput(buffer)), rules);
         buffer.position(0);
         Rules res = TypeIO.readRules(new Reads(new ByteBufferInput(buffer)));
 
-        assertEquals(rules.buildSpeedMultiplier, res.buildSpeedMultiplier);
+        assertEquals(rules.blockBuildSpeedMultiplier, res.blockBuildSpeedMultiplier);
         assertEquals(rules.attackMode, res.attackMode);
     }
 
@@ -208,12 +208,12 @@ public class ApplicationTests{
         Rules rules = new Rules();
         rules.attackMode = true;
         rules.tags.put("blah", "bleh");
-        rules.buildSpeedMultiplier = 99.1f;
+        rules.blockBuildSpeedMultiplier = 99.1f;
 
         String str = JsonIO.write(rules);
         Rules res = JsonIO.read(Rules.class, str);
 
-        assertEquals(rules.buildSpeedMultiplier, res.buildSpeedMultiplier);
+        assertEquals(rules.blockBuildSpeedMultiplier, res.blockBuildSpeedMultiplier);
         assertEquals(rules.attackMode, res.attackMode);
         assertEquals(rules.tags.get("blah"), res.tags.get("blah"));
 
@@ -694,7 +694,7 @@ public class ApplicationTests{
         //infinite build range
         state.rules.editor = true;
         state.rules.infiniteResources = true;
-        state.rules.buildSpeedMultiplier = 999999f;
+        state.rules.blockBuildSpeedMultiplier = 999999f;
 
         d1.set(0f, 0f);
         d2.set(20f, 20f);
