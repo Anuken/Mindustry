@@ -29,7 +29,7 @@ import static mindustry.Vars.*;
 abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
     static final Vec2[] vecs = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
 
-    @Import float x, y, rotation, buildSpeedMultiplier;
+    @Import float x, y, rotation, blockBuildSpeedMultiplier;
     @Import UnitType type;
     @Import Team team;
 
@@ -41,7 +41,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
     private transient float buildAlpha = 0f;
 
     public boolean canBuild(){
-        return type.buildSpeed > 0 && buildSpeedMultiplier > 0;
+        return type.buildSpeed > 0 && blockBuildSpeedMultiplier > 0;
     }
 
     @Override
@@ -124,7 +124,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             return;
         }
 
-        float bs = 1f / entity.buildCost * Time.delta * type.buildSpeed * buildSpeedMultiplier * state.rules.buildSpeed(team);
+        float bs = 1f / entity.buildCost * Time.delta * type.buildSpeed * blockBuildSpeedMultiplier * state.rules.buildSpeed(team);
 
         //otherwise, update it.
         if(current.breaking){
