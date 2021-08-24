@@ -402,7 +402,7 @@ public class Block extends UnlockableContent{
             stats.add(Stat.health, health, StatUnit.none);
         }
 
-        if(canBeBuilt()){
+        if(canBeBuilt() && buildVisibility != BuildVisibility.sandboxOnly){
             stats.add(Stat.buildTime, buildCost / 60, StatUnit.seconds);
             stats.add(Stat.buildCost, StatValues.items(false, requirements));
         }
