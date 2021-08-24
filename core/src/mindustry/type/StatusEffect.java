@@ -21,8 +21,8 @@ public class StatusEffect extends UnlockableContent{
     public float speedMultiplier = 1f;
     /** Unit reload multiplier. */
     public float reloadMultiplier = 1f;
-    /** Unit build speed multiplier. */
-    public float buildSpeedMultiplier = 1f;
+    /** Unit build block speed multiplier. */
+    public float blockBuildSpeedMultiplier = 1f;
     /** Unit drag multiplier. */
     public float dragMultiplier = 1f;
     /** Damage dealt upon transition to an affinity. */
@@ -74,7 +74,7 @@ public class StatusEffect extends UnlockableContent{
         if(healthMultiplier != 1) stats.addPercent(Stat.healthMultiplier, healthMultiplier);
         if(speedMultiplier != 1) stats.addPercent(Stat.speedMultiplier, speedMultiplier);
         if(reloadMultiplier != 1) stats.addPercent(Stat.reloadMultiplier, reloadMultiplier);
-        if(buildSpeedMultiplier != 1) stats.addPercent(Stat.buildSpeedMultiplier, buildSpeedMultiplier);
+        if(blockBuildSpeedMultiplier != 1) stats.addPercent(Stat.blockBuildSpeedMultiplier, blockBuildSpeedMultiplier);
         if(damage > 0) stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
         if(damage < 0) stats.add(Stat.healing, -damage * 60f, StatUnit.perSecond);
 
