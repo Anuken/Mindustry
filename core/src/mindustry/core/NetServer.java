@@ -896,7 +896,7 @@ public class NetServer implements ApplicationListener{
     }
 
     String fixName(String name){
-        name = name.trim();
+        name = name.trim().replace("\n", "").replace("\t", "");
         if(name.equals("[") || name.equals("]")){
             return "";
         }
