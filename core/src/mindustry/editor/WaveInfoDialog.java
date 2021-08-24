@@ -18,6 +18,8 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.*;
 
@@ -29,6 +31,8 @@ public class WaveInfoDialog extends BaseDialog{
     private Table table;
     private int start = 0;
     private UnitType lastType = UnitTypes.dagger;
+    private StatusEffect lastEffect = StatusEffects.none;
+    private Sort sort = Sort.begin;
     private float updateTimer, updatePeriod = 1f;
     private WaveGraph graph = new WaveGraph();
 
@@ -41,6 +45,35 @@ public class WaveInfoDialog extends BaseDialog{
         addCloseListener();
 
         onResize(this::setup);
+        buttons.button(Icon.filterSmall, () -> {
+            BaseDialog dialog = new BaseDialog("@waves.sort");
+            dialog.setFillParent(false);
+            dialog.cont.defaults().size(210f, 64f);
+            dialog.cont.button("@waves.sort.begin", () -> {
+                sort = Sort.begin;
+                dialog.hide();
+                buildGroups();
+            });
+            dialog.cont.button("@waves.sort.totals", () -> {
+                sort = Sort.totals;
+                dialog.hide();
+                buildGroups();
+            });
+            dialog.cont.button("@waves.sort.health", () -> {
+                sort = Sort.health;
+                dialog.hide();
+                buildGroups();
+            });
+            dialog.cont.button("@waves.sort.type", () -> {
+                sort = Sort.type;
+                dialog.hide();
+                buildGroups();
+            });
+            dialog.addCloseButton();
+            dialog.show();
+            buildGroups();
+        }).size(60f, 64f);
+
         addCloseButton();
 
         buttons.button("@waves.edit", () -> {
@@ -165,7 +198,10 @@ public class WaveInfoDialog extends BaseDialog{
         table.margin(10f);
 
         if(groups != null){
-            groups.sort(g -> g.begin);
+            if(sort == Sort.begin) groups.sort(g -> g.begin);
+            if(sort == Sort.totals) groups.sort(g -> g.unitAmount);
+            if(sort == Sort.health) groups.sort(g -> g.type.health);
+            if(sort == Sort.type) groups.sort(Comparator.comparing(g -> g.type));
 
             for(SpawnGroup group : groups){
                 table.table(Tex.button, t -> {
@@ -173,12 +209,14 @@ public class WaveInfoDialog extends BaseDialog{
                     t.button(b -> {
                         b.left();
                         b.image(group.type.uiIcon).size(32f).padRight(3).scaling(Scaling.fit);
+                        if(group.effect != null && group.effect != StatusEffects.none) b.image(group.effect.uiIcon).size(20f).padRight(3).scaling(Scaling.fit);
                         b.add(group.type.localizedName).color(Pal.accent);
 
                         b.add().growX();
 
                         b.label(() -> (group.begin + 1) + "").color(Color.lightGray).minWidth(45f).labelAlign(Align.left).left();
 
+                        b.button(Icon.logicSmall, Styles.emptyi, () -> showEffect(group)).pad(-6).size(46f);
                         b.button(Icon.unitsSmall, Styles.emptyi, () -> showUpdate(group)).pad(-6).size(46f);
                         b.button(Icon.cancel, Styles.emptyi, () -> {
                             groups.remove(group);
@@ -304,6 +342,43 @@ public class WaveInfoDialog extends BaseDialog{
         });
         dialog.addCloseButton();
         dialog.show();
+    }
+
+    void showEffect(SpawnGroup group){
+        BaseDialog dialog = new BaseDialog("");
+        dialog.setFillParent(true);
+        dialog.cont.pane(p -> {
+            int i = 0;
+            for(StatusEffect effect : content.statusEffects()){
+                if(effect.isHidden() && (effect.isHidden() && effect != StatusEffects.none)) continue;
+                p.button(t -> {
+                    t.left();
+                    if(effect.uiIcon != null && effect != StatusEffects.none){
+                        t.image(effect.uiIcon).size(8 * 4).scaling(Scaling.fit).padRight(2f);
+                    }else{
+                        t.image(Icon.none).size(8 * 4).scaling(Scaling.fit).padRight(2f);
+                    }
+
+                    if(effect != StatusEffects.none){
+                        t.add(effect.localizedName);
+                    }else{
+                        t.add("@settings.resetKey");
+                    }
+                }, () -> {
+                    lastEffect = effect;
+                    group.effect = effect;
+                    dialog.hide();
+                    buildGroups();
+                }).pad(2).margin(12f).fillX();
+                if(++i % 3 == 0) p.row();
+            }
+        });
+        dialog.addCloseButton();
+        dialog.show();
+    }
+
+    enum Sort{
+        begin, totals, health, type;
     }
 
     void updateWaves(){
