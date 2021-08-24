@@ -38,7 +38,7 @@ public enum Stat{
     healthMultiplier,
     speedMultiplier,
     reloadMultiplier,
-    buildSpeedMultiplier,
+    blockBuildSpeedMultiplier,
     reactive,
     healing,
 
