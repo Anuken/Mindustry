@@ -28,7 +28,7 @@ public enum Gamemode{
         rules.pvp = true;
         rules.enemyCoreBuildRadius = 600f;
         rules.buildCostMultiplier = 1f;
-        rules.buildSpeedMultiplier = 1f;
+        rules.blockBuildSpeedMultiplier = 1f;
         rules.unitBuildSpeedMultiplier = 2f;
         rules.attackMode = true;
     }, map -> map.teams.size > 1),
