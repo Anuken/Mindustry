@@ -1158,12 +1158,14 @@ public class Blocks implements ContentList{
         battery = new Battery("battery"){{
             requirements(Category.power, with(Items.copper, 5, Items.lead, 20));
             consumes.powerBuffered(4000f);
+            baseExplosiveness = 1f;
         }};
 
         batteryLarge = new Battery("battery-large"){{
             requirements(Category.power, with(Items.titanium, 20, Items.lead, 40, Items.silicon, 20));
             size = 3;
             consumes.powerBuffered(50000f);
+            baseExplosiveness = 5f;
         }};
 
         combustionGenerator = new BurnerGenerator("combustion-generator"){{
