@@ -33,6 +33,7 @@ public class WaveInfoDialog extends BaseDialog{
     private UnitType lastType = UnitTypes.dagger;
     private StatusEffect lastEffect = StatusEffects.none;
     private Sort sort = Sort.begin;
+    private boolean reverseSort = false;
     private float updateTimer, updatePeriod = 1f;
     private WaveGraph graph = new WaveGraph();
 
@@ -45,7 +46,7 @@ public class WaveInfoDialog extends BaseDialog{
         addCloseListener();
 
         onResize(this::setup);
-        buttons.button(Icon.filterSmall, () -> {
+        buttons.button(Icon.filter, () -> {
             BaseDialog dialog = new BaseDialog("@waves.sort");
             dialog.setFillParent(false);
             dialog.cont.defaults().size(210f, 64f);
@@ -69,6 +70,11 @@ public class WaveInfoDialog extends BaseDialog{
                 dialog.hide();
                 buildGroups();
             });
+            dialog.row();
+            dialog.check("@waves.sort.reverse", b -> reverseSort = (b ? true : false)).padTop(4).update(b -> {
+                b.setChecked(reverseSort == true);
+                buildGroups();
+            }).padBottom(8f);
             dialog.addCloseButton();
             dialog.show();
             buildGroups();
@@ -198,10 +204,14 @@ public class WaveInfoDialog extends BaseDialog{
         table.margin(10f);
 
         if(groups != null){
-            if(sort == Sort.begin) groups.sort(g -> g.begin);
-            if(sort == Sort.totals) groups.sort(g -> g.unitAmount);
-            if(sort == Sort.health) groups.sort(g -> g.type.health);
-            if(sort == Sort.type) groups.sort(Comparator.comparing(g -> g.type));
+            if(sort == Sort.begin) groups.sort(g -> g.begin * (reverseSort ? -1 : 1));
+            if(sort == Sort.totals) groups.sort(g -> g.unitAmount * (reverseSort ? -1 : 1));
+            if(sort == Sort.health) groups.sort(g -> g.type.health * (reverseSort ? -1 : 1));
+            if(sort == Sort.type && reverseSort){
+                groups.sortComparing(g -> g.type).reverse();
+            }else if(sort == Sort.type){
+                 groups.sortComparing(g -> g.type);
+            }
 
             for(SpawnGroup group : groups){
                 table.table(Tex.button, t -> {
