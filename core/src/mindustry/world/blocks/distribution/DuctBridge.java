@@ -44,6 +44,12 @@ public class DuctBridge extends Block{
     }
 
     @Override
+    public void init(){
+        clipSize = Math.max(clipSize, (range + 0.5f) * 2 * tilesize);
+        super.init();
+    }
+
+    @Override
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(region, req.drawx(), req.drawy());
         Draw.rect(dirRegion, req.drawx(), req.drawy(), req.rotation * 90);

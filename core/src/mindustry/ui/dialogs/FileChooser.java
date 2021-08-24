@@ -39,6 +39,7 @@ public class FileChooser extends BaseDialog{
 
         if(!lastDirectory.exists()){
             lastDirectory = homeDirectory;
+            directory = lastDirectory;
         }
 
         onResize(() -> {

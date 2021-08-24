@@ -86,7 +86,7 @@ public abstract class LStatement{
 
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
         return table.field(value, Styles.nodeField, s -> setter.get(sanitize(s)))
-            .size(144f, 40f).pad(2f).color(table.color).maxTextLength(LAssembler.maxTokenLength).addInputDialog();
+            .size(144f, 40f).pad(2f).color(table.color).maxTextLength(LAssembler.maxTokenLength);
     }
 
     protected Cell<TextField> fields(Table table, String desc, String value, Cons<String> setter){
@@ -175,7 +175,7 @@ public abstract class LStatement{
         t.top().pane(inner -> {
             inner.top();
             hideCons.get(inner, hide);
-        }).pad(0f).top().get().setScrollingDisabled(true, false);
+        }).pad(0f).top().scrollX(false);
 
         t.pack();
     }

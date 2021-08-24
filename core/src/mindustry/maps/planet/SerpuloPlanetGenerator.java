@@ -490,7 +490,8 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         state.rules.waves = sector.info.waves = true;
         state.rules.enemyCoreBuildRadius = 600f;
 
-        state.rules.spawns = Waves.generate(difficulty, new Rand(), state.rules.attackMode);
+        //spawn air only when spawn is blocked
+        state.rules.spawns = Waves.generate(difficulty, new Rand(sector.id), state.rules.attackMode, state.rules.attackMode && spawner.countGroundSpawns() == 0);
     }
 
     @Override

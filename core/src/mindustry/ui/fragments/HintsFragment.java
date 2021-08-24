@@ -53,7 +53,7 @@ public class HintsFragment extends Fragment{
                 Hint hint = hints.find(Hint::show);
                 if(hint != null && hint.complete()){
                     hints.remove(hint);
-                }else if(hint != null){
+                }else if(hint != null && !renderer.isCutscene() && state.isGame() && control.saves.getTotalPlaytime() > 8000){
                     display(hint);
                 }else{
                     //moused over a derelict structure
@@ -92,7 +92,7 @@ public class HintsFragment extends Fragment{
         hints.sort(Hint::order);
 
         Hint first = hints.find(Hint::show);
-        if(first != null){
+        if(first != null && !renderer.isCutscene() && state.isGame()){
             hints.remove(first);
             display(first);
         }
@@ -163,7 +163,7 @@ public class HintsFragment extends Fragment{
         schematicSelect(visibleDesktop, () -> ui.hints.placedBlocks.contains(Blocks.router), () -> Core.input.keyRelease(Binding.schematic_select) || Core.input.keyTap(Binding.pick)),
         conveyorPathfind(() -> control.input.block == Blocks.titaniumConveyor, () -> Core.input.keyRelease(Binding.diagonal_placement) || (mobile && Core.settings.getBool("swapdiagonal"))),
         boost(visibleDesktop, () -> !player.dead() && player.unit().type.canBoost, () -> Core.input.keyDown(Binding.boost)),
-        blockInfo(() -> true, () -> ui.content.isShown()),
+        blockInfo(() -> !(state.isCampaign() && state.rules.sector == SectorPresets.groundZero.sector && state.wave < 3), () -> ui.content.isShown()),
         derelict(() -> ui.hints.events.contains("derelictmouse"), () -> false),
         command(() -> state.rules.defaultTeam.data().units.size > 3 && !net.active(), () -> player.unit().isCommanding()),
         payloadPickup(() -> !player.unit().dead && player.unit() instanceof Payloadc p && p.payloads().isEmpty(), () -> player.unit() instanceof Payloadc p && p.payloads().any()),

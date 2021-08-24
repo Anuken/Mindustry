@@ -31,7 +31,7 @@ public class SpawnPathFilter extends GenerateFilter{
 
     @Override
     public void apply(Tiles tiles, GenerateInput in){
-        Tile core = null;
+        var cores = new Seq<Tile>();
         var spawns = new Seq<Tile>();
 
         for(Tile tile : tiles){
@@ -39,11 +39,11 @@ public class SpawnPathFilter extends GenerateFilter{
                 spawns.add(tile);
             }
             if(tile.block() instanceof CoreBlock && tile.team() != Vars.state.rules.waveTeam){
-                core = tile;
+                cores.add(tile);
             }
         }
 
-        if(core != null && spawns.any()){
+        for(var core : cores){
             for(var spawn : spawns){
                 var path = Astar.pathfind(core.x, core.y, spawn.x, spawn.y, t -> t.solid() ? 100 : 1, Astar.manhattan, tile -> !tile.floor().isDeep());
                 for(var tile : path){

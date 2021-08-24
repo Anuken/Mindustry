@@ -189,7 +189,7 @@ public class WaveGraph extends Table{
                     for(UnitType o : hidden) used.remove(o);
                 }).update(b -> b.setChecked(hidden.contains(type)));
             }
-        }).get().setScrollingDisabled(false, true);
+        }).scrollY(false);
 
         for(UnitType type : hidden){
             used.remove(type);

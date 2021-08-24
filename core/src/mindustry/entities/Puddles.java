@@ -54,8 +54,8 @@ public class Puddles{
             puddle.liquid = liquid;
             puddle.amount = amount;
             puddle.set((tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
-            puddle.add();
             map.put(tile.pos(), puddle);
+            puddle.add();
         }else if(p.liquid == liquid){
             p.accepting = Math.max(amount, p.accepting);
 

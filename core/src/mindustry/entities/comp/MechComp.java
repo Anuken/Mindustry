@@ -77,6 +77,17 @@ abstract class MechComp implements Posc, Flyingc, Hitboxc, Unitc, Mechc, Elevati
     }
 
     @Override
+    @Replace
+    public void rotateMove(Vec2 vec){
+        //mechs use baseRotation to rotate, not rotation.
+        moveAt(Tmp.v2.trns(baseRotation, vec.len()));
+
+        if(!vec.isZero()){
+            baseRotation = Angles.moveToward(baseRotation, vec.angle(), type.rotateSpeed * Math.max(Time.delta, 1));
+        }
+    }
+
+    @Override
     public void moveAt(Vec2 vector, float acceleration){
         //mark walking state when moving in a controlled manner
         if(!vector.isZero()){

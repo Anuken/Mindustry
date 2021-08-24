@@ -2,7 +2,6 @@ package mindustry.ai.types;
 
 import arc.math.*;
 import mindustry.ai.*;
-import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -49,13 +48,6 @@ public class GroundAI extends AIController{
             unit.elevation = Mathf.approachDelta(unit.elevation, 0f, unit.type.riseSpeed);
         }
 
-        if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type.rotateShooting){
-            if(unit.type.hasWeapons()){
-                unit.lookAt(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
-            }
-        }else if(unit.moving()){
-            unit.lookAt(unit.vel().angle());
-        }
-
+        faceTarget();
     }
 }

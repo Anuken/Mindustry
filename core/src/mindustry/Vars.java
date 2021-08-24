@@ -87,7 +87,7 @@ public class Vars implements Loadable{
     public static final int maxNameLength = 40;
     /** displayed item size when ingame. */
     public static final float itemSize = 5f;
-    /** units outside of this bound will die instantly */
+    /** units outside this bound will die instantly */
     public static final float finalWorldBounds = 250;
     /** range for building */
     public static final float buildingRange = 220f;

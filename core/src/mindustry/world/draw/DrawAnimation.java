@@ -45,6 +45,6 @@ public class DrawAnimation extends DrawBlock{
 
     @Override
     public TextureRegion[] icons(Block block){
-        return new TextureRegion[]{block.region, top};
+        return top.found() ? new TextureRegion[]{block.region, top} : new TextureRegion[]{block.region};
     }
 }

@@ -267,6 +267,7 @@ public class Mods implements Loadable{
 
             TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.linear : TextureFilter.nearest;
 
+            Time.mark();
             //generate new icons
             for(Seq<Content> arr : content.getContentMap()){
                 arr.each(c -> {
@@ -277,6 +278,7 @@ public class Mods implements Loadable{
                     }
                 });
             }
+            Log.debug("Time to generate icons: @", Time.elapsed());
 
             //dispose old atlas data
             Core.atlas = packer.flush(filter, new TextureAtlas());
@@ -287,7 +289,7 @@ public class Mods implements Loadable{
 
         packer.dispose();
         packer = null;
-        Log.debug("Time to update textures: @", Time.elapsed());
+        Log.debug("Total time to generate & flush textures synchronously: @", Time.elapsed());
     }
 
     private PageType getPage(AtlasRegion region){

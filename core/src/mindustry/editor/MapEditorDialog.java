@@ -42,7 +42,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private BaseDialog menu;
     private Table blockSelection;
     private Rules lastSavedRules;
-    private boolean saved = false;
+    private boolean saved = false; //currently never read
     private boolean shownWithMap = false;
     private Seq<Block> blocksOut = new Seq<>();
 

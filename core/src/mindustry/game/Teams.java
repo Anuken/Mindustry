@@ -48,11 +48,11 @@ public class Teams{
         return Geometry.findClosest(x, y, get(team).cores);
     }
 
-    public boolean eachEnemyCore(Team team, Boolf<CoreBuild> ret){
+    public boolean anyEnemyCoresWithin(Team team, float x, float y, float radius){
         for(TeamData data : active){
             if(team != data.team){
                 for(CoreBuild tile : data.cores){
-                    if(ret.get(tile)){
+                    if(tile.within(x, y, radius)){
                         return true;
                     }
                 }

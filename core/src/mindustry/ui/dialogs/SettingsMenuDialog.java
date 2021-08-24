@@ -301,6 +301,8 @@ public class SettingsMenuDialog extends Dialog{
                     control.setInput(new DesktopInput());
                     input.setUseKeyboard(true);
                 }
+            }else{
+                Core.settings.put("keyboard", false);
             }
         }
         //the issue with touchscreen support on desktop is that:
@@ -356,7 +358,7 @@ public class SettingsMenuDialog extends Dialog{
         });
 
         graphics.sliderPref("screenshake", 4, 0, 8, i -> (i / 4f) + "x");
-        graphics.sliderPref("fpscap", 240, 15, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
+        graphics.sliderPref("fpscap", 240, 10, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
         graphics.sliderPref("lasersopacity", 100, 0, 100, 5, s -> {
             if(ui.settings != null){
@@ -603,7 +605,7 @@ public class SettingsMenuDialog extends Dialog{
             rebuild();
         }
 
-        void rebuild(){
+        public void rebuild(){
             clearChildren();
 
             for(Setting setting : list){
@@ -624,7 +626,7 @@ public class SettingsMenuDialog extends Dialog{
             public String title;
             public @Nullable String description;
 
-            Setting(String name){
+            public Setting(String name){
                 this.name = name;
                 String winkey = "setting." + name + ".name.windows";
                 title = OS.isWindows && bundle.has(winkey) ? bundle.get(winkey) : bundle.get("setting." + name + ".name");
@@ -656,7 +658,7 @@ public class SettingsMenuDialog extends Dialog{
             boolean def;
             Boolc changed;
 
-            CheckSetting(String name, boolean def, Boolc changed){
+            public CheckSetting(String name, boolean def, Boolc changed){
                 super(name);
                 this.def = def;
                 this.changed = changed;
@@ -685,7 +687,7 @@ public class SettingsMenuDialog extends Dialog{
             int def, min, max, step;
             StringProcessor sp;
 
-            SliderSetting(String name, int def, int min, int max, int step, StringProcessor s){
+            public SliderSetting(String name, int def, int min, int max, int step, StringProcessor s){
                 super(name);
                 this.def = def;
                 this.min = min;

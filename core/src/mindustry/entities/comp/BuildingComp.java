@@ -160,7 +160,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public final void readBase(Reads read){
-        health = read.f();
+        //cap health by block health in case of nerfs
+        health = Math.min(read.f(), block.health);
         byte rot = read.b();
         team = Team.get(read.b());
 
@@ -1074,7 +1075,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public String getDisplayName(){
         //derelict team icon currently doesn't display
-        return team == Team.derelict ?  
+        return team == Team.derelict ?
             block.localizedName + "\n" + Core.bundle.get("block.derelict") :
             block.localizedName + (team == player.team() || team.emoji.isEmpty() ? "" : " " + team.emoji);
     }
@@ -1377,10 +1378,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void damage(float damage){
         if(dead()) return;
 
-        if(Mathf.zero(state.rules.blockHealthMultiplier)){
+        float dm = state.rules.blockHealth(team);
+
+        if(Mathf.zero(dm)){
             damage = health + 1;
         }else{
-            damage /= state.rules.blockHealthMultiplier;
+            damage /= dm;
         }
 
         Call.tileDamage(self(), health - handleDamage(damage));

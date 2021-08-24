@@ -40,6 +40,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
 
     @Import int id;
     @Import float x, y;
+    @Import boolean added;
 
     transient float accepting, updateTime, lastRipple = Time.time + Mathf.random(40f);
     float amount;
@@ -73,8 +74,18 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
 
         amount = Mathf.clamp(amount, 0, maxLiquid);
 
-        if(amount <= 0f || Puddles.get(tile) != self()){
+        if(amount <= 0f){
             remove();
+            return;
+        }
+
+        if(Puddles.get(tile) != self() && added){
+            //force removal without pool free
+            Groups.all.remove(self());
+            Groups.draw.remove(self());
+            Groups.puddle.remove(self());
+            added = false;
+            return;
         }
 
         //effects-only code
@@ -83,7 +94,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
 
             Units.nearby(rect.setSize(Mathf.clamp(amount / (maxLiquid / 1.5f)) * 10f).setCenter(x, y), unitCons);
 
-            if(liquid.temperature > 0.7f && (tile.build != null) && Mathf.chance(0.5)){
+            if(liquid.temperature > 0.7f && tile.build != null && Mathf.chance(0.5)){
                 Fires.create(tile);
             }
 

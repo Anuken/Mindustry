@@ -130,7 +130,7 @@ public class Sector{
     @Nullable
     public String iconChar(){
         if(info.contentIcon != null) return info.contentIcon.emoji();
-        if(info.icon != null) return Iconc.codes.get(info.icon) + "";
+        if(info.icon != null) return (char)Iconc.codes.get(info.icon) + "";
         return null;
     }
 

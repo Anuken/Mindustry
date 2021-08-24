@@ -69,7 +69,7 @@ public class ModsDialog extends BaseDialog{
         browser.cont.pane(tablebrow -> {
             tablebrow.margin(10f).top();
             browserTable = tablebrow;
-        }).get().setScrollingDisabled(true, false);
+        }).scrollX(false);
         browser.addCloseButton();
 
         browser.onResize(this::rebuildBrowser);
@@ -208,90 +208,113 @@ public class ModsDialog extends BaseDialog{
 
         if(!mods.list().isEmpty()){
             boolean[] anyDisabled = {false};
-            SearchBar.add(cont, mods.list(),
-                mod -> mod.meta.displayName(),
-                (table, mod) -> {
-                    if(!mod.enabled() && !anyDisabled[0] && mods.list().size > 0){
-                        anyDisabled[0] = true;
-                        table.row();
-                        table.image().growX().height(4f).pad(6f).color(Pal.gray);
-                        table.row();
-                    }
+            Table[] pane = {null};
 
-                    table.button(t -> {
-                        t.top().left();
-                        t.margin(12f);
+            Cons<String> rebuild = query -> {
+                pane[0].clear();
+                boolean any = false;
+                for(LoadedMod item : mods.list()){
+                    if(Strings.matches(query, item.meta.displayName())){
+                        any = true;
+                        if(!item.enabled() && !anyDisabled[0] && mods.list().size > 0){
+                            anyDisabled[0] = true;
+                            pane[0].row();
+                            pane[0].image().growX().height(4f).pad(6f).color(Pal.gray).row();
+                        }
 
-                        t.defaults().left().top();
-                        t.table(title -> {
-                            title.left();
+                        pane[0].button(t -> {
+                            t.top().left();
+                            t.margin(12f);
 
-                            title.add(new BorderImage(){{
-                                if(mod.iconTexture != null){
-                                    setDrawable(new TextureRegion(mod.iconTexture));
-                                }else{
-                                    setDrawable(Tex.nomap);
-                                }
-                                border(Pal.accent);
-                            }}).size(h - 8f).padTop(-8f).padLeft(-8f).padRight(8f);
+                            t.defaults().left().top();
+                            t.table(title1 -> {
+                                title1.left();
 
-                            title.table(text -> {
-                                boolean hideDisabled = !mod.isSupported() || mod.hasUnmetDependencies() || mod.hasContentErrors();
+                                title1.add(new BorderImage(){{
+                                    if(item.iconTexture != null){
+                                        setDrawable(new TextureRegion(item.iconTexture));
+                                    }else{
+                                        setDrawable(Tex.nomap);
+                                    }
+                                    border(Pal.accent);
+                                }}).size(h - 8f).padTop(-8f).padLeft(-8f).padRight(8f);
 
-                                text.add("[accent]" + Strings.stripColors(mod.meta.displayName()) + "\n[lightgray]v" + Strings.stripColors(trimText(mod.meta.version)) + (mod.enabled() || hideDisabled ? "" : "\n" + Core.bundle.get("mod.disabled") + ""))
+                                title1.table(text -> {
+                                    boolean hideDisabled = !item.isSupported() || item.hasUnmetDependencies() || item.hasContentErrors();
+
+                                    text.add("[accent]" + Strings.stripColors(item.meta.displayName()) + "\n[lightgray]v" + Strings.stripColors(trimText(item.meta.version)) + (item.enabled() || hideDisabled ? "" : "\n" + Core.bundle.get("mod.disabled") + ""))
                                     .wrap().top().width(300f).growX().left();
 
-                                text.row();
-
-                                if(mod.isOutdated()){
-                                    text.labelWrap("@mod.outdated").growX();
                                     text.row();
-                                }else if(!mod.isSupported()){
-                                    text.labelWrap(Core.bundle.format("mod.requiresversion", mod.meta.minGameVersion)).growX();
-                                    text.row();
-                                }else if(mod.hasUnmetDependencies()){
-                                    text.labelWrap(Core.bundle.format("mod.missingdependencies", mod.missingDependencies.toString(", "))).growX();
-                                    t.row();
-                                }else if(mod.hasContentErrors()){
-                                    text.labelWrap("@mod.erroredcontent").growX();
-                                    text.row();
-                                }else if(mod.meta.hidden){
-                                    text.labelWrap("@mod.multiplayer.compatible").growX();
-                                    text.row();
-                                }
-                            }).top().growX();
 
-                            title.add().growX();
-                        }).growX().growY().left();
+                                    if(item.isOutdated()){
+                                        text.labelWrap("@mod.outdated").growX();
+                                        text.row();
+                                    }else if(!item.isSupported()){
+                                        text.labelWrap(Core.bundle.format("mod.requiresversion", item.meta.minGameVersion)).growX();
+                                        text.row();
+                                    }else if(item.hasUnmetDependencies()){
+                                        text.labelWrap(Core.bundle.format("mod.missingdependencies", item.missingDependencies.toString(", "))).growX();
+                                        t.row();
+                                    }else if(item.hasContentErrors()){
+                                        text.labelWrap("@mod.erroredcontent").growX();
+                                        text.row();
+                                    }else if(item.meta.hidden){
+                                        text.labelWrap("@mod.multiplayer.compatible").growX();
+                                        text.row();
+                                    }
+                                }).top().growX();
 
-                        t.table(right -> {
-                            right.right();
-                            right.button(mod.enabled() ? Icon.downOpen : Icon.upOpen, Styles.clearPartiali, () -> {
-                                mods.setEnabled(mod, !mod.enabled());
-                                setup();
-                            }).size(50f).disabled(!mod.isSupported());
+                                title1.add().growX();
+                            }).growX().growY().left();
 
-                            right.button(mod.hasSteamID() ? Icon.link : Icon.trash, Styles.clearPartiali, () -> {
-                                if(!mod.hasSteamID()){
-                                    ui.showConfirm("@confirm", "@mod.remove.confirm", () -> {
-                                        mods.removeMod(mod);
-                                        setup();
-                                    });
-                                }else{
-                                    platform.viewListing(mod);
-                                }
-                            }).size(50f);
+                            t.table(right -> {
+                                right.right();
+                                right.button(item.enabled() ? Icon.downOpen : Icon.upOpen, Styles.clearPartiali, () -> {
+                                    mods.setEnabled(item, !item.enabled());
+                                    setup();
+                                }).size(50f).disabled(!item.isSupported());
 
-                            if(steam && !mod.hasSteamID()){
-                                right.row();
-                                right.button(Icon.export, Styles.clearPartiali, () -> {
-                                    platform.publish(mod);
+                                right.button(item.hasSteamID() ? Icon.link : Icon.trash, Styles.clearPartiali, () -> {
+                                    if(!item.hasSteamID()){
+                                        ui.showConfirm("@confirm", "@mod.remove.confirm", () -> {
+                                            mods.removeMod(item);
+                                            setup();
+                                        });
+                                    }else{
+                                        platform.viewListing(item);
+                                    }
                                 }).size(50f);
-                            }
-                        }).growX().right().padRight(-8f).padTop(-8f);
-                    }, Styles.clearPartialt, () -> showMod(mod)).size(w, h).growX().pad(4f);
-                    table.row();
-                }, !mobile || Core.graphics.isPortrait()).margin(10f).top();
+
+                                if(steam && !item.hasSteamID()){
+                                    right.row();
+                                    right.button(Icon.export, Styles.clearPartiali, () -> {
+                                        platform.publish(item);
+                                    }).size(50f);
+                                }
+                            }).growX().right().padRight(-8f).padTop(-8f);
+                        }, Styles.clearPartialt, () -> showMod(item)).size(w, h).growX().pad(4f);
+                        pane[0].row();
+                    }
+                }
+
+                if(!any){
+                    pane[0].add("@none.found").color(Color.lightGray).pad(4);
+                }
+            };
+
+            if(!mobile || Core.graphics.isPortrait()){
+                cont.table(search -> {
+                    search.image(Icon.zoom).padRight(8f);
+                    search.field("", rebuild).growX();
+                }).fillX().padBottom(4);
+            }
+
+            cont.row();
+            cont.pane(table1 -> {
+                pane[0] = table1.margin(10f).top();
+                rebuild.get("");
+            }).scrollX(false);
         }else{
             cont.table(Styles.black6, t -> t.add("@mods.none")).height(80f);
         }
@@ -387,14 +410,14 @@ public class ModsDialog extends BaseDialog{
             browserTable.clear();
             int i = 0;
 
-            Seq<ModListing> listings = rlistings;
+            var listings = rlistings;
             if(!orderDate){
                 listings = rlistings.copy();
                 listings.sortComparing(m1 -> -m1.stars);
             }
 
             for(ModListing mod : listings){
-                if((mod.hasJava && Vars.ios) || !searchtxt.isEmpty() && !mod.repo.toLowerCase().contains(searchtxt.toLowerCase()) || (Vars.ios && mod.hasScripts)) continue;
+                if((mod.hasJava && Vars.ios) || (!Strings.matches(searchtxt, mod.name) && !Strings.matches(searchtxt, mod.repo)) || (Vars.ios && mod.hasScripts)) continue;
 
                 float s = 64f;
 

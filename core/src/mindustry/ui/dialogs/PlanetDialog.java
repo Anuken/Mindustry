@@ -26,7 +26,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.input.*;
-import mindustry.io.legacy.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -61,9 +60,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
     public Seq<Sector> newPresets = new Seq<>();
     public float presetShow = 0f;
-    public boolean showed = false;
+    public boolean showed = false, sectorsShown;
+    public String searchText = "";
 
-    public Table sectorTop = new Table();
+    public Table sectorTop = new Table(), notifs = new Table();
     public Label hoverLabel = new Label("");
 
     public PlanetDialog(){
@@ -73,17 +73,22 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         planets.planet = content.getByName(ContentType.planet, Core.settings.getString("lastplanet", "serpulo"));
         if(planets.planet == null) planets.planet = Planets.serpulo;
 
-        keyDown(key -> {
-            if(key == KeyCode.escape || key == KeyCode.back || key == Core.keybinds.get(Binding.planet_map).key){
-                if(showing() && newPresets.size > 1){
-                    //clear all except first, which is the last sector.
-                    newPresets.truncate(1);
-                }else if(selected != null){
-                    selected = null;
-                    updateSelected();
-                }else{
-                    Core.app.post(this::hide);
+        addListener(new InputListener(){
+            @Override
+            public boolean keyDown(InputEvent event, KeyCode key){
+                if(event.targetActor == PlanetDialog.this && (key == KeyCode.escape || key == KeyCode.back || key == Core.keybinds.get(Binding.planet_map).key)){
+                    if(showing() && newPresets.size > 1){
+                        //clear all except first, which is the last sector.
+                        newPresets.truncate(1);
+                    }else if(selected != null){
+                        selected = null;
+                        updateSelected();
+                    }else{
+                        Core.app.post(() -> hide());
+                    }
+                    return true;
                 }
+                return false;
             }
         });
 
@@ -120,8 +125,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             pos.rotate(Tmp.v31.set(planets.cam.up).rotate(planets.cam.direction, 90), amount);
         });
 
-        scrolled(value -> {
-            zoom = Mathf.clamp(zoom + value / 10f, 0.5f, 2f);
+        addListener(new InputListener(){
+            @Override
+            public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
+                if(event.targetActor == PlanetDialog.this){
+                    zoom = Mathf.clamp(zoom + amountY / 10f, 0.5f, 2f);
+                }
+                return true;
+            }
         });
 
         addCaptureListener(new ElementGestureListener(){
@@ -151,16 +162,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(net.client()){
             ui.showInfo("@map.multiplayer");
             return this;
-        }
-
-        //load legacy research
-        if(Core.settings.has("unlocks") && !Core.settings.has("junction-unlocked")){
-            Core.app.post(() -> {
-                ui.showCustomConfirm("@research", "@research.legacy", "@research.load", "@research.discard", () -> {
-                    LegacyIO.readResearch();
-                    Core.settings.remove("unlocks");
-                }, () -> Core.settings.remove("unlocks"));
-            });
         }
 
         rebuildButtons();
@@ -385,11 +386,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     if(selected != null && selected != sec && selected.hasBase()){
                         //imports
                         if(sec.info.getRealDestination() == selected && sec.info.anyExports()){
-                            planets.drawArc(planet, sec.tile.v, selected.tile.v, Color.gray.write(Tmp.c2).a(selectAlpha), Pal.accent, 0.4f, 90f, 25);
+                            planets.drawArc(planet, sec.tile.v, selected.tile.v, Color.gray.write(Tmp.c2).a(selectAlpha), Pal.accent.write(Tmp.c3).a(selectAlpha), 0.4f, 90f, 25);
                         }
                         //exports
                         if(selected.info.getRealDestination() == sec && selected.info.anyExports()){
-                            planets.drawArc(planet, selected.tile.v, sec.tile.v, Pal.place.write(Tmp.c2).a(selectAlpha), Pal.accent, 0.4f, 90f, 25);
+                            planets.drawArc(planet, selected.tile.v, sec.tile.v, Pal.place.write(Tmp.c2).a(selectAlpha), Pal.accent.write(Tmp.c3).a(selectAlpha), 0.4f, 90f, 25);
                         }
                     }
                 }
@@ -449,6 +450,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     void setup(){
+        searchText = "";
         zoom = planets.zoom = 1f;
         selectAlpha = 1f;
         ui.minimapfrag.hide();
@@ -482,12 +484,18 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
 
             @Override
+            public void act(float delta){
+                if(scene.getDialog() == PlanetDialog.this && !scene.hit(input.mouseX(), input.mouseY(), true).isDescendantOf(e -> e instanceof ScrollPane)){
+                    scene.setScrollFocus(PlanetDialog.this);
+                }
+
+                super.act(delta);
+            }
+
+            @Override
             public void draw(){
                 planets.orbitAlpha = selectAlpha;
                 planets.render(PlanetDialog.this);
-                if(Core.scene.getDialog() == PlanetDialog.this){
-                    Core.scene.setScrollFocus(PlanetDialog.this);
-                }
             }
         },
         //info text
@@ -513,7 +521,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                 selected = null;
                                 launchSector = null;
                                 renderer.planets.planet = planet;
-                                Core.settings.put("lastplanet", planet.name);
+                                settings.put("lastplanet", planet.name);
                             }).width(200).height(40).growX().update(bb -> bb.setChecked(renderer.planets.planet == planet));
                             pt.row();
                         }
@@ -522,11 +530,98 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
         }),
 
-        new Table(t -> {
-            t.top();
-            //t.add(sectorTop);
-        })).grow();
+        new Table(c -> {
+            c.visible(() -> !(graphics.isPortrait() && mobile));
+            if(planets.planet.sectors.contains(Sector::hasBase)){
+                int attacked = planets.planet.sectors.count(Sector::isAttacked);
 
+                //sector notifications & search
+                c.top().right();
+                c.defaults().width(290f);
+
+                c.button(bundle.get("sectorlist") +
+                    (attacked == 0 ? "" : "\n[red]⚠[lightgray] " + bundle.format("sectorlist.attacked", "[red]" + attacked + "[]")),
+                    Icon.downOpen, Styles.squareTogglet, () -> sectorsShown = !sectorsShown)
+                .height(60f).checked(b -> {
+                    Image image = (Image)b.getCells().first().get();
+                    image.setDrawable(sectorsShown ? Icon.upOpen : Icon.downOpen);
+                    return sectorsShown;
+                }).with(t -> t.left().margin(7f)).with(t -> t.getLabelCell().grow().left()).row();
+
+                c.collapser(t -> {
+                    t.background(Styles.black8);
+
+                    notifs = t;
+                    rebuildList();
+                }, false, () -> sectorsShown).padBottom(64f).row();
+            }
+        })).grow();
+    }
+
+    void rebuildList(){
+        if(notifs == null) return;
+
+        notifs.clear();
+
+        var all = planets.planet.sectors.select(Sector::hasBase);
+        all.sort(Structs.comps(Structs.comparingBool(s -> !s.isAttacked()), Structs.comparingInt(s -> s.save == null ? 0 : -(int)s.save.meta.timePlayed)));
+
+        notifs.pane(p -> {
+            Runnable[] readd = {null};
+
+            p.table(s -> {
+                s.image(Icon.zoom).padRight(4);
+                s.field(searchText, t -> {
+                    searchText = t;
+                    readd[0].run();
+                }).growX().height(50f);
+            }).growX().row();
+
+            Table con = p.table().growX().get();
+            con.touchable = Touchable.enabled;
+
+            readd[0] = () -> {
+                con.clearChildren();
+                for(Sector sec : all){
+                    if(sec.hasBase() && (searchText.isEmpty() || sec.name().toLowerCase().contains(searchText.toLowerCase()))){
+                        con.button(t -> {
+                            t.marginRight(10f);
+                            t.left();
+                            t.defaults().growX();
+
+                            t.table(head -> {
+                                head.left().defaults();
+
+                                if(sec.isAttacked()){
+                                    head.image(Icon.warningSmall).update(i -> {
+                                        i.color.set(Pal.accent).lerp(Pal.remove, Mathf.absin(Time.globalTime, 9f, 1f));
+                                    }).padRight(4f);
+                                }
+
+                                String ic = sec.iconChar() == null ? "" : sec.iconChar() + " ";
+
+                                head.add(ic + sec.name()).growX().wrap();
+                            }).growX().row();
+
+                            if(sec.isAttacked()){
+                                addSurvivedInfo(sec, t, true);
+                            }
+                        }, Styles.underlineb, () -> {
+                            lookAt(sec);
+                            selected = sec;
+                            updateSelected();
+                        }).margin(8f).marginLeft(13f).marginBottom(6f).marginTop(6f).padBottom(3f).padTop(3f).growX().checked(b -> selected == sec).row();
+                        //for resources: .tooltip(sec.info.resources.toString("", u -> u.emoji()))
+                    }
+                }
+
+                if(con.getChildren().isEmpty()){
+                    con.add("@none.found").pad(10f);
+                }
+            };
+
+            readd[0].run();
+        }).grow().scrollX(false);
     }
 
     @Override
@@ -725,6 +820,19 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         dialog.show();
     }
 
+    void addSurvivedInfo(Sector sector, Table table, boolean wrap){
+        if(!wrap){
+            table.add(Core.bundle.format("sectors.underattack", (int)(sector.info.damage * 100))).wrapLabel(wrap).row();
+        }
+
+        if(sector.info.wavesSurvived >= 0 && sector.info.wavesSurvived - sector.info.wavesPassed >= 0 && !sector.isBeingPlayed()){
+            int toCapture = sector.info.attack || sector.info.winWave <= 1 ? -1 : sector.info.winWave - (sector.info.wave + sector.info.wavesPassed);
+            boolean plus = (sector.info.wavesSurvived - sector.info.wavesPassed) >= SectorDamage.maxRetWave - 1;
+            table.add(Core.bundle.format("sectors.survives", Math.min(sector.info.wavesSurvived - sector.info.wavesPassed, toCapture <= 0 ? 200 : toCapture) +
+            (plus ? "+" : "") + (toCapture < 0 ? "" : "/" + toCapture))).wrapLabel(wrap).row();
+        }
+    }
+
     void updateSelected(){
         Sector sector = selected;
         Table stable = sectorTop;
@@ -749,6 +857,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                    ui.showTextInput("@sectors.rename", "@name", 20, sector.name(), v -> {
                        sector.setName(v);
                        updateSelected();
+                       rebuildList();
                    });
                 }).size(40f).padLeft(4);
             }
@@ -761,6 +870,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 new Dialog(""){{
                     closeOnBack();
                     setFillParent(true);
+
+                    Runnable refresh = () -> {
+                        sector.saveInfo();
+                        hide();
+                        updateSelected();
+                        rebuildList();
+                    };
+
                     cont.pane(t -> {
                         resized(true, () -> {
                             t.clearChildren();
@@ -770,9 +887,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             t.button(Icon.none, Styles.clearTogglei, () -> {
                                 sector.info.icon = null;
                                 sector.info.contentIcon = null;
-                                sector.saveInfo();
-                                hide();
-                                updateSelected();
+                                refresh.run();
                             }).checked(sector.info.icon == null && sector.info.contentIcon == null);
 
                             int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
@@ -784,9 +899,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                 t.button(value, Styles.clearTogglei, () -> {
                                     sector.info.icon = key;
                                     sector.info.contentIcon = null;
-                                    sector.saveInfo();
-                                    hide();
-                                    updateSelected();
+                                    refresh.run();
                                 }).checked(key.equals(sector.info.icon));
 
                                 if(++i % cols == 0) t.row();
@@ -803,9 +916,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                         t.button(new TextureRegionDrawable(u.uiIcon), Styles.clearTogglei, iconMed, () -> {
                                             sector.info.icon = null;
                                             sector.info.contentIcon = u;
-                                            sector.saveInfo();
-                                            hide();
-                                            updateSelected();
+                                            refresh.run();
                                         }).checked(sector.info.contentIcon == u);
 
                                         if(++i % cols == 0) t.row();
@@ -840,16 +951,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         if(sector.isAttacked()){
-            stable.add(Core.bundle.format("sectors.underattack", (int)(sector.info.damage * 100)));
-            stable.row();
-
-            if(sector.info.wavesSurvived >= 0 && sector.info.wavesSurvived - sector.info.wavesPassed >= 0 && !sector.isBeingPlayed()){
-                int toCapture = sector.info.attack || sector.info.winWave <= 1 ? -1 : sector.info.winWave - (sector.info.wave + sector.info.wavesPassed);
-                boolean plus = (sector.info.wavesSurvived - sector.info.wavesPassed) >= SectorDamage.maxRetWave - 1;
-                stable.add(Core.bundle.format("sectors.survives", Math.min(sector.info.wavesSurvived - sector.info.wavesPassed, toCapture <= 0 ? 200 : toCapture) +
-                (plus ? "+" : "") + (toCapture < 0 ? "" : "/" + toCapture)));
-                stable.row();
-            }
+            addSurvivedInfo(sector, stable, false);
         }else if(sector.hasBase() && sector.near().contains(Sector::hasEnemyBase)){
             stable.add("@sectors.vulnerable");
             stable.row();
@@ -886,6 +988,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.pack();
         stable.setPosition(x, y, Align.center);
 
+        //do not fade out for now, TODO remove?
+        /*
         stable.update(() -> {
             if(selected != null){
                 if(launching){
@@ -901,7 +1005,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     }
                 }
             }
-        });
+        });*/
 
         stable.act(0f);
     }

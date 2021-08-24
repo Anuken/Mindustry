@@ -130,7 +130,7 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public Seq<AssetDescriptor> getDependencies(){
-        return Seq.with(new AssetDescriptor<>(Control.class), new AssetDescriptor<>("outline", Font.class), new AssetDescriptor<>("default", Font.class), new AssetDescriptor<>("chat", Font.class));
+        return Seq.with(new AssetDescriptor<>(Control.class), new AssetDescriptor<>("outline", Font.class), new AssetDescriptor<>("default", Font.class));
     }
 
     @Override
@@ -261,6 +261,7 @@ public class UI implements ApplicationListener, Loadable{
                 this.numeric = inumeric;
                 this.maxLength = textLength;
                 this.accepted = confirmed;
+                this.allowEmpty = false;
             }});
         }else{
             new Dialog(titleText){{

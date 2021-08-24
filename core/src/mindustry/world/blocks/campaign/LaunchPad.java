@@ -122,7 +122,7 @@ public class LaunchPad extends Block{
             if(!state.isCampaign()) return;
 
             //increment launchCounter then launch when full and base conditions are met
-            if((launchCounter += edelta()) >= launchTime && items.total() >= itemCapacity){
+            if((launchCounter += edelta()) >= launchTime && edelta() >= 0.001f && items.total() >= itemCapacity){
                 launchSound.at(x, y);
                 LaunchPayload entity = LaunchPayload.create();
                 items.each((item, amount) -> entity.stacks.add(new ItemStack(item, amount)));
@@ -141,7 +141,7 @@ public class LaunchPad extends Block{
         public void display(Table table){
             super.display(table);
 
-            if(!state.isCampaign() || net.client()) return;
+            if(!state.isCampaign() || net.client() || team != player.team()) return;
 
             table.row();
             table.label(() -> {

@@ -37,7 +37,7 @@
   },
   {
     "name": "mindustry.ddns.net",
-    "address": ["mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
+    "address": ["mindustry.ddns.net", "mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
   },
   {
     "name": "Surrealment",
@@ -45,7 +45,7 @@
   },
   {
     "name": "ALEX",
-    "address": ["alexmindustryhub.ddns.net:6568", "alexmindustry.ddns.net:25586", "alexmindustry.ddns.net:25587", "alexmindustryattac.ddns.net:25800","alexmindustryturbo.ddns.net:25581","alexmindustryhex.ddns.net:25583"]
+    "address": ["alexmindustryhub.ddns.net:6568", "dogemindustry.ddns.net:25586", "alexmindustry.ddns.net:25587", "alexmindustryattac.ddns.net:25800","alexmindustryturbo.ddns.net:25581","alexmindustryhex.ddns.net:25583"]
   },
   {
     "name": "Minty [subzero]",
@@ -61,7 +61,7 @@
   },
   {
     "name": "md.obvilionnetwork.ru",
-    "address": ["obvilionnetwork.ru", "obvilionnetwork.ru:7001", "obvilionnetwork.ru:7002"]
+    "address": ["obvilionnetwork.ru", "obvilionnetwork.ru:7001", "obvilionnetwork.ru:7002", "obvilionnetwork.ru:7003"]
   },
   {
     "name": "Mindustry PLAY",
@@ -98,5 +98,17 @@
   {
     "name": "Xpdustry",
     "address": ["xpdustry.fr"]
+  },
+  {
+    "name": "CxZx",
+    "address": ["usfr2.forcehost.net:25578"]
+  },
+  {
+     "name": "Español",
+    "address": ["168.119.36.188:41445"]
+  },
+  {
+     "name": "CreateDustry",
+    "address": ["144.76.120.74:18645"]
   }
 ]

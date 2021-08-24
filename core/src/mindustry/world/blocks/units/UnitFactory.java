@@ -143,8 +143,13 @@ public class UnitFactory extends UnitBlock{
         @Override
         public Object senseObject(LAccess sensor){
             if(sensor == LAccess.config) return currentPlan == -1 ? null : plans.get(currentPlan).unit;
-            if(sensor == LAccess.progress) return Mathf.clamp(fraction());
             return super.senseObject(sensor);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return Mathf.clamp(fraction());
+            return super.sense(sensor);
         }
 
         @Override
@@ -213,8 +218,8 @@ public class UnitFactory extends UnitBlock{
             }
 
             if(consValid() && currentPlan != -1){
-                time += edelta() * speedScl * Vars.state.rules.unitBuildSpeedMultiplier;
-                progress += edelta() * Vars.state.rules.unitBuildSpeedMultiplier;
+                time += edelta() * speedScl * Vars.state.rules.unitBuildSpeed(team);
+                progress += edelta() * Vars.state.rules.unitBuildSpeed(team);
                 speedScl = Mathf.lerpDelta(speedScl, 1f, 0.05f);
             }else{
                 speedScl = Mathf.lerpDelta(speedScl, 0f, 0.05f);

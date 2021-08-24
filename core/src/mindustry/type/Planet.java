@@ -35,6 +35,8 @@ public class Planet extends UnlockableContent{
     public float radius;
     /** Atmosphere radius adjustment parameters. */
     public float atmosphereRadIn = 0, atmosphereRadOut = 0.3f;
+    /** Frustrum sphere clip radius. */
+    public float clipRadius = -1f;
     /** Orbital radius around the sun. Do not change unless you know exactly what you are doing.*/
     public float orbitRadius;
     /** Total radius of this planet and all its children. */
@@ -47,7 +49,7 @@ public class Planet extends UnlockableContent{
     public float sectorApproxRadius;
     /** Whether this planet is tidally locked relative to its parent - see https://en.wikipedia.org/wiki/Tidal_locking */
     public boolean tidalLock = false;
-    /** Whether or not this planet is listed in the planet access UI. **/
+    /** Whether this planet is listed in the planet access UI. **/
     public boolean accessible = true;
     /** The default starting sector displayed to the map dialog. */
     public int startSector = 0;
@@ -237,6 +239,7 @@ public class Planet extends UnlockableContent{
             updateBaseCoverage();
         }
 
+        clipRadius = Math.max(clipRadius, radius + atmosphereRadOut + 0.5f);
     }
 
     @Override

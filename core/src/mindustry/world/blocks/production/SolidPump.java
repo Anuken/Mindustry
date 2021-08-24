@@ -48,7 +48,7 @@ public class SolidPump extends Pump{
         bars.add("efficiency", (SolidPumpBuild entity) -> new Bar(() -> Core.bundle.formatFloat("bar.pumpspeed",
         entity.lastPump / Time.delta * 60, 1),
         () -> Pal.ammo,
-        () -> entity.warmup));
+        () -> entity.warmup * entity.efficiency()));
     }
 
     @Override
@@ -69,6 +69,11 @@ public class SolidPump extends Pump{
     }
 
     @Override
+    public boolean outputsItems(){
+        return false;
+    }
+
+    @Override
     protected boolean canPump(Tile tile){
         return tile != null && !tile.floor().isLiquid;
     }
@@ -85,10 +90,16 @@ public class SolidPump extends Pump{
         public float validTiles;
         public float lastPump;
 
+
+        @Override
+        public void drawCracks(){}
+
         @Override
         public void draw(){
             Draw.rect(region, x, y);
-            Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
+            super.drawCracks();
+
+            Drawf.liquid(liquidRegion, x, y, liquids.get(result) / liquidCapacity, result.color);
             Drawf.spinSprite(rotatorRegion, x, y, pumpTime * rotateSpeed);
             Draw.rect(topRegion, x, y);
         }
@@ -114,7 +125,7 @@ public class SolidPump extends Pump{
                 lastPump = 0f;
             }
 
-            pumpTime += warmup * delta();
+            pumpTime += warmup * edelta();
 
             dumpLiquid(result);
         }
@@ -133,7 +144,7 @@ public class SolidPump extends Pump{
         }
 
         public float typeLiquid(){
-            return liquids.total();
+            return liquids.get(result);
         }
     }
 }

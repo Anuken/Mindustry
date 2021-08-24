@@ -42,6 +42,8 @@ public class UnitType extends UnlockableContent{
 
     /** If true, the unit is always at elevation 1. */
     public boolean flying;
+    /** If `flying` and this is true, the unit can appear on the title screen */
+    public boolean onTitleScreen = true;
     /** Creates a new instance of this unit class. */
     public Prov<? extends Unit> constructor;
     /** The default AI controller to assign on creation. */
@@ -75,6 +77,8 @@ public class UnitType extends UnlockableContent{
     public Effect fallEffect = Fx.fallSmoke;
     public Effect fallThrusterEffect = Fx.fallSmoke;
     public Effect deathExplosionEffect = Fx.dynamicExplosion;
+    /** Additional sprites that are drawn with the unit. */
+    public Seq<UnitDecal> decals = new Seq<>();
     public Seq<Ability> abilities = new Seq<>();
     /** Flags to target based on priority. Null indicates that the closest target should be found. The closest enemy core is used as a fallback. */
     public BlockFlag[] targetFlags = {null};
@@ -323,7 +327,7 @@ public class UnitType extends UnlockableContent{
         singleTarget = weapons.size <= 1 && !forceMultiTarget;
 
         if(itemCapacity < 0){
-            itemCapacity = Math.max(Mathf.round((int)(hitSize * 4.3), 10), 10);
+            itemCapacity = Math.max(Mathf.round((int)(hitSize * 4f), 10), 10);
         }
 
         //assume slight range margin
@@ -563,14 +567,26 @@ public class UnitType extends UnlockableContent{
             unit.trns(-legOffset.x, -legOffset.y);
         }
 
+        if(decals.size > 0){
+            float base = unit.rotation - 90;
+            for(var d : decals){
+                Draw.z(d.layer);
+                Draw.scl(d.xScale, d.yScale);
+                Draw.color(d.color);
+                Draw.rect(d.region, unit.x + Angles.trnsx(base, d.x, d.y), unit.y + Angles.trnsy(base, d.x, d.y), base + d.rotation);
+            }
+            Draw.reset();
+            Draw.z(z);
+        }
+
         if(unit.abilities.size > 0){
             for(Ability a : unit.abilities){
                 Draw.reset();
                 a.draw(unit);
             }
-
-            Draw.reset();
         }
+
+        Draw.reset();
     }
 
     public <T extends Unit & Payloadc> void drawPayload(T unit){
@@ -847,4 +863,5 @@ public class UnitType extends UnlockableContent{
     }
 
     //endregion
+
 }

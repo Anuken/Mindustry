@@ -7,10 +7,10 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
@@ -33,7 +33,7 @@ public class UnitSpawnAbility extends Ability{
 
     @Override
     public void update(Unit unit){
-        timer += Time.delta * state.rules.unitBuildSpeedMultiplier;
+        timer += Time.delta * state.rules.unitBuildSpeed(unit.team);
 
         if(timer >= spawnTime && Units.canCreate(unit.team, this.unit)){
             float x = unit.x + Angles.trnsx(unit.rotation, spawnY, spawnX), y = unit.y + Angles.trnsy(unit.rotation, spawnY, spawnX);
@@ -41,6 +41,7 @@ public class UnitSpawnAbility extends Ability{
             Unit u = this.unit.create(unit.team);
             u.set(x, y);
             u.rotation = unit.rotation;
+            Events.fire(new UnitCreateEvent(u, null, unit));
             if(!Vars.net.client()){
                 u.add();
             }

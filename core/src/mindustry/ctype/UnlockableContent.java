@@ -149,9 +149,17 @@ public abstract class UnlockableContent extends MappableContent{
         }
     }
 
+    public boolean unlockedNowHost(){
+        if(!state.isCampaign()) return true;
+        return net != null && net.client() ?
+            alwaysUnlocked || state.rules.researched.contains(name) :
+            unlocked || alwaysUnlocked;
+    }
+
     public boolean unlocked(){
-        if(net != null && net.client()) return alwaysUnlocked || state.rules.researched.contains(name);
-        return unlocked || alwaysUnlocked;
+        return net != null && net.client() ?
+            alwaysUnlocked || unlocked || state.rules.researched.contains(name) :
+            unlocked || alwaysUnlocked;
     }
 
     /** Locks this content again. */
