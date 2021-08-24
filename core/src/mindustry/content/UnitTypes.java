@@ -1498,15 +1498,13 @@ public class UnitTypes implements ContentList{
             trailY = -4f;
             trailScl = 1.9f;
 
-            abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 6, 60f * 6f, 60f));
-
             weapons.add(new Weapon("mount-weapon"){{
-                reload = 15f;
+                reload = 10f;
                 x = 5f;
                 y = 3.5f;
                 rotate = true;
                 rotateSpeed = 5f;
-                inaccuracy = 10f;
+                inaccuracy = 8f;
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.shoot;
                 bullet = Bullets.flakLead;
@@ -1522,7 +1520,15 @@ public class UnitTypes implements ContentList{
                 shake = 1.5f;
                 ejectEffect = Fx.casing2;
                 shootSound = Sounds.bang;
-                bullet = Bullets.artilleryDense;
+                bullet = new ArtilleryBulletType(3f, 20, "shell"){{
+                    hitEffect = Fx.flakExplosion;
+                    knockback = 0.8f;
+                    lifetime = 80f;
+                    width = height = 11f;
+                    collidesTiles = false;
+                    splashDamageRadius = 30f * 0.75f;
+                    splashDamage = 40f;
+                }};
             }});
         }};
 
@@ -1856,6 +1862,8 @@ public class UnitTypes implements ContentList{
             trailY = -4f;
             trailScl = 1.9f;
             ammoType = new ItemAmmoType(Items.coal);
+
+            abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 6, 60f * 6f, 60f));
 
             buildSpeed = 2f;
 

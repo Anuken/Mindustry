@@ -164,7 +164,7 @@ public class StatusEffects implements ContentList{
         }};
 
         boss = new StatusEffect("boss"){{
-            color = Team.sharded.color;
+            color = Team.crux.color;
             permanent = true;
             damageMultiplier = 1.3f;
             healthMultiplier = 1.5f;

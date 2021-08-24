@@ -623,7 +623,7 @@ public class DesktopInput extends InputHandler{
     protected void updateMovement(Unit unit){
         boolean omni = unit.type.omniMovement;
 
-        float speed = unit.realSpeed();
+        float speed = unit.speed();
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
@@ -642,11 +642,7 @@ public class DesktopInput extends InputHandler{
             unit.lookAt(unit.prefRotation());
         }
 
-        if(omni){
-            unit.moveAt(movement);
-        }else{
-            unit.rotateMove(movement);
-        }
+        unit.movePref(movement);
 
         unit.aim(unit.type.faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation, Core.input.mouseWorld().dst(unit)).add(unit.x, unit.y));
         unit.controlWeapons(true, player.shooting && !boosted);

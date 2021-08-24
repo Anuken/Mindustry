@@ -647,7 +647,7 @@ public class NetServer implements ApplicationListener{
             Unit unit = player.unit();
 
             long elapsed = Math.min(Time.timeSinceMillis(con.lastReceivedClientTime), 1500);
-            float maxSpeed = unit.realSpeed();
+            float maxSpeed = unit.speed();
 
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.2f;
 

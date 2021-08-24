@@ -51,6 +51,15 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     private transient boolean wasPlayer;
     private transient boolean wasHealed;
 
+    /** Move based on preferred unit movement type. */
+    public void movePref(Vec2 movement){
+        if(type.omniMovement){
+            moveAt(movement);
+        }else{
+            rotateMove(movement);
+        }
+    }
+
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
     }
@@ -95,15 +104,18 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return type.hasWeapons();
     }
 
+    /** @return speed with boost & floor multipliers factored in. */
     public float speed(){
         float strafePenalty = isGrounded() || !isPlayer() ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(vel().angle(), rotation) / 180f);
+        float boost = Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation);
         //limit speed to minimum formation speed to preserve formation
-        return (isCommanding() ? minFormationSpeed * 0.98f : type.speed) * strafePenalty;
+        return (isCommanding() ? minFormationSpeed * 0.98f : type.speed) * strafePenalty * boost * floorSpeedMultiplier();
     }
 
-    /** @return speed with boost multipliers factored in. */
+    /** @deprecated use speed() instead */
+    @Deprecated
     public float realSpeed(){
-        return Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation) * speed() * floorSpeedMultiplier();
+        return speed();
     }
 
     /** Iterates through this unit and everything it is controlling. */
