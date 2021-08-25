@@ -18,8 +18,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
-import java.util.*;
-
 import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.*;
 
@@ -50,26 +48,13 @@ public class WaveInfoDialog extends BaseDialog{
             BaseDialog dialog = new BaseDialog("@waves.sort");
             dialog.setFillParent(false);
             dialog.cont.defaults().size(210f, 64f);
-            dialog.cont.button("@waves.sort.begin", () -> {
-                sort = Sort.begin;
-                dialog.hide();
-                buildGroups();
-            });
-            dialog.cont.button("@waves.sort.totals", () -> {
-                sort = Sort.totals;
-                dialog.hide();
-                buildGroups();
-            });
-            dialog.cont.button("@waves.sort.health", () -> {
-                sort = Sort.health;
-                dialog.hide();
-                buildGroups();
-            });
-            dialog.cont.button("@waves.sort.type", () -> {
-                sort = Sort.type;
-                dialog.hide();
-                buildGroups();
-            });
+            for(Sort s : Sort.values()){
+                dialog.cont.button("@waves.sort." + s, () -> {
+                    sort = s;
+                    dialog.hide();
+                    buildGroups();
+                });
+            }
             dialog.row();
             dialog.check("@waves.sort.reverse", b -> reverseSort = (b ? true : false)).padTop(4).update(b -> {
                 b.setChecked(reverseSort == true);
@@ -204,14 +189,11 @@ public class WaveInfoDialog extends BaseDialog{
         table.margin(10f);
 
         if(groups != null){
-            if(sort == Sort.begin) groups.sort(g -> g.begin * (reverseSort ? -1 : 1));
-            if(sort == Sort.totals) groups.sort(g -> g.unitAmount * (reverseSort ? -1 : 1));
-            if(sort == Sort.health) groups.sort(g -> g.type.health * (reverseSort ? -1 : 1));
-            if(sort == Sort.type && reverseSort){
-                groups.sortComparing(g -> g.type).reverse();
-            }else if(sort == Sort.type){
-                 groups.sortComparing(g -> g.type);
-            }
+            if(sort == Sort.begin) groups.sort(g -> g.begin);
+            if(sort == Sort.totals) groups.sort(g -> g.unitAmount);
+            if(sort == Sort.health) groups.sort(g -> g.type.health);
+            if(sort == Sort.type) groups.sortComparing(g -> g.type);
+            if(reverseSort) groups.reverse();
 
             for(SpawnGroup group : groups){
                 table.table(Tex.button, t -> {
