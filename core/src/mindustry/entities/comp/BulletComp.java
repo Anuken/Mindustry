@@ -133,8 +133,9 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         int x = x0f, dx = Math.abs(x1 - x), sx = x < x1 ? 1 : -1;
         int y = y0f, dy = Math.abs(y1 - y), sy = y < y1 ? 1 : -1;
         int e2, err = dx - dy;
+        int ww = world.width(), wh = world.height();
 
-        while(true){
+        while(x >= 0 && y >= 0 && x < ww && y < wh){
             Building build = world.build(x, y);
             if(build != null && isAdded() && build.collide(self()) && type.testCollision(self(), build)
                 && !build.dead() && (type.collidesTeam || build.team != team) && !(type.pierceBuilding && hasCollided(build.id))){
