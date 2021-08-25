@@ -89,7 +89,7 @@ public class BaseAI{
                     calculating = false;
                 }
             }else{
-                var field = pathfinder.getField(state.rules.waveTeam, Pathfinder.costGround, Pathfinder.fieldCore);
+                var field = pathfinder.getField(data.team, Pathfinder.costGround, Pathfinder.fieldCore);
 
                 if(field.weights != null){
                     int[][] weights = field.weights;
@@ -120,7 +120,7 @@ public class BaseAI{
                         }
 
                         //found the end.
-                        if(calcTile.build instanceof CoreBuild b && b.team == state.rules.defaultTeam){
+                        if(calcTile.build instanceof CoreBuild b && b.team != data.team){
                             //clean up calculations and flush results
                             calculating = false;
                             calcCount = 0;

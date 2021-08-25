@@ -101,6 +101,8 @@ public class EntityProcess extends BaseProcessor{
 
                 inter.addJavadoc("Interface for {@link $L}", component.fullName());
 
+                skipDeprecated(inter);
+
                 //implement extra interfaces these components may have, e.g. position
                 for(Stype extraInterface : component.interfaces().select(i -> !isCompInterface(i))){
                     //javapoet completely chokes on this if I add `addSuperInterface` or create the type name with TypeName.get
@@ -570,6 +572,8 @@ public class EntityProcess extends BaseProcessor{
                 .returns(tname(packageName + "." + name))
                 .addStatement(ann.pooled() ? "return Pools.obtain($L.class, " +name +"::new)" : "return new $L()", name).build());
 
+                skipDeprecated(builder);
+
                 definitions.add(new EntityDefinition(packageName + "." + name, builder, type, typeIsBase ? null : baseClass, components, groups, allFieldSpecs, legacy));
             }
 
@@ -837,6 +841,8 @@ public class EntityProcess extends BaseProcessor{
                 TypeSpec.Builder nullBuilder = TypeSpec.classBuilder(className)
                 .addModifiers(Modifier.FINAL);
 
+                skipDeprecated(nullBuilder);
+
                 nullBuilder.addSuperinterface(interf.tname());
                 if(superclass != null) nullBuilder.superclass(tname(baseName(superclass)));
 
@@ -978,6 +984,11 @@ public class EntityProcess extends BaseProcessor{
             return Seq.with(e.getTypeMirrors()).map(Stype::of);
         }
         throw new IllegalArgumentException("Missing types.");
+    }
+
+    void skipDeprecated(TypeSpec.Builder builder){
+        //deprecations are irrelevant in generated code
+        builder.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"deprecation\"").build());
     }
 
     class GroupDefinition{
