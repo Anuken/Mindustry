@@ -795,20 +795,11 @@ public class UnitType extends UnlockableContent{
         Draw.reset();
     }
 
-    public void applyOutlineColor(Unit unit){
-        if(unit.isBoss()){
-            Draw.mixcol(unit.team.color, Mathf.absin(7f, 1f));
-        }
-
-        if(unit.drownTime > 0 && unit.lastDrownFloor != null){
-            Draw.color(Color.white, unit.lastDrownFloor.mapColor, unit.drownTime * 0.4f);
-        }
-    }
-
     public void drawOutline(Unit unit){
         Draw.reset();
 
         if(Core.atlas.isFound(outlineRegion)){
+            applyColor(unit);
             applyOutlineColor(unit);
             Draw.rect(outlineRegion, unit.x, unit.y, unit.rotation - 90);
             Draw.reset();
@@ -962,7 +953,7 @@ public class UnitType extends UnlockableContent{
         Draw.mixcol(Color.white, unit.hitTime);
 
         if(unit.lastDrownFloor != null){
-            Draw.color(Color.white, unit.lastDrownFloor.mapColor, unit.drownTime * 0.4f);
+            Draw.color(Color.white, Tmp.c1.set(unit.lastDrownFloor.mapColor).mul(0.83f), unit.drownTime * 0.9f);
         }else{
             Draw.color(Color.white);
         }
@@ -972,13 +963,23 @@ public class UnitType extends UnlockableContent{
         Draw.mixcol();
     }
 
+    public void applyOutlineColor(Unit unit){
+        if(unit.isBoss()){
+            Draw.mixcol(unit.team.color, Mathf.absin(7f, 1f));
+        }
+
+        if(unit.drownTime > 0 && unit.lastDrownFloor != null){
+            Draw.color(Color.white, Tmp.c1.set(unit.lastDrownFloor.mapColor).mul(0.8f), unit.drownTime * 0.9f);
+        }
+    }
+
     public void applyColor(Unit unit){
         Draw.color();
         Tmp.c1.set(Color.white).lerp(Pal.heal, Mathf.clamp(unit.healTime - unit.hitTime));
         Draw.mixcol(Tmp.c1, Math.max(unit.hitTime, Mathf.clamp(unit.healTime)));
 
         if(unit.drownTime > 0 && unit.lastDrownFloor != null){
-            Draw.mixcol(unit.lastDrownFloor.mapColor, unit.drownTime * 0.85f);
+            Draw.mixcol(Tmp.c1.set(unit.lastDrownFloor.mapColor).mul(0.83f), unit.drownTime * 0.9f);
         }
     }
 
