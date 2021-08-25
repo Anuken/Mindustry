@@ -116,7 +116,7 @@ public class Waves{
                 spacing = 5;
                 unitAmount = 1;
                 unitScaling = 3;
-                effect = StatusEffects.shielded;
+                shields = 640f;
                 max = 25;
             }},
 
