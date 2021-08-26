@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.ui.layout.Table;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -18,6 +19,7 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.ItemSelection;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
 
@@ -71,6 +73,15 @@ public class Drill extends Block{
         hasItems = true;
         ambientSound = Sounds.drill;
         ambientSoundVolume = 0.018f;
+        saveConfig = true;
+        configurable = true;
+
+        config(Item.class, (DrillBuild tile, Item item) -> {
+            countOre(tile.tile);
+            if(!itemArray.contains(item)) return; // ignore processor-configured invalid items
+            tile.dominantItem = item;
+        });
+        configClear((DrillBuild tile) -> tile.dominantItem = returnItem);
     }
 
     @Override
@@ -208,6 +219,30 @@ public class Drill extends Block{
 
         public int dominantItems;
         public Item dominantItem;
+
+        @Override
+        public boolean interactable(Team team){
+            if(!super.interactable(team)){
+                return false;
+            }
+            countOre(tile);
+            return itemArray.size > 1;
+        }
+
+        @Override
+        public boolean onConfigureTileTapped(Building other){
+            if(this == other){
+                deselect();
+                configure(null);
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
+            ItemSelection.buildTable(table, itemArray, () -> dominantItem, this::configure);
+        }
 
         @Override
         public boolean shouldConsume(){
