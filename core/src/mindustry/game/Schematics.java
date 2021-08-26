@@ -333,7 +333,7 @@ public class Schematics implements Loadable{
 
     /** Creates a schematic from a world selection. */
     public Schematic create(int x, int y, int x2, int y2){
-        NormalizeResult result = Placement.normalizeArea(x, y, x2, y2, 0, false, maxSchematicSize);
+        NormalizeResult result = Placement.normalizeArea(x, y, x2, y2, 0, false, maxSchematicSize * (Core.input.keyDown(Binding.boost) ? 3 : 1));
         x = result.x;
         y = result.y;
         x2 = result.x2;

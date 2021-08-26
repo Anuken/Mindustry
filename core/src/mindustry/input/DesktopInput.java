@@ -111,7 +111,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyDown(Binding.schematic_select) && !Core.scene.hasKeyboard() && mode != breaking){
-            drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
+            drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize * (Core.input.keyDown(Binding.boost) ? 3 : 1));
         }
 
         Draw.reset();
@@ -488,6 +488,10 @@ public class DesktopInput extends InputHandler{
                 mode = none;
             }else if(!selectRequests.isEmpty()){
                 flushRequests(selectRequests);
+                if(selectRequests.size >= Vars.maxSchematicSize * Vars.maxSchematicSize){
+                    selectRequests.clear();
+                    lastSchematic = null;
+                }
             }else if(isPlacing()){
                 selectX = cursorX;
                 selectY = cursorY;
