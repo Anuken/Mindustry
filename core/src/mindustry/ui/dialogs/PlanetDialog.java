@@ -372,8 +372,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         if(selectAlpha > 0.001f){
-
-
             for(Sector sec : planet.sectors){
                 if(sec.hasBase()){
                     for(Sector enemy : sec.near()){
