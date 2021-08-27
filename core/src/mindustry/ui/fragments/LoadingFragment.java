@@ -83,6 +83,7 @@ public class LoadingFragment extends Fragment{
     }
 
     public void show(String text){
+        button.visible = false;
         nameLabel.setColor(Color.white);
         bar.visible = false;
         table.clearActions();
