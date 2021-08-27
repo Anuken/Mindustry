@@ -27,6 +27,8 @@ public abstract class UnlockableContent extends MappableContent{
     public boolean alwaysUnlocked = false;
     /** Whether to show the description in the research dialog preview. */
     public boolean inlineDescription = true;
+    /** Whether details of blocks are hidden in custom games if they haven't been unlocked in campaign mode. */
+    public boolean hideDetails = true;
     /** Special logic icon ID. */
     public int iconId = 0;
     /** Icon of the content to use in UI. */
