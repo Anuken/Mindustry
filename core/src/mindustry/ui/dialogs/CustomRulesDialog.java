@@ -227,6 +227,7 @@ public class CustomRulesDialog extends BaseDialog{
                 check("@rules.cheating", b -> teams.cheat = b, () -> teams.cheat);
                 number("@rules.blockhealthmultiplier", f -> teams.blockHealthMultiplier = f, () -> teams.blockHealthMultiplier);
                 number("@rules.blockdamagemultiplier", f -> teams.blockDamageMultiplier = f, () -> teams.blockDamageMultiplier);
+                number("@rules.enemycorebuildradius", f -> teams.enemyCoreBuildRadius = f * tilesize, () -> Math.min(teams.enemyCoreBuildRadius / tilesize, 200), () -> !rules.polygonCoreProtection && (team != rules.defaultTeam || rules.pvp));
 
                 title("@rules.title.unit");
                 check("@rules.unitcapvariable", b -> teams.unitCapVariable = b, () -> teams.unitCapVariable);

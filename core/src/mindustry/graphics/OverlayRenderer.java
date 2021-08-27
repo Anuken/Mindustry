@@ -175,11 +175,12 @@ public class OverlayRenderer{
                 Draw.color();
             }else{
                 state.teams.eachEnemyCore(player.team(), core -> {
-                    if(Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(core.x, core.y, state.rules.enemyCoreBuildRadius * 2f))){
+                    float br = state.rules.buildRadius(core.team);
+                    if(Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(core.x, core.y, br * 2f))){
                         Draw.color(Color.darkGray);
-                        Lines.circle(core.x, core.y - 2, state.rules.enemyCoreBuildRadius);
+                        Lines.circle(core.x, core.y - 2, br);
                         Draw.color(Pal.accent, core.team.color, 0.5f + Mathf.absin(Time.time, 10f, 0.5f));
-                        Lines.circle(core.x, core.y, state.rules.enemyCoreBuildRadius);
+                        Lines.circle(core.x, core.y, br);
                     }
                 });
             }

@@ -162,6 +162,10 @@ public class Rules{
         return buildSpeedMultiplier * teams.get(team).buildSpeedMultiplier;
     }
 
+    public float buildRadius(Team team){
+        return enemyCoreBuildRadius != teams.get(team).enemyCoreBuildRadius ? teams.get(team).enemyCoreBuildRadius : enemyCoreBuildRadius;
+    }
+
     public float ammoConsumption(Team team){
         return ammoConsumptionMultiplier * teams.get(team).ammoConsumptionMultiplier;
     }
@@ -197,6 +201,8 @@ public class Rules{
         public float blockDamageMultiplier = 1f;
         /** Multiplier for building speed. */
         public float buildSpeedMultiplier = 1f;
+        /** No-build zone around enemy core radius. */
+        public float enemyCoreBuildRadius = 400f;
         /** Multiplier for ammo consumption on units. */
         public float ammoConsumptionMultiplier = 1f;
         /** Base unit cap. Can still be increased by blocks. */

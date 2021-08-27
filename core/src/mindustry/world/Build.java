@@ -136,22 +136,22 @@ public class Build{
 
         if(!state.rules.editor){
             //find closest core, if it doesn't match the team, placing is not legal
-            if(state.rules.polygonCoreProtection){
-                float mindst = Float.MAX_VALUE;
-                CoreBuild closest = null;
-                for(TeamData data : state.teams.active){
-                    for(CoreBuild tile : data.cores){
-                        float dst = tile.dst2(x * tilesize + type.offset, y * tilesize + type.offset);
-                        if(dst < mindst){
-                            closest = tile;
-                            mindst = dst;
-                        }
+            float mindst = Float.MAX_VALUE;
+            CoreBuild closest = null;
+            for(TeamData data : state.teams.active){
+                for(CoreBuild tile : data.cores){
+                    float dst = tile.dst2(x * tilesize + type.offset, y * tilesize + type.offset);
+                    if(dst < mindst){
+                        closest = tile;
+                        mindst = dst;
                     }
                 }
+            }
+            if(state.rules.polygonCoreProtection){
                 if(closest != null && closest.team != team){
                     return false;
                 }
-            }else if(state.teams.anyEnemyCoresWithin(team, x * tilesize + type.offset, y * tilesize + type.offset, state.rules.enemyCoreBuildRadius + tilesize)){
+            }else if(state.teams.anyEnemyCoresWithin(team, x * tilesize + type.offset, y * tilesize + type.offset, state.rules.buildRadius(closest.team) + tilesize)){
                 return false;
             }
         }
