@@ -2,6 +2,7 @@ package mindustry.game;
 
 import arc.struct.*;
 import arc.util.*;
+import arc.Events;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;
@@ -95,6 +96,7 @@ public class SpawnGroup implements JsonSerializable{
             }
         }
 
+        Events.fire(new EventType.UnitSpawnEvent(unit));
         return unit;
     }
 
