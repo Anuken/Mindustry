@@ -39,7 +39,7 @@ public class BeControl{
     public BeControl(){
         if(active()){
             Timer.schedule(() -> {
-                if(Vars.clientLoaded && checkUpdates && !mobile){
+                if((Vars.clientLoaded || headless) && checkUpdates && !mobile){
                     checkUpdate(t -> {});
                 }
             }, updateInterval, updateInterval);
