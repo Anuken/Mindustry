@@ -226,7 +226,7 @@ public class Mods implements Loadable{
             //dummy texture atlas that returns the 'shadow' regions; used for mod loading
             Core.atlas = new TextureAtlas(){
                 {
-                    //needed for the correct operation of the found() method in the TextureRegion
+                    //needed for the correct method of the found() method in the TextureRegion
                     error = shadow.find("error");
                 }
 
