@@ -81,7 +81,7 @@ public class ContentInfoDialog extends BaseDialog{
         }
 
         if(content.details != null){
-            table.add("[gray]" + (content.unlocked() ? content.details : Iconc.lock + " " + Core.bundle.get("unlock.incampaign"))).pad(6).padTop(20).width(400f).wrap().fillX();
+            table.add("[gray]" + (content.unlocked() || !content.hideDetails ? content.details : Iconc.lock + " " + Core.bundle.get("unlock.incampaign"))).pad(6).padTop(20).width(400f).wrap().fillX();
             table.row();
         }
 
