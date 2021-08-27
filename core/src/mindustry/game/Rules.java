@@ -162,6 +162,14 @@ public class Rules{
         return buildSpeedMultiplier * teams.get(team).buildSpeedMultiplier;
     }
 
+    public float deconstructRefund(Team team){
+        return deconstructRefundMultiplier != teams.get(team).deconstructRefundMultiplier ? teams.get(team).deconstructRefundMultiplier : deconstructRefundMultiplier;
+    }
+
+    public float buildCost(Team team){
+        return buildCostMultiplier * teams.get(team).buildCostMultiplier;
+    }
+
     public float buildRadius(Team team){
         return enemyCoreBuildRadius != teams.get(team).enemyCoreBuildRadius ? teams.get(team).enemyCoreBuildRadius : enemyCoreBuildRadius;
     }
@@ -201,14 +209,16 @@ public class Rules{
         public float blockDamageMultiplier = 1f;
         /** Multiplier for building speed. */
         public float buildSpeedMultiplier = 1f;
+        /** Multiplier for percentage of materials refunded when deconstructing. */
+        public float deconstructRefundMultiplier = 0.5f;
+        /** Multiplier for buildings resource cost. */
+        public float buildCostMultiplier = 1f;
         /** No-build zone around enemy core radius. */
         public float enemyCoreBuildRadius = 400f;
         /** Multiplier for ammo consumption on units. */
         public float ammoConsumptionMultiplier = 1f;
         /** Base unit cap. Can still be increased by blocks. */
         public int unitCap = 0;
-
-        //build cost disabled due to technical complexity
     }
 
     /** A simple map for storing TeamRules in an efficient way without hashing. */
