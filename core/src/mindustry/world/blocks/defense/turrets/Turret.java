@@ -149,7 +149,7 @@ public class Turret extends ReloadTurret{
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
         public @Nullable BlockUnitc unit;
-        public boolean wasShooting, charging;
+        public boolean canShoot, wasShooting, charging;
 
         @Override
         public void created(){
@@ -279,7 +279,7 @@ public class Turret extends ReloadTurret{
                 }
 
                 if(validateTarget()){
-                    boolean canShoot = true;
+                    canShoot = true;
 
                     if(isControlled()){ //player behavior
                         targetPos.set(unit.aimX(), unit.aimY());
