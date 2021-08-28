@@ -2,7 +2,7 @@ package mindustry.game;
 
 import arc.struct.*;
 import arc.util.*;
-import arc.Events;
+import arc.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;
