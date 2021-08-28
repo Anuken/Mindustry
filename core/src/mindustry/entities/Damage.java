@@ -362,11 +362,6 @@ public class Damage{
             }
             float amount = calculateDamage(x, y, entity.getX(), entity.getY(), radius, damage);
             entity.damage(amount);
-            if(entity instanceof Building b){
-                b.damage(team, amount);
-            }else{
-                entity.damage(amount);
-            }
             //TODO better velocity displacement
             float dst = tr.set(entity.getX() - x, entity.getY() - y).len();
             entity.vel.add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
@@ -471,7 +466,7 @@ public class Damage{
             for(int dy = -trad; dy <= trad; dy++){
                 Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
                 if(tile != null && tile.build != null && (team == null ||team.isEnemy(tile.team())) && Mathf.dst(dx, dy) <= trad){
-                    tile.build.damage(damage);
+                    tile.build.damage(team, damage);
                 }
             }
         }
