@@ -2,13 +2,11 @@ package mindustry.game;
 
 import arc.struct.*;
 import arc.util.*;
-import arc.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
-import mindustry.game.EventType.*;
 import mindustry.io.legacy.*;
 import mindustry.type.*;
 
