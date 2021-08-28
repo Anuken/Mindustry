@@ -362,6 +362,11 @@ public class Damage{
             }
             float amount = calculateDamage(x, y, entity.getX(), entity.getY(), radius, damage);
             entity.damage(amount);
+            if(entity instanceof Building b){
+                b.damage(team, amount);
+            }else{
+                entity.damage(amount);
+            }
             //TODO better velocity displacement
             float dst = tr.set(entity.getX() - x, entity.getY() - y).len();
             entity.vel.add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
