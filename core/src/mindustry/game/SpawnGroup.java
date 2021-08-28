@@ -8,6 +8,7 @@ import arc.util.serialization.Json.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
+import mindustry.game.*;
 import mindustry.io.legacy.*;
 import mindustry.type.*;
 
@@ -96,7 +97,7 @@ public class SpawnGroup implements JsonSerializable{
             }
         }
 
-        Events.fire(new EventType.UnitSpawnEvent(unit));
+        Events.fire(new UnitSpawnEvent(unit));
         return unit;
     }
 
