@@ -8,7 +8,7 @@ import arc.util.serialization.Json.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
-import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.io.legacy.*;
 import mindustry.type.*;
 
