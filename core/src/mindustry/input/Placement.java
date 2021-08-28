@@ -121,7 +121,8 @@ public class Placement{
         }
 
         Boolf<BuildPlan> placeable = plan -> (plan.placeable(player.team())) ||
-            (plan.tile() != null && plan.tile().block() == plan.block); //don't count the same block as inaccessible
+            (plan.tile() != null && (!plan.tile().block().allowBridging && plan.tile().block().canReplace(plan.block) ||
+            plan.tile().block() == plan.block)); //don't count the same block as inaccessible
 
         var result = plans1.clear();
         var team = player.team();

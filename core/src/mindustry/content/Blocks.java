@@ -1008,6 +1008,7 @@ public class Blocks implements ContentList{
         distributor = new Router("distributor"){{
             requirements(Category.distribution, with(Items.lead, 4, Items.copper, 4));
             size = 2;
+            allowBridging = false;
         }};
 
         overflowGate = new OverflowGate("overflow-gate"){{
@@ -1102,6 +1103,7 @@ public class Blocks implements ContentList{
             size = 3;
             liquidCapacity = 1500f;
             health = 500;
+            allowBridging = false;
         }};
 
         liquidJunction = new LiquidJunction("liquid-junction"){{

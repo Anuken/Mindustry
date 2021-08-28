@@ -80,6 +80,8 @@ public class Block extends UnlockableContent{
     public boolean unloadable = true;
     /** whether units can resupply by taking items from this block */
     public boolean allowResupply = false;
+    /** whether to allow conveyors/conduits/ducts to bridge over this block in placement */
+    public boolean allowBridging = true;
     /** whether this is solid */
     public boolean solid;
     /** whether this block CAN be solid. */
