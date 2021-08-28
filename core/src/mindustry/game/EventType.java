@@ -428,6 +428,15 @@ public class EventType{
         }
     }
 
+    /** Called when a unit is spawned by wave. */
+    public static class UnitSpawnEvent{
+        public final Unit unit;
+
+        public UnitSpawnEvent(Unit unit) {
+            this.unit = unit;
+        }
+    }
+
     /** Called when a unit is dumped from any payload block. */
     public static class UnitUnloadEvent{
         public final Unit unit;
