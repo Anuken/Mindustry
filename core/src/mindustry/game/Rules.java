@@ -163,7 +163,7 @@ public class Rules{
     }
 
     public float deconstructRefund(Team team){
-        return deconstructRefundMultiplier != teams.get(team).deconstructRefundMultiplier ? teams.get(team).deconstructRefundMultiplier : deconstructRefundMultiplier;
+        return (deconstructRefundMultiplier * 2) * (teams.get(team).deconstructRefundMultiplier * 2) / 2; //best solution for now, might fix it later
     }
 
     public float buildCost(Team team){
@@ -171,7 +171,7 @@ public class Rules{
     }
 
     public float buildRadius(Team team){
-        return enemyCoreBuildRadius != teams.get(team).enemyCoreBuildRadius ? teams.get(team).enemyCoreBuildRadius : enemyCoreBuildRadius;
+        return enemyCoreBuildRadius + teams.get(team).enemyCoreBuildRadius;
     }
 
     public float ammoConsumption(Team team){
