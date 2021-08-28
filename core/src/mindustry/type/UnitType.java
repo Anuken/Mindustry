@@ -316,7 +316,6 @@ public class UnitType extends UnlockableContent{
         if(example instanceof WaterMovec){
             canDrown = false;
             omniMovement = false;
-            immunities.add(StatusEffects.wet);
         }
 
         if(lightRadius == -1){

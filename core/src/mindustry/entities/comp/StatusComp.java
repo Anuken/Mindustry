@@ -109,7 +109,7 @@ abstract class StatusComp implements Posc, Flyingc{
     @Override
     public void update(){
         Floor floor = floorOn();
-        if(isGrounded() && !type.hovering){
+        if(this instanceof WaterMovec ? floor.status != StatusEffects.wet : isGrounded() && !type.hovering){
             //apply effect
             apply(floor.status, floor.statusDuration);
         }
