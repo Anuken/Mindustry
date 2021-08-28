@@ -428,7 +428,7 @@ public class EventType{
         }
     }
 
-    /**Called when a unit is spawned by wave. */
+    /** Called when a unit is spawned by wave. */
     public static class UnitSpawnEvent{
         public final Unit unit;
 
