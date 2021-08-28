@@ -97,7 +97,6 @@ public class SpawnGroup implements JsonSerializable{
             }
         }
 
-        Events.fire(new UnitSpawnEvent(unit));
         return unit;
     }
 
