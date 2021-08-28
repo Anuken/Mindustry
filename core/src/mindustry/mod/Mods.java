@@ -225,6 +225,10 @@ public class Mods implements Loadable{
             var shadow = Core.atlas;
             //dummy texture atlas that returns the 'shadow' regions; used for mod loading
             Core.atlas = new TextureAtlas(){
+                {
+                    //needed for the correct operation of the found() method in the TextureRegion
+                    error = shadow.find("error");
+                }
 
                 @Override
                 public AtlasRegion find(String name){

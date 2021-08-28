@@ -79,7 +79,7 @@ public class PayloadBlock extends Block{
 
         @Override
         public boolean canControlSelect(Player player){
-            return !player.unit().spawnedByCore && this.payload == null && acceptUnitPayload(player.unit()) && player.tileOn().build == this;
+            return !player.unit().spawnedByCore && this.payload == null && acceptUnitPayload(player.unit()) && player.tileOn() != null && player.tileOn().build == this;
         }
 
         @Override

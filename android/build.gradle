@@ -7,8 +7,7 @@ buildscript{
     }
 
     dependencies{
-        //note that later versions, like alpha05, fail to work correctly
-        classpath 'com.android.tools.build:gradle:7.1.0-alpha02'
+        classpath 'com.android.tools.build:gradle:7.0.1'
     }
 }
 

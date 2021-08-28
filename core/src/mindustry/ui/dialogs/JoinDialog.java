@@ -119,7 +119,7 @@ public class JoinDialog extends BaseDialog{
 
         refreshLocal();
         refreshRemote();
-        refreshGlobal();
+        refreshCommunity();
     }
 
     void setupRemote(){
@@ -331,7 +331,7 @@ public class JoinDialog extends BaseDialog{
             if(eye){
                 name.button(Icon.eyeSmall, Styles.emptyi, () -> {
                     showHidden = !showHidden;
-                    refreshGlobal();
+                    refreshCommunity();
                 }).update(i -> i.getStyle().imageUp = (showHidden ? Icon.eyeSmall : Icon.eyeOffSmall))
                     .size(40f).right().padRight(3).tooltip("@servers.showhidden");
             }
@@ -357,7 +357,7 @@ public class JoinDialog extends BaseDialog{
         net.discoverServers(this::addLocalHost, this::finishLocalHosts);
     }
 
-    void refreshGlobal(){
+    void refreshCommunity(){
         int cur = refreshes;
 
         global.clear();

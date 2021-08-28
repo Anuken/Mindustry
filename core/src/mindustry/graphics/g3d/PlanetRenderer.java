@@ -236,7 +236,6 @@ public class PlanetRenderer implements Disposable{
             Tmp.c1.set(from).lerp(to, (f+ Time.globalTime /timeScale)%1f);
             batch.color(Tmp.c1);
             batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f));
-
         }
         batch.flush(Gl.lineStrip);
     }

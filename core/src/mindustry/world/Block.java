@@ -850,6 +850,10 @@ public class Block extends UnlockableContent{
         if(!outputsPower && consumes.hasPower() && consumes.getPower().buffered){
             throw new IllegalArgumentException("Consumer using buffered power: " + name);
         }
+
+        if(buildVisibility == BuildVisibility.sandboxOnly){
+            hideDetails = false;
+        }
     }
 
     @Override
