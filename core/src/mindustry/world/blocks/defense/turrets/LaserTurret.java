@@ -90,7 +90,7 @@ public class LaserTurret extends PowerTurret{
                 return;
             }
 
-            if(reload <= 0 && (consValid() || cheating())){
+            if(reload <= 0 && (consValid() || cheating()) && !charging){
                 BulletType type = peekAmmo();
 
                 shoot(type);
