@@ -74,7 +74,13 @@ public class WaveSpawner{
                     for(int i = 0; i < spawned; i++){
                         Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
                         unit.set(spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
-                        spawnEffect(unit);
+                        
+                        Tile on = world.tileWorld(spawnX, spawnY);
+                        if(!(unit instanceof WaterMovec) && on != null && on.floor().isDeep()) {
+                            unit.remove();
+                        }else{
+                            spawnEffect(unit);
+                        }
                     }
                 });
             }else{
