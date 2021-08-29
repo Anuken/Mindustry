@@ -607,7 +607,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawControl(Unit unit){
-        Draw.z(Layer.groundUnit - 2);
+        Draw.z(unit.isFlying() ? Layer.flyingUnitLow : Layer.groundUnit - 2);
 
         Draw.color(Pal.accent, Color.white, Mathf.absin(4f, 0.3f));
         Lines.poly(unit.x, unit.y, 4, unit.hitSize + 1.5f);
