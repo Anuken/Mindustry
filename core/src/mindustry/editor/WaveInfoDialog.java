@@ -174,7 +174,6 @@ public class WaveInfoDialog extends BaseDialog{
                     buildGroups();
                 }).growX().height(60f);
                 t.button("@waves.duplicate", Styles.cleart, () -> {
-                    if(groups == null || expandedGroup == null) return;
                     groups.add(expandedGroup.copy());
                     buildGroups();
                 }).disabled(g -> expandedGroup == null).growX().height(60f);
