@@ -166,6 +166,8 @@ public class SpawnGroup implements JsonSerializable{
         newGroup.max = this.max;
         newGroup.unitScaling = this.unitScaling;
         newGroup.unitAmount = this.unitAmount;
+        newGroup.shields = this.shields;
+        newGroup.shieldScaling = this.shieldScaling;
         newGroup.effect = this.effect;
         newGroup.items = this.items;
         return newGroup;
