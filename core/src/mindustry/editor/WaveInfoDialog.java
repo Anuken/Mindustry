@@ -177,7 +177,7 @@ public class WaveInfoDialog extends BaseDialog{
                     if(groups == null || expandedGroup == null) return;
                     groups.add(expandedGroup.copy());
                     buildGroups();
-                }).disabled(expandedGroup == null).growX().height(60f);
+                }).disabled(g -> expandedGroup == null).growX().height(60f);
             }).growX();
         }), new Label("@waves.none"){{
             visible(() -> groups.isEmpty());
