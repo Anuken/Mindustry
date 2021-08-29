@@ -2421,6 +2421,8 @@ public class UnitTypes implements ContentList{
         //region neoplasm
 
         scuttler = new UnitType("scuttler"){{
+            health = 20000;
+            armor = 17;
             outlineColor = Pal.neoplasmOutline;
             hitSize = 48f;
             omniMovement = false;
@@ -2434,6 +2436,8 @@ public class UnitTypes implements ContentList{
             segmentScl = 4f;
             segmentPhase = 5f;
             speed = 1f;
+
+            immunities.addAll(StatusEffects.burning, StatusEffects.melting);
         }};
 
         //endregion
