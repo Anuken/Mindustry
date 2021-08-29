@@ -164,14 +164,21 @@ public class WaveInfoDialog extends BaseDialog{
         cont.stack(new Table(Tex.clear, main -> {
             main.pane(t -> table = t).growX().growY().padRight(8f).scrollX(false);
             main.row();
-            main.button("@add", () -> {
-                if(groups == null) groups = new Seq<>();
-                SpawnGroup newGroup = new SpawnGroup(lastType);
-                groups.add(newGroup);
-                expandedGroup = newGroup;
-                showUpdate(newGroup);
-                buildGroups();
-            }).growX().height(70f);
+            main.table(Tex.button, t -> {
+                t.button("@add", Styles.cleart, () -> {
+                    if(groups == null) groups = new Seq<>();
+                    SpawnGroup newGroup = new SpawnGroup(lastType);
+                    groups.add(newGroup);
+                    expandedGroup = newGroup;
+                    showUpdate(newGroup);
+                    buildGroups();
+                }).growX().height(60f);
+                t.button("@waves.duplicate", Styles.cleart, () -> {
+                    if(groups == null || expandedGroup == null) return;
+                    groups.add(expandedGroup.copy());
+                    buildGroups();
+                }).disabled(expandedGroup == null).growX().height(60f);
+            }).growX();
         }), new Label("@waves.none"){{
             visible(() -> groups.isEmpty());
             this.touchable = Touchable.disabled;
