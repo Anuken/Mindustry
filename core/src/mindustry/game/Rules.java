@@ -163,7 +163,11 @@ public class Rules{
     }
 
     public float deconstructRefund(Team team){
-        return (deconstructRefundMultiplier * 2) * (teams.get(team).deconstructRefundMultiplier * 2) / 2; //best solution for now, might fix it later
+        if(deconstructRefundMultiplier < 1 || teams.get(team).deconstructRefundMultiplier < 1){
+            return deconstructRefundMultiplier * teams.get(team).deconstructRefundMultiplier * 2;
+        }else{
+            return deconstructRefundMultiplier * teams.get(team).deconstructRefundMultiplier;
+        }
     }
 
     public float buildCost(Team team){
