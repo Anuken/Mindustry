@@ -220,9 +220,10 @@ public class Turret extends ReloadTurret{
 
         public void targetPosition(Posc pos){
             if(!hasAmmo() || pos == null) return;
-            BulletType bullet = peekAmmo();
 
             if(predict){
+                BulletType bullet = peekAmmo();
+
                 var offset = Tmp.v1.setZero();
                 
                 //when delay is accurate, assume unit has moved by chargeTime already
