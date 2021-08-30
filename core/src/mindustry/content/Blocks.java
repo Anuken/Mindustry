@@ -26,6 +26,7 @@ import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.consumers.*;
+import mindustry.world.draw.projections.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
@@ -863,10 +864,11 @@ public class Blocks implements ContentList{
             size = 4;
         }};
 
-        mender = new MendProjector("mender"){{
+        mender = new Projector("mender"){{
             requirements(Category.effect, with(Items.lead, 30, Items.copper, 25));
             consumes.power(0.3f);
             size = 1;
+            heal = true;
             reload = 200f;
             range = 40f;
             healPercent = 4f;
@@ -876,10 +878,11 @@ public class Blocks implements ContentList{
             consumes.item(Items.silicon).boost();
         }};
 
-        mendProjector = new MendProjector("mend-projector"){{
+        mendProjector = new Projector("mend-projector"){{
             requirements(Category.effect, with(Items.lead, 100, Items.titanium, 25, Items.silicon, 40));
             consumes.power(1.5f);
             size = 2;
+            heal = true;
             reload = 250f;
             range = 85f;
             healPercent = 11f;
@@ -888,17 +891,23 @@ public class Blocks implements ContentList{
             consumes.item(Items.phaseFabric).boost();
         }};
 
-        overdriveProjector = new OverdriveProjector("overdrive-projector"){{
+        overdriveProjector = new Projector("overdrive-projector"){{
             requirements(Category.effect, with(Items.lead, 100, Items.titanium, 75, Items.silicon, 75, Items.plastanium, 30));
             consumes.power(3.50f);
             size = 2;
+            override = true;
+            reload = 60f;
+            range = 80f;
+            useTime = 400f;
+            phaseRangeBoost = 20f;
             consumes.item(Items.phaseFabric).boost();
         }};
 
-        overdriveDome = new OverdriveProjector("overdrive-dome"){{
+        overdriveDome = new Projector("overdrive-dome"){{
             requirements(Category.effect, with(Items.lead, 200, Items.titanium, 130, Items.silicon, 130, Items.plastanium, 80, Items.surgeAlloy, 120));
             consumes.power(10f);
             size = 3;
+            override = true;
             range = 200f;
             speedBoost = 2.5f;
             useTime = 300f;
