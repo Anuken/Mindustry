@@ -2,6 +2,7 @@ package mindustry.world.blocks.defense;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -32,7 +33,7 @@ public class Projector extends Block{
     public DrawProjection projection = new DrawMendProjection();
 
     public boolean hasBoost = true;
-    
+
     public boolean overdrive = false;
     public float speedBoost = 1.5f;
     public float speedBoostPhase = 0.75f;

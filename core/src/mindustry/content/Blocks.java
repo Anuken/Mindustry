@@ -895,6 +895,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, with(Items.lead, 100, Items.titanium, 75, Items.silicon, 75, Items.plastanium, 30));
             consumes.power(3.50f);
             size = 2;
+            projection = new DrawOverdriveProjection();
             override = true;
             reload = 60f;
             range = 80f;
@@ -907,6 +908,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, with(Items.lead, 200, Items.titanium, 130, Items.silicon, 130, Items.plastanium, 80, Items.surgeAlloy, 120));
             consumes.power(10f);
             size = 3;
+            projection = new DrawOverdriveProjection();
             override = true;
             range = 200f;
             speedBoost = 2.5f;
