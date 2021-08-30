@@ -231,9 +231,11 @@ public class Turret extends ReloadTurret{
                 }
 
                 targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed <= 0.01f ? 99999999f : bullet.speed));
-            }
 
-            if(targetPos.isZero()){
+                if(targetPos.isZero()){
+                    targetPos.set(pos);
+                }
+            }else{
                 targetPos.set(pos);
             }
         }
