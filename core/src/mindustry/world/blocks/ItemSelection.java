@@ -17,9 +17,16 @@ public class ItemSelection{
     public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer){
         buildTable(table, items, holder, consumer, true);
     }
-    
-    public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect){
 
+    public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect){
+        buildTable(table, items, holder, consumer, closeSelect, 4);
+    }
+
+    public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, int columns){
+        buildTable(table, items, holder, consumer, true, columns);
+    }
+    
+    public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect, int columns){
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         group.setMinCheckCount(0);
         Table cont = new Table();
@@ -37,14 +44,14 @@ public class ItemSelection{
             button.getStyle().imageUp = new TextureRegionDrawable(item.uiIcon);
             button.update(() -> button.setChecked(holder.get() == item));
 
-            if(i++ % 4 == 3){
+            if(i++ % columns == (columns - 1)){
                 cont.row();
             }
         }
 
         //add extra blank spaces so it looks nice
-        if(i % 4 != 0){
-            int remaining = 4 - (i % 4);
+        if(i % columns != 0){
+            int remaining = columns - (i % columns);
             for(int j = 0; j < remaining; j++){
                 cont.image(Styles.black6);
             }
