@@ -19,14 +19,18 @@ public class ItemSelection{
     }
 
     public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect){
-        buildTable(table, items, holder, consumer, closeSelect, 4);
+        buildTable(table, items, holder, consumer, closeSelect, 4, 4);
     }
 
     public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, int columns){
-        buildTable(table, items, holder, consumer, true, columns);
+        buildTable(table, items, holder, consumer, true, 4, columns);
+    }
+
+    public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, int rows, int columns){
+        buildTable(table, items, holder, consumer, true, rows, columns);
     }
     
-    public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect, int columns){
+    public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect, int rows, int columns){
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         group.setMinCheckCount(0);
         Table cont = new Table();
@@ -65,6 +69,6 @@ public class ItemSelection{
         });
 
         pane.setOverscroll(false, false);
-        table.add(pane).maxHeight(Scl.scl(40 * 5));
+        table.add(pane).maxHeight(Scl.scl((53f + (1f / 3f)) * rows));
     }
 }
