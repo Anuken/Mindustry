@@ -36,7 +36,7 @@
     "address": ["obvilionnetwork.ru:7004", "obvilionnetwork.ru:7005"]
   },
   {
-    "name": "io",
+    "name": "[stat]<[white]io[]>[]",
     "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000", "mindustry.io.community:4000", "mindustry.io.community:5000"]
   },
   {
