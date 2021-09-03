@@ -88,9 +88,9 @@ public class TractorBeamTurret extends BaseTurret{
                 consumeCoolant();
             }
 
-            targetIsValid = target != null && target.within(this, range + target.hitSize/2f) && target.team() != team && target.checkTarget(targetAir, targetGround) && efficiency() > 0.02f;
+            targetIsValid = false;
 
-            if(targetIsValid){
+            if(target != null && target.within(this, range + target.hitSize/2f) && target.team() != team && target.checkTarget(targetAir, targetGround) && efficiency() > 0.02f){
                 lockAndShootTarget();
             }else{
                 reduceStrength();
@@ -127,6 +127,7 @@ public class TractorBeamTurret extends BaseTurret{
             lockTarget(dest);
 
             if(Angles.within(rotation, dest, shootCone)){
+                targetIsValid = true;
                 shoot();
             }
         }
@@ -167,6 +168,12 @@ public class TractorBeamTurret extends BaseTurret{
             }
         }
 
+        private void drawTurret(){
+            Draw.rect(baseRegion, x, y);
+            Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
+            Draw.rect(region, x, y, rotation - 90);
+        }
+
         private void drawLaser(){
             Draw.z(Layer.bullet);
             float ang = angleTo(lastX, lastY);
@@ -178,12 +185,6 @@ public class TractorBeamTurret extends BaseTurret{
             lastX, lastY, strength * efficiency() * laserWidth);
 
             Draw.mixcol();
-        }
-
-        private void drawTurret(){
-            Draw.rect(baseRegion, x, y);
-            Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
-            Draw.rect(region, x, y, rotation - 90);
         }
 
         @Override
