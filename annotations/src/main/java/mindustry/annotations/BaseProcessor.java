@@ -91,7 +91,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
     }
 
     public static TypeName tname(String pack, String simple){
-        return ClassName.get(pack, simple );
+        return ClassName.get(pack, simple);
     }
 
     public static TypeName tname(String name){
