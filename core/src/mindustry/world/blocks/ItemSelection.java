@@ -54,7 +54,7 @@ public class ItemSelection{
             for(T item : list){
                 if(!item.unlockedNow()) continue;
 
-                ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, 24, () -> {
+                ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, 36, () -> {
                     if(closeSelect) control.input.frag.config.hideConfig();
                 }).group(group).get();
                 button.changed(() -> consumer.get(button.isChecked() ? item : null));
