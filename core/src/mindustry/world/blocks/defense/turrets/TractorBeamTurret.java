@@ -74,64 +74,84 @@ public class TractorBeamTurret extends BaseTurret{
     public class TractorBeamBuild extends BaseTurretBuild{
         public @Nullable Unit target;
         public float lastX, lastY, strength;
-        public boolean any;
+        public boolean targetIsValid;
         public float coolant = 1f;
 
         @Override
         public void updateTile(){
-
-            //retarget
+            
             if(timer(timerTarget, retargetTime)){
-                target = Units.closestEnemy(team, x, y, range, u -> u.checkTarget(targetAir, targetGround));
+                retarget();
             }
 
-            //consume coolant
             if(target != null && acceptCoolant){
-                float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
-
-                Liquid liquid = liquids.current();
-
-                float used = Math.min(Math.min(liquids.get(liquid), maxUsed * Time.delta), Math.max(0, (1f / coolantMultiplier) / liquid.heatCapacity));
-
-                liquids.remove(liquid, used);
-
-                if(Mathf.chance(0.06 * used)){
-                    coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
-                }
-
-                coolant = 1f + (used * liquid.heatCapacity * coolantMultiplier);
+                consumeCoolant();
             }
 
-            any = false;
+            targetIsValid = target != null && target.within(this, range + target.hitSize/2f) && target.team() != team && target.checkTarget(targetAir, targetGround) && efficiency() > 0.02f;
 
-            //look at target
-            if(target != null && target.within(this, range + target.hitSize/2f) && target.team() != team && target.checkTarget(targetAir, targetGround) && efficiency() > 0.02f){
-                if(!headless){
-                    control.sound.loop(shootSound, this, shootSoundVolume);
-                }
-
-                float dest = angleTo(target);
-                rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
-                lastX = target.x;
-                lastY = target.y;
-                strength = Mathf.lerpDelta(strength, 1f, 0.1f);
-
-                //shoot when possible
-                if(Angles.within(rotation, dest, shootCone)){
-                    if(damage > 0){
-                        target.damageContinuous(damage * efficiency());
-                    }
-
-                    if(status != StatusEffects.none){
-                        target.apply(status, statusDuration);
-                    }
-
-                    any = true;
-                    target.impulseNet(Tmp.v1.set(this).sub(target).limit((force + (1f - target.dst(this) / range) * scaledForce) * edelta() * timeScale));
-                }
+            if(targetIsValid){
+                lockAndShootTarget();
             }else{
-                strength = Mathf.lerpDelta(strength, 0, 0.1f);
+                reduceStrength();
             }
+        }
+
+        private void retarget(){
+            target = Units.closestEnemy(team, x, y, range, u -> u.checkTarget(targetAir, targetGround));
+        }
+
+        private void consumeCoolant(){
+            float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
+
+            Liquid liquid = liquids.current();
+
+            float used = Math.min(Math.min(liquids.get(liquid), maxUsed * Time.delta), Math.max(0, (1f / coolantMultiplier) / liquid.heatCapacity));
+
+            liquids.remove(liquid, used);
+
+            if(Mathf.chance(0.06 * used)){
+                coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
+            }
+
+            coolant = 1f + (used * liquid.heatCapacity * coolantMultiplier);
+        }
+
+        private void lockAndShootTarget(){
+            if(!headless){
+                control.sound.loop(shootSound, this, shootSoundVolume);
+            }
+
+            float dest = angleTo(target);
+
+            lockTarget(dest);
+
+            if(Angles.within(rotation, dest, shootCone)){
+                shoot();
+            }
+        }
+
+        private void lockTarget(float dest){
+            rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
+            lastX = target.x;
+            lastY = target.y;
+            strength = Mathf.lerpDelta(strength, 1f, 0.1f);
+        }
+
+        private void shoot(){
+            if(damage > 0){
+                target.damageContinuous(damage * efficiency());
+            }
+
+            if(status != StatusEffects.none){
+                target.apply(status, statusDuration);
+            }
+
+            target.impulseNet(Tmp.v1.set(this).sub(target).limit((force + (1f - target.dst(this) / range) * scaledForce) * edelta() * timeScale));
+        }
+
+        private void reduceStrength() {
+            strength = Mathf.lerpDelta(strength, 0, 0.1f);
         }
 
         @Override
@@ -141,23 +161,29 @@ public class TractorBeamTurret extends BaseTurret{
 
         @Override
         public void draw(){
+            drawTurret();
+            if(targetIsValid){
+                drawLaser();
+            }
+        }
+
+        private void drawLaser(){
+            Draw.z(Layer.bullet);
+            float ang = angleTo(lastX, lastY);
+
+            Draw.mixcol(laserColor, Mathf.absin(4f, 0.6f));
+
+            Drawf.laser(team, laser, laserStart, laserEnd,
+            x + Angles.trnsx(ang, shootLength), y + Angles.trnsy(ang, shootLength),
+            lastX, lastY, strength * efficiency() * laserWidth);
+
+            Draw.mixcol();
+        }
+
+        private void drawTurret(){
             Draw.rect(baseRegion, x, y);
             Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
             Draw.rect(region, x, y, rotation - 90);
-
-            //draw laser if applicable
-            if(any){
-                Draw.z(Layer.bullet);
-                float ang = angleTo(lastX, lastY);
-
-                Draw.mixcol(laserColor, Mathf.absin(4f, 0.6f));
-
-                Drawf.laser(team, laser, laserStart, laserEnd,
-                x + Angles.trnsx(ang, shootLength), y + Angles.trnsy(ang, shootLength),
-                lastX, lastY, strength * efficiency() * laserWidth);
-
-                Draw.mixcol();
-            }
         }
 
         @Override
