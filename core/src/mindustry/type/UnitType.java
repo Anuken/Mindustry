@@ -141,6 +141,7 @@ public class UnitType extends UnlockableContent{
         super(name);
 
         constructor = EntityMapping.map(this.name);
+        selectionSize = 36f;
     }
 
     public UnitController createController(){

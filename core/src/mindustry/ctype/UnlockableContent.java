@@ -3,6 +3,7 @@ package mindustry.ctype;
 import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -31,6 +32,8 @@ public abstract class UnlockableContent extends MappableContent{
     public boolean hideDetails = true;
     /** Special logic icon ID. */
     public int iconId = 0;
+    /** How big the content appears in certain selection menus */
+    public float selectionSize = 24f;
     /** Icon of the content to use in UI. */
     public TextureRegion uiIcon;
     /** Icon of the full content. Unscaled.*/

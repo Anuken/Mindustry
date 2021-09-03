@@ -273,6 +273,7 @@ public class Block extends UnlockableContent{
     public Block(String name){
         super(name);
         initBuilding();
+        selectionSize = 36f;
     }
 
     public void drawBase(Tile tile){

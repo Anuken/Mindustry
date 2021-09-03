@@ -2,6 +2,7 @@ package mindustry.world.blocks;
 
 import arc.*;
 import arc.func.*;
+import arc.math.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
@@ -54,13 +55,12 @@ public class ItemSelection{
             for(T item : list){
                 if(!item.unlockedNow()) continue;
 
-                ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, 36, () -> {
+                ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, Mathf.clamp(item.selectionSize, 0f, 40f), () -> {
                     if(closeSelect) control.input.frag.config.hideConfig();
-                }).group(group).get();
+                }).tooltip(item.localizedName).group(group).get();
                 button.changed(() -> consumer.get(button.isChecked() ? item : null));
                 button.getStyle().imageUp = new TextureRegionDrawable(item.uiIcon);
                 button.update(() -> button.setChecked(holder.get() == item));
-                button.getImageCell().tooltip(item.localizedName);
 
                 if(i++ % columns == (columns - 1)){
                     cont.row();
