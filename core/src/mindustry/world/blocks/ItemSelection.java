@@ -1,5 +1,6 @@
 package mindustry.world.blocks;
 
+import arc.*;
 import arc.func.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
@@ -12,7 +13,9 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class ItemSelection{
+    private static TextField search;
     private static float scrollPos = 0f;
+    private static int rowCount;
 
     public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer){
         buildTable(table, items, holder, consumer, true);
@@ -36,29 +39,52 @@ public class ItemSelection{
         Table cont = new Table();
         cont.defaults().size(40);
 
-        int i = 0;
+        Runnable[] rebuild = {null};
+        if(search != null) search.clearText();
 
-        for(T item : items){
-            if(!item.unlockedNow()) continue;
+        rebuild[0] = () -> {
+            group.clear();
+            cont.clearChildren();
 
-            ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, 24, () -> {
-                if(closeSelect) control.input.frag.config.hideConfig();
-            }).group(group).get();
-            button.changed(() -> consumer.get(button.isChecked() ? item : null));
-            button.getStyle().imageUp = new TextureRegionDrawable(item.uiIcon);
-            button.update(() -> button.setChecked(holder.get() == item));
+            var text = search != null ? search.getText() : "";
+            int i = 0;
+            rowCount = 0;
 
-            if(i++ % columns == (columns - 1)){
-                cont.row();
+            Seq<T> list = items.select(u -> (text.isEmpty() || u.localizedName.toLowerCase().contains(text.toLowerCase())));
+            for(T item : list){
+                if(!item.unlockedNow()) continue;
+
+                ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, 24, () -> {
+                    if(closeSelect) control.input.frag.config.hideConfig();
+                }).group(group).get();
+                button.changed(() -> consumer.get(button.isChecked() ? item : null));
+                button.getStyle().imageUp = new TextureRegionDrawable(item.uiIcon);
+                button.update(() -> button.setChecked(holder.get() == item));
+
+                if(i++ % columns == (columns - 1)){
+                    cont.row();
+                    rowCount++;
+                }
             }
-        }
 
-        //add extra blank spaces so it looks nice
-        if(i % columns != 0){
-            int remaining = columns - (i % columns);
-            for(int j = 0; j < remaining; j++){
-                cont.image(Styles.black6);
+            //add extra blank spaces so it looks nice
+            if(i % columns != 0){
+                int remaining = columns - (i % columns);
+                for(int j = 0; j < remaining; j++){
+                    cont.image(Styles.black6);
+                }
             }
+        };
+
+        rebuild[0].run();
+
+        Table main = new Table();
+        if(rowCount > rows){
+            main.table(s -> {
+                s.image(Icon.zoom).padRight(8);
+                search = s.field(null, text -> rebuild[0].run()).growX().get();
+                search.setMessageText(Core.bundle.get("players.search"));
+            }).fillX().padBottom(4).row();
         }
 
         ScrollPane pane = new ScrollPane(cont, Styles.smallPane);
@@ -69,6 +95,7 @@ public class ItemSelection{
         });
 
         pane.setOverscroll(false, false);
-        table.add(pane).maxHeight(Scl.scl(40 * rows));
+        main.add(pane).maxHeight(Scl.scl(40 * rows));
+        table.add(main);
     }
 }
