@@ -96,7 +96,7 @@ public class ItemSelection{
         });
 
         pane.setOverscroll(false, false);
-        main.add(pane).maxHeight(Scl.scl(40 * rows));
+        main.add(pane).maxHeight(40 * rows);
         table.add(main);
     }
 }
