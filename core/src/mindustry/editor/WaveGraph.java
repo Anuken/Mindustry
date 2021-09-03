@@ -112,7 +112,7 @@ public class WaveGraph extends Table{
 
                 lay.setText(font, "" + i);
 
-                font.draw("" + i, cx, cy + lay.height/2f, Align.right);
+                font.draw("" + i, cx, cy + lay.height / 2f, Align.right);
             }
             Draw.alpha(1f);
 
@@ -123,7 +123,7 @@ public class WaveGraph extends Table{
                 float cy = y + fh, cx = graphX + graphW / (values.length - 1) * i;
 
                 Lines.line(cx, cy, cx, cy + len);
-                if(i == values.length/2){
+                if(i == values.length / 2){
                     font.draw("" + (i + from + 1), cx, cy - Scl.scl(2f), Align.center);
                 }
             }
@@ -174,7 +174,7 @@ public class WaveGraph extends Table{
                 sum += spawned;
             }
             maxTotal = Math.max(maxTotal, sum);
-            maxHealth = Math.max(maxHealth,healthsum);
+            maxHealth = Math.max(maxHealth, healthsum);
         }
 
         ObjectSet<UnitType> usedCopy = new ObjectSet<>(used);
