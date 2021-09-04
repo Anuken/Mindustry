@@ -368,7 +368,7 @@ public class ModsDialog extends BaseDialog{
         Seq<UnlockableContent> all = Seq.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent).as();
         if(all.any()){
             dialog.cont.row();
-            dialog.cont.button( "@mods.viewcontent", Icon.book, () -> {
+            dialog.cont.button("@mods.viewcontent", Icon.book, () -> {
                 BaseDialog d = new BaseDialog(mod.meta.displayName());
                 d.cont.pane(cs -> {
                     int i = 0;
