@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 
 public class Trail{
     public int length;
@@ -73,7 +74,7 @@ public class Trail{
 
     /** Removes the last point from the trail at intervals. */
     public void shorten(){
-        if((counter += Time.delta) >= 0.99f){
+        if(Vars.state.isPlaying() && (counter += Time.delta) >= 0.99f){
             if(points.size >= 3){
                 points.removeRange(0, 2);
             }
@@ -89,7 +90,7 @@ public class Trail{
 
     /** Adds a new point to the trail at intervals. */
     public void update(float x, float y, float width){
-        if((counter += Time.delta) >= 0.99f){
+        if(Vars.state.isPlaying() && (counter += Time.delta) >= 0.99f){
             if(points.size > length*3){
                 points.removeRange(0, 2);
             }
