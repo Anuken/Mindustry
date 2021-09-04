@@ -173,6 +173,10 @@ public class Administration{
         return Config.strict.bool();
     }
 
+    public boolean censorSwearWords(){
+        return Config.censorSwearing.bool();
+    }
+
     public boolean allowsCustomClients(){
         return Config.allowCustomClients.bool();
     }
@@ -464,6 +468,7 @@ public class Administration{
         logging("Whether to log everything to files.", true),
         strict("Whether strict mode is on - corrects positions and prevents duplicate UUIDs.", true),
         antiSpam("Whether spammers are automatically kicked and rate-limited.", headless),
+        censorSwearing("Whether swear words will be censored when messaging.", true),
         interactRateWindow("Block interaction rate limit window, in seconds.", 6),
         interactRateLimit("Block interaction rate limit.", 25),
         interactRateKick("How many times a player must interact inside the window to get kicked.", 60),

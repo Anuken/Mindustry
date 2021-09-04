@@ -27,6 +27,7 @@ import mindustry.world.modules.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.*;
 import java.util.zip.*;
 
 import static mindustry.Vars.*;
@@ -48,6 +49,44 @@ public class NetClient implements ApplicationListener{
     private float timeoutTime = 0f;
     /** Last sent client snapshot ID. */
     private int lastSent;
+    /** symbol that will replace swear words */
+    private static String swearSymbol = "###";
+    /** symbols that swearing detector ignores, to prevent swear escaping. */
+    private static Pattern swearIgnore = Pattern.compile("[`~!@#$%^&*()-_=+{}|;:'\",<.>/?]");
+    /** regex for rude, obscene words that might harm others. These words will be censored upon sending message in multiplayer by default. */
+    private static Pattern swearPattern = Pattern.compile(String.join("|",
+            "(dumb|)f(u|c|uc)k(s|ing| you|)",
+            "a[sr]s(e|)(hole|)",
+            "(bull|)shit",
+            "shut( |)up",
+            "(go |)(fuck|kill) yourself",
+            "shut your (mouth|face|ass|arse)",
+            "stfu|shut the( fuck | )up",
+            "kys",
+            "gay|gey",
+            "incest|fornication",
+            "bastard",
+            "(son of a|)( |)bitch",
+            "piss off",
+            "snatch",
+            "prick",
+            "moron",
+            "id(i|)ot",
+            "nigg(a|er)",
+            "vagina",
+            "porn",
+            "pussy",
+            "cock",
+            "dick(head|)",
+            "slut",
+            "cum",
+            "cunt",
+            "sex(ual|)",
+            "blad",
+            "motherfucker",
+            "cy[kк]a|blyat|cy[kк]a blyat",
+            "kurwa"
+    ));
 
     /** List of entities that were removed, and need not be added while syncing. */
     private IntSet removed = new IntSet();
@@ -216,6 +255,11 @@ public class NetClient implements ApplicationListener{
 
         if(message.length() > maxTextLength){
             throw new ValidateException(player, "Player has sent a message above the text limit.");
+        }
+
+        if(swearPattern.matcher(swearIgnore.matcher(message.toLowerCase()).replaceAll("")).find()){
+            Events.fire(new PlayerSwearEvent(player, message));
+            if(netServer.admins.censorSwearWords()) message = swearPattern.matcher(swearIgnore.matcher(message).replaceAll("")).replaceAll(swearSymbol);
         }
 
         Events.fire(new PlayerChatEvent(player, message));

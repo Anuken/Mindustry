@@ -157,6 +157,16 @@ public class EventType{
         }
     }
 
+    public static class PlayerSwearEvent{
+        public final Player player;
+        public final String message;
+
+        public PlayerSwearEvent(Player player, String message){
+            this.player = player;
+            this.message = message;
+        }
+    }
+
     /** Called when a sector is conquered, e.g. a boss or base is defeated. */
     public static class SectorCaptureEvent{
         public final Sector sector;
@@ -432,7 +442,7 @@ public class EventType{
     public static class UnitSpawnEvent{
         public final Unit unit;
 
-        public UnitSpawnEvent(Unit unit) {
+        public UnitSpawnEvent(Unit unit){
             this.unit = unit;
         }
     }
