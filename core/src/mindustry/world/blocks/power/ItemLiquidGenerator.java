@@ -128,6 +128,9 @@ public class ItemLiquidGenerator extends PowerGenerator{
                 liquids.remove(liquid, used * power.graph.getUsageFraction());
                 productionEfficiency = baseLiquidEfficiency * used / maximumPossible;
 
+                if(generateTime > 0f){
+                    generateTime -= delta();
+                }
                 if(generateTime <= 0f && used > 0.001f){
                     generateEffect.at(x + Mathf.range(generateEffectRnd), y + Mathf.range(generateEffectRnd));
                     generateTime = 1f;
