@@ -609,7 +609,7 @@ public class Blocks implements ContentList{
             rotate = false;
             solid = true;
             outputsLiquid = true;
-            drawer = new DrawMixer();
+            drawer = new DrawMixer(true);
 
             consumes.power(1f);
             consumes.item(Items.titanium);

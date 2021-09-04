@@ -9,6 +9,7 @@ public class LiquidRouter extends LiquidBlock{
         super(name);
 
         noUpdateDisabled = true;
+        canOverdrive = false;
     }
 
     public class LiquidRouterBuild extends LiquidBuild{
