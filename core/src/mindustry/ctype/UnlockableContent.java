@@ -3,7 +3,6 @@ package mindustry.ctype;
 import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
