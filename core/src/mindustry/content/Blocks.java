@@ -442,7 +442,7 @@ public class Blocks implements ContentList{
         Seq.with(metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6)
         .each(b -> b.asFloor().wall = darkMetal);
 
-        pebbles = new DoubleOverlayFloor("pebbles");
+        pebbles = new OverlayFloor("pebbles");
 
         tendrils = new OverlayFloor("tendrils");
 
