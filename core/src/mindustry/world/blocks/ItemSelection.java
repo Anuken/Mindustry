@@ -91,10 +91,7 @@ public class ItemSelection{
         ScrollPane pane = new ScrollPane(cont, Styles.smallPane);
         pane.setScrollingDisabled(true, false);
         pane.setScrollYForce(scrollPos);
-        pane.update(() -> {
-            scrollPos = pane.getScrollY();
-        });
-
+        pane.update(() -> scrollPos = pane.getScrollY());
         pane.setOverscroll(false, false);
         main.add(pane).maxHeight(40 * rows);
         table.top().add(main);
