@@ -84,8 +84,8 @@ public class Planets implements ContentList{
             generator = new SerpuloPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
             cloudMeshLoader = () -> new MultiMesh(
-                new HexSkyMesh(this, 0, 0.6f, 0.01f + 0.18f, 5, Color.white.cpy().lerp(Pal.spore, 0.75f).a(0.7f), 2, 0.5f, 1.1f, 0.42f),
-                new HexSkyMesh(this, 10, 0.25f, 0.01f + 0.16f, 5, new Color().set(Pal.spore).mul(0.9f).a(0.7f), 2, 0.5f, 1f, 0.37f)
+                new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, new Color().set(Pal.spore).mul(0.9f).a(0.75f), 2, 0.5f, 1f, 0.38f),
+                new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Pal.spore, 0.6f).a(0.75f), 2, 0.5f, 1.1f, 0.41f)
             );
             atmosphereColor = Color.valueOf("3c1b8f");
             atmosphereRadIn = 0.02f;

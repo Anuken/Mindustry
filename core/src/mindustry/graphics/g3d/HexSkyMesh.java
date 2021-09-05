@@ -38,7 +38,7 @@ public class HexSkyMesh extends PlanetMesh{
     }
 
     public float relRot(){
-        return Time.globalTime * speed / 34f;
+        return Time.globalTime * speed / 40f;
     }
 
     @Override

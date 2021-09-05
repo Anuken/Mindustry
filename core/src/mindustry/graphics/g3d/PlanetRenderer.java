@@ -151,6 +151,8 @@ public class PlanetRenderer implements Disposable{
     public void renderTransparent(Planet planet){
         if(!planet.visible()) return;
 
+        planet.drawClouds(cam.combined, planet.getTransform(mat));
+
         if(planet.hasGrid() && planet == this.planet){
             renderSectors(planet);
         }
@@ -158,8 +160,6 @@ public class PlanetRenderer implements Disposable{
         if(cam.frustum.containsSphere(planet.position, planet.clipRadius) && planet.parent != null && planet.hasAtmosphere && Core.settings.getBool("atmosphere")){
             planet.drawAtmosphere(atmosphere, cam);
         }
-
-        planet.drawClouds(cam.combined, planet.getTransform(mat));
 
         for(Planet child : planet.children){
             renderTransparent(child);
