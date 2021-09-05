@@ -9,6 +9,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -24,6 +25,7 @@ public class PayloadBlock extends Block{
 
         update = true;
         sync = true;
+        envEnabled |= Env.space;
     }
 
     public static boolean blends(Building build, int direction){
