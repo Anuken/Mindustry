@@ -35,7 +35,7 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, spawn, cliff, deepwater, water, taintedWater, tar, slag, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space,
+    air, spawn, cliff, deepwater, water, taintedWater, deepTaintedWater, tar, slag, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space,
     dacite, rhyolite, rhyoliteCrater, regolith, yellowStone, redIce,
     redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
@@ -156,7 +156,19 @@ public class Blocks implements ContentList{
         }};
 
         taintedWater = new Floor("tainted-water"){{
-            speedMultiplier = 0.17f;
+            speedMultiplier = 0.5f;
+            variants = 0;
+            status = StatusEffects.wet;
+            statusDuration = 90f;
+            liquidDrop = Liquids.water;
+            isLiquid = true;
+            cacheLayer = CacheLayer.water;
+            albedo = 0.5f;
+            attributes.set(Attribute.spores, 0.15f);
+        }};
+
+        deepTaintedWater = new Floor("deep-tainted-water"){{
+            speedMultiplier = 0.18f;
             variants = 0;
             status = StatusEffects.wet;
             statusDuration = 140f;
@@ -384,7 +396,9 @@ public class Blocks implements ContentList{
             attributes.set(Attribute.silicate, 1f);
         }};
 
-        sporeWall = new StaticWall("spore-wall");
+        sporeWall = new StaticWall("spore-wall"){{
+            taintedWater.asFloor().wall = deepTaintedWater.asFloor().wall = this;
+        }};
 
         dirtWall = new StaticWall("dirt-wall");
 
@@ -547,7 +561,7 @@ public class Blocks implements ContentList{
         Seq.with(metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6)
         .each(b -> b.asFloor().wall = darkMetal);
 
-        pebbles = new DoubleOverlayFloor("pebbles");
+        pebbles = new OverlayFloor("pebbles");
 
         tendrils = new OverlayFloor("tendrils");
 
@@ -819,10 +833,10 @@ public class Blocks implements ContentList{
         disassembler = new Separator("disassembler"){{
             requirements(Category.crafting, with(Items.plastanium, 40, Items.titanium, 100, Items.silicon, 150, Items.thorium, 80));
             results = with(
-                Items.sand, 4,
-                Items.graphite, 2,
-                Items.titanium, 2,
-                Items.thorium, 2
+                Items.sand, 2,
+                Items.graphite, 1,
+                Items.titanium, 1,
+                Items.thorium, 1
             );
             hasPower = true;
             craftTime = 15f;
