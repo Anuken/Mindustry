@@ -40,7 +40,7 @@ public class WaveGraph extends Table{
 
             int maxY = switch(mode){
                 case counts -> nextStep(max);
-                case health -> nextStep((int) maxHealth);
+                case health -> nextStep((int)maxHealth);
                 case totals -> nextStep(maxTotal);
             };
 
@@ -212,14 +212,14 @@ public class WaveGraph extends Table{
 
     int nextStep(float value){
         int order = 1;
-        while (order < value){
-            if (order * 2 > value) {
+        while(order < value){
+            if(order * 2 > value){
                 return order * 2;
             }
-            if (order * 5 > value) {
+            if(order * 5 > value){
                 return order * 5;
             }
-            if (order * 10 > value){
+            if(order * 10 > value){
                 return order * 10;
             }
             order *= 10;
