@@ -97,6 +97,6 @@ public class ItemSelection{
 
         pane.setOverscroll(false, false);
         main.add(pane).maxHeight(40 * rows);
-        table.add(main);
+        table.top().add(main);
     }
 }
