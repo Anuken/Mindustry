@@ -683,10 +683,10 @@ public class Blocks implements ContentList{
         disassembler = new Separator("disassembler"){{
             requirements(Category.crafting, with(Items.plastanium, 40, Items.titanium, 100, Items.silicon, 150, Items.thorium, 80));
             results = with(
-                Items.sand, 4,
-                Items.graphite, 2,
-                Items.titanium, 2,
-                Items.thorium, 2
+                Items.sand, 2,
+                Items.graphite, 1,
+                Items.titanium, 1,
+                Items.thorium, 1
             );
             hasPower = true;
             craftTime = 15f;
