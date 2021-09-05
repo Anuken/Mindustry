@@ -82,11 +82,9 @@ public class ItemSelection{
 
         Table main = new Table().background(Styles.black6);
         if(rowCount > rows){
-            main.table(s -> {
-                s.image(Icon.zoom).right().padRight(8);
-                search = s.field(null, text -> rebuild[0].run()).left().growX().get();
-                search.setMessageText(Core.bundle.get("players.search"));
-            }).width(40 * columns).padBottom(4).left().row();
+            search = main.field(null, text -> rebuild[0].run()).width(40 * columns).padBottom(4).left().growX().get();
+            search.setMessageText(Core.bundle.get("players.search"));
+            main.row();
         }
 
         ScrollPane pane = new ScrollPane(cont, Styles.smallPane);
