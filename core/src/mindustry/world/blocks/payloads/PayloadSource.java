@@ -28,6 +28,7 @@ public class PayloadSource extends PayloadBlock{
         hasPower = false;
         rotate = true;
         configurable = true;
+        selectionRows = selectionColumns = 8;
         //make sure to display large units.
         clipSize = 120;
         noUpdateDisabled = true;
@@ -88,7 +89,7 @@ public class PayloadSource extends PayloadBlock{
             ItemSelection.buildTable(table,
                 content.blocks().select(PayloadSource.this::canProduce).<UnlockableContent>as()
                 .and(content.units().select(PayloadSource.this::canProduce).as()),
-            () -> (UnlockableContent)config(), this::configure, 8, 8);
+            () -> (UnlockableContent)config(), this::configure, selectionRows, selectionColumns);
         }
 
         @Override

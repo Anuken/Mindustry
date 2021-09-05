@@ -159,6 +159,8 @@ public class Block extends UnlockableContent{
     public int unitCapModifier = 0;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
+    /** Used in blocks with selection menus such sorters for how large the menu should be */
+    public int selectionRows = 5, selectionColumns = 4;
     /** If true, this block can be configured by logic. */
     public boolean logicConfigurable = false;
     /** Whether this block consumes touchDown events when tapped. */

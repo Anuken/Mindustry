@@ -129,7 +129,7 @@ public class Sorter extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.items(), () -> sortItem, this::configure);
+            ItemSelection.buildTable(table, content.items(), () -> sortItem, this::configure, selectionRows, selectionColumns);
         }
 
         @Override

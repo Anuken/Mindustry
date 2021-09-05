@@ -53,7 +53,7 @@ public class BlockForge extends BlockProducer{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.blocks().select(BlockForge.this::canProduce), () -> recipe, this::configure);
+            ItemSelection.buildTable(table, content.blocks().select(BlockForge.this::canProduce), () -> recipe, this::configure, selectionRows, selectionColumns);
         }
 
         @Override
