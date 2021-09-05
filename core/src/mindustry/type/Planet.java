@@ -3,6 +3,7 @@ package mindustry.type;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.g3d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -21,6 +22,8 @@ public class Planet extends UnlockableContent{
     private static final Vec3 intersectResult = new Vec3();
     /** Mesh used for rendering. Created on load() - will be null on the server! */
     public @Nullable GenericMesh mesh;
+    /** Mesh used for rendering planet clouds. Null if no clouds are present. */
+    public @Nullable GenericMesh cloudMesh;
     /** Position in global coordinates. Will be 0,0,0 until the Universe updates it. */
     public Vec3 position = new Vec3();
     /** Grid used for the sectors on the planet. Null if this planet can't be landed on. */
@@ -86,7 +89,7 @@ public class Planet extends UnlockableContent{
     /** Satellites orbiting this planet. */
     public Seq<Satellite> satellites = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
-    protected Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2);
+    protected Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2), cloudMeshLoader = () -> null;
 
     public Planet(String name, Planet parent, float radius){
         super(name);
@@ -235,6 +238,7 @@ public class Planet extends UnlockableContent{
         super.load();
 
         mesh = meshLoader.get();
+        cloudMesh = cloudMeshLoader.get();
     }
 
     @Override
@@ -299,5 +303,29 @@ public class Planet extends UnlockableContent{
 
     public void draw(Mat3D projection, Mat3D transform){
         mesh.render(projection, transform);
+    }
+
+    public void drawAtmosphere(Mesh atmosphere, Camera3D cam){
+        //atmosphere does not contribute to depth buffer
+        Gl.depthMask(false);
+
+        Blending.additive.apply();
+
+        Shaders.atmosphere.camera = cam;
+        Shaders.atmosphere.planet = this;
+        Shaders.atmosphere.bind();
+        Shaders.atmosphere.apply();
+
+        atmosphere.render(Shaders.atmosphere, Gl.triangles);
+
+        Blending.normal.apply();
+
+        Gl.depthMask(true);
+    }
+
+    public void drawClouds(Mat3D projection, Mat3D transform){
+        if(cloudMesh != null){
+            cloudMesh.render(projection, transform);
+        }
     }
 }

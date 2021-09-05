@@ -156,21 +156,10 @@ public class PlanetRenderer implements Disposable{
         }
 
         if(cam.frustum.containsSphere(planet.position, planet.clipRadius) && planet.parent != null && planet.hasAtmosphere && Core.settings.getBool("atmosphere")){
-            Gl.depthMask(false);
-
-            Blending.additive.apply();
-
-            Shaders.atmosphere.camera = cam;
-            Shaders.atmosphere.planet = planet;
-            Shaders.atmosphere.bind();
-            Shaders.atmosphere.apply();
-
-            atmosphere.render(Shaders.atmosphere, Gl.triangles);
-
-            Blending.normal.apply();
-
-            Gl.depthMask(true);
+            planet.drawAtmosphere(atmosphere, cam);
         }
+
+        planet.drawClouds(cam.combined, planet.getTransform(mat));
 
         for(Planet child : planet.children){
             renderTransparent(child);
