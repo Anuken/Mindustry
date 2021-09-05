@@ -53,7 +53,7 @@ public class WaveGraph extends Table{
 
                     for(int i = 0; i < values.length; i++){
                         int val = values[i][type.id];
-                        float cx = graphX + i*spacing, cy = graphY + val * graphH / max;
+                        float cx = graphX + i * spacing, cy = graphY + val * graphH / max;
                         Lines.linePoint(cx, cy);
                     }
 
@@ -69,7 +69,7 @@ public class WaveGraph extends Table{
                         sum += values[i][type.id];
                     }
 
-                    float cx = graphX + i*spacing, cy = graphY + sum * graphH / maxTotal;
+                    float cx = graphX + i * spacing, cy = graphY + sum * graphH / maxTotal;
                     Lines.linePoint(cx, cy);
                 }
 
@@ -84,7 +84,7 @@ public class WaveGraph extends Table{
                         sum += (type.health) * values[i][type.id];
                     }
 
-                    float cx = graphX + i*spacing, cy = graphY + sum * graphH / maxHealth;
+                    float cx = graphX + i * spacing, cy = graphY + sum * graphH / maxHealth;
                     Lines.linePoint(cx, cy);
                 }
 
@@ -92,7 +92,7 @@ public class WaveGraph extends Table{
             }
 
             //how many numbers can fit here
-            float totalMarks = (graphH - getMarginBottom() *2f) / (lay.height * 2);
+            float totalMarks = (graphH - getMarginBottom() * 2f) / (lay.height * 2);
 
             int markSpace = Math.max(1, Mathf.ceil(max / totalMarks));
 
@@ -103,7 +103,7 @@ public class WaveGraph extends Table{
 
                 lay.setText(font, "" + i);
 
-                font.draw("" + i, cx, cy + lay.height/2f, Align.right);
+                font.draw("" + i, cx, cy + lay.height / 2f, Align.right);
             }
 
             float len = Scl.scl(4f);
@@ -113,7 +113,7 @@ public class WaveGraph extends Table{
                 float cy = y + fh, cx = graphX + graphW / (values.length - 1) * i;
 
                 Lines.line(cx, cy, cx, cy + len);
-                if(i == values.length/2){
+                if(i == values.length / 2){
                     font.draw("" + (i + from + 1), cx, cy - Scl.scl(2f), Align.center);
                 }
             }
@@ -164,7 +164,7 @@ public class WaveGraph extends Table{
                 sum += spawned;
             }
             maxTotal = Math.max(maxTotal, sum);
-            maxHealth = Math.max(maxHealth,healthsum);
+            maxHealth = Math.max(maxHealth, healthsum);
         }
 
         ObjectSet<UnitType> usedCopy = new ObjectSet<>(used);
