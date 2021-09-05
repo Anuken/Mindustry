@@ -7,6 +7,7 @@ import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
@@ -37,7 +38,7 @@ public class ItemSelection{
     public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect, int rows, int columns){
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         group.setMinCheckCount(0);
-        Table cont = new Table();
+        Table cont = new Table().top();
         cont.defaults().size(40);
 
         Runnable[] rebuild = {null};
@@ -79,20 +80,20 @@ public class ItemSelection{
 
         rebuild[0].run();
 
-        Table main = new Table();
+        Table main = new Table().background(Styles.black6);
         if(rowCount > rows){
             main.table(s -> {
                 s.image(Icon.zoom).right().padRight(8);
                 search = s.field(null, text -> rebuild[0].run()).left().growX().get();
                 search.setMessageText(Core.bundle.get("players.search"));
-            }).width(40 * columns).padBottom(4).row();
+            }).width(40 * columns).padBottom(4).left().row();
         }
 
         ScrollPane pane = new ScrollPane(cont, Styles.smallPane);
         pane.setScrollingDisabled(true, false);
+        pane.setOverscroll(false, false);
         pane.setScrollYForce(scrollPos);
         pane.update(() -> scrollPos = pane.getScrollY());
-        pane.setOverscroll(false, false);
         main.add(pane).maxHeight(40 * rows);
         table.top().add(main);
     }
