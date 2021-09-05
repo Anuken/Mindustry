@@ -104,11 +104,15 @@
     "address": ["usfr2.forcehost.net:25578"]
   },
   {
-     "name": "Español",
+    "name": "Español",
     "address": ["168.119.36.188:41445"]
   },
   {
-     "name": "CreateDustry",
+    "name": "CreateDustry",
     "address": ["144.76.120.74:18645"]
+  },
+  {
+    "name": "HexedPvP",
+    "address": ["001.finland.eu.hosts.dynamichost.xyz:23664"]
   }
 ]
