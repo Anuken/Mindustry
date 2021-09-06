@@ -30,7 +30,7 @@ public class ParticleEffect extends Effect{
     public float spin = 0f;
     /** Controls the initial and final sprite sizes. */
     public float sizeFrom = 2f, sizeTo = 0f;
-    /** Controls the amount of ticks the effect waits before changing size */
+    /** Controls the amount of ticks the effect waits before changing size. */
     public float sizeChangeStart = 0f;
     /** Rotation offset. */
     public float offset = 0;
