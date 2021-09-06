@@ -158,7 +158,9 @@ public class Generators{
                         }
                     });
 
-                    Fi.get("../blocks/environment/cliffmask" + (val & 0xff) + ".png").writePng(result);
+                    Fi fi = Fi.get("../blocks/environment/cliffmask" + (val & 0xff) + ".png");
+                    fi.writePng(result);
+                    fi.copyTo(Fi.get("../editor").child("editor-" + fi.name()));
                 });
             }
 
