@@ -38,8 +38,14 @@ public class WaveGraph extends Table{
 
             lay.setText(font, "1");
 
+            int maxY = switch(mode){
+                case counts -> nextStep(max);
+                case health -> nextStep((int)maxHealth);
+                case totals -> nextStep(maxTotal);
+            };
+
             float fh = lay.height;
-            float offsetX = Scl.scl(30f), offsetY = Scl.scl(22f) + fh + Scl.scl(5f);
+            float offsetX = Scl.scl(lay.width * (maxY + "").length() * 2), offsetY = Scl.scl(22f) + fh + Scl.scl(5f);
 
             float graphX = x + offsetX, graphY = y + offsetY, graphW = width - offsetX, graphH = height - offsetY;
             float spacing = graphW / (values.length - 1);
@@ -53,7 +59,7 @@ public class WaveGraph extends Table{
 
                     for(int i = 0; i < values.length; i++){
                         int val = values[i][type.id];
-                        float cx = graphX + i * spacing, cy = graphY + val * graphH / max;
+                        float cx = graphX + i * spacing, cy = graphY + val * graphH / maxY;
                         Lines.linePoint(cx, cy);
                     }
 
@@ -69,7 +75,8 @@ public class WaveGraph extends Table{
                         sum += values[i][type.id];
                     }
 
-                    float cx = graphX + i * spacing, cy = graphY + sum * graphH / maxTotal;
+                    float cx = graphX + i * spacing, cy = graphY + sum * graphH / maxY;
+
                     Lines.linePoint(cx, cy);
                 }
 
@@ -84,7 +91,8 @@ public class WaveGraph extends Table{
                         sum += (type.health) * values[i][type.id];
                     }
 
-                    float cx = graphX + i * spacing, cy = graphY + sum * graphH / maxHealth;
+                    float cx = graphX + i * spacing, cy = graphY + sum * graphH / maxY;
+
                     Lines.linePoint(cx, cy);
                 }
 
@@ -92,19 +100,24 @@ public class WaveGraph extends Table{
             }
 
             //how many numbers can fit here
-            float totalMarks = (graphH - getMarginBottom() * 2f) / (lay.height * 2);
 
-            int markSpace = Math.max(1, Mathf.ceil(max / totalMarks));
+            float totalMarks = Mathf.clamp(maxY, 1, 10);
+
+            int markSpace = Math.max(1, Mathf.ceil(maxY / totalMarks));
 
             Draw.color(Color.lightGray);
-            for(int i = 0; i < max; i += markSpace){
-                float cy = graphY + i * graphH / max, cx = graphX;
-                //Lines.line(cx, cy, cx + len, cy);
+            Draw.alpha(0.1f);
+
+            for(int i = 0; i < maxY; i += markSpace){
+                float cy = graphY + i * graphH / maxY, cx = graphX;
+
+                Lines.line(cx, cy, cx + graphW, cy);
 
                 lay.setText(font, "" + i);
 
                 font.draw("" + i, cx, cy + lay.height / 2f, Align.right);
             }
+            Draw.alpha(1f);
 
             float len = Scl.scl(4f);
             font.setColor(Color.lightGray);
@@ -198,6 +211,23 @@ public class WaveGraph extends Table{
 
     Color color(UnitType type){
         return Tmp.c1.fromHsv(type.id / (float)Vars.content.units().size * 360f, 0.7f, 1f);
+    }
+
+    int nextStep(float value){
+        int order = 1;
+        while(order < value){
+            if(order * 2 > value){
+                return order * 2;
+            }
+            if(order * 5 > value){
+                return order * 5;
+            }
+            if(order * 10 > value){
+                return order * 10;
+            }
+            order *= 10;
+        }
+        return order;
     }
 
     enum Mode{

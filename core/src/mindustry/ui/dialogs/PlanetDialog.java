@@ -518,7 +518,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             pt.button(planet.localizedName, Styles.clearTogglet, () -> {
                                 selected = null;
                                 launchSector = null;
-                                renderer.planets.planet = planet;
+                                if(renderer.planets.planet != planet){
+                                    renderer.planets.planet = planet;
+                                    rebuildList();
+                                }
                                 settings.put("lastplanet", planet.name);
                             }).width(200).height(40).growX().update(bb -> bb.setChecked(renderer.planets.planet == planet));
                             pt.row();

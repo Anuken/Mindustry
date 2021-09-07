@@ -207,7 +207,7 @@ public class HudFragment extends Fragment{
                         logic.skipWave();
                     }
                 }).growY().fillX().right().width(40f).disabled(b -> !canSkipWave()).name("skip");
-            }).width(dsize * 5 + 4f);
+            }).width(dsize * 5 + 4f).name("statustable");
 
             wavesMain.row();
 

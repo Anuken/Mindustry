@@ -317,6 +317,9 @@ public class UnitType extends UnlockableContent{
             canDrown = false;
             omniMovement = false;
             immunities.add(StatusEffects.wet);
+            if(visualElevation < 0f){
+                visualElevation = 0.11f;
+            }
         }
 
         if(lightRadius == -1){

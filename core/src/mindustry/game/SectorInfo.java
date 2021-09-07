@@ -288,7 +288,7 @@ public class SectorInfo{
     public void eachImport(Planet planet, Cons<Sector> cons){
         for(Sector sector : planet.sectors){
             Sector dest = sector.info.getRealDestination();
-            if(sector.hasBase() && sector.info != this && dest != null && dest.info == this){
+            if(sector.hasBase() && sector.info != this && dest != null && dest.info == this && sector.info.anyExports()){
                 cons.get(sector);
             }
         }

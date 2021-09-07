@@ -13,6 +13,7 @@ public class AirBlock extends Floor{
         hasShadow = false;
         useColor = false;
         wall = this;
+        needsSurface = false;
     }
 
     @Override
