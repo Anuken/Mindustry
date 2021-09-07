@@ -157,6 +157,22 @@ public class SpawnGroup implements JsonSerializable{
         '}';
     }
 
+    public SpawnGroup copy(){
+        SpawnGroup newGroup = new SpawnGroup();
+        newGroup.type = this.type;
+        newGroup.end = this.end;
+        newGroup.begin = this.begin;
+        newGroup.spacing = this.spacing;
+        newGroup.max = this.max;
+        newGroup.unitScaling = this.unitScaling;
+        newGroup.unitAmount = this.unitAmount;
+        newGroup.shields = this.shields;
+        newGroup.shieldScaling = this.shieldScaling;
+        newGroup.effect = this.effect;
+        newGroup.items = this.items;
+        return newGroup;
+    }
+
     @Override
     public boolean equals(Object o){
         if(this == o) return true;
