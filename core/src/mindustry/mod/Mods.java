@@ -782,7 +782,7 @@ public class Mods implements Loadable{
                 !skipModLoading() &&
                 Core.settings.getBool("mod-" + baseName + "-enabled", true) &&
                 Version.isAtLeast(meta.minGameVersion) &&
-                (meta.getMinMajor() >= 105 || headless)
+                (meta.getMinMajor() >= 130 || headless)
             ){
                 if(ios){
                     throw new ModLoadException("Java class mods are not supported on iOS.");
@@ -913,8 +913,8 @@ public class Mods implements Loadable{
 
         /** @return whether this mod is outdated, e.g. not compatible with v6. */
         public boolean isOutdated(){
-            //must be at least 105 to indicate v6 compat
-            return getMinMajor() < 105;
+            //must be at least 130 to indicate v7 compat
+            return getMinMajor() < 130;
         }
 
         public int getMinMajor(){
