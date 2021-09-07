@@ -222,7 +222,7 @@ public class WaveInfoDialog extends BaseDialog{
                             groups.remove(group);
                             table.getCell(t).pad(0f);
                             t.remove();
-                            updateWaves();
+                            buildGroups();
                         }).pad(-6).size(46f).padRight(-12f);
                     }, () -> {
                         expandedGroup = expandedGroup == group ? null : group;
