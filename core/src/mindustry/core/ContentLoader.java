@@ -8,8 +8,9 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.game.EventType.*;
 import mindustry.entities.bullet.*;
+import mindustry.game.EventType.*;
+import mindustry.io.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -211,10 +212,16 @@ public class ContentLoader{
     }
 
     public <T extends MappableContent> T getByName(ContentType type, String name){
-        if(contentNameMap[type.ordinal()] == null){
-            return null;
+        var map = contentNameMap[type.ordinal()];
+
+        if(map == null) return null;
+
+        //load fallbacks
+        if(type == ContentType.block){
+            name = SaveVersion.modContentNameMap.get(name, name);
         }
-        return (T)contentNameMap[type.ordinal()].get(name);
+
+        return (T)map.get(name);
     }
 
     public <T extends Content> T getByID(ContentType type, int id){
