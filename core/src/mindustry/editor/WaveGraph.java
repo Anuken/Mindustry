@@ -181,7 +181,7 @@ public class WaveGraph extends Table{
 
         colors.clear();
         colors.left();
-        colors.button("@waves.units.hide", Styles.fullTogglet, () -> {
+        colors.button("@waves.units.hide", Styles.cleart, () -> {
             if(hidden.size == usedCopy.size){
                 hidden.clear();
             }else{
@@ -191,7 +191,7 @@ public class WaveGraph extends Table{
             used.clear();
             used.addAll(usedCopy);
             for(UnitType o : hidden) used.remove(o);
-        }).update(b -> b.setChecked(hidden.size == usedCopy.size)).height(32f).width(130f);
+        }).update(b -> b.setText(hidden.size == usedCopy.size ? "@waves.units.show" : "@waves.units.hide")).height(32f).width(130f);
         colors.pane(t -> {
             t.left();
             for(UnitType type : used){
