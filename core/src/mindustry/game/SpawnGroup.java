@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
  * weapon equipped, ammo used, and status effects.
  * Each spawn group can have multiple sub-groups spawned in different areas of the map.
  */
-public class SpawnGroup implements JsonSerializable{
+public class SpawnGroup implements JsonSerializable, Cloneable{
     public static final int never = Integer.MAX_VALUE;
 
     /** The unit type spawned */
@@ -157,20 +157,9 @@ public class SpawnGroup implements JsonSerializable{
         '}';
     }
 
-    public SpawnGroup copy(){
-        SpawnGroup newGroup = new SpawnGroup();
-        newGroup.type = this.type;
-        newGroup.end = this.end;
-        newGroup.begin = this.begin;
-        newGroup.spacing = this.spacing;
-        newGroup.max = this.max;
-        newGroup.unitScaling = this.unitScaling;
-        newGroup.unitAmount = this.unitAmount;
-        newGroup.shields = this.shields;
-        newGroup.shieldScaling = this.shieldScaling;
-        newGroup.effect = this.effect;
-        newGroup.items = this.items;
-        return newGroup;
+    @Override
+    public SpawnGroup clone() throws CloneNotSupportedException{
+        return (SpawnGroup)super.clone();
     }
 
     @Override
