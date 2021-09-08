@@ -845,7 +845,8 @@ public class Block extends UnlockableContent{
         }
 
         if(!outputsPower && consumes.hasPower() && consumes.getPower().buffered){
-            throw new IllegalArgumentException("Consumer using buffered power: " + name);
+            Log.warn("Consumer using buffered power: @. Disabling buffered power.", name);
+            consumes.getPower().buffered = false;
         }
 
         if(buildVisibility == BuildVisibility.sandboxOnly){

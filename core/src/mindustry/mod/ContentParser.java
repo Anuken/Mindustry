@@ -80,6 +80,8 @@ public class ContentParser{
             if(data.isString()){
                 StatusEffect result = locate(ContentType.status, data.asString());
                 if(result != null) return result;
+                result = (StatusEffect)fieldOpt(StatusEffects.class, data);
+                if(result != null) return result;
                 throw new IllegalArgumentException("Unknown status effect: '" + data.asString() + "'");
             }
             StatusEffect effect = new StatusEffect(currentMod.name + "-" + data.getString("name"));
