@@ -448,7 +448,7 @@ public class UnitType extends UnlockableContent{
             if(!packer.has(name + "-outline")){
                 PixmapRegion base = Core.atlas.getPixmap(region);
                 var result = Pixmaps.outline(base, outlineColor, outlineRadius);
-                if(Core.settings.getBool("linear")){
+                if(Core.settings.getBool("linear", true)){
                     Pixmaps.bleed(result);
                 }
                 packer.add(PageType.main, name + "-outline", result);
