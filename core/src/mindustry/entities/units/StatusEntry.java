@@ -3,8 +3,6 @@ package mindustry.entities.units;
 import mindustry.type.*;
 
 public class StatusEntry{
-    public static final StatusEntry tmp = new StatusEntry();
-
     public StatusEffect effect;
     public float time;
 

@@ -4,13 +4,15 @@ import arc.*;
 import arc.Files.*;
 import arc.backend.sdl.*;
 import arc.backend.sdl.jni.*;
+import arc.discord.*;
+import arc.discord.DiscordRPC.*;
 import arc.files.*;
 import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Log.*;
 import arc.util.serialization.*;
-import club.minnced.discord.rpc.*;
 import com.codedisaster.steamworks.*;
 import mindustry.*;
 import mindustry.core.*;
@@ -19,6 +21,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
+import mindustry.service.*;
 import mindustry.type.*;
 
 import java.io.*;
@@ -26,8 +29,8 @@ import java.io.*;
 import static mindustry.Vars.*;
 
 public class DesktopLauncher extends ClientLauncher{
-    public final static String discordID = "610508934456934412";
-    boolean useDiscord = OS.is64Bit && !OS.isARM && !OS.hasProp("nodiscord"), loadError = false;
+    public final static long discordID = 610508934456934412L;
+    boolean useDiscord = !OS.hasProp("nodiscord"), loadError = false;
     Throwable steamError;
 
     public static void main(String[] arg){
@@ -38,6 +41,13 @@ public class DesktopLauncher extends ClientLauncher{
                 maximized = true;
                 width = 900;
                 height = 700;
+                //enable gl3 with command-line argument
+                if(Structs.contains(arg, "-gl3")){
+                    gl30 = true;
+                }
+                if(Structs.contains(arg, "-debug")){
+                    Log.level = LogLevel.debug;
+                }
                 setWindowIcon(FileType.internal, "icons/icon_64.png");
             }});
         }catch(Throwable e){
@@ -52,13 +62,15 @@ public class DesktopLauncher extends ClientLauncher{
 
         if(useDiscord){
             try{
-                DiscordRPC.INSTANCE.Discord_Initialize(discordID, null, true, "1127400");
+                DiscordRPC.connect(discordID);
                 Log.info("Initialized Discord rich presence.");
-                Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC.INSTANCE::Discord_Shutdown));
+                Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::close));
+            }catch(NoDiscordClientException none){
+                //don't log if no client is found
+                useDiscord = false;
             }catch(Throwable t){
                 useDiscord = false;
-                Log.err("Failed to initialize discord. Enable debug logging for details.");
-                Log.debug("Discord init error: \n@\n", Strings.getStackTrace(t));
+                Log.warn("Failed to initialize Discord RPC - you are likely using a JVM <16.");
             }
         }
 
@@ -92,9 +104,6 @@ public class DesktopLauncher extends ClientLauncher{
                 if(SteamAPI.restartAppIfNecessary(SVars.steamID)){
                     System.exit(0);
                 }
-            }catch(NullPointerException ignored){
-                steam = false;
-                Log.info("Running in offline mode.");
             }catch(Throwable e){
                 steam = false;
                 Log.err("Failed to load Steam native libraries.");
@@ -121,6 +130,40 @@ public class DesktopLauncher extends ClientLauncher{
         SVars.workshop = new SWorkshop();
         SVars.user = new SUser();
         boolean[] isShutdown = {false};
+
+        service = new GameService(){
+
+            @Override
+            public boolean enabled(){
+                return true;
+            }
+
+            @Override
+            public void completeAchievement(String name){
+                SVars.stats.stats.setAchievement(name);
+                SVars.stats.stats.storeStats();
+            }
+
+            @Override
+            public boolean isAchieved(String name){
+                return SVars.stats.stats.isAchieved(name, false);
+            }
+
+            @Override
+            public int getStat(String name, int def){
+                return SVars.stats.stats.getStatI(name, def);
+            }
+
+            @Override
+            public void setStat(String name, int amount){
+                SVars.stats.stats.setStatI(name, amount);
+            }
+
+            @Override
+            public void storeStats(){
+                SVars.stats.onUpdate();
+            }
+        };
 
         Events.on(ClientLoadEvent.class, event -> {
             Core.settings.defaults("name", SVars.net.friends.getPersonaName());
@@ -246,7 +289,6 @@ public class DesktopLauncher extends ClientLauncher{
         String uiState = "";
 
         if(inGame){
-            //TODO implement nice name for sector
             gameMapWithWave = Strings.capitalize(Strings.stripColors(state.map.name()));
 
             if(state.rules.waves){
@@ -267,7 +309,7 @@ public class DesktopLauncher extends ClientLauncher{
         }
 
         if(useDiscord){
-            DiscordRichPresence presence = new DiscordRichPresence();
+            RichPresence presence = new RichPresence();
 
             if(inGame){
                 presence.state = gameMode + gamePlayersSuffix;
@@ -281,7 +323,9 @@ public class DesktopLauncher extends ClientLauncher{
 
             presence.largeImageKey = "logo";
 
-            DiscordRPC.INSTANCE.Discord_UpdatePresence(presence);
+            try{
+                DiscordRPC.send(presence);
+            }catch(Exception ignored){}
         }
 
         if(steam){

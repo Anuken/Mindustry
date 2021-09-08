@@ -21,6 +21,7 @@ public enum LAccess{
     maxHealth,
     heat,
     efficiency,
+    progress,
     timescale,
     rotation,
     x,
@@ -42,7 +43,6 @@ public enum LAccess{
     controller,
     commanded,
     name,
-    config,
     payloadCount,
     payloadType,
 
@@ -50,7 +50,7 @@ public enum LAccess{
     enabled("to"), //"to" is standard for single parameter access
     shoot("x", "y", "shoot"),
     shootp(true, "unit", "shoot"),
-    configure(true, "to"),
+    config(true, "to"),
     color("r", "g", "b");
 
     public final String[] params;

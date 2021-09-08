@@ -1,8 +1,0 @@
-[This is a truncated changelog, see Github for full notes]
-- Fixed enemy power nodes getting linked w/ allied ones, leading to buggy power behavior
-- Fixed chat not working when paused
-- Fixed 128+ cores on map breaking servers
-- Fixed editor breaking building links on resize
-- Made turrets/units take enemy hitbox size into account when targeting
-- Made builder/repair AI flee from enemies when idle
-- Mods: Many various bugfixes for json effects

@@ -6,6 +6,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.content.*;
+import mindustry.gen.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
@@ -18,14 +19,19 @@ public class SpawnPathFilter extends GenerateFilter{
 
     @Override
     public FilterOption[] options(){
-        return Structs.arr(
-        new SliderOption("radius", () -> radius, f -> radius = (int)f, 1, 20).display()
-        );
+        return new SliderOption[]{
+            new SliderOption("radius", () -> radius, f -> radius = (int)f, 1, 20).display()
+        };
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockCommandCenter;
     }
 
     @Override
     public void apply(Tiles tiles, GenerateInput in){
-        Tile core = null;
+        var cores = new Seq<Tile>();
         var spawns = new Seq<Tile>();
 
         for(Tile tile : tiles){
@@ -33,11 +39,11 @@ public class SpawnPathFilter extends GenerateFilter{
                 spawns.add(tile);
             }
             if(tile.block() instanceof CoreBlock && tile.team() != Vars.state.rules.waveTeam){
-                core = tile;
+                cores.add(tile);
             }
         }
 
-        if(core != null && spawns.any()){
+        for(var core : cores){
             for(var spawn : spawns){
                 var path = Astar.pathfind(core.x, core.y, spawn.x, spawn.y, t -> t.solid() ? 100 : 1, Astar.manhattan, tile -> !tile.floor().isDeep());
                 for(var tile : path){

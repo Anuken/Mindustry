@@ -1,9 +1,0 @@
-Toto je malá aktualizace. Neobsahuje  mnoho nového obsahu, hlavně opravy chyb.
-Další plánovaná aktualizace se zaměří na kampaň a pravděpodobně zabere více času.
-
-- Opravy chyb
-- Přidána barva týmu pro řídicí středisko (příspěvek od Voz-Duh)
-- Vyčištěny některé sprajty jednotek tak, aby ladily s V6 stylem (částěčný příspěvek od Voz-Duh)
-- Přidána podpora na Androidu pro modifikace založené na Javě (aktuálně prakticky bez dokumentace)
-- Přidána vysoce kapacitní pamě%tový banka (2x2) pro logické procesory
-- Vyvážení hry

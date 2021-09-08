@@ -83,8 +83,8 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         Tile on = tileOn();
 
         //clear removed state of unit so it can be synced
-        if(Vars.net.client() && payload instanceof UnitPayload){
-            Vars.netClient.clearRemovedEntity(((UnitPayload)payload).unit.id);
+        if(Vars.net.client() && payload instanceof UnitPayload u){
+            Vars.netClient.clearRemovedEntity(u.unit.id);
         }
 
         //drop off payload on an acceptor if possible
@@ -106,7 +106,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         Unit u = payload.unit;
 
         //can't drop ground units
-        if(!u.canPass(tileX(), tileY())){
+        if(!u.canPass(tileX(), tileY()) || Units.count(x, y, u.physicSize(), o -> o.isGrounded()) > 1){
             return false;
         }
 
@@ -159,7 +159,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         }
 
         for(Payload p : payloads){
-            table.image(p.icon(Cicon.small)).size(itemSize).padRight(pad);
+            table.image(p.icon()).size(itemSize).padRight(pad);
         }
     }
 }

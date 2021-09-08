@@ -1,12 +1,10 @@
 package mindustry.type;
 
 import arc.func.*;
-import arc.graphics.g2d.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.maps.generators.*;
-import mindustry.ui.*;
 
 public class SectorPreset extends UnlockableContent{
     public FileMapGenerator generator;
@@ -18,6 +16,7 @@ public class SectorPreset extends UnlockableContent{
     public boolean useAI = true;
     /** Difficulty, 0-10. */
     public float difficulty;
+    public float startWaveTimeMultiplier = 2f;
     public boolean addStartingItems = false;
 
     public SectorPreset(String name, Planet planet, int sector){
@@ -32,8 +31,10 @@ public class SectorPreset extends UnlockableContent{
     }
 
     @Override
-    public TextureRegion icon(Cicon c){
-        return Icon.terrain.getRegion();
+    public void loadIcon(){
+        if(Icon.terrain != null){
+            uiIcon = fullIcon = Icon.terrain.getRegion();
+        }
     }
 
     @Override

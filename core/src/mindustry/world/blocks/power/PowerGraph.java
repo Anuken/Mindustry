@@ -49,7 +49,7 @@ public class PowerGraph{
     }
 
     public float getPowerBalance(){
-        return powerBalance.mean();
+        return powerBalance.rawMean();
     }
 
     public float getLastPowerNeeded(){
@@ -174,9 +174,9 @@ public class PowerGraph{
         return Math.min(excess, capacity);
     }
 
-    public void distributePower(float needed, float produced){
+    public void distributePower(float needed, float produced, boolean charged){
         //distribute even if not needed. this is because some might be requiring power but not using it; it updates consumers
-        float coverage = Mathf.zero(needed) && Mathf.zero(produced) ? 0f : Mathf.zero(needed) ? 1f : Math.min(1, produced / needed);
+        float coverage = Mathf.zero(needed) && Mathf.zero(produced) && !charged && Mathf.zero(lastPowerStored) ? 0f : Mathf.zero(needed) ? 1f : Math.min(1, produced / needed);
         for(Building consumer : consumers){
             Consumers consumes = consumer.block.consumes;
             if(consumes.hasPower()){
@@ -233,6 +233,7 @@ public class PowerGraph{
         energyDelta = 0f;
 
         if(!(consumers.size == 0 && producers.size == 0 && batteries.size == 0)){
+            boolean charged = false;
 
             if(!Mathf.equal(powerNeeded, powerProduced)){
                 if(powerNeeded > powerProduced){
@@ -240,11 +241,12 @@ public class PowerGraph{
                     powerProduced += powerBatteryUsed;
                     lastPowerProduced += powerBatteryUsed;
                 }else if(powerProduced > powerNeeded){
+                    charged = true;
                     powerProduced -= chargeBatteries(powerProduced - powerNeeded);
                 }
             }
 
-            distributePower(powerNeeded, powerProduced);
+            distributePower(powerNeeded, powerProduced, charged);
         }
     }
 

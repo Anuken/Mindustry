@@ -1,12 +1,12 @@
 package mindustry.net;
 
 import arc.*;
-import arc.Net.*;
 import arc.files.*;
 import arc.func.*;
 import arc.util.*;
 import arc.util.async.*;
 import arc.util.serialization.*;
+import mindustry.*;
 import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -39,7 +39,7 @@ public class BeControl{
     public BeControl(){
         if(active()){
             Timer.schedule(() -> {
-                if(checkUpdates && !mobile){
+                if((Vars.clientLoaded || headless) && checkUpdates && !mobile){
                     checkUpdate(t -> {});
                 }
             }, updateInterval, updateInterval);
@@ -61,27 +61,25 @@ public class BeControl{
 
     /** asynchronously checks for updates. */
     public void checkUpdate(Boolc done){
-        Core.net.httpGet("https://api.github.com/repos/Anuken/MindustryBuilds/releases/latest", res -> {
-            if(res.getStatus() == HttpStatus.OK){
-                Jval val = Jval.read(res.getResultAsString());
-                int newBuild = Strings.parseInt(val.getString("tag_name", "0"));
-                if(newBuild > Version.build){
-                    Jval asset = val.get("assets").asArray().find(v -> v.getString("name", "").startsWith(headless ? "Mindustry-BE-Server" : "Mindustry-BE-Desktop"));
-                    String url = asset.getString("browser_download_url", "");
-                    updateAvailable = true;
-                    updateBuild = newBuild;
-                    updateUrl = url;
-                    Core.app.post(() -> {
-                        showUpdateDialog();
-                        done.get(true);
-                    });
-                }else{
-                    Core.app.post(() -> done.get(false));
-                }
+        Http.get("https://api.github.com/repos/Anuken/MindustryBuilds/releases/latest")
+        .error(e -> {}) //ignore errors
+        .submit(res -> {
+            Jval val = Jval.read(res.getResultAsString());
+            int newBuild = Strings.parseInt(val.getString("tag_name", "0"));
+            if(newBuild > Version.build){
+                Jval asset = val.get("assets").asArray().find(v -> v.getString("name", "").startsWith(headless ? "Mindustry-BE-Server" : "Mindustry-BE-Desktop"));
+                String url = asset.getString("browser_download_url", "");
+                updateAvailable = true;
+                updateBuild = newBuild;
+                updateUrl = url;
+                Core.app.post(() -> {
+                    showUpdateDialog();
+                    done.get(true);
+                });
             }else{
                 Core.app.post(() -> done.get(false));
             }
-        }, error -> {}); //ignore errors
+        });
     }
 
     /** @return whether a new update is available */

@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import mindustry.ctype.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.type.*;
 import mindustry.graphics.*;
@@ -12,7 +13,7 @@ import mindustry.graphics.*;
 import static mindustry.Vars.*;
 
 public class StatusEffects implements ContentList{
-    public static StatusEffect none, burning, freezing, unmoving, slow, wet, muddy, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss, sporeSlowed, disarmed;
+    public static StatusEffect none, burning, freezing, unmoving, slow, wet, muddy, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss, sporeSlowed, disarmed, electrified, invincible;
 
     @Override
     public void load(){
@@ -21,16 +22,16 @@ public class StatusEffects implements ContentList{
 
         burning = new StatusEffect("burning"){{
             color = Color.valueOf("ffc455");
-            damage = 0.12f; //over 8 seconds, this would be ~60 damage
+            damage = 0.167f;
             effect = Fx.burning;
             transitionDamage = 8f;
 
             init(() -> {
                 opposite(wet, freezing);
-                affinity(tarred, ((unit, time, newTime, result) -> {
+                affinity(tarred, ((unit, result, time) -> {
                     unit.damagePierce(transitionDamage);
                     Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
-                    result.set(burning, Math.min(time + newTime, 300f));
+                    result.set(burning, Math.min(time + result.time, 300f));
                 }));
             });
         }};
@@ -45,9 +46,8 @@ public class StatusEffects implements ContentList{
             init(() -> {
                 opposite(melting, burning);
 
-                affinity(blasted, ((unit, time, newTime, result) -> {
+                affinity(blasted, ((unit, result, time) -> {
                     unit.damagePierce(transitionDamage);
-                    result.set(freezing, time);
                 }));
             });
         }};
@@ -70,14 +70,13 @@ public class StatusEffects implements ContentList{
             transitionDamage = 14;
 
             init(() -> {
-                affinity(shocked, ((unit, time, newTime, result) -> {
+                affinity(shocked, (unit, result, time) -> {
                     unit.damagePierce(transitionDamage);
                     if(unit.team == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
-                    result.set(wet, time);
-                }));
-                opposite(burning);
+                });
+                opposite(burning, melting);
             });
         }};
 		
@@ -86,6 +85,7 @@ public class StatusEffects implements ContentList{
             speedMultiplier = 0.94f;
             effect = Fx.muddy;
             effectChance = 0.09f;
+            show = false;
         }};
 
         melting = new StatusEffect("melting"){{
@@ -97,11 +97,11 @@ public class StatusEffects implements ContentList{
 
             init(() -> {
                 opposite(wet, freezing);
-                affinity(tarred, ((unit, time, newTime, result) -> {
+                affinity(tarred, (unit, result, time) -> {
                     unit.damagePierce(8f);
                     Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
-                    result.set(melting, Math.min(time + newTime, 200f));
-                }));
+                    result.set(melting, Math.min(time + result.time, 200f));
+                });
             });
         }};
 
@@ -110,6 +110,14 @@ public class StatusEffects implements ContentList{
             speedMultiplier = 0.7f;
             healthMultiplier = 0.8f;
             effect = Fx.sapped;
+            effectChance = 0.1f;
+        }};
+
+        electrified = new StatusEffect("electrified"){{
+            color = Pal.heal;
+            speedMultiplier = 0.7f;
+            reloadMultiplier = 0.6f;
+            effect = Fx.electrified;
             effectChance = 0.1f;
         }};
 
@@ -126,8 +134,8 @@ public class StatusEffects implements ContentList{
             effect = Fx.oily;
 
             init(() -> {
-                affinity(melting, ((unit, time, newTime, result) -> result.set(melting, newTime + time)));
-                affinity(burning, ((unit, time, newTime, result) -> result.set(burning, newTime + time)));
+                affinity(melting, (unit, result, time) -> result.set(melting, result.time + time));
+                affinity(burning, (unit, result, time) -> result.set(burning, result.time + time));
             });
         }};
 
@@ -156,7 +164,7 @@ public class StatusEffects implements ContentList{
         }};
 
         boss = new StatusEffect("boss"){{
-            color = Pal.health;
+            color = Team.crux.color;
             permanent = true;
             damageMultiplier = 1.3f;
             healthMultiplier = 1.5f;
@@ -180,6 +188,10 @@ public class StatusEffects implements ContentList{
         disarmed = new StatusEffect("disarmed"){{
             color = Color.valueOf("e9ead3");
             disarm = true;
+        }};
+
+        invincible = new StatusEffect("invincible"){{
+            healthMultiplier = Float.POSITIVE_INFINITY;
         }};
     }
 }

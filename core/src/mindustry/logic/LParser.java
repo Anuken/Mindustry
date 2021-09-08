@@ -43,7 +43,7 @@ public class LParser{
     String string(){
         int from = pos;
 
-        while(pos++ < chars.length){
+        while(++pos < chars.length){
             var c = chars[pos];
             if(c == '\n'){
                 error("Missing closing quote \" before end of line.");
@@ -52,7 +52,7 @@ public class LParser{
             }
         }
 
-        if(chars[pos] != '"') error("Missing closing quote \" before end of file.");
+        if(pos >= chars.length || chars[pos] != '"') error("Missing closing quote \" before end of file.");
 
         return new String(chars, from, ++pos - from);
     }
@@ -128,6 +128,11 @@ public class LParser{
                     tokens[1] = "-1";
                 }
 
+                for(int i = 1; i < tok; i++){
+                    if(tokens[i].equals("@configure")) tokens[i] = "@config";
+                    if(tokens[i].equals("configure")) tokens[i] = "config";
+                }
+
                 LStatement st;
 
                 try{
@@ -165,7 +170,7 @@ public class LParser{
 
         while(pos < chars.length && line < LExecutor.maxInstructions){
             switch(chars[pos]){
-                case '\n', ' ' -> pos ++; //skip newlines and spaces
+                case '\n', ';', ' ' -> pos ++; //skip newlines and spaces
                 case '\r' -> pos += 2; //skip the newline after the \r
                 default -> statement();
             }

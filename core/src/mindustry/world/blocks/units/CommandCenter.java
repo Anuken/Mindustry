@@ -20,23 +20,33 @@ import mindustry.world.*;
 import mindustry.world.meta.*;
 
 public class CommandCenter extends Block{
+    public final int timerEffect = timers ++;
+
     public TextureRegionDrawable[] commandRegions = new TextureRegionDrawable[UnitCommand.all.length];
     public Color topColor = null, bottomColor = Color.valueOf("5e5e5e");
     public Effect effect = Fx.commandSend;
+    public float effectSize = 150f;
+    public float forceRadius = 31f, forceStrength = 0.2f;
 
     public CommandCenter(String name){
         super(name);
 
         flags = EnumSet.of(BlockFlag.rally);
-        destructible = true;
+        update = true;
         solid = true;
         configurable = true;
         drawDisabled = false;
+        logicConfigurable = true;
 
         config(UnitCommand.class, (CommandBuild build, UnitCommand command) -> {
-            build.team.data().command = command;
-            effect.at(build);
-            Events.fire(new CommandIssueEvent(build, command));
+            if(build.team.data().command != command){
+                build.team.data().command = command;
+                //do not spam effect
+                if(build.timer(timerEffect, 60f)){
+                    effect.at(build, effectSize);
+                }
+                Events.fire(new CommandIssueEvent(build, command));
+            }
         });
     }
 
@@ -51,11 +61,32 @@ public class CommandCenter extends Block{
         }
     }
 
+    @Override
+    public boolean configSenseable(){
+        return true;
+    }
+
     public class CommandBuild extends Building{
 
         @Override
         public Object config(){
             return team.data().command;
+        }
+
+        @Override
+        public void updateTile(){
+            super.updateTile();
+
+            //push away allied units
+            team.data().tree().intersect(x - forceRadius/2f, y - forceRadius/2f, forceRadius, forceRadius, u -> {
+                if(!u.isPlayer()){
+                    float dst = dst(u);
+                    float rs = forceRadius + u.hitSize/2f;
+                    if(dst < rs){
+                        u.vel.add(Tmp.v1.set(u).sub(x, y).setLength(1f - dst / rs).scl(forceStrength));
+                    }
+                }
+            });
         }
 
         @Override

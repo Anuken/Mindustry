@@ -28,8 +28,10 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "conduit-bottom-#") TextureRegion[] botRegions;
+    public @Load("@-cap") TextureRegion capRegion;
 
     public boolean leaks = true;
+    public @Nullable Block junctionReplacement, bridgeReplacement;
 
     public Conduit(String name){
         super(name);
@@ -38,6 +40,15 @@ public class Conduit extends LiquidBlock implements Autotiler{
         floating = true;
         conveyorPlacement = true;
         noUpdateDisabled = true;
+        canOverdrive = false;
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        if(junctionReplacement == null) junctionReplacement = Blocks.liquidJunction;
+        if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge)) bridgeReplacement = Blocks.bridgeConduit;
     }
 
     @Override
@@ -57,12 +68,14 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     @Override
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
+        if(junctionReplacement == null) return this;
+
         Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof Conduit || req.block instanceof LiquidJunction));
         return cont.get(Geometry.d4(req.rotation)) &&
             cont.get(Geometry.d4(req.rotation - 2)) &&
             req.tile() != null &&
             req.tile().block() instanceof Conduit &&
-            Mathf.mod(req.build().rotation - req.rotation, 2) == 1 ? Blocks.liquidJunction : this;
+            Mathf.mod(req.build().rotation - req.rotation, 2) == 1 ? junctionReplacement : this;
     }
 
     @Override
@@ -72,7 +85,9 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
-        Placement.calculateBridges(plans, (ItemBridge)Blocks.bridgeConduit);
+        if(bridgeReplacement == null) return;
+
+        Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement);
     }
 
     @Override
@@ -83,6 +98,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public class ConduitBuild extends LiquidBuild implements ChainedBuilding{
         public float smoothLiquid;
         public int blendbits, xscl, yscl, blending;
+        public boolean capped;
 
         @Override
         public void draw(){
@@ -104,6 +120,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
             Draw.scl(xscl, yscl);
             drawAt(x, y, blendbits, rotation, SliceMode.none);
             Draw.reset();
+
+            if(capped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg());
         }
 
         protected void drawAt(float x, float y, int bits, float rotation, SliceMode slice){
@@ -124,6 +142,9 @@ public class Conduit extends LiquidBlock implements Autotiler{
             xscl = bits[1];
             yscl = bits[2];
             blending = bits[4];
+
+            Building next = front();
+            capped = next == null || next.team != team || !next.block.hasLiquids;
         }
 
         @Override

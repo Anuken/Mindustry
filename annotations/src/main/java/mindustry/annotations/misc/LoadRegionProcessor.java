@@ -18,6 +18,7 @@ public class LoadRegionProcessor extends BaseProcessor{
     @Override
     public void process(RoundEnvironment env) throws Exception{
         TypeSpec.Builder regionClass = TypeSpec.classBuilder("ContentRegions")
+            .addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"deprecation\"").build())
             .addModifiers(Modifier.PUBLIC);
         MethodSpec.Builder method = MethodSpec.methodBuilder("loadRegions")
             .addParameter(tname("mindustry.ctype.MappableContent"), "content")
@@ -34,7 +35,7 @@ public class LoadRegionProcessor extends BaseProcessor{
         }
 
         for(Entry<Stype, Seq<Svar>> entry : fieldMap){
-            method.beginControlFlow("if(content instanceof $T)", entry.key.tname());
+            method.beginControlFlow("if(content instanceof $L)", entry.key.fullName());
 
             for(Svar field : entry.value){
                 Load an = field.annotation(Load.class);
@@ -45,7 +46,7 @@ public class LoadRegionProcessor extends BaseProcessor{
 
                 //not an array
                 if(dims == 0){
-                    method.addStatement("(($T)content).$L = $T.atlas.find($L$L)", entry.key.tname(), field.name(), Core.class, parse(an.value()), fallbackString);
+                    method.addStatement("(($L)content).$L = $T.atlas.find($L$L)", entry.key.fullName(), field.name(), Core.class, parse(an.value()), fallbackString);
                 }else{
                     //is an array, create length string
                     int[] lengths = an.lengths();

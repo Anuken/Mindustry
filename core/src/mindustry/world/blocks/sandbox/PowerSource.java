@@ -1,9 +1,9 @@
 package mindustry.world.blocks.sandbox;
 
 import mindustry.world.blocks.power.*;
+import mindustry.world.meta.*;
 
 public class PowerSource extends PowerNode{
-
     public float powerProduction = 10000f;
 
     public PowerSource(String name){
@@ -11,6 +11,8 @@ public class PowerSource extends PowerNode{
         maxNodes = 100;
         outputsPower = true;
         consumesPower = false;
+        //TODO maybe don't?
+        envEnabled = Env.any;
     }
 
     public class PowerSourceBuild extends PowerNodeBuild{

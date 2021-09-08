@@ -2,6 +2,7 @@ package mindustry.entities.comp;
 
 import arc.math.*;
 import arc.math.geom.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.async.PhysicsProcess.*;
 import mindustry.gen.*;
@@ -11,7 +12,7 @@ import mindustry.gen.*;
  * Has mass.*/
 @Component
 abstract class PhysicsComp implements Velc, Hitboxc, Flyingc{
-    @Import float hitSize;
+    @Import float hitSize, x, y;
     @Import Vec2 vel;
 
     transient PhysicRef physref;

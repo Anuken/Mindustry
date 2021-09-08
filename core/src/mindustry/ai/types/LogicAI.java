@@ -15,9 +15,9 @@ import static mindustry.Vars.*;
 
 public class LogicAI extends AIController{
     /** Minimum delay between item transfers. */
-    public static final float transferDelay = 60f * 2f;
+    public static final float transferDelay = 60f * 1.5f;
     /** Time after which the unit resets its controlled and reverts to a normal unit. */
-    public static final float logicControlTimeout = 10f * 60f;
+    public static final float logicControlTimeout = 60f * 10f;
 
     public LUnitControl control = LUnitControl.idle;
     public float moveX, moveY, moveRad;
@@ -44,7 +44,7 @@ public class LogicAI extends AIController{
     private ObjectSet<Object> radars = new ObjectSet<>();
 
     @Override
-    protected void updateMovement(){
+    public void updateMovement(){
         if(itemTimer >= 0) itemTimer -= Time.delta;
         if(payTimer >= 0) payTimer -= Time.delta;
 
@@ -98,13 +98,13 @@ public class LogicAI extends AIController{
         }
 
         if(unit.type.canBoost && !unit.type.flying){
-            unit.elevation = Mathf.approachDelta(unit.elevation, Mathf.num(boost || unit.onSolid()), 0.08f);
+            unit.elevation = Mathf.approachDelta(unit.elevation, Mathf.num(boost || unit.onSolid() || (unit.isFlying() && !unit.canLand())), unit.type.riseSpeed);
         }
 
         //look where moving if there's nothing to aim at
-        if(!shoot){
+        if(!shoot || !unit.type.omniMovement){
             unit.lookAt(unit.prefRotation());
-        }else if(unit.hasWeapons() && unit.mounts.length > 0){ //if there is, look at the object
+        }else if(unit.hasWeapons() && unit.mounts.length > 0 && !unit.mounts[0].weapon.ignoreRotation){ //if there is, look at the object
             unit.lookAt(unit.mounts[0].aimX, unit.mounts[0].aimY);
         }
     }
@@ -114,14 +114,14 @@ public class LogicAI extends AIController{
     }
 
     @Override
-    protected void moveTo(Position target, float circleLength, float smooth){
+    public void moveTo(Position target, float circleLength, float smooth){
         if(target == null) return;
 
         vec.set(target).sub(unit);
 
         float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / smooth, -1f, 1f);
 
-        vec.setLength(unit.realSpeed() * length);
+        vec.setLength(unit.speed() * length);
         if(length < -0.5f){
             vec.rotate(180f);
         }else if(length < 0){
@@ -131,33 +131,39 @@ public class LogicAI extends AIController{
         //do not move when infinite vectors are used.
         if(vec.isNaN() || vec.isInfinite()) return;
 
-        unit.approach(vec);
+        if(unit.type.omniMovement){
+            unit.approach(vec);
+        }else{
+            unit.rotateMove(vec);
+        }
+
+
     }
 
     @Override
-    protected boolean checkTarget(Teamc target, float x, float y, float range){
+    public boolean checkTarget(Teamc target, float x, float y, float range){
         return false;
     }
 
     //always retarget
     @Override
-    protected boolean retarget(){
+    public boolean retarget(){
         return true;
     }
 
     @Override
-    protected boolean invalid(Teamc target){
+    public boolean invalid(Teamc target){
         return false;
     }
 
     @Override
-    protected boolean shouldShoot(){
+    public boolean shouldShoot(){
         return shoot && !(unit.type.canBoost && boost);
     }
 
     //always aim for the main target
     @Override
-    protected Teamc target(float x, float y, float range, boolean air, boolean ground){
+    public Teamc target(float x, float y, float range, boolean air, boolean ground){
         return switch(aimControl){
             case target -> posTarget;
             case targetp -> mainTarget;

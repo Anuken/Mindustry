@@ -6,7 +6,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.math.geom.Geometry.*;
 import arc.struct.*;
-import arc.struct.ObjectIntMap.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
@@ -21,7 +20,6 @@ import mindustry.maps.*;
 import mindustry.maps.filters.*;
 import mindustry.maps.filters.GenerateFilter.*;
 import mindustry.type.*;
-import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.legacy.*;
@@ -271,13 +269,13 @@ public class World{
     private void setSectorRules(Sector sector){
         state.map = new Map(StringMap.of("name", sector.preset == null ? sector.planet.localizedName + "; Sector " + sector.id : sector.preset.localizedName));
         state.rules.sector = sector;
-
         state.rules.weather.clear();
 
-        //apply weather based on terrain
-        ObjectIntMap<Block> floorc = new ObjectIntMap<>();
+        sector.planet.generator.addWeather(sector, state.rules);
+
         ObjectSet<UnlockableContent> content = new ObjectSet<>();
 
+        //TODO duplicate code?
         for(Tile tile : world.tiles){
             if(world.getDarkness(tile.x, tile.y) >= 3){
                 continue;
@@ -287,49 +285,9 @@ public class World{
             if(tile.floor().itemDrop != null) content.add(tile.floor().itemDrop);
             if(tile.overlay().itemDrop != null) content.add(tile.overlay().itemDrop);
             if(liquid != null) content.add(liquid);
-
-            if(!tile.block().isStatic()){
-                floorc.increment(tile.floor());
-                if(tile.overlay() != Blocks.air){
-                    floorc.increment(tile.overlay());
-                }
-            }
         }
 
-        //sort counts in descending order
-        Seq<Entry<Block>> entries = floorc.entries().toArray();
-        entries.sort(e -> -e.value);
-        //remove all blocks occuring < 30 times - unimportant
-        entries.removeAll(e -> e.value < 30);
-
-        Block[] floors = new Block[entries.size];
-        for(int i = 0; i < entries.size; i++){
-            floors[i] = entries.get(i).key;
-        }
-
-        //TODO bad code
-        boolean hasSnow = floors[0].name.contains("ice") || floors[0].name.contains("snow");
-        boolean hasRain = !hasSnow && content.contains(Liquids.water) && !floors[0].name.contains("sand");
-        boolean hasDesert = !hasSnow && !hasRain && floors[0] == Blocks.sand;
-        boolean hasSpores = floors[0].name.contains("spore") || floors[0].name.contains("moss") || floors[0].name.contains("tainted");
-
-        if(hasSnow){
-            state.rules.weather.add(new WeatherEntry(Weathers.snow));
-        }
-
-        if(hasRain){
-            state.rules.weather.add(new WeatherEntry(Weathers.rain));
-            state.rules.weather.add(new WeatherEntry(Weathers.fog));
-        }
-
-        if(hasDesert){
-            state.rules.weather.add(new WeatherEntry(Weathers.sandstorm));
-        }
-
-        if(hasSpores){
-            state.rules.weather.add(new WeatherEntry(Weathers.sporestorm));
-        }
-
+        state.rules.cloudColor = sector.planet.landCloudColor;
         sector.info.resources = content.asArray();
         sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
         sector.saveInfo();
@@ -368,8 +326,8 @@ public class World{
         invalidMap = false;
 
         if(!headless){
-            if(state.teams.playerCores().size == 0 && !checkRules.pvp){
-                ui.showErrorMessage("@map.nospawn");
+            if(state.teams.cores(checkRules.defaultTeam).size == 0 && !checkRules.pvp){
+                ui.showErrorMessage(Core.bundle.format("map.nospawn", checkRules.defaultTeam.color, checkRules.defaultTeam.localized()));
                 invalidMap = true;
             }else if(checkRules.pvp){ //pvp maps need two cores to be valid
                 if(state.teams.getActive().count(TeamData::hasCore) < 2){
@@ -377,9 +335,9 @@ public class World{
                     ui.showErrorMessage("@map.nospawn.pvp");
                 }
             }else if(checkRules.attackMode){ //attack maps need two cores to be valid
-                invalidMap = state.teams.get(state.rules.waveTeam).noCores();
+                invalidMap = state.rules.waveTeam.data().noCores();
                 if(invalidMap){
-                    ui.showErrorMessage("@map.nospawn.attack");
+                    ui.showErrorMessage(Core.bundle.format("map.nospawn.attack", checkRules.waveTeam.color, checkRules.waveTeam.localized()));
                 }
             }
         }else{
@@ -393,41 +351,28 @@ public class World{
         if(invalidMap) Core.app.post(() -> state.set(State.menu));
     }
 
-    public void notifyChanged(Tile tile){
-        if(!generating){
-            Core.app.post(() -> Events.fire(new TileChangeEvent(tile)));
-        }
-    }
-
     public void raycastEachWorld(float x0, float y0, float x1, float y1, Raycaster cons){
         raycastEach(toTile(x0), toTile(y0), toTile(x1), toTile(y1), cons);
     }
 
     public void raycastEach(int x0f, int y0f, int x1, int y1, Raycaster cons){
-        int x0 = x0f;
-        int y0 = y0f;
-        int dx = Math.abs(x1 - x0);
-        int dy = Math.abs(y1 - y0);
+        int x0 = x0f, dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+        int y0 = y0f, dy = Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+        int e2, err = dx - dy;
 
-        int sx = x0 < x1 ? 1 : -1;
-        int sy = y0 < y1 ? 1 : -1;
-
-        int err = dx - dy;
-        int e2;
         while(true){
-
             if(cons.accept(x0, y0)) break;
             if(x0 == x1 && y0 == y1) break;
 
             e2 = 2 * err;
             if(e2 > -dy){
-                err = err - dy;
-                x0 = x0 + sx;
+                err -= dy;
+                x0 += sx;
             }
 
             if(e2 < dx){
-                err = err + dx;
-                y0 = y0 + sy;
+                err += dx;
+                y0 += sy;
             }
         }
     }
@@ -464,7 +409,7 @@ public class World{
         byte[] dark = new byte[tiles.width * tiles.height];
         byte[] writeBuffer = new byte[tiles.width * tiles.height];
 
-        byte darkIterations = 4;
+        byte darkIterations = darkRadius;
 
         for(int i = 0; i < dark.length; i++){
             Tile tile = tiles.geti(i);
@@ -498,7 +443,7 @@ public class World{
                 tile.data = dark[idx];
             }
 
-            if(dark[idx] == 4){
+            if(dark[idx] == darkRadius){
                 boolean full = true;
                 for(Point2 p : Geometry.d4){
                     int px = p.x + tile.x, py = p.y + tile.y;
@@ -509,11 +454,28 @@ public class World{
                     }
                 }
 
-                if(full) tile.data = 5;
+                if(full) tile.data = darkRadius + 1;
             }
         }
     }
 
+    public byte getWallDarkness(Tile tile){
+        if(tile.isDarkened()){
+            int minDst = darkRadius + 1;
+            for(int cx = tile.x - darkRadius; cx <= tile.x + darkRadius; cx++){
+                for(int cy = tile.y - darkRadius; cy <= tile.y + darkRadius; cy++){
+                    if(tiles.in(cx, cy) && !rawTile(cx, cy).isDarkened()){
+                        minDst = Math.min(minDst, Math.abs(cx - tile.x) + Math.abs(cy - tile.y));
+                    }
+                }
+            }
+
+            return (byte)Math.max((minDst - 1), 0);
+        }
+        return 0;
+    }
+
+    //TODO optimize; this is very slow and called too often!
     public float getDarkness(int x, int y){
         int edgeBlend = 2;
 
@@ -557,8 +519,7 @@ public class World{
 
     private class Context implements WorldContext{
 
-        Context(){
-        }
+        Context(){}
 
         @Override
         public Tile tile(int index){
@@ -611,7 +572,7 @@ public class World{
 
                 for(GenerateFilter filter : filters){
                     filter.randomize();
-                    input.begin(filter, width(), height(), (x, y) -> tiles.getn(x, y));
+                    input.begin(width(), height(), (x, y) -> tiles.getn(x, y));
                     filter.apply(tiles, input);
                 }
             }

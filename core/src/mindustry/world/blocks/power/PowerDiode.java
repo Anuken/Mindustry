@@ -35,7 +35,7 @@ public class PowerDiode extends Block{
 
     @Override
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        Draw.rect(icon(Cicon.full), req.drawx(), req.drawy());
+        Draw.rect(fullIcon, req.drawx(), req.drawy());
         Draw.rect(arrow, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
     }
 

@@ -7,7 +7,7 @@ import mindustry.mod.Mods.*;
 
 /** Base class for a content type that is loaded in {@link mindustry.core.ContentLoader}. */
 public abstract class Content implements Comparable<Content>, Disposable{
-    public final short id;
+    public short id;
     /** Info on which mod this content was loaded from. */
     public ModContentInfo minfo = new ModContentInfo();
 
@@ -30,6 +30,9 @@ public abstract class Content implements Comparable<Content>, Disposable{
      * Use for loading regions or other image data.
      */
     public void load(){}
+
+    /** Called right after load(). */
+    public void loadIcon(){}
 
     /** @return whether an error occurred during mod loading. */
     public boolean hasErrored(){

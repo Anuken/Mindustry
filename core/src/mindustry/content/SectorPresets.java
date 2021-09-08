@@ -14,12 +14,14 @@ public class SectorPresets implements ContentList{
 
     @Override
     public void load(){
+        //region serpulo
 
         groundZero = new SectorPreset("groundZero", serpulo, 15){{
             alwaysUnlocked = true;
             addStartingItems = true;
             captureWave = 10;
             difficulty = 1;
+            startWaveTimeMultiplier = 3f;
         }};
 
         saltFlats = new SectorPreset("saltFlats", serpulo, 101){{
@@ -95,5 +97,7 @@ public class SectorPresets implements ContentList{
         planetaryTerminal = new SectorPreset("planetaryTerminal", serpulo, 93){{
             difficulty = 10;
         }};
+
+        //endregion
     }
 }

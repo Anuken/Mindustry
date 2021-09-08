@@ -47,13 +47,18 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         loadFileLogger();
         platform = this;
+        maxTextureSize = Gl.getInt(Gl.maxTextureSize);
         beginTime = Time.millis();
 
         //debug GL information
         Log.info("[GL] Version: @", graphics.getGLVersion());
-        Log.info("[GL] Max texture size: @", Gl.getInt(Gl.maxTextureSize));
+        Log.info("[GL] Max texture size: @", maxTextureSize);
         Log.info("[GL] Using @ context.", gl30 != null ? "OpenGL 3" : "OpenGL 2");
-        Log.info("[JAVA] Version: @", System.getProperty("java.version"));
+        if(maxTextureSize < 4096) Log.warn("[GL] Your maximum texture size is below the recommended minimum of 4096. This will cause severe performance issues.");
+        Log.info("[JAVA] Version: @", OS.javaVersion);
+        long ram = Runtime.getRuntime().maxMemory();
+        boolean gb = ram >= 1024 * 1024 * 1024;
+        Log.info("[RAM] Available: @ @", Strings.fixed(gb ? ram / 1024f / 1024 / 1024f : ram / 1024f / 1024f, 1), gb ? "GB" : "MB");
 
         Time.setDeltaProvider(() -> {
             float result = Core.graphics.getDeltaTime() * 60f;
@@ -81,11 +86,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Fonts.loadDefaultFont();
 
         //load fallback atlas if max texture size is below 4096
-        assets.load(new AssetDescriptor<>(Gl.getInt(Gl.maxTextureSize) >= 4096  ? "sprites/sprites.atlas" : "sprites/fallback/sprites.atlas", TextureAtlas.class)).loaded = t -> {
-            atlas = (TextureAtlas)t;
-            Fonts.mergeFontAtlas(atlas);
-        };
-
+        assets.load(new AssetDescriptor<>(maxTextureSize >= 4096 ? "sprites/sprites.aatls" : "sprites/fallback/sprites.aatls", TextureAtlas.class)).loaded = t -> atlas = t;
         assets.loadRun("maps", Map.class, () -> maps.loadPreviews());
 
         Musics.load();
@@ -99,6 +100,9 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
             content.createModContent();
         });
 
+        assets.load(mods);
+        assets.loadRun("mergeUI", PixmapPacker.class, () -> {}, () -> Fonts.mergeFontAtlas(atlas));
+
         add(logic = new Logic());
         add(control = new Control());
         add(renderer = new Renderer());
@@ -106,7 +110,6 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         add(netServer = new NetServer());
         add(netClient = new NetClient());
 
-        assets.load(mods);
         assets.load(schematics);
 
         assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> content.load());
@@ -149,7 +152,17 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 }
                 mods.eachClass(Mod::init);
                 finished = true;
-                Events.fire(new ClientLoadEvent());
+                var event = new ClientLoadEvent();
+                //a temporary measure for compatibility with certain mods
+                Events.fireWrap(event.getClass(), event, listener -> {
+                    try{
+                        listener.get(event);
+                    }catch(NoSuchFieldError | NoSuchMethodError | NoClassDefFoundError error){
+                        Log.err(error);
+                    }
+
+                });
+                clientLoaded = true;
                 super.resize(graphics.getWidth(), graphics.getHeight());
                 app.post(() -> app.post(() -> app.post(() -> app.post(() -> {
                     super.resize(graphics.getWidth(), graphics.getHeight());

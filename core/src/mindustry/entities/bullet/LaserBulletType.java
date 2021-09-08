@@ -21,7 +21,8 @@ public class LaserBulletType extends BulletType{
     public boolean largeHit = false;
 
     public LaserBulletType(float damage){
-        super(0.01f, damage);
+        this.damage = damage;
+        this.speed = 0f;
 
         hitEffect = Fx.hitLaserBlast;
         hitColor = colors[2];
@@ -30,6 +31,7 @@ public class LaserBulletType extends BulletType{
         smokeEffect = Fx.none;
         hitSize = 4;
         lifetime = 16f;
+        impact = true;
         keepVelocity = false;
         collides = false;
         pierce = true;

@@ -94,7 +94,11 @@ public class PlanetRenderer implements Disposable{
         cam.position.setZero();
         cam.update();
 
+        Gl.depthMask(false);
+
         skybox.render(cam.combined);
+
+        Gl.depthMask(true);
 
         cam.position.set(lastPos);
         cam.update();
@@ -132,8 +136,12 @@ public class PlanetRenderer implements Disposable{
     public void renderPlanet(Planet planet){
         if(!planet.visible()) return;
 
-        //render planet at offsetted position in the world
-        planet.draw(cam.combined, planet.getTransform(mat));
+        cam.update();
+
+        if(cam.frustum.containsSphere(planet.position, planet.clipRadius)){
+            //render planet at offsetted position in the world
+            planet.draw(cam.combined, planet.getTransform(mat));
+        }
 
         renderOrbit(planet);
 
@@ -145,26 +153,15 @@ public class PlanetRenderer implements Disposable{
     public void renderTransparent(Planet planet){
         if(!planet.visible()) return;
 
-        if(planet.isLandable() && planet == this.planet){
+        if(planet.hasGrid() && planet == this.planet){
             renderSectors(planet);
         }
 
-        if(planet.parent != null && planet.hasAtmosphere && Core.settings.getBool("atmosphere")){
-            Gl.depthMask(false);
-
-            Blending.additive.apply();
-
-            Shaders.atmosphere.camera = cam;
-            Shaders.atmosphere.planet = planet;
-            Shaders.atmosphere.bind();
-            Shaders.atmosphere.apply();
-
-            atmosphere.render(Shaders.atmosphere, Gl.triangles);
-
-            Blending.normal.apply();
-
-            Gl.depthMask(true);
+        if(cam.frustum.containsSphere(planet.position, planet.clipRadius) && planet.parent != null && planet.hasAtmosphere && Core.settings.getBool("atmosphere")){
+            planet.drawAtmosphere(atmosphere, cam);
         }
+
+        planet.drawClouds(cam.combined, planet.getTransform(mat));
 
         for(Planet child : planet.children){
             renderTransparent(child);
@@ -172,7 +169,7 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void renderOrbit(Planet planet){
-        if(planet.parent == null || !planet.visible()) return;
+        if(planet.parent == null || !planet.visible() || orbitAlpha <= 0.02f) return;
 
         Vec3 center = planet.parent.position;
         float radius = planet.orbitRadius;
@@ -182,6 +179,8 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void renderSectors(Planet planet){
+        if(orbitAlpha <= 0.02f) return;
+
         //apply transformed position
         batch.proj().mul(planet.getTransform(mat));
 
@@ -203,13 +202,17 @@ public class PlanetRenderer implements Disposable{
     public void drawArc(Planet planet, Vec3 a, Vec3 b){
         drawArc(planet, a, b, Pal.accent, Color.clear, 1f);
     }
+
     public void drawArc(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length){
         drawArc(planet, a, b, from, to, length, 80f, 25);
     }
 
     public void drawArc(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount){
+        //increase curve height when on opposite side of planet, so it doesn't tunnel through
+        float dot = 1f - (Tmp.v32.set(a).nor().dot(Tmp.v33.set(b).nor()) + 1f)/2f;
+
         Vec3 avg = Tmp.v31.set(b).add(a).scl(0.5f);
-        avg.setLength(planet.radius*(1f+length));
+        avg.setLength(planet.radius*(1f+length) + dot * 1.35f);
 
         points.clear();
         points.addAll(Tmp.v33.set(b).setLength(outlineRad), Tmp.v31, Tmp.v34.set(a).setLength(outlineRad));
@@ -220,7 +223,6 @@ public class PlanetRenderer implements Disposable{
             Tmp.c1.set(from).lerp(to, (f+ Time.globalTime /timeScale)%1f);
             batch.color(Tmp.c1);
             batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f));
-
         }
         batch.flush(Gl.lineStrip);
     }

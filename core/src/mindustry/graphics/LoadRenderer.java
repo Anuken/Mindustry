@@ -37,6 +37,8 @@ public class LoadRenderer implements Disposable{
     private int lastLength = -1;
     private FxProcessor fx;
     private WindowedMean renderTimes = new WindowedMean(20);
+    private BloomFilter bloom;
+    private boolean renderStencil = true;
     private long lastFrameTime;
 
     {
@@ -44,12 +46,17 @@ public class LoadRenderer implements Disposable{
         try{
             fx = new FxProcessor(Format.rgba8888, 2, 2, false, true);
         }catch(Exception e){
-            fx = new FxProcessor(Format.rgb565, 2, 2, false, true);
+            try{
+                fx = new FxProcessor(Format.rgb565, 2, 2, false, true);
+            }catch(Exception awful){
+                renderStencil = false;
+                fx = new FxProcessor(Format.rgba8888, 2, 2, false, false);
+            }
         }
 
         //vignetting is probably too much
         //fx.addEffect(new VignettingFilter(false));
-        fx.addEffect(new BloomFilter());
+        fx.addEffect(bloom = new BloomFilter());
 
         bars = new Bar[]{
             new Bar("s_proc#", OS.cores / 16f, OS.cores < 4),
@@ -69,6 +76,7 @@ public class LoadRenderer implements Disposable{
     public void dispose(){
         mesh.dispose();
         fx.dispose();
+        bloom.dispose();
     }
 
     public void draw(){
@@ -177,7 +185,7 @@ public class LoadRenderer implements Disposable{
         Lines.poly(w/2, h/2, 4, rad);
         Lines.poly(w/2, h/2, 4, rad2);
 
-        if(assets.isLoaded("tech")){
+        if(assets.isLoaded("tech") && renderStencil){
             Font font = assets.get("tech");
             font.getData().markupEnabled = true;
 
@@ -468,6 +476,7 @@ public class LoadRenderer implements Disposable{
             name.contains("maps") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "system";
 
             Font font = assets.get("tech");
+            font.getData().markupEnabled = true;
             font.setColor(Pal.accent);
             Draw.color(Color.black);
             font.draw(red + "[[[[ " + key + " ]]\n" + orange + "<" + Version.modifier + "  " + (Version.build == 0 ? "[init]" : Version.buildString()) + ">", w/2f, h/2f + 110*s, Align.center);

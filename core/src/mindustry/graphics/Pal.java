@@ -6,6 +6,7 @@ public class Pal{
     public static Color
 
     thoriumPink = Color.valueOf("f9a3c7"),
+    coalBlack = Color.valueOf("272727"),
 
     items = Color.valueOf("2ea756"),
     command = Color.valueOf("eab678"),
@@ -14,10 +15,12 @@ public class Pal{
     sapBullet = Color.valueOf("bf92f9"),
     sapBulletBack = Color.valueOf("6d56bf"),
 
+    reactorPurple = Color.valueOf("bf92f9"),
+    reactorPurple2 = Color.valueOf("8a73c6"),
+
     spore = Color.valueOf("7457ce"),
 
     shield = Color.valueOf("ffd37f").a(0.7f),
-    shieldIn = Color.black.cpy().a(0f),
 
     bulletYellow = Color.valueOf("fff8e8"),
     bulletYellowBack = Color.valueOf("f9c27a"),

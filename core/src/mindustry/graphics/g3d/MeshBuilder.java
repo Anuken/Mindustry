@@ -48,6 +48,9 @@ public class MeshBuilder{
         begin(grid.tiles.length * 12 * (3 + 3 + 1));
 
         for(Ptile tile : grid.tiles){
+            if(mesher.skip(tile.v)){
+                continue;
+            }
 
             Corner[] c = tile.corners;
 

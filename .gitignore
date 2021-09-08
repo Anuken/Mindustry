@@ -1,4 +1,5 @@
 logs/
+/fastlane/metadata/android/en-US/changelogs/
 /core/assets/mindustry-saves/
 /core/assets/mindustry-maps/
 /core/assets/bundles/output/

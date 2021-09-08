@@ -6,14 +6,17 @@ import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.ui.dialogs.*;
+import static mindustry.Vars.*;
 
 public class MapResizeDialog extends BaseDialog{
     public static int minSize = 50, maxSize = 500, increment = 50;
 
     int width, height;
 
-    public MapResizeDialog(MapEditor editor, Intc2 cons){
+    public MapResizeDialog(Intc2 cons){
         super("@editor.resizemap");
+
+        closeOnBack();
         shown(() -> {
             cont.clear();
             width = editor.width();
@@ -28,7 +31,7 @@ public class MapResizeDialog extends BaseDialog{
                 table.field((w ? width : height) + "", TextFieldFilter.digitsOnly, value -> {
                     int val = Integer.parseInt(value);
                     if(w) width = val; else height = val;
-                }).valid(value -> Strings.canParsePositiveInt(value) && Integer.parseInt(value) <= maxSize && Integer.parseInt(value) >= minSize).addInputDialog(3);
+                }).valid(value -> Strings.canParsePositiveInt(value) && Integer.parseInt(value) <= maxSize && Integer.parseInt(value) >= minSize).maxTextLength(3);
 
                 table.row();
             }

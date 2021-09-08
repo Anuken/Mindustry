@@ -1,0 +1,46 @@
+[
+  {
+    "name": "mindustry.pl",
+    "address": ["46.105.36.238:6000", "46.105.36.238:6666", "46.105.36.238:6966"]
+  },
+  {
+    "name": "C.A.M.S.",
+    "address": ["baseduser.eu.org:6569", "v7.thedimas.pp.ua", "yeeth.mindustry.me:7000", "yeeth.mindustry.me:4000", "yeeth.mindustry.me:2000", "yeeth.mindustry.me:3000"]
+  },
+  {
+    "name": "hexpvp.ml",
+    "address": "hexpvp.ml"
+  },
+  {
+    "name": "Omega",
+    "address": ["yeeth.mindustry.me", "yeeth.mindustry.me:2006", "yeeth.mindustry.me:2003","yeeth.mindustry.me:2002", "yeeth.mindustry.me:2001", "yeeth.mindustry.me:2007", "yeeth.mindustry.me:2005"]
+  },
+  {
+    "name": "MeowLand",
+    "address": ["34.134.111.15", "fifr4.quackhost.uk:21013", "34.134.111.15:4000", "34.134.111.15:7000"]
+  },
+  {
+    "name": "[cyan]DarkDustry",
+    "address": ["darkdustry.ml", "darkdustry.ml:3000", "darkdustry.ml:7000", "darkdustry.ml:8000"] 
+  },
+  {
+    "name": "Chaotic Neutral",
+    "address": ["c-n.ddns.net:5555", "c-n.ddns.net:6666"]
+  },
+  {
+    "name": "XCore",
+    "address": ["35.202.253.94", "35.202.253.94:2000"]
+  },
+  {
+    "name": "Obvilion Network",
+    "address": ["obvilionnetwork.ru:7004", "obvilionnetwork.ru:7005"]
+  },
+  {
+    "name": "io",
+    "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000", "mindustry.io.community:4000", "mindustry.io.community:5000"]
+  },
+  {
+    "name": "Korea",
+    "address": ["mindustry.kr"]
+  }
+]

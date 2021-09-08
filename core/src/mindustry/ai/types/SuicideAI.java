@@ -9,7 +9,10 @@ import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.liquid.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
+
+import static mindustry.Vars.*;
 
 public class SuicideAI extends GroundAI{
     static boolean blockedByBlock;
@@ -29,17 +32,17 @@ public class SuicideAI extends GroundAI{
 
         boolean rotate = false, shoot = false, moveToTarget = false;
 
+        if(target == null){
+            target = core;
+        }
+
         if(!Units.invalidateTarget(target, unit, unit.range()) && unit.hasWeapons()){
             rotate = true;
             shoot = unit.within(target, unit.type.weapons.first().bullet.range() +
                 (target instanceof Building b ? b.block.size * Vars.tilesize / 2f : ((Hitboxc)target).hitSize() / 2f));
 
-            if(unit.type.hasWeapons()){
-                unit.aimLook(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
-            }
-
             //do not move toward walls or transport blocks
-            if(!(target instanceof Building build && (
+            if(!(target instanceof Building build && !(build.block instanceof CoreBlock) && (
                 build.block.group == BlockGroup.walls ||
                 build.block.group == BlockGroup.liquids ||
                 build.block.group == BlockGroup.transportation
@@ -69,7 +72,7 @@ public class SuicideAI extends GroundAI{
                 if(!blocked){
                     moveToTarget = true;
                     //move towards target directly
-                    unit.moveAt(vec.set(target).sub(unit).limit(unit.speed()));
+                    unit.movePref(vec.set(target).sub(unit).limit(unit.speed()));
                 }
             }
         }
@@ -81,18 +84,30 @@ public class SuicideAI extends GroundAI{
                 if(target != null && !unit.within(target, 70f)){
                     pathfind(Pathfinder.fieldRally);
                 }
-            }else if(command() == UnitCommand.attack && core != null){
-                pathfind(Pathfinder.fieldCore);
-            }
+            }else if(command() == UnitCommand.attack){
+                boolean move = true;
 
-            if(unit.moving()) unit.lookAt(unit.vel().angle());
+                //stop moving toward the drop zone if applicable
+                if(core == null && state.rules.waves && unit.team == state.rules.defaultTeam){
+                    Tile spawner = getClosestSpawner();
+                    if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)){
+                        move = false;
+                    }
+                }
+
+                if(move){
+                    pathfind(Pathfinder.fieldCore);
+                }
+            }
         }
 
         unit.controlWeapons(rotate, shoot);
+
+        faceTarget();
     }
 
     @Override
-    protected Teamc target(float x, float y, float range, boolean air, boolean ground){
+    public Teamc target(float x, float y, float range, boolean air, boolean ground){
         return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground &&
             !(t.block instanceof Conveyor || t.block instanceof Conduit)); //do not target conveyors/conduits
     }

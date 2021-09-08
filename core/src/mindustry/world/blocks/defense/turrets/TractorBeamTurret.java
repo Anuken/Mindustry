@@ -20,10 +20,6 @@ import static mindustry.Vars.*;
 public class TractorBeamTurret extends BaseTurret{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;
-
-    public @Load("block-@size") TextureRegion baseRegion;
-    public @Load("@-laser") TextureRegion laser;
-    public @Load("@-laser-end") TextureRegion laserEnd;
     
     public float shootCone = 6f;
     public float shootLength = 5f;
@@ -39,6 +35,11 @@ public class TractorBeamTurret extends BaseTurret{
     public Sound shootSound = Sounds.tractorbeam;
     public float shootSoundVolume = 0.9f;
 
+    public @Load("block-@size") TextureRegion baseRegion;
+    public @Load("@-laser") TextureRegion laser;
+    public @Load(value = "@-laser-start", fallback = "@-laser-end") TextureRegion laserStart;
+    public @Load("@-laser-end") TextureRegion laserEnd;
+
     public TractorBeamTurret(String name){
         super(name);
 
@@ -47,7 +48,6 @@ public class TractorBeamTurret extends BaseTurret{
 
         //disabled due to version mismatch problems
         acceptCoolant = false;
-        expanded = true;
     }
 
     @Override
@@ -62,6 +62,13 @@ public class TractorBeamTurret extends BaseTurret{
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
         stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        clipSize = Math.max(clipSize, (range + tilesize) * 2);
     }
 
     public class TractorBeamBuild extends BaseTurretBuild{
@@ -145,7 +152,7 @@ public class TractorBeamTurret extends BaseTurret{
 
                 Draw.mixcol(laserColor, Mathf.absin(4f, 0.6f));
 
-                Drawf.laser(team, laser, laserEnd,
+                Drawf.laser(team, laser, laserStart, laserEnd,
                 x + Angles.trnsx(ang, shootLength), y + Angles.trnsy(ang, shootLength),
                 lastX, lastY, strength * efficiency() * laserWidth);
 

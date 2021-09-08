@@ -1,9 +1,0 @@
-[This is a truncated changelog, see Github for full notes]
-As 6.0 is more or less stable now, updates have slowed down significantly. This is likely to be one of the last notable releases before 7.0.
-
-- Fixed same-line logic comments not parsing
-- Fixed mass driver rotating before payload is received
-- Fixed bullets dealing splash damage twice upon collision - splash damage of certain bullets has been increased to compensate
-
-
-

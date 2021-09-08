@@ -33,7 +33,7 @@ public class ItemImage extends Stack{
 
         add(new Table(o -> {
             o.left();
-            o.add(new Image(stack.item.icon(Cicon.medium))).size(32f);
+            o.add(new Image(stack.item.uiIcon)).size(32f);
         }));
 
         if(stack.amount != 0){

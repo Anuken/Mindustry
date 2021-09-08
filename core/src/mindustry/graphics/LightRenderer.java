@@ -19,6 +19,9 @@ public class LightRenderer{
     private float[] vertices = new float[24];
     private FrameBuffer buffer = new FrameBuffer();
     private Seq<Runnable> lights = new Seq<>();
+    private Seq<CircleLight> circles = new Seq<>(CircleLight.class);
+    private int circleIndex = 0;
+    private TextureRegion circleRegion;
 
     public void add(Runnable run){
         if(!enabled()) return;
@@ -27,14 +30,17 @@ public class LightRenderer{
     }
 
     public void add(float x, float y, float radius, Color color, float opacity){
-        if(!enabled()) return;
+        if(!enabled() || radius <= 0f) return;
 
-        float res = color.toFloatBits();
-        add(() -> {
-            Draw.color(res);
-            Draw.alpha(opacity);
-            Draw.rect("circle-shadow", x, y, radius * 2, radius * 2);
-        });
+        float res = Color.toFloatBits(color.r, color.g, color.b, opacity);
+
+        if(circles.size <= circleIndex) circles.add(new CircleLight());
+
+        //pool circles to prevent runaway GC usage from lambda capturing
+        var light = circles.items[circleIndex];
+        light.set(x, y, res, radius);
+
+        circleIndex ++;
     }
 
     public void add(float x, float y, TextureRegion region, Color color, float opacity){
@@ -170,7 +176,7 @@ public class LightRenderer{
     }
 
     public boolean enabled(){
-        return state.rules.lighting && state.rules.ambientLight.a > 0.00001f;
+        return state.rules.lighting && state.rules.ambientLight.a > 0.0001f;
     }
 
     public void draw(){
@@ -178,6 +184,8 @@ public class LightRenderer{
             lights.clear();
             return;
         }
+
+        if(circleRegion == null) circleRegion = Core.atlas.find("circle-shadow");
 
         buffer.resize(Core.graphics.getWidth()/scaling, Core.graphics.getHeight()/scaling);
 
@@ -188,6 +196,11 @@ public class LightRenderer{
         for(Runnable run : lights){
             run.run();
         }
+        for(int i = 0; i < circleIndex; i++){
+            var cir = circles.items[i];
+            Draw.color(cir.color);
+            Draw.rect(circleRegion, cir.x, cir.y, cir.radius * 2, cir.radius * 2);
+        }
         Draw.reset();
         buffer.end();
         Gl.blendEquationSeparate(Gl.funcAdd, Gl.funcAdd);
@@ -197,5 +210,17 @@ public class LightRenderer{
         buffer.blit(Shaders.light);
 
         lights.clear();
+        circleIndex = 0;
+    }
+
+    static class CircleLight{
+        float x, y, color, radius;
+
+        public void set(float x, float y, float color, float radius){
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.radius = radius;
+        }
     }
 }

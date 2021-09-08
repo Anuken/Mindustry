@@ -21,7 +21,7 @@ public class Shaders{
     public static UnitBuildShader build;
     public static DarknessShader darkness;
     public static LightShader light;
-    public static SurfaceShader water, mud, tar, slag, space;
+    public static SurfaceShader water, mud, tar, slag, space, caustics;
     public static PlanetShader planet;
     public static PlanetGridShader planetGrid;
     public static AtmosphereShader atmosphere;
@@ -48,6 +48,12 @@ public class Shaders{
         tar = new SurfaceShader("tar");
         slag = new SurfaceShader("slag");
         space = new SpaceShader("space");
+        //caustics = new SurfaceShader("caustics"){
+        //    @Override
+        //    public String textureName(){
+        //        return "caustics";
+        //    }
+        //};
         planet = new PlanetShader();
         planetGrid = new PlanetGridShader();
         atmosphere = new AtmosphereShader();
@@ -228,7 +234,7 @@ public class Shaders{
             super(frag);
 
             Core.assets.load("sprites/space.png", Texture.class).loaded = t -> {
-                texture = (Texture)t;
+                texture = t;
                 texture.setFilter(TextureFilter.linear);
                 texture.setWrap(TextureWrap.mirroredRepeat);
             };
@@ -249,6 +255,8 @@ public class Shaders{
     }
 
     public static class SurfaceShader extends Shader{
+        Texture noiseTex;
+
         public SurfaceShader(String frag){
             super(getShaderFi("screenspace.vert"), getShaderFi(frag + ".frag"));
             loadNoise();
@@ -259,10 +267,14 @@ public class Shaders{
             loadNoise();
         }
 
+        public String textureName(){
+            return "noise";
+        }
+
         public void loadNoise(){
-            Core.assets.load("sprites/noise.png", Texture.class).loaded = t -> {
-                ((Texture)t).setFilter(TextureFilter.linear);
-                ((Texture)t).setWrap(TextureWrap.repeat);
+            Core.assets.load("sprites/" + textureName() + ".png", Texture.class).loaded = t -> {
+                t.setFilter(TextureFilter.linear);
+                t.setWrap(TextureWrap.repeat);
             };
         }
 
@@ -273,7 +285,11 @@ public class Shaders{
             setUniformf("u_time", Time.time);
 
             if(hasUniform("u_noise")){
-                Core.assets.get("sprites/noise.png", Texture.class).bind(1);
+                if(noiseTex == null){
+                    noiseTex = Core.assets.get("sprites/" + textureName() + ".png", Texture.class);
+                }
+
+                noiseTex.bind(1);
                 renderer.effectBuffer.getTexture().bind(0);
 
                 setUniformi("u_noise", 1);

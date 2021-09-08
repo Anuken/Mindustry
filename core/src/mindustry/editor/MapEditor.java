@@ -21,7 +21,7 @@ public class MapEditor{
     public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15, 20};
 
     public StringMap tags = new StringMap();
-    public MapRenderer renderer = new MapRenderer(this);
+    public MapRenderer renderer = new MapRenderer();
 
     private final Context context = new Context();
     private OperationStack stack = new OperationStack();
@@ -62,7 +62,7 @@ public class MapEditor{
     public void beginEdit(Pixmap pixmap){
         reset();
 
-        createTiles(pixmap.getWidth(), pixmap.getHeight());
+        createTiles(pixmap.width, pixmap.height);
         load(() -> MapIO.readImage(pixmap, tiles()));
         renderer.resize(width(), height());
     }
@@ -330,7 +330,7 @@ public class MapEditor{
     public void addTileOp(long data){
         if(loading) return;
 
-        if(currentOp == null) currentOp = new DrawOperation(this);
+        if(currentOp == null) currentOp = new DrawOperation();
         currentOp.addOperation(data);
 
         renderer.updatePoint(TileOp.x(data), TileOp.y(data));

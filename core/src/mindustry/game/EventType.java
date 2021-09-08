@@ -6,8 +6,10 @@ import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.net.*;
+import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 public class EventType{
 
@@ -133,6 +135,18 @@ public class EventType{
         }
     }
 
+    /** Consider using Menus.registerMenu instead. */
+    public static class MenuOptionChooseEvent{
+        public final Player player;
+        public final int menuId, option;
+
+        public MenuOptionChooseEvent(Player player, int menuId, int option){
+            this.player = player;
+            this.option = option;
+            this.menuId = menuId;
+        }
+    }
+
     public static class PlayerChatEvent{
         public final Player player;
         public final String message;
@@ -242,11 +256,55 @@ public class EventType{
         }
     }
 
-    public static class TileChangeEvent{
-        public final Tile tile;
+    /**
+     * Called *before* a tile has changed.
+     * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
+     * Do not modify any tiles inside listeners that use this tile.
+     * */
+    public static class TilePreChangeEvent{
+        public Tile tile;
 
-        public TileChangeEvent(Tile tile){
+        public TilePreChangeEvent set(Tile tile){
             this.tile = tile;
+            return this;
+        }
+    }
+
+    /**
+     * Called *after* a tile has changed.
+     * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
+     * Do not modify any tiles inside listeners that use this tile.
+     * */
+    public static class TileChangeEvent{
+        public Tile tile;
+
+        public TileChangeEvent set(Tile tile){
+            this.tile = tile;
+            return this;
+        }
+    }
+
+    /**
+     * Called after a building's team changes.
+     * Event object is reused, do not nest!
+     * */
+    public static class BuildTeamChangeEvent{
+        public Team previous;
+        public Building build;
+
+        public BuildTeamChangeEvent set(Team previous, Building build){
+            this.build = build;
+            this.previous = previous;
+            return this;
+        }
+    }
+
+    /** Called when a core block is placed/removed or its team is changed. */
+    public static class CoreChangeEvent{
+        public CoreBuild core;
+
+        public CoreChangeEvent(CoreBuild core){
+            this.core = core;
         }
     }
 
@@ -353,14 +411,29 @@ public class EventType{
         }
     }
 
-    /** Called when a unit is created in a reconstructor or factory. */
+    /** Called when a unit is created in a reconstructor, factory or other unit. */
     public static class UnitCreateEvent{
         public final Unit unit;
-        public final Building spawner;
+        public final @Nullable Building spawner;
+        public final @Nullable Unit spawnerUnit;
 
-        public UnitCreateEvent(Unit unit, Building spawner){
+        public UnitCreateEvent(Unit unit, Building spawner, Unit spawnerUnit){
             this.unit = unit;
             this.spawner = spawner;
+            this.spawnerUnit = spawnerUnit;
+        }
+
+        public UnitCreateEvent(Unit unit, Building spawner){
+            this(unit, spawner, null);
+        }
+    }
+
+    /** Called when a unit is spawned by wave. */
+    public static class UnitSpawnEvent{
+        public final Unit unit;
+
+        public UnitSpawnEvent(Unit unit) {
+            this.unit = unit;
         }
     }
 
@@ -389,6 +462,17 @@ public class EventType{
 
         public ConnectionEvent(NetConnection connection){
             this.connection = connection;
+        }
+    }
+
+    /** Called when a player sends a connection packet. */
+    public static class ConnectPacketEvent{
+        public final NetConnection connection;
+        public final ConnectPacket packet;
+
+        public ConnectPacketEvent(NetConnection connection, ConnectPacket packet){
+            this.connection = connection;
+            this.packet = packet;
         }
     }
 

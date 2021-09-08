@@ -53,11 +53,11 @@ public class PausedDialog extends BaseDialog{
                         ui.host.show();
                     }
                 }
-            }).disabled(b -> !((steam && net.server()) || !net.active())).colspan(2).width(dw * 2 + 20f).update(e -> e.setText(net.server() && steam ? "@invitefriends" : "@hostserver"));
+            }).disabled(b -> !((steam && net.server()) || !net.active())).colspan(2).width(dw * 2 + 10f).update(e -> e.setText(net.server() && steam ? "@invitefriends" : "@hostserver"));
 
             cont.row();
 
-            cont.button("@quit", Icon.exit, this::showQuitConfirm).colspan(2).width(dw + 20f).update(s -> s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "@save.quit" : "@quit"));
+            cont.button("@quit", Icon.exit, this::showQuitConfirm).colspan(2).width(dw + 10f).update(s -> s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "@save.quit" : "@quit"));
 
         }else{
             cont.defaults().size(130f).pad(5);
@@ -93,12 +93,19 @@ public class PausedDialog extends BaseDialog{
     }
 
     void showQuitConfirm(){
-        ui.showConfirm("@confirm", "@quit.confirm", () -> {
+        Runnable quit = () -> {
             wasClient = net.client();
             if(net.client()) netClient.disconnectQuietly();
             runExitSave();
             hide();
-        });
+        };
+
+        if(confirmExit){
+            ui.showConfirm("@confirm", "@quit.confirm", quit);
+        }else{
+            quit.run();
+        }
+
     }
 
     public void runExitSave(){

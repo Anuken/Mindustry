@@ -3,6 +3,7 @@ package mindustry.world.blocks.defense.turrets;
 import arc.graphics.g2d.*;
 import arc.struct.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -11,7 +12,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
-import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
@@ -27,19 +27,21 @@ public class LiquidTurret extends Turret{
         hasLiquids = true;
         loopSound = Sounds.spray;
         shootSound = Sounds.none;
+        smokeEffect = Fx.none;
+        shootEffect = Fx.none;
         outlinedIcon = 1;
     }
 
     /** Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...] */
     public void ammo(Object... objects){
-        ammoTypes = OrderedMap.of(objects);
+        ammoTypes = ObjectMap.of(objects);
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.ammo, new AmmoListValue<>(ammoTypes));
+        stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
     }
 
     @Override
@@ -83,12 +85,14 @@ public class LiquidTurret extends Turret{
 
         @Override
         public boolean shouldActiveSound(){
-            return wasShooting;
+            return wasShooting && enabled;
         }
 
         @Override
         public void updateTile(){
-            unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
+            if(unit != null){
+                unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
+            }
 
             super.updateTile();
         }
@@ -96,16 +100,26 @@ public class LiquidTurret extends Turret{
         @Override
         protected void findTarget(){
             if(extinguish && liquids.current().canExtinguish()){
+                Fire result = null;
+                float mindst = 0f;
                 int tr = (int)(range / tilesize);
                 for(int x = -tr; x <= tr; x++){
                     for(int y = -tr; y <= tr; y++){
-                        Tile other = world.tileWorld(x + tile.x, y + tile.y);
+                        Tile other = world.tile(x + tile.x, y + tile.y);
+                        var fire = Fires.get(x + tile.x, y + tile.y);
+                        float dst = fire == null ? 0 : dst2(fire);
                         //do not extinguish fires on other team blocks
-                        if(other != null && Fires.has(x + tile.x, y + tile.y) && (other.build == null || other.team() == team)){
-                            target = Fires.get(x + tile.x, y + tile.y);
-                            return;
+                        if(other != null && fire != null && Fires.has(other.x, other.y) && dst <= range * range && (result == null || dst < mindst) && (other.build == null || other.team() == team)){
+                            result = fire;
+                            mindst = dst;
                         }
                     }
+                }
+
+                if(result != null){
+                    target = result;
+                    //don't run standard targeting
+                    return;
                 }
             }
 
@@ -116,8 +130,11 @@ public class LiquidTurret extends Turret{
         protected void effects(){
             BulletType type = peekAmmo();
 
-            type.shootEffect.at(x + tr.x, y + tr.y, rotation, liquids.current().color);
-            type.smokeEffect.at(x + tr.x, y + tr.y, rotation, liquids.current().color);
+            Effect fshootEffect = shootEffect == Fx.none ? type.shootEffect : shootEffect;
+            Effect fsmokeEffect = smokeEffect == Fx.none ? type.smokeEffect : smokeEffect;
+
+            fshootEffect.at(x + tr.x, y + tr.y, rotation, liquids.current().color);
+            fsmokeEffect.at(x + tr.x, y + tr.y, rotation, liquids.current().color);
             shootSound.at(tile);
 
             if(shootShake > 0){

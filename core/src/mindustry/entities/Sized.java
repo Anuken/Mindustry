@@ -1,5 +1,7 @@
 package mindustry.entities;
 
-public interface Sized{
+import arc.math.geom.*;
+
+public interface Sized extends Position{
     float hitSize();
 }

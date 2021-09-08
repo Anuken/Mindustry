@@ -40,16 +40,12 @@ abstract class EntityComp{
         return false;
     }
 
+    /** Replaced with `this` after code generation. */
     <T extends Entityc> T self(){
         return (T)this;
     }
 
     <T> T as(){
-        return (T)this;
-    }
-
-    <T> T with(Cons<T> cons){
-        cons.get((T)this);
         return (T)this;
     }
 

@@ -1,5 +1,6 @@
 package mindustry.game;
 
+import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
@@ -39,12 +40,12 @@ public class SpawnGroup implements JsonSerializable{
     public float shieldScaling = 0f;
     /** Amount of enemies spawned initially, with no scaling */
     public int unitAmount = 1;
+    /** Seq of payloads that this unit will spawn with. */
+    public @Nullable Seq<UnitType> payloads;
     /** Status effect applied to the spawned unit. Null to disable. */
-    @Nullable
-    public StatusEffect effect;
+    public @Nullable StatusEffect effect;
     /** Items this unit spawns with. Null to disable. */
-    @Nullable
-    public ItemStack items;
+    public @Nullable ItemStack items;
 
     public SpawnGroup(UnitType type){
         this.type = type;
@@ -85,6 +86,15 @@ public class SpawnGroup implements JsonSerializable{
 
         unit.shield = getShield(wave);
 
+        //load up spawn payloads
+        if(payloads != null && unit instanceof Payloadc pay){
+            for(var type : payloads){
+                if(type == null) continue;
+                Unit payload = type.create(unit.team);
+                pay.pickup(payload);
+            }
+        }
+
         return unit;
     }
 
@@ -101,6 +111,9 @@ public class SpawnGroup implements JsonSerializable{
         if(shieldScaling != 0) json.writeValue("shieldScaling", shieldScaling);
         if(unitAmount != 1) json.writeValue("amount", unitAmount);
         if(effect != null) json.writeValue("effect", effect.name);
+        if(payloads != null && payloads.size > 0){
+            json.writeValue("payloads", payloads.map(u -> u.name).toArray(String.class));
+        }
     }
 
     @Override
@@ -117,6 +130,9 @@ public class SpawnGroup implements JsonSerializable{
         shields = data.getFloat("shields", 0);
         shieldScaling = data.getFloat("shieldScaling", 0);
         unitAmount = data.getInt("amount", 1);
+        if(data.has("payloads")){
+            payloads = Seq.with(json.readValue(String[].class, data.get("payloads"))).map(s -> content.getByName(ContentType.unit, s));
+        }
 
         //old boss effect ID
         if(data.has("effect") && data.get("effect").isNumber() && data.getInt("effect", -1) == 8){

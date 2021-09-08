@@ -4,6 +4,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
 
@@ -18,17 +19,17 @@ abstract class TeamComp implements Posc{
     }
 
     @Nullable
-    public Building core(){
+    public CoreBuild core(){
         return team.core();
     }
 
     @Nullable
-    public Building closestCore(){
+    public CoreBuild closestCore(){
         return state.teams.closestCore(x, y, team);
     }
 
     @Nullable
-    public Building closestEnemyCore(){
+    public CoreBuild closestEnemyCore(){
         return state.teams.closestEnemyCore(x, y, team);
     }
 }

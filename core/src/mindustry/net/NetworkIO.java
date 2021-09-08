@@ -46,6 +46,7 @@ public class NetworkIO{
 
             SaveIO.getSaveWriter().writeContentHeader(stream);
             SaveIO.getSaveWriter().writeMap(stream);
+            SaveIO.getSaveWriter().writeTeamBlocks(stream);
         }catch(IOException e){
             throw new RuntimeException(e);
         }
@@ -70,6 +71,7 @@ public class NetworkIO{
 
             SaveIO.getSaveWriter().readContentHeader(stream);
             SaveIO.getSaveWriter().readMap(stream, world.context);
+            SaveIO.getSaveWriter().readTeamBlocks(stream);
         }catch(IOException e){
             throw new RuntimeException(e);
         }finally{

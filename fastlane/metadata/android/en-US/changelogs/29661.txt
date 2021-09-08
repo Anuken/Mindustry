@@ -1,9 +1,0 @@
-- Fixed some bugs
-- Didn't fix some other bugs
-- Added 6 new units to fill in missing T4/5 upgrades
-- Added unit outlines for visual clarity, may remove later
-- Added mud floor (Contributed by ThePlayerA)
-- Added research costs to units in tech tree
-- Added ability to replace small walls with bigger ones directly
-- Added launch pad destination selection (barely tested)
-- Added team colors for storage blocks (Contributed by Voz-Duh)
