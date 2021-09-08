@@ -181,6 +181,11 @@ public class HintsFragment extends Fragment{
             && SectorPresets.frozenForest.unlocked()
             && SectorPresets.frozenForest.sector.save == null,
             () -> state.isCampaign() && state.getSector().preset == SectorPresets.frozenForest),
+        presetDifficulty(() -> state.isCampaign()
+            && state.getSector().preset == null
+            && state.getSector().threat >= 0.5f
+            && !SectorPresets.tarFields.sector.isCaptured(), //appear only when the player hasn't progressed much in the game yet
+            () -> state.isCampaign() && state.getSector().preset != null),
         coreIncinerate(() -> state.isCampaign() && state.rules.defaultTeam.core() != null && state.rules.defaultTeam.core().items.get(Items.copper) >= state.rules.defaultTeam.core().storageCapacity - 10, () -> false),
         coopCampaign(() -> net.client() && state.isCampaign() && SectorPresets.groundZero.sector.hasBase(), () -> false),
         ;
