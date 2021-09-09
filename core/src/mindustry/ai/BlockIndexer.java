@@ -50,10 +50,12 @@ public class BlockIndexer{
         clearFlags();
 
         Events.on(TilePreChangeEvent.class, event -> {
+            if(state.isEditor()) return;
             removeIndex(event.tile);
         });
 
         Events.on(TileChangeEvent.class, event -> {
+            if(state.isEditor()) return;
             addIndex(event.tile);
         });
 
