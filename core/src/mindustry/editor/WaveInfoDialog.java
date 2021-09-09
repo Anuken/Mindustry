@@ -1,7 +1,6 @@
 package mindustry.editor;
 
 import arc.*;
-import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.scene.event.*;
@@ -19,6 +18,8 @@ import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
+
+import java.util.*;
 
 import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.*;
@@ -205,6 +206,13 @@ public class WaveInfoDialog extends BaseDialog{
 
                         b.label(() -> (group.begin + 1) + "").color(Color.lightGray).minWidth(45f).labelAlign(Align.left).left();
 
+                        b.button(Icon.copySmall, Styles.emptyi, () -> {
+                            SpawnGroup newGroup = group.copy();
+                            expandedGroup = newGroup;
+                            groups.add(newGroup);
+                            buildGroups();
+                        }).pad(-6).size(46f);
+
                         b.button(group.effect != null && group.effect != StatusEffects.none ?
                             new TextureRegionDrawable(group.effect.uiIcon) :
                             Icon.logicSmall,
@@ -215,7 +223,7 @@ public class WaveInfoDialog extends BaseDialog{
                             groups.remove(group);
                             table.getCell(t).pad(0f);
                             t.remove();
-                            updateWaves();
+                            buildGroups();
                         }).pad(-6).size(46f).padRight(-12f);
                     }, () -> {
                         expandedGroup = expandedGroup == group ? null : group;
@@ -374,15 +382,15 @@ public class WaveInfoDialog extends BaseDialog{
     }
 
     enum Sort{
-        begin(g -> g.begin),
-        health(g -> g.type.health),
-        type(g -> g.type.id);
+        begin(Structs.comps(Structs.comparingFloat(g -> g.begin), Structs.comparingFloat(g -> g.type.id))),
+        health(Structs.comps(Structs.comparingFloat(g -> g.type.health), Structs.comparingFloat(g -> g.begin))),
+        type(Structs.comps(Structs.comparingFloat(g -> g.type.id), Structs.comparingFloat(g -> g.begin)));
 
         static final Sort[] all = values();
 
-        final Floatf<SpawnGroup> sort;
+        final Comparator<SpawnGroup> sort;
 
-        Sort(Floatf<SpawnGroup> sort){
+        Sort(Comparator<SpawnGroup> sort){
             this.sort = sort;
         }
     }
