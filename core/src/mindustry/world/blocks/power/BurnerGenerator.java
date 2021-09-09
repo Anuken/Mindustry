@@ -9,6 +9,7 @@ public class BurnerGenerator extends ItemLiquidGenerator{
     public @Load(value = "@-turbine#", length = 2) TextureRegion[] turbineRegions;
     public @Load("@-cap") TextureRegion capRegion;
     public float turbineSpeed = 2f;
+    public boolean hasTurbines = true;
 
     public BurnerGenerator(String name){
         super(true, false, name);
@@ -26,7 +27,7 @@ public class BurnerGenerator extends ItemLiquidGenerator{
 
     @Override
     public TextureRegion[] icons(){
-        return turbineRegions[0].found() ? new TextureRegion[]{region, turbineRegions[0], turbineRegions[1], capRegion} : super.icons();
+        return turbineRegions[0].found() && hasTurbines ? new TextureRegion[]{region, turbineRegions[0], turbineRegions[1], capRegion} : super.icons();
     }
 
     public class BurnerGeneratorBuild extends ItemLiquidGeneratorBuild{
@@ -35,7 +36,7 @@ public class BurnerGenerator extends ItemLiquidGenerator{
         public void draw(){
             super.draw();
 
-            if(turbineRegions[0].found()){
+            if(turbineRegions[0].found() && hasTurbines){
                 Draw.rect(turbineRegions[0], x, y, totalTime * turbineSpeed);
                 Draw.rect(turbineRegions[1], x, y, -totalTime * turbineSpeed);
 
