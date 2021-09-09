@@ -111,7 +111,7 @@ public class BlockIndexer{
                 }
             }
 
-            //update the unit cap when building is remove
+            //update the unit cap when building is removed
             data.unitCap -= tile.block().unitCapModifier;
 
             //unregister building from building quadtree
