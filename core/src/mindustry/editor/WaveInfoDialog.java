@@ -207,14 +207,10 @@ public class WaveInfoDialog extends BaseDialog{
                         b.label(() -> (group.begin + 1) + "").color(Color.lightGray).minWidth(45f).labelAlign(Align.left).left();
 
                         b.button(Icon.copySmall, Styles.emptyi, () -> {
-                            try{
-                                SpawnGroup newGroup = group.clone();
-                                expandedGroup = newGroup;
-                                groups.add(newGroup);
-                                buildGroups();
-                            }catch(CloneNotSupportedException e){
-                                Log.err(e);
-                            }
+                            SpawnGroup newGroup = group.copy();
+                            expandedGroup = newGroup;
+                            groups.add(newGroup);
+                            buildGroups();
                         }).pad(-6).size(46f);
 
                         b.button(group.effect != null && group.effect != StatusEffects.none ?

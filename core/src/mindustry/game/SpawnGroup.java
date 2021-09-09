@@ -157,9 +157,12 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
         '}';
     }
 
-    @Override
-    public SpawnGroup clone() throws CloneNotSupportedException{
-        return (SpawnGroup)super.clone();
+    public SpawnGroup copy(){
+        try {
+            return (SpawnGroup)clone();
+        }catch(CloneNotSupportedException how){
+            throw new RuntimeException("If you see this, what did you even do?", how);
+        }
     }
 
     @Override
