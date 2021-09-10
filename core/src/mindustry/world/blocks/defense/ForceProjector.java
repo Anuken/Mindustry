@@ -15,7 +15,6 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.defense.OverdriveProjector.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
