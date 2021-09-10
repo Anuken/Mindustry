@@ -421,8 +421,8 @@ public class TechTree implements ContentList{
                                 });
                             });
 
-                            node(retusa, () -> {
-                                node(oxynoe, () -> {
+                            node(retusa, Seq.with(new SectorComplete(windsweptIslands)), () -> {
+                                node(oxynoe, Seq.with(new SectorComplete(coastline)), () -> {
                                     node(cyerce, () -> {
                                         node(aegires, () -> {
                                             node(navanax, () -> {
@@ -532,6 +532,14 @@ public class TechTree implements ContentList{
                                     new Research(door)
                                 ), () -> {
 
+                                });
+
+                                node(coastline, Seq.with(
+                                    new SectorComplete(windsweptIslands),
+                                    new Research(navalFactory),
+                                    new Research(payloadConveyor)
+                                ), () -> {
+                                    //TODO naval fortress
                                 });
                             });
                         });
