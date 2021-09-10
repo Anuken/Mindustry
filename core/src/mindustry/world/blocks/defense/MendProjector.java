@@ -11,7 +11,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.world.*;
-import mindustry.world.blocks.defense.OverdriveProjector.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
