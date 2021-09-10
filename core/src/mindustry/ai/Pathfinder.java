@@ -138,7 +138,7 @@ public class Pathfinder implements Runnable{
     /** Starts or restarts the pathfinding thread. */
     private void start(){
         stop();
-        thread = Threads.daemon(this);
+        thread = Threads.daemon("Pathfinder", this);
     }
 
     /** Stops the pathfinding thread. */
