@@ -71,9 +71,7 @@ public class SectorPresets implements ContentList{
         }};
 
         navalFortress = new SectorPreset("navalFortress", serpulo, 216){{
-            //TODO AI or not?
-            useAI = true;
-            difficulty = 8;
+            difficulty = 9;
         }};
 
         fungalPass = new SectorPreset("fungalPass", serpulo, 21){{

@@ -425,7 +425,7 @@ public class TechTree implements ContentList{
                                 node(oxynoe, Seq.with(new SectorComplete(coastline)), () -> {
                                     node(cyerce, () -> {
                                         node(aegires, () -> {
-                                            node(navanax, () -> {
+                                            node(navanax, Seq.with(new SectorComplete(navalFortress)), () -> {
 
                                             });
                                         });
@@ -539,7 +539,16 @@ public class TechTree implements ContentList{
                                     new Research(navalFactory),
                                     new Research(payloadConveyor)
                                 ), () -> {
-                                    //TODO naval fortress
+                                    node(navalFortress, Seq.with(
+                                        new SectorComplete(coastline),
+                                        new SectorComplete(extractionOutpost),
+                                        new Research(oxynoe),
+                                        new Research(minke),
+                                        new Research(cyclone),
+                                        new Research(ripple)
+                                    ), () -> {
+
+                                    });
                                 });
                             });
                         });
