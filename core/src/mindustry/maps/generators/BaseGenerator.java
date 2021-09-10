@@ -46,8 +46,8 @@ public class BaseGenerator{
         wallsSmall.sort(b -> b.buildCost);
         wallsLarge.sort(b -> b.buildCost);
 
-        float bracketRange = 0.2f;
-        float baseChance = Mathf.lerp(0.7f, 1.9f, difficulty);
+        float bracketRange = 0.17f;
+        float baseChance = Mathf.lerp(0.7f, 2.1f, difficulty);
         int wallAngle = 70; //180 for full coverage
         double resourceChance = 0.5 * baseChance;
         double nonResourceChance = 0.0005 * baseChance;
