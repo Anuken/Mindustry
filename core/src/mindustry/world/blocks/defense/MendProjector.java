@@ -58,16 +58,17 @@ public class MendProjector extends Block{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
+        float wx = x * tilesize + offset, wy = y * tilesize + offset;
 
         if(boosterUnlocked()){
-            indexer.eachBlock(player.team(), x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, other -> Mathf.dst(x * tilesize + offset, y * tilesize + offset, other.x, other.y) >= range, other -> Drawf.selected(other, Tmp.c1.set(phaseColor).a(Mathf.absin(4f, 1f) / 2f)));
+            indexer.eachBlock(player.team(), wx, wy, range + phaseRangeBoost, other -> Mathf.dst(x * tilesize + offset, y * tilesize + offset, other.x, other.y) >= range, other -> Drawf.selected(other, Tmp.c1.set(phaseColor).a(Mathf.absin(4f, 1f) / 2f)));
 
-            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.5f);
+            Drawf.dashCircle(wx, wy, range + phaseRangeBoost, phaseColor, 0.5f);
         }
 
-        indexer.eachBlock(player.team(), x * tilesize + offset, y * tilesize + offset, range, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
+        indexer.eachBlock(player.team(), wx, wy, range, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
 
-        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
+        Drawf.dashCircle(wx, wy, range, baseColor);
     }
 
     public class MendBuild extends Building implements Ranged{

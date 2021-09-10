@@ -86,10 +86,11 @@ public class ForceProjector extends Block{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
+        float wx = x * tilesize + offset, wy = y * tilesize + offset;
 
-        if(boosterUnlocked()) Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius + phaseRadiusBoost, player.team().color, 0.5f);
+        if(boosterUnlocked()) Drawf.hexagon(wx, wy, radius + phaseRadiusBoost, player.team().color, 0.5f);
 
-        Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius, player.team().color);
+        Drawf.hexagon(wx, wy, radius, player.team().color);
     }
 
     public class ForceBuild extends Building implements Ranged{
