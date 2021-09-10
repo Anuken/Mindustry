@@ -11,6 +11,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.world.*;
+import mindustry.world.blocks.defense.OverdriveProjector.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -58,10 +59,16 @@ public class MendProjector extends Block{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
-        
-        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
+
+        if(boosterUnlocked()){
+            indexer.eachBlock(player.team(), x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, other -> Mathf.dst(x * tilesize + offset, y * tilesize + offset, other.x, other.y) >= range, other -> Drawf.selected(other, Tmp.c1.set(phaseColor).a(Mathf.absin(4f, 1f) / 2f)));
+
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.5f);
+        }
 
         indexer.eachBlock(player.team(), x * tilesize + offset, y * tilesize + offset, range, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
+
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
     }
 
     public class MendBuild extends Building implements Ranged{
@@ -107,6 +114,12 @@ public class MendProjector extends Block{
         @Override
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
+
+            if(phaseHeat <= 0.999f && boosterUnlocked()){
+                indexer.eachBlock(this, range + phaseRangeBoost, other -> dst(other) >= range, other -> Drawf.selected(other, Tmp.c1.set(phaseColor).a(Mathf.absin(4f, 1f) / 2f)));
+
+                Drawf.dashCircle(x, y, range + phaseRangeBoost, phaseColor, 0.5f);
+            }
 
             indexer.eachBlock(this, realRange, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
 

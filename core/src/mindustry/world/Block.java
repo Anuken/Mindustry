@@ -762,6 +762,19 @@ public class Block extends UnlockableContent{
         return out;
     }
 
+    /** @return if all booster items are unlocked. If it doesn't have a booster, it outputs false */
+    public boolean boosterUnlocked(){
+        if(consumes.has(ConsumeType.item)){
+            for(ItemStack item: consumes.getItem().items){
+                if(!item.item.unlockedNow() || !consumes.getItem().isBoost()){
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void getDependencies(Cons<UnlockableContent> cons){
         //just requires items

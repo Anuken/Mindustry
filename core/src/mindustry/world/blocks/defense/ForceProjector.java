@@ -15,6 +15,7 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.defense.OverdriveProjector.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -87,13 +88,9 @@ public class ForceProjector extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
-        Draw.color(Pal.gray);
-        Lines.stroke(3f);
-        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
-        Draw.color(player.team().color);
-        Lines.stroke(1f);
-        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
-        Draw.color();
+        if(boosterUnlocked()) Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius + phaseRadiusBoost, player.team().color, 0.5f);
+
+        Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius, player.team().color);
     }
 
     public class ForceBuild extends Building implements Ranged{
@@ -214,6 +211,15 @@ public class ForceProjector extends Block{
             }
 
             Draw.reset();
+        }
+
+        @Override
+        public void drawSelect(){
+            super.drawSelect();
+
+            if(phaseHeat <= 0.999f && boosterUnlocked()) Drawf.hexagon(x, y, radius + phaseRadiusBoost, team.color, 0.5f);
+
+            Drawf.hexagon(x, y, radius, team.color);
         }
 
         @Override
