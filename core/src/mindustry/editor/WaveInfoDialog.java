@@ -3,6 +3,7 @@ package mindustry.editor;
 import arc.*;
 import arc.graphics.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
@@ -316,7 +317,30 @@ public class WaveInfoDialog extends BaseDialog{
                         t.check("@waves.guardian", b -> {
                             group.effect = (b ? StatusEffects.boss : null);
                             buildGroups();
-                        }).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss)).padBottom(8f);
+                        }).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss)).padBottom(8f).row();
+
+                        //spawn positions are clunky and thus experimental for now
+                        if(experimental){
+                            t.table(a -> {
+                                a.add("spawn at ");
+
+                                a.field(group.spawn == -1 ? "" : Point2.x(group.spawn) + "", TextFieldFilter.digitsOnly, text -> {
+                                    if(Strings.canParsePositiveInt(text)){
+                                        group.spawn = Point2.pack(Strings.parseInt(text), Point2.y(group.spawn));
+                                        Log.info(group.spawn);
+                                    }
+                                }).width(70f);
+
+                                a.add(",");
+
+                                a.field(group.spawn == -1 ? "" : Point2.y(group.spawn) + "", TextFieldFilter.digitsOnly, text -> {
+                                    if(Strings.canParsePositiveInt(text)){
+                                        group.spawn = Point2.pack(Point2.x(group.spawn), Strings.parseInt(text));
+                                        Log.info(group.spawn);
+                                    }
+                                }).width(70f);
+                            }).padBottom(8f).padTop(-8f).row();
+                        }
                     }
                 }).width(340f).pad(8);
 

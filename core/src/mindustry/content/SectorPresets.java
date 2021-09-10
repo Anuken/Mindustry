@@ -70,9 +70,8 @@ public class SectorPresets implements ContentList{
             difficulty = 5;
         }};
 
-        //TODO
-        if(false)
         navalFortress = new SectorPreset("navalFortress", serpulo, 216){{
+            //TODO AI or not?
             useAI = true;
             difficulty = 8;
         }};

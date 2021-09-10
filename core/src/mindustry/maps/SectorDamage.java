@@ -321,14 +321,20 @@ public class SectorDamage{
         var reg = new LinearRegression();
         SpawnGroup bossGroup = null;
         Seq<Vec2> waveDps = new Seq<>(), waveHealth = new Seq<>();
+        int groundSpawns = Math.max(spawner.countFlyerSpawns(), 1), airSpawns = Math.max(spawner.countGroundSpawns(), 1);
 
         for(int wave = state.wave; wave < state.wave + 10; wave ++){
             float sumWaveDps = 0f, sumWaveHealth = 0f;
 
             for(SpawnGroup group : state.rules.spawns){
+                //calculate the amount of spawn points used
+                //if there's a spawn position override, there is only one potential place they spawn
+                //assume that all overridden positions are valid, should always be true in properly designed campaign maps
+                int spawnCount = group.spawn != -1 ? 1 : group.type.flying ? airSpawns : groundSpawns;
+
                 float healthMult = 1f + Mathf.clamp(group.type.armor / 20f);
                 StatusEffect effect = (group.effect == null ? StatusEffects.none : group.effect);
-                int spawned = group.getSpawned(wave);
+                int spawned = group.getSpawned(wave) * spawnCount;
                 //save the boss group
                 if(group.effect == StatusEffects.boss){
                     bossGroup = group;
