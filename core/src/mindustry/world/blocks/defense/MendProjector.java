@@ -115,10 +115,11 @@ public class MendProjector extends Block{
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
 
-            if(phaseHeat <= 0.999f && boosterUnlocked()){
-                indexer.eachBlock(this, range + phaseRangeBoost, other -> dst(other) >= range, other -> Drawf.selected(other, Tmp.c1.set(phaseColor).a(Mathf.absin(4f, 1f) / 2f)));
+            if(phaseHeat < 1f && boosterUnlocked()){
+                float a = 0.5f - Mathf.curve(phaseHeat, 0.9f, 1f)  / 2f;
+                indexer.eachBlock(this, range + phaseRangeBoost, other -> dst(other) >= range, other -> Drawf.selected(other, Tmp.c1.set(phaseColor).a(Mathf.absin(4f, 1f) * a)));
 
-                Drawf.dashCircle(x, y, range + phaseRangeBoost, phaseColor, 0.5f);
+                Drawf.dashCircle(x, y, range + phaseRangeBoost, phaseColor, a);
             }
 
             indexer.eachBlock(this, realRange, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
