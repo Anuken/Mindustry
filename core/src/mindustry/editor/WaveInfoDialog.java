@@ -69,41 +69,46 @@ public class WaveInfoDialog extends BaseDialog{
 
         addCloseButton();
 
-        buttons.button("@waves.edit", () -> {
+        buttons.button("@waves.edit", Icon.pencil, () -> {
             BaseDialog dialog = new BaseDialog("@waves.edit");
             dialog.addCloseButton();
             dialog.setFillParent(false);
-            dialog.cont.defaults().size(210f, 64f);
-            dialog.cont.button("@waves.copy", () -> {
-                ui.showInfoFade("@waves.copied");
-                Core.app.setClipboardText(maps.writeWaves(groups));
-                dialog.hide();
-            }).disabled(b -> groups == null);
-            dialog.cont.row();
-            dialog.cont.button("@waves.load", () -> {
-                try{
-                    groups = maps.readWaves(Core.app.getClipboardText());
+            dialog.cont.table(Tex.button, t -> {
+                var style = Styles.cleart;
+                t.defaults().size(210f, 58f);
+
+                t.button("@waves.copy", Icon.copy, style, () -> {
+                    ui.showInfoFade("@waves.copied");
+                    Core.app.setClipboardText(maps.writeWaves(groups));
+                    dialog.hide();
+                }).disabled(b -> groups == null).marginLeft(12f).row();
+
+                t.button("@waves.load", Icon.download, style, () -> {
+                    try{
+                        groups = maps.readWaves(Core.app.getClipboardText());
+                        buildGroups();
+                    }catch(Exception e){
+                        e.printStackTrace();
+                        ui.showErrorMessage("@waves.invalid");
+                    }
+                    dialog.hide();
+                }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null || Core.app.getClipboardText().isEmpty()).row();
+
+               t.button("@settings.reset", Icon.upload, style, () -> ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
+                    groups = JsonIO.copy(waves.get());
                     buildGroups();
-                }catch(Exception e){
-                    e.printStackTrace();
-                    ui.showErrorMessage("@waves.invalid");
-                }
-                dialog.hide();
-            }).disabled(b -> Core.app.getClipboardText() == null || Core.app.getClipboardText().isEmpty());
-            dialog.cont.row();
-            dialog.cont.button("@settings.reset", () -> ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
-                groups = JsonIO.copy(waves.get());
-                buildGroups();
-                dialog.hide();
-            }));
-            dialog.cont.row();
-            dialog.cont.button("@clear", () -> ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
-                groups.clear();
-                buildGroups();
-                dialog.hide();
-            }));
+                    dialog.hide();
+                })).marginLeft(12f).row();
+
+                t.button("@clear", Icon.cancel, style, () -> ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
+                    groups.clear();
+                    buildGroups();
+                    dialog.hide();
+                })).marginLeft(12f);
+            });
+
             dialog.show();
-        }).size(270f, 64f);
+        }).size(250f, 64f);
 
         buttons.defaults().width(60f);
 

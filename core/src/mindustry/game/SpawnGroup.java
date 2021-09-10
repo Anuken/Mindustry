@@ -158,7 +158,7 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
     }
 
     public SpawnGroup copy(){
-        try {
+        try{
             return (SpawnGroup)clone();
         }catch(CloneNotSupportedException how){
             throw new RuntimeException("If you see this, what did you even do?", how);
