@@ -393,7 +393,7 @@ public class WaveInfoDialog extends BaseDialog{
                     if(!payloads) dialog.hide();
                     if(payloads) updateIcons(group);
                     buildGroups();
-                }).pad(2).margin(12f).maxWidth(200f).fillX().disabled(a -> payloads ? payLeft < type.hitSize * type.hitSize : a != a);
+                }).pad(2).margin(12f).fillX().disabled(a -> payloads ? payLeft < type.hitSize * type.hitSize : a != a);
                 if(++i % 3 == 0) p.row();
             }
         });
@@ -472,7 +472,7 @@ public class WaveInfoDialog extends BaseDialog{
                 }, () -> {
                     group.items = new ItemStack(item, itemAmount);
                     updateIcons(group);
-                    if(itemAmount <= 0) group.items = null;
+                    if(itemAmount <= 0) group.items.amount = itemAmount = group.type.itemCapacity;
                     dialog.hide();
                     buildGroups();
                 });
