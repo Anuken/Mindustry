@@ -159,6 +159,8 @@ public class Block extends UnlockableContent{
     public int unitCapModifier = 0;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
+    /** If true, the building inventory can be shown with the config. */
+    public boolean allowConfigInventory = true;
     /** Used in blocks with selection menus such sorters for how large the menu should be */
     public int selectionRows = 5, selectionColumns = 4;
     /** If true, this block can be configured by logic. */
@@ -848,7 +850,8 @@ public class Block extends UnlockableContent{
         }
 
         if(!outputsPower && consumes.hasPower() && consumes.getPower().buffered){
-            throw new IllegalArgumentException("Consumer using buffered power: " + name);
+            Log.warn("Consumer using buffered power: @. Disabling buffered power.", name);
+            consumes.getPower().buffered = false;
         }
 
         if(buildVisibility == BuildVisibility.sandboxOnly){
@@ -912,12 +915,17 @@ public class Block extends UnlockableContent{
                     for(int x = 0; x < base.width; x++){
                         for(int y = 0; y < base.height; y++){
                             int color = base.get(x, y);
-                            int index = color == 0xffffffff ? 0 : color == 0xdcc6c6ff ? 1 : color == 0x9d7f7fff ? 2 : -1;
+                            int index = switch(color){
+                                case 0xffffffff -> 0;
+                                case 0xdcc6c6ff, 0xdbc5c5ff -> 1;
+                                case 0x9d7f7fff, 0x9e8080ff -> 2;
+                                default -> -1;
+                            };
                             out.setRaw(x, y, index == -1 ? base.get(x, y) : team.palettei[index]);
                         }
                     }
 
-                    if(Core.settings.getBool("linear")){
+                    if(Core.settings.getBool("linear", true)){
                         Pixmaps.bleed(out);
                     }
 
@@ -938,7 +946,7 @@ public class Block extends UnlockableContent{
         if(outlineIcon){
             PixmapRegion region = Core.atlas.getPixmap(gen[outlinedIcon >= 0 ? outlinedIcon : gen.length -1]);
             Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
-            if(Core.settings.getBool("linear")){
+            if(Core.settings.getBool("linear", true)){
                 Pixmaps.bleed(out);
             }
             packer.add(PageType.main, name, out);

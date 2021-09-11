@@ -750,7 +750,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             c.defaults().padBottom(5);
 
             if(sector.preset != null && sector.preset.description != null){
-                c.add(sector.preset.displayDescription()).left().row();
+                c.add(sector.preset.displayDescription()).width(420f).wrap().left().row();
             }
 
             c.add(Core.bundle.get("sectors.time") + " [accent]" + sector.save.getPlayTime()).left().row();

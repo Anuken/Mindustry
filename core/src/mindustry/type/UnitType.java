@@ -318,6 +318,9 @@ public class UnitType extends UnlockableContent{
             canDrown = false;
             omniMovement = false;
             immunities.add(StatusEffects.wet);
+            if(visualElevation < 0f){
+                visualElevation = 0.11f;
+            }
         }
 
         if(lightRadius == -1){
@@ -446,7 +449,7 @@ public class UnitType extends UnlockableContent{
             if(!packer.has(name + "-outline")){
                 PixmapRegion base = Core.atlas.getPixmap(region);
                 var result = Pixmaps.outline(base, outlineColor, outlineRadius);
-                if(Core.settings.getBool("linear")){
+                if(Core.settings.getBool("linear", true)){
                     Pixmaps.bleed(result);
                 }
                 packer.add(PageType.main, name + "-outline", result);
@@ -627,7 +630,7 @@ public class UnitType extends UnlockableContent{
         Draw.color(0, 0, 0, 0.4f);
         float rad = 1.6f;
         float size = Math.max(region.width, region.height) * Draw.scl;
-        Draw.rect(softShadowRegion, unit, size * rad * Draw.xscl, size * rad * Draw.yscl);
+        Draw.rect(softShadowRegion, unit, size * rad * Draw.xscl, size * rad * Draw.yscl, unit.rotation - 90);
         Draw.color();
     }
 

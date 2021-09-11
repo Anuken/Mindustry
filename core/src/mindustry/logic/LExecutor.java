@@ -715,6 +715,7 @@ public class LExecutor{
                 if((base instanceof Building && timer.get(30f)) || (ai != null && ai.checkTargetTimer(this))){
                     //if any of the targets involve enemies
                     boolean enemies = target1 == RadarTarget.enemy || target2 == RadarTarget.enemy || target3 == RadarTarget.enemy;
+                    boolean allies = target1 == RadarTarget.ally || target2 == RadarTarget.ally || target3 == RadarTarget.ally;
 
                     best = null;
                     bestValue = 0;
@@ -725,6 +726,11 @@ public class LExecutor{
                             if(data.items[i].team != r.team()){
                                 find(r, range, sortDir, data.items[i].team);
                             }
+                        }
+                    }else if(!allies){
+                        Seq<TeamData> data = state.teams.present;
+                        for(int i = 0; i < data.size; i++){
+                            find(r, range, sortDir, data.items[i].team);
                         }
                     }else{
                         find(r, range, sortDir, r.team());

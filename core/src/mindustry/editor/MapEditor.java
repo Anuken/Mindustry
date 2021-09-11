@@ -18,7 +18,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class MapEditor{
-    public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15, 20};
+    public static final float[] brushSizes = {1, 1.5f, 2, 3, 4, 5, 9, 15, 20};
 
     public StringMap tags = new StringMap();
     public MapRenderer renderer = new MapRenderer();
@@ -28,7 +28,7 @@ public class MapEditor{
     private DrawOperation currentOp;
     private boolean loading;
 
-    public int brushSize = 1;
+    public float brushSize = 1;
     public int rotation;
     public Block drawBlock = Blocks.stone;
     public Team drawTeam = Team.sharded;
@@ -227,8 +227,9 @@ public class MapEditor{
     }
 
     public void drawCircle(int x, int y, Cons<Tile> drawer){
-        for(int rx = -brushSize; rx <= brushSize; rx++){
-            for(int ry = -brushSize; ry <= brushSize; ry++){
+        int clamped = (int)brushSize;
+        for(int rx = -clamped; rx <= clamped; rx++){
+            for(int ry = -clamped; ry <= clamped; ry++){
                 if(Mathf.within(rx, ry, brushSize - 0.5f + 0.0001f)){
                     int wx = x + rx, wy = y + ry;
 
@@ -243,8 +244,9 @@ public class MapEditor{
     }
 
     public void drawSquare(int x, int y, Cons<Tile> drawer){
-        for(int rx = -brushSize; rx <= brushSize; rx++){
-            for(int ry = -brushSize; ry <= brushSize; ry++){
+        int clamped = (int)brushSize;
+        for(int rx = -clamped; rx <= clamped; rx++){
+            for(int ry = -clamped; ry <= clamped; ry++){
                 int wx = x + rx, wy = y + ry;
 
                 if(wx < 0 || wy < 0 || wx >= width() || wy >= height()){
