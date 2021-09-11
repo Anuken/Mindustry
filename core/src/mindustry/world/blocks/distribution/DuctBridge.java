@@ -211,7 +211,7 @@ public class DuctBridge extends Block{
         public DuctBridgeBuild findLink(){
             for(int i = 1; i <= range; i++){
                 Tile other = tile.nearby(Geometry.d4x(rotation) * i, Geometry.d4y(rotation) * i);
-                if(other.build instanceof DuctBridgeBuild build && build.team == team){
+                if(other != null && other.build instanceof DuctBridgeBuild build && build.team == team){
                     return build;
                 }
             }
