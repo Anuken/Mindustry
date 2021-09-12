@@ -114,5 +114,9 @@
   {
     "name": "HexedPvP",
     "address": ["001.finland.eu.hosts.dynamichost.xyz:23664"]
+  },
+  {
+    "name": "NukeLand",
+    "address": ["3.144.15.160", "3.144.15.160:1337"] 
   }
 ]
