@@ -72,7 +72,9 @@ public class Wall extends Block{
                 Draw.blend();
                 Draw.reset();
 
-                hit = Mathf.clamp(hit - Time.delta / 10f);
+                if(!state.isPaused()){
+                    hit = Mathf.clamp(hit - Time.delta / 10f);
+                }
             }
         }
 
