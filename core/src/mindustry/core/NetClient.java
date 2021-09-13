@@ -218,6 +218,8 @@ public class NetClient implements ApplicationListener{
             throw new ValidateException(player, "Player has sent a message above the text limit.");
         }
 
+        message = message.replace("\n", "");
+
         Events.fire(new PlayerChatEvent(player, message));
 
         //log commands before they are handled
