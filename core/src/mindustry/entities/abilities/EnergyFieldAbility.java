@@ -26,7 +26,7 @@ public class EnergyFieldAbility extends Ability{
     public Sound shootSound = Sounds.spark;
     public float statusDuration = 60f * 6f;
     public float x, y;
-    public boolean hitBuildings = true;
+    public boolean targetGround = true, targetAir = true, hitBuildings = true, hitUnits = true;
     public int maxTargets = 25;
     public float healPercent = 2.5f;
 
@@ -99,13 +99,15 @@ public class EnergyFieldAbility extends Ability{
 
             all.clear();
 
-            Units.nearby(null, rx, ry, range, other -> {
-                if(other != unit){
-                    all.add(other);
-                }
-            });
+            if(hitUnits){
+                Units.nearby(null, rx, ry, range, other -> {
+                    if(other != unit && (other.isFlying() ? targetAir : targetGround)){
+                        all.add(other);
+                    }
+                });
+            }
 
-            if(hitBuildings){
+            if(hitBuildings && targetGround){
                 Units.nearbyBuildings(rx, ry, range, b -> {
                     if(b.team != Team.derelict || state.rules.coreCapture){
                         all.add(b);
