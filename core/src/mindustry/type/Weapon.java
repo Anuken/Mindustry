@@ -91,6 +91,8 @@ public class Weapon implements Cloneable{
     public boolean ignoreRotation = false;
     /** min velocity required for this weapon to shoot */
     public float minShootVelocity = -1f;
+    /** should the shoot effects follow the unit (effects need followParent set to true for this to work) */
+    public boolean parentizeEffects;
     /** internal value used for alternation - do not change! */
     public int otherSide = -1;
     /** sound used for shooting */
@@ -333,7 +335,7 @@ public class Weapon implements Cloneable{
             Angles.shotgun(shots, spacing, rotation, f -> mount.bullet = bullet(unit, shootX, shootY, f + Mathf.range(inaccuracy), lifeScl));
         }
 
-        boolean parentize = ammo.keepVelocity;
+        boolean parentize = ammo.keepVelocity || parentizeEffects;
 
         if(delay){
             Time.run(firstShotDelay, () -> {
