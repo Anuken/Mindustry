@@ -18,12 +18,6 @@ configurations{ natives }
 repositories{
     mavenCentral()
     maven{ url "https://maven.google.com" }
-
-    ivy{
-        url 'https://github.com/'
-        patternLayout{ artifact '/[organisation]/[module]/raw/master/backends/backend-android/libs/android.jar' }
-        metadataSources{ artifact() }
-    }
 }
 
 task deploy(type: Copy){
@@ -35,7 +29,7 @@ task deploy(type: Copy){
 }
 
 android{
-    buildToolsVersion '30.0.2'
+    buildToolsVersion '30.0.3'
     compileSdkVersion 30
     sourceSets{
         main{
@@ -145,8 +139,9 @@ dependencies{
     gpImplementation "com.google.android.gms:play-services-games:21.0.0"
     gpImplementation "com.google.android.gms:play-services-auth:19.0.0"
 
-    //android dependencies magically disappear during compilation, thanks gradle!
-    compileOnly "Anuken:Arc:android"
+    //TODO dynamically find best android platform jar instead of hard-coding to 30
+    def sdkFile = new File((String)findSdkDir(), "/platforms/android-30/android.jar")
+    if(sdkFile.exists()) compileOnly files(sdkFile.absolutePath)
 }
 
 task copyAndroidNatives(){

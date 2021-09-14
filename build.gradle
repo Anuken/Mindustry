@@ -13,22 +13,10 @@ buildscript{
         google()
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven{ url 'https://jitpack.io' }
-
-        //fake repository to download my patched robovm jar from
-        ivy{
-            url 'https://github.com/'
-            patternLayout{ artifact '/[organisation]/[module]/raw/a-single-jar-file/[revision].jar' }
-            metadataSources{ artifact() }
-        }
     }
 
     dependencies{
-        //use local, patched robovm gradle plugin until my PR for gradle 7.0 support is merged
-        //https://github.com/Anuken/robovm/raw/a-single-jar-file/robovm-gradle-plugin-2.3.14-SNAPSHOT.jar
-        classpath "Anuken:robovm:robovm-gradle-plugin-2.3.14-SNAPSHOT"
-        //needed for plugin above
-        classpath "com.mobidevelop.robovm:robovm-dist-compiler:2.3.13"
-
+        classpath "com.mobidevelop.robovm:robovm-gradle-plugin:2.3.14"
         classpath "com.github.Anuken.Arc:packer:$arcHash"
         classpath "com.github.Anuken.Arc:arc-core:$arcHash"
     }
