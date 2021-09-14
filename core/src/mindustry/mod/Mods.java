@@ -177,7 +177,7 @@ public class Mods implements Loadable{
     }
 
     private void packSprites(Seq<Fi> sprites, LoadedMod mod, boolean prefix, Seq<AsyncResult<Runnable>> tasks){
-        boolean linear = Core.settings.getBool("linear");
+        boolean linear = Core.settings.getBool("linear", true);
 
         for(Fi file : sprites){
             //read and bleed pixmaps in parallel
@@ -186,7 +186,7 @@ public class Mods implements Loadable{
                     Pixmap pix = new Pixmap(file.readBytes());
                     //only bleeds when linear filtering is on at startup
                     if(linear){
-                        Pixmaps.bleed(pix);
+                        Pixmaps.bleed(pix, 2);
                     }
                     //this returns a *runnable* which actually packs the resulting pixmap; this has to be done synchronously outside the method
                     return () -> {
@@ -225,6 +225,10 @@ public class Mods implements Loadable{
             var shadow = Core.atlas;
             //dummy texture atlas that returns the 'shadow' regions; used for mod loading
             Core.atlas = new TextureAtlas(){
+                {
+                    //needed for the correct operation of the found() method in the TextureRegion
+                    error = shadow.find("error");
+                }
 
                 @Override
                 public AtlasRegion find(String name){
@@ -265,7 +269,7 @@ public class Mods implements Loadable{
                 }
             };
 
-            TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.linear : TextureFilter.nearest;
+            TextureFilter filter = Core.settings.getBool("linear", true) ? TextureFilter.linear : TextureFilter.nearest;
 
             Time.mark();
             //generate new icons

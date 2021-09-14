@@ -162,7 +162,9 @@ public class ArcNetProvider implements NetProvider{
                 client.connect(5000, ip, port, port);
                 success.run();
             }catch(Exception e){
-                net.handleException(e);
+                if(netClient.isConnecting()){
+                    net.handleException(e);
+                }
             }
         });
     }

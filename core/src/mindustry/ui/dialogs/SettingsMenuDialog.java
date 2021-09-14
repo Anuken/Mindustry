@@ -230,8 +230,12 @@ public class SettingsMenuDialog extends Dialog{
                         platform.shareFile(logs);
                     }else{
                         platform.showFileChooser(false, "txt", file -> {
-                            file.writeString(getLogs());
-                            app.post(() -> ui.showInfo("@crash.exported"));
+                            try{
+                                file.writeBytes(getLogs().getBytes(Strings.utf8));
+                                app.post(() -> ui.showInfo("@crash.exported"));
+                            }catch(Throwable e){
+                                ui.showException(e);
+                            }
                         });
                     }
                 }

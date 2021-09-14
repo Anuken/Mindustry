@@ -470,15 +470,15 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         getHitbox(rect);
     }
 
-    public Tile nearby(Point2 relative){
+    public @Nullable Tile nearby(Point2 relative){
         return world.tile(x + relative.x, y + relative.y);
     }
 
-    public Tile nearby(int dx, int dy){
+    public @Nullable Tile nearby(int dx, int dy){
         return world.tile(x + dx, y + dy);
     }
 
-    public Tile nearby(int rotation){
+    public @Nullable Tile nearby(int rotation){
         if(rotation == 0) return world.tile(x + 1, y);
         if(rotation == 1) return world.tile(x, y + 1);
         if(rotation == 2) return world.tile(x - 1, y);
@@ -486,7 +486,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return null;
     }
 
-    public Building nearbyBuild(int rotation){
+    public @Nullable Building nearbyBuild(int rotation){
         if(rotation == 0) return world.build(x + 1, y);
         if(rotation == 1) return world.build(x, y + 1);
         if(rotation == 2) return world.build(x - 1, y);

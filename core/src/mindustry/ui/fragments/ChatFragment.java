@@ -176,7 +176,8 @@ public class ChatFragment extends Table{
         String message = chatfield.getText().trim();
         clearChatInput();
 
-        if(message.isEmpty()) return;
+        //avoid sending prefix-empty messages
+        if(message.isEmpty() || (message.startsWith(mode.prefix) && message.substring(mode.prefix.length()).isEmpty())) return;
 
         history.insert(1, message);
 

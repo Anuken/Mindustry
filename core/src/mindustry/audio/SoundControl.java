@@ -179,7 +179,7 @@ public class SoundControl{
         float avol = Core.settings.getInt("ambientvol", 100) / 100f;
 
         sounds.each((sound, data) -> {
-            data.curVolume = Mathf.lerpDelta(data.curVolume, data.volume * avol, 0.2f);
+            data.curVolume = Mathf.lerpDelta(data.curVolume, data.volume * avol, 0.11f);
 
             boolean play = data.curVolume > 0.01f;
             float pan = Mathf.zero(data.total, 0.0001f) ? 0f : sound.calcPan(data.sum.x / data.total, data.sum.y / data.total);

@@ -155,7 +155,7 @@ public class SchematicsDialog extends BaseDialog{
                             });
 
                             buttons.button(Icon.pencil, style, () -> {
-                                new Dialog("@schematic.rename"){{
+                                new BaseDialog("@schematic.rename"){{
                                     setFillParent(true);
 
                                     cont.margin(30);

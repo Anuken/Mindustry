@@ -12,7 +12,7 @@
 
 <h2>Campanie</h2>
 
-- Capturează planeta Serpulo avansând prin peste 250 de sectoare genereate procedural și 16 harți create manual
+- Capturează planeta Serpulo avansând prin peste 250 de sectoare generate procedural și 16 hărți create manual
 - Capturează teritoriul și construiește fabrici pt producția de resurse în timp ce joci în alte sectoare
 - Apără-ți sectoarele de invaziile inamice periodice
 - Coordonează distribuția de resurse între sectoare folosind platforme de lansare

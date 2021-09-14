@@ -5,7 +5,7 @@
   },
   {
     "name": "C.A.M.S.",
-    "address": ["baseduser.eu.org:6569", "v7.thedimas.pp.ua", "mindustry.me:7000"]
+    "address": ["baseduser.eu.org:6569", "v7.thedimas.pp.ua", "yeeth.mindustry.me:7000", "yeeth.mindustry.me:4000", "yeeth.mindustry.me:2000", "yeeth.mindustry.me:3000"]
   },
   {
     "name": "hexpvp.ml",
@@ -13,14 +13,14 @@
   },
   {
     "name": "Omega",
-    "address": ["yeet.mindustry.me:6567", "yeet.mindustry.me:2345", "n3.mindustry.me:4444","n2.mindustry.me:4040", "n2.mindustry.me:4002", "n2.mindustry.me:4001"]
+    "address": ["yeeth.mindustry.me", "yeeth.mindustry.me:2006", "yeeth.mindustry.me:2003","yeeth.mindustry.me:2002", "yeeth.mindustry.me:2001", "yeeth.mindustry.me:2007", "yeeth.mindustry.me:2005"]
   },
   {
     "name": "MeowLand",
     "address": ["34.134.111.15", "fifr4.quackhost.uk:21013", "34.134.111.15:4000", "34.134.111.15:7000"]
   },
   {
-    "name": "[cyan]DarkDustry",
+    "name": "DarkDustry",
     "address": ["darkdustry.ml", "darkdustry.ml:3000", "darkdustry.ml:7000", "darkdustry.ml:8000"] 
   },
   {
@@ -37,10 +37,14 @@
   },
   {
     "name": "io",
-    "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000", "mindustry.io.community:4000", "mindustry.io.community:5000"]
+    "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000", "mindustry.io.community:4000", "labs.io.community"]
   },
   {
     "name": "Korea",
     "address": ["mindustry.kr"]
+  },
+  {
+    "name": "SubZero",
+    "address": ["minty-server.ddns.net"]
   }
 ]

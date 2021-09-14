@@ -29,7 +29,7 @@
   },
   {
     "name": "Ranked",
-    "address": ["mindustryranked.ddns.net:16567"]
+    "address": ["mindustryranked.ddns.net:16567", "mindustryranked.ddns.net:16568", "mindustryranked.ddns.net:16569"]
   },
   {
     "name": "TWS",
@@ -57,7 +57,7 @@
   },
   {
     "name": "Omega",
-    "address": ["178.170.47.34:20204", "157.90.213.2:30308", "157.90.180.53:25738", "185.86.230.61:25578", "mindustry.me:7172"] 
+    "address": ["yeeth.mindustry.me:2004","185.86.230.61:25570"] 
   },
   {
     "name": "md.obvilionnetwork.ru",
@@ -104,11 +104,15 @@
     "address": ["usfr2.forcehost.net:25578"]
   },
   {
-     "name": "Español",
+    "name": "Español",
     "address": ["168.119.36.188:41445"]
   },
   {
-     "name": "CreateDustry",
+    "name": "CreateDustry",
     "address": ["144.76.120.74:18645"]
+  },
+  {
+    "name": "HexedPvP",
+    "address": ["001.finland.eu.hosts.dynamichost.xyz:23664"]
   }
 ]

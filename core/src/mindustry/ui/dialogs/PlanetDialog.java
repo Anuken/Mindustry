@@ -372,8 +372,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         if(selectAlpha > 0.001f){
-
-
             for(Sector sec : planet.sectors){
                 if(sec.hasBase()){
                     for(Sector enemy : sec.near()){
@@ -520,7 +518,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             pt.button(planet.localizedName, Styles.clearTogglet, () -> {
                                 selected = null;
                                 launchSector = null;
-                                renderer.planets.planet = planet;
+                                if(renderer.planets.planet != planet){
+                                    renderer.planets.planet = planet;
+                                    rebuildList();
+                                }
                                 settings.put("lastplanet", planet.name);
                             }).width(200).height(40).growX().update(bb -> bb.setChecked(renderer.planets.planet == planet));
                             pt.row();
@@ -749,7 +750,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             c.defaults().padBottom(5);
 
             if(sector.preset != null && sector.preset.description != null){
-                c.add(sector.preset.displayDescription()).left().row();
+                c.add(sector.preset.displayDescription()).width(420f).wrap().left().row();
             }
 
             c.add(Core.bundle.get("sectors.time") + " [accent]" + sector.save.getPlayTime()).left().row();
