@@ -13,10 +13,11 @@ public class PowerGraph{
     private static final Seq<Building> outArray2 = new Seq<>();
     private static final IntSet closedSet = new IntSet();
 
-    private final Seq<Building> producers = new Seq<>(false);
-    private final Seq<Building> consumers = new Seq<>(false);
-    private final Seq<Building> batteries = new Seq<>(false);
-    private final Seq<Building> all = new Seq<>(false);
+    //do not modify any of these unless you know what you're doing!
+    public final Seq<Building> producers = new Seq<>(false);
+    public final Seq<Building> consumers = new Seq<>(false);
+    public final Seq<Building> batteries = new Seq<>(false);
+    public final Seq<Building> all = new Seq<>(false);
 
     private final WindowedMean powerBalance = new WindowedMean(60);
     private float lastPowerProduced, lastPowerNeeded, lastPowerStored;

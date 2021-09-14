@@ -20,6 +20,8 @@ public class ParticleEffect extends Effect{
     public float cone = 180f, length = 20f, baseLength = 0f;
     /** Particle size/length/radius interpolation. */
     public Interp interp = Interp.linear;
+    /** Particle size interpolation. Null to use interp. */
+    public @Nullable Interp sizeInterp = null;
     public float offsetX, offsetY;
     public float lightScl = 2f, lightOpacity = 0.6f;
     public @Nullable Color lightColor;
@@ -44,6 +46,7 @@ public class ParticleEffect extends Effect{
     @Override
     public void init(){
         clip = Math.max(clip, length + Math.max(sizeFrom, sizeTo));
+        if(sizeInterp == null) sizeInterp = interp;
     }
 
     @Override
@@ -52,15 +55,15 @@ public class ParticleEffect extends Effect{
 
         float rawfin = e.fin();
         float fin = e.fin(interp);
-        float rad = interp.apply(sizeFrom, sizeTo, rawfin) * 2;
+        float rad = sizeInterp.apply(sizeFrom, sizeTo, rawfin) * 2;
         float ox = e.x + Angles.trnsx(e.rotation, offsetX, offsetY), oy = e.y + Angles.trnsy(e.rotation, offsetX, offsetY);
 
         Draw.color(colorFrom, colorTo, fin);
         Color lightColor = this.lightColor == null ? Draw.getColor() : this.lightColor;
 
         if(line){
-            Lines.stroke(interp.apply(strokeFrom, strokeTo, rawfin));
-            float len = interp.apply(lenFrom, lenTo, rawfin);
+            Lines.stroke(sizeInterp.apply(strokeFrom, strokeTo, rawfin));
+            float len = sizeInterp.apply(lenFrom, lenTo, rawfin);
 
             rand.setSeed(e.id);
             for(int i = 0; i < particles; i++){

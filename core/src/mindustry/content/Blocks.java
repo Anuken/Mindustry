@@ -1199,6 +1199,7 @@ public class Blocks implements ContentList{
 
         distributor = new Router("distributor"){{
             requirements(Category.distribution, with(Items.lead, 4, Items.copper, 4));
+            buildCostMultiplier = 3f;
             size = 2;
         }};
 

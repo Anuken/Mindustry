@@ -38,8 +38,14 @@ public class WaveGraph extends Table{
 
             lay.setText(font, "1");
 
+            int maxY = switch(mode){
+                case counts -> nextStep(max);
+                case health -> nextStep((int)maxHealth);
+                case totals -> nextStep(maxTotal);
+            };
+
             float fh = lay.height;
-            float offsetX = Scl.scl(30f), offsetY = Scl.scl(22f) + fh + Scl.scl(5f);
+            float offsetX = Scl.scl(lay.width * (maxY + "").length() * 2), offsetY = Scl.scl(22f) + fh + Scl.scl(5f);
 
             float graphX = x + offsetX, graphY = y + offsetY, graphW = width - offsetX, graphH = height - offsetY;
             float spacing = graphW / (values.length - 1);
@@ -53,7 +59,7 @@ public class WaveGraph extends Table{
 
                     for(int i = 0; i < values.length; i++){
                         int val = values[i][type.id];
-                        float cx = graphX + i*spacing, cy = graphY + val * graphH / max;
+                        float cx = graphX + i * spacing, cy = graphY + val * graphH / maxY;
                         Lines.linePoint(cx, cy);
                     }
 
@@ -69,7 +75,7 @@ public class WaveGraph extends Table{
                         sum += values[i][type.id];
                     }
 
-                    float cx = graphX + i*spacing, cy = graphY + sum * graphH / maxTotal;
+                    float cx = graphX + i * spacing, cy = graphY + sum * graphH / maxY;
                     Lines.linePoint(cx, cy);
                 }
 
@@ -84,7 +90,7 @@ public class WaveGraph extends Table{
                         sum += (type.health) * values[i][type.id];
                     }
 
-                    float cx = graphX + i*spacing, cy = graphY + sum * graphH / maxHealth;
+                    float cx = graphX + i * spacing, cy = graphY + sum * graphH / maxY;
                     Lines.linePoint(cx, cy);
                 }
 
@@ -92,19 +98,23 @@ public class WaveGraph extends Table{
             }
 
             //how many numbers can fit here
-            float totalMarks = (graphH - getMarginBottom() *2f) / (lay.height * 2);
+            float totalMarks = Mathf.clamp(maxY, 1, 10);
 
-            int markSpace = Math.max(1, Mathf.ceil(max / totalMarks));
+            int markSpace = Math.max(1, Mathf.ceil(maxY / totalMarks));
 
             Draw.color(Color.lightGray);
-            for(int i = 0; i < max; i += markSpace){
-                float cy = graphY + i * graphH / max, cx = graphX;
-                //Lines.line(cx, cy, cx + len, cy);
+            Draw.alpha(0.1f);
+
+            for(int i = 0; i < maxY; i += markSpace){
+                float cy = graphY + i * graphH / maxY, cx = graphX;
+
+                Lines.line(cx, cy, cx + graphW, cy);
 
                 lay.setText(font, "" + i);
 
-                font.draw("" + i, cx, cy + lay.height/2f, Align.right);
+                font.draw("" + i, cx, cy + lay.height / 2f, Align.right);
             }
+            Draw.alpha(1f);
 
             float len = Scl.scl(4f);
             font.setColor(Color.lightGray);
@@ -113,7 +123,7 @@ public class WaveGraph extends Table{
                 float cy = y + fh, cx = graphX + graphW / (values.length - 1) * i;
 
                 Lines.line(cx, cy, cx, cy + len);
-                if(i == values.length/2){
+                if(i == values.length / 2){
                     font.draw("" + (i + from + 1), cx, cy - Scl.scl(2f), Align.center);
                 }
             }
@@ -164,13 +174,24 @@ public class WaveGraph extends Table{
                 sum += spawned;
             }
             maxTotal = Math.max(maxTotal, sum);
-            maxHealth = Math.max(maxHealth,healthsum);
+            maxHealth = Math.max(maxHealth, healthsum);
         }
 
         ObjectSet<UnitType> usedCopy = new ObjectSet<>(used);
 
         colors.clear();
         colors.left();
+        colors.button("@waves.units.hide", Styles.cleart, () -> {
+            if(hidden.size == usedCopy.size){
+                hidden.clear();
+            }else{
+                hidden.addAll(usedCopy);
+            }
+
+            used.clear();
+            used.addAll(usedCopy);
+            for(UnitType o : hidden) used.remove(o);
+        }).update(b -> b.setText(hidden.size == usedCopy.size ? "@waves.units.show" : "@waves.units.hide")).height(32f).width(130f);
         colors.pane(t -> {
             t.left();
             for(UnitType type : used){
@@ -198,6 +219,23 @@ public class WaveGraph extends Table{
 
     Color color(UnitType type){
         return Tmp.c1.fromHsv(type.id / (float)Vars.content.units().size * 360f, 0.7f, 1f);
+    }
+
+    int nextStep(float value){
+        int order = 1;
+        while(order < value){
+            if(order * 2 > value){
+                return order * 2;
+            }
+            if(order * 5 > value){
+                return order * 5;
+            }
+            if(order * 10 > value){
+                return order * 10;
+            }
+            order *= 10;
+        }
+        return order;
     }
 
     enum Mode{

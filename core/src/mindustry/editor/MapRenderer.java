@@ -10,6 +10,7 @@ import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -131,6 +132,11 @@ public class MapRenderer implements Disposable{
                 clearEditor : wall.variants > 0 ?
                 wall.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, wall.editorVariantRegions().length - 1)] :
                 wall.editorIcon();
+
+            if(wall == Blocks.cliff){
+                mesh.setColor(Tmp.c1.set(floor.mapColor).mul(1.6f));
+                region = ((Cliff)Blocks.cliff).editorCliffs[tile.data & 0xff];
+            }
 
             offsetX = tilesize / 2f - region.width / 2f * Draw.scl;
             offsetY = tilesize / 2f - region.height / 2f * Draw.scl;

@@ -50,10 +50,12 @@ public class BlockIndexer{
         clearFlags();
 
         Events.on(TilePreChangeEvent.class, event -> {
+            if(state.isEditor()) return;
             removeIndex(event.tile);
         });
 
         Events.on(TileChangeEvent.class, event -> {
+            if(state.isEditor()) return;
             addIndex(event.tile);
         });
 
@@ -109,7 +111,7 @@ public class BlockIndexer{
                 }
             }
 
-            //update the unit cap when building is remove
+            //update the unit cap when building is removed
             data.unitCap -= tile.block().unitCapModifier;
 
             //unregister building from building quadtree

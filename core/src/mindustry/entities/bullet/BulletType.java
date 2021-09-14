@@ -346,13 +346,7 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void update(Bullet b){
-        if(!headless && trailLength > 0){
-            if(b.trail == null){
-                b.trail = new Trail(trailLength);
-            }
-            b.trail.length = trailLength;
-            b.trail.update(b.x, b.y, trailInterp.apply(b.fin()));
-        }
+        updateTrail(b);
 
         if(homingPower > 0.0001f && b.time >= homingDelay){
             Teamc target;
@@ -384,6 +378,16 @@ public class BulletType extends Content implements Cloneable{
             if(b.timer(0, trailInterval)){
                 trailEffect.at(b.x, b.y, trailRotation ? b.rotation() : trailParam, trailColor);
             }
+        }
+    }
+    
+    public void updateTrail(Bullet b){
+        if(!headless && trailLength > 0){
+            if(b.trail == null){
+                b.trail = new Trail(trailLength);
+            }
+            b.trail.length = trailLength;
+            b.trail.update(b.x, b.y, trailInterp.apply(b.fin()));
         }
     }
 

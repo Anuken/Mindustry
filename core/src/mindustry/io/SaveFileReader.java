@@ -60,6 +60,13 @@ public abstract class SaveFileReader{
     "block-forge", "constructor"
     );
 
+    public static final ObjectMap<String, String> modContentNameMap = ObjectMap.of(
+    "craters", "crater-stone",
+    "deepwater", "deep-water",
+    "water", "shallow-water",
+    "slag", "molten-slag"
+    );
+
     protected final ReusableByteOutStream byteOutput = new ReusableByteOutStream();
     protected final DataOutputStream dataBytes = new DataOutputStream(byteOutput);
     protected final ReusableByteOutStream byteOutputSmall = new ReusableByteOutStream();
