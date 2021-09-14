@@ -42,5 +42,9 @@
   {
     "name": "Korea",
     "address": ["mindustry.kr"]
+  },
+  {
+    "name": "SubZero",
+    "address": ["minty-server.ddns.net"]
   }
 ]
