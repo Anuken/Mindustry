@@ -18,6 +18,12 @@ configurations{ natives }
 repositories{
     mavenCentral()
     maven{ url "https://maven.google.com" }
+
+    ivy{
+        url 'https://github.com/'
+        patternLayout{ artifact '/[organisation]/[module]/raw/master/backends/backend-android/libs/android.jar' }
+        metadataSources{ artifact() }
+    }
 }
 
 task deploy(type: Copy){
@@ -140,8 +146,7 @@ dependencies{
     gpImplementation "com.google.android.gms:play-services-auth:19.0.0"
 
     //android dependencies magically disappear during compilation, thanks gradle!
-    def sdkFile = new File((String)findSdkDir(), "/platforms/android-29/android.jar")
-    if(sdkFile.exists()) compileOnly files(sdkFile.absolutePath)
+    compileOnly "Anuken:Arc:android"
 }
 
 task copyAndroidNatives(){

@@ -17,14 +17,8 @@ buildscript{
         //fake repository to download my patched robovm jar from
         ivy{
             url 'https://github.com/'
-
-            patternLayout {
-                artifact '/[organisation]/[module]/raw/a-single-jar-file/[revision].jar'
-            }
-
-            // This is required in Gradle 6.0+ as metadata file (ivy.xml)
-            // is mandatory. Docs linked below this code section
-            metadataSources { artifact() }
+            patternLayout{ artifact '/[organisation]/[module]/raw/a-single-jar-file/[revision].jar' }
+            metadataSources{ artifact() }
         }
     }
 
