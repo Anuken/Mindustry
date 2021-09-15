@@ -137,7 +137,7 @@ public class MapsDialog extends BaseDialog{
 
         cont.add(search).growX();
         cont.row();
-        cont.add(pane).uniformX();
+        cont.add(pane).uniformX().growY();
         cont.row();
         cont.add(buttons).growX();
     }
