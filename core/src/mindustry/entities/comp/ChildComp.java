@@ -18,8 +18,8 @@ abstract class ChildComp implements Posc{
         if(parent != null){
             offsetX = x - parent.getX();
             offsetY = y - parent.getY();
-            if(rotateWithParent && parent instanceof Unit u){
-                offsetRot = -u.rotation();
+            if(rotateWithParent && parent instanceof Rotc r){
+                offsetRot = -r.rotation();
             }
         }
     }
@@ -27,9 +27,9 @@ abstract class ChildComp implements Posc{
     @Override
     public void update(){
         if(parent != null){
-            if(rotateWithParent && parent instanceof Unit u){
-                x = parent.getX() + Angles.trnsx(u.rotation() + offsetRot, offsetX, offsetY);
-                y = parent.getY() + Angles.trnsy(u.rotation() + offsetRot, offsetX, offsetY);
+            if(rotateWithParent && parent instanceof Rotc r){
+                x = parent.getX() + Angles.trnsx(r.rotation() + offsetRot, offsetX, offsetY);
+                y = parent.getY() + Angles.trnsy(r.rotation() + offsetRot, offsetX, offsetY);
             }else{
                 x = parent.getX() + offsetX;
                 y = parent.getY() + offsetY;
