@@ -22,6 +22,7 @@ public class EnergyFieldAbility extends Ability{
 
     public float damage = 1, reload = 100, range = 60;
     public Effect healEffect = Fx.heal, hitEffect = Fx.hitLaserBlast, damageEffect = Fx.chainLightning;
+    public boolean parentizeEffects;
     public StatusEffect status = StatusEffects.electrified;
     public Sound shootSound = Sounds.spark;
     public float statusDuration = 60f * 6f;
@@ -130,9 +131,13 @@ public class EnergyFieldAbility extends Ability{
                     if(other.damaged()){
                         anyNearby = true;
                         other.heal(healPercent / 100f * other.maxHealth());
-                        healEffect.at(other);
+                        if(parentizeEffects){
+                            healEffect.atParent(other);
+                        }else{
+                            healEffect.at(other);
+                        }
                         damageEffect.at(rx, ry, 0f, color, other);
-                        hitEffect.at(rx, ry, unit.angleTo(other), color);
+                        hitEffect.at(rx, ry, unit.angleTo(other), color, parentizeEffects ? unit : null);
 
                         if(other instanceof Building b){
                             Fx.healBlockFull.at(b.x, b.y, b.block.size, color);
@@ -148,9 +153,9 @@ public class EnergyFieldAbility extends Ability{
                     if(other instanceof Statusc s){
                         s.apply(status, statusDuration);
                     }
-                    hitEffect.at(other.x(), other.y(), unit.angleTo(other), color);
+                    hitEffect.at(other.x(), other.y(), unit.angleTo(other), color, parentizeEffects ? other : null);
                     damageEffect.at(rx, ry, 0f, color, other);
-                    hitEffect.at(rx, ry, unit.angleTo(other), color);
+                    hitEffect.at(rx, ry, unit.angleTo(other), color, parentizeEffects ? unit : null);
                 }
             }
 

@@ -9,6 +9,7 @@ public class RepairFieldAbility extends Ability{
     public float amount = 1, reload = 100, range = 60;
     public Effect healEffect = Fx.heal;
     public Effect activeEffect = Fx.healWaveDynamic;
+    public boolean parentizeEffects;
 
     protected float timer;
     protected boolean wasHealed = false;
@@ -30,7 +31,11 @@ public class RepairFieldAbility extends Ability{
 
             Units.nearby(unit.team, unit.x, unit.y, range, other -> {
                 if(other.damaged()){
-                    healEffect.at(other);
+                    if(parentizeEffects){
+                        healEffect.atParent(other);
+                    }else{
+                        healEffect.at(other);
+                    }
                     wasHealed = true;
                 }
                 other.heal(amount);

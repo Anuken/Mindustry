@@ -10,8 +10,9 @@ import mindustry.type.*;
 public class StatusFieldAbility extends Ability{
     public StatusEffect effect;
     public float duration = 60, reload = 100, range = 20;
-    public Effect applyEffect = Fx.heal;
+    public Effect applyEffect = Fx.none;
     public Effect activeEffect = Fx.overdriveWave;
+    public boolean parentizeEffects;
 
     protected float timer;
 
@@ -35,6 +36,11 @@ public class StatusFieldAbility extends Ability{
 
         if(timer >= reload){
             Units.nearby(unit.team, unit.x, unit.y, range, other -> {
+                if(parentizeEffects){
+                    applyEffect.atParent(other);
+                }else{
+                    applyEffect.at(other);
+                }
                 other.apply(effect, duration);
             });
 
