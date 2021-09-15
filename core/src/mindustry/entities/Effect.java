@@ -30,7 +30,7 @@ public class Effect{
     public float lifetime = 50f;
     /** Clip size. */
     public float clip;
-    /** If true, if data is a unit, the effect will follow it. */
+    /** If true and data is a unit, the effect will follow it. */
     public boolean followParent;
     /** If this and followParent are true, the effect will offset with the parent's rotation. */
     public boolean rotateWithParent;
