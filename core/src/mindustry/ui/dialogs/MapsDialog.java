@@ -151,9 +151,9 @@ public class MapsDialog extends BaseDialog{
 
         int i = 0;
         Seq<Map> copy = showAll ? Vars.maps.all().copy() : Vars.maps.customMaps().copy();
-        copy.filter(m ->{
-            for (Gamemode mode : modes){
-                if (!mode.valid(m)) return false;
+        copy.filter(m -> {
+            for(Gamemode mode : modes){
+                if(!mode.valid(m)) return false;
             }
             return searchString == null || Strings.stripColors(m.name()).toLowerCase().contains(searchString);
         });
@@ -190,7 +190,7 @@ public class MapsDialog extends BaseDialog{
         dialog.cont.table(Tex.button, t -> {
             for(Gamemode m : Gamemode.all){
                 t.button(m.name(), Styles.clearTogglet, () -> {
-                    if (modes.contains(m)){
+                    if(modes.contains(m)){
                         modes.remove(m);
                     }else{
                         modes.add(m);
