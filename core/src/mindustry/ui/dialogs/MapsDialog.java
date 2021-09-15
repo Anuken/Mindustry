@@ -4,9 +4,11 @@ import arc.*;
 import arc.graphics.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -17,6 +19,12 @@ import static mindustry.Vars.*;
 
 public class MapsDialog extends BaseDialog{
     private BaseDialog dialog;
+    private String searchString;
+    private Seq<Gamemode> modes = new Seq<>();
+    private Table mapTable = new Table();
+    private TextField searchField;
+
+    private boolean showAll = Core.settings.getBool("editorShowAllMaps", true);
 
     public MapsDialog(){
         super("@maps");
@@ -37,8 +45,10 @@ public class MapsDialog extends BaseDialog{
     void setup(){
         buttons.clearChildren();
 
+        searchString = null;
+
         if(Core.graphics.isPortrait()){
-            buttons.button("@back", Icon.left, this::hide).size(210f*2f, 64f).colspan(2);
+            buttons.button("@back", Icon.left, this::hide).size(210f * 2f, 64f).colspan(2);
             buttons.row();
         }else{
             buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
@@ -108,26 +118,53 @@ public class MapsDialog extends BaseDialog{
             });
         }).size(210f, 64f);
 
-
         cont.clear();
 
-        Table maps = new Table();
-        maps.marginRight(24);
+        rebuildMaps();
 
-        ScrollPane pane = new ScrollPane(maps);
+        ScrollPane pane = new ScrollPane(mapTable);
         pane.setFadeScrollBars(false);
+
+        Table search = new Table();
+        search.image(Icon.zoom);
+        searchField = search.field("", t -> {
+            searchString = t.length() > 0 ? t.toLowerCase() : null;
+            rebuildMaps();
+        }).maxTextLength(50).growX().get();
+        searchField.setMessageText("@editor.search");
+        search.button(Icon.filter, Styles.emptyi, this::showMapFilters);
+
+        cont.add(search).growX();
+        cont.row();
+        cont.add(pane).uniformX();
+        cont.row();
+        cont.add(buttons).growX();
+    }
+
+    void rebuildMaps(){
+        mapTable.clear();
+
+        mapTable.marginRight(24);
 
         int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
         float mapsize = 200f;
 
         int i = 0;
-        for(Map map : Vars.maps.all()){
+        Seq<Map> copy = showAll ? Vars.maps.all().copy() : Vars.maps.customMaps().copy();
+        copy.filter(m ->{
+            for (Gamemode mode : modes){
+                if (!mode.valid(m)) return false;
+            }
+            return searchString == null || Strings.stripColors(m.name()).toLowerCase().contains(searchString);
+        });
+
+        for(Map map : copy){
 
             if(i % maxwidth == 0){
-                maps.row();
+                mapTable.row();
             }
 
-            TextButton button = maps.button("", Styles.cleart, () -> showMapInfo(map)).width(mapsize).pad(8).get();
+            TextButton button = mapTable.button("", Styles.cleart, () -> showMapInfo(map)).width(mapsize).pad(8).get();
             button.clearChildren();
             button.margin(9);
             button.add(map.name()).width(mapsize - 18f).center().get().setEllipsis(true);
@@ -141,13 +178,36 @@ public class MapsDialog extends BaseDialog{
             i++;
         }
 
-        if(Vars.maps.all().size == 0){
-            maps.add("@maps.none");
+        if(copy.size == 0){
+            mapTable.add("@maps.none");
         }
+    }
 
-        cont.add(buttons).growX();
-        cont.row();
-        cont.add(pane).uniformX();
+    void showMapFilters(){
+        dialog = new BaseDialog("@editor.filters");
+        dialog.addCloseButton();
+        dialog.setFillParent(false);
+        dialog.cont.table(Tex.button, t -> {
+            for(Gamemode m : Gamemode.all){
+                t.button(m.name(), Styles.clearTogglet, () -> {
+                    if (modes.contains(m)){
+                        modes.remove(m);
+                    }else{
+                        modes.add(m);
+                    }
+                    rebuildMaps();
+                }).size(150f, 60f).checked(modes.contains(m));
+            }
+        }).row();
+
+        dialog.cont.check("@editor.showAll", b -> {
+            showAll = b;
+            Core.settings.put("editorShowAllMaps", showAll);
+            Core.settings.forceSave();
+            rebuildMaps();
+        }).checked(showAll);
+
+        dialog.show();
     }
 
     void showMapInfo(Map map){
@@ -212,5 +272,22 @@ public class MapsDialog extends BaseDialog{
         }).fillX().height(54f).marginLeft(10).disabled(!map.workshop && !map.custom);
 
         dialog.show();
+    }
+
+    @Override
+    public Dialog show(){
+        super.show();
+
+        if(Core.app.isDesktop()){
+            focusSearchField();
+        }
+
+        return this;
+    }
+
+    public void focusSearchField(){
+        if(searchField == null) return;
+
+        Core.scene.setKeyboardFocus(searchField);
     }
 }
