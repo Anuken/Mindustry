@@ -267,7 +267,7 @@ project(":ios"){
             props.load(new FileInputStream(vfile))
         }else{
             props['app.id'] = 'io.anuke.mindustry'
-            props['app.version'] = '6.0'
+            props['app.version'] = '7.0'
             props['app.mainclass'] = 'mindustry.IOSLauncher'
             props['app.executable'] = 'IOSLauncher'
             props['app.name'] = 'Mindustry'
