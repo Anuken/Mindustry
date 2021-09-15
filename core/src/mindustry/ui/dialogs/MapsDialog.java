@@ -2,6 +2,7 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.graphics.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -190,24 +191,29 @@ public class MapsDialog extends BaseDialog{
         dialog.addCloseButton();
         dialog.setFillParent(false);
         dialog.cont.table(Tex.button, t -> {
-            for(Gamemode m : Gamemode.all){
-                t.button(m.name(), Styles.clearTogglet, () -> {
-                    if(modes.contains(m)){
-                        modes.remove(m);
-                    }else{
-                        modes.add(m);
-                    }
-                    rebuildMaps();
-                }).size(150f, 60f).checked(modes.contains(m));
+            int i = 0;
+            for(Gamemode mode : Gamemode.all){
+                TextureRegionDrawable icon = Vars.ui.getIcon("mode" + Strings.capitalize(mode.name()));
+                if(Core.atlas.isFound(icon.getRegion())){
+                    t.button(mode.name(), icon, Styles.clearTogglet, () -> {
+                        if(modes.contains(mode)){
+                            modes.remove(mode);
+                        }else{
+                            modes.add(mode);
+                        }
+                        rebuildMaps();
+                    }).size(150f, 60f).checked(modes.contains(mode));
+                    if(++i % 3 == 0) t.row();
+                }
             }
-        }).row();
-
-        dialog.cont.check("@editor.showAll", b -> {
-            showAll = b;
-            Core.settings.put("editorShowAllMaps", showAll);
-            Core.settings.forceSave();
-            rebuildMaps();
-        }).checked(showAll);
+            t.row();
+            t.button("@editor.showAll", Styles.clearTogglet, () -> {
+                showAll = !showAll;
+                Core.settings.put("editorShowAllMaps", showAll);
+                Core.settings.forceSave();
+                rebuildMaps();
+            }).checked(b -> showAll).colspan(3).growX().height(40f);
+        });
 
         dialog.show();
     }
