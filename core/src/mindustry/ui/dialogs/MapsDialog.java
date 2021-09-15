@@ -150,15 +150,17 @@ public class MapsDialog extends BaseDialog{
         float mapsize = 200f;
 
         int i = 0;
-        Seq<Map> copy = showAll ? Vars.maps.all().copy() : Vars.maps.customMaps().copy();
-        copy.filter(m -> {
-            for(Gamemode mode : modes){
-                if(!mode.valid(m)) return false;
-            }
-            return searchString == null || Strings.stripColors(m.name()).toLowerCase().contains(searchString);
-        });
 
-        for(Map map : copy){
+        Seq<Map> mapList = showAll ? Vars.maps.all() : Vars.maps.customMaps();
+        for(Map map : mapList){
+
+            boolean invalid = false;
+            for(Gamemode mode : modes){
+                invalid |= !mode.valid(map);
+            }
+            if(invalid || (searchString != null && !Strings.stripColors(map.name()).toLowerCase().contains(searchString))){
+                continue;
+            }
 
             if(i % maxwidth == 0){
                 mapTable.row();
@@ -178,7 +180,7 @@ public class MapsDialog extends BaseDialog{
             i++;
         }
 
-        if(copy.size == 0){
+        if(mapList.size == 0){
             mapTable.add("@maps.none");
         }
     }
