@@ -30,8 +30,10 @@ public class Effect{
     public float lifetime = 50f;
     /** Clip size. */
     public float clip;
-    /** If true, parent unit is data are followed. */
+    /** If true, if data is a unit, the effect will follow it. */
     public boolean followParent;
+    /** If this and followParent are true, the effect will offset with the parent's rotation. */
+    public boolean rotateWithParent;
 
     public float layer = Layer.effect;
     public float layerDuration;
@@ -58,6 +60,11 @@ public class Effect{
 
     public Effect followParent(boolean follow){
         followParent = follow;
+        return this;
+    }
+
+    public Effect rotateWithParent(boolean follow){
+        rotateWithParent = follow;
         return this;
     }
 
@@ -157,7 +164,10 @@ public class Effect{
             entity.lifetime = effect.lifetime;
             entity.set(x, y);
             entity.color.set(color);
-            if(effect.followParent && data instanceof Posc p) entity.parent = p;
+            if(effect.followParent && data instanceof Posc p){
+                entity.parent = p;
+                entity.rotateWithParent = effect.rotateWithParent;
+            }
             entity.add();
         }
     }
