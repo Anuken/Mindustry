@@ -1878,7 +1878,7 @@ public class Fx{
         color(e.color);
         stroke(3f * e.fout());
         Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
-    }),
+    }).followParent(true),
 
     coreLandDust = new Effect(100f, e -> {
         color(e.color, e.fout(0.1f));

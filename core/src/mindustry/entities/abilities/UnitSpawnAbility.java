@@ -18,6 +18,7 @@ public class UnitSpawnAbility extends Ability{
     public UnitType unit;
     public float spawnTime = 60f, spawnX, spawnY;
     public Effect spawnEffect = Fx.spawn;
+    public boolean parentizeEffects;
 
     protected float timer;
 
@@ -37,7 +38,7 @@ public class UnitSpawnAbility extends Ability{
 
         if(timer >= spawnTime && Units.canCreate(unit.team, this.unit)){
             float x = unit.x + Angles.trnsx(unit.rotation, spawnY, spawnX), y = unit.y + Angles.trnsy(unit.rotation, spawnY, spawnX);
-            spawnEffect.at(x, y);
+            spawnEffect.at(x, y, 0f, parentizeEffects ? unit : null);
             Unit u = this.unit.create(unit.team);
             u.set(x, y);
             u.rotation = unit.rotation;
