@@ -391,13 +391,11 @@ public class Blocks implements ContentList{
         moss = new Floor("moss"){{
             variants = 3;
             attributes.set(Attribute.spores, 0.15f);
-            wall = sporePine;
         }};
 
         sporeMoss = new Floor("spore-moss"){{
             variants = 3;
             attributes.set(Attribute.spores, 0.3f);
-            wall = sporeWall;
         }};
 
         stoneWall = new StaticWall("stone-wall"){{
@@ -405,7 +403,7 @@ public class Blocks implements ContentList{
         }};
 
         sporeWall = new StaticWall("spore-wall"){{
-            taintedWater.asFloor().wall = deepTaintedWater.asFloor().wall = this;
+            taintedWater.asFloor().wall = deepTaintedWater.asFloor().wall = sporeMoss.asFloor().wall = this;
         }};
 
         dirtWall = new StaticWall("dirt-wall");
@@ -466,7 +464,9 @@ public class Blocks implements ContentList{
 
         shaleWall = new StaticWall("shale-wall");
 
-        sporePine = new StaticTree("spore-pine");
+        sporePine = new StaticTree("spore-pine"){{
+            moss.asFloor().wall = this;
+        }};
 
         snowPine = new StaticTree("snow-pine");
 
