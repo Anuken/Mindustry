@@ -127,7 +127,7 @@ public class Blocks implements ContentList{
             statusDuration = 120f;
             drownTime = 140f;
             cacheLayer = CacheLayer.water;
-            albedo = 0.5f;
+            albedo = 0.9f;
         }};
 
         water = new Floor("shallow-water"){{
@@ -138,7 +138,7 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
-            albedo = 0.5f;
+            albedo = 0.9f;
         }};
 
         taintedWater = new Floor("tainted-water"){{
@@ -149,7 +149,7 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
-            albedo = 0.5f;
+            albedo = 0.9f;
             attributes.set(Attribute.spores, 0.15f);
         }};
 
@@ -162,27 +162,27 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
-            albedo = 0.5f;
+            albedo = 0.9f;
             attributes.set(Attribute.spores, 0.15f);
         }};
 
         darksandTaintedWater = new ShallowLiquid("darksand-tainted-water"){{
             speedMultiplier = 0.75f;
             statusDuration = 60f;
-            albedo = 0.5f;
+            albedo = 0.9f;
             attributes.set(Attribute.spores, 0.1f);
         }};
 
         sandWater = new ShallowLiquid("sand-water"){{
             speedMultiplier = 0.8f;
             statusDuration = 50f;
-            albedo = 0.5f;
+            albedo = 0.9f;
         }};
 
         darksandWater = new ShallowLiquid("darksand-water"){{
             speedMultiplier = 0.8f;
             statusDuration = 50f;
-            albedo = 0.5f;
+            albedo = 0.9f;
         }};
 
         tar = new Floor("tar"){{
@@ -275,7 +275,6 @@ public class Blocks implements ContentList{
             statusDuration = 30f;
             attributes.set(Attribute.water, 1f);
             cacheLayer = CacheLayer.mud;
-            albedo = 0.35f;
             walkSound = Sounds.mud;
             walkSoundVolume = 0.08f;
             walkSoundPitchMin = 0.4f;
@@ -300,18 +299,21 @@ public class Blocks implements ContentList{
 
         snow = new Floor("snow"){{
             attributes.set(Attribute.water, 0.2f);
+            albedo = 0.7f;
         }};
 
         ice = new Floor("ice"){{
             dragMultiplier = 0.35f;
             speedMultiplier = 0.9f;
             attributes.set(Attribute.water, 0.4f);
+            albedo = 0.65f;
         }};
 
         iceSnow = new Floor("ice-snow"){{
             dragMultiplier = 0.6f;
             variants = 3;
             attributes.set(Attribute.water, 0.3f);
+            albedo = 0.6f;
         }};
 
         shale = new Floor("shale"){{
