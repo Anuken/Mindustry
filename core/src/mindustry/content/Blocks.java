@@ -408,6 +408,7 @@ public class Blocks implements ContentList{
 
         iceWall = new StaticWall("ice-wall"){{
             iceSnow.asFloor().wall = this;
+            albedo = 0.6f;
         }};
 
         snowWall = new StaticWall("snow-wall");

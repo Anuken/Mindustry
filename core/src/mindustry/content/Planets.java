@@ -78,6 +78,7 @@ public class Planets implements ContentList{
             startSector = 10;
             atmosphereRadIn = -0.01f;
             atmosphereRadOut = 0.3f;
+            alwaysUnlocked = true;
         }};
 
         serpulo = new Planet("serpulo", sun, 1, 3){{
@@ -118,19 +119,20 @@ public class Planets implements ContentList{
             cgen.get((AsteroidGenerator)generator);
 
             meshLoader = () -> {
+                Color tinted = tint.mapColor.cpy().a(1f - tint.mapColor.a);
                 Seq<GenericMesh> meshes = new Seq<>();
                 Color color = base.mapColor;
                 Rand rand = new Rand(id + 2);
 
                 meshes.add(new NoiseMesh(
                     this, 0, 2, radius, 2, 0.55f, 0.45f, 14f,
-                    color, tint.mapColor, 3, 0.6f, 0.38f, tintThresh
+                    color, tinted, 3, 0.6f, 0.38f, tintThresh
                 ));
 
                 for(int j = 0; j < pieces; j++){
                     meshes.add(new MatMesh(
                         new NoiseMesh(this, j + 1, 1, 0.022f + rand.random(0.039f) * scale, 2, 0.6f, 0.38f, 20f,
-                        color, tint.mapColor, 3, 0.6f, 0.38f, tintThresh),
+                        color, tinted, 3, 0.6f, 0.38f, tintThresh),
                         new Mat3D().setToTranslation(Tmp.v31.setToRandomDirection(rand).setLength(rand.random(0.44f, 1.4f) * scale)))
                     );
                 }
