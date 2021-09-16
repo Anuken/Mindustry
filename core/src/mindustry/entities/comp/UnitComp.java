@@ -44,6 +44,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     boolean spawnedByCore;
     double flag;
 
+    transient float shadowAlpha = -1f;
     transient Seq<Ability> abilities = new Seq<>(0);
     transient float healTime;
     private transient float resupplyTime = Mathf.random(10f);

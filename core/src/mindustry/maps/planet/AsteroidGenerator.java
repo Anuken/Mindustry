@@ -46,9 +46,9 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
         int sx = width/2, sy = height/2;
         rand = new Rand(seed);
 
-        pass((x, y) -> {
-            floor = Blocks.space;
-        });
+        Floor background = Blocks.empty.asFloor();
+
+        tiles.eachTile(t -> t.setFloor(background));
 
         //spawn asteroids
         asteroid(sx, sy, rand.random(30, 50));
@@ -70,7 +70,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
 
         //random noise stone
         pass((x, y) -> {
-            if(floor != Blocks.space){
+            if(floor != background){
                 if(Ridged.noise2d(seed, x, y, foct, fper, 1f / fscl) - Ridged.noise2d(seed, x, y, 1, 1f, 5f)/2.7f > fmag){
                     floor = Blocks.stone;
                 }
@@ -79,12 +79,12 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
 
         //walls at insides
         pass((x, y) -> {
-            if(floor == Blocks.space || Ridged.noise2d(seed + 1, x, y, 4, 0.7f, 1f / 60f) > 0.45f || Mathf.within(x, y, sx, sy, 20 + Ridged.noise2d(seed, x, y, 3, 0.5f, 1f / 30f) * 6f)) return;
+            if(floor == background || Ridged.noise2d(seed + 1, x, y, 4, 0.7f, 1f / 60f) > 0.45f || Mathf.within(x, y, sx, sy, 20 + Ridged.noise2d(seed, x, y, 3, 0.5f, 1f / 30f) * 6f)) return;
 
             int radius = 6;
             for(int dx = x - radius; dx <= x + radius; dx++){
                 for(int dy = y - radius; dy <= y + radius; dy++){
-                    if(Mathf.within(dx, dy, x, y, radius + 0.0001f) && tiles.in(dx, dy) && tiles.getn(dx, dy).floor() == Blocks.space){
+                    if(Mathf.within(dx, dy, x, y, radius + 0.0001f) && tiles.in(dx, dy) && tiles.getn(dx, dy).floor() == background){
                         return;
                     }
                 }
@@ -132,6 +132,8 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
 
         Schematics.placeLaunchLoadout(sx, sy);
 
+        state.rules.backgroundTexture = "sprites/space.png";
+        state.rules.borderDarkness = false;
         state.rules.environment = Env.space;
     }
 

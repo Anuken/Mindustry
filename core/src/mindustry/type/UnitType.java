@@ -698,8 +698,15 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawShadow(Unit unit){
-        Draw.color(Pal.shadow);
         float e = Math.max(unit.elevation, visualElevation) * (1f - unit.drownTime);
+        float x = unit.x + shadowTX * e, y = unit.y + shadowTY * e;
+        Floor floor = world.floorWorld(x, y);
+
+        float dest = floor.canShadow ? 1f : 0f;
+        //yes, this updates state in draw()... which isn't a problem, because I don't want it to be obvious anyway
+        unit.shadowAlpha = unit.shadowAlpha < 0 ? dest : Mathf.approachDelta(unit.shadowAlpha, dest, 0.11f);
+        Draw.color(Pal.shadow, Pal.shadow.a * unit.shadowAlpha);
+
         Draw.rect(shadowRegion, unit.x + shadowTX * e, unit.y + shadowTY * e, unit.rotation - 90);
         Draw.color();
     }

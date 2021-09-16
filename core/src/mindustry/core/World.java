@@ -8,6 +8,7 @@ import arc.math.geom.Geometry.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
@@ -479,12 +480,14 @@ public class World{
 
     //TODO optimize; this is very slow and called too often!
     public float getDarkness(int x, int y){
-        int edgeBlend = 2;
-
         float dark = 0;
-        int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (tiles.width - 1)), Math.abs(y - (tiles.height - 1)))));
-        if(edgeDst <= edgeBlend){
-            dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
+
+        if(Vars.state.rules.borderDarkness){
+            int edgeBlend = 2;
+            int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (tiles.width - 1)), Math.abs(y - (tiles.height - 1)))));
+            if(edgeDst <= edgeBlend){
+                dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
+            }
         }
 
         if(state.hasSector() && state.getSector().preset == null){

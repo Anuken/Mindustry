@@ -117,8 +117,18 @@ public class Rules{
     public @Nullable String modeName;
     /** Whether cores incinerate items when full, just like in the campaign. */
     public boolean coreIncinerates = false;
+    /** If false, borders fade out into darkness. Only use with custom backgrounds!*/
+    public boolean borderDarkness = true;
     /** special tags for additional info. */
     public StringMap tags = new StringMap();
+    /** path to background texture with extension (e.g. "sprites/space.png")*/
+    public @Nullable String backgroundTexture;
+    /** background texture move speed scaling - bigger numbers mean slower movement */
+    public float backgroundSpeed = 27000f;
+    /** background texture scaling factor */
+    public float backgroundScl = 1f;
+    /** background UV offsets */
+    public float backgroundOffsetX = 0.1f, backgroundOffsetY = 0.1f;
 
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */
     public Rules copy(){

@@ -1,6 +1,7 @@
 package mindustry.core;
 
 import arc.*;
+import arc.assets.loaders.TextureLoader.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
@@ -310,8 +311,43 @@ public class Renderer implements ApplicationListener{
         Events.fire(Trigger.postDraw);
     }
 
-    private void drawBackground(){
-        //nothing to draw currently
+    protected void drawBackground(){
+        if(state.rules.backgroundTexture != null){
+            if(!assets.isLoaded(state.rules.backgroundTexture, Texture.class)){
+                var file = assets.getFileHandleResolver().resolve(state.rules.backgroundTexture);
+
+                //don't draw invalid/non-existent backgrounds.
+                if(!file.exists() || !file.extEquals("png")){
+                    return;
+                }
+
+                var desc = assets.load(state.rules.backgroundTexture, Texture.class, new TextureParameter(){{
+                    wrapU = TextureWrap.mirroredRepeat;
+                    wrapV = TextureWrap.mirroredRepeat;
+                    magFilter = TextureFilter.linear;
+                    minFilter = TextureFilter.linear;
+                }});
+
+                assets.finishLoadingAsset(desc);
+            }
+
+            Texture tex = assets.get(state.rules.backgroundTexture, Texture.class);
+            Tmp.tr1.set(tex);
+            Tmp.tr1.u = 0f;
+            Tmp.tr1.v = 0f;
+
+            float ratio = camera.width / camera.height;
+            float size = state.rules.backgroundScl;
+
+            Tmp.tr1.u2 = size;
+            Tmp.tr1.v2 = size / ratio;
+
+            float sx = (camera.position.x) / state.rules.backgroundSpeed, sy = (camera.position.y) / state.rules.backgroundSpeed;
+
+            Tmp.tr1.scroll(sx + state.rules.backgroundOffsetX, -sy + state.rules.backgroundOffsetY);
+
+            Draw.rect(Tmp.tr1, camera.position.x, camera.position.y, camera.width, camera.height);
+        }
     }
 
     void updateLandParticles(){
