@@ -452,6 +452,7 @@ public class UnitTypes implements ContentList{
                 x = y = 0f;
 
                 firstShotDelay = Fx.greenLaserChargeSmall.lifetime - 1f;
+                parentizeEffects = true;
 
                 reload = 155f;
                 recoil = 0f;
@@ -541,6 +542,7 @@ public class UnitTypes implements ContentList{
                 shootStatusDuration = 60f * 2f;
                 shootStatus = StatusEffects.unmoving;
                 firstShotDelay = Fx.greenLaserCharge.lifetime;
+                parentizeEffects = true;
 
                 bullet = new LaserBulletType(){{
                     length = 460f;
