@@ -16,7 +16,7 @@ public class MatMesh implements GenericMesh{
     }
 
     @Override
-    public void render(Mat3D projection, Mat3D transform){
-        mesh.render(projection, tmp.set(transform).mul(mat));
+    public void render(PlanetParams params, Mat3D projection, Mat3D transform){
+        mesh.render(params, projection, tmp.set(transform).mul(mat));
     }
 }

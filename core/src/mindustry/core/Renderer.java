@@ -322,10 +322,8 @@ public class Renderer implements ApplicationListener{
                 }
 
                 var desc = assets.load(state.rules.backgroundTexture, Texture.class, new TextureParameter(){{
-                    wrapU = TextureWrap.mirroredRepeat;
-                    wrapV = TextureWrap.mirroredRepeat;
-                    magFilter = TextureFilter.linear;
-                    minFilter = TextureFilter.linear;
+                    wrapU = wrapV = TextureWrap.mirroredRepeat;
+                    magFilter = minFilter = TextureFilter.linear;
                 }});
 
                 assets.finishLoadingAsset(desc);

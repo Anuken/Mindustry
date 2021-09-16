@@ -301,8 +301,8 @@ public class Planet extends UnlockableContent{
         return visible;
     }
 
-    public void draw(Mat3D projection, Mat3D transform){
-        mesh.render(projection, transform);
+    public void draw(PlanetParams params, Mat3D projection, Mat3D transform){
+        mesh.render(params, projection, transform);
     }
 
     public void drawAtmosphere(Mesh atmosphere, Camera3D cam){
@@ -323,9 +323,9 @@ public class Planet extends UnlockableContent{
         Gl.depthMask(true);
     }
 
-    public void drawClouds(Mat3D projection, Mat3D transform){
+    public void drawClouds(PlanetParams params, Mat3D projection, Mat3D transform){
         if(cloudMesh != null){
-            cloudMesh.render(projection, transform);
+            cloudMesh.render(params, projection, transform);
         }
     }
 }

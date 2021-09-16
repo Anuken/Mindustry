@@ -10,9 +10,9 @@ public class MultiMesh implements GenericMesh{
     }
 
     @Override
-    public void render(Mat3D projection, Mat3D transform){
+    public void render(PlanetParams params, Mat3D projection, Mat3D transform){
         for(var v : meshes){
-            v.render(projection, transform);
+            v.render(params, projection, transform);
         }
     }
 }

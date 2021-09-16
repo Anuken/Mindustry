@@ -4,7 +4,6 @@ import arc.graphics.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.noise.*;
-import mindustry.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 
@@ -42,8 +41,8 @@ public class HexSkyMesh extends PlanetMesh{
     }
 
     @Override
-    public void render(Mat3D projection, Mat3D transform){
-        preRender();
+    public void render(PlanetParams params, Mat3D projection, Mat3D transform){
+        preRender(params);
         shader.bind();
         shader.setUniformMatrix4("u_proj", projection.val);
         shader.setUniformMatrix4("u_trans", mat.setToTranslation(planet.position).rotate(Vec3.Y, planet.getRotation() + relRot()).val);
@@ -52,9 +51,10 @@ public class HexSkyMesh extends PlanetMesh{
     }
 
     @Override
-    public void preRender(){
+    public void preRender(PlanetParams params){
+        Shaders.clouds.planet = planet;
         Shaders.clouds.lightDir.set(planet.solarSystem.position).sub(planet.position).rotate(Vec3.Y, planet.getRotation() + relRot()).nor();
         Shaders.clouds.ambientColor.set(planet.solarSystem.lightColor);
-        Shaders.clouds.alpha = 1f - Vars.ui.planet.planets.orbitAlpha;
+        Shaders.clouds.alpha = 1f - params.uiAlpha;
     }
 }

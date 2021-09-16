@@ -19,12 +19,15 @@ public abstract class PlanetMesh implements GenericMesh{
 
     public PlanetMesh(){}
 
-    /** Should be overridden to set up any shader parameters such as planet position, normals, etc. */
-    public abstract void preRender();
+    /** Should be overridden to set up any shader parameters such as planet position, normals, etc.
+     * @param params*/
+    public void preRender(PlanetParams params){
+
+    }
 
     @Override
-    public void render(Mat3D projection, Mat3D transform){
-        preRender();
+    public void render(PlanetParams params, Mat3D projection, Mat3D transform){
+        preRender(params);
         shader.bind();
         shader.setUniformMatrix4("u_proj", projection.val);
         shader.setUniformMatrix4("u_trans", transform.val);

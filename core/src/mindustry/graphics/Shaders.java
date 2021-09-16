@@ -95,6 +95,7 @@ public class Shaders{
         public Vec3 lightDir = new Vec3(1, 1, 1).nor();
         public Color ambientColor = Color.white.cpy();
         public Vec3 camDir = new Vec3();
+        public Planet planet;
 
         public PlanetShader(){
             super("planet", "planet");
@@ -102,7 +103,7 @@ public class Shaders{
 
         @Override
         public void apply(){
-            camDir.set(renderer.planets.cam.direction).rotate(Vec3.Y, renderer.planets.planet.getRotation());
+            camDir.set(renderer.planets.cam.direction).rotate(Vec3.Y, planet.getRotation());
 
             setUniformf("u_lightdir", lightDir);
             setUniformf("u_ambientColor", ambientColor.r, ambientColor.g, ambientColor.b);
@@ -115,6 +116,7 @@ public class Shaders{
         public Color ambientColor = Color.white.cpy();
         public Vec3 camDir = new Vec3();
         public float alpha = 1f;
+        public Planet planet;
 
         public CloudShader(){
             super("planet", "clouds");
@@ -122,7 +124,7 @@ public class Shaders{
 
         @Override
         public void apply(){
-            camDir.set(renderer.planets.cam.direction).rotate(Vec3.Y, renderer.planets.planet.getRotation());
+            camDir.set(renderer.planets.cam.direction).rotate(Vec3.Y, planet.getRotation());
 
             setUniformf("u_alpha", alpha);
             setUniformf("u_lightdir", lightDir);
