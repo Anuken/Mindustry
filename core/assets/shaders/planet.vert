@@ -15,12 +15,12 @@ const float shinefalloff = 4.0;
 const float shinelen = 0.2;
 
 void main(){
-    vec3 specular = vec3(0, 0, 0);
+    vec3 specular = vec3(0.0, 0.0, 0.0);
 
     vec3 lightReflect = normalize(reflect(a_normal, u_lightdir));
     float specularFactor = dot(u_camdir, lightReflect);
-    if(specularFactor > 0){
-        specular = vec3(1.0f * pow(specularFactor, 32f)) * (1f-a_color.a);  //specular power = 32
+    if(specularFactor > 0.0){
+        specular = vec3(1.0 * pow(specularFactor, 32.0)) * (1.0-a_color.a);  //specular power = 32
     }
 
 	vec3 norc = (u_ambientColor + specular) * (diffuse + vec3(clamp((dot(a_normal, u_lightdir) + 1.0) / 2.0, 0.0, 1.0)));
