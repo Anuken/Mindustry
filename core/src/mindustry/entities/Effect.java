@@ -76,6 +76,10 @@ public class Effect{
         create(this, pos.getX(), pos.getY(), 0, Color.white, null);
     }
 
+    public void at(Position pos, boolean parentize){
+        create(this, pos.getX(), pos.getY(), 0, Color.white, parentize ? pos : null);
+    }
+
     public void at(Position pos, float rotation){
         create(this, pos.getX(), pos.getY(), rotation, Color.white, null);
     }
