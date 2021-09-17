@@ -1,6 +1,7 @@
 package mindustry.entities.abilities;
 
 import arc.*;
+import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
