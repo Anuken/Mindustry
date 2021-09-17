@@ -159,8 +159,7 @@ public class WaveInfoDialog extends BaseDialog{
                 s.image(Icon.zoom).padRight(8);
                 s.field(search <= 0 ? "" : search + "", TextFieldFilter.digitsOnly, text -> {
                     search = Math.max(Strings.parseInt(text) - (Strings.parseInt(text) > 1 ? 1 : 0), 0);
-                    start = search != 0 ? Math.max((Strings.parseInt(text) - 1) - (displayed / 2), 0) : 0;
-                    if(displayed % 2 != 0) start = Math.max(start - 1, 0);
+                    start = search != 0 ? Math.max((Strings.parseInt(text) - 1) - (displayed / 2) - (displayed % 2), 0) : 0;
                     buildGroups();
                 }).growX().maxTextLength(8).get().setMessageText("@waves.search");
                 s.button(Icon.filter, Styles.emptyi, () -> showFilter()).size(46f).tooltip("@waves.filter");
