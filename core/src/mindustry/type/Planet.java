@@ -33,7 +33,7 @@ public class Planet extends UnlockableContent{
     /** Array of sectors; directly maps to tiles in the grid. */
     public Seq<Sector> sectors = new Seq<>();
     /** Default spacing between planet orbits in world units. This is defined per-parent! */
-    public float orbitSpacing = 11f;
+    public float orbitSpacing = 12f;
     /** Radius of this planet's sphere. Does not take into account satellites. */
     public float radius;
     /** Camera radius offset. */

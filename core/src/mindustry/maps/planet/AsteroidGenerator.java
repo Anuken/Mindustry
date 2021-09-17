@@ -119,7 +119,6 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
         //TODO:
         //- copper maybe should not exist
         //- consider replacing certain ores with something else
-        //- sand source - olivine/pyroxene?
 
         //titanium
         pass((x, y) -> {
