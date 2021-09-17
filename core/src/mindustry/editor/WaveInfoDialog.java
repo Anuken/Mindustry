@@ -26,12 +26,11 @@ import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.*;
 
 public class WaveInfoDialog extends BaseDialog{
-    private int displayed = 20;
+    private int start = 0, displayed = 20, graphSpeed = 1, maxGraphSpeed = 32;
     Seq<SpawnGroup> groups = new Seq<>();
     private SpawnGroup expandedGroup;
 
     private Table table, iTable, eTable, uTable;
-    private int start = 0;
     private int itemAmount, payLeft;
     private int search, filterHealth, filterHealthMode, filterBegin, filterEnd, filterAmount, filterAmountWave, filterShields, filterShieldsWave, filterRange = 20;
     private UnitType lastType = UnitTypes.dagger;
@@ -97,31 +96,36 @@ public class WaveInfoDialog extends BaseDialog{
 
         buttons.button("<", () -> {}).update(t -> {
             if(t.getClickListener().isPressed()){
-                shift(-1);
+                shift(-graphSpeed);
             }
         });
         buttons.button(">", () -> {}).update(t -> {
             if(t.getClickListener().isPressed()){
-                shift(1);
+                shift(graphSpeed);
             }
         });
 
         buttons.button("-", () -> {}).update(t -> {
             if(t.getClickListener().isPressed()){
-                view(-1);
+                view(-graphSpeed);
             }
         });
         buttons.button("+", () -> {}).update(t -> {
             if(t.getClickListener().isPressed()){
-                view(1);
+                view(graphSpeed);
             }
         });
 
         if(experimental){
+            buttons.button("x" + graphSpeed, () -> {
+                graphSpeed *= 2;
+                if(graphSpeed >= maxGraphSpeed) graphSpeed = 1;
+            }).update(b -> b.setText("x" + graphSpeed)).width(100f);
+
             buttons.button("Random", Icon.refresh, () -> {
                 groups.clear();
                 groups = Waves.generate(1f / 10f);
-                updateWaves();
+                buildGroups();
             }).width(200f);
         }
     }
@@ -215,12 +219,13 @@ public class WaveInfoDialog extends BaseDialog{
             if(reverseSort) groups.reverse();
 
             for(SpawnGroup group : groups){
-                if((search != 0 && group.getSpawned(search) <= 0) || (filterHealth != 0 && !(filterHealthMode == 0 ? group.type.health > filterHealth : filterHealthMode == 1 ? group.type.health < filterHealth :
-                between((int)group.type.health, filterHealth - filterRange, filterHealth + filterRange))) || (filterBegin != 0 && !between(filterBegin, group.begin - Math.round(filterRange / 10),
-                group.begin + Math.round(filterRange / 10))) || (filterEnd != 0 && !between(filterEnd, group.end - Math.round(filterRange / 10), group.end + Math.round(filterRange / 10))) ||
-                (filterAmount != 0 && !between(group.getSpawned(filterAmountWave != 0 ? filterAmountWave : search), filterAmount - Math.round(filterRange / 4), filterAmount + Math.round(filterRange / 4))) ||
-                (filterShields != 0 && !between((int)group.getShield(filterShieldsWave != 0 ? filterShieldsWave : search), filterShields - Math.round(filterRange / 4),
-                filterShields + Math.round(filterRange / 4))) || (filterEffect != StatusEffects.none && group.effect != filterEffect)) continue;
+                if((search != 0 && group.getSpawned(search) <= 0)
+                || (filterHealth != 0 && !(filterHealthMode == 0 ? group.type.health > filterHealth : filterHealthMode == 1 ? group.type.health < filterHealth : between((int)group.type.health, filterHealth - filterRange, filterHealth + filterRange)))
+                || (filterBegin != 0 && !between(filterBegin, group.begin - filterRange / 10, group.begin + filterRange / 10))
+                || (filterEnd != 0 && !between(filterEnd, group.end - filterRange / 10, group.end + filterRange / 10))
+                || (filterAmount != 0 && !between(group.getSpawned(filterAmountWave != 0 ? filterAmountWave : search), filterAmount - filterRange / 4, filterAmount + filterRange / 4))
+                || (filterShields != 0 && !between((int)group.getShield(filterShieldsWave != 0 ? filterShieldsWave : search), filterShields - filterRange / 4, filterShields + filterRange / 4))
+                || (filterEffect != StatusEffects.none && group.effect != filterEffect)) continue;
 
                 table.table(Tex.button, t -> {
                     t.margin(0).defaults().pad(3).padLeft(5f).growX().left();
@@ -410,8 +415,7 @@ public class WaveInfoDialog extends BaseDialog{
                     if(payloads){
                         group.payloads.add(type);
                     }else{
-                        lastType = type;
-                        group.type = type;
+                        group.type = lastType = type;
                     }
                     if(group.payloads != null && group.type.payloadCapacity <= 8) group.payloads.clear();
                     if(!payloads) dialog.hide();
