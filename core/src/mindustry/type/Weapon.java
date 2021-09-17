@@ -47,6 +47,8 @@ public class Weapon implements Cloneable{
     public boolean continuous;
     /** whether this weapon can be aimed manually by players */
     public boolean controllable = true;
+    /** whether this weapon can be automatically aimed by the unit */
+    public boolean aiControllable = true;
     /** whether to automatically target relevant units in update(); only works when controllable = false. */
     public boolean autoTarget = false;
     /** whether to perform target trajectory prediction */
