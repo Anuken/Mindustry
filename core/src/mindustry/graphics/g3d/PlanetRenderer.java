@@ -124,7 +124,7 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void beginBloom(){
-        bloom.resize(Core.graphics.getWidth() / 4, Core.graphics.getHeight() / 4);
+        bloom.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
         bloom.capture();
     }
 

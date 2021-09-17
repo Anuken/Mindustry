@@ -277,7 +277,7 @@ public class Renderer implements ApplicationListener{
         }
 
         if(bloom != null){
-            bloom.resize(graphics.getWidth() / 4, graphics.getHeight() / 4);
+            bloom.resize(graphics.getWidth(), graphics.getHeight());
             Draw.draw(Layer.bullet - 0.02f, bloom::capture);
             Draw.draw(Layer.effect + 0.02f, bloom::render);
         }
