@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;
+import mindustry.graphics.g3d.*;
 import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
@@ -129,6 +130,8 @@ public class Rules{
     public float backgroundScl = 1f;
     /** background UV offsets */
     public float backgroundOffsetX = 0.1f, backgroundOffsetY = 0.1f;
+    /** Parameters for planet rendered in the background. Cannot be changed once a map is loaded. */
+    public @Nullable PlanetParams planetBackground;
 
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */
     public Rules copy(){

@@ -43,6 +43,7 @@ public class Renderer implements ApplicationListener{
     public PlanetRenderer planets;
 
     public @Nullable Bloom bloom;
+    public @Nullable FrameBuffer backgroundBuffer;
     public FrameBuffer effectBuffer = new FrameBuffer();
     public boolean animateShields, drawWeather = true, drawStatus;
     public float weatherAlpha;
@@ -109,6 +110,14 @@ public class Renderer implements ApplicationListener{
             t.setWrap(TextureWrap.repeat);
             t.setFilter(TextureFilter.linear);
         };
+
+        Events.on(WorldLoadEvent.class, e -> {
+            //reset background buffer on every world load, so it can be re-cached first render
+            if(backgroundBuffer != null){
+                backgroundBuffer.dispose();
+                backgroundBuffer = null;
+            }
+        });
     }
 
     @Override
@@ -278,7 +287,7 @@ public class Renderer implements ApplicationListener{
         }
 
         if(bloom != null){
-            bloom.resize(graphics.getWidth() / 4, graphics.getHeight() / 4);
+            bloom.resize(graphics.getWidth(), graphics.getHeight());
             Draw.draw(Layer.bullet - 0.02f, bloom::capture);
             Draw.draw(Layer.effect + 0.02f, bloom::render);
         }
@@ -312,7 +321,8 @@ public class Renderer implements ApplicationListener{
     }
 
     protected void drawBackground(){
-        if(state.rules.backgroundTexture != null){
+        //draw background only if there is no planet background with a skybox
+        if(state.rules.backgroundTexture != null && (state.rules.planetBackground == null || !state.rules.planetBackground.drawSkybox)){
             if(!assets.isLoaded(state.rules.backgroundTexture, Texture.class)){
                 var file = assets.getFileHandleResolver().resolve(state.rules.backgroundTexture);
 
@@ -346,6 +356,36 @@ public class Renderer implements ApplicationListener{
 
             Draw.rect(Tmp.tr1, camera.position.x, camera.position.y, camera.width, camera.height);
         }
+
+        if(state.rules.planetBackground != null){
+            int size = Math.max(graphics.getWidth(), graphics.getHeight());
+
+            boolean resized = false;
+            if(backgroundBuffer == null){
+                resized = true;
+                backgroundBuffer = new FrameBuffer(size, size);
+            }
+
+            if(resized || backgroundBuffer.resize(size, size)){
+                backgroundBuffer.begin(Color.clear);
+
+                var params = state.rules.planetBackground;
+
+                //override some values
+                params.viewW = size;
+                params.viewH = size;
+                params.alwaysDrawAtmosphere = true;
+                params.drawUi = false;
+
+                planets.render(params);
+
+                backgroundBuffer.end();
+            }
+
+            float drawSize = Math.max(camera.width, camera.height);
+            Draw.rect(Draw.wrap(backgroundBuffer.getTexture()), camera.position.x, camera.position.y, drawSize, -drawSize);
+        }
+
     }
 
     void updateLandParticles(){

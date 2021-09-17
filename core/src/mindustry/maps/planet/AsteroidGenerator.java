@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.game.*;
+import mindustry.graphics.g3d.*;
 import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.blocks.environment.*;
@@ -132,7 +133,11 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
 
         Schematics.placeLaunchLoadout(sx, sy);
 
-        state.rules.backgroundTexture = "sprites/space.png";
+        state.rules.planetBackground = new PlanetParams(){{
+            planet = sector.planet;
+            zoom = 1f;
+        }};
+        //state.rules.backgroundTexture = "sprites/space.png";
         state.rules.borderDarkness = false;
         state.rules.environment = Env.space;
     }

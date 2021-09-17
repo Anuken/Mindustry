@@ -59,12 +59,15 @@ public class PlanetRenderer implements Disposable{
         Gl.enable(Gl.cullFace);
         Gl.cullFace(Gl.back);
 
+        int w = params.viewW <= 0 ? Core.graphics.getWidth() : params.viewW;
+        int h = params.viewH <= 0 ? Core.graphics.getHeight() : params.viewH;
+
         bloom.blending = !params.drawSkybox;
 
         //lock to up vector so it doesn't get confusing
         cam.up.set(Vec3.Y);
 
-        cam.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+        cam.resize(w, h);
         params.camPos.setLength((params.planet.radius + params.planet.camRadius) * camLength + (params.zoom-1f) * (params.planet.radius + params.planet.camRadius) * 2);
         cam.position.set(params.planet.position).add(params.camPos);
         //cam.up.set(params.camUp); //TODO broken
@@ -79,7 +82,9 @@ public class PlanetRenderer implements Disposable{
 
         Events.fire(Trigger.universeDrawBegin);
 
-        beginBloom();
+        //begin bloom
+        bloom.resize(w, h);
+        bloom.capture();
 
         if(params.drawSkybox){
             //render skybox at 0,0,0
@@ -102,7 +107,7 @@ public class PlanetRenderer implements Disposable{
         renderPlanet(params.solarSystem, params);
         renderTransparent(params.solarSystem, params);
 
-        endBloom();
+        bloom.render();
 
         Events.fire(Trigger.universeDrawEnd);
 
@@ -117,16 +122,6 @@ public class PlanetRenderer implements Disposable{
 
         cam.update();
     }
-
-    public void beginBloom(){
-        bloom.resize(Core.graphics.getWidth() / 4, Core.graphics.getHeight() / 4);
-        bloom.capture();
-    }
-
-    public void endBloom(){
-        bloom.render();
-    }
-
 
     public void renderPlanet(Planet planet, PlanetParams params){
         if(!planet.visible()) return;
@@ -152,7 +147,7 @@ public class PlanetRenderer implements Disposable{
             renderSectors(planet, params);
         }
 
-        if(cam.frustum.containsSphere(planet.position, planet.clipRadius) && planet.parent != null && planet.hasAtmosphere && Core.settings.getBool("atmosphere")){
+        if(cam.frustum.containsSphere(planet.position, planet.clipRadius) && planet.parent != null && planet.hasAtmosphere && (params.alwaysDrawAtmosphere || Core.settings.getBool("atmosphere"))){
             planet.drawAtmosphere(atmosphere, cam);
         }
 

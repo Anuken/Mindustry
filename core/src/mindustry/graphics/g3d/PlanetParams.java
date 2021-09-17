@@ -26,10 +26,14 @@ public class PlanetParams{
     public boolean drawUi = false;
     /** If true, a space skybox is drawn. */
     public boolean drawSkybox = true;
+
     /** Handles drawing details. */
     public @Nullable transient PlanetInterfaceRenderer renderer;
+    /** Viewport size. <=0 to use screen size. Do not change in rules. */
+    public transient int viewW = -1, viewH = -1;
+    /** If true, atmosphere will be drawn regardless of player options. */
+    public transient boolean alwaysDrawAtmosphere = false;
 
     //TODO:
     //- blur
-    //- transparent background
 }
