@@ -160,6 +160,7 @@ public class WaveInfoDialog extends BaseDialog{
                 s.field(search <= 0 ? "" : search + "", TextFieldFilter.digitsOnly, text -> {
                     search = Math.max(Strings.parseInt(text) - (Strings.parseInt(text) > 1 ? 1 : 0), 0);
                     start = search != 0 ? Math.max((Strings.parseInt(text) - 1) - (displayed / 2), 0) : 0;
+                    if(displayed % 2 != 0) start = Math.max(start - 1, 0);
                     buildGroups();
                 }).growX().maxTextLength(8).get().setMessageText("@waves.search");
                 s.button(Icon.filter, Styles.emptyi, () -> showFilter()).size(46f).tooltip("@waves.filter");
@@ -221,10 +222,10 @@ public class WaveInfoDialog extends BaseDialog{
             for(SpawnGroup group : groups){
                 if((search != 0 && group.getSpawned(search) <= 0)
                 || (filterHealth != 0 && !(filterHealthMode == 0 ? group.type.health > filterHealth : filterHealthMode == 1 ? group.type.health < filterHealth : between((int)group.type.health, filterHealth - filterRange, filterHealth + filterRange)))
-                || (filterBegin != 0 && !between(filterBegin, group.begin - filterRange / 10, group.begin + filterRange / 10))
-                || (filterEnd != 0 && !between(filterEnd, group.end - filterRange / 10, group.end + filterRange / 10))
-                || (filterAmount != 0 && !between(group.getSpawned(filterAmountWave != 0 ? filterAmountWave : search), filterAmount - filterRange / 4, filterAmount + filterRange / 4))
-                || (filterShields != 0 && !between((int)group.getShield(filterShieldsWave != 0 ? filterShieldsWave : search), filterShields - filterRange / 4, filterShields + filterRange / 4))
+                || (filterBegin != 0 && !between(filterBegin, group.begin - filterRange/10, group.begin + filterRange/10))
+                || (filterEnd != 0 && !between(filterEnd, group.end - filterRange/10, group.end + filterRange/10))
+                || (filterAmount != 0 && !between(group.getSpawned(filterAmountWave), filterAmount - filterRange/4, filterAmount + filterRange/4))
+                || (filterShields != 0 && !between((int)group.getShield(filterShieldsWave > 0 ? filterShieldsWave : search), filterShields - filterRange/4, filterShields + filterRange/4))
                 || (filterEffect != StatusEffects.none && group.effect != filterEffect)) continue;
 
                 table.table(Tex.button, t -> {
@@ -242,7 +243,6 @@ public class WaveInfoDialog extends BaseDialog{
                         b.button(Icon.settingsSmall, Styles.emptyi, () -> {
                             BaseDialog dialog = new BaseDialog("@waves.group");
                             dialog.setFillParent(false);
-                            buildGroups();
                             dialog.cont.table(Tex.button, a -> iTable = a).row();
                             dialog.cont.table(c -> {
                                 c.defaults().size(210f, 64f).pad(2f);
@@ -261,6 +261,7 @@ public class WaveInfoDialog extends BaseDialog{
                                     dialog.hide();
                                 }));
                             });
+                            buildGroups();
                             updateIcons(group);
                             dialog.addCloseButton();
                             dialog.show();
