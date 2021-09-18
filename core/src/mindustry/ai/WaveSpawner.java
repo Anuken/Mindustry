@@ -19,7 +19,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class WaveSpawner{
-    private static final float margin = 40f, coreMargin = tilesize * 2f, maxSteps = 30;
+    private static final float margin = 0f, coreMargin = tilesize * 2f, maxSteps = 30;
 
     private int tmpCount;
     private Seq<Tile> spawns = new Seq<>();

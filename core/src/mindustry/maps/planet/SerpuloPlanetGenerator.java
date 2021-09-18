@@ -18,6 +18,8 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class SerpuloPlanetGenerator extends PlanetGenerator{
+    //alternate, less direct generation (wip)
+    public static boolean alt = false;
     static final int seed = 0;
 
     BaseGenerator basegen = new BaseGenerator();
@@ -175,8 +177,12 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                 Vec2 midpoint = Tmp.v1.set(to.x, to.y).add(x, y).scl(0.5f);
                 rand.nextFloat();
 
-                //add randomized offset to avoid straight lines
-                midpoint.add(Tmp.v2.setToRandomDirection(rand).scl(Tmp.v1.dst(x, y)));
+                if(alt){
+                    midpoint.add(Tmp.v2.set(1, 0f).setAngle(Angles.angle(to.x, to.y, x, y) + 90f * (rand.chance(0.5) ? 1f : -1f)).scl(Tmp.v1.dst(x, y) * 2f));
+                }else{
+                    //add randomized offset to avoid straight lines
+                    midpoint.add(Tmp.v2.setToRandomDirection(rand).scl(Tmp.v1.dst(x, y)));
+                }
 
                 midpoint.sub(width/2f, height/2f).limit(width / 2f / Mathf.sqrt3).add(width/2f, height/2f);
 

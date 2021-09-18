@@ -20,7 +20,7 @@ void main(){
     vec3 lightReflect = normalize(reflect(a_normal, u_lightdir));
     float specularFactor = dot(u_camdir, lightReflect);
     if(specularFactor > 0.0){
-        specular = vec3(1.0 * pow(specularFactor, 32.0)) * (1.0-a_color.a);  //specular power = 32
+        specular = vec3(1.0 * pow(specularFactor, 64.0)) * (1.0-a_color.a);  //specular power = 32
     }
 
 	vec3 norc = (u_ambientColor + specular) * (diffuse + vec3(clamp((dot(a_normal, u_lightdir) + 1.0) / 2.0, 0.0, 1.0)));
