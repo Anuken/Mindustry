@@ -32,7 +32,7 @@ public class WaveInfoDialog extends BaseDialog{
 
     private Table table, iTable, eTable, uTable;
     private int itemAmount, payLeft;
-    private int search, filterHealth, filterHealthMode, filterBegin, filterEnd, filterAmount, filterAmountWave, filterShields, filterShieldsWave, filterRange = 20;
+    private int search = -1, filterHealth, filterHealthMode, filterBegin, filterEnd, filterAmount, filterAmountWave, filterShields, filterShieldsWave, filterRange = 20;
     private UnitType lastType = UnitTypes.dagger;
     private StatusEffect filterEffect = StatusEffects.none;
     private Sort sort = Sort.begin;
@@ -157,9 +157,9 @@ public class WaveInfoDialog extends BaseDialog{
         cont.stack(new Table(Tex.clear, main -> {
             main.table(s -> {
                 s.image(Icon.zoom).padRight(8);
-                s.field(search <= 0 ? "" : search + "", TextFieldFilter.digitsOnly, text -> {
-                    search = Math.max(Strings.parseInt(text) - (Strings.parseInt(text) > 1 ? 1 : 0), 0);
-                    start = search != 0 ? Math.max((Strings.parseInt(text) - 1) - (displayed / 2) - (displayed % 2), 0) : 0;
+                s.field(search < 0 ? "" : search + "", TextFieldFilter.digitsOnly, text -> {
+                    search = !text.isEmpty() ? Math.max(Strings.parseInt(text) - 1, -1) : -1;
+                    start = Math.max(search - (displayed / 2) - (displayed % 2), 0);
                     buildGroups();
                 }).growX().maxTextLength(8).get().setMessageText("@waves.search");
                 s.button(Icon.filter, Styles.emptyi, () -> showFilter()).size(46f).tooltip("@waves.filter");
@@ -219,7 +219,7 @@ public class WaveInfoDialog extends BaseDialog{
             if(reverseSort) groups.reverse();
 
             for(SpawnGroup group : groups){
-                if((search != 0 && group.getSpawned(search) <= 0)
+                if((search >= 0 && group.getSpawned(search) <= 0)
                 || (filterHealth != 0 && !(filterHealthMode == 0 ? group.type.health > filterHealth : filterHealthMode == 1 ? group.type.health < filterHealth : between((int)group.type.health, filterHealth - filterRange, filterHealth + filterRange)))
                 || (filterBegin != 0 && !between(filterBegin, group.begin - filterRange/10, group.begin + filterRange/10))
                 || (filterEnd != 0 && !between(filterEnd, group.end - filterRange/10, group.end + filterRange/10))
