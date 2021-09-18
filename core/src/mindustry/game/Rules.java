@@ -122,6 +122,8 @@ public class Rules{
     public boolean borderDarkness = true;
     /** special tags for additional info. */
     public StringMap tags = new StringMap();
+    /** Name of callback to call for background rendering in mods; see Renderer#addCustomBackground. Runs last. */
+    public @Nullable String customBackgroundCallback;
     /** path to background texture with extension (e.g. "sprites/space.png")*/
     public @Nullable String backgroundTexture;
     /** background texture move speed scaling - bigger numbers mean slower movement */

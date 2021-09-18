@@ -50,6 +50,7 @@ public class Renderer implements ApplicationListener{
     /** minZoom = zooming out, maxZoom = zooming in */
     public float minZoom = 1.5f, maxZoom = 6f;
     public Seq<EnvRenderer> envRenderers = new Seq<>();
+    public ObjectMap<String, Runnable> customBackgrounds = new ObjectMap<>();
     public TextureRegion[] bubbles = new TextureRegion[16], splashes = new TextureRegion[12];
 
     private @Nullable CoreBuild landCore;
@@ -88,6 +89,10 @@ public class Renderer implements ApplicationListener{
 
     public void addEnvRenderer(int mask, Runnable render){
         envRenderers.add(new EnvRenderer(mask, render));
+    }
+
+    public void addCustomBackground(String name, Runnable render){
+        customBackgrounds.put(name, render);
     }
 
     @Override
@@ -384,6 +389,10 @@ public class Renderer implements ApplicationListener{
 
             float drawSize = Math.max(camera.width, camera.height);
             Draw.rect(Draw.wrap(backgroundBuffer.getTexture()), camera.position.x, camera.position.y, drawSize, -drawSize);
+        }
+
+        if(state.rules.customBackgroundCallback != null && customBackgrounds.containsKey(state.rules.customBackgroundCallback)){
+            customBackgrounds.get(state.rules.customBackgroundCallback).run();
         }
 
     }
