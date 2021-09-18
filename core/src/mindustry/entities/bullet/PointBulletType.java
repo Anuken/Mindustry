@@ -28,9 +28,7 @@ public class PointBulletType extends BulletType{
             py = b.y + b.lifetime * b.vel.y,
             rot = b.rotation();
 
-        Geometry.iterateLine(0f, b.x, b.y, px, py, trailSpacing, (x, y) -> {
-            trailEffect.at(x, y, rot);
-        });
+        Geometry.iterateLine(0f, b.x, b.y, px, py, trailSpacing, (x, y) -> trailEffect.at(x, y, rot));
 
         b.time = b.lifetime;
         b.set(px, py);
@@ -41,7 +39,7 @@ public class PointBulletType extends BulletType{
         result = null;
         float range = 1f;
 
-        Units.nearby(b.team, px - range, py - range, range*2f, range*2f, e -> {
+        Units.nearby(px - range, py - range, range * 2f, range * 2f, e -> {
             if(e.dead() || e.team == b.team && (!friendlyFire || e == b.owner)) return;
 
             e.hitbox(Tmp.r1);
