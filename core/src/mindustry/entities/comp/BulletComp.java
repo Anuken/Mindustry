@@ -92,7 +92,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Replace
     @Override
     public boolean collides(Hitboxc other){
-        return type.collides && (other instanceof Teamc t && t.team() != team)
+        return type.collides && (other instanceof Teamc t && (t.team() != team || (type.friendlyFire && t != owner)))
             && !(other instanceof Flyingc f && !f.checkTarget(type.collidesAir, type.collidesGround))
             && !(type.pierce && hasCollided(other.id())); //prevent multiple collisions
     }
@@ -143,7 +143,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
                 boolean remove = false;
                 float health = build.health;
 
-                if(build.team != team){
+                if(build.team != team || type.friendlyFire){
                     remove = build.collision(self());
                 }
 

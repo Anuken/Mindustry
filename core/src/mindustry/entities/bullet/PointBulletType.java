@@ -41,8 +41,8 @@ public class PointBulletType extends BulletType{
         result = null;
         float range = 1f;
 
-        Units.nearbyEnemies(b.team, px - range, py - range, range*2f, range*2f, e -> {
-            if(e.dead()) return;
+        Units.nearby(b.team, px - range, py - range, range*2f, range*2f, e -> {
+            if(e.dead() || e.team == b.team && (!friendlyFire || e == b.owner)) return;
 
             e.hitbox(Tmp.r1);
             if(!Tmp.r1.contains(px, py)) return;
@@ -58,7 +58,7 @@ public class PointBulletType extends BulletType{
             b.collision(result, px, py);
         }else{
             Building build = Vars.world.buildWorld(px, py);
-            if(build != null && build.team != b.team){
+            if(build != null && (build.team != b.team || (friendlyFire && build != b.owner))){
                 build.collision(b);
             }
         }

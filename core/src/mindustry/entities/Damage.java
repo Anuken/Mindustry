@@ -108,7 +108,7 @@ public class Damage{
         furthest = null;
 
         boolean found = world.raycast(b.tileX(), b.tileY(), World.toTile(b.x + Tmp.v1.x), World.toTile(b.y + Tmp.v1.y),
-        (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team && furthest.block().absorbLasers);
+        (x, y) -> (furthest = world.tile(x, y)) != null && (furthest.team() != b.team || b.type.friendlyFire) && furthest.block().absorbLasers);
 
         return found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
     }
@@ -153,7 +153,7 @@ public class Damage{
             if(hitter.damage > 0){
                 float health = !collide ? 0 : tile.health;
 
-                if(collide && tile.team != team && tile.collide(hitter)){
+                if(collide && (tile.team() != team || (hitter.type.friendlyFire && tile != hitter.owner)) && tile.collide(hitter)){
                     tile.collision(hitter);
                     hitter.type.hit(hitter, tile.x, tile.y);
                 }
@@ -206,7 +206,7 @@ public class Damage{
 
             Vec2 vec = Geometry.raycastRect(x, y, x2, y2, hitrect.grow(expand * 2));
 
-            if(vec != null && hitter.damage > 0){
+            if(vec != null && hitter.damage > 0 && (e.team() != team || (hitter.type.friendlyFire && e != hitter.owner))){
                 effect.at(vec.x, vec.y);
                 e.collision(hitter, vec.x, vec.y);
                 hitter.collision(e, vec.x, vec.y);
@@ -215,7 +215,7 @@ public class Damage{
 
         units.clear();
 
-        Units.nearbyEnemies(team, rect, u -> {
+        Units.nearby(rect, u -> {
             if(u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)){
                 units.add(u);
             }
@@ -237,7 +237,7 @@ public class Damage{
         if(hitter.type.collidesGround){
             world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
-                if(tile != null && tile.team != hitter.team){
+                if(tile != null && (tile.team != hitter.team || (hitter.type.friendlyFire && tile != hitter.owner))){
                     tmpBuilding = tile;
                     return true;
                 }
@@ -267,8 +267,8 @@ public class Damage{
 
         tmpUnit = null;
 
-        Units.nearbyEnemies(hitter.team, rect, e -> {
-            if((tmpUnit != null && e.dst2(x, y) > tmpUnit.dst2(x, y)) || !e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)) return;
+        Units.nearby(rect, e -> {
+            if((tmpUnit != null && e.dst2(x, y) > tmpUnit.dst2(x, y)) || !e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround) || e.team == hitter.team && (!hitter.type.friendlyFire || e == hitter.owner)) return;
 
             e.hitbox(hitrect);
             Rect other = hitrect;

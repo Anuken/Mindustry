@@ -91,6 +91,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean collidesAir = true, collidesGround = true;
     /** Whether this bullet types collides with anything at all. */
     public boolean collides = true;
+    /** Whether this bullet can damage its own team */
+    public boolean friendlyFire = false;
     /** Whether velocity is inherited from the shooter. */
     public boolean keepVelocity = true;
     /** Whether to scale lifetime (not actually velocity!) to disappear at the target position. Used for artillery. */
@@ -208,20 +210,20 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public boolean testCollision(Bullet bullet, Building tile){
-        return healPercent <= 0.001f || tile.team != bullet.team || tile.healthf() < 1f;
+        return healPercent <= 0.001f || (tile.team != bullet.team || (friendlyFire && tile != bullet.owner)) || tile.healthf() < 1f;
     }
 
     /** If direct is false, this is an indirect hit and the tile was already damaged.
      * TODO this is a mess. */
     public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
-        if(makeFire && build.team != b.team){
+        if(makeFire && (build.team != b.team || friendlyFire)){
             Fires.create(build.tile);
         }
 
         if(healPercent > 0f && build.team == b.team && !(build.block instanceof ConstructBlock)){
             Fx.healBlockFull.at(build.x, build.y, build.block.size, Pal.heal);
             build.heal(healPercent / 100f * build.maxHealth);
-        }else if(build.team != b.team && direct){
+        }else if((build.team != b.team || friendlyFire) && direct){
             hit(b);
         }
     }
@@ -288,7 +290,7 @@ public class BulletType extends Content implements Cloneable{
             }
 
             if(makeFire){
-                indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> Fires.create(other.tile));
+                indexer.eachBlock(null, x, y, splashDamageRadius, other -> (other.team != b.team || friendlyFire && other != b.owner), other -> Fires.create(other.tile));
             }
         }
 
@@ -415,7 +417,10 @@ public class BulletType extends Content implements Cloneable{
         if(lightRadius == -1){
             lightRadius = Math.max(18, hitSize * 5f);
         }
+
         drawSize = Math.max(drawSize, trailLength * speed * 2f);
+
+        if(friendlyFire) collidesTeam = true;
     }
 
     @Override
