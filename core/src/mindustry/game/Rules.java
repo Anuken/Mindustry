@@ -126,7 +126,7 @@ public class Rules{
     public @Nullable String customBackgroundCallback;
     /** path to background texture with extension (e.g. "sprites/space.png")*/
     public @Nullable String backgroundTexture;
-    /** background texture move speed scaling - bigger numbers mean slower movement */
+    /** background texture move speed scaling - bigger numbers mean slower movement. 0 to disable. */
     public float backgroundSpeed = 27000f;
     /** background texture scaling factor */
     public float backgroundScl = 1f;

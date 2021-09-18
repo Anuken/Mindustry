@@ -355,7 +355,12 @@ public class Renderer implements ApplicationListener{
             Tmp.tr1.u2 = size;
             Tmp.tr1.v2 = size / ratio;
 
-            float sx = (camera.position.x) / state.rules.backgroundSpeed, sy = (camera.position.y) / state.rules.backgroundSpeed;
+            float sx = 0f, sy = 0f;
+
+            if(!Mathf.zero(state.rules.backgroundSpeed)){
+                sx = (camera.position.x) / state.rules.backgroundSpeed;
+                sy = (camera.position.y) / state.rules.backgroundSpeed;
+            }
 
             Tmp.tr1.scroll(sx + state.rules.backgroundOffsetX, -sy + state.rules.backgroundOffsetY);
 
