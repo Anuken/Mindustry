@@ -66,6 +66,7 @@ public class Turret extends ReloadTurret{
     public boolean targetAir = true;
     public boolean targetGround = true;
     public boolean targetHealing = false;
+    public boolean playerControllable = true;
 
     //charging
     public float chargeTime = -1f;
@@ -155,6 +156,11 @@ public class Turret extends ReloadTurret{
         public void created(){
             unit = (BlockUnitc)UnitTypes.block.create(team);
             unit.tile(this);
+        }
+
+        @Override
+        public boolean canControl(){
+            return playerControllable;
         }
 
         @Override
