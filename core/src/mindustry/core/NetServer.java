@@ -397,7 +397,9 @@ public class NetServer implements ApplicationListener{
                 }
 
                 if(found != null){
-                    if(found.admin){
+                    if(found == player){
+                        player.sendMessage("[scarlet]You can't vote to kick yourself.");
+                    }else if(found.admin){
                         player.sendMessage("[scarlet]Did you really expect to be able to kick an admin?");
                     }else if(found.isLocal()){
                         player.sendMessage("[scarlet]Local players cannot be kicked.");
