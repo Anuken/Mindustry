@@ -38,7 +38,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     public void getCollisions(Cons<QuadTree> consumer){
         Seq<TeamData> data = state.teams.present;
         for(int i = 0; i < data.size; i++){
-            if(data.items[i].team != team){
+            if(data.items[i].team != team || type.friendlyFire){
                 consumer.get(data.items[i].tree());
             }
         }
