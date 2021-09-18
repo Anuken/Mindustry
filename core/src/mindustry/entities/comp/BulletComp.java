@@ -138,16 +138,16 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         while(x >= 0 && y >= 0 && x < ww && y < wh){
             Building build = world.build(x, y);
             if(build != null && isAdded() && build.collide(self()) && type.testCollision(self(), build)
-                && !build.dead() && (type.collidesTeam || build.team != team) && !(type.pierceBuilding && hasCollided(build.id))){
+                && !build.dead() && (type.collidesTeam || build.team != team || (type.friendlyFire && build != owner)) && !(type.pierceBuilding && hasCollided(build.id))){
 
                 boolean remove = false;
                 float health = build.health;
 
-                if(build.team != team || type.friendlyFire){
+                if(build.team != team || (type.friendlyFire && build != owner)){
                     remove = build.collision(self());
                 }
 
-                if(remove || type.collidesTeam){
+                if(remove || type.collidesTeam || (type.friendlyFire && build != owner)){
                     if(!type.pierceBuilding){
                         hit = true;
                         remove();

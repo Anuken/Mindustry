@@ -419,8 +419,6 @@ public class BulletType extends Content implements Cloneable{
         }
 
         drawSize = Math.max(drawSize, trailLength * speed * 2f);
-
-        if(friendlyFire) collidesTeam = true;
     }
 
     @Override
