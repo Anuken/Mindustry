@@ -390,7 +390,7 @@ public class LStatements{
     public static class RadarStatement extends LStatement{
         public RadarTarget target1 = RadarTarget.enemy, target2 = RadarTarget.any, target3 = RadarTarget.any;
         public RadarSort sort = RadarSort.distance;
-        public String radar = "turret1", sortOrder = "1", output = "result";
+        public String radar = "turret1", sortOrder = "1", index = "0", output = "result";
 
         @Override
         public void build(Table table){
@@ -437,6 +437,10 @@ public class LStatements{
                 }, 2, cell -> cell.size(100, 50)));
             }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
+            table.add(" index ").self(this::param);
+
+            fields(table, index, v -> index = v);
+
             table.add(" output ").self(this::param);
 
             fields(table, output, v -> output = v);
@@ -453,7 +457,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new RadarI(target1, target2, target3, sort, builder.var(radar), builder.var(sortOrder), builder.var(output));
+            return new RadarI(target1, target2, target3, sort, builder.var(radar), builder.var(sortOrder), builder.var(index), builder.var(output));
         }
     }
 
@@ -923,7 +927,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new RadarI(target1, target2, target3, sort, LExecutor.varUnit, builder.var(sortOrder), builder.var(output));
+            return new RadarI(target1, target2, target3, sort, LExecutor.varUnit, builder.var(sortOrder), builder.var(index), builder.var(output));
         }
     }
 

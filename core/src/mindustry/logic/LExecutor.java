@@ -674,7 +674,7 @@ public class LExecutor{
     public static class RadarI implements LInstruction{
         public RadarTarget target1 = RadarTarget.enemy, target2 = RadarTarget.any, target3 = RadarTarget.any;
         public RadarSort sort = RadarSort.distance;
-        public int radar, sortOrder, output;
+        public int radar, sortOrder, index, output;
 
         //radar instructions are special in that they cache their output and only change it at fixed intervals.
         //this prevents lag from spam of radar instructions
@@ -684,13 +684,14 @@ public class LExecutor{
         static float bestValue = 0f;
         static Unit best = null;
 
-        public RadarI(RadarTarget target1, RadarTarget target2, RadarTarget target3, RadarSort sort, int radar, int sortOrder, int output){
+        public RadarI(RadarTarget target1, RadarTarget target2, RadarTarget target3, RadarSort sort, int radar, int sortOrder, int index, int output){
             this.target1 = target1;
             this.target2 = target2;
             this.target3 = target3;
             this.sort = sort;
             this.radar = radar;
             this.sortOrder = sortOrder;
+            this.index = index;
             this.output = output;
         }
 
@@ -702,6 +703,8 @@ public class LExecutor{
             Object base = exec.obj(radar);
 
             int sortDir = exec.bool(sortOrder) ? 1 : -1;
+            int idx = exec.numi(index);
+            idx = Math.max(0, idx);
             LogicAI ai = null;
 
             if(base instanceof Ranged r && r.team() == exec.team &&
@@ -724,16 +727,16 @@ public class LExecutor{
                         Seq<TeamData> data = state.teams.present;
                         for(int i = 0; i < data.size; i++){
                             if(data.items[i].team != r.team()){
-                                find(r, range, sortDir, data.items[i].team);
+                                find(r, range, sortDir, data.items[i].team, idx);
                             }
                         }
                     }else if(!allies){
                         Seq<TeamData> data = state.teams.present;
                         for(int i = 0; i < data.size; i++){
-                            find(r, range, sortDir, data.items[i].team);
+                            find(r, range, sortDir, data.items[i].team, idx);
                         }
                     }else{
-                        find(r, range, sortDir, r.team());
+                        find(r, range, sortDir, r.team(), idx);
                     }
 
                     lastTarget = targeted = best;
@@ -747,7 +750,8 @@ public class LExecutor{
             }
         }
 
-        void find(Ranged b, float range, int sortDir, Team team){
+        void find(Ranged b, float range, int sortDir, Team team, int idx){
+            ObjectMap<Float, Unit> units = new ObjectMap<>();
             Units.nearby(team, b.x(), b.y(), range, u -> {
                 if(!u.within(b, range)) return;
 
@@ -759,11 +763,11 @@ public class LExecutor{
                 if(!valid) return;
 
                 float val = sort.func.get(b, u) * sortDir;
-                if(val > bestValue || best == null){
-                    bestValue = val;
-                    best = u;
-                }
+                units.put(val, u);
             });
+            if(units.size == 0 || idx >= units.size) return;
+            bestValue = units.keys().toSeq().sort().get(units.size - 1 - idx);
+            best = units.get(bestValue);
         }
     }
 
