@@ -681,8 +681,9 @@ public class LExecutor{
         public Healthc lastTarget;
         public Interval timer = new Interval();
 
-        static float bestValue = 0f;
         static Unit best = null;
+        static FloatSeq values = new FloatSeq();
+        static Seq<Unit> units = new Seq<>();
 
         public RadarI(RadarTarget target1, RadarTarget target2, RadarTarget target3, RadarSort sort, int radar, int sortOrder, int index, int output){
             this.target1 = target1;
@@ -701,10 +702,8 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Object base = exec.obj(radar);
-
             int sortDir = exec.bool(sortOrder) ? 1 : -1;
-            int idx = exec.numi(index);
-            idx = Math.max(0, idx);
+            int idx = Math.max(0, exec.numi(index));
             LogicAI ai = null;
 
             if(base instanceof Ranged r && r.team() == exec.team &&
@@ -721,7 +720,6 @@ public class LExecutor{
                     boolean allies = target1 == RadarTarget.ally || target2 == RadarTarget.ally || target3 == RadarTarget.ally;
 
                     best = null;
-                    bestValue = 0;
 
                     if(enemies){
                         Seq<TeamData> data = state.teams.present;
@@ -751,7 +749,8 @@ public class LExecutor{
         }
 
         void find(Ranged b, float range, int sortDir, Team team, int idx){
-            ObjectMap<Float, Unit> units = new ObjectMap<>();
+            values.clear();
+            units.clear();
             Units.nearby(team, b.x(), b.y(), range, u -> {
                 if(!u.within(b, range)) return;
 
@@ -763,11 +762,21 @@ public class LExecutor{
                 if(!valid) return;
 
                 float val = sort.func.get(b, u) * sortDir;
-                units.put(val, u);
+                for(int i = 0; i <= idx; i++){
+                    if(i >= values.size){
+                        values.add(val);
+                        units.add(u);
+                        return;
+                    }else if(values.get(i) < val){
+                        values.insert(i, val);
+                        units.insert(i, u);
+                        return;
+                    }
+                }
             });
+
             if(units.size == 0 || idx >= units.size) return;
-            bestValue = units.keys().toSeq().sort().get(units.size - 1 - idx);
-            best = units.get(bestValue);
+            best = units.get(idx);
         }
     }
 
