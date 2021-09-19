@@ -199,7 +199,7 @@ public class BulletType extends Content implements Cloneable{
 
     /** Returns maximum distance the bullet this bullet type has can travel. */
     public float range(){
-        return Math.max(speed * lifetime * (1f - drag), maxRange);
+        return Mathf.zero(drag) ? speed * lifetime : Math.max(speed * (1f - Mathf.pow(1f - drag, lifetime)) / drag, maxRange);
     }
 
     /** @return continuous damage in damage/sec, or -1 if not continuous. */
