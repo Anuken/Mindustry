@@ -89,18 +89,18 @@ public class TypeIO{
             write.b((byte)14);
             write.i(b.length);
             write.b(b);
-        }else if(object instanceof boolean[] b){
-            write.b(16);
-            write.i(b.length);
-            for(boolean bool : b){
-                write.bool(bool);
-            }
         }else if(object instanceof UnitCommand c){
             write.b((byte)15);
             write.b(c.ordinal());
         }else if(object instanceof BuildingBox b){
             write.b(12);
             write.i(b.pos);
+        }else if(object instanceof boolean[] b){
+            write.b(16);
+            write.i(b.length);
+            for(boolean bool : b){
+                write.bool(bool);
+            }
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
