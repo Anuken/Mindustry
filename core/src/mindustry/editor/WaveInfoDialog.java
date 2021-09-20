@@ -1,6 +1,7 @@
 package mindustry.editor;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -26,13 +27,14 @@ import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.*;
 
 public class WaveInfoDialog extends BaseDialog{
-    private int start = 0, displayed = 20, graphSpeed = 1, maxGraphSpeed = 32;
+    private int start = 0, displayed = 20, graphSpeed = 1, maxGraphSpeed = 16;
     Seq<SpawnGroup> groups = new Seq<>();
     private SpawnGroup expandedGroup;
 
     private Table table, iTable, eTable, uTable;
     private int itemAmount, payLeft;
-    private int search = -1, filterHealth, filterHealthMode, filterBegin, filterEnd, filterAmount, filterAmountWave, filterShields, filterShieldsWave, filterRange = 20;
+    private int search = -1, filterHealth, filterBegin = -1, filterEnd = -1, filterAmount, filterAmountWave;
+    private boolean filterHealthMode = false, filterStrict = false;
     private UnitType lastType = UnitTypes.dagger;
     private StatusEffect filterEffect = StatusEffects.none;
     private Sort sort = Sort.begin;
@@ -76,7 +78,7 @@ public class WaveInfoDialog extends BaseDialog{
                     dialog.hide();
                 }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null || Core.app.getClipboardText().isEmpty()).row();
 
-               t.button("@settings.reset", Icon.upload, style, () -> ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
+                t.button("@settings.reset", Icon.upload, style, () -> ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
                     groups = JsonIO.copy(waves.get());
                     buildGroups();
                     dialog.hide();
@@ -119,7 +121,7 @@ public class WaveInfoDialog extends BaseDialog{
         if(experimental){
             buttons.button("x" + graphSpeed, () -> {
                 graphSpeed *= 2;
-                if(graphSpeed >= maxGraphSpeed) graphSpeed = 1;
+                if(graphSpeed > maxGraphSpeed) graphSpeed = 1;
             }).update(b -> b.setText("x" + graphSpeed)).width(100f);
 
             buttons.button("Random", Icon.refresh, () -> {
@@ -162,7 +164,7 @@ public class WaveInfoDialog extends BaseDialog{
                     start = Math.max(search - (displayed / 2) - (displayed % 2), 0);
                     buildGroups();
                 }).growX().maxTextLength(8).get().setMessageText("@waves.search");
-                s.button(Icon.filter, Styles.emptyi, () -> showFilter()).size(46f).tooltip("@waves.filter");
+                s.button(Icon.filter, Styles.emptyi, this::showFilter).size(46f).tooltip("@waves.filter");
             }).fillX().pad(6f).row();
             main.pane(t -> table = t).growX().growY().padRight(8f).scrollX(false);
             main.row();
@@ -220,11 +222,10 @@ public class WaveInfoDialog extends BaseDialog{
 
             for(SpawnGroup group : groups){
                 if((search >= 0 && group.getSpawned(search) <= 0)
-                || (filterHealth != 0 && !(filterHealthMode == 0 ? group.type.health > filterHealth : filterHealthMode == 1 ? group.type.health < filterHealth : between((int)group.type.health, filterHealth - filterRange, filterHealth + filterRange)))
-                || (filterBegin != 0 && !between(filterBegin, group.begin - filterRange/10, group.begin + filterRange/10))
-                || (filterEnd != 0 && !between(filterEnd, group.end - filterRange/10, group.end + filterRange/10))
-                || (filterAmount != 0 && !between(group.getSpawned(filterAmountWave), filterAmount - filterRange/4, filterAmount + filterRange/4))
-                || (filterShields != 0 && !between((int)group.getShield(filterShieldsWave > 0 ? filterShieldsWave : search), filterShields - filterRange/4, filterShields + filterRange/4))
+                || (filterHealth != 0 && !(filterHealthMode ? group.type.health * (search >= 0 ? group.getSpawned(search) : 1) > filterHealth : group.type.health * (search >= 0 ? group.getSpawned(search) : 1) < filterHealth))
+                || (filterBegin >= 0 && !(filterStrict ? group.begin == filterBegin : group.begin - 2 <= filterBegin && group.begin + 2 >= filterBegin))
+                || (filterEnd >= 0 && !(filterStrict ? group.end == filterEnd : group.end - 2 <= filterEnd && group.end + 2 >= filterEnd))
+                || (filterAmount != 0 && !(filterStrict ? group.getSpawned(filterAmountWave) == filterAmount : filterAmount - 5 <= group.getSpawned(filterAmountWave) && filterAmount + 5 >= group.getSpawned(filterAmountWave)))
                 || (filterEffect != StatusEffects.none && group.effect != filterEffect)) continue;
 
                 table.table(Tex.button, t -> {
@@ -421,7 +422,7 @@ public class WaveInfoDialog extends BaseDialog{
                     if(!payloads) dialog.hide();
                     if(payloads) updateIcons(group);
                     buildGroups();
-                }).pad(2).margin(12f).fillX().disabled(a -> payloads ? payLeft < type.hitSize * type.hitSize : a != a);
+                }).pad(2).margin(12f).fillX().disabled(a -> payloads && payLeft < type.hitSize * type.hitSize);
                 if(++i % 3 == 0) p.row();
             }
         });
@@ -518,79 +519,37 @@ public class WaveInfoDialog extends BaseDialog{
         dialog.cont.add(Core.bundle.get("waves.sort.health") + ":");
         dialog.cont.table(filter -> {
             filter.button(">", Styles.cleart, () -> {
-                filterHealthMode++;
-                if(filterHealthMode > 2) filterHealthMode = 0;
+                filterHealthMode = !filterHealthMode;
                 buildGroups();
-            }).update(b -> b.setText(filterHealthMode == 0 ? ">" : filterHealthMode == 1 ? "<" : "~")).size(40f).padRight(4f);
-            filter.field(filterHealth + "", TextFieldFilter.digitsOnly, text -> {
-                if(Strings.canParsePositiveInt(text)){
-                    filterHealth = !text.isEmpty() ? Strings.parseInt(text) : 0;
-                    buildGroups();
-                }
-            }).width(170f).maxTextLength(15).row();
+            }).update(b -> b.setText(filterHealthMode ? ">" : "<")).size(40f).padRight(4f);
+            filter.defaults().width(170f);
+            numField("", filter, f -> filterHealth = f, () -> filterHealth, 15);
         }).row();
 
         dialog.cont.add("@waves.filter.begin");
         dialog.cont.table(filter -> {
-            filter.field(filterBegin + "", TextFieldFilter.digitsOnly, text -> {
-                if(Strings.canParsePositiveInt(text)){
-                    filterBegin = !text.isEmpty() ? Strings.parseInt(text) : 0;
-                    buildGroups();
-                }
-            }).width(120f).maxTextLength(8);
-            filter.add("@waves.to");
-            filter.field(filterEnd + "", TextFieldFilter.digitsOnly, text -> {
-                if(Strings.canParsePositiveInt(text)){
-                    filterEnd = !text.isEmpty() ? Strings.parseInt(text) : 0;
-                    buildGroups();
-                }
-            }).width(120f).maxTextLength(8).row();
+            filter.defaults().maxWidth(120f);
+            numField("", filter, f -> filterBegin = f - 1, () -> filterBegin + 1, 8);
+            numField("@waves.to", filter, f -> filterEnd = f - 1, () -> filterEnd + 1, 8);
         }).row();
 
         dialog.cont.add(Core.bundle.get("waves.filter.amount") + ":");
         dialog.cont.table(filter -> {
-            filter.field(filterAmount + "", TextFieldFilter.digitsOnly, text -> {
-                if(Strings.canParsePositiveInt(text)){
-                    filterAmount = !text.isEmpty() ? Strings.parseInt(text) : 0;
-                    buildGroups();
-                }
-            }).width(120f).maxTextLength(12);
-            filter.add("@waves.filter.onwave");
-            filter.field(filterAmountWave + "", TextFieldFilter.digitsOnly, text -> {
-                if(Strings.canParsePositiveInt(text)){
-                    filterAmountWave = !text.isEmpty() ? Strings.parseInt(text) : 0;
-                    buildGroups();
-                }
-            }).width(120f).maxTextLength(8);
+            filter.defaults().maxWidth(120f);
+            numField("", filter, f -> filterAmount = f, () -> filterAmount, 12);
+            numField("@waves.filter.onwave", filter, f -> filterAmountWave = f, () -> filterAmountWave, 8);
         }).row();
 
-        dialog.cont.add(Core.bundle.get("waves.filter.shields") + ":");
-        dialog.cont.table(filter -> {
-            filter.field(filterShields + "", TextFieldFilter.digitsOnly, text -> {
-                if(Strings.canParsePositiveInt(text)){
-                    filterShields = !text.isEmpty() ? Strings.parseInt(text) : 0;
-                    buildGroups();
-                }
-            }).width(120f).maxTextLength(12);
-            filter.add("@waves.filter.onwave");
-            filter.field(filterShieldsWave + "", TextFieldFilter.digitsOnly, text -> {
-                if(Strings.canParsePositiveInt(text)){
-                    filterShieldsWave = !text.isEmpty() ? Strings.parseInt(text) : 0;
-                    buildGroups();
-                }
-            }).width(120f).maxTextLength(8);
-        }).row();
-
-        dialog.cont.add(Core.bundle.get("waves.filter.range") + ":");
-        dialog.cont.field(filterRange + "", TextFieldFilter.digitsOnly, text -> {
-            if(Strings.canParsePositiveInt(text)) filterRange = !text.isEmpty() ? Strings.parseInt(text) : 0;
-            buildGroups();
-        }).maxTextLength(7).row();
         dialog.cont.table(t -> {
             eTable = t;
             updateIcons(null);
         }).row();
         dialog.row();
+        dialog.check("@waves.filter.strict", b -> {
+            filterStrict = b;
+            buildGroups();
+        }).checked(filterStrict).padBottom(10f).row();
+
         dialog.table(p -> {
             p.defaults().size(210f, 64f).padLeft(4f).padRight(4f);
             p.button("@back", Icon.left, dialog::hide);
@@ -661,13 +620,20 @@ public class WaveInfoDialog extends BaseDialog{
         }
     }
 
-    boolean between(int number, int minValue, int maxValue){
-        return minValue <= number && maxValue >= number;
+    void numField(String text, Table t, Intc cons, Intp prov, int maxLength){
+        if(!text.isEmpty()) t.add(text);
+        t.field(prov.get() + "", TextFieldFilter.digitsOnly, input -> {
+            if(Strings.canParsePositiveInt(input)){
+                cons.get(!input.isEmpty() ? Strings.parseInt(input) : 0);
+                buildGroups();
+            }
+        }).maxTextLength(maxLength);
     }
 
     void clearFilter(){
-        filterHealth = filterHealthMode = filterBegin = filterEnd = filterAmount = filterAmountWave = filterShields = filterShieldsWave = 0;
-        filterRange = 20;
+        filterHealth = filterAmount = filterAmountWave = 0;
+        filterStrict = filterHealthMode = false;
+        filterBegin = filterEnd = -1;
         filterEffect = StatusEffects.none;
     }
 
