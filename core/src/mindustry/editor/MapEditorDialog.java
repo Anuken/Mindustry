@@ -581,6 +581,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 mid.table(t -> {
                     t.button("@editor.cliffs", Icon.terrain, Styles.cleart, editor::addCliffs).growX().margin(9f);
                 }).growX().top();
+
+                mid.row();
+
+                var layer = new SettingsMenuDialog.SettingsTable();
+                layer.checkPref("layer.block", true, bool -> editor.renderer.updateAll());
+                layer.checkPref("layer.wall", true, bool -> editor.renderer.updateAll());
+
+                mid.add(layer);
             }).margin(0).left().growY();
 
 

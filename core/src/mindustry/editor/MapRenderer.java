@@ -106,7 +106,7 @@ public class MapRenderer implements Disposable{
         int idxDecal = (wx % chunkSize) + (wy % chunkSize) * chunkSize + chunkSize * chunkSize;
         boolean center = tile.isCenter();
 
-        if(wall != Blocks.air && wall.synthetic()){
+        if(wall != Blocks.air && wall.synthetic() && Core.settings.getBool("layer.block")){
             region = !wall.editorIcon().found() || !center ? clearEditor : wall.editorIcon();
 
             float width = region.width * Draw.scl, height = region.height * Draw.scl;
@@ -124,10 +124,10 @@ public class MapRenderer implements Disposable{
 
         float offsetX = -(wall.size / 3) * tilesize, offsetY = -(wall.size / 3) * tilesize;
 
-        if((wall.update || wall.destructible) && center){
+        if(wall.synthetic() && Core.settings.getBool("layer.block") && center){
             mesh.setColor(team.color);
             region = Core.atlas.find("block-border-editor");
-        }else if(!wall.synthetic() && wall != Blocks.air && center){
+        }else if(!wall.synthetic() && wall != Blocks.air && center && Core.settings.getBool("layer.wall")){
             region = !wall.editorIcon().found() ?
                 clearEditor : wall.variants > 0 ?
                 wall.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, wall.editorVariantRegions().length - 1)] :
