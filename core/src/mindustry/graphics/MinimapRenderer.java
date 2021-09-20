@@ -97,7 +97,7 @@ public class MinimapRenderer{
 
             Draw.mixcol(unit.team().color, 1f);
             float scale = Scl.scl(1f) / 2f * scaling * 32f;
-            var region = unit.type.fullIcon;
+            var region = unit.icon();
             Draw.rect(region, x + rx, y + ry, scale, scale * (float)region.height / region.width, unit.rotation() - 90);
             Draw.reset();
         }

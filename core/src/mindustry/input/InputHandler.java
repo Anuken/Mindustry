@@ -174,7 +174,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         //remove item for every controlling unit
         player.unit().eachGroup(unit -> {
-            Call.takeItems(build, item, unit.maxAccepted(item), unit);
+            Call.takeItems(build, item, Math.min(unit.maxAccepted(item), amount), unit);
 
             if(unit == player.unit()){
                 Events.fire(new WithdrawEvent(build, player, item, amount));
