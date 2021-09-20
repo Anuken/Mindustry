@@ -32,6 +32,10 @@
     "address": ["35.202.253.94", "35.202.253.94:2000"]
   },
   {
+    "name": "BE6.RUN",
+    "address": ["be6.run", "mindustrycn.top","be6.run:6666"]
+  },
+  {
     "name": "Obvilion Network",
     "address": ["obvilionnetwork.ru:7004", "obvilionnetwork.ru:7005"]
   },
