@@ -1,6 +1,7 @@
 package mindustry.entities.abilities;
 
 import arc.*;
+import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -12,6 +13,7 @@ public class StatusFieldAbility extends Ability{
     public float duration = 60, reload = 100, range = 20;
     public Effect applyEffect = Fx.none;
     public Effect activeEffect = Fx.overdriveWave;
+    public float effectX, effectY;
     public boolean parentizeEffects;
 
     protected float timer;
@@ -40,7 +42,8 @@ public class StatusFieldAbility extends Ability{
                 applyEffect.at(other, parentizeEffects);
             });
 
-            activeEffect.at(unit, parentizeEffects);
+            float x = unit.x + Angles.trnsx(unit.rotation, effectY, effectX), y = unit.y + Angles.trnsy(unit.rotation, effectY, effectX);
+            activeEffect.at(x, y, unit.rotation, parentizeEffects ? unit : null);
 
             timer = 0f;
         }
