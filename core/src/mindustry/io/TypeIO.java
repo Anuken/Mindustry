@@ -89,6 +89,12 @@ public class TypeIO{
             write.b((byte)14);
             write.i(b.length);
             write.b(b);
+        }else if(object instanceof boolean[] b){
+            write.b(16);
+            write.i(b.length);
+            for(boolean bool : b){
+                write.bool(bool);
+            }
         }else if(object instanceof UnitCommand c){
             write.b((byte)15);
             write.b(c.ordinal());
@@ -126,6 +132,7 @@ public class TypeIO{
             case 13: return LAccess.all[read.s()];
             case 14: int blen = read.i(); byte[] bytes = new byte[blen]; read.b(bytes); return bytes;
             case 15: return UnitCommand.all[read.b()];
+            case 16: int boollen = read.i(); boolean[] bools = new boolean[boollen]; for(int i = 0; i < boollen; i ++) bools[i] = read.bool(); return bools;
             default: throw new IllegalArgumentException("Unknown object type: " + type);
         }
     }
