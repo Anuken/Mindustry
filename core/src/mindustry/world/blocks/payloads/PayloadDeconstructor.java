@@ -4,10 +4,12 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.*;
+import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
+
+import static mindustry.Vars.*;
 
 public class PayloadDeconstructor extends PayloadBlock{
     public float maxPayloadSize = 4;
@@ -74,7 +76,7 @@ public class PayloadDeconstructor extends PayloadBlock{
                     Draw.color(Pal.remove);
                     Draw.alpha(1f);
 
-                    Lines.lineAngleCenter(x + Mathf.sin(time, 20f, Vars.tilesize / 2f * block.size - 3f), y, 90f, block.size * Vars.tilesize - 6f);
+                    Lines.lineAngleCenter(x + Mathf.sin(time, 20f, tilesize / 2f * block.size - 3f), y, 90f, block.size * tilesize - 6f);
 
                     Draw.reset();
                 });
@@ -151,7 +153,8 @@ public class PayloadDeconstructor extends PayloadBlock{
 
                 //finish deconstruction, prepare for next payload.
                 if(progress >= 1f){
-                    //TODO
+                    Fx.breakBlock.at(x, y, deconstructing.size() / tilesize);
+
                     deconstructing = null;
                     accum = null;
                 }

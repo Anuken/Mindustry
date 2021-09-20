@@ -1,6 +1,7 @@
 package mindustry.maps.planet;
 
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.game.*;
@@ -92,7 +93,6 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
             }
 
             block = floor.asFloor().wall;
-
         });
 
         //random craters
@@ -135,6 +135,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
         state.rules.planetBackground = new PlanetParams(){{
             planet = sector.planet;
             zoom = 1f;
+            camPos = new Vec3(1.2388899f, 1.6047299f, 2.4758825f);
         }};
         //state.rules.backgroundTexture = "sprites/space.png";
         state.rules.borderDarkness = false;

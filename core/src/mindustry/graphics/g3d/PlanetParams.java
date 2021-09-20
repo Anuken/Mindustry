@@ -36,4 +36,5 @@ public class PlanetParams{
 
     //TODO:
     //- blur
+    //- darken
 }
