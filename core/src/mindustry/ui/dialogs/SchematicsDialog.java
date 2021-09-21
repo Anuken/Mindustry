@@ -35,7 +35,7 @@ public class SchematicsDialog extends BaseDialog{
     private String search = "";
     private TextField searchField;
     private Runnable rebuildPane = () -> {}, rebuildTags = () -> {};
-    private Pattern ignoreSymbols = Pattern.compile("[`~!@#$%^&*()-_=+{}|;:'\",<.>/?]");
+    private Pattern ignoreSymbols = Pattern.compile("[`~!@#$%^&*()\\-_=+{}|;:'\",<.>/?]");
     private Seq<String> tags, selectedTags = new Seq<>();
     private boolean checkedTags;
 
