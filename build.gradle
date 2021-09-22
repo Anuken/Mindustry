@@ -375,7 +375,7 @@ project(":core"){
         if(localArc() && debugged()) api arcModule("extensions:recorder")
         if(localArc()) api arcModule(":extensions:packer")
 
-        annotationProcessor 'com.github.Anuken:jabel:34e4c172e65b3928cd9eabe1993654ea79c409cd'
+        annotationProcessor 'com.github.Anuken:jabel:0.5.0'
         compileOnly project(":annotations")
         kapt project(":annotations")
     }
