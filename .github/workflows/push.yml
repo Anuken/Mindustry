@@ -22,4 +22,4 @@ jobs:
       with:
         java-version: 17
     - name: Run unit tests
-      run: ./gradlew clean cleanTest test
+      run: ./gradlew clean cleanTest test --stacktrace
