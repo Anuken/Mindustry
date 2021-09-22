@@ -57,9 +57,10 @@ public class LExecutor{
 
     /** Runs a single instruction. */
     public void runOnce(){
-        //set time
-        vars[varTime].numval = Time.millis();
-        vars[varTick].numval = Time.time;
+        //set up time; note that @time is now only updated once every invocation and directly based off of @tick.
+        //having time be based off of user system time was a very bad idea.
+        vars[varTime].numval = state.tick / 60.0 * 1000.0;
+        vars[varTick].numval = state.tick;
 
         //reset to start
         if(vars[varCounter].numval >= instructions.length || vars[varCounter].numval < 0){
