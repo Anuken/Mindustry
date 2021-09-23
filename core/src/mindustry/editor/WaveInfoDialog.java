@@ -32,9 +32,9 @@ public class WaveInfoDialog extends BaseDialog{
     private SpawnGroup expandedGroup;
 
     private Table table, iTable, eTable, uTable;
-    private int search = -1, payLeft;
+    private int search = -1, payLeft, maxVisible = 30;
     private int filterHealth, filterBegin = -1, filterEnd = -1, filterAmount, filterAmountWave;
-    private boolean filterHealthMode = false, filterStrict = false;
+    private boolean expandPane = false, filterHealthMode = false, filterStrict = false;
     private UnitType lastType = UnitTypes.dagger;
     private StatusEffect filterEffect = StatusEffects.none;
     private Sort sort = Sort.begin;
@@ -401,7 +401,7 @@ public class WaveInfoDialog extends BaseDialog{
         BaseDialog dialog = new BaseDialog("");
         dialog.setFillParent(true);
         if(payloads && group.payloads == null) group.payloads = Seq.with();
-        if(payloads) dialog.cont.pane(e -> {
+        if(payloads) dialog.cont.table(e -> {
             uTable = e;
             updateIcons(group);
         }).padBottom(6f).row();
@@ -598,24 +598,33 @@ public class WaveInfoDialog extends BaseDialog{
             uTable.left();
             uTable.defaults().pad(3);
             payLeft = (int)group.type.payloadCapacity;
-            int i = 0;
-            for(UnitType payl : group.payloads){
-                uTable.table(Tex.button, s -> {
-                    s.image(payl.uiIcon).size(45f);
-                    s.button(Icon.cancelSmall, Styles.emptyi, () -> {
-                        group.payloads.remove(payl);
-                        updateIcons(group);
-                        buildGroups();
-                    }).size(20f).padRight(-9f).padLeft(-6f);
-                }).pad(2).margin(12f).fillX();
-                payLeft -= payl.hitSize * payl.hitSize;
-                if(++i % 12 == 0) uTable.row();
-            }
-            if(!group.payloads.isEmpty()) uTable.button(Icon.cancel, () -> {
-                group.payloads.clear();
-                updateIcons(group);
-                buildGroups();
-            }).padLeft(6f).tooltip("@clear");
+            uTable.table(units -> {
+                int i = 0;
+                for(UnitType payl : group.payloads){
+                    if(i < maxVisible || expandPane) units.table(Tex.button, s -> {
+                        s.image(payl.uiIcon).size(45f);
+                        s.button(Icon.cancelSmall, Styles.emptyi, () -> {
+                            group.payloads.remove(payl);
+                            updateIcons(group);
+                            buildGroups();
+                        }).size(20f).padRight(-9f).padLeft(-6f);
+                    }).pad(2).margin(12f).fillX();
+                    payLeft -= payl.hitSize * payl.hitSize;
+                    if(++i % 10 == 0) units.row();
+                }
+            });
+            uTable.table(b -> {
+                b.defaults().pad(2);
+                if(group.payloads.size > 1) b.button(Icon.cancel, () -> {
+                    group.payloads.clear();
+                    updateIcons(group);
+                    buildGroups();
+                }).tooltip("@clear").row();
+                if(group.payloads.size > maxVisible) b.button(expandPane ? Icon.eyeSmall : Icon.eyeOffSmall, () -> {
+                    expandPane = !expandPane;
+                    updateIcons(group);
+                }).size(45f).tooltip(expandPane ? "@server.hidden" : "@server.shown");
+            }).padLeft(6f);
         }
     }
 
