@@ -334,12 +334,6 @@ public class SchematicsDialog extends BaseDialog{
         dialog.show();
     }
 
-    public void focusSearchField(){
-        if(searchField == null) return;
-
-        Core.scene.setKeyboardFocus(searchField);
-    }
-
 
     //adds all new tags to the global list of tags
     //alternatively, unknown tags could be discarded on import?
@@ -635,8 +629,8 @@ public class SchematicsDialog extends BaseDialog{
     public Dialog show(){
         super.show();
 
-        if(Core.app.isDesktop()){
-            focusSearchField();
+        if(Core.app.isDesktop() && searchField != null){
+            Core.scene.setKeyboardFocus(searchField);
         }
 
         return this;
