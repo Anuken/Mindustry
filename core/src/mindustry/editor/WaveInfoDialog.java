@@ -32,14 +32,15 @@ public class WaveInfoDialog extends BaseDialog{
     private SpawnGroup expandedGroup;
 
     private Table table, iTable, eTable, uTable;
-    private int itemAmount, payLeft;
-    private int search = -1, filterHealth, filterBegin = -1, filterEnd = -1, filterAmount, filterAmountWave;
+    private int search = -1, payLeft;
+    private int filterHealth, filterBegin = -1, filterEnd = -1, filterAmount, filterAmountWave;
     private boolean filterHealthMode = false, filterStrict = false;
     private UnitType lastType = UnitTypes.dagger;
     private StatusEffect filterEffect = StatusEffects.none;
     private Sort sort = Sort.begin;
     private boolean reverseSort = false;
     private float updateTimer, updatePeriod = 1f;
+    private TextField amountField = new TextField();
     private WaveGraph graph = new WaveGraph();
 
     public WaveInfoDialog(){
@@ -471,16 +472,15 @@ public class WaveInfoDialog extends BaseDialog{
     void showItems(SpawnGroup group){
         BaseDialog dialog = new BaseDialog("");
         dialog.setFillParent(true);
+        dialog.cont.table(items -> {
+            items.add(Core.bundle.get("filter.option.amount") + ":");
+            amountField = items.field((group.items != null ? group.items.amount : 0) + "", TextFieldFilter.digitsOnly, text -> {
+                if(Strings.canParsePositiveInt(text) && group.items != null){
+                    group.items.amount = Strings.parseInt(text) <= 0 ? group.type.itemCapacity : Mathf.clamp(Strings.parseInt(text), 0, group.type.itemCapacity);
+                }
+            }).width(120f).pad(2).margin(12f).maxTextLength(String.valueOf(group.type.itemCapacity).length() + 1).get();
+        }).padBottom(6f).row();
         dialog.cont.pane(p -> {
-            p.add("");
-            p.table(a -> {
-                a.add(Core.bundle.get("filter.option.amount") + ":");
-                a.field(itemAmount + "", TextFieldFilter.digitsOnly, text -> {
-                    if(Strings.canParseInt(text)){
-                        itemAmount = Mathf.clamp(Strings.parseInt(text), 0, group.type.itemCapacity);
-                    }
-                }).width(120f).pad(2).margin(12f).maxTextLength(String.valueOf(group.type.itemCapacity).length() + 1);
-            }).row();
             int i = 1;
             p.defaults().pad(2).margin(12f).minWidth(200f).fillX();
             p.button(icon -> {
@@ -499,9 +499,8 @@ public class WaveInfoDialog extends BaseDialog{
                     if(item.uiIcon != null) t.image(item.uiIcon).size(8 * 4).scaling(Scaling.fit).padRight(2f);
                     t.add(item.localizedName);
                 }, () -> {
-                    group.items = new ItemStack(item, itemAmount);
+                    group.items = new ItemStack(item, Strings.parseInt(amountField.getText()) <= 0 ? group.type.itemCapacity : Mathf.clamp(Strings.parseInt(amountField.getText()), 0, group.type.itemCapacity));
                     updateIcons(group);
-                    if(itemAmount <= 0) group.items.amount = itemAmount = group.type.itemCapacity;
                     dialog.hide();
                     buildGroups();
                 });
