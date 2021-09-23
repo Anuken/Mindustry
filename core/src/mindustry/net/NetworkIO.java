@@ -9,6 +9,7 @@ import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
+import mindustry.logic.*;
 import mindustry.maps.Map;
 import mindustry.net.Administration.*;
 
@@ -41,6 +42,8 @@ public class NetworkIO{
             stream.writeInt(state.wave);
             stream.writeFloat(state.wavetime);
             stream.writeDouble(state.tick);
+            stream.writeLong(GlobalConstants.rand.seed0);
+            stream.writeLong(GlobalConstants.rand.seed1);
 
             stream.writeInt(player.id);
             player.write(Writes.get(stream));
@@ -63,6 +66,8 @@ public class NetworkIO{
             state.wave = stream.readInt();
             state.wavetime = stream.readFloat();
             state.tick = stream.readDouble();
+            GlobalConstants.rand.seed0 = stream.readLong();
+            GlobalConstants.rand.seed1 = stream.readLong();
 
             Groups.clear();
             int id = stream.readInt();
