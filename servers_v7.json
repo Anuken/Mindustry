@@ -46,5 +46,9 @@
   {
     "name": "SubZero",
     "address": ["minty-server.ddns.net"]
+  },
+  {
+    "name": "Online Mindustry Community",
+    "address": ["172.104.253.198", "172.104.253.198:4000"]
   }
 ]
