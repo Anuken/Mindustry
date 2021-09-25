@@ -30,7 +30,9 @@ public class Effect{
     public float lifetime = 50f;
     /** Clip size. */
     public float clip;
-    /** If true and data is a unit, the effect will follow it. */
+    /** Amount added to rotation */
+    public float baseRotation;
+    /** If true, parent unit is data are followed. */
     public boolean followParent;
     /** If this and followParent are true, the effect will offset with the parent's rotation. */
     public boolean rotateWithParent;
@@ -73,6 +75,11 @@ public class Effect{
         return this;
     }
 
+    public Effect baseRotation(float d){
+        baseRotation = d;
+        return this;
+    }
+
     public Effect layer(float l, float duration){
         layer = l;
         this.layerDuration = duration;
@@ -81,6 +88,10 @@ public class Effect{
 
     public void at(Position pos){
         create(this, pos.getX(), pos.getY(), 0, Color.white, null);
+    }
+
+    public void at(Position pos, boolean parentize){
+        create(this, pos.getX(), pos.getY(), 0, Color.white, parentize ? pos : null);
     }
 
     public void at(Position pos, float rotation){
@@ -159,7 +170,7 @@ public class Effect{
 
             EffectState entity = EffectState.create();
             entity.effect = effect;
-            entity.rotation = rotation;
+            entity.rotation = effect.baseRotation + rotation;
             entity.data = data;
             entity.lifetime = effect.lifetime;
             entity.set(x, y);
