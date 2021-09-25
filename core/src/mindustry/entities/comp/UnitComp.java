@@ -517,6 +517,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             }
         }
 
+        if(abilities.size > 0){
+            for(Ability a : abilities){
+                a.death(self());
+            }
+        }
+
         remove();
     }
 
