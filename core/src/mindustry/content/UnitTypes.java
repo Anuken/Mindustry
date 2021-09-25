@@ -487,7 +487,7 @@ public class UnitTypes implements ContentList{
                 y = -30f / 4f;
                 shootY = 6f;
                 beamWidth = 0.8f;
-                repairSpeed = 1.4f;
+                repairSpeed = 0.7f;
 
                 bullet = new BulletType(){{
                     maxRange = 120f;
