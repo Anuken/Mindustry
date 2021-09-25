@@ -34,8 +34,8 @@ public class Effect{
     public float baseRotation;
     /** If true, parent unit is data are followed. */
     public boolean followParent;
-    /** If this and followParent are true, the effect will offset with the parent's rotation. */
-    public boolean rotateWithParent;
+    /** If this and followParent are true, the effect will offset and rotate with the parent's rotation. */
+    public boolean rotWithParent;
 
     public float layer = Layer.effect;
     public float layerDuration;
@@ -65,8 +65,8 @@ public class Effect{
         return this;
     }
 
-    public Effect rotateWithParent(boolean follow){
-        rotateWithParent = follow;
+    public Effect rotWithParent(boolean follow){
+        rotWithParent = follow;
         return this;
     }
 
@@ -177,7 +177,7 @@ public class Effect{
             entity.color.set(color);
             if(effect.followParent && data instanceof Posc p){
                 entity.parent = p;
-                entity.rotateWithParent = effect.rotateWithParent;
+                entity.rotWithParent = effect.rotWithParent;
             }
             entity.add();
         }
