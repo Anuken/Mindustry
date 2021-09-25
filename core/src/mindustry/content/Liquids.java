@@ -48,8 +48,9 @@ public class Liquids implements ContentList{
         neoplasm = new CellLiquid("neoplasm", Color.valueOf("e05438")){{
             heatCapacity = 0.4f;
             temperature = 0.54f;
-            viscosity = 0.65f;
+            viscosity = 0.85f;
             flammability = 0.1f;
+            capPuddles = false;
 
             colorFrom = Color.valueOf("f98f4a");
             colorTo = Color.valueOf("9e172c");

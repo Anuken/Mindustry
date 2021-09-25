@@ -35,6 +35,7 @@ public class CellLiquid extends Liquid{
 
         rand.setSeed(id);
         for(int i = 0; i < cells; i++){
+            Draw.z(Layer.debris - 0.5f + i/1000f + (id % 100) / 10000f);
             Tmp.v1.trns(rand.random(360f), rand.random(length));
             float vx = x + Tmp.v1.x, vy = y + Tmp.v1.y;
 

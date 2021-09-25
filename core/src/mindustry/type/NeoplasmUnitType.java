@@ -18,11 +18,14 @@ public class NeoplasmUnitType extends UnitType{
             percentAmount = 1f / (30f * 60f) * 100f;
         }});
 
+        abilities.add(new LiquidExplodeAbility(){{
+            liquid = Liquids.neoplasm;
+        }});
+
         //green flashing is unnecessary since they always regen
         showHeal = false;
 
         //TODO
         //- liquid regen ability
-        //- liquid/neoplasm explode ability
     }
 }

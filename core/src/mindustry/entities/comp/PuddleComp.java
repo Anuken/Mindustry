@@ -20,7 +20,6 @@ import static mindustry.entities.Puddles.*;
 @Component(base = true)
 abstract class PuddleComp implements Posc, Puddlec, Drawc{
     private static final Rect rect = new Rect(), rect2 = new Rect();
-    private static int seeds;
 
     private static Puddle paramPuddle;
     private static Cons<Unit> unitCons = unit -> {
@@ -70,7 +69,9 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
             amount -= deposited * targets;
         }
 
-        amount = Mathf.clamp(amount, 0, maxLiquid);
+        if(liquid.capPuddles){
+            amount = Mathf.clamp(amount, 0, maxLiquid);
+        }
 
         if(amount <= 0f){
             remove();
@@ -108,6 +109,8 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
         }
 
         updateTime -= Time.delta;
+
+        liquid.update(self());
     }
 
     @Override

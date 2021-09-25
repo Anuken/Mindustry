@@ -43,6 +43,8 @@ public class Liquid extends UnlockableContent{
     public float particleSpacing = 60f;
     /** Temperature at which this liquid vaporizes. This isn't just boiling. */
     public float boilPoint = 2f;
+    /** If true, puddle size is capped. */
+    public boolean capPuddles = true;
     /** Effect when this liquid vaporizes. */
     public Effect vaporEffect = Fx.vapor;
 
@@ -95,6 +97,11 @@ public class Liquid extends UnlockableContent{
         if(lightColor.a > 0.001f && f > 0){
             Drawf.light(Team.derelict, x, y, 30f * f, lightColor, color.a * f * 0.8f);
         }
+    }
+
+    /** Runs when puddles update. */
+    public void update(Puddle puddle){
+
     }
 
     @Override
