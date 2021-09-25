@@ -202,10 +202,16 @@ public class Block extends UnlockableContent{
     public int outlinedIcon = -1;
     /** Whether this block has a shadow under it. */
     public boolean hasShadow = true;
-    /** Sounds made when this block is destroyed.*/
-    public Sound destroySound = Sounds.boom;
+    /** Should the sound made when this block is built change in pitch. */
+    public boolean placePitchChange = true;
+    /** Should the sound made when this block is deconstructed change in pitch. */
+    public boolean breakPitchChange = true;
+    /** Sound made when this block is built. */
+    public Sound placeSound = Sounds.place;
     /** Sound made when this block is deconstructed. */
     public Sound breakSound = Sounds.breaks;
+    /** Sounds made when this block is destroyed.*/
+    public Sound destroySound = Sounds.boom;
     /** How reflective this block is. */
     public float albedo = 0f;
     /** Environmental passive light color. */
