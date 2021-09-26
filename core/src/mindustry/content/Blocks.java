@@ -35,7 +35,7 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, spawn, cliff, deepwater, water, taintedWater, deepTaintedWater, tar, slag, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space,
+    air, spawn, cliff, deepwater, water, taintedWater, deepTaintedWater, tar, slag, cryofluid, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space,
     dacite,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, grass, salt,
@@ -194,6 +194,22 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.oil;
             isLiquid = true;
             cacheLayer = CacheLayer.tar;
+        }};
+
+        cryofluid = new Floor("pooled-cryofluid"){{
+            drownTime = 150f;
+            status = StatusEffects.freezing;
+            statusDuration = 240f;
+            speedMultiplier = 0.5f;
+            variants = 0;
+            liquidDrop = Liquids.cryofluid;
+            liquidMultiplier = 0.5f;
+            isLiquid = true;
+            cacheLayer = CacheLayer.cryofluid;
+
+            emitLight = true;
+            lightRadius = 20f;
+            lightColor = Color.cyan.cpy().a(0.19f);
         }};
 
         slag = new Floor("molten-slag"){{
