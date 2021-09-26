@@ -27,5 +27,6 @@ public class NeoplasmUnitType extends UnitType{
 
         //TODO
         //- liquid regen ability
+        //- new explode effect
     }
 }

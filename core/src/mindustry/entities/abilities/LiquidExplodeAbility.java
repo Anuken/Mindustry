@@ -18,6 +18,7 @@ public class LiquidExplodeAbility extends Ability{
 
     @Override
     public void death(Unit unit){
+        //TODO what if noise is radial, so it looks like a splat?
         int tx = unit.tileX(), ty = unit.tileY();
         int rad = (int)(unit.hitSize / tilesize * radScale);
         float realNoise = unit.hitSize / noiseMag;
