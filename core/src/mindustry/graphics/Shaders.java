@@ -21,7 +21,7 @@ public class Shaders{
     public static UnitBuildShader build;
     public static DarknessShader darkness;
     public static LightShader light;
-    public static SurfaceShader water, mud, tar, slag, space, caustics;
+    public static SurfaceShader water, mud, tar, slag, cryofluid, space, caustics;
     public static PlanetShader planet;
     public static PlanetGridShader planetGrid;
     public static AtmosphereShader atmosphere;
@@ -47,6 +47,7 @@ public class Shaders{
         mud = new SurfaceShader("mud");
         tar = new SurfaceShader("tar");
         slag = new SurfaceShader("slag");
+        cryofluid = new SurfaceShader("cryofluid");
         space = new SpaceShader("space");
         //caustics = new SurfaceShader("caustics"){
         //    @Override
