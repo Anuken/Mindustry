@@ -149,6 +149,7 @@ public class MapsDialog extends BaseDialog{
 
         int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
         float mapsize = 200f;
+        boolean noMapsShown = true;
 
         int i = 0;
 
@@ -162,6 +163,8 @@ public class MapsDialog extends BaseDialog{
             if(invalid || (searchString != null && !Strings.stripColors(map.name()).toLowerCase().contains(searchString))){
                 continue;
             }
+
+            noMapsShown = false;
 
             if(i % maxwidth == 0){
                 mapTable.row();
@@ -181,7 +184,7 @@ public class MapsDialog extends BaseDialog{
             i++;
         }
 
-        if(mapList.size == 0){
+        if(noMapsShown){
             mapTable.add("@maps.none");
         }
     }
