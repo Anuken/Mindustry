@@ -286,16 +286,10 @@ public class MapsDialog extends BaseDialog{
     public Dialog show(){
         super.show();
 
-        if(Core.app.isDesktop()){
-            focusSearchField();
+        if(Core.app.isDesktop() && searchField != null){
+            Core.scene.setKeyboardFocus(searchField);
         }
 
         return this;
-    }
-
-    public void focusSearchField(){
-        if(searchField == null) return;
-
-        Core.scene.setKeyboardFocus(searchField);
     }
 }
