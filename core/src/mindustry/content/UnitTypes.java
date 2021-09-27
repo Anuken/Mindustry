@@ -1864,8 +1864,8 @@ public class UnitTypes implements ContentList{
                     trailWidth = 3f;
                     trailLength = 8;
 
-                    splashDamage = 42f;
-                    splashDamageRadius = 40f;
+                    splashDamage = 33f;
+                    splashDamageRadius = 32f;
                 }};
             }});
         }};
@@ -1940,7 +1940,7 @@ public class UnitTypes implements ContentList{
                     shootEffect = Fx.sparkShoot;
                     hitEffect = Fx.pointHit;
                     maxRange = 100f;
-                    damage = 15f;
+                    damage = 17f;
                 }};
             }});
 

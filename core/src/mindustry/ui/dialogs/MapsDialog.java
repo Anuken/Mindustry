@@ -205,7 +205,7 @@ public class MapsDialog extends BaseDialog{
                             modes.add(mode);
                         }
                         rebuildMaps();
-                    }).size(150f, 60f).checked(modes.contains(mode));
+                    }).size(150f, 60f).marginLeft(6f).checked(modes.contains(mode));
                     if(++i % 3 == 0) t.row();
                 }
             }
