@@ -93,6 +93,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean collides = true;
     /** If true, this projectile collides with non-surface floors. */
     public boolean collideFloor = false;
+    /** If true, this projectile collides with static walls */
+    public boolean collideTerrain = false;
     /** Whether velocity is inherited from the shooter. */
     public boolean keepVelocity = true;
     /** Whether to scale lifetime (not actually velocity!) to disappear at the target position. Used for artillery. */
