@@ -14,6 +14,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -143,6 +144,16 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
             if(type.collideFloor){
                 Tile tile = world.tile(x, y);
                 if(tile == null || tile.floor().hasSurface() || tile.block() != Blocks.air){
+                    type.despawned(self());
+                    remove();
+                    hit = true;
+                    return;
+                }
+            }
+
+            if(type.collideTerrain){
+                Tile tile = world.tile(x, y);
+                if(tile != null && tile.block() instanceof StaticWall){
                     type.despawned(self());
                     remove();
                     hit = true;
