@@ -362,13 +362,13 @@ public class Fx{
 
         Fill.circle(e.x, e.y, e.fin() * 10);
         Drawf.light(e.x, e.y, e.fin() * 20f, Pal.heal, 0.7f);
-    }).followParent(true),
+    }).followParent(true).rotWithParent(true),
 
     greenLaserChargeSmall = new Effect(40f, 100f, e -> {
         color(Pal.heal);
         stroke(e.fin() * 2f);
         Lines.circle(e.x, e.y, e.fout() * 50f);
-    }).followParent(true),
+    }).followParent(true).rotWithParent(true),
 
     greenCloud = new Effect(80f, e -> {
         color(Pal.heal);
@@ -1943,7 +1943,7 @@ public class Fx{
         }
 
         Lines.endLine();
-    }).followParent(false),
+    }).followParent(false).rotWithParent(false),
 
     chainEmp = new Effect(30f, 300f, e -> {
         if(!(e.data instanceof Position p)) return;
@@ -1980,5 +1980,5 @@ public class Fx{
         }
 
         Lines.endLine();
-    }).followParent(false);
+    }).followParent(false).rotWithParent(false);
 }
