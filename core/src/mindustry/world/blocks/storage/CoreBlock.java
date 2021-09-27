@@ -133,7 +133,7 @@ public class CoreBlock extends StorageBlock{
     public void placeBegan(Tile tile, Block previous){
         //finish placement immediately when a block is replaced.
         if(previous instanceof CoreBlock){
-            tile.setBlock(this, tile.team());
+            tile.setNet(this, tile.team(), 0);
             Fx.placeBlock.at(tile, tile.block().size);
             Fx.upgradeCore.at(tile, tile.block().size);
 
