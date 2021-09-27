@@ -40,6 +40,7 @@ public class Items implements ContentList{
             explosiveness = 0.2f;
             flammability = 1f;
             hardness = 2;
+            hideDetails = true;
         }};
 
         titanium = new Item("titanium", Color.valueOf("8da1e3")){{
@@ -55,7 +56,7 @@ public class Items implements ContentList{
         }};
 
         scrap = new Item("scrap", Color.valueOf("777777")){{
-
+            hideDetails = true;
         }};
 
         silicon = new Item("silicon", Color.valueOf("53565c")){{
@@ -80,6 +81,7 @@ public class Items implements ContentList{
 
         sporePod = new Item("spore-pod", Color.valueOf("7457ce")){{
             flammability = 1.15f;
+            hideDetails = true;
         }};
 
         blastCompound = new Item("blast-compound", Color.valueOf("ff795e")){{

@@ -1019,6 +1019,7 @@ public class Blocks implements ContentList{
         router = new Router("router"){{
             requirements(Category.distribution, with(Items.copper, 3));
             buildCostMultiplier = 4f;
+            hideDetails = true;
         }};
 
         distributor = new Router("distributor"){{
@@ -1352,6 +1353,7 @@ public class Blocks implements ContentList{
             hasLiquids = true;
             hasPower = true;
             hasItems = true;
+            hideDetails = true;
 
             craftEffect = Fx.none;
             envRequired |= Env.spores;
@@ -1399,6 +1401,7 @@ public class Blocks implements ContentList{
 
         coreFoundation = new CoreBlock("core-foundation"){{
             requirements(Category.effect, with(Items.copper, 3000, Items.lead, 3000, Items.silicon, 2000));
+            hideDetails = true;
 
             unitType = UnitTypes.beta;
             health = 3500;
@@ -1412,6 +1415,7 @@ public class Blocks implements ContentList{
 
         coreNucleus = new CoreBlock("core-nucleus"){{
             requirements(Category.effect, with(Items.copper, 8000, Items.lead, 8000, Items.silicon, 5000, Items.thorium, 4000));
+            hideDetails = true;
 
             unitType = UnitTypes.gamma;
             health = 6000;
