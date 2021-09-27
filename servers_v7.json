@@ -46,5 +46,9 @@
   {
     "name": "SubZero",
     "address": ["minty-server.ddns.net"]
+  },
+  {
+    "name": "Shiza Minigames",
+    "address": ["shizashizashiza.ml"]
   }
 ]

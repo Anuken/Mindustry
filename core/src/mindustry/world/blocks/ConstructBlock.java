@@ -58,7 +58,7 @@ public class ConstructBlock extends Block{
         block.breakEffect.at(tile.drawx(), tile.drawy(), block.size, block.mapColor);
         Events.fire(new BlockBuildEndEvent(tile, builder, team, true, null));
         tile.remove();
-        if(shouldPlay()) block.breakSound.at(tile, calcPitch(false));
+        if(shouldPlay()) block.breakSound.at(tile, block.breakPitchChange ? calcPitch(false) : 1f);
     }
 
     @Remote(called = Loc.server)
@@ -97,7 +97,7 @@ public class ConstructBlock extends Block{
         }
 
         Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
-        if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
+        if(shouldPlay()) block.placeSound.at(tile, block.placePitchChange ? calcPitch(true) : 1f);
 
         Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
     }

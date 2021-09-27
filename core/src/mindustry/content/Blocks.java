@@ -874,6 +874,7 @@ public class Blocks implements ContentList{
         }};
 
         thruster = new Thruster("thruster"){{
+            requirements(Category.defense, BuildVisibility.sandboxOnly, with(Items.scrap, 96));
             health = 55 * 16 * wallHealthMultiplier;
             size = 4;
         }};
