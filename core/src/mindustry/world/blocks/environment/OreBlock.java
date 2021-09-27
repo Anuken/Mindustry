@@ -11,7 +11,7 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
-/**An overlay ore for a specific item type.*/
+/** An overlay ore for a specific item type. */
 public class OreBlock extends OverlayFloor{
 
     public OreBlock(String name, Item ore){
@@ -27,7 +27,7 @@ public class OreBlock extends OverlayFloor{
         this("ore-" + ore.name, ore);
     }
 
-    /** For mod use only!*/
+    /** For mod use only! */
     public OreBlock(String name){
         super(name);
         this.useColor = true;

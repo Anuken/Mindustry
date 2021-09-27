@@ -20,7 +20,7 @@ import mindustry.world.blocks.*;
 import static mindustry.Vars.*;
 
 public class Floor extends Block{
-    /** edge fallback, used mainly for ores */
+    /** Edge fallback, used mainly for ores. */
     public String edge = "stone";
     /** Multiplies unit velocity by this when walked on. */
     public float speedMultiplier = 1f;
@@ -42,13 +42,13 @@ public class Floor extends Block{
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect. */
     public float statusDuration = 60f;
-    /** liquids that drop from this block, used for pumps. */
+    /** Liquids that drop from this block, used for pumps. */
     public @Nullable Liquid liquidDrop = null;
     /** Multiplier for pumped liquids, used for deep water. */
     public float liquidMultiplier = 1f;
-    /** whether this block is liquid. */
+    /** Whether this block is liquid. */
     public boolean isLiquid;
-    /** if true, this block cannot be mined by players. useful for annoying things like sand. */
+    /** If true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
     /** Group of blocks that this block does not draw edges on. */
     public Block blendGroup = this;

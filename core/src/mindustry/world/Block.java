@@ -60,77 +60,77 @@ public class Block extends UnlockableContent{
     /** If true, this block outputs to its facing direction, when applicable.
      * Used for blending calculations. */
     public boolean outputFacing = true;
-    /** if true, this block does not accept input from the sides (used for armored conveyors) */
+    /** If true, this block does not accept input from the sides (used for armored conveyors). */
     public boolean noSideBlend = false;
-    /** whether to display flow rate */
+    /** Whether to display flow rate. */
     public boolean displayFlow = true;
-    /** whether this block is visible in the editor */
+    /** Whether this block is visible in the editor. */
     public boolean inEditor = true;
-    /** the last configuration value applied to this block. */
+    /** The last configuration value applied to this block. */
     public @Nullable Object lastConfig;
-    /** whether to save the last config and apply it to newly placed blocks */
+    /** Whether to save the last config and apply it to newly placed blocks. */
     public boolean saveConfig = false;
-    /** whether to allow copying the config through middle click */
+    /** Whether to allow copying the config through middle click. */
     public boolean copyConfig = true;
-    /** whether this block has a tile entity that updates */
+    /** Whether this block has a tile entity that updates. */
     public boolean update;
-    /** whether this block has health and can be destroyed */
+    /** Whether this block has health and can be destroyed. */
     public boolean destructible;
-    /** whether unloaders work on this block */
+    /** Whether unloaders work on this block. */
     public boolean unloadable = true;
-    /** whether units can resupply by taking items from this block */
+    /** Whether units can resupply by taking items from this block. */
     public boolean allowResupply = false;
-    /** whether this is solid */
+    /** Whether this is solid. */
     public boolean solid;
-    /** whether this block CAN be solid. */
+    /** Whether this block CAN be solid. */
     public boolean solidifes;
-    /** whether this is rotateable */
+    /** Whether this is rotatable. */
     public boolean rotate;
-    /** number of different variant regions to use */
+    /** Number of different variant regions to use. */
     public int variants = 0;
-    /** whether to draw a rotation arrow - this does not apply to lines of blocks */
+    /** Whether to draw a rotation arrow - this does not apply to lines of blocks. */
     public boolean drawArrow = true;
-    /** for static blocks only: if true, tile data() is saved in world data. */
+    /** For static blocks only: if true, tile data() is saved in world data. */
     public boolean saveData;
-    /** whether you can break this with rightclick */
+    /** Whether you can break this with right click. */
     public boolean breakable;
-    /** whether to add this block to brokenblocks */
+    /** Whether to add this block to the team's build queue when broken. */
     public boolean rebuildable = true;
-    /** whether this block can only be placed on water */
+    /** Whether this block can only be placed on water. */
     public boolean requiresWater = false;
-    /** whether this block can be placed on any liquids, anywhere */
+    /** Whether this block can be placed on any liquids, anywhere. */
     public boolean placeableLiquid = false;
-    /** whether this block can be placed directly by the player via PlacementFragment */
+    /** Whether this block can be placed directly by the player via PlacementFragment. */
     public boolean placeablePlayer = true;
-    /** whether this floor can be placed on. */
+    /** Whether this floor can be placed on. */
     public boolean placeableOn = true;
-    /** whether this block has insulating properties. */
+    /** Whether this block has insulating properties. */
     public boolean insulated = false;
-    /** whether the sprite is a full square. */
+    /** Whether the sprite is a full square. */
     public boolean squareSprite = true;
-    /** whether this block absorbs laser attacks. */
+    /** Whether this block absorbs laser attacks. */
     public boolean absorbLasers = false;
-    /** if false, the status is never drawn */
+    /** If false, the status is never drawn. */
     public boolean enableDrawStatus = true;
-    /** whether to draw disabled status */
+    /** Whether to draw disabled status. */
     public boolean drawDisabled = true;
-    /** whether to automatically reset enabled status after a logic block has not interacted for a while. */
+    /** Whether to automatically reset enabled status after a logic block has not interacted for a while. */
     public boolean autoResetEnabled = true;
-    /** if true, the block stops updating when disabled */
+    /** If true, the block stops updating when disabled. */
     public boolean noUpdateDisabled = false;
     /** Whether to use this block's color in the minimap. Only used for overlays. */
     public boolean useColor = true;
-    /** item that drops from this block, used for drills */
+    /** Item that drops from this block, used for drills. */
     public @Nullable Item itemDrop = null;
-    /** tile entity health */
+    /** Tile entity health. */
     public int health = -1;
-    /** base block explosiveness */
+    /** Base block explosiveness. */
     public float baseExplosiveness = 0f;
-    /** whether this block can be placed on edges of liquids. */
+    /** Whether this block can be placed on edges of liquids. */
     public boolean floating = false;
-    /** multiblock size */
+    /** Multiblock size */
     public int size = 1;
-    /** multiblock offset */
+    /** Multiblock offset */
     public float offset = 0f;
     /** Deprecated for removal: Use clipSize instead.
      * This does nothing, and is kept to preserve compatibility with v6 mods. */
@@ -138,15 +138,15 @@ public class Block extends UnlockableContent{
     public boolean expanded = false;
     /** Clipping size of this block. Should be as large as the block will draw. */
     public float clipSize = -1f;
-    /** Max of timers used. */
+    /** Max number of timers used. */
     public int timers = 0;
     /** Cache layer. Only used for 'cached' rendering. */
     public CacheLayer cacheLayer = CacheLayer.normal;
     /** Special flag; if false, floor will be drawn under this block even if it is cached. */
     public boolean fillsTile = true;
-    /** whether this block can be replaced in all cases */
+    /** Whether this block can be replaced in all cases. */
     public boolean alwaysReplace = false;
-    /** if false, this block can never be replaced. */
+    /** If false, this block can never be replaced. */
     public boolean replaceable = true;
     /** The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other. */
     public BlockGroup group = BlockGroup.none;
@@ -167,11 +167,11 @@ public class Block extends UnlockableContent{
     public boolean consumesTap;
     /** Whether to draw the glow of the liquid for this block, if it has one. */
     public boolean drawLiquidLight = true;
-    /** Environmental flags that are *all* required for this block to function. 0 = any environment */
+    /** Environmental flags that are *all* required for this block to function. 0 = any environment. */
     public int envRequired = 0;
     /** The environment flags that this block can function in. If the env matches any of these, it will be enabled. */
     public int envEnabled = Env.terrestrial;
-    /** The environment flags that this block *cannot* function in. If the env matches any of these, it will be *disabled*. */
+    /** The environment flags that this block cannot* function in. If the env matches any of these, it will be *disabled*. */
     public int envDisabled = 0;
     /** Whether to periodically sync this block across the network. */
     public boolean sync;
@@ -192,7 +192,7 @@ public class Block extends UnlockableContent{
     public boolean targetable = true;
     /** Whether the overdrive core has any effect on this block. */
     public boolean canOverdrive = true;
-    /** Outlined icon color.*/
+    /** Outlined icon color. */
     public Color outlineColor = Color.valueOf("404049");
     /** Whether any icon region has an outline added. */
     public boolean outlineIcon = false;
@@ -253,7 +253,7 @@ public class Block extends UnlockableContent{
     public Effect destroyEffect = Fx.dynamicExplosion;
     /** Multiplier for cost of research in tech tree. */
     public float researchCostMultiplier = 1;
-    /** Whether this block has instant transfer.*/
+    /** Whether this block has instant transfer. */
     public boolean instantTransfer = false;
     /** Whether you can rotate this block after it is placed. */
     public boolean quickRotate = true;
@@ -273,9 +273,9 @@ public class Block extends UnlockableContent{
     protected static final Seq<Tile> tempTiles = new Seq<>();
     protected static final Seq<Building> tempTileEnts = new Seq<>();
 
-    /** Dump timer ID.*/
+    /** Dump timer ID. */
     protected final int timerDump = timers++;
-    /** How often to try dumping items in ticks, e.g. 5 = 12 times/sec*/
+    /** How often to try dumping items in ticks, e.g. 5 = 12 times/sec. */
     protected final int dumpTime = 5;
 
     public Block(String name){
