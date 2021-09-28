@@ -1037,7 +1037,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 int amount = Math.min(items.get(item), explosionItemCap());
                 explosiveness += item.explosiveness * amount;
                 flammability += item.flammability * amount;
-                power += item.charge * amount * 100f;
+                power += item.charge * Mathf.pow(amount, 1.1f) * 150f;
             }
         }
 
