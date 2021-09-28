@@ -1823,6 +1823,7 @@ public class UnitTypes implements ContentList{
                 shotDelay = 7f;
                 x = y = shootX = shootY = 0f;
                 shootSound = Sounds.mineDeploy;
+                rotateSpeed = 180f;
 
                 bullet = new BasicBulletType(){{
                     sprite = "mine-bullet";
@@ -1840,7 +1841,6 @@ public class UnitTypes implements ContentList{
 
                     hitSound = Sounds.plasmaboom;
 
-                    shootCone = 360f;
                     ejectEffect = Fx.none;
                     hitSize = 22f;
 
