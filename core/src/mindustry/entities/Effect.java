@@ -30,6 +30,8 @@ public class Effect{
     public float lifetime = 50f;
     /** Clip size. */
     public float clip;
+    /** Time delay before the effect starts */
+    public float delay;
     /** Amount added to rotation */
     public float baseRotation;
     /** If true, parent unit is data are followed. */
@@ -77,6 +79,11 @@ public class Effect{
 
     public Effect baseRotation(float d){
         baseRotation = d;
+        return this;
+    }
+    
+    public Effect delay(float d){
+        delay = d;
         return this;
     }
 
@@ -168,18 +175,20 @@ public class Effect{
                 effect.init();
             }
 
-            EffectState entity = EffectState.create();
-            entity.effect = effect;
-            entity.rotation = effect.baseRotation + rotation;
-            entity.data = data;
-            entity.lifetime = effect.lifetime;
-            entity.set(x, y);
-            entity.color.set(color);
-            if(effect.followParent && data instanceof Posc p){
-                entity.parent = p;
-                entity.rotWithParent = effect.rotWithParent;
-            }
-            entity.add();
+            Time.run(effect.delay, () -> {
+                EffectState entity = EffectState.create();
+                entity.effect = effect;
+                entity.rotation = effect.baseRotation + rotation;
+                entity.data = data;
+                entity.lifetime = effect.lifetime;
+                entity.set(x, y);
+                entity.color.set(color);
+                if(effect.followParent && data instanceof Posc p){
+                    entity.parent = p;
+                    entity.rotWithParent = effect.rotWithParent;
+                }
+                entity.add();
+            });
         }
     }
 
