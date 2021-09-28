@@ -81,7 +81,7 @@ public class ItemSelection{
         rebuild[0].run();
 
         Table main = new Table().background(Styles.black6);
-        if(rowCount > rows){
+        if(rowCount > rows * 1.5f){
             search = main.field(null, text -> rebuild[0].run()).width(40 * columns).padBottom(4).left().growX().get();
             search.setMessageText("@players.search");
             main.row();
