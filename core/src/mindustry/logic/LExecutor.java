@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -56,9 +57,10 @@ public class LExecutor{
 
     /** Runs a single instruction. */
     public void runOnce(){
-        //set time
-        vars[varTime].numval = Time.millis();
-        vars[varTick].numval = Time.time;
+        //set up time; note that @time is now only updated once every invocation and directly based off of @tick.
+        //having time be based off of user system time was a very bad idea.
+        vars[varTime].numval = state.tick / 60.0 * 1000.0;
+        vars[varTick].numval = state.tick;
 
         //reset to start
         if(vars[varCounter].numval >= instructions.length || vars[varCounter].numval < 0){
@@ -449,7 +451,7 @@ public class LExecutor{
                     case build -> {
                         if(state.rules.logicUnitBuild && unit.canBuild() && exec.obj(p3) instanceof Block block && block.canBeBuilt()){
                             int x = World.toTile(x1 - block.offset/tilesize), y = World.toTile(y1 - block.offset/tilesize);
-                            int rot = exec.numi(p4);
+                            int rot = Mathf.mod(exec.numi(p4), 4);
 
                             //reset state of last request when necessary
                             if(ai.plan.x != x || ai.plan.y != y || ai.plan.block != block || unit.plans.isEmpty()){

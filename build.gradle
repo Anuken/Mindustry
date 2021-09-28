@@ -23,8 +23,8 @@ buildscript{
 }
 
 plugins{
-    id 'org.jetbrains.kotlin.jvm' version '1.5.21'
-    id "org.jetbrains.kotlin.kapt" version "1.5.21"
+    id 'org.jetbrains.kotlin.jvm' version '1.5.31'
+    id "org.jetbrains.kotlin.kapt" version "1.5.31"
 }
 
 allprojects{
@@ -375,7 +375,7 @@ project(":core"){
         if(localArc() && debugged()) api arcModule("extensions:recorder")
         if(localArc()) api arcModule(":extensions:packer")
 
-        annotationProcessor 'com.github.Anuken:jabel:34e4c172e65b3928cd9eabe1993654ea79c409cd'
+        annotationProcessor 'com.github.Anuken:jabel:0.6.0'
         compileOnly project(":annotations")
         kapt project(":annotations")
     }

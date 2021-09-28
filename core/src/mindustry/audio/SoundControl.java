@@ -76,6 +76,8 @@ public class SoundControl{
                 sound.setBus(uiBus);
             }
         }
+
+        Events.fire(new MusicRegisterEvent());
     }
 
     public void loop(Sound sound, float volume){

@@ -262,9 +262,36 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         for(Room room : roomseq){
             spawn.connect(room);
         }
+
         Room fspawn = spawn;
 
         cells(1);
+
+        //shoreline setup
+        int deepRadius = 4;
+
+        pass((x, y) -> {
+            if(floor.asFloor().isLiquid && !floor.asFloor().isDeep()){
+
+                for(int cx = -deepRadius; cx <= deepRadius; cx++){
+                    for(int cy = -deepRadius; cy <= deepRadius; cy++){
+
+                        if((cx) * (cx) + (cy) * (cy) <= deepRadius * deepRadius){
+                            int wx = cx + x, wy = cy + y;
+
+                            Tile tile = tiles.get(wx, wy);
+                            if(tile != null && (!tile.floor().isLiquid || tile.block() != Blocks.air)){
+                                //found something solid, skip replacing anything
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                floor = floor == Blocks.darksandTaintedWater ? Blocks.taintedWater : Blocks.water;
+            }
+        });
+
         distort(10f, 6f);
 
         //rivers
@@ -286,7 +313,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                     floor = spore ?
                         (deep ? Blocks.taintedWater : Blocks.darksandTaintedWater) :
                         (deep ? Blocks.water :
-                            (floor == Blocks.sand ? Blocks.sandWater : Blocks.darksandWater));
+                            (floor == Blocks.sand || floor == Blocks.salt ? Blocks.sandWater : Blocks.darksandWater));
                 }
             }
         });

@@ -33,6 +33,8 @@ public class StatusEffect extends UnlockableContent{
     public float damage;
     /** Chance of effect appearing. */
     public float effectChance = 0.15f;
+    /** Should the effect be given a parent */
+    public boolean parentizeEffect;
     /** If true, the effect never disappears. */
     public boolean permanent;
     /** If true, this effect will only react with other effects and cannot be applied. */
@@ -120,7 +122,7 @@ public class StatusEffect extends UnlockableContent{
 
         if(effect != Fx.none && Mathf.chanceDelta(effectChance)){
             Tmp.v1.rnd(Mathf.range(unit.type.hitSize/2f));
-            effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, color);
+            effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, parentizeEffect ? unit : null);
         }
     }
 

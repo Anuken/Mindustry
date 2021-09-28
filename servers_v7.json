@@ -21,7 +21,7 @@
   },
   {
     "name": "DarkDustry",
-    "address": ["darkdustry.ml", "darkdustry.ml:3000", "darkdustry.ml:7000", "darkdustry.ml:8000"] 
+    "address": ["darkdustry.ml", "darkdustry.ml:6000", "darkdustry.ml:7000", "darkdustry.ml:8000", "darkdustry.ml:9000"] 
   },
   {
     "name": "Chaotic Neutral",
@@ -46,5 +46,9 @@
   {
     "name": "SubZero",
     "address": ["minty-server.ddns.net"]
+  },
+  {
+    "name": "Shiza Minigames",
+    "address": ["shizashizashiza.ml"]
   }
 ]

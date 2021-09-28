@@ -62,6 +62,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return Point2.pack(x, y);
     }
 
+    /** @return this tile's position, packed to the world width - for use in width*height arrays. */
+    public int array(){
+        return x + y * world.tiles.width;
+    }
+
     public byte relativeTo(Tile tile){
         return relativeTo(tile.x, tile.y);
     }
@@ -269,6 +274,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         this.floor = type;
         this.overlay = (Floor)Blocks.air;
 
+        if(!headless && !world.isGenerating()){
+            renderer.blocks.removeFloorIndex(this);
+        }
+
         recache();
         if(build != null){
             build.onProximityUpdate();
@@ -305,6 +314,8 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         if(!headless && !world.isGenerating()){
             renderer.blocks.floor.recacheTile(this);
             renderer.minimap.update(this);
+            renderer.blocks.invalidateTile(this);
+            renderer.blocks.addFloorIndex(this);
             //update neighbor tiles as well
             for(int i = 0; i < 8; i++){
                 Tile other = world.tile(x + Geometry.d8[i].x, y + Geometry.d8[i].y);

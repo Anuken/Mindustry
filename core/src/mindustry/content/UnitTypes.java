@@ -1787,7 +1787,6 @@ public class UnitTypes implements ContentList{
         //endregion
         //region naval support
         retusa = new UnitType("retusa"){{
-            defaultController = HugAI::new;
             speed = 0.9f;
             targetAir = false;
             drag = 0.14f;
@@ -1821,15 +1820,17 @@ public class UnitTypes implements ContentList{
 
             weapons.add(new Weapon(){{
                 mirror = false;
-                reload = 80f;
+                rotate = true;
+                reload = 90f;
                 shots = 3;
                 shotDelay = 7f;
                 x = y = shootX = shootY = 0f;
                 shootSound = Sounds.mineDeploy;
+                rotateSpeed = 180f;
 
                 bullet = new BasicBulletType(){{
                     sprite = "mine-bullet";
-                    width = height = 11f;
+                    width = height = 8f;
                     layer = Layer.scorch;
                     shootEffect = smokeEffect = Fx.none;
 
@@ -1843,23 +1844,31 @@ public class UnitTypes implements ContentList{
 
                     hitSound = Sounds.plasmaboom;
 
-                    shootCone = 360f;
                     ejectEffect = Fx.none;
                     hitSize = 22f;
 
                     collidesAir = false;
 
-                    lifetime = 500f;
+                    lifetime = 87f;
 
                     hitEffect = new MultiEffect(Fx.blastExplosion, Fx.greenCloud);
                     keepVelocity = false;
 
                     shrinkX = shrinkY = 0f;
 
-                    speed = 0f;
+                    inaccuracy = 2f;
+                    weaveMag = 5f;
+                    weaveScale = 4f;
+                    speed = 0.7f;
+                    drag = -0.017f;
+                    homingPower = 0.05f;
+                    collideFloor = true;
+                    trailColor = Pal.heal;
+                    trailWidth = 3f;
+                    trailLength = 8;
 
-                    splashDamage = 55f;
-                    splashDamageRadius = 45f;
+                    splashDamage = 33f;
+                    splashDamageRadius = 32f;
                 }};
             }});
         }};
@@ -1934,7 +1943,7 @@ public class UnitTypes implements ContentList{
                     shootEffect = Fx.sparkShoot;
                     hitEffect = Fx.pointHit;
                     maxRange = 100f;
-                    damage = 15f;
+                    damage = 17f;
                 }};
             }});
 

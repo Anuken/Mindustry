@@ -19,6 +19,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
@@ -452,7 +453,7 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
-    public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, boolean gameOver, int timeData, byte tps, byte[] coreData){
+    public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, boolean gameOver, int timeData, byte tps, long rand0, long rand1, byte[] coreData){
         try{
             if(wave > state.wave){
                 state.wave = wave;
@@ -465,6 +466,11 @@ public class NetClient implements ApplicationListener{
             state.enemies = enemies;
             state.serverPaused = paused;
             state.serverTps = tps & 0xff;
+
+            //note that this is far from a guarantee that random state is synced - tiny changes in delta and ping can throw everything off again.
+            //syncing will only make much of a difference when rand() is called infrequently
+            GlobalConstants.rand.seed0 = rand0;
+            GlobalConstants.rand.seed1 = rand1;
 
             universe.updateNetSeconds(timeData);
 
