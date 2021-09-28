@@ -31,7 +31,7 @@ public class Effect{
     /** Clip size. */
     public float clip;
     /** Time delay before the effect starts */
-    public float delay;
+    public float startDelay;
     /** Amount added to rotation */
     public float baseRotation;
     /** If true, parent unit is data are followed. */
@@ -82,8 +82,8 @@ public class Effect{
         return this;
     }
     
-    public Effect delay(float d){
-        delay = d;
+    public Effect startDelay(float d){
+        startDelay = d;
         return this;
     }
 
@@ -175,7 +175,7 @@ public class Effect{
                 effect.init();
             }
 
-            Time.run(effect.delay, () -> {
+            Time.run(effect.startDelay, () -> {
                 EffectState entity = EffectState.create();
                 entity.effect = effect;
                 entity.rotation = effect.baseRotation + rotation;
