@@ -200,6 +200,18 @@ public class Weapon implements Cloneable{
         boolean can = unit.canShoot();
         mount.reload = Math.max(mount.reload - Time.delta * unit.reloadMultiplier, 0);
 
+        //rotate if applicable
+        if(rotate && (mount.rotate || mount.shoot) && can){
+            float axisX = unit.x + Angles.trnsx(unit.rotation - 90,  x, y),
+            axisY = unit.y + Angles.trnsy(unit.rotation - 90,  x, y);
+
+            mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - unit.rotation;
+            mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, rotateSpeed * Time.delta);
+        }else if(!rotate){
+            mount.rotation = 0;
+            mount.targetRotation = unit.angleTo(mount.aimX, mount.aimY);
+        }
+
         float
         weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : 0),
         mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
@@ -256,7 +268,7 @@ public class Weapon implements Cloneable{
             }
         }else{
             //heat decreases when not firing
-            mount.heat = Math.max(mount.heat - Time.delta * unit.reloadMultiplier / mount.weapon.cooldownTime, 0);
+            mount.heat = Math.max(mount.heat - Time.delta * unit.reloadMultiplier / cooldownTime, 0);
 
             if(mount.sound != null){
                 mount.sound.update(bulletX, bulletY, false);
@@ -270,26 +282,14 @@ public class Weapon implements Cloneable{
             mount.side = !mount.side;
         }
 
-        //rotate if applicable
-        if(rotate && (mount.rotate || mount.shoot) && can){
-            float axisX = unit.x + Angles.trnsx(unit.rotation - 90,  x, y),
-            axisY = unit.y + Angles.trnsy(unit.rotation - 90,  x, y);
-
-            mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - unit.rotation;
-            mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, rotateSpeed * Time.delta);
-        }else if(!rotate){
-            mount.rotation = 0;
-            mount.targetRotation = unit.angleTo(mount.aimX, mount.aimY);
-        }
-
         //shoot if applicable
         if(mount.shoot && //must be shooting
         can && //must be able to shoot
         (!useAmmo || unit.ammo > 0 || !state.rules.unitAmmo || unit.team.rules().infiniteAmmo) && //check ammo
         (!alternate || mount.side == flipSprite) &&
-        unit.vel.len() >= mount.weapon.minShootVelocity && //check velocity requirements
+        unit.vel.len() >= minShootVelocity && //check velocity requirements
         mount.reload <= 0.0001f && //reload has to be 0
-        Angles.within(rotate ? mount.rotation : unit.rotation, mount.targetRotation, mount.weapon.shootCone) //has to be within the cone
+        Angles.within(rotate ? mount.rotation : unit.rotation, mount.targetRotation, shootCone) //has to be within the cone
         ){
             shoot(unit, mount, bulletX, bulletY, mount.aimX, mount.aimY, mountX, mountY, shootAngle, Mathf.sign(x));
 

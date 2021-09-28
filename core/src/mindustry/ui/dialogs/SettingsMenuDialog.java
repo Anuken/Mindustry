@@ -17,7 +17,6 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
-import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -32,7 +31,7 @@ import java.util.zip.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
-public class SettingsMenuDialog extends Dialog{
+public class SettingsMenuDialog extends BaseDialog{
     public SettingsTable graphics;
     public SettingsTable game;
     public SettingsTable sound;
@@ -48,38 +47,19 @@ public class SettingsMenuDialog extends Dialog{
         addCloseButton();
 
         cont.add(main = new SettingsTable());
-
-        hidden(() -> {
-            Sounds.back.play();
-            if(state.isGame()){
-                if(!wasPaused || net.active())
-                    state.set(State.playing);
-            }
-        });
+        shouldPause = true;
 
         shown(() -> {
             back();
-            if(state.isGame()){
-                wasPaused = state.is(State.paused);
-                state.set(State.paused);
-            }
-
             rebuildMenu();
         });
 
-        Events.on(ResizeEvent.class, event -> {
-            if(isShown() && Core.scene.getDialog() == this){
-                graphics.rebuild();
-                sound.rebuild();
-                game.rebuild();
-                updateScrollFocus();
-            }
+        onResize(() -> {
+            graphics.rebuild();
+            sound.rebuild();
+            game.rebuild();
+            updateScrollFocus();
         });
-
-        setFillParent(true);
-        title.setAlignment(Align.center);
-        titleTable.row();
-        titleTable.add(new Image()).growX().height(3f).pad(4f).get().setColor(Pal.accent);
 
         cont.clearChildren();
         cont.remove();
