@@ -138,7 +138,7 @@ public class Weapon implements Cloneable{
     }
 
     public float dps(){
-        return (bullet.estimateDPS() / reload) * shots * 60f;
+        return (bullet.estimateDPS() / (reload * (otherSide != 0 ? 2 : 1))) * shots * 60f;
     }
 
     //TODO copy-pasted code
