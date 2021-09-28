@@ -14,8 +14,6 @@ uniform float u_time;
 
 varying vec2 v_texCoords;
 
-const float shakeScl = 20.0;
-
 void main(){
     vec2 c = v_texCoords.xy;
     vec2 coords = vec2(c.x * u_resolution.x + u_campos.x, c.y * u_resolution.y + u_campos.y);
