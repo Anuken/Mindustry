@@ -426,13 +426,14 @@ public class Turret extends ReloadTurret{
                 //when burst spacing is enabled, use the burst pattern
             }else if(burstSpacing > 0.0001f){
                 for(int i = 0; i < shots; i++){
+                    int ii = i;
                     Time.run(burstSpacing * i, () -> {
                         if(!isValid() || !hasAmmo()) return;
 
                         recoil = recoilAmount;
 
                         tr.trns(rotation, shootLength, Mathf.range(xRand));
-                        bullet(type, rotation + Mathf.range(inaccuracy));
+                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (ii - (int)(shots / 2f)) * spread);
                         effects();
                         useAmmo();
                         recoil = recoilAmount;
