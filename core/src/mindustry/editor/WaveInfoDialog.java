@@ -21,8 +21,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
-import java.util.*;
-
 import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.*;
 
@@ -218,7 +216,7 @@ public class WaveInfoDialog extends BaseDialog{
         table.margin(10f);
 
         if(groups != null){
-            groups.sort(sort.sort);
+            groups.sort(Structs.comps(Structs.comparingFloat(sort.sort), Structs.comparingInt(g -> sort == Sort.begin ? g.type.id : g.begin)));
             if(reverseSort) groups.reverse();
 
             for(SpawnGroup group : groups){
@@ -416,12 +414,13 @@ public class WaveInfoDialog extends BaseDialog{
                 }, () -> {
                     if(payloads){
                         group.payloads.add(type);
+                        updateIcons(group);
                     }else{
                         group.type = lastType = type;
+                        dialog.hide();
                     }
                     if(group.payloads != null && group.type.payloadCapacity <= 8) group.payloads.clear();
-                    if(!payloads) dialog.hide();
-                    if(payloads) updateIcons(group);
+                    if(group.items != null) group.items.amount = Mathf.clamp(group.items.amount, 0, group.type.itemCapacity);
                     buildGroups();
                 }).pad(2).margin(12f).fillX().disabled(a -> payloads && payLeft < type.hitSize * type.hitSize);
                 if(++i % 3 == 0) p.row();
@@ -431,7 +430,7 @@ public class WaveInfoDialog extends BaseDialog{
         dialog.show();
     }
 
-    void showEffect(SpawnGroup group, boolean filterMode){
+    void showEffect(SpawnGroup group){
         BaseDialog dialog = new BaseDialog("");
         dialog.setFillParent(true);
         dialog.cont.pane(p -> {
@@ -453,7 +452,7 @@ public class WaveInfoDialog extends BaseDialog{
                         t.add("@settings.resetKey");
                     }
                 }, () -> {
-                    if(filterMode){
+                    if(group == null){
                         filterEffect = effect;
                     }else{
                         group.effect = effect;
@@ -573,7 +572,7 @@ public class WaveInfoDialog extends BaseDialog{
                     icon.image(Icon.logic).padRight(6f);
                 }
                 icon.add("@waves.group.effect");
-            }, Styles.cleart, () -> showEffect(group, false));
+            }, Styles.cleart, () -> showEffect(group));
             iTable.button("@waves.group.payloads", Icon.defense, Styles.cleart, () -> showUpdate(group, true)).disabled(c -> group.type.payloadCapacity <= 8);
             iTable.button(icon -> {
                 if(group.items != null){
@@ -590,7 +589,7 @@ public class WaveInfoDialog extends BaseDialog{
             eTable.add(Core.bundle.get("waves.filter.effect") + ":");
             eTable.button(filterEffect != null && filterEffect != StatusEffects.none ?
                 new TextureRegionDrawable(filterEffect.uiIcon) :
-            Icon.logic, () -> showEffect(null, true)).padLeft(30f).size(60f);
+            Icon.logic, () -> showEffect(null)).padLeft(30f).size(60f);
         }
 
         if(uTable != null && group != null && group.payloads != null){
@@ -623,7 +622,7 @@ public class WaveInfoDialog extends BaseDialog{
                 if(group.payloads.size > maxVisible) b.button(expandPane ? Icon.eyeSmall : Icon.eyeOffSmall, () -> {
                     expandPane = !expandPane;
                     updateIcons(group);
-                }).size(45f).tooltip(expandPane ? "@server.hidden" : "@server.shown");
+                }).size(45f).tooltip(expandPane ? "@server.shown" : "@server.hidden");
             }).padLeft(6f);
         }
     }
@@ -646,15 +645,15 @@ public class WaveInfoDialog extends BaseDialog{
     }
 
     enum Sort{
-        begin(Structs.comps(Structs.comparingFloat(g -> g.begin), Structs.comparingFloat(g -> g.type.id))),
-        health(Structs.comps(Structs.comparingFloat(g -> g.type.health), Structs.comparingFloat(g -> g.begin))),
-        type(Structs.comps(Structs.comparingFloat(g -> g.type.id), Structs.comparingFloat(g -> g.begin)));
+        begin(g -> g.begin),
+        health(g -> g.type.health),
+        type(g -> g.type.id);
 
         static final Sort[] all = values();
 
-        final Comparator<SpawnGroup> sort;
+        final Floatf<SpawnGroup> sort;
 
-        Sort(Comparator<SpawnGroup> sort){
+        Sort(Floatf<SpawnGroup> sort){
             this.sort = sort;
         }
     }
