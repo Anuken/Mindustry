@@ -11,12 +11,13 @@ import mindustry.type.*;
 public class StatusFieldAbility extends Ability{
     public StatusEffect effect;
     public float duration = 60, reload = 100, range = 20;
+    public boolean instant;
     public Effect applyEffect = Fx.none;
     public Effect activeEffect = Fx.overdriveWave;
     public float effectX, effectY;
     public boolean parentizeEffects;
 
-    protected float timer;
+    protected float timer = -1f;
 
     StatusFieldAbility(){}
 
@@ -34,6 +35,10 @@ public class StatusFieldAbility extends Ability{
 
     @Override
     public void update(Unit unit){
+        if(timer < 0){
+            timer = instant ? reload : 0f;
+        }
+
         timer += Time.delta;
 
         if(timer >= reload){

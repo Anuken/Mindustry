@@ -7,11 +7,12 @@ import mindustry.gen.*;
 
 public class ShieldRegenFieldAbility extends Ability{
     public float amount = 1, max = 100f, reload = 100, range = 60;
+    public boolean instant;
     public Effect applyEffect = Fx.shieldApply;
     public Effect activeEffect = Fx.shieldWave;
     public boolean parentizeEffects;
 
-    protected float timer;
+    protected float timer = -1f;
     protected boolean applied = false;
 
     ShieldRegenFieldAbility(){}
@@ -25,6 +26,10 @@ public class ShieldRegenFieldAbility extends Ability{
 
     @Override
     public void update(Unit unit){
+        if(timer < 0){
+            timer = instant ? reload : 0f;
+        }
+
         timer += Time.delta;
 
         if(timer >= reload){

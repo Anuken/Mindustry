@@ -7,11 +7,12 @@ import mindustry.gen.*;
 
 public class RepairFieldAbility extends Ability{
     public float amount = 1, reload = 100, range = 60;
+    public boolean instant;
     public Effect healEffect = Fx.heal;
     public Effect activeEffect = Fx.healWaveDynamic;
     public boolean parentizeEffects = false;
 
-    protected float timer;
+    protected float timer = -1f;
     protected boolean wasHealed = false;
 
     RepairFieldAbility(){}
@@ -24,6 +25,10 @@ public class RepairFieldAbility extends Ability{
 
     @Override
     public void update(Unit unit){
+        if(timer < 0){
+            timer = instant ? reload : 0f;
+        }
+
         timer += Time.delta;
 
         if(timer >= reload){
