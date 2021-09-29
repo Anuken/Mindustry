@@ -20,6 +20,7 @@ import static mindustry.Vars.*;
 
 public class MapsDialog extends BaseDialog{
     private BaseDialog dialog;
+    private boolean searchDescription = true;
     private String searchString;
     private Seq<Gamemode> modes = new Seq<>();
     private Table mapTable = new Table();
@@ -129,11 +130,15 @@ public class MapsDialog extends BaseDialog{
         Table search = new Table();
         search.image(Icon.zoom);
         searchField = search.field("", t -> {
-            searchString = t.length() > 0 ? t.toLowerCase() : null;
+            searchString = !t.isEmpty() ? t.toLowerCase() : null;
             rebuildMaps();
         }).maxTextLength(50).growX().get();
         searchField.setMessageText("@editor.search");
-        search.button(Icon.filter, Styles.emptyi, this::showMapFilters);
+        search.button(Icon.layers, Styles.emptytogglei, () -> {
+            searchDescription = !searchDescription;
+            rebuildMaps();
+        }).padRight(6f).padLeft(4f).checked(searchDescription).tooltip("@editor.searchDescription");
+        search.button(Icon.filter, Styles.emptyi, this::showMapFilters).tooltip("@editor.filters");
 
         cont.add(search).growX();
         cont.row();
@@ -160,7 +165,8 @@ public class MapsDialog extends BaseDialog{
             for(Gamemode mode : modes){
                 invalid |= !mode.valid(map);
             }
-            if(invalid || (searchString != null && !Strings.stripColors(map.name()).toLowerCase().contains(searchString))){
+            String searchType = map.author() + map.name() + (searchDescription ? map.description() : "");
+            if(invalid || (searchString != null && !Strings.stripColors(searchType).toLowerCase().contains(searchString))){
                 continue;
             }
 
@@ -196,7 +202,7 @@ public class MapsDialog extends BaseDialog{
         dialog.cont.table(Tex.button, t -> {
             int i = 0;
             for(Gamemode mode : Gamemode.all){
-                TextureRegionDrawable icon = Vars.ui.getIcon("mode" + Strings.capitalize(mode.name()));
+                TextureRegionDrawable icon = ui.getIcon("mode" + Strings.capitalize(mode.name()));
                 if(Core.atlas.isFound(icon.getRegion())){
                     t.button(mode.name(), icon, Styles.clearTogglet, () -> {
                         if(modes.contains(mode)){
@@ -209,14 +215,13 @@ public class MapsDialog extends BaseDialog{
                     if(++i % 3 == 0) t.row();
                 }
             }
-            t.row();
-            t.button("@editor.showAll", Styles.clearTogglet, () -> {
-                showAll = !showAll;
-                Core.settings.put("editorShowAllMaps", showAll);
-                Core.settings.forceSave();
-                rebuildMaps();
-            }).checked(b -> showAll).colspan(3).growX().height(40f);
-        });
+        }).row();
+        dialog.cont.check("@editor.showAll", b -> {
+            showAll = b;
+            Core.settings.put("editorShowAllMaps", showAll);
+            Core.settings.forceSave();
+            rebuildMaps();
+        }).checked(showAll).colspan(3).height(40f).row();
 
         dialog.show();
     }
