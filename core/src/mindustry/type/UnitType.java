@@ -389,6 +389,8 @@ public class UnitType extends UnlockableContent{
                 //since there are now two weapons, the recoil time must be doubled
                 w.recoilTime *= 2f;
                 copy.recoilTime *= 2f;
+                w.reload *= 2f;
+                copy.reload *= 2f;
 
                 w.otherSide = mapped.size - 1;
                 copy.otherSide = mapped.size - 2;

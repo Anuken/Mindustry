@@ -138,7 +138,7 @@ public class Weapon implements Cloneable{
     }
 
     public float dps(){
-        return (bullet.estimateDPS() / (reload * (otherSide != 0 ? 2 : 1))) * shots * 60f;
+        return (bullet.estimateDPS() / reload) * shots * 60f;
     }
 
     //TODO copy-pasted code
@@ -198,6 +198,7 @@ public class Weapon implements Cloneable{
 
     public void update(Unit unit, WeaponMount mount){
         boolean can = unit.canShoot();
+        float lastReload = mount.reload;
         mount.reload = Math.max(mount.reload - Time.delta * unit.reloadMultiplier, 0);
         mount.recoil = Math.max(mount.recoil - (Time.delta * recoil * unit.reloadMultiplier) / recoilTime, 0);
 
@@ -279,9 +280,8 @@ public class Weapon implements Cloneable{
 
         //flip weapon shoot side for alternating weapons
         boolean wasFlipped = mount.side;
-        if(otherSide != -1 && alternate && mount.side == flipSprite && mount.reload <= 0.0001f){
+        if(otherSide != -1 && alternate && mount.side == flipSprite && mount.reload <= reload / 2f && lastReload > reload / 2f){
             unit.mounts[otherSide].side = !unit.mounts[otherSide].side;
-            unit.mounts[otherSide].reload = reload;
             mount.side = !mount.side;
         }
 
