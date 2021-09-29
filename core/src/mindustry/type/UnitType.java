@@ -386,7 +386,7 @@ public class UnitType extends UnlockableContent{
                 copy.flipSprite = !copy.flipSprite;
                 mapped.add(copy);
 
-                //since there are now two weapons, the recoil time must be doubled
+                //since there are now two weapons, the reload and recoil time must be doubled
                 w.recoilTime *= 2f;
                 copy.recoilTime *= 2f;
                 w.reload *= 2f;
