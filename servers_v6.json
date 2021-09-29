@@ -114,5 +114,9 @@
   {
     "name": "NukeDustry",
     "address": ["nukedustry.tk", "nukedustry.tk:6568"]
+  },
+  {
+    "name": "MindustryBR",
+    "address": ["mindustryptbr.ddns.net", "mindustryptbr.myddns.me", "mindustryptbr.myddns.me:6566"]
   }
 ]
