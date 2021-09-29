@@ -375,6 +375,7 @@ public class UnitType extends UnlockableContent{
         //add mirrored weapon variants
         Seq<Weapon> mapped = new Seq<>();
         for(Weapon w : weapons){
+            if(w.recoilTime < 0) w.recoilTime = w.reload;
             mapped.add(w);
 
             //mirrors are copies with X values negated
@@ -385,7 +386,9 @@ public class UnitType extends UnlockableContent{
                 copy.flipSprite = !copy.flipSprite;
                 mapped.add(copy);
 
-                //since there are now two weapons, the reload time must be doubled
+                //since there are now two weapons, the reload and recoil time must be doubled
+                w.recoilTime *= 2f;
+                copy.recoilTime *= 2f;
                 w.reload *= 2f;
                 copy.reload *= 2f;
 
