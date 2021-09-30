@@ -327,9 +327,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             }
         }
 
-        boolean naval = (float)waters / total >= 0.28f;
-
-        Log.info(waters + " " + total  );
+        boolean naval = (float)waters / total >= 0.26f;
 
         //create water pathway if the map is flooded
         if(naval){
