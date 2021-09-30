@@ -346,6 +346,7 @@ public class Weapon implements Cloneable{
 
                 unit.vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
                 Effect.shake(shake, shake, shootX, shootY);
+                mount.recoil = recoil;
                 mount.heat = 1f;
                 if(!continuous){
                     shootSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
@@ -355,10 +356,10 @@ public class Weapon implements Cloneable{
         }else{
             unit.vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
             Effect.shake(shake, shake, shootX, shootY);
+            mount.recoil = recoil;
             mount.heat = 1f;
         }
 
-        mount.recoil = recoil;
         ejectEffect.at(mountX, mountY, rotation * side);
         ammo.shootEffect.at(shootX, shootY, rotation, parentize ? unit : null);
         ammo.smokeEffect.at(shootX, shootY, rotation, parentize ? unit : null);
