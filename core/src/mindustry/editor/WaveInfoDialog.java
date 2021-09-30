@@ -75,7 +75,7 @@ public class WaveInfoDialog extends BaseDialog{
                         ui.showErrorMessage("@waves.invalid");
                     }
                     dialog.hide();
-                }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null || Core.app.getClipboardText().isEmpty()).row();
+                }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith("[{")).row();
 
                 t.button("@settings.reset", Icon.upload, style, () -> ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
                     groups = JsonIO.copy(waves.get());
@@ -473,11 +473,12 @@ public class WaveInfoDialog extends BaseDialog{
         dialog.setFillParent(true);
         dialog.cont.table(items -> {
             items.add(Core.bundle.get("filter.option.amount") + ":");
-            amountField = items.field((group.items != null ? group.items.amount : 0) + "", TextFieldFilter.digitsOnly, text -> {
+            amountField = items.field(group.items != null ? group.items.amount + "" : "", TextFieldFilter.digitsOnly, text -> {
                 if(Strings.canParsePositiveInt(text) && group.items != null){
                     group.items.amount = Strings.parseInt(text) <= 0 ? group.type.itemCapacity : Mathf.clamp(Strings.parseInt(text), 0, group.type.itemCapacity);
                 }
-            }).width(120f).pad(2).margin(12f).maxTextLength(String.valueOf(group.type.itemCapacity).length() + 1).get();
+            }).width(120f).pad(2).margin(12f).maxTextLength((group.type.itemCapacity + "").length() + 1).get();
+            amountField.setMessageText(group.type.itemCapacity + "");
         }).padBottom(6f).row();
         dialog.cont.pane(p -> {
             int i = 1;
