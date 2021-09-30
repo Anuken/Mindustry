@@ -3,9 +3,6 @@
     "name": "mindustry.pl",
     "address": ["46.105.36.238:6000", "46.105.36.238:6666", "46.105.36.238:6966"]
   },
-  { "name": "devass.su",
-    "address": ["185.22.152.66"]
-  },
   {
     "name": "C.A.M.S.",
     "address": ["baseduser.eu.org:6569", "v7.thedimas.pp.ua", "yeeth.mindustry.me:7000", "yeeth.mindustry.me:4000", "yeeth.mindustry.me:2000", "yeeth.mindustry.me:3000"]
@@ -53,5 +50,8 @@
   {
     "name": "Shiza Minigames",
     "address": ["shizashizashiza.ml"]
+  },
+  { "name": "devass.su",
+    "address": ["185.22.152.66"]
   }
 ]
