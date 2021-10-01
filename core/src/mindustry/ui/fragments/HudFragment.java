@@ -778,6 +778,7 @@ public class HudFragment extends Fragment{
     }
 
     private void addInfoTable(Table table){
+        table.name = "infotable";
         table.left();
 
         var count = new float[]{-1};

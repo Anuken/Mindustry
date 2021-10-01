@@ -265,15 +265,27 @@ public class Waves{
     }
 
     public static Seq<SpawnGroup> generate(float difficulty, Rand rand, boolean attack, boolean airOnly){
+        return generate(difficulty, rand, attack, airOnly, false);
+    }
+
+    public static Seq<SpawnGroup> generate(float difficulty, Rand rand, boolean attack, boolean airOnly, boolean naval){
         UnitType[][] species = {
         {dagger, mace, fortress, scepter, reign},
         {nova, pulsar, quasar, vela, corvus},
         {crawler, atrax, spiroct, arkyid, toxopid},
+        {risso, minke, bryde, sei, omura},
+        {risso, oxynoe, cyerce, aegires, navanax}, //retusa intentionally left out as it cannot damage the core properly
         {flare, horizon, zenith, rand.chance(0.5) ? quad : antumbra, rand.chance(0.1) ? quad : eclipse}
         };
 
         if(airOnly){
             species = Structs.filter(UnitType[].class, species, v -> v[0].flying);
+        }
+
+        if(naval){
+            species = Structs.filter(UnitType[].class, species, v -> v[0].flying || v[0].naval);
+        }else{
+            species = Structs.filter(UnitType[].class, species, v -> v[0].flying && !v[0].naval);
         }
 
         UnitType[][] fspec = species;

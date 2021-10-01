@@ -49,6 +49,8 @@ public class BulletType extends Content implements Cloneable{
     public Effect despawnEffect = Fx.hitBulletSmall;
     /** Effect created when shooting. */
     public Effect shootEffect = Fx.shootSmall;
+    /** Effect created when charging completes; only usable in single-shot weapons with a firstShotDelay / shotDelay. */
+    public Effect chargeShootEffect = Fx.none;
     /** Extra smoke effect created when shooting. */
     public Effect smokeEffect = Fx.shootSmallSmoke;
     /** Sound made when hitting something or getting removed.*/

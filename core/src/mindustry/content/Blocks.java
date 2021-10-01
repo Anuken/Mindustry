@@ -1885,6 +1885,7 @@ public class Blocks implements ContentList{
             recoilAmount = 3f;
             shootShake = 1f;
             burstSpacing = 3f;
+            spread = 0f;
             shots = 4;
             ammoUseEffect = Fx.casing2;
             health = 240 * size * size;

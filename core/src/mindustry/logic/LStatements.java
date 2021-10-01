@@ -1,5 +1,6 @@
 package mindustry.logic;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.scene.style.*;
@@ -758,6 +759,20 @@ public class LStatements{
 
             table.add().growX();
             table.add(new JumpButton(() -> dest, s -> dest = s)).size(30).right().padLeft(-8);
+
+            String name = name();
+
+            //hack way of finding the title label...
+            Core.app.post(() -> {
+                //must be delayed because parent is added later
+                if(table.parent != null){
+                    Label title = table.parent.find("statement-name");
+                    if(title != null){
+                        title.update(() -> title.setText((dest != null ? name + " -> " + dest.index : name)));
+                    }
+                }
+            });
+
         }
 
         void rebuild(Table table){

@@ -115,7 +115,7 @@ public class UnitType extends UnlockableContent{
     /** This is a VERY ROUGH estimate of unit DPS. */
     public float dpsEstimate = -1;
     public float clipSize = -1;
-    public boolean canDrown = true;
+    public boolean canDrown = true, naval = false;
     public float drownTimeMultiplier = 1f;
     public float engineOffset = 5f, engineSize = 2.5f;
     public float strafePenalty = 0.5f;
@@ -333,6 +333,7 @@ public class UnitType extends UnlockableContent{
 
         //water preset
         if(example instanceof WaterMovec){
+            naval = true;
             canDrown = false;
             omniMovement = false;
             immunities.add(StatusEffects.wet);
@@ -398,6 +399,7 @@ public class UnitType extends UnlockableContent{
         //add mirrored weapon variants
         Seq<Weapon> mapped = new Seq<>();
         for(Weapon w : weapons){
+            if(w.recoilTime < 0) w.recoilTime = w.reload;
             mapped.add(w);
 
             //mirrors are copies with X values negated
@@ -408,7 +410,9 @@ public class UnitType extends UnlockableContent{
                 copy.flipSprite = !copy.flipSprite;
                 mapped.add(copy);
 
-                //since there are now two weapons, the reload time must be doubled
+                //since there are now two weapons, the reload and recoil time must be doubled
+                w.recoilTime *= 2f;
+                copy.recoilTime *= 2f;
                 w.reload *= 2f;
                 copy.reload *= 2f;
 
