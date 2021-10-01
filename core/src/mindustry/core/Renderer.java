@@ -376,7 +376,7 @@ public class Renderer implements ApplicationListener{
                 backgroundBuffer = new FrameBuffer(size, size);
             }
 
-            if(resized || backgroundBuffer.resize(size, size)){
+            if(resized || backgroundBuffer.resizeCheck(size, size)){
                 backgroundBuffer.begin(Color.clear);
 
                 var params = state.rules.planetBackground;
