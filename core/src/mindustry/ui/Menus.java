@@ -68,15 +68,29 @@ public class Menus{
         ui.showText("", message);
     }
 
-    @Remote(variants = Variant.both)
+    @Remote(variants = Variant.both, unreliable = true)
     public static void infoPopup(String message, float duration, int align, int top, int left, int bottom, int right){
         if(message == null) return;
 
         ui.showInfoPopup(message, duration, align, top, left, bottom, right);
     }
 
-    @Remote(variants = Variant.both)
+    @Remote(variants = Variant.both, unreliable = true)
     public static void label(String message, float duration, float worldx, float worldy){
+        if(message == null) return;
+
+        ui.showLabel(message, duration, worldx, worldy);
+    }
+
+    @Remote(variants = Variant.both)
+    public static void infoPopupReliable(String message, float duration, int align, int top, int left, int bottom, int right){
+        if(message == null) return;
+
+        ui.showInfoPopup(message, duration, align, top, left, bottom, right);
+    }
+
+    @Remote(variants = Variant.both)
+    public static void labelReliable(String message, float duration, float worldx, float worldy){
         if(message == null) return;
 
         ui.showLabel(message, duration, worldx, worldy);

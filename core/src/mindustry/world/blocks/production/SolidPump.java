@@ -38,7 +38,7 @@ public class SolidPump extends Pump{
         drawPotentialLinks(x, y);
 
         if(attribute != null){
-            drawPlaceText(Core.bundle.format("bar.efficiency", Math.round(Math.max(sumAttribute(attribute, x, y) / size / size + baseEfficiency, 0f) * 100 * percentSolid(x, y))), x, y, valid);
+            drawPlaceText(Core.bundle.format("bar.efficiency", Math.round(Math.max((sumAttribute(attribute, x, y)) / size / size + percentSolid(x, y) * baseEfficiency, 0f) * 100)), x, y, valid);
         }
     }
 
@@ -89,7 +89,6 @@ public class SolidPump extends Pump{
         public float boost;
         public float validTiles;
         public float lastPump;
-
 
         @Override
         public void drawCracks(){}
