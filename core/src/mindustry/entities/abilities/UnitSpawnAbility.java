@@ -17,10 +17,11 @@ import static mindustry.Vars.*;
 public class UnitSpawnAbility extends Ability{
     public UnitType unit;
     public float spawnTime = 60f, spawnX, spawnY;
+    public boolean instant;
     public Effect spawnEffect = Fx.spawn;
     public boolean parentizeEffects;
 
-    protected float timer;
+    protected float timer = -1;
 
     public UnitSpawnAbility(UnitType unit, float spawnTime, float spawnX, float spawnY){
         this.unit = unit;
@@ -34,6 +35,10 @@ public class UnitSpawnAbility extends Ability{
 
     @Override
     public void update(Unit unit){
+        if(timer < 0){
+            timer = instant ? spawnTime : 0f;
+        }
+        
         timer += Time.delta * state.rules.unitBuildSpeed(unit.team);
 
         if(timer >= spawnTime && Units.canCreate(unit.team, this.unit)){
