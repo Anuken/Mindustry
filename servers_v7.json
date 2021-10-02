@@ -51,7 +51,8 @@
     "name": "Shiza Minigames",
     "address": ["shizashizashiza.ml"]
   },
-  { "name": "devass.su",
+  { 
+    "name": "devass.su",
     "address": ["185.22.152.66"]
   }
 ]
