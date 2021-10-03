@@ -25,12 +25,13 @@ import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.*;
 
 public class WaveInfoDialog extends BaseDialog{
-    private int start = 0, displayed = 20, graphSpeed = 1, maxGraphSpeed = 16;
+    private int start = 0, displayed = 20, graphSpeed = 1;
+    public int maxVisible = 30, maxGraphSpeed = 16;
     Seq<SpawnGroup> groups = new Seq<>();
     private SpawnGroup expandedGroup;
 
     private Table table, iTable, eTable, uTable;
-    private int search = -1, payLeft, maxVisible = 30;
+    private int search = -1, payLeft;
     private int filterHealth, filterBegin = -1, filterEnd = -1, filterAmount, filterAmountWave;
     private boolean expandPane = false, filterHealthMode = false, filterStrict = false;
     private UnitType lastType = UnitTypes.dagger;
@@ -280,12 +281,7 @@ public class WaveInfoDialog extends BaseDialog{
 
                     if(expandedGroup == group){
                         t.table(spawns -> {
-                            spawns.field("" + (group.begin + 1), TextFieldFilter.digitsOnly, text -> {
-                                if(Strings.canParsePositiveInt(text)){
-                                    group.begin = Strings.parseInt(text) - 1;
-                                    updateWaves();
-                                }
-                            }).width(100f);
+                            numField("", spawns, f -> group.begin = f - 1, () -> group.begin + 1, 100f);
                             spawns.add("@waves.to").padLeft(4).padRight(4);
                             spawns.field(group.end == never ? "" : (group.end + 1) + "", TextFieldFilter.digitsOnly, text -> {
                                 if(Strings.canParsePositiveInt(text)){
@@ -310,12 +306,7 @@ public class WaveInfoDialog extends BaseDialog{
                         }).row();
 
                         t.table(a -> {
-                            a.field(group.unitAmount + "", TextFieldFilter.digitsOnly, text -> {
-                                if(Strings.canParsePositiveInt(text)){
-                                    group.unitAmount = Strings.parseInt(text);
-                                    updateWaves();
-                                }
-                            }).width(80f);
+                            numField("", a, f -> group.unitAmount = f, () -> group.unitAmount, 80f);
 
                             a.add(" + ");
                             a.field(Strings.fixed(Math.max((Mathf.zero(group.unitScaling) ? 0 : 1f / group.unitScaling), 0), 2), TextFieldFilter.floatsOnly, text -> {
@@ -328,31 +319,13 @@ public class WaveInfoDialog extends BaseDialog{
                         }).row();
 
                         t.table(a -> {
-                            a.field(group.max + "", TextFieldFilter.digitsOnly, text -> {
-                                if(Strings.canParsePositiveInt(text)){
-                                    group.max = Strings.parseInt(text);
-                                    updateWaves();
-                                }
-                            }).width(80f);
-
+                            numField("", a, f -> group.max = f, () -> group.max, 80f);
                             a.add("@waves.max").padLeft(5);
                         }).row();
 
                         t.table(a -> {
-                            a.field((int)group.shields + "", TextFieldFilter.digitsOnly, text -> {
-                                if(Strings.canParsePositiveInt(text)){
-                                    group.shields = Strings.parseInt(text);
-                                    updateWaves();
-                                }
-                            }).width(80f);
-
-                            a.add(" + ");
-                            a.field((int)group.shieldScaling + "", TextFieldFilter.digitsOnly, text -> {
-                                if(Strings.canParsePositiveInt(text)){
-                                    group.shieldScaling = Strings.parseInt(text);
-                                    updateWaves();
-                                }
-                            }).width(80f);
+                            numField("", a, f -> group.shields = f, () -> (int)group.shields, 80f);
+                            numField(" + ", a, f -> group.shieldScaling = f, () -> (int)group.shieldScaling, 80f);
                             a.add("@waves.shields").padLeft(4);
                         }).row();
 
@@ -494,6 +467,7 @@ public class WaveInfoDialog extends BaseDialog{
                 buildGroups();
             });
             for(Item item : content.items()){
+                if(item.isHidden()) continue;
                 p.button(t -> {
                     t.left();
                     if(item.uiIcon != null) t.image(item.uiIcon).size(8 * 4).scaling(Scaling.fit).padRight(2f);
@@ -521,22 +495,19 @@ public class WaveInfoDialog extends BaseDialog{
                 filterHealthMode = !filterHealthMode;
                 buildGroups();
             }).update(b -> b.setText(filterHealthMode ? ">" : "<")).size(40f).padRight(4f);
-            filter.defaults().width(170f);
-            numField("", filter, f -> filterHealth = f, () -> filterHealth, 15);
+            numField("", filter, f -> filterHealth = f, () -> filterHealth, 170f, 15);
         }).row();
 
         dialog.cont.add("@waves.filter.begin");
         dialog.cont.table(filter -> {
-            filter.defaults().maxWidth(120f);
-            numField("", filter, f -> filterBegin = f - 1, () -> filterBegin + 1, 8);
-            numField("@waves.to", filter, f -> filterEnd = f - 1, () -> filterEnd + 1, 8);
+            numField("", filter, f -> filterBegin = f - 1, () -> filterBegin + 1, 120f, 8);
+            numField("@waves.to", filter, f -> filterEnd = f - 1, () -> filterEnd + 1, 120f, 8);
         }).row();
 
         dialog.cont.add(Core.bundle.get("waves.filter.amount") + ":");
         dialog.cont.table(filter -> {
-            filter.defaults().maxWidth(120f);
-            numField("", filter, f -> filterAmount = f, () -> filterAmount, 12);
-            numField("@waves.filter.onwave", filter, f -> filterAmountWave = f, () -> filterAmountWave, 8);
+            numField("", filter, f -> filterAmount = f, () -> filterAmount, 120f, 12);
+            numField("@waves.filter.onwave", filter, f -> filterAmountWave = f, () -> filterAmountWave, 120f, 8);
         }).row();
 
         dialog.cont.table(t -> {
@@ -628,14 +599,19 @@ public class WaveInfoDialog extends BaseDialog{
         }
     }
 
-    void numField(String text, Table t, Intc cons, Intp prov, int maxLength){
+    void numField(String text, Table t, Intc cons, Intp prov, float width){
+        numField(text, t, cons, prov, width, Integer.MAX_VALUE);
+    }
+
+    void numField(String text, Table t, Intc cons, Intp prov, float width, int maxLength){
         if(!text.isEmpty()) t.add(text);
         t.field(prov.get() + "", TextFieldFilter.digitsOnly, input -> {
             if(Strings.canParsePositiveInt(input)){
                 cons.get(!input.isEmpty() ? Strings.parseInt(input) : 0);
-                buildGroups();
+                if(maxLength != Integer.MAX_VALUE) buildGroups();
+                updateWaves();
             }
-        }).maxTextLength(maxLength);
+        }).width(width).maxTextLength(maxLength);
     }
 
     void clearFilter(){
