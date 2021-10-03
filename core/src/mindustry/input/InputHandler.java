@@ -50,6 +50,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public final OverlayFragment frag = new OverlayFragment();
 
+    /** If any of these functions return true, input is locked. */
+    public Seq<Boolp> inputLocks = Seq.with(() -> renderer.isCutscene());
     public Interval controlInterval = new Interval();
     public @Nullable Block block;
     public boolean overrideLineRotation;
@@ -431,6 +433,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             player.unit().commandNearby(new CircleFormation());
             Fx.commandSend.at(player, player.unit().type.commandRadius);
         }
+    }
+
+    /** Adds an input lock; if this function returns true, input is locked. Used for mod cutscenes or panning. */
+    public void addLock(Boolp lock){
+        inputLocks.add(lock);
+    }
+
+    /** @return whether most input is locked, for 'cutscenes' */
+    public boolean locked(){
+        return inputLocks.contains(Boolp::get);
     }
 
     public Eachable<BuildPlan> allRequests(){
