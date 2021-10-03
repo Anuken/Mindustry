@@ -435,7 +435,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    /** Adds an input lock; if this function returns true, input is locked. Used for mod cutscenes or panning. */
+    /** Adds an input lock; if this function returns true, input is locked. Used for mod 'cutscenes' or custom camera panning. */
     public void addLock(Boolp lock){
         inputLocks.add(lock);
     }
@@ -470,6 +470,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && !player.team().rules().infiniteAmmo && player.unit().ammo <= 0){
             player.unit().type.weapons.first().noAmmoSound.at(player.unit());
+        }
+
+        //you don't want selected blocks while locked, looks weird
+        if(locked()){
+            block = null;
         }
 
         wasShooting = player.shooting;
