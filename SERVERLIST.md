@@ -24,4 +24,4 @@ For example, if your server address is `google.com`, you would add a comma after
     "address": "google.com"
   }
 ```
-Then, press the *'submit pull request'* button and I'll take a look at your server. If I have any issues with it, I'll let you know in the PR comments.
+Then, press the *'submit pull request'* button and I'll take a look at your server. If I have any issues with it, I'll let you know in the PR comments. Also, make sure that your server doesn't have any mods because modded servers won't be added to list.
