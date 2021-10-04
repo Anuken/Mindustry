@@ -16,7 +16,7 @@ import static mindustry.Vars.*;
 
 public class Sorter extends Block{
     public boolean invert;
-
+    public boolean alter[4];
     public Sorter(String name){
         super(name);
         update = true;
@@ -114,12 +114,12 @@ public class Sorter extends Block{
                 }else if(!bc){
                     return null;
                 }else{
-                    if(rotation == 0){
+                    if(alter[dir] == 0){
                         to = a;
-                        if(flip) this.rotation = (byte)1;
+                        if(flip) this.alter[dir] = (byte)1;
                     }else{
                         to = b;
-                        if(flip) this.rotation = (byte)0;
+                        if(flip) this.alter[dir] = (byte)0;
                     }
                 }
             }
