@@ -11,7 +11,7 @@ import mindustry.world.meta.*;
 public class OverflowGate extends Block{
     public float speed = 1f;
     public boolean invert = false;
-
+    public boolean alter[] = {false, false, false, false};
     public OverflowGate(String name){
         super(name);
         hasItems = true;
