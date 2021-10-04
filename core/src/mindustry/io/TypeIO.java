@@ -95,6 +95,12 @@ public class TypeIO{
         }else if(object instanceof BuildingBox b){
             write.b(12);
             write.i(b.pos);
+        }else if(object instanceof boolean[] b){
+            write.b(16);
+            write.i(b.length);
+            for(boolean bool : b){
+                write.bool(bool);
+            }
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -126,6 +132,7 @@ public class TypeIO{
             case 13: return LAccess.all[read.s()];
             case 14: int blen = read.i(); byte[] bytes = new byte[blen]; read.b(bytes); return bytes;
             case 15: return UnitCommand.all[read.b()];
+            case 16: int boollen = read.i(); boolean[] bools = new boolean[boollen]; for(int i = 0; i < boollen; i ++) bools[i] = read.bool(); return bools;
             default: throw new IllegalArgumentException("Unknown object type: " + type);
         }
     }

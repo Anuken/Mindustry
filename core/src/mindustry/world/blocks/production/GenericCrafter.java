@@ -127,24 +127,32 @@ public class GenericCrafter extends Block{
             }
 
             if(progress >= 1f){
-                consume();
-
-                if(outputItems != null){
-                    for(ItemStack output : outputItems){
-                        for(int i = 0; i < output.amount; i++){
-                            offload(output.item);
-                        }
-                    }
-                }
-
-                if(outputLiquid != null){
-                    handleLiquid(this, outputLiquid.liquid, outputLiquid.amount);
-                }
-
-                craftEffect.at(x, y);
-                progress %= 1f;
+                craft();
             }
 
+            dumpOutputs();
+        }
+
+        public void craft(){
+            consume();
+
+            if(outputItems != null){
+                for(ItemStack output : outputItems){
+                    for(int i = 0; i < output.amount; i++){
+                        offload(output.item);
+                    }
+                }
+            }
+
+            if(outputLiquid != null){
+                handleLiquid(this, outputLiquid.liquid, outputLiquid.amount);
+            }
+
+            craftEffect.at(x, y);
+            progress %= 1f;
+        }
+
+        public void dumpOutputs(){
             if(outputItems != null && timer(timerDump, dumpTime / timeScale)){
                 for(ItemStack output : outputItems){
                     dump(output.item);

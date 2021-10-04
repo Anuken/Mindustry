@@ -40,6 +40,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         floating = true;
         conveyorPlacement = true;
         noUpdateDisabled = true;
+        canOverdrive = false;
     }
 
     @Override

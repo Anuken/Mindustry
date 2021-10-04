@@ -32,7 +32,9 @@ public class Fx{
         //lifetime is how many frames it takes to fade out the trail
         e.lifetime = trail.length * 1.4f;
 
-        trail.shorten();
+        if(!state.isPaused()){
+            trail.shorten();
+        }
         trail.drawCap(e.color, e.rotation);
         trail.draw(e.color, e.rotation);
     }),
@@ -360,13 +362,13 @@ public class Fx{
 
         Fill.circle(e.x, e.y, e.fin() * 10);
         Drawf.light(e.x, e.y, e.fin() * 20f, Pal.heal, 0.7f);
-    }),
+    }).followParent(true).rotWithParent(true),
 
     greenLaserChargeSmall = new Effect(40f, 100f, e -> {
         color(Pal.heal);
         stroke(e.fin() * 2f);
         Lines.circle(e.x, e.y, e.fout() * 50f);
-    }),
+    }).followParent(true).rotWithParent(true),
 
     greenCloud = new Effect(80f, e -> {
         color(Pal.heal);
@@ -391,12 +393,6 @@ public class Fx{
         color(Pal.heal);
         stroke(e.fout() * 2f);
         Lines.circle(e.x, e.y, 2f + e.finpow() * 7f);
-    }),
-
-    healDenamic = new Effect(11, e -> {
-        color(Pal.heal);
-        stroke(e.fout() * 2f);
-        Lines.circle(e.x, e.y, 2f + e.finpow() * e.rotation);
     }),
 
     shieldWave = new Effect(22, e -> {
@@ -459,7 +455,7 @@ public class Fx{
         color(Pal.lightFlame, Pal.darkFlame, e.fin());
         stroke(0.5f + e.fout());
 
-        randLenVectors(e.id, 2, e.fin() * 15f, e.rotation, 50f, (x, y) -> {
+        randLenVectors(e.id, 2, 1f + e.fin() * 15f, e.rotation, 50f, (x, y) -> {
             float ang = Mathf.angle(x, y);
             lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
         });
@@ -469,7 +465,7 @@ public class Fx{
         color(Color.white, Pal.heal, e.fin());
         stroke(0.5f + e.fout());
 
-        randLenVectors(e.id, 2, e.fin() * 15f, e.rotation, 50f, (x, y) -> {
+        randLenVectors(e.id, 2, 1f + e.fin() * 15f, e.rotation, 50f, (x, y) -> {
             float ang = Mathf.angle(x, y);
             lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
         });
@@ -478,7 +474,7 @@ public class Fx{
     hitLiquid = new Effect(16, e -> {
         color(e.color);
 
-        randLenVectors(e.id, 5, e.fin() * 15f, e.rotation, 60f, (x, y) -> {
+        randLenVectors(e.id, 5, 1f + e.fin() * 15f, e.rotation, 60f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 2f);
         });
     }),
@@ -1000,7 +996,9 @@ public class Fx{
         float length = 20f * e.finpow();
         float size = 7f * e.fout();
 
-        rect(((Item)e.data).fullIcon, e.x + trnsx(e.rotation, length), e.y + trnsy(e.rotation, length), size, size);
+        if(!(e.data instanceof Item item)) return;
+
+        rect(item.fullIcon, e.x + trnsx(e.rotation, length), e.y + trnsy(e.rotation, length), size, size);
     }),
 
     shockwave = new Effect(10f, 80f, e -> {
@@ -1880,14 +1878,14 @@ public class Fx{
         color(e.color);
         stroke(3f * e.fout());
         Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
-    }),
+    }).followParent(true),
 
     coreLandDust = new Effect(100f, e -> {
         color(e.color, e.fout(0.1f));
         rand.setSeed(e.id);
         Tmp.v1.trns(e.rotation, e.finpow() * 90f * rand.random(0.2f, 1f));
         Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 8f * rand.random(0.6f, 1f) * e.fout(0.2f));
-    }).layer(Layer.block + 1f),
+    }).layer(Layer.groundUnit + 1f),
 
     unitShieldBreak = new Effect(35, e -> {
         if(!(e.data instanceof Unitc)) return;
@@ -1945,7 +1943,7 @@ public class Fx{
         }
 
         Lines.endLine();
-    }).followParent(false),
+    }).followParent(false).rotWithParent(false),
 
     chainEmp = new Effect(30f, 300f, e -> {
         if(!(e.data instanceof Position p)) return;
@@ -1982,5 +1980,5 @@ public class Fx{
         }
 
         Lines.endLine();
-    }).followParent(false);
+    }).followParent(false).rotWithParent(false);
 }

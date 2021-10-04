@@ -105,8 +105,8 @@ public class Renderer implements ApplicationListener{
         for(int i = 0; i < splashes.length; i++) splashes[i] = atlas.find("splash-" + i);
 
         assets.load("sprites/clouds.png", Texture.class).loaded = t -> {
-            ((Texture)t).setWrap(TextureWrap.repeat);
-            ((Texture)t).setFilter(TextureFilter.linear);
+            t.setWrap(TextureWrap.repeat);
+            t.setFilter(TextureFilter.linear);
         };
     }
 
@@ -114,7 +114,7 @@ public class Renderer implements ApplicationListener{
     public void update(){
         Color.white.set(1f, 1f, 1f, 1f);
 
-        float dest = Mathf.round(targetscale, 0.5f);
+        float dest = Mathf.clamp(Mathf.round(targetscale, 0.5f), minScale(), maxScale());
         camerascale = Mathf.lerpDelta(camerascale, dest, 0.1f);
         if(Mathf.equal(camerascale, dest, 0.001f)) camerascale = dest;
         laserOpacity = settings.getInt("lasersopacity") / 100f;
@@ -277,7 +277,7 @@ public class Renderer implements ApplicationListener{
         }
 
         if(bloom != null){
-            bloom.resize(graphics.getWidth() / 4, graphics.getHeight() / 4);
+            bloom.resize(graphics.getWidth(), graphics.getHeight());
             Draw.draw(Layer.bullet - 0.02f, bloom::capture);
             Draw.draw(Layer.effect + 0.02f, bloom::render);
         }
@@ -504,6 +504,8 @@ public class Renderer implements ApplicationListener{
 
     public void showLaunch(CoreBlock coreType){
         Vars.ui.hudfrag.showLaunch();
+        Vars.control.input.frag.config.hideConfig();
+        Vars.control.input.frag.inv.hide();
         launchCoreType = coreType;
         launching = true;
         landCore = player.team().core();

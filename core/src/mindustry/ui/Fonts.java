@@ -37,7 +37,6 @@ public class Fonts{
 
     public static Font def;
     public static Font outline;
-    public static Font chat;
     public static Font icon;
     public static Font iconLarge;
     public static Font tech;
@@ -75,20 +74,19 @@ public class Fonts{
         largeIcons.clear();
         FreeTypeFontParameter param = fontParameter();
 
-        Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = f -> Fonts.def = (Font)f;
-        Core.assets.load("chat", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = f -> Fonts.chat = (Font)f;
+        Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = f -> Fonts.def = f;
         Core.assets.load("icon", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 30;
             incremental = true;
             characters = "\0";
-        }})).loaded = f -> Fonts.icon = (Font)f;
+        }})).loaded = f -> Fonts.icon = f;
         Core.assets.load("iconLarge", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 48;
             incremental = false;
             characters = "\0" + Iconc.all;
             borderWidth = 5f;
             borderColor = Color.darkGray;
-        }})).loaded = f -> Fonts.iconLarge = (Font)f;
+        }})).loaded = f -> Fonts.iconLarge = f;
     }
 
     public static TextureRegion getLargeIcon(String name){
@@ -104,7 +102,7 @@ public class Fonts{
     }
 
     public static void loadContentIcons(){
-        Seq<Font> fonts = Seq.with(Fonts.chat, Fonts.def, Fonts.outline);
+        Seq<Font> fonts = Seq.with(Fonts.def, Fonts.outline);
         Texture uitex = Core.atlas.find("logo").texture;
         int size = (int)(Fonts.def.getData().lineHeight/Fonts.def.getData().scaleY);
 
@@ -198,12 +196,12 @@ public class Fonts{
             size = 18;
         }};
 
-        Core.assets.load("outline", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = t -> Fonts.outline = (Font)t;
+        Core.assets.load("outline", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = t -> Fonts.outline = t;
 
         Core.assets.load("tech", Font.class, new FreeTypeFontLoaderParameter("fonts/tech.ttf", new FreeTypeFontParameter(){{
             size = 18;
         }})).loaded = f -> {
-            Fonts.tech = (Font)f;
+            Fonts.tech = f;
             Fonts.tech.getData().down *= 1.5f;
         };
     }

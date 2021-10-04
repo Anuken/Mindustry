@@ -17,6 +17,7 @@ public class LoadingFragment extends Fragment{
     private TextButton button;
     private Bar bar;
     private Label nameLabel;
+    private float progValue;
 
     @Override
     public void build(Group parent){
@@ -55,6 +56,17 @@ public class LoadingFragment extends Fragment{
         bar.set(() -> ((int)(progress.get() * 100) + "%"), progress, Pal.accent);
     }
 
+    public void snapProgress(){
+        bar.snap();
+    }
+
+    public void setProgress(float progress){
+        progValue = progress;
+        if(!bar.visible){
+            setProgress(() -> progValue);
+        }
+    }
+
     public void setButton(Runnable listener){
         button.visible = true;
         button.getListeners().remove(button.getListeners().size - 1);
@@ -71,6 +83,7 @@ public class LoadingFragment extends Fragment{
     }
 
     public void show(String text){
+        button.visible = false;
         nameLabel.setColor(Color.white);
         bar.visible = false;
         table.clearActions();

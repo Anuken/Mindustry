@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import mindustry.ctype.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.type.*;
 import mindustry.graphics.*;
@@ -163,7 +164,7 @@ public class StatusEffects implements ContentList{
         }};
 
         boss = new StatusEffect("boss"){{
-            color = Pal.health;
+            color = Team.crux.color;
             permanent = true;
             damageMultiplier = 1.3f;
             healthMultiplier = 1.5f;

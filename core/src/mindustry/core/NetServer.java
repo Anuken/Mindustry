@@ -19,6 +19,7 @@ import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
@@ -397,7 +398,9 @@ public class NetServer implements ApplicationListener{
                 }
 
                 if(found != null){
-                    if(found.admin){
+                    if(found == player){
+                        player.sendMessage("[scarlet]You can't vote to kick yourself.");
+                    }else if(found.admin){
                         player.sendMessage("[scarlet]Did you really expect to be able to kick an admin?");
                     }else if(found.isLocal()){
                         player.sendMessage("[scarlet]Local players cannot be kicked.");
@@ -647,7 +650,7 @@ public class NetServer implements ApplicationListener{
             Unit unit = player.unit();
 
             long elapsed = Math.min(Time.timeSinceMillis(con.lastReceivedClientTime), 1500);
-            float maxSpeed = unit.realSpeed();
+            float maxSpeed = unit.speed();
 
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.2f;
 
@@ -865,7 +868,8 @@ public class NetServer implements ApplicationListener{
         dataStream.close();
 
         //write basic state data.
-        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver, universe.seconds(), tps, syncStream.toByteArray());
+        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver,
+            universe.seconds(), tps, GlobalConstants.rand.seed0, GlobalConstants.rand.seed1, syncStream.toByteArray());
 
         syncStream.reset();
 
@@ -896,7 +900,7 @@ public class NetServer implements ApplicationListener{
     }
 
     String fixName(String name){
-        name = name.trim();
+        name = name.trim().replace("\n", "").replace("\t", "");
         if(name.equals("[") || name.equals("]")){
             return "";
         }

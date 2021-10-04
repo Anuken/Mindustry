@@ -287,7 +287,6 @@ public class ServerControl implements ApplicationListener{
             Core.app.exit();
         });
 
-
         handler.register("stop", "Stop hosting the server.", arg -> {
             net.closeServer();
             if(lastTask != null) lastTask.cancel();

@@ -158,7 +158,9 @@ public class Generators{
                         }
                     });
 
-                    Fi.get("../blocks/environment/cliffmask" + (val & 0xff) + ".png").writePng(result);
+                    Fi fi = Fi.get("../blocks/environment/cliffmask" + (val & 0xff) + ".png");
+                    fi.writePng(result);
+                    fi.copyTo(Fi.get("../editor").child("editor-" + fi.name()));
                 });
             }
 
@@ -380,7 +382,7 @@ public class Generators{
                     base.each((x, y) -> tint.setRaw(x, y, Color.muli(tint.getRaw(x, y), stat.color.rgba())));
 
                     //outline the image
-                    Pixmap container = new Pixmap(38, 38);
+                    Pixmap container = new Pixmap(tint.width + 6, tint.height + 6);
                     container.draw(base, 3, 3, true);
                     base = container.outline(Pal.gray, 3);
                 }

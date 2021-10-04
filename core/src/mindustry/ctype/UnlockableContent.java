@@ -27,6 +27,8 @@ public abstract class UnlockableContent extends MappableContent{
     public boolean alwaysUnlocked = false;
     /** Whether to show the description in the research dialog preview. */
     public boolean inlineDescription = true;
+    /** Whether details of blocks are hidden in custom games if they haven't been unlocked in campaign mode. */
+    public boolean hideDetails = true;
     /** Special logic icon ID. */
     public int iconId = 0;
     /** Icon of the content to use in UI. */
@@ -149,9 +151,17 @@ public abstract class UnlockableContent extends MappableContent{
         }
     }
 
+    public boolean unlockedNowHost(){
+        if(!state.isCampaign()) return true;
+        return net != null && net.client() ?
+            alwaysUnlocked || state.rules.researched.contains(name) :
+            unlocked || alwaysUnlocked;
+    }
+
     public boolean unlocked(){
-        if(net != null && net.client()) return alwaysUnlocked || state.rules.researched.contains(name);
-        return unlocked || alwaysUnlocked;
+        return net != null && net.client() ?
+            alwaysUnlocked || unlocked || state.rules.researched.contains(name) :
+            unlocked || alwaysUnlocked;
     }
 
     /** Locks this content again. */

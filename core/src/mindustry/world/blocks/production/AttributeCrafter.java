@@ -37,7 +37,7 @@ public class AttributeCrafter extends GenericCrafter{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.affinities, attribute, boostScale);
+        stats.add(Stat.affinities, attribute, boostScale * size * size);
     }
 
     public class AttributeCrafterBuild extends GenericCrafterBuild{

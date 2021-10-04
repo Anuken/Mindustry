@@ -70,6 +70,8 @@ public class EventType{
     public static class ContentInitEvent{}
     /** Called when the client game is first loaded. */
     public static class ClientLoadEvent{}
+    /** Called after SoundControl registers its music. */
+    public static class MusicRegisterEvent{}
     /** Called *after* all the modded files have been added into Vars.tree */
     public static class FileTreeInitEvent{}
     /** Called when a game begins and the world is loaded. */
@@ -411,14 +413,29 @@ public class EventType{
         }
     }
 
-    /** Called when a unit is created in a reconstructor or factory. */
+    /** Called when a unit is created in a reconstructor, factory or other unit. */
     public static class UnitCreateEvent{
         public final Unit unit;
-        public final Building spawner;
+        public final @Nullable Building spawner;
+        public final @Nullable Unit spawnerUnit;
 
-        public UnitCreateEvent(Unit unit, Building spawner){
+        public UnitCreateEvent(Unit unit, Building spawner, Unit spawnerUnit){
             this.unit = unit;
             this.spawner = spawner;
+            this.spawnerUnit = spawnerUnit;
+        }
+
+        public UnitCreateEvent(Unit unit, Building spawner){
+            this(unit, spawner, null);
+        }
+    }
+
+    /** Called when a unit is spawned by wave. */
+    public static class UnitSpawnEvent{
+        public final Unit unit;
+
+        public UnitSpawnEvent(Unit unit) {
+            this.unit = unit;
         }
     }
 

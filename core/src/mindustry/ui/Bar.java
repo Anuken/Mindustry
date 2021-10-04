@@ -62,6 +62,10 @@ public class Bar extends Element{
         update(() -> this.name = name.get());
     }
 
+    public void snap(){
+        lastValue = value = fraction.get();
+    }
+
     public Bar outline(Color color, float stroke){
         outlineColor.set(color);
         outlineRadius = Scl.scl(stroke);

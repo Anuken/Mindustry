@@ -126,7 +126,7 @@ public class StatValues{
 
                 if(state.isGame()){
                     var blocks = Vars.content.blocks()
-                    .select(block -> block instanceof Floor f && indexer.isBlockPresent(block) && f.attributes.get(attr) != 0 && !(f.isLiquid && !floating))
+                    .select(block -> block instanceof Floor f && indexer.isBlockPresent(block) && f.attributes.get(attr) != 0 && !(f.isDeep() && !floating))
                     .<Floor>as().with(s -> s.sort(f -> f.attributes.get(attr)));
 
                     if(blocks.any()){

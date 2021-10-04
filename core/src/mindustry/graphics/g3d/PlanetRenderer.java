@@ -124,7 +124,7 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void beginBloom(){
-        bloom.resize(Core.graphics.getWidth() / 4, Core.graphics.getHeight() / 4);
+        bloom.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
         bloom.capture();
     }
 
@@ -136,8 +136,12 @@ public class PlanetRenderer implements Disposable{
     public void renderPlanet(Planet planet){
         if(!planet.visible()) return;
 
-        //render planet at offsetted position in the world
-        planet.draw(cam.combined, planet.getTransform(mat));
+        cam.update();
+
+        if(cam.frustum.containsSphere(planet.position, planet.clipRadius)){
+            //render planet at offsetted position in the world
+            planet.draw(cam.combined, planet.getTransform(mat));
+        }
 
         renderOrbit(planet);
 
@@ -153,22 +157,11 @@ public class PlanetRenderer implements Disposable{
             renderSectors(planet);
         }
 
-        if(planet.parent != null && planet.hasAtmosphere && Core.settings.getBool("atmosphere")){
-            Gl.depthMask(false);
-
-            Blending.additive.apply();
-
-            Shaders.atmosphere.camera = cam;
-            Shaders.atmosphere.planet = planet;
-            Shaders.atmosphere.bind();
-            Shaders.atmosphere.apply();
-
-            atmosphere.render(Shaders.atmosphere, Gl.triangles);
-
-            Blending.normal.apply();
-
-            Gl.depthMask(true);
+        if(cam.frustum.containsSphere(planet.position, planet.clipRadius) && planet.parent != null && planet.hasAtmosphere && Core.settings.getBool("atmosphere")){
+            planet.drawAtmosphere(atmosphere, cam);
         }
+
+        planet.drawClouds(cam.combined, planet.getTransform(mat));
 
         for(Planet child : planet.children){
             renderTransparent(child);
@@ -230,7 +223,6 @@ public class PlanetRenderer implements Disposable{
             Tmp.c1.set(from).lerp(to, (f+ Time.globalTime /timeScale)%1f);
             batch.color(Tmp.c1);
             batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f));
-
         }
         batch.flush(Gl.lineStrip);
     }

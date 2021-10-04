@@ -48,6 +48,8 @@ public class Floor extends Block{
     public float liquidMultiplier = 1f;
     /** whether this block is liquid. */
     public boolean isLiquid;
+    /** shallow water flag used for generation */
+    public boolean shallow = false;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
     /** Group of blocks that this block does not draw edges on. */

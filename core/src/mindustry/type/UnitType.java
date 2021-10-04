@@ -77,6 +77,8 @@ public class UnitType extends UnlockableContent{
     public Effect fallEffect = Fx.fallSmoke;
     public Effect fallThrusterEffect = Fx.fallSmoke;
     public Effect deathExplosionEffect = Fx.dynamicExplosion;
+    /** Additional sprites that are drawn with the unit. */
+    public Seq<UnitDecal> decals = new Seq<>();
     public Seq<Ability> abilities = new Seq<>();
     /** Flags to target based on priority. Null indicates that the closest target should be found. The closest enemy core is used as a fallback. */
     public BlockFlag[] targetFlags = {null};
@@ -109,7 +111,7 @@ public class UnitType extends UnlockableContent{
     /** This is a VERY ROUGH estimate of unit DPS. */
     public float dpsEstimate = -1;
     public float clipSize = -1;
-    public boolean canDrown = true;
+    public boolean canDrown = true, naval = false;
     public float engineOffset = 5f, engineSize = 2.5f;
     public float strafePenalty = 0.5f;
     public float hitSize = 6f;
@@ -312,9 +314,13 @@ public class UnitType extends UnlockableContent{
 
         //water preset
         if(example instanceof WaterMovec){
+            naval = true;
             canDrown = false;
             omniMovement = false;
             immunities.add(StatusEffects.wet);
+            if(visualElevation < 0f){
+                visualElevation = 0.11f;
+            }
         }
 
         if(lightRadius == -1){
@@ -325,7 +331,7 @@ public class UnitType extends UnlockableContent{
         singleTarget = weapons.size <= 1 && !forceMultiTarget;
 
         if(itemCapacity < 0){
-            itemCapacity = Math.max(Mathf.round((int)(hitSize * 4.3), 10), 10);
+            itemCapacity = Math.max(Mathf.round((int)(hitSize * 4f), 10), 10);
         }
 
         //assume slight range margin
@@ -370,6 +376,7 @@ public class UnitType extends UnlockableContent{
         //add mirrored weapon variants
         Seq<Weapon> mapped = new Seq<>();
         for(Weapon w : weapons){
+            if(w.recoilTime < 0) w.recoilTime = w.reload;
             mapped.add(w);
 
             //mirrors are copies with X values negated
@@ -380,7 +387,9 @@ public class UnitType extends UnlockableContent{
                 copy.flipSprite = !copy.flipSprite;
                 mapped.add(copy);
 
-                //since there are now two weapons, the reload time must be doubled
+                //since there are now two weapons, the reload and recoil time must be doubled
+                w.recoilTime *= 2f;
+                copy.recoilTime *= 2f;
                 w.reload *= 2f;
                 copy.reload *= 2f;
 
@@ -443,7 +452,7 @@ public class UnitType extends UnlockableContent{
             if(!packer.has(name + "-outline")){
                 PixmapRegion base = Core.atlas.getPixmap(region);
                 var result = Pixmaps.outline(base, outlineColor, outlineRadius);
-                if(Core.settings.getBool("linear")){
+                if(Core.settings.getBool("linear", true)){
                     Pixmaps.bleed(result);
                 }
                 packer.add(PageType.main, name + "-outline", result);
@@ -565,14 +574,26 @@ public class UnitType extends UnlockableContent{
             unit.trns(-legOffset.x, -legOffset.y);
         }
 
+        if(decals.size > 0){
+            float base = unit.rotation - 90;
+            for(var d : decals){
+                Draw.z(d.layer);
+                Draw.scl(d.xScale, d.yScale);
+                Draw.color(d.color);
+                Draw.rect(d.region, unit.x + Angles.trnsx(base, d.x, d.y), unit.y + Angles.trnsy(base, d.x, d.y), base + d.rotation);
+            }
+            Draw.reset();
+            Draw.z(z);
+        }
+
         if(unit.abilities.size > 0){
             for(Ability a : unit.abilities){
                 Draw.reset();
                 a.draw(unit);
             }
-
-            Draw.reset();
         }
+
+        Draw.reset();
     }
 
     public <T extends Unit & Payloadc> void drawPayload(T unit){
@@ -593,7 +614,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawControl(Unit unit){
-        Draw.z(Layer.groundUnit - 2);
+        Draw.z(unit.isFlying() ? Layer.flyingUnitLow : Layer.groundUnit - 2);
 
         Draw.color(Pal.accent, Color.white, Mathf.absin(4f, 0.3f));
         Lines.poly(unit.x, unit.y, 4, unit.hitSize + 1.5f);
@@ -612,7 +633,7 @@ public class UnitType extends UnlockableContent{
         Draw.color(0, 0, 0, 0.4f);
         float rad = 1.6f;
         float size = Math.max(region.width, region.height) * Draw.scl;
-        Draw.rect(softShadowRegion, unit, size * rad * Draw.xscl, size * rad * Draw.yscl);
+        Draw.rect(softShadowRegion, unit, size * rad * Draw.xscl, size * rad * Draw.yscl, unit.rotation - 90);
         Draw.color();
     }
 
@@ -849,4 +870,5 @@ public class UnitType extends UnlockableContent{
     }
 
     //endregion
+
 }

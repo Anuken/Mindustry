@@ -92,6 +92,7 @@ public abstract class SaveVersion extends SaveFileReader{
             "build", Version.build,
             "mapname", state.map.name(),
             "wave", state.wave,
+            "tick", state.tick,
             "wavetime", state.wavetime,
             "stats", JsonIO.write(state.stats),
             "rules", JsonIO.write(state.rules),
@@ -110,6 +111,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
         state.wave = map.getInt("wave");
         state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
+        state.tick = map.getFloat("tick");
         state.stats = JsonIO.read(GameStats.class, map.get("stats", "{}"));
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
         if(state.rules.spawns.isEmpty()) state.rules.spawns = waves.get();

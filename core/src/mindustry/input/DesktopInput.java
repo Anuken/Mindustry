@@ -193,6 +193,7 @@ public class DesktopInput extends InputHandler{
             ui.listfrag.toggle();
         }
 
+        boolean locked = locked();
         boolean panCam = false;
         float camSpeed = (!Core.input.keyDown(Binding.boost) ? panSpeed : panBoostSpeed) * (!Core.input.keyDown(KeyCode.altLeft) ? 1f : 2.5f) * Time.delta;
 
@@ -205,24 +206,27 @@ public class DesktopInput extends InputHandler{
             panning = false;
         }
 
-        if(((player.dead() || state.isPaused()) && !ui.chatfrag.shown()) && !scene.hasField() && !scene.hasDialog()){
-            if(input.keyDown(Binding.mouse_move)){
-                panCam = true;
+        if(!locked){
+            if(((player.dead() || state.isPaused()) && !ui.chatfrag.shown()) && !scene.hasField() && !scene.hasDialog()){
+                if(input.keyDown(Binding.mouse_move)){
+                    panCam = true;
+                }
+
+                Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(camSpeed));
+            }else if(!player.dead() && !panning){
+                Core.camera.position.lerpDelta(player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
             }
 
-            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(camSpeed));
-        }else if(!player.dead() && !panning){
-            Core.camera.position.lerpDelta(player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
+            if(panCam){
+                Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * panScale, -1, 1) * camSpeed;
+                Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * panScale, -1, 1) * camSpeed;
+            }
+
         }
 
-        if(panCam){
-            Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * panScale, -1, 1) * camSpeed;
-            Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * panScale, -1, 1) * camSpeed;
-        }
+        shouldShoot = !scene.hasMouse() && !locked;
 
-        shouldShoot = !scene.hasMouse();
-
-        if(!scene.hasMouse()){
+        if(!scene.hasMouse() && !locked){
             if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){
                 Unit on = selectedUnit();
                 var build = selectedControlBuild();
@@ -237,7 +241,7 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        if(!player.dead() && !state.isPaused() && !scene.hasField() && !renderer.isCutscene()){
+        if(!player.dead() && !state.isPaused() && !scene.hasField() && !locked){
             updateMovement(player.unit());
 
             if(Core.input.keyTap(Binding.respawn)){
@@ -272,7 +276,7 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        if(player.dead()){
+        if(player.dead() || locked){
             cursorType = SystemCursor.arrow;
             return;
         }
@@ -624,7 +628,7 @@ public class DesktopInput extends InputHandler{
     protected void updateMovement(Unit unit){
         boolean omni = unit.type.omniMovement;
 
-        float speed = unit.realSpeed();
+        float speed = unit.speed();
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
@@ -643,11 +647,7 @@ public class DesktopInput extends InputHandler{
             unit.lookAt(unit.prefRotation());
         }
 
-        if(omni){
-            unit.moveAt(movement);
-        }else{
-            unit.rotateMove(movement);
-        }
+        unit.movePref(movement);
 
         unit.aim(unit.type.faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation, Core.input.mouseWorld().dst(unit)).add(unit.x, unit.y));
         unit.controlWeapons(true, player.shooting && !boosted);

@@ -18,6 +18,7 @@ public class MultiEffect extends Effect{
     @Override
     public void init(){
         for(Effect f : effects){
+            f.init();
             clip = Math.max(clip, f.clip);
             lifetime = Math.max(lifetime, f.lifetime);
         }

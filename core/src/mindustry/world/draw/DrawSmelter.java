@@ -38,13 +38,15 @@ public class DrawSmelter extends DrawBlock{
             float cr = Mathf.random(0.1f);
 
             Draw.z(Layer.block + 0.01f);
+            
+            Draw.alpha(build.warmup);
+            Draw.rect(top, build.x, build.y);
 
             Draw.alpha(((1f - g) + Mathf.absin(Time.time, 8f, g) + Mathf.random(r) - r) * build.warmup);
 
             Draw.tint(flameColor);
             Fill.circle(build.x, build.y, flameRadius + Mathf.absin(Time.time, flameRadiusScl, flameRadiusMag) + cr);
             Draw.color(1f, 1f, 1f, build.warmup);
-            Draw.rect(top, build.x, build.y);
             Fill.circle(build.x, build.y, flameRadiusIn + Mathf.absin(Time.time, flameRadiusScl, flameRadiusInMag) + cr);
 
             Draw.color();

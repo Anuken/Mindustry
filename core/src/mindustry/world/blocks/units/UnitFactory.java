@@ -39,12 +39,15 @@ public class UnitFactory extends UnitBlock{
         rotate = true;
 
         config(Integer.class, (UnitFactoryBuild tile, Integer i) -> {
+            if(tile.currentPlan == i) return;
             tile.currentPlan = i < 0 || i >= plans.size ? -1 : i;
             tile.progress = 0;
         });
 
         config(UnitType.class, (UnitFactoryBuild tile, UnitType val) -> {
-            tile.currentPlan = plans.indexOf(p -> p.unit == val);
+            int next = plans.indexOf(p -> p.unit == val);
+            if(tile.currentPlan == next) return;
+            tile.currentPlan = next;
             tile.progress = 0;
         });
 
@@ -143,8 +146,13 @@ public class UnitFactory extends UnitBlock{
         @Override
         public Object senseObject(LAccess sensor){
             if(sensor == LAccess.config) return currentPlan == -1 ? null : plans.get(currentPlan).unit;
-            if(sensor == LAccess.progress) return Mathf.clamp(fraction());
             return super.senseObject(sensor);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return Mathf.clamp(fraction());
+            return super.sense(sensor);
         }
 
         @Override
