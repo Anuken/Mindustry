@@ -25,7 +25,6 @@ public class LiquidTurret extends Turret{
         shootSound = Sounds.none;
         smokeEffect = Fx.none;
         shootEffect = Fx.none;
-        outlinedIcon = 1;
         drawLiquid = true;
     }
 
