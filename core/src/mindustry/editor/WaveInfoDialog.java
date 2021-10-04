@@ -26,7 +26,7 @@ import static mindustry.game.SpawnGroup.*;
 
 public class WaveInfoDialog extends BaseDialog{
     private int start = 0, displayed = 20, graphSpeed = 1;
-    public int maxVisible = 30, maxGraphSpeed = 16;
+    private final int maxVisible = 30, maxGraphSpeed = 16;
     Seq<SpawnGroup> groups = new Seq<>();
     private SpawnGroup expandedGroup;
 
