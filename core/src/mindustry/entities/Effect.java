@@ -30,6 +30,8 @@ public class Effect{
     public float lifetime = 50f;
     /** Clip size. */
     public float clip;
+    /** Time delay before the effect starts */
+    public float startDelay;
     /** Amount added to rotation */
     public float baseRotation;
     /** If true, parent unit is data are followed. */
@@ -56,6 +58,11 @@ public class Effect{
     public Effect(){
         this.id = all.size;
         all.add(this);
+    }
+
+    public Effect startDelay(float d){
+        startDelay = d;
+        return this;
     }
 
     public void init(){}
@@ -168,19 +175,27 @@ public class Effect{
                 effect.init();
             }
 
-            EffectState entity = EffectState.create();
-            entity.effect = effect;
-            entity.rotation = effect.baseRotation + rotation;
-            entity.data = data;
-            entity.lifetime = effect.lifetime;
-            entity.set(x, y);
-            entity.color.set(color);
-            if(effect.followParent && data instanceof Posc p){
-                entity.parent = p;
-                entity.rotWithParent = effect.rotWithParent;
+            if(effect.startDelay <= 0f){
+                inst(effect, x, y, rotation, color, data);
+            }else{
+                Time.runTask(effect.startDelay, () -> inst(effect, x, y, rotation, color, data));
             }
-            entity.add();
         }
+    }
+
+    private static void inst(Effect effect, float x, float y, float rotation, Color color, Object data){
+        EffectState entity = EffectState.create();
+        entity.effect = effect;
+        entity.rotation = effect.baseRotation + rotation;
+        entity.data = data;
+        entity.lifetime = effect.lifetime;
+        entity.set(x, y);
+        entity.color.set(color);
+        if(effect.followParent && data instanceof Posc p){
+            entity.parent = p;
+            entity.rotWithParent = effect.rotWithParent;
+        }
+        entity.add();
     }
 
     public static void decal(TextureRegion region, float x, float y, float rotation){

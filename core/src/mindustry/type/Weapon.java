@@ -346,14 +346,17 @@ public class Weapon implements Cloneable{
 
                 unit.vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
                 Effect.shake(shake, shake, shootX, shootY);
+                mount.recoil = recoil;
                 mount.heat = 1f;
                 if(!continuous){
                     shootSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
                 }
+                ammo.chargeShootEffect.at(shootX + unit.x - baseX, shootY + unit.y - baseY, rotation, parentize ? unit : null);
             });
         }else{
             unit.vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
             Effect.shake(shake, shake, shootX, shootY);
+            mount.recoil = recoil;
             mount.heat = 1f;
         }
 

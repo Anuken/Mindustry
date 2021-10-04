@@ -111,7 +111,7 @@ public class UnitType extends UnlockableContent{
     /** This is a VERY ROUGH estimate of unit DPS. */
     public float dpsEstimate = -1;
     public float clipSize = -1;
-    public boolean canDrown = true;
+    public boolean canDrown = true, naval = false;
     public float engineOffset = 5f, engineSize = 2.5f;
     public float strafePenalty = 0.5f;
     public float hitSize = 6f;
@@ -314,6 +314,7 @@ public class UnitType extends UnlockableContent{
 
         //water preset
         if(example instanceof WaterMovec){
+            naval = true;
             canDrown = false;
             omniMovement = false;
             immunities.add(StatusEffects.wet);

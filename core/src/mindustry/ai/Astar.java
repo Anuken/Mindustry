@@ -6,6 +6,8 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.world.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
 public class Astar{
@@ -13,7 +15,7 @@ public class Astar{
 
     private static final Seq<Tile> out = new Seq<>();
     private static final PQueue<Tile> queue = new PQueue<>(200 * 200 / 4, (a, b) -> 0);
-    private static final IntFloatMap costs = new IntFloatMap();
+    private static float[] costs;
     private static byte[][] rotations;
 
     public static Seq<Tile> pathfind(Tile from, Tile to, TileHueristic th, Boolf<Tile> passable){
@@ -32,9 +34,14 @@ public class Astar{
 
         GridBits closed = new GridBits(tiles.width, tiles.height);
 
-        costs.clear();
+        if(costs == null || costs.length != tiles.width * tiles.height){
+            costs = new float[tiles.width * tiles.height];
+        }
+
+        Arrays.fill(costs, 0);
+
         queue.clear();
-        queue.comparator = Structs.comparingFloat(a -> costs.get(a.pos(), 0f) + dh.cost(a.x, a.y, end.x, end.y));
+        queue.comparator = Structs.comparingFloat(a -> costs[a.array()] + dh.cost(a.x, a.y, end.x, end.y));
         queue.add(start);
         if(rotations == null || rotations.length != world.width() || rotations[0].length != world.height()){
             rotations = new byte[world.width()][world.height()];
@@ -43,7 +50,7 @@ public class Astar{
         boolean found = false;
         while(!queue.empty()){
             Tile next = queue.poll();
-            float baseCost = costs.get(next.pos(), 0f);
+            float baseCost = costs[next.array()];
             if(next == end){
                 found = true;
                 break;
@@ -58,7 +65,7 @@ public class Astar{
                         if(!closed.get(child.x, child.y)){
                             closed.set(child.x, child.y);
                             rotations[child.x][child.y] = child.relativeTo(next.x, next.y);
-                            costs.put(child.pos(), newCost);
+                            costs[child.array()] = newCost;
                             queue.add(child);
                         }
                     }

@@ -62,6 +62,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return Point2.pack(x, y);
     }
 
+    /** @return this tile's position, packed to the world width - for use in width*height arrays. */
+    public int array(){
+        return x + y * world.tiles.width;
+    }
+
     public byte relativeTo(Tile tile){
         return relativeTo(tile.x, tile.y);
     }
