@@ -69,12 +69,12 @@ public class OverflowGate extends Block{
                 }else if(bc && !ac){
                     to = b;
                 }else{
-                    if(rotation == 0){
+                    if(alter[dir] == 0){
                         to = a;
-                        if(flip) rotation =1;
+                        if(flip) alter[dir] = 1;
                     }else{
                         to = b;
-                        if(flip) rotation = 0;
+                        if(flip) alter[dir] = 0;
                     }
                 }
             }
