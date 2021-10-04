@@ -83,6 +83,9 @@ public class Turret extends ReloadTurret{
 
     public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
     public @Load("@-heat") TextureRegion heatRegion;
+    public @Load("@-liquid") TextureRegion liquidRegion;
+    public @Load("@-top") TextureRegion topRegion;
+    public boolean drawLiquid;
     public float elevation = -1f;
 
     public Cons<TurretBuild> drawer = tile -> Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
@@ -132,6 +135,7 @@ public class Turret extends ReloadTurret{
 
     @Override
     public TextureRegion[] icons(){
+        if(drawLiquid && topRegion.found()) return new TextureRegion[]{baseRegion, region, topRegion};
         return new TextureRegion[]{baseRegion, region};
     }
 
@@ -255,6 +259,13 @@ public class Turret extends ReloadTurret{
 
             if(heatRegion != Core.atlas.find("error")){
                 heatDrawer.get(this);
+            }
+
+            if(drawLiquid){
+                if(liquidRegion.found()){
+                    Drawf.liquid(liquidRegion, x + tr2.x, y + tr2.y, liquids.total() / liquidCapacity, liquids.current().color, rotation - 90);
+                }
+                if(topRegion.found()) Draw.rect(topRegion, x + tr2.x, y + tr2.y, rotation - 90);
             }
         }
 

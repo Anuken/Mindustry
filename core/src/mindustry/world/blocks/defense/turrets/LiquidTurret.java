@@ -2,12 +2,10 @@ package mindustry.world.blocks.defense.turrets;
 
 import arc.graphics.g2d.*;
 import arc.struct.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
@@ -17,8 +15,6 @@ import static mindustry.Vars.*;
 
 public class LiquidTurret extends Turret{
     public ObjectMap<Liquid, BulletType> ammoTypes = new ObjectMap<>();
-    public @Load("@-liquid") TextureRegion liquidRegion;
-    public @Load("@-top") TextureRegion topRegion;
     public boolean extinguish = true;
 
     public LiquidTurret(String name){
@@ -30,6 +26,7 @@ public class LiquidTurret extends Turret{
         smokeEffect = Fx.none;
         shootEffect = Fx.none;
         outlinedIcon = 1;
+        drawLiquid = true;
     }
 
     /** Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...] */
@@ -73,16 +70,6 @@ public class LiquidTurret extends Turret{
     }
 
     public class LiquidTurretBuild extends TurretBuild{
-        @Override
-        public void draw(){
-            super.draw();
-            
-            if(liquidRegion.found()){
-                Drawf.liquid(liquidRegion, x + tr2.x, y + tr2.y, liquids.total() / liquidCapacity, liquids.current().color, rotation - 90);
-            }
-            if(topRegion.found()) Draw.rect(topRegion, x + tr2.x, y + tr2.y, rotation - 90);
-        }
-
         @Override
         public boolean shouldActiveSound(){
             return wasShooting && enabled;
