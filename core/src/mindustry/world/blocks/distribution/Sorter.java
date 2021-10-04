@@ -16,7 +16,7 @@ import static mindustry.Vars.*;
 
 public class Sorter extends Block{
     public boolean invert;
-    public boolean alter[4];
+    public boolean alter[] = {false, false, false, false};
     public Sorter(String name){
         super(name);
         update = true;
