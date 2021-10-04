@@ -112,8 +112,12 @@ public class BulletType extends Content implements Cloneable{
     public boolean backMove = true;
     /** Bullet range override. */
     public float maxRange = -1f;
+    /** Base block health healed */
+    public float baseHeal = 0f;
     /** % of block health healed **/
     public float healPercent = 0f;
+    /** Max block health healing */
+    public float healCap = 0f;
     /** Whether to make fire on impact */
     public boolean makeFire = false;
     /** Whether to create hit effects on despawn. Forced to true if this bullet has any special effects like splash damage. */
@@ -224,9 +228,10 @@ public class BulletType extends Content implements Cloneable{
             Fires.create(build.tile);
         }
 
-        if(healPercent > 0f && build.team == b.team && !(build.block instanceof ConstructBlock)){
+        if((healPercent > 0f || baseHeal > 0f) && build.team == b.team && !(build.block instanceof ConstructBlock)){
             Fx.healBlockFull.at(build.x, build.y, build.block.size, Pal.heal);
-            build.heal(healPercent / 100f * build.maxHealth);
+            float heal = healPercent / 100f * build.maxHealth + baseHeal;
+            build.heal(healCap > 0 ? Math.min(heal, healCap) : heal);
         }else if(build.team != b.team && direct){
             hit(b);
         }
