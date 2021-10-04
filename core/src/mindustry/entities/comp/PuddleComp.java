@@ -60,7 +60,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
         accepting = 0f;
 
         if(amount >= maxLiquid / 1.5f){
-            float deposited = Math.min((amount - maxLiquid / 1.5f) / 4f, 0.3f) * Time.delta;
+            float deposited = Math.min((amount - maxLiquid / 1.5f) / 4f, 0.3f * Time.delta);
             int targets = 0;
             for(Point2 point : Geometry.d4){
                 Tile other = world.tile(tile.x + point.x, tile.y + point.y);
