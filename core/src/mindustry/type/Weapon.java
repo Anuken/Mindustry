@@ -200,7 +200,11 @@ public class Weapon implements Cloneable{
         boolean can = unit.canShoot();
         float lastReload = mount.reload;
         mount.reload = Math.max(mount.reload - Time.delta * unit.reloadMultiplier, 0);
-        mount.recoil = Math.max(mount.recoil - (Time.delta * recoil * unit.reloadMultiplier) / recoilTime, 0);
+        if(recoil > 0){
+            mount.recoil = Math.max(mount.recoil - (Time.delta * recoil * unit.reloadMultiplier) / recoilTime, 0);
+        }else{
+            mount.recoil = Math.min(mount.recoil - (Time.delta * recoil * unit.reloadMultiplier) / recoilTime, 0);
+        }
 
         //rotate if applicable
         if(rotate && (mount.rotate || mount.shoot) && can){
@@ -360,7 +364,6 @@ public class Weapon implements Cloneable{
             mount.heat = 1f;
         }
 
-        mount.recoil = recoil;
         ejectEffect.at(mountX, mountY, rotation * side);
         ammo.shootEffect.at(shootX, shootY, rotation, parentize ? unit : null);
         ammo.smokeEffect.at(shootX, shootY, rotation, parentize ? unit : null);
