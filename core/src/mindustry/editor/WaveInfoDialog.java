@@ -468,12 +468,6 @@ public class WaveInfoDialog extends BaseDialog{
                 numField("@waves.filter.onwave", filter, f -> filterAmountWave = f, () -> filterAmountWave, 120f, 8);
             }).row();
 
-            dialog.row();
-            dialog.check("@waves.filter.strict", b -> {
-                filterStrict = b;
-                buildGroups();
-            }).checked(filterStrict).padBottom(10f).row();
-
             dialog.cont.table(filter -> {
                 filter.add(Core.bundle.get("waves.filter.effect") + ":");
                 filter.button(filterEffect != null && filterEffect != StatusEffects.none ? new TextureRegionDrawable(filterEffect.uiIcon) :
@@ -487,6 +481,12 @@ public class WaveInfoDialog extends BaseDialog{
             });
         };
         rebuild[0].run();
+
+        dialog.row();
+        dialog.check("@waves.filter.strict", b -> {
+            filterStrict = b;
+            buildGroups();
+        }).update(b -> b.setChecked(filterStrict)).padBottom(10f).row();
 
         dialog.table(p -> {
             p.defaults().size(210f, 64f).padLeft(4f).padRight(4f);
