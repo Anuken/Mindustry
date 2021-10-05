@@ -33,7 +33,7 @@
   },
   {
     "name": "Obvilion Network",
-    "address": ["obvilionnetwork.ru:7004", "obvilionnetwork.ru:7005"]
+    "address": ["obvilion.ru:7004", "obvilion.ru:7005"]
   },
   {
     "name": "io",
@@ -50,5 +50,9 @@
   {
     "name": "Shiza Minigames",
     "address": ["shizashizashiza.ml"]
+  },
+  { 
+    "name": "devass.su",
+    "address": ["185.22.152.66"]
   }
 ]

@@ -60,8 +60,8 @@
     "address": ["yeeth.mindustry.me:2004","185.86.230.61:25570"] 
   },
   {
-    "name": "md.obvilionnetwork.ru",
-    "address": ["obvilionnetwork.ru", "obvilionnetwork.ru:7001", "obvilionnetwork.ru:7002", "obvilionnetwork.ru:7003"]
+    "name": "Obvilion Network",
+    "address": ["obvilion.ru", "obvilion.ru:7001", "obvilion.ru:7002", "obvilion.ru:7003"]
   },
   {
     "name": "Mindustry PLAY",
@@ -113,7 +113,7 @@
   },
   {
     "name": "NukeDustry",
-    "address": ["nukedustry.tk", "nukedustry.tk:6568"]
+    "address": ["nukedustry.tk:7777", "nukedustry.tk:8888"]
   },
   {
     "name": "MindustryBR",
