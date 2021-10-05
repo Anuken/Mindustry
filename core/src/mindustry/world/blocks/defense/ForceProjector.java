@@ -31,13 +31,14 @@ public class ForceProjector extends Block{
     public float cooldownNormal = 1.75f;
     public float cooldownLiquid = 1.5f;
     public float cooldownBrokenBase = 0.35f;
+    public Effect absorbEffect = Fx.absorb;
     public @Load("@-top") TextureRegion topRegion;
 
     static ForceBuild paramEntity;
     static final Cons<Bullet> shieldConsumer = trait -> {
         if(trait.team != paramEntity.team && trait.type.absorbable && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, trait.x(), trait.y())){
             trait.absorb();
-            Fx.absorb.at(trait);
+            absorbEffect.at(trait);
             paramEntity.hit = 1f;
             paramEntity.buildup += trait.damage();
         }
