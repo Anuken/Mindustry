@@ -62,6 +62,10 @@ public class PointBulletType extends BulletType{
                 build.collision(b);
             }
         }
+         
+        for(int i = 0; i < lightning; i++){
+            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, px, py, b.rotation() + Mathf.range(lightningCone/2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
+        }
 
         b.remove();
 
