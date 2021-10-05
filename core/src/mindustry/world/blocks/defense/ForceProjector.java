@@ -33,6 +33,7 @@ public class ForceProjector extends Block{
     public float cooldownLiquid = 1.5f;
     public float cooldownBrokenBase = 0.35f;
     public Effect absorbEffect = Fx.absorb;
+    public Effect shieldBreakEffect = Fx.shieldBreak;
     public @Load("@-top") TextureRegion topRegion;
 
     static ForceBuild paramEntity;
@@ -156,7 +157,7 @@ public class ForceProjector extends Block{
             if(buildup >= shieldHealth + phaseShieldBoost * phaseHeat && !broken){
                 broken = true;
                 buildup = shieldHealth;
-                Fx.shieldBreak.at(x, y, realRadius(), team.color);
+                shieldBreakEffect.at(x, y, realRadius(), team.color);
             }
 
             if(hit > 0f){
