@@ -435,7 +435,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, KeyCode button){
-        if(state.isMenu()) return false;
+        if(state.isMenu() || locked()) return false;
 
         down = true;
 
@@ -515,7 +515,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean longPress(float x, float y){
-        if(state.isMenu()|| player.dead()) return false;
+        if(state.isMenu()|| player.dead() || locked()) return false;
 
         //get tile on cursor
         Tile cursor = tileAt(x, y);
@@ -575,7 +575,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean tap(float x, float y, int count, KeyCode button){
-        if(state.isMenu() || lineMode) return false;
+        if(state.isMenu() || lineMode || locked()) return false;
 
         float worldx = Core.input.mouseWorld(x, y).x, worldy = Core.input.mouseWorld(x, y).y;
 
@@ -654,6 +654,8 @@ public class MobileInput extends InputHandler implements GestureListener{
     public void update(){
         super.update();
 
+        boolean locked = locked();
+
         if(player.dead()){
             mode = none;
             manualShooting = false;
@@ -661,11 +663,11 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //zoom camera
-        if(Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
+        if(!locked && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
-        if(!Core.settings.getBool("keyboard")){
+        if(!Core.settings.getBool("keyboard") && !locked){
             //move camera around
             float camSpeed = 6f;
             Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed));
@@ -681,7 +683,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        if(!player.dead() && !state.isPaused() && !renderer.isCutscene()){
+        if(!player.dead() && !state.isPaused() && !locked){
             updateMovement(player.unit());
         }
 
@@ -791,7 +793,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY){
-        if(Core.scene == null || Core.scene.hasDialog() || Core.settings.getBool("keyboard")) return false;
+        if(Core.scene == null || Core.scene.hasDialog() || Core.settings.getBool("keyboard") || locked()) return false;
 
         float scale = Core.camera.width / Core.graphics.getWidth();
         deltaX *= scale;
