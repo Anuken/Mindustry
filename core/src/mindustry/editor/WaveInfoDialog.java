@@ -13,6 +13,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -30,7 +31,7 @@ public class WaveInfoDialog extends BaseDialog{
     Seq<SpawnGroup> groups = new Seq<>();
     private SpawnGroup expandedGroup;
 
-    private Table table, iTable, eTable, uTable;
+    private Table table, iTable, uTable;
     private int search = -1, payLeft;
     private int filterHealth, filterBegin = -1, filterEnd = -1, filterAmount, filterAmountWave;
     private boolean expandPane = false, filterHealthMode = false, filterStrict = false;
@@ -174,7 +175,7 @@ public class WaveInfoDialog extends BaseDialog{
                     SpawnGroup newGroup = new SpawnGroup(lastType);
                     groups.add(newGroup);
                     expandedGroup = newGroup;
-                    showUpdate(newGroup, false);
+                    showContentPane(newGroup, c -> newGroup.type = lastType = c, () -> newGroup.type);
                     buildGroups();
                     clearFilter();
                 }).growX().height(70f);
@@ -266,7 +267,7 @@ public class WaveInfoDialog extends BaseDialog{
                             dialog.addCloseButton();
                             dialog.show();
                         }).pad(-6).size(46f);
-                        b.button(Icon.unitsSmall, Styles.emptyi, () -> showUpdate(group, false)).pad(-6).size(46f);
+                        b.button(Icon.unitsSmall, Styles.emptyi, () -> showContentPane(group, c -> group.type = lastType = c, () -> group.type)).pad(-6).size(46f);
                         b.button(Icon.cancel, Styles.emptyi, () -> {
                             if(expandedGroup == group) expandedGroup = null;
                             groups.remove(group);
@@ -368,83 +369,24 @@ public class WaveInfoDialog extends BaseDialog{
         updateWaves();
     }
 
-    void showUpdate(SpawnGroup group, boolean payloads){
-        BaseDialog dialog = new BaseDialog("");
-        dialog.setFillParent(true);
-        if(payloads && group.payloads == null) group.payloads = Seq.with();
-        if(payloads) dialog.cont.table(e -> {
-            uTable = e;
-            updateIcons(group);
-        }).padBottom(6f).row();
-        dialog.cont.pane(p -> {
-            int i = 0;
-            for(UnitType type : content.units()){
-                if(!payloads ? type.isHidden() : (type.isHidden() || type.hitSize * type.hitSize > group.type.payloadCapacity || type.flying)) continue;
-                p.button(t -> {
-                    t.left();
-                    t.image(type.uiIcon).size(8 * 4).scaling(Scaling.fit).padRight(2f);
-                    t.add(type.localizedName);
-                }, () -> {
-                    if(payloads){
-                        group.payloads.add(type);
-                        updateIcons(group);
-                    }else{
-                        group.type = lastType = type;
-                        dialog.hide();
-                    }
-                    if(group.payloads != null && group.type.payloadCapacity <= 8) group.payloads.clear();
-                    if(group.items != null) group.items.amount = Mathf.clamp(group.items.amount, 0, group.type.itemCapacity);
-                    buildGroups();
-                }).pad(2).margin(12f).fillX().disabled(a -> payloads && payLeft < type.hitSize * type.hitSize);
-                if(++i % 3 == 0) p.row();
-            }
-        });
-        dialog.addCloseButton();
-        dialog.show();
+    <T extends UnlockableContent> void showContentPane(SpawnGroup group, Cons<T> cons, Prov<T> prov){
+        showContentPane(group, cons, prov, i -> true, false);
     }
 
-    void showEffect(SpawnGroup group){
+    <T extends UnlockableContent> void showContentPane(SpawnGroup group, Cons<T> cons, Prov<T> prov, Boolf<T> pred, boolean payloads){
         BaseDialog dialog = new BaseDialog("");
         dialog.setFillParent(true);
-        dialog.cont.pane(p -> {
-            int i = 0;
-            for(StatusEffect effect : content.statusEffects()){
-                if(effect != StatusEffects.none && (effect.isHidden() || effect.reactive)) continue;
+        ContentType ctype = prov.get().getContentType();
 
-                p.button(t -> {
-                    t.left();
-                    if(effect.uiIcon != null && effect != StatusEffects.none){
-                        t.image(effect.uiIcon).size(8 * 4).scaling(Scaling.fit).padRight(2f);
-                    }else{
-                        t.image(Icon.none).size(8 * 4).scaling(Scaling.fit).padRight(2f);
-                    }
+        if(payloads && ctype == ContentType.unit){
+            if(group.payloads == null) group.payloads = Seq.with();
+            dialog.cont.table(e -> {
+                uTable = e;
+                updateIcons(group);
+            }).padBottom(6f).row();
+        }
 
-                    if(effect != StatusEffects.none){
-                        t.add(effect.localizedName);
-                    }else{
-                        t.add("@settings.resetKey");
-                    }
-                }, () -> {
-                    if(group == null){
-                        filterEffect = effect;
-                    }else{
-                        group.effect = effect;
-                    }
-                    updateIcons(group);
-                    dialog.hide();
-                    buildGroups();
-                }).pad(2).margin(12f).fillX();
-                if(++i % 3 == 0) p.row();
-            }
-        });
-        dialog.addCloseButton();
-        dialog.show();
-    }
-
-    void showItems(SpawnGroup group){
-        BaseDialog dialog = new BaseDialog("");
-        dialog.setFillParent(true);
-        dialog.cont.table(items -> {
+        if(ctype == ContentType.item) dialog.cont.table(items -> {
             items.add(Core.bundle.get("filter.option.amount") + ":");
             amountField = items.field(group.items != null ? group.items.amount + "" : "", TextFieldFilter.digitsOnly, text -> {
                 if(Strings.canParsePositiveInt(text) && group.items != null){
@@ -453,33 +395,43 @@ public class WaveInfoDialog extends BaseDialog{
             }).width(120f).pad(2).margin(12f).maxTextLength((group.type.itemCapacity + "").length() + 1).get();
             amountField.setMessageText(group.type.itemCapacity + "");
         }).padBottom(6f).row();
+
         dialog.cont.pane(p -> {
-            int i = 1;
-            p.defaults().pad(2).margin(12f).minWidth(200f).fillX();
-            p.button(icon -> {
+            int[] i = {ctype != ContentType.unit ? 1 : 0};
+            p.defaults().pad(2).margin(12f).minWidth(ctype == ContentType.item ? 200f : Float.MIN_VALUE).fillX();
+            if(ctype != ContentType.unit) p.button(icon -> {
                 icon.left();
                 icon.image(Icon.none).size(8 * 4).scaling(Scaling.fit).padRight(2f);
                 icon.add("@settings.resetKey");
             }, () -> {
-                group.items = null;
+                cons.get(ctype == ContentType.status ? (T)StatusEffects.none : null);
                 updateIcons(group);
                 dialog.hide();
                 buildGroups();
             });
-            for(Item item : content.items()){
-                if(item.isHidden()) continue;
+            content.<T>getBy(ctype).each(type -> !type.isHidden() && pred.get(type), type -> {
                 p.button(t -> {
                     t.left();
-                    if(item.uiIcon != null) t.image(item.uiIcon).size(8 * 4).scaling(Scaling.fit).padRight(2f);
-                    t.add(item.localizedName);
+                    t.image(type.uiIcon).size(8 * 4).scaling(Scaling.fit).padRight(2f);
+                    t.add(type.localizedName);
                 }, () -> {
-                    group.items = new ItemStack(item, Strings.parseInt(amountField.getText()) <= 0 ? group.type.itemCapacity : Mathf.clamp(Strings.parseInt(amountField.getText()), 0, group.type.itemCapacity));
+                    if(ctype == ContentType.item){
+                        int amount = Strings.parseInt(amountField.getText()) <= 0 ? group.type.itemCapacity : Mathf.clamp(Strings.parseInt(amountField.getText()), 0, group.type.itemCapacity);
+                        group.items = new ItemStack((Item)type, amount);
+                    }else{
+                        cons.get(type);
+                    }
+
+                    if(ctype == ContentType.unit){
+                        if(group.payloads != null && group.type.payloadCapacity <= 8) group.payloads.clear();
+                        if(group.items != null) group.items.amount = Mathf.clamp(group.items.amount, 0, group.type.itemCapacity);
+                    }
+                    if(!payloads) dialog.hide();
                     updateIcons(group);
-                    dialog.hide();
                     buildGroups();
-                });
-                if(++i % 3 == 0) p.row();
-            }
+                }).update(b -> b.setDisabled(payloads && type instanceof UnitType u && payLeft < u.hitSize * u.hitSize));
+                if(++i[0] % 3 == 0) p.row();
+            });
         });
         dialog.addCloseButton();
         dialog.show();
@@ -488,37 +440,53 @@ public class WaveInfoDialog extends BaseDialog{
     void showFilter(){
         BaseDialog dialog = new BaseDialog("@waves.filter");
         dialog.setFillParent(false);
-        dialog.cont.defaults().size(210f, 64f);
-        dialog.cont.add(Core.bundle.get("waves.sort.health") + ":");
-        dialog.cont.table(filter -> {
-            filter.button(">", Styles.cleart, () -> {
-                filterHealthMode = !filterHealthMode;
+
+        Runnable[] rebuild = {null};
+
+        rebuild[0] = () -> {
+            dialog.cont.clearChildren();
+            dialog.cont.defaults().size(210f, 64f);
+
+            dialog.cont.add(Core.bundle.get("waves.sort.health") + ":");
+            dialog.cont.table(filter -> {
+                filter.button(">", Styles.cleart, () -> {
+                    filterHealthMode = !filterHealthMode;
+                    buildGroups();
+                }).update(b -> b.setText(filterHealthMode ? ">" : "<")).size(40f).padRight(4f);
+                numField("", filter, f -> filterHealth = f, () -> filterHealth, 170f, 15);
+            }).row();
+
+            dialog.cont.add("@waves.filter.begin");
+            dialog.cont.table(filter -> {
+                numField("", filter, f -> filterBegin = f - 1, () -> filterBegin + 1, 120f, 8);
+                numField("@waves.to", filter, f -> filterEnd = f - 1, () -> filterEnd + 1, 120f, 8);
+            }).row();
+
+            dialog.cont.add(Core.bundle.get("waves.filter.amount") + ":");
+            dialog.cont.table(filter -> {
+                numField("", filter, f -> filterAmount = f, () -> filterAmount, 120f, 12);
+                numField("@waves.filter.onwave", filter, f -> filterAmountWave = f, () -> filterAmountWave, 120f, 8);
+            }).row();
+
+            dialog.row();
+            dialog.check("@waves.filter.strict", b -> {
+                filterStrict = b;
                 buildGroups();
-            }).update(b -> b.setText(filterHealthMode ? ">" : "<")).size(40f).padRight(4f);
-            numField("", filter, f -> filterHealth = f, () -> filterHealth, 170f, 15);
-        }).row();
+            }).checked(filterStrict).padBottom(10f).row();
 
-        dialog.cont.add("@waves.filter.begin");
-        dialog.cont.table(filter -> {
-            numField("", filter, f -> filterBegin = f - 1, () -> filterBegin + 1, 120f, 8);
-            numField("@waves.to", filter, f -> filterEnd = f - 1, () -> filterEnd + 1, 120f, 8);
-        }).row();
-
-        dialog.cont.add(Core.bundle.get("waves.filter.amount") + ":");
-        dialog.cont.table(filter -> {
-            numField("", filter, f -> filterAmount = f, () -> filterAmount, 120f, 12);
-            numField("@waves.filter.onwave", filter, f -> filterAmountWave = f, () -> filterAmountWave, 120f, 8);
-        }).row();
-
-        dialog.cont.table(t -> {
-            eTable = t;
-            updateIcons(null);
-        }).row();
-        dialog.row();
-        dialog.check("@waves.filter.strict", b -> {
-            filterStrict = b;
-            buildGroups();
-        }).checked(filterStrict).padBottom(10f).row();
+            dialog.cont.table(filter -> {
+                filter.add(Core.bundle.get("waves.filter.effect") + ":");
+                filter.button(filterEffect != null && filterEffect != StatusEffects.none ? new TextureRegionDrawable(filterEffect.uiIcon) :
+                Icon.logic, () -> {
+                    showContentPane(null, c -> filterEffect = c, () -> filterEffect, effect -> !(effect.isHidden()  || effect.reactive), false);
+                    rebuild[0].run();
+                }).update(b -> {
+                    b.reset();
+                    b.image(filterEffect != StatusEffects.none ? new TextureRegionDrawable(filterEffect.uiIcon) : Icon.logic);
+                }).padLeft(30f).size(60f);
+            });
+        };
+        rebuild[0].run();
 
         dialog.table(p -> {
             p.defaults().size(210f, 64f).padLeft(4f).padRight(4f);
@@ -526,15 +494,18 @@ public class WaveInfoDialog extends BaseDialog{
             p.button("@clear", Icon.refresh, () -> {
                 clearFilter();
                 buildGroups();
-                dialog.hide();
+                rebuild[0].run();
             });
         });
+
         dialog.addCloseListener();
         dialog.show();
     }
 
     void updateIcons(SpawnGroup group){
-        if(iTable != null && group != null){
+        if(group == null) return;
+
+        if(iTable != null){
             iTable.clear();
             iTable.defaults().size(200f, 60f).pad(2f);
             iTable.button(icon -> {
@@ -544,8 +515,10 @@ public class WaveInfoDialog extends BaseDialog{
                     icon.image(Icon.logic).padRight(6f);
                 }
                 icon.add("@waves.group.effect");
-            }, Styles.cleart, () -> showEffect(group));
-            iTable.button("@waves.group.payloads", Icon.defense, Styles.cleart, () -> showUpdate(group, true)).disabled(c -> group.type.payloadCapacity <= 8);
+            }, Styles.cleart, () -> showContentPane(group, c -> group.effect = c, () -> group.effect, effect -> !(effect.isHidden()  || effect.reactive), false));
+            iTable.button("@waves.group.payloads", Icon.defense, Styles.cleart,
+            () -> showContentPane(group, c -> group.payloads.add(c), () -> group.type, type -> !(type.isHidden() || type.hitSize * type.hitSize > group.type.payloadCapacity || type.flying), true))
+            .disabled(c -> group.type.payloadCapacity <= 8);
             iTable.button(icon -> {
                 if(group.items != null){
                     icon.image(group.items.item.uiIcon).padRight(6f);
@@ -553,18 +526,10 @@ public class WaveInfoDialog extends BaseDialog{
                     icon.image(Icon.effect).padRight(6f);
                 }
                 icon.add("@waves.group.items");
-            }, Styles.cleart, () -> showItems(group));
+            }, Styles.cleart, () -> showContentPane(group, c -> group.items = null, () -> Items.copper));
         }
 
-        if(eTable != null){
-            eTable.clear();
-            eTable.add(Core.bundle.get("waves.filter.effect") + ":");
-            eTable.button(filterEffect != null && filterEffect != StatusEffects.none ?
-                new TextureRegionDrawable(filterEffect.uiIcon) :
-            Icon.logic, () -> showEffect(null)).padLeft(30f).size(60f);
-        }
-
-        if(uTable != null && group != null && group.payloads != null){
+        if(uTable != null && group.payloads != null){
             uTable.clear();
             uTable.left();
             uTable.defaults().pad(3);
