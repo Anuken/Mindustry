@@ -20,7 +20,7 @@ public class LiquidExplodeAbility extends Ability{
     public void death(Unit unit){
         //TODO what if noise is radial, so it looks like a splat?
         int tx = unit.tileX(), ty = unit.tileY();
-        int rad = (int)(unit.hitSize / tilesize * radScale);
+        int rad = Math.max((int)(unit.hitSize / tilesize * radScale), 1);
         float realNoise = unit.hitSize / noiseMag;
         for(int x = -rad; x <= rad; x++){
             for(int y = -rad; y <= rad; y++){

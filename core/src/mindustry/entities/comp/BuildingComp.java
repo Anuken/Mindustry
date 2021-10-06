@@ -606,7 +606,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             return moveLiquid(next.build, liquid);
         }else if(leaks && !next.block().solid && !next.block().hasLiquids){
             float leakAmount = liquids.get(liquid) / 1.5f;
-            Puddles.deposit(next, tile, liquid, leakAmount);
+            Puddles.deposit(next, tile, liquid, leakAmount, true, true);
             liquids.remove(liquid, leakAmount);
         }
         return 0;

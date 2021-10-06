@@ -32,6 +32,10 @@ public class Puddles{
     }
 
     public static void deposit(Tile tile, Tile source, Liquid liquid, float amount, boolean initial){
+        deposit(tile, source, liquid, amount, initial, false);
+    }
+
+    public static void deposit(Tile tile, Tile source, Liquid liquid, float amount, boolean initial, boolean cap){
         if(tile == null) return;
 
         float ax = (tile.worldx() + source.worldx()) / 2f, ay = (tile.worldy() + source.worldy()) / 2f;
@@ -51,8 +55,7 @@ public class Puddles{
         }
 
         if(tile.floor().isLiquid && !canStayOn(liquid, tile.floor().liquidDrop)){
-            reactPuddle(tile.floor().liquidDrop, liquid, amount, tile,
-            ax, ay);
+            reactPuddle(tile.floor().liquidDrop, liquid, amount, tile, ax, ay);
 
             Puddle p = map.get(tile.pos());
 
@@ -82,7 +85,13 @@ public class Puddles{
                 p.lastRipple = Time.time;
             }
         }else{
-            p.amount += reactPuddle(p.liquid, liquid, amount, p.tile, (p.x + source.worldx())/2f, (p.y + source.worldy())/2f);
+            float added = reactPuddle(p.liquid, liquid, amount, p.tile, (p.x + source.worldx())/2f, (p.y + source.worldy())/2f);
+
+            if(cap){
+                added = Mathf.clamp(maxLiquid - p.amount, 0f, added);
+            }
+
+            p.amount += added;
         }
     }
 

@@ -22,6 +22,11 @@ public class NeoplasmUnitType extends UnitType{
             liquid = Liquids.neoplasm;
         }});
 
+        abilities.add(new LiquidRegenAbility(){{
+            liquid = Liquids.neoplasm;
+            slurpEffect = Fx.neoplasmHeal;
+        }});
+
         //green flashing is unnecessary since they always regen
         showHeal = false;
 

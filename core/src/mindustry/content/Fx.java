@@ -901,6 +901,15 @@ public class Fx{
         });
     }),
 
+    //TODO needs a lot of work
+    neoplasmHeal = new Effect(120f, e -> {
+        color(Pal.neoplasm1, Pal.neoplasm2, e.fin());
+
+        randLenVectors(e.id, 1, e.fin() * 3f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.2f + e.fslope() * 2f);
+        });
+    }).followParent(true).rotWithParent(true).layer(Layer.bullet - 2),
+
     steam = new Effect(35f, e -> {
         color(Color.lightGray);
 
