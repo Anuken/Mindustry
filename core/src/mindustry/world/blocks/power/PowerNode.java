@@ -112,7 +112,7 @@ public class PowerNode extends PowerBlock{
         ));
 
         bars.add("batteries", entity -> new Bar(() ->
-        Core.bundle.format("bar.powerstored",
+        Core.bundle.format("bar.powertotal",
             (UI.formatAmount((long)entity.power.graph.getLastPowerStored())), UI.formatAmount((long)entity.power.graph.getLastCapacity())),
             () -> Pal.powerBar,
             () -> Mathf.clamp(entity.power.graph.getLastPowerStored() / entity.power.graph.getLastCapacity())

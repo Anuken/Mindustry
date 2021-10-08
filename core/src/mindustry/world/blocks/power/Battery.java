@@ -42,7 +42,7 @@ public class Battery extends PowerDistributor{
         float capacity = cons.capacity;
         bars.add("stored", entity -> new Bar(() ->
             Core.bundle.format("bar.powerstored",
-                Float.isNaN(entity.power.status * capacity) ? "<ERROR>" : UI.formatAmount((int)(entity.power.status * capacity))),
+                Float.isNaN(entity.power.status * capacity) ? "<ERROR>" : UI.formatAmount((int)(entity.power.status * capacity)), UI.formatAmount((int)(capacity))),
             () -> Pal.powerBar,
             () -> Mathf.zero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status
         ));
