@@ -1,11 +1,16 @@
 package mindustry.world.blocks.power;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.ui.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -21,6 +26,26 @@ public class Battery extends PowerDistributor{
         outputsPower = true;
         consumesPower = true;
         flags = EnumSet.of(BlockFlag.battery);
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+        bars.add("power", entity -> new Bar(() ->
+            Core.bundle.format("bar.powerbalance",
+                ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + UI.formatAmount((long)(entity.power.graph.getPowerBalance() * 60)))),
+            () -> Pal.powerBar,
+            () -> Mathf.clamp(entity.power.graph.getLastPowerProduced() / entity.power.graph.getLastPowerNeeded())
+        ));
+
+        ConsumePower cons = consumes.getPower();
+        float capacity = cons.capacity;
+        bars.add("stored", entity -> new Bar(() ->
+            Core.bundle.format("bar.powerstored",
+                Float.isNaN(entity.power.status * capacity) ? "<ERROR>" : UI.formatAmount((int)(entity.power.status * capacity))),
+            () -> Pal.powerBar,
+            () -> Mathf.zero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status
+        ));
     }
 
     public class BatteryBuild extends Building{
