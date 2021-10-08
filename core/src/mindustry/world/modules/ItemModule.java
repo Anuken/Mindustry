@@ -178,6 +178,10 @@ public class ItemModule extends BlockModule{
     public boolean any(){
         return total > 0;
     }
+    
+    public int[] items(){
+        return items[];
+    }
 
     @Nullable
     public Item first(){
