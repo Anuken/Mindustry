@@ -180,7 +180,7 @@ public class ItemModule extends BlockModule{
     }
     
     public int[] items(){
-        return items[];
+        return items;
     }
 
     @Nullable
