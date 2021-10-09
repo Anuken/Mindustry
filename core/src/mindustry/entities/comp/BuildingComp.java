@@ -1241,6 +1241,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return amount;
     }
 
+    public boolean absorbLasers(){
+        return block.absorbLasers;
+    }
+
+    public boolean isInsulated(){
+        return block.insulated;
+    }
+
     public boolean collide(Bullet other){
         return true;
     }

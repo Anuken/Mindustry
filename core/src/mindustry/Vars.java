@@ -199,6 +199,8 @@ public class Vars implements Loadable{
     public static final String saveExtension = "msav";
     /** schematic file extension */
     public static final String schematicExtension = "msch";
+    /** path to the java executable */
+    public static String javaPath;
 
     /** list of all locales that can be switched to */
     public static Locale[] locales;
@@ -293,6 +295,10 @@ public class Vars implements Loadable{
         pathfinder = new Pathfinder();
         bases = new BaseRegistry();
         constants = new GlobalConstants();
+        javaPath =
+            new Fi(OS.prop("java.home")).child("bin/java").exists() ? new Fi(OS.prop("java.home")).child("bin/java").absolutePath() :
+            Core.files.local("jre/bin/java").exists() ? Core.files.local("jre/bin/java").absolutePath() :
+            "java";
 
         state = new GameState();
 

@@ -327,7 +327,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             }
         }
 
-        boolean naval = (float)waters / total >= 0.26f;
+        boolean naval = (float)waters / total >= 0.19f;
 
         //create water pathway if the map is flooded
         if(naval){
@@ -345,11 +345,11 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             Vec3 v = sector.rect.project(x, y);
 
             float rr = Simplex.noise2d(sector.id, (float)2, 0.6f, 1f / 7f, x, y) * 0.1f;
-            float value = Ridged.noise3d(2, v.x, v.y, v.z, 1, 1f / 53f) + rr - rawHeight(v) * 0f;
+            float value = Ridged.noise3d(2, v.x, v.y, v.z, 1, 1f / 55f) + rr - rawHeight(v) * 0f;
             float rrscl = rr * 44 - 2;
 
-            if(value > 0.12f && !Mathf.within(x, y, fspawn.x, fspawn.y, 12 + rrscl)){
-                boolean deep = value > 0.12f + 0.1f && !Mathf.within(x, y, fspawn.x, fspawn.y, 15 + rrscl);
+            if(value > 0.17f && !Mathf.within(x, y, fspawn.x, fspawn.y, 12 + rrscl)){
+                boolean deep = value > 0.17f + 0.1f && !Mathf.within(x, y, fspawn.x, fspawn.y, 15 + rrscl);
                 boolean spore = floor != Blocks.sand && floor != Blocks.salt;
                 //do not place rivers on ice, they're frozen
                 //ignore pre-existing liquids
@@ -407,7 +407,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                         }
                     }
 
-                    floor = floor == Blocks.water ? Blocks.deepwater : Blocks.deepTaintedWater;
+                    floor = floor == Blocks.water ? Blocks.deepwater : Blocks.taintedWater;
                 }
             });
         }
