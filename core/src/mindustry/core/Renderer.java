@@ -299,6 +299,7 @@ public class Renderer implements ApplicationListener{
         Draw.draw(Layer.overlayUI, overlays::drawTop);
         Draw.draw(Layer.space, this::drawLanding);
 
+        Events.fire(Trigger.drawOver);
         blocks.drawBlocks();
 
         Groups.draw.draw(Drawc::draw);

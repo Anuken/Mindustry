@@ -189,6 +189,7 @@ const WaveEvent = Packages.mindustry.game.EventType.WaveEvent
 const ResetEvent = Packages.mindustry.game.EventType.ResetEvent
 const PlayEvent = Packages.mindustry.game.EventType.PlayEvent
 const DisposeEvent = Packages.mindustry.game.EventType.DisposeEvent
+const ServerWriteEvent = Packages.mindustry.game.EventType.ServerWriteEvent
 const ServerLoadEvent = Packages.mindustry.game.EventType.ServerLoadEvent
 const ClientCreateEvent = Packages.mindustry.game.EventType.ClientCreateEvent
 const SaveLoadEvent = Packages.mindustry.game.EventType.SaveLoadEvent
