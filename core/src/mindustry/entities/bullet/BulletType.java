@@ -241,7 +241,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void hitEntity(Bullet b, Hitboxc entity, float health){
         if(entity instanceof Healthc h){
-            h.damage(b.damage + (damagePercent / 100f * h.maxHealth()));
+            h.damage(b.damage + (damagePercent > 0f ? damagePercent / 100f * h.maxHealth() : 0));
         }
 
         if(entity instanceof Unit unit){
