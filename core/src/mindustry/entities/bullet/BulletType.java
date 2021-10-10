@@ -112,8 +112,10 @@ public class BulletType extends Content implements Cloneable{
     public boolean backMove = true;
     /** Bullet range override. */
     public float maxRange = -1f;
-    /** % of block health healed **/
+    /** % of block health healed. */
     public float healPercent = 0f;
+    /** damage dealt in % on hit, on top of regular damage. */
+    public float damagePercent = 0f;
     /** Whether to make fire on impact */
     public boolean makeFire = false;
     /** Whether to create hit effects on despawn. Forced to true if this bullet has any special effects like splash damage. */
@@ -180,8 +182,7 @@ public class BulletType extends Content implements Cloneable{
         this.damage = damage;
     }
 
-    public BulletType(){
-    }
+    public BulletType(){}
 
     public BulletType copy(){
         try{
@@ -220,8 +221,14 @@ public class BulletType extends Content implements Cloneable{
     /** If direct is false, this is an indirect hit and the tile was already damaged.
      * TODO this is a mess. */
     public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
-        if(makeFire && build.team != b.team){
-            Fires.create(build.tile);
+        if(build.team != b.team){
+            if(makeFire){
+                Fires.create(build.tile);
+            }
+
+            if(damagePercent > 0f){
+                build.damage(damage + (damagePercent / 100f * build.maxHealth()));
+            }
         }
 
         if(healPercent > 0f && build.team == b.team && !(build.block instanceof ConstructBlock)){
@@ -234,7 +241,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void hitEntity(Bullet b, Hitboxc entity, float health){
         if(entity instanceof Healthc h){
-            h.damage(b.damage);
+            h.damage(b.damage + (damagePercent / 100f * h.maxHealth()));
         }
 
         if(entity instanceof Unit unit){
@@ -327,7 +334,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void drawTrail(Bullet b){
         if(trailLength > 0 && b.trail != null){
-            //draw below bullets? TODO
+            //TODO draw below bullets?
             float z = Draw.z();
             Draw.z(z - 0.0001f);
             b.trail.draw(trailColor, trailWidth);

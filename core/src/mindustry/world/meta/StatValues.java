@@ -279,7 +279,13 @@ public class StatValues{
 
                     if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
                         if(type.continuousDamage() > 0){
-                            bt.add(Core.bundle.format("bullet.damage", type.continuousDamage()) + StatUnit.perSecond.localized());
+                            if(type.damagePercent > 0f){
+                                bt.add(Core.bundle.format("bullet.damage", type.continuousDamage() + StatUnit.perSecond.localized() + " + " + Strings.autoFixed(type.damagePercent, 2) + StatUnit.percent.localized()));
+                            }else{
+                                bt.add(Core.bundle.format("bullet.damage", type.continuousDamage()) + StatUnit.perSecond.localized());
+                            }
+                        }else if(type.damagePercent > 0){
+                            bt.add(Core.bundle.format("bullet.damage", (type.damage > 0f ? type.damage + " + " : "") + Strings.autoFixed(type.damagePercent, 2) + StatUnit.percent.localized()));
                         }else{
                             bt.add(Core.bundle.format("bullet.damage", type.damage));
                         }
