@@ -310,7 +310,7 @@ public class NetServer implements ApplicationListener{
             Groups.player.each(Player::admin, a -> a.sendMessage(raw, player, args[0]));
         });
 
-        //duration of a a kick in seconds
+        //duration of a kick in seconds
         int kickDuration = 60 * 60;
         //voting round duration in seconds
         float voteDuration = 0.5f * 60;
