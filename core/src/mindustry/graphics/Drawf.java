@@ -280,6 +280,15 @@ public class Drawf{
         Draw.reset();
     }
     
+    public static void build(TextureRegion region, float rotation, float progress){
+        Shaders.blockbuild.region = region;
+        Shaders.blockbuild.progress = progress;
+        
+        Draw.shader(Shaders.blockbuild);
+        Draw.rect(region, x, y, rotation);
+        Draw.shader();
+    }
+    
     /** Draws a sprite that should be light-wise correct, when rotated. Provided sprite must be symmetrical in shape. */
     public static void spinSprite(TextureRegion region, float x, float y, float r){
         r = Mathf.mod(r, 90f);
