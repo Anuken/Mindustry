@@ -15,9 +15,11 @@ import static mindustry.Vars.*;
 public class BuilderAI extends AIController{
     public static float buildRadius = 1500, retreatDst = 110f, fleeRange = 370f, retreatDelay = Time.toSeconds * 2f;
 
+    public @Nullable Unit following;
+    public @Nullable Teamc enemy;
+    public @Nullable BlockPlan lastPlan;
+
     boolean found = false;
-    @Nullable Unit following;
-    @Nullable Teamc enemy;
     float retreatTimer;
 
     @Override
@@ -43,6 +45,7 @@ public class BuilderAI extends AIController{
             //set to follower's first build plan, whatever that is
             unit.plans.clear();
             unit.plans.addFirst(following.buildPlan());
+            lastPlan = null;
         }else if(unit.buildPlan() == null){
             //not following anyone or building
             if(timer.get(timerTarget4, 40)){
@@ -78,10 +81,11 @@ public class BuilderAI extends AIController{
             }
 
             boolean valid =
-                (req.tile() != null && req.tile().build instanceof ConstructBuild cons && cons.current == req.block) ||
-                (req.breaking ?
-                    Build.validBreak(unit.team(), req.x, req.y) :
-                    Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation));
+                !(lastPlan != null && lastPlan.removed) &&
+                    ((req.tile() != null && req.tile().build instanceof ConstructBuild cons && cons.current == req.block) ||
+                    (req.breaking ?
+                        Build.validBreak(unit.team(), req.x, req.y) :
+                        Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation)));
 
             if(valid){
                 //move toward the request
@@ -89,6 +93,7 @@ public class BuilderAI extends AIController{
             }else{
                 //discard invalid request
                 unit.plans.removeFirst();
+                lastPlan = null;
             }
         }else{
 
@@ -127,6 +132,7 @@ public class BuilderAI extends AIController{
                 if(world.tile(block.x, block.y) != null && world.tile(block.x, block.y).block().id == block.block){
                     blocks.removeFirst();
                 }else if(Build.validPlace(content.block(block.block), unit.team(), block.x, block.y, block.rotation)){ //it's valid.
+                    lastPlan = block;
                     //add build request.
                     unit.addBuild(new BuildPlan(block.x, block.y, block.rotation, content.block(block.block), block.config));
                     //shift build plan to tail so next unit builds something else.

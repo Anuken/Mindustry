@@ -30,6 +30,7 @@ public class Weather extends UnlockableContent{
     public Sound sound = Sounds.none;
     public float soundVol = 0.1f, soundVolMin = 0f;
     public float soundVolOscMag = 0f, soundVolOscScl = 20f;
+    public boolean hidden = false;
 
     //internals
     public Prov<WeatherState> type = WeatherState::create;
@@ -341,15 +342,15 @@ public class Weather extends UnlockableContent{
 
         @Override
         public void draw(){
-            if(renderer.weatherAlpha() > 0.0001f && renderer.drawWeather && Core.settings.getBool("showweather")){
+            if(renderer.weatherAlpha > 0.0001f && renderer.drawWeather && Core.settings.getBool("showweather")){
                 Draw.draw(Layer.weather, () -> {
-                    Draw.alpha(renderer.weatherAlpha() * opacity * weather.opacityMultiplier);
+                    Draw.alpha(renderer.weatherAlpha * opacity * weather.opacityMultiplier);
                     weather.drawOver(self());
                     Draw.reset();
                 });
 
                 Draw.draw(Layer.debris, () -> {
-                    Draw.alpha(renderer.weatherAlpha() * opacity * weather.opacityMultiplier);
+                    Draw.alpha(renderer.weatherAlpha * opacity * weather.opacityMultiplier);
                     weather.drawUnder(self());
                     Draw.reset();
                 });

@@ -18,7 +18,6 @@ import static mindustry.Vars.*;
 public abstract class PlanetGenerator extends BasicGenerator implements HexMesher{
     protected IntSeq ints = new IntSeq();
     protected Sector sector;
-    protected Simplex noise = new Simplex();
 
     /** Should generate sector bases for a planet. */
     public void generateSector(Sector sector){
@@ -77,7 +76,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         //sort counts in descending order
         Seq<Entry<Block>> entries = floorc.entries().toArray();
         entries.sort(e -> -e.value);
-        //remove all blocks occuring < 30 times - unimportant
+        //remove all blocks occurring < 30 times - unimportant
         entries.removeAll(e -> e.value < 30);
 
         Block[] floors = new Block[entries.size];
@@ -85,7 +84,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
             floors[i] = entries.get(i).key;
         }
 
-        //TODO bad code
+        //bad contains() code, but will likely never be fixed
         boolean hasSnow = floors.length > 0 && (floors[0].name.contains("ice") || floors[0].name.contains("snow"));
         boolean hasRain = floors.length > 0 && !hasSnow && content.contains(Liquids.water) && !floors[0].name.contains("sand");
         boolean hasDesert = floors.length > 0 && !hasSnow && !hasRain && floors[0] == Blocks.sand;
@@ -116,7 +115,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
     @Override
     protected float noise(float x, float y, double octaves, double falloff, double scl, double mag){
         Vec3 v = sector.rect.project(x, y);
-        return (float)noise.octaveNoise3D(octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float)mag;
+        return Simplex.noise3d(0, octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float)mag;
     }
 
     /** @return the scaling factor for sector rects. */

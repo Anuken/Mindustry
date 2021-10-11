@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
 
 @Component
 abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
-    @Import float x, y, rotation;
+    @Import float x, y, rotation, speedMultiplier;
     @Import UnitType type;
 
     private transient Trail tleft = new Trail(1), tright = new Trail(1);
@@ -27,13 +27,14 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
 
     @Override
     public void update(){
+        boolean flying = isFlying();
         for(int i = 0; i < 2; i++){
             Trail t = i == 0 ? tleft : tright;
             t.length = type.trailLength;
 
             int sign = i == 0 ? -1 : 1;
             float cx = Angles.trnsx(rotation - 90, type.trailX * sign, type.trailY) + x, cy = Angles.trnsy(rotation - 90, type.trailX * sign, type.trailY) + y;
-            t.update(cx, cy, world.floorWorld(cx, cy).isLiquid ? 1 : 0);
+            t.update(cx, cy, world.floorWorld(cx, cy).isLiquid && !flying ? 1 : 0);
         }
     }
 
@@ -41,6 +42,13 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     @Replace
     public int pathType(){
         return Pathfinder.costNaval;
+    }
+
+    //don't want obnoxious splashing
+    @Override
+    @Replace
+    public boolean emitWalkSound(){
+        return false;
     }
 
     @Override
@@ -72,9 +80,15 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     }
 
     @Replace
+    @Override
+    public boolean onSolid(){
+        return EntityCollisions.waterSolid(tileX(), tileY());
+    }
+
+    @Replace
     public float floorSpeedMultiplier(){
         Floor on = isFlying() ? Blocks.air.asFloor() : floorOn();
-        return on.isDeep() ? 1.3f : 1f;
+        return (on.shallow ? 1f : 1.3f) * speedMultiplier;
     }
 
     public boolean onLiquid(){

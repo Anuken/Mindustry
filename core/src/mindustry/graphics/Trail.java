@@ -77,6 +77,8 @@ public class Trail{
             if(points.size >= 3){
                 points.removeRange(0, 2);
             }
+
+            counter = 0f;
         }
     }
 

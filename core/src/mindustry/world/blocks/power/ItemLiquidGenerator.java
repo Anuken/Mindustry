@@ -29,6 +29,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
     public float maxLiquidGenerate = 0.4f;
 
     public Effect generateEffect = Fx.generatespark;
+    public float generateEffectRnd = 3f;
     public Effect explodeEffect = Fx.generatespark;
     public Color heatColor = Color.valueOf("ff9b59");
     public @Load("@-top") TextureRegion topRegion;
@@ -61,6 +62,8 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
     @Override
     public void init(){
+        emitLight = true;
+        lightRadius = 65f * size;
         if(!defaults){
             setDefaults();
         }
@@ -125,13 +128,14 @@ public class ItemLiquidGenerator extends PowerGenerator{
                 liquids.remove(liquid, used * power.graph.getUsageFraction());
                 productionEfficiency = baseLiquidEfficiency * used / maximumPossible;
 
-                if(used > 0.001f && Mathf.chance(0.05 * delta())){
-                    generateEffect.at(x + Mathf.range(3f), y + Mathf.range(3f));
+                if(used > 0.001f && (generateTime -= delta()) <= 0f){
+                    generateEffect.at(x + Mathf.range(generateEffectRnd), y + Mathf.range(generateEffectRnd));
+                    generateTime = 1f;
                 }
             }else if(hasItems){
                 // No liquids accepted or none supplied, try using items if accepted
                 if(generateTime <= 0f && items.total() > 0){
-                    generateEffect.at(x + Mathf.range(3f), y + Mathf.range(3f));
+                    generateEffect.at(x + Mathf.range(generateEffectRnd), y + Mathf.range(generateEffectRnd));
                     Item item = items.take();
                     productionEfficiency = getItemEfficiency(item);
                     explosiveness = item.explosiveness;

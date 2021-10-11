@@ -1,5 +1,6 @@
 package mindustry.io;
 
+import arc.audio.*;
 import arc.graphics.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -94,6 +95,12 @@ public class TypeIO{
         }else if(object instanceof BuildingBox b){
             write.b(12);
             write.i(b.pos);
+        }else if(object instanceof boolean[] b){
+            write.b(16);
+            write.i(b.length);
+            for(boolean bool : b){
+                write.bool(bool);
+            }
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -125,6 +132,7 @@ public class TypeIO{
             case 13: return LAccess.all[read.s()];
             case 14: int blen = read.i(); byte[] bytes = new byte[blen]; read.b(bytes); return bytes;
             case 15: return UnitCommand.all[read.b()];
+            case 16: int boollen = read.i(); boolean[] bools = new boolean[boollen]; for(int i = 0; i < boollen; i ++) bools[i] = read.bool(); return bools;
             default: throw new IllegalArgumentException("Unknown object type: " + type);
         }
     }
@@ -501,6 +509,15 @@ public class TypeIO{
         return id == -1 ? null : content.item(id);
     }
 
+    //note that only the standard sound constants in Sounds are supported; modded sounds are not.
+    public static void writeSound(Writes write, Sound sound){
+        write.s(Sounds.getSoundId(sound));
+    }
+
+    public static Sound readSound(Reads read){
+        return Sounds.getSound(read.s());
+    }
+
     public static void writeWeather(Writes write, Weather item){
         write.s(item == null ? -1 : item.id);
     }
@@ -633,7 +650,7 @@ public class TypeIO{
         }
     }
 
-    /** Representes a building that has not been resolved yet. */
+    /** Represents a building that has not been resolved yet. */
     public static class BuildingBox{
         public int pos;
 

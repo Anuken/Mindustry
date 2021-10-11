@@ -108,7 +108,13 @@ public class Placement{
         points.addAll(result);
     }
 
+    public static boolean isSidePlace(Seq<BuildPlan> plans){
+        return plans.size > 1 && Mathf.mod(Tile.relativeTo(plans.first().x, plans.first().y, plans.get(1).x, plans.get(1).y) - plans.first().rotation, 2) == 1;
+    }
+
     public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge){
+        if(isSidePlace(plans)) return;
+
         //check for orthogonal placement + unlocked state
         if(!(plans.first().x == plans.peek().x || plans.first().y == plans.peek().y) || !bridge.unlockedNow()){
             return;
@@ -170,6 +176,8 @@ public class Placement{
     }
 
     public static void calculateDuctBridges(Seq<BuildPlan> plans, DuctBridge bridge){
+        if(isSidePlace(plans)) return;
+
         //check for orthogonal placement + unlocked state
         if(!(plans.first().x == plans.peek().x || plans.first().y == plans.peek().y) || !bridge.unlockedNow()){
             return;
@@ -180,7 +188,6 @@ public class Placement{
 
         var result = plans1.clear();
         var team = player.team();
-        var rot = plans.first().rotation;
 
         outer:
         for(int i = 0; i < plans.size;){

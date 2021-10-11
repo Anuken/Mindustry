@@ -3,15 +3,15 @@ name: Pull Request Tests
 on: [pull_request, workflow_dispatch]
 
 jobs:
-  buildJava14:
+  testPR:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up JDK 14
+    - name: Set up JDK 16
       uses: actions/setup-java@v1
       with:
-        java-version: 14
+        java-version: 16
     - name: Run unit tests and build JAR
       run: ./gradlew test desktop:dist
     - name: Upload desktop JAR for testing

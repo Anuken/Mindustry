@@ -6,9 +6,11 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -44,19 +46,19 @@ public class AIController implements UnitController{
     }
 
     @Nullable
-    protected AIController fallback(){
+    public AIController fallback(){
         return null;
     }
 
-    protected boolean useFallback(){
+    public boolean useFallback(){
         return false;
     }
 
-    protected UnitCommand command(){
+    public UnitCommand command(){
         return unit.team.data().command;
     }
 
-    protected void updateVisuals(){
+    public void updateVisuals(){
         if(unit.isFlying()){
             unit.wobble();
 
@@ -64,22 +66,38 @@ public class AIController implements UnitController{
         }
     }
 
-    protected void updateMovement(){
+    public void updateMovement(){
 
     }
 
-    protected void updateTargeting(){
+    public void updateTargeting(){
         if(unit.hasWeapons()){
             updateWeapons();
         }
     }
 
-    protected boolean invalid(Teamc target){
+    /** For ground units: Looks at the target, or the movement position. Does not apply to non-omni units. */
+    public void faceTarget(){
+        if(unit.type.omniMovement || unit instanceof Mechc){
+            if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type.rotateShooting && unit.type.hasWeapons()){
+                unit.lookAt(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
+            }else if(unit.moving()){
+                unit.lookAt(unit.vel().angle());
+            }
+        }
+    }
+
+    public void faceMovement(){
+        if((unit.type.omniMovement || unit instanceof Mechc) && unit.moving()){
+            unit.lookAt(unit.vel().angle());
+        }
+    }
+
+    public boolean invalid(Teamc target){
         return Units.invalidateTarget(target, unit.team, unit.x, unit.y);
     }
 
-
-    protected void pathfind(int pathTarget){
+    public void pathfind(int pathTarget){
         int costType = unit.pathType();
 
         Tile tile = unit.tileOn();
@@ -88,15 +106,15 @@ public class AIController implements UnitController{
 
         if(tile == targetTile || (costType == Pathfinder.costNaval && !targetTile.floor().isLiquid)) return;
 
-        unit.moveAt(vec.trns(unit.angleTo(targetTile.worldx(), targetTile.worldy()), unit.speed()));
+        unit.movePref(vec.trns(unit.angleTo(targetTile.worldx(), targetTile.worldy()), unit.speed()));
     }
 
-    protected void updateWeapons(){
+    public void updateWeapons(){
         float rotation = unit.rotation - 90;
         boolean ret = retarget();
 
         if(ret){
-            target = findTarget(unit.x, unit.y, unit.range(), unit.type.targetAir, unit.type.targetGround);
+            target = findMainTarget(unit.x, unit.y, unit.range(), unit.type.targetAir, unit.type.targetGround);
         }
 
         if(invalid(target)){
@@ -145,44 +163,57 @@ public class AIController implements UnitController{
         }
     }
 
-    protected boolean checkTarget(Teamc target, float x, float y, float range){
+    public boolean checkTarget(Teamc target, float x, float y, float range){
         return Units.invalidateTarget(target, unit.team, x, y, range);
     }
 
-    protected boolean shouldShoot(){
+    public boolean shouldShoot(){
         return true;
     }
 
-    protected Teamc targetFlag(float x, float y, BlockFlag flag, boolean enemy){
+    public Teamc targetFlag(float x, float y, BlockFlag flag, boolean enemy){
+        if(unit.team == Team.derelict) return null;
         Tile target = Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getAllied(unit.team, flag));
         return target == null ? null : target.build;
     }
 
-    protected Teamc target(float x, float y, float range, boolean air, boolean ground){
+    public Teamc target(float x, float y, float range, boolean air, boolean ground){
         return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground);
     }
 
-    protected boolean retarget(){
+    public boolean retarget(){
         return timer.get(timerTarget, target == null ? 40 : 90);
     }
 
-    protected Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
+    public Teamc findMainTarget(float x, float y, float range, boolean air, boolean ground){
+        return findTarget(x, y, range, air, ground);
+    }
+
+    public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
         return target(x, y, range, air, ground);
     }
 
-    protected void init(){
+    public void init(){
 
     }
 
-    protected @Nullable Tile getClosestSpawner(){
+    public @Nullable Tile getClosestSpawner(){
         return Geometry.findClosest(unit.x, unit.y, Vars.spawner.getSpawns());
     }
 
-    protected void circle(Position target, float circleLength){
+    public void unloadPayloads(){
+        if(unit instanceof Payloadc pay && pay.hasPayload() && target instanceof Building && pay.payloads().peek() instanceof UnitPayload){
+            if(target.within(unit, Math.max(unit.type().range + 1f, 75f))){
+                pay.dropLastPayload();
+            }
+        }
+    }
+
+    public void circle(Position target, float circleLength){
         circle(target, circleLength, unit.speed());
     }
 
-    protected void circle(Position target, float circleLength, float speed){
+    public void circle(Position target, float circleLength, float speed){
         if(target == null) return;
 
         vec.set(target).sub(unit);
@@ -196,18 +227,18 @@ public class AIController implements UnitController{
         unit.moveAt(vec);
     }
 
-    protected void moveTo(Position target, float circleLength){
+    public void moveTo(Position target, float circleLength){
         moveTo(target, circleLength, 100f);
     }
 
-    protected void moveTo(Position target, float circleLength, float smooth){
+    public void moveTo(Position target, float circleLength, float smooth){
         if(target == null) return;
 
         vec.set(target).sub(unit);
 
         float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / smooth, -1f, 1f);
 
-        vec.setLength(unit.realSpeed() * length);
+        vec.setLength(unit.speed() * length);
         if(length < -0.5f){
             vec.rotate(180f);
         }else if(length < 0){

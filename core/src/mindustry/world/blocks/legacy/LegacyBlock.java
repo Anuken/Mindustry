@@ -7,6 +7,7 @@ public class LegacyBlock extends Block{
 
     public LegacyBlock(String name){
         super(name);
+        inEditor = false;
     }
 
     /** Removes this block from the world, or replaces it with something else. */

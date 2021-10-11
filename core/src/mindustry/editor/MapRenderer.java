@@ -10,6 +10,7 @@ import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -18,6 +19,7 @@ public class MapRenderer implements Disposable{
     private IndexedRenderer[][] chunks;
     private IntSet updates = new IntSet();
     private IntSet delayedUpdates = new IntSet();
+    private TextureRegion clearEditor;
     private int width, height;
 
     public void resize(int width, int height){
@@ -45,6 +47,7 @@ public class MapRenderer implements Disposable{
 
     public void draw(float tx, float ty, float tw, float th){
         Draw.flush();
+        clearEditor = Core.atlas.find("clear-editor");
 
         updates.each(i -> render(i % width, i / width));
         updates.clear();
@@ -80,6 +83,7 @@ public class MapRenderer implements Disposable{
     }
 
     public void updateAll(){
+        clearEditor = Core.atlas.find("clear-editor");
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
                 render(x, y);
@@ -103,7 +107,7 @@ public class MapRenderer implements Disposable{
         boolean center = tile.isCenter();
 
         if(wall != Blocks.air && wall.synthetic()){
-            region = !Core.atlas.isFound(wall.editorIcon()) || !center ? Core.atlas.find("clear-editor") : wall.editorIcon();
+            region = !wall.editorIcon().found() || !center ? clearEditor : wall.editorIcon();
 
             float width = region.width * Draw.scl, height = region.height * Draw.scl;
 
@@ -124,13 +128,22 @@ public class MapRenderer implements Disposable{
             mesh.setColor(team.color);
             region = Core.atlas.find("block-border-editor");
         }else if(!wall.synthetic() && wall != Blocks.air && center){
-            region = !Core.atlas.isFound(wall.editorIcon()) ? Core.atlas.find("clear-editor") : wall.editorIcon();
+            region = !wall.editorIcon().found() ?
+                clearEditor : wall.variants > 0 ?
+                wall.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, wall.editorVariantRegions().length - 1)] :
+                wall.editorIcon();
+
+            if(wall == Blocks.cliff){
+                mesh.setColor(Tmp.c1.set(floor.mapColor).mul(1.6f));
+                region = ((Cliff)Blocks.cliff).editorCliffs[tile.data & 0xff];
+            }
+
             offsetX = tilesize / 2f - region.width / 2f * Draw.scl;
             offsetY = tilesize / 2f - region.height / 2f * Draw.scl;
         }else if(wall == Blocks.air && !tile.overlay().isAir()){
             region = tile.overlay().editorVariantRegions()[Mathf.randomSeed(idxWall, 0, tile.overlay().editorVariantRegions().length - 1)];
         }else{
-            region = Core.atlas.find("clear-editor");
+            region = clearEditor;
         }
 
         float width = region.width * Draw.scl, height = region.height * Draw.scl;

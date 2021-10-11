@@ -4,19 +4,18 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import mindustry.content.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 public class Prop extends Block{
-    public int variants;
 
     public Prop(String name){
         super(name);
         breakable = true;
         alwaysReplace = true;
         instantDeconstruct = true;
-        
-        deconstructThreshold = 0.35f;
         breakEffect = Fx.breakProp;
+        breakSound = Sounds.rockBreak;
     }
 
     @Override
@@ -27,18 +26,5 @@ public class Prop extends Block{
     @Override
     public TextureRegion[] icons(){
         return variants == 0 ? super.icons() : new TextureRegion[]{Core.atlas.find(name + "1")};
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        if(variants > 0){
-            variantRegions = new TextureRegion[variants];
-
-            for(int i = 0; i < variants; i++){
-                variantRegions[i] = Core.atlas.find(name + (i + 1));
-            }
-        }
     }
 }

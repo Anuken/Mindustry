@@ -16,8 +16,8 @@ abstract class ShieldComp implements Healthc, Posc{
 
     /** Absorbs health damage. */
     float shield;
-    /** Subtracts an amount from damage. */
-    float armor;
+    /** Subtracts an amount from damage. No need to save. */
+    transient float armor;
     /** Shield opacity. */
     transient float shieldAlpha = 0f;
 

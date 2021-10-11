@@ -1,5 +1,6 @@
 package mindustry.game;
 
+import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -21,6 +22,7 @@ public class SectorInfo{
     private static final int valueWindow = 60;
     /** refresh period of export in ticks */
     private static final float refreshPeriod = 60;
+    private static float returnf;
 
     /** Core input statistics. */
     public ObjectMap<Item, ExportStat> production = new ObjectMap<>();
@@ -55,7 +57,7 @@ public class SectorInfo{
     /** Waves this sector can survive if under attack. Based on wave in info. <0 means uncalculated. */
     public int wavesSurvived = -1;
     /** Time between waves. */
-    public float waveSpacing = 60 * 60 * 2;
+    public float waveSpacing = 2 * Time.toMinutes;
     /** Damage dealt to sector. */
     public float damage;
     /** How many waves have passed while the player was away. */
@@ -76,6 +78,8 @@ public class SectorInfo{
     public int waveVersion = -1;
     /** Whether this sector was indicated to the player or not. */
     public boolean shown = false;
+    /** Temporary seq for last imported items. Do not use. */
+    public transient ItemSeq lastImported = new ItemSeq();
 
     /** Special variables for simulation. */
     public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope, bossHealth, bossDps, curEnemyHealth, curEnemyDps;
@@ -115,11 +119,6 @@ public class SectorInfo{
     /** Updates export statistics. */
     public void handleItemExport(Item item, int amount){
         export.get(item, ExportStat::new).counter += amount;
-    }
-
-    /** Subtracts from export statistics. */
-    public void handleItemImport(Item item, int amount){
-        export.get(item, ExportStat::new).counter -= amount;
     }
 
     public float getExport(Item item){
@@ -268,6 +267,31 @@ public class SectorInfo{
         ObjectFloatMap<Item> map = new ObjectFloatMap<>();
         export.each((item, value) -> map.put(item, value.mean));
         return map;
+    }
+
+    public boolean anyExports(){
+        if(export.size == 0) return false;
+        returnf = 0f;
+        export.each((i, e) -> returnf += e.mean);
+        return returnf >= 0.01f;
+    }
+
+    /** @return a newly allocated map with import statistics. Use sparingly. */
+    //TODO this can be a float map
+    public ObjectMap<Item, ExportStat> importStats(Planet planet){
+        ObjectMap<Item, ExportStat> imports = new ObjectMap<>();
+        eachImport(planet, sector -> sector.info.export.each((item, stat) -> imports.get(item, ExportStat::new).mean += stat.mean));
+        return imports;
+    }
+
+    /** Iterates through every sector this one imports from. */
+    public void eachImport(Planet planet, Cons<Sector> cons){
+        for(Sector sector : planet.sectors){
+            Sector dest = sector.info.getRealDestination();
+            if(sector.hasBase() && sector.info != this && dest != null && dest.info == this && sector.info.anyExports()){
+                cons.get(sector);
+            }
+        }
     }
 
     public static class ExportStat{

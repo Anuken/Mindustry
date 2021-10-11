@@ -21,7 +21,6 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.payloads.*;
-import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -59,12 +58,6 @@ public class PayloadLaunchPad extends PayloadBlock{
         @Override
         public Cursor getCursor(){
             return !state.isCampaign() || net.client() ? SystemCursor.arrow : super.getCursor();
-        }
-
-        //cannot be disabled
-        @Override
-        public float efficiency(){
-            return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
         }
 
         @Override

@@ -36,7 +36,6 @@ import java.text.*;
 import java.util.*;
 
 import static arc.Core.*;
-import static mindustry.Vars.net;
 import static mindustry.Vars.*;
 
 /**
@@ -173,13 +172,19 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(BlockDestroyEvent.class, e -> {
             if(e.tile.team() == player.team()){
-                state.stats.buildingsDestroyed++;
+                state.stats.buildingsDestroyed ++;
             }
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
             if(e.unit.team() != player.team()){
-                state.stats.enemyUnitsDestroyed++;
+                state.stats.enemyUnitsDestroyed ++;
+            }
+        });
+
+        Events.on(UnitCreateEvent.class, e -> {
+            if(e.unit.team == state.rules.defaultTeam){
+                state.stats.unitsCreated++;
             }
         });
 
@@ -195,14 +200,16 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.run(Trigger.newGame, () -> {
-            Building core = player.bestCore();
+            var core = player.bestCore();
 
             if(core == null) return;
 
             camera.position.set(core);
             player.set(core);
 
-            if(showLandAnimation){
+            if(!settings.getBool("skipcoreanimation")){
+                //delay player respawn so animation can play.
+                player.deathTimer = -80f;
                 //TODO this sounds pretty bad due to conflict
                 if(settings.getInt("musicvol") > 0){
                     Musics.land.stop();
@@ -211,14 +218,14 @@ public class Control implements ApplicationListener, Loadable{
                 }
 
                 app.post(() -> ui.hudfrag.showLand());
-                renderer.zoomIn(Fx.coreLand.lifetime);
-                app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block));
+                renderer.showLanding();
 
-                Time.run(Fx.coreLand.lifetime, () -> {
+                Time.run(coreLandDuration, () -> {
                     Fx.launch.at(core);
                     Effect.shake(5f, 5f, core);
+                    core.thrusterTime = 1f;
 
-                    if(state.isCampaign()){
+                    if(state.isCampaign() && Vars.showSectorLandInfo){
                         ui.announce("[accent]" + state.rules.sector.name() + "\n" +
                         (state.rules.sector.info.resources.any() ? "[lightgray]" + bundle.get("sectors.resources") + "[white] " +
                         state.rules.sector.info.resources.toString(" ", u -> u.emoji()) : ""), 5);
@@ -247,12 +254,12 @@ public class Control implements ApplicationListener, Loadable{
         saves.load();
     }
 
-    /** Automatically unlocks things with no requirements. */
+    /** Automatically unlocks things with no requirements and no locked parents. */
     void checkAutoUnlocks(){
         if(net.client()) return;
 
         for(TechNode node : TechTree.all){
-            if(!node.content.unlocked() && node.requirements.length == 0 && !node.objectives.contains(o -> !o.complete())){
+            if(!node.content.unlocked() && (node.parent == null || node.parent.content.unlocked()) && node.requirements.length == 0 && !node.objectives.contains(o -> !o.complete())){
                 node.content.unlock();
             }
         }
@@ -323,13 +330,15 @@ public class Control implements ApplicationListener, Loadable{
             if(slot != null && !clearSectors){
 
                 try{
+                    boolean hadNoCore = !sector.info.hasCore;
                     reloader.begin();
                     slot.load();
                     slot.setAutosave(true);
                     state.rules.sector = sector;
+                    state.rules.cloudColor = sector.planet.landCloudColor;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
-                    if(state.rules.defaultTeam.cores().isEmpty()){
+                    if(state.rules.defaultTeam.cores().isEmpty() || hadNoCore){
 
                         //no spawn set -> delete the sector save
                         if(sector.info.spawnPosition == 0){
@@ -380,6 +389,8 @@ public class Control implements ApplicationListener, Loadable{
                         Groups.fire.clear();
                         Groups.puddle.clear();
 
+                        //reset to 0, so replaced cores don't count
+                        state.rules.defaultTeam.data().unitCap = 0;
                         Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
                         //set up camera/player locations
@@ -541,7 +552,12 @@ public class Control implements ApplicationListener, Loadable{
                 core.items.each((i, a) -> i.unlock());
             }
 
-            if(Core.input.keyTap(Binding.pause) && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
+            //cannot launch while paused
+            if(state.is(State.paused) && renderer.isCutscene()){
+                state.set(State.playing);
+            }
+
+            if(Core.input.keyTap(Binding.pause) && !renderer.isCutscene() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.is(State.playing) ? State.paused : State.playing);
             }
 

@@ -136,6 +136,7 @@ public class ItemTurret extends Turret{
             }
 
             BulletType type = ammoTypes.get(item);
+            if(type == null) return;
             totalAmmo += type.ammoMultiplier;
 
             //find ammo entry by type

@@ -3,12 +3,16 @@ package mindustry.maps.filters;
 
 import arc.*;
 import arc.func.*;
+import arc.scene.*;
+import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -35,7 +39,7 @@ public abstract class FilterOption{
         final Floatc setter;
         final float min, max, step;
 
-        boolean display;
+        boolean display = true;
 
         SliderOption(String name, Floatp getter, Floatc setter, float min, float max){
             this(name, getter, setter, min, max, (max - min) / 200);
@@ -57,19 +61,30 @@ public abstract class FilterOption{
 
         @Override
         public void build(Table table){
+            Element base;
             if(!display){
-                table.add("@filter.option." + name);
+                Label l = new Label("@filter.option." + name);
+                l.setWrap(true);
+                l.setStyle(Styles.outlineLabel);
+                base = l;
             }else{
-                table.label(() -> Core.bundle.get("filter.option." + name) + ": " + (int)getter.get());
+                Table t = new Table().marginLeft(11f).marginRight(11f);
+                base = t;
+                t.add("@filter.option." + name).growX().wrap().style(Styles.outlineLabel);
+                t.label(() -> Strings.autoFixed(getter.get(), 2)).style(Styles.outlineLabel).right().labelAlign(Align.right).padLeft(6);
             }
-            table.row();
-            Slider slider = table.slider(min, max, step, setter).growX().get();
+            base.touchable = Touchable.disabled;
+
+            Slider slider = new Slider(min, max, step, false);
+            slider.moved(setter);
             slider.setValue(getter.get());
             if(updateEditorOnChange){
                 slider.changed(changed);
             }else{
                 slider.released(changed);
             }
+
+            table.stack(slider, base).colspan(2).pad(3).growX().row();
         }
     }
 

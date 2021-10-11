@@ -54,6 +54,7 @@ public class Drill extends Block{
     public float updateEffectChance = 0.02f;
 
     public boolean drawRim = false;
+    public boolean drawSpinSprite = true;
     public Color heatColor = Color.valueOf("ff5512");
     public @Load("@-rim") TextureRegion rimRegion;
     public @Load("@-rotator") TextureRegion rotatorRegion;
@@ -194,7 +195,7 @@ public class Drill extends Block{
     }
 
     public boolean canMine(Tile tile){
-        if(tile == null) return false;
+        if(tile == null || tile.block().isStatic()) return false;
         Item drops = tile.drop();
         return drops != null && drops.hardness <= tier;
     }
@@ -314,7 +315,11 @@ public class Drill extends Block{
                 Draw.color();
             }
 
-            Draw.rect(rotatorRegion, x, y, timeDrilled * rotateSpeed);
+            if(drawSpinSprite){
+                Drawf.spinSprite(rotatorRegion, x, y, timeDrilled * rotateSpeed);
+            }else{
+                Draw.rect(rotatorRegion, x, y, timeDrilled * rotateSpeed);
+            }
 
             Draw.rect(topRegion, x, y);
 

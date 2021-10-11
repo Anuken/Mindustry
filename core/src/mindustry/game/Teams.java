@@ -1,6 +1,7 @@
 package mindustry.game;
 
 import arc.func.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.Queue;
 import arc.struct.*;
@@ -47,11 +48,11 @@ public class Teams{
         return Geometry.findClosest(x, y, get(team).cores);
     }
 
-    public boolean eachEnemyCore(Team team, Boolf<CoreBuild> ret){
+    public boolean anyEnemyCoresWithin(Team team, float x, float y, float radius){
         for(TeamData data : active){
-            if(areEnemies(team, data.team)){
+            if(team != data.team){
                 for(CoreBuild tile : data.cores){
-                    if(ret.get(tile)){
+                    if(tile.within(x, y, radius)){
                         return true;
                     }
                 }
@@ -62,7 +63,7 @@ public class Teams{
 
     public void eachEnemyCore(Team team, Cons<Building> ret){
         for(TeamData data : active){
-            if(areEnemies(team, data.team)){
+            if(team != data.team){
                 for(Building tile : data.cores){
                     ret.get(tile);
                 }
@@ -89,11 +90,6 @@ public class Teams{
     public boolean isActive(Team team){
         //the enemy wave team is always active
         return get(team).active();
-    }
-
-    /** Returns whether {@param other} is an enemy of {@param #team}. */
-    public boolean areEnemies(Team team, Team other){
-        return team != other;
     }
 
     public boolean canInteract(Team team, Team other){
@@ -216,7 +212,7 @@ public class Teams{
             Seq<Team> enemies = new Seq<>();
 
             for(TeamData other : active){
-                if(areEnemies(data.team, other.team)){
+                if(data.team != other.team){
                     enemies.add(other.team);
                 }
             }
@@ -263,6 +259,34 @@ public class Teams{
         public TeamData(Team team){
             this.team = team;
             this.ai = new BaseAI(this);
+        }
+
+        /** Destroys this team's presence on the map, killing part of its buildings and converting everything to 'derelict'. */
+        public void destroyToDerelict(){
+
+            //grab all buildings from quadtree.
+            var builds = new Seq<Building>();
+            if(buildings != null){
+                buildings.getObjects(builds);
+            }
+
+            //convert all team tiles to neutral, randomly killing them
+            for(var b : builds){
+                //TODO this may cause a lot of packet spam, optimize?
+                Call.setTeam(b, Team.derelict);
+
+                if(Mathf.chance(0.25)){
+                    Time.run(Mathf.random(0f, 60f * 6f), b::kill);
+                }
+            }
+
+            //kill all units randomly
+            units.each(u -> Time.run(Mathf.random(0f, 60f * 5f), () -> {
+                //ensure unit hasn't switched teams for whatever reason
+                if(u.team == team){
+                    u.kill();
+                }
+            }));
         }
 
         @Nullable
@@ -325,6 +349,7 @@ public class Teams{
     public static class BlockPlan{
         public final short x, y, rotation, block;
         public final Object config;
+        public boolean removed;
 
         public BlockPlan(int x, int y, short rotation, short block, Object config){
             this.x = (short)x;

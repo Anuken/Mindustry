@@ -20,8 +20,6 @@ import mindustry.world.blocks.*;
 import static mindustry.Vars.*;
 
 public class Floor extends Block{
-    /** number of different variant regions to use */
-    public int variants = 3;
     /** edge fallback, used mainly for ores */
     public String edge = "stone";
     /** Multiplies unit velocity by this when walked on. */
@@ -30,7 +28,7 @@ public class Floor extends Block{
     public float dragMultiplier = 1f;
     /** Damage taken per tick on this tile. */
     public float damageTaken = 0f;
-    /** How many ticks it takes to drown on this. */
+    /** How many ticks it takes to drown on this. 0 to disable. */
     public float drownTime = 0f;
     /** Effect when walking on this floor. */
     public Effect walkEffect = Fx.none;
@@ -44,18 +42,18 @@ public class Floor extends Block{
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect. */
     public float statusDuration = 60f;
-    /** liquids that drop from this block, used for pumps */
+    /** liquids that drop from this block, used for pumps. */
     public @Nullable Liquid liquidDrop = null;
     /** Multiplier for pumped liquids, used for deep water. */
     public float liquidMultiplier = 1f;
-    /** whether this block can be drowned in */
+    /** whether this block is liquid. */
     public boolean isLiquid;
+    /** shallow water flag used for generation */
+    public boolean shallow = false;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
     /** Group of blocks that this block does not draw edges on. */
     public Block blendGroup = this;
-    /** Effect displayed when randomly updated. */
-    public Effect updateEffect = Fx.none;
     /** Array of affinities to certain things. */
     public Attributes attributes = new Attributes();
     /** Whether this ore generates in maps by default. */
@@ -76,6 +74,12 @@ public class Floor extends Block{
 
     public Floor(String name){
         super(name);
+        variants = 3;
+    }
+
+    public Floor(String name, int variants){
+        super(name);
+        this.variants = variants;
     }
 
     @Override
@@ -85,7 +89,6 @@ public class Floor extends Block{
         //load variant regions for drawing
         if(variants > 0){
             variantRegions = new TextureRegion[variants];
-
             for(int i = 0; i < variants; i++){
                 variantRegions[i] = Core.atlas.find(name + (i + 1));
             }
@@ -93,7 +96,6 @@ public class Floor extends Block{
             variantRegions = new TextureRegion[1];
             variantRegions[0] = Core.atlas.find(name);
         }
-
         int size = (int)(tilesize / Draw.scl);
         if(Core.atlas.has(name + "-edge")){
             edges = Core.atlas.find(name + "-edge").split(size, size);
@@ -130,17 +132,10 @@ public class Floor extends Block{
     @Override
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
-        packer.add(PageType.editor, "editor-" + name, Core.atlas.getPixmap(fullIcon).crop());
+        packer.add(PageType.editor, "editor-" + name, Core.atlas.getPixmap(fullIcon));
 
         if(blendGroup != this){
             return;
-        }
-
-        if(variants > 0){
-            for(int i = 0; i < variants; i++){
-                String rname = name + (i + 1);
-                packer.add(PageType.editor, "editor-" + rname, Core.atlas.getPixmap(rname).crop());
-            }
         }
 
         PixmapRegion image = Core.atlas.getPixmap(icons()[0]);

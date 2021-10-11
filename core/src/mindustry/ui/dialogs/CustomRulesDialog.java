@@ -13,6 +13,7 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
+import mindustry.game.Rules.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -28,87 +29,93 @@ public class CustomRulesDialog extends BaseDialog{
     private Table main;
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
-    private BaseDialog banDialog;
 
     public CustomRulesDialog(){
         super("@mode.custom");
 
         loadoutDialog = new LoadoutDialog();
-        banDialog = new BaseDialog("@bannedblocks");
-        banDialog.addCloseButton();
-
-        banDialog.shown(this::rebuildBanned);
-        banDialog.buttons.button("@addall", Icon.add, () -> {
-            rules.bannedBlocks.addAll(content.blocks().select(Block::canBeBuilt));
-            rebuildBanned();
-        }).size(180, 64f);
-
-        banDialog.buttons.button("@clear", Icon.trash, () -> {
-            rules.bannedBlocks.clear();
-            rebuildBanned();
-        }).size(180, 64f);
 
         setFillParent(true);
         shown(this::setup);
         addCloseButton();
     }
 
-    private void rebuildBanned(){
-        float previousScroll = banDialog.cont.getChildren().isEmpty() ? 0f : ((ScrollPane)banDialog.cont.getChildren().first()).getScrollY();
-        banDialog.cont.clear();
-        banDialog.cont.pane(t -> {
-            t.margin(10f);
+    private <T extends UnlockableContent> void showBanned(String title, ContentType type, ObjectSet<T> set, Boolf<T> pred){
+        BaseDialog bd = new BaseDialog(title);
+        bd.addCloseButton();
 
-            if(rules.bannedBlocks.isEmpty()){
-                t.add("@empty");
-            }
+        Runnable[] rebuild = {null};
 
-            Seq<Block> array = Seq.with(rules.bannedBlocks);
-            array.sort();
+        rebuild[0] = () -> {
+            float previousScroll = bd.cont.getChildren().isEmpty() ? 0f : ((ScrollPane)bd.cont.getChildren().first()).getScrollY();
+            bd.cont.clear();
+            bd.cont.pane(t -> {
+                t.margin(10f);
 
-            int cols = mobile && Core.graphics.isPortrait() ? 1 : mobile ? 2 : 3;
-            int i = 0;
-
-            for(Block block : array){
-                t.table(Tex.underline, b -> {
-                    b.left().margin(4f);
-                    b.image(block.uiIcon).size(iconMed).padRight(3);
-                    b.add(block.localizedName).color(Color.lightGray).padLeft(3).growX().left().wrap();
-
-                    b.button(Icon.cancel, Styles.clearPartiali, () -> {
-                       rules.bannedBlocks.remove(block);
-                       rebuildBanned();
-                    }).size(70f).pad(-4f).padLeft(0f);
-                }).size(300f, 70f).padRight(5);
-
-                if(++i % cols == 0){
-                    t.row();
+                if(set.isEmpty()){
+                    t.add("@empty");
                 }
-            }
-        }).get().setScrollYForce(previousScroll);
-        banDialog.cont.row();
-        banDialog.cont.button("@add", Icon.add, () -> {
-            BaseDialog dialog = new BaseDialog("@add");
-            dialog.cont.pane(t -> {
-                t.left().margin(14f);
-                int[] i = {0};
-                content.blocks().each(b -> !rules.bannedBlocks.contains(b) && b.canBeBuilt(), b -> {
-                    int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
-                    t.button(new TextureRegionDrawable(b.uiIcon), Styles.cleari, iconMed, () -> {
-                        rules.bannedBlocks.add(b);
-                        rebuildBanned();
-                        dialog.hide();
-                    }).size(60f);
 
-                    if(++i[0] % cols == 0){
+                Seq<T> array = set.asArray();
+                array.sort();
+
+                int cols = mobile && Core.graphics.isPortrait() ? 1 : mobile ? 2 : 3;
+                int i = 0;
+
+                for(T con : array){
+                    t.table(Tex.underline, b -> {
+                        b.left().margin(4f);
+                        b.image(con.uiIcon).size(iconMed).padRight(3);
+                        b.add(con.localizedName).color(Color.lightGray).padLeft(3).growX().left().wrap();
+
+                        b.button(Icon.cancel, Styles.clearPartiali, () -> {
+                            set.remove(con);
+                            rebuild[0].run();
+                        }).size(70f).pad(-4f).padLeft(0f);
+                    }).size(300f, 70f).padRight(5);
+
+                    if(++i % cols == 0){
                         t.row();
                     }
-                });
-            });
+                }
+            }).get().setScrollYForce(previousScroll);
+            bd.cont.row();
+            bd.cont.button("@add", Icon.add, () -> {
+                BaseDialog dialog = new BaseDialog("@add");
+                dialog.cont.pane(t -> {
+                    t.left().margin(14f);
+                    int[] i = {0};
+                    content.<T>getBy(type).each(b -> !set.contains(b) && pred.get(b), b -> {
+                        int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
+                        t.button(new TextureRegionDrawable(b.uiIcon), Styles.cleari, iconMed, () -> {
+                            set.add(b);
+                            rebuild[0].run();
+                            dialog.hide();
+                        }).size(60f);
 
-            dialog.addCloseButton();
-            dialog.show();
-        }).size(300f, 64f);
+                        if(++i[0] % cols == 0){
+                            t.row();
+                        }
+                    });
+                });
+
+                dialog.addCloseButton();
+                dialog.show();
+            }).size(300f, 64f);
+        };
+
+        bd.shown(rebuild[0]);
+        bd.buttons.button("@addall", Icon.add, () -> {
+            set.addAll(content.<T>getBy(type).select(pred));
+            rebuild[0].run();
+        }).size(180, 64f);
+
+        bd.buttons.button("@clear", Icon.trash, () -> {
+            set.clear();
+            rebuild[0].run();
+        }).size(180, 64f);
+
+        bd.show();
     }
 
     public void show(Rules rules, Prov<Rules> resetter){
@@ -119,7 +126,7 @@ public class CustomRulesDialog extends BaseDialog{
 
     void setup(){
         cont.clear();
-        cont.pane(m -> main = m).get().setScrollingDisabled(true, false);
+        cont.pane(m -> main = m).scrollX(false);
         main.margin(10f);
         main.button("@settings.reset", () -> {
             rules = resetter.get();
@@ -142,6 +149,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
         check("@rules.schematic", b -> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
         check("@rules.coreincinerates", b -> rules.coreIncinerates = b, () -> rules.coreIncinerates);
+        check("@rules.cleanupdeadteams", b -> rules.cleanupDeadTeams = b, () -> rules.cleanupDeadTeams, () -> rules.pvp);
         number("@rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
         number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, 0.001f, 50f);
         number("@rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
@@ -156,7 +164,7 @@ public class CustomRulesDialog extends BaseDialog{
         )).left().width(300f);
         main.row();
 
-        main.button("@bannedblocks", banDialog::show).left().width(300f);
+        main.button("@bannedblocks", () -> showBanned("@bannedblocks", ContentType.block, rules.bannedBlocks, Block::canBeBuilt)).left().width(300f);
         main.row();
 
         title("@rules.title.unit");
@@ -166,11 +174,15 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
         number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0.001f, 50f);
 
+        main.button("@bannedunits", () -> showBanned("@bannedunits", ContentType.unit, rules.bannedUnits, u -> !u.isHidden())).left().width(300f);
+        main.row();
+
         title("@rules.title.enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
         check("@rules.buildai", b -> rules.teams.get(rules.waveTeam).ai = rules.teams.get(rules.waveTeam).infiniteResources = b, () -> rules.teams.get(rules.waveTeam).ai);
         check("@rules.corecapture", b -> rules.coreCapture = b, () -> rules.coreCapture);
-        number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
+        check("@rules.polygoncoreprotection", b -> rules.polygonCoreProtection = b, () -> rules.polygonCoreProtection);
+        number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200), () -> !rules.polygonCoreProtection);
 
         title("@rules.title.environment");
         check("@rules.explosions", b -> rules.damageExplosions = b, () -> rules.damageExplosions);
@@ -189,6 +201,53 @@ public class CustomRulesDialog extends BaseDialog{
         }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f).row();
 
         main.button("@rules.weather", this::weatherDialog).width(250f).left().row();
+
+        title("@rules.title.teams");
+
+        team("@rules.playerteam", t -> rules.defaultTeam = t, () -> rules.defaultTeam);
+        team("@rules.enemyteam", t -> rules.waveTeam = t, () -> rules.waveTeam);
+
+        for(Team team : Team.baseTeams){
+            boolean[] shown = {false};
+            Table wasMain = main;
+
+            main.button("[#" + team.color +  "]" + team.localized() + (team.emoji.isEmpty() ? "" : "[] " + team.emoji), Icon.downOpen, Styles.togglet, () -> {
+                shown[0] = !shown[0];
+            }).marginLeft(14f).width(260f).height(55f).checked(a -> shown[0]).row();
+
+            main.collapser(t -> {
+                t.left().defaults().fillX().left().pad(5);
+                main = t;
+                TeamRule teams = rules.teams.get(team);
+
+                number("@rules.blockhealthmultiplier", f -> teams.blockHealthMultiplier = f, () -> teams.blockHealthMultiplier);
+                number("@rules.blockdamagemultiplier", f -> teams.blockDamageMultiplier = f, () -> teams.blockDamageMultiplier);
+
+                check("@rules.buildai", b -> teams.ai = b, () -> teams.ai, () -> team != rules.defaultTeam);
+                number("@rules.aitier", false, f -> teams.aiTier = f, () -> teams.aiTier, () -> teams.ai, 0, 1);
+
+                check("@rules.infiniteresources", b -> teams.infiniteResources = b, () -> teams.infiniteResources);
+                number("@rules.buildspeedmultiplier", f -> teams.buildSpeedMultiplier = f, () -> teams.buildSpeedMultiplier, 0.001f, 50f);
+
+                number("@rules.unitdamagemultiplier", f -> teams.unitDamageMultiplier = f, () -> teams.unitDamageMultiplier);
+                number("@rules.unitbuildspeedmultiplier", f -> teams.unitBuildSpeedMultiplier = f, () -> teams.unitBuildSpeedMultiplier, 0.001f, 50f);
+
+                main = wasMain;
+            }, () -> shown[0]).growX().row();
+        }
+    }
+
+    void team(String text, Cons<Team> cons, Prov<Team> prov){
+        main.table(t -> {
+            t.left();
+            t.add(text).left().padRight(5);
+
+            for(Team team : Team.baseTeams){
+                t.button(Tex.whiteui, Styles.clearTogglei, 38f, () -> {
+                    cons.get(team);
+                }).pad(1f).checked(b -> prov.get() == team).size(60f).tooltip(team.localized()).with(i -> i.getStyle().imageUpColor = team.color);
+            }
+        }).padTop(0).row();
     }
 
     void number(String text, Floatc cons, Floatp prov){
@@ -207,15 +266,15 @@ public class CustomRulesDialog extends BaseDialog{
         number(text, false, cons, prov, condition, 0, Float.MAX_VALUE);
     }
 
+    //TODO integer param unused
     void number(String text, boolean integer, Intc cons, Intp prov, int min, int max){
         main.table(t -> {
             t.left();
             t.add(text).left().padRight(5);
-            t.field((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseInt(s)))
+            t.field((prov.get()) + "", s -> cons.get(Strings.parseInt(s)))
                     .padRight(100f)
-                    .valid(f -> Strings.parseInt(f) >= min && Strings.parseInt(f) <= max).width(120f).left().addInputDialog();
-        }).padTop(0);
-        main.row();
+                    .valid(f -> Strings.parseInt(f) >= min && Strings.parseInt(f) <= max).width(120f).left();
+        }).padTop(0).row();
     }
 
     void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition, float min, float max){
@@ -226,7 +285,7 @@ public class CustomRulesDialog extends BaseDialog{
             t.field((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseFloat(s)))
             .padRight(100f)
             .update(a -> a.setDisabled(!condition.get()))
-            .valid(f -> Strings.canParsePositiveFloat(f) && Strings.parseFloat(f) >= min && Strings.parseFloat(f) <= max).width(120f).left().addInputDialog();
+            .valid(f -> Strings.canParsePositiveFloat(f) && Strings.parseFloat(f) >= min && Strings.parseFloat(f) <= max).width(120f).left();
         }).padTop(0);
         main.row();
     }
@@ -250,7 +309,7 @@ public class CustomRulesDialog extends BaseDialog{
     Cell<TextField> field(Table table, float value, Floatc setter){
         return table.field(Strings.autoFixed(value, 2), v -> setter.get(Strings.parseFloat(v)))
             .valid(Strings::canParsePositiveFloat)
-            .size(90f, 40f).pad(2f).addInputDialog();
+            .size(90f, 40f).pad(2f);
     }
 
     void weatherDialog(){
@@ -261,7 +320,7 @@ public class CustomRulesDialog extends BaseDialog{
 
             rebuild[0] = () -> {
                 base.clearChildren();
-                int cols = Math.max(1, Core.graphics.getWidth() / 460);
+                int cols = Math.max(1, (int)(Core.graphics.getWidth() / Scl.scl(450)));
                 int idx = 0;
 
                 for(WeatherEntry entry : rules.weather){
@@ -337,6 +396,7 @@ public class CustomRulesDialog extends BaseDialog{
                 t.background(Tex.button);
                 int i = 0;
                 for(Weather weather : content.<Weather>getBy(ContentType.weather)){
+                    if(weather.hidden) continue;
 
                     t.button(weather.localizedName, Styles.cleart, () -> {
                         rules.weather.add(new WeatherEntry(weather));

@@ -64,6 +64,7 @@ public class Reconstructor extends UnitBlock{
 
     @Override
     public void setStats(){
+        stats.timePeriod = constructTime;
         super.setStats();
 
         stats.add(Stat.productionTime, constructTime / 60f, StatUnit.seconds);
@@ -115,11 +116,28 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
-            return this.payload == null
-                && (this.enabled || source == this)
-                && relativeTo(source) != rotation
-                && payload instanceof UnitPayload pay
-                && hasUpgrade(pay.unit.type);
+            if(!(this.payload == null
+            && (this.enabled || source == this)
+            && relativeTo(source) != rotation
+            && payload instanceof UnitPayload pay)){
+                return false;
+            }
+
+            var upgrade = upgrade(pay.unit.type);
+
+            if(upgrade != null){
+                if(!upgrade.unlockedNowHost()){
+                    //flash "not researched"
+                    pay.showOverlay(Icon.tree);
+                }
+
+                if(upgrade.isBanned()){
+                    //flash an X, meaning 'banned'
+                    pay.showOverlay(Icon.cancel);
+                }
+            }
+
+            return upgrade != null && upgrade.unlockedNowHost() && !upgrade.isBanned();
         }
 
         @Override
@@ -179,7 +197,7 @@ public class Reconstructor extends UnitBlock{
                     if(moveInPayload()){
                         if(consValid()){
                             valid = true;
-                            progress += edelta() * state.rules.unitBuildSpeedMultiplier;
+                            progress += edelta() * state.rules.unitBuildSpeed(team);
                         }
 
                         //upgrade the unit
@@ -196,7 +214,7 @@ public class Reconstructor extends UnitBlock{
             }
 
             speedScl = Mathf.lerpDelta(speedScl, Mathf.num(valid), 0.05f);
-            time += edelta() * speedScl * state.rules.unitBuildSpeedMultiplier;
+            time += edelta() * speedScl * state.rules.unitBuildSpeed(team);
         }
 
         @Override
@@ -214,7 +232,7 @@ public class Reconstructor extends UnitBlock{
             if(payload == null) return null;
 
             UnitType t = upgrade(payload.unit.type);
-            return t != null && t.unlockedNow() ? t : null;
+            return t != null && t.unlockedNowHost() ? t : null;
         }
 
         public boolean constructing(){
@@ -223,7 +241,7 @@ public class Reconstructor extends UnitBlock{
 
         public boolean hasUpgrade(UnitType type){
             UnitType t = upgrade(type);
-            return t != null && t.unlockedNow();
+            return t != null && t.unlockedNowHost() && !type.isBanned();
         }
 
         public UnitType upgrade(UnitType type){

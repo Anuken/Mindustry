@@ -9,7 +9,7 @@ def ICON_DIR = new File("$rootDir/core/assets/icons/icon.icns")
 def platforms = ["Linux64", "Windows64", "Windows32", "MacOS"]
 
 task run(dependsOn: classes, type: JavaExec){
-    main = project.mainClassName
+    mainClass = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = project.assetsDir
@@ -30,7 +30,7 @@ task run(dependsOn: classes, type: JavaExec){
     }
 
     if(args.contains("debug")){
-        main = "mindustry.debug.DebugLauncher"
+        mainClass = "mindustry.debug.DebugLauncher"
     }
 }
 
@@ -48,7 +48,7 @@ task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     }
 }
 
-if(!project.ext.hasSprites()){
+if(!project.ext.hasSprites() && System.getenv("JITPACK") != "true"){
     println "Scheduling sprite packing."
     run.dependsOn ":tools:pack"
     dist.dependsOn ":tools:pack"
@@ -119,12 +119,14 @@ platforms.each{ platform ->
                     "--removelibs", "$rootDir/desktop/build/packr/desktop.jar".toString()
                 ]
 
+                args += "--vmargs"
+
                 if(platform == "MacOS"){
-                    args += ["--vmargs", "XstartOnFirstThread"] as String[]
-                }else{
-                    //TODO unneeded for windows?
-                    args += ["--vmargs", "Dhttps.protocols=TLSv1.2,TLSv1.1,TLSv1"]
+                    args += "XstartOnFirstThread"
                 }
+
+                args += "Dhttps.protocols=TLSv1.2,TLSv1.1,TLSv1"
+                args += "XX:+ShowCodeDetailsInExceptionMessages"
 
                 exec{
                     commandLine args.toList()

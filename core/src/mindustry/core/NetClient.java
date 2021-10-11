@@ -1,6 +1,7 @@
 package mindustry.core;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
@@ -18,6 +19,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
@@ -160,6 +162,20 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.both, unreliable = true)
+    public static void sound(Sound sound, float volume, float pitch, float pan){
+        if(sound == null) return;
+
+        sound.play(Mathf.clamp(volume, 0, 4f) * Core.settings.getInt("sfxvol") / 100f, pitch, pan);
+    }
+
+    @Remote(variants = Variant.both, unreliable = true)
+    public static void soundAt(Sound sound, float x, float y, float volume, float pitch){
+        if(sound == null) return;
+
+        sound.at(x, y, pitch, Mathf.clamp(volume, 0, 4f));
+    }
+
+    @Remote(variants = Variant.both, unreliable = true)
     public static void effect(Effect effect, float x, float y, float rotation, Color color){
         if(effect == null) return;
 
@@ -171,15 +187,15 @@ public class NetClient implements ApplicationListener{
         effect(effect, x, y, rotation, color);
     }
 
-    //called on all clients
     @Remote(targets = Loc.server, variants = Variant.both)
-    public static void sendMessage(String message, String sender, Player playersender){
+    public static void sendMessage(String message, @Nullable String unformatted, @Nullable Player playersender){
         if(Vars.ui != null){
-            Vars.ui.chatfrag.addMessage(message, sender);
+            Vars.ui.chatfrag.addMessage(message);
         }
 
-        if(playersender != null){
-            playersender.lastText(message);
+        //display raw unformatted text above player head
+        if(playersender != null && unformatted != null){
+            playersender.lastText(unformatted);
             playersender.textFadeTime(1f);
         }
     }
@@ -188,7 +204,7 @@ public class NetClient implements ApplicationListener{
     @Remote(called = Loc.server, targets = Loc.server)
     public static void sendMessage(String message){
         if(Vars.ui != null){
-            Vars.ui.chatfrag.addMessage(message, null);
+            Vars.ui.chatfrag.addMessage(message);
         }
     }
 
@@ -202,6 +218,8 @@ public class NetClient implements ApplicationListener{
         if(message.length() > maxTextLength){
             throw new ValidateException(player, "Player has sent a message above the text limit.");
         }
+
+        message = message.replace("\n", "");
 
         Events.fire(new PlayerChatEvent(player, message));
 
@@ -222,7 +240,7 @@ public class NetClient implements ApplicationListener{
 
             //special case; graphical server needs to see its message
             if(!headless){
-                sendMessage(message, colorizeName(player.id, player.name), player);
+                sendMessage(netServer.chatFormatter.format(player, message), message, player);
             }
 
             //server console logging
@@ -230,7 +248,7 @@ public class NetClient implements ApplicationListener{
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
-            Call.sendMessage(message, colorizeName(player.id(), player.name), player);
+            Call.sendMessage(netServer.chatFormatter.format(player, message), message, player);
         }else{
 
             //a command was sent, now get the output
@@ -266,14 +284,9 @@ public class NetClient implements ApplicationListener{
         }
     }
 
-    public static String colorizeName(int id, String name){
-        Player player = Groups.player.getByID(id);
-        if(name == null || player == null) return null;
-        return "[#" + player.color().toString().toUpperCase() + "]" + name;
-    }
-
     @Remote(called = Loc.client, variants = Variant.one)
     public static void connect(String ip, int port){
+        if(!steam && ip.startsWith("steam:")) return;
         netClient.disconnectQuietly();
         logic.reset();
 
@@ -434,7 +447,7 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
-    public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, boolean gameOver, int timeData, byte tps, byte[] coreData){
+    public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, boolean gameOver, int timeData, byte tps, long rand0, long rand1, byte[] coreData){
         try{
             if(wave > state.wave){
                 state.wave = wave;
@@ -447,6 +460,11 @@ public class NetClient implements ApplicationListener{
             state.enemies = enemies;
             state.serverPaused = paused;
             state.serverTps = tps & 0xff;
+
+            //note that this is far from a guarantee that random state is synced - tiny changes in delta and ping can throw everything off again.
+            //syncing will only make much of a difference when rand() is called infrequently
+            GlobalConstants.rand.seed0 = rand0;
+            GlobalConstants.rand.seed1 = rand1;
 
             universe.updateNetSeconds(timeData);
 
@@ -489,6 +507,11 @@ public class NetClient implements ApplicationListener{
                 timeoutTime = 0f;
             }
         }
+    }
+
+    /** Resets the world data timeout counter. */
+    public void resetTimeout(){
+        timeoutTime = 0f;
     }
 
     public boolean isConnecting(){

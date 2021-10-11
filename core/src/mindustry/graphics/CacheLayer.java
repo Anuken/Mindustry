@@ -3,13 +3,14 @@ package mindustry.graphics;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.gl.*;
+import arc.util.*;
 
 import static mindustry.Vars.*;
 
 public class CacheLayer{
     public static CacheLayer
 
-    water, mud, tar, slag, space, normal, walls;
+    water, mud, cryofluid, tar, slag, space, normal, walls;
 
     public static CacheLayer[] all = {};
 
@@ -36,6 +37,7 @@ public class CacheLayer{
             mud = new ShaderLayer(Shaders.mud),
             tar = new ShaderLayer(Shaders.tar),
             slag = new ShaderLayer(Shaders.slag),
+            cryofluid = new ShaderLayer(Shaders.cryofluid),
             space = new ShaderLayer(Shaders.space),
             normal = new CacheLayer(),
             walls = new CacheLayer()
@@ -53,7 +55,7 @@ public class CacheLayer{
     }
 
     public static class ShaderLayer extends CacheLayer{
-        public Shader shader;
+        public @Nullable Shader shader;
 
         public ShaderLayer(Shader shader){
             //shader will be null on headless backend, but that's ok

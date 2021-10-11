@@ -16,6 +16,7 @@ import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.Units.*;
 import mindustry.entities.bullet.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -60,8 +61,12 @@ public class Turret extends ReloadTurret{
     public float minRange = 0f;
     public float burstSpacing = 0;
     public boolean alternate = false;
+    /** If true, this turret will accurately target moving targets with respect to charge time. */
+    public boolean accurateDelay = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
+    public boolean targetHealing = false;
+    public boolean playerControllable = true;
 
     //charging
     public float chargeTime = -1f;
@@ -106,7 +111,7 @@ public class Turret extends ReloadTurret{
         super.setStats();
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
-        stats.add(Stat.reload, 60f / (reloadTime) * (alternate ? 1 : shots), StatUnit.none);
+        stats.add(Stat.reload, 60f / (reloadTime) * (alternate ? 1 : shots), StatUnit.perSecond);
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
@@ -116,7 +121,7 @@ public class Turret extends ReloadTurret{
     public void init(){
         if(acceptCoolant && !consumes.has(ConsumeType.liquid)){
             hasLiquids = true;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, coolantUsage)).update(false).boost();
+            consumes.add(new ConsumeCoolant(coolantUsage)).update(false).boost();
         }
         
         if(shootLength < 0) shootLength = size * tilesize / 2f;
@@ -151,6 +156,11 @@ public class Turret extends ReloadTurret{
         public void created(){
             unit = (BlockUnitc)UnitTypes.block.create(team);
             unit.tile(this);
+        }
+
+        @Override
+        public boolean canControl(){
+            return playerControllable;
         }
 
         @Override
@@ -216,11 +226,16 @@ public class Turret extends ReloadTurret{
         public void targetPosition(Posc pos){
             if(!hasAmmo() || pos == null) return;
             BulletType bullet = peekAmmo();
-            float speed = bullet.speed;
-            //slow bullets never intersect
-            if(speed < 0.1f) speed = 9999999f;
 
-            targetPos.set(Predict.intercept(this, pos, speed));
+            var offset = Tmp.v1.setZero();
+
+            //when delay is accurate, assume unit has moved by chargeTime already
+            if(accurateDelay && pos instanceof Hitboxc h){
+                offset.set(h.deltaX(), h.deltaY()).scl(chargeTime / Time.delta);
+            }
+
+            targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed <= 0.01f ? 99999999f : bullet.speed));
+
             if(targetPos.isZero()){
                 targetPos.set(pos);
             }
@@ -264,6 +279,7 @@ public class Turret extends ReloadTurret{
             }
 
             if(hasAmmo()){
+                if(Float.isNaN(reload)) rotation = 0;
 
                 if(timer(timerTarget, targetInterval)){
                     findTarget();
@@ -280,9 +296,7 @@ public class Turret extends ReloadTurret{
                     }else{ //default AI behavior
                         targetPosition(target);
 
-                        if(Float.isNaN(rotation)){
-                            rotation = 0;
-                        }
+                        if(Float.isNaN(rotation)) rotation = 0;
                     }
 
                     float targetRot = angleTo(targetPos);
@@ -313,7 +327,11 @@ public class Turret extends ReloadTurret{
         }
 
         protected boolean validateTarget(){
-            return !Units.invalidateTarget(target, team, x, y) || isControlled() || logicControlled();
+            return !Units.invalidateTarget(target, canHeal() ? Team.derelict : team, x, y) || isControlled() || logicControlled();
+        }
+
+        protected boolean canHeal(){
+            return targetHealing && hasAmmo() && peekAmmo().collidesTeam && peekAmmo().healPercent > 0;
         }
 
         protected void findTarget(){
@@ -321,6 +339,10 @@ public class Turret extends ReloadTurret{
                 target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded(), unitSort);
             }else{
                 target = Units.bestTarget(team, x, y, range, e -> !e.dead() && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> true, unitSort);
+
+                if(target == null && canHeal()){
+                    target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);
+                }
             }
         }
 
@@ -404,13 +426,14 @@ public class Turret extends ReloadTurret{
                 //when burst spacing is enabled, use the burst pattern
             }else if(burstSpacing > 0.0001f){
                 for(int i = 0; i < shots; i++){
+                    int ii = i;
                     Time.run(burstSpacing * i, () -> {
                         if(!isValid() || !hasAmmo()) return;
 
                         recoil = recoilAmount;
 
                         tr.trns(rotation, shootLength, Mathf.range(xRand));
-                        bullet(type, rotation + Mathf.range(inaccuracy));
+                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (ii - (int)(shots / 2f)) * spread);
                         effects();
                         useAmmo();
                         recoil = recoilAmount;

@@ -287,6 +287,7 @@ public class World{
             if(liquid != null) content.add(liquid);
         }
 
+        state.rules.cloudColor = sector.planet.landCloudColor;
         sector.info.resources = content.asArray();
         sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
         sector.saveInfo();
@@ -325,8 +326,8 @@ public class World{
         invalidMap = false;
 
         if(!headless){
-            if(state.teams.playerCores().size == 0 && !checkRules.pvp){
-                ui.showErrorMessage("@map.nospawn");
+            if(state.teams.cores(checkRules.defaultTeam).size == 0 && !checkRules.pvp){
+                ui.showErrorMessage(Core.bundle.format("map.nospawn", checkRules.defaultTeam.color, checkRules.defaultTeam.localized()));
                 invalidMap = true;
             }else if(checkRules.pvp){ //pvp maps need two cores to be valid
                 if(state.teams.getActive().count(TeamData::hasCore) < 2){
@@ -336,7 +337,7 @@ public class World{
             }else if(checkRules.attackMode){ //attack maps need two cores to be valid
                 invalidMap = state.rules.waveTeam.data().noCores();
                 if(invalidMap){
-                    ui.showErrorMessage("@map.nospawn.attack");
+                    ui.showErrorMessage(Core.bundle.format("map.nospawn.attack", checkRules.waveTeam.color, checkRules.waveTeam.localized()));
                 }
             }
         }else{
@@ -355,30 +356,23 @@ public class World{
     }
 
     public void raycastEach(int x0f, int y0f, int x1, int y1, Raycaster cons){
-        int x0 = x0f;
-        int y0 = y0f;
-        int dx = Math.abs(x1 - x0);
-        int dy = Math.abs(y1 - y0);
+        int x0 = x0f, dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+        int y0 = y0f, dy = Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+        int e2, err = dx - dy;
 
-        int sx = x0 < x1 ? 1 : -1;
-        int sy = y0 < y1 ? 1 : -1;
-
-        int err = dx - dy;
-        int e2;
         while(true){
-
             if(cons.accept(x0, y0)) break;
             if(x0 == x1 && y0 == y1) break;
 
             e2 = 2 * err;
             if(e2 > -dy){
-                err = err - dy;
-                x0 = x0 + sx;
+                err -= dy;
+                x0 += sx;
             }
 
             if(e2 < dx){
-                err = err + dx;
-                y0 = y0 + sy;
+                err += dx;
+                y0 += sy;
             }
         }
     }
@@ -525,8 +519,7 @@ public class World{
 
     private class Context implements WorldContext{
 
-        Context(){
-        }
+        Context(){}
 
         @Override
         public Tile tile(int index){
@@ -579,7 +572,7 @@ public class World{
 
                 for(GenerateFilter filter : filters){
                     filter.randomize();
-                    input.begin(filter, width(), height(), (x, y) -> tiles.getn(x, y));
+                    input.begin(width(), height(), (x, y) -> tiles.getn(x, y));
                     filter.apply(tiles, input);
                 }
             }

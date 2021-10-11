@@ -29,7 +29,7 @@ public class PayloadVoid extends PayloadBlock{
         return new TextureRegion[]{region, topRegion};
     }
 
-    public class BlockLoaderBuild extends PayloadBlockBuild<Payload>{
+    public class PayloadVoidBuild extends PayloadBlockBuild<Payload>{
 
         @Override
         public void draw(){
@@ -46,6 +46,11 @@ public class PayloadVoid extends PayloadBlock{
 
             Draw.z(Layer.blockOver);
             drawPayload();
+        }
+
+        @Override
+        public boolean acceptUnitPayload(Unit unit){
+            return true;
         }
 
         @Override

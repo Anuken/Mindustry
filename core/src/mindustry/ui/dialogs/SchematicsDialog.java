@@ -35,13 +35,13 @@ public class SchematicsDialog extends BaseDialog{
     private String search = "";
     private TextField searchField;
     private Runnable rebuildPane = () -> {}, rebuildTags = () -> {};
-    private Pattern ignoreSymbols = Pattern.compile("[`~!@#$%^&*()-_=+{}|;:'\",<.>/?]");
+    private Pattern ignoreSymbols = Pattern.compile("[`~!@#$%^&*()\\-_=+{}|;:'\",<.>/?]");
     private Seq<String> tags, selectedTags = new Seq<>();
     private boolean checkedTags;
 
     public SchematicsDialog(){
         super("@schematics");
-        Core.assets.load("sprites/schematic-background.png", Texture.class).loaded = t -> ((Texture)t).setWrap(TextureWrap.repeat);
+        Core.assets.load("sprites/schematic-background.png", Texture.class).loaded = t -> t.setWrap(TextureWrap.repeat);
 
         tags = Core.settings.getJson("schematic-tags", Seq.class, String.class, Seq::new);
 
@@ -97,7 +97,7 @@ public class SchematicsDialog extends BaseDialog{
                     }
                 };
                 rebuildTags.run();
-            }).fillX().height(tagh).get().setScrollingDisabled(false, true);
+            }).fillX().height(tagh).scrollY(false);
 
             in.button(Icon.pencilSmall, () -> {
                 showAllTags();
@@ -155,7 +155,7 @@ public class SchematicsDialog extends BaseDialog{
                             });
 
                             buttons.button(Icon.pencil, style, () -> {
-                                new Dialog("@schematic.rename"){{
+                                new BaseDialog("@schematic.rename"){{
                                     setFillParent(true);
 
                                     cont.margin(30);
@@ -164,12 +164,12 @@ public class SchematicsDialog extends BaseDialog{
                                     cont.table(tags -> buildTags(s, tags, false)).maxWidth(400f).fillX().left().row();
 
                                     cont.margin(30).add("@name").padRight(6f);
-                                    TextField nameField = cont.field(s.name(), null).size(400f, 55f).addInputDialog().left().get();
+                                    TextField nameField = cont.field(s.name(), null).size(400f, 55f).left().get();
 
                                     cont.row();
 
                                     cont.margin(30).add("@editor.description").padRight(6f);
-                                    TextField descField = cont.area(s.description(), Styles.areaField, t -> {}).size(400f, 140f).left().addInputDialog().get();
+                                    TextField descField = cont.area(s.description(), Styles.areaField, t -> {}).size(400f, 140f).left().get();
 
                                     Runnable accept = () -> {
                                         s.tags.put("name", nameField.getText());
@@ -246,7 +246,7 @@ public class SchematicsDialog extends BaseDialog{
             };
 
             rebuildPane.run();
-        }).grow().get().setScrollingDisabled(true, false);
+        }).grow().scrollX(false);
     }
 
     public void showInfo(Schematic schematic){
@@ -334,12 +334,6 @@ public class SchematicsDialog extends BaseDialog{
         dialog.show();
     }
 
-    public void focusSearchField(){
-        if(searchField == null) return;
-
-        Core.scene.setKeyboardFocus(searchField);
-    }
-
 
     //adds all new tags to the global list of tags
     //alternatively, unknown tags could be discarded on import?
@@ -415,32 +409,14 @@ public class SchematicsDialog extends BaseDialog{
                     t.marginRight(19f);
                     t.defaults().size(48f);
 
-                    int cols = (int)Math.min(20, Core.graphics.getWidth() / 52f);
-
-                    /*
-                    int i = 0;
-                    for(var key : defaultIcons){
-                        var value = Icon.icons.get(key);
-
-                        t.button(value, Styles.cleari, () -> {
-                            sector.info.icon = key;
-                            sector.info.contentIcon = null;
-                            sector.saveInfo();
-                            hide();
-                            updateSelected();
-                        }).checked(key.equals(sector.info.icon));
-
-                        if(++i % cols == 0) t.row();
-                    }*/
-
-                    int i = 0;
+                    int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
 
                     for(ContentType ctype : defaultContentIcons){
                         t.row();
                         t.image().colspan(cols).growX().width(Float.NEGATIVE_INFINITY).height(3f).color(Pal.accent);
                         t.row();
 
-                        i = 0;
+                        int i = 0;
                         for(UnlockableContent u : content.getBy(ctype).<UnlockableContent>as()){
                             if(!u.isHidden() && u.unlockedNow() && u.hasEmoji() && !tags.contains(u.emoji())){
                                 t.button(new TextureRegionDrawable(u.uiIcon), Styles.cleari, iconMed, () -> {
@@ -591,7 +567,7 @@ public class SchematicsDialog extends BaseDialog{
                 });
             }
 
-        }).fillX().left().height(tagh).get().setScrollingDisabled(false, true);
+        }).fillX().left().height(tagh).scrollY(false);
 
         t.button(Icon.addSmall, () -> {
             var dialog = new BaseDialog("@schematic.addtag");
@@ -653,8 +629,8 @@ public class SchematicsDialog extends BaseDialog{
     public Dialog show(){
         super.show();
 
-        if(Core.app.isDesktop()){
-            focusSearchField();
+        if(Core.app.isDesktop() && searchField != null){
+            Core.scene.setKeyboardFocus(searchField);
         }
 
         return this;

@@ -69,7 +69,6 @@ public class SaveIO{
             getMeta(stream);
             return true;
         }catch(Throwable e){
-            Log.err(e);
             return false;
         }
     }
@@ -114,13 +113,17 @@ public class SaveIO{
 
     public static void write(OutputStream os, StringMap tags){
         try(DataOutputStream stream = new DataOutputStream(os)){
+            SaveVersion ver = getVersion();
+
             stream.write(header);
-            stream.writeInt(getVersion().version);
+            stream.writeInt(ver.version);
             if(tags == null){
-                getVersion().write(stream);
+                ver.write(stream);
             }else{
-                getVersion().write(stream, tags);
+                ver.write(stream, tags);
             }
+
+            Events.fire(new SaveWriteEvent());
         }catch(Throwable e){
             throw new RuntimeException(e);
         }

@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -23,6 +24,7 @@ public interface Payload extends Position{
     float size();
 
     float x();
+
     float y();
 
     /** @return whether this payload was dumped. */
@@ -30,7 +32,7 @@ public interface Payload extends Position{
         return false;
     }
 
-    /** @return whether this payload fits in a given size. 2.5 is the max for a standard 3x3 conveyor. */
+    /** @return whether this payload fits in a given size. 3 is the max for a standard 3x3 conveyor. */
     default boolean fits(float s){
         return size() / tilesize <= s;
     }
@@ -45,6 +47,12 @@ public interface Payload extends Position{
 
     /** @return icon describing the contents. */
     TextureRegion icon();
+
+    /** @deprecated use icon() instead. */
+    @Deprecated
+    default TextureRegion icon(Cicon icon){
+        return icon();
+    }
 
     @Override
     default float getX(){

@@ -32,7 +32,7 @@
 
 [list]
 [*] [b]Survie[/b]: Construisez des tourelles pour défendre votre base des ennemis dans un style de jeu inspiré des tower-defense. Survivez aussi longtemps que possible, avant de faire décoller votre noyau. Utilisez les ressources récoltées pour débloquer de nouvelles technologies. Préparez votre base pour les attaques de puissants boss aériens.
-[*] [b]Attaque[/b]: Construisez des usines et produisez des unités pour détruire les noyaux ennemis, tout en défendant votre base contre les vagues d'attaque. Créez une grande variété d'unités offensives et de support pour vous aider dans vos objectifs.
+[*] [b]Attaque[/b]: Construisez des usines et produisez des unités pour détruire les noyaux ennemis, tout en défendant votre base contre les vagues d'attaque. Créez une grande variété d'unités offensives et de soutien pour vous aider dans vos objectifs.
 [*] [b]PvP[/b]: Affrontez d'autres joueurs. Constituez jusqu'à 4 équipes différentes et tentez de détruire les noyaux adverses. Créez des unités d'assaut ou attaquez directement les autres bases avec vos mechs.
 [*] [b]Bac à sable[/b]: Jouez avec des ressources infinies et sans menace ennemie. Utilisez des objets et des blocs spécifiques à ce mode de jeu tels que les sources de liquides. Testez vos designs et faites apparaître les ennemis à la demande.
 [/list]
@@ -53,10 +53,10 @@
 
 [list]
 [*] Peignez le terrain grâce à une interface d'édition.
-[*] Éditez and prévisualisez les structures en jeu.
+[*] Éditez et prévisualisez les structures en jeu.
 [*] Outils d'édition configurables: choisissez comment chaque outil fonctionne.
 [*] Générateur de carte puissant, disposant d'un grand nombre de filtres permettant la manipulation procédurale du terrain.
-[*] Appliquez les effets bruit, distortion, lissage, erosion, symétrie, génération de minerais et terrain aléatoire.
+[*] Appliquez les effets bruit, distorsion, lissage, érosion, symétrie, génération de minerais et terrain aléatoire.
 [*] Randomisez et configurez la génération des minerais ainsi que le placement des rivières et des tuiles de ressources.
 [*] Configurez la disposition des vagues d'ennemis.
 [*] Partagez vos cartes sur le Workshop Steam.

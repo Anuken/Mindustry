@@ -143,8 +143,8 @@ public class EntityIO{
                 if(sl) cont("if(!islocal)");
 
                 if(sf){
-                    //TODO + targetSuf may not give the right result, test it
-                    st(field.name + lastSuf + " = this." + field.name + targetSuf);
+                    //TODO adding + targetSuf to the assignment fixes units being interpolated incorrectly during physics, but makes interpolation snap instead.
+                    st(field.name + lastSuf + " = this." + field.name);
                 }
 
                 io(field.type, "this." + (sf ? field.name + targetSuf : field.name) + " = ");

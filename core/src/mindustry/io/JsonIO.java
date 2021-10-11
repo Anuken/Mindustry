@@ -1,11 +1,13 @@
 package mindustry.io;
 
+import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
+import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -69,8 +71,6 @@ public class JsonIO{
     static void apply(Json json){
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
-
-        //TODO this is terrible
 
         json.setSerializer(Sector.class, new Serializer<>(){
             @Override
@@ -214,9 +214,16 @@ public class JsonIO{
                 String str = jsonData.asString();
                 Item item = Vars.content.getByName(ContentType.item, str);
                 Liquid liquid = Vars.content.getByName(ContentType.liquid, str);
-                return item != null ? item : liquid;
+                Block block = Vars.content.getByName(ContentType.block, str);
+                return item != null ? item : liquid == null ? block : liquid;
             }
         });
+
+        //use short names for all filter types
+        for(var filter : Maps.allFilterTypes){
+            var i = filter.get();
+            json.addClassTag(Strings.camelize(i.getClass().getSimpleName().replace("Filter", "")), i.getClass());
+        }
     }
 
     static class CustomJson extends Json{

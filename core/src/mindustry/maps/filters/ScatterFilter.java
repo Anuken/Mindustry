@@ -1,6 +1,5 @@
 package mindustry.maps.filters;
 
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -13,12 +12,12 @@ public class ScatterFilter extends GenerateFilter{
 
     @Override
     public FilterOption[] options(){
-        return Structs.arr(
-        new SliderOption("chance", () -> chance, f -> chance = f, 0f, 1f),
-        new BlockOption("flooronto", () -> flooronto, b -> flooronto = b, floorsOptional),
-        new BlockOption("floor", () -> floor, b -> floor = b, floorsOptional),
-        new BlockOption("block", () -> block, b -> block = b, wallsOresOptional)
-        );
+        return new FilterOption[]{
+            new SliderOption("chance", () -> chance, f -> chance = f, 0f, 1f),
+            new BlockOption("flooronto", () -> flooronto, b -> flooronto = b, floorsOptional),
+            new BlockOption("floor", () -> floor, b -> floor = b, floorsOptional),
+            new BlockOption("block", () -> block, b -> block = b, wallsOresOptional)
+        };
     }
 
     @Override
@@ -27,9 +26,9 @@ public class ScatterFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(){
+    public void apply(GenerateInput in){
 
-        if(block != Blocks.air && (in.floor == flooronto || flooronto == Blocks.air) && in.block == Blocks.air && chance() <= chance){
+        if(block != Blocks.air && (in.floor == flooronto || flooronto == Blocks.air) && in.block == Blocks.air && chance(in.x, in.y) <= chance){
             if(!block.isOverlay()){
                 in.block = block;
             }else{
@@ -37,7 +36,7 @@ public class ScatterFilter extends GenerateFilter{
             }
         }
 
-        if(floor != Blocks.air && (in.floor == flooronto || flooronto == Blocks.air) && chance() <= chance){
+        if(floor != Blocks.air && (in.floor == flooronto || flooronto == Blocks.air) && chance(in.x, in.y) <= chance){
             in.floor = floor;
         }
     }

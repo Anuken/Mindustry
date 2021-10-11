@@ -8,10 +8,12 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -47,11 +49,7 @@ public class StatValues{
 
     public static StatValue liquids(Boolf<Liquid> filter, float amount, boolean perSecond){
         return table -> {
-            Seq<Liquid> list = new Seq<>();
-
-            for(Liquid item : content.liquids()){
-                if(!item.isHidden() && filter.get(item)) list.add(item);
-            }
+            Seq<Liquid> list = content.liquids().select(i -> filter.get(i) && i.unlockedNow());
 
             for(int i = 0; i < list.size; i++){
                 table.add(new LiquidDisplay(list.get(i), amount, perSecond)).padRight(5);
@@ -89,12 +87,12 @@ public class StatValues{
 
     public static StatValue items(float timePeriod, Boolf<Item> filter){
         return table -> {
-            Seq<Item> list = content.items().select(filter);
+            Seq<Item> list = content.items().select(i -> filter.get(i) && i.unlockedNow());
 
             for(int i = 0; i < list.size; i++){
                 Item item = list.get(i);
 
-                table.add(timePeriod <= 0 ? new ItemDisplay(item) : new ItemDisplay(item, 0, timePeriod, true)).padRight(5);
+                table.add(timePeriod <= 0 ? new ItemDisplay(item) : new ItemDisplay(item, 1, timePeriod, true)).padRight(5);
 
                 if(i != list.size - 1){
                     table.add("/");
@@ -115,6 +113,51 @@ public class StatValues{
             new Image(floor.uiIcon).setScaling(Scaling.fit),
             new Table(t -> t.top().right().add((multiplier < 0 ? "[scarlet]" : startZero ? "[accent]" : "[accent]+") + (int)((multiplier) * 100) + "%").style(Styles.outlineLabel))
         );
+    }
+
+    public static StatValue floors(Attribute attr, boolean floating, float scale, boolean startZero){
+        return table -> table.table(c -> {
+            Runnable[] rebuild = {null};
+            Map[] lastMap = {null};
+
+            rebuild[0] = () -> {
+                c.clearChildren();
+                c.left();
+
+                if(state.isGame()){
+                    var blocks = Vars.content.blocks()
+                    .select(block -> block instanceof Floor f && indexer.isBlockPresent(block) && f.attributes.get(attr) != 0 && !(f.isDeep() && !floating))
+                    .<Floor>as().with(s -> s.sort(f -> f.attributes.get(attr)));
+
+                    if(blocks.any()){
+                        int i = 0;
+                        for(var block : blocks){
+
+                            floorEfficiency(block, block.attributes.get(attr) * scale, startZero).display(c);
+                            if(++i % 5 == 0){
+                                c.row();
+                            }
+                        }
+                    }else{
+                        c.add("@none.inmap");
+                    }
+                }else{
+                    c.add("@stat.showinmap");
+                }
+            };
+
+            rebuild[0].run();
+
+            //rebuild when map changes.
+            c.update(() -> {
+                Map current = state.isGame() ? state.map : null;
+
+                if(current != lastMap[0]){
+                    rebuild[0].run();
+                    lastMap[0] = current;
+                }
+            });
+        });
     }
 
     public static StatValue blocks(Boolf<Block> pred){
@@ -209,6 +252,10 @@ public class StatValues{
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map){
+        return ammo(map, 0);
+    }
+
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, int indent){
         return table -> {
 
             table.row();
@@ -217,12 +264,12 @@ public class StatValues{
             orderedKeys.sort();
 
             for(T t : orderedKeys){
-                boolean unit = t instanceof UnitType;
+                boolean compact = t instanceof UnitType || indent > 0;
 
                 BulletType type = map.get(t);
 
                 //no point in displaying unit icon twice
-                if(!unit & !(t instanceof PowerTurret)){
+                if(!compact && !(t instanceof PowerTurret)){
                     table.image(icon(t)).size(3 * 8).padRight(4).right().top();
                     table.add(t.localizedName).padRight(10).left().top();
                 }
@@ -246,11 +293,11 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
                     }
 
-                    if(!unit && !Mathf.equal(type.ammoMultiplier, 1f) && type.displayAmmoMultiplier){
+                    if(!compact && !Mathf.equal(type.ammoMultiplier, 1f) && type.displayAmmoMultiplier){
                         sep(bt, Core.bundle.format("bullet.multiplier", (int)type.ammoMultiplier));
                     }
 
-                    if(!Mathf.equal(type.reloadMultiplier, 1f)){
+                    if(!compact && !Mathf.equal(type.reloadMultiplier, 1f)){
                         sep(bt, Core.bundle.format("bullet.reload", Strings.autoFixed(type.reloadMultiplier, 2)));
                     }
 
@@ -259,7 +306,7 @@ public class StatValues{
                     }
 
                     if(type.healPercent > 0f){
-                        sep(bt, Core.bundle.format("bullet.healpercent", (int)type.healPercent));
+                        sep(bt, Core.bundle.format("bullet.healpercent", Strings.autoFixed(type.healPercent, 2)));
                     }
 
                     if(type.pierce || type.pierceCap != -1){
@@ -278,14 +325,17 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.lightning", type.lightning, type.lightningDamage < 0 ? type.damage : type.lightningDamage));
                     }
 
-                    if(type.fragBullet != null){
-                        sep(bt, "@bullet.frag");
-                    }
-
                     if(type.status != StatusEffects.none){
                         sep(bt, (type.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName);
                     }
-                }).padTop(unit ? 0 : -9).left().get().background(unit ? null : Tex.underline);
+
+                    if(type.fragBullet != null){
+                        sep(bt, Core.bundle.format("bullet.frags", type.fragBullets));
+                        bt.row();
+
+                        ammo(ObjectMap.of(t, type.fragBullet), indent + 1).display(bt);
+                    }
+                }).padTop(compact ? 0 : -9).padLeft(indent * 8).left().get().background(compact ? null : Tex.underline);
 
                 table.row();
             }

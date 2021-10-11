@@ -16,6 +16,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 
 public class LCanvas extends Table{
@@ -181,7 +182,7 @@ public class LCanvas extends Table{
             float dst = Math.min(y - this.y, Core.graphics.getHeight() - y);
             if(dst < Scl.scl(100f)){ //scroll margin
                 int sign = Mathf.sign(Core.graphics.getHeight()/2f - y);
-                pane.setScrollY(pane.getScrollY() + sign * Scl.scl(15f));
+                pane.setScrollY(pane.getScrollY() + sign * Scl.scl(15f) * Time.delta);
             }
         }
     }
@@ -216,6 +217,7 @@ public class LCanvas extends Table{
 
                 e.setSize(width, e.getPrefHeight());
                 e.setPosition(0, height - cy, Align.topLeft);
+                ((StatementElem)e).updateAddress(i);
 
                 cy += e.getPrefHeight() + space;
                 seq.add(e);
@@ -315,6 +317,8 @@ public class LCanvas extends Table{
 
     public class StatementElem extends Table{
         public LStatement st;
+        public int index;
+        Label addressLabel;
 
         public StatementElem(LStatement st){
             this.st = st;
@@ -332,8 +336,10 @@ public class LCanvas extends Table{
                 t.margin(6f);
                 t.touchable = Touchable.enabled;
 
-                t.add(st.name()).style(Styles.outlineLabel).color(color).padRight(8);
+                t.add(st.name()).style(Styles.outlineLabel).name("statement-name").color(color).padRight(8);
                 t.add().growX();
+
+                addressLabel = t.add(index + "").style(Styles.outlineLabel).color(color).padRight(8).get();
 
                 t.button(Icon.copy, Styles.logici, () -> {
                 }).size(24f).padRight(6).get().tapped(this::copy);
@@ -394,12 +400,26 @@ public class LCanvas extends Table{
             marginBottom(7);
         }
 
+        public void updateAddress(int index){
+            this.index = index;
+            addressLabel.setText(index + "");
+        }
+
         public void copy(){
+            st.saveUI();
             LStatement copy = st.copy();
+
+            if(copy instanceof JumpStatement st && st.destIndex != -1){
+                int index = statements.getChildren().indexOf(this);
+                if(index != -1 && index < st.destIndex){
+                    st.destIndex ++;
+                }
+            }
+
             if(copy != null){
                 StatementElem s = new StatementElem(copy);
 
-                statements.addChildAfter(StatementElem.this,s);
+                statements.addChildAfter(StatementElem.this, s);
                 statements.layout();
                 copy.elem = s;
                 copy.setupUI();

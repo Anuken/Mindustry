@@ -207,7 +207,7 @@ public class HudFragment extends Fragment{
                         logic.skipWave();
                     }
                 }).growY().fillX().right().width(40f).disabled(b -> !canSkipWave()).name("skip");
-            }).width(dsize * 5 + 4f);
+            }).width(dsize * 5 + 4f).name("statustable");
 
             wavesMain.row();
 
@@ -267,6 +267,7 @@ public class HudFragment extends Fragment{
         //core info
         parent.fill(t -> {
             t.top();
+            t.visible(() -> shown);
 
             t.name = "coreinfo";
 
@@ -322,7 +323,7 @@ public class HudFragment extends Fragment{
                 }
                 return max == 0f ? 0f : val / max;
             }).blink(Color.white).outline(new Color(0, 0, 0, 0.6f), 7f)).grow())
-            .fillX().width(320f).height(60f).name("boss").visible(() -> state.rules.waves && state.boss() != null).padTop(7).row();
+            .fillX().width(320f).height(60f).name("boss").visible(() -> state.rules.waves && state.boss() != null && !(mobile && Core.graphics.isPortrait())).padTop(7).row();
 
             t.table(Styles.black3, p -> p.margin(4).label(() -> hudText).style(Styles.outlineLabel)).touchable(Touchable.disabled).with(p -> p.visible(() -> {
                 p.color.a = Mathf.lerpDelta(p.color.a, Mathf.num(showHudText), 0.2f);
@@ -544,20 +545,17 @@ public class HudFragment extends Fragment{
         }
     }
 
-    public void showLaunchDirect(){
-        Image image = new Image();
-        image.color.a = 0f;
-        image.setFillParent(true);
-        image.actions(Actions.fadeIn(launchDuration / 60f, Interp.pow2In), Actions.delay(8f / 60f), Actions.remove());
-        Core.scene.add(image);
-    }
-
     public void showLaunch(){
+        float margin = 30f;
+
         Image image = new Image();
         image.color.a = 0f;
+        image.touchable = Touchable.disabled;
         image.setFillParent(true);
-        image.actions(Actions.fadeIn(40f / 60f));
+        image.actions(Actions.delay((coreLandDuration - margin) / 60f), Actions.fadeIn(margin / 60f, Interp.pow2In), Actions.delay(6f / 60f), Actions.remove());
         image.update(() -> {
+            image.toFront();
+            ui.loadfrag.toFront();
             if(state.isMenu()){
                 image.remove();
             }
@@ -570,9 +568,10 @@ public class HudFragment extends Fragment{
         image.color.a = 1f;
         image.touchable = Touchable.disabled;
         image.setFillParent(true);
-        image.actions(Actions.fadeOut(0.8f), Actions.remove());
+        image.actions(Actions.fadeOut(35f / 60f), Actions.remove());
         image.update(() -> {
             image.toFront();
+            ui.loadfrag.toFront();
             if(state.isMenu()){
                 image.remove();
             }
@@ -725,7 +724,7 @@ public class HudFragment extends Fragment{
             t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
             t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
             t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> {
-                b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type.ammoType.color : Pal.health);
+                b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type.ammoType.color() : Pal.health);
             });
 
             t.getChildren().get(1).toFront();
@@ -779,6 +778,7 @@ public class HudFragment extends Fragment{
     }
 
     private void addInfoTable(Table table){
+        table.name = "infotable";
         table.left();
 
         var count = new float[]{-1};

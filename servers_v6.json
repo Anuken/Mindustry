@@ -1,15 +1,11 @@
 [
   {
-    "name": "RCR",
-    "address": ["185.104.248.61"]
+    "name": "RCM",
+    "address": ["185.104.248.61", "easyplay.su"]
   },
   {
     "name": "SMokeOfAnarchy.duckdns.org",
     "address": ["smokeofanarchy.duckdns.org:6853"]
-  },
-  {
-    "name": "mindustry.pl",
-    "address": ["mindustry.pl:6000", "mindustry.pl:6666", "mindustry.pl", "mindustry.pl:6966"]
   },
   {
     "name": "{AA}",
@@ -21,15 +17,7 @@
   },
   {
     "name": "C.A.M.S.",
-    "address": ["routerchain.ddns.net", "nikochio.ddns.net", "easyplay.su", "play.thedimas.pp.ua"]
-  },
-  {
-    "name": "BE6.RUN",
-    "address": ["be6.run", "mindustrycn.top"]
-  },
-  {
-    "name": "io",
-    "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000", "mindustry.io.community:4000"]
+    "address": ["baseduser.eu.org:6568", "nikochio.ddns.net", "play.thedimas.pp.ua"]
   },
   {
     "name": "ECAN",
@@ -37,11 +25,11 @@
   },
   {
     "name": "Chaotic Neutral",
-    "address": ["Chaotic-Neutral.ddns.net:1111", "Chaotic-Neutral.ddns.net:2222", "Chaotic-Neutral.ddns.net:5555", "Chaotic-Neutral.ddns.net:6666", "Chaotic-Neutral.ddns.net:7777"]
+    "address": ["Chaotic-Neutral.ddns.net:1111", "Chaotic-Neutral.ddns.net:2222", "Chaotic-Neutral.ddns.net:7777"]
   },
   {
     "name": "Ranked",
-    "address": ["mindustryranked.ddns.net:16567"]
+    "address": ["mindustryranked.ddns.net:16567", "mindustryranked.ddns.net:16568", "mindustryranked.ddns.net:16569"]
   },
   {
     "name": "TWS",
@@ -49,7 +37,7 @@
   },
   {
     "name": "mindustry.ddns.net",
-    "address": ["mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
+    "address": ["mindustry.ddns.net", "mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
   },
   {
     "name": "Surrealment",
@@ -57,7 +45,7 @@
   },
   {
     "name": "ALEX",
-    "address": ["alexmindustryhub.ddns.net:6568", "alexmindustry.ddns.net:6568", "alexmindustry.ddns.net:6569", "alexmindustryattac.ddns.net:25800","alexmindustryturbo.ddns.net:25854","alexmindustryhex.ddns.net:25587"]
+    "address": ["alexmindustryhub.ddns.net:6568", "dogemindustry.ddns.net:25586", "alexmindustry.ddns.net:25587", "alexmindustryattac.ddns.net:25800","alexmindustryturbo.ddns.net:25581","alexmindustryhex.ddns.net:25583"]
   },
   {
     "name": "Minty [subzero]",
@@ -65,19 +53,15 @@
   },
   {
     "name": "Korea",
-    "address": ["mindustry.kr"]
-  },
-  {
-    "name": "hexpvp.ml",
-    "address": ["hexpvp.ml"]
+    "address": ["mindustry.initd.kr"]
   },
   {
     "name": "Omega",
-    "address": ["178.170.47.34:20204", "157.90.213.2:30308", "157.90.180.53:25738"] 
+    "address": ["yeeth.mindustry.me:2004","185.86.230.61:25570"] 
   },
   {
-    "name": "md.obvilionnetwork.ru",
-    "address": ["obvilionnetwork.ru", "obvilionnetwork.ru:7001", "obvilionnetwork.ru:7002", "obvilionnetwork.ru:7003"]
+    "name": "Obvilion Network",
+    "address": ["obvilion.ru", "obvilion.ru:7001", "obvilion.ru:7002", "obvilion.ru:7003"]
   },
   {
     "name": "Mindustry PLAY",
@@ -88,23 +72,51 @@
     "address": ["v6.mindustry.nydus.app:6566"]
   },
   {
-    "name": "MD Community",
-    "address": ["mindurka.tk", "mindurka.tk:4000"]
-  },
-  {
     "name": "Mindustry.Party",
     "address": ["game.mindustry.party"]
   },
   {
     "name": "TSR", 
-    "address": ["fifr4.quackhost.uk:20131"]
+    "address": ["ult4.falix.gg:26904"]
   },
   {
     "name": "Sakura", 
-    "address": ["160.16.207.141"]
+    "address": ["160.16.207.141", "160.16.207.141:21527", "160.16.207.141:31587", "160.16.207.141:26810"]
   },
   {
     "name": "MeowLand",
     "address": ["34.134.111.15"]
+  },
+  {
+    "name": "M-DE",
+    "address": ["mindustry.inc.li", "mindustry.inc.li:6568"]
+  },
+  {
+    "name": "Hungarian",
+    "address": ["survival.humindustry.tk", "148.251.175.124:25601"]
+  },
+  {
+    "name": "Xpdustry",
+    "address": ["xpdustry.fr"]
+  },
+  {
+    "name": "CxZx",
+    "address": ["usfr2.forcehost.net:25578"]
+  },
+  {
+    "name": "Español",
+    "address": ["168.119.36.188:41445"]
+  },
+  {
+    "name": "CreateDustry",
+    "address": ["144.76.120.74:18645"]
+  },
+  {
+    "name": "NukeDustry",
+    "address": ["nukedustry.tk:7777", "nukedustry.tk:8888"]
+  },
+  {
+    "name": "MindustryBR",
+    "address": ["mindustryptbr.ddns.net", "mindustryptbr.myddns.me"]
   }
 ]

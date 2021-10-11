@@ -24,5 +24,6 @@ public class ShallowLiquid extends Floor{
         status = liquidBase.status;
         liquidDrop = liquidBase.liquidDrop;
         cacheLayer = liquidBase.cacheLayer;
+        shallow = true;
     }
 }

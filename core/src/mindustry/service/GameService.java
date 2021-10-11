@@ -166,6 +166,7 @@ public class GameService{
             if(campaign()){
                 if(unitsBuilt.add(e.unit.type.name)){
                     SStat.unitTypesBuilt.set(content.units().count(u -> unitsBuilt.contains(u.name) && !u.isHidden()));
+                    save();
                 }
 
                 if(t5s.contains(e.unit.type)){

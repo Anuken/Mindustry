@@ -34,7 +34,7 @@ public class PayloadMassDriver extends PayloadBlock{
     public Sound shootSound = Sounds.shootBig;
     public float shake = 3f;
 
-    public Effect transferEffect = new Effect(11f, 300f, e -> {
+    public Effect transferEffect = new Effect(11f, 600f, e -> {
         if(!(e.data instanceof PayloadMassDriverData data)) return;
         Tmp.v1.set(data.x, data.y).lerp(data.ox, data.oy, Interp.sineIn.apply(e.fin()));
         data.payload.set(Tmp.v1.x, Tmp.v1.y, e.rotation);
@@ -60,6 +60,7 @@ public class PayloadMassDriver extends PayloadBlock{
         sync = true;
         rotate = true;
         outputsPayload = true;
+        group = BlockGroup.units;
 
         //point2 is relative
         config(Point2.class, (PayloadDriverBuild tile, Point2 point) -> tile.link = Point2.pack(point.x + tile.tileX(), point.y + tile.tileY()));
@@ -184,6 +185,7 @@ public class PayloadMassDriver extends PayloadBlock{
             if(current != null &&
                 !(
                     current instanceof PayloadDriverBuild entity &&
+                    current.isValid() &&
                     entity.consValid() && entity.block == block &&
                     entity.link == pos() && within(current, range)
                 )){
@@ -455,6 +457,7 @@ public class PayloadMassDriver extends PayloadBlock{
 
         @Override
         public Point2 config(){
+            if(tile == null) return null;
             return Point2.unpack(link).sub(tile.x, tile.y);
         }
 

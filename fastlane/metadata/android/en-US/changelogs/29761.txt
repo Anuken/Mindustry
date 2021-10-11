@@ -1,6 +1,0 @@
-[This is a truncated changelog, see Github for full notes]
-- Leaving sectors while guardians are present is now heavily penalized
-- Made community servers sort by ping
-- Changed "global items" to "total items"
-- Added hint about core item incineration
-- Made sector landing zones display on map when visible but not unlocked

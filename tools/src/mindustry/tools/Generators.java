@@ -158,7 +158,9 @@ public class Generators{
                         }
                     });
 
-                    Fi.get("../blocks/environment/cliffmask" + (val & 0xff) + ".png").writePng(result);
+                    Fi fi = Fi.get("../blocks/environment/cliffmask" + (val & 0xff) + ".png");
+                    fi.writePng(result);
+                    fi.copyTo(Fi.get("../editor").child("editor-" + fi.name()));
                 });
             }
 
@@ -176,7 +178,7 @@ public class Generators{
                     for(int x = 0; x < dim; x++){
                         for(int y = 0; y < dim; y++){
                             float dst = Mathf.dst((float)x/dim, (float)y/dim, 0.5f, 0.5f) * 2f;
-                            if(dst < 1.2f && RidgedPerlin.noise2d(1, x, y, 3, 1f / 40f) - dst*(1f-fract) > 0.16f){
+                            if(dst < 1.2f && Ridged.noise2d(1, x, y, 3, 1f / 40f) - dst*(1f-fract) > 0.16f){
                                 image.setRaw(x, y, Color.whiteRgba);
                             }
                         }
@@ -220,7 +222,7 @@ public class Generators{
 
                 TextureRegion[] regions = block.getGeneratedIcons();
 
-                if(block instanceof Floor){
+                if(block.variants > 0 || block instanceof Floor){
                     for(TextureRegion region : block.variantRegions()){
                         GenRegion gen = (GenRegion)region;
                         if(gen.path == null) continue;
@@ -244,7 +246,7 @@ public class Generators{
                             teamr.each((x, y) -> {
                                 int color = teamr.getRaw(x, y);
                                 int index = color == 0xffffffff ? 0 : color == 0xdcc6c6ff ? 1 : color == 0x9d7f7fff ? 2 : -1;
-                                out.setRaw(x, y, index == -1 ? teamr.getRaw(x, y) : team.palette[index].rgba());
+                                out.setRaw(x, y, index == -1 ? teamr.getRaw(x, y) : team.palettei[index]);
                             });
                             save(out, block.name + "-team-" + team.name);
 
@@ -380,7 +382,7 @@ public class Generators{
                     base.each((x, y) -> tint.setRaw(x, y, Color.muli(tint.getRaw(x, y), stat.color.rgba())));
 
                     //outline the image
-                    Pixmap container = new Pixmap(38, 38);
+                    Pixmap container = new Pixmap(tint.width + 6, tint.height + 6);
                     container.draw(base, 3, 3, true);
                     base = container.outline(Pal.gray, 3);
                 }
@@ -390,7 +392,19 @@ public class Generators{
             }
         });
 
-        //TODO broken, freezes
+        generate("team-icons", () -> {
+            for(Team team : Team.all){
+                if(has("team-" + team.name)){
+                    int rgba = team == Team.derelict ? Color.valueOf("b7b8c9").rgba() : team.color.rgba();
+                    Pixmap base = get("team-" + team.name);
+                    base.each((x, y) -> base.setRaw(x, y, Color.muli(base.getRaw(x, y), rgba)));
+
+                    delete("team-" + team.name);
+                    save(base.outline(Pal.gray, 3), "../ui/team-" + team.name);
+                }
+            }
+        });
+
         generate("unit-icons", () -> content.units().each(type -> {
             if(type.isHidden()) return; //hidden units don't generate
 
@@ -488,7 +502,7 @@ public class Generators{
 
                 image.each((x, y) -> {
                     //add darker cracks on top
-                    boolean rValue = Math.max(RidgedPerlin.noise2d(1, x, y, 3, 1f / (20f + image.width/8f)), 0) > 0.16f;
+                    boolean rValue = Math.max(Ridged.noise2d(1, x, y, 3, 1f / (20f + image.width/8f)), 0) > 0.16f;
                     //cut out random chunks with voronoi
                     boolean vval = vn.noise(x, y, 1f / (14f + image.width/40f)) > 0.47;
 
@@ -599,16 +613,13 @@ public class Generators{
         });
     }
 
-    /** Generates a scorch pixmap based on parameters. Thread safe, unless multiple scorch generators are running in parallel. */
+    /** Generates a scorch pixmap based on parameters. Thread safe. */
     public static class ScorchGenerator{
-        private static final Simplex sim = new Simplex();
-
         public int size = 80, seed = 0, color = Color.whiteRgba;
         public double scale = 18, pow = 2, octaves = 4, pers = 0.4, add = 2, nscl = 4.5f;
 
         public Pixmap generate(){
             Pixmap pix = new Pixmap(size, size);
-            sim.setSeed(seed);
 
             pix.each((x, y) -> {
                 double dst = Mathf.dst(x, y, size/2, size/2) / (size / 2f);
@@ -621,7 +632,7 @@ public class Generators{
         }
 
         private double noise(float angle){
-            return Math.pow(sim.octaveNoise2D(octaves, pers, 1 / scale, Angles.trnsx(angle, size/2f) + size/2f, Angles.trnsy(angle, size/2f) + size/2f), pow);
+            return Math.pow(Simplex.noise2d(seed, octaves, pers, 1 / scale, Angles.trnsx(angle, size/2f) + size/2f, Angles.trnsy(angle, size/2f) + size/2f), pow);
         }
     }
 

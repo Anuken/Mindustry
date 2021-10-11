@@ -38,6 +38,7 @@ public class Duct extends Block implements Autotiler{
         itemCapacity = 1;
         noUpdateDisabled = true;
         rotate = true;
+        noSideBlend = true;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
     }
 

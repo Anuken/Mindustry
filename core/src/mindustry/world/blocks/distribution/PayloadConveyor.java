@@ -20,7 +20,7 @@ public class PayloadConveyor extends Block{
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-edge") TextureRegion edgeRegion;
     public Interp interp = Interp.pow5;
-    public float payloadLimit = 2.9f;
+    public float payloadLimit = 3f;
 
     public PayloadConveyor(String name){
         super(name);
@@ -75,7 +75,7 @@ public class PayloadConveyor extends Block{
 
         @Override
         public boolean canControlSelect(Player player){
-            return this.item == null && !player.unit().spawnedByCore && player.unit().hitSize / tilesize <= payloadLimit && player.tileOn().build == this;
+            return this.item == null && !player.unit().spawnedByCore && player.unit().hitSize / tilesize <= payloadLimit && player.tileOn() != null && player.tileOn().build == this;
         }
 
         @Override
@@ -113,7 +113,7 @@ public class PayloadConveyor extends Block{
 
             int ntrns = 1 + size/2;
             Tile next = tile.nearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
-            blocked = (next != null && next.solid() && !next.block().outputsPayload) || (this.next != null && (this.next.rotation + 2)%4 == rotation);
+            blocked = (next != null && next.solid() && !(next.block().outputsPayload || next.block().acceptsPayload)) || (this.next != null && this.next.block.rotate && (this.next.rotation + 2) % 4 == rotation);
         }
 
         @Override

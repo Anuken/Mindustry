@@ -26,26 +26,30 @@ public class AttributeCrafter extends GenericCrafter{
     public void setBars(){
         super.setBars();
 
-        bars.add("efficiency", entity ->
+        bars.add("efficiency", (AttributeCrafterBuild entity) ->
             new Bar(() ->
-            Core.bundle.format("bar.efficiency", (int)(entity.efficiency() * 100)),
+            Core.bundle.format("bar.efficiency", (int)(entity.efficiencyScale() * 100)),
             () -> Pal.lightOrange,
-            entity::efficiency));
+            entity::efficiencyScale));
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.affinities, attribute, boostScale);
+        stats.add(Stat.affinities, attribute, boostScale * size * size);
     }
 
     public class AttributeCrafterBuild extends GenericCrafterBuild{
         public float attrsum;
 
         @Override
-        public float efficiency(){
-            return (baseEfficiency + Math.min(maxBoost, boostScale * attrsum)) * super.efficiency();
+        public float getProgressIncrease(float base){
+            return super.getProgressIncrease(base) * efficiencyScale();
+        }
+
+        public float efficiencyScale(){
+            return baseEfficiency + Math.min(maxBoost, boostScale * attrsum) + attribute.env();
         }
 
         @Override

@@ -55,20 +55,30 @@ public class Links{
 
     private static String report(){
         return "https://github.com/Anuken/Mindustry/issues/new?assignees=&labels=bug&body=" +
-            Strings.encode(Strings.format(
-            "**Platform**: `@`\n" +
-            "\n**Build**: `@`\n" +
-            "\n**Issue**: *Explain your issue in detail.*\n" +
-            "\n**Steps to reproduce**: *How you happened across the issue, and what exactly you did to make the bug happen.*\n" +
-            "\n**Link(s) to mod(s) used**: `@`\n" +
-            "\n**Save file**: *The (zipped) save file you were playing on when the bug happened. THIS IS REQUIRED FOR ANY ISSUE HAPPENING IN-GAME, REGARDLESS OF WHETHER YOU THINK IT HAPPENS EVERYWHERE. DO NOT DELETE OR OMIT THIS LINE UNLESS YOU ARE SURE THAT THE ISSUE DOES NOT HAPPEN IN-GAME.*\n" +
-            "\n**Crash report**: *The contents of relevant crash report files. REQUIRED if you are reporting a crash.*\n" +
-            "\n---\n" +
-            "\n*Place an X (no spaces) between the brackets to confirm that you have read the line below.*" +
-            "\n- [ ] **I have updated to the latest release (https://github.com/Anuken/Mindustry/releases) to make sure my issue has not been fixed.**" +
-            "\n- [ ] **I have searched the closed and open issues to make sure that this problem has not already been reported.**",
-            OS.isAndroid ? "Android " + Core.app.getVersion() : (System.getProperty("os.name") + (OS.is64Bit ? " x64" : " x32")),
-            Version.combined(),
-            Vars.mods.list().any() ? Vars.mods.list().select(LoadedMod::enabled).map(l -> l.meta.author + "/" + l.name + ":" + l.meta.version) : "none"));
+        Strings.encode(Strings.format(
+        """
+        **Platform**: `@`
+                    
+        **Build**: `@`
+                    
+        **Issue**: *Explain your issue in detail.*
+                    
+        **Steps to reproduce**: *How you happened across the issue, and what exactly you did to make the bug happen.*
+                    
+        **Link(s) to mod(s) used**: `@`
+                    
+        **Save file**: *The (zipped) save file you were playing on when the bug happened. THIS IS REQUIRED FOR ANY ISSUE HAPPENING IN-GAME, REGARDLESS OF WHETHER YOU THINK IT HAPPENS EVERYWHERE. DO NOT DELETE OR OMIT THIS LINE UNLESS YOU ARE SURE THAT THE ISSUE DOES NOT HAPPEN IN-GAME.*
+                    
+        **Crash report**: *The contents of relevant crash report files. REQUIRED if you are reporting a crash.*
+                    
+        ---
+                    
+        *Place an X (no spaces) between the brackets to confirm that you have read the line below.*
+        - [ ] **I have updated to the latest release (https://github.com/Anuken/Mindustry/releases) to make sure my issue has not been fixed.**
+        - [ ] **I have searched the closed and open issues to make sure that this problem has not already been reported.**
+        """,
+        OS.isAndroid ? "Android " + Core.app.getVersion() : (OS.osName + " x" + OS.osArchBits),
+        Version.combined(),
+        Vars.mods.list().any() ? Vars.mods.list().select(LoadedMod::enabled).map(l -> l.meta.author + "/" + l.name + ":" + l.meta.version) : "none"));
     }
 }

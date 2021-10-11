@@ -11,6 +11,7 @@ import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Log.*;
 import arc.util.serialization.*;
 import com.codedisaster.steamworks.*;
 import mindustry.*;
@@ -43,6 +44,9 @@ public class DesktopLauncher extends ClientLauncher{
                 //enable gl3 with command-line argument
                 if(Structs.contains(arg, "-gl3")){
                     gl30 = true;
+                }
+                if(Structs.contains(arg, "-debug")){
+                    Log.level = LogLevel.debug;
                 }
                 setWindowIcon(FileType.internal, "icons/icon_64.png");
             }});
@@ -100,9 +104,6 @@ public class DesktopLauncher extends ClientLauncher{
                 if(SteamAPI.restartAppIfNecessary(SVars.steamID)){
                     System.exit(0);
                 }
-            }catch(NullPointerException ignored){
-                steam = false;
-                Log.info("Running in offline mode.");
             }catch(Throwable e){
                 steam = false;
                 Log.err("Failed to load Steam native libraries.");
@@ -322,7 +323,9 @@ public class DesktopLauncher extends ClientLauncher{
 
             presence.largeImageKey = "logo";
 
-            DiscordRPC.send(presence);
+            try{
+                DiscordRPC.send(presence);
+            }catch(Exception ignored){}
         }
 
         if(steam){

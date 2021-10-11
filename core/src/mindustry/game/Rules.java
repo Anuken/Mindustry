@@ -50,7 +50,7 @@ public class Rules{
     public boolean unitAmmo = false;
     /** Whether cores add to unit limit */
     public boolean unitCapVariable = true;
-    /** How fast unit pads build units. */
+    /** How fast unit factories build units. */
     public float unitBuildSpeedMultiplier = 1f;
     /** How much damage any other units deal. */
     public float unitDamageMultiplier = 1f;
@@ -68,6 +68,10 @@ public class Rules{
     public float deconstructRefundMultiplier = 0.5f;
     /** No-build zone around enemy core radius. */
     public float enemyCoreBuildRadius = 400f;
+    /** If true, no-build zones are calculated based on the closest core. */
+    public boolean polygonCoreProtection = false;
+    /** If true, dead teams in PvP automatically have their blocks & units converted to derelict upon death. */
+    public boolean cleanupDeadTeams = true;
     /** Radius around enemy wave drop zones.*/
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
@@ -90,6 +94,8 @@ public class Rules{
     public Seq<WeatherEntry> weather = new Seq<>(1);
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
+    /** Units that cannot be built. */
+    public ObjectSet<UnitType> bannedUnits = new ObjectSet<>();
     /** Reveals blocks normally hidden by build visibility. */
     public ObjectSet<Block> revealedBlocks = new ObjectSet<>();
     /** Unlocked content names. Only used in multiplayer when the campaign is enabled. */
@@ -105,28 +111,14 @@ public class Rules{
     public Team defaultTeam = Team.sharded;
     /** team of the enemy in waves/sectors. */
     public Team waveTeam = Team.crux;
+    /** color of clouds that is displayed when the player is landing */
+    public Color cloudColor = new Color(0f, 0f, 0f, 0f);
     /** name of the custom mode that this ruleset describes, or null. */
     public @Nullable String modeName;
     /** Whether cores incinerate items when full, just like in the campaign. */
     public boolean coreIncinerates = false;
     /** special tags for additional info. */
     public StringMap tags = new StringMap();
-
-    /** A team-specific ruleset. */
-    public static class TeamRule{
-        /** Whether to use building AI. */
-        public boolean ai;
-        /** TODO Tier of blocks/designs that the AI uses for building. [0, 1] */
-        public float aiTier = 1f;
-        /** Whether, when AI is enabled, ships should be spawned from the core. */
-        public boolean aiCoreSpawn = true;
-        /** If true, blocks don't require power or resources. */
-        public boolean cheat;
-        /** If true, resources are not consumed when building. */
-        public boolean infiniteResources;
-        /** If true, this team has infinite unit ammo. */
-        public boolean infiniteAmmo;
-    }
 
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */
     public Rules copy(){
@@ -146,6 +138,55 @@ public class Rules{
         }else{
             return Gamemode.survival;
         }
+    }
+
+    public float unitBuildSpeed(Team team){
+        return unitBuildSpeedMultiplier * teams.get(team).unitBuildSpeedMultiplier;
+    }
+
+    public float unitDamage(Team team){
+        return unitDamageMultiplier * teams.get(team).unitDamageMultiplier;
+    }
+
+    public float blockHealth(Team team){
+        return blockHealthMultiplier * teams.get(team).blockHealthMultiplier;
+    }
+
+    public float blockDamage(Team team){
+        return blockDamageMultiplier * teams.get(team).blockDamageMultiplier;
+    }
+
+    public float buildSpeed(Team team){
+        return buildSpeedMultiplier * teams.get(team).buildSpeedMultiplier;
+    }
+
+    /** A team-specific ruleset. */
+    public static class TeamRule{
+        /** Whether to use building AI. */
+        public boolean ai;
+        /** TODO Tier of blocks/designs that the AI uses for building. [0, 1] */
+        public float aiTier = 1f;
+        /** Whether, when AI is enabled, ships should be spawned from the core. */
+        public boolean aiCoreSpawn = true;
+        /** If true, blocks don't require power or resources. */
+        public boolean cheat;
+        /** If true, resources are not consumed when building. */
+        public boolean infiniteResources;
+        /** If true, this team has infinite unit ammo. */
+        public boolean infiniteAmmo;
+
+        /** How fast unit factories build units. */
+        public float unitBuildSpeedMultiplier = 1f;
+        /** How much damage any other units deal. */
+        public float unitDamageMultiplier = 1f;
+        /** How much health blocks start with. */
+        public float blockHealthMultiplier = 1f;
+        /** How much damage blocks (turrets) deal. */
+        public float blockDamageMultiplier = 1f;
+        /** Multiplier for building speed. */
+        public float buildSpeedMultiplier = 1f;
+
+        //build cost disabled due to technical complexity
     }
 
     /** A simple map for storing TeamRules in an efficient way without hashing. */

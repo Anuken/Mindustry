@@ -1,46 +1,40 @@
 package mindustry.net;
 
 import arc.*;
-import arc.Net.*;
 import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import arc.util.serialization.*;
-import arc.util.serialization.JsonValue.*;
-import arc.util.serialization.JsonWriter.*;
 import mindustry.*;
 import mindustry.core.*;
-import mindustry.gen.*;
 
 import java.io.*;
 import java.text.*;
 import java.util.*;
 
 import static arc.Core.*;
-import static mindustry.Vars.net;
 import static mindustry.Vars.*;
 
 public class CrashSender{
 
     public static String createReport(String error){
         String report = "Mindustry has crashed. How unfortunate.\n";
-        if(mods.list().size == 0 && Version.build != -1){
+        if(mods != null && mods.list().size == 0 && Version.build != -1){
             report += "Report this at " + Vars.reportIssueURL + "\n\n";
         }
-        return report + "Version: " + Version.combined() + (Vars.headless ? " (Server)" : "") + "\n"
-            + "OS: " + System.getProperty("os.name") + " x" + (OS.is64Bit ? "64" : "32") + "\n"
-            + "Java Version: " + System.getProperty("java.version") + "\n"
-            + "Java Architecture: " + System.getProperty("sun.arch.data.model") + "\n"
-            + mods.list().size + " Mods" + (mods.list().isEmpty() ? "" : ": " + mods.list().toString(", ", mod -> mod.name + ":" + mod.meta.version))
-            + "\n\n" + error;
+        return report
+        + "Version: " + Version.combined() + (Vars.headless ? " (Server)" : "") + "\n"
+        + "OS: " + OS.osName + " x" + (OS.osArchBits) + " (" + OS.osArch + ")\n"
+        + "Java Version: " + OS.javaVersion + "\n"
+        + (mods == null ? "<no mod init>" : mods.list().size + " Mods" + (mods.list().isEmpty() ? "" : ": " + mods.list().toString(", ", mod -> mod.name + ":" + mod.meta.version)))
+        + "\n\n" + error;
     }
 
     public static void log(Throwable exception){
         try{
             Core.settings.getDataDirectory().child("crashes").child("crash_" + System.currentTimeMillis() + ".txt")
-                .writeString(createReport(Strings.neatError(exception)));
+            .writeString(createReport(Strings.neatError(exception)));
         }catch(Throwable ignored){
         }
     }
@@ -60,7 +54,7 @@ public class CrashSender{
             }catch(Throwable ignored){}
 
             //don't create crash logs for custom builds, as it's expected
-            if(Version.build == -1 || (System.getProperty("user.name").equals("anuke") && "release".equals(Version.modifier))){
+            if(Version.build == -1 || (OS.username.equals("anuke") && !"steam".equals(Version.modifier))){
                 ret();
             }
 
@@ -127,6 +121,9 @@ public class CrashSender{
             }catch(Throwable ignored){
             }
 
+            //disabled until further notice.
+            /*
+
             JsonValue value = new JsonValue(ValueType.object);
 
             boolean fn = netActive, fs = netServer;
@@ -141,31 +138,23 @@ public class CrashSender{
             ex(() -> value.addChild("server", new JsonValue(fs)));
             ex(() -> value.addChild("players", new JsonValue(Groups.player.size())));
             ex(() -> value.addChild("state", new JsonValue(Vars.state.getState().name())));
-            ex(() -> value.addChild("os", new JsonValue(System.getProperty("os.name") + "x" + (OS.is64Bit ? "64" : "32"))));
+            ex(() -> value.addChild("os", new JsonValue(OS.osName + " x" + OS.osArchBits + " " + OS.osVersion)));
             ex(() -> value.addChild("trace", new JsonValue(parseException(exception))));
-            ex(() -> value.addChild("javaVersion", new JsonValue(System.getProperty("java.version"))));
-            ex(() -> value.addChild("javaArch", new JsonValue(System.getProperty("sun.arch.data.model"))));
-
-            boolean[] sent = {false};
-
+            ex(() -> value.addChild("javaVersion", new JsonValue(OS.javaVersion)));
+            ex(() -> value.addChild("javaArch", new JsonValue(OS.osArchBits)));
+            
             Log.info("Sending crash report.");
-            //post to crash report URL, exit code indicates send success
-            httpPost(Vars.crashReportURL, value.toJson(OutputType.json), r -> {
-                Log.info("Crash sent successfully.");
-                sent[0] = true;
-                System.exit(1);
-            }, t -> {
-                t.printStackTrace();
-                sent[0] = true;
-                System.exit(-1);
-            });
 
-            //sleep until report is sent
-            try{
-                while(!sent[0]){
-                    Thread.sleep(30);
-                }
-            }catch(InterruptedException ignored){}
+            //post to crash report URL, exit code indicates send success
+            Http.post(Vars.crashReportURL, value.toJson(OutputType.json)).error(t -> {
+                Log.info("Crash report not sent.");
+                System.exit(-1);
+            }).block(r -> {
+                Log.info("Crash sent successfully.");
+                System.exit(1);
+            });*/
+
+            ret();
         }catch(Throwable death){
             death.printStackTrace();
         }
@@ -175,10 +164,6 @@ public class CrashSender{
 
     private static void ret(){
         System.exit(1);
-    }
-
-    private static void httpPost(String url, String content, Cons<HttpResponse> success, Cons<Throwable> failure){
-        new NetJavaImpl().http(new HttpRequest().method(HttpMethod.POST).content(content).url(url), success, failure);
     }
 
     private static String parseException(Throwable e){

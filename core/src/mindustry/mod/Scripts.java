@@ -1,15 +1,12 @@
 package mindustry.mod;
 
 import arc.*;
-import arc.assets.*;
-import arc.assets.loaders.MusicLoader.*;
-import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
 import arc.func.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
+import arc.util.io.*;
 import mindustry.*;
 import mindustry.mod.Mods.*;
 import rhino.*;
@@ -18,25 +15,14 @@ import rhino.module.provider.*;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
 import java.util.regex.*;
 
 public class Scripts implements Disposable{
-    private static final Seq<String> blacklist = Seq.with(".net.", "java.net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
-        "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
-        ".awt", "socket", "classloader", "oracle", "invoke", "java.util.function", "java.util.stream", "org.", "mod.classmap");
-    private static final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "jdk.proxy", "mindustry.gen.",
-        "mindustry.logic.", "mindustry.async.", "saveio", "systemcursor", "filetreeinitevent", "asyncexecutor");
+    public final Context context;
+    public final Scriptable scope;
 
-    private final Context context;
-    private final Scriptable scope;
     private boolean errored;
-
     LoadedMod currentMod = null;
-
-    public static boolean allowClass(String type){
-        return !blacklist.contains(t -> type.toLowerCase(Locale.ROOT).contains(t)) || whitelist.contains(t -> type.toLowerCase(Locale.ROOT).contains(t));
-    }
 
     public Scripts(){
         Time.mark();
@@ -60,7 +46,7 @@ public class Scripts implements Disposable{
 
     public String runConsole(String text){
         try{
-            Object o = context.evaluateString(scope, text, "console.js", 1, null);
+            Object o = context.evaluateString(scope, text, "console.js", 1);
             if(o instanceof NativeJavaObject n) o = n.unwrap();
             if(o instanceof Undefined) o = "undefined";
             return String.valueOf(o);
@@ -96,30 +82,14 @@ public class Scripts implements Disposable{
         return Vars.tree.get(path, true).readBytes();
     }
 
+    //kept for backwards compatibility
     public Sound loadSound(String soundName){
-        if(Vars.headless) return new Sound();
-
-        String name = "sounds/" + soundName;
-        String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
-
-        var sound = new Sound();
-        AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundParameter(sound));
-        desc.errored = Throwable::printStackTrace;
-
-        return sound;
+        return Vars.tree.loadSound(soundName);
     }
 
+    //kept for backwards compatibility
     public Music loadMusic(String soundName){
-        if(Vars.headless) return new Music();
-
-        String name = "music/" + soundName;
-        String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
-
-        var music = new Music();
-        AssetDescriptor<?> desc = Core.assets.load(path, Music.class, new MusicParameter(music));
-        desc.errored = Throwable::printStackTrace;
-
-        return music;
+        return Vars.tree.loadMusic(soundName);
     }
 
     /** Ask the user to select a file to read for a certain purpose like "Please upload a sprite" */
@@ -141,7 +111,7 @@ public class Scripts implements Disposable{
 
     /** writeFile but for a byte[] */
     public void writeBinFile(String purpose, String ext, byte[] contents){
-        if(contents == null) contents = new byte[0];
+        if(contents == null) contents = Streams.emptyBytes;
         final byte[] fContents = contents;
         selectFile(false, purpose, ext, fi -> fi.writeBytes(fContents));
     }
@@ -172,11 +142,11 @@ public class Scripts implements Disposable{
         try{
             if(currentMod != null){
                 //inject script info into file
-                context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1, null);
+                context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1);
             }
             context.evaluateString(scope,
             wrap ? "(function(){'use strict';\n" + script + "\n})();" : script,
-            file, 0, null);
+            file, 0);
             return true;
         }catch(Throwable t){
             if(currentMod != null){
@@ -193,7 +163,7 @@ public class Scripts implements Disposable{
     }
 
     private class ScriptModuleProvider extends UrlModuleSourceProvider{
-        private Pattern directory = Pattern.compile("^(.+?)/(.+)");
+        private final Pattern directory = Pattern.compile("^(.+?)/(.+)");
 
         public ScriptModuleProvider(){
             super(null, null);
@@ -224,7 +194,7 @@ public class Scripts implements Disposable{
             if(!module.exists() || module.isDirectory()) return null;
             return new ModuleSource(
                 new InputStreamReader(new ByteArrayInputStream((module.readString()).getBytes())),
-                null, new URI(moduleId), root.file().toURI(), validator);
+                new URI(moduleId), root.file().toURI(), validator);
         }
     }
 }

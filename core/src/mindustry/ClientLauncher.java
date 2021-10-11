@@ -55,7 +55,10 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Log.info("[GL] Max texture size: @", maxTextureSize);
         Log.info("[GL] Using @ context.", gl30 != null ? "OpenGL 3" : "OpenGL 2");
         if(maxTextureSize < 4096) Log.warn("[GL] Your maximum texture size is below the recommended minimum of 4096. This will cause severe performance issues.");
-        Log.info("[JAVA] Version: @", System.getProperty("java.version"));
+        Log.info("[JAVA] Version: @", OS.javaVersion);
+        long ram = Runtime.getRuntime().maxMemory();
+        boolean gb = ram >= 1024 * 1024 * 1024;
+        Log.info("[RAM] Available: @ @", Strings.fixed(gb ? ram / 1024f / 1024 / 1024f : ram / 1024f / 1024f, 1), gb ? "GB" : "MB");
 
         Time.setDeltaProvider(() -> {
             float result = Core.graphics.getDeltaTime() * 60f;
@@ -83,7 +86,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Fonts.loadDefaultFont();
 
         //load fallback atlas if max texture size is below 4096
-        assets.load(new AssetDescriptor<>(maxTextureSize >= 4096  ? "sprites/sprites.aatls" : "sprites/fallback/sprites.aatls", TextureAtlas.class)).loaded = t -> atlas = (TextureAtlas)t;
+        assets.load(new AssetDescriptor<>(maxTextureSize >= 4096 ? "sprites/sprites.aatls" : "sprites/fallback/sprites.aatls", TextureAtlas.class)).loaded = t -> atlas = t;
         assets.loadRun("maps", Map.class, () -> maps.loadPreviews());
 
         Musics.load();
@@ -149,7 +152,16 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 }
                 mods.eachClass(Mod::init);
                 finished = true;
-                Events.fire(new ClientLoadEvent());
+                var event = new ClientLoadEvent();
+                //a temporary measure for compatibility with certain mods
+                Events.fireWrap(event.getClass(), event, listener -> {
+                    try{
+                        listener.get(event);
+                    }catch(NoSuchFieldError | NoSuchMethodError | NoClassDefFoundError error){
+                        Log.err(error);
+                    }
+
+                });
                 clientLoaded = true;
                 super.resize(graphics.getWidth(), graphics.getHeight());
                 app.post(() -> app.post(() -> app.post(() -> app.post(() -> {

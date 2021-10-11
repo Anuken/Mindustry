@@ -41,13 +41,14 @@ public class ConstructBlock extends Block{
         health = 20;
         consumesTap = true;
         solidifes = true;
+        inEditor = false;
         consBlocks[size - 1] = this;
         sync = true;
     }
 
     /** Returns a ConstructBlock by size. */
     public static ConstructBlock get(int size){
-        if(size > maxBlockSize) throw new IllegalArgumentException("No. Don't place ConstructBlock of size greater than " + maxBlockSize);
+        if(size > maxBlockSize) throw new IllegalArgumentException("No. Don't place ConstructBlocks of size greater than " + maxBlockSize);
         return consBlocks[size - 1];
     }
 
@@ -57,7 +58,7 @@ public class ConstructBlock extends Block{
         block.breakEffect.at(tile.drawx(), tile.drawy(), block.size, block.mapColor);
         Events.fire(new BlockBuildEndEvent(tile, builder, team, true, null));
         tile.remove();
-        if(shouldPlay()) Sounds.breaks.at(tile, calcPitch(false));
+        if(shouldPlay()) block.breakSound.at(tile, block.breakPitchChange ? calcPitch(false) : 1f);
     }
 
     @Remote(called = Loc.server)
@@ -83,6 +84,11 @@ public class ConstructBlock extends Block{
             if(builder != null && builder.getControllerName() != null){
                 tile.build.lastAccessed = builder.getControllerName();
             }
+
+            //make sure block indexer knows it's damaged
+            if(tile.build.damaged()){
+                indexer.notifyBuildDamaged(tile.build);
+            }
         }
 
         //last builder was this local client player, call placed()
@@ -91,7 +97,9 @@ public class ConstructBlock extends Block{
         }
 
         Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
-        if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
+        if(shouldPlay()) block.placeSound.at(tile, block.placePitchChange ? calcPitch(true) : 1f);
+
+        Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
     }
 
     static boolean shouldPlay(){
@@ -123,8 +131,6 @@ public class ConstructBlock extends Block{
         if(tile.build != null){
             tile.build.placed();
         }
-
-        Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
     }
 
     @Override
@@ -259,7 +265,9 @@ public class ConstructBlock extends Block{
 
             if(progress >= 1f || state.rules.infiniteResources){
                 if(lastBuilder == null) lastBuilder = builder;
-                constructed(tile, current, lastBuilder, (byte)rotation, builder.team, config);
+                if(!net.client()){
+                    constructed(tile, current, lastBuilder, (byte)rotation, builder.team, config);
+                }
             }
         }
 
@@ -294,7 +302,7 @@ public class ConstructBlock extends Block{
                 int accumulated = (int)(accumulator[i]); //get amount
 
                 if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
-                    if(core != null && requirements[i].item.unlockedNow()){ //only accept items that are unlocked
+                    if(core != null && requirements[i].item.unlockedNowHost()){ //only accept items that are unlocked
                         int accepting = Math.min(accumulated, core.storageCapacity - core.items.get(requirements[i].item));
                         //transfer items directly, as this is not production.
                         core.items.add(requirements[i].item, accepting);
