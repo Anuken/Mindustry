@@ -113,6 +113,7 @@ public class SaveIO{
 
     public static void write(OutputStream os, StringMap tags){
         try(DataOutputStream stream = new DataOutputStream(os)){
+            Events.fire(new SaveWriteEvent());
             SaveVersion ver = getVersion();
 
             stream.write(header);
@@ -122,8 +123,6 @@ public class SaveIO{
             }else{
                 ver.write(stream, tags);
             }
-
-            Events.fire(new SaveWriteEvent());
         }catch(Throwable e){
             throw new RuntimeException(e);
         }
