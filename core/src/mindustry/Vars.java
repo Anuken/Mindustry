@@ -132,6 +132,8 @@ public class Vars implements Loadable{
         Color.valueOf("4b5ef1"),
         Color.valueOf("2cabfe"),
     };
+    /** maximum TCP packet size */
+    public static final int maxTcpSize = 900;
     /** default server port */
     public static final int port = 6567;
     /** multicast discovery port.*/
