@@ -118,5 +118,8 @@
   {
     "name": "MindustryBR",
     "address": ["mindustryptbr.ddns.net", "mindustryptbr.myddns.me"]
+  }, 
+"name": "Lifestarse Server",
+    "address": ["13.17.33.33"]
   }
 ]
