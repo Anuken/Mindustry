@@ -32,14 +32,13 @@ public class WaveInfoDialog extends BaseDialog{
     private SpawnGroup expandedGroup;
 
     private Table table, iTable, uTable;
-    private int search = -1, payLeft;
-    private int filterHealth, filterBegin = -1, filterEnd = -1, filterAmount, filterAmountWave;
+    private int search = -1, filterHealth, filterBegin = -1, filterEnd = -1, filterAmount, filterAmountWave;
     private boolean expandPane = false, filterHealthMode = false, filterStrict = false;
     private UnitType lastType = UnitTypes.dagger;
     private StatusEffect filterEffect = StatusEffects.none;
     private Sort sort = Sort.begin;
     private boolean reverseSort = false;
-    private float updateTimer, updatePeriod = 1f;
+    private float updateTimer, payLeft, updatePeriod = 1f;
     private TextField amountField = new TextField();
     private WaveGraph graph = new WaveGraph();
 
@@ -533,7 +532,7 @@ public class WaveInfoDialog extends BaseDialog{
             uTable.clear();
             uTable.left();
             uTable.defaults().pad(3);
-            payLeft = (int)group.type.payloadCapacity;
+            payLeft = group.type.payloadCapacity;
             uTable.table(units -> {
                 int i = 0;
                 for(UnitType payl : group.payloads){
