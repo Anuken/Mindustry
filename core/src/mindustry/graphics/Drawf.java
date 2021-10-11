@@ -280,7 +280,7 @@ public class Drawf{
         Draw.reset();
     }
     
-    public static void build(TextureRegion region, float rotation, float progress){
+    public static void build(TextureRegion region, float x, float y, float rotation, float progress){
         Shaders.blockbuild.region = region;
         Shaders.blockbuild.progress = progress;
         
