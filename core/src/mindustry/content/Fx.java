@@ -30,7 +30,7 @@ public class Fx{
     none = new Effect(0, 0f, e -> {}),
     
     blockCrash = new Effect(100f, e -> {
-        Block block = content.getByID(ContentType.block, Float.floatToIntBits(e.rotation));
+        Block block = (Block)e.data;
         if(block == null){
             return;
         }
