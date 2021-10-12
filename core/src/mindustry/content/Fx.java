@@ -12,6 +12,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.Block;
 
 import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
@@ -26,6 +27,19 @@ public class Fx{
     public static final Effect
 
     none = new Effect(0, 0f, e -> {}),
+    
+    blockCrash = new Effect(100f, e -> {
+        Block block = (Block)e.data;
+        if(block == null){
+            return;
+        }
+        alpha(e.fin() + 0.5f);
+        float offset = Mathf.lerp(0f, 200f, e.fout());
+        color(0f, 0f, 0f, 0.44f);
+        rect(block.fullIcon, e.x - offset * 4f, e.y, (float)block.size * 8f, (float)block.size * 8f);
+        color(Color.white);
+        rect(block.fullIcon, e.x + offset, e.y + offset * 5f, (float)block.size * 8f, (float)block.size * 8f);
+    }),
 
     trailFade = new Effect(400f, e -> {
         if(!(e.data instanceof Trail trail)) return;

@@ -54,5 +54,9 @@
   { 
     "name": "devass.su",
     "address": ["185.22.152.66"]
+  },
+  {
+    "name": "Phoenix Network",
+    "address": ["172.104.253.198"]
   }
 ]
