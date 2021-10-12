@@ -33,6 +33,7 @@ public class EventType{
         socketConfigChanged,
         update,
         draw,
+        drawOver,
         preDraw,
         postDraw,
         uiDrawBegin,
@@ -50,6 +51,7 @@ public class EventType{
     public static class ResizeEvent{}
     public static class MapMakeEvent{}
     public static class MapPublishEvent{}
+    public static class SaveWriteEvent{}
     public static class SaveLoadEvent{}
     public static class ClientCreateEvent{}
     public static class ServerLoadEvent{}
@@ -503,7 +505,7 @@ public class EventType{
             this.player = player;
         }
     }
-    
+
     public static class PlayerBanEvent{
         @Nullable
         public final Player player;
@@ -514,7 +516,7 @@ public class EventType{
             this.uuid = uuid;
         }
     }
-    
+
     public static class PlayerUnbanEvent{
         @Nullable
         public final Player player;
@@ -525,7 +527,7 @@ public class EventType{
             this.uuid = uuid;
         }
     }
-    
+
     public static class PlayerIpBanEvent{
         public final String ip;
 
@@ -533,7 +535,7 @@ public class EventType{
             this.ip = ip;
         }
     }
-    
+
     public static class PlayerIpUnbanEvent{
         public final String ip;
 
@@ -541,6 +543,5 @@ public class EventType{
             this.ip = ip;
         }
     }
-    
-}
 
+}

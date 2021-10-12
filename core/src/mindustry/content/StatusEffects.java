@@ -28,11 +28,11 @@ public class StatusEffects implements ContentList{
 
             init(() -> {
                 opposite(wet, freezing);
-                affinity(tarred, ((unit, result, time) -> {
+                affinity(tarred, (unit, result, time) -> {
                     unit.damagePierce(transitionDamage);
                     Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
                     result.set(burning, Math.min(time + result.time, 300f));
-                }));
+                });
             });
         }};
 
@@ -46,9 +46,9 @@ public class StatusEffects implements ContentList{
             init(() -> {
                 opposite(melting, burning);
 
-                affinity(blasted, ((unit, result, time) -> {
+                affinity(blasted, (unit, result, time) -> {
                     unit.damagePierce(transitionDamage);
-                }));
+                });
             });
         }};
 

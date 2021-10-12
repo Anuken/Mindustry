@@ -187,15 +187,15 @@ public class NetClient implements ApplicationListener{
         effect(effect, x, y, rotation, color);
     }
 
-    //called on all clients
     @Remote(targets = Loc.server, variants = Variant.both)
-    public static void sendMessage(String message, String sender, Player playersender){
+    public static void sendMessage(String message, @Nullable String unformatted, @Nullable Player playersender){
         if(Vars.ui != null){
-            Vars.ui.chatfrag.addMessage(message, sender);
+            Vars.ui.chatfrag.addMessage(message);
         }
 
-        if(playersender != null){
-            playersender.lastText(message);
+        //display raw unformatted text above player head
+        if(playersender != null && unformatted != null){
+            playersender.lastText(unformatted);
             playersender.textFadeTime(1f);
         }
     }
@@ -204,7 +204,7 @@ public class NetClient implements ApplicationListener{
     @Remote(called = Loc.server, targets = Loc.server)
     public static void sendMessage(String message){
         if(Vars.ui != null){
-            Vars.ui.chatfrag.addMessage(message, null);
+            Vars.ui.chatfrag.addMessage(message);
         }
     }
 
@@ -240,7 +240,7 @@ public class NetClient implements ApplicationListener{
 
             //special case; graphical server needs to see its message
             if(!headless){
-                sendMessage(message, colorizeName(player.id, player.name), player);
+                sendMessage(netServer.chatFormatter.format(player, message), message, player);
             }
 
             //server console logging
@@ -248,7 +248,7 @@ public class NetClient implements ApplicationListener{
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
-            Call.sendMessage(message, colorizeName(player.id(), player.name), player);
+            Call.sendMessage(netServer.chatFormatter.format(player, message), message, player);
         }else{
 
             //a command was sent, now get the output
@@ -282,12 +282,6 @@ public class NetClient implements ApplicationListener{
                 player.sendMessage(text);
             }
         }
-    }
-
-    public static String colorizeName(int id, String name){
-        Player player = Groups.player.getByID(id);
-        if(name == null || player == null) return null;
-        return "[#" + player.color().toString().toUpperCase() + "]" + name;
     }
 
     @Remote(called = Loc.client, variants = Variant.one)

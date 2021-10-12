@@ -667,7 +667,7 @@ public class HudFragment extends Fragment{
 
                 float stroke = width * 0.35f;
                 float bh = height/2f;
-                Draw.color(color);
+                Draw.color(color, parentAlpha);
 
                 float f1 = Math.min(fract * 2f, 1f), f2 = (fract - 0.5f) * 2f;
 
@@ -703,10 +703,10 @@ public class HudFragment extends Fragment{
         new Element(){
             @Override
             public void draw(){
-                Draw.color(Pal.darkerGray);
+                Draw.color(Pal.darkerGray, parentAlpha);
                 Fill.poly(x + width/2f, y + height/2f, 6, height / Mathf.sqrt3);
                 Draw.reset();
-                Drawf.shadow(x + width/2f, y + height/2f, height * 1.13f);
+                Drawf.shadow(x + width/2f, y + height/2f, height * 1.13f, parentAlpha);
             }
         },
         new Table(t -> {

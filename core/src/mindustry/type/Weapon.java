@@ -200,7 +200,7 @@ public class Weapon implements Cloneable{
         boolean can = unit.canShoot();
         float lastReload = mount.reload;
         mount.reload = Math.max(mount.reload - Time.delta * unit.reloadMultiplier, 0);
-        mount.recoil = Math.max(mount.recoil - (Time.delta * recoil * unit.reloadMultiplier) / recoilTime, 0);
+        mount.recoil = Mathf.approachDelta(mount.recoil, 0, (Math.abs(recoil) * unit.reloadMultiplier) / recoilTime);
 
         //rotate if applicable
         if(rotate && (mount.rotate || mount.shoot) && can){

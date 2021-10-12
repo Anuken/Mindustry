@@ -114,13 +114,8 @@ public class Sorter extends Block{
                 }else if(!bc){
                     return null;
                 }else{
-                    if(rotation == 0){
-                        to = a;
-                        if(flip) this.rotation = (byte)1;
-                    }else{
-                        to = b;
-                        if(flip) this.rotation = (byte)0;
-                    }
+                    to = (rotation & (1 << dir)) == 0 ? a : b;
+                    if(flip) rotation ^= (1 << dir);
                 }
             }
 
