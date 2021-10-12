@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ctype.ContentType;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -29,7 +30,7 @@ public class Fx{
     none = new Effect(0, 0f, e -> {}),
     
     blockCrash = new Effect(100f, e -> {
-        Block block = (Block)e.data;
+        Block block = content.getByID(ContentType.block, Float.floatToIntBits(e.rotation));
         if(block == null){
             return;
         }
