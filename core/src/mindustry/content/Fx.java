@@ -7,7 +7,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ctype.ContentType;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
