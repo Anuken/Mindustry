@@ -29,10 +29,8 @@ public class Fx{
     none = new Effect(0, 0f, e -> {}),
     
     blockCrash = new Effect(100f, e -> {
-        Block block = (Block)e.data;
-        if(block == null){
-            return;
-        }
+        if(!(e.data instanceof Block block)) return;
+
         alpha(e.fin() + 0.5f);
         float offset = Mathf.lerp(0f, 200f, e.fout());
         color(0f, 0f, 0f, 0.44f);
