@@ -13,6 +13,10 @@ import static mindustry.Vars.*;
 
 /**An overlay ore for a specific item type.*/
 public class OreBlock extends OverlayFloor{
+    /** drill hardness of the ore */
+    public int hardness = 0;
+    /** if true, this ore is of lowest priority to drills. */
+    public boolean lowPriority;
 
     public OreBlock(String name, Item ore){
         super(name);
