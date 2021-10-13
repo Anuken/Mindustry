@@ -77,6 +77,7 @@ public class Drill extends Block{
 
     @Override
     public void init(){
+        super.init();
         if(drillEffectRnd < 0) drillEffectRnd = size;
     }
 
