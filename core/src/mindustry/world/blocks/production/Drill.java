@@ -198,7 +198,7 @@ public class Drill extends Block{
             return;
         }
 
-        returnItem = oreArray.peek();
+        returnItem = ((OreBlock)oreArray.peek()).itemDrop;
         returnCount = oreCount.get(oreArray.peek(), 0);
     }
 
