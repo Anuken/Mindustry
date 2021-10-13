@@ -178,7 +178,7 @@ public class Drill extends Block{
 
         for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
             if(canMine(other)){
-                oreCount.increment(other, 0, 1);
+                oreCount.increment(other.overlay(), 0, 1);
             }
         }
 
@@ -205,7 +205,7 @@ public class Drill extends Block{
     public boolean canMine(Tile tile){
         if(tile == null || tile.block().isStatic()) return false;
         Item drops = tile.drop();
-        return drops != null && tile.hardness <= tier;
+        return drops != null && drops.hardness <= tier;
     }
 
     public class DrillBuild extends Building{
