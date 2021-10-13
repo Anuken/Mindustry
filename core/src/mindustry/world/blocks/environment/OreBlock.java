@@ -21,6 +21,10 @@ public class OreBlock extends OverlayFloor{
         this.variants = 3;
         this.mapColor.set(ore.color);
         this.useColor = true;
+
+        /** Backwards compatibility */
+        this.hardness = ore.hardness;
+        this.lowPriority = ore.lowPriority;
     }
 
     public OreBlock(Item ore){
