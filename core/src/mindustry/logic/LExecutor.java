@@ -739,6 +739,10 @@ public class LExecutor{
 
                     lastTarget = targeted = best;
                 }else{
+                    //return from cached units if possible
+                    if(idx < units.size){
+                        lastTarget = units.get(idx);
+                    }
                     targeted = lastTarget;
                 }
 
@@ -762,7 +766,7 @@ public class LExecutor{
                 if(!valid) return;
 
                 float val = sort.func.get(b, u) * sortDir;
-                for(int i = 0; i <= idx; i++){
+                for(int i = 0; i <= values.size; i++){
                     if(i >= values.size){
                         values.add(val);
                         units.add(u);
