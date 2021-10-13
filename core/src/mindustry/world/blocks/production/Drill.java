@@ -46,6 +46,8 @@ public class Drill extends Block{
     public boolean drawMineItem = true;
     /** Effect played when an item is produced. This is colored. */
     public Effect drillEffect = Fx.mine;
+    /** Drill effect randomness. Block size by default. */
+    public float drillEffectRnd = -1f;
     /** Speed the drill bit rotates at. */
     public float rotateSpeed = 2f;
     /** Effect randomly played while drilling. */
@@ -71,6 +73,12 @@ public class Drill extends Block{
         hasItems = true;
         ambientSound = Sounds.drill;
         ambientSoundVolume = 0.018f;
+    }
+
+    @Override
+    public void init(){
+        super.init();
+        if(drillEffectRnd < 0) drillEffectRnd = size;
     }
 
     @Override
@@ -285,7 +293,7 @@ public class Drill extends Block{
 
                 progress %= delay;
 
-                drillEffect.at(x + Mathf.range(size), y + Mathf.range(size), dominantItem.color);
+                drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
             }
         }
 
