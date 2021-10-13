@@ -203,9 +203,9 @@ public class Drill extends Block{
     }
 
     public boolean canMine(Tile tile){
-        if(tile == null || tile.block().isStatic()) return false;
+        if(tile == null || tile.block().isStatic() || !(tile.overlay() instanceof OreBlock)) return false;
         Item drops = tile.drop();
-        return drops != null && drops.hardness <= tier;
+        return drops != null && ((OreBlock)tile.overlay()).hardness <= tier;
     }
 
     public class DrillBuild extends Building{
