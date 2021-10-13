@@ -404,25 +404,27 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //region handler methods
 
     /** @return whether the player can select (but not actually control) this building. */
-    public boolean canControlSelect(Player player){
+    public boolean canControlSelect(Unit player){
         return false;
     }
 
     /** Called when a player control-selects this building - not called for ControlBlock subclasses. */
-    public void onControlSelect(Player player){
+    public void onControlSelect(Unit player){
 
     }
 
-    public void acceptPlayerPayload(Player player, Cons<Payload> grabber){
+    public void handleUnitPayload(Unit player, Cons<Payload> grabber){
         Fx.spawn.at(player);
-        var unit = player.unit();
-        player.clearUnit();
-        //player.deathTimer = Player.deathDelay + 1f; //for instant respawn
-        unit.remove();
-        grabber.get(new UnitPayload(unit));
-        Fx.unitDrop.at(unit);
+
+        if(player.isPlayer()){
+            player.getPlayer().clearUnit();
+        }
+
+        player.remove();
+        grabber.get(new UnitPayload(player));
+        Fx.unitDrop.at(player);
         if(Vars.net.client()){
-            Vars.netClient.clearRemovedEntity(unit.id);
+            Vars.netClient.clearRemovedEntity(player.id);
         }
     }
 

@@ -448,6 +448,12 @@ public class LExecutor{
                             ai.payTimer = LogicAI.transferDelay;
                         }
                     }
+                    case payEnter -> {
+                        Building build = world.buildWorld(unit.x, unit.y);
+                        if(build != null && unit.team() == build.team && build.canControlSelect(unit)){
+                            Call.unitBuildingControlSelect(unit, build);
+                        }
+                    }
                     case build -> {
                         if(state.rules.logicUnitBuild && unit.canBuild() && exec.obj(p3) instanceof Block block && block.canBeBuilt()){
                             int x = World.toTile(x1 - block.offset/tilesize), y = World.toTile(y1 - block.offset/tilesize);
