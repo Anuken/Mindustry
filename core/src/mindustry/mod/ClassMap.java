@@ -93,8 +93,6 @@ public class ClassMap{
         classes.put("AcceleratorBuild", mindustry.world.blocks.campaign.Accelerator.AcceleratorBuild.class);
         classes.put("LaunchPad", mindustry.world.blocks.campaign.LaunchPad.class);
         classes.put("LaunchPadBuild", mindustry.world.blocks.campaign.LaunchPad.LaunchPadBuild.class);
-        classes.put("PayloadLaunchPad", mindustry.world.blocks.campaign.PayloadLaunchPad.class);
-        classes.put("PayloadLaunchPadBuild", mindustry.world.blocks.campaign.PayloadLaunchPad.PayloadLaunchPadBuild.class);
         classes.put("Door", mindustry.world.blocks.defense.Door.class);
         classes.put("DoorBuild", mindustry.world.blocks.defense.Door.DoorBuild.class);
         classes.put("ForceProjector", mindustry.world.blocks.defense.ForceProjector.class);
