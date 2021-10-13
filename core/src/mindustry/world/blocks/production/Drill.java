@@ -178,7 +178,7 @@ public class Drill extends Block{
 
         for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
             if(canMine(other)){
-                oreCount.increment(other.overlay(), 0, 1);
+                oreCount.increment(((OreBlock)other.overlay()), 0, 1);
             }
         }
 
