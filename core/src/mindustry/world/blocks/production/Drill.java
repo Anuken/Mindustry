@@ -26,8 +26,8 @@ import static mindustry.Vars.*;
 public class Drill extends Block{
     public float hardnessDrillMultiplier = 50f;
 
-    protected final ObjectIntMap<Item> oreCount = new ObjectIntMap<>();
-    protected final Seq<Item> itemArray = new Seq<>();
+    protected final ObjectIntMap<OreBlock> oreCount = new ObjectIntMap<>();
+    protected final Seq<OreBlock> oreArray = new Seq<>();
 
     /** Maximum tier of blocks this drill can mine. */
     public int tier;
@@ -174,38 +174,38 @@ public class Drill extends Block{
         returnCount = 0;
 
         oreCount.clear();
-        itemArray.clear();
+        oreArray.clear();
 
         for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
             if(canMine(other)){
-                oreCount.increment(getDrop(other), 0, 1);
+                oreCount.increment(other, 0, 1);
             }
         }
 
-        for(Item item : oreCount.keys()){
-            itemArray.add(item);
+        for(OreBlock ore : oreCount.keys()){
+            oreArray.add(ore);
         }
 
-        itemArray.sort((item1, item2) -> {
-            int type = Boolean.compare(!item1.lowPriority, !item2.lowPriority);
+        oreArray.sort((ore1, ore2) -> {
+            int type = Boolean.compare(!ore1.lowPriority, !ore2.lowPriority);
             if(type != 0) return type;
-            int amounts = Integer.compare(oreCount.get(item1, 0), oreCount.get(item2, 0));
+            int amounts = Integer.compare(oreCount.get(ore1, 0), oreCount.get(ore2, 0));
             if(amounts != 0) return amounts;
-            return Integer.compare(item1.id, item2.id);
+            return Integer.compare(ore1.id, ore2.id);
         });
 
-        if(itemArray.size == 0){
+        if(oreArray.size == 0){
             return;
         }
 
-        returnItem = itemArray.peek();
-        returnCount = oreCount.get(itemArray.peek(), 0);
+        returnItem = oreArray.peek();
+        returnCount = oreCount.get(oreArray.peek(), 0);
     }
 
     public boolean canMine(Tile tile){
         if(tile == null || tile.block().isStatic()) return false;
         Item drops = tile.drop();
-        return drops != null && drops.hardness <= tier;
+        return drops != null && tile.hardness <= tier;
     }
 
     public class DrillBuild extends Building{
