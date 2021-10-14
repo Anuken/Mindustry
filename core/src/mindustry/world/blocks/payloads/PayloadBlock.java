@@ -9,6 +9,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -24,6 +25,7 @@ public class PayloadBlock extends Block{
 
         update = true;
         sync = true;
+        envEnabled |= Env.space;
     }
 
     public static boolean blends(Building build, int direction){
@@ -78,16 +80,16 @@ public class PayloadBlock extends Block{
         }
 
         @Override
-        public boolean canControlSelect(Unit player){
-            return !player.spawnedByCore && this.payload == null && acceptUnitPayload(player) && player.tileOn() != null && player.tileOn().build == this;
+        public boolean canControlSelect(Player player){
+            return !player.unit().spawnedByCore && this.payload == null && acceptUnitPayload(player.unit()) && player.tileOn() != null && player.tileOn().build == this;
         }
 
         @Override
-        public void onControlSelect(Unit player){
+        public void onControlSelect(Player player){
             float x = player.x, y = player.y;
-            handleUnitPayload(player, p -> payload = (T)p);
+            acceptPlayerPayload(player, p -> payload = (T)p);
             this.payVector.set(x, y).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
-            this.payRotation = player.rotation;
+            this.payRotation = player.unit().rotation;
         }
 
         @Override
