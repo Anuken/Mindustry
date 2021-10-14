@@ -117,6 +117,8 @@ public class Weapon implements Cloneable{
     public Func<Weapon, WeaponMount> mountType = WeaponMount::new;
     /** status effect duration when shot */
     public float shootStatusDuration = 60f * 5f;
+    /** whether this weapon should fire when its owner dies */
+    public boolean shootOnDeath = false;
 
     public Weapon(String name){
         this.name = name;
