@@ -15,6 +15,7 @@ import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
@@ -38,6 +39,7 @@ public class PlacementFragment extends Fragment{
     Block menuHoverBlock;
     Displayable hover;
     Object lastDisplayState;
+    Team lastTeam;
     boolean wasHovered;
     Table blockTable, toggler, topTable;
     ScrollPane blockPane;
@@ -190,8 +192,10 @@ public class PlacementFragment extends Fragment{
         }
 
         if(Core.input.keyTap(Binding.block_info)){
-            Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block;
-            if(displayBlock != null){
+            var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            Block hovering = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
+            Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block != null ? input.block : hovering;
+            if(displayBlock != null && displayBlock.unlockedNow()){
                 ui.content.show(displayBlock);
                 Events.fire(new BlockInfoEvent());
             }
@@ -283,13 +287,14 @@ public class PlacementFragment extends Fragment{
 
                         //don't refresh unnecessarily
                         //refresh only when the hover state changes, or the displayed block changes
-                        if(wasHovered == isHovered && lastDisplayState == displayState) return;
+                        if(wasHovered == isHovered && lastDisplayState == displayState && lastTeam == player.team()) return;
 
                         topTable.clear();
                         topTable.top().left().margin(5);
 
                         lastDisplayState = displayState;
                         wasHovered = isHovered;
+                        lastTeam = player.team();
 
                         //show details of selected block, with costs
                         if(displayBlock != null){
@@ -440,7 +445,7 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean unlocked(Block block){
-        return block.unlockedNow();
+        return block.unlockedNow() && block.placeablePlayer;
     }
 
     boolean hasInfoBox(){

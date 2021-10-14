@@ -21,6 +21,16 @@ public class FileMapGenerator implements WorldGenerator{
         this.preset = preset;
     }
 
+    public FileMapGenerator(Map map, SectorPreset preset){
+        this.map = map;
+        this.preset = preset;
+    }
+
+    /** If you use this constructor, make sure to override generate()! */
+    public FileMapGenerator(SectorPreset preset){
+        this(emptyMap, preset);
+    }
+
     @Override
     public void generate(Tiles tiles){
         if(map == null) throw new RuntimeException("Generator has null map, cannot be used.");

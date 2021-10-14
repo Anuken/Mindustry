@@ -10,9 +10,12 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+
+import static mindustry.Vars.*;
 
 public class EnergyFieldAbility extends Ability{
     private static final Seq<Healthc> all = new Seq<>();
@@ -23,7 +26,7 @@ public class EnergyFieldAbility extends Ability{
     public Sound shootSound = Sounds.spark;
     public float statusDuration = 60f * 6f;
     public float x, y;
-    public boolean hitBuildings = true;
+    public boolean targetGround = true, targetAir = true, hitBuildings = true, hitUnits = true;
     public int maxTargets = 25;
     public float healPercent = 2.5f;
 
@@ -31,6 +34,7 @@ public class EnergyFieldAbility extends Ability{
     public float effectRadius = 5f, sectorRad = 0.14f, rotateSpeed = 0.5f;
     public int sectors = 5;
     public Color color = Pal.heal;
+    public boolean useAmmo = true;
 
     protected float timer, curStroke;
     protected boolean anyNearby = false;
@@ -88,22 +92,27 @@ public class EnergyFieldAbility extends Ability{
 
         curStroke = Mathf.lerpDelta(curStroke, anyNearby ? 1 : 0, 0.09f);
 
-        if((timer += Time.delta) >= reload){
-
+        if((timer += Time.delta) >= reload && (!useAmmo || unit.ammo > 0 || !state.rules.unitAmmo)){
             Tmp.v1.trns(unit.rotation - 90, x, y).add(unit.x, unit.y);
             float rx = Tmp.v1.x, ry = Tmp.v1.y;
             anyNearby = false;
 
             all.clear();
 
-            Units.nearby(null, rx, ry, range, other -> {
-                if(other != unit){
-                    all.add(other);
-                }
-            });
+            if(hitUnits){
+                Units.nearby(null, rx, ry, range, other -> {
+                    if(other != unit && (other.isFlying() ? targetAir : targetGround)){
+                        all.add(other);
+                    }
+                });
+            }
 
-            if(hitBuildings){
-                Units.nearbyBuildings(rx, ry, range, all::add);
+            if(hitBuildings && targetGround){
+                Units.nearbyBuildings(rx, ry, range, b -> {
+                    if(b.team != Team.derelict || state.rules.coreCapture){
+                        all.add(b);
+                    }
+                });
             }
 
             all.sort(h -> h.dst2(rx, ry));
@@ -131,7 +140,11 @@ public class EnergyFieldAbility extends Ability{
                     }
                 }else{
                     anyNearby = true;
-                    other.damage(damage);
+                    if(other instanceof Building b){
+                        b.damage(unit.team, damage);
+                    }else{
+                        other.damage(damage);
+                    }
                     if(other instanceof Statusc s){
                         s.apply(status, statusDuration);
                     }
@@ -143,6 +156,10 @@ public class EnergyFieldAbility extends Ability{
 
             if(anyNearby){
                 shootSound.at(unit);
+
+                if(useAmmo && state.rules.unitAmmo){
+                    unit.ammo --;
+                }
             }
 
             timer = 0f;

@@ -13,6 +13,7 @@ public enum LUnitControl{
     itemTake("from", "item", "amount"),
     payDrop,
     payTake("takeUnits"),
+    payEnter,
     mine("x", "y"),
     flag("value"),
     build("x", "y", "block", "rotation", "config"),

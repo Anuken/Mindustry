@@ -79,6 +79,9 @@ public class ServerControl implements ApplicationListener{
         }
 
         logger = (level1, text) -> {
+            //err has red text instead of reset.
+            if(level1 == LogLevel.err) text = text.replace(reset, lightRed + bold);
+
             String result = bold + lightBlack + "[" + dateTime.format(LocalDateTime.now()) + "] " + reset + format(tags[level1.ordinal()] + " " + text + "&fr");
             System.out.println(result);
 
@@ -287,7 +290,6 @@ public class ServerControl implements ApplicationListener{
             Core.app.exit();
         });
 
-
         handler.register("stop", "Stop hosting the server.", arg -> {
             net.closeServer();
             if(lastTask != null) lastTask.cancel();
@@ -380,6 +382,8 @@ public class ServerControl implements ApplicationListener{
             maps.reload();
             if(maps.all().size > beforeMaps){
                 info("@ new map(s) found and reloaded.", maps.all().size - beforeMaps);
+            }else if(maps.all().size < beforeMaps){
+                info("@ old map(s) deleted.", beforeMaps - maps.all().size);
             }else{
                 info("Maps reloaded.");
             }

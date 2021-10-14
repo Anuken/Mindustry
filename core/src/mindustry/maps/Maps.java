@@ -381,7 +381,7 @@ public class Maps{
             //try to load preview
             if(map.previewFile().exists()){
                 //this may fail, but calls queueNewPreview
-                Core.assets.load(new AssetDescriptor<>(map.previewFile().path() + "." + mapExtension, Texture.class, new MapPreviewParameter(map))).loaded = t -> map.texture = (Texture)t;
+                Core.assets.load(new AssetDescriptor<>(map.previewFile().path() + "." + mapExtension, Texture.class, new MapPreviewParameter(map))).loaded = t -> map.texture = t;
 
                 try{
                     readCache(map);
@@ -420,6 +420,8 @@ public class Maps{
                     writeCache(map);
                 }catch(Exception e){
                     e.printStackTrace();
+                }finally{
+                    pix.dispose();
                 }
             });
         }catch(Exception e){

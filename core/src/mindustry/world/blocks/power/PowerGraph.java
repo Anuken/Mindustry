@@ -13,10 +13,11 @@ public class PowerGraph{
     private static final Seq<Building> outArray2 = new Seq<>();
     private static final IntSet closedSet = new IntSet();
 
-    private final Seq<Building> producers = new Seq<>(false);
-    private final Seq<Building> consumers = new Seq<>(false);
-    private final Seq<Building> batteries = new Seq<>(false);
-    private final Seq<Building> all = new Seq<>(false);
+    //do not modify any of these unless you know what you're doing!
+    public final Seq<Building> producers = new Seq<>(false);
+    public final Seq<Building> consumers = new Seq<>(false);
+    public final Seq<Building> batteries = new Seq<>(false);
+    public final Seq<Building> all = new Seq<>(false);
 
     private final WindowedMean powerBalance = new WindowedMean(60);
     private float lastPowerProduced, lastPowerNeeded, lastPowerStored;
@@ -174,9 +175,9 @@ public class PowerGraph{
         return Math.min(excess, capacity);
     }
 
-    public void distributePower(float needed, float produced){
+    public void distributePower(float needed, float produced, boolean charged){
         //distribute even if not needed. this is because some might be requiring power but not using it; it updates consumers
-        float coverage = Mathf.zero(needed) && Mathf.zero(produced) ? 0f : Mathf.zero(needed) ? 1f : Math.min(1, produced / needed);
+        float coverage = Mathf.zero(needed) && Mathf.zero(produced) && !charged && Mathf.zero(lastPowerStored) ? 0f : Mathf.zero(needed) ? 1f : Math.min(1, produced / needed);
         for(Building consumer : consumers){
             Consumers consumes = consumer.block.consumes;
             if(consumes.hasPower()){
@@ -233,6 +234,7 @@ public class PowerGraph{
         energyDelta = 0f;
 
         if(!(consumers.size == 0 && producers.size == 0 && batteries.size == 0)){
+            boolean charged = false;
 
             if(!Mathf.equal(powerNeeded, powerProduced)){
                 if(powerNeeded > powerProduced){
@@ -240,11 +242,12 @@ public class PowerGraph{
                     powerProduced += powerBatteryUsed;
                     lastPowerProduced += powerBatteryUsed;
                 }else if(powerProduced > powerNeeded){
+                    charged = true;
                     powerProduced -= chargeBatteries(powerProduced - powerNeeded);
                 }
             }
 
-            distributePower(powerNeeded, powerProduced);
+            distributePower(powerNeeded, powerProduced, charged);
         }
     }
 

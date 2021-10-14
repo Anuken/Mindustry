@@ -16,6 +16,7 @@ import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.Units.*;
 import mindustry.entities.bullet.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -64,6 +65,8 @@ public class Turret extends ReloadTurret{
     public boolean accurateDelay = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
+    public boolean targetHealing = false;
+    public boolean playerControllable = true;
 
     //charging
     public float chargeTime = -1f;
@@ -153,6 +156,11 @@ public class Turret extends ReloadTurret{
         public void created(){
             unit = (BlockUnitc)UnitTypes.block.create(team);
             unit.tile(this);
+        }
+
+        @Override
+        public boolean canControl(){
+            return playerControllable;
         }
 
         @Override
@@ -271,6 +279,7 @@ public class Turret extends ReloadTurret{
             }
 
             if(hasAmmo()){
+                if(Float.isNaN(reload)) rotation = 0;
 
                 if(timer(timerTarget, targetInterval)){
                     findTarget();
@@ -287,9 +296,7 @@ public class Turret extends ReloadTurret{
                     }else{ //default AI behavior
                         targetPosition(target);
 
-                        if(Float.isNaN(rotation)){
-                            rotation = 0;
-                        }
+                        if(Float.isNaN(rotation)) rotation = 0;
                     }
 
                     float targetRot = angleTo(targetPos);
@@ -320,7 +327,11 @@ public class Turret extends ReloadTurret{
         }
 
         protected boolean validateTarget(){
-            return !Units.invalidateTarget(target, team, x, y) || isControlled() || logicControlled();
+            return !Units.invalidateTarget(target, canHeal() ? Team.derelict : team, x, y) || isControlled() || logicControlled();
+        }
+
+        protected boolean canHeal(){
+            return targetHealing && hasAmmo() && peekAmmo().collidesTeam && peekAmmo().healPercent > 0;
         }
 
         protected void findTarget(){
@@ -328,6 +339,10 @@ public class Turret extends ReloadTurret{
                 target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded(), unitSort);
             }else{
                 target = Units.bestTarget(team, x, y, range, e -> !e.dead() && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> true, unitSort);
+
+                if(target == null && canHeal()){
+                    target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);
+                }
             }
         }
 
@@ -403,7 +418,7 @@ public class Turret extends ReloadTurret{
                     tr.trns(rotation, shootLength);
                     recoil = recoilAmount;
                     heat = 1f;
-                    bullet(type, rotation + Mathf.range(inaccuracy));
+                    bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
                     effects();
                     charging = false;
                 });
@@ -411,13 +426,14 @@ public class Turret extends ReloadTurret{
                 //when burst spacing is enabled, use the burst pattern
             }else if(burstSpacing > 0.0001f){
                 for(int i = 0; i < shots; i++){
+                    int ii = i;
                     Time.run(burstSpacing * i, () -> {
                         if(!isValid() || !hasAmmo()) return;
 
                         recoil = recoilAmount;
 
                         tr.trns(rotation, shootLength, Mathf.range(xRand));
-                        bullet(type, rotation + Mathf.range(inaccuracy));
+                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (ii - (int)(shots / 2f)) * spread);
                         effects();
                         useAmmo();
                         recoil = recoilAmount;
@@ -432,7 +448,7 @@ public class Turret extends ReloadTurret{
                     float i = (shotCounter % shots) - (shots-1)/2f;
 
                     tr.trns(rotation - 90, spread * i + Mathf.range(xRand), shootLength);
-                    bullet(type, rotation + Mathf.range(inaccuracy));
+                    bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
                 }else{
                     tr.trns(rotation, shootLength, Mathf.range(xRand));
 

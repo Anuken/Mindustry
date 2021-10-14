@@ -158,7 +158,9 @@ public class Generators{
                         }
                     });
 
-                    Fi.get("../blocks/environment/cliffmask" + (val & 0xff) + ".png").writePng(result);
+                    Fi fi = Fi.get("../blocks/environment/cliffmask" + (val & 0xff) + ".png");
+                    fi.writePng(result);
+                    fi.copyTo(Fi.get("../editor").child("editor-" + fi.name()));
                 });
             }
 
@@ -244,7 +246,7 @@ public class Generators{
                             teamr.each((x, y) -> {
                                 int color = teamr.getRaw(x, y);
                                 int index = color == 0xffffffff ? 0 : color == 0xdcc6c6ff ? 1 : color == 0x9d7f7fff ? 2 : -1;
-                                out.setRaw(x, y, index == -1 ? teamr.getRaw(x, y) : team.palette[index].rgba());
+                                out.setRaw(x, y, index == -1 ? teamr.getRaw(x, y) : team.palettei[index]);
                             });
                             save(out, block.name + "-team-" + team.name);
 
@@ -380,13 +382,26 @@ public class Generators{
                     base.each((x, y) -> tint.setRaw(x, y, Color.muli(tint.getRaw(x, y), stat.color.rgba())));
 
                     //outline the image
-                    Pixmap container = new Pixmap(38, 38);
+                    Pixmap container = new Pixmap(tint.width + 6, tint.height + 6);
                     container.draw(base, 3, 3, true);
                     base = container.outline(Pal.gray, 3);
                 }
 
                 saveScaled(base, item.name + "-icon-logic", logicIconSize);
                 save(base, "../ui/" + item.getContentType().name() + "-" + item.name + "-ui");
+            }
+        });
+
+        generate("team-icons", () -> {
+            for(Team team : Team.all){
+                if(has("team-" + team.name)){
+                    int rgba = team == Team.derelict ? Color.valueOf("b7b8c9").rgba() : team.color.rgba();
+                    Pixmap base = get("team-" + team.name);
+                    base.each((x, y) -> base.setRaw(x, y, Color.muli(base.getRaw(x, y), rgba)));
+
+                    delete("team-" + team.name);
+                    save(base.outline(Pal.gray, 3), "../ui/team-" + team.name);
+                }
             }
         });
 
@@ -444,11 +459,12 @@ public class Generators{
 
                 //draw base region on top to mask weapons
                 image.draw(get(type.region), true);
-                int baseColor = Color.valueOf("ffa665").rgba();
 
                 Pixmap baseCell = get(type.cellRegion);
-                Pixmap cell = new Pixmap(type.cellRegion.width, type.cellRegion.height);
-                cell.each((x, y) -> cell.set(x, y, Color.muli(baseCell.getRaw(x, y), baseColor)));
+                Pixmap cell = baseCell.copy();
+
+                //replace with 0xffd37fff : 0xdca463ff for sharded colors?
+                cell.replace(in -> in == 0xffffffff ? 0xffa664ff : in == 0xdcc6c6ff ? 0xd06b53ff : 0);
 
                 image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2, true);
 

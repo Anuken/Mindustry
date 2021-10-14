@@ -21,12 +21,12 @@ public class DefenderAI extends AIController{
     }
 
     @Override
-    protected void updateTargeting(){
+    public void updateTargeting(){
         if(retarget()) target = findTarget(unit.x, unit.y, unit.range(), true, true);
     }
     
     @Override
-    protected Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
+    public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
 
         //find unit to follow if not in rally mode
         if(command() != UnitCommand.rally){

@@ -15,11 +15,12 @@ import static mindustry.Vars.*;
 public class BuilderAI extends AIController{
     public static float buildRadius = 1500, retreatDst = 110f, fleeRange = 370f, retreatDelay = Time.toSeconds * 2f;
 
+    public @Nullable Unit following;
+    public @Nullable Teamc enemy;
+    public @Nullable BlockPlan lastPlan;
+
     boolean found = false;
-    @Nullable Unit following;
-    @Nullable Teamc enemy;
     float retreatTimer;
-    @Nullable BlockPlan lastPlan;
 
     @Override
     public void updateMovement(){

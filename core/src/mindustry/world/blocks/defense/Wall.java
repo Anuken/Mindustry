@@ -72,7 +72,9 @@ public class Wall extends Block{
                 Draw.blend();
                 Draw.reset();
 
-                hit = Mathf.clamp(hit - Time.delta / 10f);
+                if(!state.isPaused()){
+                    hit = Mathf.clamp(hit - Time.delta / 10f);
+                }
             }
         }
 
@@ -93,7 +95,7 @@ public class Wall extends Block{
             //deflect bullets if necessary
             if(chanceDeflect > 0f){
                 //slow bullets are not deflected
-                if(bullet.vel().len() <= 0.1f || !bullet.type.reflectable) return true;
+                if(bullet.vel.len() <= 0.1f || !bullet.type.reflectable) return true;
 
                 //bullet reflection chance depends on bullet damage
                 if(!Mathf.chance(chanceDeflect / bullet.damage())) return true;
@@ -112,9 +114,9 @@ public class Wall extends Block{
                     bullet.vel.y *= -1;
                 }
 
-                bullet.owner(this);
-                bullet.team(team);
-                bullet.time(bullet.time() + 1f);
+                bullet.owner = this;
+                bullet.team = team;
+                bullet.time += 1f;
 
                 //disable bullet collision by returning false
                 return false;

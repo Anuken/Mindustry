@@ -35,7 +35,7 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, spawn, cliff, deepwater, water, taintedWater, tar, slag, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space,
+    air, spawn, cliff, deepwater, water, taintedWater, deepTaintedWater, tar, slag, cryofluid, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space,
     dacite,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, grass, salt,
@@ -83,7 +83,7 @@ public class Blocks implements ContentList{
     commandCenter,
     groundFactory, airFactory, navalFactory,
     additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor,
-    repairPoint, repairTurret, resupplyPoint,
+    repairPoint, repairTurret,
 
     //payloads
     payloadConveyor, payloadRouter, payloadPropulsionTower,
@@ -117,7 +117,7 @@ public class Blocks implements ContentList{
             new ConstructBlock(i);
         }
 
-        deepwater = new Floor("deepwater"){{
+        deepwater = new Floor("deep-water"){{
             speedMultiplier = 0.2f;
             variants = 0;
             liquidDrop = Liquids.water;
@@ -127,10 +127,10 @@ public class Blocks implements ContentList{
             statusDuration = 120f;
             drownTime = 140f;
             cacheLayer = CacheLayer.water;
-            albedo = 0.5f;
+            albedo = 0.9f;
         }};
 
-        water = new Floor("water"){{
+        water = new Floor("shallow-water"){{
             speedMultiplier = 0.5f;
             variants = 0;
             status = StatusEffects.wet;
@@ -138,11 +138,23 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
-            albedo = 0.5f;
+            albedo = 0.9f;
         }};
 
         taintedWater = new Floor("tainted-water"){{
-            speedMultiplier = 0.17f;
+            speedMultiplier = 0.5f;
+            variants = 0;
+            status = StatusEffects.wet;
+            statusDuration = 90f;
+            liquidDrop = Liquids.water;
+            isLiquid = true;
+            cacheLayer = CacheLayer.water;
+            albedo = 0.9f;
+            attributes.set(Attribute.spores, 0.15f);
+        }};
+
+        deepTaintedWater = new Floor("deep-tainted-water"){{
+            speedMultiplier = 0.18f;
             variants = 0;
             status = StatusEffects.wet;
             statusDuration = 140f;
@@ -150,27 +162,27 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
-            albedo = 0.5f;
+            albedo = 0.9f;
             attributes.set(Attribute.spores, 0.15f);
         }};
 
         darksandTaintedWater = new ShallowLiquid("darksand-tainted-water"){{
             speedMultiplier = 0.75f;
             statusDuration = 60f;
-            albedo = 0.5f;
+            albedo = 0.9f;
             attributes.set(Attribute.spores, 0.1f);
         }};
 
         sandWater = new ShallowLiquid("sand-water"){{
             speedMultiplier = 0.8f;
             statusDuration = 50f;
-            albedo = 0.5f;
+            albedo = 0.9f;
         }};
 
         darksandWater = new ShallowLiquid("darksand-water"){{
             speedMultiplier = 0.8f;
             statusDuration = 50f;
-            albedo = 0.5f;
+            albedo = 0.9f;
         }};
 
         tar = new Floor("tar"){{
@@ -184,7 +196,23 @@ public class Blocks implements ContentList{
             cacheLayer = CacheLayer.tar;
         }};
 
-        slag = new Floor("slag"){{
+        cryofluid = new Floor("pooled-cryofluid"){{
+            drownTime = 150f;
+            status = StatusEffects.freezing;
+            statusDuration = 240f;
+            speedMultiplier = 0.5f;
+            variants = 0;
+            liquidDrop = Liquids.cryofluid;
+            liquidMultiplier = 0.5f;
+            isLiquid = true;
+            cacheLayer = CacheLayer.cryofluid;
+
+            emitLight = true;
+            lightRadius = 25f;
+            lightColor = Color.cyan.cpy().a(0.19f);
+        }};
+
+        slag = new Floor("molten-slag"){{
             drownTime = 150f;
             status = StatusEffects.melting;
             statusDuration = 240f;
@@ -209,7 +237,7 @@ public class Blocks implements ContentList{
 
         stone = new Floor("stone");
 
-        craters = new Floor("craters"){{
+        craters = new Floor("crater-stone"){{
             variants = 3;
             blendGroup = stone;
         }};
@@ -263,7 +291,6 @@ public class Blocks implements ContentList{
             statusDuration = 30f;
             attributes.set(Attribute.water, 1f);
             cacheLayer = CacheLayer.mud;
-            albedo = 0.35f;
             walkSound = Sounds.mud;
             walkSoundVolume = 0.08f;
             walkSoundPitchMin = 0.4f;
@@ -288,18 +315,21 @@ public class Blocks implements ContentList{
 
         snow = new Floor("snow"){{
             attributes.set(Attribute.water, 0.2f);
+            albedo = 0.7f;
         }};
 
         ice = new Floor("ice"){{
             dragMultiplier = 0.35f;
             speedMultiplier = 0.9f;
             attributes.set(Attribute.water, 0.4f);
+            albedo = 0.65f;
         }};
 
         iceSnow = new Floor("ice-snow"){{
             dragMultiplier = 0.6f;
             variants = 3;
             attributes.set(Attribute.water, 0.3f);
+            albedo = 0.6f;
         }};
 
         shale = new Floor("shale"){{
@@ -313,6 +343,7 @@ public class Blocks implements ContentList{
 
         sporeWall = new StaticWall("spore-wall"){{
             variants = 2;
+            taintedWater.asFloor().wall = deepTaintedWater.asFloor().wall = this;
         }};
 
         dirtWall = new StaticWall("dirt-wall"){{
@@ -429,7 +460,7 @@ public class Blocks implements ContentList{
         Seq.with(metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6)
         .each(b -> b.asFloor().wall = darkMetal);
 
-        pebbles = new DoubleOverlayFloor("pebbles");
+        pebbles = new OverlayFloor("pebbles");
 
         tendrils = new OverlayFloor("tendrils");
 
@@ -509,6 +540,8 @@ public class Blocks implements ContentList{
             hasPower = true;
             hasLiquids = false;
             drawer = new DrawSmelter(Color.valueOf("ffef99"));
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.07f;
 
             consumes.items(with(Items.coal, 1, Items.sand, 2));
             consumes.power(0.50f);
@@ -525,6 +558,8 @@ public class Blocks implements ContentList{
             itemCapacity = 30;
             boostScale = 0.15f;
             drawer = new DrawSmelter(Color.valueOf("ffef99"));
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.07f;
 
             consumes.items(with(Items.coal, 4, Items.sand, 6, Items.pyratite, 1));
             consumes.power(4f);
@@ -538,6 +573,8 @@ public class Blocks implements ContentList{
             size = 2;
             hasPower = hasItems = true;
             drawer = new DrawSmelter(Color.valueOf("ffc099"));
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.07f;
 
             consumes.items(with(Items.lead, 1, Items.sand, 1));
             consumes.power(0.60f);
@@ -603,7 +640,7 @@ public class Blocks implements ContentList{
             rotate = false;
             solid = true;
             outputsLiquid = true;
-            drawer = new DrawMixer();
+            drawer = new DrawMixer(true);
 
             consumes.power(1f);
             consumes.item(Items.titanium);
@@ -657,17 +694,17 @@ public class Blocks implements ContentList{
             craftTime = 35f;
             size = 2;
 
-            consumes.power(1f);
-            consumes.liquid(Liquids.slag, 0.07f);
+            consumes.power(1.1f);
+            consumes.liquid(Liquids.slag, 4f / 60f);
         }};
 
         disassembler = new Separator("disassembler"){{
             requirements(Category.crafting, with(Items.plastanium, 40, Items.titanium, 100, Items.silicon, 150, Items.thorium, 80));
             results = with(
-                Items.sand, 4,
-                Items.graphite, 2,
-                Items.titanium, 2,
-                Items.thorium, 2
+                Items.sand, 2,
+                Items.graphite, 1,
+                Items.titanium, 1,
+                Items.thorium, 1
             );
             hasPower = true;
             craftTime = 15f;
@@ -702,7 +739,9 @@ public class Blocks implements ContentList{
             craftTime = 40f;
             updateEffect = Fx.pulverizeSmall;
             hasItems = hasPower = true;
-            drawer = new DrawRotator();
+            drawer = new DrawRotator(){{
+                drawSpinSprite = true;
+            }};
             ambientSound = Sounds.grinding;
             ambientSoundVolume = 0.025f;
 
@@ -851,6 +890,7 @@ public class Blocks implements ContentList{
         }};
 
         thruster = new Thruster("thruster"){{
+            requirements(Category.defense, BuildVisibility.sandboxOnly, with(Items.scrap, 96));
             health = 55 * 16 * wallHealthMultiplier;
             size = 4;
         }};
@@ -964,15 +1004,20 @@ public class Blocks implements ContentList{
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
             requirements(Category.distribution, with(Items.lead, 6, Items.copper, 6));
+            fadeIn = moveArrows = false;
             range = 4;
             speed = 74f;
+            arrowSpacing = 6f;
             bufferCapacity = 14;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
             requirements(Category.distribution, with(Items.phaseFabric, 5, Items.silicon, 7, Items.lead, 10, Items.graphite, 10));
             range = 12;
+            arrowPeriod = 0.9f;
+            arrowTimeScl = 2.75f;
             hasPower = true;
+            pulse = true;
             consumes.power(0.30f);
         }};
 
@@ -994,6 +1039,7 @@ public class Blocks implements ContentList{
 
         distributor = new Router("distributor"){{
             requirements(Category.distribution, with(Items.lead, 4, Items.copper, 4));
+            buildCostMultiplier = 3f;
             size = 2;
         }};
 
@@ -1039,7 +1085,7 @@ public class Blocks implements ContentList{
 
         mechanicalPump = new Pump("mechanical-pump"){{
             requirements(Category.liquid, with(Items.copper, 15, Items.metaglass, 10));
-            pumpAmount = 0.11f;
+            pumpAmount = 7f / 60f;
         }};
 
         rotaryPump = new Pump("rotary-pump"){{
@@ -1095,8 +1141,10 @@ public class Blocks implements ContentList{
             requirements(Category.liquid, with(Items.graphite, 2, Items.metaglass, 2));
         }};
 
-        bridgeConduit = new LiquidExtendingBridge("bridge-conduit"){{
+        bridgeConduit = new LiquidBridge("bridge-conduit"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 8));
+            fadeIn = moveArrows = false;
+            arrowSpacing = 6f;
             range = 4;
             hasPower = false;
         }};
@@ -1104,8 +1152,11 @@ public class Blocks implements ContentList{
         phaseConduit = new LiquidBridge("phase-conduit"){{
             requirements(Category.liquid, with(Items.phaseFabric, 5, Items.silicon, 7, Items.metaglass, 20, Items.titanium, 10));
             range = 12;
+            arrowPeriod = 0.9f;
+            arrowTimeScl = 2.75f;
             hasPower = true;
             canOverdrive = false;
+            pulse = true;
             consumes.power(0.30f);
         }};
 
@@ -1140,12 +1191,14 @@ public class Blocks implements ContentList{
         battery = new Battery("battery"){{
             requirements(Category.power, with(Items.copper, 5, Items.lead, 20));
             consumes.powerBuffered(4000f);
+            baseExplosiveness = 1f;
         }};
 
         batteryLarge = new Battery("battery-large"){{
             requirements(Category.power, with(Items.titanium, 20, Items.lead, 40, Items.silicon, 20));
             size = 3;
             consumes.powerBuffered(50000f);
+            baseExplosiveness = 5f;
         }};
 
         combustionGenerator = new BurnerGenerator("combustion-generator"){{
@@ -1285,6 +1338,7 @@ public class Blocks implements ContentList{
             drillEffect = Fx.mineHuge;
             rotateSpeed = 6f;
             warmupSpeed = 0.01f;
+            itemCapacity = 20;
 
             //more than the laser drill
             liquidBoostIntensity = 1.8f;
@@ -1324,14 +1378,13 @@ public class Blocks implements ContentList{
             maxBoost = 2f;
 
             consumes.power(80f / 60f);
-            consumes.liquid(Liquids.water, 20f / 60f);
+            consumes.liquid(Liquids.water, 18f / 60f);
         }};
 
         oilExtractor = new Fracker("oil-extractor"){{
             requirements(Category.production, with(Items.copper, 150, Items.graphite, 175, Items.lead, 115, Items.thorium, 115, Items.silicon, 75));
             result = Liquids.oil;
             updateEffect = Fx.pulverize;
-            liquidCapacity = 50f;
             updateEffectChance = 0.05f;
             pumpAmount = 0.25f;
             size = 3;
@@ -1367,6 +1420,7 @@ public class Blocks implements ContentList{
             health = 3500;
             itemCapacity = 9000;
             size = 4;
+            thrusterLength = 34/4f;
 
             unitCapModifier = 16;
             researchCostMultiplier = 0.07f;
@@ -1379,6 +1433,7 @@ public class Blocks implements ContentList{
             health = 6000;
             itemCapacity = 13000;
             size = 5;
+            thrusterLength = 40/4f;
 
             unitCapModifier = 24;
             researchCostMultiplier = 0.11f;
@@ -1388,14 +1443,14 @@ public class Blocks implements ContentList{
             requirements(Category.effect, with(Items.titanium, 250, Items.thorium, 125));
             size = 3;
             itemCapacity = 1000;
-            health = size * size * 60;
+            health = size * size * 55;
         }};
 
         container = new StorageBlock("container"){{
             requirements(Category.effect, with(Items.titanium, 100));
             size = 2;
             itemCapacity = 300;
-            health = size * size * 60;
+            health = size * size * 55;
         }};
 
         unloader = new Unloader("unloader"){{
@@ -1592,7 +1647,7 @@ public class Blocks implements ContentList{
             shots = 4;
             burstSpacing = 5;
             inaccuracy = 10f;
-            range = 215f;
+            range = 235f;
             xRand = 6f;
             size = 2;
             health = 300 * size * size;
@@ -1620,6 +1675,7 @@ public class Blocks implements ContentList{
             recoilAmount = 3f;
             shootShake = 1f;
             burstSpacing = 3f;
+            spread = 0f;
             shots = 4;
             ammoUseEffect = Fx.casing2;
             health = 240 * size * size;
@@ -1765,7 +1821,7 @@ public class Blocks implements ContentList{
                     despawnEffect = Fx.instBomb;
                     trailSpacing = 20f;
                     damage = 1350;
-                    buildingDamageMultiplier = 0.25f;
+                    buildingDamageMultiplier = 0.2f;
                     speed = brange;
                     hitShake = 6f;
                     ammoMultiplier = 1f;
@@ -1833,13 +1889,13 @@ public class Blocks implements ContentList{
             range = 195f;
             reloadTime = 90f;
             firingMoveFract = 0.5f;
-            shootDuration = 220f;
+            shootDuration = 230f;
             powerUse = 17f;
             shootSound = Sounds.laserbig;
             loopSound = Sounds.beam;
             loopSoundVolume = 2f;
 
-            shootType = new ContinuousLaserBulletType(70){{
+            shootType = new ContinuousLaserBulletType(78){{
                 length = 200f;
                 hitEffect = Fx.hitMeltdown;
                 hitColor = Pal.meltdownHit;
@@ -1868,7 +1924,7 @@ public class Blocks implements ContentList{
             requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 80));
             plans = Seq.with(
                 new UnitPlan(UnitTypes.dagger, 60f * 15, with(Items.silicon, 10, Items.lead, 10)),
-                new UnitPlan(UnitTypes.crawler, 60f * 12, with(Items.silicon, 10, Items.coal, 20)),
+                new UnitPlan(UnitTypes.crawler, 60f * 10, with(Items.silicon, 8, Items.coal, 10)),
                 new UnitPlan(UnitTypes.nova, 60f * 40, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20))
             );
             size = 3;
@@ -2003,17 +2059,6 @@ public class Blocks implements ContentList{
             acceptCoolant = true;
         }};
 
-        resupplyPoint = new ResupplyPoint("resupply-point"){{
-            requirements(Category.units, BuildVisibility.ammoOnly, with(Items.lead, 20, Items.copper, 15, Items.silicon, 15));
-
-            size = 2;
-            range = 80f;
-            itemCapacity = 20;
-            ammoAmount = 5;
-
-            consumes.item(Items.copper, 1);
-        }};
-
         //endregion
         //region payloads
 
@@ -2030,9 +2075,9 @@ public class Blocks implements ContentList{
         payloadPropulsionTower = new PayloadMassDriver("payload-propulsion-tower"){{
             requirements(Category.units, with(Items.thorium, 300, Items.silicon, 200, Items.plastanium, 200, Items.phaseFabric, 50));
             size = 5;
-            reloadTime = 140f;
+            reloadTime = 130f;
             chargeTime = 100f;
-            range = 500f;
+            range = 1000f;
             maxPayloadSize = 3.5f;
             consumes.power(6f);
         }};
@@ -2074,11 +2119,15 @@ public class Blocks implements ContentList{
         payloadSource = new PayloadSource("payload-source"){{
             requirements(Category.units, BuildVisibility.sandboxOnly, with());
             size = 5;
+            alwaysUnlocked = true;
+            group = BlockGroup.units;
         }};
 
         payloadVoid = new PayloadVoid("payload-void"){{
             requirements(Category.units, BuildVisibility.sandboxOnly, with());
             size = 5;
+            alwaysUnlocked = true;
+            group = BlockGroup.units;
         }};
 
         //TODO move

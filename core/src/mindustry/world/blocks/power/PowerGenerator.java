@@ -62,15 +62,24 @@ public class PowerGenerator extends PowerDistributor{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.f(productionEfficiency);
+            write.f(generateTime);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
             productionEfficiency = read.f();
+            if(revision >= 1){
+                generateTime = read.f();
+            }
         }
     }
 }

@@ -6,4 +6,4 @@ before_install:
   - jshell --version
 install:
   - ./gradlew publishToMavenLocal
-  - sed -i 's/ --illegal-access=permit//' gradle.properties #remove extra flags after compilation
+  - echo -n > gradle.properties #zero out gradle.properties

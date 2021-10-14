@@ -104,7 +104,7 @@ public class Router extends Block{
                 int angle = Mathf.mod((int)((angleTo(unit.aimX(), unit.aimY()) + 45) / 90), 4);
 
                 if(unit.isShooting()){
-                    Building other = nearby(angle);
+                    Building other = nearby(rotation = angle);
                     if(other != null && other.acceptItem(this, item)){
                         return other;
                     }

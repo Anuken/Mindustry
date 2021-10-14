@@ -78,16 +78,16 @@ public class PayloadBlock extends Block{
         }
 
         @Override
-        public boolean canControlSelect(Player player){
-            return !player.unit().spawnedByCore && this.payload == null && acceptUnitPayload(player.unit()) && player.tileOn().build == this;
+        public boolean canControlSelect(Unit player){
+            return !player.spawnedByCore && this.payload == null && acceptUnitPayload(player) && player.tileOn() != null && player.tileOn().build == this;
         }
 
         @Override
-        public void onControlSelect(Player player){
+        public void onControlSelect(Unit player){
             float x = player.x, y = player.y;
-            acceptPlayerPayload(player, p -> payload = (T)p);
+            handleUnitPayload(player, p -> payload = (T)p);
             this.payVector.set(x, y).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
-            this.payRotation = player.unit().rotation;
+            this.payRotation = player.rotation;
         }
 
         @Override
@@ -193,8 +193,14 @@ public class PayloadBlock extends Block{
         }
 
         public void dumpPayload(){
+            //translate payload forward slightly
+            float tx = Angles.trnsx(payload.rotation(), 0.1f), ty = Angles.trnsy(payload.rotation(), 0.1f);
+            payload.set(payload.x() + tx, payload.y() + ty, payload.rotation());
+
             if(payload.dump()){
                 payload = null;
+            }else{
+                payload.set(payload.x() - tx, payload.y() - ty, payload.rotation());
             }
         }
 

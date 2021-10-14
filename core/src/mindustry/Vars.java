@@ -40,12 +40,12 @@ public class Vars implements Loadable{
     public static boolean loadLocales = true;
     /** Whether the logger is loaded. */
     public static boolean loadedLogger = false, loadedFileLogger = false;
-    /** Whether to enable various experimental features (e.g. cliffs) */
+    /** Whether to enable various experimental features (e.g. spawn positions for spawn groups) */
     public static boolean experimental = false;
     /** Name of current Steam player. */
     public static String steamPlayerName = "";
     /** Default accessible content types used for player-selectable icons. */
-    public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block};
+    public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit};
     /** Wall darkness radius. */
     public static final int darkRadius = 4;
     /** Maximum extra padding around deployment schematics. */
@@ -87,7 +87,7 @@ public class Vars implements Loadable{
     public static final int maxNameLength = 40;
     /** displayed item size when ingame. */
     public static final float itemSize = 5f;
-    /** units outside of this bound will die instantly */
+    /** units outside this bound will die instantly */
     public static final float finalWorldBounds = 250;
     /** range for building */
     public static final float buildingRange = 220f;
@@ -103,8 +103,8 @@ public class Vars implements Loadable{
     public static final float invasionGracePeriod = 20;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.1f;
-    /** launch animation duration */
-    public static final float launchDuration = 140f;
+    /** land/launch animation duration */
+    public static final float coreLandDuration = 160f;
     /** size of tiles in units */
     public static final int tilesize = 8;
     /** size of one tile payload (^2) */
@@ -132,6 +132,8 @@ public class Vars implements Loadable{
         Color.valueOf("4b5ef1"),
         Color.valueOf("2cabfe"),
     };
+    /** maximum TCP packet size */
+    public static final int maxTcpSize = 900;
     /** default server port */
     public static final int port = 6567;
     /** multicast discovery port.*/
@@ -142,8 +144,8 @@ public class Vars implements Loadable{
     public static boolean clientLoaded = false;
     /** max GL texture size */
     public static int maxTextureSize = 2048;
-    /** Whether to show the core landing animation. */
-    public static boolean showLandAnimation = true;
+    /** Whether to show sector info upon landing. */
+    public static boolean showSectorLandInfo = true;
     /** Whether to check for memory use before taking screenshots. */
     public static boolean checkScreenshotMemory = true;
     /** Whether to prompt the user to confirm exiting. */
@@ -199,6 +201,8 @@ public class Vars implements Loadable{
     public static final String saveExtension = "msav";
     /** schematic file extension */
     public static final String schematicExtension = "msch";
+    /** path to the java executable */
+    public static String javaPath;
 
     /** list of all locales that can be switched to */
     public static Locale[] locales;
@@ -293,6 +297,10 @@ public class Vars implements Loadable{
         pathfinder = new Pathfinder();
         bases = new BaseRegistry();
         constants = new GlobalConstants();
+        javaPath =
+            new Fi(OS.prop("java.home")).child("bin/java").exists() ? new Fi(OS.prop("java.home")).child("bin/java").absolutePath() :
+            Core.files.local("jre/bin/java").exists() ? Core.files.local("jre/bin/java").absolutePath() :
+            "java";
 
         state = new GameState();
 

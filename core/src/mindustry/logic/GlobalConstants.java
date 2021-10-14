@@ -2,6 +2,7 @@ package mindustry.logic;
 
 import arc.*;
 import arc.files.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -18,6 +19,8 @@ import java.io.*;
 public class GlobalConstants{
     public static final int ctrlProcessor = 1, ctrlPlayer = 2, ctrlFormation = 3;
     public static final ContentType[] lookableContent = {ContentType.block, ContentType.unit, ContentType.item, ContentType.liquid};
+    /** Global random state. */
+    public static final Rand rand = new Rand();
 
     private ObjectIntMap<String> namesToIds = new ObjectIntMap<>();
     private Seq<Var> vars = new Seq<>(Var.class);

@@ -32,6 +32,8 @@ public class Conveyor extends Block implements Autotiler{
     public float speed = 0f;
     public float displayedSpeed = 0f;
 
+    public @Nullable Block junctionReplacement, bridgeReplacement;
+
     public Conveyor(String name){
         super(name);
         rotate = true;
@@ -53,6 +55,14 @@ public class Conveyor extends Block implements Autotiler{
         
         //have to add a custom calculated speed, since the actual movement speed is apparently not linear
         stats.add(Stat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        if(junctionReplacement == null) junctionReplacement = Blocks.junction;
+        if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge)) bridgeReplacement = Blocks.itemBridge;
     }
 
     @Override
@@ -79,7 +89,9 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
-        Placement.calculateBridges(plans, (ItemBridge)Blocks.itemBridge);
+        if(bridgeReplacement == null) return;
+
+        Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement);
     }
 
     @Override
@@ -94,12 +106,14 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
+        if(junctionReplacement == null) return this;
+
         Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof Conveyor || req.block instanceof Junction));
         return cont.get(Geometry.d4(req.rotation)) &&
             cont.get(Geometry.d4(req.rotation - 2)) &&
             req.tile() != null &&
             req.tile().block() instanceof Conveyor &&
-            Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? Blocks.junction : this;
+            Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? junctionReplacement : this;
     }
 
     public class ConveyorBuild extends Building implements ChainedBuilding{
