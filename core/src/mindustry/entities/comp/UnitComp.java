@@ -38,6 +38,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Import int id;
     @Import @Nullable Tile mineTile;
     @Import Vec2 vel;
+    @Import WeaponMount[] mounts;
 
     private UnitController controller;
     UnitType type;
@@ -494,6 +495,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         if(explosiveness > 7f && (isLocal() || wasPlayer)){
             Events.fire(Trigger.suicideBomb);
+        }
+
+        for(WeaponMount mount : mounts){
+            if(mount.weapon.shootOnDeath && !(mount.weapon.bullet.killShooter && mount.shoot)){
+                mount.reload = 0f;
+                mount.shoot = true;
+                mount.weapon.update(self(), mount);
+            }
         }
 
         //if this unit crash landed (was flying), damage stuff in a radius
