@@ -242,12 +242,15 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public boolean canControlSelect(Player player){
-            return true;
+        public boolean canControlSelect(Unit player){
+            return player.isPlayer();
         }
 
         @Override
-        public void onControlSelect(Player player){
+        public void onControlSelect(Unit unit){
+            if(!unit.isPlayer()) return;
+            Player player = unit.getPlayer();
+
             Fx.spawn.at(player);
             if(net.client() && player == Vars.player){
                 control.input.controlledType = null;
