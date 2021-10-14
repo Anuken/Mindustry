@@ -102,7 +102,7 @@ public class Blocks implements ContentList{
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
 
     //campaign
-    launchPad, payloadLaunchPad, interplanetaryAccelerator,
+    launchPad, interplanetaryAccelerator,
 
     //nuclear?
     nuclearWarhead, warheadAssembler, ballisticSilo //TODO
