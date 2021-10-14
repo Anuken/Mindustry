@@ -236,6 +236,10 @@ public class ImagePacker{
         base.draw(image, 0, 0, image.width, image.height, base.width/2 - wx/2, base.height/2 - wy/2, wx, wy, true, true);
     }
 
+    static void delete(String name){
+        ((GenRegion)Core.atlas.find(name)).path.delete();
+    }
+
     static void replace(String name, Pixmap image){
         Fi.get(name + ".png").writePng(image);
         ((GenRegion)Core.atlas.find(name)).path.delete();

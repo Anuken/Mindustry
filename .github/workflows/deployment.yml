@@ -39,7 +39,7 @@ jobs:
         cp -a Mindustry/core/build/javadoc/. docs/
         cd docs
         git add .
-        git commit -m "Update ${RELEASE_VERSION:1}"
+        git commit --allow-empty -m "Update ${RELEASE_VERSION:1}"
         git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/MindustryGame/docs
         cd ../Mindustry
     - name: Update F-Droid build string

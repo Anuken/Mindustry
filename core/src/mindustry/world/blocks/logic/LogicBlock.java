@@ -174,7 +174,7 @@ public class LogicBlock extends Block{
         public boolean active = true, valid;
         public int x, y;
         public String name;
-        Building lastBuild;
+        public Building lastBuild;
 
         public LogicLink(int x, int y, String name, boolean valid){
             this.x = x;
@@ -397,7 +397,8 @@ public class LogicBlock extends Block{
                     var cur = world.build(l.x, l.y);
 
                     boolean valid = validLink(cur);
-                    if(valid != l.valid || (l.lastBuild != null && l.lastBuild != cur)){
+                    if(l.lastBuild == null) l.lastBuild = cur;
+                    if(valid != l.valid || l.lastBuild != cur){
                         l.lastBuild = cur;
                         changed = true;
                         l.valid = valid;

@@ -162,7 +162,9 @@ public class ArcNetProvider implements NetProvider{
                 client.connect(5000, ip, port, port);
                 success.run();
             }catch(Exception e){
-                net.handleException(e);
+                if(netClient.isConnecting()){
+                    net.handleException(e);
+                }
             }
         });
     }
@@ -342,24 +344,9 @@ public class ArcNetProvider implements NetProvider{
         //for debugging total read/write speeds
         private static final boolean debug = false;
 
-        ThreadLocal<ByteBuffer> decompressBuffer = new ThreadLocal<>(){
-            @Override
-            protected ByteBuffer initialValue(){
-                return ByteBuffer.allocate(32768);
-            }
-        };
-        ThreadLocal<Reads> reads = new ThreadLocal<>(){
-            @Override
-            protected Reads initialValue(){
-                return new Reads(new ByteBufferInput(decompressBuffer.get()));
-            }
-        };
-        ThreadLocal<Writes> writes = new ThreadLocal<>(){
-            @Override
-            protected Writes initialValue(){
-                return new Writes(new ByteBufferOutput(decompressBuffer.get()));
-            }
-        };
+        ThreadLocal<ByteBuffer> decompressBuffer = Threads.local(() -> ByteBuffer.allocate(32768));
+        ThreadLocal<Reads> reads = Threads.local(() -> new Reads(new ByteBufferInput(decompressBuffer.get())));
+        ThreadLocal<Writes> writes = Threads.local(() -> new Writes(new ByteBufferOutput(decompressBuffer.get())));
 
         //for debugging network write counts
         static WindowedMean upload = new WindowedMean(5), download = new WindowedMean(5);

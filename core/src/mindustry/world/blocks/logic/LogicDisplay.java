@@ -106,6 +106,15 @@ public class LogicDisplay extends Block{
             });
             Draw.blend();
         }
+
+        @Override
+        public void remove(){
+            super.remove();
+            if(buffer != null){
+                buffer.dispose();
+                buffer = null;
+            }
+        }
     }
 
     static int unpackSign(int value){

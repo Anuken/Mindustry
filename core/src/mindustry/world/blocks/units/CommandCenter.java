@@ -26,12 +26,13 @@ public class CommandCenter extends Block{
     public Color topColor = null, bottomColor = Color.valueOf("5e5e5e");
     public Effect effect = Fx.commandSend;
     public float effectSize = 150f;
+    public float forceRadius = 31f, forceStrength = 0.2f;
 
     public CommandCenter(String name){
         super(name);
 
         flags = EnumSet.of(BlockFlag.rally);
-        destructible = true;
+        update = true;
         solid = true;
         configurable = true;
         drawDisabled = false;
@@ -70,6 +71,22 @@ public class CommandCenter extends Block{
         @Override
         public Object config(){
             return team.data().command;
+        }
+
+        @Override
+        public void updateTile(){
+            super.updateTile();
+
+            //push away allied units
+            team.data().tree().intersect(x - forceRadius/2f, y - forceRadius/2f, forceRadius, forceRadius, u -> {
+                if(!u.isPlayer()){
+                    float dst = dst(u);
+                    float rs = forceRadius + u.hitSize/2f;
+                    if(dst < rs){
+                        u.vel.add(Tmp.v1.set(u).sub(x, y).setLength(1f - dst / rs).scl(forceStrength));
+                    }
+                }
+            });
         }
 
         @Override

@@ -421,11 +421,11 @@ public class TechTree implements ContentList{
                                 });
                             });
 
-                            node(retusa, () -> {
-                                node(oxynoe, () -> {
+                            node(retusa, Seq.with(new SectorComplete(windsweptIslands)), () -> {
+                                node(oxynoe, Seq.with(new SectorComplete(coastline)), () -> {
                                     node(cyerce, () -> {
                                         node(aegires, () -> {
-                                            node(navanax, () -> {
+                                            node(navanax, Seq.with(new SectorComplete(navalFortress)), () -> {
 
                                             });
                                         });
@@ -531,7 +531,22 @@ public class TechTree implements ContentList{
                                     new Research(airFactory),
                                     new Research(door)
                                 ), () -> {
+                                    node(coastline, Seq.with(
+                                        new SectorComplete(windsweptIslands),
+                                        new Research(navalFactory),
+                                        new Research(payloadConveyor)
+                                    ), () -> {
+                                        node(navalFortress, Seq.with(
+                                            new SectorComplete(coastline),
+                                            new SectorComplete(extractionOutpost),
+                                            new Research(oxynoe),
+                                            new Research(minke),
+                                            new Research(cyclone),
+                                            new Research(ripple)
+                                        ), () -> {
 
+                                        });
+                                    });
                                 });
                             });
                         });

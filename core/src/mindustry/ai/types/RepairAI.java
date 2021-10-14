@@ -13,7 +13,7 @@ public class RepairAI extends AIController{
     float retreatTimer;
 
     @Override
-    protected void updateMovement(){
+    public void updateMovement(){
         if(target instanceof Building){
             boolean shoot = false;
 
@@ -56,7 +56,7 @@ public class RepairAI extends AIController{
     }
 
     @Override
-    protected void updateTargeting(){
+    public void updateTargeting(){
         Building target = Units.findDamagedTile(unit.team, unit.x, unit.y);
 
         if(target instanceof ConstructBuild) target = null;

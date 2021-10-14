@@ -7,6 +7,9 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 
 public class RailBulletType extends BulletType{
+    //for calculating the furthest point
+    static float furthest = 0;
+
     public Effect pierceEffect = Fx.hitBulletSmall, updateEffect = Fx.none;
     /** Multiplier of damage decreased per health pierced. */
     public float pierceDamageFactor = 1f;
@@ -47,6 +50,11 @@ public class RailBulletType extends BulletType{
 
         //subtract health from each consecutive pierce
         b.damage -= Math.min(b.damage, sub);
+
+        //bullet was stopped, decrease furthest distance
+        if(b.damage <= 0f){
+            furthest = Math.min(furthest, b.dst(pos));
+        }
     }
 
     @Override
@@ -54,8 +62,9 @@ public class RailBulletType extends BulletType{
         super.init(b);
 
         b.fdata = length;
+        furthest = length;
         Damage.collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), length, false, false);
-        float resultLen = b.fdata;
+        float resultLen = furthest;
 
         Vec2 nor = Tmp.v1.trns(b.rotation(), 1f).nor();
         for(float i = 0; i <= resultLen; i += updateEffectSeg){

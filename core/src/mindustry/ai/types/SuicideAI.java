@@ -41,10 +41,6 @@ public class SuicideAI extends GroundAI{
             shoot = unit.within(target, unit.type.weapons.first().bullet.range() +
                 (target instanceof Building b ? b.block.size * Vars.tilesize / 2f : ((Hitboxc)target).hitSize() / 2f));
 
-            if(unit.type.hasWeapons()){
-                unit.aimLook(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
-            }
-
             //do not move toward walls or transport blocks
             if(!(target instanceof Building build && !(build.block instanceof CoreBlock) && (
                 build.block.group == BlockGroup.walls ||
@@ -76,7 +72,7 @@ public class SuicideAI extends GroundAI{
                 if(!blocked){
                     moveToTarget = true;
                     //move towards target directly
-                    unit.moveAt(vec.set(target).sub(unit).limit(unit.speed()));
+                    unit.movePref(vec.set(target).sub(unit).limit(unit.speed()));
                 }
             }
         }
@@ -103,15 +99,15 @@ public class SuicideAI extends GroundAI{
                     pathfind(Pathfinder.fieldCore);
                 }
             }
-
-            if(unit.moving()) unit.lookAt(unit.vel().angle());
         }
 
         unit.controlWeapons(rotate, shoot);
+
+        faceTarget();
     }
 
     @Override
-    protected Teamc target(float x, float y, float range, boolean air, boolean ground){
+    public Teamc target(float x, float y, float range, boolean air, boolean ground){
         return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground &&
             !(t.block instanceof Conveyor || t.block instanceof Conduit)); //do not target conveyors/conduits
     }

@@ -12,6 +12,8 @@ public class WeaponMount{
     public float reload;
     /** rotation relative to the unit this mount is on */
     public float rotation;
+    /** weapon recoil */
+    public float recoil;
     /** destination rotation; do not modify! */
     public float targetRotation;
     /** current heat, 0 to 1*/

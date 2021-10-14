@@ -24,6 +24,8 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class JoinDialog extends BaseDialog{
+    //TODO unused
+    Seq<Host> commmunityHosts = new Seq<>();
     Seq<Server> servers = new Seq<>();
     Dialog add;
     Server renaming;
@@ -67,7 +69,7 @@ public class JoinDialog extends BaseDialog{
 
         TextField field = add.cont.field(Core.settings.getString("ip"), text -> {
             Core.settings.put("ip", text);
-        }).size(320f, 54f).maxTextLength(100).addInputDialog().get();
+        }).size(320f, 54f).maxTextLength(100).get();
 
         add.cont.row();
         add.buttons.defaults().size(140f, 60f).pad(4f);
@@ -119,7 +121,7 @@ public class JoinDialog extends BaseDialog{
 
         refreshLocal();
         refreshRemote();
-        refreshGlobal();
+        refreshCommunity();
     }
 
     void setupRemote(){
@@ -271,7 +273,7 @@ public class JoinDialog extends BaseDialog{
 
         hosts.clear();
 
-        section("@servers.local", local, false);
+        section(steam ? "@servers.local.steam" : "@servers.local", local, false);
         section("@servers.remote", remote, false);
         section("@servers.global", global, true);
 
@@ -287,7 +289,7 @@ public class JoinDialog extends BaseDialog{
             t.field(Core.settings.getString("name"), text -> {
                 player.name(text);
                 Core.settings.put("name", text);
-            }).grow().pad(8).addInputDialog(maxNameLength);
+            }).grow().pad(8).maxTextLength(maxNameLength);
 
             ImageButton button = t.button(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new PaletteDialog().show(color -> {
@@ -331,7 +333,7 @@ public class JoinDialog extends BaseDialog{
             if(eye){
                 name.button(Icon.eyeSmall, Styles.emptyi, () -> {
                     showHidden = !showHidden;
-                    refreshGlobal();
+                    refreshCommunity();
                 }).update(i -> i.getStyle().imageUp = (showHidden ? Icon.eyeSmall : Icon.eyeOffSmall))
                     .size(40f).right().padRight(3).tooltip("@servers.showhidden");
             }
@@ -357,7 +359,8 @@ public class JoinDialog extends BaseDialog{
         net.discoverServers(this::addLocalHost, this::finishLocalHosts);
     }
 
-    void refreshGlobal(){
+    void refreshCommunity(){
+        commmunityHosts.clear();
         int cur = refreshes;
 
         global.clear();
@@ -377,6 +380,8 @@ public class JoinDialog extends BaseDialog{
                 net.pingHost(resaddress, resport, res -> {
                     if(refreshes != cur) return;
                     res.port = resport;
+
+                    commmunityHosts.add(res);
 
                     //add header
                     if(groupTable[0] == null){

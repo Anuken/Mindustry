@@ -40,10 +40,10 @@ public class BurnerGenerator extends ItemLiquidGenerator{
                 Draw.rect(turbineRegions[1], x, y, -totalTime * turbineSpeed);
 
                 Draw.rect(capRegion, x, y);
+            }
 
-                if(hasLiquids){
-                    Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
-                }
+            if(hasLiquids && liquidRegion.found()){
+                Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
             }
         }
     }
