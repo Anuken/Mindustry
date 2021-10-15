@@ -2302,14 +2302,15 @@ public class Blocks implements ContentList{
         }};
 
         constructor = new Constructor("constructor"){{
-            requirements(Category.units, with(Items.thorium, 100));
+            requirements(Category.units, with(Items.silicon, 50, Items.thorium, 70, Items.graphite, 50));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
+        //yes this block is pretty much useless
         largeConstructor = new Constructor("large-constructor"){{
-            requirements(Category.units, with(Items.thorium, 100));
+            requirements(Category.units, with(Items.silicon, 100, Items.thorium, 150, Items.graphite, 50, Items.phaseFabric, 40));
             hasPower = true;
             consumes.power(2f);
             maxBlockSize = 4;
@@ -2318,20 +2319,20 @@ public class Blocks implements ContentList{
         }};
 
         payloadLoader = new PayloadLoader("payload-loader"){{
-            requirements(Category.units, with(Items.thorium, 100));
+            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.copper, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
         payloadUnloader = new PayloadUnloader("payload-unloader"){{
-            requirements(Category.units, with(Items.thorium, 100));
+            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.copper, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
-        //TODO deprecated
+        //deprecated, will be removed.
         blockForge = constructor;
         blockLoader = payloadLoader;
         blockUnloader = payloadUnloader;

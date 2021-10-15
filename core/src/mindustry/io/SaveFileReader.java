@@ -57,7 +57,9 @@ public abstract class SaveFileReader{
     "slag", "molten-slag",
 
     "cryofluidmixer", "cryofluid-mixer",
-    "block-forge", "constructor"
+    "block-forge", "constructor",
+    "block-unloader", "payload-unloader",
+    "block-loader", "payload-loader"
     );
 
     public static final ObjectMap<String, String> modContentNameMap = ObjectMap.of(
