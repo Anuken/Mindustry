@@ -139,8 +139,7 @@ public class BuilderAI extends AIController{
                     blocks.addLast(blocks.removeFirst());
                 }else{
                     //shift head of queue to tail, try something else next time
-                    blocks.removeFirst();
-                    blocks.addLast(block);
+                    blocks.addLast(blocks.removeFirst());
                 }
             }
         }
