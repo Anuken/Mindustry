@@ -684,6 +684,10 @@ public class Block extends UnlockableContent{
         return this instanceof OverlayFloor;
     }
 
+    public boolean isProp(){
+        return this instanceof Prop;
+    }
+
     public Floor asFloor(){
         return (Floor)this;
     }
