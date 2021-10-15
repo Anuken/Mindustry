@@ -11,6 +11,7 @@ import arc.util.*;
 import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
@@ -41,7 +42,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Import WeaponMount[] mounts;
 
     private UnitController controller;
-    UnitType type;
+    UnitType type = UnitTypes.alpha;
     boolean spawnedByCore;
     double flag;
 
