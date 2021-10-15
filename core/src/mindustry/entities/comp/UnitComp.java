@@ -41,7 +41,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Import WeaponMount[] mounts;
 
     private UnitController controller;
-    UnitType type;
+    @Nullable UnitType type;
     boolean spawnedByCore;
     double flag;
 
