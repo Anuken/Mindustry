@@ -42,6 +42,9 @@ public class LogicBlock extends Block{
         group = BlockGroup.logic;
         schematicPriority = 5;
 
+        //universal, no real requirements
+        envEnabled = Env.any;
+
         config(byte[].class, (LogicBuild build, byte[] data) -> build.readCompressed(data, true));
 
         config(Integer.class, (LogicBuild entity, Integer pos) -> {

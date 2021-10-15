@@ -58,6 +58,7 @@ public class ForceProjector extends Block{
         ambientSound = Sounds.shield;
         ambientSoundVolume = 0.08f;
         consumes.add(new ConsumeCoolant(0.1f)).boost().update(false);
+        envEnabled |= Env.space;
     }
 
     @Override

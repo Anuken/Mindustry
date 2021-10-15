@@ -26,7 +26,7 @@ public class Weapon implements Cloneable{
     static int sequenceNum = 0;
     
     /** displayed weapon region */
-    public String name = "";
+    public String name;
     /** bullet shot */
     public BulletType bullet = Bullets.standardCopper;
     /** shell ejection effect */

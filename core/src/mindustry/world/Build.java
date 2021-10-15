@@ -169,7 +169,7 @@ public class Build{
             return false;
         }
 
-        if(!type.canPlaceOn(tile, team)){
+        if(!type.canPlaceOn(tile, team, rotation)){
             return false;
         }
 

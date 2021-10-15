@@ -410,7 +410,7 @@ public class ItemBridge extends Block{
         }
 
         protected boolean checkAccept(Building source, Tile other){
-            if(linked(source)) return true;
+            if(tile == null || linked(source)) return true;
 
             if(linkValid(tile, other)){
                 int rel = relativeTo(other);

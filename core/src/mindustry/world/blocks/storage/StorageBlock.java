@@ -23,6 +23,7 @@ public class StorageBlock extends Block{
         group = BlockGroup.transportation;
         flags = EnumSet.of(BlockFlag.storage);
         allowResupply = true;
+        envEnabled = Env.any;
     }
 
     @Override

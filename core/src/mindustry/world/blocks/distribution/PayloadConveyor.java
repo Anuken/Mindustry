@@ -30,6 +30,7 @@ public class PayloadConveyor extends Block{
         update = true;
         outputsPayload = true;
         noUpdateDisabled = true;
+        envEnabled |= Env.space;
         sync = true;
     }
 

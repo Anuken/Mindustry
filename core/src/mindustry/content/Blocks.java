@@ -35,7 +35,7 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, spawn, cliff, deepwater, water, taintedWater, deepTaintedWater, tar, slag, cryofluid, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space,
+    air, spawn, cliff, deepwater, water, taintedWater, deepTaintedWater, tar, slag, cryofluid, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space, empty,
     dacite,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, grass, salt,
@@ -433,18 +433,6 @@ public class Blocks implements ContentList{
         basaltBoulder = new Prop("basalt-boulder"){{
             variants = 2;
             basalt.asFloor().decoration = hotrock.asFloor().decoration = darksand.asFloor().decoration = magmarock.asFloor().decoration = this;
-        }};
-
-        moss = new Floor("moss"){{
-            variants = 3;
-            attributes.set(Attribute.spores, 0.15f);
-            wall = sporePine;
-        }};
-
-        sporeMoss = new Floor("spore-moss"){{
-            variants = 3;
-            attributes.set(Attribute.spores, 0.3f);
-            wall = sporeWall;
         }};
 
         metalFloor = new Floor("metal-floor", 0);
@@ -2105,14 +2093,15 @@ public class Blocks implements ContentList{
         }};
 
         constructor = new Constructor("constructor"){{
-            requirements(Category.units, with(Items.thorium, 100));
+            requirements(Category.units, with(Items.silicon, 50, Items.thorium, 70, Items.graphite, 50));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
+        //yes this block is pretty much useless
         largeConstructor = new Constructor("large-constructor"){{
-            requirements(Category.units, with(Items.thorium, 100));
+            requirements(Category.units, with(Items.silicon, 100, Items.thorium, 150, Items.graphite, 50, Items.phaseFabric, 40));
             hasPower = true;
             consumes.power(2f);
             maxBlockSize = 4;
@@ -2121,20 +2110,20 @@ public class Blocks implements ContentList{
         }};
 
         payloadLoader = new PayloadLoader("payload-loader"){{
-            requirements(Category.units, with(Items.thorium, 100));
+            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.copper, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
         payloadUnloader = new PayloadUnloader("payload-unloader"){{
-            requirements(Category.units, with(Items.thorium, 100));
+            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.copper, 100));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
-        //TODO deprecated
+        //deprecated, will be removed.
         blockForge = constructor;
         blockLoader = payloadLoader;
         blockUnloader = payloadUnloader;

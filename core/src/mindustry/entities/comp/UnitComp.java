@@ -45,11 +45,17 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     boolean spawnedByCore;
     double flag;
 
+    transient float shadowAlpha = -1f;
     transient Seq<Ability> abilities = new Seq<>(0);
     transient float healTime;
     private transient float resupplyTime = Mathf.random(10f);
     private transient boolean wasPlayer;
     private transient boolean wasHealed;
+
+    /** Called when this unit was unloaded from a factory or spawn point. */
+    public void unloaded(){
+
+    }
 
     /** Move based on preferred unit movement type. */
     public void movePref(Vec2 movement){
@@ -517,6 +523,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                     Tmp.v1.rnd(range);
                     Effect.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
                 }
+            }
+        }
+
+        if(abilities.size > 0){
+            for(Ability a : abilities){
+                a.death(self());
             }
         }
 

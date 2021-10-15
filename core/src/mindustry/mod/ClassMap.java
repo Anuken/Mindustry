@@ -218,14 +218,8 @@ public class ClassMap{
         classes.put("SwitchBuild", mindustry.world.blocks.logic.SwitchBlock.SwitchBuild.class);
         classes.put("BallisticSilo", mindustry.world.blocks.payloads.BallisticSilo.class);
         classes.put("BallisticSiloBuild", mindustry.world.blocks.payloads.BallisticSilo.BallisticSiloBuild.class);
-        classes.put("BlockForge", mindustry.world.blocks.payloads.BlockForge.class);
-        classes.put("BlockForgeBuild", mindustry.world.blocks.payloads.BlockForge.BlockForgeBuild.class);
-        classes.put("BlockLoader", mindustry.world.blocks.payloads.BlockLoader.class);
-        classes.put("BlockLoaderBuild", mindustry.world.blocks.payloads.BlockLoader.BlockLoaderBuild.class);
         classes.put("BlockProducer", mindustry.world.blocks.payloads.BlockProducer.class);
         classes.put("BlockProducerBuild", mindustry.world.blocks.payloads.BlockProducer.BlockProducerBuild.class);
-        classes.put("BlockUnloader", mindustry.world.blocks.payloads.BlockUnloader.class);
-        classes.put("BlockUnloaderBuild", mindustry.world.blocks.payloads.BlockUnloader.BlockUnloaderBuild.class);
         classes.put("BuildPayload", mindustry.world.blocks.payloads.BuildPayload.class);
         classes.put("NuclearWarhead", mindustry.world.blocks.payloads.NuclearWarhead.class);
         classes.put("NuclearWarheadBuild", mindustry.world.blocks.payloads.NuclearWarhead.NuclearWarheadBuild.class);

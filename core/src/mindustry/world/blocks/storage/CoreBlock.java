@@ -121,7 +121,7 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile, Team team){
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
         if(tile == null) return false;
         CoreBuild core = team.core();
         //must have all requirements
@@ -166,7 +166,7 @@ public class CoreBlock extends StorageBlock{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         if(world.tile(x, y) == null) return;
 
-        if(!canPlaceOn(world.tile(x, y), player.team())){
+        if(!canPlaceOn(world.tile(x, y), player.team(), rotation)){
 
             drawPlaceText(Core.bundle.get(
                 (player.team().core() != null && player.team().core().items.has(requirements, state.rules.buildCostMultiplier)) || state.rules.infiniteResources ?

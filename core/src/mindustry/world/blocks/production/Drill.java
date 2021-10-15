@@ -36,7 +36,7 @@ public class Drill extends Block{
     /** How many times faster the drill will progress when boosted by liquid. */
     public float liquidBoostIntensity = 1.6f;
     /** Speed at which the drill speeds up. */
-    public float warmupSpeed = 0.02f;
+    public float warmupSpeed = 0.015f;
 
     //return variables for countOre
     protected @Nullable Item returnItem;
@@ -108,7 +108,7 @@ public class Drill extends Block{
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile, Team team){
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
         if(isMultiblock()){
             for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
                 if(canMine(other)){
@@ -275,14 +275,14 @@ public class Drill extends Block{
                 speed *= efficiency(); // Drill slower when not at full power
 
                 lastDrillSpeed = (speed * dominantItems * warmup) / (drillTime + hardnessDrillMultiplier * dominantItem.hardness);
-                warmup = Mathf.lerpDelta(warmup, speed, warmupSpeed);
+                warmup = Mathf.approachDelta(warmup, speed, warmupSpeed);
                 progress += delta() * dominantItems * speed * warmup;
 
                 if(Mathf.chanceDelta(updateEffectChance * warmup))
                     updateEffect.at(x + Mathf.range(size * 2f), y + Mathf.range(size * 2f));
             }else{
                 lastDrillSpeed = 0f;
-                warmup = Mathf.lerpDelta(warmup, 0f, warmupSpeed);
+                warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
                 return;
             }
 

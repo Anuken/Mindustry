@@ -380,7 +380,7 @@ public class Vars implements Loadable{
                 log.log(level, text);
 
                 try{
-                    writer.write("[" + Character.toUpperCase(level.name().charAt(0)) +"] " + Log.removeColors(text) + "\n");
+                    writer.write("[" + Character.toUpperCase(level.name().charAt(0)) + "] " + Log.removeColors(text) + "\n");
                     writer.flush();
                 }catch(IOException e){
                     e.printStackTrace();

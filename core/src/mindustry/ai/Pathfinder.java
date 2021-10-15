@@ -50,6 +50,7 @@ public class Pathfinder implements Runnable{
 
         //legs
         (team, tile) -> PathTile.legSolid(tile) ? impassable : 1 +
+            (PathTile.deep(tile) ? 6000 : 0) + //leg units can now drown
             (PathTile.solid(tile) ? 5 : 0),
 
         //water

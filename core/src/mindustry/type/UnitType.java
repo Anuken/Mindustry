@@ -71,9 +71,13 @@ public class UnitType extends UnlockableContent{
     public int commandLimit = 8;
     public float commandRadius = 150f;
     public float visualElevation = -1f;
+    /** If true and this is a legged unit, this unit can walk over blocks. */
     public boolean allowLegStep = false;
+    /** If true, this unit cannot drown, and will not be affected by the floor under it. */
     public boolean hovering = false;
     public boolean omniMovement = true;
+    public boolean showHeal = true;
+    public Color healColor = Pal.heal;
     public Effect fallEffect = Fx.fallSmoke;
     public Effect fallThrusterEffect = Fx.fallSmoke;
     public Effect deathExplosionEffect = Fx.dynamicExplosion;
@@ -112,13 +116,14 @@ public class UnitType extends UnlockableContent{
     public float dpsEstimate = -1;
     public float clipSize = -1;
     public boolean canDrown = true, naval = false;
+    public float drownTimeMultiplier = 1f;
     public float engineOffset = 5f, engineSize = 2.5f;
     public float strafePenalty = 0.5f;
     public float hitSize = 6f;
     public float itemOffsetY = 3f;
     public float lightRadius = -1f, lightOpacity = 0.6f;
     public Color lightColor = Pal.powerLight;
-    public boolean drawCell = true, drawItems = true, drawShields = true;
+    public boolean drawCell = true, drawItems = true, drawShields = true, drawBody = true;
     public int trailLength = 3;
     public float trailX = 4f, trailY = -3f, trailScl = 1f;
     /** Whether the unit can heal blocks. Initialized in init() */
@@ -135,7 +140,9 @@ public class UnitType extends UnlockableContent{
         softShadowRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion;
     public TextureRegion[] wreckRegions;
 
+    protected float buildTime = -1f;
     protected @Nullable ItemStack[] cachedRequirements;
+    protected @Nullable ItemStack[] totalRequirements;
 
     public UnitType(String name){
         super(name);
@@ -312,6 +319,8 @@ public class UnitType extends UnlockableContent{
 
         Unit example = constructor.get();
 
+        allowLegStep = example instanceof Legsc;
+
         //water preset
         if(example instanceof WaterMovec){
             naval = true;
@@ -321,6 +330,10 @@ public class UnitType extends UnlockableContent{
             if(visualElevation < 0f){
                 visualElevation = 0.11f;
             }
+        }
+
+        if(flying){
+            envEnabled |= Env.space;
         }
 
         if(lightRadius == -1){
@@ -475,25 +488,72 @@ public class UnitType extends UnlockableContent{
         }
     }
 
+    /** @return the time required to build this unit, as a value that takes into account reconstructors */
+    public float getBuildTime(){
+        getTotalRequirements();
+        return buildTime;
+    }
+
+    /** @return all items needed to build this unit, including reconstructor steps. */
+    public ItemStack[] getTotalRequirements(){
+        if(totalRequirements == null){
+            UnitType[] ret = {null};
+            float[] timeret = {0f};
+            ItemStack[] result = getRequirements(ret, timeret);
+
+            //prevents stack overflow if requirements are circular and result != null
+            totalRequirements = ItemStack.empty;
+
+            if(result != null){
+                ItemSeq total = new ItemSeq();
+
+                total.add(result);
+                if(ret[0] != null){
+                    total.add(ret[0].getTotalRequirements());
+                }
+                totalRequirements = total.toArray();
+            }
+
+            for(var stack : totalRequirements){
+                buildTime += stack.item.cost * stack.amount;
+            }
+        }
+        return totalRequirements;
+    }
+
+    /** @return item requirements based on reconstructors or factories found; returns previous unit in array if provided */
+    public @Nullable ItemStack[] getRequirements(@Nullable UnitType[] prevReturn, @Nullable float[] timeReturn){
+        var rec = (Reconstructor)content.blocks().find(b -> b instanceof Reconstructor re && re.upgrades.contains(u -> u[1] == this));
+
+        if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems ci){
+            if(prevReturn != null){
+                prevReturn[0] = rec.upgrades.find(u -> u[1] == this)[0];
+            }
+            if(timeReturn != null){
+                timeReturn[0] = rec.constructTime;
+            }
+            return ci.items;
+        }else{
+            var factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory uf && uf.plans.contains(p -> p.unit == this));
+            if(factory != null){
+
+                var plan = factory.plans.find(p -> p.unit == this);
+                if(timeReturn != null){
+                    timeReturn[0] = plan.time;
+                }
+                return plan.requirements;
+            }
+        }
+        return null;
+    }
+
     @Override
     public ItemStack[] researchRequirements(){
         if(cachedRequirements != null){
             return cachedRequirements;
         }
 
-        ItemStack[] stacks = null;
-
-        //calculate costs based on reconstructors or factories found
-        Block rec = content.blocks().find(b -> b instanceof Reconstructor re && re.upgrades.contains(u -> u[1] == this));
-
-        if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems ci){
-            stacks = ci.items;
-        }else{
-            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory uf && uf.plans.contains(p -> p.unit == this));
-            if(factory != null){
-                stacks = factory.plans.find(p -> p.unit == this).requirements;
-            }
-        }
+        ItemStack[] stacks = getRequirements(null, null);
 
         if(stacks != null){
             ItemStack[] out = new ItemStack[stacks.length];
@@ -557,10 +617,10 @@ public class UnitType extends UnlockableContent{
 
         Draw.z(z);
 
-        drawOutline(unit);
+        if(drawBody) drawOutline(unit);
         drawWeaponOutlines(unit);
         if(engineSize > 0) drawEngine(unit);
-        drawBody(unit);
+        if(drawBody) drawBody(unit);
         if(drawCell) drawCell(unit);
         drawWeapons(unit);
         if(drawItems) drawItems(unit);
@@ -623,14 +683,25 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawShadow(Unit unit){
-        Draw.color(Pal.shadow);
-        float e = Math.max(unit.elevation, visualElevation);
+        float e = Math.max(unit.elevation, visualElevation) * (1f - unit.drownTime);
+        float x = unit.x + shadowTX * e, y = unit.y + shadowTY * e;
+        Floor floor = world.floorWorld(x, y);
+
+        float dest = floor.canShadow ? 1f : 0f;
+        //yes, this updates state in draw()... which isn't a problem, because I don't want it to be obvious anyway
+        unit.shadowAlpha = unit.shadowAlpha < 0 ? dest : Mathf.approachDelta(unit.shadowAlpha, dest, 0.11f);
+        Draw.color(Pal.shadow, Pal.shadow.a * unit.shadowAlpha);
+
         Draw.rect(shadowRegion, unit.x + shadowTX * e, unit.y + shadowTY * e, unit.rotation - 90);
         Draw.color();
     }
 
     public void drawSoftShadow(Unit unit){
-        Draw.color(0, 0, 0, 0.4f);
+        drawSoftShadow(unit, 1f);
+    }
+
+    public void drawSoftShadow(Unit unit, float alpha){
+        Draw.color(0, 0, 0, 0.4f * alpha);
         float rad = 1.6f;
         float size = Math.max(region.width, region.height) * Draw.scl;
         Draw.rect(softShadowRegion, unit, size * rad * Draw.xscl, size * rad * Draw.yscl, unit.rotation - 90);
@@ -719,16 +790,11 @@ public class UnitType extends UnlockableContent{
         Draw.reset();
     }
 
-    public void applyOutlineColor(Unit unit){
-        if(unit.isBoss()){
-            Draw.mixcol(unit.team.color, Mathf.absin(7f, 1f));
-        }
-    }
-
     public void drawOutline(Unit unit){
         Draw.reset();
 
         if(Core.atlas.isFound(outlineRegion)){
+            applyColor(unit);
             applyOutlineColor(unit);
             Draw.rect(outlineRegion, unit.x, unit.y, unit.rotation - 90);
             Draw.reset();
@@ -764,14 +830,16 @@ public class UnitType extends UnlockableContent{
 
     public <T extends Unit & Legsc> void drawLegs(T unit){
         applyColor(unit);
+        Tmp.c3.set(Draw.getMixColor());
 
         Leg[] legs = unit.legs();
 
         float ssize = footRegion.width * Draw.scl * 1.5f;
         float rotation = unit.baseRotation();
+        float invDrown = 1f - unit.drownTime;
 
         for(Leg leg : legs){
-            Drawf.shadow(leg.base.x, leg.base.y, ssize);
+            Drawf.shadow(leg.base.x, leg.base.y, ssize, invDrown);
         }
 
         //legs are drawn front first
@@ -787,12 +855,14 @@ public class UnitType extends UnlockableContent{
             Tmp.v1.set(leg.base).sub(leg.joint).inv().setLength(legExtension);
 
             if(leg.moving && visualElevation > 0){
-                float scl = visualElevation;
+                float scl = visualElevation * invDrown;
                 float elev = Mathf.slope(1f - leg.stage) * scl;
                 Draw.color(Pal.shadow);
                 Draw.rect(footRegion, leg.base.x + shadowTX * elev, leg.base.y + shadowTY * elev, position.angleTo(leg.base));
                 Draw.color();
             }
+
+            Draw.mixcol(Tmp.c3, Tmp.c3.a);
 
             Draw.rect(footRegion, leg.base.x, leg.base.y, position.angleTo(leg.base));
 
@@ -848,8 +918,8 @@ public class UnitType extends UnlockableContent{
 
         Draw.mixcol(Color.white, unit.hitTime);
 
-        if(floor.isLiquid){
-            Draw.color(Color.white, floor.mapColor, unit.drownTime() * 0.4f);
+        if(unit.lastDrownFloor != null){
+            Draw.color(Color.white, Tmp.c1.set(unit.lastDrownFloor.mapColor).mul(0.83f), unit.drownTime * 0.9f);
         }else{
             Draw.color(Color.white);
         }
@@ -859,13 +929,25 @@ public class UnitType extends UnlockableContent{
         Draw.mixcol();
     }
 
+    public void applyOutlineColor(Unit unit){
+        if(unit.isBoss()){
+            Draw.mixcol(unit.team.color, Mathf.absin(7f, 1f));
+        }
+
+        if(unit.drownTime > 0 && unit.lastDrownFloor != null){
+            Draw.color(Color.white, Tmp.c1.set(unit.lastDrownFloor.mapColor).mul(0.8f), unit.drownTime * 0.9f);
+        }
+    }
+
     public void applyColor(Unit unit){
         Draw.color();
-        Tmp.c1.set(Color.white).lerp(Pal.heal, Mathf.clamp(unit.healTime - unit.hitTime));
+        if(showHeal){
+            Tmp.c1.set(Color.white).lerp(healColor, Mathf.clamp(unit.healTime - unit.hitTime));
+        }
         Draw.mixcol(Tmp.c1, Math.max(unit.hitTime, Mathf.clamp(unit.healTime)));
 
-        if(unit.drownTime > 0 && unit.floorOn().isDeep()){
-            Draw.mixcol(unit.floorOn().mapColor, unit.drownTime * 0.8f);
+        if(unit.drownTime > 0 && unit.lastDrownFloor != null){
+            Draw.mixcol(Tmp.c1.set(unit.lastDrownFloor.mapColor).mul(0.83f), unit.drownTime * 0.9f);
         }
     }
 

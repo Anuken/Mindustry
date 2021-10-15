@@ -25,9 +25,4 @@ public class SunMesh extends HexMesh{
             }
         }, divisions, Shaders.unlit);
     }
-
-    @Override
-    public void preRender(){
-        //do absolutely nothing
-    }
 }

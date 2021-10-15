@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;
+import mindustry.graphics.g3d.*;
 import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
@@ -117,8 +118,22 @@ public class Rules{
     public @Nullable String modeName;
     /** Whether cores incinerate items when full, just like in the campaign. */
     public boolean coreIncinerates = false;
+    /** If false, borders fade out into darkness. Only use with custom backgrounds!*/
+    public boolean borderDarkness = true;
     /** special tags for additional info. */
     public StringMap tags = new StringMap();
+    /** Name of callback to call for background rendering in mods; see Renderer#addCustomBackground. Runs last. */
+    public @Nullable String customBackgroundCallback;
+    /** path to background texture with extension (e.g. "sprites/space.png")*/
+    public @Nullable String backgroundTexture;
+    /** background texture move speed scaling - bigger numbers mean slower movement. 0 to disable. */
+    public float backgroundSpeed = 27000f;
+    /** background texture scaling factor */
+    public float backgroundScl = 1f;
+    /** background UV offsets */
+    public float backgroundOffsetX = 0.1f, backgroundOffsetY = 0.1f;
+    /** Parameters for planet rendered in the background. Cannot be changed once a map is loaded. */
+    public @Nullable PlanetParams planetBackground;
 
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */
     public Rules copy(){
@@ -138,6 +153,10 @@ public class Rules{
         }else{
             return Gamemode.survival;
         }
+    }
+
+    public boolean hasEnv(int env){
+        return (environment & env) != 0;
     }
 
     public float unitBuildSpeed(Team team){
