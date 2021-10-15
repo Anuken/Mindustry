@@ -81,6 +81,8 @@ public class Rules{
     public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
     public int unitCap = 0;
+    /** Environment drag multiplier. */
+    public float dragMultiplier = 1f;
     /** Environmental flags that dictate visuals & how blocks function. */
     public int environment = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
     /** Attributes of the environment. */

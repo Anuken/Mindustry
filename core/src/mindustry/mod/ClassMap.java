@@ -163,7 +163,6 @@ public class ClassMap{
         classes.put("StackConveyor", mindustry.world.blocks.distribution.StackConveyor.class);
         classes.put("StackConveyorBuild", mindustry.world.blocks.distribution.StackConveyor.StackConveyorBuild.class);
         classes.put("AirBlock", mindustry.world.blocks.environment.AirBlock.class);
-        classes.put("Bush", mindustry.world.blocks.environment.Bush.class);
         classes.put("Cliff", mindustry.world.blocks.environment.Cliff.class);
         classes.put("DoubleOverlayFloor", mindustry.world.blocks.environment.DoubleOverlayFloor.class);
         classes.put("EmptyFloor", mindustry.world.blocks.environment.EmptyFloor.class);
@@ -173,12 +172,10 @@ public class ClassMap{
         classes.put("Prop", mindustry.world.blocks.environment.Prop.class);
         classes.put("ShallowLiquid", mindustry.world.blocks.environment.ShallowLiquid.class);
         classes.put("SpawnBlock", mindustry.world.blocks.environment.SpawnBlock.class);
-        classes.put("StaticClusterWall", mindustry.world.blocks.environment.StaticClusterWall.class);
         classes.put("StaticTree", mindustry.world.blocks.environment.StaticTree.class);
         classes.put("StaticWall", mindustry.world.blocks.environment.StaticWall.class);
         classes.put("TreeBlock", mindustry.world.blocks.environment.TreeBlock.class);
         classes.put("WallOreBlock", mindustry.world.blocks.environment.WallOreBlock.class);
-        classes.put("WavingProp", mindustry.world.blocks.environment.WavingProp.class);
         classes.put("WobbleProp", mindustry.world.blocks.environment.WobbleProp.class);
         classes.put("BlockForge", mindustry.world.blocks.experimental.BlockForge.class);
         classes.put("BlockForgeBuild", mindustry.world.blocks.experimental.BlockForge.BlockForgeBuild.class);

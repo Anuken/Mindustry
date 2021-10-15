@@ -1513,6 +1513,7 @@ public class Blocks implements ContentList{
             tier = 4;
             updateEffect = Fx.pulverizeMedium;
             drillEffect = Fx.mineBig;
+            envEnabled |= Env.space;
 
             consumes.power(1.10f);
             consumes.liquid(Liquids.water, 0.08f).boost();
@@ -2416,15 +2417,6 @@ public class Blocks implements ContentList{
             launchTime = 60f * 20;
             hasPower = true;
             consumes.power(4f);
-        }};
-
-        //TODO
-        payloadLaunchPad = new PayloadLaunchPad("payload-launch-pad"){{
-            requirements(Category.units, BuildVisibility.debugOnly, ItemStack.with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
-            size = 5;
-            launchTime = 60f;
-            hasPower = true;
-            consumes.power(7f);
         }};
 
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
