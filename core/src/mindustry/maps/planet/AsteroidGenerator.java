@@ -138,7 +138,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
             camPos = new Vec3(1.2388899f, 1.6047299f, 2.4758825f);
         }};
         //state.rules.backgroundTexture = "sprites/space.png";
-        state.rules.dragMultiplier = 0.5f;
+        state.rules.dragMultiplier = 0.7f; //yes, yes space has 0 drag but 0% drag is very annoying
         state.rules.borderDarkness = false;
         state.rules.environment = Env.space;
     }
