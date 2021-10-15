@@ -236,10 +236,11 @@ public class ContentParser{
             Block block;
 
             if(locate(ContentType.block, name) != null){
-                block = locate(ContentType.block, name);
-
                 if(value.has("type")){
-                    throw new IllegalArgumentException("When defining properties for an existing block, you must not re-declare its type. The original type will be used. Block: " + name);
+                    Log.warn("Warning: '" + name + "' re-declares a type. This will be interpreted as a new block. If you wish to override a vanilla block, omit the 'type' section, as vanilla block `type`s cannot be changed.");
+                    block = make(resolve(value.getString("type", ""), Block.class), mod + "-" + name);
+                }else{
+                    block = locate(ContentType.block, name);
                 }
             }else{
                 block = make(resolve(value.getString("type", ""), Block.class), mod + "-" + name);
