@@ -25,6 +25,7 @@ public class PayloadBlock extends Block{
 
         update = true;
         sync = true;
+        group = BlockGroup.payloads;
         envEnabled |= Env.space;
     }
 
