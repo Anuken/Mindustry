@@ -250,10 +250,7 @@ public class Blocks implements ContentList{
             canShadow = false;
         }};
 
-        empty = new EmptyFloor("empty"){{
-            placeableOn = false;
-            solid = true;
-        }};
+        empty = new EmptyFloor("empty");
 
         stone = new Floor("stone");
 

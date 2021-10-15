@@ -68,7 +68,7 @@ public class BuilderAI extends AIController{
             //approach request if building
             BuildPlan req = unit.buildPlan();
 
-            //clear break plan if another player is breaking something.
+            //clear break plan if another player is breaking something
             if(!req.breaking && timer.get(timerTarget2, 40f)){
                 for(Player player : Groups.player){
                     if(player.isBuilder() && player.unit().activelyBuilding() && player.unit().buildPlan().samePos(req) && player.unit().buildPlan().breaking){
@@ -131,16 +131,15 @@ public class BuilderAI extends AIController{
                 //check if it's already been placed
                 if(world.tile(block.x, block.y) != null && world.tile(block.x, block.y).block().id == block.block){
                     blocks.removeFirst();
-                }else if(Build.validPlace(content.block(block.block), unit.team(), block.x, block.y, block.rotation)){ //it's valid.
+                }else if(Build.validPlace(content.block(block.block), unit.team(), block.x, block.y, block.rotation)){ //it's valid
                     lastPlan = block;
-                    //add build request.
+                    //add build request
                     unit.addBuild(new BuildPlan(block.x, block.y, block.rotation, content.block(block.block), block.config));
-                    //shift build plan to tail so next unit builds something else.
+                    //shift build plan to tail so next unit builds something else
                     blocks.addLast(blocks.removeFirst());
                 }else{
                     //shift head of queue to tail, try something else next time
-                    blocks.removeFirst();
-                    blocks.addLast(block);
+                    blocks.addLast(blocks.removeFirst());
                 }
             }
         }

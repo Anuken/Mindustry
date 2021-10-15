@@ -38,11 +38,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     boolean admin;
     String name = "frog";
     Color color = new Color();
-    //locale should not be synced.
     transient String locale = "en";
     transient float deathTimer;
     transient String lastText = "";
     transient float textFadeTime;
+
     transient private Unit lastReadUnit = Nulls.unit;
     transient private int wrongReadUnits;
     transient @Nullable Unit justSwitchFrom, justSwitchTo;
