@@ -566,8 +566,8 @@ public class ContentParser{
     }
 
     private <T extends MappableContent> T locate(ContentType type, String name){
-        T first = Vars.content.getByName(type, currentMod.name + "-" + name); //try vanilla replacement
-        return first != null ? first : Vars.content.getByName(type, name);
+        T first = Vars.content.getByName(type, name); //try vanilla replacement
+        return first != null ? first : Vars.content.getByName(type, currentMod.name + "-" + name);
     }
 
     private <T extends MappableContent> T locateAny(String name){
@@ -746,15 +746,15 @@ public class ContentParser{
                 TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName));
 
                 if(parent == null){
-                    throw new IllegalArgumentException("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
+                    Log.warn("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
+                }else{
+                    //add this node to the parent
+                    if(!parent.children.contains(node)){
+                        parent.children.add(node);
+                    }
+                    //reparent the node
+                    node.parent = parent;
                 }
-
-                //add this node to the parent
-                if(!parent.children.contains(node)){
-                    parent.children.add(node);
-                }
-                //reparent the node
-                node.parent = parent;
             });
         }
     }
