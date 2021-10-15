@@ -566,8 +566,8 @@ public class ContentParser{
     }
 
     private <T extends MappableContent> T locate(ContentType type, String name){
-        T first = Vars.content.getByName(type, name); //try vanilla replacement
-        return first != null ? first : Vars.content.getByName(type, currentMod.name + "-" + name);
+        T first = Vars.content.getByName(type, currentMod.name + "-" + name); //try vanilla replacement
+        return first != null ? first : Vars.content.getByName(type, name);
     }
 
     private <T extends MappableContent> T locateAny(String name){
