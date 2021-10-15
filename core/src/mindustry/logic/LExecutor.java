@@ -431,17 +431,16 @@ public class LExecutor{
                                     Call.pickedUnitPayload(unit, result);
                                 }
                             }else{ //buildings
-                                Building tile = world.buildWorld(unit.x, unit.y);
+                                Building build = world.buildWorld(unit.x, unit.y);
 
                                 //TODO copy pasted code
-                                if(tile != null && tile.team == unit.team){
-                                    if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
-                                        Call.pickedBuildPayload(unit, tile, true);
-                                    }else{ //pick up block payload
-                                        Payload current = tile.getPayload();
-                                        if(current != null && pay.canPickupPayload(current)){
-                                            Call.pickedBuildPayload(unit, tile, false);
-                                        }
+                                if(build != null && build.team == unit.team){
+                                    Payload current = build.getPayload();
+                                    if(current != null && pay.canPickupPayload(current)){
+                                        Call.pickedBuildPayload(unit, build, false);
+                                        //pick up whole building directly
+                                    }else if(build.block.buildVisibility != BuildVisibility.hidden && build.canPickup() && pay.canPickup(build)){
+                                        Call.pickedBuildPayload(unit, build, true);
                                     }
                                 }
                             }
