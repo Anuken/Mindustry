@@ -23,6 +23,7 @@ public class Constructor extends BlockProducer{
         size = 3;
         configurable = true;
 
+        configClear((ConstructorBuild tile) -> tile.recipe = null);
         config(Block.class, (ConstructorBuild tile, Block block) -> {
             if(tile.recipe != block) tile.progress = 0f;
             if(canProduce(block)){
