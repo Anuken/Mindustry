@@ -62,7 +62,7 @@ public class PayloadLoader extends PayloadBlock{
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             return super.acceptPayload(source, payload) &&
-                payload.size() <= maxBlockSize &&
+                payload.fits(maxBlockSize) &&
                 payload instanceof BuildPayload build &&
                 ((build.build.block.hasItems && build.block().unloadable && build.block().itemCapacity >= 10 && build.block().size <= maxBlockSize) ||
                 build.build.block().hasLiquids && build.block().liquidCapacity >= 10f);
