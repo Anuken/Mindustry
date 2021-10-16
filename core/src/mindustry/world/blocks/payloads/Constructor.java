@@ -29,6 +29,7 @@ public class Constructor extends BlockProducer{
                 tile.recipe = block;
             }
         });
+        configClear((ConstructorBuild tile) -> tile.recipe = null);
     }
 
     @Override
