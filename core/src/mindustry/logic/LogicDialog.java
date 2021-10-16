@@ -7,6 +7,7 @@ import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
 import arc.util.*;
+import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -66,6 +67,18 @@ public class LogicDialog extends BaseDialog{
 
         buttons.button("@variables", Icon.menu, () -> {
             BaseDialog dialog = new BaseDialog("@variables");
+            dialog.hidden(() -> {
+                if(!wasPaused){
+                    state.set(State.paused);
+                }
+            });
+
+            dialog.shown(() -> {
+                if(!wasPaused){
+                    state.set(State.playing);
+                }
+            });
+
             dialog.cont.pane(p -> {
                 p.margin(10f).marginRight(16f);
                 p.table(Tex.button, t -> {
