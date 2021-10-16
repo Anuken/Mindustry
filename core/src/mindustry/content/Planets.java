@@ -14,7 +14,7 @@ public class Planets implements ContentList{
 
     @Override
     public void load(){
-        sun = new Planet("sun", null, 4){{
+        sun = new Planet("sun", null, 4f){{
             bloom = true;
             accessible = false;
 
@@ -31,7 +31,7 @@ public class Planets implements ContentList{
             );
         }};
 
-        serpulo = new Planet("serpulo", sun, 1, 3){{
+        serpulo = new Planet("serpulo", sun, 1f, 3){{
             generator = new SerpuloPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
             cloudMeshLoader = () -> new MultiMesh(
