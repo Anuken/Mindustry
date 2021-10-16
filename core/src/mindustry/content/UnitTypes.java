@@ -581,6 +581,7 @@ public class UnitTypes implements ContentList{
             ammoType = new ItemAmmoType(Items.coal);
 
             weapons.add(new Weapon(){{
+                shootOnDeath = true;
                 reload = 24f;
                 shootCone = 180f;
                 ejectEffect = Fx.none;
@@ -591,7 +592,7 @@ public class UnitTypes implements ContentList{
                     hitEffect = Fx.pulverize;
                     lifetime = 10f;
                     speed = 1f;
-                    splashDamageRadius = 60f;
+                    splashDamageRadius = 55f;
                     instantDisappear = true;
                     splashDamage = 90f;
                     killShooter = true;
