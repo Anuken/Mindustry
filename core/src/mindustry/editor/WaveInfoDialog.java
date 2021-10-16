@@ -32,8 +32,8 @@ public class WaveInfoDialog extends BaseDialog{
     private SpawnGroup expandedGroup;
 
     private Table table, iTable, uTable;
-    private int search = -1, filterHealth, filterBegin = -1, filterEnd = -1, filterAmount, filterAmountWave;
-    private boolean expandPane = false, filterHealthMode = false, filterStrict = false;
+    private int search = -1, filterHealth, filterHealthMode, filterBegin = -1, filterEnd = -1, filterAmount, filterAmountWave;
+    private boolean expandPane = false, filterStrict = false;
     private UnitType lastType = UnitTypes.dagger;
     private StatusEffect filterEffect = StatusEffects.none;
     private Sort sort = Sort.begin;
@@ -164,7 +164,7 @@ public class WaveInfoDialog extends BaseDialog{
                     start = Math.max(search - (displayed / 2) - (displayed % 2), 0);
                     buildGroups();
                 }).growX().maxTextLength(8).get().setMessageText("@waves.search");
-                s.button(Icon.filter, Styles.emptyi, this::showFilter).size(46f).tooltip("@waves.filter");
+                s.button(Icon.filter, Styles.emptyi, this::showFilters).size(46f).tooltip("@waves.filter");
             }).fillX().pad(6f).row();
             main.pane(t -> table = t).growX().growY().padRight(8f).scrollX(false);
             main.row();
@@ -176,7 +176,7 @@ public class WaveInfoDialog extends BaseDialog{
                     expandedGroup = newGroup;
                     showContentPane(newGroup, c -> newGroup.type = lastType = c, () -> newGroup.type);
                     buildGroups();
-                    clearFilter();
+                    clearFilters();
                 }).growX().height(70f);
                 f.button(Icon.filter, () -> {
                     BaseDialog dialog = new BaseDialog("@waves.sort");
@@ -220,12 +220,14 @@ public class WaveInfoDialog extends BaseDialog{
             groups.sort(Structs.comps(Structs.comparingFloat(sort.sort), Structs.comparingInt(g -> sort == Sort.begin ? g.type.id : g.begin)));
             if(reverseSort) groups.reverse();
 
+            int range = filterStrict ? 0 : 20;
+
             for(SpawnGroup group : groups){
                 if((search >= 0 && group.getSpawned(search) <= 0)
-                || (filterHealth != 0 && !(filterHealthMode ? group.type.health * (search >= 0 ? group.getSpawned(search) : 1) > filterHealth : group.type.health * (search >= 0 ? group.getSpawned(search) : 1) < filterHealth))
-                || (filterBegin >= 0 && !(filterStrict ? group.begin == filterBegin : group.begin - 2 <= filterBegin && group.begin + 2 >= filterBegin))
-                || (filterEnd >= 0 && !(filterStrict ? group.end == filterEnd : group.end - 2 <= filterEnd && group.end + 2 >= filterEnd))
-                || (filterAmount != 0 && !(filterStrict ? group.getSpawned(filterAmountWave) == filterAmount : filterAmount - 5 <= group.getSpawned(filterAmountWave) && filterAmount + 5 >= group.getSpawned(filterAmountWave)))
+                || (filterHealth != 0 && !(filterHealthMode == 0 ? group.type.health > filterHealth : filterHealthMode == 1 ? group.type.health < filterHealth : filterHealth - range*2 <= group.type.health && filterHealth + range*2 >= group.type.health))
+                || (filterBegin >= 0 && !(filterStrict ? group.begin == filterBegin : group.begin - range/10 <= filterBegin && group.begin + range/10 >= filterBegin))
+                || (filterEnd >= 0 && !(group.end - range/10 <= filterEnd && group.end + range/10 >= filterEnd))
+                || (filterAmount != 0 && !(filterAmount - range/4 <= group.getSpawned(filterAmountWave) && filterAmount + range/4 >= group.getSpawned(filterAmountWave)))
                 || (filterEffect != StatusEffects.none && group.effect != filterEffect)) continue;
 
                 table.table(Tex.button, t -> {
@@ -361,6 +363,10 @@ public class WaveInfoDialog extends BaseDialog{
 
                 table.row();
             }
+
+            if(table.getChildren().isEmpty() && !groups.isEmpty()){
+                table.add("@none");
+            }
         }else{
             table.add("@editor.default");
         }
@@ -436,7 +442,7 @@ public class WaveInfoDialog extends BaseDialog{
         dialog.show();
     }
 
-    void showFilter(){
+    void showFilters(){
         BaseDialog dialog = new BaseDialog("@waves.filter");
         dialog.setFillParent(false);
 
@@ -449,9 +455,10 @@ public class WaveInfoDialog extends BaseDialog{
             dialog.cont.add(Core.bundle.get("waves.sort.health") + ":");
             dialog.cont.table(filter -> {
                 filter.button(">", Styles.cleart, () -> {
-                    filterHealthMode = !filterHealthMode;
+                    filterHealthMode ++;
+                    if(filterHealthMode == 3) filterHealthMode = 0;
                     buildGroups();
-                }).update(b -> b.setText(filterHealthMode ? ">" : "<")).size(40f).padRight(4f);
+                }).update(b -> b.setText(filterHealthMode == 0 ? ">" : filterHealthMode == 1 ? "<" : "~")).size(40f).padRight(4f);
                 numField("", filter, f -> filterHealth = f, () -> filterHealth, 170f, 15);
             }).row();
 
@@ -491,7 +498,7 @@ public class WaveInfoDialog extends BaseDialog{
             p.defaults().size(210f, 64f).padLeft(4f).padRight(4f);
             p.button("@back", Icon.left, dialog::hide);
             p.button("@clear", Icon.refresh, () -> {
-                clearFilter();
+                clearFilters();
                 buildGroups();
                 rebuild[0].run();
             });
@@ -578,9 +585,9 @@ public class WaveInfoDialog extends BaseDialog{
         }).width(width).maxTextLength(maxLength);
     }
 
-    void clearFilter(){
-        filterHealth = filterAmount = filterAmountWave = 0;
-        filterStrict = filterHealthMode = false;
+    void clearFilters(){
+        filterHealth = filterHealthMode = filterAmount = filterAmountWave = 0;
+        filterStrict = false;
         filterBegin = filterEnd = -1;
         filterEffect = StatusEffects.none;
     }
