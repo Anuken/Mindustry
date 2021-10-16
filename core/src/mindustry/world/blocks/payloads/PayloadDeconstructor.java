@@ -86,6 +86,11 @@ public class PayloadDeconstructor extends PayloadBlock{
         }
 
         @Override
+        public boolean acceptUnitPayload(Unit unit){
+            return payload == null && !unit.spawnedByCore;
+        }
+
+        @Override
         public void handlePayload(Building source, Payload payload){
             super.handlePayload(source, payload);
             accum = null;

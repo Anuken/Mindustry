@@ -70,7 +70,6 @@ public class LogicDialog extends BaseDialog{
                 p.margin(10f).marginRight(16f);
                 p.table(Tex.button, t -> {
                     t.defaults().fillX().height(45f);
-                    int i = 0;
                     for(var s : executor.vars){
                         if(s.constant) continue;
 
@@ -122,14 +121,13 @@ public class LogicDialog extends BaseDialog{
                             label.act(1f);
                         }).padRight(pad);
 
+                        //TODO type name does not update, is this important?
                         t.add(new Image(Tex.whiteui, color.cpy().mul(mul))).width(stub);
                         t.stack(new Image(Tex.whiteui, color), new Label(" " + typeName + " ", Styles.outlineLabel));
 
                         t.row();
 
-                        t.add().growX().colspan(6).height(4);
-
-                        t.row();
+                        t.add().growX().colspan(6).height(4).row();
                     }
                 });
             });
