@@ -19,7 +19,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class WaveSpawner{
-    private static final float margin = 40f, coreMargin = tilesize * 2f, maxSteps = 30;
+    private static final float margin = 0f, coreMargin = tilesize * 2f, maxSteps = 30;
 
     private int tmpCount;
     private Seq<Tile> spawns = new Seq<>();
@@ -203,6 +203,7 @@ public class WaveSpawner{
         unit.apply(StatusEffects.unmoving, 30f);
         unit.apply(StatusEffects.invincible, 60f);
         unit.add();
+        unit.unloaded();
 
         Events.fire(new UnitSpawnEvent(unit));
         Call.spawnEffect(unit.x, unit.y, unit.rotation, unit.type);

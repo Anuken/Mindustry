@@ -1,7 +1,7 @@
 [
   {
     "name": "mindustry.pl",
-    "address": ["46.105.36.238:6000", "46.105.36.238:6666", "46.105.36.238:6966"]
+    "address": ["0.baseduser.eu.org:6000", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6966"]
   },
   {
     "name": "C.A.M.S.",
@@ -21,7 +21,7 @@
   },
   {
     "name": "DarkDustry",
-    "address": ["darkdustry.ml", "darkdustry.ml:3000", "darkdustry.ml:7000", "darkdustry.ml:8000"] 
+    "address": ["darkdustry.ml", "darkdustry.ml:6000", "darkdustry.ml:7000", "darkdustry.ml:8000", "darkdustry.ml:9000"] 
   },
   {
     "name": "Chaotic Neutral",
@@ -33,7 +33,7 @@
   },
   {
     "name": "Obvilion Network",
-    "address": ["obvilionnetwork.ru:7004", "obvilionnetwork.ru:7005"]
+    "address": ["obvilion.ru:7004", "obvilion.ru:7005"]
   },
   {
     "name": "io",
@@ -46,5 +46,17 @@
   {
     "name": "SubZero",
     "address": ["minty-server.ddns.net"]
+  },
+  {
+    "name": "Shiza Minigames",
+    "address": ["shizashizashiza.ml"]
+  },
+  { 
+    "name": "devass.su",
+    "address": ["185.22.152.66"]
+  },
+  {
+    "name": "Phoenix Network",
+    "address": ["172.104.253.198"]
   }
 ]

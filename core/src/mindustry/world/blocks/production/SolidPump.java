@@ -31,6 +31,8 @@ public class SolidPump extends Pump{
     public SolidPump(String name){
         super(name);
         hasPower = true;
+        //only supports ground by default
+        envEnabled = Env.terrestrial;
     }
 
     @Override
@@ -38,7 +40,7 @@ public class SolidPump extends Pump{
         drawPotentialLinks(x, y);
 
         if(attribute != null){
-            drawPlaceText(Core.bundle.format("bar.efficiency", Math.round(Math.max(sumAttribute(attribute, x, y) / size / size + baseEfficiency, 0f) * 100 * percentSolid(x, y))), x, y, valid);
+            drawPlaceText(Core.bundle.format("bar.efficiency", Math.round(Math.max((sumAttribute(attribute, x, y)) / size / size + percentSolid(x, y) * baseEfficiency, 0f) * 100)), x, y, valid);
         }
     }
 
@@ -46,7 +48,7 @@ public class SolidPump extends Pump{
     public void setBars(){
         super.setBars();
         bars.add("efficiency", (SolidPumpBuild entity) -> new Bar(() -> Core.bundle.formatFloat("bar.pumpspeed",
-        entity.lastPump / Time.delta * 60, 1),
+        entity.lastPump * 60, 1),
         () -> Pal.ammo,
         () -> entity.warmup * entity.efficiency()));
     }
@@ -63,7 +65,7 @@ public class SolidPump extends Pump{
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile, Team team){
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
         float sum = tile.getLinkedTilesAs(this, tempTiles).sumf(t -> canPump(t) ? baseEfficiency + (attribute != null ? t.floor().attributes.get(attribute) : 0f) : 0f);
         return sum > 0.00001f;
     }
@@ -90,7 +92,6 @@ public class SolidPump extends Pump{
         public float validTiles;
         public float lastPump;
 
-
         @Override
         public void drawCracks(){}
 
@@ -116,7 +117,7 @@ public class SolidPump extends Pump{
             if(cons.valid() && typeLiquid() < liquidCapacity - 0.001f){
                 float maxPump = Math.min(liquidCapacity - typeLiquid(), pumpAmount * delta() * fraction * efficiency());
                 liquids.add(result, maxPump);
-                lastPump = maxPump;
+                lastPump = maxPump / Time.delta;
                 warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
                 if(Mathf.chance(delta() * updateEffectChance))
                     updateEffect.at(x + Mathf.range(size * 2f), y + Mathf.range(size * 2f));

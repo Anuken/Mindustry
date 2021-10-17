@@ -9,7 +9,7 @@ def ICON_DIR = new File("$rootDir/core/assets/icons/icon.icns")
 def platforms = ["Linux64", "Windows64", "Windows32", "MacOS"]
 
 task run(dependsOn: classes, type: JavaExec){
-    main = project.mainClassName
+    mainClass = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = project.assetsDir
@@ -30,7 +30,7 @@ task run(dependsOn: classes, type: JavaExec){
     }
 
     if(args.contains("debug")){
-        main = "mindustry.debug.DebugLauncher"
+        mainClass = "mindustry.debug.DebugLauncher"
     }
 }
 

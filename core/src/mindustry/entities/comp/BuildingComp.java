@@ -404,30 +404,36 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //region handler methods
 
     /** @return whether the player can select (but not actually control) this building. */
-    public boolean canControlSelect(Player player){
+    public boolean canControlSelect(Unit player){
         return false;
     }
 
     /** Called when a player control-selects this building - not called for ControlBlock subclasses. */
-    public void onControlSelect(Player player){
+    public void onControlSelect(Unit player){
 
     }
 
-    public void acceptPlayerPayload(Player player, Cons<Payload> grabber){
+    public void handleUnitPayload(Unit player, Cons<Payload> grabber){
         Fx.spawn.at(player);
-        var unit = player.unit();
-        player.clearUnit();
-        //player.deathTimer = Player.deathDelay + 1f; //for instant respawn
-        unit.remove();
-        grabber.get(new UnitPayload(unit));
-        Fx.unitDrop.at(unit);
+
+        if(player.isPlayer()){
+            player.getPlayer().clearUnit();
+        }
+
+        player.remove();
+        grabber.get(new UnitPayload(player));
+        Fx.unitDrop.at(player);
         if(Vars.net.client()){
-            Vars.netClient.clearRemovedEntity(unit.id);
+            Vars.netClient.clearRemovedEntity(player.id);
         }
     }
 
     public boolean canUnload(){
         return block.unloadable;
+    }
+
+    public boolean payloadCheck(int conveyorRotation){
+        return block.rotate && (rotation + 2) % 4 == conveyorRotation;
     }
 
     /** Called when an unloader takes an item. */
@@ -1037,7 +1043,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 int amount = Math.min(items.get(item), explosionItemCap());
                 explosiveness += item.explosiveness * amount;
                 flammability += item.flammability * amount;
-                power += item.charge * amount * 100f;
+                power += item.charge * Mathf.pow(amount, 1.1f) * 150f;
             }
         }
 
@@ -1239,6 +1245,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public float handleDamage(float amount){
         return amount;
+    }
+
+    public boolean absorbLasers(){
+        return block.absorbLasers;
+    }
+
+    public boolean isInsulated(){
+        return block.insulated;
     }
 
     public boolean collide(Bullet other){

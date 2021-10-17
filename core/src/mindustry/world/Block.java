@@ -25,6 +25,7 @@ import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
@@ -49,6 +50,7 @@ public class Block extends UnlockableContent{
     public boolean outputsPayload = false;
     public boolean acceptsPayload = false;
     public boolean acceptsItems = false;
+    public boolean separateItemCapacity = false;
 
     public int itemCapacity = 10;
     public float liquidCapacity = 10f;
@@ -122,6 +124,8 @@ public class Block extends UnlockableContent{
     public boolean useColor = true;
     /** item that drops from this block, used for drills */
     public @Nullable Item itemDrop = null;
+    /** Array of affinities to certain things. */
+    public Attributes attributes = new Attributes();
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
@@ -202,10 +206,16 @@ public class Block extends UnlockableContent{
     public int outlinedIcon = -1;
     /** Whether this block has a shadow under it. */
     public boolean hasShadow = true;
-    /** Sounds made when this block is destroyed.*/
-    public Sound destroySound = Sounds.boom;
+    /** Should the sound made when this block is built change in pitch. */
+    public boolean placePitchChange = true;
+    /** Should the sound made when this block is deconstructed change in pitch. */
+    public boolean breakPitchChange = true;
+    /** Sound made when this block is built. */
+    public Sound placeSound = Sounds.place;
     /** Sound made when this block is deconstructed. */
     public Sound breakSound = Sounds.breaks;
+    /** Sounds made when this block is destroyed.*/
+    public Sound destroySound = Sounds.boom;
     /** How reflective this block is. */
     public float albedo = 0f;
     /** Environmental passive light color. */
@@ -378,9 +388,15 @@ public class Block extends UnlockableContent{
     }
 
     /** Returns whether or not this block can be place on the specified  */
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
+        return canPlaceOn(tile, team);
+    }
+
+    /** Legacy canPlaceOn implementation, override {@link #canPlaceOn(Tile, Team, int)} instead.*/
     public boolean canPlaceOn(Tile tile, Team team){
         return true;
     }
+
 
     public boolean canBreak(Tile tile){
         return true;

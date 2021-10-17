@@ -35,7 +35,7 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, spawn, cliff, deepwater, water, taintedWater, deepTaintedWater, tar, slag, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space,
+    air, spawn, cliff, deepwater, water, taintedWater, deepTaintedWater, tar, slag, cryofluid, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space, empty,
     dacite,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, grass, salt,
@@ -64,7 +64,7 @@ public class Blocks implements ContentList{
     duct, ductRouter, ductBridge,
 
     //liquid
-    mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
+    mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidContainer, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
 
     //power
     combustionGenerator, thermalGenerator, steamGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
@@ -86,17 +86,18 @@ public class Blocks implements ContentList{
     repairPoint, repairTurret,
 
     //payloads
-    payloadConveyor, payloadRouter, payloadPropulsionTower,
+    payloadConveyor, payloadRouter, payloadPropulsionTower, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
 
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
 
     //campaign
-    launchPad, interplanetaryAccelerator,
-
-    //misc experimental
-    blockForge, blockLoader, blockUnloader
+    launchPad, interplanetaryAccelerator
     ;
+
+    /** @deprecated use the blocks with proper names, */
+    @Deprecated
+    public static Block blockForge, blockLoader, blockUnloader;
 
     @Override
     public void load(){
@@ -125,9 +126,9 @@ public class Blocks implements ContentList{
             isLiquid = true;
             status = StatusEffects.wet;
             statusDuration = 120f;
-            drownTime = 140f;
+            drownTime = 200f;
             cacheLayer = CacheLayer.water;
-            albedo = 0.5f;
+            albedo = 0.9f;
         }};
 
         water = new Floor("shallow-water"){{
@@ -138,7 +139,7 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
-            albedo = 0.5f;
+            albedo = 0.9f;
         }};
 
         taintedWater = new Floor("tainted-water"){{
@@ -149,7 +150,7 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
-            albedo = 0.5f;
+            albedo = 0.9f;
             attributes.set(Attribute.spores, 0.15f);
         }};
 
@@ -158,35 +159,35 @@ public class Blocks implements ContentList{
             variants = 0;
             status = StatusEffects.wet;
             statusDuration = 140f;
-            drownTime = 120f;
+            drownTime = 200f;
             liquidDrop = Liquids.water;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
-            albedo = 0.5f;
+            albedo = 0.9f;
             attributes.set(Attribute.spores, 0.15f);
         }};
 
         darksandTaintedWater = new ShallowLiquid("darksand-tainted-water"){{
             speedMultiplier = 0.75f;
             statusDuration = 60f;
-            albedo = 0.5f;
+            albedo = 0.9f;
             attributes.set(Attribute.spores, 0.1f);
         }};
 
         sandWater = new ShallowLiquid("sand-water"){{
             speedMultiplier = 0.8f;
             statusDuration = 50f;
-            albedo = 0.5f;
+            albedo = 0.9f;
         }};
 
         darksandWater = new ShallowLiquid("darksand-water"){{
             speedMultiplier = 0.8f;
             statusDuration = 50f;
-            albedo = 0.5f;
+            albedo = 0.9f;
         }};
 
         tar = new Floor("tar"){{
-            drownTime = 150f;
+            drownTime = 230f;
             status = StatusEffects.tarred;
             statusDuration = 240f;
             speedMultiplier = 0.19f;
@@ -196,8 +197,24 @@ public class Blocks implements ContentList{
             cacheLayer = CacheLayer.tar;
         }};
 
-        slag = new Floor("molten-slag"){{
+        cryofluid = new Floor("pooled-cryofluid"){{
             drownTime = 150f;
+            status = StatusEffects.freezing;
+            statusDuration = 240f;
+            speedMultiplier = 0.5f;
+            variants = 0;
+            liquidDrop = Liquids.cryofluid;
+            liquidMultiplier = 0.5f;
+            isLiquid = true;
+            cacheLayer = CacheLayer.cryofluid;
+
+            emitLight = true;
+            lightRadius = 25f;
+            lightColor = Color.cyan.cpy().a(0.19f);
+        }};
+
+        slag = new Floor("molten-slag"){{
+            drownTime = 230f;
             status = StatusEffects.melting;
             statusDuration = 240f;
             speedMultiplier = 0.19f;
@@ -217,7 +234,10 @@ public class Blocks implements ContentList{
             placeableOn = false;
             solid = true;
             variants = 0;
+            canShadow = false;
         }};
+
+        empty = new EmptyFloor("empty");
 
         stone = new Floor("stone");
 
@@ -275,7 +295,6 @@ public class Blocks implements ContentList{
             statusDuration = 30f;
             attributes.set(Attribute.water, 1f);
             cacheLayer = CacheLayer.mud;
-            albedo = 0.35f;
             walkSound = Sounds.mud;
             walkSoundVolume = 0.08f;
             walkSoundPitchMin = 0.4f;
@@ -300,18 +319,21 @@ public class Blocks implements ContentList{
 
         snow = new Floor("snow"){{
             attributes.set(Attribute.water, 0.2f);
+            albedo = 0.7f;
         }};
 
         ice = new Floor("ice"){{
             dragMultiplier = 0.35f;
             speedMultiplier = 0.9f;
             attributes.set(Attribute.water, 0.4f);
+            albedo = 0.65f;
         }};
 
         iceSnow = new Floor("ice-snow"){{
             dragMultiplier = 0.6f;
             variants = 3;
             attributes.set(Attribute.water, 0.3f);
+            albedo = 0.6f;
         }};
 
         shale = new Floor("shale"){{
@@ -319,34 +341,36 @@ public class Blocks implements ContentList{
             attributes.set(Attribute.oil, 1.6f);
         }};
 
+        moss = new Floor("moss"){{
+            variants = 3;
+            attributes.set(Attribute.spores, 0.15f);
+        }};
+
+        sporeMoss = new Floor("spore-moss"){{
+            variants = 3;
+            attributes.set(Attribute.spores, 0.3f);
+        }};
+
         stoneWall = new StaticWall("stone-wall"){{
             variants = 2;
         }};
 
         sporeWall = new StaticWall("spore-wall"){{
-            variants = 2;
-            taintedWater.asFloor().wall = deepTaintedWater.asFloor().wall = this;
+            taintedWater.asFloor().wall = deepTaintedWater.asFloor().wall = sporeMoss.asFloor().wall = this;
         }};
 
-        dirtWall = new StaticWall("dirt-wall"){{
-            variants = 2;
-        }};
+        dirtWall = new StaticWall("dirt-wall");
 
-        daciteWall = new StaticWall("dacite-wall"){{
-            variants = 2;
-        }};
+        daciteWall = new StaticWall("dacite-wall");
 
         iceWall = new StaticWall("ice-wall"){{
-            variants = 2;
             iceSnow.asFloor().wall = this;
+            albedo = 0.6f;
         }};
 
-        snowWall = new StaticWall("snow-wall"){{
-            variants = 2;
-        }};
+        snowWall = new StaticWall("snow-wall");
 
         duneWall = new StaticWall("dune-wall"){{
-            variants = 2;
             basalt.asFloor().wall = darksandWater.asFloor().wall = darksandTaintedWater.asFloor().wall = this;
         }};
 
@@ -359,21 +383,15 @@ public class Blocks implements ContentList{
 
         shrubs = new StaticWall("shrubs");
 
-        shaleWall = new StaticWall("shale-wall"){{
-            variants = 2;
-        }};
+        shaleWall = new StaticWall("shale-wall");
 
         sporePine = new StaticTree("spore-pine"){{
-            variants = 0;
+            moss.asFloor().wall = this;
         }};
 
-        snowPine = new StaticTree("snow-pine"){{
-            variants = 0;
-        }};
+        snowPine = new StaticTree("snow-pine");
 
-        pine = new StaticTree("pine"){{
-            variants = 0;
-        }};
+        pine = new StaticTree("pine");
 
         whiteTreeDead = new TreeBlock("white-tree-dead");
 
@@ -386,7 +404,7 @@ public class Blocks implements ContentList{
 
         boulder = new Prop("boulder"){{
             variants = 2;
-            stone.asFloor().decoration = this;
+            stone.asFloor().decoration = craters.asFloor().decoration = charr.asFloor().decoration = this;
         }};
 
         snowBoulder = new Prop("snow-boulder"){{
@@ -396,30 +414,22 @@ public class Blocks implements ContentList{
 
         shaleBoulder = new Prop("shale-boulder"){{
             variants = 2;
+            shale.asFloor().decoration = this;
         }};
 
         sandBoulder = new Prop("sand-boulder"){{
             variants = 2;
+            sand.asFloor().decoration = this;
         }};
 
         daciteBoulder = new Prop("dacite-boulder"){{
             variants = 2;
+            dacite.asFloor().decoration = this;
         }};
 
         basaltBoulder = new Prop("basalt-boulder"){{
             variants = 2;
-        }};
-
-        moss = new Floor("moss"){{
-            variants = 3;
-            attributes.set(Attribute.spores, 0.15f);
-            wall = sporePine;
-        }};
-
-        sporeMoss = new Floor("spore-moss"){{
-            variants = 3;
-            attributes.set(Attribute.spores, 0.3f);
-            wall = sporeWall;
+            basalt.asFloor().decoration = hotrock.asFloor().decoration = darksand.asFloor().decoration = magmarock.asFloor().decoration = this;
         }};
 
         metalFloor = new Floor("metal-floor", 0);
@@ -872,6 +882,7 @@ public class Blocks implements ContentList{
         }};
 
         thruster = new Thruster("thruster"){{
+            requirements(Category.defense, BuildVisibility.sandboxOnly, with(Items.scrap, 96));
             health = 55 * 16 * wallHealthMultiplier;
             size = 4;
         }};
@@ -1111,10 +1122,16 @@ public class Blocks implements ContentList{
             liquidCapacity = 20f;
         }};
 
+        liquidContainer = new LiquidRouter("liquid-container"){{
+            requirements(Category.liquid, with(Items.titanium, 10, Items.metaglass, 15));
+            liquidCapacity = 700f;
+            size = 2;
+        }};
+
         liquidTank = new LiquidRouter("liquid-tank"){{
-            requirements(Category.liquid, with(Items.titanium, 25, Items.metaglass, 25));
+            requirements(Category.liquid, with(Items.titanium, 30, Items.metaglass, 40));
             size = 3;
-            liquidCapacity = 1500f;
+            liquidCapacity = 1800f;
             health = 500;
         }};
 
@@ -1656,6 +1673,7 @@ public class Blocks implements ContentList{
             recoilAmount = 3f;
             shootShake = 1f;
             burstSpacing = 3f;
+            spread = 0f;
             shots = 4;
             ammoUseEffect = Fx.casing2;
             health = 240 * size * size;
@@ -1879,6 +1897,7 @@ public class Blocks implements ContentList{
                 length = 200f;
                 hitEffect = Fx.hitMeltdown;
                 hitColor = Pal.meltdownHit;
+                status = StatusEffects.melting;
                 drawSize = 420f;
 
                 incendChance = 0.4f;
@@ -2062,6 +2081,50 @@ public class Blocks implements ContentList{
             consumes.power(6f);
         }};
 
+        deconstructor = new PayloadDeconstructor("deconstructor"){{
+            requirements(Category.units, with(Items.thorium, 250, Items.silicon, 200, Items.graphite, 250));
+            itemCapacity = 250;
+            consumes.power(3f);
+            size = 5;
+            deconstructSpeed = 2f;
+        }};
+
+        constructor = new Constructor("constructor"){{
+            requirements(Category.units, with(Items.silicon, 50, Items.thorium, 70, Items.graphite, 50));
+            hasPower = true;
+            consumes.power(2f);
+            size = 3;
+        }};
+
+        //yes this block is pretty much useless
+        largeConstructor = new Constructor("large-constructor"){{
+            requirements(Category.units, with(Items.silicon, 100, Items.thorium, 150, Items.graphite, 50, Items.phaseFabric, 40));
+            hasPower = true;
+            consumes.power(2f);
+            maxBlockSize = 4;
+            minBlockSize = 3;
+            size = 5;
+        }};
+
+        payloadLoader = new PayloadLoader("payload-loader"){{
+            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.copper, 100));
+            hasPower = true;
+            consumes.power(2f);
+            size = 3;
+        }};
+
+        payloadUnloader = new PayloadUnloader("payload-unloader"){{
+            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.copper, 100));
+            hasPower = true;
+            consumes.power(2f);
+            size = 3;
+        }};
+
+        //deprecated, will be removed.
+        blockForge = constructor;
+        blockLoader = payloadLoader;
+        blockUnloader = payloadUnloader;
+
         //endregion
         //region sandbox
 
@@ -2222,30 +2285,6 @@ public class Blocks implements ContentList{
             displaySize = 176;
 
             size = 6;
-        }};
-
-        //endregion
-        //region experimental
-
-        blockForge = new BlockForge("block-forge"){{
-            requirements(Category.units, BuildVisibility.debugOnly, with(Items.thorium, 100));
-            hasPower = true;
-            consumes.power(2f);
-            size = 3;
-        }};
-
-        blockLoader = new BlockLoader("block-loader"){{
-            requirements(Category.units, BuildVisibility.debugOnly, with(Items.thorium, 100));
-            hasPower = true;
-            consumes.power(2f);
-            size = 3;
-        }};
-
-        blockUnloader = new BlockUnloader("block-unloader"){{
-            requirements(Category.units, BuildVisibility.debugOnly, with(Items.thorium, 100));
-            hasPower = true;
-            consumes.power(2f);
-            size = 3;
         }};
 
         //endregion

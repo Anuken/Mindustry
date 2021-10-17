@@ -21,6 +21,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.mod.ContentParser.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
@@ -649,6 +650,11 @@ public class Mods implements Loadable{
 
     public void handleContentError(Content content, Throwable error){
         parser.markError(content, error);
+    }
+
+    /** Adds a listener for parsed JSON objects. */
+    public void addParseListener(ParseListener hook){
+        parser.listeners.add(hook);
     }
 
     /** @return a list of mods and versions, in the format name:version. */

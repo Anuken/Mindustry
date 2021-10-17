@@ -27,6 +27,7 @@ public class LiquidSource extends Block{
         noUpdateDisabled = true;
         displayFlow = false;
         group = BlockGroup.liquids;
+        envEnabled = Env.any;
 
         config(Liquid.class, (LiquidSourceBuild tile, Liquid l) -> tile.source = l);
         configClear((LiquidSourceBuild tile) -> tile.source = null);

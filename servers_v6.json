@@ -60,8 +60,8 @@
     "address": ["yeeth.mindustry.me:2004","185.86.230.61:25570"] 
   },
   {
-    "name": "md.obvilionnetwork.ru",
-    "address": ["obvilionnetwork.ru", "obvilionnetwork.ru:7001", "obvilionnetwork.ru:7002", "obvilionnetwork.ru:7003"]
+    "name": "Obvilion Network",
+    "address": ["obvilion.ru", "obvilion.ru:7001", "obvilion.ru:7002", "obvilion.ru:7003"]
   },
   {
     "name": "Mindustry PLAY",
@@ -93,7 +93,7 @@
   },
   {
     "name": "Hungarian",
-    "address": ["magyarmindustry.tk", "148.251.175.124:25601"]
+    "address": ["survival.humindustry.tk", "148.251.175.124:25601"]
   },
   {
     "name": "Xpdustry",
@@ -112,7 +112,11 @@
     "address": ["144.76.120.74:18645"]
   },
   {
-    "name": "HexedPvP",
-    "address": ["001.finland.eu.hosts.dynamichost.xyz:23664"]
+    "name": "NukeDustry",
+    "address": ["nukedustry.tk:7777", "nukedustry.tk:8888"]
+  },
+  {
+    "name": "MindustryBR",
+    "address": ["mindustryptbr.ddns.net", "mindustryptbr.myddns.me", "mindustry.me:4447"]
   }
 ]

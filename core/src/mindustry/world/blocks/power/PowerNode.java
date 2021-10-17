@@ -43,6 +43,7 @@ public class PowerNode extends PowerBlock{
         swapDiagonalPlacement = true;
         schematicPriority = -10;
         drawDisabled = false;
+        envEnabled |= Env.space;
 
         config(Integer.class, (entity, value) -> {
             PowerModule power = entity.power;
@@ -348,7 +349,7 @@ public class PowerNode extends PowerBlock{
     public static boolean insulated(int x, int y, int x2, int y2){
         return world.raycast(x, y, x2, y2, (wx, wy) -> {
             Building tile = world.build(wx, wy);
-            return tile != null && tile.block.insulated;
+            return tile != null && tile.isInsulated();
         });
     }
 

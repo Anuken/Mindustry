@@ -108,14 +108,18 @@ public class StatValues{
         };
     }
 
-    public static StatValue floorEfficiency(Floor floor, float multiplier, boolean startZero){
+    public static StatValue blockEfficiency(Block floor, float multiplier, boolean startZero){
         return table -> table.stack(
             new Image(floor.uiIcon).setScaling(Scaling.fit),
             new Table(t -> t.top().right().add((multiplier < 0 ? "[scarlet]" : startZero ? "[accent]" : "[accent]+") + (int)((multiplier) * 100) + "%").style(Styles.outlineLabel))
         );
     }
 
-    public static StatValue floors(Attribute attr, boolean floating, float scale, boolean startZero){
+    public static StatValue blocks(Attribute attr, boolean floating, float scale, boolean startZero){
+        return blocks(attr, floating, scale, startZero, true);
+    }
+
+    public static StatValue blocks(Attribute attr, boolean floating, float scale, boolean startZero, boolean checkFloors){
         return table -> table.table(c -> {
             Runnable[] rebuild = {null};
             Map[] lastMap = {null};
@@ -126,14 +130,14 @@ public class StatValues{
 
                 if(state.isGame()){
                     var blocks = Vars.content.blocks()
-                    .select(block -> block instanceof Floor f && indexer.isBlockPresent(block) && f.attributes.get(attr) != 0 && !(f.isDeep() && !floating))
+                    .select(block -> (!checkFloors || block instanceof Floor) && indexer.isBlockPresent(block) && block.attributes.get(attr) != 0 && !((block instanceof Floor f && f.isDeep()) && !floating))
                     .<Floor>as().with(s -> s.sort(f -> f.attributes.get(attr)));
 
                     if(blocks.any()){
                         int i = 0;
                         for(var block : blocks){
 
-                            floorEfficiency(block, block.attributes.get(attr) * scale, startZero).display(c);
+                            blockEfficiency(block, block.attributes.get(attr) * scale, startZero).display(c);
                             if(++i % 5 == 0){
                                 c.row();
                             }

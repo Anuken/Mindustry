@@ -9,6 +9,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.EntityCollisions.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -18,22 +19,30 @@ import mindustry.world.blocks.environment.*;
 abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
     @Import float x, y;
     @Import UnitType type;
+    @Import Team team;
 
     transient Leg[] legs = {};
     transient float totalLength;
     transient float moveSpace;
     transient float baseRotation;
+    transient Floor lastDeepFloor;
 
     @Replace
     @Override
     public SolidPred solidity(){
-        return !type.allowLegStep ? EntityCollisions::solid : EntityCollisions::legsSolid;
+        return type.allowLegStep ? EntityCollisions::legsSolid : EntityCollisions::solid;
     }
 
     @Override
     @Replace
     public int pathType(){
-        return Pathfinder.costLegs;
+        return type.allowLegStep ? Pathfinder.costGround : Pathfinder.costLegs;
+    }
+
+    @Override
+    @Replace
+    public Floor drownFloor(){
+        return lastDeepFloor;
     }
 
     @Override
@@ -41,10 +50,18 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         resetLegs();
     }
 
+    @Override
+    public void unloaded(){
+        resetLegs(1f);
+    }
+
     public void resetLegs(){
+        resetLegs(type.legLength);
+    }
+
+    public void resetLegs(float legLength){
         float rot = baseRotation;
         int count = type.legCount;
-        float legLength = type.legLength;
 
         this.legs = new Leg[count];
 
@@ -85,6 +102,9 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         Vec2 moveOffset = Tmp.v4.trns(rot, trns);
         boolean moving = moving();
 
+        lastDeepFloor = null;
+        int deeps = 0;
+
         for(int i = 0; i < legs.length; i++){
             float dstRot = legAngle(rot, i);
             Vec2 baseOffset = Tmp.v5.trns(dstRot, type.legBaseOffset).add(x, y);
@@ -105,11 +125,16 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             l.moving = move;
             l.stage = moving ? stageF % 1f : Mathf.lerpDelta(l.stage, 0f, 0.1f);
 
+            Floor floor = Vars.world.floorWorld(l.base.x, l.base.y);
+            if(floor.isDeep()){
+                deeps ++;
+                lastDeepFloor = floor;
+            }
+
             if(l.group != group){
 
                 //create effect when transitioning to a group it can't move in
                 if(!move && i % div == l.group){
-                    Floor floor = Vars.world.floorWorld(l.base.x, l.base.y);
                     if(floor.isLiquid){
                         floor.walkEffect.at(l.base.x, l.base.y, type.rippleScale, floor.mapColor);
                         floor.walkSound.at(x, y, 1f, floor.walkSoundVolume);
@@ -123,7 +148,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
                     }
 
                     if(type.legSplashDamage > 0){
-                        Damage.damage(team(), l.base.x, l.base.y, type.legSplashRange, type.legSplashDamage, false, true);
+                        Damage.damage(team, l.base.x, l.base.y, type.legSplashRange, type.legSplashDamage, false, true);
                     }
                 }
 
@@ -147,6 +172,11 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             }
 
             l.joint.lerpDelta(jointDest, moveSpeed / 4f);
+        }
+
+        //when at least 1 leg is touching land, it can't drown
+        if(deeps != legs.length){
+            lastDeepFloor = null;
         }
     }
 

@@ -2,9 +2,16 @@ package mindustry.logic;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
+import arc.scene.actions.*;
+import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
 import arc.util.*;
+import mindustry.core.GameState.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.logic.LExecutor.*;
 import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
@@ -15,6 +22,7 @@ import static mindustry.logic.LCanvas.*;
 public class LogicDialog extends BaseDialog{
     public LCanvas canvas;
     Cons<String> consumer = s -> {};
+    @Nullable LExecutor executor;
 
     public LogicDialog(){
         super("logic");
@@ -57,6 +65,90 @@ public class LogicDialog extends BaseDialog{
             dialog.show();
         }).name("edit");
 
+        buttons.button("@variables", Icon.menu, () -> {
+            BaseDialog dialog = new BaseDialog("@variables");
+            dialog.hidden(() -> {
+                if(!wasPaused){
+                    state.set(State.paused);
+                }
+            });
+
+            dialog.shown(() -> {
+                if(!wasPaused){
+                    state.set(State.playing);
+                }
+            });
+
+            dialog.cont.pane(p -> {
+                p.margin(10f).marginRight(16f);
+                p.table(Tex.button, t -> {
+                    t.defaults().fillX().height(45f);
+                    for(var s : executor.vars){
+                        if(s.constant) continue;
+
+                        Color varColor = Pal.gray;
+                        float stub = 8f, mul = 0.5f, pad = 4;
+
+                        Color color =
+                            !s.isobj ? Pal.place :
+                            s.objval == null ? Color.darkGray :
+                            s.objval instanceof String ? Pal.ammo :
+                            s.objval instanceof Content ? Pal.logicOperations :
+                            s.objval instanceof Building ? Pal.logicBlocks :
+                            s.objval instanceof Unit ? Pal.logicUnits :
+                            s.objval instanceof Enum<?> ? Pal.logicIo :
+                            Color.white;
+
+                        String typeName =
+                            !s.isobj ? "number" :
+                            s.objval == null ? "null" :
+                            s.objval instanceof String ? "string" :
+                            s.objval instanceof Content ? "content" :
+                            s.objval instanceof Building ? "building" :
+                            s.objval instanceof Unit ? "unit" :
+                            s.objval instanceof Enum<?> ? "enum" :
+                            "unknown";
+
+                        t.add(new Image(Tex.whiteui, varColor.cpy().mul(mul))).width(stub);
+                        t.stack(new Image(Tex.whiteui, varColor), new Label(" " + s.name + " ", Styles.outlineLabel){{
+                            setColor(Pal.accent);
+                        }}).padRight(pad);
+
+                        t.add(new Image(Tex.whiteui, Pal.gray.cpy().mul(mul))).width(stub);
+                        t.table(Tex.pane, out -> {
+                            float period = 15f;
+                            float[] counter = {-1f};
+                            Label label = out.add("").style(Styles.outlineLabel).padLeft(4).padRight(4).width(140f).wrap().get();
+                            label.update(() -> {
+                                if(counter[0] < 0 || (counter[0] += Time.delta) >= period){
+                                    String text = s.isobj ? PrintI.toString(s.objval) : Math.abs(s.numval - (long)s.numval) < 0.00001 ? (long)s.numval + "" : s.numval + "";
+                                    if(!label.textEquals(text)){
+                                        label.setText(text);
+                                        if(counter[0] >= 0f){
+                                            label.actions(Actions.color(Pal.accent), Actions.color(Color.white, 0.2f));
+                                        }
+                                    }
+                                    counter[0] = 0f;
+                                }
+                            });
+                            label.act(1f);
+                        }).padRight(pad);
+
+                        //TODO type name does not update, is this important?
+                        t.add(new Image(Tex.whiteui, color.cpy().mul(mul))).width(stub);
+                        t.stack(new Image(Tex.whiteui, color), new Label(" " + typeName + " ", Styles.outlineLabel));
+
+                        t.row();
+
+                        t.add().growX().colspan(6).height(4).row();
+                    }
+                });
+            });
+
+            dialog.addCloseButton();
+            dialog.show();
+        }).name("variables").disabled(b -> executor == null || executor.vars.length == 0);
+
         buttons.button("@add", Icon.add, () -> {
             BaseDialog dialog = new BaseDialog("@add");
             dialog.cont.pane(t -> {
@@ -92,7 +184,8 @@ public class LogicDialog extends BaseDialog{
         onResize(() -> canvas.rebuild());
     }
 
-    public void show(String code, Cons<String> modified){
+    public void show(String code, LExecutor executor, Cons<String> modified){
+        this.executor = executor;
         canvas.statements.clearChildren();
         canvas.rebuild();
         try{

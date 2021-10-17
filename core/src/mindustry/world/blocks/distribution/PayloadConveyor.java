@@ -30,6 +30,7 @@ public class PayloadConveyor extends Block{
         update = true;
         outputsPayload = true;
         noUpdateDisabled = true;
+        envEnabled |= Env.space;
         sync = true;
     }
 
@@ -74,13 +75,13 @@ public class PayloadConveyor extends Block{
         public int step = -1, stepAccepted = -1;
 
         @Override
-        public boolean canControlSelect(Player player){
-            return this.item == null && !player.unit().spawnedByCore && player.unit().hitSize / tilesize <= payloadLimit && player.tileOn() != null && player.tileOn().build == this;
+        public boolean canControlSelect(Unit player){
+            return this.item == null && !player.spawnedByCore && player.hitSize / tilesize <= payloadLimit && player.tileOn() != null && player.tileOn().build == this;
         }
 
         @Override
-        public void onControlSelect(Player player){
-            acceptPlayerPayload(player, p -> item = p);
+        public void onControlSelect(Unit player){
+            handleUnitPayload(player, p -> item = p);
         }
 
         @Override
@@ -113,7 +114,7 @@ public class PayloadConveyor extends Block{
 
             int ntrns = 1 + size/2;
             Tile next = tile.nearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
-            blocked = (next != null && next.solid() && !(next.block().outputsPayload || next.block().acceptsPayload)) || (this.next != null && this.next.block.rotate && (this.next.rotation + 2) % 4 == rotation);
+            blocked = (next != null && next.solid() && !(next.block().outputsPayload || next.block().acceptsPayload)) || (this.next != null && this.next.payloadCheck(rotation));
         }
 
         @Override

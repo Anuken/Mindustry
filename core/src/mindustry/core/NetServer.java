@@ -19,6 +19,7 @@ import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
@@ -63,6 +64,8 @@ public class NetServer implements ApplicationListener{
 
         return state.rules.defaultTeam;
     };
+    /** Converts a message + NULLABLE player sender into a single string. Override for custom prefixes/suffixes. */
+    public ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
 
     private boolean closing = false;
     private Interval timer = new Interval();
@@ -292,20 +295,22 @@ public class NetServer implements ApplicationListener{
         clientCommands.<Player>register("t", "<message...>", "Send a message only to your teammates.", (args, player) -> {
             String message = admins.filterMessage(player, args[0]);
             if(message != null){
-                Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(message, player, "[#" + player.team().color.toString() + "]<T>" + NetClient.colorizeName(player.id(), player.name)));
+                String raw = "[#" + player.team().color.toString() + "]<T> " + chatFormatter.format(player, message);
+                Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(raw, player, message));
             }
         });
 
         clientCommands.<Player>register("a", "<message...>", "Send a message only to admins.", (args, player) -> {
             if(!player.admin){
-                player.sendMessage("[scarlet]You must be admin to use this command.");
+                player.sendMessage("[scarlet]You must be an admin to use this command.");
                 return;
             }
 
-            Groups.player.each(Player::admin, a -> a.sendMessage(args[0], player, "[#" + Pal.adminChat.toString() + "]<A>" + NetClient.colorizeName(player.id, player.name)));
+            String raw = "[#" + Pal.adminChat.toString() + "]<A> " + chatFormatter.format(player, args[0]);
+            Groups.player.each(Player::admin, a -> a.sendMessage(raw, player, args[0]));
         });
 
-        //duration of a a kick in seconds
+        //duration of a kick in seconds
         int kickDuration = 60 * 60;
         //voting round duration in seconds
         float voteDuration = 0.5f * 60;
@@ -867,7 +872,8 @@ public class NetServer implements ApplicationListener{
         dataStream.close();
 
         //write basic state data.
-        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver, universe.seconds(), tps, syncStream.toByteArray());
+        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver,
+            universe.seconds(), tps, GlobalConstants.rand.seed0, GlobalConstants.rand.seed1, syncStream.toByteArray());
 
         syncStream.reset();
 
@@ -978,5 +984,10 @@ public class NetServer implements ApplicationListener{
 
     public interface TeamAssigner{
         Team assign(Player player, Iterable<Player> players);
+    }
+
+    public interface ChatFormatter{
+        /** @return text to be placed before player name */
+        String format(@Nullable Player player, String message);
     }
 }
