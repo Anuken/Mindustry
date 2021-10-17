@@ -983,4 +983,22 @@ public class Block extends UnlockableContent{
         packer.add(PageType.editor, name + "-icon-editor", editorBase);
     }
 
+    public void flipRequest(BuildPlan req, boolean x) {
+        req.pointConfig(p -> {
+            int corigin = x ? req.originalWidth/2 : req.originalHeight/2;
+            int nvalue = -(x ? p.x : p.y);
+            if(x){
+                req.originalX = -(req.originalX - corigin) + corigin;
+                p.x = nvalue;
+            }else{
+                req.originalY = -(req.originalY - corigin) + corigin;
+                p.y = nvalue;
+            }
+        });
+
+        //flip rotation
+        if(x == (req.rotation % 2 == 0)){
+            req.rotation = Mathf.mod(req.rotation + 2, 4);
+        }
+    }
 }

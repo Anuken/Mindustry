@@ -683,22 +683,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 req.y = (int)((value - req.block.offset) / tilesize);
             }
 
-            req.pointConfig(p -> {
-                int corigin = x ? req.originalWidth/2 : req.originalHeight/2;
-                int nvalue = -(x ? p.x : p.y);
-                if(x){
-                    req.originalX = -(req.originalX - corigin) + corigin;
-                    p.x = nvalue;
-                }else{
-                    req.originalY = -(req.originalY - corigin) + corigin;
-                    p.y = nvalue;
-                }
-            });
-
-            //flip rotation
-            if(x == (req.rotation % 2 == 0)){
-                req.rotation = Mathf.mod(req.rotation + 2, 4);
-            }
+            req.block.flipRequest(req,x);
         });
     }
 
