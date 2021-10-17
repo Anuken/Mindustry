@@ -80,6 +80,7 @@ public class BuildPayload implements Payload{
     @Override
     public void draw(){
         drawShadow(1f);
+        //build.draw(); //TODO broken for blocks that change layers, such as conveyors, but would be nice...
         Draw.rect(build.block.fullIcon, build.x, build.y);
     }
 
