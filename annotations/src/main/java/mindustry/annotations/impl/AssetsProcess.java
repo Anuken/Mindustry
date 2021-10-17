@@ -22,8 +22,8 @@ public class AssetsProcess extends BaseProcessor{
 
     @Override
     public void process(RoundEnvironment env) throws Exception{
-        processSounds("Sounds", rootDirectory + "/core/assets/sounds", "arc.audio.Sound");
-        processSounds("Musics", rootDirectory + "/core/assets/music", "arc.audio.Music");
+        processSounds("Sounds", rootDirectory + "/core/assets/sounds", "arc.audio.Sound", true);
+        processSounds("Musics", rootDirectory + "/core/assets/music", "arc.audio.Music", false);
         processUI(env.getElementsAnnotatedWith(StyleDefaults.class));
     }
 
@@ -117,25 +117,27 @@ public class AssetsProcess extends BaseProcessor{
         JavaFile.builder(packageName, type.build()).build().writeTo(BaseProcessor.filer);
     }
 
-    void processSounds(String classname, String path, String rtype) throws Exception{
+    void processSounds(String classname, String path, String rtype, boolean genid) throws Exception{
         TypeSpec.Builder type = TypeSpec.classBuilder(classname).addModifiers(Modifier.PUBLIC);
         MethodSpec.Builder loadBegin = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         CodeBlock.Builder staticb = CodeBlock.builder();
 
-        type.addField(FieldSpec.builder(IntMap.class, "idToSound", Modifier.STATIC, Modifier.PRIVATE).initializer("new IntMap()").build());
-        type.addField(FieldSpec.builder(ObjectIntMap.class, "soundToId", Modifier.STATIC, Modifier.PRIVATE).initializer("new ObjectIntMap()").build());
+        if(genid){
+            type.addField(FieldSpec.builder(IntMap.class, "idToSound", Modifier.STATIC, Modifier.PRIVATE).initializer("new IntMap()").build());
+            type.addField(FieldSpec.builder(ObjectIntMap.class, "soundToId", Modifier.STATIC, Modifier.PRIVATE).initializer("new ObjectIntMap()").build());
 
-        type.addMethod(MethodSpec.methodBuilder("getSoundId")
-        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-        .addParameter(Sound.class, "sound")
-        .returns(int.class)
-        .addStatement("return soundToId.get(sound, -1)").build());
+            type.addMethod(MethodSpec.methodBuilder("getSoundId")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .addParameter(Sound.class, "sound")
+            .returns(int.class)
+            .addStatement("return soundToId.get(sound, -1)").build());
 
-        type.addMethod(MethodSpec.methodBuilder("getSound")
-        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-        .addParameter(int.class, "id")
-        .returns(Sound.class)
-        .addStatement("return (Sound)idToSound.get(id, () -> Sounds.none)").build());
+            type.addMethod(MethodSpec.methodBuilder("getSound")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .addParameter(int.class, "id")
+            .returns(Sound.class)
+            .addStatement("return (Sound)idToSound.get(id, () -> Sounds.none)").build());
+        }
 
         HashSet<String> names = new HashSet<>();
         Seq<Fi> files = new Seq<>();
@@ -157,17 +159,23 @@ public class AssetsProcess extends BaseProcessor{
 
             String filepath =  path.substring(path.lastIndexOf("/") + 1) + p.path().substring(p.path().lastIndexOf(path) + path.length());
 
-            staticb.addStatement("soundToId.put($L, $L)", name, id);
+            if(genid){
+                staticb.addStatement("soundToId.put($L, $L)", name, id);
 
-            loadBegin.addStatement("$T.assets.load($S, $L.class).loaded = a -> { $L = ($L)a; soundToId.put(a, $L); idToSound.put($L, a); }",
+                loadBegin.addStatement("$T.assets.load($S, $L.class).loaded = a -> { $L = ($L)a; soundToId.put(a, $L); idToSound.put($L, a); }",
                 Core.class, filepath, rtype, name, rtype, id, id);
+            }else{
+                loadBegin.addStatement("$T.assets.load($S, $L.class)", Core.class, filepath, rtype);
+            }
 
             type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new " + rtype + "()").build());
 
             id ++;
         }
 
-        type.addStaticBlock(staticb.build());
+        if(genid){
+            type.addStaticBlock(staticb.build());
+        }
 
         if(classname.equals("Sounds")){
             type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "none", Modifier.STATIC, Modifier.PUBLIC).initializer("new " + rtype + "()").build());

@@ -98,7 +98,7 @@ public class PayloadDeconstructor extends PayloadBlock{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
-            return deconstructing == null && super.acceptPayload(source, payload) && payload.requirements().length > 0 && payload.fits(maxPayloadSize);
+            return deconstructing == null && this.payload == null && super.acceptPayload(source, payload) && payload.requirements().length > 0 && payload.fits(maxPayloadSize);
         }
 
         @Override
