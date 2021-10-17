@@ -1,5 +1,9 @@
 [
   {
+    "name": "Pandorum",
+    "addres": ["pandorum.su:5018", "pandorum.su:5019", "pandorum.su:5020"]
+  },
+  {
     "name": "mindustry.pl",
     "address": ["0.baseduser.eu.org:6000", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6966"]
   },
