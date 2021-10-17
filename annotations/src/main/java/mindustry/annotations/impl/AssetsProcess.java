@@ -165,7 +165,7 @@ public class AssetsProcess extends BaseProcessor{
                 loadBegin.addStatement("$T.assets.load($S, $L.class).loaded = a -> { $L = ($L)a; soundToId.put(a, $L); idToSound.put($L, a); }",
                 Core.class, filepath, rtype, name, rtype, id, id);
             }else{
-                loadBegin.addStatement("$T.assets.load($S, $L.class)", Core.class, filepath, rtype);
+                loadBegin.addStatement("$T.assets.load($S, $L.class).loaded = a -> { $L = ($L)a; }", Core.class, filepath, rtype, name, rtype);
             }
 
             type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new " + rtype + "()").build());
