@@ -58,5 +58,9 @@
   {
     "name": "Phoenix Network",
     "address": ["172.104.253.198"]
+  },
+  {
+    "name": "MindustryBR",
+    "address": ["mindustry.me:4451", "n2.mindustry.me:4446"]
   }
 ]
