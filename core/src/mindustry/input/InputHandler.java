@@ -683,7 +683,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 req.y = (int)((value - req.block.offset) / tilesize);
             }
 
-            req.block.flipRequest(req,x);
+            req.block.flipRequest(req, x);
         });
     }
 
