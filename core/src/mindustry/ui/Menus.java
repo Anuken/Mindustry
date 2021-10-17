@@ -11,11 +11,12 @@ import static mindustry.Vars.*;
 
 /** Class for handling menus and notifications across the network. Unstable API! */
 public class Menus{
-    private static IntMap<MenuListener> menuListeners = new IntMap<>();
+    private static final Seq<MenuListener> menuListeners = new Seq<>();
 
     /** Register a *global* menu listener. If no option is chosen, the option is returned as -1. */
-    public static void registerMenu(int id, MenuListener listener){
-        menuListeners.put(id, listener);
+    public static int registerMenu(MenuListener listener){
+        menuListeners.add(listener);
+        return menuListeners.size - 1;
     }
 
     //do not invoke any of the methods below directly, use Call
@@ -30,7 +31,7 @@ public class Menus{
 
     @Remote(targets = Loc.both, called = Loc.both)
     public static void menuChoose(@Nullable Player player, int menuId, int option){
-        if(player != null && menuListeners.containsKey(menuId)){
+        if(player != null && menuId >= 0 && menuId < menuListeners.size){
             Events.fire(new MenuOptionChooseEvent(player, menuId, option));
             menuListeners.get(menuId).get(player, option);
         }

@@ -14,6 +14,7 @@ import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.logic.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -28,6 +29,7 @@ public class LightBlock extends Block{
         update = true;
         configurable = true;
         saveConfig = true;
+        envEnabled |= Env.space;
         swapDiagonalPlacement = true;
 
         config(Integer.class, (LightBuild tile, Integer value) -> tile.color = value);

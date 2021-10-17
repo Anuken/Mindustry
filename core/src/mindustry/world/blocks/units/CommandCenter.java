@@ -37,6 +37,7 @@ public class CommandCenter extends Block{
         configurable = true;
         drawDisabled = false;
         logicConfigurable = true;
+        envEnabled = Env.any;
 
         config(UnitCommand.class, (CommandBuild build, UnitCommand command) -> {
             if(build.team.data().command != command){

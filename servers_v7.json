@@ -1,7 +1,7 @@
 [
   {
     "name": "mindustry.pl",
-    "address": ["46.105.36.238:6000", "46.105.36.238:6666", "46.105.36.238:6966"]
+    "address": ["0.baseduser.eu.org:6000", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6966"]
   },
   {
     "name": "C.A.M.S.",
@@ -54,5 +54,9 @@
   { 
     "name": "devass.su",
     "address": ["185.22.152.66"]
+  },
+  {
+    "name": "Phoenix Network",
+    "address": ["172.104.253.198"]
   }
 ]

@@ -18,6 +18,7 @@ public class SectorPreset extends UnlockableContent{
     public float difficulty;
     public float startWaveTimeMultiplier = 2f;
     public boolean addStartingItems = false;
+    public boolean showSectorLandInfo = true;
 
     public SectorPreset(String name, Planet planet, int sector){
         super(name);

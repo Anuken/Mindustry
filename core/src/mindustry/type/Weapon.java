@@ -26,7 +26,7 @@ public class Weapon implements Cloneable{
     static int sequenceNum = 0;
     
     /** displayed weapon region */
-    public String name = "";
+    public String name;
     /** bullet shot */
     public BulletType bullet = Bullets.standardCopper;
     /** shell ejection effect */
@@ -117,6 +117,8 @@ public class Weapon implements Cloneable{
     public Func<Weapon, WeaponMount> mountType = WeaponMount::new;
     /** status effect duration when shot */
     public float shootStatusDuration = 60f * 5f;
+    /** whether this weapon should fire when its owner dies */
+    public boolean shootOnDeath = false;
 
     public Weapon(String name){
         this.name = name;

@@ -151,7 +151,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         public boolean acceptLiquid(Building source, Liquid liquid){
             noSleep();
             return (liquids.current() == liquid || liquids.currentAmount() < 0.2f)
-                && ((source.relativeTo(tile.x, tile.y) + 2) % 4 != rotation);
+                && (tile == null || (source.relativeTo(tile.x, tile.y) + 2) % 4 != rotation);
         }
 
         @Override

@@ -132,6 +132,8 @@ public class Vars implements Loadable{
         Color.valueOf("4b5ef1"),
         Color.valueOf("2cabfe"),
     };
+    /** maximum TCP packet size */
+    public static final int maxTcpSize = 900;
     /** default server port */
     public static final int port = 6567;
     /** multicast discovery port.*/
@@ -378,7 +380,7 @@ public class Vars implements Loadable{
                 log.log(level, text);
 
                 try{
-                    writer.write("[" + Character.toUpperCase(level.name().charAt(0)) +"] " + Log.removeColors(text) + "\n");
+                    writer.write("[" + Character.toUpperCase(level.name().charAt(0)) + "] " + Log.removeColors(text) + "\n");
                     writer.flush();
                 }catch(IOException e){
                     e.printStackTrace();

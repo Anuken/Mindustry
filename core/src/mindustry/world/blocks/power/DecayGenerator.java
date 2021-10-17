@@ -1,6 +1,7 @@
 package mindustry.world.blocks.power;
 
 import mindustry.type.*;
+import mindustry.world.meta.*;
 
 public class DecayGenerator extends ItemLiquidGenerator{
 
@@ -8,6 +9,7 @@ public class DecayGenerator extends ItemLiquidGenerator{
         super(true, false, name);
         hasItems = true;
         hasLiquids = false;
+        envEnabled = Env.any;
     }
 
     @Override

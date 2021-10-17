@@ -227,6 +227,7 @@ public class ConstructBlock extends Block{
 
                 for(TextureRegion region : current.getGeneratedIcons()){
                     Shaders.blockbuild.region = region;
+                    Shaders.blockbuild.time = Time.time;
                     Shaders.blockbuild.progress = progress;
 
                     Draw.rect(region, x, y, current.rotate ? rotdeg() : 0);

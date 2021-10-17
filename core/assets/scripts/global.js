@@ -191,6 +191,7 @@ const PlayEvent = Packages.mindustry.game.EventType.PlayEvent
 const DisposeEvent = Packages.mindustry.game.EventType.DisposeEvent
 const ServerLoadEvent = Packages.mindustry.game.EventType.ServerLoadEvent
 const ClientCreateEvent = Packages.mindustry.game.EventType.ClientCreateEvent
+const SaveWriteEvent = Packages.mindustry.game.EventType.SaveWriteEvent
 const SaveLoadEvent = Packages.mindustry.game.EventType.SaveLoadEvent
 const MapPublishEvent = Packages.mindustry.game.EventType.MapPublishEvent
 const MapMakeEvent = Packages.mindustry.game.EventType.MapMakeEvent

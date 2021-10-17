@@ -157,13 +157,13 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 2.1f;
             health = 9000;
             armor = 10f;
-            canDrown = false;
             mechFrontSway = 1f;
             ammoType = new ItemAmmoType(Items.thorium);
 
             mechStepParticles = true;
             mechStepShake = 0.15f;
             singleTarget = true;
+            drownTimeMultiplier = 4f;
 
             weapons.add(
             new Weapon("scepter-weapon"){{
@@ -221,7 +221,7 @@ public class UnitTypes implements ContentList{
             armor = 14f;
             mechStepParticles = true;
             mechStepShake = 0.75f;
-            canDrown = false;
+            drownTimeMultiplier = 6f;
             mechFrontSway = 1.9f;
             mechSideSway = 0.6f;
             ammoType = new ItemAmmoType(Items.thorium);
@@ -414,13 +414,13 @@ public class UnitTypes implements ContentList{
             hitSize = 24f;
 
             rotateSpeed = 1.8f;
-            canDrown = false;
             mechFrontSway = 1f;
             buildSpeed = 3f;
 
             mechStepParticles = true;
             mechStepShake = 0.15f;
             ammoType = new PowerAmmoType(2500);
+            drownTimeMultiplier = 4f;
 
             speed = 0.44f;
             boostMultiplier = 2.4f;
@@ -501,6 +501,7 @@ public class UnitTypes implements ContentList{
             armor = 9f;
             landShake = 1.5f;
             rotateSpeed = 1.5f;
+            drownTimeMultiplier = 6f;
 
             commandLimit = 8;
 
@@ -511,7 +512,6 @@ public class UnitTypes implements ContentList{
             legTrns = 0.58f;
             hovering = true;
             visualElevation = 0.2f;
-            allowLegStep = true;
             ammoType = new PowerAmmoType(4000);
             groundLayer = Layer.legUnit;
 
@@ -581,6 +581,7 @@ public class UnitTypes implements ContentList{
             ammoType = new ItemAmmoType(Items.coal);
 
             weapons.add(new Weapon(){{
+                shootOnDeath = true;
                 reload = 24f;
                 shootCone = 180f;
                 ejectEffect = Fx.none;
@@ -591,7 +592,7 @@ public class UnitTypes implements ContentList{
                     hitEffect = Fx.pulverize;
                     lifetime = 10f;
                     speed = 1f;
-                    splashDamageRadius = 60f;
+                    splashDamageRadius = 55f;
                     instantDisappear = true;
                     splashDamage = 90f;
                     killShooter = true;
@@ -602,7 +603,7 @@ public class UnitTypes implements ContentList{
         }};
 
         atrax = new UnitType("atrax"){{
-            speed = 0.54f;
+            speed = 0.57f;
             drag = 0.4f;
             hitSize = 13f;
             rotateSpeed = 3f;
@@ -618,7 +619,6 @@ public class UnitTypes implements ContentList{
             armor = 3f;
             ammoType = new ItemAmmoType(Items.coal);
 
-            allowLegStep = true;
             visualElevation = 0.2f;
             groundLayer = Layer.legUnit - 1f;
 
@@ -632,8 +632,8 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.flame;
 
                 bullet = new LiquidBulletType(Liquids.slag){{
-                    damage = 11;
-                    speed = 2.4f;
+                    damage = 13;
+                    speed = 2.5f;
                     drag = 0.009f;
                     shootEffect = Fx.shootSmall;
                     lifetime = 57f;
@@ -643,11 +643,11 @@ public class UnitTypes implements ContentList{
         }};
 
         spiroct = new UnitType("spiroct"){{
-            speed = 0.48f;
+            speed = 0.52f;
             drag = 0.4f;
             hitSize = 15f;
             rotateSpeed = 3f;
-            health = 910;
+            health = 940;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
             legCount = 6;
             legLength = 13f;
@@ -660,7 +660,6 @@ public class UnitTypes implements ContentList{
 
             buildSpeed = 0.75f;
 
-            allowLegStep = true;
             visualElevation = 0.3f;
             groundLayer = Layer.legUnit;
 
@@ -678,7 +677,7 @@ public class UnitTypes implements ContentList{
                 bullet = new SapBulletType(){{
                     sapStrength = 0.5f;
                     length = 75f;
-                    damage = 20;
+                    damage = 23;
                     shootEffect = Fx.shootSmall;
                     hitColor = color = Color.valueOf("bf92f9");
                     despawnEffect = Fx.none;
@@ -698,7 +697,7 @@ public class UnitTypes implements ContentList{
                 bullet = new SapBulletType(){{
                     sapStrength = 0.8f;
                     length = 40f;
-                    damage = 16;
+                    damage = 18;
                     shootEffect = Fx.shootSmall;
                     hitColor = color = Color.valueOf("bf92f9");
                     despawnEffect = Fx.none;
@@ -711,7 +710,7 @@ public class UnitTypes implements ContentList{
 
         arkyid = new UnitType("arkyid"){{
             drag = 0.1f;
-            speed = 0.6f;
+            speed = 0.62f;
             hitSize = 23f;
             health = 8000;
             armor = 6f;
@@ -733,16 +732,16 @@ public class UnitTypes implements ContentList{
 
             legSplashDamage = 32;
             legSplashRange = 30;
+            drownTimeMultiplier = 2f;
 
             hovering = true;
-            allowLegStep = true;
             visualElevation = 0.65f;
             groundLayer = Layer.legUnit;
 
             BulletType sapper = new SapBulletType(){{
                 sapStrength = 0.85f;
                 length = 55f;
-                damage = 37;
+                damage = 40;
                 shootEffect = Fx.shootSmall;
                 hitColor = color = Color.valueOf("bf92f9");
                 despawnEffect = Fx.none;
@@ -820,6 +819,7 @@ public class UnitTypes implements ContentList{
             lightRadius = 140f;
 
             rotateSpeed = 1.9f;
+            drownTimeMultiplier = 3f;
 
             legCount = 8;
             legMoveSpace = 0.8f;
@@ -828,7 +828,6 @@ public class UnitTypes implements ContentList{
             legExtension = -20;
             legBaseOffset = 8f;
             landShake = 1f;
-            legSpeed = 0.1f;
             legLengthScl = 0.93f;
             rippleScale = 3f;
             legSpeed = 0.19f;
@@ -839,7 +838,6 @@ public class UnitTypes implements ContentList{
             legSplashRange = 60;
 
             hovering = true;
-            allowLegStep = true;
             visualElevation = 0.95f;
             groundLayer = Layer.legUnit;
 
@@ -2287,6 +2285,7 @@ public class UnitTypes implements ContentList{
             defaultController = BuilderAI::new;
             isCounted = false;
 
+            lowAltitude = true;
             flying = true;
             mineSpeed = 6.5f;
             mineTier = 1;
@@ -2366,6 +2365,7 @@ public class UnitTypes implements ContentList{
             defaultController = BuilderAI::new;
             isCounted = false;
 
+            lowAltitude = true;
             flying = true;
             mineSpeed = 8f;
             mineTier = 2;

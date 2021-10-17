@@ -203,6 +203,7 @@ public class WaveSpawner{
         unit.apply(StatusEffects.unmoving, 30f);
         unit.apply(StatusEffects.invincible, 60f);
         unit.add();
+        unit.unloaded();
 
         Events.fire(new UnitSpawnEvent(unit));
         Call.spawnEffect(unit.x, unit.y, unit.rotation, unit.type);

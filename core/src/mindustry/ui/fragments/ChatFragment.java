@@ -23,7 +23,7 @@ import static mindustry.Vars.*;
 
 public class ChatFragment extends Table{
     private static final int messagesShown = 10;
-    private Seq<ChatMessage> messages = new Seq<>();
+    private Seq<String> messages = new Seq<>();
     private float fadetime;
     private boolean shown = false;
     private TextField chatfield;
@@ -144,13 +144,13 @@ public class ChatFragment extends Table{
         float theight = offsety + spacing + getMarginBottom() + scene.marginBottom;
         for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos && (i < fadetime || shown); i++){
 
-            layout.setText(font, messages.get(i).formattedMessage, Color.white, textWidth, Align.bottomLeft, true);
+            layout.setText(font, messages.get(i), Color.white, textWidth, Align.bottomLeft, true);
             theight += layout.height + textspacing;
             if(i - scrollPos == 0) theight -= textspacing + 1;
 
             font.getCache().clear();
             font.getCache().setColor(Color.white);
-            font.getCache().addText(messages.get(i).formattedMessage, fontoffsetx + offsetx, offsety + theight, textWidth, Align.bottomLeft, true);
+            font.getCache().addText(messages.get(i), fontoffsetx + offsetx, offsety + theight, textWidth, Align.bottomLeft, true);
 
             if(!shown && fadetime - i < 1f && fadetime - i >= 0f){
                 font.getCache().setAlphas((fadetime - i) * opacity);
@@ -257,30 +257,14 @@ public class ChatFragment extends Table{
         return shown;
     }
 
-    public void addMessage(String message, String sender){
-        if(sender == null && message == null) return;
-        messages.insert(0, new ChatMessage(message, sender));
+    public void addMessage(String message){
+        if(message == null) return;
+        messages.insert(0, message);
 
         fadetime += 1f;
         fadetime = Math.min(fadetime, messagesShown) + 1f;
         
         if(scrollPos > 0) scrollPos++;
-    }
-
-    private static class ChatMessage{
-        public final String sender;
-        public final String message;
-        public final String formattedMessage;
-
-        public ChatMessage(String message, String sender){
-            this.message = message;
-            this.sender = sender;
-            if(sender == null){ //no sender, this is a server message?
-                formattedMessage = message == null ? "" : message;
-            }else{
-                formattedMessage = "[coral][[" + sender + "[coral]]:[white] " + message;
-            }
-        }
     }
 
     private enum ChatMode{

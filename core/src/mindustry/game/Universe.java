@@ -82,10 +82,11 @@ public class Universe{
             }
         }
 
-        if(state.hasSector()){
+        if(state.hasSector() && state.getSector().planet.updateLighting){
+            var planet = state.getSector().planet;
             //update sector light
             float light = state.getSector().getLight();
-            float alpha = Mathf.clamp(Mathf.map(light, 0f, 0.8f, 0.3f, 1f));
+            float alpha = Mathf.clamp(Mathf.map(light, planet.lightSrcFrom, planet.lightSrcTo, planet.lightDstFrom, planet.lightDstTo));
 
             //assign and map so darkness is not 100% dark
             state.rules.ambientLight.a = 1f - alpha;

@@ -31,6 +31,8 @@ public class SolidPump extends Pump{
     public SolidPump(String name){
         super(name);
         hasPower = true;
+        //only supports ground by default
+        envEnabled = Env.terrestrial;
     }
 
     @Override
@@ -63,7 +65,7 @@ public class SolidPump extends Pump{
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile, Team team){
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
         float sum = tile.getLinkedTilesAs(this, tempTiles).sumf(t -> canPump(t) ? baseEfficiency + (attribute != null ? t.floor().attributes.get(attribute) : 0f) : 0f);
         return sum > 0.00001f;
     }
