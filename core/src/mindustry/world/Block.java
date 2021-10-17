@@ -983,7 +983,7 @@ public class Block extends UnlockableContent{
         packer.add(PageType.editor, name + "-icon-editor", editorBase);
     }
 
-    public void flipRequest(BuildPlan req, boolean x) {
+    public void flipRequest(BuildPlan req, boolean x){
         req.pointConfig(p -> {
             int corigin = x ? req.originalWidth/2 : req.originalHeight/2;
             int nvalue = -(x ? p.x : p.y);
