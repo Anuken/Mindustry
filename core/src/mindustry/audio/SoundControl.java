@@ -213,6 +213,21 @@ public class SoundControl{
             playOnce(ambientMusic.random(lastRandomPlayed));
         }
     }
+    
+    /** Plays a music track once and only once. If something is already playing, does nothing.*/
+    public void playOnce(Music music){
+        if(current != null || music == null || !shouldPlay()) return; //do not interrupt already-playing tracks
+
+        //save last random track played to prevent duplicates
+        lastRandomPlayed = music;
+
+        //set fade to 1 and play it, stopping the current when it's done
+        fade = 1f;
+        current = music;
+        current.setVolume(1f);
+        current.setLooping(false);
+        current.play();
+    }
 
     /** Whether to play dark music.*/
     protected boolean isDark(){
@@ -281,21 +296,6 @@ public class SoundControl{
                 }
             }
         }
-    }
-
-    /** Plays a music track once and only once. If something is already playing, does nothing.*/
-    protected void playOnce(Music music){
-        if(current != null || music == null || !shouldPlay()) return; //do not interrupt already-playing tracks
-
-        //save last random track played to prevent duplicates
-        lastRandomPlayed = music;
-
-        //set fade to 1 and play it, stopping the current when it's done
-        fade = 1f;
-        current = music;
-        current.setVolume(1f);
-        current.setLooping(false);
-        current.play();
     }
 
     protected boolean shouldPlay(){
