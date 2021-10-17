@@ -114,8 +114,10 @@ public class BulletType extends Content implements Cloneable{
     public float maxRange = -1f;
     /** % of block health healed. */
     public float healPercent = 0f;
-    /** damage dealt in % on hit, on top of regular damage. */
+    /** Damage dealt in % on hit, on top of regular damage. */
     public float damagePercent = 0f;
+    /** Max amount of damage. */
+    public float damageCap = 0f;
     /** Whether to make fire on impact */
     public boolean makeFire = false;
     /** Whether to create hit effects on despawn. Forced to true if this bullet has any special effects like splash damage. */
@@ -198,6 +200,7 @@ public class BulletType extends Content implements Cloneable{
     /** @return estimated damage per shot. this can be very inaccurate. */
     public float estimateDPS(){
         float sum = damage + splashDamage*0.75f;
+        sum = Math.min(sum + (damagePercent*100f * 500f), damageCap > 0f ? damageCap : Float.MAX_VALUE); //assuming the block has 500 health
         if(fragBullet != null && fragBullet != this){
             sum += fragBullet.estimateDPS() * fragBullets / 2f;
         }
@@ -227,7 +230,8 @@ public class BulletType extends Content implements Cloneable{
             }
 
             if(damagePercent > 0f){
-                build.damage(damage + (damagePercent / 100f * build.maxHealth()));
+                float dmg = damage + (damagePercent / 100f * build.maxHealth());
+                build.damage(damageCap > 0f ? Math.min(dmg, damageCap) : dmg);
             }
         }
 
@@ -241,7 +245,8 @@ public class BulletType extends Content implements Cloneable{
 
     public void hitEntity(Bullet b, Hitboxc entity, float health){
         if(entity instanceof Healthc h){
-            h.damage(b.damage + (damagePercent > 0f ? damagePercent / 100f * h.maxHealth() : 0));
+            float dmg = b.damage + (damagePercent / 100f * h.maxHealth());
+            h.damage(damageCap > 0f ? Math.min(dmg, damageCap) : dmg);
         }
 
         if(entity instanceof Unit unit){
