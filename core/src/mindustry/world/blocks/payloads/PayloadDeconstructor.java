@@ -158,10 +158,26 @@ public class PayloadDeconstructor extends PayloadBlock{
 
                 //finish deconstruction, prepare for next payload.
                 if(progress >= 1f){
-                    Fx.breakBlock.at(x, y, deconstructing.size() / tilesize);
+                    canProgress = true;
+                    //check for rounding errors
+                    for(int i = 0; i < reqs.length; i++){
+                        if(Mathf.equal(accum[i], 1f, 0.0001f)){
+                            if(items.total() < itemCapacity){
+                                items.add(reqs[i].item, 1);
+                                accum[i] = 0f;
+                            }else{
+                                canProgress = false;
+                                break;
+                            }
+                        }
+                    }
 
-                    deconstructing = null;
-                    accum = null;
+                    if(canProgress){
+                        Fx.breakBlock.at(x, y, deconstructing.size() / tilesize);
+
+                        deconstructing = null;
+                        accum = null;
+                    }
                 }
             }else if(moveInPayload(false) && payload != null){
                 accum = new float[payload.requirements().length];
