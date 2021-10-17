@@ -136,7 +136,7 @@ public class LogicDialog extends BaseDialog{
 
                         //TODO type name does not update, is this important?
                         t.add(new Image(Tex.whiteui, color.cpy().mul(mul))).width(stub);
-                        t.stack(new Image(Tex.whiteui, color), new Label(" " + typeName + " ", Styles.outlineLabel));
+                        t.stack(new Image(Tex.whiteui, color), new Label(" " + Core.bundle.get("vartype." + typeName) + " ", Styles.outlineLabel));
 
                         t.row();
 
