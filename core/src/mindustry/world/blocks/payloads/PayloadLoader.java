@@ -149,9 +149,9 @@ public class PayloadLoader extends PayloadBlock{
             return payload != null && (
                 (payload.block().hasLiquids && payload.build.liquids.total() >= payload.block().liquidCapacity - 0.001f) ||
                 (payload.block().hasItems &&
-                    payload.block().separateItemCapacity ?
+                    (payload.block().separateItemCapacity ?
                         content.items().contains(i -> payload.build.items.get(i) >= payload.block().itemCapacity) :
-                        payload.build.items.total() >= payload.block().itemCapacity));
+                        payload.build.items.total() >= payload.block().itemCapacity)));
         }
     }
 }
