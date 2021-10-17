@@ -58,5 +58,9 @@
   {
     "name": "Phoenix Network",
     "address": ["172.104.253.198"]
+  },
+  {
+    "name": "Xpdustry",
+    "address": ["xpdustry.fr:7000"]
   }
 ]
