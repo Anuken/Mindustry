@@ -149,14 +149,8 @@ public class Turret extends ReloadTurret{
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
-        public @Nullable BlockUnitc unit;
+        public BlockUnitc unit = (BlockUnitc)UnitTypes.block.create(team);
         public boolean wasShooting, charging;
-
-        @Override
-        public void created(){
-            unit = (BlockUnitc)UnitTypes.block.create(team);
-            unit.tile(this);
-        }
 
         @Override
         public boolean canControl(){
@@ -165,7 +159,7 @@ public class Turret extends ReloadTurret{
 
         @Override
         public void control(LAccess type, double p1, double p2, double p3, double p4){
-            if(type == LAccess.shoot && (unit == null || !unit.isPlayer())){
+            if(type == LAccess.shoot && !unit.isPlayer()){
                 targetPos.set(World.unconv((float)p1), World.unconv((float)p2));
                 logicControlTime = logicControlCooldown;
                 logicShooting = !Mathf.zero(p3);
@@ -203,15 +197,14 @@ public class Turret extends ReloadTurret{
         }
 
         public boolean isShooting(){
-            return (isControlled() ? (unit != null && unit.isShooting()) : logicControlled() ? logicShooting : target != null);
+            return (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
         }
 
         @Override
         public Unit unit(){
-            if(unit == null){
-                unit = (BlockUnitc)UnitTypes.block.create(team);
-                unit.tile(this);
-            }
+            //make sure stats are correct
+            unit.tile(this);
+            unit.team(team);
             return (Unit)unit;
         }
 
@@ -267,12 +260,9 @@ public class Turret extends ReloadTurret{
             recoil = Mathf.lerpDelta(recoil, 0f, restitution);
             heat = Mathf.lerpDelta(heat, 0f, cooldown);
 
-            if(unit != null){
-                unit.health(health);
-                unit.rotation(rotation);
-                unit.team(team);
-                unit.set(x, y);
-            }
+            unit.tile(this);
+            unit.rotation(rotation);
+            unit.team(team);
 
             if(logicControlTime > 0){
                 logicControlTime -= Time.delta;

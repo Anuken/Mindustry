@@ -91,9 +91,7 @@ public class LiquidTurret extends Turret{
 
         @Override
         public void updateTile(){
-            if(unit != null){
-                unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
-            }
+            unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
 
             super.updateTile();
         }
