@@ -463,7 +463,7 @@ public class Block extends UnlockableContent{
         if(hasItems && configurable){
             bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
         }
-        
+
         if(unitCapModifier != 0){
             stats.add(Stat.maxUnits, (unitCapModifier < 0 ? "-" : "+") + Math.abs(unitCapModifier));
         }
@@ -819,7 +819,7 @@ public class Block extends UnlockableContent{
         }
 
         clipSize = Math.max(clipSize, size * tilesize);
-        
+
         //only kept to ensure compatibility with v6 mods.
         if(expanded){
             clipSize += tilesize * 10f;
@@ -984,7 +984,17 @@ public class Block extends UnlockableContent{
         packer.add(PageType.editor, name + "-icon-editor", editorBase);
     }
 
-    public void flipRequest(BuildPlan req, boolean x){
+    public void flipRequest(BuildPlan req, boolean x, int schemOriginX, int schemOriginY){
+        int origin = (x ? schemOriginX : schemOriginY) * tilesize;
+        if(req.breaking) return;
+
+        float value = -((x ? req.x : req.y) * tilesize - origin + req.block.offset) + origin;
+
+        if(x){
+            req.x = (int)((value - req.block.offset) / tilesize);
+        }else{
+            req.y = (int)((value - req.block.offset) / tilesize);
+        }
         req.pointConfig(p -> {
             int corigin = x ? req.originalWidth/2 : req.originalHeight/2;
             int nvalue = -(x ? p.x : p.y);
