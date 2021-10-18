@@ -103,6 +103,7 @@ public class PayloadDeconstructor extends PayloadBlock{
 
         @Override
         public void updateTile(){
+            super.updateTile();
             if(items.total() > 0){
                 for(int i = 0; i < dumpRate; i++){
                     dumpAccumulate();

@@ -3,6 +3,7 @@ package mindustry.world.blocks.payloads;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -58,6 +59,7 @@ public class PayloadLoader extends PayloadBlock{
     }
 
     public class PayloadLoaderBuild extends PayloadBlockBuild<BuildPayload>{
+        public boolean exporting = false;
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
@@ -66,6 +68,12 @@ public class PayloadLoader extends PayloadBlock{
                 payload instanceof BuildPayload build &&
                 ((build.build.block.hasItems && build.block().unloadable && build.block().itemCapacity >= 10 && build.block().size <= maxBlockSize) ||
                 build.build.block().hasLiquids && build.block().liquidCapacity >= 10f);
+        }
+
+        @Override
+        public void handlePayload(Building source, Payload payload){
+            super.handlePayload(source, payload);
+            exporting = false;
         }
 
         @Override
@@ -103,6 +111,7 @@ public class PayloadLoader extends PayloadBlock{
 
         @Override
         public void updateTile(){
+            super.updateTile();
             if(shouldExport()){
                 moveOutPayload();
             }else if(moveInPayload()){
@@ -119,6 +128,9 @@ public class PayloadLoader extends PayloadBlock{
                                     if(payload.build.acceptItem(payload.build, item)){
                                         payload.build.handleItem(payload.build, item);
                                         items.remove(item, 1);
+                                        break;
+                                    }else if(payload.block().separateItemCapacity || payload.block().consumes.consumesItem(item)){
+                                        exporting = true;
                                         break;
                                     }
                                 }
@@ -147,11 +159,28 @@ public class PayloadLoader extends PayloadBlock{
 
         public boolean shouldExport(){
             return payload != null && (
+                exporting ||
                 (payload.block().hasLiquids && payload.build.liquids.total() >= payload.block().liquidCapacity - 0.001f) ||
-                (payload.block().hasItems &&
-                    (payload.block().separateItemCapacity ?
-                        content.items().contains(i -> payload.build.items.get(i) >= payload.block().itemCapacity) :
-                        payload.build.items.total() >= payload.block().itemCapacity)));
+                (payload.block().hasItems && payload.block().separateItemCapacity && content.items().contains(i -> payload.build.items.get(i) >= payload.block().itemCapacity)));
+        }
+
+        @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.bool(exporting);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            if(revision >= 1){
+                exporting = read.bool();
+            }
         }
     }
 }

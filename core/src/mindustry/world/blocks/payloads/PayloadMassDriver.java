@@ -143,6 +143,7 @@ public class PayloadMassDriver extends PayloadBlock{
 
         @Override
         public void updateTile(){
+            super.updateTile();
             Building link = world.build(this.link);
             boolean hasLink = linkValid();
 

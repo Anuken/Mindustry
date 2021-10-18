@@ -291,7 +291,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public byte relativeTo(Building tile){
-        return relativeTo(tile.tile());
+        return relativeTo(tile.tile);
     }
 
     public byte relativeToEdge(Tile other){
@@ -921,6 +921,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         drawTeamTop();
+    }
+
+    public void payloadDraw(){
+        draw();
     }
 
     public void drawTeamTop(){
