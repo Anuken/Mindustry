@@ -14,7 +14,7 @@ public class ConsumeModule extends BlockModule{
     }
 
     public BlockStatus status(){
-        if (entity.enabledControlTime > 0 && !entity.enabled){
+        if(entity.enabledControlTime > 0 && !entity.enabled){
             return BlockStatus.logicDisable;
         }
 
