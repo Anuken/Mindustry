@@ -118,5 +118,9 @@
   {
     "name": "MindustryBR",
     "address": ["mindustryptbr.ddns.net", "mindustryptbr.myddns.me", "mindustry.me:4447"]
+  },
+  {
+    "name": "Conservatory",
+    "address": ["143.198.71.232"]
   }
 ]
