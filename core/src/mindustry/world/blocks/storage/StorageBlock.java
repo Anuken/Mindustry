@@ -20,6 +20,7 @@ public class StorageBlock extends Block{
         solid = true;
         update = false;
         destructible = true;
+        separateItemCapacity = true;
         group = BlockGroup.transportation;
         flags = EnumSet.of(BlockFlag.storage);
         allowResupply = true;

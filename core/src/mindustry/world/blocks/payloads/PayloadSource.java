@@ -103,6 +103,7 @@ public class PayloadSource extends PayloadBlock{
 
         @Override
         public void updateTile(){
+            super.updateTile();
             if(payload == null){
                 scl = 0f;
                 if(unit != null){

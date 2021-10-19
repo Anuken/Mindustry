@@ -291,7 +291,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public byte relativeTo(Building tile){
-        return relativeTo(tile.tile());
+        return relativeTo(tile.tile);
     }
 
     public byte relativeToEdge(Tile other){
@@ -413,19 +413,18 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     }
 
-    public void handleUnitPayload(Unit player, Cons<Payload> grabber){
-        Fx.spawn.at(player);
+    public void handleUnitPayload(Unit unit, Cons<Payload> grabber){
+        Fx.spawn.at(unit);
 
-        if(player.isPlayer()){
-            player.getPlayer().clearUnit();
+        if(unit.isPlayer()){
+            unit.getPlayer().clearUnit();
         }
 
-        player.remove();
-        grabber.get(new UnitPayload(player));
-        Fx.unitDrop.at(player);
-        if(Vars.net.client()){
-            Vars.netClient.clearRemovedEntity(player.id);
-        }
+        unit.remove();
+        //needs new ID as it is now a payload
+        unit.id = EntityGroup.nextId();
+        grabber.get(new UnitPayload(unit));
+        Fx.unitDrop.at(unit);
     }
 
     public boolean canUnload(){
@@ -924,6 +923,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         drawTeamTop();
     }
 
+    public void payloadDraw(){
+        draw();
+    }
+
     public void drawTeamTop(){
         if(block.teamRegion.found()){
             if(block.teamRegions[team.id] == block.teamRegion) Draw.color(team.color);
@@ -1063,7 +1066,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
                 for(int i = 0; i < Mathf.clamp(amount / 5, 0, 30); i++){
                     Time.run(i / 2f, () -> {
-                        Tile other = world.tile(tileX() + Mathf.range(block.size / 2), tileY() + Mathf.range(block.size / 2));
+                        Tile other = world.tileWorld(x + Mathf.range(block.size * tilesize / 2), y + Mathf.range(block.size * tilesize / 2));
                         if(other != null){
                             Puddles.deposit(other, liquid, splash);
                         }

@@ -53,6 +53,11 @@ public class AttributeCrafter extends GenericCrafter{
         }
 
         @Override
+        public void pickedUp(){
+            attrsum = 0f;
+        }
+
+        @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
