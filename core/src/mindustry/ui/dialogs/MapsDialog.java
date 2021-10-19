@@ -157,8 +157,9 @@ public class MapsDialog extends BaseDialog{
         int i = 0;
 
         Seq<Map> mapList = showCustom ?
-        showBuiltIn ? maps.all() : maps.customMaps() :
-        showBuiltIn ? maps.defaultMaps() : null;
+            showBuiltIn ? maps.all() : maps.customMaps() :
+            showBuiltIn ? maps.defaultMaps() : null;
+
         if(mapList != null){
             for(Map map : mapList){
 
