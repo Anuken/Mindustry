@@ -3,6 +3,7 @@ package mindustry.editor;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.event.*;
@@ -278,6 +279,12 @@ public class WaveInfoDialog extends BaseDialog{
                             t.remove();
                             buildGroups();
                         }).pad(-6).size(46f).padRight(-12f);
+                        b.clicked(KeyCode.mouseMiddle, () -> {
+                            SpawnGroup copy = group.copy();
+                            groups.add(copy);
+                            expandedGroup = copy;
+                            buildGroups();
+                        });
                     }, () -> {
                         expandedGroup = expandedGroup == group ? null : group;
                         buildGroups();
@@ -608,8 +615,7 @@ public class WaveInfoDialog extends BaseDialog{
         final Floatf<SpawnGroup> sort, secondary;
 
         Sort(Floatf<SpawnGroup> sort){
-            this.sort = sort;
-            this.secondary = g -> g.type.id;
+            this(sort, g -> g.type.id);
         }
 
         Sort(Floatf<SpawnGroup> sort, Floatf<SpawnGroup> secondary){
