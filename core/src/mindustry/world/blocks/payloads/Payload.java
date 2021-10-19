@@ -36,6 +36,9 @@ public interface Payload extends Position{
     /** @return the time taken to build this payload. */
     float buildTime();
 
+    /** update this payload if it is a block */
+    default void update(){}
+
     /** @return whether this payload was dumped. */
     default boolean dump(){
         return false;
@@ -94,6 +97,7 @@ public interface Payload extends Position{
             BuildPayload payload = new BuildPayload(block, Team.derelict);
             byte version = read.b();
             payload.build.readAll(read, version);
+            payload.build.tile = emptyTile;
             return (T)payload;
         }else if(type == payloadUnit){
             byte id = read.b();
