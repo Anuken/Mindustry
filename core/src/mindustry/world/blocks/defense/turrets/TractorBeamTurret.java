@@ -45,6 +45,7 @@ public class TractorBeamTurret extends BaseTurret{
 
         rotateSpeed = 10f;
         coolantMultiplier = 1f;
+        envEnabled |= Env.space;
 
         //disabled due to version mismatch problems
         acceptCoolant = false;
