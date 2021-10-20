@@ -204,7 +204,7 @@ public class MapsDialog extends BaseDialog{
         dialog = new BaseDialog("@editor.filters");
         dialog.addCloseButton();
         dialog.cont.table(menu -> {
-            menu.label(() -> "@editor.filters.mode").width(150f).left();
+            menu.add("@editor.filters.mode").width(150f).left();
             menu.table(t -> {
                 for(Gamemode mode : Gamemode.all){
                     TextureRegionDrawable icon = Vars.ui.getIcon("mode" + Strings.capitalize(mode.name()));
@@ -222,7 +222,7 @@ public class MapsDialog extends BaseDialog{
             }).padBottom(10f);
             menu.row();
 
-            menu.label(() -> "@editor.filters.type").width(150f).left();
+            menu.add("@editor.filters.type").width(150f).left();
             menu.table(Tex.button, t -> {
                 t.button("@custom", Styles.clearTogglet, () -> {
                     showCustom = !showCustom;
@@ -239,7 +239,7 @@ public class MapsDialog extends BaseDialog{
             }).padBottom(10f);
             menu.row();
 
-            menu.label(() -> "@editor.filters.search").width(150f).left();
+            menu.add("@editor.filters.search").width(150f).left();
             menu.table(Tex.button, t -> {
                 t.button("@editor.filters.author", Styles.clearTogglet, () -> {
                     searchAuthor = !searchAuthor;
