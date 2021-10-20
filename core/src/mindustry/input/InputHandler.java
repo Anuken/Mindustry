@@ -992,11 +992,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         //consume tap event if necessary
+        var invBuild = (!build.block.hasItems || build.items.total() == 0) && build.getPayload() instanceof BuildPayload pay ? pay.build : build;
         if(build.interactable(player.team()) && build.block.consumesTap){
             consumed = true;
-        }else if(build.interactable(player.team()) && build.block.synthetic() && (!consumed || build.block.allowConfigInventory)){
-            if(build.block.hasItems && build.items.total() > 0){
-                frag.inv.showFor(build);
+        }else if(invBuild.interactable(player.team()) && invBuild.block.synthetic() && (!consumed || invBuild.block.allowConfigInventory)){
+            if(invBuild.block.hasItems && invBuild.items.total() > 0){
+                frag.inv.showFor(invBuild);
                 consumed = true;
                 showedInventory = true;
             }

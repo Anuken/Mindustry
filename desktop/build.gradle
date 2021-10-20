@@ -54,17 +54,15 @@ if(!project.ext.hasSprites() && System.getenv("JITPACK") != "true"){
     dist.dependsOn ":tools:pack"
 }
 
-//this is only for local testing
 task steamtest(dependsOn: dist){
     doLast{
         copy{
             from "build/libs/Mindustry.jar"
-            if(System.properties["os.name"].contains("Mac")){
-                into "/Users/anuke/Library/Application Support/Steam/steamapps/common/Mindustry/Mindustry.app/Contents/Resources"
-            }else{
-                into "/home/anuke/.steam/steam/steamapps/common/Mindustry/jre"
-            }
-            rename("Mindustry.jar", "desktop.jar")
+            into System.getenv("destination") ?: System.properties["os.name"].contains("Mac") ?
+                "/Users/anuke/Library/Application Support/Steam/steamapps/common/Mindustry/Mindustry.app/Contents/Resources" :
+                "/home/anuke/.steam/steam/steamapps/common/Mindustry/jre"
+
+            rename("Mindustry.jar", System.getenv("outfile") ?:  "desktop.jar")
         }
     }
 }
