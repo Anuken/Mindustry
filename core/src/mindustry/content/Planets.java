@@ -23,7 +23,7 @@ public class Planets implements ContentList{
 
     @Override
     public void load(){
-        sun = new Planet("sun", null, 4){{
+        sun = new Planet("sun", null, 4f){{
             bloom = true;
             accessible = false;
 
@@ -40,7 +40,7 @@ public class Planets implements ContentList{
             );
         }};
 
-        erekir = new Planet("erekir", sun, 1, 2){{
+        erekir = new Planet("erekir", sun, 1f, 2){{
             generator = new ErekirPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 5);
             atmosphereColor = Color.valueOf("f07218");
@@ -71,7 +71,7 @@ public class Planets implements ContentList{
             gen.max += 2;
         });
 
-        tantros = new Planet("tantros", sun, 1, 2){{
+        tantros = new Planet("tantros", sun, 1f, 2){{
             generator = new TantrosPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 4);
             atmosphereColor = Color.valueOf("3db899");
@@ -81,7 +81,7 @@ public class Planets implements ContentList{
             alwaysUnlocked = true;
         }};
 
-        serpulo = new Planet("serpulo", sun, 1, 3){{
+        serpulo = new Planet("serpulo", sun, 1f, 3){{
             generator = new SerpuloPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
             cloudMeshLoader = () -> new MultiMesh(

@@ -58,5 +58,13 @@
   {
     "name": "Phoenix Network",
     "address": ["172.104.253.198"]
+  },
+  {
+    "name": "Pandorum",
+    "address": ["pandorum.su:5018", "pandorum.su:5019", "pandorum.su:5020"]
+  },
+  {
+    "name": "MindustryBR",
+    "address": ["mindustry.me:4451", "n2.mindustry.me:4446"]
   }
 ]

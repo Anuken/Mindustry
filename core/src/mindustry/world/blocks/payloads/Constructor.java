@@ -8,6 +8,7 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -23,6 +24,7 @@ public class Constructor extends BlockProducer{
         size = 3;
         configurable = true;
 
+        configClear((ConstructorBuild tile) -> tile.recipe = null);
         config(Block.class, (ConstructorBuild tile, Block block) -> {
             if(tile.recipe != block) tile.progress = 0f;
             if(canProduce(block)){
@@ -40,7 +42,7 @@ public class Constructor extends BlockProducer{
     }
 
     public boolean canProduce(Block b){
-        return b.isVisible() && b.size >= minBlockSize && b.size <= maxBlockSize;
+        return b.isVisible() && b.size >= minBlockSize && b.size <= maxBlockSize && !(b instanceof CoreBlock) && !state.rules.bannedBlocks.contains(b);
     }
     
     public class ConstructorBuild extends BlockProducerBuild{

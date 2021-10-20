@@ -86,6 +86,11 @@ public class PayloadDeconstructor extends PayloadBlock{
         }
 
         @Override
+        public boolean acceptUnitPayload(Unit unit){
+            return payload == null && deconstructing == null && !unit.spawnedByCore && unit.type.getTotalRequirements().length > 0 && unit.hitSize / tilesize <= maxPayloadSize;
+        }
+
+        @Override
         public void handlePayload(Building source, Payload payload){
             super.handlePayload(source, payload);
             accum = null;
@@ -93,11 +98,12 @@ public class PayloadDeconstructor extends PayloadBlock{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
-            return deconstructing == null && super.acceptPayload(source, payload) && payload.requirements().length > 0 && payload.fits(maxPayloadSize);
+            return deconstructing == null && this.payload == null && super.acceptPayload(source, payload) && payload.requirements().length > 0 && payload.fits(maxPayloadSize);
         }
 
         @Override
         public void updateTile(){
+            super.updateTile();
             if(items.total() > 0){
                 for(int i = 0; i < dumpRate; i++){
                     dumpAccumulate();
@@ -153,10 +159,26 @@ public class PayloadDeconstructor extends PayloadBlock{
 
                 //finish deconstruction, prepare for next payload.
                 if(progress >= 1f){
-                    Fx.breakBlock.at(x, y, deconstructing.size() / tilesize);
+                    canProgress = true;
+                    //check for rounding errors
+                    for(int i = 0; i < reqs.length; i++){
+                        if(Mathf.equal(accum[i], 1f, 0.0001f)){
+                            if(items.total() < itemCapacity){
+                                items.add(reqs[i].item, 1);
+                                accum[i] = 0f;
+                            }else{
+                                canProgress = false;
+                                break;
+                            }
+                        }
+                    }
 
-                    deconstructing = null;
-                    accum = null;
+                    if(canProgress){
+                        Fx.breakBlock.at(x, y, deconstructing.size() / tilesize);
+
+                        deconstructing = null;
+                        accum = null;
+                    }
                 }
             }else if(moveInPayload(false) && payload != null){
                 accum = new float[payload.requirements().length];

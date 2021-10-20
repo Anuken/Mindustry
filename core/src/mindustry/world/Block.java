@@ -50,6 +50,7 @@ public class Block extends UnlockableContent{
     public boolean outputsPayload = false;
     public boolean acceptsPayload = false;
     public boolean acceptsItems = false;
+    public boolean separateItemCapacity = false;
 
     public int itemCapacity = 10;
     public float liquidCapacity = 10f;

@@ -335,7 +335,7 @@ public class LExecutor{
         /** Checks is a unit is valid for logic AI control, and returns the controller. */
         @Nullable
         public static LogicAI checkLogicAI(LExecutor exec, Object unitObj){
-            if(unitObj instanceof Unit unit && exec.obj(varUnit) == unit && unit.team == exec.team && !unit.isPlayer() && !(unit.controller() instanceof FormationAI)){
+            if(unitObj instanceof Unit unit && unit.isValid() && exec.obj(varUnit) == unit && unit.team == exec.team && !unit.isPlayer() && !(unit.controller() instanceof FormationAI)){
                 if(unit.controller() instanceof LogicAI la){
                     la.controller = exec.building(varThis);
                     return la;
@@ -934,26 +934,30 @@ public class LExecutor{
             //this should avoid any garbage allocation
             Var v = exec.var(value);
             if(v.isobj && value != 0){
-                String strValue =
-                    v.objval == null ? "null" :
-                    v.objval instanceof String s ? s :
-                    v.objval == Blocks.stoneWall ? "solid" : //special alias
-                    v.objval instanceof MappableContent content ? content.name :
-                    v.objval instanceof Content ? "[content]" :
-                    v.objval instanceof Building build ? build.block.name :
-                    v.objval instanceof Unit unit ? unit.type.name :
-                    v.objval instanceof Enum<?> e ? e.name() :
-                    "[object]";
+                String strValue = toString(v.objval);
 
                 exec.textBuffer.append(strValue);
             }else{
                 //display integer version when possible
-                if(Math.abs(v.numval - (long)v.numval) < 0.000001){
+                if(Math.abs(v.numval - (long)v.numval) < 0.00001){
                     exec.textBuffer.append((long)v.numval);
                 }else{
                     exec.textBuffer.append(v.numval);
                 }
             }
+        }
+
+        public static String toString(Object obj){
+            return
+                obj == null ? "null" :
+                obj instanceof String s ? s :
+                obj == Blocks.stoneWall ? "solid" : //special alias
+                obj instanceof MappableContent content ? content.name :
+                obj instanceof Content ? "[content]" :
+                obj instanceof Building build ? build.block.name :
+                obj instanceof Unit unit ? unit.type.name :
+                obj instanceof Enum<?> e ? e.name() :
+                "[object]";
         }
     }
 

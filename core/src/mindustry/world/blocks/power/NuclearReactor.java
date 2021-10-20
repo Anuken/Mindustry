@@ -76,6 +76,7 @@ public class NuclearReactor extends PowerGenerator{
 
     public class NuclearReactorBuild extends GeneratorBuild{
         public float heat;
+        public float flash;
 
         @Override
         public void updateTile(){
@@ -130,7 +131,7 @@ public class NuclearReactor extends PowerGenerator{
         public void onDestroyed(){
             super.onDestroyed();
 
-            Sounds.explosionbig.at(tile);
+            Sounds.explosionbig.at(this);
 
             int fuel = items.get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
 
@@ -160,10 +161,9 @@ public class NuclearReactor extends PowerGenerator{
             Draw.rect(topRegion, x, y);
 
             if(heat > flashThreshold){
-                float flash = 1f + ((heat - flashThreshold) / (1f - flashThreshold)) * 5.4f;
-                flash += flash * Time.delta;
+                flash += (1f + ((heat - flashThreshold) / (1f - flashThreshold)) * 5.4f) * Time.delta;
                 Draw.color(Color.red, Color.yellow, Mathf.absin(flash, 9f, 1f));
-                Draw.alpha(0.6f);
+                Draw.alpha(0.3f);
                 Draw.rect(lightsRegion, x, y);
             }
 

@@ -132,6 +132,12 @@ public class Planet extends UnlockableContent{
         }
     }
 
+    /** @deprecated confusing parameter orer, use the other constructor instead */
+    @Deprecated
+    public Planet(String name, Planet parent, int sectorSize, float radius){
+        this(name, parent, radius, sectorSize);
+    }
+
     public @Nullable Sector getLastSector(){
         if(sectors.isEmpty()){
             return null;

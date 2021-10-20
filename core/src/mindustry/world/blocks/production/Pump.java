@@ -92,6 +92,11 @@ public class Pump extends LiquidBlock{
         }
 
         @Override
+        public void pickedUp(){
+            amount = 0f;
+        }
+
+        @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
 

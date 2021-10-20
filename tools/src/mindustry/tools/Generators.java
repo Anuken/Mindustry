@@ -477,8 +477,8 @@ public class Generators{
                     Pixmap baseCell = get(type.cellRegion);
                     Pixmap cell = baseCell.copy();
 
-                    //replace with 0xffd37fff : 0xdca463ff for sharded colors?
-                    cell.replace(in -> in == 0xffffffff ? 0xffa664ff : in == 0xdcc6c6ff ? 0xd06b53ff : 0);
+                //replace with 0xffd37fff : 0xdca463ff for sharded colors?
+                cell.replace(in -> in == 0xffffffff ? 0xffa664ff : in == 0xdcc6c6ff || in == 0xdcc5c5ff ? 0xd06b53ff : 0);
 
                     image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2, true);
                 }

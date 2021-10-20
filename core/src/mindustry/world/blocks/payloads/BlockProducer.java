@@ -78,6 +78,7 @@ public abstract class BlockProducer extends PayloadBlock{
 
         @Override
         public void updateTile(){
+            super.updateTile();
             var recipe = recipe();
             boolean produce = recipe != null && consValid() && payload == null;
 
