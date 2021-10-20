@@ -76,6 +76,8 @@ public class Block extends UnlockableContent{
     public boolean copyConfig = true;
     /** whether this block has a tile entity that updates */
     public boolean update;
+    /** whether this block updates as a payload */
+    public boolean payloadUpdate = true;
     /** whether this block has health and can be destroyed */
     public boolean destructible;
     /** whether unloaders work on this block */
