@@ -138,7 +138,7 @@ public class PayloadBlock extends Block{
         @Override
         public void updateTile(){
             if(payload != null){
-                payload.update();
+                payload.update(false);
             }
         }
 
