@@ -26,6 +26,7 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.service.*;
+import mindustry.world.*;
 
 import java.io.*;
 import java.nio.charset.*;
@@ -195,6 +196,8 @@ public class Vars implements Loadable{
     public static Fi launchIDFile;
     /** empty map, indicates no current map */
     public static Map emptyMap;
+    /** empty tile for payloads */
+    public static Tile emptyTile;
     /** map file extension */
     public static final String mapExtension = "msav";
     /** save file extension */
@@ -309,6 +312,10 @@ public class Vars implements Loadable{
         android = Core.app.isAndroid();
 
         modDirectory.mkdirs();
+
+        Events.on(ContentInitEvent.class, e -> {
+            emptyTile = new Tile(Short.MAX_VALUE - 20, Short.MAX_VALUE - 20);
+        });
 
         mods.load();
         maps.load();

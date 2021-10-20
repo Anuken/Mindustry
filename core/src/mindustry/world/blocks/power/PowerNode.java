@@ -444,7 +444,7 @@ public class PowerNode extends PowerBlock{
         public void draw(){
             super.draw();
 
-            if(Mathf.zero(Renderer.laserOpacity)) return;
+            if(Mathf.zero(Renderer.laserOpacity) || isPayload()) return;
 
             Draw.z(Layer.power);
             setupColor(power.graph.getSatisfaction());

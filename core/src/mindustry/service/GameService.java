@@ -176,7 +176,7 @@ public class GameService{
         });
 
         Events.on(UnitControlEvent.class, e -> {
-            if(e.unit instanceof BlockUnitc && ((BlockUnitc)e.unit).tile().block == Blocks.router){
+            if(e.unit instanceof BlockUnitc unit && unit.tile().block == Blocks.router){
                 becomeRouter.complete();
             }
         });

@@ -285,7 +285,7 @@ public class Waves{
         if(naval){
             species = Structs.filter(UnitType[].class, species, v -> v[0].flying || v[0].naval);
         }else{
-            species = Structs.filter(UnitType[].class, species, v -> v[0].flying && !v[0].naval);
+            species = Structs.filter(UnitType[].class, species, v -> !v[0].naval);
         }
 
         UnitType[][] fspec = species;

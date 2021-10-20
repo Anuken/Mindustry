@@ -88,7 +88,9 @@ public class TechTree implements ContentList{
                     node(conduit, () -> {
                         node(liquidJunction, () -> {
                             node(liquidRouter, () -> {
-                                node(liquidTank);
+                                node(liquidContainer, () -> {
+                                    node(liquidTank);
+                                });
 
                                 node(bridgeConduit);
 

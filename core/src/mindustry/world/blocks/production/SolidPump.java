@@ -96,6 +96,11 @@ public class SolidPump extends Pump{
         public void drawCracks(){}
 
         @Override
+        public void pickedUp(){
+            boost = validTiles = 0f;
+        }
+
+        @Override
         public void draw(){
             Draw.rect(region, x, y);
             super.drawCracks();

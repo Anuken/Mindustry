@@ -141,7 +141,7 @@ public class ImpactReactor extends PowerGenerator{
 
             if(warmup < 0.3f || !state.rules.reactorExplosions) return;
 
-            Sounds.explosionbig.at(tile);
+            Sounds.explosionbig.at(this);
 
             Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
 
