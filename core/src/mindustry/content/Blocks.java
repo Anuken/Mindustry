@@ -901,7 +901,7 @@ public class Blocks implements ContentList{
         }};
 
         mendProjector = new MendProjector("mend-projector"){{
-            requirements(Category.effect, with(Items.lead, 100, Items.titanium, 25, Items.silicon, 40));
+            requirements(Category.effect, with(Items.lead, 100, Items.titanium, 25, Items.silicon, 40, Items.copper, 50));
             consumes.power(1.5f);
             size = 2;
             reload = 250f;
@@ -1645,7 +1645,7 @@ public class Blocks implements ContentList{
             shots = 4;
             burstSpacing = 5;
             inaccuracy = 10f;
-            range = 235f;
+            range = 240f;
             xRand = 6f;
             size = 2;
             health = 300 * size * size;
