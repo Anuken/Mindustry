@@ -122,6 +122,8 @@ public class Block extends UnlockableContent{
     public boolean autoResetEnabled = true;
     /** if true, the block stops updating when disabled */
     public boolean noUpdateDisabled = false;
+    /** if true, this block updates when a payload of a unit. Currently unused! */
+    public boolean updateInUnits = true;
     /** Whether to use this block's color in the minimap. Only used for overlays. */
     public boolean useColor = true;
     /** item that drops from this block, used for drills */
@@ -154,7 +156,7 @@ public class Block extends UnlockableContent{
     public boolean alwaysReplace = false;
     /** if false, this block can never be replaced. */
     public boolean replaceable = true;
-    /** The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other. */
+    /** The block group. Unless {@link #canReplace} is overridden, blocks in the same group can replace each other. */
     public BlockGroup group = BlockGroup.none;
     /** List of block flags. Used for AI indexing. */
     public EnumSet<BlockFlag> flags = EnumSet.of();
