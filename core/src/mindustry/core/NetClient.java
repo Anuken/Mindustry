@@ -174,15 +174,6 @@ public class NetClient implements ApplicationListener{
 
         sound.at(x, y, pitch, Mathf.clamp(volume, 0, 4f));
     }
-    
-    @Remote(variants = Variant.both, unreliable = true)
-    public static void music(Music music, float position){
-        if(music == null || position < 0) return;
-
-        control.sound.stop();
-        control.sound.playOnce(music);
-        music.setPosition(position);
-    }
 
     @Remote(variants = Variant.both, unreliable = true)
     public static void effect(Effect effect, float x, float y, float rotation, Color color){
