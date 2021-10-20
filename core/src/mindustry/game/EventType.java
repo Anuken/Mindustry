@@ -544,4 +544,15 @@ public class EventType{
         }
     }
 
+    public static class AdminRequestEvent{
+        public final Player player;
+        public final @Nullable Player other;
+        public final AdminAction action;
+
+        public AdminRequestEvent(Player player, Player other, AdminAction action){
+            this.player = player;
+            this.other = other;
+            this.action = action;
+        }
+    }
 }
