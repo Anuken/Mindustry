@@ -180,7 +180,7 @@ public class LoadDialog extends BaseDialog{
         }
 
         if(!any){
-            slots.add("@maps.none");
+            slots.add("@save.none");
         }
     }
 
