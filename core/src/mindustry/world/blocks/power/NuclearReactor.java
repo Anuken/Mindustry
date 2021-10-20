@@ -139,7 +139,8 @@ public class NuclearReactor extends PowerGenerator{
             if((fuel < 5 && heat < 0.5f) || !state.rules.reactorExplosions) return;
 
             Effect.shake(6f, 16f, x, y);
-            Damage.damage(x, y, explosionRadius * tilesize * (float)(fuel / itemCapacity), explosionDamage * 4);
+            // * ((float)fuel / itemCapacity) to scale based on fullness
+            Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
 
             explodeEffect.at(x, y);
         }

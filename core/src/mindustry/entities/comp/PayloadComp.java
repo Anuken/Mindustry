@@ -15,7 +15,6 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
-import mindustry.world.blocks.power.*;
 
 /** An entity that holds a payload. */
 @Component
@@ -23,12 +22,14 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     @Import float x, y, rotation;
     @Import UnitType type;
 
-    private transient @Nullable PowerGraph payloadPower;
-
     Seq<Payload> payloads = new Seq<>();
 
     //uncomment for insanity
+
     /*
+
+    private transient @Nullable PowerGraph payloadPower;
+
     @Override
     public void update(){
         if(payloadPower != null){
