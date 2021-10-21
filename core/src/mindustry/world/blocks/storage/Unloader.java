@@ -67,16 +67,15 @@ public class Unloader extends Block{
 
         @Override
         public void updateTile(){
-            if((unloadTimer += delta()) < speed) return;
-            if(proximity.size < 2) return;
+            if(((unloadTimer += delta()) < speed) || (proximity.size < 2)) return;
             Item item = null;
             boolean any = false;
             int itemslength = content.items().size;
 
+            //initialize possibleBlocks only if the new size is bigger than the previous, to avoid unnecessary allocations
             if(possibleBlocks.size != proximity.size){
                 int tmp = possibleBlocks.size;
                 possibleBlocks.setSize(proximity.size);
-                // TODO: Optimise this to avoid problems when pasting big schematics
                 for(int i = tmp; i < proximity.size; i++){
                     possibleBlocks.set(i, new ContainerStat());
                 }
@@ -88,6 +87,8 @@ public class Unloader extends Block{
                 for(int pos = 0; pos < proximity.size; pos++){
                     var other = proximity.get(pos);
                     boolean interactable = other.interactable(team);
+
+                    //set the stats of all buildings in possibleBlocks
                     ContainerStat pb = possibleBlocks.get(pos);
                     pb.building = other;
                     pb.canUnload = interactable && other.canUnload() && other.items != null && other.items.has(sortItem);
@@ -102,14 +103,18 @@ public class Unloader extends Block{
                     boolean hasReceiver = false;
                     boolean isDistinct = false;
                     Item possibleItem = content.item(total);
+
                     for(int pos = 0; pos < proximity.size; pos++){
                         var other = proximity.get(pos);
                         boolean interactable = other.interactable(team);
-                        ContainerStat pb = possibleBlocks.get(pos);
 
+                        //set the stats of all buildings in possibleBlocks while we are at it
+                        ContainerStat pb = possibleBlocks.get(pos);
                         pb.building = other;
                         pb.canUnload = interactable && other.canUnload() && other.items != null && other.items.has(possibleItem);
                         pb.canLoad = interactable && !(other.block instanceof StorageBlock) && other.acceptItem(this, possibleItem);
+
+                        //the part handling framerate issues and slow conveyor belts, to avoid skipping items
                         if(hasProvider && pb.canLoad) isDistinct = true;
                         if(hasReceiver && pb.canUnload) isDistinct = true;
                         hasProvider = hasProvider || pb.canUnload;
@@ -130,7 +135,7 @@ public class Unloader extends Block{
                     pb.loadFactor = (other.getMaximumAccepted(item) == 0) || (other.items == null) ? 0 : other.items.get(item) / (float)other.getMaximumAccepted(item);
                 }
 
-                //sort that give unload priority to blocks that can give but not receive, mainly plast and storage
+                //sort so it gives full priority to blocks that can give but not receive (mainly plast and storage), and then by load
                 possibleBlocks.sort((e1, e2) -> {
                     // TODO: canLoad should test if storage/plast instead, otherwise a full factory will get full priority, barely an issue
                     int canLoad = Boolean.compare(e2.canLoad, e1.canLoad);
@@ -157,15 +162,13 @@ public class Unloader extends Block{
                 }
 
                 //trade the items
-                if(dumpingFrom != null && dumpingTo != null){
-                    if(dumpingFrom.loadFactor != dumpingTo.loadFactor){
-                        dumpingTo.building.handleItem(this, item);
-                        dumpingFrom.building.removeStack(item, 1);
-                        any = true;
-                    }
+                if(dumpingFrom != null && dumpingTo != null && dumpingFrom.loadFactor != dumpingTo.loadFactor){
+                    dumpingTo.building.handleItem(this, item);
+                    dumpingFrom.building.removeStack(item, 1);
+                    any = true;
                 }
 
-                rotations = item.id;
+                if(sortItem == null) rotations = item.id;
             }
 
             if(any){
