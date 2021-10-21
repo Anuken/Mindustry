@@ -230,4 +230,15 @@ public class LoadDialog extends BaseDialog{
             }
         });
     }
+
+    @Override
+    public Dialog show(){
+        super.show();
+
+        if(Core.app.isDesktop() && searchField != null){
+            Core.scene.setKeyboardFocus(searchField);
+        }
+
+        return this;
+    }
 }
