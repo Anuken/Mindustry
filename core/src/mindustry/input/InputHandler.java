@@ -53,19 +53,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** If any of these functions return true, input is locked. */
     public Seq<Boolp> inputLocks = Seq.with(() -> renderer.isCutscene());
     public Interval controlInterval = new Interval();
-    public @Nullable
-    Block block;
+    public @Nullable Block block;
     public boolean overrideLineRotation;
     public int rotation;
     public boolean droppingItem;
     public Group uiGroup;
     public boolean isBuilding = true, buildWasAutoPaused = false, wasShooting = false;
-    public @Nullable
-    UnitType controlledType;
+    public @Nullable UnitType controlledType;
     public float recentRespawnTimer;
 
-    public @Nullable
-    Schematic lastSchematic;
+    public @Nullable Schematic lastSchematic;
     public GestureDetector detector;
     public PlaceLine line = new PlaceLine();
     public BuildPlan resultreq;
@@ -127,8 +124,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(unit != null && unit.item() == item) unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
 
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
-            Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {
-            }));
+            Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
         }
         if(amount > 0){
             build.handleStack(item, amount, unit);
@@ -333,7 +329,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build == null) return;
 
         if(net.server() && (!Units.canInteract(player, build) ||
-        !netServer.admins.allowAction(player, ActionType.rotate, build.tile(), action -> action.rotation = Mathf.mod(build.rotation + Mathf.sign(direction), 4)))){
+            !netServer.admins.allowAction(player, ActionType.rotate, build.tile(), action -> action.rotation = Mathf.mod(build.rotation + Mathf.sign(direction), 4)))){
             throw new ValidateException(player, "Player cannot rotate a block.");
         }
 
@@ -348,7 +344,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void tileConfig(@Nullable Player player, Building build, @Nullable Object value){
         if(build == null) return;
         if(net.server() && (!Units.canInteract(player, build) ||
-        !netServer.admins.allowAction(player, ActionType.configure, build.tile, action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
+            !netServer.admins.allowAction(player, ActionType.configure, build.tile, action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
         build.configured(player == null || player.dead() ? null : player.unit(), value);
         Core.app.post(() -> Events.fire(new ConfigEvent(build, player, value)));
     }
@@ -435,8 +431,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(player == null || player.dead() || (player.unit() == null)) return;
 
         //make sure player is allowed to make the command
-        if(net.server() && !netServer.admins.allowAction(player, ActionType.command, action -> {
-        })){
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.command, action -> {})){
             throw new ValidateException(player, "Player cannot command a unit.");
         }
 
@@ -676,6 +671,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void flipRequests(Seq<BuildPlan> requests, boolean x){
         int origin = (x ? schemOriginX() : schemOriginY()) * tilesize;
+
         requests.each(req -> {
             if(req.breaking) return;
 
@@ -686,18 +682,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }else{
                 req.y = (int)((value - req.block.offset) / tilesize);
             }
-            req.pointConfig(p -> {
-                int corigin = x ? req.originalWidth / 2 : req.originalHeight / 2;
-                int nvalue = -(x ? p.x : p.y);
-                if(x){
-                    req.originalX = -(req.originalX - corigin) + corigin;
-                    p.x = nvalue;
-                }else{
-                    req.originalY = -(req.originalY - corigin) + corigin;
-                    p.y = nvalue;
-                }
-            });
-            req.block.flipRotation(req, x);
+
+            req.block.flipRequest(req, x);
         });
     }
 
@@ -1049,11 +1035,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     boolean canMine(Tile tile){
         return !Core.scene.hasMouse()
-        && tile.drop() != null
-        && player.unit().validMine(tile)
-        && !((!Core.settings.getBool("doubletapmine") && tile.floor().playerUnmineable) && tile.overlay().itemDrop == null)
-        && player.unit().acceptsItem(tile.drop())
-        && tile.block() == Blocks.air;
+            && tile.drop() != null
+            && player.unit().validMine(tile)
+            && !((!Core.settings.getBool("doubletapmine") && tile.floor().playerUnmineable) && tile.overlay().itemDrop == null)
+            && player.unit().acceptsItem(tile.drop())
+            && tile.block() == Blocks.air;
     }
 
     /** Returns the tile at the specified MOUSE coordinates. */
@@ -1101,8 +1087,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return Core.input.mouseWorld(getMouseX(), getMouseY()).sub(x, y).angle();
     }
 
-    public @Nullable
-    Unit selectedUnit(){
+    public @Nullable Unit selectedUnit(){
         Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, Unitc::isAI);
         if(unit != null){
             unit.hitbox(Tmp.r1);
@@ -1120,8 +1105,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return null;
     }
 
-    public @Nullable
-    Building selectedControlBuild(){
+    public @Nullable Building selectedControlBuild(){
         Building build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
         if(build != null && !player.dead() && build.canControlSelect(player.unit()) && build.team == player.team()){
             return build;
@@ -1171,7 +1155,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean canShoot(){
         return block == null && !onConfigurable() && !isDroppingItem() && !player.unit().activelyBuilding() &&
-        !(player.unit() instanceof Mechc && player.unit().isFlying()) && !player.unit().mining();
+            !(player.unit() instanceof Mechc && player.unit().isFlying()) && !player.unit().mining();
     }
 
     public boolean onConfigurable(){
@@ -1187,7 +1171,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void tryDropItems(@Nullable Building build, float x, float y){
-        if(!droppingItem || player.unit().stack.amount <= 0 || canTapPlayer(x, y) || state.isPaused()){
+        if(!droppingItem || player.unit().stack.amount <= 0 || canTapPlayer(x, y) || state.isPaused() ){
             droppingItem = false;
             return;
         }
@@ -1217,9 +1201,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //TODO with many requests, this is O(n * m), very laggy
         for(BuildPlan req : player.unit().plans()){
             if(req != ignore
-            && !req.breaking
-            && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
-            && !(type.canReplace(req.block) && Tmp.r1.equals(Tmp.r2))){
+                    && !req.breaking
+                    && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
+                    && !(type.canReplace(req.block) && Tmp.r1.equals(Tmp.r2))){
                 return false;
             }
         }
@@ -1246,15 +1230,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Draw.color(!valid ? Pal.removeBack : Pal.accentBack);
         Draw.rect(Core.atlas.find("place-arrow"),
-        x * tilesize + block.offset + dx * trns,
-        y * tilesize + block.offset - 1 + dy * trns,
+        x * tilesize + block.offset + dx*trns,
+        y * tilesize + block.offset - 1 + dy*trns,
         Core.atlas.find("place-arrow").width * Draw.scl,
         Core.atlas.find("place-arrow").height * Draw.scl, rotation * 90 - 90);
 
         Draw.color(!valid ? Pal.remove : Pal.accent);
         Draw.rect(Core.atlas.find("place-arrow"),
-        x * tilesize + block.offset + dx * trns,
-        y * tilesize + block.offset + dy * trns,
+        x * tilesize + block.offset + dx*trns,
+        y * tilesize + block.offset + dy*trns,
         Core.atlas.find("place-arrow").width * Draw.scl,
         Core.atlas.find("place-arrow").height * Draw.scl, rotation * 90 - 90);
     }
@@ -1276,7 +1260,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             var start = world.build(startX, startY);
             var end = world.build(endX, endY);
             if(block != null && start instanceof ChainedBuilding && end instanceof ChainedBuilding
-            && block.canReplace(end.block) && block.canReplace(start.block)){
+                    && block.canReplace(end.block) && block.canReplace(start.block)){
                 points = Placement.upgradeLine(startX, startY, endX, endY);
                 endRotation = end.rotation;
             }else{

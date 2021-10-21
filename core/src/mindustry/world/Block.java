@@ -463,7 +463,7 @@ public class Block extends UnlockableContent{
         if(hasItems && configurable){
             bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
         }
-
+        
         if(unitCapModifier != 0){
             stats.add(Stat.maxUnits, (unitCapModifier < 0 ? "-" : "+") + Math.abs(unitCapModifier));
         }
@@ -819,7 +819,7 @@ public class Block extends UnlockableContent{
         }
 
         clipSize = Math.max(clipSize, size * tilesize);
-
+        
         //only kept to ensure compatibility with v6 mods.
         if(expanded){
             clipSize += tilesize * 10f;
@@ -984,7 +984,19 @@ public class Block extends UnlockableContent{
         packer.add(PageType.editor, name + "-icon-editor", editorBase);
     }
 
-    public void flipRotation(BuildPlan req, boolean x){
+    public void flipRequest(BuildPlan req, boolean x){
+        req.pointConfig(p -> {
+            int corigin = x ? req.originalWidth/2 : req.originalHeight/2;
+            int nvalue = -(x ? p.x : p.y);
+            if(x){
+                req.originalX = -(req.originalX - corigin) + corigin;
+                p.x = nvalue;
+            }else{
+                req.originalY = -(req.originalY - corigin) + corigin;
+                p.y = nvalue;
+            }
+        });
+
         //flip rotation
         if(x == (req.rotation % 2 == 0)){
             req.rotation = Mathf.mod(req.rotation + 2, 4);
