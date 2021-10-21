@@ -275,7 +275,9 @@ public class NetServer implements ApplicationListener{
             int page = args.length > 0 ? Strings.parseInt(args[0]) : 1;
             int pages = Mathf.ceil((float)clientCommands.getCommandList().size / commandsPerPage);
 
-            if(--page >= pages || page < 0){
+            page--;
+
+            if(page >= pages || page < 0){
                 player.sendMessage("[scarlet]'page' must be a number between[orange] 1[] and[orange] " + pages + "[scarlet].");
                 return;
             }
