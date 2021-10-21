@@ -1346,7 +1346,7 @@ public class Blocks implements ContentList{
         }};
 
         waterExtractor = new SolidPump("water-extractor"){{
-            requirements(Category.production, with(Items.metaglass, 30, Items.graphite, 30, Items.lead, 30));
+            requirements(Category.production, with(Items.metaglass, 30, Items.graphite, 30, Items.lead, 30, Items.copper, 30));
             result = Liquids.water;
             pumpAmount = 0.11f;
             size = 2;
@@ -2062,12 +2062,12 @@ public class Blocks implements ContentList{
         //region payloads
 
         payloadConveyor = new PayloadConveyor("payload-conveyor"){{
-            requirements(Category.units, with(Items.graphite, 10, Items.copper, 20));
+            requirements(Category.units, with(Items.graphite, 10, Items.lead, 10));
             canOverdrive = false;
         }};
 
         payloadRouter = new PayloadRouter("payload-router"){{
-            requirements(Category.units, with(Items.graphite, 15, Items.copper, 20));
+            requirements(Category.units, with(Items.graphite, 15, Items.lead, 15));
             canOverdrive = false;
         }};
 
