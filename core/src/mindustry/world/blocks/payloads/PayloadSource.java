@@ -92,6 +92,17 @@ public class PayloadSource extends PayloadBlock{
         }
 
         @Override
+        public boolean onConfigureTileTapped(Building other){
+            if(this == other){
+                deselect();
+                configure(null);
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
         public Object config(){
             return unit == null ? block : unit;
         }
