@@ -119,7 +119,7 @@ public class MessageBlock extends Block{
                         dialog.hide();
                     }).size(130f, 60f);
                     dialog.update(() -> {
-                        if(tile.block() != MessageBlock.this){
+                        if(tile.build != this){
                             dialog.hide();
                         }
                     });

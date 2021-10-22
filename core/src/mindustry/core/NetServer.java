@@ -275,7 +275,7 @@ public class NetServer implements ApplicationListener{
             int page = args.length > 0 ? Strings.parseInt(args[0]) : 1;
             int pages = Mathf.ceil((float)clientCommands.getCommandList().size / commandsPerPage);
 
-            page --;
+            page--;
 
             if(page >= pages || page < 0){
                 player.sendMessage("[scarlet]'page' must be a number between[orange] 1[] and[orange] " + pages + "[scarlet].");
@@ -723,6 +723,8 @@ public class NetServer implements ApplicationListener{
             warn("@ attempted to perform admin action on nonexistant or admin player.", player.name);
             return;
         }
+
+        Events.fire(new EventType.AdminRequestEvent(player, other, action));
 
         if(action == AdminAction.wave){
             //no verification is done, so admins can hypothetically spam waves

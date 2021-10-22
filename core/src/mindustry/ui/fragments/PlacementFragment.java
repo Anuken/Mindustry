@@ -445,7 +445,7 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean unlocked(Block block){
-        return block.unlockedNow() && block.placeablePlayer;
+        return block.unlockedNow() && block.placeablePlayer && (state.rules.hiddenBuildItems.isEmpty() || !Structs.contains(block.requirements, i -> state.rules.hiddenBuildItems.contains(i.item)));
     }
 
     boolean hasInfoBox(){

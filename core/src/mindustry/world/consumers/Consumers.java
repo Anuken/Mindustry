@@ -16,6 +16,14 @@ public class Consumers{
     public final Bits itemFilters = new Bits(Vars.content.items().size);
     public final Bits liquidfilters = new Bits(Vars.content.liquids().size);
 
+    public boolean consumesItem(Item item){
+        return itemFilters.get(item.id);
+    }
+
+    public boolean consumesLiquid(Liquid liq){
+        return liquidfilters.get(liq.id);
+    }
+
     public boolean any(){
         return results != null && results.length > 0;
     }

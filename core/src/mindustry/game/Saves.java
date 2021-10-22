@@ -155,6 +155,7 @@ public class Saves{
         SaveSlot slot = new SaveSlot(getNextSlotFile());
         slot.importFile(file);
         slot.setName(file.nameWithoutExtension());
+
         saves.add(slot);
         slot.meta = SaveIO.getMeta(slot.file);
         current = slot;
@@ -330,6 +331,10 @@ public class Saves{
         public void importFile(Fi from) throws IOException{
             try{
                 from.copyTo(file);
+                if(previewFile().exists()){
+                    requestedPreview = false;
+                    previewFile().delete();
+                }
             }catch(Exception e){
                 throw new IOException(e);
             }

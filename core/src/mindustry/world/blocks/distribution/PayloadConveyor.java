@@ -126,6 +126,10 @@ public class PayloadConveyor extends Block{
         public void updateTile(){
             if(!enabled) return;
 
+            if(item != null){
+                item.update(false);
+            }
+
             lastInterp = curInterp;
             curInterp = fract();
             //rollover skip
@@ -229,6 +233,11 @@ public class PayloadConveyor extends Block{
             if(item != null){
                 item.draw();
             }
+        }
+
+        @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon,x, y);
         }
 
         public float time(){

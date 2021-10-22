@@ -24,6 +24,7 @@ import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
@@ -789,6 +790,57 @@ public class ApplicationTests{
                 }
             }
         }
+    }
+
+    void checkPayloads(){
+        for(int x = 0; x < world.tiles.width; x++){
+            for(int y = 0; y < world.tiles.height; y++){
+                Tile tile = world.rawTile(x, y);
+                if(tile.build != null && tile.isCenter() && !(tile.block() instanceof CoreBlock)){
+                    try{
+                        tile.build.update();
+                    }catch(Throwable t){
+                        fail("Failed to update block in payload: '" + ((BuildPayload)tile.build.getPayload()).block() + "'", t);
+                    }
+                    assertEquals(tile.block(), tile.build.block);
+                    assertEquals(tile.block().health, tile.build.health());
+                }
+            }
+        }
+    }
+
+    @Test
+    void allPayloadBlockTest(){
+        int ts = 20;
+        Tiles tiles = world.resize(ts * 3, ts * 3);
+
+        world.beginMapLoad();
+        for(int x = 0; x < tiles.width; x++){
+            for(int y = 0; y < tiles.height; y++){
+                tiles.set(x, y, new Tile(x, y, Blocks.stone, Blocks.air, Blocks.air));
+            }
+        }
+
+        tiles.getn(tiles.width - 2, tiles.height - 2).setBlock(Blocks.coreShard, Team.sharded);
+
+        Seq<Block> blocks = content.blocks().select(b -> b.canBeBuilt());
+        for(int i = 0; i < blocks.size; i++){
+            int x = (i % ts) * 3 + 1;
+            int y = (i / ts) * 3 + 1;
+            Tile tile = tiles.get(x, y);
+            tile.setBlock(Blocks.payloadConveyor, Team.sharded);
+            Building build = tile.build;
+            build.handlePayload(build, new BuildPayload(blocks.get(i), Team.sharded));
+        }
+        world.endMapLoad();
+
+        checkPayloads();
+
+        SaveIO.write(saveDirectory.child("payloads.msav"));
+        logic.reset();
+        SaveIO.load(saveDirectory.child("payloads.msav"));
+
+        checkPayloads();
     }
 
     @TestFactory

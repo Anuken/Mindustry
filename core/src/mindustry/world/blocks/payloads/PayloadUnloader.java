@@ -36,6 +36,7 @@ public class PayloadUnloader extends PayloadLoader{
 
         @Override
         public void updateTile(){
+            super.updateTile();
             if(shouldExport()){
                 //one-use, disposable block
                 if(payload.block().instantDeconstruct){
