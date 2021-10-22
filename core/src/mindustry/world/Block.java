@@ -266,6 +266,7 @@ public class Block extends UnlockableContent{
     /** Main subclass. Non-anonymous. */
     public @Nullable Class<?> subclass;
 
+    public float selectScroll; //scroll position for certain blocks
     public Prov<Building> buildType = null; //initialized later
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 

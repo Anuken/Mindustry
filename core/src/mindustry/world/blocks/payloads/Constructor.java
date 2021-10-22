@@ -54,7 +54,7 @@ public class Constructor extends BlockProducer{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.blocks().select(Constructor.this::canProduce), () -> recipe, this::configure);
+            ItemSelection.buildTable(Constructor.this, table, content.blocks().select(Constructor.this::canProduce), () -> recipe, this::configure);
         }
 
         @Override
