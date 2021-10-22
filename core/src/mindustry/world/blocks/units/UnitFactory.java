@@ -167,6 +167,17 @@ public class UnitFactory extends UnitBlock{
         }
 
         @Override
+        public boolean onConfigureTileTapped(Building other){
+            if(this == other){
+                deselect();
+                configure(null);
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
         public boolean acceptPayload(Building source, Payload payload){
             return false;
         }
