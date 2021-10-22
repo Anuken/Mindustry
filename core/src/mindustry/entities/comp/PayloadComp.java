@@ -24,6 +24,38 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
 
     Seq<Payload> payloads = new Seq<>();
 
+    //uncomment for insanity
+
+    /*
+
+    private transient @Nullable PowerGraph payloadPower;
+
+    @Override
+    public void update(){
+        if(payloadPower != null){
+            payloadPower.clear();
+        }
+
+        //update power graph first, resolve everything
+        for(Payload pay : payloads){
+            if(pay instanceof BuildPayload pb && pb.build.power != null){
+                if(payloadPower == null) payloadPower = new PowerGraph();
+
+                pb.build.power.graph = null;
+                payloadPower.add(pb.build);
+            }
+        }
+
+        if(payloadPower != null){
+            payloadPower.update();
+        }
+
+        for(Payload pay : payloads){
+            pay.set(x, y, rotation);
+            pay.update(true);
+        }
+    }*/
+
     float payloadUsed(){
         return payloads.sumf(p -> p.size() * p.size());
     }
@@ -50,7 +82,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
 
     void pickup(Unit unit){
         unit.remove();
-        payloads.add(new UnitPayload(unit));
+        addPayload(new UnitPayload(unit));
         Fx.unitPickup.at(unit);
         if(Vars.net.client()){
             Vars.netClient.clearRemovedEntity(unit.id);
@@ -62,7 +94,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         tile.pickedUp();
         tile.tile.remove();
         tile.tile = Vars.emptyTile;
-        payloads.add(new BuildPayload(tile));
+        addPayload(new BuildPayload(tile));
         Fx.unitPickup.at(tile);
         Events.fire(new PickupEvent(self(), tile));
     }

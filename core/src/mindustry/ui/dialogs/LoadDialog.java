@@ -8,7 +8,9 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.core.GameState.*;
+import mindustry.game.*;
 import mindustry.game.Saves.*;
 import mindustry.gen.*;
 import mindustry.io.*;
@@ -20,8 +22,12 @@ import java.io.*;
 import static mindustry.Vars.*;
 
 public class LoadDialog extends BaseDialog{
-    ScrollPane pane;
     Table slots;
+    String searchString;
+    Gamemode filteredMode;
+    TextField searchField;
+    ScrollPane pane;
+    BaseDialog dialog;
 
     public LoadDialog(){
         this("@loadgame");
@@ -43,9 +49,38 @@ public class LoadDialog extends BaseDialog{
 
         slots = new Table();
         pane = new ScrollPane(slots);
+
+        rebuild();
+
+        Table search = new Table();
+        search.image(Icon.zoom);
+        searchField = search.field("", t -> {
+            searchString = t.length() > 0 ? t.toLowerCase() : null;
+            rebuild();
+        }).maxTextLength(50).growX().get();
+        searchField.setMessageText("@save.search");
+        for(Gamemode mode : Gamemode.all){
+            TextureRegionDrawable icon = Vars.ui.getIcon("mode" + Strings.capitalize(mode.name()));
+            boolean sandbox = mode == Gamemode.sandbox;
+            if(Core.atlas.isFound(icon.getRegion()) || sandbox){
+                search.button(sandbox ? Icon.terrain : icon, Styles.emptytogglei, () -> {
+                    filteredMode = filteredMode == mode ? null : mode;
+                    rebuild();
+                }).size(60f).checked(b -> filteredMode == mode).tooltip("@mode." + mode.name() + ".name");
+            }
+        }
+
         pane.setFadeScrollBars(false);
         pane.setScrollingDisabled(true, false);
 
+        cont.add(search).growX();
+        cont.row();
+        cont.add(pane).growY();
+    }
+
+    public void rebuild(){
+
+        slots.clear();
         slots.marginRight(24).marginLeft(20f);
 
         Time.runTask(2f, () -> Core.scene.setScrollFocus(pane));
@@ -58,7 +93,11 @@ public class LoadDialog extends BaseDialog{
         boolean any = false;
 
         for(SaveSlot slot : array){
-            if(slot.isHidden()) continue;
+            if(slot.isHidden()
+            || (searchString != null && !Strings.stripColors(slot.getName()).toLowerCase().contains(searchString))
+            || (filteredMode != null && filteredMode != slot.mode())){
+                continue;
+            }
 
             any = true;
 
@@ -82,14 +121,14 @@ public class LoadDialog extends BaseDialog{
                     t.button(Icon.trash, Styles.emptyi, () -> {
                         ui.showConfirm("@confirm", "@save.delete.confirm", () -> {
                             slot.delete();
-                            setup();
+                            rebuild();
                         });
                     }).right();
 
                     t.button(Icon.pencil, Styles.emptyi, () -> {
                         ui.showTextInput("@save.rename", "@save.rename.text", slot.getName(), text -> {
                             slot.setName(text);
-                            setup();
+                            rebuild();
                         });
                     }).right();
 
@@ -141,10 +180,8 @@ public class LoadDialog extends BaseDialog{
         }
 
         if(!any){
-            slots.button("@save.none", () -> {}).disabled(true).fillX().margin(20f).minWidth(340f).height(80f).pad(4f);
+            slots.add("@save.none");
         }
-
-        cont.add(pane);
     }
 
     public void addSetup(){
@@ -154,7 +191,7 @@ public class LoadDialog extends BaseDialog{
                 if(SaveIO.isSaveValid(file)){
                     try{
                         control.saves.importSave(file);
-                        setup();
+                        rebuild();
                     }catch(IOException e){
                         e.printStackTrace();
                         ui.showException("@save.import.fail", e);
@@ -192,5 +229,16 @@ public class LoadDialog extends BaseDialog{
                 runLoadSave(slot);
             }
         });
+    }
+
+    @Override
+    public Dialog show(){
+        super.show();
+
+        if(Core.app.isDesktop() && searchField != null){
+            Core.scene.setKeyboardFocus(searchField);
+        }
+
+        return this;
     }
 }
