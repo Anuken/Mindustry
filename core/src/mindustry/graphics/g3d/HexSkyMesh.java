@@ -1,6 +1,7 @@
 package mindustry.graphics.g3d;
 
 import arc.graphics.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.noise.*;
@@ -42,6 +43,9 @@ public class HexSkyMesh extends PlanetMesh{
 
     @Override
     public void render(PlanetParams params, Mat3D projection, Mat3D transform){
+        //don't waste performance rendering 0-alpha clouds
+        if(Mathf.zero(1f - params.uiAlpha, 0.01f)) return;
+
         preRender(params);
         shader.bind();
         shader.setUniformMatrix4("u_proj", projection.val);
