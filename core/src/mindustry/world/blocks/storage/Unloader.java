@@ -29,6 +29,7 @@ public class Unloader extends Block{
         itemCapacity = 0;
         noUpdateDisabled = true;
         unloadable = false;
+        envEnabled = Env.any;
 
         config(Item.class, (UnloaderBuild tile, Item item) -> tile.sortItem = item);
         configClear((UnloaderBuild tile) -> tile.sortItem = null);
@@ -137,7 +138,8 @@ public class Unloader extends Block{
 
                 //sort so it gives full priority to blocks that can give but not receive (mainly plast and storage), and then by load
                 possibleBlocks.sort((e1, e2) -> {
-                    // TODO: canLoad should test if storage/plast instead, otherwise a full factory will get full priority, barely an issue
+                    // TODO: instead of canLoad it should be ((instance of Storage) || (is it a plast belt i can unload from))
+                    //  otherwise a 100% full factory will get full priority over the storage/plast, barely an issue but still wasting trades and thus speed
                     int canLoad = Boolean.compare(e2.canLoad, e1.canLoad);
                     return (canLoad != 0) ? canLoad : Float.compare(e1.loadFactor, e2.loadFactor);
                 });
