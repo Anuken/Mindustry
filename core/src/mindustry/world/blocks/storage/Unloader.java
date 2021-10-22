@@ -3,6 +3,7 @@ package mindustry.world.blocks.storage;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
@@ -54,56 +55,133 @@ public class Unloader extends Block{
     public class UnloaderBuild extends Building{
         public float unloadTimer = 0f;
         public Item sortItem = null;
-        public Building dumpingTo;
         public int offset = 0;
-        public int[] rotations;
+        public int rotations = 0;
+        public Seq<ContainerStat> possibleBlocks = new Seq<>();
+
+        public class ContainerStat{
+            Building building;
+            float loadFactor;
+            boolean canLoad;
+            boolean canUnload;
+        }
 
         @Override
         public void updateTile(){
-            if((unloadTimer += delta()) >= speed){
-                boolean any = false;
-                if(rotations == null || rotations.length != proximity.size){
-                    rotations = new int[proximity.size];
+            if(((unloadTimer += delta()) < speed) || (proximity.size < 2)) return;
+            Item item = null;
+            boolean any = false;
+            int itemslength = content.items().size;
+
+            //initialize possibleBlocks only if the new size is bigger than the previous, to avoid unnecessary allocations
+            if(possibleBlocks.size != proximity.size){
+                int tmp = possibleBlocks.size;
+                possibleBlocks.setSize(proximity.size);
+                for(int i = tmp; i < proximity.size; i++){
+                    possibleBlocks.set(i, new ContainerStat());
+                }
+            }
+
+            if(sortItem != null){
+                item = sortItem;
+
+                for(int pos = 0; pos < proximity.size; pos++){
+                    var other = proximity.get(pos);
+                    boolean interactable = other.interactable(team);
+
+                    //set the stats of all buildings in possibleBlocks
+                    ContainerStat pb = possibleBlocks.get(pos);
+                    pb.building = other;
+                    pb.canUnload = interactable && other.canUnload() && other.items != null && other.items.has(sortItem);
+                    pb.canLoad = interactable && !(other.block instanceof StorageBlock) && other.acceptItem(this, sortItem);
+                }
+            }else{
+                //select the next item for nulloaders
+                //inspired of nextIndex() but for all proximity at once, and also way more powerful
+                for(int i = 0; i < itemslength; i++){
+                    int total = (rotations + i + 1) % itemslength;
+                    boolean hasProvider = false;
+                    boolean hasReceiver = false;
+                    boolean isDistinct = false;
+                    Item possibleItem = content.item(total);
+
+                    for(int pos = 0; pos < proximity.size; pos++){
+                        var other = proximity.get(pos);
+                        boolean interactable = other.interactable(team);
+
+                        //set the stats of all buildings in possibleBlocks while we are at it
+                        ContainerStat pb = possibleBlocks.get(pos);
+                        pb.building = other;
+                        pb.canUnload = interactable && other.canUnload() && other.items != null && other.items.has(possibleItem);
+                        pb.canLoad = interactable && !(other.block instanceof StorageBlock) && other.acceptItem(this, possibleItem);
+
+                        //the part handling framerate issues and slow conveyor belts, to avoid skipping items
+                        if(hasProvider && pb.canLoad) isDistinct = true;
+                        if(hasReceiver && pb.canUnload) isDistinct = true;
+                        hasProvider = hasProvider || pb.canUnload;
+                        hasReceiver = hasReceiver || pb.canLoad;
+                    }
+                    if(isDistinct){
+                        item = possibleItem;
+                        break;
+                    }
+                }
+            }
+
+            if(item != null){
+                //only compute the load factor if a transfer is possible
+                for(int pos = 0; pos < proximity.size; pos++){
+                    ContainerStat pb = possibleBlocks.get(pos);
+                    var other = pb.building;
+                    pb.loadFactor = (other.getMaximumAccepted(item) == 0) || (other.items == null) ? 0 : other.items.get(item) / (float)other.getMaximumAccepted(item);
                 }
 
-                for(int i = 0; i < proximity.size; i++){
-                    int pos = (offset + i) % proximity.size;
-                    var other = proximity.get(pos);
+                //sort so it gives full priority to blocks that can give but not receive (mainly plast and storage), and then by load
+                possibleBlocks.sort((e1, e2) -> {
+                    // TODO: instead of canLoad it should be ((instance of Storage) || (is it a plast belt i can unload from))
+                    //  otherwise a 100% full factory will get full priority over the storage/plast, barely an issue but still wasting trades and thus speed
+                    int canLoad = Boolean.compare(e2.canLoad, e1.canLoad);
+                    return (canLoad != 0) ? canLoad : Float.compare(e1.loadFactor, e2.loadFactor);
+                });
 
-                    if(other.interactable(team) && other.block.unloadable && other.canUnload() && other.block.hasItems
-                    && ((sortItem == null && other.items.total() > 0) || (sortItem != null && other.items.has(sortItem)))){
-                        //make sure the item can't be dumped back into this block
-                        dumpingTo = other;
+                ContainerStat dumpingFrom = null;
+                ContainerStat dumpingTo = null;
 
-                        //get item to be taken
-                        Item item = sortItem == null ? other.items.takeIndex(rotations[pos]) : sortItem;
-
-                        //remove item if it's dumped correctly
-                        if(put(item)){
-                            other.items.remove(item, 1);
-                            any = true;
-
-                            if(sortItem == null){
-                                rotations[pos] = item.id + 1;
-                            }
-
-                            other.itemTaken(item);
-                        }else if(sortItem == null){
-                            rotations[pos] = other.items.nextIndex(rotations[pos]);
-                        }
+                //choose the building to accept the item
+                for(int i = 0; i < possibleBlocks.size; i++){
+                    if(possibleBlocks.get(i).canLoad){
+                        dumpingTo = possibleBlocks.get(i);
+                        break;
                     }
                 }
 
-                if(any){
-                    unloadTimer %= speed;
-                }else{
-                    unloadTimer = Math.min(unloadTimer, speed);
+                //choose the building to give the item
+                for(int i = possibleBlocks.size - 1; i >= 0; i--){
+                    if(possibleBlocks.get(i).canUnload){
+                        dumpingFrom = possibleBlocks.get(i);
+                        break;
+                    }
                 }
 
-                if(proximity.size > 0){
-                    offset ++;
-                    offset %= proximity.size;
+                //trade the items
+                if(dumpingFrom != null && dumpingTo != null && dumpingFrom.loadFactor != dumpingTo.loadFactor){
+                    dumpingTo.building.handleItem(this, item);
+                    dumpingFrom.building.removeStack(item, 1);
+                    any = true;
                 }
+
+                if(sortItem == null) rotations = item.id;
+            }
+
+            if(any){
+                unloadTimer %= speed;
+            }else{
+                unloadTimer = Math.min(unloadTimer, speed);
+            }
+
+            if(proximity.size > 0){
+                offset++;
+                offset %= proximity.size;
             }
         }
 
@@ -130,11 +208,6 @@ public class Unloader extends Block{
             }
 
             return true;
-        }
-
-        @Override
-        public boolean canDump(Building to, Item item){
-            return !(to.block instanceof StorageBlock) && to != dumpingTo;
         }
 
         @Override
