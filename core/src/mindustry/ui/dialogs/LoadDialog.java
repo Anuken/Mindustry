@@ -63,7 +63,7 @@ public class LoadDialog extends BaseDialog{
             TextureRegionDrawable icon = Vars.ui.getIcon("mode" + Strings.capitalize(mode.name()));
             boolean sandbox = mode == Gamemode.sandbox;
             if(Core.atlas.isFound(icon.getRegion()) || sandbox){
-                search.button(sandbox ? Icon.pencil : icon, Styles.emptytogglei, () -> {
+                search.button(sandbox ? Icon.terrain : icon, Styles.emptytogglei, () -> {
                     filteredMode = filteredMode == mode ? null : mode;
                     rebuild();
                 }).size(60f).checked(b -> filteredMode == mode).tooltip("@mode." + mode.name() + ".name");
