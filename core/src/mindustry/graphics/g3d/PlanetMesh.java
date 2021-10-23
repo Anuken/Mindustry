@@ -19,8 +19,7 @@ public abstract class PlanetMesh implements GenericMesh{
 
     public PlanetMesh(){}
 
-    /** Should be overridden to set up any shader parameters such as planet position, normals, etc.
-     * @param params*/
+    /** Should be overridden to set up any shader parameters such as planet position, normals, etc. */
     public void preRender(PlanetParams params){
 
     }

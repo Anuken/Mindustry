@@ -210,7 +210,7 @@ public class PlanetGrid{
 
     static int tileCount(int size){
         return 10 * Mathf.pow(3, size) + 2;
-    }
+    }///
 
     static int cornerCount(int size){
         return 20 * Mathf.pow(3, size);

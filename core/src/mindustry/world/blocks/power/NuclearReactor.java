@@ -49,6 +49,7 @@ public class NuclearReactor extends PowerGenerator{
 
     public NuclearReactor(String name){
         super(name);
+        updateInUnits = false;
         itemCapacity = 30;
         liquidCapacity = 30;
         hasItems = true;
@@ -138,6 +139,7 @@ public class NuclearReactor extends PowerGenerator{
             if((fuel < 5 && heat < 0.5f) || !state.rules.reactorExplosions) return;
 
             Effect.shake(6f, 16f, x, y);
+            // * ((float)fuel / itemCapacity) to scale based on fullness
             Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
 
             explodeEffect.at(x, y);

@@ -100,6 +100,7 @@ public class Turret extends ReloadTurret{
     public Turret(String name){
         super(name);
         liquidCapacity = 20f;
+        quickRotate = false;
     }
 
     @Override
@@ -184,8 +185,8 @@ public class Turret extends ReloadTurret{
                 logicControlTime = logicControlCooldown;
                 logicShooting = !Mathf.zero(p2);
 
-                if(p1 instanceof Posc){
-                    targetPosition((Posc)p1);
+                if(p1 instanceof Posc pos){
+                    targetPosition(pos);
                 }
             }
 
