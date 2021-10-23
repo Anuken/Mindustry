@@ -2143,7 +2143,7 @@ public class Blocks implements ContentList{
             }}
             );
 
-            shootLength = 0.5f;
+            shootLength = 0f;
             outlineColor = Color.valueOf("2d2f39");
             size = 2;
             envEnabled |= Env.space;
