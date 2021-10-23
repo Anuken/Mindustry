@@ -312,7 +312,7 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            if(this == source) return true; //player threw items
+            if(this == source) return items.total() < itemCapacity && (!items.any() || items.has(item)); //player threw items
             if(cooldown > recharge - 1f) return false; //still cooling down
             return !((state != stateLoad) //not a loading dock
             ||  (items.any() && !items.has(item)) //incompatible items
