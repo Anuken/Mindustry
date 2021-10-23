@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -76,7 +77,7 @@ public class BeamDrill extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Item item = null;
+        Item item = null, invalidItem = null;
         boolean multiple = false;
         int count = 0;
 
@@ -88,15 +89,17 @@ public class BeamDrill extends Block{
             for(; j < range; j++){
                 int rx = Tmp.p1.x + Geometry.d4x(rotation)*j, ry = Tmp.p1.y + Geometry.d4y(rotation)*j;
                 Tile other = world.tile(rx, ry);
-                if(other != null){
-                    if(other.solid()){
-                        Item drop = other.wallDrop();
-                        if(drop != null && drop.hardness <= tier){
+                if(other != null && other.solid()){
+                    Item drop = other.wallDrop();
+                    if(drop != null){
+                        if(drop.hardness <= tier){
                             found = drop;
-                            count ++;
+                            count++;
+                        }else{
+                            invalidItem = drop;
                         }
-                        break;
                     }
+                    break;
                 }
             }
 
@@ -126,8 +129,29 @@ public class BeamDrill extends Block{
                 Draw.reset();
                 Draw.rect(item.fullIcon, dx, dy, s, s);
             }
+        }else if(invalidItem != null){
+            drawPlaceText(Core.bundle.get("bar.drilltierreq"), x, y, false);
         }
 
+    }
+
+    @Override
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
+        for(int i = 0; i < size; i++){
+            getLaserPos(tile.x, tile.y, rotation, i, Tmp.p1);
+            for(int j = 0; j < range; j++){
+                Tile other = world.tile(Tmp.p1.x + Geometry.d4x(rotation)*j, Tmp.p1.y + Geometry.d4y(rotation)*j);
+                if(other != null && other.solid()){
+                    Item drop = other.wallDrop();
+                    if(drop != null && drop.hardness <= tier){
+                        return true;
+                    }
+                    break;
+                }
+            }
+        }
+
+        return false;
     }
 
     void getLaserPos(int tx, int ty, int rotation, int i, Point2 out){
@@ -221,7 +245,7 @@ public class BeamDrill extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return items.total() < itemCapacity;
+            return items.total() < itemCapacity && enabled;
         }
 
         @Override
