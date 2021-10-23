@@ -81,6 +81,7 @@ public class Turret extends ReloadTurret{
     protected Vec2 tr = new Vec2();
     protected Vec2 tr2 = new Vec2();
 
+    public @Nullable String basePrefix;
     public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
     public @Load("@-heat") TextureRegion heatRegion;
     public float elevation = -1f;
@@ -128,6 +129,15 @@ public class Turret extends ReloadTurret{
         if(elevation < 0) elevation = size / 2f;
 
         super.init();
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
+        if(basePrefix != null){
+            baseRegion = Core.atlas.find(basePrefix + "-block-" + size);
+        }
     }
 
     @Override

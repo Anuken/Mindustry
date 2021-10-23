@@ -65,7 +65,7 @@ public class Duct extends Block implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock);
+        return (otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock)) || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class Duct extends Block implements Autotiler{
 
             //draw extra ducts facing this one for tiling purposes
             for(int i = 0; i < 4; i++){
-                if((blending & (1 << i)) != 0 && !(i == 0 && nextc != null)){
+                if((blending & (1 << i)) != 0){
                     int dir = r - i;
                     float rot = i == 0 ? rotation : (dir)*90;
                     drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, rot, i != 0 ? SliceMode.bottom : SliceMode.top);

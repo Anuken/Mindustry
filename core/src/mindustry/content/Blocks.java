@@ -89,6 +89,9 @@ public class Blocks implements ContentList{
     //turrets
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
+    //turrets - erekir
+    breach,
+
     //units
     commandCenter,
     groundFactory, airFactory, navalFactory,
@@ -2118,6 +2121,41 @@ public class Blocks implements ContentList{
 
             health = 200 * size * size;
             consumes.add(new ConsumeCoolant(0.5f)).update(false);
+        }};
+
+        breach = new ItemTurret("breach"){{
+            requirements(Category.turret, with(Items.beryllium, 35), true);
+            ammo(
+            Items.beryllium, new BasicBulletType(7f, 20){{
+                width = 8f;
+                height = 14f;
+                shootEffect = Fx.berylSpark;
+                smokeEffect = Fx.shootBigSmoke;
+                ammoMultiplier = 2;
+                pierce = true;
+                pierceBuilding = true;
+                hitColor = backColor = trailColor = Pal.berylShot;
+                frontColor = Color.white;
+                trailWidth = 1.5f;
+                trailLength = 10;
+                //TODO different effect?
+                hitEffect = despawnEffect = Fx.hitBulletColor;
+            }}
+            );
+
+            shootLength = 0.5f;
+            outlineColor = Color.valueOf("2d2f39");
+            size = 2;
+            envEnabled |= Env.space;
+            basePrefix = "reinforced";
+            reloadTime = 40f;
+            restitution = 0.03f;
+            range = 180;
+            shootCone = 3f;
+            health = 300 * size * size;
+            rotateSpeed = 2f;
+
+            limitRange();
         }};
 
         //endregion

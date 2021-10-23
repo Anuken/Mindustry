@@ -112,5 +112,11 @@ public class Pal{
     logicControl = Color.valueOf("6bb2b2"),
     logicOperations = Color.valueOf("877bad"),
     logicIo = Color.valueOf("a08a8a"),
-    logicUnits = Color.valueOf("c7b59d");
+    logicUnits = Color.valueOf("c7b59d"),
+
+    berylShot = Color.valueOf("b1dd7e"),
+
+    plasticBurn = Color.valueOf("e9ead3"),
+
+    muddy = Color.valueOf("432722");
 }

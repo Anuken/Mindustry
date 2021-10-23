@@ -437,6 +437,24 @@ public class Fx{
         Drawf.light(e.x, e.y, 20f, Pal.lightOrange, 0.6f * e.fout());
     }),
 
+    hitBulletColor = new Effect(14, e -> {
+        color(Color.white, e.color, e.fin());
+
+        e.scaled(7f, s -> {
+            stroke(0.5f + s.fout());
+            Lines.circle(e.x, e.y, s.fin() * 5f);
+        });
+
+        stroke(0.5f + e.fout());
+
+        randLenVectors(e.id, 5, e.fin() * 15f, (x, y) -> {
+            float ang = Mathf.angle(x, y);
+            lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
+        });
+
+        Drawf.light(e.x, e.y, 20f, e.color, 0.6f * e.fout());
+    }),
+
     hitFuse = new Effect(14, e -> {
         color(Color.white, Pal.surge, e.fin());
 
@@ -981,7 +999,7 @@ public class Fx{
     }),
 
     muddy = new Effect(80f, e -> {
-        color(Color.valueOf("432722"));
+        color(Pal.muddy);
         alpha(Mathf.clamp(e.fin() * 2f));
 
         Fill.circle(e.x, e.y, e.fout());
@@ -1297,6 +1315,15 @@ public class Fx{
 
         randLenVectors(e.id, 9, e.finpow() * 23f, e.rotation, 20f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 2.4f + 0.2f);
+        });
+    }),
+
+    berylSpark = new Effect(21f, e -> {
+        color(Color.white, Pal.berylShot, e.fin());
+        stroke(e.fout() * 1.1f + 0.5f);
+
+        randLenVectors(e.id, 5, 27f * e.fin(), e.rotation, 9f, (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 5f + 0.5f);
         });
     }),
 
@@ -1620,7 +1647,7 @@ public class Fx{
 
     plasticburn = new Effect(40, e -> {
         randLenVectors(e.id, 5, 3f + e.fin() * 5f, (x, y) -> {
-            color(Color.valueOf("e9ead3"), Color.gray, e.fin());
+            color(Pal.plasticBurn, Color.gray, e.fin());
             Fill.circle(e.x + x, e.y + y, e.fout());
         });
     }),
