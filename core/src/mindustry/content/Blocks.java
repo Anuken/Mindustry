@@ -2126,7 +2126,7 @@ public class Blocks implements ContentList{
         breach = new ItemTurret("breach"){{
             requirements(Category.turret, with(Items.beryllium, 35), true);
             ammo(
-            Items.beryllium, new BasicBulletType(7f, 20){{
+            Items.beryllium, new BasicBulletType(7f, 25){{
                 width = 8f;
                 height = 14f;
                 shootEffect = Fx.berylSpark;
@@ -2153,7 +2153,7 @@ public class Blocks implements ContentList{
             range = 180;
             shootCone = 3f;
             health = 300 * size * size;
-            rotateSpeed = 2f;
+            rotateSpeed = 1.8f;
 
             limitRange();
         }};
