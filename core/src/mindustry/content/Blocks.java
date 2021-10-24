@@ -85,6 +85,8 @@ public class Blocks implements ContentList{
 
     //storage
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
+    //storage - erekir
+    coreBastion,
 
     //turrets
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
@@ -1648,6 +1650,17 @@ public class Blocks implements ContentList{
 
             unitCapModifier = 24;
             researchCostMultiplier = 0.11f;
+        }};
+
+        coreBastion = new CoreBlock("core-bastion"){{
+            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.beryllium, 1000, Items.graphite, 1000));
+
+            unitType = UnitTypes.alpha;
+            health = 3000;
+            itemCapacity = 3000; //TODO more or less?
+            size = 3;
+
+            unitCapModifier = 10;
         }};
 
         vault = new StorageBlock("vault"){{
