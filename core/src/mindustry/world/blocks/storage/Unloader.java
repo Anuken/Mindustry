@@ -11,6 +11,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.distribution.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -136,12 +137,10 @@ public class Unloader extends Block{
                     pb.loadFactor = (other.getMaximumAccepted(item) == 0) || (other.items == null) ? 0 : other.items.get(item) / (float)other.getMaximumAccepted(item);
                 }
 
-                //sort so it gives full priority to blocks that can give but not receive (mainly plast and storage), and then by load
+                //sort so it gives full priority to blocks that can give but not receive (stackConveyors and Storage), and then by load
                 possibleBlocks.sort((e1, e2) -> {
-                    // TODO: instead of canLoad it should be ((instance of Storage) || (is it a plast belt i can unload from))
-                    //  otherwise a 100% full factory will get full priority over the storage/plast, barely an issue but still wasting trades and thus speed
-                    int canLoad = Boolean.compare(e2.canLoad, e1.canLoad);
-                    return (canLoad != 0) ? canLoad : Float.compare(e1.loadFactor, e2.loadFactor);
+                    int getsPriority = Boolean.compare((e1.building.block instanceof StorageBlock || e1.building.block instanceof StackConveyor), (e2.building.block instanceof StorageBlock || e2.building.block instanceof StackConveyor));
+                    return (getsPriority != 0) ? getsPriority : Float.compare(e1.loadFactor, e2.loadFactor);
                 });
 
                 ContainerStat dumpingFrom = null;
