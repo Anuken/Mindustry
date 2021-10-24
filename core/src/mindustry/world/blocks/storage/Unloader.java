@@ -138,10 +138,10 @@ public class Unloader extends Block{
                 }
 
                 //sort so it gives full priority to blocks that can give but not receive (stackConveyors and Storage), and then by load
-                possibleBlocks.sort((e1, e2) -> {
-                    int getsPriority = Boolean.compare((e1.building.block instanceof StorageBlock || e1.building.block instanceof StackConveyor), (e2.building.block instanceof StorageBlock || e2.building.block instanceof StackConveyor));
-                    return (getsPriority != 0) ? getsPriority : Float.compare(e1.loadFactor, e2.loadFactor);
-                });
+                possibleBlocks.sort(Structs.comps(
+                    Structs.comparingBool(e -> e.building.block instanceof StorageBlock || e.building.block instanceof StackConveyor),
+                    Structs.comparingFloat(e -> e.loadFactor)
+                ));
 
                 ContainerStat dumpingFrom = null;
                 ContainerStat dumpingTo = null;
