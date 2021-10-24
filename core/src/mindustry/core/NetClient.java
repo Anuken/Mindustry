@@ -94,8 +94,9 @@ public class NetClient implements ApplicationListener{
             c.mobile = mobile;
             c.versionType = Version.type;
             c.color = player.color.rgba();
-            c.usid = getUsid(packet.addressTCP);
+            c.usid = getUsid(packet.hostName);
             c.uuid = platform.getUUID();
+            c.host = packet.hostName;
 
             if(c.uuid == null){
                 ui.showErrorMessage("@invalidid");

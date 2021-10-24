@@ -10,6 +10,8 @@ import arc.util.*;
 import arc.util.Log.*;
 import arc.util.async.*;
 import arc.util.io.*;
+import mindustry.*;
+import mindustry.io.*;
 import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 import net.jpountz.lz4.*;
@@ -26,6 +28,7 @@ public class ArcNetProvider implements NetProvider{
     final Client client;
     final Prov<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[512], 512);
     final AsyncExecutor executor = new AsyncExecutor(Math.max(Runtime.getRuntime().availableProcessors(), 6));
+    private String lastHost = "";
 
     final Server server;
     final CopyOnWriteArrayList<ArcConnection> connections = new CopyOnWriteArrayList<>();
@@ -47,7 +50,9 @@ public class ArcNetProvider implements NetProvider{
             @Override
             public void connected(Connection connection){
                 Connect c = new Connect();
+                c.hostName = lastHost;
                 c.addressTCP = connection.getRemoteAddressTCP().getAddress().getHostAddress();
+                //unreachable if?
                 if(connection.getRemoteAddressTCP() != null) c.addressTCP = connection.getRemoteAddressTCP().toString();
 
                 Core.app.post(() -> net.handleClientReceived(c));
@@ -82,6 +87,7 @@ public class ArcNetProvider implements NetProvider{
         server = new Server(32768, 8192, new PacketSerializer());
         server.setMulticast(multicastGroup, multicastPort);
         server.setDiscoveryHandler((address, handler) -> {
+            //TODO need to modify arc-net to get hostname in ping
             ByteBuffer buffer = NetworkIO.writeServerData();
             buffer.position(0);
             handler.respond(buffer);
@@ -158,7 +164,7 @@ public class ArcNetProvider implements NetProvider{
                         if(!(e instanceof ClosedSelectorException)) net.handleException(e);
                     }
                 });
-
+                lastHost = port == Vars.port ? ip : (ip + ":" + port);
                 client.connect(5000, ip, port, port);
                 success.run();
             }catch(Exception e){
@@ -191,9 +197,16 @@ public class ArcNetProvider implements NetProvider{
     @Override
     public void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> invalid){
         try{
+            ByteBuffer sendBuffer = ByteBuffer.allocate(64);
+            sendBuffer.put((byte)-2);
+            PacketSerializer.writeFramework(sendBuffer, DiscoverHost(port == Vars.port ? address : address + ":" + port));
+            sendBuffer.flip();
+            byte[] data = new byte[sendBuffer.limit()];
+            sendBuffer.get(data);
+
             DatagramSocket socket = new DatagramSocket();
             long time = Time.millis();
-            socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), port));
+            socket.send(new DatagramPacket(data, data.length, InetAddress.getByName(address), port));
             socket.setSoTimeout(2000);
 
             DatagramPacket packet = packetSupplier.get();
@@ -450,13 +463,14 @@ public class ArcNetProvider implements NetProvider{
             }
         }
 
-        public void writeFramework(ByteBuffer buffer, FrameworkMessage message){
+        public static void writeFramework(ByteBuffer buffer, FrameworkMessage message){
             if(message instanceof Ping p){
                 buffer.put((byte)0);
                 buffer.putInt(p.id);
                 buffer.put(p.isReply ? 1 : (byte)0);
             }else if(message instanceof DiscoverHost){
                 buffer.put((byte)1);
+                TypeIO.writeString(buffer, message.hostName);
             }else if(message instanceof KeepAlive){
                 buffer.put((byte)2);
             }else if(message instanceof RegisterUDP p){
