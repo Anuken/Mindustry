@@ -171,12 +171,8 @@ public class Weapon implements Cloneable{
             Drawf.shadow(wx, wy, shadow);
         }
 
-        if(outlineRegion.found() && top){
-            Draw.rect(outlineRegion,
-            wx, wy,
-            outlineRegion.width * Draw.scl * -Mathf.sign(flipSprite),
-            region.height * Draw.scl,
-            weaponRotation);
+        if (top){
+            drawOutline(unit, mount);
         }
 
         Draw.rect(region,
