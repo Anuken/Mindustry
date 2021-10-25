@@ -28,7 +28,7 @@ import static mindustry.game.SpawnGroup.*;
 
 public class WaveInfoDialog extends BaseDialog{
     private int start = 0, displayed = 20, graphSpeed = 1;
-    private final int maxVisible = 30, maxGraphSpeed = 16;
+    private static final int maxVisible = 30, maxGraphSpeed = 16;
     Seq<SpawnGroup> groups = new Seq<>();
     private SpawnGroup expandedGroup;
 
@@ -66,7 +66,7 @@ public class WaveInfoDialog extends BaseDialog{
                     ui.showInfoFade("@waves.copied");
                     Core.app.setClipboardText(maps.writeWaves(groups));
                     dialog.hide();
-                }).disabled(b -> groups == null).marginLeft(12f).row();
+                }).disabled(groups == null).marginLeft(12f).row();
 
                 t.button("@waves.load", Icon.download, style, () -> {
                     try{
@@ -77,7 +77,7 @@ public class WaveInfoDialog extends BaseDialog{
                         ui.showErrorMessage("@waves.invalid");
                     }
                     dialog.hide();
-                }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith("[{")).row();
+                }).marginLeft(12f).disabled(Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith("[{")).row();
 
                 t.button("@settings.reset", Icon.upload, style, () -> ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
                     groups = JsonIO.copy(waves.get());
@@ -582,7 +582,7 @@ public class WaveInfoDialog extends BaseDialog{
     }
 
     void numField(String text, Table t, Intc cons, Intp prov, float width){
-        numField(text, t, cons, prov, width, Integer.MAX_VALUE);
+        numField(text, t, cons, prov, width, never);
     }
 
     void numField(String text, Table t, Intc cons, Intp prov, float width, int maxLength){
@@ -590,7 +590,7 @@ public class WaveInfoDialog extends BaseDialog{
         t.field(prov.get() + "", TextFieldFilter.digitsOnly, input -> {
             if(Strings.canParsePositiveInt(input)){
                 cons.get(!input.isEmpty() ? Strings.parseInt(input) : 0);
-                if(maxLength != Integer.MAX_VALUE) buildGroups();
+                if(maxLength != never) buildGroups();
                 updateWaves();
             }
         }).width(width).maxTextLength(maxLength);
