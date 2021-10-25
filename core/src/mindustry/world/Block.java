@@ -265,6 +265,8 @@ public class Block extends UnlockableContent{
     public boolean quickRotate = true;
     /** Main subclass. Non-anonymous. */
     public @Nullable Class<?> subclass;
+    /** Determines if this block gets a higher unloader priority. */
+    public boolean highUnloadPriority = false;
 
     public float selectScroll; //scroll position for certain blocks
     public Prov<Building> buildType = null; //initialized later
