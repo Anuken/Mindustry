@@ -27,16 +27,16 @@ import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.*;
 
 public class WaveInfoDialog extends BaseDialog{
-    private int start = 0, displayed = 20, graphSpeed = 1;
     private static final int maxVisible = 30, maxGraphSpeed = 16;
+    private int start = 0, displayed = 20, graphSpeed = 1;
     Seq<SpawnGroup> groups = new Seq<>();
-    private SpawnGroup expandedGroup;
+    private @Nullable SpawnGroup expandedGroup;
 
     private Table table, iTable, uTable;
     private int search = -1, filterHealth, filterHealthMode, filterBegin = -1, filterEnd = -1, filterAmount, filterAmountWave;
     private boolean expandPane = false, filterStrict = false;
     private UnitType lastType = UnitTypes.dagger;
-    private StatusEffect filterEffect = StatusEffects.none;
+    private @Nullable StatusEffect filterEffect;
     private Sort sort = Sort.begin;
     private boolean reverseSort = false;
     private float updateTimer, payLeft, updatePeriod = 1f;
@@ -77,7 +77,7 @@ public class WaveInfoDialog extends BaseDialog{
                         ui.showErrorMessage("@waves.invalid");
                     }
                     dialog.hide();
-                }).marginLeft(12f).disabled(Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith("[{")).row();
+                }).marginLeft(12f).disabled(Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith("[")).row();
 
                 t.button("@settings.reset", Icon.upload, style, () -> ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
                     groups = JsonIO.copy(waves.get());
@@ -165,7 +165,7 @@ public class WaveInfoDialog extends BaseDialog{
                     start = Math.max(search - (displayed / 2) - (displayed % 2), 0);
                     buildGroups();
                 }).growX().maxTextLength(8).get().setMessageText("@waves.search");
-                s.button(Icon.filter, Styles.emptyi, this::showFilters).size(46f).tooltip("@waves.filter");
+                s.button(Icon.filter, Styles.emptyi, this::showFilters).size(46f).tooltip("@waves.filters");
             }).fillX().pad(6f).row();
             main.pane(t -> table = t).grow().padRight(8f).scrollX(false).row();
             main.table(f -> {
@@ -270,15 +270,15 @@ public class WaveInfoDialog extends BaseDialog{
                             updateIcons(group);
                             dialog.addCloseButton();
                             dialog.show();
-                        }).pad(-6).size(46f);
-                        b.button(Icon.unitsSmall, Styles.emptyi, () -> showContentPane(group, c -> group.type = lastType = c, () -> group.type)).pad(-6).size(46f);
+                        }).pad(-6).size(46f).tooltip("@waves.group");
+                        b.button(Icon.unitsSmall, Styles.emptyi, () -> showContentPane(group, c -> group.type = lastType = c, () -> group.type)).pad(-6).size(46f).tooltip("@waves.group.unit");
                         b.button(Icon.cancel, Styles.emptyi, () -> {
                             if(expandedGroup == group) expandedGroup = null;
                             groups.remove(group);
                             table.getCell(t).pad(0f);
                             t.remove();
                             buildGroups();
-                        }).pad(-6).size(46f).padRight(-12f);
+                        }).pad(-6).size(46f).padRight(-12f).tooltip("@waves.remove");
                         b.clicked(KeyCode.mouseMiddle, () -> {
                             SpawnGroup copy = group.copy();
                             groups.add(copy);
@@ -368,7 +368,7 @@ public class WaveInfoDialog extends BaseDialog{
                             }).padBottom(8f).padTop(-8f).row();
                         }
                     }
-                }).width(340f).pad(8);
+                }).width(340f).pad(8).name("group-" + group.type.name + "-" + groups.indexOf(group));
 
                 table.row();
             }
@@ -452,7 +452,7 @@ public class WaveInfoDialog extends BaseDialog{
     }
 
     void showFilters(){
-        BaseDialog dialog = new BaseDialog("@waves.filter");
+        BaseDialog dialog = new BaseDialog("@waves.filters");
         dialog.setFillParent(false);
 
         Runnable[] rebuild = {null};
@@ -471,20 +471,20 @@ public class WaveInfoDialog extends BaseDialog{
                 numField("", filter, f -> filterHealth = f, () -> filterHealth, 170f, 15);
             }).row();
 
-            dialog.cont.add("@waves.filter.begin");
+            dialog.cont.add("@waves.filters.begin");
             dialog.cont.table(filter -> {
                 numField("", filter, f -> filterBegin = f - 1, () -> filterBegin + 1, 120f, 8);
                 numField("@waves.to", filter, f -> filterEnd = f - 1, () -> filterEnd + 1, 120f, 8);
             }).row();
 
-            dialog.cont.add(Core.bundle.get("waves.filter.amount") + ":");
+            dialog.cont.add(Core.bundle.get("waves.filters.amount") + ":");
             dialog.cont.table(filter -> {
                 numField("", filter, f -> filterAmount = f, () -> filterAmount, 120f, 12);
-                numField("@waves.filter.onwave", filter, f -> filterAmountWave = f, () -> filterAmountWave, 120f, 8);
+                numField("@waves.filters.onwave", filter, f -> filterAmountWave = f, () -> filterAmountWave, 120f, 8);
             }).row();
 
             dialog.cont.table(filter -> {
-                filter.add(Core.bundle.get("waves.filter.effect") + ":");
+                filter.add(Core.bundle.get("waves.filters.effect") + ":");
                 filter.button(filterEffect != null && filterEffect != StatusEffects.none ? new TextureRegionDrawable(filterEffect.uiIcon) :
                 Icon.logic, () -> {
                     showContentPane(null, c -> filterEffect = c, () -> StatusEffects.none, effect -> !(effect.isHidden()  || effect.reactive), false);
@@ -498,7 +498,7 @@ public class WaveInfoDialog extends BaseDialog{
         rebuild[0].run();
 
         dialog.row();
-        dialog.check("@waves.filter.strict", b -> {
+        dialog.check("@waves.filters.strict", b -> {
             filterStrict = b;
             buildGroups();
         }).update(b -> b.setChecked(filterStrict)).padBottom(10f).row();
