@@ -56,10 +56,6 @@
     "address": ["mindustry.initd.kr"]
   },
   {
-    "name": "Russian open-source community",
-    "address": ["185.22.152.66"]
-  },
-  {
     "name": "Omega",
     "address": ["yeeth.mindustry.me:2004","185.86.230.61:25570"] 
   },
@@ -126,5 +122,9 @@
   {
     "name": "Conservatory",
     "address": ["143.198.71.232"]
+  },
+  {
+    "name": "Russian open-source community",
+    "address": ["185.22.152.66"]
   }
 ]
