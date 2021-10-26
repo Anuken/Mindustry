@@ -11,7 +11,6 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.distribution.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -139,7 +138,7 @@ public class Unloader extends Block{
 
                 //sort so it gives full priority to blocks that can give but not receive (stackConveyors and Storage), and then by load
                 possibleBlocks.sort(Structs.comps(
-                    Structs.comparingBool(e -> e.building.block instanceof StorageBlock || e.building.block instanceof StackConveyor),
+                    Structs.comparingBool(e -> e.building.block.highUnloadPriority),
                     Structs.comparingFloat(e -> e.loadFactor)
                 ));
 
@@ -163,7 +162,7 @@ public class Unloader extends Block{
                 }
 
                 //trade the items
-                if(dumpingFrom != null && dumpingTo != null && dumpingFrom.loadFactor != dumpingTo.loadFactor){
+                if(dumpingFrom != null && dumpingTo != null && (dumpingFrom.loadFactor != dumpingTo.loadFactor || dumpingFrom.building.block.highUnloadPriority)){
                     dumpingTo.building.handleItem(this, item);
                     dumpingFrom.building.removeStack(item, 1);
                     any = true;

@@ -155,7 +155,7 @@ public class Weapon implements Cloneable{
             Draw.rect(outlineRegion,
             wx, wy,
             outlineRegion.width * Draw.scl * -Mathf.sign(flipSprite),
-            region.height * Draw.scl,
+            outlineRegion.height * Draw.scl,
             weaponRotation);
         }
     }
