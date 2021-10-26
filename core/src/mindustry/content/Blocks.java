@@ -81,7 +81,7 @@ public class Blocks implements ContentList{
 
     //production
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
-    cliffCrusher, beamDrill,
+    cliffCrusher, plasmaBore,
 
     //storage
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
@@ -1603,12 +1603,12 @@ public class Blocks implements ContentList{
             output = Items.sand;
         }};
 
-        beamDrill = new BeamDrill("beam-drill"){{
-            requirements(Category.production, with(Items.copper, 10));
+        plasmaBore = new BeamDrill("plasma-bore"){{
+            requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 10, Items.lead, 20));
             consumes.power(0.2f);
             tier = 4;
             size = 2;
-            range = 4;
+            range = 2;
         }};
 
         //endregion

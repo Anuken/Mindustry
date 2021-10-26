@@ -23,6 +23,7 @@ public class BeamDrill extends Block{
 
     public @Load("drill-laser") TextureRegion laser;
     public @Load("drill-laser-end") TextureRegion laserEnd;
+    public @Load("drill-laser-center") TextureRegion laserCenter;
     public @Load("@-top") TextureRegion topRegion;
 
     public float drillTime = 200f;
@@ -33,7 +34,7 @@ public class BeamDrill extends Block{
     public Color sparkColor = Color.valueOf("fd9e81"), glowColor = Color.white;
     public float glowIntensity = 0.2f, pulseIntensity = 0.07f;
     public float glowScl = 3f;
-    public int sparks = 11;
+    public int sparks = 8;
     public float sparkRange = 10f, sparkLife = 27f, sparkRecurrence = 4f, sparkSpread = 45f, sparkSize = 3.5f;
 
     public BeamDrill(String name){
@@ -189,12 +190,11 @@ public class BeamDrill extends Block{
             super.updateTile();
 
             if(lasers[0] == null) updateLasers();
-            boolean cons = shouldConsume();
 
             warmup = Mathf.approachDelta(warmup, Mathf.num(consValid()), 1f / 60f);
             lastItem = null;
             boolean multiple = false;
-            int dx = Geometry.d4x(rotation), dy = Geometry.d4y(rotation), ddx = Geometry.d4x(rotation + 1), ddy = Geometry.d4y(rotation + 1);
+            int dx = Geometry.d4x(rotation), dy = Geometry.d4y(rotation);
 
             //update facing tiles
             for(int p = 0; p < size; p++){
@@ -262,13 +262,19 @@ public class BeamDrill extends Block{
                     Point2 p = lasers[i];
                     float lx = face.worldx() - (dir.x/2f)*tilesize, ly = face.worldy() - (dir.y/2f)*tilesize;
 
+                    float width = (laserWidth + Mathf.absin(Time.time + i*5 + id*9, glowScl, pulseIntensity)) * warmup;
+
                     Draw.z(Layer.power - 1);
                     Draw.mixcol(glowColor, Mathf.absin(Time.time + i*5 + id*9, glowScl, glowIntensity));
-                    Drawf.laser(team, laser, laserEnd,
+                    if(Math.abs(p.x - face.x) + Math.abs(p.y - face.y) == 0){
+                        Draw.rect(laserCenter, lx, ly, width * laserCenter.width * Draw.scl, width * laserCenter.height * Draw.scl);
+                    }else{
+                        Drawf.laser(team, laser, laserEnd,
                         (p.x - dir.x/2f) * tilesize,
                         (p.y - dir.y/2f) * tilesize,
                         lx, ly,
-                        (laserWidth + Mathf.absin(Time.time + i*5 + id*9, glowScl, pulseIntensity)) * warmup);
+                        width);
+                    }
                     Draw.mixcol();
 
                     Draw.z(Layer.effect);
