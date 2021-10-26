@@ -132,7 +132,7 @@ public class Conveyor extends Block implements Autotiler{
         public float minitem = 1;
 
         public int blendbits, blending;
-        public int blendsclx, blendscly;
+        public int blendsclx = 1, blendscly = 1;
 
         public float clogHeat = 0f;
 
@@ -163,10 +163,15 @@ public class Conveyor extends Block implements Autotiler{
                 tr2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
 
                 Draw.rect(item.fullIcon,
-                    (tile.x * tilesize + tr1.x * ys[i] + tr2.x),
-                    (tile.y * tilesize + tr1.y * ys[i] + tr2.y),
+                    (x + tr1.x * ys[i] + tr2.x),
+                    (y + tr1.y * ys[i] + tr2.y),
                     itemSize, itemSize);
             }
+        }
+
+        @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon,x, y);
         }
 
         @Override

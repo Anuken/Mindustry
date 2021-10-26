@@ -97,7 +97,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     public class ConduitBuild extends LiquidBuild implements ChainedBuilding{
         public float smoothLiquid;
-        public int blendbits, xscl, yscl, blending;
+        public int blendbits, xscl = 1, yscl = 1, blending;
         public boolean capped;
 
         @Override

@@ -36,7 +36,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
     @Override
     @Replace
     public int pathType(){
-        return type.allowLegStep ? Pathfinder.costGround : Pathfinder.costLegs;
+        return type.allowLegStep ? Pathfinder.costLegs : Pathfinder.costGround;
     }
 
     @Override

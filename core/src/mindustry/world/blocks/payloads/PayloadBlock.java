@@ -135,6 +135,13 @@ public class PayloadBlock extends Block{
             if(payload != null && !carried) payload.dump();
         }
 
+        @Override
+        public void updateTile(){
+            if(payload != null){
+                payload.update(false);
+            }
+        }
+
         public boolean blends(int direction){
             return PayloadBlock.blends(this, direction);
         }

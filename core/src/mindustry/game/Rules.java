@@ -101,6 +101,8 @@ public class Rules{
     public ObjectSet<Block> revealedBlocks = new ObjectSet<>();
     /** Unlocked content names. Only used in multiplayer when the campaign is enabled. */
     public ObjectSet<String> researched = new ObjectSet<>();
+    /** Block containing these items as requirements are hidden. */
+    public ObjectSet<Item> hiddenBuildItems = new ObjectSet<>();
     /** Whether ambient lighting is enabled. */
     public boolean lighting = false;
     /** Whether enemy lighting is visible.

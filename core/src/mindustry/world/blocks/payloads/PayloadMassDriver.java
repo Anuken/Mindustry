@@ -143,6 +143,7 @@ public class PayloadMassDriver extends PayloadBlock{
 
         @Override
         public void updateTile(){
+            super.updateTile();
             Building link = world.build(this.link);
             boolean hasLink = linkValid();
 
@@ -233,7 +234,7 @@ public class PayloadMassDriver extends PayloadBlock{
                 }
 
                 //align to shooter rotation
-                turretRotation = Angles.moveToward(turretRotation, tile.angleTo(currentShooter()), rotateSpeed * efficiency());
+                turretRotation = Angles.moveToward(turretRotation, angleTo(currentShooter()), rotateSpeed * efficiency());
             }else if(state == shooting){
                 //if there's nothing to shoot at OR someone wants to shoot at this thing, bail
                 if(!hasLink || (!waitingShooters.isEmpty() && payload == null)){
@@ -241,7 +242,7 @@ public class PayloadMassDriver extends PayloadBlock{
                     return;
                 }
 
-                float targetRotation = tile.angleTo(link);
+                float targetRotation = angleTo(link);
                 boolean movedOut = false;
 
                 payRotation = Angles.moveToward(payRotation, turretRotation, payloadRotateSpeed * delta());
