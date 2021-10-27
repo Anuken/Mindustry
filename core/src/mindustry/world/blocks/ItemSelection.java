@@ -53,10 +53,9 @@ public class ItemSelection{
         Table cont = new Table().top();
         cont.defaults().size(40);
 
-        Runnable[] rebuild = {null};
         if(search != null) search.clearText();
 
-        rebuild[0] = () -> {
+        Runnable rebuild = () -> {
             group.clear();
             cont.clearChildren();
 
@@ -90,11 +89,11 @@ public class ItemSelection{
             }
         };
 
-        rebuild[0].run();
+        rebuild.run();
 
         Table main = new Table().background(Styles.black6);
         if(rowCount > rows * 1.5f){
-            search = main.field(null, text -> rebuild[0].run()).width(40 * columns).padBottom(4).left().growX().get();
+            search = main.field(null, text -> rebuild.run()).width(40 * columns).padBottom(4).left().growX().get();
             search.setMessageText("@players.search");
             main.row();
         }
@@ -110,6 +109,7 @@ public class ItemSelection{
         }
 
         pane.setOverscroll(false, false);
-        table.add(pane).maxHeight(40 * rows).top();
+        main.add(pane).maxHeight(40 * rows);
+        table.top().add(main);
     }
 }
