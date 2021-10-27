@@ -31,6 +31,7 @@ public class BlockRenderer{
 
     private Seq<Tile> tileview = new Seq<>(false, initialRequests, Tile.class);
     private Seq<Tile> lightview = new Seq<>(false, initialRequests, Tile.class);
+    //TODO I don't like this system
     private Seq<UpdateRenderState> updateFloors = new Seq<>(UpdateRenderState.class);
 
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
