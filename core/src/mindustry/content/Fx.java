@@ -1632,6 +1632,17 @@ public class Fx{
         }
     }).layer(Layer.bullet - 1f),
 
+    turbinegenerate = new Effect(100, e -> {
+        color(Pal.vent);
+        alpha(e.fslope() * 0.8f);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 3; i++){
+            v.trns(rand.random(360f), rand.random(e.finpow() * 14f)).add(e.x, e.y);
+            Fill.circle(v.x, v.y, rand.random(1.4f, 3.4f));
+        }
+    }).layer(Layer.bullet - 1f),
+
     generatespark = new Effect(18, e -> {
         randLenVectors(e.id, 5, e.fin() * 8f, (x, y) -> {
             float len = e.fout() * 4f;

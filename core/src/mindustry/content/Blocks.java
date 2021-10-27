@@ -77,6 +77,7 @@ public class Blocks implements ContentList{
 
     //power
     combustionGenerator, thermalGenerator, steamGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
+    pressureTurbine,
     impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
 
     //production
@@ -336,6 +337,7 @@ public class Blocks implements ContentList{
 
         steamVent = new SteamVent("steam-vent"){{
             parent = blendGroup = rhyolite;
+            attributes.set(Attribute.vent, 1f);
         }};
 
         regolith = new Floor("regolith"){{
@@ -1488,6 +1490,26 @@ public class Blocks implements ContentList{
             consumes.power(25f);
             consumes.item(Items.blastCompound);
             consumes.liquid(Liquids.cryofluid, 0.25f);
+        }};
+
+        //TODO work on sprite, green bits?
+        pressureTurbine = new ThermalGenerator("pressure-turbine"){{
+            requirements(Category.power, with(Items.graphite, 35, Items.lead, 50, Items.beryllium, 25));
+            attribute = Attribute.vent;
+            displayEfficiencyScale = 1f / 9f;
+            minEfficiency = 9f - 0.0001f;
+            powerProduction = 1f;
+            displayEfficiency = false;
+            generateEffect = Fx.turbinegenerate;
+            effectChance = 0.04f;
+            size = 3;
+            ambientSound = Sounds.hum;
+            ambientSoundVolume = 0.06f;
+            spinSpeed = 0.6f;
+            spinners = true;
+            hasLiquids = true;
+            liquidOutput = new LiquidStack(Liquids.water, 5f / 60f / 9f);
+            liquidCapacity = 20f;
         }};
 
         //endregion power

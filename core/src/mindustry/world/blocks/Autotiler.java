@@ -30,8 +30,6 @@ public interface Autotiler{
     }
 
     /**
-     * Slices a texture region depending on the SliceMode paramater
-     *
      * @param input The TextureRegion to be sliced
      * @param mode The SliceMode to be applied
      * @return The sliced texture
@@ -40,12 +38,7 @@ public interface Autotiler{
         return mode == SliceMode.none ? input : mode == SliceMode.bottom ? botHalf(input) : topHalf(input);
     }
 
-    /**
-     * Get the top half of a texture
-     *
-     * @param input The TextureRegion to slice
-     * @return The top half of the texture
-     */
+    /** @return The top half of the input */
     default TextureRegion topHalf(TextureRegion input){
         TextureRegion region = Tmp.tr1;
         region.set(input);
@@ -53,12 +46,7 @@ public interface Autotiler{
         return region;
     }
 
-    /**
-     * Get the buttom half of a texture
-     *
-     * @param input The TextureRegion to slice
-     * @return The buttom half of the texture
-     */
+    /** @return The bottom half of the input */
     default TextureRegion botHalf(TextureRegion input){
         TextureRegion region = Tmp.tr1;
         region.set(input);

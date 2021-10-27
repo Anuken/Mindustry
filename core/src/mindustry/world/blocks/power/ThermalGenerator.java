@@ -2,18 +2,31 @@ package mindustry.world.blocks.power;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
 public class ThermalGenerator extends PowerGenerator{
     public Effect generateEffect = Fx.none;
     public float effectChance = 0.05f;
+    public float minEfficiency = 0f;
+    public float spinSpeed = 1f;
+    public float displayEfficiencyScale = 1f;
+    public boolean spinners = false;
+    public boolean displayEfficiency = true;
+    public @Nullable LiquidStack liquidOutput;
     public Attribute attribute = Attribute.heat;
+
+    public @Load("@-rotator") TextureRegion rotatorRegion;
+    public @Load("@-rotator-blur") TextureRegion blurRegion;
 
     public ThermalGenerator(String name){
         super(name);
@@ -21,6 +34,10 @@ public class ThermalGenerator extends PowerGenerator{
 
     @Override
     public void init(){
+        if(liquidOutput != null){
+            outputsLiquid = true;
+            hasLiquids = true;
+        }
         super.init();
         //proper light clipping
         clipSize = Math.max(clipSize, 45f * size * 2f * 2f);
@@ -30,24 +47,32 @@ public class ThermalGenerator extends PowerGenerator{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.tiles, attribute, floating, size * size, false);
+        stats.add(Stat.tiles, attribute, floating, size * size * displayEfficiencyScale, !displayEfficiency);
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
-        drawPlaceText(Core.bundle.formatFloat("bar.efficiency", sumAttribute(attribute, x, y) * 100, 1), x, y, valid);
+        if(displayEfficiency){
+            drawPlaceText(Core.bundle.formatFloat("bar.efficiency", sumAttribute(attribute, x, y) * 100, 1), x, y, valid);
+        }
     }
 
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         //make sure there's heat at this location
-        return tile.getLinkedTilesAs(this, tempTiles).sumf(other -> other.floor().attributes.get(attribute)) > 0.01f;
+        return tile.getLinkedTilesAs(this, tempTiles).sumf(other -> other.floor().attributes.get(attribute)) > minEfficiency;
+    }
+
+    @Override
+    public TextureRegion[] icons(){
+        return spinners ? new TextureRegion[]{region, rotatorRegion} : super.makeIconRegions();
     }
 
     public class ThermalGeneratorBuild extends GeneratorBuild{
         public float sum;
+        public float spinRotation;
 
         @Override
         public void updateTile(){
@@ -55,6 +80,23 @@ public class ThermalGenerator extends PowerGenerator{
 
             if(productionEfficiency > 0.1f && Mathf.chanceDelta(effectChance)){
                 generateEffect.at(x + Mathf.range(3f), y + Mathf.range(3f));
+            }
+
+            spinRotation += productionEfficiency * spinSpeed;
+
+            if(liquidOutput != null){
+                float added = Math.min(productionEfficiency * delta() * liquidOutput.amount, liquidCapacity - liquids.get(liquidOutput.liquid));
+                liquids.add(liquidOutput.liquid, added);
+                dumpLiquid(liquidOutput.liquid);
+            }
+        }
+
+        @Override
+        public void draw(){
+            super.draw();
+
+            if(spinners){
+                Drawf.spinSprite(blurRegion.found() ? blurRegion : rotatorRegion, x, y, spinRotation);
             }
         }
 

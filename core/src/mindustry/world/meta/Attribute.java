@@ -19,7 +19,9 @@ public class Attribute{
     /** Light coverage. Negative values decrease solar panel efficiency. */
     light = add("light"),
     /** Silicate content. Used for sand extraction. */
-    silicate = add("silicate");
+    silicate = add("silicate"),
+    /** Used for erekir vents only. */
+    vent = add("vent");
 
     public final int id;
     public final String name;
