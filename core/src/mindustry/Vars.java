@@ -26,6 +26,7 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.service.*;
+import mindustry.world.*;
 
 import java.io.*;
 import java.nio.charset.*;
@@ -132,6 +133,8 @@ public class Vars implements Loadable{
         Color.valueOf("4b5ef1"),
         Color.valueOf("2cabfe"),
     };
+    /** maximum TCP packet size */
+    public static final int maxTcpSize = 900;
     /** default server port */
     public static final int port = 6567;
     /** multicast discovery port.*/
@@ -193,6 +196,8 @@ public class Vars implements Loadable{
     public static Fi launchIDFile;
     /** empty map, indicates no current map */
     public static Map emptyMap;
+    /** empty tile for payloads */
+    public static Tile emptyTile;
     /** map file extension */
     public static final String mapExtension = "msav";
     /** save file extension */
@@ -308,6 +313,10 @@ public class Vars implements Loadable{
 
         modDirectory.mkdirs();
 
+        Events.on(ContentInitEvent.class, e -> {
+            emptyTile = new Tile(Short.MAX_VALUE - 20, Short.MAX_VALUE - 20);
+        });
+
         mods.load();
         maps.load();
     }
@@ -378,7 +387,7 @@ public class Vars implements Loadable{
                 log.log(level, text);
 
                 try{
-                    writer.write("[" + Character.toUpperCase(level.name().charAt(0)) +"] " + Log.removeColors(text) + "\n");
+                    writer.write("[" + Character.toUpperCase(level.name().charAt(0)) + "] " + Log.removeColors(text) + "\n");
                     writer.flush();
                 }catch(IOException e){
                     e.printStackTrace();

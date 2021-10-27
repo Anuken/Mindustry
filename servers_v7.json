@@ -1,7 +1,11 @@
 [
   {
+    "name": "Español",
+    "address": ["n2.mindustry.me:4019", "mindustry.me:2034", "mindustry.me:2035"]
+  },
+  {
     "name": "mindustry.pl",
-    "address": ["46.105.36.238:6000", "46.105.36.238:6666", "46.105.36.238:6966"]
+    "address": ["0.baseduser.eu.org:6000", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6966"]
   },
   {
     "name": "C.A.M.S.",
@@ -54,5 +58,25 @@
   { 
     "name": "devass.su",
     "address": ["185.22.152.66"]
-  }
+  },
+  {
+    "name": "Phoenix Network",
+    "address": ["172.104.253.198"]
+  },
+  {
+    "name": "Xpdustry",
+    "address": ["xpdustry.fr:7000"]
+  },
+  {
+    "name": "Pandorum",
+    "address": ["pandorum.su:5018", "pandorum.su:5019", "pandorum.su:5020"]
+  },
+  {
+    "name": "MindustryBR",
+    "address": ["n2.mindustry.me:4003", "n2.mindustry.me:4005", "n2.mindustry.me:4008", "n2.mindustry.me:4009", "n2.mindustry.me:4010"]
+  },
+  {
+    "name": "LostDustry",
+    "address": ["lostdustry.northeurope.cloudapp.azure.com:6568", "lostdustry.northeurope.cloudapp.azure.com:6569", "lostdustry.northeurope.cloudapp.azure.com:6570"]
+  } 
 ]

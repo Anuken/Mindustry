@@ -48,6 +48,7 @@ public class MassDriver extends Block{
         hasPower = true;
         outlineIcon = true;
         sync = true;
+        envEnabled |= Env.space;
 
         //point2 is relative
         config(Point2.class, (MassDriverBuild tile, Point2 point) -> tile.link = Point2.pack(point.x + tile.tileX(), point.y + tile.tileY()));
@@ -164,7 +165,7 @@ public class MassDriver extends Block{
                 }
 
                 //align to shooter rotation
-                rotation = Angles.moveToward(rotation, tile.angleTo(currentShooter()), rotateSpeed * efficiency());
+                rotation = Angles.moveToward(rotation, angleTo(currentShooter()), rotateSpeed * efficiency());
             }else if(state == DriverState.shooting){
                 //if there's nothing to shoot at OR someone wants to shoot at this thing, bail
                 if(!hasLink || (!waitingShooters.isEmpty() && (itemCapacity - items.total() >= minDistribute))){
@@ -172,7 +173,7 @@ public class MassDriver extends Block{
                     return;
                 }
 
-                float targetRotation = tile.angleTo(link);
+                float targetRotation = angleTo(link);
 
                 if(
                 items.total() >= minDistribute && //must shoot minimum amount of items

@@ -236,10 +236,11 @@ public class ContentParser{
             Block block;
 
             if(locate(ContentType.block, name) != null){
-                block = locate(ContentType.block, name);
-
                 if(value.has("type")){
-                    throw new IllegalArgumentException("When defining properties for an existing block, you must not re-declare its type. The original type will be used. Block: " + name);
+                    Log.warn("Warning: '" + name + "' re-declares a type. This will be interpreted as a new block. If you wish to override a vanilla block, omit the 'type' section, as vanilla block `type`s cannot be changed.");
+                    block = make(resolve(value.getString("type", ""), Block.class), mod + "-" + name);
+                }else{
+                    block = locate(ContentType.block, name);
                 }
             }else{
                 block = make(resolve(value.getString("type", ""), Block.class), mod + "-" + name);
@@ -746,15 +747,15 @@ public class ContentParser{
                 TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName));
 
                 if(parent == null){
-                    throw new IllegalArgumentException("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
+                    Log.warn("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
+                }else{
+                    //add this node to the parent
+                    if(!parent.children.contains(node)){
+                        parent.children.add(node);
+                    }
+                    //reparent the node
+                    node.parent = parent;
                 }
-
-                //add this node to the parent
-                if(!parent.children.contains(node)){
-                    parent.children.add(node);
-                }
-                //reparent the node
-                node.parent = parent;
             });
         }
     }

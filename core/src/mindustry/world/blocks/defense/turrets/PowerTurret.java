@@ -12,6 +12,7 @@ public class PowerTurret extends Turret{
     public PowerTurret(String name){
         super(name);
         hasPower = true;
+        envEnabled |= Env.space;
     }
 
     @Override
@@ -30,9 +31,7 @@ public class PowerTurret extends Turret{
 
         @Override
         public void updateTile(){
-            if(unit != null){
-                unit.ammo(power.status * unit.type().ammoCapacity);
-            }
+            unit.ammo(power.status * unit.type().ammoCapacity);
 
             super.updateTile();
         }

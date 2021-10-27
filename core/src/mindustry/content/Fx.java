@@ -12,6 +12,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.Block;
 
 import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
@@ -26,6 +27,17 @@ public class Fx{
     public static final Effect
 
     none = new Effect(0, 0f, e -> {}),
+    
+    blockCrash = new Effect(100f, e -> {
+        if(!(e.data instanceof Block block)) return;
+
+        alpha(e.fin() + 0.5f);
+        float offset = Mathf.lerp(0f, 200f, e.fout());
+        color(0f, 0f, 0f, 0.44f);
+        rect(block.fullIcon, e.x - offset * 4f, e.y, (float)block.size * 8f, (float)block.size * 8f);
+        color(Color.white);
+        rect(block.fullIcon, e.x + offset, e.y + offset * 5f, (float)block.size * 8f, (float)block.size * 8f);
+    }),
 
     trailFade = new Effect(400f, e -> {
         if(!(e.data instanceof Trail trail)) return;
@@ -67,9 +79,8 @@ public class Fx{
     }),
 
     unitControl = new Effect(30f, e -> {
-        if(!(e.data instanceof Unit)) return;
+        if(!(e.data instanceof Unit select)) return;
 
-        Unit select = e.data();
         boolean block = select instanceof BlockUnitc;
 
         mixcol(Pal.accent, 1f);
@@ -84,9 +95,8 @@ public class Fx{
     }),
 
     unitDespawn = new Effect(100f, e -> {
-        if(!(e.data instanceof Unit) || e.<Unit>data().type == null) return;
+        if(!(e.data instanceof Unit select) || select.type == null) return;
 
-        Unit select = e.data();
         float scl = e.fout(Interp.pow2Out);
         float p = Draw.scl;
         Draw.scl *= scl;
@@ -99,8 +109,7 @@ public class Fx{
     }),
 
     unitSpirit = new Effect(17f, e -> {
-        if(!(e.data instanceof Position)) return;
-        Position to = e.data();
+        if(!(e.data instanceof Position to)) return;
 
         color(Pal.accent);
 
@@ -118,8 +127,7 @@ public class Fx{
     }),
 
     itemTransfer = new Effect(12f, e -> {
-        if(!(e.data instanceof Position)) return;
-        Position to = e.data();
+        if(!(e.data instanceof Position to)) return;
         Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interp.pow3)
         .add(Tmp.v2.sub(e.x, e.y).nor().rotate90(1).scl(Mathf.randomSeedRange(e.id, 1f) * e.fslope() * 10f));
         float x = Tmp.v1.x, y = Tmp.v1.y;
@@ -133,9 +141,7 @@ public class Fx{
     }),
 
     pointBeam = new Effect(25f, 300f, e -> {
-        if(!(e.data instanceof Position)) return;
-
-        Position pos = e.data();
+        if(!(e.data instanceof Position pos)) return;
 
         Draw.color(e.color, e.fout());
         Lines.stroke(1.5f);
@@ -229,11 +235,10 @@ public class Fx{
     }),
 
     unitWreck = new Effect(200f, e -> {
-        if(!(e.data instanceof TextureRegion)) return;
+        if(!(e.data instanceof TextureRegion reg)) return;
 
         Draw.mixcol(Pal.rubble, 1f);
 
-        TextureRegion reg = e.data();
         float vel = e.fin(Interp.pow5Out) * 2f * Mathf.randomSeed(e.id, 1f);
         float totalRot = Mathf.randomSeed(e.id + 1, 10f);
         Tmp.v1.trns(Mathf.randomSeed(e.id + 2, 360f), vel);
@@ -1888,9 +1893,7 @@ public class Fx{
     }).layer(Layer.groundUnit + 1f),
 
     unitShieldBreak = new Effect(35, e -> {
-        if(!(e.data instanceof Unitc)) return;
-
-        Unit unit = e.data();
+        if(!(e.data instanceof Unit unit)) return;
 
         float radius = unit.hitSize() * 1.3f;
 

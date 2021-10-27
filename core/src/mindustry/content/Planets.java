@@ -14,7 +14,7 @@ public class Planets implements ContentList{
 
     @Override
     public void load(){
-        sun = new Planet("sun", null, 0, 2){{
+        sun = new Planet("sun", null, 4f){{
             bloom = true;
             accessible = false;
 
@@ -31,9 +31,13 @@ public class Planets implements ContentList{
             );
         }};
 
-        serpulo = new Planet("serpulo", sun, 3, 1){{
+        serpulo = new Planet("serpulo", sun, 1f, 3){{
             generator = new SerpuloPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
+            cloudMeshLoader = () -> new MultiMesh(
+                new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, new Color().set(Pal.spore).mul(0.9f).a(0.75f), 2, 0.45f, 0.9f, 0.38f),
+                new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Pal.spore, 0.55f).a(0.75f), 2, 0.45f, 1f, 0.41f)
+            );
             atmosphereColor = Color.valueOf("3c1b8f");
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;

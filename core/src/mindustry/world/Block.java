@@ -25,6 +25,7 @@ import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
@@ -49,6 +50,7 @@ public class Block extends UnlockableContent{
     public boolean outputsPayload = false;
     public boolean acceptsPayload = false;
     public boolean acceptsItems = false;
+    public boolean separateItemCapacity = false;
 
     public int itemCapacity = 10;
     public float liquidCapacity = 10f;
@@ -118,10 +120,14 @@ public class Block extends UnlockableContent{
     public boolean autoResetEnabled = true;
     /** if true, the block stops updating when disabled */
     public boolean noUpdateDisabled = false;
+    /** if true, this block updates when a payload of a unit. Currently unused! */
+    public boolean updateInUnits = true;
     /** Whether to use this block's color in the minimap. Only used for overlays. */
     public boolean useColor = true;
     /** item that drops from this block, used for drills */
     public @Nullable Item itemDrop = null;
+    /** Array of affinities to certain things. */
+    public Attributes attributes = new Attributes();
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
@@ -148,7 +154,7 @@ public class Block extends UnlockableContent{
     public boolean alwaysReplace = false;
     /** if false, this block can never be replaced. */
     public boolean replaceable = true;
-    /** The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other. */
+    /** The block group. Unless {@link #canReplace} is overridden, blocks in the same group can replace each other. */
     public BlockGroup group = BlockGroup.none;
     /** List of block flags. Used for AI indexing. */
     public EnumSet<BlockFlag> flags = EnumSet.of();
@@ -259,7 +265,10 @@ public class Block extends UnlockableContent{
     public boolean quickRotate = true;
     /** Main subclass. Non-anonymous. */
     public @Nullable Class<?> subclass;
+    /** Determines if this block gets a higher unloader priority. */
+    public boolean highUnloadPriority = false;
 
+    public float selectScroll; //scroll position for certain blocks
     public Prov<Building> buildType = null; //initialized later
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
@@ -384,9 +393,15 @@ public class Block extends UnlockableContent{
     }
 
     /** Returns whether or not this block can be place on the specified  */
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
+        return canPlaceOn(tile, team);
+    }
+
+    /** Legacy canPlaceOn implementation, override {@link #canPlaceOn(Tile, Team, int)} instead.*/
     public boolean canPlaceOn(Tile tile, Team team){
         return true;
     }
+
 
     public boolean canBreak(Tile tile){
         return true;

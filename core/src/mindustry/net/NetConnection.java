@@ -90,7 +90,7 @@ public abstract class NetConnection{
             cid = begin.id;
 
             while(stream.stream.available() > 0){
-                byte[] bytes = new byte[Math.min(512, stream.stream.available())];
+                byte[] bytes = new byte[Math.min(maxTcpSize, stream.stream.available())];
                 stream.stream.read(bytes);
 
                 StreamChunk chunk = new StreamChunk();

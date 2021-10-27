@@ -185,6 +185,11 @@ public class ItemBridge extends Block{
         public float transportCounter;
 
         @Override
+        public void pickedUp(){
+            link = -1;
+        }
+
+        @Override
         public void playerPlaced(Object config){
             super.playerPlaced(config);
 
@@ -410,7 +415,7 @@ public class ItemBridge extends Block{
         }
 
         protected boolean checkAccept(Building source, Tile other){
-            if(linked(source)) return true;
+            if(tile == null || linked(source)) return true;
 
             if(linkValid(tile, other)){
                 int rel = relativeTo(other);

@@ -6,25 +6,27 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
-import mindustry.ui.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 /** Configurable BlockProducer variant. */
-public class BlockForge extends BlockProducer{
+public class Constructor extends BlockProducer{
     public float buildSpeed = 0.4f;
     public int minBlockSize = 1, maxBlockSize = 2;
 
-    public BlockForge(String name){
+    public Constructor(String name){
         super(name);
 
         size = 3;
         configurable = true;
 
-        config(Block.class, (BlockForgeBuild tile, Block block) -> {
+        configClear((ConstructorBuild tile) -> tile.recipe = null);
+        config(Block.class, (ConstructorBuild tile, Block block) -> {
             if(tile.recipe != block) tile.progress = 0f;
             if(canProduce(block)){
                 tile.recipe = block;
@@ -40,10 +42,10 @@ public class BlockForge extends BlockProducer{
     }
 
     public boolean canProduce(Block b){
-        return b.isVisible() && b.size >= minBlockSize && b.size <= maxBlockSize;
+        return b.isVisible() && b.size >= minBlockSize && b.size <= maxBlockSize && !(b instanceof CoreBlock) && !state.rules.bannedBlocks.contains(b);
     }
     
-    public class BlockForgeBuild extends BlockProducerBuild{
+    public class ConstructorBuild extends BlockProducerBuild{
         public @Nullable Block recipe;
 
         @Override
@@ -53,7 +55,18 @@ public class BlockForge extends BlockProducer{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.blocks().select(BlockForge.this::canProduce), () -> recipe, this::configure);
+            ItemSelection.buildTable(Constructor.this, table, content.blocks().select(Constructor.this::canProduce), () -> recipe, this::configure);
+        }
+
+        @Override
+        public boolean onConfigureTileTapped(Building other){
+            if(this == other){
+                deselect();
+                configure(null);
+                return false;
+            }
+
+            return true;
         }
 
         @Override

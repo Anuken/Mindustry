@@ -106,7 +106,7 @@ public class LaserTurret extends PowerTurret{
 
         @Override
         protected void bullet(BulletType type, float angle){
-            bullet = type.create(tile.build, team, x + tr.x, y + tr.y, angle);
+            bullet = type.create(this, team, x + tr.x, y + tr.y, angle);
             bulletLife = shootDuration;
         }
 

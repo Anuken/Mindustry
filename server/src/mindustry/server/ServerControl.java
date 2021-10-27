@@ -79,6 +79,9 @@ public class ServerControl implements ApplicationListener{
         }
 
         logger = (level1, text) -> {
+            //err has red text instead of reset.
+            if(level1 == LogLevel.err) text = text.replace(reset, lightRed + bold);
+
             String result = bold + lightBlack + "[" + dateTime.format(LocalDateTime.now()) + "] " + reset + format(tags[level1.ordinal()] + " " + text + "&fr");
             System.out.println(result);
 

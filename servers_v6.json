@@ -4,8 +4,8 @@
     "address": ["185.104.248.61", "easyplay.su"]
   },
   {
-    "name": "SMokeOfAnarchy.duckdns.org",
-    "address": ["smokeofanarchy.duckdns.org:6853"]
+    "name": "SkaarjDustry",
+    "address": ["skaarjproject.duckdns.org"]
   },
   {
     "name": "{AA}",
@@ -117,6 +117,10 @@
   },
   {
     "name": "MindustryBR",
-    "address": ["mindustryptbr.ddns.net", "mindustryptbr.myddns.me"]
+    "address": ["mindustryptbr.ddns.net", "mindustryptbr.myddns.me", "n2.mindustry.me:4002", "n2.mindustry.me:4007"]
+  },
+  {
+    "name": "Conservatory",
+    "address": ["143.198.71.232"]
   }
 ]

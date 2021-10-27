@@ -43,6 +43,7 @@ public class PowerNode extends PowerBlock{
         swapDiagonalPlacement = true;
         schematicPriority = -10;
         drawDisabled = false;
+        envEnabled |= Env.space;
 
         config(Integer.class, (entity, value) -> {
             PowerModule power = entity.power;
@@ -443,7 +444,7 @@ public class PowerNode extends PowerBlock{
         public void draw(){
             super.draw();
 
-            if(Mathf.zero(Renderer.laserOpacity)) return;
+            if(Mathf.zero(Renderer.laserOpacity) || isPayload()) return;
 
             Draw.z(Layer.power);
             setupColor(power.graph.getSatisfaction());
