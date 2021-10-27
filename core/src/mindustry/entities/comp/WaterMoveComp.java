@@ -88,7 +88,7 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     @Replace
     public float floorSpeedMultiplier(){
         Floor on = isFlying() ? Blocks.air.asFloor() : floorOn();
-        return (on.isDeep() ? 1.3f : 1f) * speedMultiplier;
+        return (on.shallow ? 1f : 1.3f) * speedMultiplier;
     }
 
     public boolean onLiquid(){

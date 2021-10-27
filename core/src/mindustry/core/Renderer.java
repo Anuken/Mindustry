@@ -1,6 +1,7 @@
 package mindustry.core;
 
 import arc.*;
+import arc.assets.loaders.TextureLoader.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
@@ -42,12 +43,14 @@ public class Renderer implements ApplicationListener{
     public PlanetRenderer planets;
 
     public @Nullable Bloom bloom;
+    public @Nullable FrameBuffer backgroundBuffer;
     public FrameBuffer effectBuffer = new FrameBuffer();
     public boolean animateShields, drawWeather = true, drawStatus;
     public float weatherAlpha;
     /** minZoom = zooming out, maxZoom = zooming in */
     public float minZoom = 1.5f, maxZoom = 6f;
     public Seq<EnvRenderer> envRenderers = new Seq<>();
+    public ObjectMap<String, Runnable> customBackgrounds = new ObjectMap<>();
     public TextureRegion[] bubbles = new TextureRegion[16], splashes = new TextureRegion[12];
 
     private @Nullable CoreBuild landCore;
@@ -88,6 +91,10 @@ public class Renderer implements ApplicationListener{
         envRenderers.add(new EnvRenderer(mask, render));
     }
 
+    public void addCustomBackground(String name, Runnable render){
+        customBackgrounds.put(name, render);
+    }
+
     @Override
     public void init(){
         planets = new PlanetRenderer();
@@ -108,6 +115,14 @@ public class Renderer implements ApplicationListener{
             t.setWrap(TextureWrap.repeat);
             t.setFilter(TextureFilter.linear);
         };
+
+        Events.on(WorldLoadEvent.class, e -> {
+            //reset background buffer on every world load, so it can be re-cached first render
+            if(backgroundBuffer != null){
+                backgroundBuffer.dispose();
+                backgroundBuffer = null;
+            }
+        });
     }
 
     @Override
@@ -277,7 +292,7 @@ public class Renderer implements ApplicationListener{
         }
 
         if(bloom != null){
-            bloom.resize(graphics.getWidth() / 4, graphics.getHeight() / 4);
+            bloom.resize(graphics.getWidth(), graphics.getHeight());
             Draw.draw(Layer.bullet - 0.02f, bloom::capture);
             Draw.draw(Layer.effect + 0.02f, bloom::render);
         }
@@ -299,6 +314,7 @@ public class Renderer implements ApplicationListener{
         Draw.draw(Layer.overlayUI, overlays::drawTop);
         Draw.draw(Layer.space, this::drawLanding);
 
+        Events.fire(Trigger.drawOver);
         blocks.drawBlocks();
 
         Groups.draw.draw(Drawc::draw);
@@ -310,8 +326,81 @@ public class Renderer implements ApplicationListener{
         Events.fire(Trigger.postDraw);
     }
 
-    private void drawBackground(){
-        //nothing to draw currently
+    protected void drawBackground(){
+        //draw background only if there is no planet background with a skybox
+        if(state.rules.backgroundTexture != null && (state.rules.planetBackground == null || !state.rules.planetBackground.drawSkybox)){
+            if(!assets.isLoaded(state.rules.backgroundTexture, Texture.class)){
+                var file = assets.getFileHandleResolver().resolve(state.rules.backgroundTexture);
+
+                //don't draw invalid/non-existent backgrounds.
+                if(!file.exists() || !file.extEquals("png")){
+                    return;
+                }
+
+                var desc = assets.load(state.rules.backgroundTexture, Texture.class, new TextureParameter(){{
+                    wrapU = wrapV = TextureWrap.mirroredRepeat;
+                    magFilter = minFilter = TextureFilter.linear;
+                }});
+
+                assets.finishLoadingAsset(desc);
+            }
+
+            Texture tex = assets.get(state.rules.backgroundTexture, Texture.class);
+            Tmp.tr1.set(tex);
+            Tmp.tr1.u = 0f;
+            Tmp.tr1.v = 0f;
+
+            float ratio = camera.width / camera.height;
+            float size = state.rules.backgroundScl;
+
+            Tmp.tr1.u2 = size;
+            Tmp.tr1.v2 = size / ratio;
+
+            float sx = 0f, sy = 0f;
+
+            if(!Mathf.zero(state.rules.backgroundSpeed)){
+                sx = (camera.position.x) / state.rules.backgroundSpeed;
+                sy = (camera.position.y) / state.rules.backgroundSpeed;
+            }
+
+            Tmp.tr1.scroll(sx + state.rules.backgroundOffsetX, -sy + state.rules.backgroundOffsetY);
+
+            Draw.rect(Tmp.tr1, camera.position.x, camera.position.y, camera.width, camera.height);
+        }
+
+        if(state.rules.planetBackground != null){
+            int size = Math.max(graphics.getWidth(), graphics.getHeight());
+
+            boolean resized = false;
+            if(backgroundBuffer == null){
+                resized = true;
+                backgroundBuffer = new FrameBuffer(size, size);
+            }
+
+            if(resized || backgroundBuffer.resizeCheck(size, size)){
+                backgroundBuffer.begin(Color.clear);
+
+                var params = state.rules.planetBackground;
+
+                //override some values
+                params.viewW = size;
+                params.viewH = size;
+                params.alwaysDrawAtmosphere = true;
+                params.drawUi = false;
+
+                planets.render(params);
+
+                backgroundBuffer.end();
+            }
+
+            float drawSize = Math.max(camera.width, camera.height);
+            Draw.rect(Draw.wrap(backgroundBuffer.getTexture()), camera.position.x, camera.position.y, drawSize, -drawSize);
+        }
+
+        if(state.rules.customBackgroundCallback != null && customBackgrounds.containsKey(state.rules.customBackgroundCallback)){
+            customBackgrounds.get(state.rules.customBackgroundCallback).run();
+        }
+
     }
 
     void updateLandParticles(){

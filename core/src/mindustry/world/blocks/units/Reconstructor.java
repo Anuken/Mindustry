@@ -186,6 +186,12 @@ public class Reconstructor extends UnitBlock{
         }
 
         @Override
+        public Object senseObject(LAccess sensor){
+            if(sensor == LAccess.config) return unit();
+            return super.senseObject(sensor);
+        }
+
+        @Override
         public void updateTile(){
             boolean valid = false;
 
@@ -225,7 +231,7 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public boolean shouldConsume(){
-            return constructing();
+            return constructing() && enabled;
         }
 
         public UnitType unit(){

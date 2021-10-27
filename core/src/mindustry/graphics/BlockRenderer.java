@@ -117,8 +117,28 @@ public class BlockRenderer{
                 lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
             }
 
+            invalidateTile(event.tile);
             recordIndex(event.tile);
         });
+    }
+
+    public void invalidateTile(Tile tile){
+        int avgx = (int)(camera.position.x / tilesize);
+        int avgy = (int)(camera.position.y / tilesize);
+        int rangex = (int)(camera.width / tilesize / 2) + 3;
+        int rangey = (int)(camera.height / tilesize / 2) + 3;
+
+        if(Math.abs(avgx - tile.x) <= rangex && Math.abs(avgy - tile.y) <= rangey){
+            lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
+        }
+    }
+
+    public void removeFloorIndex(Tile tile){
+        if(indexFloor(tile)) floorTree.remove(tile);
+    }
+
+    public void addFloorIndex(Tile tile){
+        if(indexFloor(tile)) floorTree.insert(tile);
     }
 
     boolean indexBlock(Tile tile){

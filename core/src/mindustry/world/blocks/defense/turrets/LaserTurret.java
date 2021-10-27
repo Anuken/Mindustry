@@ -67,7 +67,7 @@ public class LaserTurret extends PowerTurret{
                 Liquid liquid = liquids.current();
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-                float used = (cheating() ? maxUsed * Time.delta : Math.min(liquids.get(liquid), maxUsed * Time.delta));
+                float used = (cheating() ? maxUsed : Math.min(liquids.get(liquid), maxUsed)) * Time.delta;
                 reload -= used * liquid.heatCapacity * coolantMultiplier;
                 liquids.remove(liquid, used);
 
@@ -106,7 +106,7 @@ public class LaserTurret extends PowerTurret{
 
         @Override
         protected void bullet(BulletType type, float angle){
-            bullet = type.create(tile.build, team, x + tr.x, y + tr.y, angle);
+            bullet = type.create(this, team, x + tr.x, y + tr.y, angle);
             bulletLife = shootDuration;
         }
 

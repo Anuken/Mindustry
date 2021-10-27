@@ -37,6 +37,7 @@ public class CommandCenter extends Block{
         configurable = true;
         drawDisabled = false;
         logicConfigurable = true;
+        envEnabled = Env.any;
 
         config(UnitCommand.class, (CommandBuild build, UnitCommand command) -> {
             if(build.team.data().command != command){
@@ -96,9 +97,9 @@ public class CommandCenter extends Block{
             float size = 6f;
 
             Draw.color(bottomColor);
-            Draw.rect(commandRegions[team.data().command.ordinal()].getRegion(), tile.drawx(), tile.drawy() - 1, size, size);
+            Draw.rect(commandRegions[team.data().command.ordinal()].getRegion(), x, y - 1, size, size);
             Draw.color(topColor == null ? team.color : topColor);
-            Draw.rect(commandRegions[team.data().command.ordinal()].getRegion(), tile.drawx(), tile.drawy(), size, size);
+            Draw.rect(commandRegions[team.data().command.ordinal()].getRegion(), x, y, size, size);
             Draw.color();
         }
 

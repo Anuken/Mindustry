@@ -97,7 +97,7 @@ public class MapPlayDialog extends BaseDialog{
         table.row();
         for(Gamemode mode : Gamemode.values()){
             if(mode.hidden) continue;
-            table.labelWrap("[accent]" + mode.toString() + ":[] [lightgray]" + mode.description()).width(400f);
+            table.labelWrap("[accent]" + mode + ":[] [lightgray]" + mode.description()).width(400f);
             table.row();
         }
 

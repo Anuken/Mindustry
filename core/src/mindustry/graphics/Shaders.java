@@ -21,8 +21,9 @@ public class Shaders{
     public static UnitBuildShader build;
     public static DarknessShader darkness;
     public static LightShader light;
-    public static SurfaceShader water, mud, tar, slag, space, caustics;
+    public static SurfaceShader water, mud, tar, slag, cryofluid, space, caustics;
     public static PlanetShader planet;
+    public static CloudShader clouds;
     public static PlanetGridShader planetGrid;
     public static AtmosphereShader atmosphere;
     public static MeshShader mesh;
@@ -47,6 +48,7 @@ public class Shaders{
         mud = new SurfaceShader("mud");
         tar = new SurfaceShader("tar");
         slag = new SurfaceShader("slag");
+        cryofluid = new SurfaceShader("cryofluid");
         space = new SpaceShader("space");
         //caustics = new SurfaceShader("caustics"){
         //    @Override
@@ -55,6 +57,7 @@ public class Shaders{
         //    }
         //};
         planet = new PlanetShader();
+        clouds = new CloudShader();
         planetGrid = new PlanetGridShader();
         atmosphere = new AtmosphereShader();
         unlit = new LoadShader("planet", "unlit");
@@ -93,6 +96,7 @@ public class Shaders{
         public Vec3 lightDir = new Vec3(1, 1, 1).nor();
         public Color ambientColor = Color.white.cpy();
         public Vec3 camDir = new Vec3();
+        public Planet planet;
 
         public PlanetShader(){
             super("planet", "planet");
@@ -100,11 +104,32 @@ public class Shaders{
 
         @Override
         public void apply(){
-            camDir.set(renderer.planets.cam.direction).rotate(Vec3.Y, renderer.planets.planet.getRotation());
+            camDir.set(renderer.planets.cam.direction).rotate(Vec3.Y, planet.getRotation());
 
             setUniformf("u_lightdir", lightDir);
             setUniformf("u_ambientColor", ambientColor.r, ambientColor.g, ambientColor.b);
             setUniformf("u_camdir", camDir);
+        }
+    }
+
+    public static class CloudShader extends LoadShader{
+        public Vec3 lightDir = new Vec3(1, 1, 1).nor();
+        public Color ambientColor = Color.white.cpy();
+        public Vec3 camDir = new Vec3();
+        public float alpha = 1f;
+        public Planet planet;
+
+        public CloudShader(){
+            super("planet", "clouds");
+        }
+
+        @Override
+        public void apply(){
+            camDir.set(renderer.planets.cam.direction).rotate(Vec3.Y, planet.getRotation());
+
+            setUniformf("u_alpha", alpha);
+            setUniformf("u_lightdir", lightDir);
+            setUniformf("u_ambientColor", ambientColor.r, ambientColor.g, ambientColor.b);
         }
     }
 
@@ -175,6 +200,7 @@ public class Shaders{
     public static class BlockBuildShader extends LoadShader{
         public float progress;
         public TextureRegion region = new TextureRegion();
+        public float time;
 
         public BlockBuildShader(){
             super("blockbuild", "default");
@@ -185,7 +211,7 @@ public class Shaders{
             setUniformf("u_progress", progress);
             setUniformf("u_uv", region.u, region.v);
             setUniformf("u_uv2", region.u2, region.v2);
-            setUniformf("u_time", Time.time);
+            setUniformf("u_time", time);
             setUniformf("u_texsize", region.texture.width, region.texture.height);
         }
     }

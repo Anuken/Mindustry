@@ -878,7 +878,7 @@ public class EntityProcess extends BaseProcessor{
 
                 nullsBuilder.addField(FieldSpec.builder(type, Strings.camelize(baseName)).initializer("new " + className + "()").addModifiers(Modifier.FINAL, Modifier.STATIC, Modifier.PUBLIC).build());
 
-                write(nullBuilder);
+                write(nullBuilder, imports.asArray());
             }
 
             write(nullsBuilder);

@@ -73,7 +73,7 @@ public class ItemSource extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.items(), () -> outputItem, this::configure, selectionRows, selectionColumns);
+            ItemSelection.buildTable(ItemSource.this, table, content.items(), () -> outputItem, this::configure, selectionRows, selectionColumns);
         }
 
         @Override

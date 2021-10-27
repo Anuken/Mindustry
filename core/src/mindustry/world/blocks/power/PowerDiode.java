@@ -23,6 +23,7 @@ public class PowerDiode extends Block{
         group = BlockGroup.power;
         noUpdateDisabled = true;
         schematicPriority = 10;
+        envEnabled |= Env.space;
     }
 
     @Override
@@ -55,7 +56,7 @@ public class PowerDiode extends Block{
         public void updateTile(){
             super.updateTile();
 
-            if(front() == null || back() == null || !back().block.hasPower || !front().block.hasPower || back().team != front().team) return;
+            if(tile == null || front() == null || back() == null || !back().block.hasPower || !front().block.hasPower || back().team != front().team) return;
 
             PowerGraph backGraph = back().power.graph;
             PowerGraph frontGraph = front().power.graph;

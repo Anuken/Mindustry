@@ -11,12 +11,12 @@ import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
 public class ItemSelection{
     private static TextField search;
-    private static float scrollPos = 0f;
     private static int rowCount;
 
     public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer){
@@ -24,18 +24,30 @@ public class ItemSelection{
     }
 
     public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect){
-        buildTable(table, items, holder, consumer, closeSelect, 5, 4);
+        buildTable(null, table, items, holder, consumer, closeSelect, 5, 4);
     }
 
     public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, int columns){
-        buildTable(table, items, holder, consumer, true, 5, columns);
+        buildTable(null, table, items, holder, consumer, true, 5, columns);
+    }
+
+    public static <T extends UnlockableContent> void buildTable(Block block, Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer){
+        buildTable(block, table, items, holder, consumer, true, 5, 4);
+    }
+
+    public static <T extends UnlockableContent> void buildTable(Block block, Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect){
+        buildTable(block, table, items, holder, consumer, closeSelect, 5 ,4);
+    }
+
+    public static <T extends UnlockableContent> void buildTable(Block block, Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, int rows, int columns){
+        buildTable(block, table, items, holder, consumer, true, rows, columns);
     }
 
     public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, int rows, int columns){
-        buildTable(table, items, holder, consumer, true, rows, columns);
+        buildTable(null, table, items, holder, consumer, true, rows, columns);
     }
     
-    public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect, int rows, int columns){
+    public static <T extends UnlockableContent> void buildTable(@Nullable Block block, Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect, int rows, int columns){
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         group.setMinCheckCount(0);
         Table cont = new Table().top();
@@ -89,10 +101,15 @@ public class ItemSelection{
 
         ScrollPane pane = new ScrollPane(cont, Styles.smallPane);
         pane.setScrollingDisabled(true, false);
+
+        if(block != null){
+            pane.setScrollYForce(block.selectScroll);
+            pane.update(() -> {
+                block.selectScroll = pane.getScrollY();
+            });
+        }
+
         pane.setOverscroll(false, false);
-        pane.setScrollYForce(scrollPos);
-        pane.update(() -> scrollPos = pane.getScrollY());
-        main.add(pane).maxHeight(40 * rows);
-        table.top().add(main);
+        table.add(pane).maxHeight(40 * rows).top();
     }
 }

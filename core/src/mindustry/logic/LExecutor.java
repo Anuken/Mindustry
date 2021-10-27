@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -56,9 +57,10 @@ public class LExecutor{
 
     /** Runs a single instruction. */
     public void runOnce(){
-        //set time
-        vars[varTime].numval = Time.millis();
-        vars[varTick].numval = Time.time;
+        //set up time; note that @time is now only updated once every invocation and directly based off of @tick.
+        //having time be based off of user system time was a very bad idea.
+        vars[varTime].numval = state.tick / 60.0 * 1000.0;
+        vars[varTick].numval = state.tick;
 
         //reset to start
         if(vars[varCounter].numval >= instructions.length || vars[varCounter].numval < 0){
@@ -333,7 +335,7 @@ public class LExecutor{
         /** Checks is a unit is valid for logic AI control, and returns the controller. */
         @Nullable
         public static LogicAI checkLogicAI(LExecutor exec, Object unitObj){
-            if(unitObj instanceof Unit unit && exec.obj(varUnit) == unit && unit.team == exec.team && !unit.isPlayer() && !(unit.controller() instanceof FormationAI)){
+            if(unitObj instanceof Unit unit && unit.isValid() && exec.obj(varUnit) == unit && unit.team == exec.team && !unit.isPlayer() && !(unit.controller() instanceof FormationAI)){
                 if(unit.controller() instanceof LogicAI la){
                     la.controller = exec.building(varThis);
                     return la;
@@ -429,27 +431,32 @@ public class LExecutor{
                                     Call.pickedUnitPayload(unit, result);
                                 }
                             }else{ //buildings
-                                Building tile = world.buildWorld(unit.x, unit.y);
+                                Building build = world.buildWorld(unit.x, unit.y);
 
                                 //TODO copy pasted code
-                                if(tile != null && tile.team == unit.team){
-                                    if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
-                                        Call.pickedBuildPayload(unit, tile, true);
-                                    }else{ //pick up block payload
-                                        Payload current = tile.getPayload();
-                                        if(current != null && pay.canPickupPayload(current)){
-                                            Call.pickedBuildPayload(unit, tile, false);
-                                        }
+                                if(build != null && build.team == unit.team){
+                                    Payload current = build.getPayload();
+                                    if(current != null && pay.canPickupPayload(current)){
+                                        Call.pickedBuildPayload(unit, build, false);
+                                        //pick up whole building directly
+                                    }else if(build.block.buildVisibility != BuildVisibility.hidden && build.canPickup() && pay.canPickup(build)){
+                                        Call.pickedBuildPayload(unit, build, true);
                                     }
                                 }
                             }
                             ai.payTimer = LogicAI.transferDelay;
                         }
                     }
+                    case payEnter -> {
+                        Building build = world.buildWorld(unit.x, unit.y);
+                        if(build != null && unit.team() == build.team && build.canControlSelect(unit)){
+                            Call.unitBuildingControlSelect(unit, build);
+                        }
+                    }
                     case build -> {
                         if(state.rules.logicUnitBuild && unit.canBuild() && exec.obj(p3) instanceof Block block && block.canBeBuilt()){
                             int x = World.toTile(x1 - block.offset/tilesize), y = World.toTile(y1 - block.offset/tilesize);
-                            int rot = exec.numi(p4);
+                            int rot = Mathf.mod(exec.numi(p4), 4);
 
                             //reset state of last request when necessary
                             if(ai.plan.x != x || ai.plan.y != y || ai.plan.block != block || unit.plans.isEmpty()){
@@ -927,26 +934,30 @@ public class LExecutor{
             //this should avoid any garbage allocation
             Var v = exec.var(value);
             if(v.isobj && value != 0){
-                String strValue =
-                    v.objval == null ? "null" :
-                    v.objval instanceof String s ? s :
-                    v.objval == Blocks.stoneWall ? "solid" : //special alias
-                    v.objval instanceof MappableContent content ? content.name :
-                    v.objval instanceof Content ? "[content]" :
-                    v.objval instanceof Building build ? build.block.name :
-                    v.objval instanceof Unit unit ? unit.type.name :
-                    v.objval instanceof Enum<?> e ? e.name() :
-                    "[object]";
+                String strValue = toString(v.objval);
 
                 exec.textBuffer.append(strValue);
             }else{
                 //display integer version when possible
-                if(Math.abs(v.numval - (long)v.numval) < 0.000001){
+                if(Math.abs(v.numval - (long)v.numval) < 0.00001){
                     exec.textBuffer.append((long)v.numval);
                 }else{
                     exec.textBuffer.append(v.numval);
                 }
             }
+        }
+
+        public static String toString(Object obj){
+            return
+                obj == null ? "null" :
+                obj instanceof String s ? s :
+                obj == Blocks.stoneWall ? "solid" : //special alias
+                obj instanceof MappableContent content ? content.name :
+                obj instanceof Content ? "[content]" :
+                obj instanceof Building build ? build.block.name :
+                obj instanceof Unit unit ? unit.type.name :
+                obj instanceof Enum<?> e ? e.name() :
+                "[object]";
         }
     }
 

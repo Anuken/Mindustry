@@ -138,8 +138,10 @@ public class Bar extends Element{
         GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         lay.setText(font, name);
 
-        font.setColor(1f, 1f, 1f, parentAlpha);
-        font.draw(name, x + width / 2f - lay.width / 2f, y + height / 2f + lay.height / 2f + 1);
+        font.setColor(1f, 1f, 1f, 1f);
+        font.getCache().clear();
+        font.getCache().addText(name, x + width / 2f - lay.width / 2f, y + height / 2f + lay.height / 2f + 1);
+        font.getCache().draw(parentAlpha);
 
         Pools.free(lay);
     }

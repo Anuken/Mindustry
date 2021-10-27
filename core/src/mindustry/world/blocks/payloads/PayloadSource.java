@@ -86,10 +86,21 @@ public class PayloadSource extends PayloadBlock{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table,
+            ItemSelection.buildTable(PayloadSource.this, table,
                 content.blocks().select(PayloadSource.this::canProduce).<UnlockableContent>as()
                 .and(content.units().select(PayloadSource.this::canProduce).as()),
             () -> (UnlockableContent)config(), this::configure, selectionRows, selectionColumns);
+        }
+
+        @Override
+        public boolean onConfigureTileTapped(Building other){
+            if(this == other){
+                deselect();
+                configure(null);
+                return false;
+            }
+
+            return true;
         }
 
         @Override
@@ -104,6 +115,7 @@ public class PayloadSource extends PayloadBlock{
 
         @Override
         public void updateTile(){
+            super.updateTile();
             if(payload == null){
                 scl = 0f;
                 if(unit != null){

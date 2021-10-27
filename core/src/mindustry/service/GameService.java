@@ -166,6 +166,7 @@ public class GameService{
             if(campaign()){
                 if(unitsBuilt.add(e.unit.type.name)){
                     SStat.unitTypesBuilt.set(content.units().count(u -> unitsBuilt.contains(u.name) && !u.isHidden()));
+                    save();
                 }
 
                 if(t5s.contains(e.unit.type)){
@@ -175,7 +176,7 @@ public class GameService{
         });
 
         Events.on(UnitControlEvent.class, e -> {
-            if(e.unit instanceof BlockUnitc && ((BlockUnitc)e.unit).tile().block == Blocks.router){
+            if(e.unit instanceof BlockUnitc unit && unit.tile().block == Blocks.router){
                 becomeRouter.complete();
             }
         });

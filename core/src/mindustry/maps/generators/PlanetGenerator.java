@@ -76,7 +76,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         //sort counts in descending order
         Seq<Entry<Block>> entries = floorc.entries().toArray();
         entries.sort(e -> -e.value);
-        //remove all blocks occuring < 30 times - unimportant
+        //remove all blocks occurring < 30 times - unimportant
         entries.removeAll(e -> e.value < 30);
 
         Block[] floors = new Block[entries.size];
@@ -84,7 +84,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
             floors[i] = entries.get(i).key;
         }
 
-        //TODO bad code
+        //bad contains() code, but will likely never be fixed
         boolean hasSnow = floors.length > 0 && (floors[0].name.contains("ice") || floors[0].name.contains("snow"));
         boolean hasRain = floors.length > 0 && !hasSnow && content.contains(Liquids.water) && !floors[0].name.contains("sand");
         boolean hasDesert = floors.length > 0 && !hasSnow && !hasRain && floors[0] == Blocks.sand;
@@ -121,6 +121,11 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
     /** @return the scaling factor for sector rects. */
     public float getSizeScl(){
         return 3200;
+    }
+
+    public int getSectorSize(Sector sector){
+        int res = (int)(sector.rect.radius * getSizeScl());
+        return res % 2 == 0 ? res : res + 1;
     }
 
     public void generate(Tiles tiles, Sector sec){

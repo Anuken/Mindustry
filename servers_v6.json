@@ -4,8 +4,8 @@
     "address": ["185.104.248.61", "easyplay.su"]
   },
   {
-    "name": "SMokeOfAnarchy.duckdns.org",
-    "address": ["smokeofanarchy.duckdns.org:6853"]
+    "name": "SkaarjDustry",
+    "address": ["skaarjproject.duckdns.org"]
   },
   {
     "name": "{AA}",
@@ -57,11 +57,11 @@
   },
   {
     "name": "Omega",
-    "address": ["yeeth.mindustry.me:2004"] 
+    "address": ["yeeth.mindustry.me:2004","185.86.230.61:25570"] 
   },
   {
-    "name": "md.obvilionnetwork.ru",
-    "address": ["obvilionnetwork.ru", "obvilionnetwork.ru:7001", "obvilionnetwork.ru:7002", "obvilionnetwork.ru:7003"]
+    "name": "Obvilion Network",
+    "address": ["obvilion.ru", "obvilion.ru:7001", "obvilion.ru:7002", "obvilion.ru:7003"]
   },
   {
     "name": "Mindustry PLAY",
@@ -93,7 +93,7 @@
   },
   {
     "name": "Hungarian",
-    "address": ["magyarmindustry.tk", "148.251.175.124:25601"]
+    "address": ["survival.humindustry.tk", "148.251.175.124:25601"]
   },
   {
     "name": "Xpdustry",
@@ -112,7 +112,15 @@
     "address": ["144.76.120.74:18645"]
   },
   {
-    "name": "HexedPvP",
-    "address": ["001.finland.eu.hosts.dynamichost.xyz:23664"]
+    "name": "NukeDustry",
+    "address": ["nukedustry.tk:7777", "nukedustry.tk:8888"]
+  },
+  {
+    "name": "MindustryBR",
+    "address": ["mindustryptbr.ddns.net", "mindustryptbr.myddns.me", "n2.mindustry.me:4002", "n2.mindustry.me:4007"]
+  },
+  {
+    "name": "Conservatory",
+    "address": ["143.198.71.232"]
   }
 ]

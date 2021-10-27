@@ -148,6 +148,8 @@ public class Weather extends UnlockableContent{
                 Draw.rect(region, x, y, size, size, rotation);
             }
         }
+
+        Draw.reset();
     }
 
     public static void drawRain(float sizeMin, float sizeMax, float xspeed, float yspeed, float density, float intensity, float stroke, Color color){

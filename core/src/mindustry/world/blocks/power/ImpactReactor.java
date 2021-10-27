@@ -43,6 +43,7 @@ public class ImpactReactor extends PowerGenerator{
         flags = EnumSet.of(BlockFlag.reactor, BlockFlag.generator);
         lightRadius = 115f;
         emitLight = true;
+        envEnabled = Env.any;
     }
 
     @Override
@@ -140,7 +141,7 @@ public class ImpactReactor extends PowerGenerator{
 
             if(warmup < 0.3f || !state.rules.reactorExplosions) return;
 
-            Sounds.explosionbig.at(tile);
+            Sounds.explosionbig.at(this);
 
             Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
 

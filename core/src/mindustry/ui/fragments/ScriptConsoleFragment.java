@@ -133,6 +133,7 @@ public class ScriptConsoleFragment extends Table{
             if(i - scrollPos == 0) theight -= textspacing + 1;
 
             font.getCache().clear();
+            font.getCache().setColor(Color.white);
             font.getCache().addText(messages.get(i), fontoffsetx + offsetx, offsety + theight, textWidth, Align.bottomLeft, true);
 
             if(!open){
