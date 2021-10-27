@@ -40,7 +40,7 @@ public class Blocks implements ContentList{
     redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     redweed, purbush, coralChunk, yellowCoral,
-    regolithWall, yellowStoneWall, rhyoliteWall, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall,
+    regolithWall, yellowStoneWall, rhyoliteWall, steamVent, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall,
     ferricStone, ferricCraters, carbonStone, beryllicStone,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder,
@@ -332,6 +332,10 @@ public class Blocks implements ContentList{
         rhyoliteCrater = new Floor("rhyolite-crater"){{
             attributes.set(Attribute.water, -1f);
             blendGroup = rhyolite;
+        }};
+
+        steamVent = new SteamVent("steam-vent"){{
+            parent = blendGroup = rhyolite;
         }};
 
         regolith = new Floor("regolith"){{

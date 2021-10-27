@@ -149,11 +149,13 @@ public class Floor extends Block{
     @Override
     public void drawBase(Tile tile){
         Mathf.rand.setSeed(tile.pos());
-
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
 
         drawEdges(tile);
+        drawOverlay(tile);
+    }
 
+    public void drawOverlay(Tile tile){
         Floor floor = tile.overlay();
         if(floor != Blocks.air && floor != this){ //ore should never have itself on top, but it's possible, so prevent a crash in that case
             floor.drawBase(tile);
@@ -163,6 +165,16 @@ public class Floor extends Block{
     @Override
     public TextureRegion[] icons(){
         return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
+    }
+
+    //TODO currently broken for dynamically edited floor tiles
+    /** @return true if this floor should be updated in the render loop, e.g. for effects. Do NOT overuse this! */
+    public boolean updateRender(Tile tile){
+        return false;
+    }
+
+    public void renderUpdate(UpdateRenderState tile){
+
     }
 
     /** @return whether this floor has a valid surface on which to place things, e.g. scorch marks. */
@@ -249,6 +261,17 @@ public class Floor extends Block{
 
     TextureRegion edge(Floor block, int x, int y){
         return block.edges()[x][2 - y];
+    }
+
+    public static class UpdateRenderState{
+        public Tile tile;
+        public Floor floor;
+        public float data;
+
+        public UpdateRenderState(Tile tile, Floor floor){
+            this.tile = tile;
+            this.floor = floor;
+        }
     }
 
 }

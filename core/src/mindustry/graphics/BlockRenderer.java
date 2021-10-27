@@ -14,6 +14,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.Floor.*;
 import mindustry.world.blocks.power.*;
 
 import static arc.Core.*;
@@ -30,6 +31,7 @@ public class BlockRenderer{
 
     private Seq<Tile> tileview = new Seq<>(false, initialRequests, Tile.class);
     private Seq<Tile> lightview = new Seq<>(false, initialRequests, Tile.class);
+    private Seq<UpdateRenderState> updateFloors = new Seq<>(UpdateRenderState.class);
 
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private float brokenFade = 0f;
@@ -78,6 +80,7 @@ public class BlockRenderer{
             Draw.color();
             shadows.end();
 
+            updateFloors.clear();
             dark.getTexture().setFilter(TextureFilter.linear);
             dark.resize(world.width(), world.height());
             dark.begin();
@@ -86,6 +89,10 @@ public class BlockRenderer{
 
             for(Tile tile : world.tiles){
                 recordIndex(tile);
+
+                if(tile.floor().updateRender(tile)){
+                    updateFloors.add(new UpdateRenderState(tile, tile.floor()));
+                }
 
                 float darkness = world.getDarkness(tile.x, tile.y);
 
@@ -270,6 +277,16 @@ public class BlockRenderer{
 
         int rangex = (int)(camera.width / tilesize / 2);
         int rangey = (int)(camera.height / tilesize / 2);
+
+        if(!state.isPaused()){
+            int updates = updateFloors.size;
+            var uitems = updateFloors.items;
+            for(int i = 0; i < updates; i++){
+                var tile = uitems[i];
+                tile.floor.renderUpdate(tile);
+            }
+        }
+
 
         if(avgx == lastCamX && avgy == lastCamY && lastRangeX == rangex && lastRangeY == rangey){
             return;

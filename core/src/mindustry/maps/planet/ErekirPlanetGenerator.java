@@ -11,6 +11,7 @@ import mindustry.game.*;
 import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -168,6 +169,27 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 }
             }
         });
+
+        //vents
+        outer:
+        for(Tile tile : tiles){
+            if(floor == Blocks.rhyolite && rand.chance(0.001)){
+                int radius = 2;
+                for(int x = -radius; x <= radius; x++){
+                    for(int y = -radius; y <= radius; y++){
+                        Tile other = tiles.get(x + tile.x, y + tile.y);
+                        if(other == null || other.floor() != Blocks.rhyolite || other.block().solid){
+                            continue outer;
+                        }
+                    }
+                }
+
+                for(var pos : SteamVent.offsets){
+                    Tile other = tiles.get(pos.x + tile.x + 1, pos.y + tile.y + 1);
+                    other.setFloor(Blocks.steamVent.asFloor());
+                }
+            }
+        }
 
         //it is very hot
         state.rules.attributes.set(Attribute.heat, 0.8f);

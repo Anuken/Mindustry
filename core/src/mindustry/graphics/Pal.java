@@ -118,5 +118,7 @@ public class Pal{
 
     plasticBurn = Color.valueOf("e9ead3"),
 
-    muddy = Color.valueOf("432722");
+    muddy = Color.valueOf("432722"),
+
+    vent = Color.valueOf("6b4e4e");
 }

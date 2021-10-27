@@ -941,6 +941,17 @@ public class Fx{
         });
     }),
 
+    ventSteam = new Effect(140f, e -> {
+        color(Pal.vent, e.fslope() * 0.85f);
+
+        float length = 3f + e.finpow() * 10f;
+        rand.setSeed(e.id);
+        for(int i = 0; i < rand.random(3, 5); i++){
+            v.trns(rand.random(360f), rand.random(length));
+            Fill.circle(e.x + v.x, e.y + v.y, rand.random(1.2f, 3.5f) + e.fslope() * 1.1f);
+        }
+    }),
+
     vapor = new Effect(110f, e -> {
         color(e.color);
         alpha(e.fout());
