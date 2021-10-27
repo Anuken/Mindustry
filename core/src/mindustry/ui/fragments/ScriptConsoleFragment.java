@@ -72,11 +72,7 @@ public class ScriptConsoleFragment extends Table{
                 }
             }
 
-            int newLines = -1;
-            for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos; i++){
-                newLines += Strings.count(messages.get(i), '\n');
-            }
-            scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size - messagesShown + newLines));
+            scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size));
         });
 
         history.insert(0, "");
