@@ -77,7 +77,7 @@ public class Blocks implements ContentList{
 
     //power
     combustionGenerator, thermalGenerator, steamGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
-    pressureTurbine,
+    turbineCondenser,
     impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
 
     //production
@@ -1493,12 +1493,12 @@ public class Blocks implements ContentList{
         }};
 
         //TODO work on sprite, green bits?
-        pressureTurbine = new ThermalGenerator("pressure-turbine"){{
+        turbineCondenser = new ThermalGenerator("turbine-condenser"){{
             requirements(Category.power, with(Items.graphite, 35, Items.lead, 50, Items.beryllium, 25));
             attribute = Attribute.vent;
             displayEfficiencyScale = 1f / 9f;
             minEfficiency = 9f - 0.0001f;
-            powerProduction = 1f;
+            powerProduction = 4f / 9f;
             displayEfficiency = false;
             generateEffect = Fx.turbinegenerate;
             effectChance = 0.04f;
