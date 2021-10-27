@@ -194,7 +194,7 @@ public class Unloader extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(Unloader.this, content.items(), () -> sortItem, this::configure, selectionRows, selectionColumns);
+            ItemSelection.buildTable(Unloader.this, table, content.items(), () -> sortItem, this::configure, selectionRows, selectionColumns);
         }
 
         @Override
