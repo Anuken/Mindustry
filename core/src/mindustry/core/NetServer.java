@@ -67,6 +67,9 @@ public class NetServer implements ApplicationListener{
     /** Converts a message + NULLABLE player sender into a single string. Override for custom prefixes/suffixes. */
     public ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
 
+    /** Handles an incorrect command response. Returns text that will be sent to player. Override for customisation. */
+    public InvalidCommandHandler invalidHandler = (response) -> null;
+
     private boolean closing = false;
     private Interval timer = new Interval();
 
@@ -991,5 +994,9 @@ public class NetServer implements ApplicationListener{
     public interface ChatFormatter{
         /** @return text to be placed before player name */
         String format(@Nullable Player player, String message);
+    }
+
+    public interface InvalidCommandHandler{
+        String handle(CommandResponse response);
     }
 }
