@@ -233,8 +233,8 @@ public class WaveInfoDialog extends BaseDialog{
                     t.margin(0).defaults().pad(3).padLeft(5f).growX().left();
                     t.button(b -> {
                         b.left();
-                        b.image(group.type.uiIcon).size(32f).padRight(3).scaling(Scaling.fit);
-                        if(group.effect != null && group.effect != StatusEffects.none) b.image(group.effect.uiIcon).size(20f).padRight(3).scaling(Scaling.fit);
+                        b.image(group.type.uiIcon).size(32f).scaling(Scaling.fit);
+                        if(group.effect != null && group.effect != StatusEffects.none) b.image(group.effect.uiIcon).size(22f).padRight(3).scaling(Scaling.fit);
                         b.add(group.type.localizedName).color(Pal.accent);
 
                         b.add().growX();
@@ -259,7 +259,7 @@ public class WaveInfoDialog extends BaseDialog{
                                     group.payloads = null;
                                     group.items = null;
                                     buildGroups();
-                                    dialog.hide();
+                                    updateIcons(group);
                                 }));
                             });
                             updateIcons(group);
@@ -379,58 +379,45 @@ public class WaveInfoDialog extends BaseDialog{
     }
 
     <T extends UnlockableContent> void showContentPane(SpawnGroup group, Cons<T> cons, Prov<T> prov){
-        showContentPane(group, cons, prov, i -> true, false);
+        showContentPane(group, cons, prov, i -> true, false, i -> {});
     }
 
-    <T extends UnlockableContent> void showContentPane(SpawnGroup group, Cons<T> cons, Prov<T> prov, Boolf<T> pred, boolean payloads){
+    <T extends UnlockableContent> void showContentPane(SpawnGroup group, Cons<T> cons, Prov<T> prov, Boolf<T> pred, Cons<Table> pane){
+        showContentPane(group, cons, prov, pred, false, pane);
+    }
+
+    <T extends UnlockableContent> void showContentPane(SpawnGroup group, Cons<T> cons, Prov<T> prov, Boolf<T> pred, boolean payloads, Cons<Table> pane){
         BaseDialog dialog = new BaseDialog("");
         dialog.setFillParent(true);
         ContentType ctype = prov.get().getContentType();
 
-        if(payloads && ctype == ContentType.unit){
-            dialog.cont.table(t -> units = t).padBottom(6f).row();
-            updateIcons(group);
-        }
-
-        if(ctype == ContentType.item){
-            dialog.cont.table(t -> {
-                t.add(Core.bundle.get("filter.option.amount") + ":");
-                amountField = t.field(group.items != null ? group.items.amount + "" : "", TextFieldFilter.digitsOnly, text -> {
-                    if(Strings.canParsePositiveInt(text) && group.items != null){
-                        group.items.amount = Strings.parseInt(text) <= 0 ? group.type.itemCapacity : Mathf.clamp(Strings.parseInt(text), 0, group.type.itemCapacity);
-                    }
-                }).width(120f).pad(2).margin(12f).maxTextLength((group.type.itemCapacity + "").length() + 1).get();
-                amountField.setMessageText(group.type.itemCapacity + "");
-            }).padBottom(6f).row();
-        }
+        dialog.cont.table(pane).padBottom(6f).row();
+        updateIcons(group);
 
         dialog.cont.pane(p -> {
-            int[] i = {ctype != ContentType.unit ? 1 : 0};
+            int[] i = {ctype != ContentType.unit || group == null ? 1 : 0};
             p.defaults().pad(2).margin(12f).minWidth(ctype == ContentType.item ? 200f : Float.MIN_VALUE).fillX();
-            if(ctype != ContentType.unit) p.button(t -> {
-                t.left();
-                t.image(Icon.none).size(8 * 4).scaling(Scaling.fit).padRight(2f);
-                t.add("@settings.resetKey");
-            }, () -> {
-                cons.get(null);
-                dialog.hide();
-                buildGroups();
-                updateIcons(group);
-            });
+            if(ctype != ContentType.unit || group == null){
+                p.button(t -> {
+                    t.left();
+                    t.image(Icon.none).size(8 * 4).scaling(Scaling.fit).padRight(2f);
+                    t.add("@settings.resetKey");
+                }, () -> {
+                    cons.get(null);
+                    dialog.hide();
+                    buildGroups();
+                    updateIcons(group);
+                });
+            }
             content.<T>getBy(ctype).each(type -> !type.isHidden() && pred.get(type), type -> {
                 p.button(t -> {
                     t.left();
                     t.image(type.uiIcon).size(8 * 4).scaling(Scaling.fit).padRight(2f);
                     t.add(type.localizedName);
                 }, () -> {
-                    if(ctype == ContentType.item){
-                        int amount = Strings.parseInt(amountField.getText()) <= 0 ? group.type.itemCapacity : Mathf.clamp(Strings.parseInt(amountField.getText()), 0, group.type.itemCapacity);
-                        group.items = new ItemStack((Item)type, amount);
-                    }else{
-                        cons.get(type);
-                    }
+                    cons.get(type);
 
-                    if(ctype == ContentType.unit){
+                    if(ctype == ContentType.unit && group != null){
                         if(group.payloads != null && !(group.type.constructor.get() instanceof Payloadc)) group.payloads.clear();
                         if(group.items != null) group.items.amount = Mathf.clamp(group.items.amount, 0, group.type.itemCapacity);
                     }
@@ -471,17 +458,17 @@ public class WaveInfoDialog extends BaseDialog{
                 numField("@waves.to", filter, f -> filterEnd = f - 1, () -> filterEnd + 1, 120f, 8);
             }).row();
 
-            dialog.cont.add(Core.bundle.get("waves.filters.amount") + ":");
+            dialog.cont.add("@waves.filters.amount");
             dialog.cont.table(filter -> {
                 numField("", filter, f -> filterAmount = f, () -> filterAmount, 120f, 12);
                 numField("@waves.filters.onwave", filter, f -> filterAmountWave = f, () -> filterAmountWave, 120f, 8);
             }).row();
 
             dialog.cont.table(filter -> {
-                filter.add(Core.bundle.get("waves.filters.effect") + ":");
+                filter.add("@waves.filters.effect");
                 filter.button(filterEffect != null ? new TextureRegionDrawable(filterEffect.uiIcon) :
                 Icon.logic, () -> {
-                    showContentPane(null, c -> filterEffect = c, () -> StatusEffects.none, effect -> !(effect.isHidden()  || effect.reactive), false);
+                    showContentPane(null, c -> filterEffect = c, () -> StatusEffects.none, effect -> !(effect.isHidden()  || effect.reactive), i -> {});
                     rebuild[0].run();
                 }).update(b -> {
                     b.reset();
@@ -516,25 +503,30 @@ public class WaveInfoDialog extends BaseDialog{
         if(settings != null){
             settings.clear();
             settings.defaults().size(200f, 60f).pad(2f);
+
             settings.button(t -> {
-                if(group.effect != null && group.effect != StatusEffects.none){
-                    t.image(group.effect.uiIcon).padRight(6f);
-                }else{
-                    t.image(Icon.logic).padRight(6f);
-                }
+                t.image(group.effect != null && group.effect != StatusEffects.none ? new TextureRegionDrawable(group.effect.uiIcon) : Icon.logic).padRight(6f);
                 t.add("@waves.group.effect");
-            }, Styles.cleart, () -> showContentPane(group, c -> group.effect = c, () -> StatusEffects.none, effect -> !(effect.isHidden()  || effect.reactive), false));
+            }, Styles.cleart, () -> showContentPane(group, c -> group.effect = c, () -> StatusEffects.none, effect -> !(effect.isHidden()  || effect.reactive), i -> {}));
+
             settings.button("@waves.group.payloads", Icon.defense, Styles.cleart,
-            () -> showContentPane(group, c -> group.payloads.add(c), () -> group.type, type -> !(type.isHidden() || type.hitSize * type.hitSize > group.type.payloadCapacity || type.flying), true))
+            () -> showContentPane(group, c -> group.payloads.add(c), () -> group.type, type -> !(type.isHidden() || type.hitSize * type.hitSize > group.type.payloadCapacity || type.flying), true, t -> units = t))
             .disabled(!(group.type.constructor.get() instanceof Payloadc));
+
             settings.button(t -> {
-                if(group.items != null){
-                    t.image(group.items.item.uiIcon).padRight(6f);
-                }else{
-                    t.image(Icon.effect).padRight(6f);
-                }
+                t.image(group.items != null ? new TextureRegionDrawable(group.items.item.uiIcon) : Icon.effect).padRight(6f);
                 t.add("@waves.group.items");
-            }, Styles.cleart, () -> showContentPane(group, c -> group.items = null, () -> Items.copper));
+            }, Styles.cleart, () -> showContentPane(group, c -> group.items = c != null ? new ItemStack(c, Strings.parseInt(amountField.getText()) <= 0 ? group.type.itemCapacity :
+                 Mathf.clamp(Strings.parseInt(amountField.getText()), 0, group.type.itemCapacity)) : null, () -> Items.copper, i -> true, t -> {
+                    t.add(Core.bundle.get("filter.option.amount") + ":");
+                    amountField = t.field(group.items != null ? group.items.amount + "" : "", TextFieldFilter.digitsOnly, text -> {
+                        if(Strings.canParsePositiveInt(text) && group.items != null){
+                          group.items.amount = Strings.parseInt(text) <= 0 ? group.type.itemCapacity : Mathf.clamp(Strings.parseInt(text), 0, group.type.itemCapacity);
+                        }
+                    }).width(120f).pad(2).margin(12f).maxTextLength((group.type.itemCapacity + "").length() + 1).get();
+                    amountField.setMessageText(group.type.itemCapacity + "");
+                })
+            );
         }
 
         if(units != null){
