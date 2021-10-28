@@ -85,8 +85,9 @@ public class Unloader extends Block{
             if(sortItem != null){
                 item = sortItem;
 
-                for(int pos = 0; pos < proximity.size; pos++){
-                    var other = proximity.get(pos);
+                for(int j = 0; j < proximity.size; j++){
+                    int pos = (offset + j) % proximity.size;
+                    var other = proximity.get(j);
                     boolean interactable = other.interactable(team);
 
                     //set the stats of all buildings in possibleBlocks
@@ -105,8 +106,9 @@ public class Unloader extends Block{
                     boolean isDistinct = false;
                     Item possibleItem = content.item(total);
 
-                    for(int pos = 0; pos < proximity.size; pos++){
-                        var other = proximity.get(pos);
+                    for(int j = 0; j < proximity.size; j++){
+                        int pos = (offset + j) % proximity.size;
+                        var other = proximity.get(j);
                         boolean interactable = other.interactable(team);
 
                         //set the stats of all buildings in possibleBlocks while we are at it
