@@ -696,9 +696,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             });
 
             //flip rotation
-            if(x == (req.rotation % 2 == 0)){
-                req.rotation = Mathf.mod(req.rotation + 2, 4);
-            }
+            req.block.flipRotation(req, x);
         });
     }
 
