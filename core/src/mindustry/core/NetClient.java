@@ -260,6 +260,11 @@ public class NetClient implements ApplicationListener{
 
             //a command was sent, now get the output
             if(response.type != ResponseType.valid){
+                if (netServer.invalidHandler.handle(response) != null) {
+                    player.sendMessage(netServer.invalidHandler.handle(response));
+                    return;
+                }
+
                 String text;
 
                 //send usage
