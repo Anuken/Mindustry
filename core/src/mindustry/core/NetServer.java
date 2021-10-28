@@ -68,7 +68,7 @@ public class NetServer implements ApplicationListener{
     public ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
 
     /** Handles an incorrect command response. Returns text that will be sent to player. Override for customisation. */
-    public InvalidCommandHandler invalidHandler = (response) -> null;
+    public InvalidCommandHandler invalidHandler = (player, response) -> null;
 
     private boolean closing = false;
     private Interval timer = new Interval();
@@ -997,6 +997,6 @@ public class NetServer implements ApplicationListener{
     }
 
     public interface InvalidCommandHandler{
-        String handle(CommandResponse response);
+        String handle(Player player, CommandResponse response);
     }
 }
