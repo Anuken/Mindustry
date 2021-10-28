@@ -177,7 +177,7 @@ public class Weapon implements Cloneable{
             Drawf.shadow(wx, wy, shadow);
         }
 
-        if (top){
+        if(top){
             drawOutline(unit, mount);
         }
 
