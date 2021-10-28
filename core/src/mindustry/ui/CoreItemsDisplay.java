@@ -1,5 +1,6 @@
 package mindustry.ui;
 
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import mindustry.*;
@@ -43,7 +44,10 @@ public class CoreItemsDisplay extends Table{
             if(usedItems.contains(item)){
                 image(item.uiIcon).size(iconSmall).padRight(3).tooltip(t -> t.background(Styles.black6).margin(4f).add(item.localizedName).style(Styles.outlineLabel));
                 //TODO leaks garbage
-                label(() -> core == null ? "0" : UI.formatAmount(core.items.get(item))).padRight(3).minWidth(52f).left();
+                Cell<Label> cell = label(() -> core == null ? "0" : UI.formatAmount(core.items.get(item))).padRight(3).left();
+                if(i % 4 != 3 && i != usedItems.size - 1){
+                    cell.minWidth(52f);
+                }
 
                 if(++i % 4 == 0){
                     row();
