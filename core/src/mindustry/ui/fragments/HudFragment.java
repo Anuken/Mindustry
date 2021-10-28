@@ -275,7 +275,7 @@ public class HudFragment extends Fragment{
 
             t.table(c -> {
                 //core items
-                c.top().collapser(coreItems, () -> Core.settings.getBool("coreitems") && !mobile && shown).fillX().row();
+                c.top().collapser(coreItems, () -> Core.settings.getBool("coreitems") && !mobile && shown).row();
 
                 float notifDuration = 240f;
                 float[] coreAttackTime = {0};
