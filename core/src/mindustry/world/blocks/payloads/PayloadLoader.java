@@ -4,9 +4,11 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
@@ -181,6 +183,43 @@ public class PayloadLoader extends PayloadBlock{
             if(revision >= 1){
                 exporting = read.bool();
             }
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            return switch(sensor){
+                case totalItems -> (payload == null || payload.build.items == null) ? 0 : payload.build.items.total();
+                case totalLiquids -> (payload == null || payload.build.liquids == null) ? 0 : payload.build.liquids.total();
+                default -> super.sense(sensor);
+            };
+        }
+
+        @Override
+        public Object senseObject(LAccess sensor){
+            return switch(sensor){
+                case firstItem -> (payload == null || payload.build.items == null) ? null : payload.build.items.first();
+                default -> super.senseObject(sensor);
+            };
+        }
+
+        @Override
+        public double sense(Content content){
+            if(content instanceof Item i){
+                if (payload != null && payload.build.items != null){
+                    return payload.build.items.get(i);
+                } else {
+                    return Float.NaN;
+                }
+            } else if (content instanceof Liquid l){
+                if (payload != null && payload.build.liquids != null){
+                    return payload.build.liquids.get(l);
+                } else {
+                    return Float.NaN;
+                }
+            }
+            return super.sense(content);
+            // uses super even though both cases are covered
+            // you never know when something is added
         }
     }
 }
