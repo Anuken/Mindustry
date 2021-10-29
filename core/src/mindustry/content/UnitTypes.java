@@ -39,7 +39,8 @@ public class UnitTypes implements ContentList{
     public static @EntityDef(value = {Unitc.class, Legsc.class}, legacy = true) UnitType spiroct, arkyid, toxopid;
 
     //air
-    public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra;
+    public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra,
+    spark;
 
     //air, legacy
     public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType mono;
@@ -2406,6 +2407,68 @@ public class UnitTypes implements ContentList{
                     smokeEffect = Fx.shootSmallSmoke;
                     buildingDamageMultiplier = 0.01f;
                     homingPower = 0.04f;
+                }};
+            }});
+        }};
+
+        //TODO bad name
+        spark = new UnitType("spark"){{
+            defaultController = BuilderAI::new;
+            isCounted = false;
+
+            lowAltitude = false;
+            flying = true;
+            targetAir = false;
+            mineSpeed = 6.5f;
+            mineTier = 1;
+            buildSpeed = 0.8f;
+            drag = 0.06f;
+            speed = 2.5f;
+            rotateSpeed = 9f;
+            accel = 0.1f;
+            itemCapacity = 40;
+            health = 300f;
+            armor = 1f;
+            hitSize = 9f;
+            commandLimit = 5;
+            engineSize = 0;
+
+            //TODO ugly definition...
+            engines = new UnitEngine[]{
+                new UnitEngine(21 / 4f, 19 / 4f, 2.2f, 45f),
+                new UnitEngine(-21 / 4f, 19 / 4f, 2.2f, 135f),
+
+                new UnitEngine(23 / 4f, -22 / 4f, 2.2f, 315f),
+                new UnitEngine(-23 / 4f, -22 / 4f, 2.2f, 225f)
+            };
+
+            weapons.add(new Weapon(""){{
+                reload = 55f;
+                x = 0f;
+                y = 1f;
+                top = false;
+                mirror = false;
+
+                bullet = new ArtilleryBulletType(3f, 11){{
+                    trailLength = 8;
+                    trailWidth = 2.4f;
+                    collidesTiles = true;
+                    collides = true;
+                    trailEffect = Fx.none;
+                    trailColor = Pal.bulletYellowBack;
+                    homingPower = 0.01f;
+                    splashDamage = 10;
+                    splashDamageRadius = 20f;
+                    weaveMag = 2f;
+                    weaveScale = 4f;
+                    width = 10f;
+                    height = 13f;
+
+                    lifetime = 50f;
+                    hitEffect = Fx.blastExplosion;
+                    shootEffect = Fx.shootBig;
+                    smokeEffect = Fx.shootBigSmoke;
+                    buildingDamageMultiplier = 0.4f;
                 }};
             }});
         }};

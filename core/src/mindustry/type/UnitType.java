@@ -118,6 +118,7 @@ public class UnitType extends UnlockableContent{
     public boolean canDrown = true, naval = false;
     public float drownTimeMultiplier = 1f;
     public float engineOffset = 5f, engineSize = 2.5f;
+    public UnitEngine[] engines = {};
     public float strafePenalty = 0.5f;
     public float hitSize = 6f;
     public float itemOffsetY = 3f;
@@ -641,6 +642,7 @@ public class UnitType extends UnlockableContent{
         if(drawBody) drawOutline(unit);
         drawWeaponOutlines(unit);
         if(engineSize > 0) drawEngine(unit);
+        if(engines.length > 0) drawEngines(unit);
         if(drawBody) drawBody(unit);
         if(drawCell) drawCell(unit);
         drawWeapons(unit);
@@ -785,6 +787,33 @@ public class UnitType extends UnlockableContent{
             unit.y + Angles.trnsy(unit.rotation + 180, offset - 1f),
             (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) / 2f  * scale
         );
+        Draw.color();
+    }
+
+    public void drawEngines(Unit unit){
+        if(!unit.isFlying()) return;
+
+        float scale = unit.elevation;
+        float rot = unit.rotation - 90;
+
+        for(var engine : engines){
+            Tmp.v1.set(engine.x, engine.y).rotate(rot);
+            float ex = Tmp.v1.x, ey = Tmp.v1.y;
+
+            Draw.color(unit.team.color);
+            Fill.circle(
+                unit.x + ex,
+                unit.y + ey,
+                (engine.radius + Mathf.absin(Time.time, 2f, engine.radius / 4f)) * scale
+            );
+            Draw.color(Color.white);
+            Fill.circle(
+                unit.x + ex - Angles.trnsx(rot + engine.rotation, 1f),
+                unit.y + ey - Angles.trnsy(rot + engine.rotation, 1f),
+                (engine.radius + Mathf.absin(Time.time, 2f, engine.radius / 4f)) / 2f  * scale
+            );
+        }
+
         Draw.color();
     }
 
@@ -1002,5 +1031,19 @@ public class UnitType extends UnlockableContent{
     }
 
     //endregion
+
+    public static class UnitEngine{
+        public float x, y, radius, rotation;
+
+        public UnitEngine(float x, float y, float radius, float rotation){
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            this.rotation = rotation;
+        }
+
+        public UnitEngine(){
+        }
+    }
 
 }
