@@ -1,12 +1,15 @@
 package mindustry.world.blocks.payloads;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
@@ -19,6 +22,7 @@ public class PayloadLoader extends PayloadBlock{
     public int itemsLoaded = 8;
     public float liquidsLoaded = 40f;
     public int maxBlockSize = 2;
+    public int itemLoadCap = Integer.MAX_VALUE;
 
     public PayloadLoader(String name){
         super(name);
@@ -125,7 +129,10 @@ public class PayloadLoader extends PayloadBlock{
                             for (int i = 0; i < items.length(); i++) {
                                 if (items.get(i) > 0) {
                                     Item item = content.item(i);
-                                    if (payload.build.acceptItem(payload.build, item)) {
+                                    if (payload.build.items.get(item) >= itemLoadCap){
+                                        exporting = true;
+                                        break;
+                                    } else if (payload.build.acceptItem(payload.build, item)) {
                                         payload.build.handleItem(payload.build, item);
                                         items.remove(item, 1);
                                         break;
@@ -183,5 +190,26 @@ public class PayloadLoader extends PayloadBlock{
             }
         }
 
+        @Override
+        public void control(LAccess type, double p1, double p2, double p3, double p4){
+            if (type == LAccess.shoot){
+                moveOutPayload();
+            } else if (type == LAccess.config) {
+                p1 += 0.0001;
+                itemLoadCap = (int) p1;
+            }
+        }
+
+        @Override
+        public void displayBars(Table table) {
+            super.displayBars(table);
+            if (itemLoadCap != Integer.MAX_VALUE) {
+                table.table(e -> {
+                    e.row();
+                    e.left();
+                    e.label(() -> "Item Load Cap: " + itemLoadCap).color(Color.lightGray);
+                }).left();
+            }
+        }
     }
 }
