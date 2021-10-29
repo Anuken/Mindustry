@@ -85,8 +85,9 @@ public class Unloader extends Block{
             if(sortItem != null){
                 item = sortItem;
 
-                for(int pos = 0; pos < proximity.size; pos++){
-                    var other = proximity.get(pos);
+                for(int j = 0; j < proximity.size; j++){
+                    int pos = (offset + j) % proximity.size;
+                    var other = proximity.get(j);
                     boolean interactable = other.interactable(team);
 
                     //set the stats of all buildings in possibleBlocks
@@ -105,8 +106,9 @@ public class Unloader extends Block{
                     boolean isDistinct = false;
                     Item possibleItem = content.item(total);
 
-                    for(int pos = 0; pos < proximity.size; pos++){
-                        var other = proximity.get(pos);
+                    for(int j = 0; j < proximity.size; j++){
+                        int pos = (offset + j) % proximity.size;
+                        var other = proximity.get(j);
                         boolean interactable = other.interactable(team);
 
                         //set the stats of all buildings in possibleBlocks while we are at it
@@ -136,13 +138,11 @@ public class Unloader extends Block{
                     pb.loadFactor = (other.getMaximumAccepted(item) == 0) || (other.items == null) ? 0 : other.items.get(item) / (float)other.getMaximumAccepted(item);
                 }
 
-                //sort so it gives full priority to blocks that can give but not receive (mainly plast and storage), and then by load
-                possibleBlocks.sort((e1, e2) -> {
-                    // TODO: instead of canLoad it should be ((instance of Storage) || (is it a plast belt i can unload from))
-                    //  otherwise a 100% full factory will get full priority over the storage/plast, barely an issue but still wasting trades and thus speed
-                    int canLoad = Boolean.compare(e2.canLoad, e1.canLoad);
-                    return (canLoad != 0) ? canLoad : Float.compare(e1.loadFactor, e2.loadFactor);
-                });
+                //sort so it gives full priority to blocks that can give but not receive (stackConveyors and Storage), and then by load
+                possibleBlocks.sort(Structs.comps(
+                    Structs.comparingBool(e -> e.building.block.highUnloadPriority),
+                    Structs.comparingFloat(e -> e.loadFactor)
+                ));
 
                 ContainerStat dumpingFrom = null;
                 ContainerStat dumpingTo = null;
@@ -164,7 +164,7 @@ public class Unloader extends Block{
                 }
 
                 //trade the items
-                if(dumpingFrom != null && dumpingTo != null && dumpingFrom.loadFactor != dumpingTo.loadFactor){
+                if(dumpingFrom != null && dumpingTo != null && (dumpingFrom.loadFactor != dumpingTo.loadFactor || dumpingFrom.building.block.highUnloadPriority)){
                     dumpingTo.building.handleItem(this, item);
                     dumpingFrom.building.removeStack(item, 1);
                     any = true;

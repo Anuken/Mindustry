@@ -257,6 +257,12 @@ public class ChatFragment extends Table{
         return shown;
     }
 
+    /** @deprecated prefixes are ignored now, just add raw messages */
+    @Deprecated
+    public void addMessage(String pointless, String message){
+        addMessage(message);
+    }
+
     public void addMessage(String message){
         if(message == null) return;
         messages.insert(0, message);
