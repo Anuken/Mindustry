@@ -6,12 +6,11 @@ import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.ctype.Content;
+import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.LAccess;
-import mindustry.type.Item;
-import mindustry.type.Liquid;
+import mindustry.logic.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -257,34 +256,47 @@ public class PayloadBlock extends Block{
 
         @Override
         public double sense(LAccess sensor) {
-            return switch (sensor) {
-                case totalItems -> (payload == null || payload.build.items == null) ? 0 : payload.build.items.total();
-                case totalLiquids -> (payload == null || payload.build.liquids == null) ? 0 : payload.build.liquids.total();
-                default -> super.sense(sensor);
-            };
+            if (payload instanceof BuildPayload block){
+                return switch (sensor) {
+                    case totalItems -> (block.build.items == null) ? 0 : block.build.items.total();
+                    case totalLiquids -> (block.build.liquids == null) ? 0 : block.build.liquids.total();
+                    default -> super.sense(sensor);
+                };
+            } else if (payload instanceof UnitPayload unit){
+                return switch(sensor){
+                    case totalItems -> unit.unit.stack().amount;
+                    default -> super.sense(sensor);
+                };
+            }
+            return super.sense(sensor);
         }
 
         @Override
         public Object senseObject(LAccess sensor) {
-            return switch (sensor) {
-                case firstItem -> (payload == null || payload.build.items == null) ? null : payload.build.items.first();
-                default -> super.senseObject(sensor);
-            };
+            if (payload instanceof BuildPayload block){
+                return switch (sensor) {
+                    case firstItem -> (block.build.items == null) ?null : block.build.items.first();
+                    default -> super.senseObject(sensor);
+                };
+            }
+            return super.senseObject(sensor);
         }
 
         @Override
         public double sense(Content content) {
-            if (content instanceof Item i) {
-                if (payload != null && payload.build.items != null) {
-                    return payload.build.items.get(i);
-                } else {
-                    return Float.NaN;
-                }
-            } else if (content instanceof Liquid l) {
-                if (payload != null && payload.build.liquids != null) {
-                    return payload.build.liquids.get(l);
-                } else {
-                    return Float.NaN;
+            if (payload instanceof BuildPayload block) {
+                if (content instanceof Item i) {
+                    if (block.build.items != null) {
+                        return block.build.items.get(i);
+                    } else {
+                        return Float.NaN;
+                    }
+                } else if (content instanceof Liquid l) {
+                    if (block.build.liquids != null) {
+                        return block.build.liquids.get(l);
+                    } else {
+                        return Float.NaN;
+                    }
                 }
             }
             return super.sense(content);
