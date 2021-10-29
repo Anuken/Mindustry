@@ -31,12 +31,20 @@ public class World{
     public final Context context = new Context();
 
     public Tiles tiles = new Tiles(0, 0);
+    /** The number of times tiles have changed in this session. Used for blocks that need to poll world state, but not frequently. */
+    public int tileChanges = -1;
 
     private boolean generating, invalidMap;
     private ObjectMap<Map, Runnable> customMapLoaders = new ObjectMap<>();
 
     public World(){
+        Events.on(TileChangeEvent.class, e -> {
+            tileChanges ++;
+        });
 
+        Events.on(WorldLoadEvent.class, e -> {
+            tileChanges = -1;
+        });
     }
 
     /** Adds a custom handler function for loading a custom map - usually a generated one. */

@@ -1,0 +1,171 @@
+package mindustry.world.blocks.power;
+
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
+import mindustry.*;
+import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.input.*;
+import mindustry.world.*;
+import mindustry.world.meta.*;
+
+import java.util.*;
+
+import static mindustry.Vars.*;
+
+public class BeamNode extends PowerBlock{
+    public int range = 5;
+
+    public @Load("power-beam") TextureRegion laser;
+    public @Load("power-beam-end") TextureRegion laserEnd;
+
+    public Color laserColor1 = Color.white;
+    public Color laserColor2 = Color.valueOf("ffd9c2");
+    public float pulseScl = 7, pulseMag = 0.05f;
+    public float laserWidth = 0.4f;
+
+    public BeamNode(String name){
+        super(name);
+        consumesPower = outputsPower = false;
+        drawDisabled = false;
+        envEnabled |= Env.space;
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        clipSize = Math.max(clipSize, tilesize*size + (range+1)*tilesize*2);
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        for(int i = 0; i < 4; i++){
+            int maxLen = range;
+            Building dest = null;
+            var dir = Geometry.d4[i];
+            int dx = dir.x, dy = dir.y;
+            for(int j = 1; j <= range; j++){
+                var other = world.build(x + j * dir.x, y + j * dir.y);
+                if(other != null && other.block.hasPower && other.team == Vars.player.team()){
+                    maxLen = j;
+                    dest = other;
+                    break;
+                }
+            }
+
+            Drawf.dashLine(Pal.placing,
+                x * tilesize + dx * (tilesize / 2f + 2),
+                y * tilesize + dy * (tilesize / 2f + 2),
+                x * tilesize + dx * (maxLen) * tilesize,
+                y * tilesize + dy * (maxLen) * tilesize
+            );
+
+            if(dest != null){
+                Drawf.square(dest.x, dest.y, dest.block.size * tilesize/2f + 2.5f, 0f);
+            }
+        }
+    }
+
+    @Override
+    public void changePlacementPath(Seq<Point2> points, int rotation){
+        Placement.calculateNodes(points, this, rotation, (point, other) -> Math.max(Math.abs(point.x - other.x), Math.abs(point.y - other.y)) <= range);
+    }
+
+    public class BeamNodeBuild extends Building{
+        //current links in cardinal directions
+        public Building[] links = new Building[4];
+        public Tile[] dests = new Tile[4];
+        public int lastChange = -2;
+
+        @Override
+        public void updateTile(){
+            if(lastChange != world.tileChanges){
+                lastChange = world.tileChanges;
+                updateDirections();
+            }
+        }
+
+        @Override
+        public void draw(){
+            super.draw();
+
+            if(Mathf.zero(Renderer.laserOpacity)) return;
+
+            Draw.z(Layer.power);
+            Draw.color(laserColor1, laserColor2, (1f - power.graph.getSatisfaction()) * 0.86f + Mathf.absin(3f, 0.1f));
+            Draw.alpha(Renderer.laserOpacity);
+            float w = laserWidth + Mathf.absin(pulseScl, pulseMag);
+
+            for(int i = 0; i < 4; i ++){
+                if(dests[i] != null && (links[i].block != block || links[i].id > id)){
+                    int dst = Math.max(Math.abs(dests[i].x - tile.x),  Math.abs(dests[i].y - tile.y));
+                    //don't draw lasers for adjacent blocks
+                    if(dst > 1){
+                        var point = Geometry.d4[i];
+                        float poff = tilesize/2f;
+                        Drawf.laser(team, laser, laserEnd, x + poff*point.x, y + poff*point.y, dests[i].worldx() - poff*point.x, dests[i].worldy() - poff*point.y, w);
+                    }
+                }
+            }
+
+            Draw.reset();
+        }
+
+        @Override
+        public void pickedUp(){
+            Arrays.fill(links, null);
+            Arrays.fill(dests, null);
+        }
+
+        public void updateDirections(){
+            for(int i = 0; i < 4; i ++){
+                var prev = links[i];
+                var dir = Geometry.d4[i];
+                links[i] = null;
+                dests[i] = null;
+                //find first block with power in range
+                for(int j = 1; j <= range; j++){
+                    var other = world.build(tile.x + j * dir.x, tile.y + j * dir.y);
+                    if(other != null && other.block.hasPower && other.team == team){
+                        links[i] = other;
+                        dests[i] = world.tile(tile.x + j * dir.x, tile.y + j * dir.y);
+                        break;
+                    }
+                }
+
+                var next = links[i];
+
+                if(next != prev){
+                    //unlinked, disconnect and reflow
+                    if(prev != null){
+                        prev.power.links.removeValue(pos());
+
+                        PowerGraph newgraph = new PowerGraph();
+                        //reflow from this point, covering all tiles on this side
+                        newgraph.reflow(this);
+
+                        if(prev.power.graph != newgraph){
+                            //reflow power for other end
+                            PowerGraph og = new PowerGraph();
+                            og.reflow(prev);
+                        }
+                    }
+
+                    //linked to a new one, connect graphs
+                    if(next != null){
+                        power.links.addUnique(next.pos());
+                        next.power.links.addUnique(pos());
+
+                        power.graph.addGraph(next.power.graph);
+                    }
+                }
+            }
+        }
+    }
+}

@@ -68,15 +68,10 @@ public class PowerNode extends PowerBlock{
                 }
             }else if(linkValid(entity, other) && valid && power.links.size < maxNodes){
 
-                if(!power.links.contains(other.pos())){
-                    power.links.add(other.pos());
-                }
+                power.links.addUnique(other.pos());
 
                 if(other.team == entity.team){
-
-                    if(!other.power.links.contains(entity.pos())){
-                        other.power.links.add(entity.pos());
-                    }
+                    other.power.links.addUnique(entity.pos());
                 }
 
                 power.graph.addGraph(other.power.graph);
