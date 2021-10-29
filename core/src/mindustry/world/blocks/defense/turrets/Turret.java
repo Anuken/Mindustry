@@ -61,6 +61,7 @@ public class Turret extends ReloadTurret{
     public float minRange = 0f;
     public float burstSpacing = 0;
     public boolean alternate = false;
+    public boolean leadTargets = true;
     /** If true, this turret will accurately target moving targets with respect to charge time. */
     public boolean accurateDelay = false;
     public boolean targetAir = true;
@@ -218,18 +219,20 @@ public class Turret extends ReloadTurret{
 
         public void targetPosition(Posc pos){
             if(!hasAmmo() || pos == null) return;
-            BulletType bullet = peekAmmo();
+            if(leadTargets){
+                BulletType bullet = peekAmmo();
 
-            var offset = Tmp.v1.setZero();
+                var offset = Tmp.v1.setZero();
 
-            //when delay is accurate, assume unit has moved by chargeTime already
-            if(accurateDelay && pos instanceof Hitboxc h){
-                offset.set(h.deltaX(), h.deltaY()).scl(chargeTime / Time.delta);
+                //when delay is accurate, assume unit has moved by chargeTime already
+                if(accurateDelay && pos instanceof Hitboxc h){
+                    offset.set(h.deltaX(), h.deltaY()).scl(chargeTime / Time.delta);
+                }
+
+                targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed <= 0.01f ? 99999999f : bullet.speed));
             }
 
-            targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed <= 0.01f ? 99999999f : bullet.speed));
-
-            if(targetPos.isZero()){
+            if(!leadTargets || targetPos.isZero()){
                 targetPos.set(pos);
             }
         }
