@@ -53,20 +53,17 @@ public class Schematics implements Loadable{
     private static final int maxPreviewsMobile = 32;
     private static final int resolution = 32;
 
-    private OptimizedByteArrayOutputStream out = new OptimizedByteArrayOutputStream(1024);
-    private Seq<Schematic> all = new Seq<>();
-    private OrderedMap<Schematic, FrameBuffer> previews = new OrderedMap<>();
-    private ObjectSet<Schematic> errored = new ObjectSet<>();
-    private ObjectMap<CoreBlock, Seq<Schematic>> loadouts = new ObjectMap<>();
+    private final OptimizedByteArrayOutputStream out = new OptimizedByteArrayOutputStream(1024);
+    private final Seq<Schematic> all = new Seq<>();
+    private final OrderedMap<Schematic, FrameBuffer> previews = new OrderedMap<>();
+    private final ObjectSet<Schematic> errored = new ObjectSet<>();
+    private final ObjectMap<CoreBlock, Seq<Schematic>> loadouts = new ObjectMap<>();
     private FrameBuffer shadowBuffer;
     private Texture errorTexture;
     private long lastClearTime;
 
     public Schematics(){
-
-        Events.on(ClientLoadEvent.class, event -> {
-            errorTexture = new Texture("sprites/error.png");
-        });
+        Events.on(ClientLoadEvent.class, event -> errorTexture = new Texture("sprites/error.png"));
     }
 
     @Override
@@ -248,7 +245,7 @@ public class Schematics implements Loadable{
 
             Draw.flush();
             //scale each request to fit schematic
-            Draw.trans().scale(resolution / tilesize, resolution / tilesize).translate(tilesize*1.5f, tilesize*1.5f);
+            Draw.trans().scale((float)resolution / tilesize, (float)resolution / tilesize).translate(tilesize*1.5f, tilesize*1.5f);
 
             //draw requests
             requests.each(req -> {
@@ -618,7 +615,7 @@ public class Schematics implements Loadable{
 
     private static Schematic rotated(Schematic input, boolean counter){
         int direction = Mathf.sign(counter);
-        Schematic schem = input == tmpSchem ? tmpSchem2 : tmpSchem2;
+        Schematic schem = tmpSchem2;
         schem.width = input.width;
         schem.height = input.height;
         Pools.freeAll(schem.tiles);

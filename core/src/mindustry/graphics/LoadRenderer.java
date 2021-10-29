@@ -30,14 +30,14 @@ public class LoadRenderer implements Disposable{
     private static final boolean preview = false;
 
     private float testprogress = 0f;
-    private StringBuilder assetText = new StringBuilder();
-    private Bar[] bars;
-    private Mesh mesh = MeshBuilder.buildHex(colorRed, 2, true, 1f);
-    private Camera3D cam = new Camera3D();
+    private final StringBuilder assetText = new StringBuilder();
+    private final Bar[] bars;
+    private final Mesh mesh = MeshBuilder.buildHex(colorRed, 2, true, 1f);
+    private final Camera3D cam = new Camera3D();
     private int lastLength = -1;
     private FxProcessor fx;
-    private WindowedMean renderTimes = new WindowedMean(20);
-    private BloomFilter bloom;
+    private final WindowedMean renderTimes = new WindowedMean(20);
+    private final BloomFilter bloom;
     private boolean renderStencil = true;
     private long lastFrameTime;
 
@@ -256,28 +256,28 @@ public class LoadRenderer implements Disposable{
                                 float y = maxy - i * barspace - barpad - barheight;
                                 float width = Mathf.clamp(bar.value());
                                 float baseWidth = Core.graphics.isPortrait() ? maxx - minx : (maxx - minx) - (maxy - y) - barpad * 2f - s * 4;
-                                float cx = minx + barpad, cy = y, topY = cy + barheight, botY = cy;
+                                float cx = minx + barpad, topY = y + barheight;
 
-                                Lines.square(cx + barheight / 2f, botY + barheight / 2f, barheight / 2f);
+                                Lines.square(cx + barheight / 2f, y + barheight / 2f, barheight / 2f);
 
                                 Fill.quad(
-                                cx + barheight, cy,
+                                cx + barheight, y,
                                 cx + barheight, topY,
                                 cx + width * baseWidth + barheight, topY,
-                                cx + width * baseWidth, botY
+                                cx + width * baseWidth, y
                                 );
 
                                 Draw.color(Color.black);
 
                                 Fill.quad(
                                 cx + width * baseWidth + barheight, topY,
-                                cx + width * baseWidth, botY,
-                                cx + baseWidth, botY,
+                                cx + width * baseWidth, y,
+                                cx + baseWidth, y,
                                 cx + baseWidth + barheight, topY);
 
                                 font.setColor(Color.black);
                                 layout.setText(font, bar.text);
-                                font.draw(bar.text, cx + barheight * 1.5f, botY + barheight / 2f + layout.height / 2f);
+                                font.draw(bar.text, cx + barheight * 1.5f, y + barheight / 2f + layout.height / 2f);
                             }
                         }
 

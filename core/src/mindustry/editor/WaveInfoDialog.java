@@ -35,7 +35,8 @@ public class WaveInfoDialog extends BaseDialog{
     private UnitType lastType = UnitTypes.dagger;
     private Sort sort = Sort.begin;
     private boolean reverseSort = false;
-    private float updateTimer, updatePeriod = 1f;
+    private float updateTimer;
+    private final float updatePeriod = 1f;
     private WaveGraph graph = new WaveGraph();
 
     public WaveInfoDialog(){

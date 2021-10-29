@@ -3,13 +3,8 @@ package mindustry.mod;
 import arc.struct.*;
 
 public class ModClassLoader extends ClassLoader{
-    private Seq<ClassLoader> children = new Seq<>();
-    private ThreadLocal<Boolean> inChild = new ThreadLocal<>(){
-        @Override
-        protected Boolean initialValue(){
-            return Boolean.FALSE;
-        }
-    };
+    private final Seq<ClassLoader> children = new Seq<>();
+    private final ThreadLocal<Boolean> inChild = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
     public ModClassLoader(ClassLoader parent){
         super(parent);

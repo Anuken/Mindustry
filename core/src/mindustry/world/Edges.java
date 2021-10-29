@@ -10,9 +10,9 @@ import static mindustry.Vars.*;
 
 public class Edges{
     private static final int maxRadius = 12;
-    private static Point2[][] edges = new Point2[maxBlockSize][0];
-    private static Point2[][] edgeInside = new Point2[maxBlockSize][0];
-    private static Vec2[][] polygons = new Vec2[maxRadius * 2][0];
+    private static final Point2[][] edges = new Point2[maxBlockSize][0];
+    private static final Point2[][] edgeInside = new Point2[maxBlockSize][0];
+    private static final Vec2[][] polygons = new Vec2[maxRadius * 2][0];
 
     static{
         for(int i = 0; i < maxRadius * 2; i++){

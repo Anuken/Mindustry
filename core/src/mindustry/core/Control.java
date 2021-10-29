@@ -15,6 +15,7 @@ import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.GameState.*;
+import mindustry.ctype.UnlockableContent;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
@@ -49,7 +50,7 @@ public class Control implements ApplicationListener, Loadable{
     public SoundControl sound;
     public InputHandler input;
 
-    private Interval timer = new Interval(2);
+    private final Interval timer = new Interval(2);
     private boolean hiscore = false;
     private boolean wasPaused = false;
 
@@ -60,9 +61,7 @@ public class Control implements ApplicationListener, Loadable{
         //show dialog saying that mod loading was skipped.
         Events.on(ClientLoadEvent.class, e -> {
             if(Vars.mods.skipModLoading() && Vars.mods.list().any()){
-                Time.runTask(4f, () -> {
-                    ui.showInfo("@mods.initfailed");
-                });
+                Time.runTask(4f, () -> ui.showInfo("@mods.initfailed"));
             }
         });
 
@@ -91,9 +90,7 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
-        Events.on(SaveLoadEvent.class, event -> {
-            input.checkUnit();
-        });
+        Events.on(SaveLoadEvent.class, event -> input.checkUnit());
 
         Events.on(ResetEvent.class, event -> {
             player.reset();
@@ -156,9 +153,7 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
-        Events.on(SectorCaptureEvent.class, e -> {
-            checkAutoUnlocks();
-        });
+        Events.on(SectorCaptureEvent.class, e -> checkAutoUnlocks());
 
         Events.on(BlockBuildEndEvent.class, e -> {
             if(e.team == player.team()){
@@ -228,7 +223,7 @@ public class Control implements ApplicationListener, Loadable{
                     if(state.isCampaign() && Vars.showSectorLandInfo && (state.rules.sector.preset == null || state.rules.sector.preset.showSectorLandInfo)){
                         ui.announce("[accent]" + state.rules.sector.name() + "\n" +
                         (state.rules.sector.info.resources.any() ? "[lightgray]" + bundle.get("sectors.resources") + "[white] " +
-                        state.rules.sector.info.resources.toString(" ", u -> u.emoji()) : ""), 5);
+                        state.rules.sector.info.resources.toString(" ", UnlockableContent::emoji) : ""), 5);
                     }
                 });
             }

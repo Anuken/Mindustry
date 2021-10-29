@@ -134,7 +134,7 @@ public abstract class BasicGenerator implements WorldGenerator{
             if(noise(sclx, scly, 0.2f, 1f) > 0.63f && noise(sclx, scly + 999, 200f, 1f) > 0.6f && (mx == 0 || my == 0 || mx == secSize - 1 || my == secSize - 1)){
                 if(Mathf.chance(noise(x + 0x231523, y, 40f, 1f))){
                     floor = floor1;
-                    if(Mathf.dst(mx, my, secSize/2, secSize/2) > secSize/2f + 2){
+                    if(Mathf.dst(mx, my, secSize / 2f, secSize / 2f) > secSize / 2f + 2){
                         floor = floor2;
                     }
                 }

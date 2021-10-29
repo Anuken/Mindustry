@@ -41,7 +41,7 @@ public class LogicAI extends AIController{
     //target shoot positions for manual aiming
     public PosTeam posTarget = PosTeam.create();
 
-    private ObjectSet<Object> radars = new ObjectSet<>();
+    private final ObjectSet<Object> radars = new ObjectSet<>();
 
     @Override
     public void updateMovement(){
@@ -64,12 +64,8 @@ public class LogicAI extends AIController{
         }
 
         switch(control){
-            case move -> {
-                moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
-            }
-            case approach -> {
-                moveTo(Tmp.v1.set(moveX, moveY), moveRad - 7f, 7);
-            }
+            case move -> moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
+            case approach -> moveTo(Tmp.v1.set(moveX, moveY), moveRad - 7f, 7);
             case pathfind -> {
                 Building core = unit.closestEnemyCore();
 
@@ -92,9 +88,7 @@ public class LogicAI extends AIController{
                     }
                 }
             }
-            case stop -> {
-                unit.clearBuilding();
-            }
+            case stop -> unit.clearBuilding();
         }
 
         if(unit.type.canBoost && !unit.type.flying){

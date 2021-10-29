@@ -24,7 +24,7 @@ public class MinimapRenderer{
     private Pixmap pixmap;
     private Texture texture;
     private TextureRegion region;
-    private Rect rect = new Rect();
+    private final Rect rect = new Rect();
     private float zoom = 4;
 
     public MinimapRenderer(){

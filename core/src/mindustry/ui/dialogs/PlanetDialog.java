@@ -216,14 +216,13 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(Core.graphics.isPortrait()){
             buttons.add(sectorTop).colspan(2).fillX().row();
             addBack();
-            addTech();
         }else{
             addBack();
             buttons.add().growX();
             buttons.add(sectorTop).minWidth(230f);
             buttons.add().growX();
-            addTech();
         }
+        addTech();
     }
 
     void addBack(){
@@ -601,9 +600,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                 head.left().defaults();
 
                                 if(sec.isAttacked()){
-                                    head.image(Icon.warningSmall).update(i -> {
-                                        i.color.set(Pal.accent).lerp(Pal.remove, Mathf.absin(Time.globalTime, 9f, 1f));
-                                    }).padRight(4f);
+                                    head.image(Icon.warningSmall).update(i -> i.color.set(Pal.accent).lerp(Pal.remove, Mathf.absin(Time.globalTime, 9f, 1f))).padRight(4f);
                                 }
 
                                 String ic = sec.iconChar() == null ? "" : sec.iconChar() + " ";
@@ -802,12 +799,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             //import
             if(sector.hasBase()){
-                displayItems(c, 1f, sector.info.importStats(sector.planet), "@sectors.import", t -> {
-                    sector.info.eachImport(sector.planet, other -> {
-                        String ic = other.iconChar();
-                        t.add(Iconc.rightOpen + " " + (ic == null || ic.isEmpty() ? "" : ic + " ") + other.name()).padLeft(10f).row();
-                    });
-                });
+                displayItems(c, 1f, sector.info.importStats(sector.planet), "@sectors.import", t -> sector.info.eachImport(sector.planet, other -> {
+                    String ic = other.iconChar();
+                    t.add(Iconc.rightOpen + " " + (ic == null || ic.isEmpty() ? "" : ic + " ") + other.name()).padLeft(10f).row();
+                }));
             }
 
             ItemSeq items = sector.items();
@@ -871,81 +866,75 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             if(sector.preset == null){
                 title.add().growX();
 
-                title.button(Icon.pencilSmall, Styles.clearPartiali, () -> {
-                   ui.showTextInput("@sectors.rename", "@name", 20, sector.name(), v -> {
-                       sector.setName(v);
-                       updateSelected();
-                       rebuildList();
-                   });
-                }).size(40f).padLeft(4);
+                title.button(Icon.pencilSmall, Styles.clearPartiali, () -> ui.showTextInput("@sectors.rename", "@name", 20, sector.name(), v -> {
+                    sector.setName(v);
+                    updateSelected();
+                    rebuildList();
+                })).size(40f).padLeft(4);
             }
 
             var icon = sector.info.contentIcon != null ?
                 new TextureRegionDrawable(sector.info.contentIcon.uiIcon) :
                 Icon.icons.get(sector.info.icon + "Small");
 
-            title.button(icon == null ? Icon.noneSmall : icon, Styles.clearPartiali, iconSmall, () -> {
-                new Dialog(""){{
-                    closeOnBack();
-                    setFillParent(true);
+            title.button(icon == null ? Icon.noneSmall : icon, Styles.clearPartiali, iconSmall, () -> new Dialog(""){{
+                closeOnBack();
+                setFillParent(true);
 
-                    Runnable refresh = () -> {
-                        sector.saveInfo();
-                        hide();
-                        updateSelected();
-                        rebuildList();
-                    };
+                Runnable refresh = () -> {
+                    sector.saveInfo();
+                    hide();
+                    updateSelected();
+                    rebuildList();
+                };
 
-                    cont.pane(t -> {
-                        resized(true, () -> {
-                            t.clearChildren();
-                            t.marginRight(19f);
-                            t.defaults().size(48f);
+                cont.pane(t -> resized(true, () -> {
+                    t.clearChildren();
+                    t.marginRight(19f);
+                    t.defaults().size(48f);
 
-                            t.button(Icon.none, Styles.clearTogglei, () -> {
-                                sector.info.icon = null;
-                                sector.info.contentIcon = null;
-                                refresh.run();
-                            }).checked(sector.info.icon == null && sector.info.contentIcon == null);
+                    t.button(Icon.none, Styles.clearTogglei, () -> {
+                        sector.info.icon = null;
+                        sector.info.contentIcon = null;
+                        refresh.run();
+                    }).checked(sector.info.icon == null && sector.info.contentIcon == null);
 
-                            int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
+                    int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
 
-                            int i = 1;
-                            for(var key : defaultIcons){
-                                var value = Icon.icons.get(key);
+                    int i = 1;
+                    for(var key : defaultIcons){
+                        var value = Icon.icons.get(key);
 
-                                t.button(value, Styles.clearTogglei, () -> {
-                                    sector.info.icon = key;
-                                    sector.info.contentIcon = null;
+                        t.button(value, Styles.clearTogglei, () -> {
+                            sector.info.icon = key;
+                            sector.info.contentIcon = null;
+                            refresh.run();
+                        }).checked(key.equals(sector.info.icon));
+
+                        if(++i % cols == 0) t.row();
+                    }
+
+                    for(ContentType ctype : defaultContentIcons){
+                        t.row();
+                        t.image().colspan(cols).growX().width(Float.NEGATIVE_INFINITY).height(3f).color(Pal.accent);
+                        t.row();
+
+                        i = 0;
+                        for(UnlockableContent u : content.getBy(ctype).<UnlockableContent>as()){
+                            if(!u.isHidden() && u.unlocked()){
+                                t.button(new TextureRegionDrawable(u.uiIcon), Styles.clearTogglei, iconMed, () -> {
+                                    sector.info.icon = null;
+                                    sector.info.contentIcon = u;
                                     refresh.run();
-                                }).checked(key.equals(sector.info.icon));
+                                }).checked(sector.info.contentIcon == u);
 
                                 if(++i % cols == 0) t.row();
                             }
-
-                            for(ContentType ctype : defaultContentIcons){
-                                t.row();
-                                t.image().colspan(cols).growX().width(Float.NEGATIVE_INFINITY).height(3f).color(Pal.accent);
-                                t.row();
-
-                                i = 0;
-                                for(UnlockableContent u : content.getBy(ctype).<UnlockableContent>as()){
-                                    if(!u.isHidden() && u.unlocked()){
-                                        t.button(new TextureRegionDrawable(u.uiIcon), Styles.clearTogglei, iconMed, () -> {
-                                            sector.info.icon = null;
-                                            sector.info.contentIcon = u;
-                                            refresh.run();
-                                        }).checked(sector.info.contentIcon == u);
-
-                                        if(++i % cols == 0) t.row();
-                                    }
-                                }
-                            }
-                        });
-                    });
-                    buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
-                }}.show();
-            }).size(40f).tooltip("@sector.changeicon");
+                        }
+                    }
+                }));
+                buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
+            }}.show()).size(40f).tooltip("@sector.changeicon");
         }).row();
 
         stable.image().color(Pal.accent).fillX().height(3f).pad(3f).row();

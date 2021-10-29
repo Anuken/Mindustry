@@ -18,7 +18,7 @@ public class WorldReloader{
         //don't begin twice
         if(began) return;
 
-        if(wasServer = net.server()){
+        if(wasServer == net.server()){
             players.clear();
 
             for(Player p : Groups.player){

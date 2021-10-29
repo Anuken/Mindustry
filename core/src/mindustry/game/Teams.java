@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 /** Class for various team-based utilities. */
 public class Teams{
     /** Maps team IDs to team data. */
-    private TeamData[] map = new TeamData[256];
+    private final TeamData[] map = new TeamData[256];
     /** Active teams. */
     public Seq<TeamData> active = new Seq<>();
     /** Teams with block or unit presence. */

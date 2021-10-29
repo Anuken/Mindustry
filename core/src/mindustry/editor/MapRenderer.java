@@ -17,8 +17,8 @@ import static mindustry.Vars.*;
 public class MapRenderer implements Disposable{
     private static final int chunkSize = 64;
     private IndexedRenderer[][] chunks;
-    private IntSet updates = new IntSet();
-    private IntSet delayedUpdates = new IntSet();
+    private final IntSet updates = new IntSet();
+    private final IntSet delayedUpdates = new IntSet();
     private TextureRegion clearEditor;
     private int width, height;
 
@@ -26,9 +26,9 @@ public class MapRenderer implements Disposable{
         updates.clear();
         delayedUpdates.clear();
         if(chunks != null){
-            for(int x = 0; x < chunks.length; x++){
-                for(int y = 0; y < chunks[0].length; y++){
-                    chunks[x][y].dispose();
+            for (IndexedRenderer[] chunk : chunks) {
+                for (int y = 0; y < chunks[0].length; y++) {
+                    chunk[y].dispose();
                 }
             }
         }
@@ -62,11 +62,11 @@ public class MapRenderer implements Disposable{
 
         var texture = Core.atlas.find("clear-editor").texture;
 
-        for(int x = 0; x < chunks.length; x++){
-            for(int y = 0; y < chunks[0].length; y++){
-                IndexedRenderer mesh = chunks[x][y];
+        for (IndexedRenderer[] chunk : chunks) {
+            for (int y = 0; y < chunks[0].length; y++) {
+                IndexedRenderer mesh = chunk[y];
 
-                if(mesh == null){
+                if (mesh == null) {
                     continue;
                 }
 
@@ -122,7 +122,7 @@ public class MapRenderer implements Disposable{
             mesh.draw(idxWall, region, wx * tilesize, wy * tilesize, 8, 8);
         }
 
-        float offsetX = -(wall.size / 3) * tilesize, offsetY = -(wall.size / 3) * tilesize;
+        float offsetX = -(wall.size / 3f) * tilesize, offsetY = -(wall.size / 3f) * tilesize;
 
         if((wall.update || wall.destructible) && center){
             mesh.setColor(team.color);
@@ -163,10 +163,10 @@ public class MapRenderer implements Disposable{
         if(chunks == null){
             return;
         }
-        for(int x = 0; x < chunks.length; x++){
-            for(int y = 0; y < chunks[0].length; y++){
-                if(chunks[x][y] != null){
-                    chunks[x][y].dispose();
+        for (IndexedRenderer[] chunk : chunks) {
+            for (int y = 0; y < chunks[0].length; y++) {
+                if (chunk[y] != null) {
+                    chunk[y].dispose();
                 }
             }
         }

@@ -85,7 +85,7 @@ public class ItemTurret extends Turret{
         public void onProximityAdded(){
             super.onProximityAdded();
 
-            //add first ammo item to cheaty blocks so they can shoot properly
+            //add first ammo item to cheaty blocks, so they can shoot properly
             if(cheating() && ammo.size > 0){
                 handleItem(this, ammoTypes.entries().next().key);
             }
@@ -122,7 +122,7 @@ public class ItemTurret extends Turret{
             }
         }
 
-        //currently can't remove items from turrets.
+        //currently, can't remove items from turrets.
         @Override
         public int removeStack(Item item, int amount){
             return 0;

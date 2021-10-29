@@ -5,7 +5,7 @@ import arc.struct.*;
 import arc.util.*;
 
 public class MultiReqImage extends Stack{
-    private Seq<ReqImage> displays = new Seq<>();
+    private final Seq<ReqImage> displays = new Seq<>();
     private float time;
 
     public void add(ReqImage display){

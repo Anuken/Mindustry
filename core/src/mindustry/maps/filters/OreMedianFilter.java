@@ -12,7 +12,7 @@ public class OreMedianFilter extends GenerateFilter{
     public float radius = 2;
     public float percentile = 0.5f;
 
-    private IntSeq blocks = new IntSeq();
+    private final IntSeq blocks = new IntSeq();
 
     @Override
     public FilterOption[] options(){

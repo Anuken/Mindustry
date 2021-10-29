@@ -137,9 +137,7 @@ public class Logic implements ApplicationListener{
         Events.on(TurnEvent.class, e -> {
             if(net.server() && state.isCampaign()){
                 int[] out = new int[content.items().size];
-                state.getSector().info.production.each((item, stat) -> {
-                    out[item.id] = Math.max(0, (int)(stat.mean * turnDuration / 60));
-                });
+                state.getSector().info.production.each((item, stat) -> out[item.id] = Math.max(0, (int)(stat.mean * turnDuration / 60)));
 
                 Call.sectorProduced(out);
             }

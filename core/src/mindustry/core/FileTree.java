@@ -12,7 +12,7 @@ import mindustry.*;
 
 /** Handles files in a modded context. */
 public class FileTree implements FileHandleResolver{
-    private ObjectMap<String, Fi> files = new ObjectMap<>();
+    private final ObjectMap<String, Fi> files = new ObjectMap<>();
 
     public void addFile(String path, Fi f){
         files.put(path, f);

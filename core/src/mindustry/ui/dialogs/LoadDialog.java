@@ -114,23 +114,17 @@ public class LoadDialog extends BaseDialog{
                     t.right();
                     t.defaults().size(40f);
 
-                    t.button(Icon.save, Styles.emptytogglei, () -> {
-                        slot.setAutosave(!slot.isAutosave());
-                    }).checked(slot.isAutosave()).right();
+                    t.button(Icon.save, Styles.emptytogglei, () -> slot.setAutosave(!slot.isAutosave())).checked(slot.isAutosave()).right();
 
-                    t.button(Icon.trash, Styles.emptyi, () -> {
-                        ui.showConfirm("@confirm", "@save.delete.confirm", () -> {
-                            slot.delete();
-                            rebuild();
-                        });
-                    }).right();
+                    t.button(Icon.trash, Styles.emptyi, () -> ui.showConfirm("@confirm", "@save.delete.confirm", () -> {
+                        slot.delete();
+                        rebuild();
+                    })).right();
 
-                    t.button(Icon.pencil, Styles.emptyi, () -> {
-                        ui.showTextInput("@save.rename", "@save.rename.text", slot.getName(), text -> {
-                            slot.setName(text);
-                            rebuild();
-                        });
-                    }).right();
+                    t.button(Icon.pencil, Styles.emptyi, () -> ui.showTextInput("@save.rename", "@save.rename.text", slot.getName(), text -> {
+                        slot.setName(text);
+                        rebuild();
+                    })).right();
 
                     t.button(Icon.export, Styles.emptyi, () -> platform.export("save-" + slot.getName(), saveExtension, slot::exportFile)).right();
 
@@ -186,41 +180,37 @@ public class LoadDialog extends BaseDialog{
 
     public void addSetup(){
 
-        buttons.button("@save.import", Icon.add, () -> {
-            platform.showFileChooser(true, saveExtension, file -> {
-                if(SaveIO.isSaveValid(file)){
-                    try{
-                        control.saves.importSave(file);
-                        rebuild();
-                    }catch(IOException e){
-                        e.printStackTrace();
-                        ui.showException("@save.import.fail", e);
-                    }
-                }else{
-                    ui.showErrorMessage("@save.import.invalid");
+        buttons.button("@save.import", Icon.add, () -> platform.showFileChooser(true, saveExtension, file -> {
+            if(SaveIO.isSaveValid(file)){
+                try{
+                    control.saves.importSave(file);
+                    rebuild();
+                }catch(IOException e){
+                    e.printStackTrace();
+                    ui.showException("@save.import.fail", e);
                 }
-            });
-        }).fillX().margin(10f);
+            }else{
+                ui.showErrorMessage("@save.import.invalid");
+            }
+        })).fillX().margin(10f);
     }
 
     public void runLoadSave(SaveSlot slot){
-        slot.cautiousLoad(() -> {
-            ui.loadAnd(() -> {
-                hide();
-                ui.paused.hide();
-                try{
-                    net.reset();
-                    slot.load();
-                    state.rules.editor = false;
-                    state.rules.sector = null;
-                    state.set(State.playing);
-                }catch(SaveException e){
-                    Log.err(e);
-                    logic.reset();
-                    ui.showErrorMessage("@save.corrupted");
-                }
-            });
-        });
+        slot.cautiousLoad(() -> ui.loadAnd(() -> {
+            hide();
+            ui.paused.hide();
+            try{
+                net.reset();
+                slot.load();
+                state.rules.editor = false;
+                state.rules.sector = null;
+                state.set(State.playing);
+            }catch(SaveException e){
+                Log.err(e);
+                logic.reset();
+                ui.showErrorMessage("@save.corrupted");
+            }
+        }));
     }
 
     public void modifyButton(TextButton button, SaveSlot slot){

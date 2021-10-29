@@ -6,6 +6,8 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.logic.LExecutor.*;
 
+import java.util.Objects;
+
 /** "Compiles" a sequence of statements into instructions. */
 public class LAssembler{
     public static ObjectMap<String, Func<String[], LStatement>> customParsers = new ObjectMap<>();
@@ -37,7 +39,7 @@ public class LAssembler{
 
         Seq<LStatement> st = read(data);
 
-        asm.instructions = st.map(l -> l.build(asm)).filter(l -> l != null).toArray(LInstruction.class);
+        asm.instructions = st.map(l -> l.build(asm)).filter(Objects::nonNull).toArray(LInstruction.class);
         return asm;
     }
 

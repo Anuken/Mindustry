@@ -38,7 +38,7 @@ public class NetClient implements ApplicationListener{
     private static final Reads dataReads = new Reads(null);
 
     private long ping;
-    private Interval timer = new Interval(5);
+    private final Interval timer = new Interval(5);
     /** Whether the client is currently connecting. */
     private boolean connecting = false;
     /** If true, no message will be shown on disconnect. */
@@ -51,12 +51,12 @@ public class NetClient implements ApplicationListener{
     private int lastSent;
 
     /** List of entities that were removed, and need not be added while syncing. */
-    private IntSet removed = new IntSet();
+    private final IntSet removed = new IntSet();
     /** Byte stream for reading in snapshots. */
-    private ReusableByteInStream byteStream = new ReusableByteInStream();
-    private DataInputStream dataStream = new DataInputStream(byteStream);
+    private final ReusableByteInStream byteStream = new ReusableByteInStream();
+    private final DataInputStream dataStream = new DataInputStream(byteStream);
     /** Packet handlers for custom types of messages. */
-    private ObjectMap<String, Seq<Cons<String>>> customPacketHandlers = new ObjectMap<>();
+    private final ObjectMap<String, Seq<Cons<String>>> customPacketHandlers = new ObjectMap<>();
 
     public NetClient(){
 

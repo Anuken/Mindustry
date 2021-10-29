@@ -33,7 +33,7 @@ public class BlockIndexer{
     /** Stores all damaged tile entities by team. */
     private Seq<Building>[] damagedTiles = new Seq[Team.all.length];
     /** All ores available on this map. */
-    private ObjectSet<Item> allOres = new ObjectSet<>();
+    private final ObjectSet<Item> allOres = new ObjectSet<>();
     /** Stores teams that are present here as tiles. */
     private Seq<Team> activeTeams = new Seq<>(Team.class);
     /** Maps teams to a map of flagged tiles by flag. */
@@ -42,9 +42,9 @@ public class BlockIndexer{
     private boolean[] blocksPresent;
 
     /** Array used for returning and reusing. */
-    private Seq<Tile> returnArray = new Seq<>();
+    private final Seq<Tile> returnArray = new Seq<>();
     /** Array used for returning and reusing. */
-    private Seq<Building> breturnArray = new Seq<>(Building.class);
+    private final Seq<Building> breturnArray = new Seq<>(Building.class);
 
     public BlockIndexer(){
         clearFlags();
@@ -324,7 +324,7 @@ public class BlockIndexer{
             if(target == null ||
             //if its closer and is at least equal priority
             (dist < targetDist && candidate.block.priority.ordinal() >= target.block.priority.ordinal()) ||
-            // block has higher priority (so range doesnt matter)
+            // block has higher priority (so range doesn't matter)
             (candidate.block.priority.ordinal() > target.block.priority.ordinal())){
                 target = candidate;
                 targetDist = dist;

@@ -37,9 +37,9 @@ public class SettingsMenuDialog extends BaseDialog{
     public SettingsTable sound;
     public SettingsTable main;
 
-    private Table prefs;
-    private Table menu;
-    private BaseDialog dataDialog;
+    private final Table prefs;
+    private final Table menu;
+    private final BaseDialog dataDialog;
     private boolean wasPaused;
 
     public SettingsMenuDialog(){
@@ -106,50 +106,42 @@ public class SettingsMenuDialog extends BaseDialog{
 
             t.row();
 
-            t.button("@settings.clearsaves", Icon.trash, style, () -> {
-                ui.showConfirm("@confirm", "@settings.clearsaves.confirm", () -> {
-                    control.saves.deleteAll();
-                });
-            }).marginLeft(4);
+            t.button("@settings.clearsaves", Icon.trash, style, () -> ui.showConfirm("@confirm", "@settings.clearsaves.confirm", () -> control.saves.deleteAll())).marginLeft(4);
 
             t.row();
 
-            t.button("@settings.clearresearch", Icon.trash, style, () -> {
-                ui.showConfirm("@confirm", "@settings.clearresearch.confirm", () -> {
-                    universe.clearLoadoutInfo();
-                    for(TechNode node : TechTree.all){
-                        node.reset();
+            t.button("@settings.clearresearch", Icon.trash, style, () -> ui.showConfirm("@confirm", "@settings.clearresearch.confirm", () -> {
+                universe.clearLoadoutInfo();
+                for(TechNode node : TechTree.all){
+                    node.reset();
+                }
+                content.each(c -> {
+                    if(c instanceof UnlockableContent u){
+                        u.clearUnlock();
                     }
-                    content.each(c -> {
-                        if(c instanceof UnlockableContent u){
-                            u.clearUnlock();
-                        }
-                    });
-                    settings.remove("unlocks");
                 });
-            }).marginLeft(4);
+                settings.remove("unlocks");
+            })).marginLeft(4);
 
             t.row();
 
-            t.button("@settings.clearcampaignsaves", Icon.trash, style, () -> {
-                ui.showConfirm("@confirm", "@settings.clearcampaignsaves.confirm", () -> {
-                    for(var planet : content.planets()){
-                        for(var sec : planet.sectors){
-                            sec.clearInfo();
-                            if(sec.save != null){
-                                sec.save.delete();
-                                sec.save = null;
-                            }
+            t.button("@settings.clearcampaignsaves", Icon.trash, style, () -> ui.showConfirm("@confirm", "@settings.clearcampaignsaves.confirm", () -> {
+                for(var planet : content.planets()){
+                    for(var sec : planet.sectors){
+                        sec.clearInfo();
+                        if(sec.save != null){
+                            sec.save.delete();
+                            sec.save = null;
                         }
                     }
+                }
 
-                    for(var slot : control.saves.getSaveSlots().copy()){
-                        if(slot.isSector()){
-                            slot.delete();
-                        }
+                for(var slot : control.saves.getSaveSlots().copy()){
+                    if(slot.isSector()){
+                        slot.delete();
                     }
-                });
-            }).marginLeft(4);
+                }
+            })).marginLeft(4);
 
             t.row();
 
@@ -264,7 +256,7 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         menu.row();
-        menu.button("@settings.data", style, () -> dataDialog.show());
+        menu.button("@settings.data", style, dataDialog::show);
     }
 
     void addSettings(){
@@ -327,9 +319,7 @@ public class SettingsMenuDialog extends BaseDialog{
             });
 
             if(!Version.modifier.contains("beta")){
-                game.checkPref("publichost", false, i -> {
-                    platform.updateLobby();
-                });
+                game.checkPref("publichost", false, i -> platform.updateLobby());
             }
         }
 

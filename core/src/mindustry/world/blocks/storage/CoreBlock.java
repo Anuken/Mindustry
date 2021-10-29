@@ -11,6 +11,7 @@ import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.ctype.UnlockableContent;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -96,7 +97,7 @@ public class CoreBlock extends StorageBlock{
         bars.add("capacity", (CoreBuild e) -> new Bar(
             () -> Core.bundle.format("bar.capacity", UI.formatAmount(e.storageCapacity)),
             () -> Pal.items,
-            () -> e.items.total() / ((float)e.storageCapacity * content.items().count(i -> i.unlockedNow()))
+            () -> e.items.total() / ((float)e.storageCapacity * content.items().count(UnlockableContent::unlockedNow))
         ));
     }
 
@@ -348,7 +349,7 @@ public class CoreBlock extends StorageBlock{
             state.teams.registerCore(this);
 
             storageCapacity = itemCapacity + proximity().sum(e -> owns(e) ? e.block.itemCapacity : 0);
-            proximity.each(e -> owns(e), t -> {
+            proximity.each(this::owns, t -> {
                 t.items = items;
                 ((StorageBuild)t).linkedCore = this;
             });

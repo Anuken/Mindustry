@@ -30,7 +30,7 @@ public class ContentLoader{
     private @Nullable LoadedMod currentMod;
     private @Nullable Content lastAdded;
     private ObjectSet<Cons<Content>> initialization = new ObjectSet<>();
-    private ContentList[] content = {
+    private final ContentList[] content = {
         new Items(),
         new StatusEffects(),
         new Liquids(),

@@ -22,14 +22,14 @@ public class MenuRenderer implements Disposable{
     private final int width = !mobile ? 100 : 60, height = !mobile ? 50 : 40;
 
     private int cacheFloor, cacheWall;
-    private Camera camera = new Camera();
-    private Mat mat = new Mat();
+    private final Camera camera = new Camera();
+    private final Mat mat = new Mat();
     private FrameBuffer shadows;
     private CacheBatch batch;
     private float time = 0f;
-    private float flyerRot = 45f;
-    private int flyers = Mathf.chance(0.2) ? Mathf.random(35) : Mathf.random(15);
-    private UnitType flyerType = content.units().select(u -> !u.isHidden() && u.hitSize <= 20f && u.flying && u.onTitleScreen && u.region.found()).random();
+    private final float flyerRot = 45f;
+    private final int flyers = Mathf.chance(0.2) ? Mathf.random(35) : Mathf.random(15);
+    private final UnitType flyerType = content.units().select(u -> !u.isHidden() && u.hitSize <= 20f && u.flying && u.onTitleScreen && u.region.found()).random();
 
     public MenuRenderer(){
         Time.mark();
@@ -44,7 +44,7 @@ public class MenuRenderer implements Disposable{
         Seq<Block> ores = content.blocks().select(b -> b instanceof OreBlock && !(b instanceof WallOreBlock));
         shadows = new FrameBuffer(width, height);
         int offset = Mathf.random(100000);
-        int s1 = offset, s2 = offset + 1, s3 = offset + 2;
+        int s2 = offset + 1, s3 = offset + 2;
         Block[] selected = Structs.select(
             new Block[]{Blocks.sand, Blocks.sandWall},
             new Block[]{Blocks.shale, Blocks.shaleWall},
@@ -83,7 +83,7 @@ public class MenuRenderer implements Disposable{
                 Block ore = Blocks.air;
                 Block wall = Blocks.air;
 
-                if(Simplex.noise2d(s1, 3, 0.5, 1/20.0, x, y) > 0.5){
+                if(Simplex.noise2d(offset, 3, 0.5, 1/20.0, x, y) > 0.5){
                     wall = walld;
                 }
 
@@ -124,9 +124,9 @@ public class MenuRenderer implements Disposable{
                 if(tech){
                     int mx = x % secSize, my = y % secSize;
                     int sclx = x / secSize, scly = y / secSize;
-                    if(Simplex.noise2d(s1, 2, 1f / 10f, 0.5f, sclx, scly) > 0.4f && (mx == 0 || my == 0 || mx == secSize - 1 || my == secSize - 1)){
+                    if(Simplex.noise2d(offset, 2, 1f / 10f, 0.5f, sclx, scly) > 0.4f && (mx == 0 || my == 0 || mx == secSize - 1 || my == secSize - 1)){
                         floor = Blocks.darkPanel3;
-                        if(Mathf.dst(mx, my, secSize/2, secSize/2) > secSize/2f + 1){
+                        if(Mathf.dst(mx, my, secSize / 2f, secSize / 2f) > secSize/2f + 1){
                             floor = Blocks.darkPanel4;
                         }
 
@@ -239,13 +239,9 @@ public class MenuRenderer implements Disposable{
 
         float size = Math.max(icon.width, icon.height) * Draw.scl * 1.6f;
 
-        flyers((x, y) -> {
-            Draw.rect(icon, x - 12f, y - 13f, flyerRot - 90);
-        });
+        flyers((x, y) -> Draw.rect(icon, x - 12f, y - 13f, flyerRot - 90));
 
-        flyers((x, y) -> {
-            Draw.rect("circle-shadow", x, y, size, size);
-        });
+        flyers((x, y) -> Draw.rect("circle-shadow", x, y, size, size));
         Draw.color();
 
         flyers((x, y) -> {

@@ -55,7 +55,7 @@ public class Renderer implements ApplicationListener{
 
     private @Nullable CoreBuild landCore;
     private @Nullable CoreBlock launchCoreType;
-    private Color clearColor = new Color(0f, 0f, 0f, 1f);
+    private final Color clearColor = new Color(0f, 0f, 0f, 1f);
     private float
     //seed for cloud visuals, 0-1
     cloudSeed = 0f,
@@ -75,7 +75,7 @@ public class Renderer implements ApplicationListener{
     shakeTime;
     //for landTime > 0: if true, core is currently *launching*, otherwise landing.
     private boolean launching;
-    private Vec2 camShakeOffset = new Vec2();
+    private final Vec2 camShakeOffset = new Vec2();
 
     public Renderer(){
         camera = new Camera();
@@ -103,9 +103,7 @@ public class Renderer implements ApplicationListener{
             setupBloom();
         }
 
-        Events.run(Trigger.newGame, () -> {
-            landCore = player.bestCore();
-        });
+        Events.run(Trigger.newGame, () -> landCore = player.bestCore());
 
         EnvRenderers.init();
         for(int i = 0; i < bubbles.length; i++) bubbles[i] = atlas.find("bubble-" + i);
@@ -544,11 +542,10 @@ public class Renderer implements ApplicationListener{
                     Tmp.v1.rotate(-90f);
                     Draw.alpha((rotation % 90f) / 90f * alpha);
                     rot -= 90f;
-                    Draw.rect(reg, x + Tmp.v1.x, y + Tmp.v1.y, rot);
                 }else{
                     Draw.alpha(alpha);
-                    Draw.rect(reg, x + Tmp.v1.x, y + Tmp.v1.y, rot);
                 }
+                Draw.rect(reg, x + Tmp.v1.x, y + Tmp.v1.y, rot);
             }
         }
         Draw.alpha(1f);

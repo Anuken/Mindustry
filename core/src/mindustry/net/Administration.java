@@ -31,7 +31,7 @@ public class Administration{
 
         //anti-spam
         addChatFilter((player, message) -> {
-            long resetTime = Config.messageRateLimit.num() * 1000;
+            long resetTime = Config.messageRateLimit.num() * 1000L;
             if(Config.antiSpam.bool() && !player.isLocal() && !player.admin){
                 //prevent people from spamming messages quickly
                 if(resetTime > 0 && Time.timeSinceMillis(player.getInfo().lastMessageTime) < resetTime){
@@ -67,7 +67,7 @@ public class Administration{
                 Config.antiSpam.bool()){
 
                 Ratekeeper rate = action.player.getInfo().rate;
-                if(rate.allow(Config.interactRateWindow.num() * 1000, Config.interactRateLimit.num())){
+                if(rate.allow(Config.interactRateWindow.num() * 1000L, Config.interactRateLimit.num())){
                     return true;
                 }else{
                     if(rate.occurences > Config.interactRateKick.num()){

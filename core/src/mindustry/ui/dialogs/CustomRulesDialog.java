@@ -28,7 +28,7 @@ public class CustomRulesDialog extends BaseDialog{
     Rules rules;
     private Table main;
     private Prov<Rules> resetter;
-    private LoadoutDialog loadoutDialog;
+    private final LoadoutDialog loadoutDialog;
 
     public CustomRulesDialog(){
         super("@mode.custom");
@@ -192,11 +192,9 @@ public class CustomRulesDialog extends BaseDialog{
 
         main.button(b -> {
             b.left();
-            b.table(Tex.pane, in -> {
-                in.stack(new Image(Tex.alphaBg), new Image(Tex.whiteui){{
-                    update(() -> setColor(rules.ambientLight));
-                }}).grow();
-            }).margin(4).size(50f).padRight(10);
+            b.table(Tex.pane, in -> in.stack(new Image(Tex.alphaBg), new Image(Tex.whiteui){{
+                update(() -> setColor(rules.ambientLight));
+            }}).grow()).margin(4).size(50f).padRight(10);
             b.add("@rules.ambientlight");
         }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f).row();
 
@@ -211,9 +209,7 @@ public class CustomRulesDialog extends BaseDialog{
             boolean[] shown = {false};
             Table wasMain = main;
 
-            main.button("[#" + team.color +  "]" + team.localized() + (team.emoji.isEmpty() ? "" : "[] " + team.emoji), Icon.downOpen, Styles.togglet, () -> {
-                shown[0] = !shown[0];
-            }).marginLeft(14f).width(260f).height(55f).checked(a -> shown[0]).row();
+            main.button("[#" + team.color +  "]" + team.localized() + (team.emoji.isEmpty() ? "" : "[] " + team.emoji), Icon.downOpen, Styles.togglet, () -> shown[0] = !shown[0]).marginLeft(14f).width(260f).height(55f).checked(a -> shown[0]).row();
 
             main.collapser(t -> {
                 t.left().defaults().fillX().left().pad(5);
@@ -243,9 +239,7 @@ public class CustomRulesDialog extends BaseDialog{
             t.add(text).left().padRight(5);
 
             for(Team team : Team.baseTeams){
-                t.button(Tex.whiteui, Styles.clearTogglei, 38f, () -> {
-                    cons.get(team);
-                }).pad(1f).checked(b -> prov.get() == team).size(60f).tooltip(team.localized()).with(i -> i.getStyle().imageUpColor = team.color);
+                t.button(Tex.whiteui, Styles.clearTogglei, 38f, () -> cons.get(team)).pad(1f).checked(b -> prov.get() == team).size(60f).tooltip(team.localized()).with(i -> i.getStyle().imageUpColor = team.color);
             }
         }).padTop(0).row();
     }

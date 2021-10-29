@@ -16,10 +16,10 @@ import static mindustry.Vars.*;
 public class LightRenderer{
     private static final int scaling = 4;
 
-    private float[] vertices = new float[24];
-    private FrameBuffer buffer = new FrameBuffer();
-    private Seq<Runnable> lights = new Seq<>();
-    private Seq<CircleLight> circles = new Seq<>(CircleLight.class);
+    private final float[] vertices = new float[24];
+    private final FrameBuffer buffer = new FrameBuffer();
+    private final Seq<Runnable> lights = new Seq<>();
+    private final Seq<CircleLight> circles = new Seq<>(CircleLight.class);
     private int circleIndex = 0;
     private TextureRegion circleRegion;
 

@@ -69,12 +69,10 @@ public class MapGenerateDialog extends BaseDialog{
         buttons.button("@back", Icon.left, this::hide);
 
         if(applied){
-            buttons.button("@editor.apply", Icon.ok, () -> {
-                ui.loadAnd(() -> {
-                    apply();
-                    hide();
-                });
-            });
+            buttons.button("@editor.apply", Icon.ok, () -> ui.loadAnd(() -> {
+                apply();
+                hide();
+            }));
         }
 
         buttons.button("@editor.randomize", Icon.refresh, () -> {

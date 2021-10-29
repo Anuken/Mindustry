@@ -35,12 +35,12 @@ public class IndexedRenderer implements Disposable{
     """
     );
     private Mesh mesh;
-    private float[] tmpVerts = new float[vsize * 6];
+    private final float[] tmpVerts = new float[vsize * 6];
     private float[] vertices;
 
     private Mat projMatrix = new Mat();
-    private Mat transMatrix = new Mat();
-    private Mat combined = new Mat();
+    private final Mat transMatrix = new Mat();
+    private final Mat combined = new Mat();
     private float color = Color.white.toFloatBits();
 
     public IndexedRenderer(int sprites){

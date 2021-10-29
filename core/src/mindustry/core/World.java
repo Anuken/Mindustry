@@ -33,7 +33,7 @@ public class World{
     public Tiles tiles = new Tiles(0, 0);
 
     private boolean generating, invalidMap;
-    private ObjectMap<Map, Runnable> customMapLoaders = new ObjectMap<>();
+    private final ObjectMap<Map, Runnable> customMapLoaders = new ObjectMap<>();
 
     public World(){
 
@@ -494,7 +494,7 @@ public class World{
             int circleBlend = 14;
             //quantized angle
             float offset = state.getSector().rect.rotation + 90;
-            float angle = Angles.angle(x, y, tiles.width/2, tiles.height/2) + offset;
+            float angle = Angles.angle(x, y, tiles.width / 2f, tiles.height / 2f) + offset;
             //polygon sides, depends on sector
             int sides = state.getSector().tile.corners.length;
             float step = 360f / sides;
@@ -503,7 +503,7 @@ public class World{
             float next = prev + step;
             //raw line length to be translated
             float length = state.getSector().getSize()/2f;
-            float rawDst = Intersector.distanceLinePoint(Tmp.v1.trns(prev, length), Tmp.v2.trns(next, length), Tmp.v3.set(x - tiles.width/2, y - tiles.height/2).rotate(offset)) / Mathf.sqrt3 - 1;
+            float rawDst = Intersector.distanceLinePoint(Tmp.v1.trns(prev, length), Tmp.v2.trns(next, length), Tmp.v3.set(x - tiles.width / 2f, y - tiles.height / 2f).rotate(offset)) / Mathf.sqrt3 - 1;
 
             //noise
             rawDst += Noise.noise(x, y, 11f, 7f) + Noise.noise(x, y, 22f, 15f);

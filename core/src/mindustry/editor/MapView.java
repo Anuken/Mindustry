@@ -23,10 +23,10 @@ public class MapView extends Element implements GestureListener{
     private float offsetx, offsety;
     private float zoom = 1f;
     private boolean grid = false;
-    private GridImage image = new GridImage(0, 0);
-    private Vec2 vec = new Vec2();
-    private Rect rect = new Rect();
-    private Vec2[][] brushPolygons = new Vec2[MapEditor.brushSizes.length][0];
+    private final GridImage image = new GridImage(0, 0);
+    private final Vec2 vec = new Vec2();
+    private final Rect rect = new Rect();
+    private final Vec2[][] brushPolygons = new Vec2[MapEditor.brushSizes.length][0];
 
     boolean drawing;
     int lastx, lasty;

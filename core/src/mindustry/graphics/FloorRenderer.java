@@ -41,19 +41,19 @@ public class FloorRenderer{
     //if true, chunks are rendered on-demand; this causes small lag spikes and is generally not needed for most maps
     private static final boolean dynamic = false;
 
-    private float[] vertices = new float[maxSprites * vertexSize * 4];
-    private short[] indices = new short[maxSprites * 6];
+    private final float[] vertices = new float[maxSprites * vertexSize * 4];
+    private final short[] indices = new short[maxSprites * 6];
     private int vidx;
-    private FloorRenderBatch batch = new FloorRenderBatch();
-    private Shader shader;
+    private final FloorRenderBatch batch = new FloorRenderBatch();
+    private final Shader shader;
     private Texture texture;
     private TextureRegion error;
 
     private Mesh[][][] cache;
-    private IntSet drawnLayerSet = new IntSet();
-    private IntSet recacheSet = new IntSet();
-    private IntSeq drawnLayers = new IntSeq();
-    private ObjectSet<CacheLayer> used = new ObjectSet<>();
+    private final IntSet drawnLayerSet = new IntSet();
+    private final IntSet recacheSet = new IntSet();
+    private final IntSeq drawnLayers = new IntSeq();
+    private final ObjectSet<CacheLayer> used = new ObjectSet<>();
 
     public FloorRenderer(){
         short j = 0;

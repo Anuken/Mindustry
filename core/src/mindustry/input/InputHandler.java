@@ -1240,7 +1240,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void drawArrow(Block block, int x, int y, int rotation, boolean valid){
-        float trns = (block.size / 2) * tilesize;
+        float trns = (block.size / 2f) * tilesize;
         int dx = Geometry.d4(rotation).x, dy = Geometry.d4(rotation).y;
 
         Draw.color(!valid ? Pal.removeBack : Pal.accentBack);

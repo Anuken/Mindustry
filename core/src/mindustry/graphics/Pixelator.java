@@ -12,7 +12,7 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class Pixelator implements Disposable{
-    private FrameBuffer buffer = new FrameBuffer();
+    private final FrameBuffer buffer = new FrameBuffer();
     private float px, py, pre;
 
     {

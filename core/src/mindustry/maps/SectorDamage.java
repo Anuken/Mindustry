@@ -40,7 +40,7 @@ public class SectorDamage{
         return (int)getDamage(info, maxRetWave, true);
     }
 
-    /** @return calculated capture progress of the enemy if retWave if false, otherwise return the maximum waves survived as int.
+    /** @return calculated capture progress of the enemy if retWave is false, otherwise return the maximum waves survived as int.
      * if it survives all the waves, returns maxRetWave. */
     public static float getDamage(SectorInfo info, int wavesPassed, boolean retWave){
         float health = info.sumHealth;
@@ -167,7 +167,7 @@ public class SectorDamage{
             }
         }
 
-        //finally apply scaled damage
+        //finally, apply scaled damage
         apply(scaled);
     }
 

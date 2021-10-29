@@ -58,14 +58,14 @@ public class Vars implements Loadable{
     /** IO buffer size. */
     public static final int bufferSize = 8192;
     /** global charset, since Android doesn't support the Charsets class */
-    public static final Charset charset = Charset.forName("UTF-8");
+    public static final Charset charset = StandardCharsets.UTF_8;
     /** main application name, capitalized */
     public static final String appName = "Mindustry";
     /** Github API URL. */
     public static final String ghApi = "https://api.github.com";
     /** URL for discord invite. */
     public static final String discordURL = "https://discord.gg/mindustry";
-    /** URL for sending crash reports to. Currently offline. */
+    /** URL for sending crash reports to. Currently, offline. */
     public static final String crashReportURL = "http://192.99.169.18/report";
     /** URL the links to the wiki's modding guide.*/
     public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/1-modding/";
@@ -74,7 +74,7 @@ public class Vars implements Loadable{
     /** URL to the JSON file containing all the stable servers.  */
     //TODO merge with v6 list upon release
     public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_v7.json";
-    /** URL of the github issue report template.*/
+    /** URL of the GitHub issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
     public static final Seq<ServerGroup> defaultServers = Seq.with();
@@ -313,9 +313,7 @@ public class Vars implements Loadable{
 
         modDirectory.mkdirs();
 
-        Events.on(ContentInitEvent.class, e -> {
-            emptyTile = new Tile(Short.MAX_VALUE - 20, Short.MAX_VALUE - 20);
-        });
+        Events.on(ContentInitEvent.class, e -> emptyTile = new Tile(Short.MAX_VALUE - 20, Short.MAX_VALUE - 20));
 
         mods.load();
         maps.load();

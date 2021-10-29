@@ -37,7 +37,7 @@ public class HudFragment extends Fragment{
     public boolean shown = true;
 
     private ImageButton flip;
-    private CoreItemsDisplay coreItems = new CoreItemsDisplay();
+    private final CoreItemsDisplay coreItems = new CoreItemsDisplay();
 
     private String hudText = "";
     private boolean showHudText;
@@ -70,17 +70,11 @@ public class HudFragment extends Fragment{
             }
         });
 
-        Events.on(SectorCaptureEvent.class, e -> {
-            showToast(Core.bundle.format("sector.captured", e.sector.isBeingPlayed() ? "" : e.sector.name() + " "));
-        });
+        Events.on(SectorCaptureEvent.class, e -> showToast(Core.bundle.format("sector.captured", e.sector.isBeingPlayed() ? "" : e.sector.name() + " ")));
 
-        Events.on(SectorLoseEvent.class, e -> {
-            showToast(Icon.warning, Core.bundle.format("sector.lost", e.sector.name()));
-        });
+        Events.on(SectorLoseEvent.class, e -> showToast(Icon.warning, Core.bundle.format("sector.lost", e.sector.name())));
 
-        Events.on(SectorInvasionEvent.class, e -> {
-            showToast(Icon.warning, Core.bundle.format("sector.attacked", e.sector.name()));
-        });
+        Events.on(SectorInvasionEvent.class, e -> showToast(Icon.warning, Core.bundle.format("sector.attacked", e.sector.name())));
 
         Events.on(ResetEvent.class, e -> {
             coreItems.resetUsed();
@@ -180,9 +174,7 @@ public class HudFragment extends Fragment{
 
             cont.update(() -> {
                 if(Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.shown() && !Core.scene.hasDialog() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
-                    Core.settings.getBoolOnce("ui-hidden", () -> {
-                        ui.announce(Core.bundle.format("showui",  Core.keybinds.get(Binding.toggle_menus).key.toString(), 11));
-                    });
+                    Core.settings.getBoolOnce("ui-hidden", () -> ui.announce(Core.bundle.format("showui",  Core.keybinds.get(Binding.toggle_menus).key.toString(), 11)));
                     toggleMenus();
                 }
             });
@@ -723,9 +715,7 @@ public class HudFragment extends Fragment{
 
             t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
             t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
-            t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> {
-                b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type.ammoType.color() : Pal.health);
-            });
+            t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type.ammoType.color() : Pal.health));
 
             t.getChildren().get(1).toFront();
         })).size(120f, 80).padRight(4);

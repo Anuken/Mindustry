@@ -54,7 +54,7 @@ public class ResearchDialog extends BaseDialog{
 
             items = new ItemSeq(){
                 //store sector item amounts for modifications
-                ObjectMap<Sector, ItemSeq> cache = new ObjectMap<>();
+                final ObjectMap<Sector, ItemSeq> cache = new ObjectMap<>();
 
                 {
                     //add global counts of each sector
@@ -276,11 +276,9 @@ public class ResearchDialog extends BaseDialog{
             this.parent = parent;
             this.width = this.height = nodeSize;
             nodes.add(this);
-            if(node.children != null){
-                children = new TechTreeNode[node.children.size];
-                for(int i = 0; i < children.length; i++){
-                    children[i] = new TechTreeNode(node.children.get(i), this);
-                }
+            children = new TechTreeNode[node.children.size];
+            for(int i = 0; i < children.length; i++){
+                children[i] = new TechTreeNode(node.children.get(i), this);
             }
         }
     }
@@ -381,7 +379,7 @@ public class ResearchDialog extends BaseDialog{
 
             if(node.requirements.length == 0) return true;
 
-            //can spend when there's at least 1 item that can be spent (non complete)
+            //can spend when there's at least 1 item that can be spent (non-complete)
             for(int i = 0; i < node.requirements.length; i++){
                 if(node.finishedRequirements[i].amount < node.requirements[i].amount && items.has(node.requirements[i].item)){
                     return true;

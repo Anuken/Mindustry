@@ -29,9 +29,9 @@ import java.util.*;
 public class Fonts{
     private static final String mainFont = "fonts/font.woff";
     private static final ObjectSet<String> unscaled = ObjectSet.with("iconLarge");
-    private static ObjectIntMap<String> unicodeIcons = new ObjectIntMap<>();
-    private static ObjectMap<String, String> stringIcons = new ObjectMap<>();
-    private static ObjectMap<String, TextureRegion> largeIcons = new ObjectMap<>();
+    private static final ObjectIntMap<String> unicodeIcons = new ObjectIntMap<>();
+    private static final ObjectMap<String, String> stringIcons = new ObjectMap<>();
+    private static final ObjectMap<String, TextureRegion> largeIcons = new ObjectMap<>();
     private static TextureRegion[] iconTable;
     private static int lastCid;
 
@@ -169,7 +169,7 @@ public class Fonts{
         UI.packer = new PixmapPacker(max >= 4096 ? 4096 : 2048, 2048, 2, true);
         Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(Core.files::internal));
         Core.assets.setLoader(Font.class, null, new FreetypeFontLoader(Core.files::internal){
-            ObjectSet<FreeTypeFontParameter> scaled = new ObjectSet<>();
+            final ObjectSet<FreeTypeFontParameter> scaled = new ObjectSet<>();
 
             @Override
             public Font loadSync(AssetManager manager, String fileName, Fi file, FreeTypeFontLoaderParameter parameter){

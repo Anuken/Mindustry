@@ -9,7 +9,7 @@ import mindustry.type.*;
 import static mindustry.Vars.*;
 
 public class ItemBuffer{
-    private long[] buffer;
+    private final long[] buffer;
     private int index;
 
     public ItemBuffer(int capacity){
@@ -67,7 +67,7 @@ public class ItemBuffer{
     }
 
     @Struct
-    class TimeItemStruct{
+    static class TimeItemStruct{
         short data;
         short item;
         float time;

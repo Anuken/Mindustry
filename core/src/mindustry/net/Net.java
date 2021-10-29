@@ -21,9 +21,9 @@ import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class Net{
-    private static Seq<Prov<? extends Packet>> packetProvs = new Seq<>();
-    private static Seq<Class<? extends Packet>> packetClasses = new Seq<>();
-    private static ObjectIntMap<Class<?>> packetToId = new ObjectIntMap<>();
+    private static final Seq<Prov<? extends Packet>> packetProvs = new Seq<>();
+    private static final Seq<Class<? extends Packet>> packetClasses = new Seq<>();
+    private static final ObjectIntMap<Class<?>> packetToId = new ObjectIntMap<>();
 
     private boolean server;
     private boolean active;

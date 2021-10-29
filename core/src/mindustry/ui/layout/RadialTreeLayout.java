@@ -4,8 +4,8 @@ import arc.math.*;
 import arc.struct.*;
 
 public class RadialTreeLayout implements TreeLayout{
-    private static ObjectSet<TreeNode> visited = new ObjectSet<>();
-    private static Queue<TreeNode> queue = new Queue<>();
+    private static final ObjectSet<TreeNode> visited = new ObjectSet<>();
+    private static final Queue<TreeNode> queue = new Queue<>();
 
     public float startRadius, delta;
 

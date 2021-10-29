@@ -21,7 +21,7 @@ import static mindustry.Vars.*;
 
 public class DatabaseDialog extends BaseDialog{
     private TextField search;
-    private Table all = new Table();
+    private final Table all = new Table();
 
     public DatabaseDialog(){
         super("@database");

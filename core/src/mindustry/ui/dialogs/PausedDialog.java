@@ -6,8 +6,8 @@ import mindustry.gen.*;
 import static mindustry.Vars.*;
 
 public class PausedDialog extends BaseDialog{
-    private SaveDialog save = new SaveDialog();
-    private LoadDialog load = new LoadDialog();
+    private final SaveDialog save = new SaveDialog();
+    private final LoadDialog load = new LoadDialog();
     private boolean wasClient = false;
 
     public PausedDialog(){

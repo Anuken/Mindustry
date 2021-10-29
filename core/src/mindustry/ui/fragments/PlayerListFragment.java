@@ -21,9 +21,9 @@ import static mindustry.Vars.*;
 public class PlayerListFragment extends Fragment{
     public Table content = new Table().marginRight(13f).marginLeft(13f);
     private boolean visible = false;
-    private Interval timer = new Interval();
+    private final Interval timer = new Interval();
     private TextField search;
-    private Seq<Player> players = new Seq<>();
+    private final Seq<Player> players = new Seq<>();
 
     @Override
     public void build(Group parent){
@@ -177,11 +177,7 @@ public class PlayerListFragment extends Fragment{
                 button.add().growY();
 
                 button.button(Icon.hammer, ustyle,
-                () -> {
-                    ui.showConfirm("@confirm", Core.bundle.format("confirmvotekick",  user.name()), () -> {
-                        Call.sendChatMessage("/votekick " + user.name());
-                    });
-                }).size(h);
+                () -> ui.showConfirm("@confirm", Core.bundle.format("confirmvotekick",  user.name()), () -> Call.sendChatMessage("/votekick " + user.name()))).size(h);
             }
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);

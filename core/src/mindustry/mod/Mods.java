@@ -31,19 +31,19 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Mods implements Loadable{
-    private AsyncExecutor async = new AsyncExecutor();
-    private Json json = new Json();
+    private final AsyncExecutor async = new AsyncExecutor();
+    private final Json json = new Json();
     private @Nullable Scripts scripts;
-    private ContentParser parser = new ContentParser();
-    private ObjectMap<String, Seq<Fi>> bundles = new ObjectMap<>();
-    private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites", "sprites-override");
+    private final ContentParser parser = new ContentParser();
+    private final ObjectMap<String, Seq<Fi>> bundles = new ObjectMap<>();
+    private final ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites", "sprites-override");
 
     private int totalSprites;
     private MultiPacker packer;
-    private ModClassLoader mainLoader = new ModClassLoader(getClass().getClassLoader());
+    private final ModClassLoader mainLoader = new ModClassLoader(getClass().getClassLoader());
 
     Seq<LoadedMod> mods = new Seq<>();
-    private ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();
+    private final ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();
     private boolean requiresReload;
 
     public Mods(){
@@ -106,7 +106,7 @@ public class Mods implements Loadable{
             //enable the mod on import
             Core.settings.put("mod-" + loaded.name + "-enabled", true);
             sortMods();
-            //try to load the mod's icon so it displays on import
+            //try to load the mod's icon, so it displays on import
             Core.app.post(() -> loadIcon(loaded));
             return loaded;
         }catch(IOException e){
@@ -502,30 +502,26 @@ public class Mods implements Loadable{
                 cont.row();
                 cont.add("@mod.errors").wrap().growX().center().get().setAlignment(Align.center);
                 cont.row();
-                cont.pane(p -> {
-                    mods.each(m -> m.enabled() && m.hasContentErrors(), m -> {
-                        p.add(m.name).color(Pal.accent).left();
-                        p.row();
-                        p.image().fillX().pad(4).color(Pal.accent);
-                        p.row();
-                        p.table(d -> {
-                            d.left().marginLeft(15f);
-                            for(Content c : m.erroredContent){
-                                d.add(c.minfo.sourceFile.nameWithoutExtension()).left().padRight(10);
-                                d.button("@details", Icon.downOpen, Styles.transt, () -> {
-                                    new Dialog(""){{
-                                        setFillParent(true);
-                                        cont.pane(e -> e.add(c.minfo.error).wrap().grow().labelAlign(Align.center, Align.left)).grow();
-                                        cont.row();
-                                        cont.button("@ok", Icon.left, this::hide).size(240f, 60f);
-                                    }}.show();
-                                }).size(190f, 50f).left().marginLeft(6);
-                                d.row();
-                            }
-                        }).left();
-                        p.row();
-                    });
-                });
+                cont.pane(p -> mods.each(m -> m.enabled() && m.hasContentErrors(), m -> {
+                    p.add(m.name).color(Pal.accent).left();
+                    p.row();
+                    p.image().fillX().pad(4).color(Pal.accent);
+                    p.row();
+                    p.table(d -> {
+                        d.left().marginLeft(15f);
+                        for(Content c : m.erroredContent){
+                            d.add(c.minfo.sourceFile.nameWithoutExtension()).left().padRight(10);
+                            d.button("@details", Icon.downOpen, Styles.transt, () -> new Dialog(""){{
+                                setFillParent(true);
+                                cont.pane(e -> e.add(c.minfo.error).wrap().grow().labelAlign(Align.center, Align.left)).grow();
+                                cont.row();
+                                cont.button("@ok", Icon.left, this::hide).size(240f, 60f);
+                            }}.show()).size(190f, 50f).left().marginLeft(6);
+                            d.row();
+                        }
+                    }).left();
+                    p.row();
+                }));
 
                 cont.row();
                 cont.button("@ok", this::hide).size(300, 50);

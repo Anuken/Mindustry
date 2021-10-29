@@ -30,7 +30,7 @@ import static mindustry.service.Achievement.*;
 public class GameService{
     private ObjectSet<String> blocksBuilt = new ObjectSet<>(), unitsBuilt = new ObjectSet<>();
     private ObjectSet<UnitType> t5s = new ObjectSet<>();
-    private IntSet checked = new IntSet();
+    private final IntSet checked = new IntSet();
 
     /** Begin listening for new achievement events, once the game service is activated. This can be called at any time, but only once. */
     public void init(){
@@ -181,9 +181,7 @@ public class GameService{
             }
         });
 
-        Events.on(SchematicCreateEvent.class, e -> {
-            SStat.schematicsCreated.add();
-        });
+        Events.on(SchematicCreateEvent.class, e -> SStat.schematicsCreated.add());
 
         Events.on(BlockDestroyEvent.class, e -> {
             if(campaign() && e.tile.team() != player.team()){
@@ -198,7 +196,7 @@ public class GameService{
         Events.on(UnlockEvent.class, e -> {
             if(e.content == Items.thorium) obtainThorium.complete();
             if(e.content == Items.titanium) obtainTitanium.complete();
-            if(e.content instanceof SectorPreset && !content.sectors().contains(s -> s.locked())){
+            if(e.content instanceof SectorPreset && !content.sectors().contains(UnlockableContent::locked)){
                 unlockAllZones.complete();
             }
         });
@@ -253,13 +251,9 @@ public class GameService{
             }
         });
 
-        Events.on(SectorLaunchEvent.class, e -> {
-            SStat.timesLaunched.add();
-        });
+        Events.on(SectorLaunchEvent.class, e -> SStat.timesLaunched.add());
 
-        Events.on(LaunchItemEvent.class, e -> {
-            SStat.itemsLaunched.add(e.stack.amount);
-        });
+        Events.on(LaunchItemEvent.class, e -> SStat.itemsLaunched.add(e.stack.amount));
 
         Events.on(WaveEvent.class, e -> {
             if(campaign()){

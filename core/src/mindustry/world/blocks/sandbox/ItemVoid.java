@@ -14,7 +14,7 @@ public class ItemVoid extends Block{
         envEnabled = Env.any;
     }
 
-    public class ItemVoidBuild extends Building{
+    public static class ItemVoidBuild extends Building{
         @Override
         public void handleItem(Building source, Item item){}
 

@@ -26,7 +26,7 @@ public class Item extends UnlockableContent{
      * 1 cost = 1 tick added to build time
      */
     public float cost = 1f;
-    /** if true, this item is of lowest priority to drills. */
+    /** if true, this item is of the lowest priority to drills. */
     public boolean lowPriority;
 
     public Item(String name, Color color){

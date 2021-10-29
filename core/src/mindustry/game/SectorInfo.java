@@ -87,7 +87,7 @@ public class SectorInfo{
     public int bossWave = -1;
 
     /** Counter refresh state. */
-    private transient Interval time = new Interval();
+    private final transient Interval time = new Interval();
     /** Core item storage input/output deltas. */
     private @Nullable transient int[] coreDeltas;
     /** Core item storage input/output deltas. */
@@ -189,9 +189,7 @@ public class SectorInfo{
         hasSpawns = spawner.countSpawns() > 0;
 
         //cap production at raw production.
-        production.each((item, stat) -> {
-            stat.mean = Math.min(stat.mean, rawProduction.get(item, ExportStat::new).mean);
-        });
+        production.each((item, stat) -> stat.mean = Math.min(stat.mean, rawProduction.get(item, ExportStat::new).mean));
 
         var pads = indexer.getAllied(state.rules.defaultTeam, BlockFlag.launchPad);
 

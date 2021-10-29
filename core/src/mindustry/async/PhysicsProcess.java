@@ -17,9 +17,9 @@ public class PhysicsProcess implements AsyncProcess{
         layerFlying = 2;
 
     private PhysicsWorld physics;
-    private Seq<PhysicRef> refs = new Seq<>(false);
-    //currently only enabled for units
-    private EntityGroup<Unit> group = Groups.unit;
+    private final Seq<PhysicRef> refs = new Seq<>(false);
+    //currently, only enabled for units
+    private final EntityGroup<Unit> group = Groups.unit;
 
     @Override
     public void begin(){

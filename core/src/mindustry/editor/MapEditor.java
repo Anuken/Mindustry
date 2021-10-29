@@ -24,7 +24,7 @@ public class MapEditor{
     public MapRenderer renderer = new MapRenderer();
 
     private final Context context = new Context();
-    private OperationStack stack = new OperationStack();
+    private final OperationStack stack = new OperationStack();
     private DrawOperation currentOp;
     private boolean loading;
 

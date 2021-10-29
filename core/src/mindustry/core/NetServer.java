@@ -68,17 +68,17 @@ public class NetServer implements ApplicationListener{
     public ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
 
     private boolean closing = false;
-    private Interval timer = new Interval();
+    private final Interval timer = new Interval();
 
-    private ReusableByteOutStream writeBuffer = new ReusableByteOutStream(127);
-    private Writes outputBuffer = new Writes(new DataOutputStream(writeBuffer));
+    private final ReusableByteOutStream writeBuffer = new ReusableByteOutStream(127);
+    private final Writes outputBuffer = new Writes(new DataOutputStream(writeBuffer));
 
     /** Stream for writing player sync data to. */
-    private ReusableByteOutStream syncStream = new ReusableByteOutStream();
+    private final ReusableByteOutStream syncStream = new ReusableByteOutStream();
     /** Data stream for writing player sync data to. */
-    private DataOutputStream dataStream = new DataOutputStream(syncStream);
+    private final DataOutputStream dataStream = new DataOutputStream(syncStream);
     /** Packet handlers for custom types of messages. */
-    private ObjectMap<String, Seq<Cons2<Player, String>>> customPacketHandlers = new ObjectMap<>();
+    private final ObjectMap<String, Seq<Cons2<Player, String>>> customPacketHandlers = new ObjectMap<>();
 
     public NetServer(){
 
@@ -318,9 +318,9 @@ public class NetServer implements ApplicationListener{
         int voteCooldown = 60 * 5;
 
         class VoteSession{
-            Player target;
-            ObjectSet<String> voted = new ObjectSet<>();
-            VoteSession[] map;
+            final Player target;
+            final ObjectSet<String> voted = new ObjectSet<>();
+            final VoteSession[] map;
             Timer.Task task;
             int votes;
 
@@ -388,9 +388,7 @@ public class NetServer implements ApplicationListener{
                 StringBuilder builder = new StringBuilder();
                 builder.append("[orange]Players to kick: \n");
 
-                Groups.player.each(p -> !p.admin && p.con != null && p != player, p -> {
-                    builder.append("[lightgray] ").append(p.name).append("[accent] (#").append(p.id()).append(")\n");
-                });
+                Groups.player.each(p -> !p.admin && p.con != null && p != player, p -> builder.append("[lightgray] ").append(p.name).append("[accent] (#").append(p.id()).append(")\n"));
                 player.sendMessage(builder.toString());
             }else{
                 Player found;
@@ -962,7 +960,7 @@ public class NetServer implements ApplicationListener{
                     return;
                 }
 
-                var connection = player.con;
+                NetConnection connection = player.con;
 
                 if(Time.timeSinceMillis(connection.syncTime) < serverSyncTime || !connection.hasConnected) return;
 

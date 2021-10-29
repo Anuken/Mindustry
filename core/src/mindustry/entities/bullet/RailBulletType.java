@@ -51,7 +51,7 @@ public class RailBulletType extends BulletType{
         //subtract health from each consecutive pierce
         b.damage -= Math.min(b.damage, sub);
 
-        //bullet was stopped, decrease furthest distance
+        //bullet was stopped, decrease the furthest distance
         if(b.damage <= 0f){
             furthest = Math.min(furthest, b.dst(pos));
         }

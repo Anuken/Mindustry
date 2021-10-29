@@ -23,21 +23,24 @@ import static mindustry.Vars.*;
 
 public class ChatFragment extends Table{
     private static final int messagesShown = 10;
-    private Seq<String> messages = new Seq<>();
+    private final Seq<String> messages = new Seq<>();
     private float fadetime;
     private boolean shown = false;
     private TextField chatfield;
-    private Label fieldlabel = new Label(">");
+    private final Label fieldlabel = new Label(">");
     private ChatMode mode = ChatMode.normal;
-    private Font font;
-    private GlyphLayout layout = new GlyphLayout();
-    private float offsetx = Scl.scl(4), offsety = Scl.scl(4), fontoffsetx = Scl.scl(2), chatspace = Scl.scl(50);
-    private Color shadowColor = new Color(0, 0, 0, 0.5f);
-    private float textspacing = Scl.scl(10);
-    private Seq<String> history = new Seq<>();
+    private final Font font;
+    private final GlyphLayout layout = new GlyphLayout();
+    private final float offsetx = Scl.scl(4);
+    private final float offsety = Scl.scl(4);
+    private final float fontoffsetx = Scl.scl(2);
+    private final float chatspace = Scl.scl(50);
+    private final Color shadowColor = new Color(0, 0, 0, 0.5f);
+    private final float textspacing = Scl.scl(10);
+    private final Seq<String> history = new Seq<>();
     private int historyPos = 0;
     private int scrollPos = 0;
-    private Fragment container = new Fragment(){
+    private final Fragment container = new Fragment(){
         @Override
         public void build(Group parent){
             scene.add(ChatFragment.this);
@@ -133,15 +136,13 @@ public class ChatFragment extends Table{
 
         super.draw();
 
-        float spacing = chatspace;
-
         chatfield.visible = shown;
         fieldlabel.visible = shown;
 
         Draw.color(shadowColor);
         Draw.alpha(shadowColor.a * opacity);
 
-        float theight = offsety + spacing + getMarginBottom() + scene.marginBottom;
+        float theight = offsety + chatspace + getMarginBottom() + scene.marginBottom;
         for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos && (i < fadetime || shown); i++){
 
             layout.setText(font, messages.get(i), Color.white, textWidth, Align.bottomLeft, true);

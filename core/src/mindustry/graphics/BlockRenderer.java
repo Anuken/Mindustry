@@ -28,17 +28,18 @@ public class BlockRenderer{
     public final FloorRenderer floor = new FloorRenderer();
     public TextureRegion[][] cracks;
 
-    private Seq<Tile> tileview = new Seq<>(false, initialRequests, Tile.class);
-    private Seq<Tile> lightview = new Seq<>(false, initialRequests, Tile.class);
+    private final Seq<Tile> tileview = new Seq<>(false, initialRequests, Tile.class);
+    private final Seq<Tile> lightview = new Seq<>(false, initialRequests, Tile.class);
 
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private float brokenFade = 0f;
-    private FrameBuffer shadows = new FrameBuffer();
-    private FrameBuffer dark = new FrameBuffer();
-    private Seq<Building> outArray2 = new Seq<>();
-    private Seq<Tile> shadowEvents = new Seq<>();
-    private IntSet darkEvents = new IntSet();
-    private IntSet procLinks = new IntSet(), procLights = new IntSet();
+    private final FrameBuffer shadows = new FrameBuffer();
+    private final FrameBuffer dark = new FrameBuffer();
+    private final Seq<Building> outArray2 = new Seq<>();
+    private final Seq<Tile> shadowEvents = new Seq<>();
+    private final IntSet darkEvents = new IntSet();
+    private final IntSet procLinks = new IntSet();
+    private final IntSet procLights = new IntSet();
 
     private BlockQuadtree blockTree;
     private FloorQuadtree floorTree;
@@ -283,7 +284,7 @@ public class BlockRenderer{
         var bounds = camera.bounds(Tmp.r3).grow(tilesize);
 
         //draw floor lights
-        floorTree.intersect(bounds, tile -> lightview.add(tile));
+        floorTree.intersect(bounds, lightview::add);
 
         blockTree.intersect(bounds, tile -> {
             if(tile.build == null || procLinks.add(tile.build.id)){

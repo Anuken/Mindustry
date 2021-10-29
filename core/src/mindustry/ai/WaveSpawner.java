@@ -22,7 +22,7 @@ public class WaveSpawner{
     private static final float margin = 0f, coreMargin = tilesize * 2f, maxSteps = 30;
 
     private int tmpCount;
-    private Seq<Tile> spawns = new Seq<>();
+    private final Seq<Tile> spawns = new Seq<>();
     private boolean spawning = false;
     private boolean any = false;
     private Tile firstSpawn = null;
@@ -34,9 +34,7 @@ public class WaveSpawner{
     @Nullable
     public Tile getFirstSpawn(){
         firstSpawn = null;
-        eachGroundSpawn((cx, cy) -> {
-            firstSpawn = world.tile(cx, cy);
-        });
+        eachGroundSpawn((cx, cy) -> firstSpawn = world.tile(cx, cy));
         return firstSpawn;
     }
 

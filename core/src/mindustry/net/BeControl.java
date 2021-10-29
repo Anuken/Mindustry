@@ -25,7 +25,7 @@ import static mindustry.Vars.*;
 public class BeControl{
     private static final int updateInterval = 60;
 
-    private AsyncExecutor executor = new AsyncExecutor(1);
+    private final AsyncExecutor executor = new AsyncExecutor(1);
     private boolean checkUpdates = true;
     private boolean updateAvailable;
     private String updateUrl;

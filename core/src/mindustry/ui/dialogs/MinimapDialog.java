@@ -27,18 +27,16 @@ public class MinimapDialog extends BaseDialog{
     void setup(){
         cont.clear();
 
-        cont.table(Tex.pane,t -> {
-            t.rect((x, y, width, height) -> {
-                if(renderer.minimap.getRegion() == null) return;
-                Draw.color(Color.white);
-                Draw.alpha(parentAlpha);
-                Draw.rect(renderer.minimap.getRegion(), x + width / 2f, y + height / 2f, width, height);
+        cont.table(Tex.pane,t -> t.rect((x, y, width, height) -> {
+            if(renderer.minimap.getRegion() == null) return;
+            Draw.color(Color.white);
+            Draw.alpha(parentAlpha);
+            Draw.rect(renderer.minimap.getRegion(), x + width / 2f, y + height / 2f, width, height);
 
-                if(renderer.minimap.getTexture() != null){
-                    renderer.minimap.drawEntities(x, y, width, height);
-                }
-            }).grow();
-        }).size(Math.min(Core.graphics.getWidth() / 1.1f, Core.graphics.getHeight() / 1.3f) / Scl.scl(1f)).padTop(-20f);
+            if(renderer.minimap.getTexture() != null){
+                renderer.minimap.drawEntities(x, y, width, height);
+            }
+        }).grow()).size(Math.min(Core.graphics.getWidth() / 1.1f, Core.graphics.getHeight() / 1.3f) / Scl.scl(1f)).padTop(-20f);
 
         cont.addListener(new InputListener(){
             @Override

@@ -7,7 +7,7 @@ import arc.util.*;
 import mindustry.*;
 
 public class MultiPacker implements Disposable{
-    private PixmapPacker[] packers = new PixmapPacker[PageType.all.length];
+    private final PixmapPacker[] packers = new PixmapPacker[PageType.all.length];
 
     public MultiPacker(){
         for(int i = 0; i < packers.length; i++){

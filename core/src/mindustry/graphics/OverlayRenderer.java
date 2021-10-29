@@ -27,17 +27,13 @@ public class OverlayRenderer{
 
     private float buildFade, unitFade;
     private Sized lastSelect;
-    private Seq<CoreEdge> cedges = new Seq<>();
+    private final Seq<CoreEdge> cedges = new Seq<>();
     private boolean updatedCores;
 
     public OverlayRenderer(){
-        Events.on(WorldLoadEvent.class, e -> {
-            updatedCores = true;
-        });
+        Events.on(WorldLoadEvent.class, e -> updatedCores = true);
 
-        Events.on(CoreChangeEvent.class, e -> {
-            updatedCores = true;
-        });
+        Events.on(CoreChangeEvent.class, e -> updatedCores = true);
     }
 
     private void updateCoreEdges(){

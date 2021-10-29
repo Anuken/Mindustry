@@ -22,7 +22,7 @@ public class LiquidVoid extends Block{
         bars.remove("liquid");
     }
 
-    public class LiquidVoidBuild extends Building{
+    public static class LiquidVoidBuild extends Building{
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
             return enabled;

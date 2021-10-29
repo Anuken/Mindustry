@@ -36,7 +36,7 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
     public float unitScaling = never;
     /** Shield points that this unit has. */
     public float shields = 0f;
-    /** How much shields get increased by per wave. */
+    /** How many shields get increased by per wave. */
     public float shieldScaling = 0f;
     /** Amount of enemies spawned initially, with no scaling */
     public int unitAmount = 1;

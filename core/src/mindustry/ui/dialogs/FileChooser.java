@@ -25,10 +25,10 @@ public class FileChooser extends BaseDialog{
     private ScrollPane pane;
     private TextField navigation, filefield;
     private TextButton ok;
-    private FileHistory stack = new FileHistory();
-    private Boolf<Fi> filter;
-    private Cons<Fi> selectListener;
-    private boolean open;
+    private final FileHistory stack = new FileHistory();
+    private final Boolf<Fi> filter;
+    private final Cons<Fi> selectListener;
+    private final boolean open;
 
     public FileChooser(String title, Boolf<Fi> filter, boolean open, Cons<Fi> result){
         super(title);
@@ -52,9 +52,7 @@ public class FileChooser extends BaseDialog{
             setupWidgets();
         });
 
-        keyDown(KeyCode.enter, () -> {
-            ok.fireClick();
-        });
+        keyDown(KeyCode.enter, () -> ok.fireClick());
 
         addCloseListener();
     }
@@ -78,9 +76,7 @@ public class FileChooser extends BaseDialog{
             hide();
         });
 
-        filefield.changed(() -> {
-            ok.setDisabled(filefield.getText().replace(" ", "").isEmpty());
-        });
+        filefield.changed(() -> ok.setDisabled(filefield.getText().replace(" ", "").isEmpty()));
 
         filefield.change();
 
@@ -112,8 +108,8 @@ public class FileChooser extends BaseDialog{
         ImageButton back = new ImageButton(Icon.left);
         ImageButton forward = new ImageButton(Icon.right);
 
-        forward.clicked(() -> stack.forward());
-        back.clicked(() -> stack.back());
+        forward.clicked(stack::forward);
+        back.clicked(stack::back);
         forward.setDisabled(() -> !stack.canForward());
         back.setDisabled(() -> !stack.canBack());
 
@@ -234,9 +230,7 @@ public class FileChooser extends BaseDialog{
                 }
             });
 
-            filefield.changed(() -> {
-                button.setChecked(filename.equals(filefield.getText()));
-            });
+            filefield.changed(() -> button.setChecked(filename.equals(filefield.getText())));
 
             Image image = new Image(file.isDirectory() ? Icon.folder : Icon.fileText);
 
@@ -260,7 +254,7 @@ public class FileChooser extends BaseDialog{
     }
 
     public class FileHistory{
-        private Seq<Fi> history = new Seq<>();
+        private final Seq<Fi> history = new Seq<>();
         private int index;
 
         public FileHistory(){

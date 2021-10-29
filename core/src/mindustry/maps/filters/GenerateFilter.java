@@ -158,7 +158,7 @@ public abstract class GenerateFilter{
     }
 
     @Struct
-    class PackTileStruct{
+    static class PackTileStruct{
         short block, floor, overlay;
     }
 }

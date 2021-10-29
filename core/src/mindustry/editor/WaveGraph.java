@@ -21,11 +21,11 @@ public class WaveGraph extends Table{
 
     private Mode mode = Mode.counts;
     private int[][] values;
-    private OrderedSet<UnitType> used = new OrderedSet<>();
+    private final OrderedSet<UnitType> used = new OrderedSet<>();
     private int max, maxTotal;
     private float maxHealth;
     private Table colors;
-    private ObjectSet<UnitType> hidden = new ObjectSet<>();
+    private final ObjectSet<UnitType> hidden = new ObjectSet<>();
 
     public WaveGraph(){
         background(Tex.pane);
@@ -106,13 +106,13 @@ public class WaveGraph extends Table{
             Draw.alpha(0.1f);
 
             for(int i = 0; i < maxY; i += markSpace){
-                float cy = graphY + i * graphH / maxY, cx = graphX;
+                float cy = graphY + i * graphH / maxY;
 
-                Lines.line(cx, cy, cx + graphW, cy);
+                Lines.line(graphX, cy, graphX + graphW, cy);
 
                 lay.setText(font, "" + i);
 
-                font.draw("" + i, cx, cy + lay.height / 2f, Align.right);
+                font.draw("" + i, graphX, cy + lay.height / 2f, Align.right);
             }
             Draw.alpha(1f);
 
@@ -145,9 +145,7 @@ public class WaveGraph extends Table{
             ButtonGroup<Button> group = new ButtonGroup<>();
 
             for(Mode m : Mode.all){
-                t.button("@wavemode." + m.name(), Styles.fullTogglet, () -> {
-                    mode = m;
-                }).group(group).height(35f).update(b -> b.setChecked(m == mode)).width(130f);
+                t.button("@wavemode." + m.name(), Styles.fullTogglet, () -> mode = m).group(group).height(35f).update(b -> b.setChecked(m == mode)).width(130f);
             }
         }).growX();
     }

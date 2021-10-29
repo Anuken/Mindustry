@@ -21,7 +21,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
     LoadoutDialog loadout = new LoadoutDialog();
     //total required items
     ItemSeq total = new ItemSeq();
-    //currently selected schematic
+    //currently, selected schematic
     Schematic selected;
     //validity of loadout items
     boolean valid;

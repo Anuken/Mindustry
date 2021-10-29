@@ -4,7 +4,7 @@ package mindustry.ai.formations;
 import arc.struct.*;
 
 /**
- * {@code FreeSlotAssignmentStrategy} is the simplest implementation of {@link SlotAssignmentStrategy}. It simply go through
+ * {@code FreeSlotAssignmentStrategy} is the simplest implementation of {@link SlotAssignmentStrategy}. It simply goes through
  * each assignment in the list and assign sequential slot numbers. The number of slots is just the length of the list.
  * <p>
  * Because each member can occupy any slot this implementation does not support roles.

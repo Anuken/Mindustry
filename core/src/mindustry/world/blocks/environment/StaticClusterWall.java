@@ -6,7 +6,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.world.*;
 
 public class StaticClusterWall extends StaticWall{
-    public @Load(value = "@-cluster#", length = 1) TextureRegion[] clusters;
+    public @Load(value = "@-cluster#") TextureRegion[] clusters;
 
     public StaticClusterWall(String name){
         super(name);

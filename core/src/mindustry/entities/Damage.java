@@ -20,14 +20,16 @@ import static mindustry.Vars.*;
 /** Utility class for damaging in an area. */
 public class Damage{
     private static Tile furthest;
-    private static Rect rect = new Rect();
-    private static Rect hitrect = new Rect();
-    private static Vec2 tr = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2();
-    private static Seq<Unit> units = new Seq<>();
-    private static IntSet collidedBlocks = new IntSet();
+    private static final Rect rect = new Rect();
+    private static final Rect hitrect = new Rect();
+    private static final Vec2 tr = new Vec2();
+    private static final Vec2 seg1 = new Vec2();
+    private static final Vec2 seg2 = new Vec2();
+    private static final Seq<Unit> units = new Seq<>();
+    private static final IntSet collidedBlocks = new IntSet();
     private static Building tmpBuilding;
     private static Unit tmpUnit;
-    private static IntFloatMap damages = new IntFloatMap();
+    private static final IntFloatMap damages = new IntFloatMap();
 
     /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage){

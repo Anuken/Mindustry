@@ -17,16 +17,16 @@ public class EntityCollisions{
     private static final float seg = 1f;
 
     //tile collisions
-    private Rect tmp = new Rect();
-    private Vec2 vector = new Vec2();
-    private Vec2 l1 = new Vec2();
-    private Rect r1 = new Rect();
-    private Rect r2 = new Rect();
+    private final Rect tmp = new Rect();
+    private final Vec2 vector = new Vec2();
+    private final Vec2 l1 = new Vec2();
+    private final Rect r1 = new Rect();
+    private final Rect r2 = new Rect();
 
     //entity collisions
-    private Seq<Hitboxc> arrOut = new Seq<>(Hitboxc.class);
-    private Cons<Hitboxc> hitCons = this::updateCollision;
-    private Cons<QuadTree> treeCons = tree -> tree.intersect(r2, arrOut);
+    private final Seq<Hitboxc> arrOut = new Seq<>(Hitboxc.class);
+    private final Cons<Hitboxc> hitCons = this::updateCollision;
+    private final Cons<QuadTree> treeCons = tree -> tree.intersect(r2, arrOut);
 
     public void moveCheck(Hitboxc entity, float deltax, float deltay, SolidPred solidCheck){
         if(!solidCheck.solid(entity.tileX(), entity.tileY())){

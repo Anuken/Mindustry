@@ -12,7 +12,7 @@ public class NuclearWarhead extends Block{
         update = true;
     }
 
-    public class NuclearWarheadBuild extends Building{
+    public static class NuclearWarheadBuild extends Building{
 
     }
 }

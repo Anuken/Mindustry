@@ -11,8 +11,8 @@ import mindustry.world.blocks.storage.CoreBlock.*;
 public class FormationAI extends AIController implements FormationMember{
     public Unit leader;
 
-    private Vec3 target = new Vec3();
-    private @Nullable Formation formation;
+    private final Vec3 target = new Vec3();
+    private @Nullable final Formation formation;
 
     public FormationAI(Unit leader, Formation formation){
         this.leader = leader;

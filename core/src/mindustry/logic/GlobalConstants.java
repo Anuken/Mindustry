@@ -22,8 +22,8 @@ public class GlobalConstants{
     /** Global random state. */
     public static final Rand rand = new Rand();
 
-    private ObjectIntMap<String> namesToIds = new ObjectIntMap<>();
-    private Seq<Var> vars = new Seq<>(Var.class);
+    private final ObjectIntMap<String> namesToIds = new ObjectIntMap<>();
+    private final Seq<Var> vars = new Seq<>(Var.class);
     private UnlockableContent[][] logicIdToContent;
     private int[][] contentIdToLogicId;
 

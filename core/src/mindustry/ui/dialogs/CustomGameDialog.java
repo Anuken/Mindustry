@@ -15,7 +15,7 @@ import mindustry.maps.*;
 import mindustry.ui.*;
 
 public class CustomGameDialog extends BaseDialog{
-    private MapPlayDialog dialog = new MapPlayDialog();
+    private final MapPlayDialog dialog = new MapPlayDialog();
 
     public CustomGameDialog(){
         super("@customgame");

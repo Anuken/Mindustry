@@ -27,7 +27,7 @@ import arc.util.*;
 public class SoftRoleSlotAssignmentStrategy extends BoundedSlotAssignmentStrategy{
     protected SlotCostProvider slotCostProvider;
     protected float costThreshold;
-    private BoolSeq filledSlots;
+    private final BoolSeq filledSlots;
 
     /**
      * Creates a {@code SoftRoleSlotAssignmentStrategy} with the given slot cost provider and no cost threshold.

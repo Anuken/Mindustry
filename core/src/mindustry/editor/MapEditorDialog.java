@@ -33,18 +33,18 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class MapEditorDialog extends Dialog implements Disposable{
-    private MapView view;
-    private MapInfoDialog infoDialog;
+    private final MapView view;
+    private final MapInfoDialog infoDialog;
     private MapLoadDialog loadDialog;
     private MapResizeDialog resizeDialog;
-    private MapGenerateDialog generateDialog;
+    private final MapGenerateDialog generateDialog;
     private ScrollPane pane;
-    private BaseDialog menu;
+    private final BaseDialog menu;
     private Table blockSelection;
     private Rules lastSavedRules;
-    private boolean saved = false; //currently never read
+    private boolean saved = false; //currently, never read
     private boolean shownWithMap = false;
-    private Seq<Block> blocksOut = new Seq<>();
+    private final Seq<Block> blocksOut = new Seq<>();
 
     public MapEditorDialog(){
         super("");
@@ -87,15 +87,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
             t.button("@editor.import", Icon.download, () -> createDialog("@editor.import",
                 "@editor.importmap", "@editor.importmap.description", Icon.download, (Runnable)loadDialog::show,
                 "@editor.importfile", "@editor.importfile.description", Icon.file, (Runnable)() ->
-                platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> {
-                    maps.tryCatchMapError(() -> {
-                        if(MapIO.isImage(file)){
-                            ui.showInfo("@editor.errorimage");
-                        }else{
-                            editor.beginEdit(MapIO.createMap(file, true));
-                        }
-                    });
-                })),
+                platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> maps.tryCatchMapError(() -> {
+                    if(MapIO.isImage(file)){
+                        ui.showInfo("@editor.errorimage");
+                    }else{
+                        editor.beginEdit(MapIO.createMap(file, true));
+                    }
+                }))),
 
                 "@editor.importimage", "@editor.importimage.description", Icon.fileImage, (Runnable)() ->
                 platform.showFileChooser(true, "png", file ->
@@ -172,9 +170,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         resizeDialog = new MapResizeDialog((x, y) -> {
             if(!(editor.width() == x && editor.height() == y)){
-                ui.loadAnd(() -> {
-                    editor.resize(x, y);
-                });
+                ui.loadAnd(() -> editor.resize(x, y));
             }
         });
 
@@ -571,16 +567,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 mid.row();
 
                 if(!mobile){
-                    mid.table(t -> {
-                        t.button("@editor.center", Icon.move, Styles.cleart, view::center).growX().margin(9f);
-                    }).growX().top();
+                    mid.table(t -> t.button("@editor.center", Icon.move, Styles.cleart, view::center).growX().margin(9f)).growX().top();
                 }
 
                 mid.row();
 
-                mid.table(t -> {
-                    t.button("@editor.cliffs", Icon.terrain, Styles.cleart, editor::addCliffs).growX().margin(9f);
-                }).growX().top();
+                mid.table(t -> t.button("@editor.cliffs", Icon.terrain, Styles.cleart, editor::addCliffs).growX().margin(9f)).growX().top();
             }).margin(0).left().growY();
 
 

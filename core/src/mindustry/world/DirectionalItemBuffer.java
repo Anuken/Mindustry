@@ -67,7 +67,7 @@ public class DirectionalItemBuffer{
     }
 
     @Struct
-    class BufferItemStruct{
+    static class BufferItemStruct{
         byte item;
         float time;
     }

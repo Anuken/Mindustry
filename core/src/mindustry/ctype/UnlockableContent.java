@@ -35,7 +35,7 @@ public abstract class UnlockableContent extends MappableContent{
     public TextureRegion uiIcon;
     /** Icon of the full content. Unscaled.*/
     public TextureRegion fullIcon;
-    /** Unlock state. Loaded from settings. Do not modify outside of the constructor. */
+    /** Unlock state. Loaded from settings. Do not modify outside the constructor. */
     protected boolean unlocked;
 
     public UnlockableContent(String name){

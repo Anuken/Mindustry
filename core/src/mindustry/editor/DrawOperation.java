@@ -10,7 +10,7 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 public class DrawOperation{
-    private LongSeq array = new LongSeq();
+    private final LongSeq array = new LongSeq();
 
     public boolean isEmpty(){
         return array.isEmpty();
@@ -76,7 +76,7 @@ public class DrawOperation{
     }
 
     @Struct
-    class TileOpStruct{
+    static class TileOpStruct{
         short x;
         short y;
         byte type;

@@ -46,9 +46,7 @@ public class StatusEffects implements ContentList{
             init(() -> {
                 opposite(melting, burning);
 
-                affinity(blasted, (unit, result, time) -> {
-                    unit.damagePierce(transitionDamage);
-                });
+                affinity(blasted, (unit, result, time) -> unit.damagePierce(transitionDamage));
             });
         }};
 

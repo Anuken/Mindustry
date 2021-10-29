@@ -28,6 +28,7 @@ import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 
+@SuppressWarnings("unchecked")
 public class Maps{
     /** All generation filter types. */
     public static Prov<GenerateFilter>[] allFilterTypes = new Prov[]{
@@ -38,17 +39,17 @@ public class Maps{
     };
 
     /** List of all built-in maps. Filenames only. */
-    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "archipelago", "debrisField", "veins", "glacier", "passage"};
+    private static final String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "archipelago", "debrisField", "veins", "glacier", "passage"};
     /** Maps tagged as PvP */
-    private static String[] pvpMaps = {"veins", "glacier", "passage"};
+    private static final String[] pvpMaps = {"veins", "glacier", "passage"};
 
     /** All maps stored in an ordered array. */
-    private Seq<Map> maps = new Seq<>();
+    private final Seq<Map> maps = new Seq<>();
     private ShuffleMode shuffleMode = ShuffleMode.all;
     private @Nullable MapProvider shuffler;
 
-    private ExecutorService executor = Threads.executor(3);
-    private ObjectSet<Map> previewList = new ObjectSet<>();
+    private final ExecutorService executor = Threads.executor(3);
+    private final ObjectSet<Map> previewList = new ObjectSet<>();
 
     public ShuffleMode getShuffleMode(){
         return shuffleMode;

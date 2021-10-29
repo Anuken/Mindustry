@@ -478,7 +478,7 @@ public class Pathfinder implements Runnable{
 
     /** Holds a copy of tile data for a specific tile position. */
     @Struct
-    class PathTileStruct{
+    static class PathTileStruct{
         //scaled block health
         @StructField(8) int health;
         //team of block, if applicable (0 by default)

@@ -34,7 +34,7 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class ModsDialog extends BaseDialog{
-    private ObjectMap<String, TextureRegion> textureCache = new ObjectMap<>();
+    private final ObjectMap<String, TextureRegion> textureCache = new ObjectMap<>();
 
     private float modImportProgress;
     private String searchtxt = "";
@@ -42,7 +42,7 @@ public class ModsDialog extends BaseDialog{
     private boolean orderDate = false;
     private BaseDialog currentContent;
 
-    private BaseDialog browser;
+    private final BaseDialog browser;
     private Table browserTable;
 
     public ModsDialog(){
@@ -288,9 +288,7 @@ public class ModsDialog extends BaseDialog{
 
                                 if(steam && !item.hasSteamID()){
                                     right.row();
-                                    right.button(Icon.export, Styles.clearPartiali, () -> {
-                                        platform.publish(item);
-                                    }).size(50f);
+                                    right.button(Icon.export, Styles.clearPartiali, () -> platform.publish(item)).size(50f);
                                 }
                             }).growX().right().padRight(-8f).padTop(-8f);
                         }, Styles.clearPartialt, () -> showMod(item)).size(w, h).growX().pad(4f);
@@ -373,9 +371,7 @@ public class ModsDialog extends BaseDialog{
                 d.cont.pane(cs -> {
                     int i = 0;
                     for(UnlockableContent c : all){
-                        cs.button(new TextureRegionDrawable(c.uiIcon), Styles.cleari, iconMed, () -> {
-                            ui.content.show(c);
-                        }).size(50f).with(im -> {
+                        cs.button(new TextureRegionDrawable(c.uiIcon), Styles.cleari, iconMed, () -> ui.content.show(c)).size(50f).with(im -> {
                             var click = im.getClickListener();
                             im.update(() -> im.getImage().color.lerp(!click.isOver() ? Color.lightGray : Color.white, 0.4f * Time.delta));
 
@@ -399,7 +395,7 @@ public class ModsDialog extends BaseDialog{
     }
 
     private void rebuildBrowser(){
-        ObjectSet<String> installed = mods.list().map(m -> m.getRepo()).asSet();
+        ObjectSet<String> installed = mods.list().map(LoadedMod::getRepo).asSet();
 
         browserTable.clear();
         browserTable.add("@loading");
@@ -488,9 +484,7 @@ public class ModsDialog extends BaseDialog{
                         sel.hide();
                         githubImportMod(mod.repo, mod.hasJava);
                     });
-                    sel.buttons.button("@mods.github.open", Icon.link, () -> {
-                        Core.app.openURI("https://github.com/" + mod.repo);
-                    });
+                    sel.buttons.button("@mods.github.open", Icon.link, () -> Core.app.openURI("https://github.com/" + mod.repo));
                     sel.keyDown(KeyCode.escape, sel::hide);
                     sel.keyDown(KeyCode.back, sel::hide);
                     sel.show();
@@ -586,9 +580,7 @@ public class ModsDialog extends BaseDialog{
     private void githubImportBranch(String branch, String repo){
         Http.get(ghApi + "/repos/" + repo + "/zipball/" + branch, loc -> {
             if(loc.getHeader("Location") != null){
-                Http.get(loc.getHeader("Location"), result -> {
-                    handleMod(repo, result);
-                }, this::importFail);
+                Http.get(loc.getHeader("Location"), result -> handleMod(repo, result), this::importFail);
             }else{
                 handleMod(repo, loc);
             }
