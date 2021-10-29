@@ -4,11 +4,9 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
@@ -60,47 +58,47 @@ public class PayloadLoader extends PayloadBlock{
         Draw.rect(topRegion, req.drawx(), req.drawy());
     }
 
-    public class PayloadLoaderBuild extends PayloadBlockBuild<BuildPayload>{
+    public class PayloadLoaderBuild extends PayloadBlockBuild<BuildPayload> {
         public boolean exporting = false;
 
         @Override
-        public boolean acceptPayload(Building source, Payload payload){
+        public boolean acceptPayload(Building source, Payload payload) {
             return super.acceptPayload(source, payload) &&
-                payload.fits(maxBlockSize) &&
-                payload instanceof BuildPayload build &&
-                ((build.build.block.hasItems && build.block().unloadable && build.block().itemCapacity >= 10 && build.block().size <= maxBlockSize) ||
-                build.build.block().hasLiquids && build.block().liquidCapacity >= 10f);
+                    payload.fits(maxBlockSize) &&
+                    payload instanceof BuildPayload build &&
+                    ((build.build.block.hasItems && build.block().unloadable && build.block().itemCapacity >= 10 && build.block().size <= maxBlockSize) ||
+                            build.build.block().hasLiquids && build.block().liquidCapacity >= 10f);
         }
 
         @Override
-        public void handlePayload(Building source, Payload payload){
+        public void handlePayload(Building source, Payload payload) {
             super.handlePayload(source, payload);
             exporting = false;
         }
 
         @Override
-        public boolean acceptItem(Building source, Item item){
+        public boolean acceptItem(Building source, Item item) {
             return items.total() < itemCapacity;
         }
 
         @Override
-        public boolean acceptLiquid(Building source, Liquid liquid){
+        public boolean acceptLiquid(Building source, Liquid liquid) {
             return liquids.current() == liquid || liquids.currentAmount() < 0.2f;
         }
 
         @Override
-        public void draw(){
+        public void draw() {
             Draw.rect(region, x, y);
 
             //draw input
             boolean fallback = true;
-            for(int i = 0; i < 4; i++){
-                if(blends(i) && i != rotation){
+            for (int i = 0; i < 4; i++) {
+                if (blends(i) && i != rotation) {
                     Draw.rect(inRegion, x, y, (i * 90) - 180);
                     fallback = false;
                 }
             }
-            if(fallback) Draw.rect(inRegion, x, y, rotation * 90);
+            if (fallback) Draw.rect(inRegion, x, y, rotation * 90);
 
             Draw.rect(outRegion, x, y, rotdeg());
 
@@ -112,26 +110,26 @@ public class PayloadLoader extends PayloadBlock{
         }
 
         @Override
-        public void updateTile(){
+        public void updateTile() {
             super.updateTile();
-            if(shouldExport()){
+            if (shouldExport()) {
                 moveOutPayload();
-            }else if(moveInPayload()){
+            } else if (moveInPayload()) {
 
                 //load up items
-                if(payload.block().hasItems && items.any()){
-                    if(efficiency() > 0.01f && timer(timerLoad, loadTime / efficiency())){
+                if (payload.block().hasItems && items.any()) {
+                    if (efficiency() > 0.01f && timer(timerLoad, loadTime / efficiency())) {
                         //load up items a set amount of times
-                        for(int j = 0; j < itemsLoaded && items.any(); j++){
+                        for (int j = 0; j < itemsLoaded && items.any(); j++) {
 
-                            for(int i = 0; i < items.length(); i++){
-                                if(items.get(i) > 0){
+                            for (int i = 0; i < items.length(); i++) {
+                                if (items.get(i) > 0) {
                                     Item item = content.item(i);
-                                    if(payload.build.acceptItem(payload.build, item)){
+                                    if (payload.build.acceptItem(payload.build, item)) {
                                         payload.build.handleItem(payload.build, item);
                                         items.remove(item, 1);
                                         break;
-                                    }else if(payload.block().separateItemCapacity || payload.block().consumes.consumesItem(item)){
+                                    } else if (payload.block().separateItemCapacity || payload.block().consumes.consumesItem(item)) {
                                         exporting = true;
                                         break;
                                     }
@@ -142,12 +140,12 @@ public class PayloadLoader extends PayloadBlock{
                 }
 
                 //load up liquids
-                if(payload.block().hasLiquids && liquids.total() >= 0.001f){
+                if (payload.block().hasLiquids && liquids.total() >= 0.001f) {
                     Liquid liq = liquids.current();
                     float total = liquids.currentAmount();
                     float flow = Math.min(Math.min(liquidsLoaded * edelta(), payload.block().liquidCapacity - payload.build.liquids.get(liq)), total);
                     //TODO potential crash here
-                    if(payload.build.acceptLiquid(payload.build, liq)){
+                    if (payload.build.acceptLiquid(payload.build, liq)) {
                         payload.build.liquids.add(liq, flow);
                         liquids.remove(liq, flow);
                     }
@@ -155,71 +153,35 @@ public class PayloadLoader extends PayloadBlock{
             }
         }
 
-        public float fraction(){
-            return payload == null ? 0f : payload.build.items.total() / (float)payload.build.block.itemCapacity;
+        public float fraction() {
+            return payload == null ? 0f : payload.build.items.total() / (float) payload.build.block.itemCapacity;
         }
 
-        public boolean shouldExport(){
+        public boolean shouldExport() {
             return payload != null && (
-                exporting ||
-                (payload.block().hasLiquids && liquids.total() >= 0.1f && payload.build.liquids.total() >= payload.block().liquidCapacity - 0.001f) ||
-                (payload.block().hasItems && items.any() && payload.block().separateItemCapacity && content.items().contains(i -> payload.build.items.get(i) >= payload.block().itemCapacity)));
+                    exporting ||
+                            (payload.block().hasLiquids && liquids.total() >= 0.1f && payload.build.liquids.total() >= payload.block().liquidCapacity - 0.001f) ||
+                            (payload.block().hasItems && items.any() && payload.block().separateItemCapacity && content.items().contains(i -> payload.build.items.get(i) >= payload.block().itemCapacity)));
         }
 
         @Override
-        public byte version(){
+        public byte version() {
             return 1;
         }
 
         @Override
-        public void write(Writes write){
+        public void write(Writes write) {
             super.write(write);
             write.bool(exporting);
         }
 
         @Override
-        public void read(Reads read, byte revision){
+        public void read(Reads read, byte revision) {
             super.read(read, revision);
-            if(revision >= 1){
+            if (revision >= 1) {
                 exporting = read.bool();
             }
         }
 
-        @Override
-        public double sense(LAccess sensor){
-            return switch(sensor){
-                case totalItems -> (payload == null || payload.build.items == null) ? 0 : payload.build.items.total();
-                case totalLiquids -> (payload == null || payload.build.liquids == null) ? 0 : payload.build.liquids.total();
-                default -> super.sense(sensor);
-            };
-        }
-
-        @Override
-        public Object senseObject(LAccess sensor){
-            return switch(sensor){
-                case firstItem -> (payload == null || payload.build.items == null) ? null : payload.build.items.first();
-                default -> super.senseObject(sensor);
-            };
-        }
-
-        @Override
-        public double sense(Content content){
-            if(content instanceof Item i){
-                if (payload != null && payload.build.items != null){
-                    return payload.build.items.get(i);
-                } else {
-                    return Float.NaN;
-                }
-            } else if (content instanceof Liquid l){
-                if (payload != null && payload.build.liquids != null){
-                    return payload.build.liquids.get(l);
-                } else {
-                    return Float.NaN;
-                }
-            }
-            return super.sense(content);
-            // uses super even though both cases are covered
-            // you never know when something is added
-        }
     }
 }
