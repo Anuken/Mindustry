@@ -102,8 +102,6 @@ public class Vars implements Loadable{
     public static final float baseInvasionChance = 1f / 100f;
     /** how many minutes have to pass before invasions in a *captured* sector start */
     public static final float invasionGracePeriod = 20;
-    /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
-    public static final float minArmorDamage = 0.1f;
     /** land/launch animation duration */
     public static final float coreLandDuration = 160f;
     /** size of tiles in units */
