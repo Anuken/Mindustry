@@ -262,11 +262,6 @@ public class PayloadBlock extends Block{
                     case totalLiquids -> (block.build.liquids == null) ? 0 : block.build.liquids.total();
                     default -> super.sense(sensor);
                 };
-            } else if (payload instanceof UnitPayload unit){
-                return switch(sensor){
-                    case totalItems -> unit.unit.stack().amount;
-                    default -> super.sense(sensor);
-                };
             }
             return switch (sensor) {
                 case totalItems -> Float.NaN;
@@ -288,8 +283,6 @@ public class PayloadBlock extends Block{
             if (content instanceof Item i) {
                 if (payload instanceof BuildPayload block && block.build.items != null) {
                     return block.build.items.get(i);
-                } else if (payload instanceof UnitPayload unit && unit.unit.items != null){
-                    return unit.unit.items.get(i);
                 } else {
                     eturn Float.NaN;
                 }
