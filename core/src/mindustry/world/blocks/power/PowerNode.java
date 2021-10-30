@@ -100,25 +100,32 @@ public class PowerNode extends PowerBlock{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("power", entity -> new Bar(() ->
-        Core.bundle.format("bar.powerbalance",
-            ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + UI.formatAmount((long)(entity.power.graph.getPowerBalance() * 60)))),
-            () -> Pal.powerBar,
-            () -> Mathf.clamp(entity.power.graph.getLastPowerProduced() / entity.power.graph.getLastPowerNeeded())
-        ));
-
-        bars.add("batteries", entity -> new Bar(() ->
-        Core.bundle.format("bar.powerstored",
-            (UI.formatAmount((long)entity.power.graph.getLastPowerStored())), UI.formatAmount((long)entity.power.graph.getLastCapacity())),
-            () -> Pal.powerBar,
-            () -> Mathf.clamp(entity.power.graph.getLastPowerStored() / entity.power.graph.getLastCapacity())
-        ));
+        bars.add("power", makePowerBalance());
+        bars.add("batteries", makeBatteryBalance());
 
         bars.add("connections", entity -> new Bar(() ->
         Core.bundle.format("bar.powerlines", entity.power.links.size, maxNodes),
             () -> Pal.items,
             () -> (float)entity.power.links.size / (float)maxNodes
         ));
+    }
+
+    public static Func<Building, Bar> makePowerBalance(){
+        return entity -> new Bar(() ->
+        Core.bundle.format("bar.powerbalance",
+            ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + UI.formatAmount((long)(entity.power.graph.getPowerBalance() * 60)))),
+            () -> Pal.powerBar,
+            () -> Mathf.clamp(entity.power.graph.getLastPowerProduced() / entity.power.graph.getLastPowerNeeded())
+        );
+    }
+
+    public static Func<Building, Bar> makeBatteryBalance(){
+        return entity -> new Bar(() ->
+        Core.bundle.format("bar.powerstored",
+            (UI.formatAmount((long)entity.power.graph.getLastPowerStored())), UI.formatAmount((long)entity.power.graph.getLastCapacity())),
+            () -> Pal.powerBar,
+            () -> Mathf.clamp(entity.power.graph.getLastPowerStored() / entity.power.graph.getLastCapacity())
+        );
     }
 
     @Override
