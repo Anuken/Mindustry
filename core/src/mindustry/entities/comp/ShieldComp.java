@@ -25,7 +25,7 @@ abstract class ShieldComp implements Healthc, Posc{
     @Override
     public void damage(float amount){
         //apply armor
-        amount = Math.max(amount - armor, minArmorDamage * amount);
+        amount = amount - (1f/(1f/amount+0.6f/armor));
         amount /= healthMultiplier;
 
         rawDamage(amount);
