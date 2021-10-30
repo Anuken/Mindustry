@@ -108,7 +108,7 @@ public class PayloadUnloader extends PayloadLoader{
             }
             boolean result = true;
             for (int i = 0; i < content.items().size; i++){
-                if (payload.build.items.get(i) > itemLoadMin){
+                if (payload.block().hasItems && payload.build.items.get(i) > itemLoadMin){
                     result = false;
                     break;
                 }
