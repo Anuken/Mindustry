@@ -116,7 +116,7 @@ public class PayloadLoader extends PayloadBlock{
         @Override
         public void updateTile(){
             super.updateTile();
-            if shouldExport()){
+            if (shouldExport()){
                 moveOutPayload();
             } else if(moveInPayload()){
 
