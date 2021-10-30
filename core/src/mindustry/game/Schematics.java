@@ -102,7 +102,7 @@ public class Schematics implements Loadable{
     }
 
     private void loadLoadouts(){
-        Seq.with(Loadouts.basicShard, Loadouts.basicFoundation, Loadouts.basicNucleus).each(s -> checkLoadout(s, false));
+        Seq.with(Loadouts.basicShard, Loadouts.basicFoundation, Loadouts.basicNucleus, Loadouts.basicBastion).each(s -> checkLoadout(s, false));
     }
 
     public void overwrite(Schematic target, Schematic newSchematic){

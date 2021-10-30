@@ -9,6 +9,7 @@ import mindustry.*;
 import mindustry.ai.*;
 import mindustry.ai.Astar.*;
 import mindustry.content.*;
+import mindustry.game.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -33,6 +34,10 @@ public abstract class BasicGenerator implements WorldGenerator{
         this.height = tiles.height;
 
         generate();
+    }
+
+    public Schematic getDefaultLoadout(){
+        return Loadouts.basicShard;
     }
 
     protected void generate(){

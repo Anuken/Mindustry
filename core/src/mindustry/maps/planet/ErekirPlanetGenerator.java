@@ -47,6 +47,11 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         return 2000;
     }
 
+    @Override
+    public Schematic getDefaultLoadout(){
+        return Loadouts.basicBastion;
+    }
+
     float rawHeight(Vec3 position){
         return Simplex.noise3d(seed, octaves, persistence, 1f/heightScl, 10f + position.x, 10f + position.y, 10f + position.z);
     }
