@@ -11,6 +11,7 @@ import static mindustry.Vars.*;
 public class PayloadUnloader extends PayloadLoader{
     public int offloadSpeed = 4;
     public int itemLoadMin = 0;
+    public boolean exporting = false;
 
     public PayloadUnloader(String name){
         super(name);
@@ -27,6 +28,12 @@ public class PayloadUnloader extends PayloadLoader{
     }
 
     public class PayloadUnloaderBuild extends PayloadLoaderBuild{
+
+        @Override
+        public void handlePayload(Building source, Payload payload) {
+            super.handlePayload(source, payload);
+            exporting = false;
+        }
 
         @Override
         public boolean acceptItem(Building source, Item item){
@@ -96,6 +103,9 @@ public class PayloadUnloader extends PayloadLoader{
             if (payload == null){
                 return false;
             }
+            if (exporting == true){
+                return true;
+            }
             boolean result = true;
             for (int i = 0; i < content.items().size; i++){
                 if (payload.build.items.get(i) > itemLoadMin){
@@ -111,7 +121,7 @@ public class PayloadUnloader extends PayloadLoader{
         @Override
         public void control(LAccess type, double p1, double p2, double p3, double p4){
             if (type == LAccess.shoot){
-                moveOutPayload();
+                exporting = true;
             } else if (type == LAccess.config) {
                 p1 += 0.0001;
                 itemLoadMin = (int) p1;

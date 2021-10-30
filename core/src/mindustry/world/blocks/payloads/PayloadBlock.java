@@ -268,35 +268,34 @@ public class PayloadBlock extends Block{
                     default -> super.sense(sensor);
                 };
             }
-            return super.sense(sensor);
+            return switch (sensor) {
+                case totalItems -> Float.NaN;
+                case totalLiquids -> Float.NaN;
+                default -> super.sense(sensor);
+            };
         }
 
         @Override
         public Object senseObject(LAccess sensor) {
-            if (payload instanceof BuildPayload block){
-                return switch (sensor) {
-                    case firstItem -> (block.build.items == null) ?null : block.build.items.first();
-                    default -> super.senseObject(sensor);
-                };
-            }
-            return super.senseObject(sensor);
+            return switch (sensor) {
+                case firstItem -> (!(payload instanceof BuildPayload block) || block.build.items == null) ? null : block.build.items.first();
+                default -> super.senseObject(sensor);
+            };
         }
 
         @Override
         public double sense(Content content) {
-            if (payload instanceof BuildPayload block) {
-                if (content instanceof Item i) {
-                    if (block.build.items != null) {
-                        return block.build.items.get(i);
-                    } else {
-                        return Float.NaN;
-                    }
-                } else if (content instanceof Liquid l) {
-                    if (block.build.liquids != null) {
-                        return block.build.liquids.get(l);
-                    } else {
-                        return Float.NaN;
-                    }
+            if (content instanceof Item i) {
+                if (payload instanceof BuildPayload block && block.build.items != null) {
+                    return block.build.items.get(i);
+                } else {
+                    return Float.NaN;
+                }
+            } else if (content instanceof Liquid l) {
+                if (payload instanceof BuildPayload block && block.build.liquids != null) {
+                    return block.build.liquids.get(l);
+                } else {
+                    return Float.NaN;
                 }
             }
             return super.sense(content);

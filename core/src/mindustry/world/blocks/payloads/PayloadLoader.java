@@ -193,7 +193,7 @@ public class PayloadLoader extends PayloadBlock{
         @Override
         public void control(LAccess type, double p1, double p2, double p3, double p4){
             if (type == LAccess.shoot){
-                moveOutPayload();
+                exporting = true;
             } else if (type == LAccess.config) {
                 p1 += 0.0001;
                 itemLoadCap = (int) p1;
