@@ -333,7 +333,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public int getMaximumAccepted(Item item){
-            return state.rules.coreIncinerates ? storageCapacity * 2 : storageCapacity;
+            return state.rules.coreIncinerates ? storageCapacity * 20 : storageCapacity;
         }
 
         @Override
@@ -348,7 +348,7 @@ public class CoreBlock extends StorageBlock{
             state.teams.registerCore(this);
 
             storageCapacity = itemCapacity + proximity().sum(e -> owns(e) ? e.block.itemCapacity : 0);
-            proximity.each(e -> owns(e), t -> {
+            proximity.each(this::owns, t -> {
                 t.items = items;
                 ((StorageBuild)t).linkedCore = this;
             });

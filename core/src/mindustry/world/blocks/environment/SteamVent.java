@@ -37,7 +37,7 @@ public class SteamVent extends Floor{
 
     public SteamVent(String name){
         super(name);
-        variants = 1;
+        variants = 2;
         inEditor = false;
     }
 
