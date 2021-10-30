@@ -26,7 +26,7 @@ public class PayloadLoader extends PayloadBlock{
 
     public PayloadLoader(String name){
         super(name);
- 
+
         hasItems = true;
         hasLiquids = true;
         itemCapacity = 100;
@@ -57,21 +57,21 @@ public class PayloadLoader extends PayloadBlock{
     @Override
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(region, req.drawx(), req.drawy());
-        Draw.rect(inRegion, req.drawx(), req.drawy(), req.rotation * 90);
-        Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
+        Draw.rect(inRegion, req.drawx(), req.drawy(), req.rotation*90);
+        Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation*90);
         Draw.rect(topRegion, req.drawx(), req.drawy());
     }
 
-    public class PayloadLoaderBuild extends PayloadBlockBuild<BuildPayload> {
+    public class PayloadLoaderBuild extends PayloadBlockBuild<BuildPayload>{
         public boolean exporting = false;
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             return super.acceptPayload(source, payload) &&
-                    payload.fits(maxBlockSize) &&
-                    payload instanceof BuildPayload build &&
-                    ((build.build.block.hasItems && build.block().unloadable && build.block().itemCapacity >= 10 && build.block().size <= maxBlockSize) ||
-                            build.build.block().hasLiquids && build.block().liquidCapacity >= 10f);
+                   payload.fits(maxBlockSize) &&
+                   payload instanceof BuildPayload build &&
+                   ((build.build.block.hasItems && build.block().unloadable && build.block().itemCapacity >= 10 && build.block().size <= maxBlockSize) ||
+                    build.build.block().hasLiquids && build.block().liquidCapacity >= 10f);
         }
 
         @Override
@@ -98,11 +98,11 @@ public class PayloadLoader extends PayloadBlock{
             boolean fallback = true;
             for(int i = 0; i < 4; i++){
                 if(blends(i) && i != rotation){
-                    Draw.rect(inRegion, x, y, (i * 90) - 180);
+                    Draw.rect(inRegion, x, y, (i*90) - 180);
                     fallback = false;
                 }
             }
-            if (fallback) Draw.rect(inRegion, x, y, rotation * 90);
+            if(fallback) Draw.rect(inRegion, x, y, rotation*90);
 
             Draw.rect(outRegion, x, y, rotdeg());
 
@@ -116,13 +116,13 @@ public class PayloadLoader extends PayloadBlock{
         @Override
         public void updateTile(){
             super.updateTile();
-            if (shouldExport()){
+            if(shouldExport()){
                 moveOutPayload();
-            } else if(moveInPayload()){
+            }else if(moveInPayload()){
 
                 //load up items
                 if(payload.block().hasItems && items.any()){
-                    if(efficiency() > 0.01f && timer(timerLoad, loadTime / efficiency())){
+                    if(efficiency() > 0.01f && timer(timerLoad, loadTime/efficiency())){
                         //load up items a set amount of times
                         for(int j = 0; j < itemsLoaded && items.any(); j++){
 
@@ -132,11 +132,11 @@ public class PayloadLoader extends PayloadBlock{
                                     if(payload.build.items.get(item) >= itemLoadCap){
                                         exporting = true;
                                         break;
-                                    }else if (payload.build.acceptItem(payload.build, item)){
+                                    }else if(payload.build.acceptItem(payload.build, item)){
                                         payload.build.handleItem(payload.build, item);
                                         items.remove(item, 1);
                                         break;
-                                    }else if (payload.block().separateItemCapacity || payload.block().consumes.consumesItem(item)){
+                                    }else if(payload.block().separateItemCapacity || payload.block().consumes.consumesItem(item)){
                                         exporting = true;
                                         break;
                                     }
@@ -150,7 +150,7 @@ public class PayloadLoader extends PayloadBlock{
                 if(payload.block().hasLiquids && liquids.total() >= 0.001f){
                     Liquid liq = liquids.current();
                     float total = liquids.currentAmount();
-                    float flow = Math.min(Math.min(liquidsLoaded * edelta(), payload.block().liquidCapacity - payload.build.liquids.get(liq)), total);
+                    float flow = Math.min(Math.min(liquidsLoaded*edelta(), payload.block().liquidCapacity - payload.build.liquids.get(liq)), total);
                     //TODO potential crash here
                     if(payload.build.acceptLiquid(payload.build, liq)){
                         payload.build.liquids.add(liq, flow);
@@ -161,14 +161,14 @@ public class PayloadLoader extends PayloadBlock{
         }
 
         public float fraction(){
-            return payload == null ? 0f : payload.build.items.total() / (float)payload.build.block.itemCapacity;
+            return payload == null ? 0f : payload.build.items.total()/(float)payload.build.block.itemCapacity;
         }
 
         public boolean shouldExport(){
             return payload != null && (
                     exporting ||
-                            (payload.block().hasLiquids && liquids.total() >= 0.1f && payload.build.liquids.total() >= payload.block().liquidCapacity - 0.001f) ||
-                            (payload.block().hasItems && items.any() && payload.block().separateItemCapacity && content.items().contains(i -> payload.build.items.get(i) >= payload.block().itemCapacity)));
+                    (payload.block().hasLiquids && liquids.total() >= 0.1f && payload.build.liquids.total() >= payload.block().liquidCapacity - 0.001f) ||
+                    (payload.block().hasItems && items.any() && payload.block().separateItemCapacity && content.items().contains(i -> payload.build.items.get(i) >= payload.block().itemCapacity)));
         }
 
         @Override
@@ -194,14 +194,14 @@ public class PayloadLoader extends PayloadBlock{
         public void control(LAccess type, double p1, double p2, double p3, double p4){
             if(type == LAccess.shoot){
                 exporting = true;
-            } else if(type == LAccess.config){
+            }else if(type == LAccess.config){
                 p1 += 0.0001;
-                itemLoadCap = (int) p1;
+                itemLoadCap = (int)p1;
             }
         }
 
         @Override
-        public void displayBars(Table table) {
+        public void displayBars(Table table){
             super.displayBars(table);
             if(itemLoadCap != Integer.MAX_VALUE){
                 table.table(e -> {

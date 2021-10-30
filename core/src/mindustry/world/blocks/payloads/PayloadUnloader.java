@@ -30,7 +30,7 @@ public class PayloadUnloader extends PayloadLoader{
     public class PayloadUnloaderBuild extends PayloadLoaderBuild{
 
         @Override
-        public void handlePayload(Building source, Payload payload) {
+        public void handlePayload(Building source, Payload payload){
             super.handlePayload(source, payload);
             exporting = false;
         }
@@ -60,7 +60,7 @@ public class PayloadUnloader extends PayloadLoader{
 
                 //unload items
                 if(payload.block().hasItems && !full()){
-                    if(efficiency() > 0.01f && timer(timerLoad, loadTime / efficiency())){
+                    if(efficiency() > 0.01f && timer(timerLoad, loadTime/efficiency())){
                         //load up items a set amount of times
                         for(int j = 0; j < itemsLoaded && !full(); j++){
                             for(int i = 0; i < items.length(); i++){
@@ -78,10 +78,10 @@ public class PayloadUnloader extends PayloadLoader{
                 //unload liquids
                 //TODO tile is null may crash
                 if(payload.block().hasLiquids && payload.build.liquids.currentAmount() >= 0.01f &&
-                    (liquids.current() == payload.build.liquids.current() || liquids.currentAmount() <= 0.2f)){
+                   (liquids.current() == payload.build.liquids.current() || liquids.currentAmount() <= 0.2f)){
                     var liq = payload.build.liquids.current();
                     float remaining = liquidCapacity - liquids.currentAmount();
-                    float flow = Math.min(Math.min(liquidsLoaded * delta(), remaining), payload.build.liquids.currentAmount());
+                    float flow = Math.min(Math.min(liquidsLoaded*delta(), remaining), payload.build.liquids.currentAmount());
 
                     liquids.add(liq, flow);
                     payload.build.liquids.remove(liq, flow);
@@ -100,37 +100,38 @@ public class PayloadUnloader extends PayloadLoader{
 
         @Override
         public boolean shouldExport(){
-            if (payload == null){
+            if(payload == null){
                 return false;
             }
-            if (exporting == true){
+            if(exporting == true){
                 return true;
             }
             boolean result = true;
-            for (int i = 0; i < content.items().size; i++){
-                if (payload.block().hasItems && payload.build.items.get(i) > itemLoadMin){
+            for(int i = 0; i < content.items().size; i++){
+                if(payload.block().hasItems && payload.build.items.get(i) > itemLoadMin){
                     result = false;
                     break;
                 }
             }
             return result &&
-                (!payload.block().hasLiquids || payload.build.liquids.currentAmount() <= 0.001f)
-            ;
+                   (!payload.block().hasLiquids || payload.build.liquids.currentAmount() <= 0.001f)
+                    ;
         }
 
         @Override
         public void control(LAccess type, double p1, double p2, double p3, double p4){
-            if (type == LAccess.shoot){
+            if(type == LAccess.shoot){
                 exporting = true;
-            } else if (type == LAccess.config) {
+            }else if(type == LAccess.config){
                 p1 += 0.0001;
-                itemLoadMin = (int) p1;
+                itemLoadMin = (int)p1;
             }
         }
+
         @Override
-        public void displayBars(Table table) {
+        public void displayBars(Table table){
             super.displayBars(table);
-            if (itemLoadMin != 0) {
+            if(itemLoadMin != 0){
                 table.table(e -> {
                     e.row();
                     e.left();
