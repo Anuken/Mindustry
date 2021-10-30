@@ -73,38 +73,37 @@ public class PayloadBlock extends Block{
     }
 
     public class PayloadBlockBuild<T extends Payload> extends Building {
-        public @Nullable
-        T payload;
+        public @Nullable T payload;
         //TODO redundant; already stored in payload?
         public Vec2 payVector = new Vec2();
         public float payRotation;
         public boolean carried;
 
-        public boolean acceptUnitPayload(Unit unit) {
+        public boolean acceptUnitPayload(Unit unit){
             return false;
         }
 
         @Override
-        public boolean canControlSelect(Unit player) {
+        public boolean canControlSelect(Unit player){
             return !player.spawnedByCore && this.payload == null && acceptUnitPayload(player) && player.tileOn() != null && player.tileOn().build == this;
         }
 
         @Override
-        public void onControlSelect(Unit player) {
+        public void onControlSelect(Unit player){
             float x = player.x, y = player.y;
-            handleUnitPayload(player, p -> payload = (T) p);
+            handleUnitPayload(player, p -> payload = (T)p);
             this.payVector.set(x, y).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
             this.payRotation = player.rotation;
         }
 
         @Override
-        public boolean acceptPayload(Building source, Payload payload) {
+        public boolean acceptPayload(Building source, Payload payload){
             return this.payload == null;
         }
 
         @Override
-        public void handlePayload(Building source, Payload payload) {
-            this.payload = (T) payload;
+        public void handlePayload(Building source, Payload payload){
+            this.payload = (T)payload;
             this.payVector.set(source).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
             this.payRotation = payload.rotation();
 
@@ -112,66 +111,62 @@ public class PayloadBlock extends Block{
         }
 
         @Override
-        public Payload getPayload() {
+        public Payload getPayload(){
             return payload;
         }
 
         @Override
-        public void pickedUp() {
+        public void pickedUp(){
             carried = true;
         }
 
         @Override
-        public void drawTeamTop() {
+        public void drawTeamTop(){
             carried = false;
         }
 
         @Override
-        public Payload takePayload() {
+        public Payload takePayload(){
             T t = payload;
             payload = null;
             return t;
         }
 
         @Override
-        public void onRemoved() {
+        public void onRemoved(){
             super.onRemoved();
-            if (payload != null && !carried) payload.dump();
+            if(payload != null && !carried) payload.dump();
         }
 
         @Override
-        public void updateTile() {
-            if (payload != null) {
+        public void updateTile(){
+            if(payload != null){
                 payload.update(false);
             }
         }
 
-        public boolean blends(int direction) {
+        public boolean blends(int direction){
             return PayloadBlock.blends(this, direction);
         }
 
-        public void updatePayload() {
+        public void updatePayload(){
             if (payload != null) {
                 payload.set(x + payVector.x, y + payVector.y, payRotation);
             }
         }
 
-        /**
-         * @return true if the payload is in position.
-         */
-        public boolean moveInPayload() {
+        /** @return true if the payload is in position. */
+        public boolean moveInPayload(){
             return moveInPayload(true);
         }
 
-        /**
-         * @return true if the payload is in position.
-         */
-        public boolean moveInPayload(boolean rotate) {
-            if (payload == null) return false;
+        /** @return true if the payload is in position. */
+        public boolean moveInPayload(boolean rotate){
+            if(payload == null) return false;
 
             updatePayload();
 
-            if (rotate) {
+            if(rotate){
                 payRotation = Angles.moveToward(payRotation, rotate ? rotdeg() : 90f, payloadRotateSpeed * edelta());
             }
             payVector.approach(Vec2.ZERO, payloadSpeed * delta());
@@ -179,12 +174,12 @@ public class PayloadBlock extends Block{
             return hasArrived();
         }
 
-        public void moveOutPayload() {
-            if (payload == null) return;
+        public void moveOutPayload(){
+            if(payload == null) return;
 
             updatePayload();
 
-            Vec2 dest = Tmp.v1.trns(rotdeg(), size * tilesize / 2f);
+            Vec2 dest = Tmp.v1.trns(rotdeg(), size * tilesize/2f);
 
             payRotation = Angles.moveToward(payRotation, rotdeg(), payloadRotateSpeed * edelta());
             payVector.approach(dest, payloadSpeed * delta());
@@ -193,41 +188,41 @@ public class PayloadBlock extends Block{
             boolean canDump = front == null || !front.tile().solid();
             boolean canMove = front != null && (front.block.outputsPayload || front.block.acceptsPayload);
 
-            if (canDump && !canMove) {
+            if(canDump && !canMove){
                 pushOutput(payload, 1f - (payVector.dst(dest) / (size * tilesize / 2f)));
             }
 
-            if (payVector.within(dest, 0.001f)) {
+            if(payVector.within(dest, 0.001f)){
                 payVector.clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
 
-                if (canMove) {
-                    if (movePayload(payload)) {
+                if(canMove){
+                    if(movePayload(payload)){
                         payload = null;
                     }
-                } else if (canDump) {
+                } else if(canDump){
                     dumpPayload();
                 }
             }
         }
 
-        public void dumpPayload() {
+        public void dumpPayload(){
             //translate payload forward slightly
             float tx = Angles.trnsx(payload.rotation(), 0.1f), ty = Angles.trnsy(payload.rotation(), 0.1f);
             payload.set(payload.x() + tx, payload.y() + ty, payload.rotation());
 
-            if (payload.dump()) {
+            if(payload.dump()){
                 payload = null;
-            } else {
+            }else{
                 payload.set(payload.x() - tx, payload.y() - ty, payload.rotation());
             }
         }
 
-        public boolean hasArrived() {
+        public boolean hasArrived(){
             return payVector.isZero(0.01f);
         }
 
-        public void drawPayload() {
-            if (payload != null) {
+        public void drawPayload(){
+            if(payload != null){
                 updatePayload();
 
                 Draw.z(Layer.blockOver);
@@ -236,7 +231,7 @@ public class PayloadBlock extends Block{
         }
 
         @Override
-        public void write(Writes write) {
+        public void write(Writes write){
             super.write(write);
 
             write.f(payVector.x);
@@ -246,7 +241,7 @@ public class PayloadBlock extends Block{
         }
 
         @Override
-        public void read(Reads read, byte revision) {
+        public void read(Reads read, byte revision){
             super.read(read, revision);
 
             payVector.set(read.f(), read.f());
@@ -255,15 +250,15 @@ public class PayloadBlock extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor) {
-            if (payload instanceof BuildPayload block){
-                return switch (sensor) {
+        public double sense(LAccess sensor){
+            if(payload instanceof BuildPayload block){
+                return switch(sensor){
                     case totalItems -> (block.build.items == null) ? 0 : block.build.items.total();
                     case totalLiquids -> (block.build.liquids == null) ? 0 : block.build.liquids.total();
                     default -> super.sense(sensor);
                 };
             }
-            return switch (sensor) {
+            return switch(sensor){
                 case totalItems -> Float.NaN;
                 case totalLiquids -> Float.NaN;
                 default -> super.sense(sensor);
@@ -271,25 +266,25 @@ public class PayloadBlock extends Block{
         }
 
         @Override
-        public Object senseObject(LAccess sensor) {
-            return switch (sensor) {
+        public Object senseObject(LAccess sensor){
+            return switch(sensor){
                 case firstItem -> (!(payload instanceof BuildPayload block) || block.build.items == null) ? null : block.build.items.first();
                 default -> super.senseObject(sensor);
             };
         }
 
         @Override
-        public double sense(Content content) {
-            if (content instanceof Item i) {
-                if (payload instanceof BuildPayload block && block.build.items != null) {
+        public double sense(Content content){
+            if(content instanceof Item i){
+                if(payload instanceof BuildPayload block && block.build.items != null){
                     return block.build.items.get(i);
-                } else {
+                }else{
                     return Float.NaN;
                 }
-            } else if (content instanceof Liquid l) {
-                if (payload instanceof BuildPayload block && block.build.liquids != null) {
+            } else if(content instanceof Liquid l){
+                if(payload instanceof BuildPayload block && block.build.liquids != null){
                     return block.build.liquids.get(l);
-                } else {
+                }else{
                     return Float.NaN;
                 }
             }
