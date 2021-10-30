@@ -284,7 +284,7 @@ public class PayloadBlock extends Block{
                 if (payload instanceof BuildPayload block && block.build.items != null) {
                     return block.build.items.get(i);
                 } else {
-                    eturn Float.NaN;
+                    return Float.NaN;
                 }
             } else if (content instanceof Liquid l) {
                 if (payload instanceof BuildPayload block && block.build.liquids != null) {
