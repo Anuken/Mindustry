@@ -31,9 +31,11 @@ public class Menus{
 
     @Remote(targets = Loc.both, called = Loc.both)
     public static void menuChoose(@Nullable Player player, int menuId, int option){
-        if(player != null && menuId >= 0 && menuId < menuListeners.size){
+        if(player != null){
             Events.fire(new MenuOptionChooseEvent(player, menuId, option));
-            menuListeners.get(menuId).get(player, option);
+            if(menuId >= 0 && menuId < menuListeners.size){
+                menuListeners.get(menuId).get(player, option);
+            }
         }
     }
 
