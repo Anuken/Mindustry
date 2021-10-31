@@ -2,13 +2,18 @@ package mindustry.world.blocks.distribution;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
+
+import static mindustry.Vars.*;
 
 public class DuctRouter extends Block{
     public float speed = 5f;
@@ -26,8 +31,13 @@ public class DuctRouter extends Block{
         unloadable = false;
         itemCapacity = 1;
         noUpdateDisabled = true;
+        configurable = true;
+        saveConfig = true;
         rotate = true;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
+
+        config(Item.class, (DuctRouterBuild tile, Item item) -> tile.sortItem = item);
+        configClear((DuctRouterBuild tile) -> tile.sortItem = null);
     }
 
     @Override
@@ -49,13 +59,21 @@ public class DuctRouter extends Block{
     }
 
     public class DuctRouterBuild extends Building{
+        public @Nullable Item sortItem;
+
         public float progress;
         public @Nullable Item current;
 
         @Override
         public void draw(){
             Draw.rect(region, x, y);
-            Draw.rect(topRegion, x, y, rotdeg());
+            if(sortItem != null){
+                Draw.color(sortItem.color);
+                Draw.rect("center", x, y);
+                Draw.color();
+            }else{
+                Draw.rect(topRegion, x, y, rotdeg());
+            }
         }
 
         @Override
@@ -67,7 +85,8 @@ public class DuctRouter extends Block{
                     var target = target();
                     if(target != null){
                         target.handleItem(this, current);
-                        cdump = (byte)((cdump + 1) % 3);
+                        int mod = sortItem != null && current != sortItem ? 2 : 3;
+                        cdump = (byte)((cdump + 1) % mod);
                         items.remove(current, 1);
                         current = null;
                         progress %= (1f - 1f/speed);
@@ -82,12 +101,30 @@ public class DuctRouter extends Block{
             }
         }
 
+        @Override
+        public void buildConfiguration(Table table){
+            ItemSelection.buildTable(DuctRouter.this, table, content.items(), () -> sortItem, this::configure);
+        }
+
+        @Override
+        public boolean onConfigureTileTapped(Building other){
+            if(this == other){
+                deselect();
+                configure(null);
+                return false;
+            }
+
+            return true;
+        }
+
         @Nullable
         public Building target(){
             if(current == null) return null;
 
             for(int i = -1; i <= 1; i++){
-                Building other = nearby(Mathf.mod(rotation + (((i + cdump + 1) % 3) - 1), 4));
+                int dir = Mathf.mod(rotation + (((i + cdump + 1) % 3) - 1), 4);
+                if(sortItem != null && (current == sortItem) != (dir == rotation)) continue;
+                Building other = nearby(dir);
                 if(other != null && other.team == team && other.acceptItem(this, current)){
                     return other;
                 }
@@ -120,6 +157,28 @@ public class DuctRouter extends Block{
             progress = -1f;
             items.add(item, 1);
             noSleep();
+        }
+
+        @Override
+        public Item config(){
+            return sortItem;
+        }
+
+        @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.s(sortItem == null ? -1 : sortItem.id);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            sortItem = content.item(read.s());
         }
     }
 }
