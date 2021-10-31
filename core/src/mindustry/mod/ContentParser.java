@@ -196,6 +196,18 @@ public class ContentParser{
                     }
                 }
 
+                //try to parse env bits
+                if((type == int.class || type == Integer.class) && jsonData.isArray()){
+                    int value = 0;
+                    for(var str : jsonData){
+                        if(!str.isString()) throw new SerializationException("Integer bitfield values must all be strings. Found: " + str);
+                        String field = str.asString();
+                        value |= Reflect.<Integer>get(Env.class, field);
+                    }
+
+                    return (T)(Integer)value;
+                }
+
                 //try to parse "item/amount" syntax
                 if(type == ItemStack.class && jsonData.isString() && jsonData.asString().contains("/")){
                     String[] split = jsonData.asString().split("/");
