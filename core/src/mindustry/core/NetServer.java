@@ -757,6 +757,8 @@ public class NetServer implements ApplicationListener{
 
         player.add();
 
+        Events.fire(new PlayerConnectionConfirmed(player));
+
         if(player.con == null || player.con.hasConnected) return;
 
         player.con.hasConnected = true;
