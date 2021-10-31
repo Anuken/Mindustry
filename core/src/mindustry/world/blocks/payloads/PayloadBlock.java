@@ -189,7 +189,7 @@ public class PayloadBlock extends Block{
             boolean canMove = front != null && (front.block.outputsPayload || front.block.acceptsPayload);
 
             if(canDump && !canMove){
-                pushOutput(payload, 1f - (payVector.dst(dest) / (size * tilesize/2f)));
+                pushOutput(payload, 1f - (payVector.dst(dest) / (size * tilesize / 2f)));
             }
 
             if(payVector.within(dest, 0.001f)){
