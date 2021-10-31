@@ -38,6 +38,7 @@ public class PayloadBlock extends Block{
         Building accept = build.nearby(Geometry.d4(direction).x * trns, Geometry.d4(direction).y * trns);
         return accept != null &&
             accept.block.outputsPayload &&
+
             //if size is the same, block must either be facing this one, or not be rotating
             ((accept.block.size == size
             && Math.abs(accept.tileX() - build.tileX()) % size == 0 //check alignment
@@ -59,7 +60,7 @@ public class PayloadBlock extends Block{
         float thresh = 0.55f;
         if(progress >= thresh){
             boolean legStep = payload instanceof UnitPayload u && u.unit.type.allowLegStep;
-            float size = payload.size(), radius = size/2f, x = payload.x(), y = payload.y(), scl = Mathf.clamp(((progress - thresh)/(1f - thresh)) * 1.1f);
+            float size = payload.size(), radius = size/2f, x = payload.x(), y = payload.y(), scl = Mathf.clamp(((progress - thresh) / (1f - thresh)) * 1.1f);
 
             Groups.unit.intersect(x - size/2f, y - size/2f, size, size, u -> {
                 float dst = u.dst(payload);
@@ -91,7 +92,7 @@ public class PayloadBlock extends Block{
         public void onControlSelect(Unit player){
             float x = player.x, y = player.y;
             handleUnitPayload(player, p -> payload = (T)p);
-            this.payVector.set(x, y).sub(this).clamp(-size * tilesize/2f, -size * tilesize/2f, size * tilesize/2f, size * tilesize/2f);
+            this.payVector.set(x, y).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
             this.payRotation = player.rotation;
         }
 
@@ -103,7 +104,7 @@ public class PayloadBlock extends Block{
         @Override
         public void handlePayload(Building source, Payload payload){
             this.payload = (T)payload;
-            this.payVector.set(source).sub(this).clamp(-size * tilesize/2f, -size * tilesize/2f, size * tilesize/2f, size * tilesize/2f);
+            this.payVector.set(source).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
             this.payRotation = payload.rotation();
 
             updatePayload();
@@ -188,11 +189,11 @@ public class PayloadBlock extends Block{
             boolean canMove = front != null && (front.block.outputsPayload || front.block.acceptsPayload);
 
             if(canDump && !canMove){
-                pushOutput(payload, 1f - (payVector.dst(dest)/(size * tilesize/2f)));
+                pushOutput(payload, 1f - (payVector.dst(dest) / (size * tilesize/2f)));
             }
 
             if(payVector.within(dest, 0.001f)){
-                payVector.clamp(-size * tilesize/2f, -size * tilesize/2f, size * tilesize/2f, size * tilesize/2f);
+                payVector.clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
 
                 if(canMove){
                     if(movePayload(payload)){
