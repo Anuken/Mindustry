@@ -270,6 +270,9 @@ public class Teams{
                 buildings.getObjects(builds);
             }
 
+            //no remaining blocks, cease building if applicable
+            blocks.clear();
+
             //convert all team tiles to neutral, randomly killing them
             for(var b : builds){
                 //TODO this may cause a lot of packet spam, optimize?
