@@ -60,7 +60,7 @@ public class PayloadUnloader extends PayloadLoader{
 
                 //unload items
                 if(payload.block().hasItems && !full()){
-                    if(efficiency() > 0.01f && timer(timerLoad, loadTime/efficiency())){
+                    if(efficiency() > 0.01f && timer(timerLoad, loadTime / efficiency())){
                         //load up items a set amount of times
                         for(int j = 0; j < itemsLoaded && !full(); j++){
                             for(int i = 0; i < items.length(); i++){
@@ -78,10 +78,10 @@ public class PayloadUnloader extends PayloadLoader{
                 //unload liquids
                 //TODO tile is null may crash
                 if(payload.block().hasLiquids && payload.build.liquids.currentAmount() >= 0.01f &&
-                   (liquids.current() == payload.build.liquids.current() || liquids.currentAmount() <= 0.2f)){
+                    (liquids.current() == payload.build.liquids.current() || liquids.currentAmount() <= 0.2f)){
                     var liq = payload.build.liquids.current();
                     float remaining = liquidCapacity - liquids.currentAmount();
-                    float flow = Math.min(Math.min(liquidsLoaded*delta(), remaining), payload.build.liquids.currentAmount());
+                    float flow = Math.min(Math.min(liquidsLoaded * delta(), remaining), payload.build.liquids.currentAmount());
 
                     liquids.add(liq, flow);
                     payload.build.liquids.remove(liq, flow);
@@ -103,7 +103,7 @@ public class PayloadUnloader extends PayloadLoader{
             if(payload == null){
                 return false;
             }
-            if(exporting == true){
+            if(exporting){
                 return true;
             }
             boolean result = true;
@@ -113,9 +113,7 @@ public class PayloadUnloader extends PayloadLoader{
                     break;
                 }
             }
-            return result &&
-                   (!payload.block().hasLiquids || payload.build.liquids.currentAmount() <= 0.001f)
-                    ;
+            return result && (!payload.block().hasLiquids || payload.build.liquids.currentAmount() <= 0.001f);
         }
 
         @Override
