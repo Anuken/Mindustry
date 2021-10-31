@@ -1294,10 +1294,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void pickedUp(){
-        power.graph.removeList(self());
-        power.graph = new PowerGraph();
-        power.links.clear();
-        power.status = 0f;
+        if(power != null){
+            if(power.graph != null){
+                power.graph.removeList(self());
+                power.graph = new PowerGraph();
+            }
+            power.links.clear();
+            power.status = 0f;
+        }
+
     }
 
     public void removeFromProximity(){
