@@ -176,7 +176,7 @@ public class BulletType extends Content implements Cloneable{
     public float lightOpacity = 0.3f;
     public Color lightColor = Pal.powerLight;
 
-    public Sortf unitSort;
+    public @Nullable Sortf unitSort;
 
     public BulletType(float speed, float damage){
         this.speed = speed;
