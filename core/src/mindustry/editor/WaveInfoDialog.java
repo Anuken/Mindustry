@@ -27,8 +27,11 @@ import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.*;
 
 public class WaveInfoDialog extends BaseDialog{
-    private static final int maxVisible = 30, maxGraphSpeed = 16;
-    private int start = 0, displayed = 20, graphSpeed = 1;
+    private static final int maxVisible = 30;
+    private static final float maxGraphSpeed = 8f;
+
+    private int start = 0, displayed = 20;
+    private float graphSpeed = 0.5f;
     Seq<SpawnGroup> groups = new Seq<>();
     private @Nullable SpawnGroup expandedGroup;
 
@@ -117,12 +120,12 @@ public class WaveInfoDialog extends BaseDialog{
             }
         });
 
-        if(experimental){
-            buttons.button("x" + graphSpeed, () -> {
-                graphSpeed *= 2;
-                if(graphSpeed > maxGraphSpeed) graphSpeed = 1;
-            }).width(100f).padLeft(20f).update(b -> b.setText("x" + graphSpeed));
+        buttons.button("x" + Strings.autoFixed(graphSpeed * 2, 2), () -> {
+            graphSpeed *= 2;
+            if(graphSpeed > maxGraphSpeed) graphSpeed = 0.25f;
+        }).width(100f).padLeft(20f).update(b -> b.setText("x" + Strings.autoFixed(graphSpeed * 2, 2)));
 
+        if(experimental){
             buttons.button("Random", Icon.refresh, () -> {
                 groups.clear();
                 groups = Waves.generate(1f / 10f);
@@ -131,20 +134,22 @@ public class WaveInfoDialog extends BaseDialog{
         }
     }
 
-    void view(int amount){
+    void view(float amount){
         updateTimer += Time.delta;
-        if(updateTimer >= updatePeriod){
-            displayed += amount;
+        float scale = 1 / Math.min(Math.abs(amount), 1);
+        if(updateTimer >= updatePeriod * scale){
+            displayed += amount * scale;
             if(displayed < 5) displayed = 5;
             updateTimer = 0f;
             updateWaves();
         }
     }
 
-    void shift(int amount){
+    void shift(float amount){
         updateTimer += Time.delta;
-        if(updateTimer >= updatePeriod){
-            start += amount;
+        float scale = 1 / Math.min(Math.abs(amount), 1);
+        if(updateTimer >= updatePeriod * scale){
+            start += amount * scale;
             if(start < 0) start = 0;
             updateTimer = 0f;
             updateWaves();
