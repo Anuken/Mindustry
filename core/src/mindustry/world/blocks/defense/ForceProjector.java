@@ -123,6 +123,12 @@ public class ForceProjector extends Block{
         }
 
         @Override
+        public void pickedUp(){
+            super.pickedUp();
+            radscl = warmup = 0f;
+        }
+
+        @Override
         public void updateTile(){
             boolean phaseValid = consumes.get(ConsumeType.item).valid(this);
 
