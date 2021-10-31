@@ -121,7 +121,7 @@ public class WaveInfoDialog extends BaseDialog{
             buttons.button("x" + graphSpeed, () -> {
                 graphSpeed *= 2;
                 if(graphSpeed > maxGraphSpeed) graphSpeed = 1;
-            }).update(b -> b.setText("x" + graphSpeed)).width(100f);
+            }).width(100f).padLeft(20f).update(b -> b.setText("x" + graphSpeed));
 
             buttons.button("Random", Icon.refresh, () -> {
                 groups.clear();
@@ -233,8 +233,8 @@ public class WaveInfoDialog extends BaseDialog{
                     t.margin(0).defaults().pad(3).padLeft(5f).growX().left();
                     t.button(b -> {
                         b.left();
-                        b.image(group.type.uiIcon).size(32f).scaling(Scaling.fit);
-                        if(group.effect != null && group.effect != StatusEffects.none) b.image(group.effect.uiIcon).size(22f).padRight(3).scaling(Scaling.fit);
+                        b.image(group.type.uiIcon).size(32f).padRight(3).scaling(Scaling.fit);
+                        if(group.effect != null && group.effect != StatusEffects.none) b.image(group.effect.uiIcon).size(22f).padLeft(-3).padRight(3).scaling(Scaling.fit);
                         b.add(group.type.localizedName).color(Pal.accent);
 
                         b.add().growX();
