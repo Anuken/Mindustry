@@ -11,6 +11,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.Units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -174,6 +175,8 @@ public class BulletType extends Content implements Cloneable{
     public float lightRadius = -1f;
     public float lightOpacity = 0.3f;
     public Color lightColor = Pal.powerLight;
+
+    public Sortf unitSort;
 
     public BulletType(float speed, float damage){
         this.speed = speed;

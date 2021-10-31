@@ -325,10 +325,12 @@ public class Turret extends ReloadTurret{
         }
 
         protected void findTarget(){
+            Sortf sort = peekAmmo().unitSort != null ? peekAmmo().unitSort : unitSort;
+
             if(targetAir && !targetGround){
-                target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded(), unitSort);
+                target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded(), sort);
             }else{
-                target = Units.bestTarget(team, x, y, range, e -> !e.dead() && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround, unitSort);
+                target = Units.bestTarget(team, x, y, range, e -> !e.dead() && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround, sort);
 
                 if(target == null && canHeal()){
                     target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);
