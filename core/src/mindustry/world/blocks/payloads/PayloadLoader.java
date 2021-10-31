@@ -122,7 +122,7 @@ public class PayloadLoader extends PayloadBlock{
 
                 //load up items
                 if(payload.block().hasItems && items.any()){
-                    if(efficiency() > 0.01f && timer(timerLoad, loadTime / efficiency())){
+                    if(efficiency() > 0.01f && timer(timerLoad, loadTime/efficiency())){
                         //load up items a set amount of times
                         for(int j = 0; j < itemsLoaded && items.any(); j++){
 
@@ -161,7 +161,7 @@ public class PayloadLoader extends PayloadBlock{
         }
 
         public float fraction(){
-            return payload == null ? 0f : payload.build.items.total() / (float)payload.build.block.itemCapacity;
+            return payload == null ? 0f : payload.build.items.total()/(float)payload.build.block.itemCapacity;
         }
 
         public boolean shouldExport(){

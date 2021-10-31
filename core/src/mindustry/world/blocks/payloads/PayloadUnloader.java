@@ -60,7 +60,7 @@ public class PayloadUnloader extends PayloadLoader{
 
                 //unload items
                 if(payload.block().hasItems && !full()){
-                    if(efficiency() > 0.01f && timer(timerLoad, loadTime / efficiency())){
+                    if(efficiency() > 0.01f && timer(timerLoad, loadTime/efficiency())){
                         //load up items a set amount of times
                         for(int j = 0; j < itemsLoaded && !full(); j++){
                             for(int i = 0; i < items.length(); i++){
