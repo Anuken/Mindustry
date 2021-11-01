@@ -20,6 +20,7 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.Units.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
@@ -61,6 +62,7 @@ public class ContentParser{
             readFields(result, data);
             return result;
         });
+        put(Sortf.class, (type, data) -> field(UnitSorts.class, data));
         put(Interp.class, (type, data) -> field(Interp.class, data));
         put(CacheLayer.class, (type, data) -> field(CacheLayer.class, data));
         put(Attribute.class, (type, data) -> Attribute.get(data.asString()));
