@@ -2,7 +2,6 @@ package mindustry.world.blocks.storage;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -65,8 +64,10 @@ public class Unloader extends Block{
             float loadFactor;
             boolean canLoad;
             boolean canUnload;
-            float random;
+            int index;
         }
+
+        public int[] lastUsed;
 
         @Override
         public void updateTile(){
@@ -82,14 +83,14 @@ public class Unloader extends Block{
                 for(int i = tmp; i < proximity.size; i++){
                     possibleBlocks.set(i, new ContainerStat());
                 }
+                lastUsed = new int[proximity.size];
             }
 
             if(sortItem != null){
                 item = sortItem;
 
-                for(int j = 0; j < proximity.size; j++){
-                    int pos = (offset + j) % proximity.size;
-                    var other = proximity.get(j);
+                for(int pos = 0; pos < proximity.size; pos++){
+                    var other = proximity.get(pos);
                     boolean interactable = other.interactable(team);
 
                     //set the stats of all buildings in possibleBlocks
@@ -97,7 +98,7 @@ public class Unloader extends Block{
                     pb.building = other;
                     pb.canUnload = interactable && other.canUnload() && other.items != null && other.items.has(sortItem);
                     pb.canLoad = interactable && !(other.block instanceof StorageBlock) && other.acceptItem(this, sortItem);
-                    pb.random = Mathf.random();
+                    pb.index = pos;
                 }
             }else{
                 //select the next item for nulloaders
@@ -109,9 +110,8 @@ public class Unloader extends Block{
                     boolean isDistinct = false;
                     Item possibleItem = content.item(total);
 
-                    for(int j = 0; j < proximity.size; j++){
-                        int pos = (offset + j) % proximity.size;
-                        var other = proximity.get(j);
+                    for(int pos = 0; pos < proximity.size; pos++){
+                        var other = proximity.get(pos);
                         boolean interactable = other.interactable(team);
 
                         //set the stats of all buildings in possibleBlocks while we are at it
@@ -119,7 +119,7 @@ public class Unloader extends Block{
                         pb.building = other;
                         pb.canUnload = interactable && other.canUnload() && other.items != null && other.items.has(possibleItem);
                         pb.canLoad = interactable && !(other.block instanceof StorageBlock) && other.acceptItem(this, possibleItem);
-                        pb.random = Mathf.random();
+                        pb.index = pos;
 
                         //the part handling framerate issues and slow conveyor belts, to avoid skipping items
                         if(hasProvider && pb.canLoad) isDistinct = true;
@@ -142,12 +142,12 @@ public class Unloader extends Block{
                     pb.loadFactor = (other.getMaximumAccepted(item) == 0) || (other.items == null) ? 0 : other.items.get(item) / (float)other.getMaximumAccepted(item);
                 }
 
-                //sort so it gives full priority to blocks that can give but not receive (stackConveyors and Storage), and then by load
+                //sort so it gives full priority to blocks that can give but not receive (stackConveyors and Storage), and then by load, and then by last use
                 possibleBlocks.sort(Structs.comps(
                     Structs.comparingBool(e -> e.building.block.highUnloadPriority),
                     Structs.comps(
                         Structs.comparingFloat(e -> e.loadFactor),
-                        Structs.comparingFloat(e -> e.random)
+                        Structs.comparingInt(e -> -lastUsed[e.index])
                 )));
 
                 ContainerStat dumpingFrom = null;
@@ -169,10 +169,17 @@ public class Unloader extends Block{
                     }
                 }
 
+                //increment the priority if not used
+                for(int i = 0; i < possibleBlocks.size; i++){
+                    lastUsed[i] = (lastUsed[i] + 1 ) % 2147483647;
+                }
+
                 //trade the items
                 if(dumpingFrom != null && dumpingTo != null && (dumpingFrom.loadFactor != dumpingTo.loadFactor || dumpingFrom.building.block.highUnloadPriority)){
                     dumpingTo.building.handleItem(this, item);
                     dumpingFrom.building.removeStack(item, 1);
+                    lastUsed[dumpingFrom.index] = 0;
+                    lastUsed[dumpingTo.index] = 0;
                     any = true;
                 }
 
