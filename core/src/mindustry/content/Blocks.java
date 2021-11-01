@@ -1414,8 +1414,8 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.graphite, 10, Items.lead, 30, Items.beryllium, 30));
             size = 3;
             consumesPower = outputsPower = true;
-            consumes.powerBuffered(30000f);
-            range = 22;
+            consumes.powerBuffered(40000f);
+            range = 23;
         }};
 
         combustionGenerator = new BurnerGenerator("combustion-generator"){{
@@ -1814,7 +1814,7 @@ public class Blocks implements ContentList{
         }};
 
         wave = new LiquidTurret("wave"){{
-            requirements(Category.turret, with(Items.metaglass, 45, Items.lead, 75));
+            requirements(Category.turret, with(Items.metaglass, 45, Items.lead, 75, Items.copper, 25));
             ammo(
                 Liquids.water, Bullets.waterShot,
                 Liquids.slag, Bullets.slagShot,
@@ -1952,7 +1952,7 @@ public class Blocks implements ContentList{
         }};
 
         segment = new PointDefenseTurret("segment"){{
-            requirements(Category.turret, with(Items.silicon, 130, Items.thorium, 80, Items.phaseFabric, 40));
+            requirements(Category.turret, with(Items.silicon, 130, Items.thorium, 80, Items.phaseFabric, 40, Items.titanium, 40));
 
             health = 250 * size * size;
             range = 180f;
