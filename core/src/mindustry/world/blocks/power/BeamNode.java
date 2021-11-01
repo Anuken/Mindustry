@@ -54,11 +54,12 @@ public class BeamNode extends PowerBlock{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         for(int i = 0; i < 4; i++){
-            int maxLen = range;
+            int maxLen = range + size/2;
             Building dest = null;
             var dir = Geometry.d4[i];
             int dx = dir.x, dy = dir.y;
-            for(int j = 1; j <= range; j++){
+            int offset = size/2;
+            for(int j = 1 + offset; j <= range + offset; j++){
                 var other = world.build(x + j * dir.x, y + j * dir.y);
                 if(other != null && other.block.hasPower && other.team == Vars.player.team()){
                     maxLen = j;
@@ -68,8 +69,8 @@ public class BeamNode extends PowerBlock{
             }
 
             Drawf.dashLine(Pal.placing,
-                x * tilesize + dx * (tilesize / 2f + 2),
-                y * tilesize + dy * (tilesize / 2f + 2),
+                x * tilesize + dx * (tilesize * size / 2f + 2),
+                y * tilesize + dy * (tilesize * size / 2f + 2),
                 x * tilesize + dx * (maxLen) * tilesize,
                 y * tilesize + dy * (maxLen) * tilesize
             );
@@ -111,13 +112,13 @@ public class BeamNode extends PowerBlock{
             float w = laserWidth + Mathf.absin(pulseScl, pulseMag);
 
             for(int i = 0; i < 4; i ++){
-                if(dests[i] != null && (links[i].block != block || links[i].id > id)){
+                if(dests[i] != null && (!(links[i].block instanceof BeamNode) || (links[i].tileX() != tileX() && links[i].tileY() != tileY()) || links[i].id > id)){
                     int dst = Math.max(Math.abs(dests[i].x - tile.x),  Math.abs(dests[i].y - tile.y));
                     //don't draw lasers for adjacent blocks
-                    if(dst > 1){
+                    if(dst > 1 + size/2){
                         var point = Geometry.d4[i];
                         float poff = tilesize/2f;
-                        Drawf.laser(team, laser, laserEnd, x + poff*point.x, y + poff*point.y, dests[i].worldx() - poff*point.x, dests[i].worldy() - poff*point.y, w);
+                        Drawf.laser(team, laser, laserEnd, x + poff*size*point.x, y + poff*size*point.y, dests[i].worldx() - poff*point.x, dests[i].worldy() - poff*point.y, w);
                     }
                 }
             }
@@ -137,8 +138,9 @@ public class BeamNode extends PowerBlock{
                 var dir = Geometry.d4[i];
                 links[i] = null;
                 dests[i] = null;
+                int offset = size/2;
                 //find first block with power in range
-                for(int j = 1; j <= range; j++){
+                for(int j = 1 + offset; j <= range + offset; j++){
                     var other = world.build(tile.x + j * dir.x, tile.y + j * dir.y);
                     if(other != null && other.block.hasPower && other.team == team){
                         links[i] = other;

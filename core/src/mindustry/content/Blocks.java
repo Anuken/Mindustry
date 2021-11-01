@@ -79,7 +79,7 @@ public class Blocks implements ContentList{
     combustionGenerator, thermalGenerator, steamGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
     turbineCondenser,
     impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
-    beamNode,
+    beamNode, beamTower,
 
     //production
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
@@ -1404,7 +1404,18 @@ public class Blocks implements ContentList{
 
         beamNode = new BeamNode("beam-node"){{
             requirements(Category.power, with(Items.graphite, 1, Items.lead, 3));
+            consumesPower = outputsPower = true;
+            consumes.powerBuffered(1000f);
             range = 10;
+        }};
+
+        //TODO requirements
+        beamTower = new BeamNode("beam-tower"){{
+            requirements(Category.power, with(Items.graphite, 10, Items.lead, 30, Items.beryllium, 30));
+            size = 3;
+            consumesPower = outputsPower = true;
+            consumes.powerBuffered(30000f);
+            range = 22;
         }};
 
         combustionGenerator = new BurnerGenerator("combustion-generator"){{
