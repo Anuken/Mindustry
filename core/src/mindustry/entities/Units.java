@@ -81,6 +81,12 @@ public class Units{
         return Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + team.data().unitCap : state.rules.unitCap);
     }
 
+    /** @return unit cap as a string, substituting the infinity symbol instead of MAX_VALUE */
+    public static String getStringCap(Team team){
+        int cap = getCap(team);
+        return cap >= Integer.MAX_VALUE - 1 ? "∞" : cap + "";
+    }
+
     /** @return whether this player can interact with a specific tile. if either of these are null, returns true.*/
     public static boolean canInteract(Player player, Building tile){
         return player == null || tile == null || tile.interactable(player.team());
