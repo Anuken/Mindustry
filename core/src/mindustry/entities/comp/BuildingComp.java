@@ -1296,7 +1296,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Called right before this building is picked up. */
     public void pickedUp(){
 
-
     }
 
     /** Called right after this building is picked up. */
