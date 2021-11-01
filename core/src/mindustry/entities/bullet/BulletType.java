@@ -358,7 +358,7 @@ public class BulletType extends Content implements Cloneable{
         updateTrail(b);
 
         if(homingPower > 0.0001f && b.time >= homingDelay){
-            Sortf sort = unitSort != null ? unitSort : Unit::dst2;
+            Sortf sort = unitSort != null ? unitSort : UnitSorts.closest;
 
             Teamc target;
             //home in on allies if possible
