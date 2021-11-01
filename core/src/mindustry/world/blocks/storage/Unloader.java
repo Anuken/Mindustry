@@ -2,6 +2,7 @@ package mindustry.world.blocks.storage;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -64,6 +65,7 @@ public class Unloader extends Block{
             float loadFactor;
             boolean canLoad;
             boolean canUnload;
+            float random;
         }
 
         @Override
@@ -95,6 +97,7 @@ public class Unloader extends Block{
                     pb.building = other;
                     pb.canUnload = interactable && other.canUnload() && other.items != null && other.items.has(sortItem);
                     pb.canLoad = interactable && !(other.block instanceof StorageBlock) && other.acceptItem(this, sortItem);
+                    pb.random = Mathf.random();
                 }
             }else{
                 //select the next item for nulloaders
@@ -116,6 +119,7 @@ public class Unloader extends Block{
                         pb.building = other;
                         pb.canUnload = interactable && other.canUnload() && other.items != null && other.items.has(possibleItem);
                         pb.canLoad = interactable && !(other.block instanceof StorageBlock) && other.acceptItem(this, possibleItem);
+                        pb.random = Mathf.random();
 
                         //the part handling framerate issues and slow conveyor belts, to avoid skipping items
                         if(hasProvider && pb.canLoad) isDistinct = true;
@@ -141,8 +145,10 @@ public class Unloader extends Block{
                 //sort so it gives full priority to blocks that can give but not receive (stackConveyors and Storage), and then by load
                 possibleBlocks.sort(Structs.comps(
                     Structs.comparingBool(e -> e.building.block.highUnloadPriority),
-                    Structs.comparingFloat(e -> e.loadFactor)
-                ));
+                    Structs.comps(
+                        Structs.comparingFloat(e -> e.loadFactor),
+                        Structs.comparingFloat(e -> e.random)
+                )));
 
                 ContainerStat dumpingFrom = null;
                 ContainerStat dumpingTo = null;
