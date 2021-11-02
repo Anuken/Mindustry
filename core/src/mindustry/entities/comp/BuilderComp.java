@@ -46,6 +46,10 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
 
     @Override
     public void update(){
+        updateBuildLogic();
+    }
+
+    public void updateBuildLogic(){
         if(!headless){
             //visual activity update
             if(lastActive != null && buildAlpha <= 0.01f){
@@ -57,7 +61,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
 
         if(!updateBuilding || !canBuild()) return;
 
-        float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange;
+        float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : type.buildRange;
         boolean infinite = state.rules.infiniteResources || team().rules().infiniteResources;
 
         Iterator<BuildPlan> it = plans.iterator();
@@ -143,7 +147,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
 
     /** Draw all current build plans. Does not draw the beam effect, only the positions. */
     void drawBuildPlans(){
-        Boolf<BuildPlan> skip = plan -> plan.progress > 0.01f || (buildPlan() == plan && plan.initialized && (within(plan.x * tilesize, plan.y * tilesize, buildingRange) || state.isEditor()));
+        Boolf<BuildPlan> skip = plan -> plan.progress > 0.01f || (buildPlan() == plan && plan.initialized && (within(plan.x * tilesize, plan.y * tilesize, type.buildRange) || state.isEditor()));
 
         for(int i = 0; i < 2; i++){
             for(BuildPlan plan : plans){
@@ -182,7 +186,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
     /** @return whether this request should be skipped, in favor of the next one. */
     boolean shouldSkip(BuildPlan request, @Nullable Building core){
         //requests that you have at least *started* are considered
-        if(state.rules.infiniteResources || team.rules().infiniteResources || request.breaking || core == null || request.isRotation(team) || (isBuilding() && !within(plans.last(), buildingRange))) return false;
+        if(state.rules.infiniteResources || team.rules().infiniteResources || request.breaking || core == null || request.isRotation(team) || (isBuilding() && !within(plans.last(), type.buildRange))) return false;
 
         return (request.stuck && !core.items.has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items.has(i.item, Math.min(i.amount, 15)) && Mathf.round(i.amount * state.rules.buildCostMultiplier) > 0) && !request.initialized);
     }
@@ -238,7 +242,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
     boolean activelyBuilding(){
         //not actively building when not near the build plan
         if(isBuilding()){
-            if(!state.isEditor() && !within(buildPlan(), state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange)){
+            if(!state.isEditor() && !within(buildPlan(), state.rules.infiniteResources ? Float.MAX_VALUE : type.buildRange)){
                 return false;
             }
         }
@@ -252,6 +256,10 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
     }
 
     public void draw(){
+        drawBuilding();
+    }
+
+    public void drawBuilding(){
         boolean active = activelyBuilding();
         if(!active && lastActive == null) return;
 
@@ -261,7 +269,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         Tile tile = world.tile(plan.x, plan.y);
         var core = team.core();
 
-        if(tile == null || !within(plan, state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange)){
+        if(tile == null || !within(plan, state.rules.infiniteResources ? Float.MAX_VALUE : type.buildRange)){
             return;
         }
 

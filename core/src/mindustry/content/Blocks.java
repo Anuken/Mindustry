@@ -65,6 +65,7 @@ public class Blocks implements ContentList{
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriveProjector, overdriveDome, forceProjector, shockMine,
+    buildTower,
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
     //transport
@@ -1155,6 +1156,14 @@ public class Blocks implements ContentList{
             tileDamage = 7f;
             length = 10;
             tendrils = 4;
+        }};
+
+        buildTower = new BuildTurret("build-tower"){{
+            requirements(Category.effect, with(Items.lead, 40, Items.beryllium, 50));
+            consumes.power(0.2f);
+            range = 200f;
+            size = 3;
+            health = 80;
         }};
 
         //endregion
