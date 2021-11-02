@@ -1160,10 +1160,12 @@ public class Blocks implements ContentList{
 
         buildTower = new BuildTurret("build-tower"){{
             requirements(Category.effect, with(Items.graphite, 40, Items.beryllium, 50));
-            consumes.power(0.2f);
-            range = 200f;
+            outlineColor = Pal.darkOutline;
+            consumes.power(1.5f);
+            range = 120f;
             size = 3;
             health = 80;
+            buildSpeed = 1.5f;
         }};
 
         //endregion
@@ -2209,7 +2211,7 @@ public class Blocks implements ContentList{
             );
 
             shootLength = 0f;
-            outlineColor = Color.valueOf("2d2f39");
+            outlineColor = Pal.darkOutline;
             size = 2;
             envEnabled |= Env.space;
             basePrefix = "reinforced";

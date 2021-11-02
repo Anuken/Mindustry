@@ -5,6 +5,7 @@ import arc.graphics.*;
 public class Pal{
     public static Color
 
+    darkOutline = Color.valueOf("2d2f39"),
     thoriumPink = Color.valueOf("f9a3c7"),
     coalBlack = Color.valueOf("272727"),
 

@@ -5,6 +5,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
@@ -12,6 +13,7 @@ import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.meta.*;
@@ -19,11 +21,12 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class BuildTurret extends BaseTurret{
-    public final int timerTarget = timers++;
-    public int targetInterval = 20;
+    public final int timerTarget = timers++, timerTarget2 = timers++;
+    public int targetInterval = 60;
 
     public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
     public float buildSpeed = 1f;
+    public float buildBeamOffset = 4.1f;
     //created in init()
     public @Nullable UnitType unitType;
     public float elevation = -1f;
@@ -46,17 +49,29 @@ public class BuildTurret extends BaseTurret{
             speed = 0f;
             hitSize = 0f;
             health = 1;
-            rotateSpeed = BuildTurret.this.rotateSpeed;
             itemCapacity = 0;
             commandLimit = 0;
+            rotateSpeed = BuildTurret.this.rotateSpeed;
+            buildBeamOffset = BuildTurret.this.buildBeamOffset;
             constructor = BlockUnitUnit::create;
             buildRange = BuildTurret.this.range;
             buildSpeed = BuildTurret.this.buildSpeed;
         }};
     }
 
+    @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{baseRegion, region};
+    }
+
     public class BuildTurretBuild extends BaseTurretBuild implements ControlBlock{
         public BlockUnitc unit = (BlockUnitc)unitType.create(team);
+        public @Nullable Unit following;
+        public @Nullable BlockPlan lastPlan;
+
+        {
+            unit.rotation(90f);
+        }
 
         @Override
         public boolean canControl(){
@@ -83,32 +98,101 @@ public class BuildTurret extends BaseTurret{
                 unit.lookAt(angleTo(unit.buildPlan()));
             }
 
-            //at 0 build speed the unit thinks it can't build, so make it >0
-            unit.buildSpeedMultiplier(Math.max(efficiency() * timeScale, 0.000001f));
+            unit.buildSpeedMultiplier(efficiency() * timeScale);
 
             if(!isControlled()){
                 unit.updateBuilding(true);
 
-                if(unit.buildPlan() == null && timer(timerTarget, targetInterval)){
+                if(following != null){
+                    //validate follower
+                    if(!following.isValid() || !following.activelyBuilding()){
+                        following = null;
+                        unit.plans().clear();
+                    }else{
+                        //set to follower's first build plan, whatever that is
+                        unit.plans().clear();
+                        unit.plans().addFirst(following.buildPlan());
+                        lastPlan = null;
+                    }
+
+                }else if(unit.buildPlan() == null && timer(timerTarget, targetInterval)){ //search for new stuff
                     Queue<BlockPlan> blocks = team.data().blocks;
                     for(int i = 0; i < blocks.size; i++){
                         var block = blocks.get(i);
                         if(within(block.x * tilesize, block.y * tilesize, range)){
-                            if(Build.validPlace(content.block(block.block), unit.team(), block.x, block.y, block.rotation)){
+                            var btype = content.block(block.block);
+
+                            if(Build.validPlace(btype, unit.team(), block.x, block.y, block.rotation) && team.items().has(btype.requirements, state.rules.buildCostMultiplier)){
                                 unit.addBuild(new BuildPlan(block.x, block.y, block.rotation, content.block(block.block), block.config));
                                 //shift build plan to tail so next unit builds something else
                                 blocks.addLast(blocks.removeIndex(i));
+                                lastPlan = block;
                                 break;
                             }
                         }
                     }
+
+                    //still not building, find someone to mimic
+                    if(unit.buildPlan() == null){
+                        following = null;
+                        Units.nearby(team, x, y, range, u -> {
+                            if(following  != null) return;
+
+                            if(u.canBuild() && u.activelyBuilding()){
+                                BuildPlan plan = u.buildPlan();
+
+                                Building build = world.build(plan.x, plan.y);
+                                if(build instanceof ConstructBuild && within(build, range)){
+                                    following = u;
+                                }
+                            }
+                        });
+                    }
+                }else if(unit.buildPlan() != null){ //validate building
+                    BuildPlan req = unit.buildPlan();
+
+                    //clear break plan if another player is breaking something
+                    if(!req.breaking && timer.get(timerTarget2, 40f)){
+                        for(Player player : Groups.player){
+                            if(player.isBuilder() && player.unit().activelyBuilding() && player.unit().buildPlan().samePos(req) && player.unit().buildPlan().breaking){
+                                unit.plans().removeFirst();
+                                //remove from list of plans
+                                team.data().blocks.remove(p -> p.x == req.x && p.y == req.y);
+                                return;
+                            }
+                        }
+                    }
+
+                    boolean valid =
+                        !(lastPlan != null && lastPlan.removed) &&
+                        ((req.tile() != null && req.tile().build instanceof ConstructBuild cons && cons.current == req.block) ||
+                        (req.breaking ?
+                        Build.validBreak(unit.team(), req.x, req.y) :
+                        Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation)));
+
+                    if(!valid){
+                        //discard invalid request
+                        unit.plans().removeFirst();
+                        lastPlan = null;
+                    }
                 }
+            }else{ //is being controlled, forget everything
+                following = null;
+                lastPlan = null;
             }
 
             //please do not commit suicide
             unit.plans().remove(b -> b.build() == this);
 
             unit.updateBuildLogic();
+
+            //at 0 build speed the unit thinks it can't build, so make it >0 after updating
+            unit.buildSpeedMultiplier(Math.max(unit.buildSpeedMultiplier(), 0.00001f));
+        }
+
+        @Override
+        public boolean shouldConsume(){
+            return super.shouldConsume() && unit.activelyBuilding();
         }
 
         @Override
