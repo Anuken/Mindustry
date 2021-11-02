@@ -78,13 +78,13 @@ public class BuildPlan implements Position{
 
     /** Transforms the internal position of this config using the specified function, and return the result. */
     public static Object pointConfig(Block block, Object config, Cons<Point2> cons){
-        if(config instanceof Point2){
-            config = ((Point2)config).cpy();
-            cons.get((Point2)config);
-        }else if(config instanceof Point2[]){
-            Point2[] result = new Point2[((Point2[])config).length];
+        if(config instanceof Point2 point){
+            config = point.cpy();
+            cons.get(point);
+        }else if(config instanceof Point2[] points){
+            Point2[] result = new Point2[points.length];
             int i = 0;
-            for(Point2 p : (Point2[])config){
+            for(Point2 p : points){
                 result[i] = p.cpy();
                 cons.get(result[i++]);
             }

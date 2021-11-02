@@ -26,7 +26,7 @@ public class BuildTurret extends BaseTurret{
 
     public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
     public float buildSpeed = 1f;
-    public float buildBeamOffset = 4.1f;
+    public float buildBeamOffset = 5f;
     //created in init()
     public @Nullable UnitType unitType;
     public float elevation = -1f;
@@ -53,9 +53,9 @@ public class BuildTurret extends BaseTurret{
             commandLimit = 0;
             rotateSpeed = BuildTurret.this.rotateSpeed;
             buildBeamOffset = BuildTurret.this.buildBeamOffset;
-            constructor = BlockUnitUnit::create;
             buildRange = BuildTurret.this.range;
             buildSpeed = BuildTurret.this.buildSpeed;
+            constructor = BlockUnitUnit::create;
         }};
     }
 

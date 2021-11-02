@@ -1161,7 +1161,7 @@ public class Blocks implements ContentList{
         buildTower = new BuildTurret("build-tower"){{
             requirements(Category.effect, with(Items.graphite, 40, Items.beryllium, 50));
             outlineColor = Pal.darkOutline;
-            consumes.power(1.5f);
+            consumes.power(3f);
             range = 120f;
             size = 3;
             health = 80;
