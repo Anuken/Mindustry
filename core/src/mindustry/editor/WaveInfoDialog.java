@@ -42,7 +42,7 @@ public class WaveInfoDialog extends BaseDialog{
     private @Nullable StatusEffect filterEffect;
     private Sort sort = Sort.begin;
     private boolean reverseSort = false;
-    private float payLeft, updateTimer, updatePeriod = 1f;
+    private float updateTimer, payLeft;
     private TextField amountField = new TextField();
     private WaveGraph graph = new WaveGraph();
 
@@ -136,8 +136,8 @@ public class WaveInfoDialog extends BaseDialog{
 
     void view(float amount){
         updateTimer += Time.delta;
-        float scale = 1 / Math.min(Math.abs(amount), 1);
-        if(updateTimer >= updatePeriod * scale){
+        float scale = 1 / Math.abs(amount);
+        if(updateTimer >= scale){
             displayed += amount * scale;
             if(displayed < 5) displayed = 5;
             updateTimer = 0f;
@@ -147,8 +147,8 @@ public class WaveInfoDialog extends BaseDialog{
 
     void shift(float amount){
         updateTimer += Time.delta;
-        float scale = 1 / Math.min(Math.abs(amount), 1);
-        if(updateTimer >= updatePeriod * scale){
+        float scale = 1 / Math.abs(amount);
+        if(updateTimer >= scale){
             start += amount * scale;
             if(start < 0) start = 0;
             updateTimer = 0f;
