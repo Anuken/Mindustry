@@ -99,6 +99,7 @@ public class BuildTurret extends BaseTurret{
             }
 
             unit.buildSpeedMultiplier(efficiency() * timeScale);
+            unit.speedMultiplier(efficiency() * timeScale);
 
             if(!isControlled()){
                 unit.updateBuilding(true);
