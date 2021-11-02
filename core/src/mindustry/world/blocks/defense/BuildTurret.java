@@ -3,11 +3,13 @@ package mindustry.world.blocks.defense;
 import arc.graphics.g2d.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -29,6 +31,8 @@ public class BuildTurret extends BaseTurret{
     public BuildTurret(String name){
         super(name);
         group = BlockGroup.turrets;
+        sync = false;
+        rotateSpeed = 10f;
     }
 
     @Override
@@ -42,7 +46,7 @@ public class BuildTurret extends BaseTurret{
             speed = 0f;
             hitSize = 0f;
             health = 1;
-            rotateSpeed = 360f;
+            rotateSpeed = BuildTurret.this.rotateSpeed;
             itemCapacity = 0;
             commandLimit = 0;
             constructor = BlockUnitUnit::create;
@@ -79,7 +83,8 @@ public class BuildTurret extends BaseTurret{
                 unit.lookAt(angleTo(unit.buildPlan()));
             }
 
-            unit.buildSpeedMultiplier(efficiency() * timeScale);
+            //at 0 build speed the unit thinks it can't build, so make it >0
+            unit.buildSpeedMultiplier(Math.max(efficiency() * timeScale, 0.000001f));
 
             if(!isControlled()){
                 unit.updateBuilding(true);
@@ -121,12 +126,12 @@ public class BuildTurret extends BaseTurret{
             unit.drawBuilding();
         }
 
-        /*
         @Override
         public void write(Writes write){
             super.write(write);
             write.f(rotation);
-            //TODO build queue
+            //TODO queue can be very large due to logic?
+            TypeIO.writeRequests(write, unit.plans().toArray(BuildPlan.class));
         }
 
         @Override
@@ -134,6 +139,13 @@ public class BuildTurret extends BaseTurret{
             super.read(read, revision);
             rotation = read.f();
             unit.rotation(rotation);
-        }*/
+            unit.plans().clear();
+            var reqs = TypeIO.readRequests(read);
+            if(reqs != null){
+                for(var req : reqs){
+                    unit.plans().add(req);
+                }
+            }
+        }
     }
 }
