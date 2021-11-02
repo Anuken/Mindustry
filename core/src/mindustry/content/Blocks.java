@@ -1159,7 +1159,7 @@ public class Blocks implements ContentList{
         }};
 
         buildTower = new BuildTurret("build-tower"){{
-            requirements(Category.effect, with(Items.lead, 40, Items.beryllium, 50));
+            requirements(Category.effect, with(Items.graphite, 40, Items.beryllium, 50));
             consumes.power(0.2f);
             range = 200f;
             size = 3;
@@ -1412,7 +1412,7 @@ public class Blocks implements ContentList{
         }};
 
         beamNode = new BeamNode("beam-node"){{
-            requirements(Category.power, with(Items.graphite, 1, Items.lead, 3));
+            requirements(Category.power, with(Items.graphite, 1, Items.beryllium, 3));
             consumesPower = outputsPower = true;
             consumes.powerBuffered(1000f);
             range = 10;
@@ -1420,7 +1420,7 @@ public class Blocks implements ContentList{
 
         //TODO requirements
         beamTower = new BeamNode("beam-tower"){{
-            requirements(Category.power, with(Items.graphite, 10, Items.lead, 30, Items.beryllium, 30));
+            requirements(Category.power, with(Items.graphite, 10, Items.beryllium, 30));
             size = 3;
             consumesPower = outputsPower = true;
             consumes.powerBuffered(40000f);
@@ -1520,7 +1520,7 @@ public class Blocks implements ContentList{
 
         //TODO work on sprite, green bits?
         turbineCondenser = new ThermalGenerator("turbine-condenser"){{
-            requirements(Category.power, with(Items.graphite, 35, Items.lead, 50, Items.beryllium, 25));
+            requirements(Category.power, with(Items.graphite, 35, Items.beryllium, 25));
             attribute = Attribute.vent;
             displayEfficiencyScale = 1f / 9f;
             minEfficiency = 9f - 0.0001f;
@@ -2375,12 +2375,12 @@ public class Blocks implements ContentList{
         //region payloads
 
         payloadConveyor = new PayloadConveyor("payload-conveyor"){{
-            requirements(Category.units, with(Items.graphite, 10, Items.lead, 10));
+            requirements(Category.units, with(Items.graphite, 10));
             canOverdrive = false;
         }};
 
         payloadRouter = new PayloadRouter("payload-router"){{
-            requirements(Category.units, with(Items.graphite, 15, Items.lead, 15));
+            requirements(Category.units, with(Items.graphite, 15));
             canOverdrive = false;
         }};
 

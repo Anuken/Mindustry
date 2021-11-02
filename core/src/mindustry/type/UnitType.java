@@ -54,8 +54,8 @@ public class UnitType extends UnlockableContent{
     public int envRequired = 0;
     /** The environment flags that this unit can function in. If the env matches any of these, it will be enabled. */
     public int envEnabled = Env.terrestrial;
-    /** The environment flags that this unit *cannot* function in. If the env matches any of these, it will be *disabled*. */
-    public int envDisabled = 0;
+    /** The environment flags that this unit *cannot* function in. If the env matches any of these, it will explode or be disabled. */
+    public int envDisabled = Env.scorching;
 
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
     public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, riseSpeed = 0.08f, fallSpeed = 0.018f;

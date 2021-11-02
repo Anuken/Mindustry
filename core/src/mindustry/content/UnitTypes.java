@@ -2415,6 +2415,7 @@ public class UnitTypes implements ContentList{
         spark = new UnitType("spark"){{
             defaultController = BuilderAI::new;
             isCounted = false;
+            envDisabled = 0;
 
             lowAltitude = false;
             flying = true;
