@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
@@ -37,7 +38,7 @@ public class ItemSelection{
         int i = 0;
 
         for(T item : items){
-            if(!item.unlockedNow()) continue;
+            if(!item.unlockedNow() || (item instanceof Item checkVisible && state.rules.hiddenBuildItems.contains(checkVisible))) continue;
 
             ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, 24, () -> {
                 if(closeSelect) control.input.frag.config.hideConfig();

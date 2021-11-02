@@ -86,8 +86,6 @@ public class Planet extends UnlockableContent{
     public Planet solarSystem;
     /** All planets orbiting this one, in ascending order of radius. */
     public Seq<Planet> children = new Seq<>();
-    /** Satellites orbiting this planet. */
-    public Seq<Satellite> satellites = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
     protected Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2), cloudMeshLoader = () -> null;
 
@@ -132,7 +130,7 @@ public class Planet extends UnlockableContent{
         }
     }
 
-    /** @deprecated confusing parameter orer, use the other constructor instead */
+    /** @deprecated confusing parameter order, use the other constructor instead */
     @Deprecated
     public Planet(String name, Planet parent, int sectorSize, float radius){
         this(name, parent, radius, sectorSize);
