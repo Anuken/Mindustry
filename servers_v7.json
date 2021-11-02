@@ -1,9 +1,5 @@
 [
   {
-    "name": "Mindustry Central",
-    "address": ["n2.mindustry.me:4019", "mindustry.me:2034", "mindustry.me:2035"]
-  },
-  {
     "name": "mindustry.pl",
     "address": ["0.baseduser.eu.org:6000", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6966"]
   },
@@ -54,10 +50,6 @@
   {
     "name": "Shiza Minigames",
     "address": ["shizashizashiza.ml"]
-  },
-  { 
-    "name": "devass.su",
-    "address": ["185.22.152.66"]
   },
   {
     "name": "Phoenix Network",
