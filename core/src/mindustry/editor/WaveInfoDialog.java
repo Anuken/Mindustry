@@ -27,9 +27,7 @@ import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.*;
 
 public class WaveInfoDialog extends BaseDialog{
-    private static final int maxVisible = 30;
     private static final float maxGraphSpeed = 8f;
-
     private int start = 0, displayed = 20;
     private float graphSpeed = 0.5f;
     Seq<SpawnGroup> groups = new Seq<>();
@@ -368,7 +366,7 @@ public class WaveInfoDialog extends BaseDialog{
                             }).padBottom(8f).padTop(-8f).row();
                         }
                     }
-                }).width(340f).pad(8).name("group-" + group.type.name + "-" + groups.indexOf(group));
+                }).width(340f).pad(8);
 
                 table.row();
             }
@@ -439,7 +437,7 @@ public class WaveInfoDialog extends BaseDialog{
 
     void showFilters(){
         BaseDialog dialog = new BaseDialog("@waves.filters");
-        dialog.setFillParent(false);
+        dialog.row().setFillParent(false);
 
         Runnable[] rebuild = {null};
 
@@ -480,7 +478,6 @@ public class WaveInfoDialog extends BaseDialog{
         };
         rebuild[0].run();
 
-        dialog.row();
         dialog.check("@waves.filters.strict", b -> {
             filterStrict = b;
             buildGroups();
@@ -536,6 +533,7 @@ public class WaveInfoDialog extends BaseDialog{
             units.left();
             units.defaults().pad(3);
 
+            int maxVisible = 30;
             if(group.payloads == null) group.payloads = new Seq<>();
 
             units.table(t -> {
