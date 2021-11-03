@@ -1,9 +1,5 @@
 [
   {
-    "name": "Mindustry Central",
-    "address": ["n2.mindustry.me:4019", "mindustry.me:2034", "mindustry.me:2035"]
-  },
-  {
     "name": "mindustry.pl",
     "address": ["0.baseduser.eu.org:6000", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6966"]
   },
@@ -26,6 +22,10 @@
   {
     "name": "DarkDustry",
     "address": ["darkdustry.ml", "darkdustry.ml:6000", "darkdustry.ml:7000", "darkdustry.ml:8000", "darkdustry.ml:9000"] 
+  },
+  {
+    "name": "SkaarjDustry",
+    "address": ["skaarjproject.duckdns.org"]
   },
   {
     "name": "Chaotic Neutral",
@@ -54,10 +54,6 @@
   {
     "name": "Shiza Minigames",
     "address": ["shizashizashiza.ml"]
-  },
-  { 
-    "name": "devass.su",
-    "address": ["185.22.152.66"]
   },
   {
     "name": "Phoenix Network",
