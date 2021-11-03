@@ -36,7 +36,7 @@ public class SwitchBlock extends Block{
             super.draw();
 
             if(enabled){
-                Draw.rect(onRegion, x, y, drawrot());
+                Draw.rect(onRegion, x, y, drawRot());
             }
         }
 
