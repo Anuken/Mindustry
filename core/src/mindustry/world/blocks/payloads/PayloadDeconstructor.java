@@ -86,6 +86,11 @@ public class PayloadDeconstructor extends PayloadBlock{
         }
 
         @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon,x, y, drawRot());
+        }
+
+        @Override
         public boolean acceptUnitPayload(Unit unit){
             return payload == null && deconstructing == null && !unit.spawnedByCore && unit.type.getTotalRequirements().length > 0 && unit.hitSize / tilesize <= maxPayloadSize;
         }

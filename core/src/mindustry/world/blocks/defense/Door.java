@@ -123,7 +123,7 @@ public class Door extends Wall{
 
         @Override
         public void draw(){
-            Draw.rect(open ? openRegion : region, x, y);
+            Draw.rect(open ? openRegion : region, x, y, drawRot());
         }
 
         @Override

@@ -237,7 +237,7 @@ public class PayloadConveyor extends Block{
 
         @Override
         public void payloadDraw(){
-            Draw.rect(block.fullIcon,x, y);
+            Draw.rect(block.fullIcon, x, y, drawRot());
         }
 
         public float time(){

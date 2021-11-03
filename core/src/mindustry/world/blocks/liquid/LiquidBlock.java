@@ -30,7 +30,7 @@ public class LiquidBlock extends Block{
     public class LiquidBuild extends Building{
         @Override
         public void draw(){
-            float rotation = rotate ? rotdeg() : 0;
+            float rotation = drawRot();
             Draw.rect(bottomRegion, x, y, rotation);
 
             if(liquids.total() > 0.001f){

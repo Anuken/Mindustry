@@ -186,6 +186,11 @@ public class Reconstructor extends UnitBlock{
         }
 
         @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon,x, y, drawRot());
+        }
+
+        @Override
         public Object senseObject(LAccess sensor){
             if(sensor == LAccess.config) return unit();
             return super.senseObject(sensor);

@@ -71,7 +71,7 @@ public class Wall extends Block{
                 Draw.color(flashColor);
                 Draw.alpha(hit * 0.5f);
                 Draw.blend(Blending.additive);
-                Fill.rect(x, y, tilesize * size, tilesize * size);
+                Fill.rect(x, y, tilesize * size, tilesize * size, drawRot());
                 Draw.blend();
                 Draw.reset();
 

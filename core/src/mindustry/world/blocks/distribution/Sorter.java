@@ -64,7 +64,7 @@ public class Sorter extends Block{
             super.draw();
 
             if(sortItem == null){
-                Draw.rect("cross", x, y);
+                Draw.rect("cross", x, y, drawRot());
             }else{
                 Draw.color(sortItem.color);
                 Draw.rect("center", x, y);

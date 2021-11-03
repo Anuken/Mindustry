@@ -32,5 +32,10 @@ public class Thruster extends Wall{
             Draw.rect(block.region, x, y);
             Draw.rect(topRegion, x, y, rotdeg());
         }
+
+        @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon,x, y, drawRot());
+        }
     }
 }

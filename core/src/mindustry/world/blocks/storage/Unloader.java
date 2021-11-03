@@ -203,7 +203,7 @@ public class Unloader extends Block{
             super.draw();
 
             Draw.color(sortItem == null ? Color.clear : sortItem.color);
-            Draw.rect("unloader-center", x, y);
+            Draw.rect("unloader-center", x, y, drawRot());
             Draw.color();
         }
 

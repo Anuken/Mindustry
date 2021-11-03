@@ -173,6 +173,11 @@ public class DuctBridge extends Block{
         }
 
         @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon,x, y, drawRot());
+        }
+
+        @Override
         public void drawSelect(){
             drawPlace(tile.x, tile.y, rotation, true, false);
             //draw incoming bridges

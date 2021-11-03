@@ -45,7 +45,7 @@ public class ShockMine extends Block{
         public void draw(){
             super.draw();
             Draw.color(team.color, teamAlpha);
-            Draw.rect(teamRegion, x, y);
+            Draw.rect(teamRegion, x, y, drawRot());
             Draw.color();
         }
 

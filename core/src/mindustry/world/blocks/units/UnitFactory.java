@@ -226,6 +226,11 @@ public class UnitFactory extends UnitBlock{
         }
 
         @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon,x, y, drawRot());
+        }
+
+        @Override
         public void updateTile(){
             if(currentPlan < 0 || currentPlan >= plans.size){
                 currentPlan = -1;

@@ -53,6 +53,11 @@ public class PowerDiode extends Block{
         }
 
         @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon,x, y, drawRot());
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
 

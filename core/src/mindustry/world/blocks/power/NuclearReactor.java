@@ -155,18 +155,19 @@ public class NuclearReactor extends PowerGenerator{
         public void draw(){
             super.draw();
 
+            float rot = drawRot();
             Draw.color(coolColor, hotColor, heat);
-            Fill.rect(x, y, size * tilesize, size * tilesize);
+            Fill.rect(x, y, size * tilesize, size * tilesize, rot);
 
             Draw.color(liquids.current().color);
             Draw.alpha(liquids.currentAmount() / liquidCapacity);
-            Draw.rect(topRegion, x, y);
+            Draw.rect(topRegion, x, y, rot);
 
             if(heat > flashThreshold){
                 flash += (1f + ((heat - flashThreshold) / (1f - flashThreshold)) * 5.4f) * Time.delta;
                 Draw.color(Color.red, Color.yellow, Mathf.absin(flash, 9f, 1f));
                 Draw.alpha(0.3f);
-                Draw.rect(lightsRegion, x, y);
+                Draw.rect(lightsRegion, x, y, rot);
             }
 
             Draw.reset();

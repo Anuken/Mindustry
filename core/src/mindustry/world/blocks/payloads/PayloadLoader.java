@@ -110,6 +110,11 @@ public class PayloadLoader extends PayloadBlock{
         }
 
         @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon,x, y, drawRot());
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
             if(shouldExport()){

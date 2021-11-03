@@ -74,7 +74,7 @@ public class LightBlock extends Block{
             super.draw();
             Draw.blend(Blending.additive);
             Draw.color(Tmp.c1.set(color), efficiency() * 0.3f);
-            Draw.rect(topRegion, x, y);
+            Draw.rect(topRegion, x, y, drawRot());
             Draw.color();
             Draw.blend();
         }

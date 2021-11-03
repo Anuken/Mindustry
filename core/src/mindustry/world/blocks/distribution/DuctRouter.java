@@ -59,6 +59,11 @@ public class DuctRouter extends Block{
         }
 
         @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon,x, y, drawRot());
+        }
+
+        @Override
         public void updateTile(){
             progress += edelta() / speed * 2f;
 

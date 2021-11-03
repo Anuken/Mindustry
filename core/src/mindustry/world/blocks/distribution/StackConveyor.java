@@ -155,6 +155,11 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon,x, y, drawRot());
+        }
+
+        @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
 

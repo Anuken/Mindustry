@@ -137,6 +137,11 @@ public abstract class BlockProducer extends PayloadBlock{
         }
 
         @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon,x, y, drawRot());
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.f(progress);

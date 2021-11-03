@@ -100,5 +100,10 @@ public class PayloadRouter extends PayloadConveyor{
                 item.draw();
             }
         }
+
+        @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon,x, y, drawRot());
+        }
     }
 }

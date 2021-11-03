@@ -54,10 +54,10 @@ public class ItemSource extends Block{
             super.draw();
 
             if(outputItem == null){
-                Draw.rect("cross", x, y);
+                Draw.rect("cross", x, y, drawRot());
             }else{
                 Draw.color(outputItem.color);
-                Draw.rect("center", x, y);
+                Draw.rect("center", x, y, drawRot());
                 Draw.color();
             }
         }

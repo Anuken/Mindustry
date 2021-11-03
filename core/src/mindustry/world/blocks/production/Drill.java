@@ -315,30 +315,31 @@ public class Drill extends Block{
         public void draw(){
             float s = 0.3f;
             float ts = 0.6f;
+            float rot = drawRot();
 
-            Draw.rect(region, x, y);
+            Draw.rect(region, x, y, rot);
             super.drawCracks();
 
             if(drawRim){
                 Draw.color(heatColor);
                 Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Time.time, 3f, s)));
                 Draw.blend(Blending.additive);
-                Draw.rect(rimRegion, x, y);
+                Draw.rect(rimRegion, x, y, rot);
                 Draw.blend();
                 Draw.color();
             }
 
             if(drawSpinSprite){
-                Drawf.spinSprite(rotatorRegion, x, y, timeDrilled * rotateSpeed);
+                Drawf.spinSprite(rotatorRegion, x, y, timeDrilled * rotateSpeed + rot);
             }else{
-                Draw.rect(rotatorRegion, x, y, timeDrilled * rotateSpeed);
+                Draw.rect(rotatorRegion, x, y, timeDrilled * rotateSpeed + rot);
             }
 
-            Draw.rect(topRegion, x, y);
+            Draw.rect(topRegion, x, y, rot);
 
             if(dominantItem != null && drawMineItem){
                 Draw.color(dominantItem.color);
-                Draw.rect(itemRegion, x, y);
+                Draw.rect(itemRegion, x, y, rot);
                 Draw.color();
             }
         }
