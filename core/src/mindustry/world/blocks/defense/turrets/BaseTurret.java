@@ -32,6 +32,7 @@ public class BaseTurret extends Block{
         group = BlockGroup.turrets;
         flags = EnumSet.of(BlockFlag.turret);
         updateInUnits = false;
+        rotateWhenPayload = false;
     }
 
     @Override

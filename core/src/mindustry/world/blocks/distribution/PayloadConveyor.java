@@ -27,6 +27,7 @@ public class PayloadConveyor extends Block{
         group = BlockGroup.transportation;
         size = 3;
         rotate = true;
+        rotateWhenPayload = true;
         update = true;
         outputsPayload = true;
         noUpdateDisabled = true;

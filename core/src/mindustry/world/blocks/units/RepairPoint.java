@@ -57,6 +57,7 @@ public class RepairPoint extends Block{
         flags = EnumSet.of(BlockFlag.repair);
         hasPower = true;
         outlineIcon = true;
+        rotateWhenPayload = false;
         //yeah, this isn't the same thing, but it's close enough
         group = BlockGroup.projectors;
 

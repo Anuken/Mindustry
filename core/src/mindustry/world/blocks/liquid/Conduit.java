@@ -36,6 +36,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public Conduit(String name){
         super(name);
         rotate = true;
+        rotateWhenPayload = true;
         solid = false;
         floating = true;
         conveyorPlacement = true;

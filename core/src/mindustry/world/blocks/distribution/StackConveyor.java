@@ -37,6 +37,7 @@ public class StackConveyor extends Block implements Autotiler{
         super(name);
 
         rotate = true;
+        rotateWhenPayload = true;
         update = true;
         group = BlockGroup.transportation;
         hasItems = true;
