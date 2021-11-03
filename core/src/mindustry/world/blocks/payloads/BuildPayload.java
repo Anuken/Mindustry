@@ -40,7 +40,7 @@ public class BuildPayload implements Payload{
     public void update(boolean inUnit){
         if(inUnit && !build.block.updateInUnits) return;
 
-        if(build.tile == null) build.tile = emptyTile;
+        build.tile = emptyTile;
         build.update();
     }
 
@@ -80,6 +80,7 @@ public class BuildPayload implements Payload{
     @Override
     public void set(float x, float y, float rotation){
         build.set(x, y);
+        build.payloadRotation = rotation;
     }
 
     @Override
@@ -91,9 +92,11 @@ public class BuildPayload implements Payload{
     public void draw(){
         drawShadow(1f);
         float prevZ = Draw.z();
-        Draw.zTransform(z -> 0.0011f + Mathf.clamp(z, prevZ - 0.001f, prevZ + 0.9f));
+        Draw.zTransform(z -> z >= Layer.flyingUnitLow ? z : 0.0011f + Mathf.clamp(z, prevZ - 0.001f, prevZ + 0.9f));
+        build.tile = emptyTile;
         build.payloadDraw();
         Draw.zTransform();
+        Draw.z(prevZ);
     }
 
     @Override

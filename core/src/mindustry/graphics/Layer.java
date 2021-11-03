@@ -62,7 +62,7 @@ public class Layer{
     //flying units
     flyingUnit = 115,
 
-    //overlaied UI, like block config guides
+    //overlaid UI, like block config guides
     overlayUI = 120,
 
     //build beam effects
