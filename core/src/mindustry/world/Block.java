@@ -88,6 +88,8 @@ public class Block extends UnlockableContent{
     public boolean solidifes;
     /** whether this is rotateable */
     public boolean rotate;
+    /** whether this rotates when on a payload conveyor */
+    public boolean rotateWhenPayload;
     /** number of different variant regions to use */
     public int variants = 0;
     /** whether to draw a rotation arrow - this does not apply to lines of blocks */

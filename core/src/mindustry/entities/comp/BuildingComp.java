@@ -61,6 +61,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient boolean updateFlow;
     transient byte cdump;
     transient int rotation;
+    transient float payloadRotation;
     transient boolean enabled = true;
     transient float enabledControlTime;
     transient String lastAccessed;
@@ -334,6 +335,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return rotation * 90;
     }
 
+    public float drawRot(){
+        if(block.rotateWhenPayload && isPayload()){
+            return payloadRotation;
+        }else if(block.rotate){
+            return rotation * 90;
+        }
+        return 0f;
+    }
+
     public Floor floor(){
         return tile.floor();
     }
@@ -442,7 +452,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called when this block is dropped as a payload. */
     public void dropped(){
-
+        payloadRotation = 0f;
     }
 
     /** This is for logic blocks. */
@@ -915,9 +925,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void draw(){
         if(block.variants == 0){
-            Draw.rect(block.region, x, y, block.rotate ? rotdeg() : 0);
+            Draw.rect(block.region, x, y, drawRot());
         }else{
-            Draw.rect(block.variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, block.variantRegions.length - 1))], x, y, block.rotate ? rotdeg() : 0);
+            Draw.rect(block.variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, block.variantRegions.length - 1))], x, y, drawRot());
         }
 
         drawTeamTop();
