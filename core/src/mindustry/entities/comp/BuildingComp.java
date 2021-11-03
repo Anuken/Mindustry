@@ -940,7 +940,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void drawTeamTop(){
         if(block.teamRegion.found()){
             if(block.teamRegions[team.id] == block.teamRegion) Draw.color(team.color);
-            Draw.rect(block.teamRegions[team.id], x, y);
+            Draw.rect(block.teamRegions[team.id], x, y, drawRot());
             Draw.color();
         }
     }
