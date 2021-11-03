@@ -88,6 +88,8 @@ public class UnitType extends UnlockableContent{
     public BlockFlag[] targetFlags = {null};
     /** targetFlags, as an override for "non-AI" teams. By default, units of this type will rush the core. */
     public BlockFlag[] playerTargetFlags = {BlockFlag.core, null};
+    /** Target items to mine. Used in MinerAI */
+    public Seq<Item> mineItems = Seq.with(Items.copper, Items.lead, Items.titanium, Items.thorium);
 
     public Color outlineColor = Pal.darkerMetal;
     public int outlineRadius = 3;
