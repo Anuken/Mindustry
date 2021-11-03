@@ -409,6 +409,7 @@ public class SettingsMenuDialog extends BaseDialog{
             graphics.checkPref("coreitems", true);
         }
         graphics.checkPref("minimap", !mobile);
+        graphics.checkPref("dropzoneindicators", true);
         graphics.checkPref("smoothcamera", true);
         graphics.checkPref("position", false);
         graphics.checkPref("fps", false);
