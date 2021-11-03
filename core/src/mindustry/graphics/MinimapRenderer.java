@@ -76,7 +76,7 @@ public class MinimapRenderer{
     }
 
     public void drawSpawns(float x, float y, float w, float h, float scaling){
-        if(!Core.settings.getBool("dropzoneindicators", false) || !state.hasSpawns()) return;
+        if(!Core.settings.getBool("dropzoneindicators", true) || !state.hasSpawns()) return;
 
         TextureRegion icon = Icon.units.getRegion();
 
