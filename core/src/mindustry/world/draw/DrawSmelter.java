@@ -30,7 +30,8 @@ public class DrawSmelter extends DrawBlock{
 
     @Override
     public void draw(GenericCrafterBuild build){
-        Draw.rect(build.block.region, build.x, build.y, build.block.rotate ? build.rotdeg() : 0);
+        float rot = build.drawRot();
+        Draw.rect(build.block.region, build.x, build.y, rot);
 
         if(build.warmup > 0f && flameColor.a > 0.001f){
             float g = 0.3f;
@@ -40,7 +41,7 @@ public class DrawSmelter extends DrawBlock{
             Draw.z(Layer.block + 0.01f);
             
             Draw.alpha(build.warmup);
-            Draw.rect(top, build.x, build.y);
+            Draw.rect(top, build.x, build.y, rot);
 
             Draw.alpha(((1f - g) + Mathf.absin(Time.time, 8f, g) + Mathf.random(r) - r) * build.warmup);
 

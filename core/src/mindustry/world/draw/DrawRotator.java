@@ -13,13 +13,14 @@ public class DrawRotator extends DrawBlock{
 
     @Override
     public void draw(GenericCrafterBuild build){
-        Draw.rect(build.block.region, build.x, build.y);
+        float rot = build.drawRot();
+        Draw.rect(build.block.region, build.x, build.y, rot);
         if(drawSpinSprite){
-            Drawf.spinSprite(rotator, build.x, build.y, build.totalProgress * spinSpeed);
+            Drawf.spinSprite(rotator, build.x, build.y, build.totalProgress * spinSpeed + rot);
         }else{
-            Draw.rect(rotator, build.x, build.y, build.totalProgress * spinSpeed);
+            Draw.rect(rotator, build.x, build.y, build.totalProgress * spinSpeed + rot);
         }
-        if(top.found()) Draw.rect(top, build.x, build.y);
+        if(top.found()) Draw.rect(top, build.x, build.y, rot);
     }
 
     @Override

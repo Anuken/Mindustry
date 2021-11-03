@@ -17,10 +17,10 @@ public class DrawCells extends DrawBlock{
 
     @Override
     public void draw(GenericCrafterBuild build){
+        float rot = build.drawRot();
+        Draw.rect(bottom, build.x, build.y, rot);
 
-        Draw.rect(bottom, build.x, build.y);
-
-        Drawf.liquid(middle, build.x, build.y, build.warmup, color);
+        Drawf.liquid(middle, build.x, build.y, build.warmup, color, rot);
 
         if(build.warmup > 0.001f){
             rand.setSeed(build.id);
@@ -41,7 +41,7 @@ public class DrawCells extends DrawBlock{
         }
 
         Draw.color();
-        Draw.rect(build.block.region, build.x, build.y);
+        Draw.rect(build.block.region, build.x, build.y, rot);
     }
 
     @Override

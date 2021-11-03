@@ -3,6 +3,7 @@ package mindustry.world.draw;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.util.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -22,9 +23,10 @@ public class DrawCultivator extends DrawBlock{
 
     @Override
     public void draw(GenericCrafterBuild build){
-        Draw.rect(build.block.region, build.x, build.y);
+        float rot = build.drawRot();
+        Draw.rect(build.block.region, build.x, build.y, rot);
 
-        Drawf.liquid(middle, build.x, build.y, build.warmup, plantColor);
+        Drawf.liquid(middle, build.x, build.y, build.warmup, plantColor, rot);
 
         Draw.color(bottomColor, plantColorLight, build.warmup);
 
@@ -35,12 +37,12 @@ public class DrawCultivator extends DrawBlock{
 
             if(life > 0){
                 Lines.stroke(build.warmup * (life + strokeMin));
-                Lines.poly(build.x + x, build.y + y, sides, (1f - life) * radius);
+                Lines.poly(build.x + Angles.trnsx(rot, x, y), build.y + Angles.trnsy(rot, x, y), sides, (1f - life) * radius);
             }
         }
 
         Draw.color();
-        Draw.rect(top, build.x, build.y);
+        Draw.rect(top, build.x, build.y, rot);
     }
 
     @Override

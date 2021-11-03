@@ -12,9 +12,9 @@ public class DrawGlow extends DrawBlock{
 
     @Override
     public void draw(GenericCrafterBuild build){
-        Draw.rect(build.block.region, build.x, build.y);
+        Draw.rect(build.block.region, build.x, build.y, build.drawRot());
         Draw.alpha(Mathf.absin(build.totalProgress, glowScale, glowAmount) * build.warmup);
-        Draw.rect(top, build.x, build.y);
+        Draw.rect(top, build.x, build.y, build.drawRot());
         Draw.reset();
     }
 

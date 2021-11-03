@@ -16,19 +16,20 @@ public class DrawAnimation extends DrawBlock{
 
     @Override
     public void draw(GenericCrafterBuild build){
-        Draw.rect(build.block.region, build.x, build.y);
+        float rot = build.drawRot();
+        Draw.rect(build.block.region, build.x, build.y, rot);
         Draw.rect(
             sine ?
                 frames[(int)Mathf.absin(build.totalProgress, frameSpeed, frameCount - 0.001f)] :
                 frames[(int)((build.totalProgress / frameSpeed) % frameCount)],
-            build.x, build.y);
+            build.x, build.y, rot);
         if(build.liquids != null){
             Draw.color(Color.clear, build.liquids.current().color, build.liquids.total() / build.block.liquidCapacity);
-            Draw.rect(liquid, build.x, build.y);
+            Draw.rect(liquid, build.x, build.y, rot);
             Draw.color();
         }
         if(top.found()){
-            Draw.rect(top, build.x, build.y);
+            Draw.rect(top, build.x, build.y, rot);
         }
     }
 

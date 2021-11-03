@@ -22,25 +22,26 @@ public class DrawLiquid extends DrawBlock{
 
     @Override
     public void draw(GenericCrafterBuild build){
-        Draw.rect(build.block.region, build.x, build.y);
+        float rot = build.drawRot();
+        Draw.rect(build.block.region, build.x, build.y, rot);
         GenericCrafter type = (GenericCrafter)build.block;
 
         if((inLiquid.found() || useOutputSprite) && type.consumes.has(ConsumeType.liquid)){
             Liquid input = type.consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
             Drawf.liquid(useOutputSprite ? liquid : inLiquid, build.x, build.y,
                 build.liquids.get(input) / type.liquidCapacity,
-                input.color
+                input.color, rot
             );
         }
 
         if(type.outputLiquid != null && build.liquids.get(type.outputLiquid.liquid) > 0){
             Drawf.liquid(liquid, build.x, build.y,
                 build.liquids.get(type.outputLiquid.liquid) / type.liquidCapacity,
-                type.outputLiquid.liquid.color
+                type.outputLiquid.liquid.color, rot
             );
         }
 
-        if(top.found()) Draw.rect(top, build.x, build.y);
+        if(top.found()) Draw.rect(top, build.x, build.y, rot);
     }
 
     @Override

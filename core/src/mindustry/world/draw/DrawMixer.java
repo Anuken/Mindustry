@@ -22,25 +22,25 @@ public class DrawMixer extends DrawBlock{
 
     @Override
     public void draw(GenericCrafterBuild build){
-        float rotation = build.block.rotate ? build.rotdeg() : 0;
-        Draw.rect(bottom, build.x, build.y, rotation);
+        float rot = build.drawRot();
+        Draw.rect(bottom, build.x, build.y, rot);
 
         if((inLiquid.found() || useOutputSprite) && build.block.consumes.has(ConsumeType.liquid)){
             Liquid input = build.block.consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
             Drawf.liquid(useOutputSprite ? liquid : inLiquid, build.x, build.y,
                 build.liquids.get(input) / build.block.liquidCapacity,
-                input.color
+                input.color, rot
             );
         }
 
         if(build.liquids.total() > 0.001f){
             Draw.color(((GenericCrafter)build.block).outputLiquid.liquid.color);
             Draw.alpha(build.liquids.get(((GenericCrafter)build.block).outputLiquid.liquid) / build.block.liquidCapacity);
-            Draw.rect(liquid, build.x, build.y, rotation);
+            Draw.rect(liquid, build.x, build.y, rot);
             Draw.color();
         }
 
-        Draw.rect(top, build.x, build.y, rotation);
+        Draw.rect(top, build.x, build.y, rot);
     }
 
     @Override

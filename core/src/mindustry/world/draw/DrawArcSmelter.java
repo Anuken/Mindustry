@@ -19,7 +19,8 @@ public class DrawArcSmelter extends DrawBlock{
 
     @Override
     public void draw(GenericCrafterBuild build){
-        Draw.rect(bottom, build.x, build.y);
+        float rot = build.rot();
+        Draw.rect(bottom, build.x, build.y, rot);
 
         if(build.warmup > 0f && flameColor.a > 0.001f){
             Lines.stroke(circleStroke * build.warmup);
@@ -49,8 +50,8 @@ public class DrawArcSmelter extends DrawBlock{
             Draw.reset();
         }
 
-        Draw.rect(top, build.x, build.y);
-        Draw.rect(build.block.region, build.x, build.y);
+        Draw.rect(top, build.x, build.y, rot);
+        Draw.rect(build.block.region, build.x, build.y, rot);
     }
 
     @Override

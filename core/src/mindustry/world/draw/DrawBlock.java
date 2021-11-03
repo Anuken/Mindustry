@@ -12,7 +12,7 @@ public class DrawBlock{
 
     /** Draws the block. */
     public void draw(GenericCrafterBuild build){
-        Draw.rect(build.block.region, build.x, build.y, build.block.rotate ? build.rotdeg() : 0);
+        Draw.rect(build.block.region, build.x, build.y, build.drawRot());
     }
 
     /** Draws any extra light for the block. */

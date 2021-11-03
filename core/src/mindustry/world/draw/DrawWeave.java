@@ -13,8 +13,9 @@ public class DrawWeave extends DrawBlock{
 
     @Override
     public void draw(GenericCrafterBuild build){
-        Draw.rect(bottom, build.x, build.y);
-        Draw.rect(weave, build.x, build.y, build.totalProgress);
+        float rot = build.drawRot();
+        Draw.rect(bottom, build.x, build.y, rot);
+        Draw.rect(weave, build.x, build.y, build.totalProgress + rot);
 
         Draw.color(Pal.accent);
         Draw.alpha(build.warmup);
@@ -22,12 +23,12 @@ public class DrawWeave extends DrawBlock{
         Lines.lineAngleCenter(
         build.x + Mathf.sin(build.totalProgress, 6f, Vars.tilesize / 3f * build.block.size),
         build.y,
-        90,
+        90 + rot,
         build.block.size * Vars.tilesize / 2f);
 
         Draw.reset();
 
-        Draw.rect(build.block.region, build.x, build.y);
+        Draw.rect(build.block.region, build.x, build.y, rot);
     }
 
     @Override
