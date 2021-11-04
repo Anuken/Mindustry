@@ -235,9 +235,9 @@ public class WaveInfoDialog extends BaseDialog{
                 table.table(Tex.button, t -> {
                     t.margin(0).defaults().pad(3).padLeft(5f).growX().left();
                     t.button(b -> {
-                        b.left();
-                        b.image(group.type.uiIcon).size(32f).padRight(3).scaling(Scaling.fit);
-                        if(group.effect != null && group.effect != StatusEffects.none) b.image(group.effect.uiIcon).size(22f).padLeft(-3).padRight(3).scaling(Scaling.fit);
+                        b.left().defaults().padRight(3).scaling(Scaling.fit);
+                        b.image(group.type.uiIcon).size(32f);
+                        if(group.effect != null && group.effect != StatusEffects.none) b.image(group.effect.uiIcon).size(22f).padLeft(-3);
                         b.add(group.type.localizedName).color(Pal.accent);
 
                         b.add().growX();
@@ -437,7 +437,7 @@ public class WaveInfoDialog extends BaseDialog{
 
     void showFilters(){
         BaseDialog dialog = new BaseDialog("@waves.filters");
-        dialog.row().setFillParent(false);
+        dialog.setFillParent(false);
 
         Runnable[] rebuild = {null};
 
@@ -478,12 +478,12 @@ public class WaveInfoDialog extends BaseDialog{
         };
         rebuild[0].run();
 
-        dialog.check("@waves.filters.strict", b -> {
+        dialog.buttons.check("@waves.filters.strict", b -> {
             filterStrict = b;
             buildGroups();
         }).update(b -> b.setChecked(filterStrict)).padBottom(10f).row();
 
-        dialog.table(p -> {
+        dialog.buttons.table(p -> {
             p.defaults().size(210f, 64f).padLeft(4f).padRight(4f);
             p.button("@back", Icon.left, dialog::hide);
             p.button("@clear", Icon.refresh, () -> {
@@ -504,16 +504,16 @@ public class WaveInfoDialog extends BaseDialog{
             settings.defaults().size(200f, 60f).pad(2f);
 
             settings.button(t -> {
-                t.image(group.effect != null && group.effect != StatusEffects.none ? new TextureRegionDrawable(group.effect.uiIcon) : Icon.logic).padRight(6f);
+                t.image(group.effect != null && group.effect != StatusEffects.none ? new TextureRegionDrawable(group.effect.uiIcon) : Icon.logic).padRight(8);
                 t.add("@waves.group.effect");
             }, Styles.cleart, () -> showContentPane(group, c -> group.effect = c, () -> StatusEffects.none, effect -> !(effect.isHidden()  || effect.reactive)));
 
-            settings.button("@waves.group.payloads", Icon.defense, Styles.cleart,
+            settings.button("@waves.group.payloads", group.payloads != null && group.payloads.any() ? Icon.modeSurvival : Icon.defense, Styles.cleart,
             () -> showContentPane(group, c -> group.payloads.add(c), () -> group.type, type -> !(type.isHidden() || type.hitSize * type.hitSize > group.type.payloadCapacity || type.flying), true, t -> units = t))
             .disabled(!(group.type.constructor.get() instanceof Payloadc));
 
             settings.button(t -> {
-                t.image(group.items != null ? new TextureRegionDrawable(group.items.item.uiIcon) : Icon.effect).padRight(6f);
+                t.image(group.items != null ? new TextureRegionDrawable(group.items.item.uiIcon) : Icon.effect).padRight(8);
                 t.add("@waves.group.items");
             }, Styles.cleart, () -> showContentPane(group, c -> group.items = c != null ? new ItemStack(c, Strings.parseInt(amountField.getText()) <= 0 ? group.type.itemCapacity :
                  Mathf.clamp(Strings.parseInt(amountField.getText()), 0, group.type.itemCapacity)) : null, () -> Items.copper, i -> true, false, t -> {
