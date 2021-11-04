@@ -23,7 +23,6 @@ public class BurstDrill extends Drill{
     public BurstDrill(String name){
         super(name);
 
-        itemCapacity = 20;
         //does not drill in the traditional sense, so this is not even used
         hardnessDrillMultiplier = 0f;
         //generally at center
