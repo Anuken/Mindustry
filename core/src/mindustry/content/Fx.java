@@ -952,6 +952,22 @@ public class Fx{
         }
     }),
 
+    drillSteam = new Effect(220f, e -> {
+
+        float length = 3f + e.finpow() * 20f;
+        rand.setSeed(e.id);
+        for(int i = 0; i < 13; i++){
+            v.trns(rand.random(360f), rand.random(length));
+            float sizer = rand.random(1.3f, 3.7f);
+
+            e.scaled(e.lifetime * rand.random(0.5f, 1f), b -> {
+                color(Color.gray, b.fslope() * 0.93f);
+
+                Fill.circle(e.x + v.x, e.y + v.y, sizer + b.fslope() * 1.2f);
+            });
+        }
+    }).startDelay(30f),
+
     vapor = new Effect(110f, e -> {
         color(e.color);
         alpha(e.fout());
@@ -1838,6 +1854,29 @@ public class Fx{
         randLenVectors(e.id, 8, 5f + e.fin() * 10f, (x, y) -> {
             Fill.square(e.x + x, e.y + y, e.fout() * 2f + 0.5f, 45);
         });
+    }),
+
+    mineImpact = new Effect(90, e -> {
+        color(e.color, Color.lightGray, e.fin());
+        randLenVectors(e.id, 12, 5f + e.finpow() * 22f, (x, y) -> {
+            Fill.square(e.x + x, e.y + y, e.fout() * 2.5f + 0.5f, 45);
+        });
+
+        color(Pal.redLight);
+
+        e.scaled(50f, b -> {
+            stroke(b.fout() * 1.5f);
+
+            randLenVectors(e.id, 12, 4f + b.finpow() * 40f, (x, y) -> {
+                lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), b.fout() * 5 + 1f);
+            });
+        });
+
+        e.scaled(30f, b -> {
+            Lines.stroke(5f * b.fout());
+            Lines.circle(e.x, e.y, b.finpow() * 28f);
+        });
+
     }),
 
     payloadReceive = new Effect(30, e -> {

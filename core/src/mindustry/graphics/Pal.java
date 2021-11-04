@@ -121,5 +121,7 @@ public class Pal{
 
     muddy = Color.valueOf("432722"),
 
+    redLight = Color.valueOf("feb380"),
+
     vent = Color.valueOf("6b4e4e");
 }

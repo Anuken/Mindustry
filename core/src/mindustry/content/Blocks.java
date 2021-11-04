@@ -6,6 +6,7 @@ import arc.struct.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -1602,13 +1603,13 @@ public class Blocks implements ContentList{
         //TODO should be crusher or something
         impactDrill = new BurstDrill("impact-drill"){{
             requirements(Category.production, with(Items.silicon, 60, Items.beryllium, 90, Items.graphite, 50));
-            drillTime = 60f * 10f;
+            drillTime = 60f * 12f;
             size = 4;
-            drawRim = false;
             hasPower = true;
             tier = 6;
-            drillEffect = Fx.mineHuge;
-            itemCapacity = 30;
+            drillEffect = new MultiEffect(Fx.mineImpact, Fx.drillSteam);
+            shake = 4f;
+            itemCapacity = 40;
 
             consumes.power(3f);
             consumes.liquid(Liquids.water, 0.2f);
