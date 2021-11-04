@@ -2152,6 +2152,7 @@ public class Blocks implements ContentList{
 
         liquidSource = new LiquidSource("liquid-source"){{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
+            liquidCapacity = 3600f;
             alwaysUnlocked = true;
         }};
 
