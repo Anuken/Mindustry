@@ -311,13 +311,17 @@ public class Drill extends Block{
         @Override
         public void drawCracks(){}
 
+        public void drawDefaultCracks(){
+            super.drawCracks();
+        }
+
         @Override
         public void draw(){
             float s = 0.3f;
             float ts = 0.6f;
 
             Draw.rect(region, x, y);
-            super.drawCracks();
+            drawDefaultCracks();
 
             if(drawRim){
                 Draw.color(heatColor);

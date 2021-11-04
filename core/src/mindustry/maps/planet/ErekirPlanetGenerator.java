@@ -172,6 +172,19 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 }else if(empty && noise(x + 782, y, 4, 0.8f, 40f, 1f) > 0.7f && block != Blocks.carbonWall){
                     ore = Blocks.wallOreBeryl;
                 }
+            }else{
+                boolean empty = true;
+                for(Point2 p : Geometry.d8){
+                    Tile other = tiles.get(x + p.x, y + p.y);
+                    if(other != null && other.block() != Blocks.air){
+                        empty = false;
+                        break;
+                    }
+                }
+
+                if(empty && noise(x + 150, y + x*2 + 100, 4, 0.8f, 42f, 1f) > 0.73f/* && floor == Blocks.yellowStone*/){
+                    ore = Blocks.oreTungsten;
+                }
             }
         });
 

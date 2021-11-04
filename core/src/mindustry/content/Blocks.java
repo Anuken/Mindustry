@@ -50,6 +50,7 @@ public class Blocks implements ContentList{
 
     //ores
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
+    oreTungsten,
 
     //wall ores
     wallOreBeryl, graphiticWall,
@@ -84,7 +85,7 @@ public class Blocks implements ContentList{
 
     //production
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
-    cliffCrusher, plasmaBore,
+    cliffCrusher, plasmaBore, impactDrill,
 
     //storage
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
@@ -634,6 +635,8 @@ public class Blocks implements ContentList{
             oreThreshold = 0.882f;
             oreScale = 25.380953f;
         }};
+
+        oreTungsten = new OreBlock(Items.tungsten);
 
         //endregion
         //region wall ore
@@ -1272,17 +1275,17 @@ public class Blocks implements ContentList{
         //special transport blocks
 
         duct = new Duct("duct"){{
-            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 5, Items.metaglass, 2));
+            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 5));
             speed = 4f;
         }};
 
         ductRouter = new DuctRouter("duct-router"){{
-            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 10, Items.metaglass, 4));
+            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 10));
             speed = 4f;
         }};
 
         ductBridge = new DuctBridge("duct-bridge"){{
-            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 20, Items.metaglass, 8));
+            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 20));
             speed = 4f;
         }};
 
@@ -1594,6 +1597,21 @@ public class Blocks implements ContentList{
 
             consumes.power(3f);
             consumes.liquid(Liquids.water, 0.1f).boost();
+        }};
+
+        //TODO should be crusher or something
+        impactDrill = new BurstDrill("impact-drill"){{
+            requirements(Category.production, with(Items.silicon, 60, Items.beryllium, 90, Items.graphite, 50));
+            drillTime = 60f * 10f;
+            size = 4;
+            drawRim = false;
+            hasPower = true;
+            tier = 6;
+            drillEffect = Fx.mineHuge;
+            itemCapacity = 30;
+
+            consumes.power(3f);
+            consumes.liquid(Liquids.water, 0.2f);
         }};
 
         waterExtractor = new SolidPump("water-extractor"){{
