@@ -1728,7 +1728,7 @@ public class Blocks implements ContentList{
         coreBastion = new CoreBlock("core-bastion"){{
             requirements(Category.effect, BuildVisibility.editorOnly, with(Items.beryllium, 1000, Items.graphite, 1000));
 
-            unitType = UnitTypes.spark;
+            unitType = UnitTypes.evoke;
             health = 3000;
             itemCapacity = 3000; //TODO more or less?
             size = 3;

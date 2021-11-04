@@ -15,11 +15,10 @@ public class BurstDrill extends Drill{
     public @Load("@-top-invert") TextureRegion topInvertRegion;
     public @Load("@-arrow") TextureRegion arrowRegion;
     public @Load("@-arrow-blur") TextureRegion arrowBlurRegion;
-    public float invertTime = 80f;
+
+    public float invertedTime = 190f;
     public float arrowSpacing = 4f;
-    public Color arrowColor = Color.valueOf("feb380");
-    //public @Load(value = "impact-reactor-plasma-#", length = 4) TextureRegion[] plasmaRegions;
-    //public Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
+    public Color arrowColor = Color.valueOf("feb380"), baseArrowColor = Color.valueOf("6e7080");
 
     public BurstDrill(String name){
         super(name);
@@ -48,7 +47,7 @@ public class BurstDrill extends Drill{
                 return;
             }
 
-            if(invertTime > 0f) invertTime -= delta() / invertTime;
+            if(invertTime > 0f) invertTime -= delta() / invertedTime;
 
             if(timer(timerDump, dumpTime)){
                 dump(items.has(dominantItem) ? dominantItem : null);
@@ -93,27 +92,12 @@ public class BurstDrill extends Drill{
             Draw.rect(region, x, y);
             drawDefaultCracks();
 
-            //TODO charge
-
             if(dominantItem != null && drawMineItem){
                 Draw.color(dominantItem.color);
                 Draw.rect(itemRegion, x, y);
                 Draw.color();
             }
 
-            /*
-            Draw.blend(Blending.additive);
-            for(int i = 0; i < plasmaRegions.length; i++){
-                float r = size * tilesize - 3f + Mathf.absin(timeDrilled, 2f + i * 1f, 5f - i * 0.5f);
-
-                Draw.color(plasma1, plasma2, (float)i / plasmaRegions.length);
-                Draw.alpha((0.3f + Mathf.absin(Time.time, 2f + i * 2f, 0.3f + i * 0.05f)) * Interp.pow4In.apply(warmup));
-                Draw.rect(plasmaRegions[i], x, y, r, r, timeDrilled  * 3f * (12 + i * 2f));
-            }
-            Draw.blend();
-            Draw.color();*/
-
-            //Drawf.spinSprite(rotatorRegion, x, y, timeDrilled * rotateSpeed);
             Draw.rect(topRegion, x, y);
             if(invertTime > 0){
                 Draw.alpha(Interp.pow3Out.apply(invertTime));
@@ -132,8 +116,9 @@ public class BurstDrill extends Drill{
                     float a = Mathf.clamp(fract * arrows - arrowFract);
                     Tmp.v1.trns(i * 90 + 45, j * arrowSpacing);
 
+                    //TODO maybe just use arrow alpha and that drawn on the base?
                     Draw.z(z);
-                    Draw.color(Color.valueOf("6e7080"), arrowColor, a);
+                    Draw.color(baseArrowColor, arrowColor, a);
                     Draw.rect(arrowRegion, x + Tmp.v1.x, y + Tmp.v1.y, i * 90);
 
                     Draw.color(arrowColor);
