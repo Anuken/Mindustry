@@ -76,7 +76,7 @@ public class Turret extends ReloadTurret{
     public Effect chargeBeginEffect = Fx.none;
     public Sound chargeSound = Sounds.none;
 
-    public Sortf unitSort = Unit::dst2;
+    public Sortf unitSort = UnitSorts.closest;
 
     protected Vec2 tr = new Vec2();
     protected Vec2 tr2 = new Vec2();

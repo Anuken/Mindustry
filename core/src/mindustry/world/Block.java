@@ -86,7 +86,7 @@ public class Block extends UnlockableContent{
     public boolean solid;
     /** whether this block CAN be solid. */
     public boolean solidifes;
-    /** whether this is rotateable */
+    /** whether this is rotatable */
     public boolean rotate;
     /** number of different variant regions to use */
     public int variants = 0;

@@ -94,9 +94,7 @@ public class Menus{
 
     @Remote(variants = Variant.both)
     public static void labelReliable(String message, float duration, float worldx, float worldy){
-        if(message == null) return;
-
-        ui.showLabel(message, duration, worldx, worldy);
+        label(message, duration, worldx, worldy);
     }
 
     @Remote(variants = Variant.both)
@@ -111,6 +109,15 @@ public class Menus{
         if(text == null || Fonts.icon.getData().getGlyph((char)unicode) == null) return;
 
         ui.hudfrag.showToast(Fonts.getGlyph(Fonts.icon, (char)unicode), text);
+    }
+
+    //internal use only
+    @Remote
+    public static void removeWorldLabel(int id){
+        var label = Groups.label.getByID(id);
+        if(label != null){
+            label.remove();
+        }
     }
 
     public interface MenuListener{
