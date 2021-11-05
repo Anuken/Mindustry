@@ -61,6 +61,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient boolean updateFlow;
     transient byte cdump;
     transient int rotation;
+    transient float payloadRotation;
     transient boolean enabled = true;
     transient float enabledControlTime;
     transient String lastAccessed;
