@@ -16,7 +16,7 @@ public class BurstDrill extends Drill{
     public @Load("@-arrow") TextureRegion arrowRegion;
     public @Load("@-arrow-blur") TextureRegion arrowBlurRegion;
 
-    public float invertedTime = 190f;
+    public float invertedTime = 200f;
     public float arrowSpacing = 4f;
     public Color arrowColor = Color.valueOf("feb380"), baseArrowColor = Color.valueOf("6e7080");
 

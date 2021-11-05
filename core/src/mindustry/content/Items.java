@@ -8,7 +8,7 @@ public class Items implements ContentList{
     public static Item
     scrap, copper, lead, graphite, coal, titanium, thorium, silicon, plastanium,
     phaseFabric, surgeAlloy, sporePod, sand, blastCompound, pyratite, metaglass,
-    beryllium, fissileMatter, dormantCyst, tungsten;
+    beryllium, fissileMatter, dormantCyst, tungsten, carbide;
 
     @Override
     public void load(){
@@ -108,6 +108,13 @@ public class Items implements ContentList{
 
         tungsten = new Item("tungsten", Color.valueOf("768a9a")){{
             hardness = 5;
+            cost = 1.2f;
+        }};
+
+        //TODO carbide impl
+
+        carbide = new Item("carbide", Color.valueOf("768a9a")){{
+            cost = 1.3f;
         }};
     }
 }
