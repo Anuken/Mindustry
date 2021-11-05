@@ -74,7 +74,7 @@ public class Blocks implements ContentList{
     //transport
     conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
     overflowGate, underflowGate, massDriver,
-    duct, ductRouter, ductBridge,
+    duct, ductRouter, ductBridge, ductUnloader,
     surgeConveyor,
 
     //liquid
@@ -1305,6 +1305,11 @@ public class Blocks implements ContentList{
 
         ductBridge = new DuctBridge("duct-bridge"){{
             requirements(Category.distribution, with(Items.graphite, 20));
+            speed = 4f;
+        }};
+
+        ductUnloader = new DirectionalUnloader("duct-unloader"){{
+            requirements(Category.distribution, with(Items.graphite, 10));
             speed = 4f;
         }};
 

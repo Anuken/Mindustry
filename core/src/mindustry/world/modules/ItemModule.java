@@ -119,6 +119,10 @@ public class ItemModule extends BlockModule{
         return sum;
     }
 
+    public boolean has(int id){
+        return items[id] > 0;
+    }
+
     public boolean has(Item item){
         return get(item) > 0;
     }

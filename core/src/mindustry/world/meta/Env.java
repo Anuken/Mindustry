@@ -20,5 +20,7 @@ public class Env{
     //has oxygen in the atmosphere
     oxygen = 1 << 7,
     //all attributes combined, only used for bitmasking purposes
-    any = 0xffffffff;
+    any = 0xffffffff,
+    //no attributes (0)
+    none = 0;
 }

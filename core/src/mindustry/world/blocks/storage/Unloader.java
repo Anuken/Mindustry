@@ -6,6 +6,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -16,6 +17,8 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Unloader extends Block{
+    public @Load(value = "@-center", fallback = "unloader-center") TextureRegion centerRegion;
+
     public float speed = 1f;
 
     public Unloader(String name){
@@ -29,7 +32,6 @@ public class Unloader extends Block{
         itemCapacity = 0;
         noUpdateDisabled = true;
         unloadable = false;
-        envEnabled = Env.any;
 
         config(Item.class, (UnloaderBuild tile, Item item) -> tile.sortItem = item);
         configClear((UnloaderBuild tile) -> tile.sortItem = null);
@@ -203,7 +205,7 @@ public class Unloader extends Block{
             super.draw();
 
             Draw.color(sortItem == null ? Color.clear : sortItem.color);
-            Draw.rect("unloader-center", x, y);
+            Draw.rect(centerRegion, x, y);
             Draw.color();
         }
 
