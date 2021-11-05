@@ -269,7 +269,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void applyBoost(float intensity, float duration){
         //do not refresh time scale when getting a weaker intensity
-        if(intensity >= this.timeScale){
+        if(intensity >= this.timeScale - 0.001f){
             timeScaleDuration = Math.max(timeScaleDuration, duration);
         }
         timeScale = Math.max(timeScale, intensity);
