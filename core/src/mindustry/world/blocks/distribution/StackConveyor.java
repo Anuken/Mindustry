@@ -1,5 +1,6 @@
 package mindustry.world.blocks.distribution;
 
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
@@ -25,9 +26,15 @@ public class StackConveyor extends Block implements Autotiler{
     public @Load(value = "@-#", length = 3) TextureRegion[] regions;
     public @Load("@-edge") TextureRegion edgeRegion;
     public @Load("@-stack") TextureRegion stackRegion;
+    /** requires power to work properly */
+    public @Load(value = "@-glow") TextureRegion glowRegion;
 
+    public float glowAlpha = 1f;
+    public Color glowColor = Pal.redLight;
+
+    public float baseEfficiency = 1f;
     public float speed = 0f;
-    public boolean splitOut = true;
+    public boolean outputRouter = true;
     /** (minimum) amount of loading docks needed to fill a line. */
     public float recharge = 2f;
     public Effect loadEffect = Fx.plasticburn;
@@ -61,7 +68,7 @@ public class StackConveyor extends Block implements Autotiler{
             int state = b.state;
             if(state == stateLoad){ //standard conveyor mode
                 return otherblock.outputsItems() && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
-            }else if(state == stateUnload){ //router mode
+            }else if(state == stateUnload && !outputRouter){ //router mode
                 return otherblock.acceptsItems &&
                     (!otherblock.noSideBlend || lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock)) &&
                     (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) ||
@@ -105,6 +112,7 @@ public class StackConveyor extends Block implements Autotiler{
         public int link = -1;
         public float cooldown;
         public Item lastItem;
+        public float glow;
 
         boolean proxUpdating = false;
 
@@ -124,6 +132,17 @@ public class StackConveyor extends Block implements Autotiler{
 
             Tile from = world.tile(link);
 
+            //TODO do not draw for certain configurations?
+            if(glowRegion.found() && glow > 0f){
+                Draw.z(Layer.blockAdditive);
+                Draw.color(glowColor, glowAlpha * glow);
+                Draw.blend(Blending.additive);
+                Draw.rect(glowRegion, x, y, rotation * 90);
+                Draw.blend();
+                Draw.color();
+                Draw.z(Layer.block - 0.1f);
+            }
+
             if(link == -1 || from == null || lastItem == null) return;
 
             int fromRot = from.build == null ? rotation : from.build.rotation;
@@ -138,6 +157,10 @@ public class StackConveyor extends Block implements Autotiler{
             float b = (rotation%4) * 90;
             if((fromRot%4) == 3 && (rotation%4) == 0) a = -1 * 90;
             if((fromRot%4) == 0 && (rotation%4) == 3) a =  4 * 90;
+
+            if(glowRegion.found()){
+                Draw.z(Layer.blockAdditive + 0.01f);
+            }
 
             //stack
             Draw.rect(stackRegion, Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interp.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
@@ -169,13 +192,14 @@ public class StackConveyor extends Block implements Autotiler{
 
             int[] bits = buildBlending(tile, rotation, null, true);
             if(bits[0] == 0 &&  blends(tile, rotation, 0) && !blends(tile, rotation, 2)) state = stateLoad;  // a 0 that faces into a conveyor with none behind it
-            if(bits[0] == 0 && !blends(tile, rotation, 0) && blends(tile, rotation, 2)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
+            if(outputRouter && bits[0] == 0 && !blends(tile, rotation, 0) && blends(tile, rotation, 2)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
+            if(!outputRouter && !(front() instanceof StackConveyorBuild)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
 
             if(!headless){
                 blendprox = 0;
 
                 for(int i = 0; i < 4; i++){
-                    if(blends(tile, rotation, i)){
+                    if(blends(tile, rotation, i) && (state != stateUnload || outputRouter || i == 0 || nearby(Mathf.mod(rotation - i, 4)) instanceof StackConveyorBuild)){
                         blendprox |= (1 << i);
                     }
                 }
@@ -210,7 +234,7 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public float efficiency(){
-            return 1f;
+            return baseEfficiency + (power == null ? 0f : power.status);
         }
 
         @Override
@@ -229,12 +253,21 @@ public class StackConveyor extends Block implements Autotiler{
                 lastItem = items.first();
             }
 
+            if(power != null) glow = Mathf.lerpDelta(glow, power.status, 0.6f);
+
             //do not continue if disabled, will still allow one to be reeled in to prevent visual stacking
             if(!enabled) return;
 
             if(state == stateUnload){ //unload
-                while(lastItem != null && (!splitOut ? moveForward(lastItem) : dump(lastItem))){
-                    if(items.empty()) poofOut();
+                while(lastItem != null && (!outputRouter ? moveForward(lastItem) : dump(lastItem))){
+                    if(!outputRouter){
+                        items.remove(lastItem, 1);
+                    }
+
+                    if(items.empty()){
+                        poofOut();
+                        lastItem = null;
+                    }
                 }
             }else{ //transfer
                 if(state != stateLoad || (items.total() >= getMaximumAccepted(lastItem))){

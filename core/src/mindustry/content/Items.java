@@ -111,9 +111,7 @@ public class Items implements ContentList{
             cost = 1.2f;
         }};
 
-        //TODO carbide impl
-
-        carbide = new Item("carbide", Color.valueOf("768a9a")){{
+        carbide = new Item("carbide", Color.valueOf("89769a")){{
             cost = 1.3f;
         }};
     }

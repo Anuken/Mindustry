@@ -1,7 +1,6 @@
 package mindustry.content;
 
 import arc.graphics.*;
-import arc.math.*;
 import arc.struct.*;
 import mindustry.*;
 import mindustry.ctype.*;
@@ -60,6 +59,7 @@ public class Blocks implements ContentList{
     //crafting
     siliconSmelter, siliconCrucible, siliconArcFurnace, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
+    carbideCrucible,
     cellSynthesisChamber,
 
     //sandbox
@@ -75,6 +75,7 @@ public class Blocks implements ContentList{
     conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
     overflowGate, underflowGate, massDriver,
     duct, ductRouter, ductBridge,
+    surgeConveyor,
 
     //liquid
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidContainer, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
@@ -939,6 +940,22 @@ public class Blocks implements ContentList{
             consumes.power(0.50f);
         }};
 
+        carbideCrucible = new GenericCrafter("carbide-crucible"){{
+            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
+            craftEffect = Fx.smeltsmoke;
+            outputItem = new ItemStack(Items.carbide, 1);
+            craftTime = 30f;
+            size = 2;
+            hasPower = hasItems = true;
+            drawer = new DrawSmelter(Color.valueOf("ffc099"));
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.07f;
+
+            //TODO use heat!
+            consumes.items(with(Items.tungsten, 1, Items.graphite, 2));
+            consumes.power(2f);
+        }};
+
         cellSynthesisChamber = new LiquidConverter("cell-synthesis-chamber"){{
             //TODO booster mechanics?
             requirements(Category.crafting, with(Items.thorium, 100, Items.phaseFabric, 120, Items.titanium, 150, Items.surgeAlloy, 70));
@@ -1277,18 +1294,33 @@ public class Blocks implements ContentList{
         //special transport blocks
 
         duct = new Duct("duct"){{
-            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 5));
+            requirements(Category.distribution, with(Items.graphite, 5));
             speed = 4f;
         }};
 
         ductRouter = new DuctRouter("duct-router"){{
-            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 10));
+            requirements(Category.distribution, with(Items.graphite, 10));
             speed = 4f;
         }};
 
         ductBridge = new DuctBridge("duct-bridge"){{
-            requirements(Category.distribution, BuildVisibility.debugOnly, with(Items.graphite, 20));
+            requirements(Category.distribution, with(Items.graphite, 20));
             speed = 4f;
+        }};
+
+        surgeConveyor = new StackConveyor("surge-conveyor"){{
+            requirements(Category.distribution, with(Items.surgeAlloy, 3, Items.graphite, 5));
+            health = 90;
+            //TODO different base speed/item capacity?
+            speed = 5f / 60f;
+            itemCapacity = 10;
+
+            outputRouter = false;
+            hasPower = true;
+            consumesPower = true;
+            conductivePower = true;
+            baseEfficiency = 1f;
+            consumes.power(1f / 60f);
         }};
 
         //endregion

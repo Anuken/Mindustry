@@ -47,6 +47,7 @@ public class Block extends UnlockableContent{
     public boolean outputsLiquid = false;
     public boolean consumesPower = true;
     public boolean outputsPower = false;
+    public boolean conductivePower = false;
     public boolean outputsPayload = false;
     public boolean acceptsPayload = false;
     public boolean acceptsItems = false;

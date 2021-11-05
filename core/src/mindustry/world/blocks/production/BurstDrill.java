@@ -7,6 +7,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.graphics.*;
 
 public class BurstDrill extends Drill{
     public float shake = 2f;
@@ -104,8 +105,6 @@ public class BurstDrill extends Drill{
                 Draw.color();
             }
 
-            float z = Draw.z();
-
             float fract = smoothProgress;
             int arrows = 3;
             Draw.color(arrowColor);
@@ -116,13 +115,13 @@ public class BurstDrill extends Drill{
                     Tmp.v1.trns(i * 90 + 45, j * arrowSpacing);
 
                     //TODO maybe just use arrow alpha and that drawn on the base?
-                    Draw.z(z);
+                    Draw.z(Layer.block);
                     Draw.color(baseArrowColor, arrowColor, a);
                     Draw.rect(arrowRegion, x + Tmp.v1.x, y + Tmp.v1.y, i * 90);
 
                     Draw.color(arrowColor);
 
-                    Draw.z(z + 0.001f);
+                    Draw.z(Layer.blockAdditive);
                     Draw.blend(Blending.additive);
                     Draw.alpha(Mathf.pow(a, 10f));
                     Draw.rect(arrowBlurRegion, x + Tmp.v1.x, y + Tmp.v1.y, i * 90);

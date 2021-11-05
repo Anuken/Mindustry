@@ -26,6 +26,9 @@ public class Layer{
     //base block layer - most blocks go here
     block = 30,
 
+    //informal layer used for additive blending overlay, grouped together to reduce draw calls
+    blockAdditive = 31,
+
     //things drawn over blocks (intermediate layer)
     blockOver = 35,
 
