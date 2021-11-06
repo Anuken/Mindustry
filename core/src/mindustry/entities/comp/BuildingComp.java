@@ -280,11 +280,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public Building nearby(int rotation){
-        if(rotation == 0) return world.build(tile.x + 1, tile.y);
-        if(rotation == 1) return world.build(tile.x, tile.y + 1);
-        if(rotation == 2) return world.build(tile.x - 1, tile.y);
-        if(rotation == 3) return world.build(tile.x, tile.y - 1);
-        return null;
+        return switch(rotation){
+            case 0 -> world.build(tile.x + 1, tile.y);
+            case 1 -> world.build(tile.x, tile.y + 1);
+            case 2 -> world.build(tile.x - 1, tile.y);
+            case 3 -> world.build(tile.x, tile.y - 1);
+            default -> null;
+        };
     }
 
     public byte relativeTo(Tile tile){
