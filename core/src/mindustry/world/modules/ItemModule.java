@@ -273,6 +273,12 @@ public class ItemModule extends BlockModule{
         }
     }
 
+    public void handleFlow(Item item, int amount){
+        if(flow != null){
+            cacheSums[item.id] += amount;
+        }
+    }
+
     public void undoFlow(Item item){
         if(flow != null){
             cacheSums[item.id] -= 1;

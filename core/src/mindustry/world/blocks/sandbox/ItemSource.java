@@ -14,6 +14,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ItemSource extends Block{
+    public int itemsPerSecond = 100;
 
     public ItemSource(String name){
         super(name);
@@ -37,6 +38,13 @@ public class ItemSource extends Block{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.output, itemsPerSecond, StatUnit.itemsSecond);
+    }
+
+    @Override
     public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
         drawRequestConfigCenter(req, req.config, "center", true);
     }
@@ -47,7 +55,8 @@ public class ItemSource extends Block{
     }
 
     public class ItemSourceBuild extends Building{
-        Item outputItem;
+        public float counter;
+        public Item outputItem;
 
         @Override
         public void draw(){
@@ -66,9 +75,15 @@ public class ItemSource extends Block{
         public void updateTile(){
             if(outputItem == null) return;
 
-            items.set(outputItem, 1);
-            dump(outputItem);
-            items.set(outputItem, 0);
+            counter += edelta();
+            float limit = 60f / itemsPerSecond;
+
+            while(counter >= limit){
+                items.set(outputItem, 1);
+                dump(outputItem);
+                items.set(outputItem, 0);
+                counter -= limit;
+            }
         }
 
         @Override

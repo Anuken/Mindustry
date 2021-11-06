@@ -75,7 +75,7 @@ public class Blocks implements ContentList{
     conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
     overflowGate, underflowGate, massDriver,
     duct, ductRouter, ductBridge, ductUnloader,
-    surgeConveyor,
+    surgeConveyor, surgeRouter,
 
     //liquid
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidContainer, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
@@ -1326,6 +1326,18 @@ public class Blocks implements ContentList{
             conductivePower = true;
             baseEfficiency = 1f;
             consumes.power(1f / 60f);
+        }};
+
+        surgeRouter = new StackRouter("surge-router"){{
+            requirements(Category.distribution, with(Items.graphite, 10, Items.surgeAlloy, 10));
+
+            speed = 6f;
+
+            hasPower = true;
+            consumesPower = true;
+            conductivePower = true;
+            baseEfficiency = 1f;
+            consumes.power(3f / 60f);
         }};
 
         //endregion

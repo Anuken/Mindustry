@@ -112,7 +112,6 @@ public class StackConveyor extends Block implements Autotiler{
         public int link = -1;
         public float cooldown;
         public Item lastItem;
-        public float glow;
 
         boolean proxUpdating = false;
 
@@ -133,9 +132,9 @@ public class StackConveyor extends Block implements Autotiler{
             Tile from = world.tile(link);
 
             //TODO do not draw for certain configurations?
-            if(glowRegion.found() && glow > 0f){
+            if(glowRegion.found() && power != null && power.status > 0f){
                 Draw.z(Layer.blockAdditive);
-                Draw.color(glowColor, glowAlpha * glow);
+                Draw.color(glowColor, glowAlpha * power.status);
                 Draw.blend(Blending.additive);
                 Draw.rect(glowRegion, x, y, rotation * 90);
                 Draw.blend();
@@ -252,8 +251,6 @@ public class StackConveyor extends Block implements Autotiler{
             if(lastItem == null || !items.has(lastItem)){
                 lastItem = items.first();
             }
-
-            if(power != null) glow = Mathf.lerpDelta(glow, power.status, 0.6f);
 
             //do not continue if disabled, will still allow one to be reeled in to prevent visual stacking
             if(!enabled) return;

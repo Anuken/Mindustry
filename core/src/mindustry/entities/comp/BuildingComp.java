@@ -1099,6 +1099,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return block.uiIcon;
     }
 
+    /** @return the item module to use for flow rate calculations */
+    public ItemModule flowItems(){
+        return items;
+    }
+
     @Override
     public void display(Table table){
         //display the block stuff
@@ -1126,7 +1131,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             if(displayFlow){
                 String ps = " " + StatUnit.perSecond.localized();
 
-                if(items != null){
+                var flowItems = flowItems();
+
+                if(flowItems != null){
                     table.row();
                     table.left();
                     table.table(l -> {
@@ -1136,9 +1143,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                             l.clearChildren();
                             l.left();
                             for(Item item : content.items()){
-                                if(items.hasFlowItem(item)){
+                                if(flowItems.hasFlowItem(item)){
                                     l.image(item.uiIcon).padRight(3f);
-                                    l.label(() -> items.getFlowRate(item) < 0 ? "..." : Strings.fixed(items.getFlowRate(item), 1) + ps).color(Color.lightGray);
+                                    l.label(() -> flowItems.getFlowRate(item) < 0 ? "..." : Strings.fixed(flowItems.getFlowRate(item), 1) + ps).color(Color.lightGray);
                                     l.row();
                                 }
                             }
@@ -1147,7 +1154,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                         rebuild.run();
                         l.update(() -> {
                             for(Item item : content.items()){
-                                if(items.hasFlowItem(item) && !current.get(item.id)){
+                                if(flowItems.hasFlowItem(item) && !current.get(item.id)){
                                     current.set(item.id);
                                     rebuild.run();
                                 }
