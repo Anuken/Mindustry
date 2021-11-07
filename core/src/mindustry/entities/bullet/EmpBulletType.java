@@ -21,9 +21,7 @@ public class EmpBulletType extends BasicBulletType{
             Vars.indexer.allBuildings(x, y, radius, other -> {
                 if(other.team == b.team){
                     if(other.block.hasPower && other.block.canOverdrive && other.timeScale < timeIncrease){
-                        if(timeIncrease >= other.timeScale){
-                            other.timeScale = Math.max(other.timeScale, timeIncrease);
-                        }
+                        other.timeScale = Math.max(other.timeScale, timeIncrease);
                         other.timeScaleDuration = Math.max(other.timeScaleDuration, timeDuration);
                         chainEffect.at(x, y, 0, hitColor, other);
                         applyEffect.at(other, other.block.size * 7f);
