@@ -210,7 +210,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         }
 
         //not allowed
-        state.rules.hiddenBuildItems.addAll(Items.copper, Items.titanium, Items.coal, Items.lead, Items.blastCompound, Items.pyratite, Items.sporePod, Items.metaglass);
+        state.rules.hiddenBuildItems.addAll(Items.copper, Items.titanium, Items.coal, Items.lead, Items.blastCompound, Items.pyratite, Items.sporePod, Items.metaglass, Items.plastanium);
 
         //it is very hot
         state.rules.attributes.set(Attribute.heat, 0.8f);

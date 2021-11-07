@@ -1690,6 +1690,13 @@ public class Fx{
         });
     }),
 
+    conveyorPoof = new Effect(35, e -> {
+        color(Pal.plasticBurn, Color.gray, e.fin());
+        randLenVectors(e.id, 4, 3f + e.fin() * 4f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 1.11f);
+        });
+    }),
+
     pulverize = new Effect(40, e -> {
         randLenVectors(e.id, 5, 3f + e.fin() * 8f, (x, y) -> {
             color(Pal.stoneGray);

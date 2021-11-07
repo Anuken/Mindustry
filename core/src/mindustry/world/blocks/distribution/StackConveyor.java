@@ -37,8 +37,8 @@ public class StackConveyor extends Block implements Autotiler{
     public boolean outputRouter = true;
     /** (minimum) amount of loading docks needed to fill a line. */
     public float recharge = 2f;
-    public Effect loadEffect = Fx.plasticburn;
-    public Effect unloadEffect = Fx.plasticburn;
+    public Effect loadEffect = Fx.conveyorPoof;
+    public Effect unloadEffect = Fx.conveyorPoof;
 
     public StackConveyor(String name){
         super(name);
