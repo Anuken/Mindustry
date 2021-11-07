@@ -98,7 +98,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public class ConduitBuild extends LiquidBuild implements ChainedBuilding{
         public float smoothLiquid;
         public int blendbits, xscl = 1, yscl = 1, blending;
-        public boolean capped;
+        public boolean capped, backCapped = false;
 
         @Override
         public void draw(){
@@ -122,6 +122,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
             Draw.reset();
 
             if(capped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg());
+            if(backCapped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg() + 180);
         }
 
         protected void drawAt(float x, float y, int bits, float rotation, SliceMode slice){
@@ -143,8 +144,9 @@ public class Conduit extends LiquidBlock implements Autotiler{
             yscl = bits[2];
             blending = bits[4];
 
-            Building next = front();
+            Building next = front(), prev = back();
             capped = next == null || next.team != team || !next.block.hasLiquids;
+            backCapped = blendbits == 0 && (prev == null || prev.team != team || !prev.block.hasLiquids);
         }
 
         @Override

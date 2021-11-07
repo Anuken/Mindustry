@@ -28,6 +28,7 @@ public class Pal{
 
     darkMetal = Color.valueOf("6e7080"),
     darkerMetal = Color.valueOf("565666"),
+    darkestMetal = Color.valueOf("38393f"),
 
     missileYellow = Color.valueOf("ffd2ae"),
     missileYellowBack = Color.valueOf("e58956"),

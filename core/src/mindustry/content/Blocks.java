@@ -80,6 +80,8 @@ public class Blocks implements ContentList{
     //liquid
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidContainer, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
 
+    reinforcedConduit,
+
     //power
     combustionGenerator, thermalGenerator, steamGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
     turbineCondenser,
@@ -1425,6 +1427,16 @@ public class Blocks implements ContentList{
             pulse = true;
             consumes.power(0.30f);
         }};
+
+        reinforcedConduit = new ArmoredConduit("reinforced-conduit"){{
+            requirements(Category.liquid, with(Items.beryllium, 2, Items.graphite, 1));
+            botColor = Pal.darkestMetal;
+            leaks = true;
+            liquidCapacity = 20f;
+            liquidPressure = 1.1f;
+            health = 250;
+        }};
+
 
         //endregion
         //region power
