@@ -31,6 +31,7 @@ public class GroundAI extends AIController{
             if(state.rules.waves && unit.team == state.rules.defaultTeam){
                 Tile spawner = getClosestSpawner();
                 if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)) move = false;
+                if(spawner == null && core == null) move = false;
             }
 
             if(move) pathfind(Pathfinder.fieldCore);
