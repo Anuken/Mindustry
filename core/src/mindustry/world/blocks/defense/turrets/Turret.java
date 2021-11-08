@@ -419,9 +419,6 @@ public class Turret extends ReloadTurret{
                     int ii = i;
                     Time.run(burstSpacing * i, () -> {
                         if(dead || !hasAmmo()) return;
-
-                        recoil = recoilAmount;
-
                         tr.trns(rotation, shootLength, Mathf.range(xRand));
                         bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (ii - (int)(shots / 2f)) * spread);
                         effects();
