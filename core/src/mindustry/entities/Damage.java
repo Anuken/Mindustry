@@ -146,83 +146,87 @@ public class Damage{
         collidedBlocks.clear();
         tr.trnsExact(angle, length);
 
-        Intc2 collider = (cx, cy) -> {
-            Building tile = world.build(cx, cy);
-            boolean collide = tile != null && collidedBlocks.add(tile.pos());
+        if(hitter.type.collidesTiles){
+            Intc2 collider = (cx, cy) -> {
+                Building tile = world.build(cx, cy);
+                boolean collide = tile != null && collidedBlocks.add(tile.pos());
 
-            if(hitter.damage > 0){
-                float health = !collide ? 0 : tile.health;
+                if(hitter.damage > 0){
+                    float health = !collide ? 0 : tile.health;
 
-                if(collide && tile.team != team && tile.collide(hitter)){
-                    tile.collision(hitter);
-                    hitter.type.hit(hitter, tile.x, tile.y);
-                }
+                    if(collide && tile.team != team && tile.collide(hitter)){
+                        tile.collision(hitter);
+                        hitter.type.hit(hitter, tile.x, tile.y);
+                    }
 
-                //try to heal the tile
-                if(collide && hitter.type.testCollision(hitter, tile)){
-                    hitter.type.hitTile(hitter, tile, health, false);
-                }
-            }
-        };
-
-        if(hitter.type.collidesGround){
-            seg1.set(x, y);
-            seg2.set(seg1).add(tr);
-            world.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
-                collider.get(cx, cy);
-
-                for(Point2 p : Geometry.d4){
-                    Tile other = world.tile(p.x + cx, p.y + cy);
-                    if(other != null && (large || Intersector.intersectSegmentRectangle(seg1, seg2, other.getBounds(Tmp.r1)))){
-                        collider.get(cx + p.x, cy + p.y);
+                    //try to heal the tile
+                    if(collide && hitter.type.testCollision(hitter, tile)){
+                        hitter.type.hitTile(hitter, tile, health, false);
                     }
                 }
-                return false;
+            };
+
+            if(hitter.type.collidesGround){
+                seg1.set(x, y);
+                seg2.set(seg1).add(tr);
+                world.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
+                    collider.get(cx, cy);
+
+                    for(Point2 p: Geometry.d4){
+                        Tile other = world.tile(p.x + cx, p.y + cy);
+                        if(other != null && (large || Intersector.intersectSegmentRectangle(seg1, seg2, other.getBounds(Tmp.r1)))){
+                            collider.get(cx + p.x, cy + p.y);
+                        }
+                    }
+                    return false;
+                });
+            }
+        }
+
+        if(hitter.type.collidesUnits){
+            rect.setPosition(x, y).setSize(tr.x, tr.y);
+            float x2 = tr.x + x, y2 = tr.y + y;
+
+            if(rect.width < 0){
+                rect.x += rect.width;
+                rect.width *= -1;
+            }
+
+            if(rect.height < 0){
+                rect.y += rect.height;
+                rect.height *= -1;
+            }
+
+            float expand = 3f;
+
+            rect.y -= expand;
+            rect.x -= expand;
+            rect.width += expand * 2;
+            rect.height += expand * 2;
+
+            Cons<Unit> cons = e -> {
+                e.hitbox(hitrect);
+
+                Vec2 vec = Geometry.raycastRect(x, y, x2, y2, hitrect.grow(expand * 2));
+
+                if(vec != null && hitter.damage > 0){
+                    effect.at(vec.x, vec.y);
+                    e.collision(hitter, vec.x, vec.y);
+                    hitter.collision(e, vec.x, vec.y);
+                }
+            };
+
+            units.clear();
+
+            Units.nearbyEnemies(team, rect, u -> {
+                if(u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)){
+                    units.add(u);
+                }
             });
+
+            units.sort(u -> u.dst2(hitter));
+            units.each(cons);
         }
-
-        rect.setPosition(x, y).setSize(tr.x, tr.y);
-        float x2 = tr.x + x, y2 = tr.y + y;
-
-        if(rect.width < 0){
-            rect.x += rect.width;
-            rect.width *= -1;
-        }
-
-        if(rect.height < 0){
-            rect.y += rect.height;
-            rect.height *= -1;
-        }
-
-        float expand = 3f;
-
-        rect.y -= expand;
-        rect.x -= expand;
-        rect.width += expand * 2;
-        rect.height += expand * 2;
-
-        Cons<Unit> cons = e -> {
-            e.hitbox(hitrect);
-
-            Vec2 vec = Geometry.raycastRect(x, y, x2, y2, hitrect.grow(expand * 2));
-
-            if(vec != null && hitter.damage > 0){
-                effect.at(vec.x, vec.y);
-                e.collision(hitter, vec.x, vec.y);
-                hitter.collision(e, vec.x, vec.y);
-            }
-        };
-
-        units.clear();
-
-        Units.nearbyEnemies(team, rect, u -> {
-            if(u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)){
-                units.add(u);
-            }
-        });
-
-        units.sort(u -> u.dst2(hitter));
-        units.each(cons);
     }
 
     /**
@@ -234,7 +238,7 @@ public class Damage{
         
         tmpBuilding = null;
 
-        if(hitter.type.collidesGround){
+        if(hitter.type.collidesTiles && hitter.type.collidesGround){
             world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
                 if(tile != null && tile.team != hitter.team){
@@ -245,44 +249,47 @@ public class Damage{
             });
         }
 
-        rect.setPosition(x, y).setSize(tr.x, tr.y);
-        float x2 = tr.x + x, y2 = tr.y + y;
-
-        if(rect.width < 0){
-            rect.x += rect.width;
-            rect.width *= -1;
-        }
-
-        if(rect.height < 0){
-            rect.y += rect.height;
-            rect.height *= -1;
-        }
-
-        float expand = 3f;
-
-        rect.y -= expand;
-        rect.x -= expand;
-        rect.width += expand * 2;
-        rect.height += expand * 2;
-
         tmpUnit = null;
 
-        Units.nearbyEnemies(hitter.team, rect, e -> {
-            if((tmpUnit != null && e.dst2(x, y) > tmpUnit.dst2(x, y)) || !e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)) return;
+        if(hitter.type.collidesUnits){
+            rect.setPosition(x, y).setSize(tr.x, tr.y);
+            float x2 = tr.x + x, y2 = tr.y + y;
 
-            e.hitbox(hitrect);
-            Rect other = hitrect;
-            other.y -= expand;
-            other.x -= expand;
-            other.width += expand * 2;
-            other.height += expand * 2;
-
-            Vec2 vec = Geometry.raycastRect(x, y, x2, y2, other);
-
-            if(vec != null){
-                tmpUnit = e;
+            if(rect.width < 0){
+                rect.x += rect.width;
+                rect.width *= -1;
             }
-        });
+
+            if(rect.height < 0){
+                rect.y += rect.height;
+                rect.height *= -1;
+            }
+
+            float expand = 3f;
+
+            rect.y -= expand;
+            rect.x -= expand;
+            rect.width += expand * 2;
+            rect.height += expand * 2;
+
+            Units.nearbyEnemies(hitter.team, rect, e -> {
+                if((tmpUnit != null && e.dst2(x, y) > tmpUnit.dst2(x, y)) || !e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround))
+                    return;
+
+                e.hitbox(hitrect);
+                Rect other = hitrect;
+                other.y -= expand;
+                other.x -= expand;
+                other.width += expand * 2;
+                other.height += expand * 2;
+
+                Vec2 vec = Geometry.raycastRect(x, y, x2, y2, other);
+
+                if(vec != null){
+                    tmpUnit = e;
+                }
+            });
+        }
 
         if(tmpBuilding != null && tmpUnit != null){
             if(Mathf.dst2(x, y, tmpBuilding.getX(), tmpBuilding.getY()) <= Mathf.dst2(x, y, tmpUnit.getX(), tmpUnit.getY())){
