@@ -65,6 +65,8 @@ public class Turret extends ReloadTurret{
     public boolean accurateDelay = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
+    public boolean targetUnits = true;
+    public boolean targetBuildings = true;
     public boolean targetHealing = false;
     public boolean playerControllable = true;
 
@@ -321,14 +323,14 @@ public class Turret extends ReloadTurret{
         }
 
         protected boolean canHeal(){
-            return targetHealing && hasAmmo() && peekAmmo().collidesTeam && peekAmmo().healPercent > 0;
+            return targetHealing && targetBuildings && hasAmmo() && peekAmmo().collidesTeam && peekAmmo().healPercent > 0;
         }
 
         protected void findTarget(){
-            if(targetAir && !targetGround){
+            if(targetUnits && targetAir && !targetGround){
                 target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded(), unitSort);
             }else{
-                target = Units.bestTarget(team, x, y, range, e -> !e.dead() && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround, unitSort);
+                target = Units.bestTarget(team, x, y, range, e -> targetUnits && !e.dead() && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && targetBuildings, unitSort);
 
                 if(target == null && canHeal()){
                     target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);
