@@ -219,3 +219,4 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     public float rotation(){
         return vel.isZero(0.001f) ? rotation : vel.angle();
     }
+}
