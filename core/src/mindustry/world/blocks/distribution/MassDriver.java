@@ -252,6 +252,7 @@ public class MassDriver extends Block{
         @Override
         public boolean onConfigureTileTapped(Building other){
             if(this == other){
+                if(link == -1) deselect();
                 configure(-1);
                 return false;
             }
