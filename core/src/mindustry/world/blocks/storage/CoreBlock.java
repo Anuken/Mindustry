@@ -53,7 +53,6 @@ public class CoreBlock extends StorageBlock{
 
         //support everything
         envEnabled = Env.any;
-        drawDisabled = false;
         replaceable = false;
         rebuildable = false;
     }
