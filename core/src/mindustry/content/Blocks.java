@@ -1448,7 +1448,7 @@ public class Blocks implements ContentList{
             size = 2;
         }};
 
-        reinforcedLiquidTank = new LiquidRouter("einforced-liquid-tank"){{
+        reinforcedLiquidTank = new LiquidRouter("reinforced-liquid-tank"){{
             requirements(Category.liquid, with(Items.tungsten, 30, Items.beryllium, 40));
             size = 3;
             liquidCapacity = 2700f;
