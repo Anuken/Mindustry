@@ -85,8 +85,8 @@ public class BulletType extends Content implements Cloneable{
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
     public float statusDuration = 60 * 8f;
-    /** Whether this bullet type collides with tiles. */
-    public boolean collidesTiles = true;
+    /** Whether this bullet type collides with units/tiles. */
+    public boolean collidesUnits = true, collidesTiles = true;
     /** Whether this bullet type collides with tiles that are of the same team. */
     public boolean collidesTeam = false;
     /** Whether this bullet type collides with air/ground units. */
@@ -359,11 +359,14 @@ public class BulletType extends Content implements Cloneable{
             //home in on allies if possible
             if(healPercent > 0){
                 target = Units.closestTarget(null, b.x, b.y, homingRange,
-                    e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team && !b.hasCollided(e.id),
-                    t -> collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id)
+                    e -> collidesUnits && e.checkTarget(collidesAir, collidesGround) && e.team != b.team && !b.hasCollided(e.id),
+                    t -> collidesTiles && collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id)
                 );
             }else{
-                target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id), t -> collidesGround && !b.hasCollided(t.id));
+                target = Units.closestTarget(b.team, b.x, b.y, homingRange,
+                    e -> collidesUnits && e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id),
+                    t -> collidesTiles && collidesGround && !b.hasCollided(t.id)
+                );
             }
 
             if(target != null){

@@ -96,6 +96,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Override
     public boolean collides(Hitboxc other){
         return type.collides && (other instanceof Teamc t && t.team() != team)
+            && !(other instanceof Unitc && !type.collidesUnits)
             && !(other instanceof Flyingc f && !f.checkTarget(type.collidesAir, type.collidesGround))
             && !(type.pierce && hasCollided(other.id())); //prevent multiple collisions
     }
@@ -218,4 +219,3 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     public float rotation(){
         return vel.isZero(0.001f) ? rotation : vel.angle();
     }
-}
