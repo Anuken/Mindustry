@@ -80,7 +80,7 @@ public class Blocks implements ContentList{
     //liquid
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidContainer, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
 
-    reinforcedConduit,
+    reinforcedConduit, reinforcedLiquidRouter, reinforcedLiquidContainer, reinforcedLiquidTank,
 
     //power
     combustionGenerator, thermalGenerator, steamGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
@@ -1435,6 +1435,23 @@ public class Blocks implements ContentList{
             liquidCapacity = 20f;
             liquidPressure = 1.1f;
             health = 250;
+        }};
+
+        reinforcedLiquidRouter = new LiquidRouter("reinforced-liquid-router"){{
+            requirements(Category.liquid, with(Items.graphite, 4, Items.beryllium, 2));
+            liquidCapacity = 30f;
+        }};
+
+        reinforcedLiquidContainer = new LiquidRouter("reinforced-liquid-container"){{
+            requirements(Category.liquid, with(Items.graphite, 10, Items.beryllium, 15));
+            liquidCapacity = 1000f;
+            size = 2;
+        }};
+
+        reinforcedLiquidTank = new LiquidRouter("einforced-liquid-tank"){{
+            requirements(Category.liquid, with(Items.tungsten, 30, Items.beryllium, 40));
+            size = 3;
+            liquidCapacity = 2700f;
         }};
 
 
