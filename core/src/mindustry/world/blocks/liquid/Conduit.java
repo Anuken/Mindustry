@@ -31,7 +31,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public @Load("@-cap") TextureRegion capRegion;
 
     public boolean leaks = true;
-    public @Nullable Block junctionReplacement, bridgeReplacement;
+    public @Nullable Block junctionReplacement, bridgeReplacement, rotBridgeReplacement;
 
     public Conduit(String name){
         super(name);
@@ -87,7 +87,11 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public void handlePlacementLine(Seq<BuildPlan> plans){
         if(bridgeReplacement == null) return;
 
-        Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement);
+        if(rotBridgeReplacement instanceof DirectionBridge duct){
+            Placement.calculateBridges(plans, duct);
+        }else{
+            Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement);
+        }
     }
 
     @Override

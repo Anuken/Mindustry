@@ -1441,6 +1441,8 @@ public class Blocks implements ContentList{
             requirements(Category.liquid, with(Items.graphite, 4, Items.beryllium, 8));
             range = 4;
             hasPower = false;
+
+            ((Conduit)reinforcedConduit).rotBridgeReplacement = this;
         }};
 
         reinforcedLiquidRouter = new LiquidRouter("reinforced-liquid-router"){{

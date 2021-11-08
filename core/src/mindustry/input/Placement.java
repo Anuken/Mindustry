@@ -175,7 +175,7 @@ public class Placement{
         plans.set(result);
     }
 
-    public static void calculateDuctBridges(Seq<BuildPlan> plans, DuctBridge bridge){
+    public static void calculateBridges(Seq<BuildPlan> plans, DirectionBridge bridge){
         if(isSidePlace(plans)) return;
 
         //check for orthogonal placement + unlocked state

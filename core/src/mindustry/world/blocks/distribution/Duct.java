@@ -75,7 +75,7 @@ public class Duct extends Block implements Autotiler{
 
     @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
-        Placement.calculateDuctBridges(plans, (DuctBridge)Blocks.ductBridge);
+        Placement.calculateBridges(plans, (DuctBridge)Blocks.ductBridge);
     }
 
     public class DuctBuild extends Building{
