@@ -1033,10 +1033,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Called *after* the tile has been removed. */
     public void afterDestroyed(){
         if(block.destroyBullet != null){
-            /** I really do not like that the bullet will not destroy derelict
-             but I can't do anything about it without using a random team
-             which may or may not cause issues with servers and js*/
-            block.destroyBullet.create(this, Team.derelict, x, y, rotdeg());
+            //I really do not like that the bullet will not destroy derelict
+            //but I can't do anything about it without using a random team
+            //which may or may not cause issues with servers and js
+            block.destroyBullet.create(this, Team.derelict, x, y, 0);
         }
     }
 
