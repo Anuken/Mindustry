@@ -721,7 +721,7 @@ public class Blocks implements ContentList{
 
         //TODO
         siliconArcFurnace = new GenericCrafter("silicon-arc-furnace"){{
-            requirements(Category.crafting, with(Items.thorium, 200, Items.metaglass, 120, Items.beryllium, 40, Items.silicon, 80));
+            requirements(Category.crafting, with(Items.thorium, 200, Items.beryllium, 40, Items.tungsten, 80));
             craftEffect = Fx.none;
             outputItem = new ItemStack(Items.silicon, 5);
             craftTime = 40f;
@@ -729,6 +729,7 @@ public class Blocks implements ContentList{
             hasPower = true;
             hasLiquids = false;
             envEnabled |= Env.space | Env.underwater;
+            envDisabled = Env.none;
             itemCapacity = 30;
             drawer = new DrawArcSmelter();
 
