@@ -122,7 +122,7 @@ public class Blocks implements ContentList{
     nuclearWarhead, warheadAssembler, ballisticSilo //TODO
     ;
 
-    /** @deprecated use the blocks with proper names, */
+    /** @deprecated use the blocks with proper names */
     @Deprecated
     public static Block blockForge, blockLoader, blockUnloader;
 
