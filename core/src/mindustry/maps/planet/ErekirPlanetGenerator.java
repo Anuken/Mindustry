@@ -49,7 +49,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
     @Override
     public Schematic getDefaultLoadout(){
-        return Loadouts.basicBastion;
+        return Loadouts.basicAegis;
     }
 
     float rawHeight(Vec3 position){
