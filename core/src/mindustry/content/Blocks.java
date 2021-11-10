@@ -95,7 +95,7 @@ public class Blocks implements ContentList{
     //storage
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
     //storage - erekir
-    coreBastion, coreAegis,
+    coreBastion, coreAegis, coreCitadel,
 
     //turrets
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
@@ -733,7 +733,6 @@ public class Blocks implements ContentList{
             itemCapacity = 30;
             drawer = new DrawArcSmelter();
 
-            //TODO don't use sand?
             consumes.items(with(Items.graphite, 1, Items.sand, 4));
             consumes.power(6f);
         }};
@@ -1825,6 +1824,7 @@ public class Blocks implements ContentList{
         }};
 
         coreAegis = new CoreBlock("core-aegis"){{
+            //TODO cost
             requirements(Category.effect, BuildVisibility.editorOnly, with(Items.beryllium, 2000, Items.graphite, 2000, Items.tungsten, 1000));
 
             unitType = UnitTypes.evoke;
@@ -1835,6 +1835,20 @@ public class Blocks implements ContentList{
 
             unitCapModifier = 20;
             researchCostMultiplier = 0.07f;
+        }};
+
+        coreCitadel = new CoreBlock("core-citadel"){{
+            //TODO cost
+            requirements(Category.effect, with(Items.beryllium, 7000, Items.graphite, 7000, Items.tungsten, 5000, Items.carbide, 5000));
+
+            unitType = UnitTypes.gamma;
+            health = 14000;
+            itemCapacity = 11000;
+            size = 5;
+            thrusterLength = 40/4f;
+
+            unitCapModifier = 30;
+            researchCostMultiplier = 0.11f;
         }};
 
         vault = new StorageBlock("vault"){{
