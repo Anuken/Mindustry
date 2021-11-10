@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.struct.*;
 import mindustry.*;
 import mindustry.ctype.*;
+import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -1839,7 +1840,7 @@ public class Blocks implements ContentList{
             size = 4;
             shootCone = 2f;
             shootSound = Sounds.railgun;
-            unitSort = (u, x, y) -> -u.maxHealth + Mathf.dst2(u.x, u.y, x, y) / 6400f;
+            unitSort = UnitSorts.strongest;
 
             coolantMultiplier = 0.4f;
 

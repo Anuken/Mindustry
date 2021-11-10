@@ -97,6 +97,8 @@ public class Weapon implements Cloneable{
     public boolean parentizeEffects;
     /** internal value used for alternation - do not change! */
     public int otherSide = -1;
+    /** draw Z offset relative to the default value */
+    public float layerOffset = 0f;
     /** sound used for shooting */
     public Sound shootSound = Sounds.pew;
     /** sound used for weapons that have a delay */
@@ -155,12 +157,16 @@ public class Weapon implements Cloneable{
             Draw.rect(outlineRegion,
             wx, wy,
             outlineRegion.width * Draw.scl * -Mathf.sign(flipSprite),
-            region.height * Draw.scl,
+            outlineRegion.height * Draw.scl,
             weaponRotation);
         }
     }
     
     public void draw(Unit unit, WeaponMount mount){
+        //apply layer offset, roll it back at the end
+        float z = Draw.z();
+        Draw.z(z + layerOffset);
+
         float
         rotation = unit.rotation - 90,
         weaponRotation  = rotation + (rotate ? mount.rotation : 0),
@@ -171,12 +177,8 @@ public class Weapon implements Cloneable{
             Drawf.shadow(wx, wy, shadow);
         }
 
-        if(outlineRegion.found() && top){
-            Draw.rect(outlineRegion,
-            wx, wy,
-            outlineRegion.width * Draw.scl * -Mathf.sign(flipSprite),
-            region.height * Draw.scl,
-            weaponRotation);
+        if(top){
+            drawOutline(unit, mount);
         }
 
         Draw.rect(region,
@@ -196,6 +198,8 @@ public class Weapon implements Cloneable{
             Draw.blend();
             Draw.color();
         }
+
+        Draw.z(z);
     }
 
     public void update(Unit unit, WeaponMount mount){

@@ -25,7 +25,7 @@ public class MinerAI extends AIController{
 
         if(mining){
             if(timer.get(timerTarget2, 60 * 4) || targetItem == null){
-                targetItem = unit.team.data().mineItems.min(i -> indexer.hasOre(i) && unit.canMine(i), i -> core.items.get(i));
+                targetItem = unit.type.mineItems.min(i -> indexer.hasOre(i) && unit.canMine(i), i -> core.items.get(i));
             }
 
             //core full of the target item, do nothing

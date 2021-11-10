@@ -160,8 +160,8 @@ public class PayloadLoader extends PayloadBlock{
         public boolean shouldExport(){
             return payload != null && (
                 exporting ||
-                (payload.block().hasLiquids && payload.build.liquids.total() >= payload.block().liquidCapacity - 0.001f) ||
-                (payload.block().hasItems && payload.block().separateItemCapacity && content.items().contains(i -> payload.build.items.get(i) >= payload.block().itemCapacity)));
+                (payload.block().hasLiquids && liquids.total() >= 0.1f && payload.build.liquids.total() >= payload.block().liquidCapacity - 0.001f) ||
+                (payload.block().hasItems && items.any() && payload.block().separateItemCapacity && content.items().contains(i -> payload.build.items.get(i) >= payload.block().itemCapacity)));
         }
 
         @Override

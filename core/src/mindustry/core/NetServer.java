@@ -67,6 +67,32 @@ public class NetServer implements ApplicationListener{
     /** Converts a message + NULLABLE player sender into a single string. Override for custom prefixes/suffixes. */
     public ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
 
+    /** Handles an incorrect command response. Returns text that will be sent to player. Override for customisation. */
+    public InvalidCommandHandler invalidHandler = (player, response) -> {
+        if(response.type == ResponseType.manyArguments){
+            return "[scarlet]Too many arguments. Usage:[lightgray] " + response.command.text + "[gray] " + response.command.paramText;
+        }else if(response.type == ResponseType.fewArguments){
+            return "[scarlet]Too few arguments. Usage:[lightgray] " + response.command.text + "[gray] " + response.command.paramText;
+        }else{ //unknown command
+            int minDst = 0;
+            Command closest = null;
+
+            for(Command command : netServer.clientCommands.getCommandList()){
+                int dst = Strings.levenshtein(command.text, response.runCommand);
+                if(dst < 3 && (closest == null || dst < minDst)){
+                    minDst = dst;
+                    closest = command;
+                }
+            }
+
+            if(closest != null){
+                return "[scarlet]Unknown command. Did you mean \"[lightgray]" + closest.text + "[]\"?";
+            }else{
+                return "[scarlet]Unknown command. Check [lightgray]/help[scarlet].";
+            }
+        }
+    };
+
     private boolean closing = false;
     private Interval timer = new Interval();
 
@@ -757,6 +783,8 @@ public class NetServer implements ApplicationListener{
 
         player.add();
 
+        Events.fire(new PlayerConnectionConfirmed(player));
+
         if(player.con == null || player.con.hasConnected) return;
 
         player.con.hasConnected = true;
@@ -991,5 +1019,9 @@ public class NetServer implements ApplicationListener{
     public interface ChatFormatter{
         /** @return text to be placed before player name */
         String format(@Nullable Player player, String message);
+    }
+
+    public interface InvalidCommandHandler{
+        String handle(Player player, CommandResponse response);
     }
 }

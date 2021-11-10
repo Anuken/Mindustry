@@ -24,12 +24,16 @@
     "address": ["darkdustry.ml", "darkdustry.ml:6000", "darkdustry.ml:7000", "darkdustry.ml:8000", "darkdustry.ml:9000"] 
   },
   {
+    "name": "SkaarjDustry",
+    "address": ["skaarjproject.duckdns.org"]
+  },
+  {
     "name": "Chaotic Neutral",
     "address": ["c-n.ddns.net:5555", "c-n.ddns.net:6666"]
   },
   {
     "name": "XCore",
-    "address": ["35.202.253.94", "35.202.253.94:2000"]
+    "address": ["skaarjproject.duckdns.org:2000"]
   },
   {
     "name": "Obvilion Network",
@@ -51,13 +55,13 @@
     "name": "Shiza Minigames",
     "address": ["shizashizashiza.ml"]
   },
-  { 
-    "name": "devass.su",
-    "address": ["185.22.152.66"]
-  },
   {
     "name": "Phoenix Network",
     "address": ["172.104.253.198"]
+  },
+  {
+    "name": "Xpdustry",
+    "address": ["xpdustry.fr:7000"]
   },
   {
     "name": "Pandorum",
@@ -65,6 +69,10 @@
   },
   {
     "name": "MindustryBR",
-    "address": ["n2.mindustry.me:4003", "n2.mindustry.me:4005", "n2.mindustry.me:4008", "n2.mindustry.me:4009", "n2.mindustry.me:4010"]
-  }
+    "address": ["n2.mindustry.me:4003", "n2.mindustry.me:4005", "n2.mindustry.me:4008", "panel.mindustry.me:2005", "n2.mindustry.me:4010"]
+  },
+  {
+    "name": "LostDustry",
+    "address": ["lostdustry.northeurope.cloudapp.azure.com:6568", "lostdustry.northeurope.cloudapp.azure.com:6569", "lostdustry.northeurope.cloudapp.azure.com:6570"]
+  } 
 ]

@@ -365,7 +365,8 @@ public class JoinDialog extends BaseDialog{
 
         global.clear();
         global.background(null);
-        for(ServerGroup group : defaultServers){
+        for(int i = 0; i < defaultServers.size; i ++){
+            ServerGroup group = defaultServers.get((i + defaultServers.size/2) % defaultServers.size);
             boolean hidden = group.hidden();
             if(hidden && !showHidden){
                 continue;

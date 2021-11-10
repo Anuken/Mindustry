@@ -42,6 +42,7 @@ public class StackConveyor extends Block implements Autotiler{
         hasItems = true;
         itemCapacity = 10;
         conveyorPlacement = true;
+        highUnloadPriority = true;
 
         ambientSound = Sounds.conveyor;
         ambientSoundVolume = 0.004f;
@@ -151,6 +152,11 @@ public class StackConveyor extends Block implements Autotiler{
         public void drawCracks(){
             Draw.z(Layer.block - 0.15f);
             super.drawCracks();
+        }
+        
+        @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon, x, y);
         }
 
         @Override
@@ -312,7 +318,7 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            if(this == source) return true; //player threw items
+            if(this == source) return items.total() < itemCapacity && (!items.any() || items.has(item)); //player threw items
             if(cooldown > recharge - 1f) return false; //still cooling down
             return !((state != stateLoad) //not a loading dock
             ||  (items.any() && !items.has(item)) //incompatible items

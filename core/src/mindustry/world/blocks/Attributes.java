@@ -56,6 +56,10 @@ public class Attributes implements JsonSerializable{
     }
 
     private void check(){
-        if(arr.length != Attribute.all.length) arr = new float[Attribute.all.length];
+        if(arr.length != Attribute.all.length){
+            var last = arr;
+            arr = new float[Attribute.all.length];
+            System.arraycopy(last, 0, arr, 0, Math.min(last.length, arr.length));
+        }
     }
 }

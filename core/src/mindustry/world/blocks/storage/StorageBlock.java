@@ -25,6 +25,7 @@ public class StorageBlock extends Block{
         flags = EnumSet.of(BlockFlag.storage);
         allowResupply = true;
         envEnabled = Env.any;
+        highUnloadPriority = true;
     }
 
     @Override
