@@ -29,6 +29,7 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
+import mindustry.entities.bullet.*;
 import mindustry.world.meta.*;
 
 import java.lang.reflect.*;
@@ -133,6 +134,8 @@ public class Block extends UnlockableContent{
     public int health = -1;
     /** base block explosiveness */
     public float baseExplosiveness = 0f;
+    /** bullet that this block spawns when destroyed */
+    public @Nullable BulletType destroyBullet = null;
     /** whether this block can be placed on edges of liquids. */
     public boolean floating = false;
     /** multiblock size */

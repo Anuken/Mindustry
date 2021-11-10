@@ -576,11 +576,14 @@ public class NetClient implements ApplicationListener{
                 for(int i = 0; i < usedRequests; i++){
                     BuildPlan plan = player.unit().plans().get(i);
                     if(plan.config instanceof byte[] b){
-                        int length = b.length;
-                        totalLength += length;
+                        totalLength += b.length;
                     }
 
-                    if(totalLength > 1024){
+                    if(plan.config instanceof String b){
+                        totalLength += b.length();
+                    }
+
+                    if(totalLength > 500){
                         usedRequests = i + 1;
                         break;
                     }
