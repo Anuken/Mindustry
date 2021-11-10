@@ -20,6 +20,7 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.Units.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
@@ -61,6 +62,7 @@ public class ContentParser{
             readFields(result, data);
             return result;
         });
+        put(Sortf.class, (type, data) -> field(UnitSorts.class, data));
         put(Interp.class, (type, data) -> field(Interp.class, data));
         put(CacheLayer.class, (type, data) -> field(CacheLayer.class, data));
         put(Attribute.class, (type, data) -> Attribute.get(data.asString()));
@@ -194,6 +196,18 @@ public class ContentParser{
                     }catch(Exception e){
                         throw new RuntimeException(e);
                     }
+                }
+
+                //try to parse env bits
+                if((type == int.class || type == Integer.class) && jsonData.isArray()){
+                    int value = 0;
+                    for(var str : jsonData){
+                        if(!str.isString()) throw new SerializationException("Integer bitfield values must all be strings. Found: " + str);
+                        String field = str.asString();
+                        value |= Reflect.<Integer>get(Env.class, field);
+                    }
+
+                    return (T)(Integer)value;
                 }
 
                 //try to parse "item/amount" syntax

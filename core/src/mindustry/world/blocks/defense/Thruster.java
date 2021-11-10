@@ -29,8 +29,7 @@ public class Thruster extends Wall{
 
         @Override
         public void draw(){
-            super.draw();
-
+            Draw.rect(block.region, x, y);
             Draw.rect(topRegion, x, y, rotdeg());
         }
     }

@@ -76,7 +76,7 @@ public class Turret extends ReloadTurret{
     public Effect chargeBeginEffect = Fx.none;
     public Sound chargeSound = Sounds.none;
 
-    public Sortf unitSort = Unit::dst2;
+    public Sortf unitSort = UnitSorts.closest;
 
     protected Vec2 tr = new Vec2();
     protected Vec2 tr2 = new Vec2();
@@ -419,9 +419,6 @@ public class Turret extends ReloadTurret{
                     int ii = i;
                     Time.run(burstSpacing * i, () -> {
                         if(dead || !hasAmmo()) return;
-
-                        recoil = recoilAmount;
-
                         tr.trns(rotation, shootLength, Mathf.range(xRand));
                         bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (ii - (int)(shots / 2f)) * spread);
                         effects();

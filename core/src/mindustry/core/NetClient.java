@@ -260,33 +260,10 @@ public class NetClient implements ApplicationListener{
 
             //a command was sent, now get the output
             if(response.type != ResponseType.valid){
-                String text;
-
-                //send usage
-                if(response.type == ResponseType.manyArguments){
-                    text = "[scarlet]Too many arguments. Usage:[lightgray] " + response.command.text + "[gray] " + response.command.paramText;
-                }else if(response.type == ResponseType.fewArguments){
-                    text = "[scarlet]Too few arguments. Usage:[lightgray] " + response.command.text + "[gray] " + response.command.paramText;
-                }else{ //unknown command
-                    int minDst = 0;
-                    Command closest = null;
-
-                    for(Command command : netServer.clientCommands.getCommandList()){
-                        int dst = Strings.levenshtein(command.text, response.runCommand);
-                        if(dst < 3 && (closest == null || dst < minDst)){
-                            minDst = dst;
-                            closest = command;
-                        }
-                    }
-
-                    if(closest != null){
-                        text = "[scarlet]Unknown command. Did you mean \"[lightgray]" + closest.text + "[]\"?";
-                    }else{
-                        text = "[scarlet]Unknown command. Check [lightgray]/help[scarlet].";
-                    }
+                String text = netServer.invalidHandler.handle(player, response);
+                if(text != null){
+                    player.sendMessage(text);
                 }
-
-                player.sendMessage(text);
             }
         }
     }
@@ -599,11 +576,14 @@ public class NetClient implements ApplicationListener{
                 for(int i = 0; i < usedRequests; i++){
                     BuildPlan plan = player.unit().plans().get(i);
                     if(plan.config instanceof byte[] b){
-                        int length = b.length;
-                        totalLength += length;
+                        totalLength += b.length;
                     }
 
-                    if(totalLength > 1024){
+                    if(plan.config instanceof String b){
+                        totalLength += b.length();
+                    }
+
+                    if(totalLength > 500){
                         usedRequests = i + 1;
                         break;
                     }

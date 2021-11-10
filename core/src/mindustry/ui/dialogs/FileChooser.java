@@ -259,15 +259,6 @@ public class FileChooser extends BaseDialog{
         Core.settings.put("lastDirectory", directory.absolutePath());
     }
 
-    private String shorten(String string){
-        int max = 30;
-        if(string.length() <= max){
-            return string;
-        }else{
-            return string.substring(0, max - 3).concat("...");
-        }
-    }
-
     public class FileHistory{
         private Seq<Fi> history = new Seq<>();
         private int index;
@@ -304,20 +295,6 @@ public class FileChooser extends BaseDialog{
 
         public boolean canBack(){
             return !(index == 1) && index > 0;
-        }
-
-        void print(){
-
-            System.out.println("\n\n\n\n\n\n");
-            int i = 0;
-            for(Fi file : history){
-                i++;
-                if(index == i){
-                    System.out.println("[[" + file.toString() + "]]");
-                }else{
-                    System.out.println("--" + file.toString() + "--");
-                }
-            }
         }
     }
 }

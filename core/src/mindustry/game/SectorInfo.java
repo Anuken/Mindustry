@@ -242,7 +242,8 @@ public class SectorInfo{
                 production.get(item).mean = Math.min(production.get(item).mean, rawProduction.get(item).mean);
 
                 if(export.containsKey(item)){
-                    export.get(item).mean = Math.min(export.get(item).mean, Math.max(rawProduction.get(item).mean, -production.get(item).mean));
+                    //export can, at most, be the raw items being produced from factories + the items being taken from the core
+                    export.get(item).mean = Math.min(export.get(item).mean, rawProduction.get(item).mean + Math.max(-production.get(item).mean, 0));
                 }
             }
 

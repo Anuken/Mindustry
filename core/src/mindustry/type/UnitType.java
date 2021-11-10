@@ -88,6 +88,8 @@ public class UnitType extends UnlockableContent{
     public BlockFlag[] targetFlags = {null};
     /** targetFlags, as an override for "non-AI" teams. By default, units of this type will rush the core. */
     public BlockFlag[] playerTargetFlags = {BlockFlag.core, null};
+    /** Target items to mine. Used in MinerAI */
+    public Seq<Item> mineItems = Seq.with(Items.copper, Items.lead, Items.titanium, Items.thorium);
 
     public Color outlineColor = Pal.darkerMetal;
     public int outlineRadius = 3;
@@ -141,8 +143,7 @@ public class UnitType extends UnlockableContent{
     public TextureRegion[] wreckRegions;
 
     protected float buildTime = -1f;
-    protected @Nullable ItemStack[] cachedRequirements;
-    protected @Nullable ItemStack[] totalRequirements;
+    protected @Nullable ItemStack[] totalRequirements, cachedRequirements, firstRequirements;
 
     public UnitType(String name){
         super(name);
@@ -305,6 +306,12 @@ public class UnitType extends UnlockableContent{
         }
         if(inst instanceof Payloadc){
             stats.add(Stat.payloadCapacity, (payloadCapacity / (tilesize * tilesize)), StatUnit.blocksSquared);
+        }
+
+        var reqs = getFirstRequirements();
+
+        if(reqs != null){
+            stats.add(Stat.buildCost, StatValues.items(reqs));
         }
 
         if(weapons.any()){
@@ -545,6 +552,13 @@ public class UnitType extends UnlockableContent{
             }
         }
         return null;
+    }
+
+    public @Nullable ItemStack[] getFirstRequirements(){
+        if(firstRequirements == null){
+            firstRequirements = getRequirements(null, null);
+        }
+        return firstRequirements;
     }
 
     @Override

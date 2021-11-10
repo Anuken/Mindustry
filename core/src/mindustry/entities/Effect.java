@@ -35,7 +35,7 @@ public class Effect{
     /** Amount added to rotation */
     public float baseRotation;
     /** If true, parent unit is data are followed. */
-    public boolean followParent;
+    public boolean followParent = true;
     /** If this and followParent are true, the effect will offset and rotate with the parent's rotation. */
     public boolean rotWithParent;
 
