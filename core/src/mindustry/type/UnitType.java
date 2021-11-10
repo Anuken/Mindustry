@@ -121,7 +121,7 @@ public class UnitType extends UnlockableContent{
     public boolean canDrown = true, naval = false;
     public float drownTimeMultiplier = 1f;
     public float engineOffset = 5f, engineSize = 2.5f;
-    public UnitEngine[] engines = {};
+    public Seq<UnitEngine> engines = new Seq<>();
     public float strafePenalty = 0.5f;
     public float hitSize = 6f;
     public float itemOffsetY = 3f;
@@ -607,6 +607,19 @@ public class UnitType extends UnlockableContent{
         return ContentType.unit;
     }
 
+    /** Sets up engines, mirroring the contents of the specified array. */
+    public void setEnginesMirror(UnitEngine... array){
+        for(var base : array){
+            engines.add(base);
+
+            var engine = base.copy();
+            engine.x *= -1;
+            engine.rotation = 180f - engine.rotation;
+            if(engine.rotation < 0) engine.rotation += 360f;
+            engines.add(engine);
+        }
+    }
+
     //region drawing
 
     public void draw(Unit unit){
@@ -657,7 +670,7 @@ public class UnitType extends UnlockableContent{
         if(drawBody) drawOutline(unit);
         drawWeaponOutlines(unit);
         if(engineSize > 0) drawEngine(unit);
-        if(engines.length > 0) drawEngines(unit);
+        if(engines.size > 0) drawEngines(unit);
         if(drawBody) drawBody(unit);
         if(drawCell) drawCell(unit);
         drawWeapons(unit);
@@ -1047,7 +1060,7 @@ public class UnitType extends UnlockableContent{
 
     //endregion
 
-    public static class UnitEngine{
+    public static class UnitEngine implements Cloneable{
         public float x, y, radius, rotation;
 
         public UnitEngine(float x, float y, float radius, float rotation){
@@ -1058,6 +1071,14 @@ public class UnitType extends UnlockableContent{
         }
 
         public UnitEngine(){
+        }
+
+        public UnitEngine copy(){
+            try{
+                return (UnitEngine)clone();
+            }catch(CloneNotSupportedException awful){
+                throw new RuntimeException("fantastic", awful);
+            }
         }
     }
 

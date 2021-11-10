@@ -2434,16 +2434,12 @@ public class UnitTypes implements ContentList{
             commandLimit = 5;
             engineSize = 0;
 
-            //TODO ugly definition...
-            engines = new UnitEngine[]{
+            setEnginesMirror(
                 new UnitEngine(21 / 4f, 19 / 4f, 2.2f, 45f),
-                new UnitEngine(-21 / 4f, 19 / 4f, 2.2f, 135f),
+                new UnitEngine(23 / 4f, -22 / 4f, 2.2f, 315f)
+            );
 
-                new UnitEngine(23 / 4f, -22 / 4f, 2.2f, 315f),
-                new UnitEngine(-23 / 4f, -22 / 4f, 2.2f, 225f)
-            };
-
-            weapons.add(new Weapon(""){{
+            weapons.add(new Weapon(){{
                 reload = 55f;
                 x = 0f;
                 y = 1f;

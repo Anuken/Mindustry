@@ -95,7 +95,7 @@ public class Blocks implements ContentList{
     //storage
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
     //storage - erekir
-    coreBastion, coreAegis, coreCitadel,
+    coreBastion, coreAegis, coreCitadel, coreAcropolis,
 
     //turrets
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
@@ -1841,13 +1841,27 @@ public class Blocks implements ContentList{
             //TODO cost
             requirements(Category.effect, with(Items.beryllium, 7000, Items.graphite, 7000, Items.tungsten, 5000, Items.carbide, 5000));
 
-            unitType = UnitTypes.gamma;
+            unitType = UnitTypes.evoke;
             health = 14000;
             itemCapacity = 11000;
             size = 5;
             thrusterLength = 40/4f;
 
             unitCapModifier = 30;
+            researchCostMultiplier = 0.11f;
+        }};
+
+        coreAcropolis = new CoreBlock("core-acropolis"){{
+            //TODO cost
+            requirements(Category.effect, with(Items.beryllium, 11000, Items.graphite, 11000, Items.tungsten, 9000, Items.carbide, 10000));
+
+            unitType = UnitTypes.evoke;
+            health = 22000;
+            itemCapacity = 16000;
+            size = 6;
+            thrusterLength = 48/4f;
+
+            unitCapModifier = 40;
             researchCostMultiplier = 0.11f;
         }};
 
