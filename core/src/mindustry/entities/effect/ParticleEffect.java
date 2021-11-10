@@ -32,6 +32,8 @@ public class ParticleEffect extends Effect{
     public float spin = 0f;
     /** Controls the initial and final sprite sizes. */
     public float sizeFrom = 2f, sizeTo = 0f;
+    /** Whether the rotation adds with the parent */
+    public boolean additive = true;
     /** Rotation offset. */
     public float offset = 0;
     /** Sprite to draw. */
@@ -81,7 +83,11 @@ public class ParticleEffect extends Effect{
                 rv.trns(e.rotation + rand.range(cone), !randLength ? l : rand.random(l));
                 float x = rv.x, y = rv.y;
 
-                Draw.rect(tex, ox + x, oy + y, rad, rad, e.rotation + offset + e.time * spin);
+                if (additive){
+                    Draw.rect(tex, ox + x, oy + y, rad, rad, e.rotation + offset + e.time * spin);
+                } else{
+                    Draw.rect(tex, ox + x, oy + y, rad, rad, offset + baseRotation + e.time * spin);
+                }
                 Drawf.light(ox + x, oy + y, rad * lightScl, lightColor, lightOpacity * Draw.getColor().a);
             }
         }
