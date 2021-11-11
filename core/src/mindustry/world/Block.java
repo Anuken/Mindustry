@@ -593,6 +593,17 @@ public class Block extends UnlockableContent{
         return (hasItems && itemCapacity > 0);
     }
 
+    /** sets {@param out} to the index-th side outside of this block, using the given rotation. */
+    public void nearbySide(int x, int y, int rotation, int index, Point2 out){
+        int cornerX = x - (size-1)/2, cornerY = y - (size-1)/2, s = size;
+        switch(rotation){
+            case 0 -> out.set(cornerX + s, cornerY + index);
+            case 1 -> out.set(cornerX + index, cornerY + s);
+            case 2 -> out.set(cornerX - 1, cornerY + index);
+            case 3 -> out.set(cornerX + index, cornerY - 1);
+        }
+    }
+
     /** Iterate through ever grid position taken up by this block. */
     public void iterateTaken(int x, int y, Intc2 placer){
         if(isMultiblock()){

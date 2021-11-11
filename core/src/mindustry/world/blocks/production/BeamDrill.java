@@ -83,7 +83,7 @@ public class BeamDrill extends Block{
         int count = 0;
 
         for(int i = 0; i < size; i++){
-            getLaserPos(x, y, rotation, i, Tmp.p1);
+            nearbySide(x, y, rotation, i, Tmp.p1);
 
             int j = 0;
             Item found = null;
@@ -139,7 +139,7 @@ public class BeamDrill extends Block{
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         for(int i = 0; i < size; i++){
-            getLaserPos(tile.x, tile.y, rotation, i, Tmp.p1);
+            nearbySide(tile.x, tile.y, rotation, i, Tmp.p1);
             for(int j = 0; j < range; j++){
                 Tile other = world.tile(Tmp.p1.x + Geometry.d4x(rotation)*j, Tmp.p1.y + Geometry.d4y(rotation)*j);
                 if(other != null && other.solid()){
@@ -153,16 +153,6 @@ public class BeamDrill extends Block{
         }
 
         return false;
-    }
-
-    void getLaserPos(int tx, int ty, int rotation, int i, Point2 out){
-        int cornerX = tx - (size-1)/2, cornerY = ty - (size-1)/2, s = size;
-        switch(rotation){
-            case 0 -> out.set(cornerX + s, cornerY + i);
-            case 1 -> out.set(cornerX + i, cornerY + s);
-            case 2 -> out.set(cornerX - 1, cornerY + i);
-            case 3 -> out.set(cornerX + i, cornerY - 1);
-        }
     }
 
     public class BeamDrillBuild extends Building{
@@ -306,7 +296,7 @@ public class BeamDrill extends Block{
         void updateLasers(){
             for(int i = 0; i < size; i++){
                 if(lasers[i] == null) lasers[i] = new Point2();
-                getLaserPos(tileX(), tileY(), rotation, i, lasers[i]);
+                nearbySide(tileX(), tileY(), rotation, i, lasers[i]);
             }
         }
 

@@ -98,7 +98,7 @@ public class Items implements ContentList{
             cost = 1.3f;
         }};
 
-        fissileMatter = new Item("fissile-matter", Color.valueOf("536631")){{
+        fissileMatter = new Item("fissile-matter", Color.valueOf("5e988d")){{
             radioactivity = 1.5f;
         }};
 

@@ -17,6 +17,7 @@ import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.heat.*;
 import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.logic.*;
@@ -59,7 +60,7 @@ public class Blocks implements ContentList{
     //crafting
     siliconSmelter, siliconCrucible, siliconArcFurnace, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
-    carbideCrucible,
+    heatReactor, carbideCrucible,
     cellSynthesisChamber,
 
     //sandbox
@@ -940,6 +941,13 @@ public class Blocks implements ContentList{
             requirements(Category.crafting, with(Items.graphite, 5, Items.lead, 15));
             health = 90;
             consumes.power(0.50f);
+        }};
+
+        heatReactor = new HeatProducer("heat-reactor"){{
+            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
+            size = 3;
+            consumeTime = 60f * 10f;
+            consumes.item(Items.fissileMatter, 1);
         }};
 
         carbideCrucible = new GenericCrafter("carbide-crucible"){{

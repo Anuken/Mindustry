@@ -40,7 +40,7 @@ public class UnitTypes implements ContentList{
 
     //air
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra,
-    evoke; //elicit, incite?
+    evoke, incite; //elicit, incite?
 
     //air, legacy
     public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType mono;
