@@ -712,6 +712,7 @@ public class Mods implements Loadable{
     }
 
     /** Tries to find the config file... */
+    @Nullable
     private ModMeta findMeta(Fi file){
         Fi metaFile =
             file.child("mod.json").exists() ?       file.child("mod.json") :
@@ -720,8 +721,7 @@ public class Mods implements Loadable{
             file.child("plugin.hjson");
 
         if(!metaFile.exists()){
-            Log.warn("Mod @ doesn't have a '[mod/plugin].[h]json' file, skipping.", file);
-            throw new ModLoadException("Invalid file: No mod.json found.");
+            return null;
         }
 
         ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaFile.readString()).toString(Jformat.plain));
@@ -742,6 +742,7 @@ public class Mods implements Loadable{
             }
 
             ModMeta meta = findMeta(zip);
+            if(meta == null) continue;
 
             dependencies.put(meta.name, meta.dependencies);
             fileMapping.put(meta.name, file);
@@ -805,6 +806,11 @@ public class Mods implements Loadable{
             }
 
             ModMeta meta = findMeta(zip);
+
+            if(meta == null){
+                Log.warn("Mod @ doesn't have a '[mod/plugin].[h]json' file, skipping.", zip);
+                throw new ModLoadException("Invalid file: No mod.json found.");
+            }
 
             String camelized = meta.name.replace(" ", "");
             String mainClass = meta.main == null ? camelized.toLowerCase(Locale.ROOT) + "." + camelized + "Mod" : meta.main;
