@@ -19,7 +19,7 @@ import mindustry.world.meta.*;
 
 public class HeatProducer extends Block{
     public float heatOutput = 10f;
-    public float warmupRate = 0.25f;
+    public float warmupRate = 0.15f;
     public float consumeTime = 100;
 
     public @Load("@-heat") TextureRegion heatRegion;

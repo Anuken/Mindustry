@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 public class BuildTurret extends BaseTurret{
     public final int timerTarget = timers++, timerTarget2 = timers++;
-    public int targetInterval = 60;
+    public int targetInterval = 30;
 
     public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
     public float buildSpeed = 1f;

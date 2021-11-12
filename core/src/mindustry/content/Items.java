@@ -108,7 +108,7 @@ public class Items implements ContentList{
 
         tungsten = new Item("tungsten", Color.valueOf("768a9a")){{
             hardness = 5;
-            cost = 1.2f;
+            cost = 1.5f;
         }};
 
         carbide = new Item("carbide", Color.valueOf("89769a")){{

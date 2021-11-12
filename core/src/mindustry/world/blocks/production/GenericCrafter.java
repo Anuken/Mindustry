@@ -117,7 +117,7 @@ public class GenericCrafter extends Block{
 
                 progress += getProgressIncrease(craftTime);
                 totalProgress += delta();
-                warmup = Mathf.approachDelta(warmup, 1f, warmupSpeed);
+                warmup = Mathf.approachDelta(warmup, warmupTarget(), warmupSpeed);
 
                 if(Mathf.chanceDelta(updateEffectChance)){
                     updateEffect.at(x + Mathf.range(size * 4f), y + Mathf.range(size * 4));
@@ -131,6 +131,10 @@ public class GenericCrafter extends Block{
             }
 
             dumpOutputs();
+        }
+
+        public float warmupTarget(){
+            return 1f;
         }
 
         public void craft(){

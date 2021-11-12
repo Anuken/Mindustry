@@ -7,14 +7,16 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.heat.*;
 
+import java.util.*;
+
 /** A crafter that requires contact from heater blocks to craft. */
 public class HeatCrafter extends GenericCrafter{
     /** Base heat requirement for 100% efficiency. */
     public float heatRequirement = 10f;
     /** After heat meets this requirement, excess heat will be scaled by this number. */
-    public float overheatScale = 0.25f;
+    public float overheatScale = 1f;
     /** Maximum possible efficiency after overheat. */
-    public float maxEfficiency = 2f;
+    public float maxEfficiency = 4f;
 
     public HeatCrafter(String name){
         super(name);
@@ -24,14 +26,14 @@ public class HeatCrafter extends GenericCrafter{
     public void setBars(){
         super.setBars();
 
-        bars.add("heat", (AttributeCrafterBuild entity) ->
+        bars.add("heat", (HeatCrafterBuild entity) ->
             new Bar(() ->
-            Core.bundle.format("bar.heatpercent", (int)entity.lastHeat),
+            Core.bundle.format("bar.heatpercent", (int)entity.heat),
             () -> Pal.lightOrange,
-            () -> entity.lastHeat / heatRequirement));
+            () -> entity.heat / heatRequirement));
 
         //TODO unnecessary?
-        bars.add("efficiency", (AttributeCrafterBuild entity) ->
+        bars.add("efficiency", (HeatCrafterBuild entity) ->
             new Bar(() ->
             Core.bundle.format("bar.efficiency", (int)(entity.efficiencyScale() * 100)),
             () -> Pal.ammo,
@@ -45,20 +47,36 @@ public class HeatCrafter extends GenericCrafter{
         //TODO heat stats
     }
 
-    public class AttributeCrafterBuild extends GenericCrafterBuild{
-        public float lastHeat = 0f;
+    public class HeatCrafterBuild extends GenericCrafterBuild{
+        //TODO sideHeat could be smooth
+        public float[] sideHeat = new float[4];
+        public float heat = 0f;
 
         @Override
         public void updateTile(){
-            lastHeat = 0f;
+            Arrays.fill(sideHeat, 0f);
+            heat = 0f;
+
             for(var edge : getEdges()){
                 Building build = nearby(edge.x, edge.y);
                 if(build != null && build.team == team && build instanceof HeatBlock heater && (!build.block.rotate || (relativeTo(build) + 2) % 4 == build.rotation)){
                     //heat is distributed across building size
-                    lastHeat += heater.heat() / build.block.size;
+                    float add = heater.heat() / build.block.size;
+
+                    sideHeat[Mathf.mod(relativeTo(build), 4)] += add;
+                    heat += add;
                 }
             }
             super.updateTile();
+        }
+
+        public float heatRequirement(){
+            return heatRequirement;
+        }
+
+        @Override
+        public float warmupTarget(){
+            return Mathf.clamp(heat / heatRequirement);
         }
 
         @Override
@@ -67,8 +85,8 @@ public class HeatCrafter extends GenericCrafter{
         }
 
         public float efficiencyScale(){
-            float over = Math.max(lastHeat - heatRequirement, 0f);
-            return Math.min(Mathf.clamp(lastHeat / heatRequirement) + over / heatRequirement * overheatScale, maxEfficiency);
+            float over = Math.max(heat - heatRequirement, 0f);
+            return Math.min(Mathf.clamp(heat / heatRequirement) + over / heatRequirement * overheatScale, maxEfficiency);
         }
     }
 }
