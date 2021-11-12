@@ -9,7 +9,6 @@ import arc.util.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.GenericCrafter.*;
 
-//TODO
 public class DrawCrucible extends DrawBlock{
     public TextureRegion top, bottom;
     public Color flameColor = Color.valueOf("f58349"), midColor = Color.valueOf("f2d585");
@@ -17,7 +16,7 @@ public class DrawCrucible extends DrawBlock{
 
     public float alpha = 0.5f;
     public int particles = 30;
-    public float particleLife = 70f, particleRad = 7f, particleSize = 3f, fadeMargin = 0.4f;
+    public float particleLife = 70f, particleRad = 7f, particleSize = 3f, fadeMargin = 0.4f, rotateScl = 1.5f;
     public Interp particleInterp = new PowIn(1.5f);
 
     @Override
@@ -41,7 +40,7 @@ public class DrawCrucible extends DrawBlock{
             rand.setSeed(build.id);
             for(int i = 0; i < particles; i++){
                 float fin = (rand.random(1f) + base) % 1f, fout = 1f - fin;
-                float angle = rand.random(360f);
+                float angle = rand.random(360f) + (Time.time / rotateScl) % 360f;
                 float len = particleRad * particleInterp.apply(fout);
                 Draw.alpha(a * (1f - Mathf.curve(fin, 1f - fadeMargin)));
                 Fill.circle(

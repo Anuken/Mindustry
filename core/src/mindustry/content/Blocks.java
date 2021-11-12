@@ -944,6 +944,7 @@ public class Blocks implements ContentList{
         }};
 
         heatReactor = new HeatProducer("heat-reactor"){{
+            //TODO quadvent
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
             size = 3;
             consumeTime = 60f * 10f;
@@ -964,7 +965,7 @@ public class Blocks implements ContentList{
 
             heatRequirement = 10f;
 
-            consumes.items(with(Items.tungsten, 1, Items.graphite, 2));
+            consumes.items(with(Items.tungsten, 2, Items.graphite, 3));
             consumes.power(2f);
         }};
 
