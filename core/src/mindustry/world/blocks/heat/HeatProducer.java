@@ -6,6 +6,8 @@ import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -26,6 +28,7 @@ public class HeatProducer extends Block{
     public @Load("@-top2") TextureRegion topRegion2;
     public Color heatColor = new Color(1f, 0.22f, 0.22f, 0.8f);
     public float heatPulse = 0.3f, heatPulseScl = 10f, glowMult = 1.2f;
+    public Effect consumeEffect = Fx.none;
 
     public HeatProducer(String name){
         super(name);
@@ -55,7 +58,6 @@ public class HeatProducer extends Block{
         Draw.rect(req.rotation > 1 ? topRegion2 : topRegion1, req.drawx(), req.drawy(), req.rotation * 90);
     }
 
-
     @Override
     public TextureRegion[] icons(){
         return new TextureRegion[]{region, topRegion1};
@@ -72,6 +74,7 @@ public class HeatProducer extends Block{
 
                 if(progress >= 1f){
                     consume();
+                    consumeEffect.at(this);
                     progress -= 1f;
                 }
             }

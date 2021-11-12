@@ -950,16 +950,18 @@ public class Blocks implements ContentList{
             consumes.item(Items.fissileMatter, 1);
         }};
 
-        carbideCrucible = new GenericCrafter("carbide-crucible"){{
+        carbideCrucible = new HeatCrafter("carbide-crucible"){{
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
             craftEffect = Fx.smeltsmoke;
             outputItem = new ItemStack(Items.carbide, 1);
             craftTime = 30f;
-            size = 2;
+            size = 3;
             hasPower = hasItems = true;
             drawer = new DrawSmelter(Color.valueOf("ffc099"));
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.07f;
+
+            heatRequirement = 10f;
 
             //TODO use heat!
             consumes.items(with(Items.tungsten, 1, Items.graphite, 2));

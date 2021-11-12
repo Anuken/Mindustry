@@ -221,12 +221,12 @@ public class Build{
 
     public static boolean contactsShallows(int x, int y, Block block){
         if(block.isMultiblock()){
-            for(Point2 point : Edges.getInsideEdges(block.size)){
+            for(Point2 point : block.getInsideEdges()){
                 Tile tile = world.tile(x + point.x, y + point.y);
                 if(tile != null && !tile.floor().isDeep()) return true;
             }
 
-            for(Point2 point : Edges.getEdges(block.size)){
+            for(Point2 point : block.getEdges()){
                 Tile tile = world.tile(x + point.x, y + point.y);
                 if(tile != null && !tile.floor().isDeep()) return true;
             }

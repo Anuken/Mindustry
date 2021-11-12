@@ -604,6 +604,14 @@ public class Block extends UnlockableContent{
         }
     }
 
+    public Point2[] getEdges(){
+        return Edges.getEdges(size);
+    }
+
+    public Point2[] getInsideEdges(){
+        return Edges.getInsideEdges(size);
+    }
+
     /** Iterate through ever grid position taken up by this block. */
     public void iterateTaken(int x, int y, Intc2 placer){
         if(isMultiblock()){
