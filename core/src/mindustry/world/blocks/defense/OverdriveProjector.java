@@ -142,7 +142,7 @@ public class OverdriveProjector extends Block{
             Draw.alpha(1f);
             Lines.stroke(2f * f * heat);
 
-            float r = Math.max(0f, Mathf.clamp(2f - f * 2f) * size * tilesize / 2f - f - 0.2f), w = Mathf.clamp(0.5f - f) * size * tilesize;
+            float r = Math.max(0f, Mathf.clamp(2f - f * 2f) * size * tilesize / 2f - f), w = Mathf.clamp(0.5f - f) * size * tilesize;
             Lines.beginLine();
             for(int i = 0; i < 4; i++){
                 Lines.linePoint(x + Geometry.d4(i).x * r + Geometry.d4(i).y * w, y + Geometry.d4(i).y * r - Geometry.d4(i).x * w);
