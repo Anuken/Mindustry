@@ -41,7 +41,7 @@ public class ForceFieldAbility extends Ability{
                 Fx.shieldBreak.at(paramUnit.x, paramUnit.y, paramField.radius, paramUnit.team.color, paramUnit);
             }
 
-            paramUnit.shield -= trait.damage();
+            paramUnit.shield -= trait.type().shieldDamage(trait);
             paramField.alpha = 1f;
         }
     };

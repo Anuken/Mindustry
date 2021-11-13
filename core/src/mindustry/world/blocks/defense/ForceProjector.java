@@ -43,7 +43,7 @@ public class ForceProjector extends Block{
             trait.absorb();
             paramEffect.at(trait);
             paramEntity.hit = 1f;
-            paramEntity.buildup += trait.damage();
+            paramEntity.buildup += trait.type().shieldDamage(trait);
         }
     };
 
