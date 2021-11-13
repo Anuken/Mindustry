@@ -30,7 +30,6 @@ public class LiquidTurret extends Turret{
         shootSound = Sounds.none;
         smokeEffect = Fx.none;
         shootEffect = Fx.none;
-        outlinedIcon = 1;
     }
 
     /** Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...] */
@@ -79,9 +78,9 @@ public class LiquidTurret extends Turret{
             super.draw();
             
             if(liquidRegion.found()){
-                Drawf.liquid(liquidRegion, x + tr2.x, y + tr2.y, liquids.total() / liquidCapacity, liquids.current().color, rotation - 90);
+                Drawf.liquid(liquidRegion, x + recoilOffset.x, y + recoilOffset.y, liquids.total() / liquidCapacity, liquids.current().color, rotation - 90);
             }
-            if(topRegion.found()) Draw.rect(topRegion, x + tr2.x, y + tr2.y, rotation - 90);
+            if(topRegion.found()) Draw.rect(topRegion, x + recoilOffset.x, y + recoilOffset.y, rotation - 90);
         }
 
         @Override
@@ -124,24 +123,6 @@ public class LiquidTurret extends Turret{
             }
 
             super.findTarget();
-        }
-
-        @Override
-        protected void effects(){
-            BulletType type = peekAmmo();
-
-            Effect fshootEffect = shootEffect == Fx.none ? type.shootEffect : shootEffect;
-            Effect fsmokeEffect = smokeEffect == Fx.none ? type.smokeEffect : smokeEffect;
-
-            fshootEffect.at(x + tr.x, y + tr.y, rotation, liquids.current().color);
-            fsmokeEffect.at(x + tr.x, y + tr.y, rotation, liquids.current().color);
-            shootSound.at(tile);
-
-            if(shootShake > 0){
-                Effect.shake(shootShake, shootShake, tile.build);
-            }
-
-            recoil = recoilAmount;
         }
 
         @Override

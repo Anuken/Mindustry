@@ -196,9 +196,11 @@ public class ForceProjector extends Block{
 
             if(buildup > 0f){
                 Draw.alpha(buildup / shieldHealth * 0.75f);
+                Draw.z(Layer.blockAdditive);
                 Draw.blend(Blending.additive);
                 Draw.rect(topRegion, x, y);
                 Draw.blend();
+                Draw.z(Layer.block);
                 Draw.reset();
             }
             

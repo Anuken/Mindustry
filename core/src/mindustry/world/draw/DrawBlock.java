@@ -5,7 +5,7 @@ import arc.math.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.GenericCrafter.*;
 
-/** An implementation of custom rendering behavior for a block.
+/** An implementation of custom rendering behavior for a crafter block.
  * This is used mostly for mods. */
 public class DrawBlock{
     protected static final Rand rand = new Rand();

@@ -16,14 +16,15 @@ import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.Units.*;
 import mindustry.entities.bullet.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
+import mindustry.world.drawturret.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -78,29 +79,31 @@ public class Turret extends ReloadTurret{
 
     public Sortf unitSort = UnitSorts.closest;
 
-    protected Vec2 tr = new Vec2();
-    protected Vec2 tr2 = new Vec2();
-
     public @Nullable String basePrefix;
     public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
     public @Load("@-heat") TextureRegion heatRegion;
     public float elevation = -1f;
 
-    public Cons<TurretBuild> drawer = tile -> Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
-    public Cons<TurretBuild> heatDrawer = tile -> {
-        if(tile.heat <= 0.00001f) return;
+    public DrawTurret draw = new DrawTurret();
 
-        Draw.color(heatColor, tile.heat);
-        Draw.blend(Blending.additive);
-        Draw.rect(heatRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
-        Draw.blend();
-        Draw.color();
-    };
+    /** @deprecated use bulletOffset; this will always be zero. **/
+    @Deprecated
+    protected Vec2 tr = new Vec2();
+    /** @deprecated use recoilOffset; this will always be zero. **/
+    @Deprecated
+    protected Vec2 tr2 = new Vec2();
+    /** @deprecated set the draw field instead, this does nothing */
+    @Deprecated
+    public Cons<TurretBuild> drawer = tile -> {};
+    /** @deprecated set the draw field instead, this does nothing */
+    @Deprecated
+    public Cons<TurretBuild> heatDrawer = tile -> {};
 
     public Turret(String name){
         super(name);
         liquidCapacity = 20f;
         quickRotate = false;
+        outlinedIcon = 1;
     }
 
     @Override
@@ -136,6 +139,8 @@ public class Turret extends ReloadTurret{
     public void load(){
         super.load();
 
+        draw.load(this);
+
         if(basePrefix != null){
             baseRegion = Core.atlas.find(basePrefix + "-block-" + size);
         }
@@ -143,7 +148,7 @@ public class Turret extends ReloadTurret{
 
     @Override
     public TextureRegion[] icons(){
-        return new TextureRegion[]{baseRegion, region};
+        return draw.icons(this);
     }
 
     public static abstract class AmmoEntry{
@@ -153,6 +158,12 @@ public class Turret extends ReloadTurret{
     }
 
     public class TurretBuild extends ReloadTurretBuild implements ControlBlock{
+        //TODO storing these as instance variables is bad design, but it's probably too late to change everything
+        /** Turret sprite offset, based on recoil. Updated every frame. */
+        public Vec2 recoilOffset = new Vec2();
+        /** Turret bullet position offset. Updated every frame. */
+        public Vec2 bulletOffset = new Vec2();
+
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float recoil, heat, logicControlTime = -1;
@@ -252,14 +263,10 @@ public class Turret extends ReloadTurret{
 
             Draw.z(Layer.turret);
 
-            tr2.trns(rotation, -recoil);
+            Drawf.shadow(region, x + recoilOffset.x - elevation, y + recoilOffset.y - elevation, rotation - 90);
 
-            Drawf.shadow(region, x + tr2.x - elevation, y + tr2.y - elevation, rotation - 90);
-            drawer.get(this);
-
-            if(heatRegion != Core.atlas.find("error")){
-                heatDrawer.get(this);
-            }
+            draw.draw(Turret.this, this);
+            draw.drawHeat(Turret.this, this);
         }
 
         @Override
@@ -274,6 +281,8 @@ public class Turret extends ReloadTurret{
             unit.tile(this);
             unit.rotation(rotation);
             unit.team(team);
+            recoilOffset.trns(rotation, -recoil);
+            bulletOffset.trns(rotation, shootLength);
 
             if(logicControlTime > 0){
                 logicControlTime -= Time.delta;
@@ -400,15 +409,14 @@ public class Turret extends ReloadTurret{
             if(chargeTime > 0){
                 useAmmo();
 
-                tr.trns(rotation, shootLength);
-                chargeBeginEffect.at(x + tr.x, y + tr.y, rotation);
-                chargeSound.at(x + tr.x, y + tr.y, 1);
+                chargeBeginEffect.at(x + bulletOffset.x, y + bulletOffset.y, rotation);
+                chargeSound.at(x + bulletOffset.x, y + bulletOffset.y, 1);
 
                 for(int i = 0; i < chargeEffects; i++){
                     Time.run(Mathf.random(chargeMaxDelay), () -> {
                         if(dead) return;
-                        tr.trns(rotation, shootLength);
-                        chargeEffect.at(x + tr.x, y + tr.y, rotation);
+                        bulletOffset.trns(rotation, shootLength);
+                        chargeEffect.at(x + bulletOffset.x, y + bulletOffset.y, rotation);
                     });
                 }
 
@@ -416,7 +424,7 @@ public class Turret extends ReloadTurret{
 
                 Time.run(chargeTime, () -> {
                     if(dead) return;
-                    tr.trns(rotation, shootLength);
+                    bulletOffset.trns(rotation, shootLength);
                     recoil = recoilAmount;
                     heat = 1f;
                     bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
@@ -430,7 +438,7 @@ public class Turret extends ReloadTurret{
                     int ii = i;
                     Time.run(burstSpacing * i, () -> {
                         if(dead || !hasAmmo()) return;
-                        tr.trns(rotation, shootLength, Mathf.range(xRand));
+                        bulletOffset.trns(rotation, shootLength, Mathf.range(xRand));
                         bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (ii - (int)(shots / 2f)) * spread);
                         effects();
                         useAmmo();
@@ -445,10 +453,10 @@ public class Turret extends ReloadTurret{
                 if(alternate){
                     float i = (shotCounter % shots) - (shots-1)/2f;
 
-                    tr.trns(rotation - 90, spread * i + Mathf.range(xRand), shootLength);
+                    bulletOffset.trns(rotation - 90, spread * i + Mathf.range(xRand), shootLength);
                     bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
                 }else{
-                    tr.trns(rotation, shootLength, Mathf.range(xRand));
+                    bulletOffset.trns(rotation, shootLength, Mathf.range(xRand));
 
                     for(int i = 0; i < shots; i++){
                         bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - (int)(shots / 2f)) * spread);
@@ -465,18 +473,18 @@ public class Turret extends ReloadTurret{
         }
 
         protected void bullet(BulletType type, float angle){
-            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + tr.x, y + tr.y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f;
+            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + bulletOffset.x, y + bulletOffset.y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f;
 
-            type.create(this, team, x + tr.x, y + tr.y, angle, 1f + Mathf.range(velocityInaccuracy), lifeScl);
+            type.create(this, team, x + bulletOffset.x, y + bulletOffset.y, angle, 1f + Mathf.range(velocityInaccuracy), lifeScl);
         }
 
         protected void effects(){
             Effect fshootEffect = shootEffect == Fx.none ? peekAmmo().shootEffect : shootEffect;
             Effect fsmokeEffect = smokeEffect == Fx.none ? peekAmmo().smokeEffect : smokeEffect;
 
-            fshootEffect.at(x + tr.x, y + tr.y, rotation);
-            fsmokeEffect.at(x + tr.x, y + tr.y, rotation);
-            shootSound.at(x + tr.x, y + tr.y, Mathf.random(0.9f, 1.1f));
+            fshootEffect.at(x + bulletOffset.x, y + bulletOffset.y, rotation);
+            fsmokeEffect.at(x + bulletOffset.x, y + bulletOffset.y, rotation);
+            shootSound.at(x + bulletOffset.x, y + bulletOffset.y, Mathf.random(0.9f, 1.1f));
 
             if(shootShake > 0){
                 Effect.shake(shootShake, shootShake, this);

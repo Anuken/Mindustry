@@ -52,9 +52,8 @@ public class LaserTurret extends PowerTurret{
 
             if(bulletLife > 0 && bullet != null){
                 wasShooting = true;
-                tr.trns(rotation, shootLength, 0f);
                 bullet.rotation(rotation);
-                bullet.set(x + tr.x, y + tr.y);
+                bullet.set(x + bulletOffset.x, y + bulletOffset.y);
                 bullet.time(0f);
                 heat = 1f;
                 recoil = recoilAmount;
@@ -106,7 +105,7 @@ public class LaserTurret extends PowerTurret{
 
         @Override
         protected void bullet(BulletType type, float angle){
-            bullet = type.create(this, team, x + tr.x, y + tr.y, angle);
+            bullet = type.create(this, team, x + bulletOffset.x, y + bulletOffset.y, angle);
             bulletLife = shootDuration;
         }
 
