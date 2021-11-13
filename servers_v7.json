@@ -24,10 +24,6 @@
     "address": ["darkdustry.ml", "darkdustry.ml:6000", "darkdustry.ml:7000", "darkdustry.ml:8000", "darkdustry.ml:9000"] 
   },
   {
-    "name": "SkaarjDustry",
-    "address": ["skaarjproject.duckdns.org"]
-  },
-  {
     "name": "Chaotic Neutral",
     "address": ["c-n.ddns.net:5555", "c-n.ddns.net:6666"]
   },
