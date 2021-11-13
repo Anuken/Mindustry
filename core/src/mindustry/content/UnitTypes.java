@@ -40,7 +40,7 @@ public class UnitTypes implements ContentList{
 
     //air
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra,
-    evoke, incite; //elicit, incite?
+    evoke; //elicit, incite?
 
     //air, legacy
     public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType mono;
@@ -49,7 +49,8 @@ public class UnitTypes implements ContentList{
     public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType poly;
 
     //air + payload
-    public static @EntityDef({Unitc.class, Payloadc.class}) UnitType mega;
+    public static @EntityDef({Unitc.class, Payloadc.class}) UnitType mega,
+    incite;
 
     //air + payload, legacy
     public static @EntityDef(value = {Unitc.class, Payloadc.class}, legacy = true) UnitType quad;
@@ -2330,7 +2331,6 @@ public class UnitTypes implements ContentList{
             defaultController = BuilderAI::new;
             isCounted = false;
 
-            lowAltitude = true;
             flying = true;
             mineSpeed = 7f;
             mineTier = 1;
@@ -2466,6 +2466,61 @@ public class UnitTypes implements ContentList{
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke;
                     buildingDamageMultiplier = 0.4f;
+                }};
+            }});
+        }};
+
+        incite = new UnitType("incite"){{
+            defaultController = BuilderAI::new;
+            isCounted = false;
+            envDisabled = 0;
+
+            lowAltitude = false;
+            flying = true;
+            targetAir = false;
+            mineSpeed = 8f;
+            mineTier = 2;
+            buildSpeed = 1.4f;
+            drag = 0.06f;
+            speed = 2.6f;
+            rotateSpeed = 6f;
+            accel = 0.11f;
+            itemCapacity = 70;
+            health = 600f;
+            armor = 2f;
+            hitSize = 18f;
+            commandLimit = 7;
+            buildBeamOffset = 10f;
+            engineSize = 0;
+            payloadCapacity = Mathf.sqr(2f) * tilePayload;
+
+            setEnginesMirror(
+            new UnitEngine(34 / 4f, 30 / 4f, 3f, 45f),
+            new UnitEngine(35 / 4f, -38 / 4f, 3f, 315f)
+            );
+
+            weapons.add(new Weapon("incite-weapon"){{
+                reload = 35f;
+                x = 4f;
+                y = 6.25f;
+                shootY = 5.75f;
+                recoil = 2f;
+                top = false;
+                layerOffset = -0.01f;
+                rotate = false;
+
+                bullet = new BasicBulletType(5f, 15){{
+                    width = 7f;
+                    height = 12f;
+                    shootEffect = Fx.sparkShoot;
+                    smokeEffect = Fx.shootBigSmoke;
+                    pierce = true;
+                    pierceBuilding = true;
+                    hitColor = backColor = trailColor = Pal.bulletYellowBack;
+                    frontColor = Color.white;
+                    trailWidth = 1.5f;
+                    trailLength = 7;
+                    hitEffect = despawnEffect = Fx.hitBulletColor;
                 }};
             }});
         }};
