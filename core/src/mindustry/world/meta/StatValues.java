@@ -293,6 +293,10 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.buildingdamage", (int)(type.buildingDamageMultiplier * 100)));
                     }
 
+                    if(type.shieldDamageMultiplier != 1){
+                        sep(bt, Core.bundle.format("bullet.shielddamage", (int)(type.shieldDamageMultiplier * 100)));
+                    }
+
                     if(type.splashDamage > 0){
                         sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
                     }
