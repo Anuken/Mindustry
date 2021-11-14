@@ -6,7 +6,6 @@ import arc.graphics.g2d.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.meta.*;
@@ -21,6 +20,7 @@ public class Pump extends LiquidBlock{
         super(name);
         group = BlockGroup.liquids;
         floating = true;
+        envEnabled = Env.terrestrial;
     }
 
     @Override
@@ -31,6 +31,8 @@ public class Pump extends LiquidBlock{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
         Tile tile = world.tile(x, y);
         if(tile == null) return;
 
@@ -46,11 +48,11 @@ public class Pump extends LiquidBlock{
 
         if(liquidDrop != null){
             float width = drawPlaceText(Core.bundle.formatFloat("bar.pumpspeed", amount * pumpAmount * 60f, 0), x, y, valid);
-            float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5;
+            float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5, s = iconSmall / 4f;
             Draw.mixcol(Color.darkGray, 1f);
-            Draw.rect(liquidDrop.icon(Cicon.small), dx, dy - 1);
+            Draw.rect(liquidDrop.fullIcon, dx, dy - 1, s, s);
             Draw.reset();
-            Draw.rect(liquidDrop.icon(Cicon.small), dx, dy);
+            Draw.rect(liquidDrop.fullIcon, dx, dy, s, s);
         }
     }
 
@@ -60,7 +62,7 @@ public class Pump extends LiquidBlock{
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile, Team team){
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
         if(isMultiblock()){
             Liquid last = null;
             for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
@@ -86,7 +88,12 @@ public class Pump extends LiquidBlock{
         public void draw(){
             Draw.rect(name, x, y);
 
-            Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
+            Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
+        }
+
+        @Override
+        public void pickedUp(){
+            amount = 0f;
         }
 
         @Override

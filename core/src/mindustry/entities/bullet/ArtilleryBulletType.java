@@ -18,6 +18,24 @@ public class ArtilleryBulletType extends BasicBulletType{
         hitSound = Sounds.explosion;
         shootEffect = Fx.shootBig;
         trailEffect = Fx.artilleryTrail;
+
+        //default settings:
+        shrinkX = 0.15f;
+        shrinkY = 0.63f;
+
+        //for trail:
+
+        /*
+        trailLength = 27;
+        trailWidth = 3.5f;
+        trailEffect = Fx.none;
+        trailColor = Pal.bulletYellowBack;
+
+        trailInterp = Interp.slope;
+
+        shrinkX = 0.8f;
+        shrinkY = 0.3f;
+        */
     }
 
     public ArtilleryBulletType(float speed, float damage){
@@ -39,15 +57,13 @@ public class ArtilleryBulletType extends BasicBulletType{
 
     @Override
     public void draw(Bullet b){
-        float baseScale = 0.7f;
-        float scale = (baseScale + b.fslope() * (1f - baseScale));
-
-        float height = this.height * ((1f - shrinkY) + shrinkY * b.fout());
+        drawTrail(b);
+        float xscale = (1f - shrinkX + b.fslope() * (shrinkX)), yscale = (1f - shrinkY + b.fslope() * (shrinkY)), rot = b.rotation();
 
         Draw.color(backColor);
-        Draw.rect(backRegion, b.x, b.y, width * scale, height * scale, b.rotation() - 90);
+        Draw.rect(backRegion, b.x, b.y, width * xscale, height * yscale, rot - 90);
         Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x, b.y, width * scale, height * scale, b.rotation() - 90);
+        Draw.rect(frontRegion, b.x, b.y, width * xscale, height * yscale, rot - 90);
         Draw.color();
     }
 }

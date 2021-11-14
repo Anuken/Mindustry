@@ -13,6 +13,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
@@ -40,7 +41,7 @@ public class Pathfinder implements Runnable{
 
     public static final Seq<PathCost> costTypes = Seq.with(
         //ground
-        (team, tile) -> (PathTile.team(tile) == team.id || PathTile.team(tile) == 0) && PathTile.solid(tile) ? impassable : 1 +
+        (team, tile) -> (PathTile.allDeep(tile) || (PathTile.team(tile) == team.id || PathTile.team(tile) == 0) && PathTile.solid(tile)) ? impassable : 1 +
             PathTile.health(tile) * 5 +
             (PathTile.nearSolid(tile) ? 2 : 0) +
             (PathTile.nearLiquid(tile) ? 6 : 0) +
@@ -49,12 +50,13 @@ public class Pathfinder implements Runnable{
 
         //legs
         (team, tile) -> PathTile.legSolid(tile) ? impassable : 1 +
+            (PathTile.deep(tile) ? 6000 : 0) + //leg units can now drown
             (PathTile.solid(tile) ? 5 : 0),
 
         //water
-        (team, tile) -> PathTile.solid(tile) || !PathTile.liquid(tile) ? 200 : 2 +
+        (team, tile) -> (PathTile.solid(tile) || !PathTile.liquid(tile) ? 6000 : 1) +
             (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
-            (PathTile.deep(tile) ? -1 : 0) +
+            (PathTile.deep(tile) ? 0 : 1) +
             (PathTile.damages(tile) ? 35 : 0)
     );
 
@@ -108,35 +110,40 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     private int packTile(Tile tile){
-        boolean nearLiquid = false, nearSolid = false, nearGround = false;
+        boolean nearLiquid = false, nearSolid = false, nearGround = false, solid = tile.solid(), allDeep = tile.floor().isDeep();
 
         for(int i = 0; i < 4; i++){
             Tile other = tile.nearby(i);
             if(other != null){
-                if(other.floor().isLiquid) nearLiquid = true;
+                Floor floor = other.floor();
+                if(floor.isLiquid) nearLiquid = true;
                 if(other.solid()) nearSolid = true;
-                if(!other.floor().isLiquid) nearGround = true;
+                if(!floor.isLiquid) nearGround = true;
+                if(!floor.isDeep()) allDeep = false;
             }
         }
 
+        int tid = tile.getTeamID();
+
         return PathTile.get(
-            tile.build == null || !tile.solid() || tile.block() instanceof CoreBlock ? 0 : Math.min((int)(tile.build.health / 40), 80),
-            tile.getTeamID(),
-            tile.solid(),
+            tile.build == null || !solid || tile.block() instanceof CoreBlock ? 0 : Math.min((int)(tile.build.health / 40), 80),
+            tid == 0 && tile.build != null && state.rules.coreCapture ? 255 : tid, //use teamid = 255 when core capture is enabled to mark out derelict structures
+            solid,
             tile.floor().isLiquid,
             tile.staticDarkness() >= 2 || (tile.floor().solid && tile.block() == Blocks.air),
             nearLiquid,
             nearGround,
             nearSolid,
             tile.floor().isDeep(),
-            tile.floor().damageTaken > 0.00001f
+            tile.floor().damageTaken > 0.00001f,
+            allDeep
         );
     }
 
     /** Starts or restarts the pathfinding thread. */
     private void start(){
         stop();
-        thread = Threads.daemon(this);
+        thread = Threads.daemon("Pathfinder", this);
     }
 
     /** Stops the pathfinding thread. */
@@ -149,7 +156,7 @@ public class Pathfinder implements Runnable{
     }
 
     /** Update a tile in the internal pathfinding grid.
-     * Causes a complete pathfinding reclaculation. Main thread only. */
+     * Causes a complete pathfinding recalculation. Main thread only. */
     public void updateTile(Tile tile){
         if(net.client()) return;
 
@@ -465,7 +472,7 @@ public class Pathfinder implements Runnable{
         protected abstract void getPositions(IntSeq out);
     }
 
-    interface PathCost{
+    public interface PathCost{
         int getCost(Team traversing, int tile);
     }
 
@@ -492,5 +499,7 @@ public class Pathfinder implements Runnable{
         boolean deep;
         //whether the floor damages
         boolean damages;
+        //whether all tiles nearby are deep
+        boolean allDeep;
     }
 }

@@ -17,7 +17,7 @@ import static mindustry.Vars.*;
 
 /** Controls playback of multiple audio tracks.*/
 public class SoundControl{
-    protected static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.6f, musicWaveChance = 0.46f;
+    protected static final float finTime = 120f, foutTime = 120f, musicInterval = 3f * Time.toMinutes, musicChance = 0.6f, musicWaveChance = 0.46f;
 
     /** normal, ambient music, plays at any time */
     public Seq<Music> ambientMusic = Seq.with();
@@ -76,6 +76,8 @@ public class SoundControl{
                 sound.setBus(uiBus);
             }
         }
+
+        Events.fire(new MusicRegisterEvent());
     }
 
     public void loop(Sound sound, float volume){
@@ -130,9 +132,16 @@ public class SoundControl{
                 Core.audio.soundBus.play();
                 setupFilters();
             }else{
-                Core.audio.soundBus.replay();
+                //stopping a single audio bus stops everything else, yay!
+                Core.audio.soundBus.stop();
+                //play music bus again, as it was stopped above
+                Core.audio.musicBus.play();
+
+                Core.audio.soundBus.play();
             }
         }
+
+        Core.audio.setPaused(Core.audio.soundBus.id, state.isPaused());
 
         if(state.isMenu()){
             silenced = false;
@@ -172,7 +181,7 @@ public class SoundControl{
         float avol = Core.settings.getInt("ambientvol", 100) / 100f;
 
         sounds.each((sound, data) -> {
-            data.curVolume = Mathf.lerpDelta(data.curVolume, data.volume * avol, 0.2f);
+            data.curVolume = Mathf.lerpDelta(data.curVolume, data.volume * avol, 0.11f);
 
             boolean play = data.curVolume > 0.01f;
             float pan = Mathf.zero(data.total, 0.0001f) ? 0f : sound.calcPan(data.sum.x / data.total, data.sum.y / data.total);
@@ -207,7 +216,7 @@ public class SoundControl{
 
     /** Whether to play dark music.*/
     protected boolean isDark(){
-        if(state.teams.get(player.team()).hasCore() && state.teams.get(player.team()).core().healthf() < 0.85f){
+        if(player.team().data().hasCore() && player.team().data().core().healthf() < 0.85f){
             //core damaged -> dark
             return true;
         }

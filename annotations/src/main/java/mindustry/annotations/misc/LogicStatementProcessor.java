@@ -26,7 +26,8 @@ public class LogicStatementProcessor extends BaseProcessor{
         MethodSpec.Builder reader = MethodSpec.methodBuilder("read")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .returns(tname("mindustry.logic.LStatement"))
-            .addParameter(String[].class, "tokens");
+            .addParameter(String[].class, "tokens")
+            .addParameter(int.class, "length");
 
         Seq<Stype> types = types(RegisterStatement.class);
 
@@ -76,7 +77,7 @@ public class LogicStatementProcessor extends BaseProcessor{
                     "");
 
                 //reading primitives, strings and enums is supported; nothing else is
-                reader.addStatement("if(tokens.length > $L) result.$L = $L(tokens[$L])",
+                reader.addStatement("if(length > $L) result.$L = $L(tokens[$L])",
                 index + 1,
                 field.name(),
                 field.mirror().toString().equals("java.lang.String") ?

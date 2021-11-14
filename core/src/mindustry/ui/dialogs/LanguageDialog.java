@@ -13,9 +13,41 @@ import static mindustry.Vars.*;
 
 public class LanguageDialog extends BaseDialog{
     private Locale lastLocale;
-    private ObjectMap<Locale, String> displayNames = ObjectMap.of(
-        Locale.TRADITIONAL_CHINESE, "正體中文",
-        Locale.SIMPLIFIED_CHINESE, "简体中文"
+    private ObjectMap<String, String> displayNames = ObjectMap.of(
+        "in_ID", "Bahasa Indonesia (Indonesia)",
+        "da", "Dansk",
+        "de", "Deutsch",
+        "et", "Eesti",
+        "en", "English",
+        "es", "Español",
+        "eu", "Euskara",
+        "fil", "Filipino",
+        "fr", "Français",
+        "it", "Italiano",
+        "lt", "Lietuvių",
+        "hu", "Magyar",
+        "nl", "Nederlands",
+        "nl_BE", "Nederlands (België)",
+        "pl", "Polski",
+        "pt_BR", "Português (Brasil)",
+        "pt_PT", "Português (Portugal)",
+        "ro", "Română",
+        "fi", "Suomi",
+        "sv", "Svenska",
+        "vi", "Tiếng Việt",
+        "tk", "Türkmen dili",
+        "tr", "Türkçe",
+        "cs", "Čeština",
+        "be", "Беларуская",
+        "bg", "Български",
+        "ru", "Русский",
+        "uk_UA", "Українська (Україна)",
+        "th", "ไทย",
+        "zh_CN", "简体中文",
+        "zh_TW", "正體中文",
+        "ja", "日本語",
+        "ko", "한국어",
+        "router", "router"
     );
 
     public LanguageDialog(){
@@ -33,7 +65,7 @@ public class LanguageDialog extends BaseDialog{
         ButtonGroup<TextButton> group = new ButtonGroup<>();
 
         for(Locale loc : locales){
-            TextButton button = new TextButton(Strings.capitalize(displayNames.get(loc, loc.getDisplayName(loc))), Styles.clearTogglet);
+            TextButton button = new TextButton(displayNames.get(loc.toString(), loc.getDisplayName(Locale.ROOT)), Styles.clearTogglet);
             button.clicked(() -> {
                 if(getLocale().equals(loc)) return;
                 Core.settings.put("locale", loc.toString());

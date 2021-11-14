@@ -3,7 +3,6 @@ package mindustry.maps;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -186,7 +185,6 @@ public class SectorDamage{
 
         Tile start = spawns.first();
 
-        Time.mark();
         var field = pathfinder.getField(state.rules.waveTeam, Pathfinder.costGround, Pathfinder.fieldCore);
         Seq<Tile> path = new Seq<>();
         boolean found = false;
@@ -245,7 +243,7 @@ public class SectorDamage{
         //first, calculate the total health of blocks in the path
 
         //radius around the path that gets counted
-        int radius = 7;
+        int radius = 5;
         IntSet counted = new IntSet();
 
         for(Tile t : sparse2){
@@ -273,17 +271,23 @@ public class SectorDamage{
         for(Building build : Groups.build){
             float e = build.efficiency();
             if(e > 0.08f){
-                if(build.team == state.rules.defaultTeam && build instanceof Ranged ranged && sparse.contains(t -> t.within(build, ranged.range() + radius*tilesize))){
+                if(build.team == state.rules.defaultTeam && build instanceof Ranged ranged && sparse.contains(t -> t.within(build, ranged.range() + 4*tilesize))){
+                    //TODO make sure power turret network supports the turrets?
                     if(build.block instanceof Turret t && build instanceof TurretBuild b && b.hasAmmo()){
-                        sumDps += t.shots / t.reloadTime * 60f * b.peekAmmo().estimateDPS() * e;
+                        sumDps += t.shots / t.reloadTime * 60f * b.peekAmmo().estimateDPS() * e * build.timeScale;
                     }
 
                     if(build.block instanceof MendProjector m){
-                        sumRps += m.healPercent / m.reload * avgHealth * 60f / 100f * e;
+                        sumRps += m.healPercent / m.reload * avgHealth * 60f / 100f * e * build.timeScale;
+                    }
+
+                    //point defense turrets act as flat health right now
+                    if(build.block instanceof PointDefenseTurret && build.consValid()){
+                        sumHealth += 150f * build.timeScale;
                     }
 
                     if(build.block instanceof ForceProjector f){
-                        sumHealth += f.shieldHealth * e;
+                        sumHealth += f.shieldHealth * e * build.timeScale;
                         sumRps += e;
                     }
                 }
@@ -317,14 +321,20 @@ public class SectorDamage{
         var reg = new LinearRegression();
         SpawnGroup bossGroup = null;
         Seq<Vec2> waveDps = new Seq<>(), waveHealth = new Seq<>();
+        int groundSpawns = Math.max(spawner.countFlyerSpawns(), 1), airSpawns = Math.max(spawner.countGroundSpawns(), 1);
 
         for(int wave = state.wave; wave < state.wave + 10; wave ++){
             float sumWaveDps = 0f, sumWaveHealth = 0f;
 
             for(SpawnGroup group : state.rules.spawns){
+                //calculate the amount of spawn points used
+                //if there's a spawn position override, there is only one potential place they spawn
+                //assume that all overridden positions are valid, should always be true in properly designed campaign maps
+                int spawnCount = group.spawn != -1 ? 1 : group.type.flying ? airSpawns : groundSpawns;
+
                 float healthMult = 1f + Mathf.clamp(group.type.armor / 20f);
                 StatusEffect effect = (group.effect == null ? StatusEffects.none : group.effect);
-                int spawned = group.getSpawned(wave);
+                int spawned = group.getSpawned(wave) * spawnCount;
                 //save the boss group
                 if(group.effect == StatusEffects.boss){
                     bossGroup = group;
@@ -498,7 +508,7 @@ public class SectorDamage{
                                 other.build.addPlan(false);
                                 other.remove();
                             }else{
-                                indexer.notifyTileDamaged(other.build);
+                                indexer.notifyBuildDamaged(other.build);
                             }
 
                         }else if(other.solid() && !other.synthetic()){ //skip damage propagation through solid blocks

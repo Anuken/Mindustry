@@ -17,13 +17,24 @@ task copyAssets(){
     }
 }
 
+task copyNatives(){
+    doLast{
+        copy{
+            from "../../Arc/natives/natives-freetype-ios/libs", "../../Arc/natives/natives-ios/libs"
+            into "libs"
+        }
+
+    }
+}
+
 task deploy{
     if(System.getProperty("os.name").contains("Mac")) dependsOn copyAssets
     dependsOn createIPA
 }
 
-//must pack before deployment, as iOS does never has the latest sprites.
+//must pack before deployment, as iOS never has the latest sprites.
 copyAssets.dependsOn ":tools:pack"
+copyAssets.dependsOn copyNatives
 launchIPhoneSimulator.dependsOn build
 launchIPadSimulator.dependsOn build
 launchIOSDevice.dependsOn build

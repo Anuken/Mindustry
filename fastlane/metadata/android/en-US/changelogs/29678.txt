@@ -1,9 +1,0 @@
-- Fixed several issues related to the locate logic instruction
-- Fixed enemy water spawns not appearing
-- Fixed many various issues related to the campaign
-- Fixed player camera not resetting its position on new game
-- Fixed illuminator being unplaceable in campaign in daylight
-- Improved item sprites slightly
-- Balancing of campaign waves
-- Logic: Added configure instruction for controlling certain blocks
-- Added extra starting items to ground zero

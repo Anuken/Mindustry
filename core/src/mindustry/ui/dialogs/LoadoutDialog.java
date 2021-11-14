@@ -59,7 +59,7 @@ public class LoadoutDialog extends BaseDialog{
 
     public void maxItems() {
         for(ItemStack stack : stacks){
-            stack.amount = total == null ? capacity : Math.min(capacity, total.get(stack.item));
+            stack.amount = total == null ? capacity : Math.max(Math.min(capacity, total.get(stack.item)), 0);
         }
     }
 
@@ -111,7 +111,7 @@ public class LoadoutDialog extends BaseDialog{
                     ui.showInfo(Core.bundle.format("configure.invalid", capacity));
                 })).size(bsize);
 
-                t.image(stack.item.icon(Cicon.small)).size(8 * 3).padRight(4).padLeft(4);
+                t.image(stack.item.uiIcon).size(8 * 3).padRight(4).padLeft(4);
                 t.label(() -> stack.amount + "").left().width(90f);
             }).pad(2).left().fillX();
 

@@ -6,10 +6,13 @@ import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;
+import mindustry.graphics.g3d.*;
 import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
 /**
  * Defines current rules on how the game should function.
@@ -34,6 +37,8 @@ public class Rules{
     public boolean editor = false;
     /** Whether a gameover can happen at all. Set this to false to implement custom gameover conditions. */
     public boolean canGameOver = true;
+    /** Whether cores change teams when they are destroyed. */
+    public boolean coreCapture = false;
     /** Whether reactors can explode and damage other blocks. */
     public boolean reactorExplosions = true;
     /** Whether schematics are allowed. */
@@ -44,10 +49,14 @@ public class Rules{
     public boolean fire = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
-    /** How fast unit pads build units. */
+    /** Whether cores add to unit limit */
+    public boolean unitCapVariable = true;
+    /** How fast unit factories build units. */
     public float unitBuildSpeedMultiplier = 1f;
     /** How much damage any other units deal. */
     public float unitDamageMultiplier = 1f;
+    /** Whether to allow units to build with logic. */
+    public boolean logicUnitBuild = true;
     /** How much health blocks start with. */
     public float blockHealthMultiplier = 1f;
     /** How much damage blocks (turrets) deal. */
@@ -60,6 +69,10 @@ public class Rules{
     public float deconstructRefundMultiplier = 0.5f;
     /** No-build zone around enemy core radius. */
     public float enemyCoreBuildRadius = 400f;
+    /** If true, no-build zones are calculated based on the closest core. */
+    public boolean polygonCoreProtection = false;
+    /** If true, dead teams in PvP automatically have their blocks & units converted to derelict upon death. */
+    public boolean cleanupDeadTeams = true;
     /** Radius around enemy wave drop zones.*/
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
@@ -68,6 +81,10 @@ public class Rules{
     public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
     public int unitCap = 0;
+    /** Environmental flags that dictate visuals & how blocks function. */
+    public int environment = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater;
+    /** Attributes of the environment. */
+    public Attributes attributes = new Attributes();
     /** Sector for saves that have them. */
     public @Nullable Sector sector;
     /** Spawn layout. */
@@ -78,10 +95,14 @@ public class Rules{
     public Seq<WeatherEntry> weather = new Seq<>(1);
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
+    /** Units that cannot be built. */
+    public ObjectSet<UnitType> bannedUnits = new ObjectSet<>();
     /** Reveals blocks normally hidden by build visibility. */
     public ObjectSet<Block> revealedBlocks = new ObjectSet<>();
     /** Unlocked content names. Only used in multiplayer when the campaign is enabled. */
     public ObjectSet<String> researched = new ObjectSet<>();
+    /** Block containing these items as requirements are hidden. */
+    public ObjectSet<Item> hiddenBuildItems = new ObjectSet<>();
     /** Whether ambient lighting is enabled. */
     public boolean lighting = false;
     /** Whether enemy lighting is visible.
@@ -93,28 +114,28 @@ public class Rules{
     public Team defaultTeam = Team.sharded;
     /** team of the enemy in waves/sectors. */
     public Team waveTeam = Team.crux;
+    /** color of clouds that is displayed when the player is landing */
+    public Color cloudColor = new Color(0f, 0f, 0f, 0f);
     /** name of the custom mode that this ruleset describes, or null. */
     public @Nullable String modeName;
     /** Whether cores incinerate items when full, just like in the campaign. */
     public boolean coreIncinerates = false;
+    /** If false, borders fade out into darkness. Only use with custom backgrounds!*/
+    public boolean borderDarkness = true;
     /** special tags for additional info. */
     public StringMap tags = new StringMap();
-
-    /** A team-specific ruleset. */
-    public static class TeamRule{
-        /** Whether to use building AI. */
-        public boolean ai;
-        /** TODO Tier of blocks/designs that the AI uses for building. [0, 1] */
-        public float aiTier = 1f;
-        /** Whether, when AI is enabled, ships should be spawned from the core. */
-        public boolean aiCoreSpawn = true;
-        /** If true, blocks don't require power or resources. */
-        public boolean cheat;
-        /** If true, resources are not consumed when building. */
-        public boolean infiniteResources;
-        /** If true, this team has infinite unit ammo. */
-        public boolean infiniteAmmo;
-    }
+    /** Name of callback to call for background rendering in mods; see Renderer#addCustomBackground. Runs last. */
+    public @Nullable String customBackgroundCallback;
+    /** path to background texture with extension (e.g. "sprites/space.png")*/
+    public @Nullable String backgroundTexture;
+    /** background texture move speed scaling - bigger numbers mean slower movement. 0 to disable. */
+    public float backgroundSpeed = 27000f;
+    /** background texture scaling factor */
+    public float backgroundScl = 1f;
+    /** background UV offsets */
+    public float backgroundOffsetX = 0.1f, backgroundOffsetY = 0.1f;
+    /** Parameters for planet rendered in the background. Cannot be changed once a map is loaded. */
+    public @Nullable PlanetParams planetBackground;
 
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */
     public Rules copy(){
@@ -136,8 +157,61 @@ public class Rules{
         }
     }
 
+    public boolean hasEnv(int env){
+        return (environment & env) != 0;
+    }
+
+    public float unitBuildSpeed(Team team){
+        return unitBuildSpeedMultiplier * teams.get(team).unitBuildSpeedMultiplier;
+    }
+
+    public float unitDamage(Team team){
+        return unitDamageMultiplier * teams.get(team).unitDamageMultiplier;
+    }
+
+    public float blockHealth(Team team){
+        return blockHealthMultiplier * teams.get(team).blockHealthMultiplier;
+    }
+
+    public float blockDamage(Team team){
+        return blockDamageMultiplier * teams.get(team).blockDamageMultiplier;
+    }
+
+    public float buildSpeed(Team team){
+        return buildSpeedMultiplier * teams.get(team).buildSpeedMultiplier;
+    }
+
+    /** A team-specific ruleset. */
+    public static class TeamRule{
+        /** Whether to use building AI. */
+        public boolean ai;
+        /** TODO Tier of blocks/designs that the AI uses for building. [0, 1] */
+        public float aiTier = 1f;
+        /** Whether, when AI is enabled, ships should be spawned from the core. */
+        public boolean aiCoreSpawn = true;
+        /** If true, blocks don't require power or resources. */
+        public boolean cheat;
+        /** If true, resources are not consumed when building. */
+        public boolean infiniteResources;
+        /** If true, this team has infinite unit ammo. */
+        public boolean infiniteAmmo;
+
+        /** How fast unit factories build units. */
+        public float unitBuildSpeedMultiplier = 1f;
+        /** How much damage any other units deal. */
+        public float unitDamageMultiplier = 1f;
+        /** How much health blocks start with. */
+        public float blockHealthMultiplier = 1f;
+        /** How much damage blocks (turrets) deal. */
+        public float blockDamageMultiplier = 1f;
+        /** Multiplier for building speed. */
+        public float buildSpeedMultiplier = 1f;
+
+        //build cost disabled due to technical complexity
+    }
+
     /** A simple map for storing TeamRules in an efficient way without hashing. */
-    public static class TeamRules implements Serializable{
+    public static class TeamRules implements JsonSerializable{
         final TeamRule[] values = new TeamRule[Team.all.length];
 
         public TeamRule get(Team team){

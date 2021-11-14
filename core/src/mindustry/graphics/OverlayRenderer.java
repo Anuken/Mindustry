@@ -5,13 +5,18 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.types.*;
+import mindustry.entities.*;
+import mindustry.game.EventType.*;
+import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.input.*;
-import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
 
@@ -21,7 +26,43 @@ public class OverlayRenderer{
     private static final Rect rect = new Rect();
 
     private float buildFade, unitFade;
-    private Unit lastSelect;
+    private Sized lastSelect;
+    private Seq<CoreEdge> cedges = new Seq<>();
+    private boolean updatedCores;
+
+    public OverlayRenderer(){
+        Events.on(WorldLoadEvent.class, e -> {
+            updatedCores = true;
+        });
+
+        Events.on(CoreChangeEvent.class, e -> {
+            updatedCores = true;
+        });
+    }
+
+    private void updateCoreEdges(){
+        if(!updatedCores){
+            return;
+        }
+
+        updatedCores = false;
+        cedges.clear();
+
+        Seq<Vec2> pos = new Seq<>();
+        Seq<CoreBuild> teams = new Seq<>();
+        for(TeamData team : state.teams.active){
+            for(CoreBuild b : team.cores){
+                teams.add(b);
+                pos.add(new Vec2(b.x, b.y));
+            }
+        }
+
+        //if this is laggy, it could be shoved in another thread.
+        var result = Voronoi.generate(pos.toArray(Vec2.class), 0, world.unitWidth(), 0, world.unitHeight());
+        for(var edge : result){
+            cedges.add(new CoreEdge(edge.x1, edge.y1, edge.x2, edge.y2, teams.get(edge.site1).team, teams.get(edge.site2).team));
+        }
+    }
 
     public void drawBottom(){
         InputHandler input = control.input;
@@ -72,27 +113,31 @@ public class OverlayRenderer{
 
         InputHandler input = control.input;
 
-        Unit select = input.selectedUnit();
+
+        Sized select = input.selectedUnit();
+        if(select == null) select = input.selectedControlBuild();
         if(!Core.input.keyDown(Binding.control)) select = null;
+
         unitFade = Mathf.lerpDelta(unitFade, Mathf.num(select != null), 0.1f);
 
         if(select != null) lastSelect = select;
         if(select == null) select = lastSelect;
-        if(select != null && select.isAI()){
+        if(select != null && (!(select instanceof Unitc u) || u.isAI())){
             Draw.mixcol(Pal.accent, 1f);
             Draw.alpha(unitFade);
+            Building build = (select instanceof BlockUnitc b ? b.tile() : select instanceof Building b ? b : null);
 
-            if(select instanceof BlockUnitc){
+            if(build != null){
                 //special selection for block "units"
-                Fill.square(select.x, select.y, ((BlockUnitc)select).tile().block.size * tilesize/2f);
-            }else{
-                Draw.rect(select.type.icon(Cicon.full), select.x(), select.y(), select.rotation() - 90);
+                Fill.square(build.x, build.y, build.block.size * tilesize/2f);
+            }else if(select instanceof Unit u){
+                Draw.rect(u.type.fullIcon, u.x, u.y, u.rotation - 90);
             }
 
             for(int i = 0; i < 4; i++){
                 float rot = i * 90f + 45f + (-Time.time) % 360f;
                 float length = select.hitSize() * 1.5f + (unitFade * 2.5f);
-                Draw.rect("select-arrow", select.x + Angles.trnsx(rot, length), select.y + Angles.trnsy(rot, length), length / 1.9f, length / 1.9f, rot - 135f);
+                Draw.rect("select-arrow", select.getX() + Angles.trnsx(rot, length), select.getY() + Angles.trnsy(rot, length), length / 1.9f, length / 1.9f, rot - 135f);
             }
 
             Draw.reset();
@@ -112,15 +157,32 @@ public class OverlayRenderer{
         Lines.stroke(buildFade * 2f);
 
         if(buildFade > 0.005f){
-            state.teams.eachEnemyCore(player.team(), core -> {
-                float dst = core.dst(player);
-                if(dst < state.rules.enemyCoreBuildRadius * 2.2f){
-                    Draw.color(Color.darkGray);
-                    Lines.circle(core.x, core.y - 2, state.rules.enemyCoreBuildRadius);
-                    Draw.color(Pal.accent, core.team.color, 0.5f + Mathf.absin(Time.time, 10f, 0.5f));
-                    Lines.circle(core.x, core.y, state.rules.enemyCoreBuildRadius);
+            if(state.rules.polygonCoreProtection){
+                updateCoreEdges();
+                Draw.color(Pal.accent);
+
+                for(int i = 0; i < 2; i++){
+                    float offset = (i == 0 ? -2f : 0f);
+                    for(CoreEdge edge : cedges){
+                        Team displayed = edge.displayed();
+                        if(displayed != null){
+                            Draw.color(i == 0 ? Color.darkGray : Tmp.c1.set(displayed.color).lerp(Pal.accent, Mathf.absin(Time.time, 10f, 0.2f)));
+                            Lines.line(edge.x1, edge.y1 + offset, edge.x2, edge.y2 + offset);
+                        }
+                    }
                 }
-            });
+
+                Draw.color();
+            }else{
+                state.teams.eachEnemyCore(player.team(), core -> {
+                    if(Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(core.x, core.y, state.rules.enemyCoreBuildRadius * 2f))){
+                        Draw.color(Color.darkGray);
+                        Lines.circle(core.x, core.y - 2, state.rules.enemyCoreBuildRadius);
+                        Draw.color(Pal.accent, core.team.color, 0.5f + Mathf.absin(Time.time, 10f, 0.5f));
+                        Lines.circle(core.x, core.y, state.rules.enemyCoreBuildRadius);
+                    }
+                });
+            }
         }
 
         Lines.stroke(2f);
@@ -159,7 +221,8 @@ public class OverlayRenderer{
 
         input.drawOverSelect();
 
-        if(ui.hudfrag.blockfrag.hover() instanceof Unit unit && unit.controller() instanceof LogicAI ai && ai.controller instanceof Building build && build.isValid()){
+        if(ui.hudfrag.blockfrag.hover() instanceof Unit unit && unit.controller() instanceof LogicAI ai && ai.controller != null && ai.controller.isValid()){
+            var build = ai.controller;
             Drawf.square(build.x, build.y, build.block.size * tilesize/2f + 2f);
             if(!unit.within(build, unit.hitSize * 2f)){
                 Drawf.arrow(unit.x, unit.y, build.x, build.y, unit.hitSize *2f, 4f);
@@ -170,7 +233,7 @@ public class OverlayRenderer{
         if(input.isDroppingItem()){
             Vec2 v = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
             float size = 8;
-            Draw.rect(player.unit().item().icon(Cicon.medium), v.x, v.y, size, size);
+            Draw.rect(player.unit().item().fullIcon, v.x, v.y, size, size);
             Draw.color(Pal.accent);
             Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time, 5f, 1f));
             Draw.reset();
@@ -184,6 +247,30 @@ public class OverlayRenderer{
                 Draw.reset();
 
             }
+        }
+    }
+
+    private static class CoreEdge{
+        float x1, y1, x2, y2;
+        Team t1, t2;
+
+        public CoreEdge(float x1, float y1, float x2, float y2, Team t1, Team t2){
+            this.x1 = x1;
+            this.y1 = y1;
+            this.x2 = x2;
+            this.y2 = y2;
+            this.t1 = t1;
+            this.t2 = t2;
+        }
+
+        @Nullable
+        Team displayed(){
+            return
+                t1 == t2 ? null :
+                t1 == player.team() ? t2 :
+                t2 == player.team() ? t1 :
+                t2.id == 0 ? t1 :
+                t1.id < t2.id && t1.id != 0 ? t1 : t2;
         }
     }
 }

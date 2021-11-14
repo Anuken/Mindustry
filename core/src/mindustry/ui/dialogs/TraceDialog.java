@@ -32,6 +32,10 @@ public class TraceDialog extends BaseDialog{
         table.row();
         table.add(Core.bundle.format("trace.mobile", info.mobile));
         table.row();
+        table.add(Core.bundle.format("trace.times.joined", info.timesJoined));
+        table.row();
+        table.add(Core.bundle.format("trace.times.kicked", info.timesKicked));
+        table.row();
 
         table.add().pad(5);
         table.row();

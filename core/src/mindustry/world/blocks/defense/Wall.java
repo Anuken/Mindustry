@@ -15,8 +15,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Wall extends Block{
-    public int variants = 0;
-
     /** Lighting chance. -1 to disable */
     public float lightningChance = -1f;
     public float lightningDamage = 20f;
@@ -38,6 +36,9 @@ public class Wall extends Block{
         buildCostMultiplier = 6f;
         canOverdrive = false;
         drawDisabled = false;
+
+        //it's a wall of course it's supported everywhere
+        envEnabled = Env.any;
     }
 
     @Override
@@ -52,20 +53,6 @@ public class Wall extends Block{
     }
 
     @Override
-    public void load(){
-        super.load();
-
-        if(variants != 0){
-            variantRegions = new TextureRegion[variants];
-
-            for(int i = 0; i < variants; i++){
-                variantRegions[i] = Core.atlas.find(name + (i + 1));
-            }
-            region = variantRegions[0];
-        }
-    }
-
-    @Override
     public TextureRegion[] icons(){
         return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
     }
@@ -75,11 +62,7 @@ public class Wall extends Block{
 
         @Override
         public void draw(){
-            if(variants == 0){
-                Draw.rect(region, x, y);
-            }else{
-                Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], x, y);
-            }
+            super.draw();
 
             //draw flashing white overlay if enabled
             if(flashHit){
@@ -92,7 +75,9 @@ public class Wall extends Block{
                 Draw.blend();
                 Draw.reset();
 
-                hit = Mathf.clamp(hit - Time.delta / 10f);
+                if(!state.isPaused()){
+                    hit = Mathf.clamp(hit - Time.delta / 10f);
+                }
             }
         }
 
@@ -113,7 +98,7 @@ public class Wall extends Block{
             //deflect bullets if necessary
             if(chanceDeflect > 0f){
                 //slow bullets are not deflected
-                if(bullet.vel().len() <= 0.1f || !bullet.type.reflectable) return true;
+                if(bullet.vel.len() <= 0.1f || !bullet.type.reflectable) return true;
 
                 //bullet reflection chance depends on bullet damage
                 if(!Mathf.chance(chanceDeflect / bullet.damage())) return true;
@@ -132,9 +117,9 @@ public class Wall extends Block{
                     bullet.vel.y *= -1;
                 }
 
-                bullet.owner(this);
-                bullet.team(team);
-                bullet.time(bullet.time() + 1f);
+                bullet.owner = this;
+                bullet.team = team;
+                bullet.time += 1f;
 
                 //disable bullet collision by returning false
                 return false;

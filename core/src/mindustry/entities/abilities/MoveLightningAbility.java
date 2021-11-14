@@ -24,6 +24,8 @@ public class MoveLightningAbility extends Ability{
     public Color color = Color.valueOf("a9d8ff");
     /** Shifts where the lightning spawns along the Y axis */
     public float offset = 0f;
+    /** Offset along the X axis. */
+    public float width = 0f;
     /** Jittering heat sprite like the shield on v5 Javelin */
     public String heatRegion = "error";
     /** Bullet type that is fired. Can be null */
@@ -32,7 +34,10 @@ public class MoveLightningAbility extends Ability{
     public float bulletAngle = 0f, bulletSpread = 0f;
     
     public Effect shootEffect = Fx.sparkShoot;
+    public boolean parentizeEffects;
     public Sound shootSound = Sounds.spark;
+
+    protected float side = 1f;
     
     MoveLightningAbility(){}
     
@@ -61,9 +66,9 @@ public class MoveLightningAbility extends Ability{
     public void update(Unit unit){
         float scl = Mathf.clamp((unit.vel().len() - minSpeed) / (maxSpeed - minSpeed));
         if(Mathf.chance(Time.delta * chance * scl)){
-            float x = unit.x + Angles.trnsx(unit.rotation, offset, 0), y = unit.y + Angles.trnsy(unit.rotation, offset, 0);
+            float x = unit.x + Angles.trnsx(unit.rotation, offset, width * side), y = unit.y + Angles.trnsy(unit.rotation, offset, width * side);
 
-            shootEffect.at(x, y, unit.rotation, color);
+            shootEffect.at(x, y, unit.rotation, color, parentizeEffects ? unit : null);
             shootSound.at(unit);
 
             if(length > 0){
@@ -73,6 +78,8 @@ public class MoveLightningAbility extends Ability{
             if(bullet != null){
                 bullet.create(unit, unit.team, x, y, unit.rotation + bulletAngle + Mathf.range(bulletSpread));
             }
+
+            side *= -1f;
         }
     }
     

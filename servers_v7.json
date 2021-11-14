@@ -1,0 +1,74 @@
+[
+  {
+    "name": "mindustry.pl",
+    "address": ["0.baseduser.eu.org:6000", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6966"]
+  },
+  {
+    "name": "C.A.M.S.",
+    "address": ["baseduser.eu.org:6569", "v7.thedimas.pp.ua", "yeeth.mindustry.me:7000", "yeeth.mindustry.me:4000", "yeeth.mindustry.me:2000", "yeeth.mindustry.me:3000"]
+  },
+  {
+    "name": "hexpvp.ml",
+    "address": "hexpvp.ml"
+  },
+  {
+    "name": "Omega",
+    "address": ["yeeth.mindustry.me", "yeeth.mindustry.me:2006", "yeeth.mindustry.me:2003","yeeth.mindustry.me:2002", "yeeth.mindustry.me:2001", "yeeth.mindustry.me:2007", "yeeth.mindustry.me:2005"]
+  },
+  {
+    "name": "MeowLand",
+    "address": ["34.134.111.15", "fifr4.quackhost.uk:21013", "34.134.111.15:4000", "34.134.111.15:7000"]
+  },
+  {
+    "name": "DarkDustry",
+    "address": ["darkdustry.ml", "darkdustry.ml:6000", "darkdustry.ml:7000", "darkdustry.ml:8000", "darkdustry.ml:9000"] 
+  },
+  {
+    "name": "Chaotic Neutral",
+    "address": ["c-n.ddns.net:5555", "c-n.ddns.net:6666"]
+  },
+  {
+    "name": "XCore",
+    "address": ["skaarjproject.duckdns.org:2000"]
+  },
+  {
+    "name": "Obvilion Network",
+    "address": ["obvilion.ru:7004", "obvilion.ru:7005"]
+  },
+  {
+    "name": "io",
+    "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000", "mindustry.io.community:4000", "labs.io.community"]
+  },
+  {
+    "name": "Korea",
+    "address": ["mindustry.kr"]
+  },
+  {
+    "name": "SubZero",
+    "address": ["minty-server.ddns.net"]
+  },
+  {
+    "name": "Shiza Minigames",
+    "address": ["shizashizashiza.ml"]
+  },
+  {
+    "name": "Phoenix Network",
+    "address": ["172.104.253.198"]
+  },
+  {
+    "name": "Xpdustry",
+    "address": ["xpdustry.fr:7000"]
+  },
+  {
+    "name": "Pandorum",
+    "address": ["pandorum.su:5018", "pandorum.su:5019", "pandorum.su:5020"]
+  },
+  {
+    "name": "MindustryBR",
+    "address": ["n2.mindustry.me:4003", "n2.mindustry.me:4005", "n2.mindustry.me:4008", "panel.mindustry.me:2005", "n2.mindustry.me:4010"]
+  },
+  {
+    "name": "LostDustry",
+    "address": ["lostdustry.northeurope.cloudapp.azure.com:6568", "lostdustry.northeurope.cloudapp.azure.com:6569", "lostdustry.northeurope.cloudapp.azure.com:6570"]
+  } 
+]

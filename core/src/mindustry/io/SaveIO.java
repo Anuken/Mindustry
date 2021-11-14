@@ -18,10 +18,10 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 public class SaveIO{
-    /** Format header. This is the string 'MSAV' in ASCII. */
-    public static final byte[] header = {77, 83, 65, 86};
+    /** Save format header. */
+    public static final byte[] header = {'M', 'S', 'A', 'V'};
     public static final IntMap<SaveVersion> versions = new IntMap<>();
-    public static final Seq<SaveVersion> versionArray = Seq.with(new Save1(), new Save2(), new Save3(), new Save4());
+    public static final Seq<SaveVersion> versionArray = Seq.with(new Save1(), new Save2(), new Save3(), new Save4(), new Save5());
 
     static{
         for(SaveVersion version : versionArray){
@@ -69,7 +69,6 @@ public class SaveIO{
             getMeta(stream);
             return true;
         }catch(Throwable e){
-            Log.err(e);
             return false;
         }
     }
@@ -114,12 +113,15 @@ public class SaveIO{
 
     public static void write(OutputStream os, StringMap tags){
         try(DataOutputStream stream = new DataOutputStream(os)){
+            Events.fire(new SaveWriteEvent());
+            SaveVersion ver = getVersion();
+
             stream.write(header);
-            stream.writeInt(getVersion().version);
+            stream.writeInt(ver.version);
             if(tags == null){
-                getVersion().write(stream);
+                ver.write(stream);
             }else{
-                getVersion().write(stream, tags);
+                ver.write(stream, tags);
             }
         }catch(Throwable e){
             throw new RuntimeException(e);

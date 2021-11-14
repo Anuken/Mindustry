@@ -36,15 +36,11 @@ public class LiquidBulletType extends BulletType{
         shootEffect = Fx.none;
         drag = 0.001f;
         knockback = 0.55f;
+        displayAmmoMultiplier = false;
     }
 
     public LiquidBulletType(){
         this(null);
-    }
-
-    @Override
-    public float range(){
-        return speed * lifetime / 2f;
     }
 
     @Override
@@ -63,9 +59,10 @@ public class LiquidBulletType extends BulletType{
 
     @Override
     public void draw(Bullet b){
+        super.draw(b);
         Draw.color(liquid.color, Color.white, b.fout() / 100f);
-
         Fill.circle(b.x, b.y, orbSize);
+        Draw.reset();
     }
 
     @Override

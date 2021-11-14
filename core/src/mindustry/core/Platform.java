@@ -20,10 +20,29 @@ import static mindustry.Vars.*;
 
 public interface Platform{
 
-    /** Dynamically loads a jar file. */
-    default Class<?> loadJar(Fi jar, String mainClass) throws Exception{
-        URLClassLoader classLoader = new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, getClass().getClassLoader());
-        return Class.forName(mainClass, true, classLoader);
+    /** Dynamically creates a class loader for a jar file. This loader must be child-first. */
+    default ClassLoader loadJar(Fi jar, ClassLoader parent) throws Exception{
+        return new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, parent){
+            @Override
+            protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException{
+                //check for loaded state
+                Class<?> loadedClass = findLoadedClass(name);
+                if(loadedClass == null){
+                    try{
+                        //try to load own class first
+                        loadedClass = findClass(name);
+                    }catch(ClassNotFoundException e){
+                        //use parent if not found
+                        return parent.loadClass(name);
+                    }
+                }
+
+                if(resolve){
+                    resolveClass(loadedClass);
+                }
+                return loadedClass;
+            }
+        };
     }
 
     /** Steam: Update lobby visibility.*/
@@ -101,7 +120,7 @@ public interface Platform{
         }else{
             ui.loadAnd(() -> {
                 try{
-                    Fi result = Core.files.local(name+ "." + extension);
+                    Fi result = Core.files.local(name + "." + extension);
                     writer.write(result);
                     platform.shareFile(result);
                 }catch(Throwable e){

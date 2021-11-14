@@ -36,7 +36,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
     }
 
     public boolean validMine(Tile tile, boolean checkDst){
-        return !(tile == null || tile.block() != Blocks.air || (!within(tile.worldx(), tile.worldy(), miningRange) && checkDst)
+        return !(tile == null || tile.block() != Blocks.air || (!within(tile.worldx(), tile.worldy(), type.miningRange) && checkDst)
         || tile.drop() == null || !canMine(tile.drop()));
     }
 
@@ -62,7 +62,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
             }
         }
 
-        if(!validMine(mineTile)){
+        if((!net.client() || isLocal()) && !validMine(mineTile)){
             mineTile = null;
             mineTimer = 0f;
         }else if(mining()){

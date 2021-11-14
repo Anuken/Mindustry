@@ -2,6 +2,7 @@ package mindustry.content;
 
 import arc.graphics.*;
 import mindustry.ctype.*;
+import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.maps.planet.*;
 import mindustry.type.*;
@@ -9,16 +10,13 @@ import mindustry.type.*;
 public class Planets implements ContentList{
     public static Planet
     sun,
-    //tantros,
     serpulo;
 
     @Override
     public void load(){
-        sun = new Planet("sun", null, 0, 2){{
+        sun = new Planet("sun", null, 4f){{
             bloom = true;
             accessible = false;
-
-            //lightColor = Color.valueOf("f4ee8e");
 
             meshLoader = () -> new SunMesh(
                 this, 4,
@@ -33,22 +31,19 @@ public class Planets implements ContentList{
             );
         }};
 
-        /*tantros = new Planet("tantros", sun, 2, 0.8f){{
-            generator = new TantrosPlanetGenerator();
-            meshLoader = () -> new HexMesh(this, 4);
-            atmosphereColor = Color.valueOf("3db899");
-            startSector = 10;
-            atmosphereRadIn = -0.01f;
-            atmosphereRadOut = 0.3f;
-        }};*/
-
-        serpulo = new Planet("serpulo", sun, 3, 1){{
+        serpulo = new Planet("serpulo", sun, 1f, 3){{
             generator = new SerpuloPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
+            cloudMeshLoader = () -> new MultiMesh(
+                new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, new Color().set(Pal.spore).mul(0.9f).a(0.75f), 2, 0.45f, 0.9f, 0.38f),
+                new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Pal.spore, 0.55f).a(0.75f), 2, 0.45f, 1f, 0.41f)
+            );
             atmosphereColor = Color.valueOf("3c1b8f");
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
             startSector = 15;
+            alwaysUnlocked = true;
+            landCloudColor = Pal.spore.cpy().a(0.5f);
         }};
     }
 }

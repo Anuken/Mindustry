@@ -12,6 +12,8 @@ public class WeaponMount{
     public float reload;
     /** rotation relative to the unit this mount is on */
     public float rotation;
+    /** weapon recoil */
+    public float recoil;
     /** destination rotation; do not modify! */
     public float targetRotation;
     /** current heat, 0 to 1*/
@@ -28,6 +30,10 @@ public class WeaponMount{
     public @Nullable Bullet bullet;
     /** sound loop for continuous weapons */
     public @Nullable SoundLoop sound;
+    /** current target; used for autonomous weapons and AI */
+    public @Nullable Teamc target;
+    /** retarget counter */
+    public float retarget = 0f;
 
     public WeaponMount(Weapon weapon){
         this.weapon = weapon;

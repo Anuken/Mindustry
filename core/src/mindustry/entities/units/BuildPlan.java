@@ -62,6 +62,10 @@ public class BuildPlan implements Position{
 
     }
 
+    public boolean placeable(Team team){
+        return Build.validPlace(block, team, x, y, rotation);
+    }
+
     public boolean isRotation(Team team){
         if(breaking) return false;
         Tile tile = tile();

@@ -11,7 +11,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
-import mindustry.world.blocks.production.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -21,7 +20,7 @@ public class PayloadConveyor extends Block{
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-edge") TextureRegion edgeRegion;
     public Interp interp = Interp.pow5;
-    public float payloadLimit = 2.5f;
+    public float payloadLimit = 3f;
 
     public PayloadConveyor(String name){
         super(name);
@@ -31,6 +30,7 @@ public class PayloadConveyor extends Block{
         update = true;
         outputsPayload = true;
         noUpdateDisabled = true;
+        envEnabled |= Env.space;
         sync = true;
     }
 
@@ -51,6 +51,21 @@ public class PayloadConveyor extends Block{
         }
     }
 
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.payloadCapacity, (payloadLimit), StatUnit.blocksSquared);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        //increase clip size for oversize loads
+        clipSize = Math.max(clipSize, size * tilesize * 2.1f);
+    }
+
     public class PayloadConveyorBuild extends Building{
         public @Nullable Payload item;
         public float progress, itemRotation, animation;
@@ -58,6 +73,16 @@ public class PayloadConveyor extends Block{
         public @Nullable Building next;
         public boolean blocked;
         public int step = -1, stepAccepted = -1;
+
+        @Override
+        public boolean canControlSelect(Unit player){
+            return this.item == null && !player.spawnedByCore && player.hitSize / tilesize <= payloadLimit && player.tileOn() != null && player.tileOn().build == this;
+        }
+
+        @Override
+        public void onControlSelect(Unit player){
+            handleUnitPayload(player, p -> item = p);
+        }
 
         @Override
         public Payload takePayload(){
@@ -70,7 +95,7 @@ public class PayloadConveyor extends Block{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-            Building accept = nearby(Geometry.d4(rotation).x * size, Geometry.d4(rotation).y * size);
+            Building accept = nearby(Geometry.d4(rotation).x * (size/2+1), Geometry.d4(rotation).y * (size/2+1));
             //next block must be aligned and of the same size
             if(accept != null && (
                 //same size
@@ -89,7 +114,7 @@ public class PayloadConveyor extends Block{
 
             int ntrns = 1 + size/2;
             Tile next = tile.nearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
-            blocked = (next != null && next.solid() && !next.block().outputsPayload) || (this.next != null && (this.next.rotation + 2)%4 == rotation);
+            blocked = (next != null && next.solid() && !(next.block().outputsPayload || next.block().acceptsPayload)) || (this.next != null && this.next.payloadCheck(rotation));
         }
 
         @Override
@@ -101,6 +126,10 @@ public class PayloadConveyor extends Block{
         public void updateTile(){
             if(!enabled) return;
 
+            if(item != null){
+                item.update(false);
+            }
+
             lastInterp = curInterp;
             curInterp = fract();
             //rollover skip
@@ -108,6 +137,9 @@ public class PayloadConveyor extends Block{
             progress = time() % moveTime;
 
             updatePayload();
+            if(item != null && next == null){
+                PayloadBlock.pushOutput(item, progress / moveTime);
+            }
 
             //TODO nondeterministic input priority
             int curStep = curStep();
@@ -203,6 +235,11 @@ public class PayloadConveyor extends Block{
             }
         }
 
+        @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon,x, y);
+        }
+
         public float time(){
             return Time.time;
         }
@@ -283,7 +320,7 @@ public class PayloadConveyor extends Block{
             if(direction == rotation){
                 return !blocked || next != null;
             }
-            return PayloadAcceptor.blends(this, direction);
+            return PayloadBlock.blends(this, direction);
         }
 
         protected TextureRegion clipRegion(Rect bounds, Rect sprite, TextureRegion region){

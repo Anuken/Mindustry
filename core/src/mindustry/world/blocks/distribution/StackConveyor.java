@@ -12,7 +12,6 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.Conveyor.*;
@@ -43,6 +42,7 @@ public class StackConveyor extends Block implements Autotiler{
         hasItems = true;
         itemCapacity = 10;
         conveyorPlacement = true;
+        highUnloadPriority = true;
 
         ambientSound = Sounds.conveyor;
         ambientSoundVolume = 0.004f;
@@ -63,6 +63,7 @@ public class StackConveyor extends Block implements Autotiler{
                 return otherblock.outputsItems() && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
             }else if(state == stateUnload){ //router mode
                 return otherblock.acceptsItems &&
+                    (!otherblock.noSideBlend || lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock)) &&
                     (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) ||
                     (otherblock instanceof StackConveyor && facing(otherx, othery, otherrot, tile.x, tile.y))) &&
                     !(world.build(otherx, othery) instanceof StackConveyorBuild s && s.state == stateUnload) &&
@@ -144,13 +145,18 @@ public class StackConveyor extends Block implements Autotiler{
             //item
             float size = itemSize * Mathf.lerp(Math.min((float)items.total() / itemCapacity, 1), 1f, 0.4f);
             Drawf.shadow(Tmp.v1.x, Tmp.v1.y, size * 1.2f);
-            Draw.rect(lastItem.icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
+            Draw.rect(lastItem.fullIcon, Tmp.v1.x, Tmp.v1.y, size, size, 0);
         }
 
         @Override
         public void drawCracks(){
             Draw.z(Layer.block - 0.15f);
             super.drawCracks();
+        }
+        
+        @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon, x, y);
         }
 
         @Override
@@ -283,7 +289,7 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public void handleItem(Building source, Item item){
-            if(items.empty()) poofIn();
+            if(items.empty() && tile != null) poofIn();
             super.handleItem(source, item);
             lastItem = item;
         }
@@ -291,7 +297,7 @@ public class StackConveyor extends Block implements Autotiler{
         @Override
         public void handleStack(Item item, int amount, Teamc source){
             if(amount <= 0) return;
-            if(items.empty()) poofIn();
+            if(items.empty() && tile != null) poofIn();
             super.handleStack(item, amount, source);
             lastItem = item;
         }
@@ -312,7 +318,7 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            if(this == source) return true; //player threw items
+            if(this == source) return items.total() < itemCapacity && (!items.any() || items.has(item)); //player threw items
             if(cooldown > recharge - 1f) return false; //still cooling down
             return !((state != stateLoad) //not a loading dock
             ||  (items.any() && !items.has(item)) //incompatible items

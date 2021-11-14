@@ -14,10 +14,10 @@ import arc.scene.ui.layout.Stack;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 
 import java.util.*;
 
@@ -147,7 +147,7 @@ public class BlockInventoryFragment extends Fragment{
                 HandCursorListener l = new HandCursorListener();
                 l.enabled = canPick;
 
-                Element image = itemImage(item.icon(Cicon.xlarge), () -> {
+                Element image = itemImage(item.uiIcon, () -> {
                     if(tile == null || !tile.isValid()){
                         return "";
                     }
@@ -201,9 +201,9 @@ public class BlockInventoryFragment extends Fragment{
     private String round(float f){
         f = (int)f;
         if(f >= 1000000){
-            return (int)(f / 1000000f) + "[gray]" + Core.bundle.getOrNull("unit.millions") + "[]";
+            return (int)(f / 1000000f) + "[gray]" + UI.millions;
         }else if(f >= 1000){
-            return (int)(f / 1000) + Core.bundle.getOrNull("unit.thousands");
+            return (int)(f / 1000) + UI.thousands;
         }else{
             return (int)f + "";
         }

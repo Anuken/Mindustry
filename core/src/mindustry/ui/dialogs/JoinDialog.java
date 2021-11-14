@@ -1,11 +1,11 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.Net.*;
 import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
 import arc.scene.ui.*;
+import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -24,6 +24,8 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class JoinDialog extends BaseDialog{
+    //TODO unused
+    Seq<Host> commmunityHosts = new Seq<>();
     Seq<Server> servers = new Seq<>();
     Dialog add;
     Server renaming;
@@ -34,6 +36,7 @@ public class JoinDialog extends BaseDialog{
     int totalHosts;
     int refreshes;
     boolean showHidden;
+    TextButtonStyle style;
 
     String lastIp;
     int lastPort;
@@ -41,6 +44,15 @@ public class JoinDialog extends BaseDialog{
 
     public JoinDialog(){
         super("@joingame");
+
+        style = new TextButtonStyle(){{
+            over = Styles.flatOver;
+            font = Fonts.def;
+            fontColor = Color.white;
+            disabledFontColor = Color.gray;
+            down = Styles.flatOver;
+            up = Styles.black5;
+        }};
 
         loadServers();
 
@@ -50,16 +62,14 @@ public class JoinDialog extends BaseDialog{
         addCloseButton();
 
         buttons.add().growX().width(-1);
-        if(!steam){
-            buttons.button("?", () -> ui.showInfo("@join.info")).size(60f, 64f).width(-1);
-        }
+        if(!steam) buttons.button("?", () -> ui.showInfo("@join.info")).size(60f, 64f);
 
         add = new BaseDialog("@joingame.title");
         add.cont.add("@joingame.ip").padRight(5f).left();
 
         TextField field = add.cont.field(Core.settings.getString("ip"), text -> {
             Core.settings.put("ip", text);
-        }).size(320f, 54f).maxTextLength(100).addInputDialog().get();
+        }).size(320f, 54f).maxTextLength(100).get();
 
         add.cont.row();
         add.buttons.defaults().size(140f, 60f).pad(4f);
@@ -97,8 +107,12 @@ public class JoinDialog extends BaseDialog{
         });
 
         onResize(() -> {
-            setup();
-            refreshAll();
+            //only refresh on resize when the minimum dimension is smaller than the maximum preferred width
+            //this means that refreshes on resize will only happen for small phones that need the list to fit in portrait mode
+            if(Math.min(Core.graphics.getWidth(), Core.graphics.getHeight()) / Scl.scl() * 0.9f < 500f){
+                setup();
+                refreshAll();
+            }
         });
     }
 
@@ -107,7 +121,7 @@ public class JoinDialog extends BaseDialog{
 
         refreshLocal();
         refreshRemote();
-        refreshGlobal();
+        refreshCommunity();
     }
 
     void setupRemote(){
@@ -117,7 +131,7 @@ public class JoinDialog extends BaseDialog{
             //why are java lambdas this bad
             TextButton[] buttons = {null};
 
-            TextButton button = buttons[0] = remote.button("[accent]" + server.displayIP(), Styles.cleart, () -> {
+            TextButton button = buttons[0] = remote.button("[accent]" + server.displayIP(), style, () -> {
                 if(!buttons[0].childrenPressed()){
                     if(server.lastHost != null){
                         Events.fire(new ClientPreConnectEvent(server.lastHost));
@@ -259,7 +273,7 @@ public class JoinDialog extends BaseDialog{
 
         hosts.clear();
 
-        section("@servers.local", local, false);
+        section(steam ? "@servers.local.steam" : "@servers.local", local, false);
         section("@servers.remote", remote, false);
         section("@servers.global", global, true);
 
@@ -275,7 +289,7 @@ public class JoinDialog extends BaseDialog{
             t.field(Core.settings.getString("name"), text -> {
                 player.name(text);
                 Core.settings.put("name", text);
-            }).grow().pad(8).addInputDialog(maxNameLength);
+            }).grow().pad(8).maxTextLength(maxNameLength);
 
             ImageButton button = t.button(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new PaletteDialog().show(color -> {
@@ -319,7 +333,7 @@ public class JoinDialog extends BaseDialog{
             if(eye){
                 name.button(Icon.eyeSmall, Styles.emptyi, () -> {
                     showHidden = !showHidden;
-                    refreshGlobal();
+                    refreshCommunity();
                 }).update(i -> i.getStyle().imageUp = (showHidden ? Icon.eyeSmall : Icon.eyeOffSmall))
                     .size(40f).right().padRight(3).tooltip("@servers.showhidden");
             }
@@ -345,12 +359,14 @@ public class JoinDialog extends BaseDialog{
         net.discoverServers(this::addLocalHost, this::finishLocalHosts);
     }
 
-    void refreshGlobal(){
+    void refreshCommunity(){
+        commmunityHosts.clear();
         int cur = refreshes;
 
         global.clear();
         global.background(null);
-        for(ServerGroup group : defaultServers){
+        for(int i = 0; i < defaultServers.size; i ++){
+            ServerGroup group = defaultServers.get((i + defaultServers.size/2) % defaultServers.size);
             boolean hidden = group.hidden();
             if(hidden && !showHidden){
                 continue;
@@ -365,6 +381,8 @@ public class JoinDialog extends BaseDialog{
                 net.pingHost(resaddress, resport, res -> {
                     if(refreshes != cur) return;
                     res.port = resport;
+
+                    commmunityHosts.add(res);
 
                     //add header
                     if(groupTable[0] == null){
@@ -402,7 +420,8 @@ public class JoinDialog extends BaseDialog{
         global.background(null);
         float w = targetWidth();
 
-        container.button(b -> buildServer(host, b), Styles.cleart, () -> {
+        //TODO looks bad
+        container.button(b -> buildServer(host, b), style, () -> {
             Events.fire(new ClientPreConnectEvent(host));
             if(!Core.settings.getBool("server-disclaimer", false)){
                 ui.showCustomConfirm("@warning", "@servers.disclaimer", "@ok", "@back", () -> {
@@ -439,7 +458,7 @@ public class JoinDialog extends BaseDialog{
 
         local.row();
 
-        local.button(b -> buildServer(host, b), Styles.cleart, () -> {
+        local.button(b -> buildServer(host, b), style, () -> {
             Events.fire(new ClientPreConnectEvent(host));
             safeConnect(host.address, host.port, host.version);
         }).width(w);
@@ -463,8 +482,10 @@ public class JoinDialog extends BaseDialog{
             net.reset();
             Vars.netClient.beginConnecting();
             net.connect(lastIp = ip, lastPort = port, () -> {
-                hide();
-                add.hide();
+                if(net.client()){
+                    hide();
+                    add.hide();
+                }
             });
         });
     }
@@ -492,7 +513,7 @@ public class JoinDialog extends BaseDialog{
 
     void safeConnect(String ip, int port, int version){
         if(version != Version.build && Version.build != -1 && version != -1){
-            ui.showInfo("[scarlet]" + (version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated).toString() + "\n[]" +
+            ui.showInfo("[scarlet]" + (version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated) + "\n[]" +
                 Core.bundle.format("server.versions", Version.build, version));
         }else{
             connect(ip, port);
@@ -513,42 +534,31 @@ public class JoinDialog extends BaseDialog{
             Core.settings.remove("server-list");
         }
 
-        var url = becontrol.active() ? serverJsonBeURL : serverJsonV6URL;
+        var url = becontrol.active() ? serverJsonBeURL : serverJsonURL;
         Log.info("Fetching community servers at @", url);
 
         //get servers
-        Core.net.httpGet(url, result -> {
-            try{
-                if(result.getStatus() != HttpStatus.OK){
-                    Log.warn("Failed to fetch community servers: @", result.getStatus());
-                    return;
+        Http.get(url)
+        .error(t -> Log.err("Failed to fetch community servers", t))
+        .submit(result -> {
+            Jval val = Jval.read(result.getResultAsString());
+            Seq<ServerGroup> servers = new Seq<>();
+            val.asArray().each(child -> {
+                String name = child.getString("name", "");
+                String[] addresses;
+                if(child.has("addresses") || (child.has("address") && child.get("address").isArray())){
+                    addresses = (child.has("addresses") ? child.get("addresses") : child.get("address")).asArray().map(Jval::asString).toArray(String.class);
+                }else{
+                    addresses = new String[]{child.getString("address", "<invalid>")};
                 }
-
-                Jval val = Jval.read(result.getResultAsString());
-                Core.app.post(() -> {
-                    try{
-                        defaultServers.clear();
-                        val.asArray().each(child -> {
-                            String name = child.getString("name", "");
-                            String[] addresses;
-                            if(child.has("addresses") || (child.has("address") && child.get("address").isArray())){
-                                addresses = (child.has("addresses") ? child.get("addresses") : child.get("address")).asArray().map(Jval::asString).toArray(String.class);
-                            }else{
-                                addresses = new String[]{child.getString("address", "<invalid>")};
-                            }
-                            defaultServers.add(new ServerGroup(name, addresses));
-                        });
-                        Log.info("Fetched @ community servers.", defaultServers.size);
-                    }catch(Throwable e){
-                        Log.err("Failed to parse community servers.");
-                        Log.err(e);
-                    }
-                });
-            }catch(Throwable e){
-                Log.err("Failed to fetch community servers.");
-                Log.err(e);
-            }
-        }, Log::err);
+                servers.add(new ServerGroup(name, addresses));
+            });
+            //modify default servers on main thread
+            Core.app.post(() -> {
+                defaultServers.addAll(servers);
+                Log.info("Fetched @ community servers.", defaultServers.size);
+            });
+        });
     }
 
     private void saveServers(){
@@ -568,7 +578,7 @@ public class JoinDialog extends BaseDialog{
                 if(isIpv6 && ip.lastIndexOf("]:") != -1 && ip.lastIndexOf("]:") != ip.length() - 1){
                     int idx = ip.indexOf("]:");
                     this.ip = ip.substring(1, idx);
-                    this.port = Integer.parseInt(ip.substring(idx + 2, ip.length()));
+                    this.port = Integer.parseInt(ip.substring(idx + 2));
                 }else if(!isIpv6 && ip.lastIndexOf(':') != -1 && ip.lastIndexOf(':') != ip.length() - 1){
                     int idx = ip.lastIndexOf(':');
                     this.ip = ip.substring(0, idx);

@@ -5,7 +5,7 @@ import mindustry.gen.*;
 
 public enum RadarTarget{
     any((team, other) -> true),
-    enemy((team, other) -> team != other.team),
+    enemy((team, other) -> team != other.team && other.team != Team.derelict),
     ally((team, other) -> team == other.team),
     player((team, other) -> other.isPlayer()),
     attacker((pos, other) -> other.canShoot()),

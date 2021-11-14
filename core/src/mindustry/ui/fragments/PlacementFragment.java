@@ -15,13 +15,13 @@ import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
 
 import static mindustry.Vars.*;
@@ -39,6 +39,7 @@ public class PlacementFragment extends Fragment{
     Block menuHoverBlock;
     Displayable hover;
     Object lastDisplayState;
+    Team lastTeam;
     boolean wasHovered;
     Table blockTable, toggler, topTable;
     ScrollPane blockPane;
@@ -97,10 +98,10 @@ public class PlacementFragment extends Fragment{
     boolean gridUpdate(InputHandler input){
         scrollPositions.put(currentCategory, blockPane.getScrollY());
 
-        if(Core.input.keyTap(Binding.pick) && player.isBuilder()){ //mouse eyedropper select
-            Building tile = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-            Block tryRecipe = tile == null ? null : tile instanceof ConstructBuild c ? c.cblock : tile.block;
-            Object tryConfig = tile == null ? null : tile.config();
+        if(Core.input.keyTap(Binding.pick) && player.isBuilder() && !Core.scene.hasDialog()){ //mouse eyedropper select
+            var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            Block tryRecipe = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
+            Object tryConfig = build == null || !build.block.copyConfig ? null : build.config();
 
             for(BuildPlan req : player.unit().plans()){
                 if(!req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).contains(Core.input.mouseWorld())){
@@ -190,6 +191,16 @@ public class PlacementFragment extends Fragment{
             return true;
         }
 
+        if(Core.input.keyTap(Binding.block_info)){
+            var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            Block hovering = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
+            Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block != null ? input.block : hovering;
+            if(displayBlock != null && displayBlock.unlockedNow()){
+                ui.content.show(displayBlock);
+                Events.fire(new BlockInfoEvent());
+            }
+        }
+
         return false;
     }
 
@@ -217,7 +228,7 @@ public class PlacementFragment extends Fragment{
                             blockTable.row();
                         }
 
-                        ImageButton button = blockTable.button(new TextureRegionDrawable(block.icon(Cicon.medium)), Styles.selecti, () -> {
+                        ImageButton button = blockTable.button(new TextureRegionDrawable(block.uiIcon), Styles.selecti, () -> {
                             if(unlocked(block)){
                                 if(Core.input.keyDown(KeyCode.shiftLeft) && Fonts.getUnicode(block.name) != 0){
                                     Core.app.setClipboardText((char)Fonts.getUnicode(block.name) + "");
@@ -228,7 +239,7 @@ public class PlacementFragment extends Fragment{
                                 }
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
-                        button.resizeImage(Cicon.medium.size);
+                        button.resizeImage(iconMed);
 
                         button.update(() -> { //color unplacable things gray
                             Building core = player.core();
@@ -276,13 +287,14 @@ public class PlacementFragment extends Fragment{
 
                         //don't refresh unnecessarily
                         //refresh only when the hover state changes, or the displayed block changes
-                        if(wasHovered == isHovered && lastDisplayState == displayState) return;
+                        if(wasHovered == isHovered && lastDisplayState == displayState && lastTeam == player.team()) return;
 
                         topTable.clear();
                         topTable.top().left().margin(5);
 
                         lastDisplayState = displayState;
                         wasHovered = isHovered;
+                        lastTeam = player.team();
 
                         //show details of selected block, with costs
                         if(displayBlock != null){
@@ -302,7 +314,7 @@ public class PlacementFragment extends Fragment{
                                 }
                                 final String keyComboFinal = keyCombo;
                                 header.left();
-                                header.add(new Image(displayBlock.icon(Cicon.medium))).size(8 * 4);
+                                header.add(new Image(displayBlock.uiIcon)).size(8 * 4);
                                 header.labelWrap(() -> !unlocked(displayBlock) ? Core.bundle.get("block.unknown") : displayBlock.localizedName + keyComboFinal)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
@@ -321,7 +333,7 @@ public class PlacementFragment extends Fragment{
                                 for(ItemStack stack : displayBlock.requirements){
                                     req.table(line -> {
                                         line.left();
-                                        line.image(stack.item.icon(Cicon.small)).size(8 * 2);
+                                        line.image(stack.item.uiIcon).size(8 * 2);
                                         line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
                                         line.labelWrap(() -> {
                                             Building core = player.core();
@@ -329,7 +341,7 @@ public class PlacementFragment extends Fragment{
 
                                             int amount = core.items.get(stack.item);
                                             int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
-                                            String color = (amount < stackamount / 2f ? "[red]" : amount < stackamount ? "[accent]" : "[white]");
+                                            String color = (amount < stackamount / 2f ? "[scarlet]" : amount < stackamount ? "[accent]" : "[white]");
 
                                             return color + UI.formatAmount(amount) + "[white]/" + stackamount;
                                         }).padLeft(5);
@@ -342,7 +354,7 @@ public class PlacementFragment extends Fragment{
                                 topTable.row();
                                 topTable.table(b -> {
                                     b.image(Icon.cancel).padRight(2).color(Color.scarlet);
-                                    b.add(!player.isBuilder() ? "@unit.nobuild" : "@banned").width(190f).wrap();
+                                    b.add(!player.isBuilder() ? "@unit.nobuild" : !displayBlock.supportsEnv(state.rules.environment) ? "@unsupported.environment" : "@banned").width(190f).wrap();
                                     b.left();
                                 }).padTop(2).left();
                             }
@@ -433,7 +445,7 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean unlocked(Block block){
-        return block.unlockedNow();
+        return block.unlockedNow() && block.placeablePlayer && (state.rules.hiddenBuildItems.isEmpty() || !Structs.contains(block.requirements, i -> state.rules.hiddenBuildItems.contains(i.item)));
     }
 
     boolean hasInfoBox(){
@@ -464,7 +476,7 @@ public class PlacementFragment extends Fragment{
             }
 
             //if the tile has a drop, display the drop
-            if(hoverTile.drop() != null){
+            if(hoverTile.drop() != null || hoverTile.wallDrop() != null){
                 return hoverTile;
             }
         }

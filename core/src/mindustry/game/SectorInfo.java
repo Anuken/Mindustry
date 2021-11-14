@@ -1,5 +1,6 @@
 package mindustry.game;
 
+import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -9,6 +10,7 @@ import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
 import java.util.*;
@@ -20,6 +22,7 @@ public class SectorInfo{
     private static final int valueWindow = 60;
     /** refresh period of export in ticks */
     private static final float refreshPeriod = 60;
+    private static float returnf;
 
     /** Core input statistics. */
     public ObjectMap<Item, ExportStat> production = new ObjectMap<>();
@@ -54,7 +57,7 @@ public class SectorInfo{
     /** Waves this sector can survive if under attack. Based on wave in info. <0 means uncalculated. */
     public int wavesSurvived = -1;
     /** Time between waves. */
-    public float waveSpacing = 60 * 60 * 2;
+    public float waveSpacing = 2 * Time.toMinutes;
     /** Damage dealt to sector. */
     public float damage;
     /** How many waves have passed while the player was away. */
@@ -69,10 +72,14 @@ public class SectorInfo{
     public @Nullable String name;
     /** Displayed icon. */
     public @Nullable String icon;
+    /** Displayed icon, as content. */
+    public @Nullable UnlockableContent contentIcon;
     /** Version of generated waves. When it doesn't match, new waves are generated. */
     public int waveVersion = -1;
     /** Whether this sector was indicated to the player or not. */
     public boolean shown = false;
+    /** Temporary seq for last imported items. Do not use. */
+    public transient ItemSeq lastImported = new ItemSeq();
 
     /** Special variables for simulation. */
     public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope, bossHealth, bossDps, curEnemyHealth, curEnemyDps;
@@ -112,11 +119,6 @@ public class SectorInfo{
     /** Updates export statistics. */
     public void handleItemExport(Item item, int amount){
         export.get(item, ExportStat::new).counter += amount;
-    }
-
-    /** Subtracts from export statistics. */
-    public void handleItemImport(Item item, int amount){
-        export.get(item, ExportStat::new).counter -= amount;
     }
 
     public float getExport(Item item){
@@ -191,6 +193,13 @@ public class SectorInfo{
             stat.mean = Math.min(stat.mean, rawProduction.get(item, ExportStat::new).mean);
         });
 
+        var pads = indexer.getAllied(state.rules.defaultTeam, BlockFlag.launchPad);
+
+        //disable export when launch pads are disabled, or there aren't any active ones
+        if(pads.size() == 0 || !Seq.with(pads).contains(t -> t.build.consValid())){
+            export.clear();
+        }
+
         if(state.rules.sector != null){
             state.rules.sector.saveInfo();
         }
@@ -233,7 +242,8 @@ public class SectorInfo{
                 production.get(item).mean = Math.min(production.get(item).mean, rawProduction.get(item).mean);
 
                 if(export.containsKey(item)){
-                    export.get(item).mean = Math.min(export.get(item).mean, Math.max(rawProduction.get(item).mean, -production.get(item).mean));
+                    //export can, at most, be the raw items being produced from factories + the items being taken from the core
+                    export.get(item).mean = Math.min(export.get(item).mean, rawProduction.get(item).mean + Math.max(-production.get(item).mean, 0));
                 }
             }
 
@@ -258,6 +268,31 @@ public class SectorInfo{
         ObjectFloatMap<Item> map = new ObjectFloatMap<>();
         export.each((item, value) -> map.put(item, value.mean));
         return map;
+    }
+
+    public boolean anyExports(){
+        if(export.size == 0) return false;
+        returnf = 0f;
+        export.each((i, e) -> returnf += e.mean);
+        return returnf >= 0.01f;
+    }
+
+    /** @return a newly allocated map with import statistics. Use sparingly. */
+    //TODO this can be a float map
+    public ObjectMap<Item, ExportStat> importStats(Planet planet){
+        ObjectMap<Item, ExportStat> imports = new ObjectMap<>();
+        eachImport(planet, sector -> sector.info.export.each((item, stat) -> imports.get(item, ExportStat::new).mean += stat.mean));
+        return imports;
+    }
+
+    /** Iterates through every sector this one imports from. */
+    public void eachImport(Planet planet, Cons<Sector> cons){
+        for(Sector sector : planet.sectors){
+            Sector dest = sector.info.getRealDestination();
+            if(sector.hasBase() && sector.info != this && dest != null && dest.info == this && sector.info.anyExports()){
+                cons.get(sector);
+            }
+        }
     }
 
     public static class ExportStat{

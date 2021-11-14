@@ -19,7 +19,9 @@ abstract class StatusComp implements Posc, Flyingc{
     private Seq<StatusEntry> statuses = new Seq<>();
     private transient Bits applied = new Bits(content.getBy(ContentType.status).size);
 
-    @ReadOnly transient float speedMultiplier = 1, damageMultiplier = 1, healthMultiplier = 1, reloadMultiplier = 1;
+    //these are considered read-only
+    transient float speedMultiplier = 1, damageMultiplier = 1, healthMultiplier = 1, reloadMultiplier = 1, buildSpeedMultiplier = 1, dragMultiplier = 1;
+    transient boolean disarmed = false;
 
     @Import UnitType type;
 
@@ -32,6 +34,11 @@ abstract class StatusComp implements Posc, Flyingc{
     void apply(StatusEffect effect, float duration){
         if(effect == StatusEffects.none || effect == null || isImmune(effect)) return; //don't apply empty or immune effects
 
+        //unlock status effects regardless of whether they were applied to friendly units
+        if(state.isCampaign()){
+            effect.unlock();
+        }
+
         if(statuses.size > 0){
             //check for opposite effects
             for(int i = 0; i < statuses.size; i ++){
@@ -40,15 +47,8 @@ abstract class StatusComp implements Posc, Flyingc{
                 if(entry.effect == effect){
                     entry.time = Math.max(entry.time, duration);
                     return;
-                }else if(entry.effect.reactsWith(effect)){ //find opposite
-                    StatusEntry.tmp.effect = entry.effect;
-                    entry.effect.getTransition(self(), effect, entry.time, duration, StatusEntry.tmp);
-                    entry.time = StatusEntry.tmp.time;
-
-                    if(StatusEntry.tmp.effect != entry.effect){
-                        entry.effect = StatusEntry.tmp.effect;
-                    }
-
+                }else if(entry.effect.applyTransition(self(), effect, entry, duration)){ //find reaction
+                    //TODO effect may react with multiple other effects
                     //stop looking when one is found
                     return;
                 }
@@ -61,6 +61,11 @@ abstract class StatusComp implements Posc, Flyingc{
             entry.set(effect, duration);
             statuses.add(entry);
         }
+    }
+
+    float getDuration(StatusEffect effect){
+        var entry = statuses.find(e -> e.effect == effect);
+        return entry == null ? 0 : entry.time;
     }
 
     void clearStatuses(){
@@ -110,7 +115,8 @@ abstract class StatusComp implements Posc, Flyingc{
         }
 
         applied.clear();
-        speedMultiplier = damageMultiplier = healthMultiplier = reloadMultiplier = 1f;
+        speedMultiplier = damageMultiplier = healthMultiplier = reloadMultiplier = buildSpeedMultiplier = dragMultiplier = 1f;
+        disarmed = false;
 
         if(statuses.isEmpty()) return;
 
@@ -132,14 +138,23 @@ abstract class StatusComp implements Posc, Flyingc{
                 healthMultiplier *= entry.effect.healthMultiplier;
                 damageMultiplier *= entry.effect.damageMultiplier;
                 reloadMultiplier *= entry.effect.reloadMultiplier;
+                buildSpeedMultiplier *= entry.effect.buildSpeedMultiplier;
+                dragMultiplier *= entry.effect.dragMultiplier;
+
+                disarmed |= entry.effect.disarm;
+
                 entry.effect.update(self(), entry.time);
             }
         }
     }
 
+    public Bits statusBits(){
+        return applied;
+    }
+
     public void draw(){
         for(StatusEntry e : statuses){
-            e.effect.draw(self());
+            e.effect.draw(self(), e.time);
         }
     }
 

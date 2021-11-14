@@ -53,7 +53,9 @@ public class TechTree implements ContentList{
                             node(titaniumConveyor, Seq.with(new SectorComplete(craters)), () -> {
                                 node(phaseConveyor, () -> {
                                     node(massDriver, () -> {
+                                        node(payloadPropulsionTower, () -> {
 
+                                        });
                                     });
                                 });
 
@@ -86,7 +88,9 @@ public class TechTree implements ContentList{
                     node(conduit, () -> {
                         node(liquidJunction, () -> {
                             node(liquidRouter, () -> {
-                                node(liquidTank);
+                                node(liquidContainer, () -> {
+                                    node(liquidTank);
+                                });
 
                                 node(bridgeConduit);
 
@@ -233,7 +237,9 @@ public class TechTree implements ContentList{
                                 });
 
                                 node(repairPoint, () -> {
+                                    node(repairTurret, () -> {
 
+                                    });
                                 });
                             });
                         });
@@ -416,6 +422,18 @@ public class TechTree implements ContentList{
                                     });
                                 });
                             });
+
+                            node(retusa, Seq.with(new SectorComplete(windsweptIslands)), () -> {
+                                node(oxynoe, Seq.with(new SectorComplete(coastline)), () -> {
+                                    node(cyerce, () -> {
+                                        node(aegires, () -> {
+                                            node(navanax, Seq.with(new SectorComplete(navalFortress)), () -> {
+
+                                            });
+                                        });
+                                    });
+                                });
+                            });
                         });
                     });
                 });
@@ -445,7 +463,6 @@ public class TechTree implements ContentList{
                         node(ruinousShores, Seq.with(
                             new SectorComplete(craters),
                             new Research(graphitePress),
-                            new Research(combustionGenerator),
                             new Research(kiln),
                             new Research(mechanicalPump)
                         ), () -> {
@@ -516,7 +533,22 @@ public class TechTree implements ContentList{
                                     new Research(airFactory),
                                     new Research(door)
                                 ), () -> {
+                                    node(coastline, Seq.with(
+                                        new SectorComplete(windsweptIslands),
+                                        new Research(navalFactory),
+                                        new Research(payloadConveyor)
+                                    ), () -> {
+                                        node(navalFortress, Seq.with(
+                                            new SectorComplete(coastline),
+                                            new SectorComplete(extractionOutpost),
+                                            new Research(oxynoe),
+                                            new Research(minke),
+                                            new Research(cyclone),
+                                            new Research(ripple)
+                                        ), () -> {
 
+                                        });
+                                    });
                                 });
                             });
                         });
@@ -549,8 +581,7 @@ public class TechTree implements ContentList{
                             node(fungalPass, Seq.with(
                                 new SectorComplete(stainedMountains),
                                 new Research(groundFactory),
-                                new Research(door),
-                                new Research(siliconSmelter)
+                                new Research(door)
                             ), () -> {
                                 node(nuclearComplex, Seq.with(
                                     new SectorComplete(fungalPass),
@@ -695,7 +726,7 @@ public class TechTree implements ContentList{
         /** Item requirements for this content. */
         public ItemStack[] requirements;
         /** Requirements that have been fulfilled. Always the same length as the requirement array. */
-        public final ItemStack[] finishedRequirements;
+        public ItemStack[] finishedRequirements;
         /** Extra objectives needed to research this. */
         public Seq<Objective> objectives = new Seq<>();
         /** Nodes that depend on this node. */
@@ -706,14 +737,8 @@ public class TechTree implements ContentList{
 
             this.parent = parent;
             this.content = content;
-            this.requirements = requirements;
             this.depth = parent == null ? 0 : parent.depth + 1;
-            this.finishedRequirements = new ItemStack[requirements.length];
-
-            //load up the requirements that have been finished if settings are available
-            for(int i = 0; i < requirements.length; i++){
-                finishedRequirements[i] = new ItemStack(requirements[i].item, Core.settings == null ? 0 : Core.settings.getInt("req-" + content.name + "-" + requirements[i].item.name));
-            }
+            setupRequirements(requirements);
 
             var used = new ObjectSet<Content>();
 
@@ -726,6 +751,16 @@ public class TechTree implements ContentList{
 
             map.put(content, this);
             all.add(this);
+        }
+
+        public void setupRequirements(ItemStack[] requirements){
+            this.requirements = requirements;
+            this.finishedRequirements = new ItemStack[requirements.length];
+
+            //load up the requirements that have been finished if settings are available
+            for(int i = 0; i < requirements.length; i++){
+                finishedRequirements[i] = new ItemStack(requirements[i].item, Core.settings == null ? 0 : Core.settings.getInt("req-" + content.name + "-" + requirements[i].item.name));
+            }
         }
 
         /** Resets finished requirements and saves. */

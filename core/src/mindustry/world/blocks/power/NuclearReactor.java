@@ -30,12 +30,18 @@ public class NuclearReactor extends PowerGenerator{
     public Color lightColor = Color.valueOf("7f19ea");
     public Color coolColor = new Color(1, 1, 1, 0f);
     public Color hotColor = Color.valueOf("ff9575a3");
-    public float itemDuration = 120; //time to consume 1 fuel
-    public float heating = 0.01f; //heating per frame * fullness
-    public float smokeThreshold = 0.3f; //threshold at which block starts smoking
-    public int explosionRadius = 40;
-    public int explosionDamage = 1350;
-    public float flashThreshold = 0.46f; //heat threshold at which the lights start flashing
+    public Effect explodeEffect = Fx.reactorExplosion;
+    /** ticks to consume 1 fuel */
+    public float itemDuration = 120;
+    /** heating per frame * fullness */
+    public float heating = 0.01f;
+    /** threshold at which block starts smoking */
+    public float smokeThreshold = 0.3f;
+    /** heat threshold at which lights start flashing */
+    public float flashThreshold = 0.46f;
+    public int explosionRadius = 19;
+    public int explosionDamage = 1250;
+    /** heat removed per unit of coolant */
     public float coolantPower = 0.5f;
 
     public @Load("@-top") TextureRegion topRegion;
@@ -43,12 +49,15 @@ public class NuclearReactor extends PowerGenerator{
 
     public NuclearReactor(String name){
         super(name);
+        updateInUnits = false;
         itemCapacity = 30;
         liquidCapacity = 30;
         hasItems = true;
         hasLiquids = true;
         rebuildable = false;
-        flags = EnumSet.of(BlockFlag.reactor);
+        flags = EnumSet.of(BlockFlag.reactor, BlockFlag.generator);
+        schematicPriority = -5;
+        envEnabled = Env.any;
     }
 
     @Override
@@ -68,6 +77,7 @@ public class NuclearReactor extends PowerGenerator{
 
     public class NuclearReactorBuild extends GeneratorBuild{
         public float heat;
+        public float flash;
 
         @Override
         public void updateTile(){
@@ -122,33 +132,17 @@ public class NuclearReactor extends PowerGenerator{
         public void onDestroyed(){
             super.onDestroyed();
 
-            Sounds.explosionbig.at(tile);
+            Sounds.explosionbig.at(this);
 
             int fuel = items.get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
 
             if((fuel < 5 && heat < 0.5f) || !state.rules.reactorExplosions) return;
 
             Effect.shake(6f, 16f, x, y);
-            Fx.nuclearShockwave.at(x, y);
-            for(int i = 0; i < 6; i++){
-                Time.run(Mathf.random(40), () -> Fx.nuclearcloud.at(x, y));
-            }
-
+            // * ((float)fuel / itemCapacity) to scale based on fullness
             Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
 
-            for(int i = 0; i < 20; i++){
-                Time.run(Mathf.random(50), () -> {
-                    tr.rnd(Mathf.random(40f));
-                    Fx.explosion.at(tr.x + x, tr.y + y);
-                });
-            }
-
-            for(int i = 0; i < 70; i++){
-                Time.run(Mathf.random(80), () -> {
-                    tr.rnd(Mathf.random(120f));
-                    Fx.nuclearsmoke.at(tr.x + x, tr.y + y);
-                });
-            }
+            explodeEffect.at(x, y);
         }
 
         @Override
@@ -169,10 +163,9 @@ public class NuclearReactor extends PowerGenerator{
             Draw.rect(topRegion, x, y);
 
             if(heat > flashThreshold){
-                float flash = 1f + ((heat - flashThreshold) / (1f - flashThreshold)) * 5.4f;
-                flash += flash * Time.delta;
+                flash += (1f + ((heat - flashThreshold) / (1f - flashThreshold)) * 5.4f) * Time.delta;
                 Draw.color(Color.red, Color.yellow, Mathf.absin(flash, 9f, 1f));
-                Draw.alpha(0.6f);
+                Draw.alpha(0.3f);
                 Draw.rect(lightsRegion, x, y);
             }
 

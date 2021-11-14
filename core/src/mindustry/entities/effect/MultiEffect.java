@@ -18,6 +18,7 @@ public class MultiEffect extends Effect{
     @Override
     public void init(){
         for(Effect f : effects){
+            f.init();
             clip = Math.max(clip, f.clip);
             lifetime = Math.max(lifetime, f.lifetime);
         }
@@ -25,8 +26,13 @@ public class MultiEffect extends Effect{
 
     @Override
     public void render(EffectContainer e){
+        int index = 0;
         for(Effect f : effects){
-            e.scaled(f.lifetime, f::render);
+            int i = ++index;
+            e.scaled(f.lifetime, cont -> {
+                cont.id = e.id + i;
+                f.render(cont);
+            });
             clip = Math.max(clip, f.clip);
         }
     }

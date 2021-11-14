@@ -10,6 +10,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -62,6 +63,21 @@ abstract class MechComp implements Posc, Flyingc, Hitboxc, Unitc, Mechc, Elevati
         walkExtension = extendScl;
     }
 
+    @Replace
+    @Override
+    public @Nullable Floor drownFloor(){
+        //large mechs can only drown when all the nearby floors are deep
+        if(hitSize >= 12 && canDrown()){
+            for(Point2 p : Geometry.d8){
+                Floor f = world.floorWorld(x + p.x * tilesize, y + p.y * tilesize);
+                if(!f.isDeep()){
+                    return null;
+                }
+            }
+        }
+        return canDrown() ? floorOn() : null;
+    }
+
     public float walkExtend(boolean scaled){
 
         //now ranges from -maxExtension to maxExtension*3
@@ -77,17 +93,28 @@ abstract class MechComp implements Posc, Flyingc, Hitboxc, Unitc, Mechc, Elevati
     }
 
     @Override
+    @Replace
+    public void rotateMove(Vec2 vec){
+        //mechs use baseRotation to rotate, not rotation.
+        moveAt(Tmp.v2.trns(baseRotation, vec.len()));
+
+        if(!vec.isZero()){
+            baseRotation = Angles.moveToward(baseRotation, vec.angle(), type.rotateSpeed * Math.max(Time.delta, 1));
+        }
+    }
+
+    @Override
     public void moveAt(Vec2 vector, float acceleration){
+        //mark walking state when moving in a controlled manner
         if(!vector.isZero()){
-            //mark walking state when moving in a controlled manner
             walked = true;
         }
     }
 
     @Override
     public void approach(Vec2 vector){
-        if(!vector.isZero(0.09f)){
-            //mark walking state when moving in a controlled manner
+        //mark walking state when moving in a controlled manner
+        if(!vector.isZero(0.001f)){
             walked = true;
         }
     }

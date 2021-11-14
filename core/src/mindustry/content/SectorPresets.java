@@ -10,16 +10,19 @@ public class SectorPresets implements ContentList{
     groundZero,
     craters, biomassFacility, frozenForest, ruinousShores, windsweptIslands, stainedMountains, tarFields,
     fungalPass, extractionOutpost, saltFlats, overgrowth,
-    impact0078, desolateRift, nuclearComplex, planetaryTerminal;
+    impact0078, desolateRift, nuclearComplex, planetaryTerminal,
+    coastline, navalFortress;
 
     @Override
     public void load(){
+        //region serpulo
 
         groundZero = new SectorPreset("groundZero", serpulo, 15){{
             alwaysUnlocked = true;
             addStartingItems = true;
             captureWave = 10;
             difficulty = 1;
+            startWaveTimeMultiplier = 3f;
         }};
 
         saltFlats = new SectorPreset("saltFlats", serpulo, 101){{
@@ -62,6 +65,15 @@ public class SectorPresets implements ContentList{
             useAI = false;
         }};
 
+        coastline = new SectorPreset("coastline", serpulo, 108){{
+            captureWave = 30;
+            difficulty = 5;
+        }};
+
+        navalFortress = new SectorPreset("navalFortress", serpulo, 216){{
+            difficulty = 9;
+        }};
+
         fungalPass = new SectorPreset("fungalPass", serpulo, 21){{
             difficulty = 4;
             useAI = false;
@@ -95,5 +107,7 @@ public class SectorPresets implements ContentList{
         planetaryTerminal = new SectorPreset("planetaryTerminal", serpulo, 93){{
             difficulty = 10;
         }};
+
+        //endregion
     }
 }

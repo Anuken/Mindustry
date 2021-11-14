@@ -10,6 +10,7 @@ public class StaticTree extends StaticWall{
 
     public StaticTree(String name){
         super(name);
+        variants = 0;
     }
 
     @Override

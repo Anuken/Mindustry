@@ -13,6 +13,7 @@ import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.payloads.*;
@@ -24,7 +25,7 @@ import static mindustry.Vars.*;
 public class Reconstructor extends UnitBlock{
     public float constructTime = 60 * 2;
     public Seq<UnitType[]> upgrades = new Seq<>();
-    public int[] capacities;
+    public int[] capacities = {};
 
     public Reconstructor(String name){
         super(name);
@@ -63,6 +64,7 @@ public class Reconstructor extends UnitBlock{
 
     @Override
     public void setStats(){
+        stats.timePeriod = constructTime;
         super.setStats();
 
         stats.add(Stat.productionTime, constructTime / 60f, StatUnit.seconds);
@@ -71,12 +73,12 @@ public class Reconstructor extends UnitBlock{
             for(var upgrade : upgrades){
                 float size = 8 * 3;
                 if(upgrade[0].unlockedNow() && upgrade[1].unlockedNow()){
-                    table.image(upgrade[0].icon(Cicon.small)).size(size).padRight(4).padLeft(10).scaling(Scaling.fit).right();
+                    table.image(upgrade[0].uiIcon).size(size).padRight(4).padLeft(10).scaling(Scaling.fit).right();
                     table.add(upgrade[0].localizedName).left();
 
                     table.add("[lightgray] -> ");
 
-                    table.image(upgrade[1].icon(Cicon.small)).size(size).padRight(4).scaling(Scaling.fit);
+                    table.image(upgrade[1].uiIcon).size(size).padRight(4).scaling(Scaling.fit);
                     table.add(upgrade[1].localizedName).left();
                     table.row();
                 }
@@ -97,6 +99,10 @@ public class Reconstructor extends UnitBlock{
         super.init();
     }
 
+    public void addUpgrade(UnitType from, UnitType to){
+        upgrades.add(new UnitType[]{from, to});
+    }
+
     public class ReconstructorBuild extends UnitBuild{
 
         public float fraction(){
@@ -104,12 +110,34 @@ public class Reconstructor extends UnitBlock{
         }
 
         @Override
+        public boolean acceptUnitPayload(Unit unit){
+            return hasUpgrade(unit.type);
+        }
+
+        @Override
         public boolean acceptPayload(Building source, Payload payload){
-            return this.payload == null
-                && (this.enabled || source == this)
-                && relativeTo(source) != rotation
-                && payload instanceof UnitPayload pay
-                && hasUpgrade(pay.unit.type);
+            if(!(this.payload == null
+            && (this.enabled || source == this)
+            && relativeTo(source) != rotation
+            && payload instanceof UnitPayload pay)){
+                return false;
+            }
+
+            var upgrade = upgrade(pay.unit.type);
+
+            if(upgrade != null){
+                if(!upgrade.unlockedNowHost()){
+                    //flash "not researched"
+                    pay.showOverlay(Icon.tree);
+                }
+
+                if(upgrade.isBanned()){
+                    //flash an X, meaning 'banned'
+                    pay.showOverlay(Icon.cancel);
+                }
+            }
+
+            return upgrade != null && upgrade.unlockedNowHost() && !upgrade.isBanned();
         }
 
         @Override
@@ -143,7 +171,7 @@ public class Reconstructor extends UnitBlock{
             if(constructing() && hasArrived()){
                 Draw.draw(Layer.blockOver, () -> {
                     Draw.alpha(1f - progress/ constructTime);
-                    Draw.rect(payload.unit.type.icon(Cicon.full), x, y, payload.rotation() - 90);
+                    Draw.rect(payload.unit.type.fullIcon, x, y, payload.rotation() - 90);
                     Draw.reset();
                     Drawf.construct(this, upgrade(payload.unit.type), payload.rotation() - 90f, progress / constructTime, speedScl, time);
                 });
@@ -158,6 +186,12 @@ public class Reconstructor extends UnitBlock{
         }
 
         @Override
+        public Object senseObject(LAccess sensor){
+            if(sensor == LAccess.config) return unit();
+            return super.senseObject(sensor);
+        }
+
+        @Override
         public void updateTile(){
             boolean valid = false;
 
@@ -169,13 +203,13 @@ public class Reconstructor extends UnitBlock{
                     if(moveInPayload()){
                         if(consValid()){
                             valid = true;
-                            progress += edelta() * state.rules.unitBuildSpeedMultiplier;
+                            progress += edelta() * state.rules.unitBuildSpeed(team);
                         }
 
                         //upgrade the unit
                         if(progress >= constructTime){
                             payload.unit = upgrade(payload.unit.type).create(payload.unit.team());
-                            progress = 0;
+                            progress %= 1f;
                             Effect.shake(2f, 3f, this);
                             Fx.producesmoke.at(this);
                             consume();
@@ -186,19 +220,25 @@ public class Reconstructor extends UnitBlock{
             }
 
             speedScl = Mathf.lerpDelta(speedScl, Mathf.num(valid), 0.05f);
-            time += edelta() * speedScl * state.rules.unitBuildSpeedMultiplier;
+            time += edelta() * speedScl * state.rules.unitBuildSpeed(team);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return Mathf.clamp(fraction());
+            return super.sense(sensor);
         }
 
         @Override
         public boolean shouldConsume(){
-            return constructing();
+            return constructing() && enabled;
         }
 
         public UnitType unit(){
             if(payload == null) return null;
 
             UnitType t = upgrade(payload.unit.type);
-            return t != null && t.unlockedNow() ? t : null;
+            return t != null && t.unlockedNowHost() ? t : null;
         }
 
         public boolean constructing(){
@@ -207,7 +247,7 @@ public class Reconstructor extends UnitBlock{
 
         public boolean hasUpgrade(UnitType type){
             UnitType t = upgrade(type);
-            return t != null && t.unlockedNow();
+            return t != null && t.unlockedNowHost() && !type.isBanned();
         }
 
         public UnitType upgrade(UnitType type){

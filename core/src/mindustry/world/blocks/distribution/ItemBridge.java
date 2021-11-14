@@ -1,12 +1,10 @@
 package mindustry.world.blocks.distribution;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.struct.IntSet.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -24,31 +22,37 @@ import static mindustry.Vars.*;
 public class ItemBridge extends Block{
     private static BuildPlan otherReq;
 
-    public final int timerTransport = timers++;
+    public final int timerCheckMoved = timers ++;
+
     public int range;
     public float transportTime = 2f;
     public @Load("@-end") TextureRegion endRegion;
     public @Load("@-bridge") TextureRegion bridgeRegion;
     public @Load("@-arrow") TextureRegion arrowRegion;
 
+    public boolean fadeIn = true;
+    public boolean moveArrows = true;
+    public boolean pulse = false;
+    public float arrowSpacing = 4f, arrowOffset = 2f, arrowPeriod = 0.4f;
+    public float arrowTimeScl = 6.2f;
+
     //for autolink
-    @Nullable
-    public ItemBridgeBuild lastBuild;
-    @Nullable
-    public BuildPlan lastPlan;
+    public @Nullable ItemBridgeBuild lastBuild;
 
     public ItemBridge(String name){
         super(name);
         update = true;
         solid = true;
         hasPower = true;
-        expanded = true;
         itemCapacity = 10;
         configurable = true;
         hasItems = true;
         unloadable = false;
         group = BlockGroup.transportation;
         noUpdateDisabled = true;
+        copyConfig = false;
+        //disabled as to not be annoying
+        allowConfigInventory = false;
 
         //point2 config is relative
         config(Point2.class, (ItemBridgeBuild tile, Point2 i) -> tile.link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
@@ -94,16 +98,16 @@ public class ItemBridge extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
         Tile link = findLink(x, y);
 
-        Lines.stroke(2f, Pal.placing);
         for(int i = 0; i < 4; i++){
-            Lines.dashLine(
+            Drawf.dashLine(Pal.placing,
             x * tilesize + Geometry.d4[i].x * (tilesize / 2f + 2),
             y * tilesize + Geometry.d4[i].y * (tilesize / 2f + 2),
-            x * tilesize + Geometry.d4[i].x * (range + 0.5f) * tilesize,
-            y * tilesize + Geometry.d4[i].y * (range + 0.5f) * tilesize,
-            range);
+            x * tilesize + Geometry.d4[i].x * (range) * tilesize,
+            y * tilesize + Geometry.d4[i].y * (range) * tilesize);
         }
 
         Draw.reset();
@@ -144,19 +148,27 @@ public class ItemBridge extends Block{
 
     public Tile findLink(int x, int y){
         Tile tile = world.tile(x, y);
-        if(tile != null && lastBuild != null && linkValid(tile, lastBuild.tile) && lastBuild.tile != tile){
+        if(tile != null && lastBuild != null && linkValid(tile, lastBuild.tile) && lastBuild.tile != tile && lastBuild.link == -1){
             return lastBuild.tile;
         }
         return null;
     }
 
     @Override
-    public void onNewPlan(BuildPlan plan){
-        if(lastPlan != null && lastPlan.config == null && positionsValid(lastPlan.x, lastPlan.y, plan.x, plan.y)){
-            lastPlan.config = new Point2(plan.x - lastPlan.x, plan.y - lastPlan.y);
-        }
+    public void init(){
+        super.init();
+        clipSize = Math.max(clipSize, (range + 0.5f) * tilesize * 2);
+    }
 
-        lastPlan = plan;
+    @Override
+    public void handlePlacementLine(Seq<BuildPlan> plans){
+        for(int i = 0; i < plans.size - 1; i++){
+            var cur = plans.get(i);
+            var next = plans.get(i + 1);
+            if(positionsValid(cur.x, cur.y, next.x, next.y)){
+                cur.config = new Point2(next.x - cur.x, next.y - cur.y);
+            }
+        }
     }
 
     @Override
@@ -166,20 +178,23 @@ public class ItemBridge extends Block{
 
     public class ItemBridgeBuild extends Building{
         public int link = -1;
-        public IntSet incoming = new IntSet();
-        public float uptime;
-        public float time;
-        public float time2;
-        public float cycleSpeed = 1f;
+        public IntSeq incoming = new IntSeq(false, 4);
+        public float warmup;
+        public float time = -8f, timeSpeed;
+        public boolean wasMoved, moved;
+        public float transportCounter;
+
+        @Override
+        public void pickedUp(){
+            link = -1;
+        }
 
         @Override
         public void playerPlaced(Object config){
             super.playerPlaced(config);
 
-            if(config != null) return;
-
             Tile link = findLink(tile.x, tile.y);
-            if(linkValid(tile, link) && !proximity.contains(link.build)){
+            if(linkValid(tile, link) && this.link != link.pos() && !proximity.contains(link.build)){
                 link.build.configure(tile.pos());
             }
 
@@ -250,7 +265,7 @@ public class ItemBridge extends Block{
         @Override
         public boolean onConfigureTileTapped(Building other){
             //reverse connection
-            if(other instanceof ItemBridgeBuild && ((ItemBridgeBuild)other).link == pos()){
+            if(other instanceof ItemBridgeBuild b && b.link == pos()){
                 configure(other.pos());
                 other.configure(-1);
                 return true;
@@ -268,53 +283,65 @@ public class ItemBridge extends Block{
         }
 
         public void checkIncoming(){
-            IntSetIterator it = incoming.iterator();
-            while(it.hasNext){
-                int i = it.next();
+            int idx = 0;
+            while(idx < incoming.size){
+                int i = incoming.items[idx];
                 Tile other = world.tile(i);
                 if(!linkValid(tile, other, false) || ((ItemBridgeBuild)other.build).link != tile.pos()){
-                    it.remove();
+                    incoming.removeIndex(idx);
+                    idx --;
                 }
+                idx ++;
             }
         }
 
         @Override
         public void updateTile(){
-            time += cycleSpeed * delta();
-            time2 += (cycleSpeed - 1f) * delta();
+            if(timer(timerCheckMoved, 30f)){
+                wasMoved = moved;
+                moved = false;
+            }
+
+            //smooth out animation, so it doesn't stop/start immediately
+            timeSpeed = Mathf.approachDelta(timeSpeed, wasMoved ? 1f : 0f, 1f / 60f);
+
+            time += timeSpeed * delta();
 
             checkIncoming();
 
             Tile other = world.tile(link);
             if(!linkValid(tile, other)){
-                dump();
-                uptime = 0f;
+                doDump();
+                warmup = 0f;
             }else{
-                ((ItemBridgeBuild)other.build).incoming.add(tile.pos());
-
-                if(consValid() && Mathf.zero(1f - efficiency())){
-                    uptime = Mathf.lerpDelta(uptime, 1f, 0.04f);
-                }else{
-                    uptime = Mathf.lerpDelta(uptime, 0f, 0.02f);
+                var inc = ((ItemBridgeBuild)other.build).incoming;
+                int pos = tile.pos();
+                if(!inc.contains(pos)){
+                    inc.add(pos);
                 }
 
+                warmup = Mathf.approachDelta(warmup, efficiency(), 1f / 30f);
                 updateTransport(other.build);
             }
         }
 
+        public void doDump(){
+            //allow dumping multiple times per frame
+            dumpAccumulate();
+        }
+
         public void updateTransport(Building other){
-            if(uptime >= 0.5f && timer(timerTransport, transportTime)){
+            transportCounter += edelta();
+            while(transportCounter >= transportTime){
                 Item item = items.take();
                 if(item != null && other.acceptItem(this, item)){
                     other.handleItem(this, item);
-                    cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f); //TODO this is kinda broken, because lerping only happens on a timer
-                }else{
-                    cycleSpeed = Mathf.lerpDelta(cycleSpeed, 1f, 0.01f);
-                    if(item != null){
-                        items.add(item, 1);
-                        items.undoFlow(item);
-                    }
+                    moved = true;
+                }else if(item != null){
+                    items.add(item, 1);
+                    items.undoFlow(item);
                 }
+                transportCounter -= transportTime;
             }
         }
 
@@ -331,8 +358,13 @@ public class ItemBridge extends Block{
 
             int i = relativeTo(other.x, other.y);
 
-            Draw.color(Color.white, Color.black, Mathf.absin(Time.time, 6f, 0.07f));
-            Draw.alpha(Math.max(uptime, 0.25f) * Renderer.bridgeOpacity);
+            if(pulse){
+                Draw.color(Color.white, Color.black, Mathf.absin(Time.time, 6f, 0.07f));
+            }
+
+            float warmup = hasPower ? this.warmup : 1f;
+
+            Draw.alpha((fadeIn ? Math.max(warmup, 0.25f) : 1f) * Renderer.bridgeOpacity);
 
             Draw.rect(endRegion, x, y, i * 90 + 90);
             Draw.rect(endRegion, other.drawx(), other.drawy(), i * 90 + 270);
@@ -347,40 +379,26 @@ public class ItemBridge extends Block{
             other.worldx() - Tmp.v1.x,
             other.worldy() - Tmp.v1.y, false);
 
-            int dist = Math.max(Math.abs(other.x - tile.x), Math.abs(other.y - tile.y));
-
-            float time = time2 / 1.7f;
-            int arrows = (dist) * tilesize / 4 - 2;
+            int dist = Math.max(Math.abs(other.x - tile.x), Math.abs(other.y - tile.y)) - 1;
 
             Draw.color();
 
+            int arrows = (int)(dist * tilesize / arrowSpacing), dx = Geometry.d4x(i), dy = Geometry.d4y(i);
+
             for(int a = 0; a < arrows; a++){
-                Draw.alpha(Mathf.absin(a / (float)arrows - time / 100f, 0.1f, 1f) * uptime * Renderer.bridgeOpacity);
+                Draw.alpha(Mathf.absin(a - time / arrowTimeScl, arrowPeriod, 1f) * warmup * Renderer.bridgeOpacity);
                 Draw.rect(arrowRegion,
-                x + Geometry.d4(i).x * (tilesize / 2f + a * 4f + time % 4f),
-                y + Geometry.d4(i).y * (tilesize / 2f + a * 4f + time % 4f), i * 90f);
+                x + dx * (tilesize / 2f + a * arrowSpacing + arrowOffset),
+                y + dy * (tilesize / 2f + a * arrowSpacing + arrowOffset),
+                i * 90f);
             }
+
             Draw.reset();
         }
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            if(team != source.team) return false;
-
-            Tile other = world.tile(link);
-
-            if(items.total() >= itemCapacity) return false;
-
-            if(linked(source)) return true;
-
-            if(linkValid(tile, other)){
-                int rel = relativeTo(other);
-                int rel2 = relativeTo(Edges.getFacingEdge(source, this));
-
-                return rel != rel2;
-            }
-
-            return false;
+            return hasItems && team == source.team && items.total() < itemCapacity && checkAccept(source, world.tile(link));
         }
 
         @Override
@@ -390,16 +408,17 @@ public class ItemBridge extends Block{
 
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
-            if(team != source.team || !hasLiquids) return false;
+            return
+                hasLiquids && team == source.team &&
+                (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f) &&
+                checkAccept(source, world.tile(link));
+        }
 
-            Tile other = world.tile(link);
-
-            if(!(liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f)) return false;
-
-            if(linked(source)) return true;
+        protected boolean checkAccept(Building source, Tile other){
+            if(tile == null || linked(source)) return true;
 
             if(linkValid(tile, other)){
-                int rel = relativeTo(other.x, other.y);
+                int rel = relativeTo(other);
                 int rel2 = relativeTo(Edges.getFacingEdge(source, this));
 
                 return rel != rel2;
@@ -423,10 +442,8 @@ public class ItemBridge extends Block{
                 Tile edge = Edges.getFacingEdge(to.tile, tile);
                 int i = relativeTo(edge.x, edge.y);
 
-                IntSetIterator it = incoming.iterator();
-
-                while(it.hasNext){
-                    int v = it.next();
+                for(int j = 0; j < incoming.size; j++){
+                    int v = incoming.items[j];
                     if(relativeTo(Point2.x(v), Point2.y(v)) == i){
                         return false;
                     }
@@ -451,27 +468,36 @@ public class ItemBridge extends Block{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.i(link);
-            write.f(uptime);
+            write.f(warmup);
             write.b(incoming.size);
 
-            IntSetIterator it = incoming.iterator();
-
-            while(it.hasNext){
-                write.i(it.next());
+            for(int i = 0; i < incoming.size; i++){
+                write.i(incoming.items[i]);
             }
+
+            write.bool(wasMoved || moved);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
             link = read.i();
-            uptime = read.f();
+            warmup = read.f();
             byte links = read.b();
             for(int i = 0; i < links; i++){
                 incoming.add(read.i());
+            }
+
+            if(revision >= 1){
+                wasMoved = moved = read.bool();
             }
         }
     }

@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 public enum LUnitControl{
+    idle,
     stop,
     move("x", "y"),
     approach("x", "y", "radius"),
@@ -12,6 +13,7 @@ public enum LUnitControl{
     itemTake("from", "item", "amount"),
     payDrop,
     payTake("takeUnits"),
+    payEnter,
     mine("x", "y"),
     flag("value"),
     build("x", "y", "block", "rotation", "config"),

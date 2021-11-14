@@ -13,8 +13,10 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 
 public class LCanvas extends Table{
@@ -29,9 +31,25 @@ public class LCanvas extends Table{
     StatementElem hovered;
     float targetWidth;
     int jumpCount = 0;
+    Seq<Tooltip> tooltips = new Seq<>();
 
     public LCanvas(){
         canvas = this;
+
+        Core.scene.addListener(new InputListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                //hide tooltips on tap
+                for(var t : tooltips){
+                    t.container.toFront();
+                }
+                Core.app.post(() -> {
+                    tooltips.each(Tooltip::hide);
+                    tooltips.clear();
+                });
+                return super.touchDown(event, x, y, pointer, button);
+            }
+        });
 
         rebuild();
     }
@@ -39,6 +57,43 @@ public class LCanvas extends Table{
     /** @return if statement elements should have rows. */
     public static boolean useRows(){
         return Core.graphics.getWidth() < Scl.scl(900f) * 1.2f;
+    }
+
+    public static void tooltip(Cell<?> cell, String key){
+        String lkey = key.toLowerCase().replace(" ", "");
+        if(Core.settings.getBool("logichints", true) && Core.bundle.has(lkey)){
+            var tip = new Tooltip(t -> t.background(Styles.black8).margin(4f).add("[lightgray]" + Core.bundle.get(lkey)).style(Styles.outlineLabel));
+
+            //mobile devices need long-press tooltips
+            if(Vars.mobile){
+                cell.get().addListener(new ElementGestureListener(20, 0.4f, 0.43f, 0.15f){
+                    @Override
+                    public boolean longPress(Element element, float x, float y){
+                        tip.show(element, x, y);
+                        canvas.tooltips.add(tip);
+                        //prevent touch down for other listeners
+                        for(var list : cell.get().getListeners()){
+                            if(list instanceof ClickListener cl){
+                                cl.cancel();
+                            }
+                        }
+                        return true;
+                    }
+                });
+            }else{
+                cell.get().addListener(tip);
+            }
+
+        }
+    }
+
+    public static void tooltip(Cell<?> cell, Enum<?> key){
+        String cl = key.getClass().getSimpleName().toLowerCase() + "." + key.name().toLowerCase();
+        if(Core.bundle.has(cl)){
+            tooltip(cell, cl);
+        }else{
+            tooltip(cell, "lenum." + key.name());
+        }
     }
 
     public void rebuild(){
@@ -58,7 +113,6 @@ public class LCanvas extends Table{
 
             jumps.cullable = false;
         }).grow().get();
-        //pane.setClip(false);
         pane.setFlickScroll(false);
 
         //load old scroll percent
@@ -128,7 +182,7 @@ public class LCanvas extends Table{
             float dst = Math.min(y - this.y, Core.graphics.getHeight() - y);
             if(dst < Scl.scl(100f)){ //scroll margin
                 int sign = Mathf.sign(Core.graphics.getHeight()/2f - y);
-                pane.setScrollY(pane.getScrollY() + sign * Scl.scl(15f));
+                pane.setScrollY(pane.getScrollY() + sign * Scl.scl(15f) * Time.delta);
             }
         }
     }
@@ -163,6 +217,7 @@ public class LCanvas extends Table{
 
                 e.setSize(width, e.getPrefHeight());
                 e.setPosition(0, height - cy, Align.topLeft);
+                ((StatementElem)e).updateAddress(i);
 
                 cy += e.getPrefHeight() + space;
                 seq.add(e);
@@ -262,6 +317,8 @@ public class LCanvas extends Table{
 
     public class StatementElem extends Table{
         public LStatement st;
+        public int index;
+        Label addressLabel;
 
         public StatementElem(LStatement st){
             this.st = st;
@@ -279,8 +336,10 @@ public class LCanvas extends Table{
                 t.margin(6f);
                 t.touchable = Touchable.enabled;
 
-                t.add(st.name()).style(Styles.outlineLabel).color(color).padRight(8);
+                t.add(st.name()).style(Styles.outlineLabel).name("statement-name").color(color).padRight(8);
                 t.add().growX();
+
+                addressLabel = t.add(index + "").style(Styles.outlineLabel).color(color).padRight(8).get();
 
                 t.button(Icon.copy, Styles.logici, () -> {
                 }).size(24f).padRight(6).get().tapped(this::copy);
@@ -341,12 +400,26 @@ public class LCanvas extends Table{
             marginBottom(7);
         }
 
+        public void updateAddress(int index){
+            this.index = index;
+            addressLabel.setText(index + "");
+        }
+
         public void copy(){
+            st.saveUI();
             LStatement copy = st.copy();
+
+            if(copy instanceof JumpStatement st && st.destIndex != -1){
+                int index = statements.getChildren().indexOf(this);
+                if(index != -1 && index < st.destIndex){
+                    st.destIndex ++;
+                }
+            }
+
             if(copy != null){
                 StatementElem s = new StatementElem(copy);
 
-                statements.addChildAfter(StatementElem.this,s);
+                statements.addChildAfter(StatementElem.this, s);
                 statements.layout();
                 copy.elem = s;
                 copy.setupUI();

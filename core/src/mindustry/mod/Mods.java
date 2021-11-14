@@ -11,6 +11,7 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.async.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
@@ -20,14 +21,17 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.mod.ContentParser.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
 import java.io.*;
+import java.util.*;
 
 import static mindustry.Vars.*;
 
 public class Mods implements Loadable{
+    private AsyncExecutor async = new AsyncExecutor();
     private Json json = new Json();
     private @Nullable Scripts scripts;
     private ContentParser parser = new ContentParser();
@@ -36,13 +40,19 @@ public class Mods implements Loadable{
 
     private int totalSprites;
     private MultiPacker packer;
+    private ModClassLoader mainLoader = new ModClassLoader(getClass().getClassLoader());
 
     Seq<LoadedMod> mods = new Seq<>();
     private ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();
-    private boolean requiresReload, createdAtlas;
+    private boolean requiresReload;
 
     public Mods(){
         Events.on(ClientLoadEvent.class, e -> Core.app.post(this::checkWarnings));
+    }
+
+    /** @return the main class loader for all mods */
+    public ClassLoader mainLoader(){
+        return mainLoader;
     }
 
     /** Returns a file named 'config.json' in a special folder for the specified plugin.
@@ -77,7 +87,8 @@ public class Mods implements Loadable{
 
     /** Imports an external mod file. Folders are not supported here. */
     public LoadedMod importMod(Fi file) throws IOException{
-        String baseName = file.nameWithoutExtension();
+        //for some reason, android likes to add colons to file names, e.g. primary:ExampleJavaMod.jar, which breaks dexing
+        String baseName = file.nameWithoutExtension().replace(':', '_').replace(' ', '_');
         String finalName = baseName;
         //find a name to prevent any name conflicts
         int count = 1;
@@ -92,11 +103,11 @@ public class Mods implements Loadable{
             var loaded = loadMod(dest, true);
             mods.add(loaded);
             requiresReload = true;
+            //enable the mod on import
+            Core.settings.put("mod-" + loaded.name + "-enabled", true);
             sortMods();
             //try to load the mod's icon so it displays on import
-            Core.app.post(() -> {
-                loadIcon(loaded);
-            });
+            Core.app.post(() -> loadIcon(loaded));
             return loaded;
         }catch(IOException e){
             dest.delete();
@@ -114,15 +125,36 @@ public class Mods implements Loadable{
         Time.mark();
 
         packer = new MultiPacker();
+        //all packing tasks to await
+        var tasks = new Seq<AsyncResult<Runnable>>();
 
         eachEnabled(mod -> {
             Seq<Fi> sprites = mod.root.child("sprites").findAll(f -> f.extension().equals("png"));
             Seq<Fi> overrides = mod.root.child("sprites-override").findAll(f -> f.extension().equals("png"));
-            packSprites(sprites, mod, true);
-            packSprites(overrides, mod, false);
+
+            packSprites(sprites, mod, true, tasks);
+            packSprites(overrides, mod, false, tasks);
+
             Log.debug("Packed @ images for mod '@'.", sprites.size + overrides.size, mod.meta.name);
             totalSprites += sprites.size + overrides.size;
         });
+
+        for(var result : tasks){
+            try{
+                var packRun = result.get();
+                if(packRun != null){ //can be null for very strange reasons, ignore if that's the case
+                    try{
+                        //actually pack the image
+                        packRun.run();
+                    }catch(Exception e){ //the image can fail to fit in the spritesheet
+                        Log.err("Failed to fit image into the spritesheet, skipping.");
+                        Log.err(e);
+                    }
+                }
+            }catch(Exception e){ //this means loading the image failed, log it and move on
+                Log.err(e);
+            }
+        }
 
         Log.debug("Time to pack textures: @", Time.elapsed());
     }
@@ -135,7 +167,7 @@ public class Mods implements Loadable{
 
     private void loadIcon(LoadedMod mod){
         //try to load icon for each mod that can have one
-        if(mod.root.child("icon.png").exists()){
+        if(mod.root.child("icon.png").exists() && !headless){
             try{
                 mod.iconTexture = new Texture(mod.root.child("icon.png"));
                 mod.iconTexture.setFilter(TextureFilter.linear);
@@ -145,23 +177,29 @@ public class Mods implements Loadable{
         }
     }
 
-    private void packSprites(Seq<Fi> sprites, LoadedMod mod, boolean prefix){
+    private void packSprites(Seq<Fi> sprites, LoadedMod mod, boolean prefix, Seq<AsyncResult<Runnable>> tasks){
+        boolean linear = Core.settings.getBool("linear", true);
+
         for(Fi file : sprites){
-            try(InputStream stream = file.read()){
-                byte[] bytes = Streams.copyBytes(stream, Math.max((int)file.length(), 512));
-                Pixmap pixmap = new Pixmap(bytes, 0, bytes.length);
-                packer.add(getPage(file), (prefix ? mod.name + "-" : "") + file.nameWithoutExtension(), new PixmapRegion(pixmap));
-                pixmap.dispose();
-            }catch(IOException e){
-                Core.app.post(() -> {
-                    Log.err("Error packing images for mod: @", mod.meta.name);
-                    Log.err(e);
-                    if(!headless) ui.showException(e);
-                });
-                break;
-            }
+            //read and bleed pixmaps in parallel
+            tasks.add(async.submit(() -> {
+                try{
+                    Pixmap pix = new Pixmap(file.readBytes());
+                    //only bleeds when linear filtering is on at startup
+                    if(linear){
+                        Pixmaps.bleed(pix, 2);
+                    }
+                    //this returns a *runnable* which actually packs the resulting pixmap; this has to be done synchronously outside the method
+                    return () -> {
+                        packer.add(getPage(file), (prefix ? mod.name + "-" : "") + file.nameWithoutExtension(), new PixmapRegion(pix));
+                        pix.dispose();
+                    };
+                }catch(Exception e){
+                    //rethrow exception with details about the cause of failure
+                    throw new Exception("Failed to load image " + file + " for mod " + mod.name, e);
+                }
+            }));
         }
-        totalSprites += sprites.size;
     }
 
     @Override
@@ -173,39 +211,90 @@ public class Mods implements Loadable{
 
         //get textures packed
         if(totalSprites > 0){
-            if(!createdAtlas) Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
-            createdAtlas = true;
 
             for(AtlasRegion region : Core.atlas.getRegions()){
+                //TODO PageType completely breaks down with multiple pages.
                 PageType type = getPage(region);
                 if(!packer.has(type, region.name)){
-                    packer.add(type, region.name, Core.atlas.getPixmap(region));
+                    packer.add(type, region.name, Core.atlas.getPixmap(region), region.splits, region.pads);
                 }
             }
 
-            TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.linear : TextureFilter.nearest;
+            Core.atlas.dispose();
 
-            //flush so generators can use these sprites
-            packer.flush(filter, Core.atlas);
+            //dead shadow-atlas for getting regions, but not pixmaps
+            var shadow = Core.atlas;
+            //dummy texture atlas that returns the 'shadow' regions; used for mod loading
+            Core.atlas = new TextureAtlas(){
+                {
+                    //needed for the correct operation of the found() method in the TextureRegion
+                    error = shadow.find("error");
+                }
 
+                @Override
+                public AtlasRegion find(String name){
+                    var base = packer.get(name);
+
+                    if(base != null){
+                        var reg = new AtlasRegion(shadow.find(name).texture, base.x, base.y, base.width, base.height);
+                        reg.name = name;
+                        reg.pixmapRegion = base;
+                        return reg;
+                    }
+
+                    return shadow.find(name);
+                }
+
+                @Override
+                public boolean isFound(TextureRegion region){
+                    return region != shadow.find("error");
+                }
+
+                @Override
+                public TextureRegion find(String name, TextureRegion def){
+                    return !has(name) ? def : find(name);
+                }
+
+                @Override
+                public boolean has(String s){
+                    return shadow.has(s) || packer.get(s) != null;
+                }
+
+                //return the *actual* pixmap regions, not the disposed ones.
+                @Override
+                public PixmapRegion getPixmap(AtlasRegion region){
+                    PixmapRegion out = packer.get(region.name);
+                    //this should not happen in normal situations
+                    if(out == null) return packer.get("error");
+                    return out;
+                }
+            };
+
+            TextureFilter filter = Core.settings.getBool("linear", true) ? TextureFilter.linear : TextureFilter.nearest;
+
+            Time.mark();
             //generate new icons
             for(Seq<Content> arr : content.getContentMap()){
                 arr.each(c -> {
                     if(c instanceof UnlockableContent u && c.minfo.mod != null){
                         u.load();
+                        u.loadIcon();
                         u.createIcons(packer);
                     }
                 });
             }
+            Log.debug("Time to generate icons: @", Time.elapsed());
 
+            //dispose old atlas data
             Core.atlas = packer.flush(filter, new TextureAtlas());
+
             Core.atlas.setErrorRegion("error");
             Log.debug("Total pages: @", Core.atlas.getTextures().size);
         }
 
         packer.dispose();
         packer = null;
-        Log.debug("Time to update textures: @", Time.elapsed());
+        Log.debug("Total time to generate & flush textures synchronously: @", Time.elapsed());
     }
 
     private PageType getPage(AtlasRegion region){
@@ -214,15 +303,17 @@ public class Mods implements Loadable{
             region.texture == Core.atlas.find("stone1").texture ? PageType.environment :
             region.texture == Core.atlas.find("clear-editor").texture ? PageType.editor :
             region.texture == Core.atlas.find("whiteui").texture ? PageType.ui :
+            region.texture == Core.atlas.find("rubble-1-0").texture ? PageType.rubble :
             PageType.main;
     }
 
     private PageType getPage(Fi file){
-        String parent = file.parent().name();
+        String path = file.path();
         return
-            parent.equals("environment") ? PageType.environment :
-            parent.equals("editor") ? PageType.editor :
-            parent.equals("ui") || file.parent().parent().name().equals("ui") ? PageType.ui :
+            path.contains("sprites/blocks/environment") ? PageType.environment :
+            path.contains("sprites/editor") ? PageType.editor :
+            path.contains("sprites/rubble") ? PageType.editor :
+            path.contains("sprites/ui") ? PageType.ui :
             PageType.main;
     }
 
@@ -255,6 +346,11 @@ public class Mods implements Loadable{
 
     public boolean requiresReload(){
         return requiresReload;
+    }
+
+    /** @return whether to skip mod loading due to previous initialization failure. */
+    public boolean skipModLoading(){
+        return failedToLaunch && Core.settings.getBool("modcrashdisable", true);
     }
 
     /** Loads all mods from the folder, but does not call any methods on them.*/
@@ -519,7 +615,8 @@ public class Mods implements Loadable{
             if(mod.root.child("content").exists()){
                 Fi contentRoot = mod.root.child("content");
                 for(ContentType type : ContentType.all){
-                    Fi folder = contentRoot.child(type.name().toLowerCase() + "s");
+                    String lower = type.name().toLowerCase(Locale.ROOT);
+                    Fi folder = contentRoot.child(lower + (lower.endsWith("s") ? "" : "s"));
                     if(folder.exists()){
                         for(Fi file : folder.findAll(f -> f.extension().equals("json") || f.extension().equals("hjson"))){
                             runs.add(new LoadRun(type, file, mod));
@@ -536,7 +633,7 @@ public class Mods implements Loadable{
             try{
                 //this binds the content but does not load it entirely
                 Content loaded = parser.parse(l.mod, l.file.nameWithoutExtension(), l.file.readString("UTF-8"), l.file, l.type);
-                Log.debug("[@] Loaded '@'.", l.mod.meta.name, (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
+                Log.debug("[@] Loaded '@'.", l.mod.meta.name, (loaded instanceof UnlockableContent u ? u.localizedName : loaded));
             }catch(Throwable e){
                 if(current != content.getLastAdded() && content.getLastAdded() != null){
                     parser.markError(content.getLastAdded(), l.mod, l.file, e);
@@ -553,6 +650,11 @@ public class Mods implements Loadable{
 
     public void handleContentError(Content content, Throwable error){
         parser.markError(content, error);
+    }
+
+    /** Adds a listener for parsed JSON objects. */
+    public void addParseListener(ParseListener hook){
+        parser.listeners.add(hook);
     }
 
     /** @return a list of mods and versions, in the format name:version. */
@@ -633,14 +735,14 @@ public class Mods implements Loadable{
 
             if(!metaf.exists()){
                 Log.warn("Mod @ doesn't have a '[mod/plugin].[h]json' file, skipping.", sourceFile);
-                throw new IllegalArgumentException("Invalid file: No mod.json found.");
+                throw new ModLoadException("Invalid file: No mod.json found.");
             }
 
             ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaf.readString()).toString(Jformat.plain));
             meta.cleanup();
             String camelized = meta.name.replace(" ", "");
-            String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
-            String baseName = meta.name.toLowerCase().replace(" ", "-");
+            String mainClass = meta.main == null ? camelized.toLowerCase(Locale.ROOT) + "." + camelized + "Mod" : meta.main;
+            String baseName = meta.name.toLowerCase(Locale.ROOT).replace(" ", "-");
 
             var other = mods.find(m -> m.name.equals(baseName));
 
@@ -660,13 +762,14 @@ public class Mods implements Loadable{
                     //unload
                     mods.remove(other);
                 }else{
-                    throw new IllegalArgumentException("A mod with the name '" + baseName + "' is already imported.");
+                    throw new ModLoadException("A mod with the name '" + baseName + "' is already imported.");
                 }
             }
 
+            ClassLoader loader = null;
             Mod mainMod;
-
             Fi mainFile = zip;
+
             if(android){
                 mainFile = mainFile.child("classes.dex");
             }else{
@@ -680,14 +783,31 @@ public class Mods implements Loadable{
 
             //make sure the main class exists before loading it; if it doesn't just don't put it there
             //if the mod is explicitly marked as java, try loading it anyway
-            if((mainFile.exists() || meta.java) &&
-                Core.settings.getBool("mod-" + baseName + "-enabled", true) && Version.isAtLeast(meta.minGameVersion) && (meta.getMinMajor() >= 105 || headless)){
-
+            if(
+                (mainFile.exists() || meta.java) &&
+                !skipModLoading() &&
+                Core.settings.getBool("mod-" + baseName + "-enabled", true) &&
+                Version.isAtLeast(meta.minGameVersion) &&
+                (meta.getMinMajor() >= 105 || headless)
+            ){
                 if(ios){
-                    throw new IllegalArgumentException("Java class mods are not supported on iOS.");
+                    throw new ModLoadException("Java class mods are not supported on iOS.");
                 }
 
-                Class<?> main = platform.loadJar(sourceFile, mainClass);
+                loader = platform.loadJar(sourceFile, mainLoader);
+                mainLoader.addChild(loader);
+                Class<?> main = Class.forName(mainClass, true, loader);
+
+                //detect mods that incorrectly package mindustry in the jar
+                if((main.getSuperclass().getName().equals("mindustry.mod.Plugin") || main.getSuperclass().getName().equals("mindustry.mod.Mod")) &&
+                    main.getSuperclass().getClassLoader() != Mod.class.getClassLoader()){
+                    throw new ModLoadException(
+                        "This mod/plugin has loaded Mindustry dependencies from its own class loader. " +
+                        "You are incorrectly including Mindustry dependencies in the mod JAR - " +
+                        "make sure Mindustry is declared as `compileOnly` in Gradle, and that the JAR is created with `runtimeClasspath`!"
+                    );
+                }
+
                 metas.put(main, meta);
                 mainMod = (Mod)main.getDeclaredConstructor().newInstance();
             }else{
@@ -707,11 +827,16 @@ public class Mods implements Loadable{
                 }
             }
 
+            //skip mod loading if it failed
+            if(skipModLoading()){
+                Core.settings.put("mod-" + baseName + "-enabled", false);
+            }
+
             if(!headless){
                 Log.info("Loaded mod '@' in @ms", meta.name, Time.elapsed());
             }
-            return new LoadedMod(sourceFile, zip, mainMod, meta);
 
+            return new LoadedMod(sourceFile, zip, mainMod, loader, meta);
         }catch(Exception e){
             //delete root zip file so it can be closed on windows
             if(rootZip != null) rootZip.delete();
@@ -743,13 +868,16 @@ public class Mods implements Loadable{
         public ModState state = ModState.enabled;
         /** Icon texture. Should be disposed. */
         public @Nullable Texture iconTexture;
+        /** Class loader for JAR mods. Null if the mod isn't loaded or this isn't a jar mod. */
+        public @Nullable ClassLoader loader;
 
-        public LoadedMod(Fi file, Fi root, Mod main, ModMeta meta){
+        public LoadedMod(Fi file, Fi root, Mod main, ClassLoader loader, ModMeta meta){
             this.root = root;
             this.file = file;
+            this.loader = loader;
             this.main = main;
             this.meta = meta;
-            this.name = meta.name.toLowerCase().replace(" ", "-");
+            this.name = meta.name.toLowerCase(Locale.ROOT).replace(" ", "-");
         }
 
         /** @return whether this is a java class mod. */
@@ -909,6 +1037,12 @@ public class Mods implements Loadable{
                     ", hidden=" + hidden +
                     ", repo=" + repo +
                     '}';
+        }
+    }
+
+    public static class ModLoadException extends RuntimeException{
+        public ModLoadException(String message){
+            super(message);
         }
     }
 

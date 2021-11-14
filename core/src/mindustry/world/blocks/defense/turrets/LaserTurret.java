@@ -4,10 +4,10 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
-import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
@@ -19,7 +19,7 @@ public class LaserTurret extends PowerTurret{
         super(name);
         canOverdrive = false;
 
-        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.01f)).update(false);
+        consumes.add(new ConsumeCoolant(0.01f)).update(false);
         coolantMultiplier = 1f;
     }
 
@@ -34,15 +34,12 @@ public class LaserTurret extends PowerTurret{
         super.setStats();
 
         stats.remove(Stat.booster);
-        stats.add(Stat.input, new BoosterListValue(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, false, l -> consumes.liquidfilters.get(l.id)));
-        stats.remove(Stat.damage);
-        //damages every 5 ticks, at least in meltdown's case
-        stats.add(Stat.damage, shootType.damage * 60f / 5f, StatUnit.perSecond);
+        stats.add(Stat.input, StatValues.boosters(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, false, l -> consumes.liquidfilters.get(l.id)));
     }
 
     public class LaserTurretBuild extends PowerTurretBuild{
-        Bullet bullet;
-        float bulletLife;
+        public Bullet bullet;
+        public float bulletLife;
 
         @Override
         protected void updateCooling(){
@@ -70,8 +67,8 @@ public class LaserTurret extends PowerTurret{
                 Liquid liquid = liquids.current();
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-                float used = (cheating() ? maxUsed * Time.delta : Math.min(liquids.get(liquid), maxUsed * Time.delta)) * liquid.heatCapacity * coolantMultiplier;
-                reload -= used;
+                float used = (cheating() ? maxUsed : Math.min(liquids.get(liquid), maxUsed)) * Time.delta;
+                reload -= used * liquid.heatCapacity * coolantMultiplier;
                 liquids.remove(liquid, used);
 
                 if(Mathf.chance(0.06 * used)){
@@ -81,12 +78,19 @@ public class LaserTurret extends PowerTurret{
         }
 
         @Override
+        public double sense(LAccess sensor){
+            //reload reversed for laser turrets
+            if(sensor == LAccess.progress) return Mathf.clamp(1f - reload / reloadTime);
+            return super.sense(sensor);
+        }
+
+        @Override
         protected void updateShooting(){
             if(bulletLife > 0 && bullet != null){
                 return;
             }
 
-            if(reload <= 0 && (consValid() || cheating())){
+            if(reload <= 0 && (consValid() || cheating()) && !charging){
                 BulletType type = peekAmmo();
 
                 shoot(type);
@@ -102,7 +106,7 @@ public class LaserTurret extends PowerTurret{
 
         @Override
         protected void bullet(BulletType type, float angle){
-            bullet = type.create(tile.build, team, x + tr.x, y + tr.y, angle);
+            bullet = type.create(this, team, x + tr.x, y + tr.y, angle);
             bulletLife = shootDuration;
         }
 

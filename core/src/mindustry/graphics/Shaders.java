@@ -15,14 +15,15 @@ import mindustry.type.*;
 import static mindustry.Vars.*;
 
 public class Shaders{
-    public static BlockBuild blockbuild;
+    public static BlockBuildShader blockbuild;
     public static @Nullable ShieldShader shield;
     public static BuildBeamShader buildBeam;
-    public static UnitBuild build;
+    public static UnitBuildShader build;
     public static DarknessShader darkness;
     public static LightShader light;
-    public static SurfaceShader water, mud, tar, slag, space;
+    public static SurfaceShader water, mud, tar, slag, cryofluid, space, caustics;
     public static PlanetShader planet;
+    public static CloudShader clouds;
     public static PlanetGridShader planetGrid;
     public static AtmosphereShader atmosphere;
     public static MeshShader mesh;
@@ -31,7 +32,7 @@ public class Shaders{
 
     public static void init(){
         mesh = new MeshShader();
-        blockbuild = new BlockBuild();
+        blockbuild = new BlockBuildShader();
         try{
             shield = new ShieldShader();
         }catch(Throwable t){
@@ -40,15 +41,23 @@ public class Shaders{
             t.printStackTrace();
         }
         buildBeam = new BuildBeamShader();
-        build = new UnitBuild();
+        build = new UnitBuildShader();
         darkness = new DarknessShader();
         light = new LightShader();
         water = new SurfaceShader("water");
         mud = new SurfaceShader("mud");
         tar = new SurfaceShader("tar");
         slag = new SurfaceShader("slag");
+        cryofluid = new SurfaceShader("cryofluid");
         space = new SpaceShader("space");
+        //caustics = new SurfaceShader("caustics"){
+        //    @Override
+        //    public String textureName(){
+        //        return "caustics";
+        //    }
+        //};
         planet = new PlanetShader();
+        clouds = new CloudShader();
         planetGrid = new PlanetGridShader();
         atmosphere = new AtmosphereShader();
         unlit = new LoadShader("planet", "unlit");
@@ -87,6 +96,7 @@ public class Shaders{
         public Vec3 lightDir = new Vec3(1, 1, 1).nor();
         public Color ambientColor = Color.white.cpy();
         public Vec3 camDir = new Vec3();
+        public Planet planet;
 
         public PlanetShader(){
             super("planet", "planet");
@@ -94,11 +104,32 @@ public class Shaders{
 
         @Override
         public void apply(){
-            camDir.set(renderer.planets.cam.direction).rotate(Vec3.Y, renderer.planets.planet.getRotation());
+            camDir.set(renderer.planets.cam.direction).rotate(Vec3.Y, planet.getRotation());
 
             setUniformf("u_lightdir", lightDir);
             setUniformf("u_ambientColor", ambientColor.r, ambientColor.g, ambientColor.b);
             setUniformf("u_camdir", camDir);
+        }
+    }
+
+    public static class CloudShader extends LoadShader{
+        public Vec3 lightDir = new Vec3(1, 1, 1).nor();
+        public Color ambientColor = Color.white.cpy();
+        public Vec3 camDir = new Vec3();
+        public float alpha = 1f;
+        public Planet planet;
+
+        public CloudShader(){
+            super("planet", "clouds");
+        }
+
+        @Override
+        public void apply(){
+            camDir.set(renderer.planets.cam.direction).rotate(Vec3.Y, planet.getRotation());
+
+            setUniformf("u_alpha", alpha);
+            setUniformf("u_lightdir", lightDir);
+            setUniformf("u_ambientColor", ambientColor.r, ambientColor.g, ambientColor.b);
         }
     }
 
@@ -142,12 +173,16 @@ public class Shaders{
         }
     }
 
-    public static class UnitBuild extends LoadShader{
+    /** @deprecated transition class for mods; use UnitBuildShader instead. */
+    @Deprecated
+    public static class UnitBuild extends UnitBuildShader{}
+
+    public static class UnitBuildShader extends LoadShader{
         public float progress, time;
         public Color color = new Color();
         public TextureRegion region;
 
-        public UnitBuild(){
+        public UnitBuildShader(){
             super("unitbuild", "default");
         }
 
@@ -162,11 +197,12 @@ public class Shaders{
         }
     }
 
-    public static class BlockBuild extends LoadShader{
+    public static class BlockBuildShader extends LoadShader{
         public float progress;
         public TextureRegion region = new TextureRegion();
+        public float time;
 
-        public BlockBuild(){
+        public BlockBuildShader(){
             super("blockbuild", "default");
         }
 
@@ -175,7 +211,7 @@ public class Shaders{
             setUniformf("u_progress", progress);
             setUniformf("u_uv", region.u, region.v);
             setUniformf("u_uv2", region.u2, region.v2);
-            setUniformf("u_time", Time.time);
+            setUniformf("u_time", time);
             setUniformf("u_texsize", region.texture.width, region.texture.height);
         }
     }
@@ -224,7 +260,7 @@ public class Shaders{
             super(frag);
 
             Core.assets.load("sprites/space.png", Texture.class).loaded = t -> {
-                texture = (Texture)t;
+                texture = t;
                 texture.setFilter(TextureFilter.linear);
                 texture.setWrap(TextureWrap.mirroredRepeat);
             };
@@ -245,6 +281,8 @@ public class Shaders{
     }
 
     public static class SurfaceShader extends Shader{
+        Texture noiseTex;
+
         public SurfaceShader(String frag){
             super(getShaderFi("screenspace.vert"), getShaderFi(frag + ".frag"));
             loadNoise();
@@ -255,10 +293,14 @@ public class Shaders{
             loadNoise();
         }
 
+        public String textureName(){
+            return "noise";
+        }
+
         public void loadNoise(){
-            Core.assets.load("sprites/noise.png", Texture.class).loaded = t -> {
-                ((Texture)t).setFilter(TextureFilter.linear);
-                ((Texture)t).setWrap(TextureWrap.repeat);
+            Core.assets.load("sprites/" + textureName() + ".png", Texture.class).loaded = t -> {
+                t.setFilter(TextureFilter.linear);
+                t.setWrap(TextureWrap.repeat);
             };
         }
 
@@ -269,7 +311,11 @@ public class Shaders{
             setUniformf("u_time", Time.time);
 
             if(hasUniform("u_noise")){
-                Core.assets.get("sprites/noise.png", Texture.class).bind(1);
+                if(noiseTex == null){
+                    noiseTex = Core.assets.get("sprites/" + textureName() + ".png", Texture.class);
+                }
+
+                noiseTex.bind(1);
                 renderer.effectBuffer.getTexture().bind(0);
 
                 setUniformi("u_noise", 1);

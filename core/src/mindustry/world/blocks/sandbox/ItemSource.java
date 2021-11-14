@@ -24,6 +24,7 @@ public class ItemSource extends Block{
         configurable = true;
         saveConfig = true;
         noUpdateDisabled = true;
+        envEnabled = Env.any;
 
         config(Item.class, (ItemSourceBuild tile, Item item) -> tile.outputItem = item);
         configClear((ItemSourceBuild tile) -> tile.outputItem = null);
@@ -72,7 +73,7 @@ public class ItemSource extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.items(), () -> outputItem, this::configure);
+            ItemSelection.buildTable(ItemSource.this, table, content.items(), () -> outputItem, this::configure);
         }
 
         @Override

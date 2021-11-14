@@ -60,6 +60,7 @@ public enum Binding implements KeyBind{
     minimap(KeyCode.m),
     research(KeyCode.b),
     planet_map(KeyCode.n),
+    block_info(KeyCode.f1),
     toggle_menus(KeyCode.c),
     screenshot(KeyCode.p),
     toggle_power_lines(KeyCode.f5),

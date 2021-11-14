@@ -16,7 +16,6 @@ import mindustry.net.*;
 import mindustry.ui.*;
 import org.robovm.apple.coregraphics.*;
 import org.robovm.apple.foundation.*;
-import org.robovm.apple.glkit.*;
 import org.robovm.apple.uikit.*;
 import org.robovm.objc.block.*;
 
@@ -25,7 +24,7 @@ import java.util.*;
 import java.util.zip.*;
 
 import static mindustry.Vars.*;
-import static org.robovm.apple.foundation.NSPathUtilities.getDocumentsDirectory;
+import static org.robovm.apple.foundation.NSPathUtilities.*;
 
 //warnings for deprecated functions related to multi-window applications are not applicable here
 @SuppressWarnings("deprecation")
@@ -76,7 +75,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 class ChooserDelegate extends NSObject implements UIDocumentBrowserViewControllerDelegate{
                     @Override
                     public void didPickDocumentURLs(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
-
                     }
 
                     @Override
@@ -175,9 +173,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 forced = false;
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
-        }, new IOSApplicationConfiguration(){{
-            stencilFormat = GLKViewDrawableStencilFormat._8;
-        }});
+        }, new IOSApplicationConfiguration());
     }
 
     @Override
@@ -223,7 +219,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                 if(SaveIO.isSaveValid(file)){
                     try{
-                        SaveMeta meta = SaveIO.getMeta(new DataInputStream(new InflaterInputStream(file.read(Streams.DEFAULT_BUFFER_SIZE))));
+                        SaveMeta meta = SaveIO.getMeta(new DataInputStream(new InflaterInputStream(file.read(Streams.defaultBufferSize))));
                         if(meta.tags.containsKey("name")){
                             //is map
                             if(!ui.editor.isShown()){

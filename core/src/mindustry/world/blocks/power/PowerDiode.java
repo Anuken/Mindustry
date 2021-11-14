@@ -23,6 +23,7 @@ public class PowerDiode extends Block{
         group = BlockGroup.power;
         noUpdateDisabled = true;
         schematicPriority = 10;
+        envEnabled |= Env.space;
     }
 
     @Override
@@ -35,7 +36,7 @@ public class PowerDiode extends Block{
 
     @Override
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        Draw.rect(icon(Cicon.full), req.drawx(), req.drawy());
+        Draw.rect(fullIcon, req.drawx(), req.drawy());
         Draw.rect(arrow, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
     }
 
@@ -55,7 +56,7 @@ public class PowerDiode extends Block{
         public void updateTile(){
             super.updateTile();
 
-            if(front() == null || back() == null || !back().block.hasPower || !front().block.hasPower || back().team != front().team) return;
+            if(tile == null || front() == null || back() == null || !back().block.hasPower || !front().block.hasPower || back().team != front().team) return;
 
             PowerGraph backGraph = back().power.graph;
             PowerGraph frontGraph = front().power.graph;

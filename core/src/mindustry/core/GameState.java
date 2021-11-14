@@ -16,8 +16,12 @@ public class GameState{
     public int wave = 1;
     /** Wave countdown in ticks. */
     public float wavetime;
+    /** Logic tick. */
+    public double tick;
     /** Whether the game is in game over state. */
-    public boolean gameOver = false, serverPaused = false, wasTimeout;
+    public boolean gameOver = false, serverPaused = false;
+    /** Server ticks/second. Only valid in multiplayer. */
+    public int serverTps = -1;
     /** Map that is currently being played on. */
     public Map map = emptyMap;
     /** The current game rules. */
@@ -33,8 +37,9 @@ public class GameState{
     /** Current game state. */
     private State state = State.menu;
 
+    @Nullable
     public Unit boss(){
-        return teams.boss;
+        return teams.bosses.firstOpt();
     }
 
     public void set(State astate){

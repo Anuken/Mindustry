@@ -37,7 +37,7 @@ public class ItemStack implements Comparable<ItemStack>{
     }
 
     public static ItemStack[] mult(ItemStack[] stacks, float amount){
-        ItemStack[] copy = new ItemStack[stacks.length];
+        var copy = new ItemStack[stacks.length];
         for(int i = 0; i < copy.length; i++){
             copy[i] = new ItemStack(stacks[i].item, Mathf.round(stacks[i].amount * amount));
         }
@@ -45,7 +45,7 @@ public class ItemStack implements Comparable<ItemStack>{
     }
 
     public static ItemStack[] with(Object... items){
-        ItemStack[] stacks = new ItemStack[items.length / 2];
+        var stacks = new ItemStack[items.length / 2];
         for(int i = 0; i < items.length; i += 2){
             stacks[i / 2] = new ItemStack((Item)items[i], ((Number)items[i + 1]).intValue());
         }

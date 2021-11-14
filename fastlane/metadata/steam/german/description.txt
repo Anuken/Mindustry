@@ -3,11 +3,13 @@
 [h2]Spielmechanik[/h2]
 
 [list]
-[*] Baue komplexe Produktionsketten aus Förderbändern, um deine Geschütztürme mit Munition zu versorgen
-[*] Stelle Materialien her, um deine Fabrik zu vergrößern und sie vor Gegnerwellen zu schützen
-[*] Spiele mit deinen Freunden in plattformübergreifenden Partien oder fordere sie zum Kampf heraus
-[*] Es gibt immer etwas zu tun: Wenn du deine Kühlsysteme nicht im Blick behältst, könnte dein Reaktor explodieren!
-[*] Produziere Einheiten, die bei deiner Basis helfen oder den Gegner angreifen
+[*] Baue komplexe Produktionsketten aus Förderbändern, um deine Geschütztürme mit Munition zu versorgen und erweiterte Ressourcen zum Verbessern deiner Basis herzustellen
+[*] Benutze Produktionsblöcke, um eine große Vielfalt an Ressourcen herzustellen
+[*] Beschütze deine Basis vor Gegnerwellen
+[*] Spiele platformübergreifend mit deinen Freunden, oder fordere sie zu einem Team-basiertem PvP-Match hinaus
+[*] Transportiere Flüssigkeiten und bekämpfe die ständige Bedrohung von Feuerausbrüchen oder gegnerische Luftangriffe
+[*] Nutze deine Produktionsblöcke voll aus, indem du Schmiermittle und Kühlung besorgst
+[*] Stelle eine Vielfalt an Einheiten her, welche je nach Typ Angriffe und Verteidigung oder Abläufe in der Basis unterstützen können
 [/list]
 
 [img]{STEAM_APP_IMAGE}/extras/ezgif-1-8679abe089cd.gif[/img]
@@ -16,11 +18,12 @@
 
 [list]
 [*] Erobere den Planeten Serpulo, indem du über 250 prozedural generierte Sektoren und 16 handgemachte Karten eroberst
-[*] Stelle Materialien in eroberten Sektoren her, während du den nächsten Sektor eroberst
+[*] Erorbere ein Gebiet und stelle Fabriken auf, welche dir Ressourcen produzieren, während du den nächsten Sektor eroberst
 [*] Verteidige deine Sektoren vor regelmäßigen Invasionen
-[*] Transportiere Materialien zwischen deinen Sektoren
-[*] Schalte neue Blöcke in der Forschung frei
+[*] Koordiniere Ressourcenverteilung zwischen Sektoren mit Launchpads
+[*] Erforsche neue Blöcke, um deinen Fortschitt foranzutreiben
 [*] Schließe Missionen zusammen mit deinen Freunden ab
+[*] 130+ verschiedenste Blöcke
 [*] 33 verschiedene Einheiten
 [*] über 50 Erfolge
 [/list]
@@ -28,10 +31,10 @@
 [h2]Spielmodi[/h2]
 
 [list]
-[*] [b]Überleben[/b]: Baue Geschütztürme und verteidige Wellen von Gegnern. Bereite dich auf zwischenzeitliche Zerstörungsangriffe von flugfähigen Einheiten vor.
-[*] [b]Angriff[/b]: Stelle Einheiten her, um den gegnerischen Kern zu zerstören. Vergesse dabei nicht, deinen eigenen Kern zu schützen!
-[*] [b]PvP[/b]: Kämpfe gegen andere Spieler in Teams und zerstöre die gegnerischen Kerne.
-[*] [b]Sandkasten[/b]: Probiere deine Designs mit unendlichen Ressourcen und Gegnerwellen auf Anfrage aus.
+[*] [b]Überleben[/b]: Baue Geschütztürme, um deine Basis zu beschützen. Überlebe so lange wie möglich und starte deine Ressourcen, um mit ihnen zu forschen. Bereite deine Basis auf gegnerische Bossangriffe vor.
+[*] [b]Angriff[/b]: Baue Fabriken für Einheiten, die den gegnerischen Kern zerstören und währenddessen deinen beschützen. Erstelle eine Mischung aus defensive und offensive Einheiten, um dich zu unterstüzen. Aktiviere wahlweise eine KI, sodass der Gegner auch bauen kann.
+[*] [b]PvP[/b]: Kämpfe mit bis zu vier Teams um den Sieg und zerstöre die gegnerischen Kerne. Baue Einheiten oder greife die Gegner direkt an.
+[*] [b]Sandkasten[/b]: Spiele mit unendlichen Ressources und ohne Gegnergefahr. Benutze besondere Ressourcenquellen um Sachen auszuprobieren, oder erstelle Gegner auf Anfrage.
 [/list]
 
 [img]{STEAM_APP_IMAGE}/extras/2020-11-30_10-46-02.gif[/img]
@@ -39,18 +42,24 @@
 [h2]Mehrspielermodus[/h2]
 
 [list]
+[*] 16 eingebaute Karten für eigene Spiele
+[*] Spielt gemeinsam, gegeneinander oder im Sandkasten
 [*] Trete einem öffentlichen Server bei oder eröffne ein Spiel für deine Freunde
-[*] Ändere die Spielregeln: Kosten, Schadenswerte und mehr!
+[*] Anpassbare Spielregeln: Verändere Blockkosten, Gegnerstärke, Anfangsitems, Wellen und mehr!
 [*] Kombiniere PvP und PvE (player versus enemies)
 [/list]
 
 [h2]Karteneditor[/h2]
 
 [list]
+[*] Male Terrain
+[*] Editiere und sehe eine Vorschau deiner Karte im Spiel
 [*] Passe die Werkzeuge nach deinen Vorstellungen an
-[*] Viele Filter für das prozedurale Generieren der Umgebung
-[*] Verschönere die Landschaft mit Rauschen, Verzerrungen, Erosion, Symmetrie und Zufallsgenerierung
-[*] Modifiziere die Gegnerwellen
+[*] Nützliches Generationssystem für Karten mit vielen verschiedenen Filtern für das Bearbeiten vom Terrain
+[*] Verschönere die Landschaft mit Rauschen, Verzerrungen, Glätte, Erosion, Symmetrie, Erzgeneration und Zufallsgenerierung
+[*] Lasse Erze, Flüsse und andere Ressourcen automatisch generieren
+[*] Konfiguriere die Gegnerwellen
 [*] Teile deine Karten im Steam-Workshop
+[*] Gib der Karte besondere Spielregeln
 [*] Nutze über 80 verschiedene Umgebungsblöcke
 [/list]

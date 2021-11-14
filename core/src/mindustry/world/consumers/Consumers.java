@@ -16,6 +16,14 @@ public class Consumers{
     public final Bits itemFilters = new Bits(Vars.content.items().size);
     public final Bits liquidfilters = new Bits(Vars.content.liquids().size);
 
+    public boolean consumesItem(Item item){
+        return itemFilters.get(item.id);
+    }
+
+    public boolean consumesLiquid(Liquid liq){
+        return liquidfilters.get(liq.id);
+    }
+
     public boolean any(){
         return results != null && results.length > 0;
     }
@@ -66,6 +74,11 @@ public class Consumers{
     /** Creates a consumer which only consumes power when the condition is met. */
     public <T extends Building> ConsumePower powerCond(float usage, Boolf<T> cons){
         return add(new ConditionalConsumePower(usage, (Boolf<Building>)cons));
+    }
+
+    /** Creates a consumer that consumes a dynamic amount of power. */
+    public <T extends Building> ConsumePower powerDynamic(Floatf<T> usage){
+        return add(new DynamicConsumePower((Floatf<Building>)usage));
     }
 
     /**

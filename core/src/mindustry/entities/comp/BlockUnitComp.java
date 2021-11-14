@@ -4,7 +4,6 @@ import arc.graphics.g2d.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
@@ -19,7 +18,7 @@ abstract class BlockUnitComp implements Unitc{
 
         //sets up block stats
         maxHealth(tile.block.health);
-        health(tile.health());
+        health(tile.health);
         hitSize(tile.block.size * tilesize * 0.7f);
         set(tile);
     }
@@ -34,7 +33,7 @@ abstract class BlockUnitComp implements Unitc{
     @Replace
     @Override
     public TextureRegion icon(){
-        return tile.block.icon(Cicon.full);
+        return tile.block.fullIcon;
     }
 
     @Override

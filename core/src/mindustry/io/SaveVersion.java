@@ -1,6 +1,7 @@
 package mindustry.io;
 
 import arc.*;
+import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -12,10 +13,11 @@ import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
-import mindustry.maps.*;
+import mindustry.maps.Map;
 import mindustry.world.*;
 
 import java.io.*;
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -24,6 +26,9 @@ public abstract class SaveVersion extends SaveFileReader{
 
     //HACK stores the last read build of the save file, valid after read meta call
     protected int lastReadBuild;
+    //stores entity mappings for use after readEntityMapping
+    //if null, fall back to EntityMapping's values
+    protected @Nullable Prov[] entityMapping;
 
     public SaveVersion(int version){
         this.version = version;
@@ -87,6 +92,7 @@ public abstract class SaveVersion extends SaveFileReader{
             "build", Version.build,
             "mapname", state.map.name(),
             "wave", state.wave,
+            "tick", state.tick,
             "wavetime", state.wavetime,
             "stats", JsonIO.write(state.stats),
             "rules", JsonIO.write(state.rules),
@@ -105,6 +111,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
         state.wave = map.getInt("wave");
         state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
+        state.tick = map.getFloat("tick");
         state.stats = JsonIO.read(GameStats.class, map.get("stats", "{}"));
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
         if(state.rules.spawns.isEmpty()) state.rules.spawns = waves.get();
@@ -284,7 +291,7 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
-    public void writeEntities(DataOutput stream) throws IOException{
+    public void writeTeamBlocks(DataOutput stream) throws IOException{
         //write team data with entities.
         Seq<TeamData> data = state.teams.getActive().copy();
         if(!data.contains(Team.sharded.data())) data.add(Team.sharded.data());
@@ -300,7 +307,9 @@ public abstract class SaveVersion extends SaveFileReader{
                 TypeIO.writeObject(Writes.get(stream), block.config);
             }
         }
+    }
 
+    public void writeWorldEntities(DataOutput stream) throws IOException{
         stream.writeInt(Groups.all.count(Entityc::serialize));
         for(Entityc entity : Groups.all){
             if(!entity.serialize()) continue;
@@ -312,7 +321,21 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
-    public void readEntities(DataInput stream) throws IOException{
+    public void writeEntityMapping(DataOutput stream) throws IOException{
+        stream.writeShort(EntityMapping.customIdMap.size);
+        for(var entry : EntityMapping.customIdMap.entries()){
+            stream.writeShort(entry.key);
+            stream.writeUTF(entry.value);
+        }
+    }
+
+    public void writeEntities(DataOutput stream) throws IOException{
+        writeEntityMapping(stream);
+        writeTeamBlocks(stream);
+        writeWorldEntities(stream);
+    }
+
+    public void readTeamBlocks(DataInput stream) throws IOException{
         int teamc = stream.readInt();
 
         for(int i = 0; i < teamc; i++){
@@ -333,21 +356,46 @@ public abstract class SaveVersion extends SaveFileReader{
                 }
             }
         }
+    }
+
+    public void readWorldEntities(DataInput stream) throws IOException{
+        //entityMapping is null in older save versions, so use the default
+        Prov[] mapping = this.entityMapping == null ? EntityMapping.idMap : this.entityMapping;
 
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
             readChunk(stream, true, in -> {
-                byte typeid = in.readByte();
-                if(EntityMapping.map(typeid) == null){
+                int typeid = in.readUnsignedByte();
+                if(mapping[typeid] == null){
                     in.skipBytes(lastRegionLength - 1);
                     return;
                 }
 
-                Entityc entity = (Entityc)EntityMapping.map(typeid).get();
+                Entityc entity = (Entityc)mapping[typeid].get();
                 entity.read(Reads.get(in));
                 entity.add();
             });
         }
+    }
+
+    public void readEntityMapping(DataInput stream) throws IOException{
+        //copy entityMapping for further mutation; will be used in readWorldEntities
+        entityMapping = Arrays.copyOf(EntityMapping.idMap, EntityMapping.idMap.length);
+
+        short amount = stream.readShort();
+        for(int i = 0; i < amount; i++){
+            //everything that corresponded to this ID in this save goes by this name
+            //so replace the prov in the current mapping with the one found with this name
+            short id = stream.readShort();
+            String name = stream.readUTF();
+            entityMapping[id] = EntityMapping.map(name);
+        }
+    }
+
+    public void readEntities(DataInput stream) throws IOException{
+        readEntityMapping(stream);
+        readTeamBlocks(stream);
+        readWorldEntities(stream);
     }
 
     public void readContentHeader(DataInput stream) throws IOException{
@@ -362,7 +410,8 @@ public abstract class SaveVersion extends SaveFileReader{
 
             for(int j = 0; j < total; j++){
                 String name = stream.readUTF();
-                map[type.ordinal()][j] = content.getByName(type, fallback.get(name, name));
+                //fallback only for blocks
+                map[type.ordinal()][j] = content.getByName(type, type == ContentType.block ? fallback.get(name, name) : name);
             }
         }
 

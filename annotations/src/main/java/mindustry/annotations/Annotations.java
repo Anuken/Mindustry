@@ -118,7 +118,7 @@ public class Annotations{
         /**
          * The region name to load. Variables can be used:
          * "@" -> block name
-         * "$size" -> block size
+         * "@size" -> block size
          * "#" "#1" "#2" -> index number, for arrays
          * */
         String value();
@@ -177,12 +177,12 @@ public class Annotations{
     //region remote
 
     public enum PacketPriority{
+        /** Does not get handled unless client is connected. */
+        low,
         /** Gets put in a queue and processed if not connected. */
         normal,
         /** Gets handled immediately, regardless of connection status. */
         high,
-        /** Does not get handled unless client is connected. */
-        low
     }
 
     /** A set of two booleans, one specifying server and one specifying client. */

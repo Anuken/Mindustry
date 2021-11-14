@@ -13,6 +13,7 @@ import com.android.dx.dex.cf.*;
 import com.android.dx.dex.file.DexFile;
 import com.android.dx.merge.*;
 import dalvik.system.*;
+import mindustry.mod.*;
 import rhino.*;
 
 import java.io.*;
@@ -30,23 +31,6 @@ public class AndroidRhinoContext{
      * @return a context prepared for android
      */
     public static Context enter(File cacheDirectory){
-        if(!SecurityController.hasGlobal())
-            SecurityController.initGlobal(new SecurityController(){
-                @Override
-                public GeneratedClassLoader createClassLoader(ClassLoader classLoader, Object o){
-                    return Context.getCurrentContext().createClassLoader(classLoader);
-                }
-
-                @Override
-                public Object getDynamicSecurityDomain(Object o){
-                    return null;
-                }
-
-                @Override
-                public Object callWithDomain(Object o, Context context, Callable callable, Scriptable scriptable, Scriptable scriptable1, Object[] objects){
-                    return null;
-                }
-            });
 
         AndroidContextFactory factory;
         if(!ContextFactory.hasExplicitGlobal()){
@@ -175,7 +159,7 @@ public class AndroidRhinoContext{
             }catch(IOException e){
                 e.printStackTrace();
             }
-            android.content.Context context = ((AndroidApplication) Core.app).getContext();
+            android.content.Context context = (android.content.Context)((AndroidApplication)Core.app);
             return new DexClassLoader(dexFile.getPath(), VERSION.SDK_INT >= 21 ? context.getCodeCacheDir().getPath() : context.getCacheDir().getAbsolutePath(), null, getParent()).loadClass(name);
         }
 

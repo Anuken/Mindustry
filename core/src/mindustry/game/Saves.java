@@ -55,6 +55,16 @@ public class Saves{
             }
         }
 
+        //clear saves from build <130 that had the new naval sectors.
+        saves.removeAll(s -> {
+            if(s.getSector() != null && (s.getSector().id == 108 || s.getSector().id == 216) && s.meta.build <= 130 && s.meta.build > 0){
+                s.getSector().clearInfo();
+                s.file.delete();
+                return true;
+            }
+            return false;
+        });
+
         lastSectorSave = saves.find(s -> s.isSector() && s.getName().equals(Core.settings.getString("last-sector-save", "<none>")));
 
         //automatically assign sector save slots
@@ -145,6 +155,7 @@ public class Saves{
         SaveSlot slot = new SaveSlot(getNextSlotFile());
         slot.importFile(file);
         slot.setName(file.nameWithoutExtension());
+
         saves.add(slot);
         slot.meta = SaveIO.getMeta(slot.file);
         current = slot;
@@ -214,7 +225,7 @@ public class Saves{
             }
             previewExecutor.submit(() -> {
                 try{
-                    previewFile().writePNG(renderer.minimap.getPixmap());
+                    previewFile().writePng(renderer.minimap.getPixmap());
                     requestedPreview = false;
                 }catch(Throwable t){
                     Log.err(t);
@@ -289,7 +300,7 @@ public class Saves{
             return meta.mods;
         }
 
-        public Sector getSector(){
+        public @Nullable Sector getSector(){
             return meta == null || meta.rules == null ? null : meta.rules.sector;
         }
 
@@ -320,6 +331,10 @@ public class Saves{
         public void importFile(Fi from) throws IOException{
             try{
                 from.copyTo(file);
+                if(previewFile().exists()){
+                    requestedPreview = false;
+                    previewFile().delete();
+                }
             }catch(Exception e){
                 throw new IOException(e);
             }

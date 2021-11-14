@@ -7,6 +7,9 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 
 public class RailBulletType extends BulletType{
+    //for calculating the furthest point
+    static float furthest = 0;
+
     public Effect pierceEffect = Fx.hitBulletSmall, updateEffect = Fx.none;
     /** Multiplier of damage decreased per health pierced. */
     public float pierceDamageFactor = 1f;
@@ -16,6 +19,7 @@ public class RailBulletType extends BulletType{
     public float updateEffectSeg = 20f;
 
     public RailBulletType(){
+        speed = 0f;
         pierceBuilding = true;
         pierce = true;
         reflectable = false;
@@ -23,7 +27,6 @@ public class RailBulletType extends BulletType{
         despawnEffect = Fx.none;
         collides = false;
         lifetime = 1f;
-        speed = 0.01f;
     }
 
     @Override
@@ -47,6 +50,11 @@ public class RailBulletType extends BulletType{
 
         //subtract health from each consecutive pierce
         b.damage -= Math.min(b.damage, sub);
+
+        //bullet was stopped, decrease furthest distance
+        if(b.damage <= 0f){
+            furthest = Math.min(furthest, b.dst(pos));
+        }
     }
 
     @Override
@@ -54,10 +62,11 @@ public class RailBulletType extends BulletType{
         super.init(b);
 
         b.fdata = length;
+        furthest = length;
         Damage.collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), length, false, false);
-        float resultLen = b.fdata;
+        float resultLen = furthest;
 
-        Vec2 nor = Tmp.v1.set(b.vel).nor();
+        Vec2 nor = Tmp.v1.trns(b.rotation(), 1f).nor();
         for(float i = 0; i <= resultLen; i += updateEffectSeg){
             updateEffect.at(b.x + nor.x * i, b.y + nor.y * i, b.rotation());
         }
@@ -69,8 +78,9 @@ public class RailBulletType extends BulletType{
     }
 
     @Override
-    public void hitEntity(Bullet b, Hitboxc entity, float initialHealth){
-        handle(b, entity, initialHealth);
+    public void hitEntity(Bullet b, Hitboxc entity, float health){
+        super.hitEntity(b, entity, health);
+        handle(b, entity, health);
     }
 
     @Override
