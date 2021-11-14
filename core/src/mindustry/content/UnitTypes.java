@@ -2495,12 +2495,12 @@ public class UnitTypes implements ContentList{
             payloadCapacity = Mathf.sqr(2f) * tilePayload;
 
             setEnginesMirror(
-            new UnitEngine(34 / 4f, 30 / 4f, 3f, 45f),
+            new UnitEngine(34 / 4f, 31 / 4f, 3f, 45f),
             new UnitEngine(35 / 4f, -38 / 4f, 3f, 315f)
             );
 
             weapons.add(new Weapon("incite-weapon"){{
-                reload = 35f;
+                reload = 30f;
                 x = 4f;
                 y = 6.25f;
                 shootY = 5.75f;
@@ -2514,6 +2514,7 @@ public class UnitTypes implements ContentList{
                     height = 12f;
                     shootEffect = Fx.sparkShoot;
                     smokeEffect = Fx.shootBigSmoke;
+                    pierceCap = 2;
                     pierce = true;
                     pierceBuilding = true;
                     hitColor = backColor = trailColor = Pal.bulletYellowBack;

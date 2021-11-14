@@ -49,10 +49,16 @@ public abstract class BasicGenerator implements WorldGenerator{
     }
 
     public void median(int radius, double percentile){
+        median(radius, percentile, null);
+    }
+
+    public void median(int radius, double percentile, @Nullable Block targetFloor){
         short[] blocks = new short[tiles.width * tiles.height];
         short[] floors = new short[blocks.length];
 
         tiles.each((x, y) -> {
+            if(targetFloor != null && tiles.getn(x, y).floor() != targetFloor) return;
+
             ints1.clear();
             ints2.clear();
             Geometry.circle(x, y, width, height, radius, (cx, cy) -> {
@@ -67,6 +73,8 @@ public abstract class BasicGenerator implements WorldGenerator{
         });
 
         pass((x, y) -> {
+            if(targetFloor != null && floor != targetFloor) return;
+
             block = content.block(blocks[x + y * width]);
             floor = content.block(floors[x + y * width]);
         });

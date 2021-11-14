@@ -110,7 +110,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 if(floor != Blocks.redIce){
                     float noise = noise(x + 782, y, 7, 0.8f, 280f, 1f);
                     if(noise > 0.62f){
-                        if(noise > 0.7f){
+                        if(noise > 0.635f){
+                            //TODO slag must be rounded, no single occurrences
                             floor = Blocks.slag;
                         }else{
                             floor = Blocks.yellowStone;
@@ -135,6 +136,9 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         distort(10f, 12f);
         distort(5f, 7f);
+
+        //smooth out slag to prevent random 1-tile patches
+        median(3, 0.6, Blocks.slag);
 
         pass((x, y) -> {
             float max = 0;
@@ -206,6 +210,12 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                     Tile other = tiles.get(pos.x + tile.x + 1, pos.y + tile.y + 1);
                     other.setFloor(Blocks.steamVent.asFloor());
                 }
+            }
+        }
+
+        for(Tile tile : tiles){
+            if(tile.overlay().needsSurface && !tile.floor().hasSurface()){
+                tile.setOverlay(Blocks.air);
             }
         }
 
