@@ -711,9 +711,9 @@ public class Mods implements Loadable{
         }
     }
 
-    /** Tries to find the config file... */
+    /** Tries to find the config file of a mod/plugin. */
     @Nullable
-    private ModMeta findMeta(Fi file){
+    public ModMeta findMeta(Fi file){
         Fi metaFile =
             file.child("mod.json").exists() ?       file.child("mod.json") :
             file.child("mod.hjson").exists() ?      file.child("mod.hjson") :
@@ -729,7 +729,8 @@ public class Mods implements Loadable{
         return meta;
     }
 
-    /** Resolves the loading order of the mods for dependencies using their internal names */
+    /** Resolves the loading order of a list mods/plugins using their internal names.
+     * It also skips non-mods files or folders. */
     public Seq<Fi> resolveDependencies(Seq<Fi> files){
         ObjectMap<String, Fi> fileMapping = new ObjectMap<>(files.size);
         ObjectMap<String, Seq<String>> dependencies = new ObjectMap<>(files.size);
@@ -760,6 +761,11 @@ public class Mods implements Loadable{
             }
         }
 
+        // Adds the invalid mods
+        for(String missingMod : dependencies.keys()){
+            if(!ordered.contains(missingMod)) ordered.add(missingMod, 0);
+        }
+
         Seq<Fi> resolved = ordered.orderedItems().map(fileMapping::get);
         // Since the resolver explores the dependencies from leaves to the root, reverse the seq
         resolved.reverse();
@@ -771,17 +777,12 @@ public class Mods implements Loadable{
         visited.add(modName);
 
         for(String dependency : dependencies.get(modName)){
-            if(visited.contains(dependency)){
-                // What should I do ? throw or skip ?
-                // throw new ModLoadException("@ has circular dependencies.", modName);
-            }else if(dependencies.containsKey(dependency)){
+            // Checks if the dependency tree isn't circular and that the dependency is not missing
+            if(!visited.contains(dependency) && dependencies.containsKey(dependency)){
                 // Skips if the dependency was already explored in a separate tree
                 if(ordered.contains(dependency)) continue;
                 ordered.add(dependency);
                 resolveDependencies(dependency, dependencies, ordered, visited);
-            }else{
-                // What should I do ? throw or skip ?
-                // throw new ModLoadException("@ is missing for @.", dependency, modName);
             }
         }
     }
