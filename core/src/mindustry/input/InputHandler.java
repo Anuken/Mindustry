@@ -405,7 +405,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, unit.team.color, unit));
             if(!player.dead()){
-                Fx.unitSpirit.at(player.x, player.y, 0f, unit);
+                Fx.unitSpirit.at(player.x, player.y, 0f, unit.team.color, unit);
             }
         }else if(net.server()){
             //reject forwarding the packet if the unit was dead, AI or team

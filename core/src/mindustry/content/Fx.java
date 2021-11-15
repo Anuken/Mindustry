@@ -83,10 +83,11 @@ public class Fx{
 
         boolean block = select instanceof BlockUnitc;
 
-        mixcol(e.color, 1f);
+        mixcol(Pal.accent, 1f);
         alpha(e.fout());
         rect(block ? ((BlockUnitc)select).tile().block.fullIcon : select.type.fullIcon, select.x, select.y, block ? 0f : select.rotation - 90f);
         alpha(1f);
+        mixcol(e.color, 1f);
         Lines.stroke(e.fslope());
         Lines.square(select.x, select.y, e.fout() * select.hitSize * 2f, 45);
         Lines.stroke(e.fslope() * 2f);
@@ -111,7 +112,7 @@ public class Fx{
     unitSpirit = new Effect(17f, e -> {
         if(!(e.data instanceof Position to)) return;
 
-        color(Pal.accent);
+        color(e.color);
 
         Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interp.pow2In);
         float x = Tmp.v1.x, y = Tmp.v1.y;
