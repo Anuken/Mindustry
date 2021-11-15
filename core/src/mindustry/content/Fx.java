@@ -83,7 +83,7 @@ public class Fx{
 
         boolean block = select instanceof BlockUnitc;
 
-        mixcol(Pal.accent, 1f);
+        mixcol(e.color, 1f);
         alpha(e.fout());
         rect(block ? ((BlockUnitc)select).tile().block.fullIcon : select.type.fullIcon, select.x, select.y, block ? 0f : select.rotation - 90f);
         alpha(1f);
@@ -101,7 +101,7 @@ public class Fx{
         float p = Draw.scl;
         Draw.scl *= scl;
 
-        mixcol(Pal.accent, 1f);
+        mixcol(e.color, 1f);
         rect(select.type.fullIcon, select.x, select.y, select.rotation - 90f);
         reset();
 
