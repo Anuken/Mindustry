@@ -2,22 +2,15 @@ package mindustry.world.consumers;
 
 import arc.func.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.world.meta.*;
 
 public class ConsumeItemDynamic extends Consume{
     public final Func<Building, ItemStack[]> items;
 
     public <T extends Building> ConsumeItemDynamic(Func<T, ItemStack[]> items){
         this.items = (Func<Building, ItemStack[]>)items;
-    }
-
-    @Override
-    public void applyItemFilter(Bits filter){
-        //this must be done dynamically
     }
 
     @Override
@@ -53,16 +46,6 @@ public class ConsumeItemDynamic extends Consume{
     }
 
     @Override
-    public String getIcon(){
-        return "icon-item";
-    }
-
-    @Override
-    public void update(Building build){
-
-    }
-
-    @Override
     public void trigger(Building build){
         for(ItemStack stack : items.get(build)){
             build.items.remove(stack);
@@ -72,10 +55,5 @@ public class ConsumeItemDynamic extends Consume{
     @Override
     public boolean valid(Building build){
         return build.items != null && build.items.has(items.get(build));
-    }
-
-    @Override
-    public void display(Stats stats){
-        //should be handled by the block
     }
 }
