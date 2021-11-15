@@ -567,6 +567,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         liquids.add(liquid, amount);
     }
 
+    //TODO entire liquid system is awful
     public void dumpLiquid(Liquid liquid){
         dumpLiquid(liquid, 2f);
     }
@@ -585,9 +586,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
-            Building other = proximity.get((i + dump) % proximity.size);
 
-            if(outputDir != -1 && (relativeTo(other) + rotation) % 4 != outputDir) return;
+            Building other = proximity.get((i + dump) % proximity.size);
+            if(outputDir != -1 && (outputDir + rotation) % 4 != relativeTo(other)) continue;
 
             other = other.getLiquidDestination(self(), liquid);
 

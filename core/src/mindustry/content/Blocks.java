@@ -60,7 +60,7 @@ public class Blocks implements ContentList{
     //crafting
     siliconSmelter, siliconCrucible, siliconArcFurnace, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
-    oxidizer, heatReactor, carbideCrucible,
+    electrolyzer, oxidizer, heatReactor, carbideCrucible,
     cellSynthesisChamber,
 
     //sandbox
@@ -935,6 +935,7 @@ public class Blocks implements ContentList{
             craftTime = 30f;
             size = 2;
             hasPower = hasItems = hasLiquids = true;
+            rotatePlan = false;
 
             consumes.liquid(Liquids.oil, 0.1f);
             consumes.power(0.7f);
@@ -946,10 +947,46 @@ public class Blocks implements ContentList{
             consumes.power(0.50f);
         }};
 
+        //TODO better name
+        electrolyzer = new GenericCrafter("electrolyzer"){{
+            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
+            size = 3;
+
+            craftTime = 10f;
+            rotate = true;
+
+            liquidCapacity = 100f;
+
+            consumes.liquid(Liquids.water, 1f);
+            consumes.power(2f);
+
+            drawer = new DrawMulti(
+                new DrawRegion("-bottom"),
+                new DrawLiquidRegion(Liquids.water),
+                new DrawBubbles(Color.valueOf("7693e3")){{
+                    sides = 10;
+                    recurrence = 3f;
+                    spread = 6;
+                    radius = 1.5f;
+                    amount = 20;
+                }},
+                new DrawRegion(),
+                new DrawLiquidOutputs(),
+                new DrawRegion("-top"),
+                new DrawGlowRegion(){{
+                    alpha = 0.5f;
+                    color = new Color(1f, 0.22f, 0.22f);
+                }}
+            );
+            iconOverride = new String[]{"-bottom", "", "-top"};
+
+            outputLiquids = LiquidStack.with(Liquids.ozone, 0.5f, Liquids.hydrogen, 0.5f);
+            liquidOutputDirections = new int[]{1, 3};
+        }};
+
         oxidizer = new HeatProducer("oxidizer"){{
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
-            //TODO bigger?
-            size = 2;
+            size = 3;
 
             //TODO multi liquid output
             //converts oxygen (?) + beryllium into heat + oxide

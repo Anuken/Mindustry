@@ -1,5 +1,6 @@
 package mindustry.world.blocks.production;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
@@ -13,6 +14,7 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
@@ -38,6 +40,8 @@ public class GenericCrafter extends Block{
     public boolean legacyReadWarmup = false;
 
     public DrawBlock drawer = new DrawBlock();
+    /** If set, the icon is overridden to be these strings, in order. Each string is a suffix. */
+    public String[] iconOverride = null;
 
     public GenericCrafter(String name){
         super(name);
@@ -48,6 +52,7 @@ public class GenericCrafter extends Block{
         sync = true;
         ambientSoundVolume = 0.03f;
         flags = EnumSet.of(BlockFlag.factory);
+        drawArrow = false;
     }
 
     @Override
@@ -69,19 +74,48 @@ public class GenericCrafter extends Block{
     public void setBars(){
         super.setBars();
 
-        //set up liquid bars for multiple liquid outputs; TODO multiple inputs not yet supported due to inherent complexity
-        //TODO this will currently screw up input display if input liquids are available - no good way to fix that yet
-        if(outputLiquids != null && outputLiquids.length > 1){
+        //set up liquid bars for multiple liquid outputs
+        //TODO this will currently screw up input display if input liquids are filters - no good way to fix that yet
+        if(outputLiquids != null && outputLiquids.length > 0){
             bars.remove("liquid");
 
+            Seq<Liquid> consumed = new Seq<>();
+
+            //find list of liquids consumed
+            if(consumes.has(ConsumeType.liquid)){
+                var consl = consumes.get(ConsumeType.liquid);
+                if(consl instanceof ConsumeLiquid liq){
+                    consumed.add(liq.liquid);
+                }else if(consl instanceof ConsumeLiquids multi){
+                    for(var stack : multi.liquids){
+                        consumed.add(stack.liquid);
+                    }
+                }
+            }
+
+            //display consumed first
+            for(var liq : consumed){
+                bars.add("liquid-consume-" + liq.name, entity -> new Bar(
+                    () -> liq.localizedName,
+                    liq::barColor,
+                    () -> entity.liquids.get(liq) / liquidCapacity)
+                );
+            }
+
+            //then display output buffer
             for(var stack : outputLiquids){
-                bars.add("liquid-" + stack.liquid.name, entity -> new Bar(
+                bars.add("liquid-output-" + stack.liquid.name, entity -> new Bar(
                     () -> stack.liquid.localizedName,
                     () -> stack.liquid.barColor(),
                     () -> entity.liquids.get(stack.liquid) / liquidCapacity)
                 );
             }
         }
+    }
+
+    @Override
+    public boolean rotatedOutput(int x, int y){
+        return false;
     }
 
     @Override
@@ -93,13 +127,13 @@ public class GenericCrafter extends Block{
 
     @Override
     public void init(){
-        outputsLiquid = outputLiquid != null;
         if(outputItems == null && outputItem != null){
             outputItems = new ItemStack[]{outputItem};
         }
         if(outputLiquids == null && outputLiquid != null){
             outputLiquids = new LiquidStack[]{outputLiquid};
         }
+        outputsLiquid = outputLiquids != null;
         super.init();
     }
 
@@ -114,6 +148,13 @@ public class GenericCrafter extends Block{
 
     @Override
     public TextureRegion[] icons(){
+        if(iconOverride != null){
+            var out = new TextureRegion[iconOverride.length];
+            for(int i = 0; i < out.length; i++){
+                out[i] = Core.atlas.find(name + iconOverride[i]);
+            }
+            return out;
+        }
         return drawer.icons(this);
     }
 

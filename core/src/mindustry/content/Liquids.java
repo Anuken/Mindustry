@@ -58,17 +58,18 @@ public class Liquids implements ContentList{
         }};
 
         //TODO reactivity, etc
-        ozone = new Liquid("ozone", Color.valueOf("bdd7ff")){{
+        ozone = new Liquid("ozone", Color.valueOf("f099da")){{
             gas = true;
-            barColor = Color.valueOf("97bdf7");
+            barColor = Color.valueOf("d699f0");
             explosiveness = 1f;
             flammability = 1f;
         }};
 
         //TODO combustion
-        hydrogen = new Liquid("hydrogen", Color.valueOf("e8d1ff")){{
+        hydrogen = new Liquid("hydrogen", Color.valueOf("97a5f7")){{
             gas = true;
-            barColor = Color.valueOf("c599f0");
+            barColor = Color.valueOf("7d8be0");
+            flammability = 1f;
         }};
 
         //TODO dicyanoacetylene

@@ -7,6 +7,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.production.GenericCrafter.*;
 
 public class DrawGlow extends DrawBlock{
+    public String suffix = "-top";
     public float glowAmount = 0.9f, glowScale = 3f;
     public TextureRegion top;
 
@@ -20,6 +21,6 @@ public class DrawGlow extends DrawBlock{
 
     @Override
     public void load(Block block){
-        top = Core.atlas.find(block.name + "-top");
+        top = Core.atlas.find(block.name + suffix);
     }
 }

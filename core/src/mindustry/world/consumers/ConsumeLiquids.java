@@ -2,6 +2,7 @@ package mindustry.world.consumers;
 
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -38,7 +39,7 @@ public class ConsumeLiquids extends Consume{
             int i = 0;
             for(var stack : liquids){
                 c.add(new ReqImage(stack.liquid.uiIcon,
-                () -> build.liquids != null && build.liquids.get(stack.liquid) >= stack.amount * build.delta())).padRight(8);
+                () -> build.liquids.get(stack.liquid) >= stack.amount * build.delta())).size(Vars.iconMed).padRight(8);
                 if(++i % 4 == 0) c.row();
             }
         }).left();
@@ -63,6 +64,7 @@ public class ConsumeLiquids extends Consume{
 
     @Override
     public void display(Stats stats){
+        //TODO display is wrong
         stats.add(booster ? Stat.booster : Stat.input, StatValues.liquids(stats.timePeriod, stats.timePeriod >= 0, liquids));
     }
 

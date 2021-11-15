@@ -1,7 +1,10 @@
 package mindustry.world.draw;
 
 import arc.graphics.g2d.*;
+import arc.util.*;
+import mindustry.entities.units.*;
 import mindustry.world.*;
+import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.production.GenericCrafter.*;
 
 /** combined several DrawBlocks into one */
@@ -21,6 +24,13 @@ public class DrawMulti extends DrawBlock{
     public void draw(GenericCrafterBuild build){
         for(var draw : drawers){
             draw.draw(build);
+        }
+    }
+
+    @Override
+    public void drawPlan(GenericCrafter crafter, BuildPlan plan, Eachable<BuildPlan> list){
+        for(var draw : drawers){
+            draw.drawPlan(crafter, plan, list);
         }
     }
 
