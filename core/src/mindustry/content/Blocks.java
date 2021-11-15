@@ -60,7 +60,7 @@ public class Blocks implements ContentList{
     //crafting
     siliconSmelter, siliconCrucible, siliconArcFurnace, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
-    heatReactor, carbideCrucible,
+    oxidizer, heatReactor, carbideCrucible,
     cellSynthesisChamber,
 
     //sandbox
@@ -75,13 +75,16 @@ public class Blocks implements ContentList{
     //transport
     conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
     overflowGate, underflowGate, massDriver,
+
+    //transport - alternate
     duct, ductRouter, ductBridge, ductUnloader,
     surgeConveyor, surgeRouter,
 
     //liquid
-    mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidContainer, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
+    mechanicalPump, rotaryPump, impulsePump, conduit, pulseConduit, platedConduit, liquidRouter, liquidContainer, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
 
-    reinforcedConduit, reinforcedBridgeConduit, reinforcedLiquidRouter, reinforcedLiquidContainer, reinforcedLiquidTank,
+    //liquid - reinforced
+    reinforcedPump, reinforcedConduit, reinforcedBridgeConduit, reinforcedLiquidRouter, reinforcedLiquidContainer, reinforcedLiquidTank,
 
     //power
     combustionGenerator, thermalGenerator, steamGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
@@ -943,11 +946,21 @@ public class Blocks implements ContentList{
             consumes.power(0.50f);
         }};
 
+        oxidizer = new HeatProducer("oxidizer"){{
+            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
+            //TODO bigger?
+            size = 2;
+
+            //TODO multi liquid output
+            //converts oxygen (?) + beryllium into heat + oxide
+        }};
+
         heatReactor = new HeatProducer("heat-reactor"){{
             //TODO quadvent
+            //TODO coolant?
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
             size = 3;
-            consumeTime = 60f * 10f;
+            craftTime = 60f * 10f;
             consumes.item(Items.fissileMatter, 1);
         }};
 
@@ -1370,7 +1383,7 @@ public class Blocks implements ContentList{
             size = 2;
         }};
 
-        thermalPump = new Pump("thermal-pump"){{
+        impulsePump = new Pump("impulse-pump"){{
             requirements(Category.liquid, with(Items.copper, 80, Items.metaglass, 90, Items.silicon, 30, Items.titanium, 40, Items.thorium, 35));
             pumpAmount = 0.22f;
             consumes.power(1.3f);
@@ -1437,6 +1450,21 @@ public class Blocks implements ContentList{
             canOverdrive = false;
             pulse = true;
             consumes.power(0.30f);
+        }};
+
+        //reinforced stuff
+
+        //TODO different name
+        reinforcedPump = new Pump("reinforced-pump"){{
+            requirements(Category.liquid, with(Items.beryllium, 70, Items.tungsten, 20, Items.silicon, 20));
+            //TODO perhaps something else?
+            consumes.item(Items.beryllium);
+
+            pumpAmount = 0.4f;
+            consumes.power(0.5f);
+            liquidCapacity = 40f;
+            hasPower = true;
+            size = 2;
         }};
 
         reinforcedConduit = new ArmoredConduit("reinforced-conduit"){{

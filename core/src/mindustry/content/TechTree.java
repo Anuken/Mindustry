@@ -104,7 +104,7 @@ public class TechTree implements ContentList{
                                     });
 
                                     node(rotaryPump, () -> {
-                                        node(thermalPump, () -> {
+                                        node(impulsePump, () -> {
 
                                         });
                                     });

@@ -5,7 +5,8 @@ import mindustry.ctype.*;
 import mindustry.type.*;
 
 public class Liquids implements ContentList{
-    public static Liquid water, slag, oil, cryofluid, neoplasm;
+    public static Liquid water, slag, oil, cryofluid, neoplasm,
+    ozone, hydrogen;
 
     @Override
     public void load(){
@@ -55,5 +56,21 @@ public class Liquids implements ContentList{
             colorFrom = Color.valueOf("f98f4a");
             colorTo = Color.valueOf("9e172c");
         }};
+
+        //TODO reactivity, etc
+        ozone = new Liquid("ozone", Color.valueOf("bdd7ff")){{
+            gas = true;
+            barColor = Color.valueOf("97bdf7");
+            explosiveness = 1f;
+            flammability = 1f;
+        }};
+
+        //TODO combustion
+        hydrogen = new Liquid("hydrogen", Color.valueOf("e8d1ff")){{
+            gas = true;
+            barColor = Color.valueOf("c599f0");
+        }};
+
+        //TODO dicyanoacetylene
     }
 }

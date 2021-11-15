@@ -8,7 +8,7 @@ public class Items implements ContentList{
     public static Item
     scrap, copper, lead, graphite, coal, titanium, thorium, silicon, plastanium,
     phaseFabric, surgeAlloy, sporePod, sand, blastCompound, pyratite, metaglass,
-    beryllium, fissileMatter, dormantCyst, tungsten, carbide;
+    beryllium, tungsten, oxide, carbide, fissileMatter, dormantCyst;
 
     @Override
     public void load(){
@@ -98,21 +98,25 @@ public class Items implements ContentList{
             cost = 1.3f;
         }};
 
+        tungsten = new Item("tungsten", Color.valueOf("768a9a")){{
+            hardness = 5;
+            cost = 1.5f;
+        }};
+
+        oxide = new Item("oxide", Color.valueOf("e4ffd6")){{
+            cost = 1.1f;
+        }};
+
+        carbide = new Item("carbide", Color.valueOf("89769a")){{
+            cost = 1.3f;
+        }};
+
         fissileMatter = new Item("fissile-matter", Color.valueOf("5e988d")){{
             radioactivity = 1.5f;
         }};
 
         dormantCyst = new Item("dormant-cyst", Color.valueOf("df824d")){{
             flammability = 0.1f;
-        }};
-
-        tungsten = new Item("tungsten", Color.valueOf("768a9a")){{
-            hardness = 5;
-            cost = 1.5f;
-        }};
-
-        carbide = new Item("carbide", Color.valueOf("89769a")){{
-            cost = 1.3f;
         }};
     }
 }

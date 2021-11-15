@@ -302,23 +302,23 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
-        if(req.config instanceof Point2[] ps){
+    public void drawRequestConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
+        if(plan.config instanceof Point2[] ps){
             setupColor(1f);
             for(Point2 point : ps){
-                int px = req.x + point.x, py = req.y + point.y;
+                int px = plan.x + point.x, py = plan.y + point.y;
                 otherReq = null;
                 list.each(other -> {
                     if(other.block != null
                         && (px >= other.x - ((other.block.size-1)/2) && py >= other.y - ((other.block.size-1)/2) && px <= other.x + other.block.size/2 && py <= other.y + other.block.size/2)
-                        && other != req && other.block.hasPower){
+                        && other != plan && other.block.hasPower){
                         otherReq = other;
                     }
                 });
 
                 if(otherReq == null || otherReq.block == null) continue;
 
-                drawLaser(player == null ? Team.sharded : player.team(), req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy(), size, otherReq.block.size);
+                drawLaser(player == null ? Team.sharded : player.team(), plan.drawx(), plan.drawy(), otherReq.drawx(), otherReq.drawy(), size, otherReq.block.size);
             }
             Draw.color();
         }

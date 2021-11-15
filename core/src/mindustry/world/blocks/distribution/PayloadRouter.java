@@ -21,10 +21,10 @@ public class PayloadRouter extends PayloadConveyor{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        super.drawRequestRegion(req, list);
+    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        super.drawRequestRegion(plan, list);
 
-        Draw.rect(overRegion, req.drawx(), req.drawy());
+        Draw.rect(overRegion, plan.drawx(), plan.drawy());
     }
 
     public class PayloadRouterBuild extends PayloadConveyorBuild{

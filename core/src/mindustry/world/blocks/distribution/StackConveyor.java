@@ -82,17 +82,17 @@ public class StackConveyor extends Block implements Autotiler{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        int[] bits = getTiling(req, list);
+    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        int[] bits = getTiling(plan, list);
 
         if(bits == null) return;
 
         TextureRegion region = regions[0];
-        Draw.rect(region, req.drawx(), req.drawy(), req.rotation * 90);
+        Draw.rect(region, plan.drawx(), plan.drawy(), plan.rotation * 90);
 
         for(int i = 0; i < 4; i++){
             if((bits[3] & (1 << i)) == 0){
-                Draw.rect(edgeRegion, req.drawx(), req.drawy(), (req.rotation - i) * 90);
+                Draw.rect(edgeRegion, plan.drawx(), plan.drawy(), (plan.rotation - i) * 90);
             }
         }
     }

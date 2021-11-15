@@ -50,16 +50,16 @@ public class Duct extends Block implements Autotiler{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        int[] bits = getTiling(req, list);
+    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        int[] bits = getTiling(plan, list);
 
         if(bits == null) return;
 
         Draw.scl(bits[1], bits[2]);
         Draw.alpha(0.5f);
-        Draw.rect(botRegions[bits[0]], req.drawx(), req.drawy(), req.rotation * 90);
+        Draw.rect(botRegions[bits[0]], plan.drawx(), plan.drawy(), plan.rotation * 90);
         Draw.color();
-        Draw.rect(topRegions[bits[0]], req.drawx(), req.drawy(), req.rotation * 90);
+        Draw.rect(topRegions[bits[0]], plan.drawx(), plan.drawy(), plan.rotation * 90);
         Draw.scl();
     }
 

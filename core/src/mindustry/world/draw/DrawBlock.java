@@ -2,7 +2,10 @@ package mindustry.world.draw;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.*;
+import mindustry.entities.units.*;
 import mindustry.world.*;
+import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.production.GenericCrafter.*;
 
 /** An implementation of custom rendering behavior for a crafter block.
@@ -18,6 +21,11 @@ public class DrawBlock{
     /** Draws any extra light for the block. */
     public void drawLight(GenericCrafterBuild build){
 
+    }
+
+    /** Draws the planned version of this block. */
+    public void drawPlan(GenericCrafter crafter, BuildPlan plan, Eachable<BuildPlan> list){
+        crafter.drawPlanBase(plan, list);
     }
 
     /** Load any relevant texture regions. */

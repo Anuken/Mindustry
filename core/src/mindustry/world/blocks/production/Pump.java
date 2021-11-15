@@ -15,6 +15,8 @@ import static mindustry.Vars.*;
 public class Pump extends LiquidBlock{
     /** Pump amount per tile. */
     public float pumpAmount = 0.2f;
+    /** Interval in-between item consumptions, if applicable. */
+    public float consumeTime = 60f * 5f;
 
     public Pump(String name){
         super(name);
@@ -41,6 +43,10 @@ public class Pump extends LiquidBlock{
 
         for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
             if(canPump(other)){
+                if(liquidDrop != null && other.floor().liquidDrop != liquidDrop){
+                    liquidDrop = null;
+                    break;
+                }
                 liquidDrop = other.floor().liquidDrop;
                 amount += other.floor().liquidMultiplier;
             }
@@ -81,6 +87,7 @@ public class Pump extends LiquidBlock{
     }
 
     public class PumpBuild extends LiquidBuild{
+        public float consTimer;
         public float amount = 0f;
         public Liquid liquidDrop = null;
 
@@ -121,6 +128,12 @@ public class Pump extends LiquidBlock{
             if(consValid() && liquidDrop != null){
                 float maxPump = Math.min(liquidCapacity - liquids.total(), amount * pumpAmount * edelta());
                 liquids.add(liquidDrop, maxPump);
+
+                //does nothing for most pumps, as those do not require items.
+                if((consTimer += delta()) >= consumeTime){
+                    consume();
+                    consumeTime = 0f;
+                }
             }
 
             dumpLiquid(liquids.current());

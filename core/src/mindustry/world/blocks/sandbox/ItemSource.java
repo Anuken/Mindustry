@@ -45,8 +45,8 @@ public class ItemSource extends Block{
     }
 
     @Override
-    public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
-        drawRequestConfigCenter(req, req.config, "center", true);
+    public void drawRequestConfig(BuildPlan plan, Eachable<BuildPlan> list){
+        drawRequestConfigCenter(plan, plan.config, "center", true);
     }
 
     @Override

@@ -128,13 +128,13 @@ public class Drawf{
     }
 
     public static void liquid(TextureRegion region, float x, float y, float alpha, Color color, float rotation){
-        Draw.color(color, alpha);
+        Draw.color(color, alpha * color.a);
         Draw.rect(region, x, y, rotation);
         Draw.color();
     }
 
     public static void liquid(TextureRegion region, float x, float y, float alpha, Color color){
-        Draw.color(color, alpha);
+        Draw.color(color, alpha * color.a);
         Draw.rect(region, x, y);
         Draw.color();
     }

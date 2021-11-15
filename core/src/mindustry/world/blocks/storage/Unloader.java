@@ -44,8 +44,8 @@ public class Unloader extends Block{
     }
 
     @Override
-    public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
-        drawRequestConfigCenter(req, req.config, "unloader-center");
+    public void drawRequestConfig(BuildPlan plan, Eachable<BuildPlan> list){
+        drawRequestConfigCenter(plan, plan.config, "unloader-center");
     }
 
     @Override

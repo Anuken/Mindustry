@@ -71,9 +71,9 @@ public class BeamDrill extends Block{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        Draw.rect(region, req.drawx(), req.drawy());
-        Draw.rect(topRegion, req.drawx(), req.drawy(), req.rotation * 90);
+    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        Draw.rect(region, plan.drawx(), plan.drawy());
+        Draw.rect(topRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
     }
 
     @Override

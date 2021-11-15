@@ -572,6 +572,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void dumpLiquid(Liquid liquid, float scaling){
+        dumpLiquid(liquid, scaling, -1);
+    }
+
+    /** @param outputDir output liquid direction relative to rotation, or -1 to use any direction. */
+    public void dumpLiquid(Liquid liquid, float scaling, int outputDir){
         int dump = this.cdump;
 
         if(liquids.get(liquid) <= 0.0001f) return;
@@ -581,6 +586,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
             Building other = proximity.get((i + dump) % proximity.size);
+
+            if(outputDir != -1 && (relativeTo(other) + rotation) % 4 != outputDir) return;
+
             other = other.getLiquidDestination(self(), liquid);
 
             if(other != null && other.team == team && other.block.hasLiquids && canDumpLiquid(other, liquid) && other.liquids != null){
@@ -1211,13 +1219,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void displayBars(Table table){
         for(Func<Building, Bar> bar : block.bars.list()){
-            //TODO fix conclusively
-            try{
-                table.add(bar.get(self())).growX();
-                table.row();
-            }catch(ClassCastException e){
-                break;
-            }
+            table.add(bar.get(self())).growX();
+            table.row();
         }
     }
 

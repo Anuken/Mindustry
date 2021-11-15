@@ -14,9 +14,12 @@ import mindustry.world.meta.*;
 
 import static mindustry.entities.Puddles.*;
 
+/** A better name for this class would be "fluid", but it's too late for that. */
 public class Liquid extends UnlockableContent{
     protected static final Rand rand = new Rand();
 
+    /** TODO If true, this fluid is treated as a gas (and does not create puddles) */
+    public boolean gas = false;
     /** Color used in pipes and on the ground. */
     public Color color;
     /** Color of this liquid in gas form. */
@@ -56,6 +59,22 @@ public class Liquid extends UnlockableContent{
     /** For modding only.*/
     public Liquid(String name){
         this(name, new Color(Color.black));
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        if(gas){
+            //always "boils", it's a gas
+            boilPoint = -1;
+            //ensure no accidental global mutation
+            color = color.cpy();
+            //all gases are transparent
+            color.a = 0.5f;
+            //for gases, gas color is implicitly their color
+            gasColor = color;
+        }
     }
 
     /** @return true if this liquid will boil in this global environment. */

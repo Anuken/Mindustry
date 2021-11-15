@@ -46,15 +46,15 @@ public class DirectionalUnloader extends Block{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        Draw.rect(region, req.drawx(), req.drawy());
-        Draw.rect(topRegion, req.drawx(), req.drawy(), req.rotation * 90);
-        drawRequestConfig(req, list);
+    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        Draw.rect(region, plan.drawx(), plan.drawy());
+        Draw.rect(topRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
+        drawRequestConfig(plan, list);
     }
 
     @Override
-    public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
-        drawRequestConfigCenter(req, req.config, "duct-unloader-center");
+    public void drawRequestConfig(BuildPlan plan, Eachable<BuildPlan> list){
+        drawRequestConfigCenter(plan, plan.config, "duct-unloader-center");
     }
 
     @Override

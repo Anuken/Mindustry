@@ -35,9 +35,9 @@ public class PowerDiode extends Block{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        Draw.rect(fullIcon, req.drawx(), req.drawy());
-        Draw.rect(arrow, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
+    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        Draw.rect(fullIcon, plan.drawx(), plan.drawy());
+        Draw.rect(arrow, plan.drawx(), plan.drawy(), !rotate ? 0 : plan.rotation * 90);
     }
 
     // battery % of the graph on either side, defaults to zero

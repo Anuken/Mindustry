@@ -47,19 +47,19 @@ public class DirectionBridge extends Block{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        Draw.rect(region, req.drawx(), req.drawy());
-        Draw.rect(dirRegion, req.drawx(), req.drawy(), req.rotation * 90);
+    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        Draw.rect(region, plan.drawx(), plan.drawy());
+        Draw.rect(dirRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
     }
 
     @Override
-    public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
+    public void drawRequestConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
         otherReq = null;
         otherDst = range;
-        Point2 d = Geometry.d4(req.rotation);
+        Point2 d = Geometry.d4(plan.rotation);
         list.each(other -> {
-            if(other.block == this && req != other && Mathf.clamp(other.x - req.x, -1, 1) == d.x && Mathf.clamp(other.y - req.y, -1, 1) == d.y){
-                int dst = Math.max(Math.abs(other.x - req.x), Math.abs(other.y - req.y));
+            if(other.block == this && plan != other && Mathf.clamp(other.x - plan.x, -1, 1) == d.x && Mathf.clamp(other.y - plan.y, -1, 1) == d.y){
+                int dst = Math.max(Math.abs(other.x - plan.x), Math.abs(other.y - plan.y));
                 if(dst <= otherDst){
                     otherReq = other;
                     otherDst = dst;
@@ -68,7 +68,7 @@ public class DirectionBridge extends Block{
         });
 
         if(otherReq != null){
-            drawBridge(req.rotation, req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy(), null);
+            drawBridge(plan.rotation, plan.drawx(), plan.drawy(), otherReq.drawx(), otherReq.drawy(), null);
         }
     }
 

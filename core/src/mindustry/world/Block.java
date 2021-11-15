@@ -454,10 +454,14 @@ public class Block extends UnlockableContent{
                 Liquid liquid = consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
                 current = entity -> liquid;
             }else{
-                current = entity -> entity.liquids == null ? Liquids.water : entity.liquids.current();
+                current = entity -> entity.liquids.current();
             }
-            bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName,
-            () -> current.get(entity).barColor(), () -> entity == null || entity.liquids == null ? 0f : entity.liquids.get(current.get(entity)) / liquidCapacity));
+
+            bars.add("liquid", entity -> new Bar(
+                () -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName,
+                () -> current.get(entity).barColor(),
+                () -> entity.liquids.get(current.get(entity)) / liquidCapacity)
+            );
         }
 
         if(hasPower && consumes.hasPower()){
@@ -465,12 +469,20 @@ public class Block extends UnlockableContent{
             boolean buffered = cons.buffered;
             float capacity = cons.capacity;
 
-            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.status * capacity) ? "<ERROR>" : UI.formatAmount((int)(entity.power.status * capacity))) :
-                Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.zero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status));
+            bars.add("power", entity -> new Bar(
+                () -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.status * capacity) ? "<ERROR>" : UI.formatAmount((int)(entity.power.status * capacity))) :
+                Core.bundle.get("bar.power"),
+                () -> Pal.powerBar,
+                () -> Mathf.zero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status)
+            );
         }
 
         if(hasItems && configurable){
-            bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
+            bars.add("items", entity -> new Bar(
+                () -> Core.bundle.format("bar.items", entity.items.total()),
+                () -> Pal.items,
+                () -> (float)entity.items.total() / itemCapacity)
+            );
         }
 
         if(unitCapModifier != 0){
@@ -515,46 +527,46 @@ public class Block extends UnlockableContent{
 
     }
 
-    public void drawPlan(BuildPlan req, Eachable<BuildPlan> list, boolean valid){
-        drawPlan(req, list, valid, 1f);
+    public void drawPlan(BuildPlan plan, Eachable<BuildPlan> list, boolean valid){
+        drawPlan(plan, list, valid, 1f);
     }
 
-    public void drawPlan(BuildPlan req, Eachable<BuildPlan> list, boolean valid, float alpha){
+    public void drawPlan(BuildPlan plan, Eachable<BuildPlan> list, boolean valid, float alpha){
         Draw.reset();
         Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
         Draw.alpha(alpha);
         float prevScale = Draw.scl;
-        Draw.scl *= req.animScale;
-        drawRequestRegion(req, list);
+        Draw.scl *= plan.animScale;
+        drawRequestRegion(plan, list);
         Draw.scl = prevScale;
         Draw.reset();
     }
 
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        TextureRegion reg = getRequestRegion(req, list);
-        Draw.rect(reg, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
+    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        TextureRegion reg = getRequestRegion(plan, list);
+        Draw.rect(reg, plan.drawx(), plan.drawy(), !rotate ? 0 : plan.rotation * 90);
 
-        if(req.worldContext && player != null && teamRegion != null && teamRegion.found()){
+        if(plan.worldContext && player != null && teamRegion != null && teamRegion.found()){
             if(teamRegions[player.team().id] == teamRegion) Draw.color(player.team().color);
-            Draw.rect(teamRegions[player.team().id], req.drawx(), req.drawy());
+            Draw.rect(teamRegions[player.team().id], plan.drawx(), plan.drawy());
             Draw.color();
         }
 
-        drawRequestConfig(req, list);
+        drawRequestConfig(plan, list);
     }
 
-    public TextureRegion getRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
+    public TextureRegion getRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
         return fullIcon;
     }
 
-    public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
+    public void drawRequestConfig(BuildPlan plan, Eachable<BuildPlan> list){
 
     }
 
-    public void drawRequestConfigCenter(BuildPlan req, Object content, String region, boolean cross){
+    public void drawRequestConfigCenter(BuildPlan plan, Object content, String region, boolean cross){
         if(content == null){
             if(cross){
-                Draw.rect("cross", req.drawx(), req.drawy());
+                Draw.rect("cross", plan.drawx(), plan.drawy());
             }
             return;
         }
@@ -562,15 +574,15 @@ public class Block extends UnlockableContent{
         if(color == null) return;
 
         Draw.color(color);
-        Draw.rect(region, req.drawx(), req.drawy());
+        Draw.rect(region, plan.drawx(), plan.drawy());
         Draw.color();
     }
 
-    public void drawRequestConfigCenter(BuildPlan req, Object content, String region){
-        drawRequestConfigCenter(req, content, region, false);
+    public void drawRequestConfigCenter(BuildPlan plan, Object content, String region){
+        drawRequestConfigCenter(plan, content, region, false);
     }
 
-    public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
+    public void drawRequestConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
 
     }
 

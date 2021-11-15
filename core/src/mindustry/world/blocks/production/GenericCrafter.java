@@ -7,9 +7,11 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
@@ -19,7 +21,13 @@ public class GenericCrafter extends Block{
     public @Nullable ItemStack outputItem;
     /** Overwrites outputItem if not null. */
     public @Nullable ItemStack[] outputItems;
+
+    /** Written to outputLiquids as a single-element array if outputLiquids is null. */
     public @Nullable LiquidStack outputLiquid;
+    /** Overwrites outputLiquid if not null. */
+    public @Nullable LiquidStack[] outputLiquids;
+    /** Liquid output directions, specified in the same order as outputLiquids. Use -1 to dump in every direction. Rotations are relative to block. */
+    public int[] liquidOutputDirections = {-1};
 
     public float craftTime = 80;
     public Effect craftEffect = Fx.none;
@@ -52,8 +60,27 @@ public class GenericCrafter extends Block{
             stats.add(Stat.output, StatValues.items(craftTime, outputItems));
         }
 
-        if(outputLiquid != null){
-            stats.add(Stat.output, outputLiquid.liquid, outputLiquid.amount * (60f / craftTime), true);
+        if(outputLiquids != null){
+            stats.add(Stat.output, StatValues.liquids(craftTime, outputLiquids));
+        }
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+
+        //set up liquid bars for multiple liquid outputs; TODO multiple inputs not yet supported due to inherent complexity
+        //TODO this will currently screw up input display if input liquids are available
+        if(outputLiquids != null && outputLiquids.length > 1){
+            bars.remove("liquid");
+
+            for(var stack : outputLiquids){
+                bars.add("liquid-" + stack.liquid.name, entity -> new Bar(
+                    () -> stack.liquid.localizedName,
+                    () -> stack.liquid.barColor(),
+                    () -> entity.liquids.get(stack.liquid) / liquidCapacity)
+                );
+            }
         }
     }
 
@@ -70,7 +97,19 @@ public class GenericCrafter extends Block{
         if(outputItems == null && outputItem != null){
             outputItems = new ItemStack[]{outputItem};
         }
+        if(outputLiquids == null && outputLiquid != null){
+            outputLiquids = new LiquidStack[]{outputLiquid};
+        }
         super.init();
+    }
+
+    public void drawPlanBase(BuildPlan req, Eachable<BuildPlan> list){
+        super.drawRequestRegion(req, list);
+    }
+
+    @Override
+    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        drawer.drawPlan(this, plan, list);
     }
 
     @Override
@@ -102,13 +141,21 @@ public class GenericCrafter extends Block{
         @Override
         public boolean shouldConsume(){
             if(outputItems != null){
-                for(ItemStack output : outputItems){
+                for(var output : outputItems){
                     if(items.get(output.item) + output.amount > itemCapacity){
                         return false;
                     }
                 }
             }
-            return (outputLiquid == null || !(liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.001f)) && enabled;
+            if(outputLiquids != null){
+                for(var output : outputLiquids){
+                    if(liquids.get(output.liquid) >= liquidCapacity - 0.001f){
+                        return false;
+                    }
+                }
+            }
+
+            return enabled;
         }
 
         @Override
@@ -141,15 +188,17 @@ public class GenericCrafter extends Block{
             consume();
 
             if(outputItems != null){
-                for(ItemStack output : outputItems){
+                for(var output : outputItems){
                     for(int i = 0; i < output.amount; i++){
                         offload(output.item);
                     }
                 }
             }
 
-            if(outputLiquid != null){
-                handleLiquid(this, outputLiquid.liquid, outputLiquid.amount);
+            if(outputLiquids != null){
+                for(var output : outputLiquids){
+                    handleLiquid(this, output.liquid, output.amount);
+                }
             }
 
             craftEffect.at(x, y);
@@ -163,8 +212,12 @@ public class GenericCrafter extends Block{
                 }
             }
 
-            if(outputLiquid != null){
-                dumpLiquid(outputLiquid.liquid);
+            if(outputLiquids != null){
+                for(int i = 0; i < outputLiquids.length; i++){
+                    int dir = liquidOutputDirections.length > i ? liquidOutputDirections[i] : -1;
+
+                    dumpLiquid(outputLiquids[i].liquid, 2f, dir);
+                }
             }
         }
 
