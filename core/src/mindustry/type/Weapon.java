@@ -194,8 +194,8 @@ public class Weapon implements Cloneable{
             Draw.color(unit.type.cellColor(unit));
             Draw.rect(cellRegion,
                 wx, wy,
-                region.width * Draw.scl * -Mathf.sign(flipSprite),
-                region.height * Draw.scl,
+                cellRegion.width * Draw.scl * -Mathf.sign(flipSprite),
+                cellRegion.height * Draw.scl,
                 weaponRotation
             );
             Draw.color();
