@@ -119,6 +119,16 @@ public class CommandCenter extends Block{
         }
 
         @Override
+        public boolean onConfigureTileTapped(Building other){
+            if(this == other){
+                deselect();
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.b(team.data().command.ordinal());

@@ -20,6 +20,7 @@ public class Battery extends PowerDistributor{
         super(name);
         outputsPower = true;
         consumesPower = true;
+        canOverdrive = false;
         flags = EnumSet.of(BlockFlag.battery);
         //TODO could be supported everywhere...
         envEnabled |= Env.space;
