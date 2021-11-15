@@ -109,6 +109,8 @@ public class Weapon implements Cloneable{
     public TextureRegion region;
     /** heat region, must be same size as region (optional) */
     public TextureRegion heatRegion;
+    /** cell region, must be same size as region (optional) */
+    public TextureRegion cellRegion;
     /** outline region to display if top is false */
     public TextureRegion outlineRegion;
     /** heat region tint */
@@ -182,19 +184,32 @@ public class Weapon implements Cloneable{
         }
 
         Draw.rect(region,
-        wx, wy,
-        region.width * Draw.scl * -Mathf.sign(flipSprite),
-        region.height * Draw.scl,
-        weaponRotation);
+            wx, wy,
+            region.width * Draw.scl * -Mathf.sign(flipSprite),
+            region.height * Draw.scl,
+            weaponRotation
+        );
+
+        if(cellRegion.found()){
+            Draw.color(unit.type.cellColor(unit));
+            Draw.rect(cellRegion,
+                wx, wy,
+                region.width * Draw.scl * -Mathf.sign(flipSprite),
+                region.height * Draw.scl,
+                weaponRotation
+            );
+            Draw.color();
+        }
 
         if(heatRegion.found() && mount.heat > 0){
             Draw.color(heatColor, mount.heat);
             Draw.blend(Blending.additive);
             Draw.rect(heatRegion,
-            wx, wy,
-            heatRegion.width * Draw.scl * -Mathf.sign(flipSprite),
-            heatRegion.height * Draw.scl,
-            weaponRotation);
+                wx, wy,
+                heatRegion.width * Draw.scl * -Mathf.sign(flipSprite),
+                heatRegion.height * Draw.scl,
+                weaponRotation
+            );
             Draw.blend();
             Draw.color();
         }
@@ -392,7 +407,7 @@ public class Weapon implements Cloneable{
     public void load(){
         region = Core.atlas.find(name, Core.atlas.find("clear"));
         heatRegion = Core.atlas.find(name + "-heat");
+        cellRegion = Core.atlas.find(name + "-cell");
         outlineRegion = Core.atlas.find(name + "-outline");
     }
-
 }
