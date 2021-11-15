@@ -79,7 +79,7 @@ public class MultiPacker implements Disposable{
     //ui page (sprites5.png) - content icons, white icons, fonts and UI elements
     public enum PageType{
         main(4096),
-        environment,
+        environment(4096, 2048),
         editor(4096, 2048),
         rubble,
         ui(4096);

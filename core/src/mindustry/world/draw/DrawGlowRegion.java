@@ -15,7 +15,7 @@ import mindustry.world.blocks.production.GenericCrafter.*;
 public class DrawGlowRegion extends DrawBlock{
     public Blending blending = Blending.additive;
     public String suffix = "-glow";
-    public float alpha = 0.9f, glowScale = 3f;
+    public float alpha = 0.9f, glowScale = 10f, glowIntensity = 0.5f;
     public float layer = Layer.blockAdditive;
     public Color color = Color.red.cpy();
     public TextureRegion top;
@@ -28,7 +28,7 @@ public class DrawGlowRegion extends DrawBlock{
         Draw.z(layer);
         Draw.blend(blending);
         Draw.color(color);
-        Draw.alpha(Mathf.absin(build.totalProgress, glowScale, alpha) * build.warmup);
+        Draw.alpha((Mathf.absin(build.totalProgress, glowScale, alpha) * glowIntensity + 1f - glowIntensity) * build.warmup * alpha);
         Draw.rect(top, build.x, build.y);
         Draw.reset();
         Draw.blend();

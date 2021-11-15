@@ -955,9 +955,9 @@ public class Blocks implements ContentList{
             craftTime = 10f;
             rotate = true;
 
-            liquidCapacity = 100f;
+            liquidCapacity = 50f;
 
-            consumes.liquid(Liquids.water, 1f);
+            consumes.liquid(Liquids.water, 5f / 60f);
             consumes.power(2f);
 
             drawer = new DrawMulti(
@@ -974,13 +974,15 @@ public class Blocks implements ContentList{
                 new DrawLiquidOutputs(),
                 new DrawRegion("-top"),
                 new DrawGlowRegion(){{
-                    alpha = 0.5f;
-                    color = new Color(1f, 0.22f, 0.22f);
+                    alpha = 0.7f;
+                    color = Color.valueOf("c4bdf3");
+                    glowIntensity = 0.3f;
+                    glowScale = 6f;
                 }}
             );
             iconOverride = new String[]{"-bottom", "", "-top"};
 
-            outputLiquids = LiquidStack.with(Liquids.ozone, 0.5f, Liquids.hydrogen, 0.5f);
+            outputLiquids = LiquidStack.with(Liquids.ozone, 2f * craftTime / 60, Liquids.hydrogen, 3f * craftTime / 60);
             liquidOutputDirections = new int[]{1, 3};
         }};
 
@@ -988,7 +990,6 @@ public class Blocks implements ContentList{
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
             size = 3;
 
-            //TODO multi liquid output
             //converts oxygen (?) + beryllium into heat + oxide
         }};
 
