@@ -62,9 +62,13 @@ public class StatValues{
     }
 
     public static StatValue liquids(float timePeriod, LiquidStack... stacks){
+        return liquids(timePeriod, true, stacks);
+    }
+
+    public static StatValue liquids(float timePeriod, boolean perSecond, LiquidStack... stacks){
         return table -> {
             for(var stack : stacks){
-                table.add(new LiquidDisplay(stack.liquid, stack.amount * (60f / timePeriod), true)).padRight(5);
+                table.add(new LiquidDisplay(stack.liquid, stack.amount * (60f / timePeriod), perSecond)).padRight(5);
             }
         };
     }

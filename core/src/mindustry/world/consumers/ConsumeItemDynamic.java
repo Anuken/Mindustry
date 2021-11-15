@@ -26,18 +26,18 @@ public class ConsumeItemDynamic extends Consume{
     }
 
     @Override
-    public void build(Building tile, Table table){
-        ItemStack[][] current = {items.get(tile)};
+    public void build(Building build, Table table){
+        ItemStack[][] current = {items.get(build)};
 
         table.table(cont -> {
             table.update(() -> {
-                if(current[0] != items.get(tile)){
-                    rebuild(tile, cont);
-                    current[0] = items.get(tile);
+                if(current[0] != items.get(build)){
+                    rebuild(build, cont);
+                    current[0] = items.get(build);
                 }
             });
 
-            rebuild(tile, cont);
+            rebuild(build, cont);
         });
     }
 
@@ -58,20 +58,20 @@ public class ConsumeItemDynamic extends Consume{
     }
 
     @Override
-    public void update(Building entity){
+    public void update(Building build){
 
     }
 
     @Override
-    public void trigger(Building entity){
-        for(ItemStack stack : items.get(entity)){
-            entity.items.remove(stack);
+    public void trigger(Building build){
+        for(ItemStack stack : items.get(build)){
+            build.items.remove(stack);
         }
     }
 
     @Override
-    public boolean valid(Building entity){
-        return entity.items != null && entity.items.has(items.get(entity));
+    public boolean valid(Building build){
+        return build.items != null && build.items.has(items.get(build));
     }
 
     @Override

@@ -32,37 +32,27 @@ public class ConsumeItems extends Consume{
     }
 
     @Override
-    public void build(Building tile, Table table){
+    public void build(Building build, Table table){
         table.table(c -> {
             int i = 0;
             for(var stack : items){
                 c.add(new ReqImage(new ItemImage(stack.item.uiIcon, stack.amount),
-                () -> tile.items != null && tile.items.has(stack.item, stack.amount))).padRight(8);
+                () -> build.items != null && build.items.has(stack.item, stack.amount))).padRight(8);
                 if(++i % 4 == 0) c.row();
             }
         }).left();
     }
 
     @Override
-    public String getIcon(){
-        return "icon-item";
-    }
-
-    @Override
-    public void update(Building entity){
-
-    }
-
-    @Override
-    public void trigger(Building entity){
+    public void trigger(Building build){
         for(var stack : items){
-            entity.items.remove(stack);
+            build.items.remove(stack);
         }
     }
 
     @Override
-    public boolean valid(Building entity){
-        return entity.items != null && entity.items.has(items);
+    public boolean valid(Building build){
+        return build.items != null && build.items.has(items);
     }
 
     @Override

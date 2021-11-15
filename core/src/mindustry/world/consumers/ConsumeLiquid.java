@@ -27,23 +27,18 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
     }
 
     @Override
-    public void build(Building tile, Table table){
-        table.add(new ReqImage(liquid.uiIcon, () -> valid(tile))).size(iconMed).top().left();
+    public void build(Building build, Table table){
+        table.add(new ReqImage(liquid.uiIcon, () -> valid(build))).size(iconMed).top().left();
     }
 
     @Override
-    public String getIcon(){
-        return "icon-liquid-consume";
+    public void update(Building build){
+        build.liquids.remove(liquid, Math.min(use(build), build.liquids.get(liquid)));
     }
 
     @Override
-    public void update(Building entity){
-        entity.liquids.remove(liquid, Math.min(use(entity), entity.liquids.get(liquid)));
-    }
-
-    @Override
-    public boolean valid(Building entity){
-        return entity != null && entity.liquids != null && entity.liquids.get(liquid) >= amount * entity.delta();
+    public boolean valid(Building build){
+        return build.liquids != null && build.liquids.get(liquid) >= amount * build.delta();
     }
 
     @Override

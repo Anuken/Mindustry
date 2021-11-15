@@ -70,7 +70,7 @@ public class GenericCrafter extends Block{
         super.setBars();
 
         //set up liquid bars for multiple liquid outputs; TODO multiple inputs not yet supported due to inherent complexity
-        //TODO this will currently screw up input display if input liquids are available
+        //TODO this will currently screw up input display if input liquids are available - no good way to fix that yet
         if(outputLiquids != null && outputLiquids.length > 1){
             bars.remove("liquid");
 

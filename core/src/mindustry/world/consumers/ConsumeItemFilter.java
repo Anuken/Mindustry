@@ -28,39 +28,34 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public void build(Building tile, Table table){
+    public void build(Building build, Table table){
         MultiReqImage image = new MultiReqImage();
         content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.uiIcon, 1),
-            () -> tile.items != null && tile.items.has(item))));
+            () -> build.items != null && build.items.has(item))));
 
         table.add(image).size(8 * 4);
     }
 
     @Override
-    public String getIcon(){
-        return "icon-item";
+    public void update(Building build){
     }
 
     @Override
-    public void update(Building entity){
-    }
-
-    @Override
-    public void trigger(Building entity){
+    public void trigger(Building build){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
-            if(entity.items != null && entity.items.has(item) && this.filter.get(item)){
-                entity.items.remove(item, 1);
+            if(build.items != null && build.items.has(item) && this.filter.get(item)){
+                build.items.remove(item, 1);
                 break;
             }
         }
     }
 
     @Override
-    public boolean valid(Building entity){
+    public boolean valid(Building build){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
-            if(entity.items != null && entity.items.has(item) && this.filter.get(item)){
+            if(build.items != null && build.items.has(item) && this.filter.get(item)){
                 return true;
             }
         }

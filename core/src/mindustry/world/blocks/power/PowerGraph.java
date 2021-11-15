@@ -345,9 +345,9 @@ public class PowerGraph{
         }
     }
 
-    private boolean otherConsumersAreValid(Building tile, Consume consumePower){
-        for(Consume cons : tile.block.consumes.all()){
-            if(cons != consumePower && !cons.isOptional() && !cons.valid(tile)){
+    private boolean otherConsumersAreValid(Building build, Consume consumePower){
+        for(Consume cons : build.block.consumes.all()){
+            if(cons != consumePower && !cons.isOptional() && !cons.valid(build)){
                 return false;
             }
         }

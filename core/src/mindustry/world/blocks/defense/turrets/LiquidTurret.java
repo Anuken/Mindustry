@@ -48,12 +48,12 @@ public class LiquidTurret extends Turret{
     public void init(){
         consumes.add(new ConsumeLiquidFilter(i -> ammoTypes.containsKey(i), 1f){
             @Override
-            public boolean valid(Building entity){
-                return entity.liquids.total() > 0.001f;
+            public boolean valid(Building build){
+                return build.liquids.total() > 0.001f;
             }
 
             @Override
-            public void update(Building entity){
+            public void update(Building build){
 
             }
 

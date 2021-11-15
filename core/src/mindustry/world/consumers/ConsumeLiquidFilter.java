@@ -38,18 +38,13 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     }
 
     @Override
-    public String getIcon(){
-        return "icon-liquid-consume";
+    public void update(Building build){
+        build.liquids.remove(build.liquids.current(), use(build));
     }
 
     @Override
-    public void update(Building entity){
-        entity.liquids.remove(entity.liquids.current(), use(entity));
-    }
-
-    @Override
-    public boolean valid(Building entity){
-        return entity != null && entity.liquids != null && filter.get(entity.liquids.current()) && entity.liquids.currentAmount() >= use(entity);
+    public boolean valid(Building build){
+        return build != null && build.liquids != null && filter.get(build.liquids.current()) && build.liquids.currentAmount() >= use(build);
     }
 
     @Override

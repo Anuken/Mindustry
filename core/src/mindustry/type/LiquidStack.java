@@ -5,6 +5,8 @@ import arc.struct.*;
 import mindustry.content.*;
 
 public class LiquidStack implements Comparable<LiquidStack>{
+    public static final LiquidStack[] empty = {};
+
     public Liquid liquid;
     public float amount;
 

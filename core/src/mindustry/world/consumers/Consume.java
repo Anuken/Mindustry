@@ -58,16 +58,14 @@ public abstract class Consume{
 
     public abstract ConsumeType type();
 
-    public abstract void build(Building tile, Table table);
+    public void build(Building build, Table table){}
 
     /** Called when a consumption is triggered manually. */
-    public void trigger(Building entity){}
+    public void trigger(Building build){}
 
-    public abstract String getIcon();
+    public void update(Building build){}
 
-    public abstract void update(Building entity);
+    public void display(Stats stats){}
 
-    public abstract boolean valid(Building entity);
-
-    public abstract void display(Stats stats);
+    public abstract boolean valid(Building build);
 }

@@ -30,26 +30,11 @@ public class ConsumePower extends Consume{
     }
 
     @Override
-    public void build(Building tile, Table table){
-        //No tooltip for power, for now
-    }
-
-    @Override
-    public String getIcon(){
-        return "icon-power";
-    }
-
-    @Override
-    public void update(Building entity){
-        // Nothing to do since PowerGraph directly updates entity.power.status
-    }
-
-    @Override
-    public boolean valid(Building entity){
+    public boolean valid(Building build){
         if(buffered){
             return true;
         }else{
-            return entity.power.status > 0f;
+            return build.power.status > 0f;
         }
     }
 
