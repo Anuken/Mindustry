@@ -645,6 +645,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 liquids.remove(liquid, flow);
                 return flow;
             }else if(next.liquids.currentAmount() / next.block.liquidCapacity > 0.1f && fract > 0.1f){
+                //TODO !IMPORTANT! uses current(), which is 1) wrong for multi-liquid blocks and 2) causes unwanted reactions, e.g. hydrogen + slag in pump
                 //TODO these are incorrect effect positions
                 float fx = (x + next.x) / 2f, fy = (y + next.y) / 2f;
 
@@ -1181,21 +1182,30 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
                 if(liquids != null){
                     table.row();
+                    table.left();
                     table.table(l -> {
-                        boolean[] had = {false};
+                        Bits current = new Bits();
 
                         Runnable rebuild = () -> {
                             l.clearChildren();
                             l.left();
-                            l.image(() -> liquids.current().uiIcon).padRight(3f);
-                            l.label(() -> liquids.getFlowRate() < 0 ? "..." : Strings.fixed(liquids.getFlowRate(), 2) + ps).color(Color.lightGray);
+                            for(var liquid : content.liquids()){
+                                if(liquids.hasFlowLiquid(liquid)){
+                                    l.image(liquid.uiIcon).padRight(3f);
+                                    l.label(() -> liquids.getFlowRate(liquid) < 0 ? "..." : Strings.fixed(liquids.getFlowRate(liquid), 1) + ps).color(Color.lightGray);
+                                    l.row();
+                                }
+                            }
                         };
 
+                        rebuild.run();
                         l.update(() -> {
-                           if(!had[0] && liquids.hadFlow()){
-                               had[0] = true;
-                               rebuild.run();
-                           }
+                            for(var liquid : content.liquids()){
+                                if(liquids.hasFlowLiquid(liquid) && !current.get(liquid.id)){
+                                    current.set(liquid.id);
+                                    rebuild.run();
+                                }
+                            }
                         });
                     }).left();
                 }

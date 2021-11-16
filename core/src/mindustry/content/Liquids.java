@@ -66,9 +66,9 @@ public class Liquids implements ContentList{
         }};
 
         //TODO combustion
-        hydrogen = new Liquid("hydrogen", Color.valueOf("97a5f7")){{
+        hydrogen = new Liquid("hydrogen", Color.valueOf("b8c2fc")){{
             gas = true;
-            barColor = Color.valueOf("7d8be0");
+            barColor = Color.valueOf("a3b0ff");
             flammability = 1f;
         }};
 

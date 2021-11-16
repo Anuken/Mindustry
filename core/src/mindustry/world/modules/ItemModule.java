@@ -90,15 +90,11 @@ public class ItemModule extends BlockModule{
 
     /** @return a specific item's flow rate in items/s; any value < 0 means not ready.*/
     public float getFlowRate(Item item){
-        if(flow == null) return -1f;
-
-        return displayFlow[item.id] * 60;
+        return flow == null ? -1f : displayFlow[item.id] * 60;
     }
 
     public boolean hasFlowItem(Item item){
-        if(flow == null) return false;
-
-        return cacheBits.get(item.id);
+        return flow != null && cacheBits.get(item.id);
     }
 
     public void each(ItemConsumer cons){

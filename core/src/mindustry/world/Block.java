@@ -447,24 +447,25 @@ public class Block extends UnlockableContent{
         if(hasItems && itemCapacity > 0) stats.add(Stat.itemCapacity, itemCapacity, StatUnit.items);
     }
 
+    public void addLiquidBar(Liquid liq){
+        bars.add("liquid-" + liq.name, entity -> new Bar(
+            () -> liq.localizedName,
+            liq::barColor,
+            () -> entity.liquids.get(liq) / liquidCapacity)
+        );
+    }
+
+    /** Adds a liquid bar that dynamically displays a liquid type. */
+    public <T extends Building> void addLiquidBar(Func<T, Liquid> current){
+        bars.add("liquid", entity -> new Bar(
+            () -> current.get((T)entity) == null || entity.liquids.get(current.get((T)entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get((T)entity).localizedName,
+            () -> current.get((T)entity) == null ? Color.clear : current.get((T)entity).barColor(),
+            () -> current.get((T)entity) == null ? 0f : entity.liquids.get(current.get((T)entity)) / liquidCapacity)
+        );
+    }
+
     public void setBars(){
         bars.add("health", entity -> new Bar("stat.health", Pal.health, entity::healthf).blink(Color.white));
-
-        if(hasLiquids){
-            Func<Building, Liquid> current;
-            if(consumes.has(ConsumeType.liquid) && consumes.get(ConsumeType.liquid) instanceof ConsumeLiquid){
-                Liquid liquid = consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
-                current = entity -> liquid;
-            }else{
-                current = entity -> entity.liquids.current();
-            }
-
-            bars.add("liquid", entity -> new Bar(
-                () -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName,
-                () -> current.get(entity).barColor(),
-                () -> entity.liquids.get(current.get(entity)) / liquidCapacity)
-            );
-        }
 
         if(hasPower && consumes.hasPower()){
             ConsumePower cons = consumes.getPower();
@@ -489,6 +490,38 @@ public class Block extends UnlockableContent{
 
         if(unitCapModifier != 0){
             stats.add(Stat.maxUnits, (unitCapModifier < 0 ? "-" : "+") + Math.abs(unitCapModifier));
+        }
+
+        //liquids added last
+        if(hasLiquids){
+            //TODO liquids need to be handled VERY carefully. there are several potential possibilities:
+            //1. no consumption or output (conduit/tank)
+            // - display current(), 1 bar
+            //2. static set of inputs and outputs
+            // - create bars for each input/output, straightforward
+            //3. TODO dynamic input/output combo???
+            // - confusion
+
+            boolean added = false;
+
+            //add bars for *specific* consumed liquids
+            if(consumes.has(ConsumeType.liquid)){
+                var consl = consumes.get(ConsumeType.liquid);
+                if(consl instanceof ConsumeLiquid liq){
+                    added = true;
+                    addLiquidBar(liq.liquid);
+                }else if(consl instanceof ConsumeLiquids multi){
+                    added = true;
+                    for(var stack : multi.liquids){
+                        addLiquidBar(stack.liquid);
+                    }
+                }
+            }
+
+            //nothing was added, so it's safe to add a dynamic liquid bar (probably?)
+            if(!added){
+                addLiquidBar(build -> build.liquids.current());
+            }
         }
     }
 

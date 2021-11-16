@@ -12,9 +12,7 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
@@ -74,41 +72,14 @@ public class GenericCrafter extends Block{
     public void setBars(){
         super.setBars();
 
-        //set up liquid bars for multiple liquid outputs
-        //TODO this will currently screw up input display if input liquids are filters - no good way to fix that yet
+        //set up liquid bars for liquid outputs
         if(outputLiquids != null && outputLiquids.length > 0){
+            //no need for dynamic liquid bar
             bars.remove("liquid");
-
-            Seq<Liquid> consumed = new Seq<>();
-
-            //find list of liquids consumed
-            if(consumes.has(ConsumeType.liquid)){
-                var consl = consumes.get(ConsumeType.liquid);
-                if(consl instanceof ConsumeLiquid liq){
-                    consumed.add(liq.liquid);
-                }else if(consl instanceof ConsumeLiquids multi){
-                    for(var stack : multi.liquids){
-                        consumed.add(stack.liquid);
-                    }
-                }
-            }
-
-            //display consumed first
-            for(var liq : consumed){
-                bars.add("liquid-consume-" + liq.name, entity -> new Bar(
-                    () -> liq.localizedName,
-                    liq::barColor,
-                    () -> entity.liquids.get(liq) / liquidCapacity)
-                );
-            }
 
             //then display output buffer
             for(var stack : outputLiquids){
-                bars.add("liquid-output-" + stack.liquid.name, entity -> new Bar(
-                    () -> stack.liquid.localizedName,
-                    () -> stack.liquid.barColor(),
-                    () -> entity.liquids.get(stack.liquid) / liquidCapacity)
-                );
+                addLiquidBar(stack.liquid);
             }
         }
     }

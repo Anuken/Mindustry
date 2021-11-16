@@ -3,6 +3,7 @@ package mindustry.world.blocks.production;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.util.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -82,6 +83,14 @@ public class Pump extends LiquidBlock{
         }
     }
 
+    @Override
+    public void setBars(){
+        super.setBars();
+
+        //replace dynamic output bar with own custom bar
+        addLiquidBar((PumpBuild build) -> build.liquidDrop);
+    }
+
     protected boolean canPump(Tile tile){
         return tile != null && tile.floor().liquidDrop != null;
     }
@@ -89,13 +98,15 @@ public class Pump extends LiquidBlock{
     public class PumpBuild extends LiquidBuild{
         public float consTimer;
         public float amount = 0f;
-        public Liquid liquidDrop = null;
+        public @Nullable Liquid liquidDrop = null;
 
         @Override
         public void draw(){
-            Draw.rect(name, x, y);
+            Draw.rect(region, x, y);
 
-            Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
+            if(liquidDrop == null) return;
+
+            Drawf.liquid(liquidRegion, x, y, liquids.get(liquidDrop) / liquidCapacity, liquidDrop.color);
         }
 
         @Override
@@ -126,17 +137,19 @@ public class Pump extends LiquidBlock{
         @Override
         public void updateTile(){
             if(consValid() && liquidDrop != null){
-                float maxPump = Math.min(liquidCapacity - liquids.total(), amount * pumpAmount * edelta());
+                float maxPump = Math.min(liquidCapacity - liquids.get(liquidDrop), amount * pumpAmount * edelta());
                 liquids.add(liquidDrop, maxPump);
 
                 //does nothing for most pumps, as those do not require items.
                 if((consTimer += delta()) >= consumeTime){
                     consume();
-                    consumeTime = 0f;
+                    consTimer = 0f;
                 }
             }
 
-            dumpLiquid(liquids.current());
+            if(liquidDrop != null){
+                dumpLiquid(liquidDrop);
+            }
         }
     }
 

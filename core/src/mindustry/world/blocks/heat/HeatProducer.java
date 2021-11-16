@@ -4,7 +4,6 @@ import arc.math.*;
 import arc.util.io.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
-import mindustry.world.blocks.power.NuclearReactor.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.draw.*;
 
@@ -30,7 +29,7 @@ public class HeatProducer extends GenericCrafter{
     public void setBars(){
         super.setBars();
 
-        bars.add("heat", (NuclearReactorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat));
+        bars.add("heat", (HeatProducerBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat));
     }
 
     public class HeatProducerBuild extends GenericCrafterBuild implements HeatBlock{

@@ -5,6 +5,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 
+//TODO should leak!
 public class LiquidJunction extends LiquidBlock{
 
     public LiquidJunction(String name){

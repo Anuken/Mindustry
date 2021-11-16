@@ -30,6 +30,7 @@ public class LiquidVoid extends Block{
 
         @Override
         public void handleLiquid(Building source, Liquid liquid, float amount){
+            liquids.handleFlow(liquid, amount);
         }
     }
 

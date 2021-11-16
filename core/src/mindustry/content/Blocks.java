@@ -60,7 +60,7 @@ public class Blocks implements ContentList{
     //crafting
     siliconSmelter, siliconCrucible, siliconArcFurnace, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
-    electrolyzer, oxidizer, heatReactor, carbideCrucible,
+    electrolyzer, oxidationChamber, heatReactor, carbideCrucible,
     cellSynthesisChamber,
 
     //sandbox
@@ -84,7 +84,7 @@ public class Blocks implements ContentList{
     mechanicalPump, rotaryPump, impulsePump, conduit, pulseConduit, platedConduit, liquidRouter, liquidContainer, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
 
     //liquid - reinforced
-    reinforcedPump, reinforcedConduit, reinforcedBridgeConduit, reinforcedLiquidRouter, reinforcedLiquidContainer, reinforcedLiquidTank,
+    reinforcedPump, reinforcedConduit, reinforcedLiquidJunction, reinforcedBridgeConduit, reinforcedLiquidRouter, reinforcedLiquidContainer, reinforcedLiquidTank,
 
     //power
     combustionGenerator, thermalGenerator, steamGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
@@ -980,17 +980,28 @@ public class Blocks implements ContentList{
                     glowScale = 6f;
                 }}
             );
-            iconOverride = new String[]{"-bottom", "", "-top"};
 
+            iconOverride = new String[]{"-bottom", "", "-top"};
             outputLiquids = LiquidStack.with(Liquids.ozone, 2f * craftTime / 60, Liquids.hydrogen, 3f * craftTime / 60);
             liquidOutputDirections = new int[]{1, 3};
         }};
 
-        oxidizer = new HeatProducer("oxidizer"){{
+        //TODO sprite
+        //TODO 'oxidation chamber'
+        if(false)
+        oxidationChamber = new HeatProducer("oxidation-chamber"){{
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
             size = 3;
 
-            //converts oxygen (?) + beryllium into heat + oxide
+            outputItem = new ItemStack(Items.oxide, 1);
+
+            consumes.liquid(Liquids.ozone, 2f / 60f);
+            consumes.item(Items.beryllium);
+            consumes.power(1f);
+
+            craftTime = 60f * 3f;
+            liquidCapacity = 30f;
+            heatOutput = 8f;
         }};
 
         heatReactor = new HeatProducer("heat-reactor"){{
@@ -1495,13 +1506,12 @@ public class Blocks implements ContentList{
         //TODO different name
         reinforcedPump = new Pump("reinforced-pump"){{
             requirements(Category.liquid, with(Items.beryllium, 70, Items.tungsten, 20, Items.silicon, 20));
-            //TODO perhaps something else?
-            consumes.item(Items.beryllium);
+            //TODO CUSTOM DRAW ANIMATION + 3x3?
+            //TODO balance consumption
+            consumes.liquid(Liquids.hydrogen, 1.5f / 60f);
 
             pumpAmount = 0.4f;
-            consumes.power(0.5f);
             liquidCapacity = 40f;
-            hasPower = true;
             size = 2;
         }};
 
@@ -1512,6 +1522,13 @@ public class Blocks implements ContentList{
             liquidCapacity = 20f;
             liquidPressure = 1.03f;
             health = 250;
+        }};
+
+        //TODO is this necessary? junctions are not good design
+        reinforcedLiquidJunction = new LiquidJunction("reinforced-liquid-junction"){{
+            requirements(Category.liquid, with(Items.graphite, 3, Items.beryllium, 3));
+            health = 260;
+            ((Conduit)reinforcedConduit).junctionReplacement = this;
         }};
 
         reinforcedBridgeConduit = new DirectionLiquidBridge("reinforced-bridge-conduit"){{
@@ -2740,23 +2757,6 @@ public class Blocks implements ContentList{
             consumes.power(10f);
             buildCostMultiplier = 0.5f;
             health = size * size * 80;
-        }};
-
-        nuclearWarhead = new NuclearWarhead("nuclear-warhead"){{
-            requirements(Category.crafting, BuildVisibility.debugOnly, with(Items.thorium, 40));
-            size = 2;
-        }};
-
-        warheadAssembler = new SingleBlockProducer("warhead-assembler"){{
-            requirements(Category.crafting, BuildVisibility.debugOnly, with(Items.thorium, 100));
-            result = nuclearWarhead;
-            size = 3;
-            buildSpeed = 0.3f;
-        }};
-
-        ballisticSilo = new BallisticSilo("ballistic-silo"){{
-            requirements(Category.crafting, BuildVisibility.debugOnly, with(Items.thorium, 100));
-            size = 5;
         }};
 
         //endregion campaign
