@@ -29,12 +29,11 @@ public class DrawLiquidRegion extends DrawBlock{
     @Override
     public void draw(GenericCrafterBuild build){
 
-        if(drawLiquid != null){
-            Drawf.liquid(liquid, build.x, build.y,
-                build.liquids.get(drawLiquid) / build.block.liquidCapacity,
-                drawLiquid.color
-            );
-        }
+        Liquid drawn = drawLiquid != null ? drawLiquid : build.liquids.current();
+        Drawf.liquid(liquid, build.x, build.y,
+            build.liquids.get(drawn) / build.block.liquidCapacity,
+            drawn.color
+        );
     }
 
     @Override

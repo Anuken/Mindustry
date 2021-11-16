@@ -90,8 +90,8 @@ public class Block extends UnlockableContent{
     public boolean solidifes;
     /** whether this is rotatable */
     public boolean rotate;
-    /** if set to plan, the plan region won't rotate when drawing */
-    public boolean rotatePlan = true;
+    /** if rotate is true and this is false, the region won't rotate when drawing */
+    public boolean rotateDraw = true;
     /** number of different variant regions to use */
     public int variants = 0;
     /** whether to draw a rotation arrow - this does not apply to lines of blocks */
@@ -579,7 +579,7 @@ public class Block extends UnlockableContent{
 
     public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
         TextureRegion reg = getRequestRegion(plan, list);
-        Draw.rect(reg, plan.drawx(), plan.drawy(), !rotate || !rotatePlan ? 0 : plan.rotation * 90);
+        Draw.rect(reg, plan.drawx(), plan.drawy(), !rotate || !rotateDraw ? 0 : plan.rotation * 90);
 
         if(plan.worldContext && player != null && teamRegion != null && teamRegion.found()){
             if(teamRegions[player.team().id] == teamRegion) Draw.color(player.team().color);

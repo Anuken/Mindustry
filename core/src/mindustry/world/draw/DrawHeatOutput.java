@@ -17,10 +17,11 @@ public class DrawHeatOutput extends DrawBlock{
 
     public Color heatColor = new Color(1f, 0.22f, 0.22f, 0.8f);
     public float heatPulse = 0.3f, heatPulseScl = 10f, glowMult = 1.2f;
+    public boolean drawRegion = false;
 
     @Override
     public void draw(GenericCrafterBuild build){
-        Draw.rect(build.block.region, build.x, build.y);
+        if(drawRegion) Draw.rect(build.block.region, build.x, build.y);
 
         Draw.rect(build.rotation > 1 ? top2 : top1, build.x, build.y, build.rotdeg());
 
@@ -28,9 +29,9 @@ public class DrawHeatOutput extends DrawBlock{
             Draw.z(Layer.blockAdditive);
             Draw.blend(Blending.additive);
             Draw.color(heatColor, heater.heatFrac() * (heatColor.a * (1f - heatPulse + Mathf.absin(heatPulseScl, heatPulse))));
-            Draw.rect(heat, build.x, build.y, build.rotdeg());
+            if(heat.found()) Draw.rect(heat, build.x, build.y, build.rotdeg());
             Draw.color(Draw.getColor().mul(glowMult));
-            Draw.rect(glow, build.x, build.y);
+            if(glow.found()) Draw.rect(glow, build.x, build.y);
             Draw.blend();
             Draw.color();
         }
@@ -38,7 +39,7 @@ public class DrawHeatOutput extends DrawBlock{
 
     @Override
     public void drawPlan(GenericCrafter block, BuildPlan plan, Eachable<BuildPlan> list){
-        Draw.rect(block.region, plan.drawx(), plan.drawy());
+        if(drawRegion) Draw.rect(block.region, plan.drawx(), plan.drawy());
         Draw.rect(plan.rotation > 1 ? top2 : top1, plan.drawx(), plan.drawy(), plan.rotation * 90);
     }
 

@@ -16,23 +16,26 @@ public class DrawArcSmelter extends DrawBlock{
     public float alpha = 0.68f;
     public int particles = 25;
     public float particleLife = 40f, particleRad = 7f, particleStroke = 1.1f, particleLen = 3f;
+    public boolean drawCenter = true;
+    public boolean drawBottom = true, drawTop = true, drawRegion = true;
+    public Blending blending = Blending.additive;
 
     @Override
     public void draw(GenericCrafterBuild build){
-        Draw.rect(bottom, build.x, build.y);
+        if(drawBottom) Draw.rect(bottom, build.x, build.y);
 
         if(build.warmup > 0f && flameColor.a > 0.001f){
             Lines.stroke(circleStroke * build.warmup);
 
             float si = Mathf.absin(flameRadiusScl, flameRadiusMag);
             float a = alpha * build.warmup;
-            Draw.blend(Blending.additive);
+            Draw.blend(blending);
 
             Draw.color(midColor, a);
-            Fill.circle(build.x, build.y, flameRad + si);
+            if(drawCenter) Fill.circle(build.x, build.y, flameRad + si);
 
             Draw.color(flameColor, a);
-            Lines.circle(build.x, build.y, (flameRad + circleSpace + si) * build.warmup);
+            if(drawCenter) Lines.circle(build.x, build.y, (flameRad + circleSpace + si) * build.warmup);
 
             Lines.stroke(particleStroke * build.warmup);
 
@@ -49,8 +52,8 @@ public class DrawArcSmelter extends DrawBlock{
             Draw.reset();
         }
 
-        Draw.rect(build.block.region, build.x, build.y);
-        if(top.found()) Draw.rect(top, build.x, build.y);
+        if(drawRegion) Draw.rect(build.block.region, build.x, build.y);
+        if(drawTop && top.found()) Draw.rect(top, build.x, build.y);
     }
 
     @Override

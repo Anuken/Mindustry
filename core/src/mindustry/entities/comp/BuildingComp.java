@@ -337,6 +337,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return rotation * 90;
     }
 
+    /** @return preferred rotation of main texture region to be drawn */
+    public float drawrot(){
+        return block.rotate && block.rotateDraw ? rotation * 90 : 0f;
+    }
+
     public Floor floor(){
         return tile.floor();
     }
@@ -930,9 +935,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void draw(){
         if(block.variants == 0){
-            Draw.rect(block.region, x, y, block.rotate ? rotdeg() : 0);
+            Draw.rect(block.region, x, y, drawrot());
         }else{
-            Draw.rect(block.variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, block.variantRegions.length - 1))], x, y, block.rotate ? rotdeg() : 0);
+            Draw.rect(block.variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, block.variantRegions.length - 1))], x, y, drawrot());
         }
 
         drawTeamTop();

@@ -935,7 +935,7 @@ public class Blocks implements ContentList{
             craftTime = 30f;
             size = 2;
             hasPower = hasItems = hasLiquids = true;
-            rotatePlan = false;
+            rotateDraw = false;
 
             consumes.liquid(Liquids.oil, 0.1f);
             consumes.power(0.7f);
@@ -987,8 +987,6 @@ public class Blocks implements ContentList{
         }};
 
         //TODO sprite
-        //TODO 'oxidation chamber'
-        if(false)
         oxidationChamber = new HeatProducer("oxidation-chamber"){{
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
             size = 3;
@@ -999,11 +997,19 @@ public class Blocks implements ContentList{
             consumes.item(Items.beryllium);
             consumes.power(1f);
 
+            rotateDraw = false;
+
+            //TODO rotor?
+            //TODO vent
+            iconOverride = new String[]{"-bottom", "", "-top1", "-glass"};
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(), new DrawBlock(), new DrawHeatOutput(), new DrawRegion("-glass"));
+
             craftTime = 60f * 3f;
             liquidCapacity = 30f;
             heatOutput = 8f;
         }};
 
+        //TODO check sprite correctness
         heatReactor = new HeatProducer("heat-reactor"){{
             //TODO quadvent
             //TODO coolant?
@@ -1021,7 +1027,7 @@ public class Blocks implements ContentList{
             size = 3;
             itemCapacity = 20;
             hasPower = hasItems = true;
-            drawer = new DrawMulti(new DrawCrucible(), new DrawHeat());
+            drawer = new DrawMulti(new DrawCrucible(), new DrawHeatInput());
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.07f;
 

@@ -14,9 +14,13 @@ public class HeatProducer extends GenericCrafter{
     public HeatProducer(String name){
         super(name);
 
-        drawer = new DrawHeatOutput();
-        update = solid = rotate = true;
+        drawer = new DrawMulti(new DrawHeatOutput(){{
+            drawRegion = true;
+        }});
+        rotateDraw = false;
+        rotate = true;
         canOverdrive = false;
+        drawArrow = true;
     }
 
     @Override

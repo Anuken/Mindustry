@@ -9,7 +9,8 @@ import mindustry.world.*;
 import mindustry.world.blocks.production.GenericCrafter.*;
 import mindustry.world.blocks.production.HeatCrafter.*;
 
-public class DrawHeat extends DrawBlock{
+/** Not standalone. */
+public class DrawHeatInput extends DrawBlock{
     public Color heatColor = new Color(1f, 0.22f, 0.22f, 0.8f);
     public float heatPulse = 0.3f, heatPulseScl = 10f;
 
