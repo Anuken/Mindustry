@@ -22,6 +22,7 @@ public class DrawMixer extends DrawBlock{
 
     @Override
     public void draw(GenericCrafterBuild build){
+        GenericCrafter crafter = (GenericCrafter)build.block;
         float rotation = build.block.rotate ? build.rotdeg() : 0;
         Draw.rect(bottom, build.x, build.y, rotation);
 
@@ -33,11 +34,10 @@ public class DrawMixer extends DrawBlock{
             );
         }
 
-        if(build.liquids.total() > 0.001f){
-            Draw.color(((GenericCrafter)build.block).outputLiquid.liquid.color);
-            Draw.alpha(build.liquids.get(((GenericCrafter)build.block).outputLiquid.liquid) / build.block.liquidCapacity);
-            Draw.rect(liquid, build.x, build.y, rotation);
-            Draw.color();
+        if(crafter.outputLiquid != null && build.liquids.get(crafter.outputLiquid.liquid) > 0.001f){
+            var liq = crafter.outputLiquid.liquid;
+
+            Drawf.liquid(liquid, build.x, build.y, build.liquids.get(liq) / crafter.liquidCapacity, liq.color);
         }
 
         Draw.rect(top, build.x, build.y, rotation);

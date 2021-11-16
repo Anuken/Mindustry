@@ -1,9 +1,9 @@
 package mindustry.world.draw;
 
 import arc.*;
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.GenericCrafter.*;
 
@@ -22,10 +22,9 @@ public class DrawAnimation extends DrawBlock{
                 frames[(int)Mathf.absin(build.totalProgress, frameSpeed, frameCount - 0.001f)] :
                 frames[(int)((build.totalProgress / frameSpeed) % frameCount)],
             build.x, build.y);
+
         if(build.liquids != null){
-            Draw.color(Color.clear, build.liquids.current().color, build.liquids.total() / build.block.liquidCapacity);
-            Draw.rect(liquid, build.x, build.y);
-            Draw.color();
+            Drawf.liquid(liquid, build.x, build.y, build.liquids.currentAmount() / build.block.liquidCapacity, build.liquids.current().color);
         }
         if(top.found()){
             Draw.rect(top, build.x, build.y);

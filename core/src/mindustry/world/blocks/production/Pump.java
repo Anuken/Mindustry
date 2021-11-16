@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.liquid.*;
@@ -112,6 +113,12 @@ public class Pump extends LiquidBlock{
         @Override
         public void pickedUp(){
             amount = 0f;
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.totalLiquids) return liquidDrop == null ? 0f : liquids.get(liquidDrop);
+            return super.sense(sensor);
         }
 
         @Override

@@ -33,8 +33,8 @@ public class LiquidBlock extends Block{
             float rotation = rotate ? rotdeg() : 0;
             Draw.rect(bottomRegion, x, y, rotation);
 
-            if(liquids.total() > 0.001f){
-                Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
+            if(liquids.currentAmount() > 0.001f){
+                Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
             }
 
             Draw.rect(topRegion, x, y, rotation);

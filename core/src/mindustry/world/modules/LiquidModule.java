@@ -11,7 +11,7 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class LiquidModule extends BlockModule{
-    private static final int windowSize = 3, updateInterval = 60;
+    private static final int windowSize = 3;
     private static final Interval flowTimer = new Interval(2);
     private static final float pollScl = 20f;
 
@@ -21,30 +21,15 @@ public class LiquidModule extends BlockModule{
     private static final Bits cacheBits = new Bits();
 
     private float[] liquids = new float[content.liquids().size];
-    private float total;
     private Liquid current = content.liquid(0);
-    private float smoothLiquid;
+    private float total, smoothLiquid;
 
-    //TODO broken for multi flow
     private @Nullable WindowedMean[] flow;
 
     public void update(boolean showFlow){
         smoothLiquid = Mathf.lerpDelta(smoothLiquid, currentAmount(), 0.1f);
 
-
         if(showFlow){
-            /*
-            if(flowTimer.get(1, pollScl)){
-
-                if(flow == null) flow = new WindowedMean(windowSize);
-                if(lastAdded > 0.0001f) hadFlow = true;
-
-                flow.add(lastAdded);
-                lastAdded = 0;
-                if(currentFlowRate < 0 || flowTimer.get(updateInterval)){
-                    currentFlowRate = flow.hasEnoughData() ? flow.mean() / pollScl : -1f;
-                }
-            }*/
 
             if(flowTimer.get(1, pollScl)){
 
@@ -101,7 +86,12 @@ public class LiquidModule extends BlockModule{
         return smoothLiquid;
     }
 
-    /** @return total amount of liquids. */
+    /**
+     * @deprecated There is no good reason to check the total amount of liquids of a block.
+     * Use of this method is almost certainly a bug; currentAmount() is probably what you want instead.
+     * All liquid storage systems either store one liquid type, or have per-liquid inventories, and as such total liquid is irrelevant.
+     * */
+    @Deprecated
     public float total(){
         return total;
     }

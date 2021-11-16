@@ -104,6 +104,10 @@ public class GenericCrafter extends Block{
         if(outputLiquids == null && outputLiquid != null){
             outputLiquids = new LiquidStack[]{outputLiquid};
         }
+        //write back to outputLiquid, as it helps with sensing
+        if(outputLiquid == null && outputLiquids != null && outputLiquids.length > 0){
+            outputLiquid = outputLiquids[0];
+        }
         outputsLiquid = outputLiquids != null;
         super.init();
     }
@@ -236,6 +240,8 @@ public class GenericCrafter extends Block{
         @Override
         public double sense(LAccess sensor){
             if(sensor == LAccess.progress) return Mathf.clamp(progress);
+            //attempt to prevent wild total liquid fluctuation, at least for crafters
+            if(sensor == LAccess.totalLiquids && outputLiquid != null) return liquids.get(outputLiquid.liquid);
             return super.sense(sensor);
         }
 

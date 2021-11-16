@@ -140,7 +140,7 @@ public class PayloadLoader extends PayloadBlock{
                 }
 
                 //load up liquids
-                if(payload.block().hasLiquids && liquids.total() >= 0.001f){
+                if(payload.block().hasLiquids && liquids.currentAmount() >= 0.001f){
                     Liquid liq = liquids.current();
                     float total = liquids.currentAmount();
                     float flow = Math.min(Math.min(liquidsLoaded * edelta(), payload.block().liquidCapacity - payload.build.liquids.get(liq)), total);
@@ -160,7 +160,7 @@ public class PayloadLoader extends PayloadBlock{
         public boolean shouldExport(){
             return payload != null && (
                 exporting ||
-                (payload.block().hasLiquids && liquids.total() >= 0.1f && payload.build.liquids.total() >= payload.block().liquidCapacity - 0.001f) ||
+                (payload.block().hasLiquids && liquids.currentAmount() >= 0.1f && payload.build.liquids.currentAmount() >= payload.block().liquidCapacity - 0.001f) ||
                 (payload.block().hasItems && items.any() && payload.block().separateItemCapacity && content.items().contains(i -> payload.build.items.get(i) >= payload.block().itemCapacity)));
         }
 

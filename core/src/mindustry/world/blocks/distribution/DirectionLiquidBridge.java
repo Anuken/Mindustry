@@ -31,8 +31,8 @@ public class DirectionLiquidBridge extends DirectionBridge{
         public void draw(){
             Draw.rect(block.region, x, y);
 
-            if(liquids.total() > 0.001f){
-                Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
+            if(liquids.currentAmount() > 0.001f){
+                Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
             }
 
             Draw.rect(dirRegion, x, y, rotdeg());
@@ -52,7 +52,7 @@ public class DirectionLiquidBridge extends DirectionBridge{
             }
 
             if(link == null){
-                if(liquids.total() > 0.0001f && timer(timerFlow, 1)){
+                if(liquids.currentAmount() > 0.0001f && timer(timerFlow, 1)){
                     moveLiquidForward(false, liquids.current());
                 }
             }

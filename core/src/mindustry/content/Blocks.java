@@ -1506,7 +1506,7 @@ public class Blocks implements ContentList{
         //TODO different name
         reinforcedPump = new Pump("reinforced-pump"){{
             requirements(Category.liquid, with(Items.beryllium, 70, Items.tungsten, 20, Items.silicon, 20));
-            //TODO CUSTOM DRAW ANIMATION + 3x3?
+            //TODO CUSTOM DRAW ANIMATION
             //TODO balance consumption
             consumes.liquid(Liquids.hydrogen, 1.5f / 60f);
 

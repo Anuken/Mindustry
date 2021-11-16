@@ -49,7 +49,7 @@ public class LiquidTurret extends Turret{
         consumes.add(new ConsumeLiquidFilter(i -> ammoTypes.containsKey(i), 1f){
             @Override
             public boolean valid(Building build){
-                return build.liquids.total() > 0.001f;
+                return build.liquids.currentAmount() >= 0.001f;
             }
 
             @Override
@@ -78,7 +78,7 @@ public class LiquidTurret extends Turret{
             super.draw();
             
             if(liquidRegion.found()){
-                Drawf.liquid(liquidRegion, x + recoilOffset.x, y + recoilOffset.y, liquids.total() / liquidCapacity, liquids.current().color, rotation - 90);
+                Drawf.liquid(liquidRegion, x + recoilOffset.x, y + recoilOffset.y, liquids.currentAmount() / liquidCapacity, liquids.current().color, rotation - 90);
             }
             if(topRegion.found()) Draw.rect(topRegion, x + recoilOffset.x, y + recoilOffset.y, rotation - 90);
         }
@@ -140,7 +140,7 @@ public class LiquidTurret extends Turret{
 
         @Override
         public boolean hasAmmo(){
-            return ammoTypes.get(liquids.current()) != null && liquids.total() >= 1f / ammoTypes.get(liquids.current()).ammoMultiplier;
+            return ammoTypes.get(liquids.current()) != null && liquids.currentAmount() >= 1f / ammoTypes.get(liquids.current()).ammoMultiplier;
         }
 
         @Override

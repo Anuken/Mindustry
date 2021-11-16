@@ -170,7 +170,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
             }
 
             if(hasLiquids){
-                Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
+                Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
             }
         }
 

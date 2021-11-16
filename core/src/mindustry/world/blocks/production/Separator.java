@@ -76,7 +76,7 @@ public class Separator extends Block{
         public void draw(){
             super.draw();
 
-            Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
+            Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
 
             if(Core.atlas.isFound(spinnerRegion)){
                 Draw.rect(spinnerRegion, x, y, totalProgress * spinnerSpeed);
@@ -132,7 +132,7 @@ public class Separator extends Block{
 
         @Override
         public boolean canDump(Building to, Item item){
-            return !consumes.itemFilters.get(item.id);
+            return !consumes.consumesItem(item);
         }
 
         @Override

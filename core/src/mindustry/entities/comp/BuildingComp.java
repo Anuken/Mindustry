@@ -556,7 +556,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public boolean acceptItem(Building source, Item item){
-        return block.consumes.itemFilters.get(item.id) && items.get(item) < getMaximumAccepted(item);
+        return block.consumes.consumesItem(item) && items.get(item) < getMaximumAccepted(item);
     }
 
     public boolean acceptLiquid(Building source, Liquid liquid){
@@ -644,21 +644,23 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 next.handleLiquid(self(), liquid, flow);
                 liquids.remove(liquid, flow);
                 return flow;
-            }else if(next.liquids.currentAmount() / next.block.liquidCapacity > 0.1f && fract > 0.1f){
+                //handle reactions between different liquid types ▼
+            }else if(!next.block.consumes.consumesLiquid(liquid) && next.liquids.currentAmount() / next.block.liquidCapacity > 0.1f && fract > 0.1f){
                 //TODO !IMPORTANT! uses current(), which is 1) wrong for multi-liquid blocks and 2) causes unwanted reactions, e.g. hydrogen + slag in pump
                 //TODO these are incorrect effect positions
                 float fx = (x + next.x) / 2f, fy = (y + next.y) / 2f;
 
                 Liquid other = next.liquids.current();
+                //TODO liquid reaction handler for extensibility
                 if((other.flammability > 0.3f && liquid.temperature > 0.7f) || (liquid.flammability > 0.3f && other.temperature > 0.7f)){
-                    damage(1 * Time.delta);
-                    next.damage(1 * Time.delta);
-                    if(Mathf.chance(0.1 * Time.delta)){
+                    damageContinuous(1);
+                    next.damageContinuous(1);
+                    if(Mathf.chanceDelta(0.1)){
                         Fx.fire.at(fx, fy);
                     }
                 }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) || (other.temperature > 0.7f && liquid.temperature < 0.55f)){
                     liquids.remove(liquid, Math.min(liquids.get(liquid), 0.7f * Time.delta));
-                    if(Mathf.chance(0.2f * Time.delta)){
+                    if(Mathf.chanceDelta(0.2f)){
                         Fx.steam.at(fx, fy);
                     }
                 }
@@ -1468,7 +1470,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case range -> this instanceof Ranged r ? r.range() / tilesize : 0;
             case rotation -> rotation;
             case totalItems -> items == null ? 0 : items.total();
-            case totalLiquids -> liquids == null ? 0 : liquids.total();
+            //TODO will give wildly fluctuating amounts due to switching of current() for multi-liquid blocks. totalLiquids is inherently bad design, but unfortunately it is useful for conduits/tanks
+            case totalLiquids -> liquids == null ? 0 : liquids.currentAmount();
             case totalPower -> power == null || !block.consumes.hasPower() ? 0 : power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
             case itemCapacity -> block.hasItems ? block.itemCapacity : 0;
             case liquidCapacity -> block.hasLiquids ? block.liquidCapacity : 0;
