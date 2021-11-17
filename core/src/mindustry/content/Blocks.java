@@ -60,7 +60,7 @@ public class Blocks implements ContentList{
     //crafting
     siliconSmelter, siliconCrucible, siliconArcFurnace, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
-    electrolyzer, oxidationChamber, heatReactor, carbideCrucible,
+    electrolyzer, oxidationChamber, heatReactor, carbideCrucible, slagCentrifuge, surgeCrucible,
     cellSynthesisChamber,
 
     //sandbox
@@ -105,7 +105,7 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
     //turrets - erekir
-    breach,
+    breach, fracture,
 
     //units
     commandCenter,
@@ -791,7 +791,7 @@ public class Blocks implements ContentList{
             itemCapacity = 20;
         }};
 
-        surgeSmelter = new GenericCrafter("alloy-smelter"){{
+        surgeSmelter = new GenericCrafter("surge-smelter"){{
             requirements(Category.crafting, with(Items.silicon, 80, Items.lead, 80, Items.thorium, 70));
             craftEffect = Fx.smeltsmoke;
             outputItem = new ItemStack(Items.surgeAlloy, 1);
@@ -1035,6 +1035,26 @@ public class Blocks implements ContentList{
             consumes.power(2f);
         }};
 
+        //TODO implement
+        if(false)
+        slagCentrifuge = new GenericCrafter("slag-centrifuge"){{
+            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 60, Items.oxide, 40));
+
+            outputLiquids = new LiquidStack[]{};
+        }};
+
+        //TODO implement
+        //original: consumes.items(with(Items.copper, 3, Items.lead, 4, Items.titanium, 2, Items.silicon, 3));
+        if(false)
+        surgeCrucible = new GenericCrafter("surge-crucible"){{
+            //needs:
+            //liquid lead???
+            //slag (a lot of it)
+            //silicon
+            //heat
+        }};
+
+        //TODO needs to be completely redone from the ground up
         cellSynthesisChamber = new LiquidConverter("cell-synthesis-chamber"){{
             //TODO booster mechanics?
             requirements(Category.crafting, with(Items.thorium, 100, Items.phaseFabric, 120, Items.titanium, 150, Items.surgeAlloy, 70));
@@ -2426,7 +2446,46 @@ public class Blocks implements ContentList{
         breach = new ItemTurret("breach"){{
             requirements(Category.turret, with(Items.beryllium, 35), true);
             ammo(
-            Items.beryllium, new BasicBulletType(7f, 25){{
+            Items.beryllium, new BasicBulletType(7f, 30){{
+                width = 8f;
+                height = 14f;
+                shootEffect = Fx.berylSpark;
+                smokeEffect = Fx.shootBigSmoke;
+                ammoMultiplier = 1;
+                pierce = true;
+                pierceBuilding = true;
+                hitColor = backColor = trailColor = Pal.berylShot;
+                frontColor = Color.white;
+                trailWidth = 1.5f;
+                trailLength = 10;
+                //TODO different effect?
+                hitEffect = despawnEffect = Fx.hitBulletColor;
+            }}
+            );
+
+            //TODO no coolant?
+
+            draw = new DrawTurret("reinforced-");
+            shootLength = 0f;
+            outlineColor = Pal.darkOutline;
+            size = 2;
+            envEnabled |= Env.space;
+            reloadTime = 40f;
+            restitution = 0.03f;
+            range = 180;
+            shootCone = 3f;
+            health = 300 * size * size;
+            rotateSpeed = 1.8f;
+
+            limitRange();
+        }};
+
+        //TODO implementation; splash damage? shotgun?
+        if(false)
+        fracture = new ItemTurret("fracture"){{
+            requirements(Category.turret, with(Items.tungsten, 35, Items.silicon, 35), true);
+            ammo(
+            Items.tungsten, new BasicBulletType(7f, 25){{
                 width = 8f;
                 height = 14f;
                 shootEffect = Fx.berylSpark;
@@ -2443,6 +2502,10 @@ public class Blocks implements ContentList{
             }}
             );
 
+            consumes.liquid(Liquids.hydrogen, 1.5f / 60f);
+            shots = 3;
+
+            //TODO cool reload animation
             draw = new DrawTurret("reinforced-");
             shootLength = 0f;
             outlineColor = Pal.darkOutline;
