@@ -39,7 +39,7 @@ public class DirectionLiquidBridge extends DirectionBridge{
             var link = findLink();
             if(link != null){
                 Draw.z(Layer.power);
-                drawBridge(rotation, x, y, link.x, link.y, Tmp.c1.set(liquids.current().color).a(liquids.currentAmount() / liquidCapacity));
+                drawBridge(rotation, x, y, link.x, link.y, Tmp.c1.set(liquids.current().color).a(liquids.currentAmount() / liquidCapacity * liquids.current().color.a));
             }
         }
 

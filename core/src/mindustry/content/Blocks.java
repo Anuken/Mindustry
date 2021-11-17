@@ -1043,20 +1043,37 @@ public class Blocks implements ContentList{
             outputLiquids = new LiquidStack[]{};
         }};
 
-        //TODO implement
         //TODO "crucible" is getting old
         //TODO should have a useful turret ammo byproduct?
         //original: consumes.items(with(Items.copper, 3, Items.lead, 4, Items.titanium, 2, Items.silicon, 3));
-        if(false)
         surgeCrucible = new HeatCrafter("surge-crucible"){{
+            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 60, Items.carbide, 30));
+
             size = 3;
 
             itemCapacity = 20;
             heatRequirement = 5f;
-            craftTime = 60f * 2.5f;
+            craftTime = 60f * 3f;
+            liquidCapacity = 80f * 5;
 
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.07f;
+
+            outputItem = new ItemStack(Items.surgeAlloy, 1);
+
+            craftEffect = new RadialEffect(Fx.surgeCruciSmoke, 4, 90f, 5f);
+
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawCircles(){{
+                color = Color.valueOf("ffc073").a(0.24f);
+                strokeMax = 2.5f;
+                radius = 10f;
+                amount = 3;
+            }}, new DrawLiquidRegion(Liquids.slag), new DrawBlock(), new DrawHeatInput(), new DrawHeatRegion(){{
+                heatColor = Color.valueOf("ff6060ff");
+            }}, new DrawHeatRegion("-vents"){{
+                heatColor.a = 1f;
+            }});
+            iconOverride = new String[]{"-bottom", ""};
 
             consumes.item(Items.silicon, 3);
             //TODO must consume from 2 pumps, 1, or 1.5?

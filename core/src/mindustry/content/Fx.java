@@ -12,7 +12,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.world.Block;
+import mindustry.world.*;
 
 import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
@@ -1343,6 +1343,21 @@ public class Fx{
         randLenVectors(e.id, 9, e.finpow() * 23f, e.rotation, 20f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 2.4f + 0.2f);
         });
+    }),
+
+    surgeCruciSmoke = new Effect(160f, e -> {
+        color(Pal.slagOrange);
+        alpha(0.6f);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 3; i++){
+            float len = rand.random(6f), rot = rand.range(40f) + e.rotation;
+
+            e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
+                v.trns(rot, len * b.finpow());
+                Fill.circle(e.x + v.x, e.y + v.y, 2f * b.fslope() + 0.2f);
+            });
+        }
     }),
 
     berylSpark = new Effect(21f, e -> {
