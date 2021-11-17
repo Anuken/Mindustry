@@ -3,6 +3,7 @@ package mindustry.content;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
@@ -2417,6 +2418,7 @@ public class UnitTypes implements ContentList{
             isCounted = false;
             envDisabled = 0;
 
+            outlineColor = Pal.darkOutline;
             lowAltitude = false;
             flying = true;
             targetAir = false;
@@ -2475,6 +2477,7 @@ public class UnitTypes implements ContentList{
             isCounted = false;
             envDisabled = 0;
 
+            outlineColor = Pal.darkOutline;
             lowAltitude = false;
             flying = true;
             targetAir = false;
@@ -2483,7 +2486,7 @@ public class UnitTypes implements ContentList{
             buildSpeed = 1.4f;
             drag = 0.06f;
             speed = 2.6f;
-            rotateSpeed = 6f;
+            rotateSpeed = 5f;
             accel = 0.11f;
             itemCapacity = 70;
             health = 600f;
@@ -2525,6 +2528,77 @@ public class UnitTypes implements ContentList{
                 }};
             }});
         }};
+
+        emanate = new UnitType("emanate"){{
+            defaultController = BuilderAI::new;
+            isCounted = false;
+            envDisabled = 0;
+
+            outlineColor = Pal.darkOutline;
+            lowAltitude = false;
+            flying = true;
+            targetAir = false;
+            mineSpeed = 8f;
+            mineTier = 3;
+            buildSpeed = 1.4f;
+            drag = 0.06f;
+            speed = 2.6f;
+            rotateSpeed = 3f;
+            accel = 0.11f;
+            itemCapacity = 140;
+            health = 1500f;
+            armor = 3f;
+            hitSize = 36f;
+            commandLimit = 9;
+            buildBeamOffset = 72f / 4f;
+            engineSize = 0;
+            payloadCapacity = Mathf.sqr(3f) * tilePayload;
+
+            float es = 3.8f;
+
+            setEnginesMirror(
+            new UnitEngine(49 / 4f, 51 / 4f, es, 45f),
+            new UnitEngine(67 / 4f, -30 / 4f, es, 315f),
+            new UnitEngine(49 / 4f, -62 / 4f, es, 315f)
+            );
+
+            Vec2[] positions = {new Vec2(30f, 50f), new Vec2(60f, -15f)};
+            int i = 0;
+
+            for(var pos : positions){
+                int fi = i;
+                weapons.add(new Weapon("incite-weapon"){{
+                    rotate = true;
+                    reload = fi == 0 ? 25f : 35f;
+                    rotateSpeed = 4f;
+                    x = pos.x/4f;
+                    y = pos.y/4f;
+                    shootY = 5.75f;
+                    recoil = 2f;
+                    rotationLimit = 90f;
+                    layerOffset = -0.01f;
+
+                    bullet = new BasicBulletType(5f, 17){{
+                        width = 7f;
+                        height = 12f;
+                        shootEffect = Fx.sparkShoot;
+                        smokeEffect = Fx.shootBigSmoke;
+                        pierceCap = 2;
+                        pierce = true;
+                        pierceBuilding = true;
+                        hitColor = backColor = trailColor = Pal.bulletYellowBack;
+                        frontColor = Color.white;
+                        trailWidth = 1.5f;
+                        trailLength = 7;
+                        hitEffect = despawnEffect = Fx.hitBulletColor;
+                    }};
+                }});
+                i ++;
+            }
+
+
+        }};
+
 
         //TODO emanate (+ better names)
 

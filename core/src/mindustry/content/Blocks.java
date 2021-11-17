@@ -1988,7 +1988,7 @@ public class Blocks implements ContentList{
             //TODO cost
             requirements(Category.effect, with(Items.beryllium, 11000, Items.graphite, 11000, Items.tungsten, 9000, Items.carbide, 10000));
 
-            unitType = UnitTypes.evoke;
+            unitType = UnitTypes.emanate;
             health = 22000;
             itemCapacity = 16000;
             size = 6;

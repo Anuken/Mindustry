@@ -85,6 +85,8 @@ public class Weapon implements Cloneable{
     public float shotDelay = 0;
     /** The half-radius of the cone in which shooting will start. */
     public float shootCone = 5f;
+    /** Cone in which the weapon can rotate relative to its mount. */
+    public float rotationLimit = 361f;
     /** ticks to cool down the heat region */
     public float cooldownTime = 20f;
     /** random sound pitch range */
@@ -147,6 +149,10 @@ public class Weapon implements Cloneable{
 
     //TODO copy-pasted code
     public void drawOutline(Unit unit, WeaponMount mount){
+        //apply layer offset, roll it back at the end
+        float z = Draw.z();
+        Draw.z(z + layerOffset);
+
         float
         rotation = unit.rotation - 90,
         weaponRotation  = rotation + (rotate ? mount.rotation : 0),
@@ -160,6 +166,8 @@ public class Weapon implements Cloneable{
             outlineRegion.height * Draw.scl,
             weaponRotation);
         }
+
+        Draw.z(z);
     }
     
     public void draw(Unit unit, WeaponMount mount){
@@ -215,6 +223,12 @@ public class Weapon implements Cloneable{
 
             mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - unit.rotation;
             mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, rotateSpeed * Time.delta);
+            if(rotationLimit < 360){
+                float dst = Angles.angleDist(mount.rotation, 0f);
+                if(dst > rotationLimit/2f){
+                    mount.rotation = Angles.moveToward(mount.rotation, 0, dst - rotationLimit/2f);
+                }
+            }
         }else if(!rotate){
             mount.rotation = 0;
             mount.targetRotation = unit.angleTo(mount.aimX, mount.aimY);
