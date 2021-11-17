@@ -1035,7 +1035,7 @@ public class Blocks implements ContentList{
             consumes.power(2f);
         }};
 
-        //TODO implement
+        //TODO implement - is this even necessary?
         if(false)
         slagCentrifuge = new GenericCrafter("slag-centrifuge"){{
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 60, Items.oxide, 40));
@@ -1044,6 +1044,7 @@ public class Blocks implements ContentList{
         }};
 
         //TODO implement
+        //TODO should have a useful turret ammo byproduct?
         //original: consumes.items(with(Items.copper, 3, Items.lead, 4, Items.titanium, 2, Items.silicon, 3));
         if(false)
         surgeCrucible = new GenericCrafter("surge-crucible"){{
