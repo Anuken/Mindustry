@@ -16,7 +16,7 @@ If you are interested in adding a large mechanic/feature or changing large amoun
 For most changes, this should not be necessary. I just want to know if you're doing something big so I can offer advice and/or make sure you're not wasting your time on it.
 
 ### Do not make formatting PRs.
-Yes, there are occurences of trailing spaces, extra newlines, empty indents, and other tiny errors. No, I don't want to merge, view, or get notified by your 1-line PR fixing it. If you're implementing a PR with modification of *actual code*, feel free to fix formatting in the general vicinity of your changes, but please don't waste everyone's time with pointless changes.
+Yes, there are occurrences of trailing spaces, extra newlines, empty indents, and other tiny errors. No, I don't want to merge, view, or get notified by your 1-line PR fixing it. If you're implementing a PR with modification of *actual code*, feel free to fix formatting in the general vicinity of your changes, but please don't waste everyone's time with pointless changes.
 
 ## Style Guidelines
 
