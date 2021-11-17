@@ -269,7 +269,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void applyBoost(float intensity, float duration){
         //do not refresh time scale when getting a weaker intensity
-        if(intensity >= this.timeScale){
+        if(intensity >= this.timeScale - 0.001f){
             timeScaleDuration = Math.max(timeScaleDuration, duration);
         }
         timeScale = Math.max(timeScale, intensity);
@@ -280,11 +280,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public Building nearby(int rotation){
-        if(rotation == 0) return world.build(tile.x + 1, tile.y);
-        if(rotation == 1) return world.build(tile.x, tile.y + 1);
-        if(rotation == 2) return world.build(tile.x - 1, tile.y);
-        if(rotation == 3) return world.build(tile.x, tile.y - 1);
-        return null;
+        return switch(rotation){
+            case 0 -> world.build(tile.x + 1, tile.y);
+            case 1 -> world.build(tile.x, tile.y + 1);
+            case 2 -> world.build(tile.x - 1, tile.y);
+            case 3 -> world.build(tile.x, tile.y - 1);
+            default -> null;
+        };
     }
 
     public byte relativeTo(Tile tile){
@@ -430,6 +432,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public boolean canUnload(){
         return block.unloadable;
+    }
+
+    public boolean canResupply(){
+        return block.allowResupply;
     }
 
     public boolean payloadCheck(int conveyorRotation){
@@ -1033,7 +1039,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called *after* the tile has been removed. */
     public void afterDestroyed(){
-
+        if(block.destroyBullet != null){
+            //I really do not like that the bullet will not destroy derelict
+            //but I can't do anything about it without using a random team
+            //which may or may not cause issues with servers and js
+            block.destroyBullet.create(this, Team.derelict, x, y, 0);
+        }
     }
 
     /** @return the cap for item amount calculations, used when this block explodes. */

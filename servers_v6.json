@@ -1,11 +1,11 @@
 [
   {
-    "name": "Mindustry Central",
-    "address": ["n2.mindustry.me:4019", "mindustry.me:2034", "mindustry.me:2035"]
-  },
-  {
     "name": "RCM",
     "address": ["185.104.248.61", "easyplay.su"]
+  },
+  {
+    "name": "SkaarjDustry",
+    "address": ["skaarjproject.duckdns.org"]
   },
   {
     "name": "{AA}",
@@ -104,8 +104,8 @@
     "address": ["usfr2.forcehost.net:25578"]
   },
   {
-    "name": "Español",
-    "address": ["168.119.36.188:41445"]
+    "name": "Mindustry Español",
+    "address": ["panel.mindustry.me:2011", "mindustry.me:2034", "mindustry.me:2035"]
   },
   {
     "name": "CreateDustry",

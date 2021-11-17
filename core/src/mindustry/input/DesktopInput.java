@@ -616,6 +616,7 @@ public class DesktopInput extends InputHandler{
         super.updateState();
 
         if(state.isMenu()){
+            lastSchematic = null;
             droppingItem = false;
             mode = none;
             block = null;
