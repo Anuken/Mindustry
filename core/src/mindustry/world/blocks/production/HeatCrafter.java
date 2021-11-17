@@ -6,6 +6,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.heat.*;
+import mindustry.world.meta.*;
 
 import java.util.*;
 
@@ -44,7 +45,7 @@ public class HeatCrafter extends GenericCrafter{
     public void setStats(){
         super.setStats();
 
-        //TODO heat stats
+        stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
     }
 
     public class HeatCrafterBuild extends GenericCrafterBuild{

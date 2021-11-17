@@ -2,9 +2,9 @@ package mindustry.world.draw;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 
 public class DrawRotator extends DrawBlock{
     public TextureRegion rotator, top;
@@ -12,12 +12,12 @@ public class DrawRotator extends DrawBlock{
     public float spinSpeed = 2f;
 
     @Override
-    public void draw(GenericCrafterBuild build){
+    public void drawBase(Building build){
         Draw.rect(build.block.region, build.x, build.y);
         if(drawSpinSprite){
-            Drawf.spinSprite(rotator, build.x, build.y, build.totalProgress * spinSpeed);
+            Drawf.spinSprite(rotator, build.x, build.y, build.totalProgress() * spinSpeed);
         }else{
-            Draw.rect(rotator, build.x, build.y, build.totalProgress * spinSpeed);
+            Draw.rect(rotator, build.x, build.y, build.totalProgress() * spinSpeed);
         }
         if(top.found()) Draw.rect(top, build.x, build.y);
     }

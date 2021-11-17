@@ -24,7 +24,7 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
-import mindustry.world.drawturret.*;
+import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -79,12 +79,14 @@ public class Turret extends ReloadTurret{
 
     public Sortf unitSort = UnitSorts.closest;
 
-    public @Nullable String basePrefix;
-    public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
-    public @Load("@-heat") TextureRegion heatRegion;
+    /** @deprecated loaded in {@link #draw} instead, unused */
+    public @Deprecated @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
+    /** @deprecated loaded in {@link #draw} instead, unused */
+    public @Deprecated @Load("@-heat") TextureRegion heatRegion;
+
     public float elevation = -1f;
 
-    public DrawTurret draw = new DrawTurret();
+    public DrawBlock draw = new DrawTurret();
 
     /** @deprecated use bulletOffset; this will always be zero. **/
     @Deprecated
@@ -140,10 +142,6 @@ public class Turret extends ReloadTurret{
         super.load();
 
         draw.load(this);
-
-        if(basePrefix != null){
-            baseRegion = Core.atlas.find(basePrefix + "-block-" + size);
-        }
     }
 
     @Override
@@ -173,6 +171,11 @@ public class Turret extends ReloadTurret{
         public Vec2 targetPos = new Vec2();
         public BlockUnitc unit = (BlockUnitc)UnitTypes.block.create(team);
         public boolean wasShooting, charging;
+
+        @Override
+        public float drawrot(){
+            return rotation - 90;
+        }
 
         @Override
         public boolean canControl(){
@@ -258,15 +261,7 @@ public class Turret extends ReloadTurret{
 
         @Override
         public void draw(){
-            Draw.rect(baseRegion, x, y);
-            Draw.color();
-
-            Draw.z(Layer.turret);
-
-            Drawf.shadow(region, x + recoilOffset.x - elevation, y + recoilOffset.y - elevation, rotation - 90);
-
-            draw.draw(Turret.this, this);
-            draw.drawHeat(Turret.this, this);
+            draw.drawBase(this);
         }
 
         @Override

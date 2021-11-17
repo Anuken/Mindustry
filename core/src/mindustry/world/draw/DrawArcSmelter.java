@@ -5,8 +5,8 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.world.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 
 public class DrawArcSmelter extends DrawBlock{
     public TextureRegion top, bottom;
@@ -21,23 +21,23 @@ public class DrawArcSmelter extends DrawBlock{
     public Blending blending = Blending.additive;
 
     @Override
-    public void draw(GenericCrafterBuild build){
+    public void drawBase(Building build){
         if(drawBottom) Draw.rect(bottom, build.x, build.y);
 
-        if(build.warmup > 0f && flameColor.a > 0.001f){
-            Lines.stroke(circleStroke * build.warmup);
+        if(build.warmup() > 0f && flameColor.a > 0.001f){
+            Lines.stroke(circleStroke * build.warmup());
 
             float si = Mathf.absin(flameRadiusScl, flameRadiusMag);
-            float a = alpha * build.warmup;
+            float a = alpha * build.warmup();
             Draw.blend(blending);
 
             Draw.color(midColor, a);
             if(drawCenter) Fill.circle(build.x, build.y, flameRad + si);
 
             Draw.color(flameColor, a);
-            if(drawCenter) Lines.circle(build.x, build.y, (flameRad + circleSpace + si) * build.warmup);
+            if(drawCenter) Lines.circle(build.x, build.y, (flameRad + circleSpace + si) * build.warmup());
 
-            Lines.stroke(particleStroke * build.warmup);
+            Lines.stroke(particleStroke * build.warmup());
 
             float base = (Time.time / particleLife);
             rand.setSeed(build.id);
@@ -45,7 +45,7 @@ public class DrawArcSmelter extends DrawBlock{
                 float fin = (rand.random(1f) + base) % 1f, fout = 1f - fin;
                 float angle = rand.random(360f);
                 float len = particleRad * Interp.pow2Out.apply(fin);
-                Lines.lineAngle(build.x + Angles.trnsx(angle, len), build.y + Angles.trnsy(angle, len), angle, particleLen * fout * build.warmup);
+                Lines.lineAngle(build.x + Angles.trnsx(angle, len), build.y + Angles.trnsy(angle, len), angle, particleLen * fout * build.warmup());
             }
 
             Draw.blend();

@@ -3,9 +3,9 @@ package mindustry.world.draw;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 
 public class DrawAnimation extends DrawBlock{
     public int frameCount = 3;
@@ -15,12 +15,12 @@ public class DrawAnimation extends DrawBlock{
     public TextureRegion liquid, top;
 
     @Override
-    public void draw(GenericCrafterBuild build){
+    public void drawBase(Building build){
         Draw.rect(build.block.region, build.x, build.y);
         Draw.rect(
             sine ?
-                frames[(int)Mathf.absin(build.totalProgress, frameSpeed, frameCount - 0.001f)] :
-                frames[(int)((build.totalProgress / frameSpeed) % frameCount)],
+                frames[(int)Mathf.absin(build.totalProgress(), frameSpeed, frameCount - 0.001f)] :
+                frames[(int)((build.totalProgress() / frameSpeed) % frameCount)],
             build.x, build.y);
 
         if(build.liquids != null){

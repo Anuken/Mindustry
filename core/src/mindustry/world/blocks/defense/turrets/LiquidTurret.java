@@ -8,7 +8,6 @@ import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
@@ -18,9 +17,12 @@ import static mindustry.Vars.*;
 
 public class LiquidTurret extends Turret{
     public ObjectMap<Liquid, BulletType> ammoTypes = new ObjectMap<>();
-    public @Load("@-liquid") TextureRegion liquidRegion;
-    public @Load("@-top") TextureRegion topRegion;
     public boolean extinguish = true;
+
+    /** @deprecated loaded in {@link #draw} instead, unused */
+    public @Deprecated @Load("@-liquid") TextureRegion liquidRegion;
+    /** @deprecated loaded in {@link #draw} instead, unused */
+    public @Deprecated @Load("@-top") TextureRegion topRegion;
 
     public LiquidTurret(String name){
         super(name);
@@ -66,22 +68,7 @@ public class LiquidTurret extends Turret{
         super.init();
     }
 
-    @Override
-    public TextureRegion[] icons(){
-        if(topRegion.found()) return new TextureRegion[]{baseRegion, region, topRegion};
-        return super.icons();
-    }
-
     public class LiquidTurretBuild extends TurretBuild{
-        @Override
-        public void draw(){
-            super.draw();
-            
-            if(liquidRegion.found()){
-                Drawf.liquid(liquidRegion, x + recoilOffset.x, y + recoilOffset.y, liquids.currentAmount() / liquidCapacity, liquids.current().color, rotation - 90);
-            }
-            if(topRegion.found()) Draw.rect(topRegion, x + recoilOffset.x, y + recoilOffset.y, rotation - 90);
-        }
 
         @Override
         public boolean shouldActiveSound(){

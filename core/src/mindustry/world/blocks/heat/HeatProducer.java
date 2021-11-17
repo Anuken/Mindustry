@@ -6,6 +6,7 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.draw.*;
+import mindustry.world.meta.*;
 
 public class HeatProducer extends GenericCrafter{
     public float heatOutput = 10f;
@@ -26,7 +27,8 @@ public class HeatProducer extends GenericCrafter{
     @Override
     public void setStats(){
         super.setStats();
-        //TODO heat prod stats
+
+        stats.add(Stat.output, heatOutput, StatUnit.heatUnits);
     }
 
     @Override

@@ -578,6 +578,11 @@ public class Block extends UnlockableContent{
     }
 
     public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        drawDefaultRequestRegion(plan, list);
+    }
+
+    /** this is a different method so subclasses can call it even after overriding the base */
+    public void drawDefaultRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
         TextureRegion reg = getRequestRegion(plan, list);
         Draw.rect(reg, plan.drawx(), plan.drawy(), !rotate || !rotateDraw ? 0 : plan.rotation * 90);
 

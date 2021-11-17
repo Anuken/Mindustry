@@ -4,6 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.production.GenericCrafter.*;
@@ -13,19 +14,27 @@ import mindustry.world.blocks.production.GenericCrafter.*;
 public class DrawBlock{
     protected static final Rand rand = new Rand();
 
-    /** Draws the block. */
-    public void draw(GenericCrafterBuild build){
+    /** @deprecated no longer called! not specific to generic crafters! */
+    @Deprecated
+    public void draw(GenericCrafterBuild build){}
+
+    /** @deprecated no longer called! not specific to generic crafters! */
+    @Deprecated
+    public void drawLight(GenericCrafterBuild build){}
+
+    /** Draws the block itself. */
+    public void drawBase(Building build){
         Draw.rect(build.block.region, build.x, build.y, build.drawrot());
     }
 
     /** Draws any extra light for the block. */
-    public void drawLight(GenericCrafterBuild build){
+    public void drawLights(Building build){
 
     }
 
     /** Draws the planned version of this block. */
-    public void drawPlan(GenericCrafter crafter, BuildPlan plan, Eachable<BuildPlan> list){
-        crafter.drawPlanBase(plan, list);
+    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
+        block.drawDefaultRequestRegion(plan, list);
     }
 
     /** Load any relevant texture regions. */
@@ -36,5 +45,10 @@ public class DrawBlock{
     /** @return the generated icons to be used for this block. */
     public TextureRegion[] icons(Block block){
         return new TextureRegion[]{block.region};
+    }
+
+    public GenericCrafter expectCrafter(Block block){
+        if(!(block instanceof GenericCrafter crafter)) throw new ClassCastException("This drawer requires the block to be a GenericCrafter. Use a different drawer.");
+        return crafter;
     }
 }

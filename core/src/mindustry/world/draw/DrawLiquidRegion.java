@@ -4,11 +4,10 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.production.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 
 /** Not standalone. */
 public class DrawLiquidRegion extends DrawBlock{
@@ -24,10 +23,10 @@ public class DrawLiquidRegion extends DrawBlock{
     }
 
     @Override
-    public void drawPlan(GenericCrafter crafter, BuildPlan plan, Eachable<BuildPlan> list){}
+    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){}
 
     @Override
-    public void draw(GenericCrafterBuild build){
+    public void drawBase(Building build){
 
         Liquid drawn = drawLiquid != null ? drawLiquid : build.liquids.current();
         Drawf.liquid(liquid, build.x, build.y,

@@ -4,9 +4,8 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.world.*;
-import mindustry.world.blocks.production.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 
 /** Not standalone. */
 public class DrawRegion extends DrawBlock{
@@ -23,7 +22,7 @@ public class DrawRegion extends DrawBlock{
     }
 
     @Override
-    public void draw(GenericCrafterBuild build){
+    public void drawBase(Building build){
         float z = Draw.z();
         if(layer > 0) Draw.z(layer);
         Draw.rect(region, build.x, build.y);
@@ -31,7 +30,7 @@ public class DrawRegion extends DrawBlock{
     }
 
     @Override
-    public void drawPlan(GenericCrafter crafter, BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
         Draw.rect(region, plan.drawx(), plan.drawy());
     }
 

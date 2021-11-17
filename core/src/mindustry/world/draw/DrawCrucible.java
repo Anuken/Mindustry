@@ -6,8 +6,8 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.Interp.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.world.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 
 public class DrawCrucible extends DrawBlock{
     public TextureRegion top, bottom;
@@ -20,21 +20,21 @@ public class DrawCrucible extends DrawBlock{
     public Interp particleInterp = new PowIn(1.5f);
 
     @Override
-    public void draw(GenericCrafterBuild build){
+    public void drawBase(Building build){
         Draw.rect(bottom, build.x, build.y);
 
-        if(build.warmup > 0f && flameColor.a > 0.001f){
-            Lines.stroke(circleStroke * build.warmup);
+        if(build.warmup() > 0f && flameColor.a > 0.001f){
+            Lines.stroke(circleStroke * build.warmup());
 
             float si = Mathf.absin(flameRadiusScl, flameRadiusMag);
-            float a = alpha * build.warmup;
+            float a = alpha * build.warmup();
             Draw.blend(Blending.additive);
 
             Draw.color(midColor, a);
             Fill.circle(build.x, build.y, flameRad + si);
 
             Draw.color(flameColor, a);
-            Lines.circle(build.x, build.y, (flameRad + circleSpace + si) * build.warmup);
+            Lines.circle(build.x, build.y, (flameRad + circleSpace + si) * build.warmup());
 
             float base = (Time.time / particleLife);
             rand.setSeed(build.id);
@@ -46,7 +46,7 @@ public class DrawCrucible extends DrawBlock{
                 Fill.circle(
                     build.x + Angles.trnsx(angle, len),
                     build.y + Angles.trnsy(angle, len),
-                    particleSize * fin * build.warmup
+                    particleSize * fin * build.warmup()
                 );
             }
 

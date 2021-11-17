@@ -986,7 +986,6 @@ public class Blocks implements ContentList{
             liquidOutputDirections = new int[]{1, 3};
         }};
 
-        //TODO sprite
         oxidationChamber = new HeatProducer("oxidation-chamber"){{
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
             size = 3;
@@ -999,20 +998,19 @@ public class Blocks implements ContentList{
 
             rotateDraw = false;
 
-            //TODO rotor?
-            //TODO vent
+            //TODO vent?
             iconOverride = new String[]{"-bottom", "", "-top1", "-glass"};
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(), new DrawBlock(), new DrawHeatOutput(), new DrawRegion("-glass"));
 
             craftTime = 60f * 3f;
             liquidCapacity = 30f;
-            heatOutput = 8f;
+            heatOutput = 5f;
         }};
 
-        //TODO check sprite correctness
         heatReactor = new HeatProducer("heat-reactor"){{
-            //TODO quadvent
+            //TODO quadvent?
             //TODO coolant?
+            //TODO extra output, should have other uses
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
             size = 3;
             craftTime = 60f * 10f;
@@ -1512,8 +1510,7 @@ public class Blocks implements ContentList{
         //TODO different name
         reinforcedPump = new Pump("reinforced-pump"){{
             requirements(Category.liquid, with(Items.beryllium, 70, Items.tungsten, 20, Items.silicon, 20));
-            //TODO CUSTOM DRAW ANIMATION
-            //TODO balance consumption
+            //TODO CUSTOM DRAW ANIMATION - pistons - repurpose DrawBlock?
             consumes.liquid(Liquids.hydrogen, 1.5f / 60f);
 
             pumpAmount = 0.4f;
@@ -1726,7 +1723,7 @@ public class Blocks implements ContentList{
             spinSpeed = 0.6f;
             spinners = true;
             hasLiquids = true;
-            liquidOutput = new LiquidStack(Liquids.water, 5f / 60f / 9f);
+            liquidOutput = new LiquidStack(Liquids.water, 10f / 60f / 9f);
             liquidCapacity = 20f;
         }};
 
@@ -2446,11 +2443,11 @@ public class Blocks implements ContentList{
             }}
             );
 
+            draw = new DrawTurret("reinforced-");
             shootLength = 0f;
             outlineColor = Pal.darkOutline;
             size = 2;
             envEnabled |= Env.space;
-            basePrefix = "reinforced";
             reloadTime = 40f;
             restitution = 0.03f;
             range = 180;

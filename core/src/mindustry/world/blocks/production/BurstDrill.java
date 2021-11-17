@@ -114,7 +114,7 @@ public class BurstDrill extends Drill{
                     float a = Mathf.clamp(fract * arrows - arrowFract);
                     Tmp.v1.trns(i * 90 + 45, j * arrowSpacing);
 
-                    //TODO maybe just use arrow alpha and that drawn on the base?
+                    //TODO maybe just use arrow alpha and draw gray on the base?
                     Draw.z(Layer.block);
                     Draw.color(baseArrowColor, arrowColor, a);
                     Draw.rect(arrowRegion, x + Tmp.v1.x, y + Tmp.v1.y, i * 90);

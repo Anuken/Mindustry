@@ -2,11 +2,11 @@ package mindustry.world.draw;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 import mindustry.world.consumers.*;
 
 public class DrawLiquid extends DrawBlock{
@@ -21,7 +21,7 @@ public class DrawLiquid extends DrawBlock{
     }
 
     @Override
-    public void draw(GenericCrafterBuild build){
+    public void drawBase(Building build){
         Draw.rect(build.block.region, build.x, build.y);
         GenericCrafter type = (GenericCrafter)build.block;
 
@@ -45,6 +45,8 @@ public class DrawLiquid extends DrawBlock{
 
     @Override
     public void load(Block block){
+        expectCrafter(block);
+
         top = Core.atlas.find(block.name + "-top");
         liquid = Core.atlas.find(block.name + "-liquid");
         inLiquid = Core.atlas.find(block.name + "-input-liquid");

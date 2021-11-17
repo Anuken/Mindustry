@@ -6,10 +6,9 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import mindustry.world.blocks.production.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 
 /** Not standalone. */
 public class DrawGlowRegion extends DrawBlock{
@@ -21,14 +20,14 @@ public class DrawGlowRegion extends DrawBlock{
     public TextureRegion top;
 
     @Override
-    public void draw(GenericCrafterBuild build){
-        if(build.warmup <= 0.001f) return;
+    public void drawBase(Building build){
+        if(build.warmup() <= 0.001f) return;
 
         float z = Draw.z();
         Draw.z(layer);
         Draw.blend(blending);
         Draw.color(color);
-        Draw.alpha((Mathf.absin(build.totalProgress, glowScale, alpha) * glowIntensity + 1f - glowIntensity) * build.warmup * alpha);
+        Draw.alpha((Mathf.absin(build.totalProgress(), glowScale, alpha) * glowIntensity + 1f - glowIntensity) * build.warmup() * alpha);
         Draw.rect(top, build.x, build.y);
         Draw.reset();
         Draw.blend();
@@ -41,5 +40,5 @@ public class DrawGlowRegion extends DrawBlock{
     }
 
     @Override
-    public void drawPlan(GenericCrafter crafter, BuildPlan plan, Eachable<BuildPlan> list){}
+    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){}
 }

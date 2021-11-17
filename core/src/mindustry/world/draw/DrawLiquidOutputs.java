@@ -4,16 +4,16 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 
 /** This must be used in conjunction with another DrawBlock; it only draws outputs. */
 public class DrawLiquidOutputs extends DrawBlock{
     public TextureRegion[][] liquidOutputRegions;
 
     @Override
-    public void draw(GenericCrafterBuild build){
+    public void drawBase(Building build){
         GenericCrafter crafter = (GenericCrafter)build.block;
         if(crafter.outputLiquids == null) return;
 
@@ -27,7 +27,8 @@ public class DrawLiquidOutputs extends DrawBlock{
     }
 
     @Override
-    public void drawPlan(GenericCrafter crafter, BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
+        GenericCrafter crafter = (GenericCrafter)block;
         if(crafter.outputLiquids == null) return;
 
         for(int i = 0; i < crafter.outputLiquids.length; i++){
@@ -41,7 +42,7 @@ public class DrawLiquidOutputs extends DrawBlock{
 
     @Override
     public void load(Block block){
-        GenericCrafter crafter = (GenericCrafter)block;
+        var crafter = expectCrafter(block);
 
         if(crafter.outputLiquids == null) return;
 

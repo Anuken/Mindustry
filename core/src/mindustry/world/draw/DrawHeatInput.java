@@ -4,9 +4,9 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 import mindustry.world.blocks.production.HeatCrafter.*;
 
 /** Not standalone. */
@@ -17,7 +17,7 @@ public class DrawHeatInput extends DrawBlock{
     public TextureRegion heat;
 
     @Override
-    public void draw(GenericCrafterBuild build){
+    public void drawBase(Building build){
 
         Draw.z(Layer.blockAdditive);
         if(build instanceof HeatCrafterBuild hc){

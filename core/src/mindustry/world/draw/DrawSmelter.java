@@ -5,9 +5,9 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 
 public class DrawSmelter extends DrawBlock{
     public Color flameColor = Color.valueOf("ffc999");
@@ -29,24 +29,24 @@ public class DrawSmelter extends DrawBlock{
     }
 
     @Override
-    public void draw(GenericCrafterBuild build){
+    public void drawBase(Building build){
         Draw.rect(build.block.region, build.x, build.y, build.block.rotate ? build.rotdeg() : 0);
 
-        if(build.warmup > 0f && flameColor.a > 0.001f){
+        if(build.warmup() > 0f && flameColor.a > 0.001f){
             float g = 0.3f;
             float r = 0.06f;
             float cr = Mathf.random(0.1f);
 
             Draw.z(Layer.block + 0.01f);
             
-            Draw.alpha(build.warmup);
+            Draw.alpha(build.warmup());
             Draw.rect(top, build.x, build.y);
 
-            Draw.alpha(((1f - g) + Mathf.absin(Time.time, 8f, g) + Mathf.random(r) - r) * build.warmup);
+            Draw.alpha(((1f - g) + Mathf.absin(Time.time, 8f, g) + Mathf.random(r) - r) * build.warmup());
 
             Draw.tint(flameColor);
             Fill.circle(build.x, build.y, flameRadius + Mathf.absin(Time.time, flameRadiusScl, flameRadiusMag) + cr);
-            Draw.color(1f, 1f, 1f, build.warmup);
+            Draw.color(1f, 1f, 1f, build.warmup());
             Fill.circle(build.x, build.y, flameRadiusIn + Mathf.absin(Time.time, flameRadiusScl, flameRadiusInMag) + cr);
 
             Draw.color();
@@ -54,7 +54,7 @@ public class DrawSmelter extends DrawBlock{
     }
 
     @Override
-    public void drawLight(GenericCrafterBuild build){
-        Drawf.light(build.team, build.x, build.y, (lightRadius + Mathf.absin(lightSinScl, lightSinMag)) * build.warmup * build.block.size, flameColor, lightAlpha);
+    public void drawLights(Building build){
+        Drawf.light(build.team, build.x, build.y, (lightRadius + Mathf.absin(lightSinScl, lightSinMag)) * build.warmup() * build.block.size, flameColor, lightAlpha);
     }
 }

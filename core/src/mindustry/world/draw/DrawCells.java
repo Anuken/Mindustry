@@ -5,9 +5,9 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 
 public class DrawCells extends DrawBlock{
     public TextureRegion bottom, middle;
@@ -16,13 +16,13 @@ public class DrawCells extends DrawBlock{
     public float range = 4f, recurrence = 6f, radius = 3f, lifetime = 60f;
 
     @Override
-    public void draw(GenericCrafterBuild build){
+    public void drawBase(Building build){
 
         Draw.rect(bottom, build.x, build.y);
 
-        Drawf.liquid(middle, build.x, build.y, build.warmup, color);
+        Drawf.liquid(middle, build.x, build.y, build.warmup(), color);
 
-        if(build.warmup > 0.001f){
+        if(build.warmup() > 0.001f){
             rand.setSeed(build.id);
             for(int i = 0; i < particles; i++){
                 float offset = rand.nextFloat() * 999999f;
@@ -33,7 +33,7 @@ public class DrawCells extends DrawBlock{
 
                 if(fin > 0){
                     Draw.color(particleColorFrom, particleColorTo, ca);
-                    Draw.alpha(build.warmup);
+                    Draw.alpha(build.warmup());
 
                     Fill.circle(build.x + x, build.y + y, fslope * radius);
                 }

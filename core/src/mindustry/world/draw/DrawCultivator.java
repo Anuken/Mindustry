@@ -4,9 +4,9 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 
 public class DrawCultivator extends DrawBlock{
     public Color plantColor = Color.valueOf("5541b1");
@@ -21,12 +21,12 @@ public class DrawCultivator extends DrawBlock{
     public TextureRegion top;
 
     @Override
-    public void draw(GenericCrafterBuild build){
+    public void drawBase(Building build){
         Draw.rect(build.block.region, build.x, build.y);
 
-        Drawf.liquid(middle, build.x, build.y, build.warmup, plantColor);
+        Drawf.liquid(middle, build.x, build.y, build.warmup(), plantColor);
 
-        Draw.color(bottomColor, plantColorLight, build.warmup);
+        Draw.color(bottomColor, plantColorLight, build.warmup());
 
         rand.setSeed(build.pos());
         for(int i = 0; i < bubbles; i++){
@@ -34,7 +34,7 @@ public class DrawCultivator extends DrawBlock{
             float life = 1f - ((Time.time / timeScl + rand.random(recurrence)) % recurrence);
 
             if(life > 0){
-                Lines.stroke(build.warmup * (life + strokeMin));
+                Lines.stroke(build.warmup() * (life + strokeMin));
                 Lines.poly(build.x + x, build.y + y, sides, (1f - life) * radius);
             }
         }

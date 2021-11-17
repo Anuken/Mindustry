@@ -6,11 +6,10 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.heat.*;
-import mindustry.world.blocks.production.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 
 public class DrawHeatOutput extends DrawBlock{
     public TextureRegion heat, glow, top1, top2;
@@ -20,7 +19,7 @@ public class DrawHeatOutput extends DrawBlock{
     public boolean drawRegion = false;
 
     @Override
-    public void draw(GenericCrafterBuild build){
+    public void drawBase(Building build){
         if(drawRegion) Draw.rect(build.block.region, build.x, build.y);
 
         Draw.rect(build.rotation > 1 ? top2 : top1, build.x, build.y, build.rotdeg());
@@ -38,7 +37,7 @@ public class DrawHeatOutput extends DrawBlock{
     }
 
     @Override
-    public void drawPlan(GenericCrafter block, BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
         if(drawRegion) Draw.rect(block.region, plan.drawx(), plan.drawy());
         Draw.rect(plan.rotation > 1 ? top2 : top1, plan.drawx(), plan.drawy(), plan.rotation * 90);
     }

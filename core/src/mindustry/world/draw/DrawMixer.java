@@ -2,11 +2,11 @@ package mindustry.world.draw;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 import mindustry.world.consumers.*;
 
 public class DrawMixer extends DrawBlock{
@@ -21,7 +21,7 @@ public class DrawMixer extends DrawBlock{
     }
 
     @Override
-    public void draw(GenericCrafterBuild build){
+    public void drawBase(Building build){
         GenericCrafter crafter = (GenericCrafter)build.block;
         float rotation = build.block.rotate ? build.rotdeg() : 0;
         Draw.rect(bottom, build.x, build.y, rotation);
@@ -45,6 +45,8 @@ public class DrawMixer extends DrawBlock{
 
     @Override
     public void load(Block block){
+        expectCrafter(block);
+
         inLiquid = Core.atlas.find(block.name + "-input-liquid");
         liquid = Core.atlas.find(block.name + "-liquid");
         top = Core.atlas.find(block.name + "-top");

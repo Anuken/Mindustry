@@ -112,7 +112,10 @@ public class BeamNode extends PowerBlock{
             float w = laserWidth + Mathf.absin(pulseScl, pulseMag);
 
             for(int i = 0; i < 4; i ++){
-                if(dests[i] != null && (!(links[i].block instanceof BeamNode) || (links[i].tileX() != tileX() && links[i].tileY() != tileY()) || links[i].id > id)){
+                if(dests[i] != null && (!(links[i].block instanceof BeamNode node) ||
+                    (links[i].tileX() != tileX() && links[i].tileY() != tileY()) ||
+                    (links[i].id > id && range >= node.range) || range > node.range)){
+
                     int dst = Math.max(Math.abs(dests[i].x - tile.x),  Math.abs(dests[i].y - tile.y));
                     //don't draw lasers for adjacent blocks
                     if(dst > 1 + size/2){

@@ -379,6 +379,20 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
     }
 
+    /**
+     * @return the building's 'warmup', a smooth value from 0 to 1.
+     * usually used for crafters and things that need to spin up before reaching full efficiency.
+     * many blocks will just return 0.
+     * */
+    public float warmup(){
+        return 0f;
+    }
+
+    /** @return total time this block has been producing something; non-crafter blocks usually return Time.time. */
+    public float totalProgress(){
+        return Time.time;
+    }
+
     public BlockStatus status(){
         return cons.status();
     }

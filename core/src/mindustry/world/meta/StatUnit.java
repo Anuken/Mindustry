@@ -16,6 +16,7 @@ public enum StatUnit{
     itemsSecond,
     liquidUnits,
     powerUnits,
+    heatUnits,
     degrees,
     seconds,
     minutes,

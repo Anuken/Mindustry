@@ -145,13 +145,13 @@ public class GenericCrafter extends Block{
 
         @Override
         public void draw(){
-            drawer.draw(this);
+            drawer.drawBase(this);
         }
 
         @Override
         public void drawLight(){
             super.drawLight();
-            drawer.drawLight(this);
+            drawer.drawLights(this);
         }
 
         @Override
@@ -198,6 +198,16 @@ public class GenericCrafter extends Block{
 
         public float warmupTarget(){
             return 1f;
+        }
+
+        @Override
+        public float warmup(){
+            return warmup;
+        }
+
+        @Override
+        public float totalProgress(){
+            return totalProgress;
         }
 
         public void craft(){
