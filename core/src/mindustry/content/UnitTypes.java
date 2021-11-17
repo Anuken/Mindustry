@@ -40,7 +40,7 @@ public class UnitTypes implements ContentList{
 
     //air
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra,
-    evoke; //elicit, incite?
+    evoke;
 
     //air, legacy
     public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType mono;
@@ -50,7 +50,7 @@ public class UnitTypes implements ContentList{
 
     //air + payload
     public static @EntityDef({Unitc.class, Payloadc.class}) UnitType mega,
-    incite;
+    incite, emanate;
 
     //air + payload, legacy
     public static @EntityDef(value = {Unitc.class, Payloadc.class}, legacy = true) UnitType quad;
@@ -2525,6 +2525,8 @@ public class UnitTypes implements ContentList{
                 }};
             }});
         }};
+
+        //TODO emanate (+ better names)
 
         //endregion
         //region internal

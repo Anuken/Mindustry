@@ -1021,7 +1021,7 @@ public class Blocks implements ContentList{
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
             craftEffect = Fx.none;
             outputItem = new ItemStack(Items.carbide, 1);
-            craftTime = 60f * 4f;
+            craftTime = 60f * 3f;
             size = 3;
             itemCapacity = 20;
             hasPower = hasItems = true;
@@ -1044,15 +1044,25 @@ public class Blocks implements ContentList{
         }};
 
         //TODO implement
+        //TODO "crucible" is getting old
         //TODO should have a useful turret ammo byproduct?
         //original: consumes.items(with(Items.copper, 3, Items.lead, 4, Items.titanium, 2, Items.silicon, 3));
         if(false)
-        surgeCrucible = new GenericCrafter("surge-crucible"){{
-            //needs:
-            //liquid lead???
-            //slag (a lot of it)
-            //silicon
-            //heat
+        surgeCrucible = new HeatCrafter("surge-crucible"){{
+            size = 3;
+
+            itemCapacity = 20;
+            heatRequirement = 5f;
+            craftTime = 60f * 2.5f;
+
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.07f;
+
+            consumes.item(Items.silicon, 3);
+            //TODO must consume from 2 pumps, 1, or 1.5?
+            //TODO consume hydrogen/ozone?
+            consumes.liquid(Liquids.slag, 2f * 80f / 60f);
+            consumes.power(2f); //TODO necessary?
         }};
 
         //TODO needs to be completely redone from the ground up
@@ -1534,7 +1544,7 @@ public class Blocks implements ContentList{
             //TODO CUSTOM DRAW ANIMATION - pistons - repurpose DrawBlock?
             consumes.liquid(Liquids.hydrogen, 1.5f / 60f);
 
-            pumpAmount = 0.4f;
+            pumpAmount = 80f / 60f / 4f;
             liquidCapacity = 40f;
             size = 2;
         }};

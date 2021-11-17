@@ -28,6 +28,7 @@ import mindustry.game.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.type.ammo.*;
@@ -759,7 +760,7 @@ public class ContentParser{
                 }
 
                 //find parent node.
-                TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName));
+                TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName) || t.content.name.equals(SaveVersion.mapFallback(researchName)));
 
                 if(parent == null){
                     Log.warn("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");

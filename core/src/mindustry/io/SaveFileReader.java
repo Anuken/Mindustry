@@ -79,6 +79,10 @@ public abstract class SaveFileReader{
     protected int lastRegionLength;
     protected @Nullable CounterInputStream currCounter;
 
+    public static String mapFallback(String name){
+        return fallback.get(name, name);
+    }
+
     public void region(String name, DataInput stream, CounterInputStream counter, IORunner<DataInput> cons) throws IOException{
         counter.resetCount();
         this.currCounter = counter;

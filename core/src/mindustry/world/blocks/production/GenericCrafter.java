@@ -39,7 +39,7 @@ public class GenericCrafter extends Block{
 
     public DrawBlock drawer = new DrawBlock();
     /** If set, the icon is overridden to be these strings, in order. Each string is a suffix. */
-    public String[] iconOverride = null;
+    public @Nullable String[] iconOverride = null;
 
     public GenericCrafter(String name){
         super(name);

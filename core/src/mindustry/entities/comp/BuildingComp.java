@@ -152,8 +152,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         write.f(health);
         write.b(rotation | 0b10000000);
         write.b(team.id);
-        write.b(1); //version
+        write.b(2); //version
         write.b(enabled ? 1 : 0);
+        //write presence of items/power/liquids/cons, so removing/adding them does not corrupt future saves.
+        write.b(moduleBitmask());
         if(items != null) items.write(write);
         if(power != null) power.write(write);
         if(liquids != null) liquids.write(write);
@@ -167,23 +169,35 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         team = Team.get(read.b());
 
         rotation = rot & 0b01111111;
+
+        int moduleBits = moduleBitmask();
         boolean legacy = true;
+
         if((rot & 0b10000000) != 0){
             byte ver = read.b(); //version of entity save
-            if(ver == 1){
+            if(ver >= 1){
                 byte on = read.b();
                 this.enabled = on == 1;
                 if(!this.enabled){
                     enabledControlTime = timeToUncontrol;
                 }
             }
+
+            //get which modules should actually be read; this was added in version 2
+            if(ver >= 2){
+                moduleBits = read.b();
+            }
             legacy = false;
         }
 
-        if(items != null) items.read(read, legacy);
-        if(power != null) power.read(read, legacy);
-        if(liquids != null) liquids.read(read, legacy);
-        if(cons != null) cons.read(read, legacy);
+        if((moduleBits & 1) != 0) (items == null ? new ItemModule() : items).read(read, legacy);
+        if((moduleBits & 2) != 0) (power == null ? new PowerModule() : power).read(read, legacy);
+        if((moduleBits & 4) != 0) (liquids == null ? new LiquidModule() : liquids).read(read, legacy);
+        if((moduleBits & 8) != 0) (cons == null ? new ConsumeModule(self()) : cons).read(read, legacy);
+    }
+
+    public int moduleBitmask(){
+        return (items != null ? 1 : 0) | (power != null ? 2 : 0) | (liquids != null ? 4 : 0) | (cons != null ? 8 : 0);
     }
 
     public void writeAll(Writes write){
