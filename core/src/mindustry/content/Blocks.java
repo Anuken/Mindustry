@@ -77,7 +77,7 @@ public class Blocks implements ContentList{
     overflowGate, underflowGate, massDriver,
 
     //transport - alternate
-    duct, ductRouter, ductBridge, ductUnloader,
+    duct, ductRouter, overflowDuct, ductBridge, ductUnloader,
     surgeConveyor, surgeRouter,
 
     //liquid
@@ -94,7 +94,7 @@ public class Blocks implements ContentList{
 
     //production
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
-    cliffCrusher, plasmaBore, impactDrill,
+    cliffCrusher, plasmaBore, largePlasmaBore, impactDrill,
 
     //storage
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
@@ -1430,6 +1430,11 @@ public class Blocks implements ContentList{
             speed = 4f;
         }};
 
+        overflowDuct = new OverflowDuct("overflow-duct"){{
+            requirements(Category.distribution, with(Items.graphite, 10));
+            speed = 4f;
+        }};
+
         ductBridge = new DuctBridge("duct-bridge"){{
             requirements(Category.distribution, with(Items.graphite, 20));
             speed = 4f;
@@ -1908,11 +1913,25 @@ public class Blocks implements ContentList{
         }};
 
         plasmaBore = new BeamDrill("plasma-bore"){{
-            requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 10, Items.lead, 20));
+            requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 10));
             consumes.power(0.2f);
+            drillTime = 200f;
             tier = 4;
             size = 2;
             range = 2;
+        }};
+
+        //TODO awful name
+        largePlasmaBore = new BeamDrill("large-plasma-bore"){{
+            //TODO requirements
+            //TODO require hydrogen? optional for all drills?
+            requirements(Category.production, with(Items.graphite, 30, Items.beryllium, 20, Items.carbide, 30));
+            consumes.power(0.6f);
+            drillTime = 170f;
+            tier = 5;
+            size = 3;
+            range = 6;
+            laserWidth = 0.7f;
         }};
 
         //endregion
