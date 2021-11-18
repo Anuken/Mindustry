@@ -122,5 +122,9 @@
   {
     "name": "Conservatory",
     "address": ["143.198.71.232"]
+  },
+  {
+    "name": "Shard",
+    "address": ["shard.mcv.kr"]
   }
 ]
