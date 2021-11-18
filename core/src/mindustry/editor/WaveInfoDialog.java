@@ -443,46 +443,43 @@ public class WaveInfoDialog extends BaseDialog{
 
         rebuild[0] = () -> {
             dialog.cont.clearChildren();
+            dialog.cont.defaults().size(210f, 64f);
 
-            dialog.cont.table(filters -> {
-                filters.defaults().size(210f, 64f);
+            dialog.cont.add(Core.bundle.get("stat.health") + ":");
+            dialog.cont.table(filter -> {
+                filter.button(">", Styles.cleart, () -> {
+                    filterHealthMode ++;
+                    if(filterHealthMode == 3) filterHealthMode = 0;
+                    buildGroups();
+                }).update(b -> b.setText(filterHealthMode == 0 ? ">" : filterHealthMode == 1 ? "<" : "~")).size(40f).padRight(4f);
+                numField("", filter, f -> filterHealth = f, () -> filterHealth, 170f, 15);
+            }).row();
 
-                filters.add(Core.bundle.get("stat.health") + ":");
-                filters.table(filter -> {
-                    filter.button(">", Styles.cleart, () -> {
-                        filterHealthMode ++;
-                        if(filterHealthMode == 3) filterHealthMode = 0;
-                        buildGroups();
-                    }).update(b -> b.setText(filterHealthMode == 0 ? ">" : filterHealthMode == 1 ? "<" : "~")).size(40f).padRight(4f);
-                    numField("", filter, f -> filterHealth = f, () -> filterHealth, 170f, 15);
-                }).row();
+            dialog.cont.add("@waves.filters.begin");
+            dialog.cont.table(filter -> {
+                numField("", filter, f -> filterBegin = f - 1, () -> filterBegin + 1, 120f, 8);
+                numField("@waves.to", filter, f -> filterEnd = f - 1, () -> filterEnd + 1, 120f, 8);
+            }).row();
 
-                filters.add("@waves.filters.begin");
-                filters.table(filter -> {
-                    numField("", filter, f -> filterBegin = f - 1, () -> filterBegin + 1, 120f, 8);
-                    numField("@waves.to", filter, f -> filterEnd = f - 1, () -> filterEnd + 1, 120f, 8);
-                }).row();
+            dialog.cont.add("@waves.filters.amount");
+            dialog.cont.table(filter -> {
+                numField("", filter, f -> filterAmount = f, () -> filterAmount, 120f, 12);
+                numField("@waves.filters.onwave", filter, f -> filterAmountWave = f, () -> filterAmountWave, 120f, 8);
+            }).row();
 
-                filters.add("@waves.filters.amount");
-                filters.table(filter -> {
-                    numField("", filter, f -> filterAmount = f, () -> filterAmount, 120f, 12);
-                    numField("@waves.filters.onwave", filter, f -> filterAmountWave = f, () -> filterAmountWave, 120f, 8);
-                }).row();
-
-                filters.table(filter -> {
-                    filter.add("@waves.filters.effect");
-                    filter.button(filterEffect != null ? new TextureRegionDrawable(filterEffect.uiIcon) :
-                        Icon.logic, () -> showContentPane(null, c -> {
-                        filterEffect = c;
-                        rebuild[0].run();
-                    }, () -> StatusEffects.none, effect -> !(effect.isHidden() || effect.reactive))).padLeft(30f).size(60f);
-                });
+            dialog.cont.table(filter -> {
+                filter.add("@waves.filters.effect");
+                filter.button(filterEffect != null ? new TextureRegionDrawable(filterEffect.uiIcon) :
+                Icon.logic, () -> showContentPane(null, c -> {
+                    filterEffect = c;
+                    rebuild[0].run();
+                }, () -> StatusEffects.none, effect -> !(effect.isHidden() || effect.reactive))).padLeft(30f).size(60f);
             }).row();
 
             dialog.cont.check("@waves.filters.strict", b -> {
                 filterStrict = b;
                 buildGroups();
-            }).checked(filterStrict).row();
+            }).checked(filterStrict).colspan(2).row();
         };
         rebuild[0].run();
 
