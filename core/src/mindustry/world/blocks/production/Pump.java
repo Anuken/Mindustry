@@ -5,11 +5,11 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.game.*;
-import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.liquid.*;
+import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -19,6 +19,7 @@ public class Pump extends LiquidBlock{
     public float pumpAmount = 0.2f;
     /** Interval in-between item consumptions, if applicable. */
     public float consumeTime = 60f * 5f;
+    public DrawBlock draw = new DrawPump();
 
     public Pump(String name){
         super(name);
@@ -65,8 +66,14 @@ public class Pump extends LiquidBlock{
     }
 
     @Override
+    public void load(){
+        super.load();
+        draw.load(this);
+    }
+
+    @Override
     public TextureRegion[] icons(){
-        return new TextureRegion[]{region};
+        return draw.icons(this);
     }
 
     @Override
@@ -103,11 +110,7 @@ public class Pump extends LiquidBlock{
 
         @Override
         public void draw(){
-            Draw.rect(region, x, y);
-
-            if(liquidDrop == null) return;
-
-            Drawf.liquid(liquidRegion, x, y, liquids.get(liquidDrop) / liquidCapacity, liquidDrop.color);
+            draw.drawBase(this);
         }
 
         @Override

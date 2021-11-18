@@ -1918,7 +1918,7 @@ public class Blocks implements ContentList{
             drillTime = 200f;
             tier = 4;
             size = 2;
-            range = 2;
+            range = 3; //TODO make it 2?
         }};
 
         //TODO awful name

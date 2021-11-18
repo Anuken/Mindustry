@@ -25,6 +25,7 @@ public class BeamDrill extends Block{
     public @Load("drill-laser-end") TextureRegion laserEnd;
     public @Load("drill-laser-center") TextureRegion laserCenter;
     public @Load("@-top") TextureRegion topRegion;
+    public @Load("@-glow") TextureRegion glowRegion;
 
     public float drillTime = 200f;
     public int range = 5;
@@ -36,6 +37,9 @@ public class BeamDrill extends Block{
     public float glowScl = 3f;
     public int sparks = 8;
     public float sparkRange = 10f, sparkLife = 27f, sparkRecurrence = 4f, sparkSpread = 45f, sparkSize = 3.5f;
+
+    public Color heatColor = new Color(1f, 0.35f, 0.35f, 0.9f);
+    public float heatPulse = 0.3f, heatPulseScl = 7f;
 
     public BeamDrill(String name){
         super(name);
@@ -283,6 +287,16 @@ public class BeamDrill extends Block{
                     Draw.reset();
                 }
             }
+
+            if(glowRegion.found()){
+                Draw.z(Layer.blockAdditive);
+                Draw.blend(Blending.additive);
+                Draw.color(heatColor, warmup * (heatColor.a * (1f - heatPulse + Mathf.absin(heatPulseScl, heatPulse))));
+                Draw.rect(glowRegion, x, y, rotdeg());
+                Draw.blend();
+                Draw.color();
+            }
+
             Draw.blend();
             Draw.reset();
         }
