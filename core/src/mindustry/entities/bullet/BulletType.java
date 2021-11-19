@@ -260,43 +260,14 @@ public class BulletType extends Content implements Cloneable{
 
         Effect.shake(hitShake, hitShake, b);
 
-        if(fragBullet != null){
-            for(int i = 0; i < fragBullets; i++){
-                float len = Mathf.random(1f, 7f);
-                float a = b.rotation() + Mathf.range(fragCone/2) + fragAngle;
-                fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
-            }
-        }
-
-        if(puddleLiquid != null && puddles > 0){
-            for(int i = 0; i < puddles; i++){
-                Tile tile = world.tileWorld(x + Mathf.range(puddleRange), y + Mathf.range(puddleRange));
-                Puddles.deposit(tile, puddleLiquid, puddleAmount);
-            }
-        }
+        createFrags(b, x, y);
+        createPuddles(b, x, y);
 
         if(incendChance > 0 && Mathf.chance(incendChance)){
             Damage.createIncend(x, y, incendSpread, incendAmount);
         }
 
-        if(splashDamageRadius > 0 && !b.absorbed){
-            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
-
-            if(status != StatusEffects.none){
-                Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
-            }
-
-            if(healPercent > 0f){
-                indexer.eachBlock(b.team, x, y, splashDamageRadius, Building::damaged, other -> {
-                    Fx.healBlockFull.at(other.x, other.y, other.block.size, Pal.heal);
-                    other.heal(healPercent / 100f * other.maxHealth());
-                });
-            }
-
-            if(makeFire){
-                indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> Fires.create(other.tile));
-            }
-        }
+        dealSplashDamage(b, x, y);
 
         for(int i = 0; i < lightning; i++){
             Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone/2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
@@ -318,6 +289,46 @@ public class BulletType extends Content implements Cloneable{
     public void removed(Bullet b){
         if(trailLength > 0 && b.trail != null && b.trail.size() > 0){
             Fx.trailFade.at(b.x, b.y, trailWidth, trailColor, b.trail.copy());
+        }
+    }
+
+    public void createFrags(Bullet b, float x, float y){
+        if(fragBullet != null){
+            for(int i = 0; i < fragBullets; i++){
+                float len = Mathf.random(1f, 7f);
+                float a = b.rotation() + Mathf.range(fragCone/2) + fragAngle;
+                fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
+            }
+        }
+    }
+
+    public void createPuddles(Bullet b, float x, float y){
+        if(puddleLiquid != null && puddles > 0){
+            for(int i = 0; i < puddles; i++){
+                Tile tile = world.tileWorld(x + Mathf.range(puddleRange), y + Mathf.range(puddleRange));
+                Puddles.deposit(tile, puddleLiquid, puddleAmount);
+            }
+        }
+    }
+
+    public void dealSplashDamage(Bullet b, float x, float y){
+        if(splashDamageRadius > 0 && !b.absorbed){
+            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
+
+            if(status != StatusEffects.none){
+                Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
+            }
+
+            if(healPercent > 0f){
+                indexer.eachBlock(b.team, x, y, splashDamageRadius, Building::damaged, other -> {
+                    Fx.healBlockFull.at(other.x, other.y, other.block.size, Pal.heal);
+                    other.heal(healPercent / 100f * other.maxHealth());
+                });
+            }
+
+            if(makeFire){
+                indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> Fires.create(other.tile));
+            }
         }
     }
 
