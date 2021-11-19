@@ -353,7 +353,22 @@ public class BulletType extends Content implements Cloneable{
 
     public void update(Bullet b){
         updateTrail(b);
+        updateHoming(b);
+        updateWeaving(b);
+        updateTrailEffects(b);
+    }
+    
+    public void updateTrail(Bullet b){
+        if(!headless && trailLength > 0){
+            if(b.trail == null){
+                b.trail = new Trail(trailLength);
+            }
+            b.trail.length = trailLength;
+            b.trail.update(b.x, b.y, trailInterp.apply(b.fin()));
+        }
+    }
 
+    public void updateHoming(Bullet b){
         if(homingPower > 0.0001f && b.time >= homingDelay){
             Teamc target;
             //home in on allies if possible
@@ -370,11 +385,15 @@ public class BulletType extends Content implements Cloneable{
                 b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), homingPower * Time.delta * 50f));
             }
         }
+    }
 
+    public void updateWeaving(Bullet b){
         if(weaveMag > 0){
             b.vel.rotate(Mathf.sin(b.time + Mathf.PI * weaveScale/2f, weaveScale, weaveMag * (Mathf.randomSeed(b.id, 0, 1) == 1 ? -1 : 1)) * Time.delta);
         }
+    }
 
+    public void updateTrailEffects(Bullet b){
         if(trailChance > 0){
             if(Mathf.chanceDelta(trailChance)){
                 trailEffect.at(b.x, b.y, trailRotation ? b.rotation() : trailParam, trailColor);
@@ -385,16 +404,6 @@ public class BulletType extends Content implements Cloneable{
             if(b.timer(0, trailInterval)){
                 trailEffect.at(b.x, b.y, trailRotation ? b.rotation() : trailParam, trailColor);
             }
-        }
-    }
-    
-    public void updateTrail(Bullet b){
-        if(!headless && trailLength > 0){
-            if(b.trail == null){
-                b.trail = new Trail(trailLength);
-            }
-            b.trail.length = trailLength;
-            b.trail.update(b.x, b.y, trailInterp.apply(b.fin()));
         }
     }
 
