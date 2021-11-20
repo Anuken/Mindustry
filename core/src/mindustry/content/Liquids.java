@@ -6,7 +6,7 @@ import mindustry.type.*;
 
 public class Liquids implements ContentList{
     public static Liquid water, slag, oil, cryofluid, neoplasm,
-    ozone, hydrogen;
+    ozone, hydrogen, cyanogen;
 
     @Override
     public void load(){
@@ -72,7 +72,13 @@ public class Liquids implements ContentList{
             flammability = 1f;
         }};
 
-        //TODO dicyanoacetylene
+        cyanogen = new Liquid("cyanogen", Color.valueOf("6fd5d5")){{
+            gas = true;
+            barColor = Color.valueOf("6fd5d5");
+            flammability = 2f;
+        }};
+
+        //TODO dicyanoacetylene vs cyanogen
 
         //TODO molten lead (maybe)
     }

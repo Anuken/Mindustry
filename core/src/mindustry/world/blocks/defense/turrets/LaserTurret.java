@@ -17,7 +17,6 @@ public class LaserTurret extends PowerTurret{
 
     public LaserTurret(String name){
         super(name);
-        canOverdrive = false;
 
         consumes.add(new ConsumeCoolant(0.01f)).update(false);
         coolantMultiplier = 1f;
@@ -25,7 +24,7 @@ public class LaserTurret extends PowerTurret{
 
     @Override
     public void init(){
-        consumes.powerCond(powerUse, entity -> ((LaserTurretBuild)entity).bullet != null || ((LaserTurretBuild)entity).target != null);
+        consumes.powerCond(powerUse, (LaserTurretBuild entity) -> entity.bullet != null || entity.target != null);
         super.init();
     }
 
@@ -54,7 +53,7 @@ public class LaserTurret extends PowerTurret{
                 wasShooting = true;
                 bullet.rotation(rotation);
                 bullet.set(x + bulletOffset.x, y + bulletOffset.y);
-                bullet.time(0f);
+                bullet.time = 0f;
                 heat = 1f;
                 recoil = recoilAmount;
                 bulletLife -= Time.delta / Math.max(efficiency(), 0.00001f);
@@ -66,7 +65,7 @@ public class LaserTurret extends PowerTurret{
                 Liquid liquid = liquids.current();
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-                float used = (cheating() ? maxUsed : Math.min(liquids.get(liquid), maxUsed)) * Time.delta;
+                float used = (cheating() ? maxUsed : Math.min(liquids.get(liquid), maxUsed)) * delta();
                 reload -= used * liquid.heatCapacity * coolantMultiplier;
                 liquids.remove(liquid, used);
 

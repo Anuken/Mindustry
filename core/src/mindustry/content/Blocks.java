@@ -60,7 +60,7 @@ public class Blocks implements ContentList{
     //crafting
     siliconSmelter, siliconCrucible, siliconArcFurnace, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
-    electrolyzer, oxidationChamber, heatReactor, carbideCrucible, slagCentrifuge, surgeCrucible,
+    electrolyzer, oxidationChamber, heatReactor, carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer,
     cellSynthesisChamber,
 
     //sandbox
@@ -460,14 +460,17 @@ public class Blocks implements ContentList{
 
         regolithWall = new StaticWall("regolith-wall"){{
             regolith.asFloor().wall = this;
+            attributes.set(Attribute.silicate, 1f);
         }};
 
         yellowStoneWall = new StaticWall("yellow-stone-wall"){{
             yellowStone.asFloor().wall = slag.asFloor().wall = this;
+            attributes.set(Attribute.silicate, 1.5f);
         }};
 
         rhyoliteWall = new StaticWall("rhyolite-wall"){{
             rhyolite.asFloor().wall = rhyoliteCrater.asFloor().wall = this;
+            attributes.set(Attribute.silicate, 1f);
         }};
 
         carbonWall = new StaticWall("carbon-wall"){{
@@ -1080,6 +1083,34 @@ public class Blocks implements ContentList{
             //TODO consume hydrogen/ozone?
             consumes.liquid(Liquids.slag, 2f * 80f / 60f);
             consumes.power(2f); //TODO necessary?
+        }};
+
+        cyanogenSynthesizer = new HeatCrafter("cyanogen-synthesizer"){{
+            //TODO requirements
+            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 60, Items.carbide, 30));
+
+            heatRequirement = 5f;
+
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(Liquids.hydrogen), new DrawBlock(), new DrawRegion("-top"), new DrawHeatInput(),
+            new DrawParticlesIn(){{
+                color = Color.valueOf("bfe9ff");
+                alpha = 0.6f;
+                particleSize = 4f;
+                particles = 10;
+                particleRad = 12f;
+                particleLife = 140f;
+            }});
+
+            size = 3;
+
+            outputLiquid = new LiquidStack(Liquids.cyanogen, 3f);
+            craftTime = 60f * 1f;
+
+            consumes.liquid(Liquids.hydrogen, 3f / 60f);
+            consumes.item(Items.graphite);
+
+            consumes.power(2f);
+            liquidCapacity = 40f;
         }};
 
         //TODO needs to be completely redone from the ground up
@@ -2512,6 +2543,7 @@ public class Blocks implements ContentList{
 
             //TODO no coolant?
 
+            acceptCoolant = false;
             draw = new DrawTurret("reinforced-");
             shootLength = 0f;
             outlineColor = Pal.darkOutline;
@@ -2527,41 +2559,43 @@ public class Blocks implements ContentList{
             limitRange();
         }};
 
-        //TODO implementation; splash damage? shotgun?
-        if(false)
+        //TODO implementation; splash damage? shotgun? AA? I have no ideas
         fracture = new ItemTurret("fracture"){{
             requirements(Category.turret, with(Items.tungsten, 35, Items.silicon, 35), true);
             ammo(
-            Items.tungsten, new BasicBulletType(7f, 25){{
-                width = 8f;
-                height = 14f;
+            Items.tungsten, new BasicBulletType(5f, 20){{
+                velocityInaccuracy = 0.2f;
+                width = 6f;
+                height = 12f;
                 shootEffect = Fx.berylSpark;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 2;
                 pierce = true;
                 pierceBuilding = true;
-                hitColor = backColor = trailColor = Pal.berylShot;
+                hitColor = backColor = trailColor = Items.tungsten.color;
                 frontColor = Color.white;
-                trailWidth = 1.5f;
-                trailLength = 10;
+                trailWidth = 1f;
+                trailLength = 4;
                 //TODO different effect?
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }}
             );
 
+            acceptCoolant = false;
             consumes.liquid(Liquids.hydrogen, 1.5f / 60f);
-            shots = 3;
+            shots = 5;
 
             //TODO cool reload animation
             draw = new DrawTurret("reinforced-");
-            shootLength = 0f;
+            shootLength = 8f;
             outlineColor = Pal.darkOutline;
             size = 2;
             envEnabled |= Env.space;
-            reloadTime = 40f;
+            reloadTime = 30f;
             restitution = 0.03f;
-            range = 180;
-            shootCone = 3f;
+            range = 90;
+            shootCone = 15f;
+            inaccuracy = 20f;
             health = 300 * size * size;
             rotateSpeed = 1.8f;
 

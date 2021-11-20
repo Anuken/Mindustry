@@ -459,7 +459,8 @@ public class Generators{
                     image.draw(get(type.region), true);
                 }
 
-                //draw outlines
+                //TODO draw under for layerOffset < 0
+                //draw weapon outlines on base
                 for(Weapon weapon : type.weapons){
                     weapon.load();
 
