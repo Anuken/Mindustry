@@ -71,7 +71,7 @@ public class Liquid extends UnlockableContent{
             //ensure no accidental global mutation
             color = color.cpy();
             //all gases are transparent
-            color.a = 0.5f;
+            color.a = 0.6f;
             //for gases, gas color is implicitly their color
             gasColor = color;
         }

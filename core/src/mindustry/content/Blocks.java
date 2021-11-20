@@ -1043,7 +1043,13 @@ public class Blocks implements ContentList{
         slagCentrifuge = new GenericCrafter("slag-centrifuge"){{
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 60, Items.oxide, 40));
 
-            outputLiquids = new LiquidStack[]{};
+            size = 3;
+            consumes.item(Items.sand, 1);
+            liquidCapacity = 80f;
+
+            consumes.liquid(Liquids.slag, 40f / 60f);
+            outputLiquid = new LiquidStack(Liquids.gallium, 1f);
+            outputItem = new ItemStack(Items.scrap, 1);
         }};
 
         //TODO "crucible" is getting old

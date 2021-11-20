@@ -6,6 +6,7 @@ import mindustry.type.*;
 
 public class Liquids implements ContentList{
     public static Liquid water, slag, oil, cryofluid, neoplasm,
+    gallium,
     ozone, hydrogen, cyanogen;
 
     @Override
@@ -55,6 +56,11 @@ public class Liquids implements ContentList{
 
             colorFrom = Color.valueOf("f98f4a");
             colorTo = Color.valueOf("9e172c");
+        }};
+
+        //TODO I have doubts about this liquid's usefulness
+        gallium = new Liquid("gallium", Color.valueOf("9a9dbf")){{
+
         }};
 
         //TODO reactivity, etc
