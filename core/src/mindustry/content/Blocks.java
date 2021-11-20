@@ -1957,7 +1957,6 @@ public class Blocks implements ContentList{
         //TODO awful name
         largePlasmaBore = new BeamDrill("large-plasma-bore"){{
             //TODO requirements
-            //TODO require hydrogen? optional for all drills?
             requirements(Category.production, with(Items.graphite, 30, Items.beryllium, 20, Items.carbide, 30));
             consumes.power(0.6f);
             drillTime = 170f;
