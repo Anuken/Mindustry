@@ -1950,6 +1950,8 @@ public class Blocks implements ContentList{
             tier = 4;
             size = 2;
             range = 3; //TODO make it 2?
+
+            consumes.liquid(Liquids.hydrogen, 1f / 60f).boost();
         }};
 
         //TODO awful name
@@ -1963,6 +1965,8 @@ public class Blocks implements ContentList{
             size = 3;
             range = 6;
             laserWidth = 0.7f;
+
+            consumes.liquid(Liquids.hydrogen, 2f / 60f).boost();
         }};
 
         //endregion

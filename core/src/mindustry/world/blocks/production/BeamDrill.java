@@ -13,6 +13,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -31,6 +32,8 @@ public class BeamDrill extends Block{
     public int range = 5;
     public int tier = 1;
     public float laserWidth = 0.65f;
+    /** How many times faster the drill will progress when boosted by an optional consumer. */
+    public float optionalBoostIntensity = 2f;
 
     public Color sparkColor = Color.valueOf("fd9e81"), glowColor = Color.white;
     public float glowIntensity = 0.2f, pulseIntensity = 0.07f;
@@ -60,6 +63,14 @@ public class BeamDrill extends Block{
     }
 
     @Override
+    public void setBars(){
+        super.setBars();
+
+        bars.add("drillspeed", (BeamDrillBuild e) ->
+            new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(e.lastDrillSpeed * 60, 2)), () -> Pal.ammo, () -> e.warmup));
+    }
+
+    @Override
     public boolean outputsItems(){
         return true;
     }
@@ -78,6 +89,15 @@ public class BeamDrill extends Block{
     public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
         Draw.rect(region, plan.drawx(), plan.drawy());
         Draw.rect(topRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        if(optionalBoostIntensity != 1){
+            stats.add(Stat.boostEffect, optionalBoostIntensity, StatUnit.timesSpeed);
+        }
     }
 
     @Override
@@ -166,6 +186,7 @@ public class BeamDrill extends Block{
 
         public float time;
         public float warmup;
+        public float lastDrillSpeed;
 
         @Override
         public void drawSelect(){
@@ -188,7 +209,7 @@ public class BeamDrill extends Block{
             warmup = Mathf.approachDelta(warmup, Mathf.num(consValid()), 1f / 60f);
             lastItem = null;
             boolean multiple = false;
-            int dx = Geometry.d4x(rotation), dy = Geometry.d4y(rotation);
+            int dx = Geometry.d4x(rotation), dy = Geometry.d4y(rotation), facingAmount = 0;
 
             //update facing tiles
             for(int p = 0; p < size; p++){
@@ -201,6 +222,7 @@ public class BeamDrill extends Block{
                         if(other.solid()){
                             Item drop = other.wallDrop();
                             if(drop != null && drop.hardness <= tier){
+                                facingAmount ++;
                                 if(lastItem != drop && lastItem != null){
                                     multiple = true;
                                 }
@@ -220,7 +242,15 @@ public class BeamDrill extends Block{
                 lastItem = null;
             }
 
-            time += edelta();
+            float multiplier = 1f;
+
+            if(cons.optionalValid()){
+                multiplier *= optionalBoostIntensity;
+            }
+
+            lastDrillSpeed = (facingAmount * multiplier * timeScale) / drillTime;
+
+            time += edelta() * multiplier;
 
             if(time >= drillTime){
                 for(Tile tile : facing){
