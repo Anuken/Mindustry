@@ -41,6 +41,8 @@ public class Weapon implements Cloneable{
     public boolean alternate = true;
     /** whether to rotate toward the target independently of unit */
     public boolean rotate = false;
+    /** if rotate is false, this is the rotation offset relative to the unit */
+    public int unitRotationOffset = 0;
     /** whether to draw the outline on top. */
     public boolean top = true;
     /** whether to hold the bullet in place while firing */
@@ -149,7 +151,7 @@ public class Weapon implements Cloneable{
     public void drawOutline(Unit unit, WeaponMount mount){
         float
         rotation = unit.rotation - 90,
-        weaponRotation  = rotation + (rotate ? mount.rotation : 0),
+        weaponRotation  = rotation + (rotate ? mount.rotation : unitRotationOffset),
         wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -mount.recoil),
         wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -mount.recoil);
 
@@ -169,7 +171,7 @@ public class Weapon implements Cloneable{
 
         float
         rotation = unit.rotation - 90,
-        weaponRotation  = rotation + (rotate ? mount.rotation : 0),
+        weaponRotation  = rotation + (rotate ? mount.rotation : unitRotationOffset),
         wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -mount.recoil),
         wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -mount.recoil);
 
@@ -216,17 +218,17 @@ public class Weapon implements Cloneable{
             mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - unit.rotation;
             mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, rotateSpeed * Time.delta);
         }else if(!rotate){
-            mount.rotation = 0;
+            mount.rotation = unitRotationOffset;
             mount.targetRotation = unit.angleTo(mount.aimX, mount.aimY);
         }
 
         float
-        weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : 0),
+        weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : unitRotationOffset),
         mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
         mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
         bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
         bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY),
-        shootAngle = rotate ? weaponRotation + 90 : Angles.angle(bulletX, bulletY, mount.aimX, mount.aimY) + (unit.rotation - unit.angleTo(mount.aimX, mount.aimY));
+        shootAngle = rotate ? weaponRotation + 90 : Angles.angle(bulletX, bulletY, mount.aimX, mount.aimY) + ((unit.rotation + unitRotationOffset) % 360 - unit.angleTo(mount.aimX, mount.aimY));
 
         //find a new target
         if(!controllable && autoTarget){
@@ -298,7 +300,7 @@ public class Weapon implements Cloneable{
         (!alternate || wasFlipped == flipSprite) &&
         unit.vel.len() >= minShootVelocity && //check velocity requirements
         mount.reload <= 0.0001f && //reload has to be 0
-        Angles.within(rotate ? mount.rotation : unit.rotation, mount.targetRotation, shootCone) //has to be within the cone
+        Angles.within(rotate ? mount.rotation : (unit.rotation + unitRotationOffset) % 360, mount.targetRotation, shootCone) //has to be within the cone
         ){
             shoot(unit, mount, bulletX, bulletY, mount.aimX, mount.aimY, mountX, mountY, shootAngle, Mathf.sign(x));
 
