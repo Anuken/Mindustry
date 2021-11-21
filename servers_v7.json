@@ -4,6 +4,10 @@
     "address": ["0.baseduser.eu.org:6000", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6966"]
   },
   {
+    "name": "SkaarjDustry",
+    "address": ["skaarjproject.duckdns.org"]
+  },
+  {
     "name": "C.A.M.S.",
     "address": ["baseduser.eu.org:6569", "v7.thedimas.pp.ua", "yeeth.mindustry.me:7000", "yeeth.mindustry.me:4000", "yeeth.mindustry.me:2000", "yeeth.mindustry.me:3000"]
   },
@@ -22,10 +26,6 @@
   {
     "name": "DarkDustry",
     "address": ["darkdustry.ml", "darkdustry.ml:6000", "darkdustry.ml:7000", "darkdustry.ml:8000", "darkdustry.ml:9000"] 
-  },
-  {
-    "name": "SkaarjDustry",
-    "address": ["skaarjproject.duckdns.org"]
   },
   {
     "name": "Chaotic Neutral",
