@@ -1,6 +1,7 @@
 package mindustry.world.draw;
 
 import arc.graphics.g2d.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -17,6 +18,10 @@ public class DrawMulti extends DrawBlock{
 
     public DrawMulti(DrawBlock... drawers){
         this.drawers = drawers;
+    }
+
+    public DrawMulti(Seq<DrawBlock> drawers){
+        this.drawers = drawers.toArray(DrawBlock.class);
     }
 
     @Override

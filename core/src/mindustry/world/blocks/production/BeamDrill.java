@@ -38,7 +38,7 @@ public class BeamDrill extends Block{
     public Color sparkColor = Color.valueOf("fd9e81"), glowColor = Color.white;
     public float glowIntensity = 0.2f, pulseIntensity = 0.07f;
     public float glowScl = 3f;
-    public int sparks = 8;
+    public int sparks = 7;
     public float sparkRange = 10f, sparkLife = 27f, sparkRecurrence = 4f, sparkSpread = 45f, sparkSize = 3.5f;
 
     public Color heatColor = new Color(1f, 0.35f, 0.35f, 0.9f);

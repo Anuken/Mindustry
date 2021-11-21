@@ -1039,20 +1039,37 @@ public class Blocks implements ContentList{
         }};
 
         //TODO implement - is this even necessary?
-        if(false)
         slagCentrifuge = new GenericCrafter("slag-centrifuge"){{
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 60, Items.oxide, 40));
 
+            consumes.power(2f / 60f);
+
             size = 3;
             consumes.item(Items.sand, 1);
+            consumes.liquid(Liquids.slag, 40f / 60f);
             liquidCapacity = 80f;
 
-            consumes.liquid(Liquids.slag, 40f / 60f);
-            outputLiquid = new LiquidStack(Liquids.gallium, 1f);
+            var drawers = Seq.with(new DrawRegion("-bottom"), new DrawLiquidRegion(Liquids.slag){{ alpha = 0.7f; }});
+
+            for(int i = 0; i < 5; i++){
+                int fi = i;
+                drawers.add(new DrawGlowRegion(-1f){{
+                    glowIntensity = 0.3f;
+                    rotateSpeed = 3f / (1f + fi/1.4f);
+                    alpha = 0.4f;
+                    color = new Color(1f, 0.5f, 0.5f, 1f);
+                }});
+            }
+
+            drawer = new DrawMulti(drawers.and(new DrawBlock()));
+            iconOverride = new String[]{"-bottom", ""};
+
+            craftTime = 60f * 2f;
+
+            outputLiquid = new LiquidStack(Liquids.gallium, 2f);
             outputItem = new ItemStack(Items.scrap, 1);
         }};
 
-        //TODO "crucible" is getting old
         //TODO should have a useful turret ammo byproduct?
         //original: consumes.items(with(Items.copper, 3, Items.lead, 4, Items.titanium, 2, Items.silicon, 3));
         surgeCrucible = new HeatCrafter("surge-crucible"){{
@@ -1106,6 +1123,8 @@ public class Blocks implements ContentList{
                 particleRad = 12f;
                 particleLife = 140f;
             }});
+
+            iconOverride = new String[]{"-bottom", "", "-top"};
 
             size = 3;
 

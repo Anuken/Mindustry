@@ -15,20 +15,28 @@ public class DrawGlowRegion extends DrawBlock{
     public Blending blending = Blending.additive;
     public String suffix = "-glow";
     public float alpha = 0.9f, glowScale = 10f, glowIntensity = 0.5f;
+    public float rotateSpeed = 0f;
     public float layer = Layer.blockAdditive;
     public Color color = Color.red.cpy();
-    public TextureRegion top;
+    public TextureRegion region;
+
+    public DrawGlowRegion(){
+    }
+
+    public DrawGlowRegion(float layer){
+        this.layer = layer;
+    }
 
     @Override
     public void drawBase(Building build){
         if(build.warmup() <= 0.001f) return;
 
         float z = Draw.z();
-        Draw.z(layer);
+        if(layer > 0) Draw.z(layer);
         Draw.blend(blending);
         Draw.color(color);
         Draw.alpha((Mathf.absin(build.totalProgress(), glowScale, alpha) * glowIntensity + 1f - glowIntensity) * build.warmup() * alpha);
-        Draw.rect(top, build.x, build.y);
+        Draw.rect(region, build.x, build.y, build.totalProgress() * rotateSpeed);
         Draw.reset();
         Draw.blend();
         Draw.z(z);
@@ -36,7 +44,7 @@ public class DrawGlowRegion extends DrawBlock{
 
     @Override
     public void load(Block block){
-        top = Core.atlas.find(block.name + suffix);
+        region = Core.atlas.find(block.name + suffix);
     }
 
     @Override
