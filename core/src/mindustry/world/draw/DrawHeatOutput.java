@@ -18,6 +18,13 @@ public class DrawHeatOutput extends DrawBlock{
     public float heatPulse = 0.3f, heatPulseScl = 10f, glowMult = 1.2f;
     public boolean drawRegion = false;
 
+    public DrawHeatOutput(){
+    }
+
+    public DrawHeatOutput(boolean drawRegion){
+        this.drawRegion = drawRegion;
+    }
+
     @Override
     public void drawBase(Building build){
         if(drawRegion) Draw.rect(build.block.region, build.x, build.y);

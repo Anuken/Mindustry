@@ -60,7 +60,7 @@ public class Blocks implements ContentList{
     //crafting
     siliconSmelter, siliconCrucible, siliconArcFurnace, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
-    electrolyzer, oxidationChamber, heatReactor, carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer,
+    electrolyzer, oxidationChamber, slagHeater, heatReactor, carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer,
     cellSynthesisChamber,
 
     //sandbox
@@ -1010,6 +1010,17 @@ public class Blocks implements ContentList{
             heatOutput = 5f;
         }};
 
+        slagHeater = new HeatProducer("slag-heater"){{
+            requirements(Category.crafting, with(Items.tungsten, 30, Items.graphite, 30));
+
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(Liquids.slag), new DrawRegion("-top"), new DrawHeatOutput(true));
+            iconOverride = new String[]{"-bottom", "", "-top"};
+            size = 2;
+            craftTime = 60f * 1f;
+            heatOutput = 2f;
+            consumes.liquid(Liquids.slag, 20f / 60f);
+        }};
+
         heatReactor = new HeatProducer("heat-reactor"){{
             //TODO quadvent?
             //TODO coolant?
@@ -1038,7 +1049,6 @@ public class Blocks implements ContentList{
             consumes.power(2f);
         }};
 
-        //TODO implement - is this even necessary?
         slagCentrifuge = new GenericCrafter("slag-centrifuge"){{
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 60, Items.oxide, 40));
 
@@ -1070,7 +1080,7 @@ public class Blocks implements ContentList{
             outputItem = new ItemStack(Items.scrap, 1);
         }};
 
-        //TODO should have a useful turret ammo byproduct?
+        //TODO should have a useful turret ammo byproduct? scrap?
         //original: consumes.items(with(Items.copper, 3, Items.lead, 4, Items.titanium, 2, Items.silicon, 3));
         surgeCrucible = new HeatCrafter("surge-crucible"){{
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 60, Items.carbide, 30));

@@ -15,9 +15,7 @@ public class HeatProducer extends GenericCrafter{
     public HeatProducer(String name){
         super(name);
 
-        drawer = new DrawMulti(new DrawHeatOutput(){{
-            drawRegion = true;
-        }});
+        drawer = new DrawHeatOutput(true);
         rotateDraw = false;
         rotate = true;
         canOverdrive = false;
@@ -35,7 +33,7 @@ public class HeatProducer extends GenericCrafter{
     public void setBars(){
         super.setBars();
 
-        bars.add("heat", (HeatProducerBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat));
+        bars.add("heat", (HeatProducerBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat / heatOutput));
     }
 
     public class HeatProducerBuild extends GenericCrafterBuild implements HeatBlock{
