@@ -26,8 +26,7 @@ jobs:
       run: |
         ./gradlew updateBundles
 
-        git diff --exit-code
-        if [ $? ]; then
+        if [ -n "$(git status --porcelain)" ]; then
           git add core/assets/bundles/*
           git commit -m "Automatic bundle update"
           git push
