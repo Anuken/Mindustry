@@ -292,7 +292,7 @@ task updateBundles{
                     continue;
                 }
 
-                if(ch >= 0xE000){
+                if(ch >= 0xE000 && ch <= 0xF8FF){
                     String hex = Integer.toHexString((int)ch);
                     outBuffer.append("\\u");
                     for(int j = 0; j < 4 - hex.length(); j++){
