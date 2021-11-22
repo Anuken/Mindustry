@@ -178,6 +178,11 @@ public class Turret extends ReloadTurret{
         }
 
         @Override
+        public boolean shouldConsume(){
+            return isActive();
+        }
+
+        @Override
         public boolean canControl(){
             return playerControllable;
         }

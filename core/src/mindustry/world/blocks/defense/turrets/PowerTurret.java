@@ -23,7 +23,7 @@ public class PowerTurret extends Turret{
 
     @Override
     public void init(){
-        consumes.powerCond(powerUse, TurretBuild::isActive);
+        consumes.power(powerUse);
         super.init();
     }
 

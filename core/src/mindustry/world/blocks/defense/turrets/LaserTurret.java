@@ -11,6 +11,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
+/** A turret that fires a continuous beam with a delay between shots. Liquid coolant is required. */
 public class LaserTurret extends PowerTurret{
     public float firingMoveFract = 0.25f;
     public float shootDuration = 100f;
@@ -24,7 +25,7 @@ public class LaserTurret extends PowerTurret{
 
     @Override
     public void init(){
-        consumes.powerCond(powerUse, (LaserTurretBuild entity) -> entity.bullet != null || entity.target != null);
+        consumes.power(powerUse);
         super.init();
     }
 
@@ -43,6 +44,12 @@ public class LaserTurret extends PowerTurret{
         @Override
         protected void updateCooling(){
             //do nothing, cooling is irrelevant here
+        }
+
+        @Override
+        public boolean shouldConsume(){
+            //still consumes power when bullet is around
+            return bullet != null || isActive();
         }
 
         @Override
