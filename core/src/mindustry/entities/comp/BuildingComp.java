@@ -474,6 +474,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return block.unloadable;
     }
 
+    public boolean canResupply(){
+        return block.allowResupply;
+    }
+
     public boolean payloadCheck(int conveyorRotation){
         return block.rotate && (rotation + 2) % 4 == conveyorRotation;
     }

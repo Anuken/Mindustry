@@ -145,12 +145,18 @@ public class Unloader extends Block{
                 }
 
                 //sort so it gives full priority to blocks that can give but not receive (stackConveyors and Storage), and then by load, and then by last use
-                possibleBlocks.sort(Structs.comps(
-                    Structs.comparingBool(e -> e.building.block.highUnloadPriority),
+                possibleBlocks.sort(
                     Structs.comps(
-                        Structs.comparingFloat(e -> e.loadFactor),
-                        Structs.comparingInt(e -> -lastUsed[e.index])
-                )));
+                        Structs.comps(
+                            Structs.comparingBool(e -> e.building.block.highUnloadPriority && !e.canLoad),
+                            Structs.comparingBool(e -> e.canUnload && !e.canLoad)
+                        ),
+                        Structs.comps(
+                            Structs.comparingFloat(e -> e.loadFactor),
+                            Structs.comparingInt(e -> -lastUsed[e.index])
+                        )
+                    )
+                );
 
                 ContainerStat dumpingFrom = null;
                 ContainerStat dumpingTo = null;
@@ -177,7 +183,7 @@ public class Unloader extends Block{
                 }
 
                 //trade the items
-                if(dumpingFrom != null && dumpingTo != null && (dumpingFrom.loadFactor != dumpingTo.loadFactor || dumpingFrom.building.block.highUnloadPriority)){
+                if(dumpingFrom != null && dumpingTo != null && (dumpingFrom.loadFactor != dumpingTo.loadFactor || !dumpingFrom.canLoad)){
                     dumpingTo.building.handleItem(this, item);
                     dumpingFrom.building.removeStack(item, 1);
                     lastUsed[dumpingFrom.index] = 0;
