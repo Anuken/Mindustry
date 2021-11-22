@@ -21,5 +21,16 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 17
+    - name: Update bundles
+      if: ${{ github.repository == 'Anuken/Mindustry' }}
+      run: |
+        ./gradlew updateBundles
+        git diff --exit-code
+        if [ $? ];
+        then
+          git add core/assets/bundles/*
+          git commit -m "Automatic bundle update"
+          git push
+        fi
     - name: Run unit tests
       run: ./gradlew clean cleanTest test --stacktrace

@@ -56,7 +56,7 @@ public class BundleLauncher{
             int added = 0;
 
             for(String key : base.orderedKeys()){
-                if(!other.containsKey(key) || other.get(key).trim().isEmpty()){
+                if(other.get(key) == null || other.get(key).trim().isEmpty()){
                     other.put(key, base.get(key));
                     added++;
                     Log.info("&lc- Adding missing key '@'...", key);
@@ -73,7 +73,9 @@ public class BundleLauncher{
             StringBuilder result = new StringBuilder();
 
             //add everything ordered
-            for(String key : base.orderedKeys().and(extras.keys().toSeq())){
+            for(String key : base.orderedKeys().copy().and(extras.keys().toSeq())){
+                if(other.get(key) == null) continue;
+
                 result.append(processor.get(key, other.get(key)));
                 other.remove(key);
             }
