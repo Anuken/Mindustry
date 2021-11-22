@@ -311,10 +311,12 @@ task updateBundles{
         PropertiesUtils.load(base, Fi.get("core/assets/bundles/bundle.properties").reader());
         Seq<String> removals = new Seq<>();
 
+        Log.info("Updating bundles...");
+
         Fi.get("core/assets/bundles").walk(child -> {
             if(child.name().equals("bundle.properties") || child.toString().contains("output")) return;
 
-            Log.info("Parsing bundle: @", child);
+            Log.info("| @", child.nameWithoutExtension());
 
             OrderedMap<String, String> other = new OrderedMap<>();
 
@@ -346,7 +348,7 @@ task updateBundles{
                     Log.info("&lr- Removing unused key '@'...", key);
                 }
             }
-            Log.info("&lr@ keys removed.", removals.size);
+            if(removals.size > 0) Log.info("&lr@ keys removed.", removals.size);
             for(String s : removals){
                 other.remove(s);
             }
@@ -366,8 +368,8 @@ task updateBundles{
                             (key + " =" + (value.trim().isEmpty() ? "" : " ") + uniEscape(value)).replace("\n", "\\n") + "\n";
             Fi output = child.sibling("output/" + child.name());
 
-            Log.info("&lc@ keys added.", added);
-            Log.info("Writing bundle to @", output);
+            if(added > 0) Log.info("&lc@ keys added.", added);
+            if(removals.size + added > 0) Log.info("Writing bundle to @", output);
             StringBuilder result = new StringBuilder();
 
             //add everything ordered
