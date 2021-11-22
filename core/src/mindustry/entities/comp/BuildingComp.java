@@ -307,8 +307,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return relativeTo(tile.x, tile.y);
     }
 
-    public byte relativeTo(Building tile){
-        return relativeTo(tile.tile);
+    public byte relativeTo(Building build){
+        if(Math.abs(x - build.x) > Math.abs(y - build.y)){
+            if(x <= build.x - 1) return 0;
+            if(x >= build.x + 1) return 2;
+        }else{
+            if(y <= build.y - 1) return 1;
+            if(y >= build.y + 1) return 3;
+        }
+        return -1;
     }
 
     public byte relativeToEdge(Tile other){

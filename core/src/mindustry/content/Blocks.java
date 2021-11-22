@@ -1019,6 +1019,7 @@ public class Blocks implements ContentList{
             craftTime = 60f * 1f;
             heatOutput = 2f;
             consumes.liquid(Liquids.slag, 20f / 60f);
+            consumes.power(0.5f / 60f);
         }};
 
         heatReactor = new HeatProducer("heat-reactor"){{
