@@ -14,7 +14,7 @@ public class BundleLauncher{
         Seq<String> removals = new Seq<>();
 
         Fi.get(".").walk(child -> {
-            if(child.name().equals("bundle.properties") || child.toString().contains("output") || !child.name().equals("bundle_ko.properties")) return;
+            if(child.name().equals("bundle.properties") || child.toString().contains("output")) return;
 
             Log.info("Parsing bundle: @", child);
 
