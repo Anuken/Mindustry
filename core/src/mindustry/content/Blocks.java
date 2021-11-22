@@ -60,7 +60,7 @@ public class Blocks implements ContentList{
     //crafting
     siliconSmelter, siliconCrucible, siliconArcFurnace, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
-    electrolyzer, oxidationChamber, slagHeater, heatReactor, carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer,
+    electrolyzer, oxidationChamber, slagHeater, slagIncinerator, heatReactor, carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer,
     cellSynthesisChamber,
 
     //sandbox
@@ -105,7 +105,7 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
     //turrets - erekir
-    breach, fracture,
+    breach, fracture, sublimate,
 
     //units
     commandCenter,
@@ -120,10 +120,8 @@ public class Blocks implements ContentList{
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
 
     //campaign
-    launchPad, interplanetaryAccelerator,
+    launchPad, interplanetaryAccelerator
 
-    //nuclear?
-    nuclearWarhead, warheadAssembler, ballisticSilo //TODO
     ;
 
     /** @deprecated use the blocks with proper names */
@@ -1022,6 +1020,12 @@ public class Blocks implements ContentList{
             consumes.power(0.5f / 60f);
         }};
 
+        slagIncinerator = new ItemIncinerator("slag-incinerator"){{
+            requirements(Category.crafting, with(Items.tungsten, 15));
+            size = 1;
+            consumes.liquid(Liquids.slag, 2f / 60f);
+        }};
+
         heatReactor = new HeatProducer("heat-reactor"){{
             //TODO quadvent?
             //TODO coolant?
@@ -1147,6 +1151,39 @@ public class Blocks implements ContentList{
 
             consumes.power(2f);
             liquidCapacity = 40f;
+        }};
+
+        //TODO bad name
+        phaseSynthesizer = new HeatCrafter("phase-synthesizer"){{
+            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 60, Items.carbide, 30));
+
+            size = 3;
+
+            itemCapacity = 30;
+            heatRequirement = 8f;
+            craftTime = 60f * 5f;
+            liquidCapacity = 80f * 5;
+
+            ambientSound = Sounds.techloop;
+            ambientSoundVolume = 0.07f;
+
+            outputItem = new ItemStack(Items.phaseFabric, 1);
+
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawCircles(){{
+                color = Color.valueOf("ffc073").a(0.24f);
+                strokeMax = 2.5f;
+                radius = 10f;
+                amount = 3;
+            }}, new DrawLiquidRegion(Liquids.slag), new DrawBlock(), new DrawHeatInput(), new DrawHeatRegion(){{
+                heatColor = Color.valueOf("ff6060ff");
+            }}, new DrawHeatRegion("-vents"){{
+                heatColor.a = 1f;
+            }});
+            iconOverride = new String[]{"-bottom", ""};
+
+            consumes.items(with(Items.thorium, 1, Items.sand, 4));
+            consumes.liquid(Liquids.ozone, 4f / 60f);
+            consumes.power(10f);
         }};
 
         //TODO needs to be completely redone from the ground up
@@ -2639,6 +2676,13 @@ public class Blocks implements ContentList{
             rotateSpeed = 1.8f;
 
             limitRange();
+        }};
+
+        //TODO bad name
+        if(false)
+        sublimate = new ContinuousTurret("sublimate"){{
+            //TODO requirements
+            requirements(Category.turret, with(Items.tungsten, 35, Items.silicon, 35), true);
         }};
 
         //endregion

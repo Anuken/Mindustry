@@ -1687,17 +1687,22 @@ public class Fx{
 
     generatespark = new Effect(18, e -> {
         randLenVectors(e.id, 5, e.fin() * 8f, (x, y) -> {
-            float len = e.fout() * 4f;
             color(Pal.orangeSpark, Color.gray, e.fin());
-            Fill.circle(e.x + x, e.y + y, len/2f);
+            Fill.circle(e.x + x, e.y + y, e.fout() * 4f /2f);
         });
     }),
 
     fuelburn = new Effect(23, e -> {
         randLenVectors(e.id, 5, e.fin() * 9f, (x, y) -> {
-            float len = e.fout() * 4f;
             color(Color.lightGray, Color.gray, e.fin());
-            Fill.circle(e.x + x, e.y + y, len/2f);
+            Fill.circle(e.x + x, e.y + y, e.fout() * 2f);
+        });
+    }),
+
+    incinerateSlag = new Effect(34, e -> {
+        randLenVectors(e.id, 4, e.finpow() * 5f, (x, y) -> {
+            color(Pal.slagOrange, Color.gray, e.fin());
+            Fill.circle(e.x + x, e.y + y, e.fout() * 1.7f);
         });
     }),
 
