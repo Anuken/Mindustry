@@ -1131,7 +1131,7 @@ public class Blocks implements ContentList{
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(Liquids.hydrogen), new DrawBlock(), new DrawRegion("-top"), new DrawHeatInput(),
             new DrawParticlesIn(){{
-                color = Color.valueOf("bfe9ff");
+                color = Color.valueOf("d4f0ff");
                 alpha = 0.6f;
                 particleSize = 4f;
                 particles = 10;
@@ -1159,31 +1159,31 @@ public class Blocks implements ContentList{
 
             size = 3;
 
-            itemCapacity = 30;
+            itemCapacity = 40;
             heatRequirement = 8f;
-            craftTime = 60f * 5f;
-            liquidCapacity = 80f * 5;
+            craftTime = 60f * 2f;
+            liquidCapacity = 10f * 4;
 
             ambientSound = Sounds.techloop;
-            ambientSoundVolume = 0.07f;
+            ambientSoundVolume = 0.03f;
 
             outputItem = new ItemStack(Items.phaseFabric, 1);
 
-            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawCircles(){{
-                color = Color.valueOf("ffc073").a(0.24f);
-                strokeMax = 2.5f;
-                radius = 10f;
-                amount = 3;
-            }}, new DrawLiquidRegion(Liquids.slag), new DrawBlock(), new DrawHeatInput(), new DrawHeatRegion(){{
-                heatColor = Color.valueOf("ff6060ff");
-            }}, new DrawHeatRegion("-vents"){{
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawSpikes(){{
+                color = Color.valueOf("ffd59e");
+                stroke = 1.5f;
+                layers = 2;
+                amount = 12;
+                rotateSpeed = 0.5f;
+                layerSpeed = -0.9f;
+            }}, new DrawMultiWeave(), new DrawBlock(), new DrawHeatInput(), new DrawHeatRegion("-vents"){{
                 heatColor.a = 1f;
             }});
             iconOverride = new String[]{"-bottom", ""};
 
-            consumes.items(with(Items.thorium, 1, Items.sand, 4));
-            consumes.liquid(Liquids.ozone, 4f / 60f);
-            consumes.power(10f);
+            consumes.items(with(Items.thorium, 2, Items.sand, 6));
+            consumes.liquid(Liquids.ozone, 2f / 60f);
+            consumes.power(8f);
         }};
 
         //TODO needs to be completely redone from the ground up

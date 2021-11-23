@@ -13,7 +13,7 @@ public class DrawCircles extends DrawBlock{
 
     public int amount = 5, sides = 15;
     public float strokeMin = 0.2f, strokeMax = 2f, timeScl = 160f;
-    public float radius = 12f;
+    public float radius = 12f, radiusOffset = 0f, x = 0f, y = 0f;
     public Interp strokeInterp = Interp.pow3In;
 
     public DrawCircles(Color color){
@@ -36,9 +36,9 @@ public class DrawCircles extends DrawBlock{
             float life = ((Time.time / timeScl + i/(float)amount) % 1f);
 
             Lines.stroke(build.warmup() * strokeInterp.apply(strokeMax, strokeMin, life));
-            Lines.poly(build.x, build.y, sides, life * radius);
+            Lines.poly(build.x + x, build.y + y, sides, radiusOffset + life * radius);
         }
 
-        Draw.color();
+        Draw.reset();
     }
 }
