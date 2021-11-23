@@ -1176,8 +1176,10 @@ public class Blocks implements ContentList{
                 amount = 12;
                 rotateSpeed = 0.5f;
                 layerSpeed = -0.9f;
-            }}, new DrawMultiWeave(), new DrawBlock(), new DrawHeatInput(), new DrawHeatRegion("-vents"){{
-                heatColor.a = 1f;
+            }}, new DrawMultiWeave(){{
+                glowColor = new Color(1f, 0.4f, 0.4f, 0.8f);
+            }}, new DrawBlock(), new DrawHeatInput(), new DrawHeatRegion("-vents"){{
+                heatColor = new Color(1f, 0.4f, 0.3f, 1f);
             }});
             iconOverride = new String[]{"-bottom", ""};
 

@@ -179,7 +179,7 @@ public class GenericCrafter extends Block{
             if(consValid()){
 
                 progress += getProgressIncrease(craftTime);
-                totalProgress += delta();
+                totalProgress += delta() * efficiency();
                 warmup = Mathf.approachDelta(warmup, warmupTarget(), warmupSpeed);
 
                 if(Mathf.chanceDelta(updateEffectChance)){
