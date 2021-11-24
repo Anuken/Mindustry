@@ -140,7 +140,7 @@ public class GenericCrafter extends Block{
 
     @Override
     public void getRegionsToOutline(Seq<TextureRegion> out){
-        drawer.getRegionsToOutline(out);
+        drawer.getRegionsToOutline(this, out);
     }
 
     public class GenericCrafterBuild extends Building{
@@ -254,10 +254,15 @@ public class GenericCrafter extends Block{
 
         @Override
         public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return Mathf.clamp(progress);
+            if(sensor == LAccess.progress) return progress();
             //attempt to prevent wild total liquid fluctuation, at least for crafters
             if(sensor == LAccess.totalLiquids && outputLiquid != null) return liquids.get(outputLiquid.liquid);
             return super.sense(sensor);
+        }
+
+        @Override
+        public float progress(){
+            return Mathf.clamp(progress);
         }
 
         @Override

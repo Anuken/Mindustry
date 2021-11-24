@@ -48,7 +48,7 @@ public class Turret extends ReloadTurret{
     public float ammoEjectBack = 1f;
     public float inaccuracy = 0f;
     public float velocityInaccuracy = 0f;
-    public float shootWarmupSpeed = 3f / 60f;
+    public float shootWarmupSpeed = 0.1f;
     public int shots = 1;
     public float spread = 4f;
     public float recoilAmount = 1f;
@@ -152,7 +152,7 @@ public class Turret extends ReloadTurret{
 
     @Override
     public void getRegionsToOutline(Seq<TextureRegion> out){
-        draw.getRegionsToOutline(out);
+        draw.getRegionsToOutline(this, out);
     }
 
     public static abstract class AmmoEntry{
@@ -233,9 +233,14 @@ public class Turret extends ReloadTurret{
                 case shootX -> World.conv(targetPos.x);
                 case shootY -> World.conv(targetPos.y);
                 case shooting -> isShooting() ? 1 : 0;
-                case progress -> Mathf.clamp(reload / reloadTime);
+                case progress -> progress();
                 default -> super.sense(sensor);
             };
+        }
+
+        @Override
+        public float progress(){
+            return Mathf.clamp(reload / reloadTime);
         }
 
         public boolean isShooting(){
@@ -286,7 +291,7 @@ public class Turret extends ReloadTurret{
             if(!validateTarget()) target = null;
 
             //TODO can be lerp instead, that's smoother
-            shootWarmup = Mathf.approachDelta(shootWarmup, isActive() ? 1f : 0f, shootWarmupSpeed);
+            shootWarmup = Mathf.lerpDelta(shootWarmup, isShooting() ? 1f : 0f, shootWarmupSpeed);
 
             wasShooting = false;
 

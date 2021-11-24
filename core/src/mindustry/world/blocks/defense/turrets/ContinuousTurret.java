@@ -55,19 +55,19 @@ public class ContinuousTurret extends Turret{
             super.updateTile();
 
             if(bullet != null){
-                wasShooting = true;
-                bullet.rotation(rotation);
-                bullet.set(x + bulletOffset.x, y + bulletOffset.y);
-                heat = 1f;
-                recoil = recoilAmount;
-
-                if(isShooting()){
-                    bullet.time = 0f;
-                }
-
                 //check to see if bullet despawned
-                if(bullet.owner != this || !bullet.isAdded()){
+                if(bullet.owner != this || !bullet.isAdded() || bullet.type == null){
                     bullet = null;
+                }else{
+                    wasShooting = true;
+                    bullet.rotation(rotation);
+                    bullet.set(x + bulletOffset.x, y + bulletOffset.y);
+                    heat = 1f;
+                    recoil = recoilAmount;
+
+                    if(isShooting()){
+                        bullet.time = bullet.lifetime * bullet.type.optimalLifeFract * shootWarmup;
+                    }
                 }
             }
         }

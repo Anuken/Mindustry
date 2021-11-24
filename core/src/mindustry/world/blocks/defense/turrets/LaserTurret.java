@@ -4,14 +4,13 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-/** A turret that fires a continuous beam with a delay between shots. Liquid coolant is required. */
+/** A turret that fires a continuous beam with a delay between shots. Liquid coolant is required. Yes, this class name is awful. */
 public class LaserTurret extends PowerTurret{
     public float firingMoveFract = 0.25f;
     public float shootDuration = 100f;
@@ -56,11 +55,15 @@ public class LaserTurret extends PowerTurret{
         public void updateTile(){
             super.updateTile();
 
+            if(!bullet.isAdded() || bullet.type == null){
+                bullet = null;
+            }
+
             if(bulletLife > 0 && bullet != null){
                 wasShooting = true;
                 bullet.rotation(rotation);
                 bullet.set(x + bulletOffset.x, y + bulletOffset.y);
-                bullet.time = 0f;
+                bullet.time = bullet.type.lifetime * bullet.type.optimalLifeFract;
                 heat = 1f;
                 recoil = recoilAmount;
                 bulletLife -= Time.delta / Math.max(efficiency(), 0.00001f);
@@ -83,10 +86,8 @@ public class LaserTurret extends PowerTurret{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            //reload reversed for laser turrets
-            if(sensor == LAccess.progress) return Mathf.clamp(1f - reload / reloadTime);
-            return super.sense(sensor);
+        public float progress(){
+            return 1f - Mathf.clamp(reload / reloadTime);
         }
 
         @Override

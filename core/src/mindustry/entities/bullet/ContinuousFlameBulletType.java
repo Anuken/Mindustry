@@ -9,12 +9,17 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
-//TODO implement
+import static arc.graphics.g2d.Draw.*;
+
 public class ContinuousFlameBulletType extends ContinuousBulletType{
-    public float fadeTime = 16f;
     public float lightStroke = 40f;
     public float width = 3.7f, oscScl = 1.2f, oscMag = 0.02f;
     public int divisions = 25;
+
+    public boolean drawFlare = true;
+    public Color flareColor = Color.valueOf("e189f5");
+    public float flareWidth = 3f, flareInnerScl = 0.5f, flareLength = 40f, flareInnerLenScl = 0.5f, flareLayer = Layer.bullet - 0.0001f, flareRotSpeed = 1.2f;
+    public boolean rotateFlare = false;
 
     /** Lengths, widths, ellipse panning, and offsets, all as fractions of the base width and length. Stored as an 'interleaved' array of values: LWPO1 LWPO2 LWPO3... */
     public float[] lengthWidthPanOffsets = {
@@ -35,6 +40,7 @@ public class ContinuousFlameBulletType extends ContinuousBulletType{
     }
 
     {
+        optimalLifeFract = 0.5f;
         length = 120f;
         hitEffect = Fx.hitBeam;
         hitSize = 4;
@@ -46,20 +52,36 @@ public class ContinuousFlameBulletType extends ContinuousBulletType{
 
     @Override
     public void draw(Bullet b){
-        float realLength = Damage.findLaserLength(b, length);
-        float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
-        float baseLen = realLength * fout;
+        float mult = b.fslope();
+        float maxLength = length * mult;
+        float realLength = Damage.findLaserLength(b, maxLength);
 
         float sin = Mathf.sin(Time.time, oscScl, oscMag);
 
         for(int i = 0; i < colors.length; i++){
             Draw.color(colors[i].write(Tmp.c1).mul(0.9f).mul(1f + Mathf.absin(Time.time, 1f, 0.1f)));
             Drawf.flame(b.x, b.y, divisions, b.rotation(),
-                baseLen * lengthWidthPanOffsets[i * 4] * (1f - sin),
-                width * lengthWidthPanOffsets[i * 4 + 1] * fout * (1f + sin),
+                realLength * lengthWidthPanOffsets[i * 4] * (1f - sin),
+                width * lengthWidthPanOffsets[i * 4 + 1] * mult * (1f + sin),
                 lengthWidthPanOffsets[i * 4 + 2],
-                baseLen * lengthWidthPanOffsets[i * 4 + 3]
+                realLength * lengthWidthPanOffsets[i * 4 + 3]
             );
+        }
+
+        if(drawFlare){
+            color(flareColor);
+            Draw.z(flareLayer);
+
+            float angle = Time.time * flareRotSpeed + (rotateFlare ? b.rotation() : 0f);
+
+            for(int i = 0; i < 4; i++){
+                Drawf.tri(b.x, b.y, flareWidth, flareLength * (mult + sin), i*90 + 45 + angle);
+            }
+
+            color();
+            for(int i = 0; i < 4; i++){
+                Drawf.tri(b.x, b.y, flareWidth * flareInnerScl, flareLength * flareInnerLenScl * (mult + sin), i*90 + 45 + angle);
+            }
         }
 
         Drawf.light(b.team, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, lightStroke, lightColor, 0.7f);

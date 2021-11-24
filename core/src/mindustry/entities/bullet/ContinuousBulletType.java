@@ -14,6 +14,7 @@ public class ContinuousBulletType extends BulletType{
     {
         speed = 0f;
         despawnEffect = Fx.none;
+        shootEffect = Fx.none;
         lifetime = 16f;
         impact = true;
         keepVelocity = false;

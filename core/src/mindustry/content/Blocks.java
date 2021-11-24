@@ -2693,13 +2693,31 @@ public class Blocks implements ContentList{
             requirements(Category.turret, with(Items.tungsten, 35, Items.silicon, 35), true);
 
             draw = new DrawTurret("reinforced-"){{
+                liquidDraw = Liquids.ozone;
+
+                Color heatc = Color.valueOf("fa2859");
+                heatColor = heatc;
+
                 parts.addAll(new RegionPart("-back"){{
-                    outline = true;
-                    rotMove = 30f;
-                    offsetX = 29 / 4f;
-                    offsetY = -10f / 4f;
-                    originX = -8f / 4f;
-                    originY = 8f / 4f;
+                    rotMove = 40f;
+                    x = 22 / 4f;
+                    y = -1f / 4f;
+                    moveY = 6f / 4f;
+                    under = true;
+                    heatColor = heatc;
+                }},
+                new RegionPart("-front"){{
+                    rotMove = 40f;
+                    x = 20 / 4f;
+                    y = 17f / 4f;
+                    moveX = 1f;
+                    moveY = 1f;
+                    under = true;
+                    heatColor = heatc;
+                }},
+                new RegionPart("-nozzle"){{
+                    moveX = 8f / 4f;
+                    heatColor = Color.valueOf("f03b0e");
                 }});
             }};
             outlineColor = Pal.darkOutline;
@@ -2711,7 +2729,7 @@ public class Blocks implements ContentList{
             shootType = new ContinuousFlameBulletType(){{
                 length = range;
             }};
-            shootLength = 9f;
+            shootLength = 7f;
             size = 3;
         }};
 

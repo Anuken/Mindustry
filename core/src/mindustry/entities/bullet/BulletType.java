@@ -41,6 +41,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean pierceBuilding;
     /** Maximum # of pierced objects. */
     public int pierceCap = -1;
+    /** Life fraction at which this bullet has the best range/damage/etc. Used for lasers and continuous turrets. */
+    public float optimalLifeFract = 0f;
     /** Z layer to drawn on. */
     public float layer = Layer.bullet;
     /** Effect shown on direct hit. */

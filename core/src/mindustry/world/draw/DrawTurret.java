@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
@@ -18,7 +19,9 @@ public class DrawTurret extends DrawBlock{
 
     public Seq<TurretPart> parts = new Seq<>();
     public String basePrefix = "";
-    public TextureRegion base, liquid, top, heat, preview;
+    /** Overrides the liquid to draw in the liquid region. */
+    public @Nullable Liquid liquidDraw;
+    public TextureRegion base, liquid, top, heat, preview, outline;
 
     public DrawTurret(String basePrefix){
         this.basePrefix = basePrefix;
@@ -28,9 +31,12 @@ public class DrawTurret extends DrawBlock{
     }
 
     @Override
-    public void getRegionsToOutline(Seq<TextureRegion> out){
+    public void getRegionsToOutline(Block block, Seq<TextureRegion> out){
         for(var part : parts){
             part.getOutlines(out);
+        }
+        if(preview.found()){
+            out.add(block.region);
         }
     }
 
@@ -42,14 +48,22 @@ public class DrawTurret extends DrawBlock{
         Draw.rect(base, build.x, build.y);
         Draw.color();
 
-        Draw.z(Layer.turret);
+        Draw.z(Layer.turret - 0.02f);
 
-        Drawf.shadow(build.block.region, build.x + tb.recoilOffset.x - turret.elevation, build.y + tb.recoilOffset.y - turret.elevation, tb.drawrot());
+        Drawf.shadow(preview, build.x + tb.recoilOffset.x - turret.elevation, build.y + tb.recoilOffset.y - turret.elevation, tb.drawrot());
+
+        Draw.z(Layer.turret);
 
         drawTurret(turret, tb);
         drawHeat(turret, tb);
 
         if(parts.size > 0){
+            if(outline.found()){
+                Draw.z(Layer.turret - 0.01f);
+                Draw.rect(outline, build.x + tb.recoilOffset.x, build.y + tb.recoilOffset.y, tb.drawrot());
+                Draw.z(Layer.turret);
+            }
+
             for(var part : parts){
                 part.draw(tb);
             }
@@ -60,7 +74,8 @@ public class DrawTurret extends DrawBlock{
         Draw.rect(block.region, build.x + build.recoilOffset.x, build.y + build.recoilOffset.y, build.drawrot());
 
         if(liquid.found()){
-            Drawf.liquid(liquid, build.x + build.recoilOffset.x, build.y + build.recoilOffset.y, build.liquids.currentAmount() / block.liquidCapacity, build.liquids.current().color, build.drawrot());
+            Liquid toDraw = liquidDraw == null ? build.liquids.current() : liquidDraw;
+            Drawf.liquid(liquid, build.x + build.recoilOffset.x, build.y + build.recoilOffset.y, build.liquids.get(toDraw) / block.liquidCapacity, toDraw.color.write(Tmp.c1).a(1f), build.drawrot());
         }
 
         if(top.found()){
@@ -71,11 +86,7 @@ public class DrawTurret extends DrawBlock{
     public void drawHeat(Turret block, TurretBuild build){
         if(build.heat <= 0.00001f || !heat.found()) return;
 
-        Draw.color(block.heatColor, build.heat);
-        Draw.blend(Blending.additive);
-        Draw.rect(heat, build.x + build.recoilOffset.x, build.y + build.recoilOffset.y, build.drawrot());
-        Draw.blend();
-        Draw.color();
+        Drawf.additive(heat, block.heatColor.write(Tmp.c1).a(build.heat), build.x + build.recoilOffset.x, build.y + build.recoilOffset.y, build.drawrot(), Layer.turretHeat);
     }
 
     /** Load any relevant texture regions. */
@@ -84,6 +95,7 @@ public class DrawTurret extends DrawBlock{
         if(!(block instanceof Turret)) throw new ClassCastException("This drawer can only be used on turrets.");
 
         preview = Core.atlas.find(block.name + "-preview", block.region);
+        outline = Core.atlas.find(block.name + "-outline");
         liquid = Core.atlas.find(block.name + "-liquid");
         top = Core.atlas.find(block.name + "-top");
         heat = Core.atlas.find(block.name + "-heat");
@@ -107,16 +119,25 @@ public class DrawTurret extends DrawBlock{
 
     public static class RegionPart extends TurretPart{
         public String suffix = "";
-        public boolean mirror = true;
+        public TextureRegion heat;
         public TextureRegion[] regions;
         public TextureRegion[] outlines;
 
-        public boolean outline = false;
+        /** If true, turret reload is used as the measure of progress. Otherwise, warmup is used. */
+        public boolean useReload = false;
+        /** If true, parts are mirrored across the turret. Requires -1 and -2 regions. */
+        public boolean mirror = true;
+        /** If true, an outline is drawn under the part. */
+        public boolean outline = true;
+        /** If true, the layer is overridden to be under the turret itself. */
+        public boolean under = false;
         public float layer = -1;
         public float outlineLayerOffset = -0.01f;
         public float rotation, rotMove;
-        public float originX, originY;
-        public float offsetX, offsetY, offsetMoveX, offsetMoveY;
+        public float x, y, moveX, moveY;
+        public float oscMag = 0f, oscScl = 7f;
+        public boolean oscAbs = false;
+        public Color heatColor = Pal.turretHeat.cpy();
 
         public RegionPart(String region){
             this.suffix = region;
@@ -133,32 +154,38 @@ public class DrawTurret extends DrawBlock{
             }
             float prevZ = layer > 0 ? layer : z;
 
-            float progress = build.warmup();
+            float progress = useReload ? build.progress() : build.warmup();
+            if(oscMag > 0){
+                progress += oscAbs ? Mathf.absin(oscScl, oscMag) : Mathf.sin(oscScl, oscMag);
+            }
 
             for(int i = 0; i < regions.length; i++){
                 var region = regions[i];
                 float sign = i == 1 ? -1 : 1;
-                Tmp.v1.set((offsetX + offsetMoveX * progress) * sign, offsetY + offsetMoveY*progress).rotate(build.rotation - 90);
+                Tmp.v1.set((x + moveX * progress) * sign, y + moveY * progress).rotate((build.rotation - 90));
 
                 float
-                    x = build.x + Tmp.v1.x,
-                    y = build.y + Tmp.v1.y,
-                    rot = (i == 0 ? rotation : 180f - rotation) + rotMove * progress * sign + build.rotation,
-                    ox = originX + region.width * Draw.scl/2f, oy = originY + region.height * Draw.scl/2f;
+                    rx = build.x + Tmp.v1.x + build.recoilOffset.x,
+                    ry = build.y + Tmp.v1.y + build.recoilOffset.y,
+                    rot = i * sign + rotMove * progress * sign + build.rotation - 90;
+
+                Draw.xscl = i == 0 ? 1 : -1;
 
                 if(outline){
                     Draw.z(prevZ + outlineLayerOffset);
-
-                    Draw.rect(outlines[i],
-                    x, y, region.width * Draw.scl, region.height * Draw.scl,
-                    ox, oy, rot);
-
+                    Draw.rect(outlines[i], rx, ry, rot);
                     Draw.z(prevZ);
                 }
 
-                Draw.rect(region,
-                    x, y, region.width * Draw.scl, region.height * Draw.scl,
-                    ox, oy, rot);
+                if(region.found()){
+                    Draw.rect(region, rx, ry, rot);
+                }
+
+                if(heat.found()){
+                    Drawf.additive(heat, heatColor.write(Tmp.c1).a(build.heat), rx, ry, rot, Layer.turretHeat);
+                }
+
+                Draw.xscl = 1f;
             }
 
             Draw.z(z);
@@ -166,6 +193,8 @@ public class DrawTurret extends DrawBlock{
 
         @Override
         public void load(Block block){
+            if(under) layer = Layer.turret - 0.0001f;
+
             if(mirror){
                 regions = new TextureRegion[]{
                     Core.atlas.find(block.name + suffix + "1"),
@@ -180,6 +209,8 @@ public class DrawTurret extends DrawBlock{
                 regions = new TextureRegion[]{Core.atlas.find(block.name + suffix)};
                 outlines = new TextureRegion[]{Core.atlas.find(block.name + suffix + "-outline")};
             }
+
+            heat = Core.atlas.find(block.name + suffix + "-heat");
         }
 
         @Override

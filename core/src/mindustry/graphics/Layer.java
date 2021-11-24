@@ -38,6 +38,9 @@ public class Layer{
     //turrets
     turret = 50,
 
+    //special layer for turret additive blending heat stuff
+    turretHeat = 50.1f,
+
     //ground units
     groundUnit = 60,
 

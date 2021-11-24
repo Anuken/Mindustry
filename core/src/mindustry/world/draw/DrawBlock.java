@@ -23,7 +23,7 @@ public class DrawBlock{
     @Deprecated
     public void drawLight(GenericCrafterBuild build){}
 
-    public void getRegionsToOutline(Seq<TextureRegion> out){
+    public void getRegionsToOutline(Block block, Seq<TextureRegion> out){
 
     }
 

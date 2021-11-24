@@ -288,7 +288,8 @@ public class Generators{
 
                         region.path.delete();
 
-                        save(out, block.name);
+                        //
+                        save(out, region.name);
                     }
 
                     if(!regions[0].found()){

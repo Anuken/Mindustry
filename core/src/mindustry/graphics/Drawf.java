@@ -62,6 +62,17 @@ public class Drawf{
         points.add(Tmp.v1.x + baseX, Tmp.v1.y + baseY);
     }
 
+    public static void additive(TextureRegion region, Color color, float x, float y, float rotation, float layer){
+        float pz = Draw.z();
+        Draw.z(layer);
+        Draw.color(color);
+        Draw.blend(Blending.additive);
+        Draw.rect(region, x, y, rotation);
+        Draw.blend();
+        Draw.color();
+        Draw.z(pz);
+    }
+
     public static void dashLine(Color color, float x, float y, float x2, float y2){
         int segments = (int)(Math.max(Math.abs(x - x2), Math.abs(y - y2)) / tilesize * 2);
         Lines.stroke(3f, Pal.gray);

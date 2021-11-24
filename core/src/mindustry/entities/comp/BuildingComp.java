@@ -414,6 +414,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return Time.time;
     }
 
+    public float progress(){
+        return 0f;
+    }
+
     public BlockStatus status(){
         return cons.status();
     }
