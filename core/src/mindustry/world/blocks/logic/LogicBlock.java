@@ -347,7 +347,11 @@ public class LogicBlock extends Block{
 
                     asm.putConst("@mapw", world.width());
                     asm.putConst("@maph", world.height());
-                    asm.putConst("@links", executor.links[0].length);
+                    asm.putConst("@links", linksLen[0]);
+                    int i = 1;
+                    for(var flag : BlockFlag.allLogic) {
+                        asm.putConst("@links-" + flag.name(), linksLen[i++]);
+                    }
                     asm.putConst("@ipt", instructionsPerTick);
 
                     if(keep){
