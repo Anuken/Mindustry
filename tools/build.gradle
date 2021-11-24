@@ -250,8 +250,10 @@ task pack(dependsOn: [classes, configurations.runtimeClasspath]){
             if(!file.isDirectory()) file.file.text = file.file.text.replace("4096", "2048")
         }
 
-        //pack fallback 2048x2048 sprites
-        TexturePacker.process(new File(rootDir, "core/assets-raw/sprites_out/").absolutePath, new File(rootDir, "core/assets/sprites/fallback/").absolutePath, "sprites.aatls")
+        //pack fallback 2048x2048 sprites - disabled when debugging
+        if(!project.hasProperty("args")){
+            TexturePacker.process(new File(rootDir, "core/assets-raw/sprites_out/").absolutePath, new File(rootDir, "core/assets/sprites/fallback/").absolutePath, "sprites.aatls")
+        }
     }
 }
 

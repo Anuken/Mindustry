@@ -55,7 +55,7 @@ public class LaserTurret extends PowerTurret{
         public void updateTile(){
             super.updateTile();
 
-            if(!bullet.isAdded() || bullet.type == null){
+            if(bullet != null && (!bullet.isAdded() || bullet.type == null)){
                 bullet = null;
             }
 

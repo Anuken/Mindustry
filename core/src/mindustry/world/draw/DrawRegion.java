@@ -11,6 +11,7 @@ import mindustry.world.*;
 public class DrawRegion extends DrawBlock{
     public TextureRegion region;
     public String suffix = "";
+    public float rotateSpeed, x, y;
     /** Any number <=0 disables layer changes. */
     public float layer = -1;
 
@@ -25,7 +26,7 @@ public class DrawRegion extends DrawBlock{
     public void drawBase(Building build){
         float z = Draw.z();
         if(layer > 0) Draw.z(layer);
-        Draw.rect(region, build.x, build.y);
+        Draw.rect(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed);
         Draw.z(z);
     }
 

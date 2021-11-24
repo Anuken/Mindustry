@@ -42,6 +42,7 @@ public class Bullets implements ContentList{
             status = StatusEffects.shocked;
             statusDuration = 10f;
             hittable = false;
+            lightColor = Color.white;
         }};
 
         //this is just a copy of the damage lightning bullet that doesn't damage air units

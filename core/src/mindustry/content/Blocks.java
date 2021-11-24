@@ -1109,9 +1109,11 @@ public class Blocks implements ContentList{
                 strokeMax = 2.5f;
                 radius = 10f;
                 amount = 3;
-            }}, new DrawLiquidRegion(Liquids.slag), new DrawBlock(), new DrawHeatInput(), new DrawHeatRegion(){{
+            }}, new DrawLiquidRegion(Liquids.slag), new DrawBlock(), new DrawHeatInput(),
+            new DrawHeatRegion(){{
                 heatColor = Color.valueOf("ff6060ff");
-            }}, new DrawHeatRegion("-vents"){{
+            }},
+            new DrawHeatRegion("-vents"){{
                 heatColor.a = 1f;
             }});
             iconOverride = new String[]{"-bottom", ""};
@@ -2147,9 +2149,17 @@ public class Blocks implements ContentList{
         }};
 
         reinforcedContainer = new StorageBlock("reinforced-container"){{
-            requirements(Category.effect, with(Items.titanium, 250, Items.thorium, 125));
+            requirements(Category.effect, with(Items.tungsten, 250, Items.graphite, 100));
             size = 3;
+            //TODO should it really be kept the same, at 1000?
             itemCapacity = 1000;
+            health = size * size * 120;
+        }};
+
+        reinforcedVault = new StorageBlock("reinforced-vault"){{
+            requirements(Category.effect, with(Items.tungsten, 250, Items.graphite, 100));
+            size = 4;
+            itemCapacity = 2500;
             health = size * size * 120;
         }};
 
