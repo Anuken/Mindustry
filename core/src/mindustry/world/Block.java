@@ -710,6 +710,10 @@ public class Block extends UnlockableContent{
         return teamRegion.found() && minfo.mod == null ? new TextureRegion[]{r, teamRegions[Team.sharded.id]} : new TextureRegion[]{r};
     }
 
+    public void getRegionsToOutline(Seq<TextureRegion> out){
+
+    }
+
     public TextureRegion[] getGeneratedIcons(){
         return generatedIcons == null ? (generatedIcons = icons()) : generatedIcons;
     }

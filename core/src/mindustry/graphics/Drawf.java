@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
@@ -15,6 +16,51 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class Drawf{
+    private static FloatSeq points = new FloatSeq();
+
+    public static void flame(float x, float y, int divisions, float rotation, float length, float width, float pan){
+        flame(x, y, divisions, rotation, length, width, pan, 0f);
+    }
+
+    public static void flame(float x, float y, int divisions, float rotation, float length, float width, float pan, float offset){
+        float len1 = length * pan, len2 = length * (1f - pan);
+
+        points.clear();
+
+        //left side; half arc beginning at 90 degrees and ending at 270
+        for(int i = 0; i < divisions; i++){
+            float rot = 90f + 180f * i / (float)divisions;
+            Tmp.v1.trnsExact(rot, width);
+
+            point(
+            (Tmp.v1.x + width) / width * len1, //convert to 0..1, then multiply by desired length
+            Tmp.v1.y, //Y axis remains unchanged
+            x, y,
+            rotation
+            );
+        }
+
+        //right side; half arc beginning at -90 (270) and ending at 90
+        for(int i = 0; i < divisions; i++){
+            float rot = -90f + 180f * i / (float)divisions;
+            Tmp.v1.trnsExact(rot, width);
+
+            point(
+            len1 + (Tmp.v1.x) / width * len2, //convert to 0..1, then multiply by desired length and offset relative to previous segment
+            Tmp.v1.y, //Y axis remains unchanged
+            x, y,
+            rotation
+            );
+        }
+
+        Fill.poly(points);
+    }
+
+    private static void point(float x, float y, float baseX, float baseY, float rotation){
+        //TODO test exact and non-exact
+        Tmp.v1.set(x, y).rotateRadExact(rotation * Mathf.degRad);
+        points.add(Tmp.v1.x + baseX, Tmp.v1.y + baseY);
+    }
 
     public static void dashLine(Color color, float x, float y, float x2, float y2){
         int segments = (int)(Math.max(Math.abs(x - x2), Math.abs(y - y2)) / tilesize * 2);

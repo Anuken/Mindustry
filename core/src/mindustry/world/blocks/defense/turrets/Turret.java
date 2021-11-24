@@ -48,6 +48,7 @@ public class Turret extends ReloadTurret{
     public float ammoEjectBack = 1f;
     public float inaccuracy = 0f;
     public float velocityInaccuracy = 0f;
+    public float shootWarmupSpeed = 3f / 60f;
     public int shots = 1;
     public float spread = 4f;
     public float recoilAmount = 1f;
@@ -149,6 +150,11 @@ public class Turret extends ReloadTurret{
         return draw.icons(this);
     }
 
+    @Override
+    public void getRegionsToOutline(Seq<TextureRegion> out){
+        draw.getRegionsToOutline(out);
+    }
+
     public static abstract class AmmoEntry{
         public int amount;
 
@@ -165,12 +171,18 @@ public class Turret extends ReloadTurret{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float recoil, heat, logicControlTime = -1;
+        public float shootWarmup;
         public int shotCounter;
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
         public BlockUnitc unit = (BlockUnitc)UnitTypes.block.create(team);
         public boolean wasShooting, charging;
+
+        @Override
+        public float warmup(){
+            return shootWarmup;
+        }
 
         @Override
         public float drawrot(){
@@ -272,6 +284,9 @@ public class Turret extends ReloadTurret{
         @Override
         public void updateTile(){
             if(!validateTarget()) target = null;
+
+            //TODO can be lerp instead, that's smoother
+            shootWarmup = Mathf.approachDelta(shootWarmup, isActive() ? 1f : 0f, shootWarmupSpeed);
 
             wasShooting = false;
 

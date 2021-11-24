@@ -138,6 +138,11 @@ public class GenericCrafter extends Block{
         return outputItems != null;
     }
 
+    @Override
+    public void getRegionsToOutline(Seq<TextureRegion> out){
+        drawer.getRegionsToOutline(out);
+    }
+
     public class GenericCrafterBuild extends Building{
         public float progress;
         public float totalProgress;

@@ -42,7 +42,7 @@ public class ContinuousTurret extends Turret{
 
         @Override
         public boolean hasAmmo(){
-            return consValid();
+            return cons.canConsume();
         }
 
         @Override

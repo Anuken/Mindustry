@@ -240,7 +240,7 @@ public class Weapon implements Cloneable{
         mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
         bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
         bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY),
-        shootAngle = rotate ? weaponRotation + 90 : Angles.angle(bulletX, bulletY, mount.aimX, mount.aimY) + (unit.rotation - unit.angleTo(mount.aimX, mount.aimY));
+        shootAngle = rotate ? unit.rotation + mount.rotation : Angles.angle(bulletX, bulletY, mount.aimX, mount.aimY) + (unit.rotation - unit.angleTo(mount.aimX, mount.aimY));
 
         //find a new target
         if(!controllable && autoTarget){
@@ -333,8 +333,16 @@ public class Weapon implements Cloneable{
         return Units.invalidateTarget(target, unit.team, x, y, range + Math.abs(shootY));
     }
 
+    protected Vec2 getShootPos(Unit unit, WeaponMount mount, Vec2 out){
+        float weaponRot = unit.rotation - 90 + (rotate ? mount.rotation : 0);
+        return out.set(unit.x, unit.y)
+            .add(Angles.trnsx(unit.rotation - 90, x, y), Angles.trnsy(unit.rotation - 90, x, y))
+            .add(Angles.trnsx(weaponRot, this.shootX, this.shootY), Angles.trnsx(weaponRot, this.shootX, this.shootY));
+    }
+
     protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float aimX, float aimY, float mountX, float mountY, float rotation, int side){
-        float baseX = unit.x, baseY = unit.y;
+        Vec2 offset = getShootPos(unit, mount, Tmp.v1);
+        float baseX = offset.x, baseY = offset.y, baseRot = unit.rotation + mount.rotation;
         boolean delay = firstShotDelay + shotDelay > 0f;
 
         (delay ? chargeSound : continuous ? Sounds.none : shootSound).at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
@@ -347,7 +355,11 @@ public class Weapon implements Cloneable{
             Angles.shotgun(shots, spacing, rotation, f -> {
                 Time.run(sequenceNum * shotDelay + firstShotDelay, () -> {
                     if(!unit.isAdded()) return;
-                    mount.bullet = bullet(unit, shootX + unit.x - baseX, shootY + unit.y - baseY, f + Mathf.range(inaccuracy), lifeScl);
+
+                    getShootPos(unit, mount, offset).sub(baseX, baseY);
+
+                    float rotOffset = unit.rotation + mount.rotation - baseRot;
+                    mount.bullet = bullet(unit, shootX + offset.x, shootY + offset.y, f + Mathf.range(inaccuracy) + rotOffset, lifeScl);
                     if(!continuous){
                         shootSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
                     }
@@ -371,7 +383,10 @@ public class Weapon implements Cloneable{
                 if(!continuous){
                     shootSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
                 }
-                ammo.chargeShootEffect.at(shootX + unit.x - baseX, shootY + unit.y - baseY, rotation, parentize ? unit : null);
+
+                getShootPos(unit, mount, offset).sub(baseX, baseY);
+
+                ammo.chargeShootEffect.at(shootX + offset.x, shootY + offset.y, rotation, parentize ? unit : null);
             });
         }else{
             unit.vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));

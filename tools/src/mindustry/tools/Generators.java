@@ -220,6 +220,9 @@ public class Generators{
                 block.load();
                 block.loadIcon();
 
+                Seq<TextureRegion> toOutline = new Seq<>();
+                block.getRegionsToOutline(toOutline);
+
                 TextureRegion[] regions = block.getGeneratedIcons();
 
                 if(block.variants > 0 || block instanceof Floor){
@@ -254,6 +257,13 @@ public class Generators{
                                 shardTeamTop = out;
                             }
                         }
+                    }
+                }
+
+                if(toOutline != null){
+                    for(TextureRegion region : toOutline){
+                        Pixmap pix = get(region).outline(block.outlineColor, block.outlineRadius);
+                        save(pix, ((GenRegion)region).name + "-outline");
                     }
                 }
 

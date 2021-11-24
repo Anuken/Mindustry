@@ -2,6 +2,7 @@ package mindustry.world.draw;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -21,6 +22,10 @@ public class DrawBlock{
     /** @deprecated no longer called! not specific to generic crafters! */
     @Deprecated
     public void drawLight(GenericCrafterBuild build){}
+
+    public void getRegionsToOutline(Seq<TextureRegion> out){
+
+    }
 
     /** Draws the block itself. */
     public void drawBase(Building build){

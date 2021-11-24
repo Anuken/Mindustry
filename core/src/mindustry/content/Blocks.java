@@ -99,7 +99,7 @@ public class Blocks implements ContentList{
     //storage
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
     //storage - erekir
-    coreBastion, coreCitadel, coreAcropolis,
+    coreBastion, coreCitadel, coreAcropolis, reinforcedContainer, reinforcedVault,
 
     //turrets
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
@@ -1143,14 +1143,13 @@ public class Blocks implements ContentList{
 
             size = 3;
 
+            liquidCapacity = 40f;
             outputLiquid = new LiquidStack(Liquids.cyanogen, 3f);
             craftTime = 60f * 1f;
 
             consumes.liquid(Liquids.hydrogen, 3f / 60f);
             consumes.item(Items.graphite);
-
             consumes.power(2f);
-            liquidCapacity = 40f;
         }};
 
         //TODO bad name
@@ -1181,7 +1180,7 @@ public class Blocks implements ContentList{
             }}, new DrawBlock(), new DrawHeatInput(), new DrawHeatRegion("-vents"){{
                 heatColor = new Color(1f, 0.4f, 0.3f, 1f);
             }});
-            iconOverride = new String[]{"-bottom", ""};
+            iconOverride = new String[]{"-bottom", "-weave", ""};
 
             consumes.items(with(Items.thorium, 2, Items.sand, 6));
             consumes.liquid(Liquids.ozone, 2f / 60f);
@@ -2126,13 +2125,6 @@ public class Blocks implements ContentList{
             researchCostMultiplier = 0.11f;
         }};
 
-        vault = new StorageBlock("vault"){{
-            requirements(Category.effect, with(Items.titanium, 250, Items.thorium, 125));
-            size = 3;
-            itemCapacity = 1000;
-            health = size * size * 55;
-        }};
-
         container = new StorageBlock("container"){{
             requirements(Category.effect, with(Items.titanium, 100));
             size = 2;
@@ -2140,10 +2132,25 @@ public class Blocks implements ContentList{
             health = size * size * 55;
         }};
 
+        vault = new StorageBlock("vault"){{
+            requirements(Category.effect, with(Items.titanium, 250, Items.thorium, 125));
+            size = 3;
+            itemCapacity = 1000;
+            health = size * size * 55;
+        }};
+
+        //TODO move tabs?
         unloader = new Unloader("unloader"){{
             requirements(Category.effect, with(Items.titanium, 25, Items.silicon, 30));
             speed = 60f / 11f;
             group = BlockGroup.transportation;
+        }};
+
+        reinforcedContainer = new StorageBlock("reinforced-container"){{
+            requirements(Category.effect, with(Items.titanium, 250, Items.thorium, 125));
+            size = 3;
+            itemCapacity = 1000;
+            health = size * size * 120;
         }};
 
         //endregion
@@ -2681,10 +2688,31 @@ public class Blocks implements ContentList{
         }};
 
         //TODO bad name
-        if(false)
         sublimate = new ContinuousTurret("sublimate"){{
             //TODO requirements
             requirements(Category.turret, with(Items.tungsten, 35, Items.silicon, 35), true);
+
+            draw = new DrawTurret("reinforced-"){{
+                parts.addAll(new RegionPart("-back"){{
+                    outline = true;
+                    rotMove = 30f;
+                    offsetX = 29 / 4f;
+                    offsetY = -10f / 4f;
+                    originX = -8f / 4f;
+                    originY = 8f / 4f;
+                }});
+            }};
+            outlineColor = Pal.darkOutline;
+
+            consumes.liquids(LiquidStack.with(Liquids.cyanogen, 3f / 60f, Liquids.ozone, 2f / 60f));
+
+            range = 170f;
+
+            shootType = new ContinuousFlameBulletType(){{
+                length = range;
+            }};
+            shootLength = 9f;
+            size = 3;
         }};
 
         //endregion

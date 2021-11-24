@@ -9,9 +9,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
-public class ContinuousLaserBulletType extends BulletType{
-    public float length = 220f;
-    public float shake = 1f;
+public class ContinuousLaserBulletType extends ContinuousBulletType{
     public float fadeTime = 16f;
     public float lightStroke = 40f;
     public float spaceMag = 35f;
@@ -20,14 +18,18 @@ public class ContinuousLaserBulletType extends BulletType{
     public float[] strokes = {2f, 1.5f, 1f, 0.3f};
     public float[] lenscales = {1f, 1.12f, 1.15f, 1.17f};
     public float width = 9f, oscScl = 0.8f, oscMag = 1.5f;
-    public boolean largeHit = true;
 
     public ContinuousLaserBulletType(float damage){
         this.damage = damage;
-        this.speed = 0f;
+    }
 
+    public ContinuousLaserBulletType(){
+    }
+
+    {
+        shake = 1f;
+        largeHit = true;
         hitEffect = Fx.hitBeam;
-        despawnEffect = Fx.none;
         hitSize = 4;
         drawSize = 420f;
         lifetime = 16f;
@@ -36,53 +38,6 @@ public class ContinuousLaserBulletType extends BulletType{
         incendSpread = 5;
         incendChance = 0.4f;
         lightColor = Color.orange;
-        impact = true;
-        keepVelocity = false;
-        collides = false;
-        pierce = true;
-        hittable = false;
-        absorbable = false;
-    }
-
-    protected ContinuousLaserBulletType(){
-        this(0);
-    }
-
-    @Override
-    public float continuousDamage(){
-        return damage / 5f * 60f;
-    }
-
-    @Override
-    public float estimateDPS(){
-        //assume firing duration is about 100 by default, may not be accurate there's no way of knowing in this method
-        //assume it pierces 3 blocks/units
-        return damage * 100f / 5f * 3f;
-    }
-
-    @Override
-    public float range(){
-        return Math.max(length, maxRange);
-    }
-
-    @Override
-    public void init(){
-        super.init();
-
-        drawSize = Math.max(drawSize, length*2f);
-    }
-
-    @Override
-    public void update(Bullet b){
-
-        //damage every 5 ticks
-        if(b.timer(1, 5f)){
-            Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), length, largeHit);
-        }
-
-        if(shake > 0){
-            Effect.shake(shake, shake, b);
-        }
     }
 
     @Override

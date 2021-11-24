@@ -25,6 +25,13 @@ public class DrawMulti extends DrawBlock{
     }
 
     @Override
+    public void getRegionsToOutline(Seq<TextureRegion> out){
+        for(var draw : drawers){
+            draw.getRegionsToOutline(out);
+        }
+    }
+
+    @Override
     public void drawBase(Building build){
         for(var draw : drawers){
             draw.drawBase(build);
