@@ -301,22 +301,53 @@ public class LogicBlock extends Block{
                         }
                     }
 
+                    var linksLen = new int[BlockFlag.allLogic.length + 1];
+
+                    // calculate links by type
+                    for(LogicLink link : links){
+                        if (link.active && link.valid) {
+                            var build = world.build(link.x, link.y);
+                            for(var flag : build.block().flags) {
+                                for(int i = 0; i < BlockFlag.allLogic.length; i++) {
+                                    if (flag == BlockFlag.allLogic[i]) {
+                                        linksLen[i+1]++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+
                     //store link objects
-                    executor.links = new Building[links.count(l -> l.valid && l.active)];
+                    //first array is for "any", all the other are shifted by one
+                    executor.links[0] = new Building[links.count(l -> l.valid && l.active)];
+
+                    for(int i = 1; i < executor.links.length; i++) {
+                        executor.links[i] = new Building[linksLen[i]];
+                        linksLen[i] = 0;
+                    }
+
                     executor.linkIds.clear();
 
-                    int index = 0;
                     for(LogicLink link : links){
                         if(link.active && link.valid){
                             Building build = world.build(link.x, link.y);
-                            executor.links[index ++] = build;
+                            for(var flag : build.block().flags) {
+                                for(int i = 0; i < BlockFlag.allLogic.length; i++) {
+                                    if (flag == BlockFlag.allLogic[i]) {
+                                        executor.links[i+1][linksLen[i+1]++] = build;
+                                    }
+                                }
+                            }
+                            //in any case put the build in the "any" group
+                            executor.links[0][linksLen[0]++] = build;
                             if(build != null) executor.linkIds.add(build.id);
                         }
                     }
 
                     asm.putConst("@mapw", world.width());
                     asm.putConst("@maph", world.height());
-                    asm.putConst("@links", executor.links.length);
+                    asm.putConst("@links", executor.links[0].length);
                     asm.putConst("@ipt", instructionsPerTick);
 
                     if(keep){

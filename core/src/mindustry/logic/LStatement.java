@@ -104,7 +104,7 @@ public abstract class LStatement{
         }
     }
 
-    protected <T extends Enum<T>> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer){
+    protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer, Cons2<Cell, T> tooltip){
         showSelectTable(b, (t, hide) -> {
             ButtonGroup<Button> group = new ButtonGroup<>();
             int i = 0;
@@ -114,11 +114,15 @@ public abstract class LStatement{
                 sizer.get(t.button(p.toString(), Styles.logicTogglet, () -> {
                     getter.get(p);
                     hide.run();
-                }).self(c -> tooltip(c, p)).checked(current == p).group(group));
+                }).self(c -> tooltip.get(c, p)).checked(current.equals(p)).group(group));
 
                 if(++i % cols == 0) t.row();
             }
         });
+    }
+
+    protected <T extends Enum<T>> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer){
+        showSelect(b, values, current, getter, cols, sizer, (c, p) -> tooltip(c, p));
     }
 
     protected <T extends Enum<T>> void showSelect(Button b, T[] values, T current, Cons<T> getter){

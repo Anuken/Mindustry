@@ -47,7 +47,7 @@ public class LExecutor{
 
     public LongSeq graphicsBuffer = new LongSeq();
     public StringBuilder textBuffer = new StringBuilder();
-    public Building[] links = {};
+    public Building[][] links = new Building[BlockFlag.allLogic.length + 1][];
     public IntSet linkIds = new IntSet();
     public Team team = Team.derelict;
 
@@ -567,10 +567,12 @@ public class LExecutor{
 
     public static class GetLinkI implements LInstruction{
         public int output, index;
+        public int group = 0;
 
-        public GetLinkI(int output, int index){
+        public GetLinkI(int output, int index, int group){
             this.index = index;
             this.output = output;
+            this.group = group;
         }
 
         public GetLinkI(){
@@ -578,9 +580,10 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
+
             int address = exec.numi(index);
 
-            exec.setobj(output, address >= 0 && address < exec.links.length ? exec.links[address] : null);
+            exec.setobj(output, address >= 0 && address < exec.links[group].length ? exec.links[group][address] : null);
         }
     }
 

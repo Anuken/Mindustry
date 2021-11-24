@@ -312,7 +312,19 @@ public class LStatements{
 
     @RegisterStatement("getlink")
     public static class GetLinkStatement extends LStatement{
+        private static final String[] values;
         public String output = "result", address = "0";
+        public String group = values[0];
+
+        static {
+            values = new String[BlockFlag.allLogic.length + 1];
+
+            int i = 0;
+            values[i++] = "any";
+            for(var flag : BlockFlag.allLogic) {
+                values[i++] = flag.name();
+            }
+        }
 
         @Override
         public void build(Table table){
@@ -321,6 +333,14 @@ public class LStatements{
             table.add(" = link# ");
 
             field(table, address, str -> address = str);
+
+            table.add(" from group ");
+
+            table.button(b -> {
+                b.label(() -> group);
+                b.clicked(() ->
+                    showSelect(b, values, group, t -> group = t, 2, cell -> cell.size(110, 50), (c, p) -> tooltip(c, "lenum." + p)));
+            }, Styles.logict, () -> {}).size(110, 40).color(table.color).left().padLeft(2);
         }
 
         @Override
@@ -330,7 +350,14 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new GetLinkI(builder.var(output), builder.var(address));
+            int groupIndex = 0;
+            for (int i = 0; i < values.length; i++) {
+                if (values[i].equals(group)) {
+                    groupIndex = i;
+                    break;
+                }
+            }
+            return new GetLinkI(builder.var(output), builder.var(address), groupIndex);
         }
     }
 
