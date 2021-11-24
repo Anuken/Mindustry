@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
@@ -42,19 +41,20 @@ public class ContinuousFlameBulletType extends ContinuousBulletType{
     {
         optimalLifeFract = 0.5f;
         length = 120f;
-        hitEffect = Fx.hitBeam;
+        hitEffect = Fx.hitFlameBeam;
         hitSize = 4;
         drawSize = 420f;
         lifetime = 16f;
-        hitColor = colors[3];
-        lightColor = colors[3];
+        hitColor = colors[1].cpy().a(1f);
+        lightColor = hitColor;
+        //TODO what if, instead of piercing, it stopped at the first target regardless? or maybe 2?
+        laserAbsorb = false;
     }
 
     @Override
     public void draw(Bullet b){
         float mult = b.fslope();
-        float maxLength = length * mult;
-        float realLength = Damage.findLaserLength(b, maxLength);
+        float realLength = length * mult;
 
         float sin = Mathf.sin(Time.time, oscScl, oscMag);
 
@@ -86,6 +86,11 @@ public class ContinuousFlameBulletType extends ContinuousBulletType{
 
         Drawf.light(b.team, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, lightStroke, lightColor, 0.7f);
         Draw.reset();
+    }
+
+    @Override
+    public float currentLength(Bullet b){
+        return length * b.fslope();
     }
 
     @Override

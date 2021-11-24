@@ -10,6 +10,7 @@ public class ContinuousBulletType extends BulletType{
     public float shake = 0f;
     public float damageInterval = 5f;
     public boolean largeHit = false;
+    public boolean laserAbsorb = true;
 
     {
         speed = 0f;
@@ -53,12 +54,16 @@ public class ContinuousBulletType extends BulletType{
 
         //damage every 5 ticks
         if(b.timer(1, damageInterval)){
-            Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), length, largeHit);
+            Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), currentLength(b), largeHit, laserAbsorb);
         }
 
         if(shake > 0){
             Effect.shake(shake, shake, b);
         }
+    }
+
+    public float currentLength(Bullet b){
+        return length;
     }
 
 }

@@ -2726,7 +2726,9 @@ public class Blocks implements ContentList{
 
             range = 170f;
 
+            //TODO unfinished, needs damage + proper mechanics
             shootType = new ContinuousFlameBulletType(){{
+                damage = 4f;
                 length = range;
             }};
             shootLength = 7f;

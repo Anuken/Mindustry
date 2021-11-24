@@ -549,6 +549,14 @@ public class Fx{
         });
     }),
 
+    hitFlameBeam = new Effect(19, e -> {
+        color(e.color);
+
+        randLenVectors(e.id, 7, e.finpow() * 11f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 2 + 0.5f);
+        });
+    }),
+
     hitMeltdown = new Effect(12, e -> {
         color(Pal.meltdownHit);
         stroke(e.fout() * 2f);
