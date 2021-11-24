@@ -2730,6 +2730,7 @@ public class Blocks implements ContentList{
             shootType = new ContinuousFlameBulletType(){{
                 damage = 4f;
                 length = range;
+                //pierceMax = 3;
             }};
             shootLength = 7f;
             size = 3;

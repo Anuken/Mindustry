@@ -11,6 +11,8 @@ public class ContinuousBulletType extends BulletType{
     public float damageInterval = 5f;
     public boolean largeHit = false;
     public boolean laserAbsorb = true;
+    /** can't use pierceCap here for... many reasons. DO NOT USE, BUGGY */
+    public int pierceMax = -1;
 
     {
         speed = 0f;
@@ -54,7 +56,7 @@ public class ContinuousBulletType extends BulletType{
 
         //damage every 5 ticks
         if(b.timer(1, damageInterval)){
-            Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), currentLength(b), largeHit, laserAbsorb);
+            Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), currentLength(b), largeHit, laserAbsorb, pierceMax);
         }
 
         if(shake > 0){

@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
@@ -47,14 +48,13 @@ public class ContinuousFlameBulletType extends ContinuousBulletType{
         lifetime = 16f;
         hitColor = colors[1].cpy().a(1f);
         lightColor = hitColor;
-        //TODO what if, instead of piercing, it stopped at the first target regardless? or maybe 2?
         laserAbsorb = false;
     }
 
     @Override
     public void draw(Bullet b){
         float mult = b.fslope();
-        float realLength = length * mult;
+        float realLength = (pierceMax <= 0 ? length : Damage.findPierceLength(b, pierceMax, length)) * mult;
 
         float sin = Mathf.sin(Time.time, oscScl, oscMag);
 

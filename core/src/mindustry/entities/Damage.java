@@ -24,6 +24,7 @@ public class Damage{
     private static Rect hitrect = new Rect();
     private static Vec2 tr = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2();
     private static Seq<Unit> units = new Seq<>();
+    private static int pierceCount = 0;
     private static IntSet collidedBlocks = new IntSet();
     private static Building tmpBuilding;
     private static Unit tmpUnit;
@@ -113,6 +114,18 @@ public class Damage{
         return found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
     }
 
+    public static float findPierceLength(Bullet b, int pierceCap, float length){
+        Tmp.v1.trnsExact(b.rotation(), length);
+
+        furthest = null;
+        pierceCount = 0;
+
+        boolean found = world.raycast(b.tileX(), b.tileY(), World.toTile(b.x + Tmp.v1.x), World.toTile(b.y + Tmp.v1.y),
+        (x, y) -> (furthest = world.tile(x, y)) != null && furthest.build != null && furthest.team() != b.team && ++pierceCount >= pierceCap);
+
+        return found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
+    }
+
     /** Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */
     public static float collideLaser(Bullet b, float length, boolean large){
         float resultLength = findLaserLength(b, length);
@@ -141,7 +154,20 @@ public class Damage{
      * Only enemies of the specified team are damaged.
      */
     public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser){
-        if(laser) length = findLaserLength(hitter, length);
+        collideLine(hitter, team, effect, x, y, angle, length, large, laser, -1);
+    }
+
+    /**
+     * Damages entities in a line.
+     * Only enemies of the specified team are damaged.
+     */
+    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
+        pierceCount = 0;
+        if(laser){
+            length = findLaserLength(hitter, length);
+        }else if(pierceCap > 0){
+            length = findPierceLength(hitter, pierceCap, length);
+        }
 
         collidedBlocks.clear();
         tr.trnsExact(angle, length);
@@ -202,6 +228,9 @@ public class Damage{
         rect.height += expand * 2;
 
         Cons<Unit> cons = e -> {
+            //the peirce cap works for units, but really terribly, I'm just disabling it for now.
+            //if(pierceCap > 0 && pierceCount > pierceCap) return;
+
             e.hitbox(hitrect);
 
             Vec2 vec = Geometry.raycastRect(x, y, x2, y2, hitrect.grow(expand * 2));
@@ -210,6 +239,8 @@ public class Damage{
                 effect.at(vec.x, vec.y);
                 e.collision(hitter, vec.x, vec.y);
                 hitter.collision(e, vec.x, vec.y);
+
+                pierceCount ++;
             }
         };
 

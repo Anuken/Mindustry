@@ -42,6 +42,7 @@ public class ContinuousTurret extends Turret{
 
         @Override
         public boolean hasAmmo(){
+            //TODO update ammo in unit so it corresponds to liquids
             return cons.canConsume();
         }
 
