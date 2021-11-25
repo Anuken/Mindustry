@@ -2,12 +2,22 @@ sourceSets.main.java.srcDirs = ["src/"]
 
 
 import arc.files.Fi
+import arc.files.ZipFi
+import arc.func.Func2
 import arc.graphics.Color
 import arc.graphics.Pixmap
 import arc.packer.TexturePacker
 import arc.struct.IntIntMap
 import arc.struct.IntMap
+import arc.struct.ObjectMap
+import arc.struct.OrderedMap
+import arc.struct.Seq
+import arc.util.Http
+import arc.util.Log
+import arc.util.OS
 import arc.util.async.Threads
+import arc.util.io.PropertiesUtils
+import arc.util.io.Streams
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -247,38 +257,171 @@ task pack(dependsOn: [classes, configurations.runtimeClasspath]){
 task genSprites(dependsOn: classes, type: JavaExec){
     finalizedBy 'antialiasGen'
 
-    main = "mindustry.tools.ImagePacker"
+    mainClass = "mindustry.tools.ImagePacker"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = genFolder
 }
 
-task updateBundles(dependsOn: classes, type: JavaExec){
-    file(genFolder).mkdirs()
-
-    main = "mindustry.tools.BundleLauncher"
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
-    workingDir = "../core/assets/bundles/"
-}
-
 task fontgen(dependsOn: classes, type: JavaExec){
-    main = "mindustry.tools.FontGenerator"
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
-    workingDir = "../"
+    /* icon font pipeline:
+     1. take set of pre-defined icons and SVGs
+     2. use Fontello API to get a font with these
+     3. combine fontello font and standard font, get output font
+     4. use json to generate a file with constants for every icon size+type (during annotation processing)
+     */
+    doLast{
+        Fi folder = Fi.get("core/assets-raw/fontgen/out/");
+        folder.mkdirs();
+
+        Log.info("Session...");
+
+        OS.exec("curl", "--fail", "--output", "core/assets-raw/fontgen/out/session", "--form", "config=@core/assets-raw/fontgen/config.json", "https://fontello.com");
+
+        Log.info("Zip...");
+
+        String session = folder.child("session").readString();
+
+        Http.get("https://fontello.com/" + session + "/get").block(result -> {
+            Streams.copy(result.getResultAsStream(), folder.child("font.zip").write());
+        });
+
+        Log.info("Icon font...");
+
+        ZipFi zip = new ZipFi(folder.child("font.zip"));
+        Fi dest = folder.child("font.woff");
+        zip.list()[0].child("font").child("fontello.ttf").copyTo(dest);
+        dest.copyTo(Fi.get("core/assets/fonts/icon.ttf"));
+
+        Log.info("Merge...");
+
+        //TODO this is broken
+
+        Log.info(OS.exec("fontforge", "-script",
+            Fi.get("core/assets-raw/fontgen/merge.pe").absolutePath(),
+            Fi.get("core/assets/fonts/font.woff").absolutePath(),
+            Fi.get("core/assets-raw/fontgen/out/font.woff").absolutePath())
+        );
+
+        Log.info("Done.");
+    }
 }
 
 task icongen(dependsOn: classes, type: JavaExec){
-    main = "mindustry.tools.IconConverter"
+    mainClass = "mindustry.tools.IconConverter"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = "../core/assets-raw"
 }
 
 task updateScripts(dependsOn: classes, type: JavaExec){
-    main = "mindustry.tools.ScriptMainGenerator"
+    mainClass = "mindustry.tools.ScriptMainGenerator"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = "../"
+}
+
+task updateBundles{
+    doLast{
+        def uniEscape = { String string ->
+            StringBuilder outBuffer = new StringBuilder();
+            int len = string.length();
+            for(int i = 0; i < len; i++){
+                char ch = string.charAt(i);
+                if((ch > 61) && (ch < 127)){
+                    outBuffer.append(ch == '\\' ? "\\\\" : ch);
+                    continue;
+                }
+
+                if(ch >= 0xE000 && ch <= 0xF8FF){
+                    String hex = Integer.toHexString((int)ch);
+                    outBuffer.append("\\u");
+                    for(int j = 0; j < 4 - hex.length(); j++){
+                        outBuffer.append('0');
+                    }
+                    outBuffer.append(hex);
+                }else{
+                    outBuffer.append(ch);
+                }
+            }
+
+            return outBuffer.toString();
+        }
+
+        OrderedMap<String, String> base = new OrderedMap<>();
+        PropertiesUtils.load(base, Fi.get("core/assets/bundles/bundle.properties").reader());
+        Seq<String> removals = new Seq<>();
+
+        Log.info("Updating bundles...");
+
+        Fi.get("core/assets/bundles").walk(child -> {
+            if(child.name().equals("bundle.properties") || child.toString().contains("output")) return;
+
+            Log.info("| @", child.nameWithoutExtension());
+
+            OrderedMap<String, String> other = new OrderedMap<>();
+
+            //find the last known comment of each line
+            ObjectMap<String, String> comments = new ObjectMap<>();
+            StringBuilder curComment = new StringBuilder();
+
+            for(String line : Seq.with(child.readString().split("\n", -1))){
+                if(line.startsWith("#") || line.isEmpty()){
+                    curComment.append(line).append("\n");
+                }else if(line.contains("=")){
+                    String lastKey = line.substring(0, line.indexOf("=")).trim();
+                    if(curComment.length() != 0){
+                        comments.put(lastKey, curComment.toString());
+                        curComment.setLength(0);
+                    }
+                }
+            }
+
+            ObjectMap<String, String> extras = new OrderedMap<>();
+            PropertiesUtils.load(other, child.reader());
+            removals.clear();
+
+            for(String key : other.orderedKeys()){
+                if(!base.containsKey(key) && key.contains(".details")){
+                    extras.put(key, other.get(key));
+                }else if(!base.containsKey(key)){
+                    removals.add(key);
+                    Log.info("&lr- Removing unused key '@'...", key);
+                }
+            }
+            if(removals.size > 0) Log.info("&lr@ keys removed.", removals.size);
+            for(String s : removals){
+                other.remove(s);
+            }
+
+            int added = 0;
+
+            for(String key : base.orderedKeys()){
+                if(other.get(key) == null || other.get(key).trim().isEmpty()){
+                    other.put(key, base.get(key));
+                    added++;
+                    Log.info("&lc- Adding missing key '@'...", key);
+                }
+            }
+
+            Func2<String, String, String> processor = (key, value) ->
+                    (comments.containsKey(key) ? comments.get(key) : "") + //append last known comment if present
+                            (key + " =" + (value.trim().isEmpty() ? "" : " ") + uniEscape(value)).replace("\n", "\\n") + "\n";
+            Fi output = child.sibling("output/" + child.name());
+
+            if(added > 0) Log.info("&lc@ keys added.", added);
+            if(removals.size + added > 0) Log.info("Writing bundle to @", output);
+            StringBuilder result = new StringBuilder();
+
+            //add everything ordered
+            for(String key : base.orderedKeys().copy().and(extras.keys().toSeq())){
+                if(other.get(key) == null) continue;
+
+                result.append(processor.get(key, other.get(key)));
+                other.remove(key);
+            }
+
+            child.writeString(result.toString());
+        });
+    }
 }

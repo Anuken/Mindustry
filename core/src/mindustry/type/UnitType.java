@@ -120,6 +120,8 @@ public class UnitType extends UnlockableContent{
     public boolean canDrown = true, naval = false;
     public float drownTimeMultiplier = 1f;
     public float engineOffset = 5f, engineSize = 2.5f;
+    public @Nullable Color engineColor = null;
+    public Color engineColorInner = Color.white;
     public float strafePenalty = 0.5f;
     public float hitSize = 6f;
     public float itemOffsetY = 3f;
@@ -766,13 +768,13 @@ public class UnitType extends UnlockableContent{
             trail.draw(unit.team.color, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * scale) * trailScl);
         }
 
-        Draw.color(unit.team.color);
+        Draw.color(engineColor == null ? unit.team.color : engineColor);
         Fill.circle(
             unit.x + Angles.trnsx(unit.rotation + 180, offset),
             unit.y + Angles.trnsy(unit.rotation + 180, offset),
             (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) * scale
         );
-        Draw.color(Color.white);
+        Draw.color(engineColorInner);
         Fill.circle(
             unit.x + Angles.trnsx(unit.rotation + 180, offset - 1f),
             unit.y + Angles.trnsy(unit.rotation + 180, offset - 1f),

@@ -424,8 +424,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         unit.remove();
+
         //needs new ID as it is now a payload
-        unit.id = EntityGroup.nextId();
+        if(net.client()){
+            unit.id = EntityGroup.nextId();
+        }else{
+            //server-side, this needs to be delayed until next frame because otherwise the packets sent out right after this event would have the wrong unit ID, leading to ghosts
+            Core.app.post(() -> unit.id = EntityGroup.nextId());
+        }
+
         grabber.get(new UnitPayload(unit));
         Fx.unitDrop.at(unit);
     }
