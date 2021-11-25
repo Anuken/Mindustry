@@ -1049,6 +1049,20 @@ public class Block extends UnlockableContent{
             packer.add(PageType.main, name, out);
         }
 
+        var toOutline = new Seq<TextureRegion>();
+        getRegionsToOutline(toOutline);
+
+        for(var region : toOutline){
+            if(region instanceof AtlasRegion atlas){
+                String regionName = atlas.name;
+                Pixmap outlined = Pixmaps.outline(Core.atlas.getPixmap(region), outlineColor, outlineRadius);
+
+                if(Core.settings.getBool("linear", true)) Pixmaps.bleed(outlined);
+
+                packer.add(PageType.main, regionName + "-outline", outlined);
+            }
+        }
+
         var editorBase = Core.atlas.getPixmap(fullIcon);
 
         if(gen.length > 1){
