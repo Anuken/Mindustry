@@ -5,12 +5,14 @@ import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.world.*;
 
 /** Not standalone. */
 public class DrawRegion extends DrawBlock{
     public TextureRegion region;
     public String suffix = "";
+    public boolean spinSprite = false;
     public float rotateSpeed, x, y;
     /** Any number <=0 disables layer changes. */
     public float layer = -1;
@@ -26,7 +28,11 @@ public class DrawRegion extends DrawBlock{
     public void drawBase(Building build){
         float z = Draw.z();
         if(layer > 0) Draw.z(layer);
-        Draw.rect(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed);
+        if(spinSprite){
+            Drawf.spinSprite(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed);
+        }else{
+            Draw.rect(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed);
+        }
         Draw.z(z);
     }
 
