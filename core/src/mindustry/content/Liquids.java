@@ -78,9 +78,9 @@ public class Liquids implements ContentList{
             flammability = 1f;
         }};
 
-        cyanogen = new Liquid("cyanogen", Color.valueOf("6fd5d5")){{
+        cyanogen = new Liquid("cyanogen", Color.valueOf("89e8b6")){{
             gas = true;
-            barColor = Color.valueOf("6fd5d5");
+            barColor = color;
             flammability = 2f;
         }};
 

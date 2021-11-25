@@ -69,6 +69,7 @@ public class Turret extends ReloadTurret{
     public boolean targetGround = true;
     public boolean targetHealing = false;
     public boolean playerControllable = true;
+    public boolean displayAmmoMultiplier = true;
 
     //charging
     public float chargeTime = -1f;

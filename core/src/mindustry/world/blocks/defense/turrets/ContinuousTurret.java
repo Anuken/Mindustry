@@ -18,6 +18,7 @@ public class ContinuousTurret extends Turret{
         coolantMultiplier = 1f;
         envEnabled |= Env.space;
         acceptCoolant = false;
+        displayAmmoMultiplier = false;
     }
 
     @Override

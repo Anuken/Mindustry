@@ -65,7 +65,7 @@ public class ConsumeLiquids extends Consume{
     @Override
     public void display(Stats stats){
         //TODO display is wrong
-        stats.add(booster ? Stat.booster : Stat.input, StatValues.liquids(stats.timePeriod, stats.timePeriod >= 0, liquids));
+        stats.add(booster ? Stat.booster : Stat.input, StatValues.liquids(1f, true, liquids));
     }
 
     protected float use(float amount, Building build){
