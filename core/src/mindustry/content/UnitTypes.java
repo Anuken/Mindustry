@@ -2624,6 +2624,7 @@ public class UnitTypes implements ContentList{
         //endregion
         //region neoplasm
 
+        if(false)
         scuttler = new NeoplasmUnitType("scuttler"){{
             health = 20000;
             armor = 17;
