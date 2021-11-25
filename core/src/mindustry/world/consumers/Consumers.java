@@ -127,6 +127,11 @@ public class Consumers{
     }
 
     @Nullable
+    public <T extends Consume> T getOrNull(ConsumeType type){
+        return (T)map[type.ordinal()];
+    }
+
+    @Nullable
     public Consume[] all(){
         return results;
     }

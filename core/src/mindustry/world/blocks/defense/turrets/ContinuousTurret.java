@@ -5,6 +5,7 @@ import arc.struct.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 /** A turret that fires a continuous beam bullet with no reload or coolant necessary. The bullet only disappears when the turret stops shooting. */
@@ -54,6 +55,19 @@ public class ContinuousTurret extends Turret{
         @Override
         public void updateTile(){
             super.updateTile();
+
+            //unclean way of calculating ammo fraction to display
+            float ammoFract = efficiency();
+            var liq = consumes.getOrNull(ConsumeType.liquid);
+            if(liq instanceof ConsumeLiquids cons){
+                for(var stack : cons.liquids){
+                    ammoFract = Math.min(ammoFract, liquids.get(stack.liquid) / liquidCapacity);
+                }
+            }else if(liq instanceof ConsumeLiquid cons){
+                ammoFract = Math.min(ammoFract, liquids.get(cons.liquid) / liquidCapacity);
+            }
+
+            unit.ammo(unit.type().ammoCapacity * ammoFract);
 
             if(bullet != null){
                 //check to see if bullet despawned

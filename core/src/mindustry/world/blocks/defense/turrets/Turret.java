@@ -191,7 +191,7 @@ public class Turret extends ReloadTurret{
 
         @Override
         public boolean shouldConsume(){
-            return isActive();
+            return isShooting();
         }
 
         @Override
@@ -290,8 +290,8 @@ public class Turret extends ReloadTurret{
         public void updateTile(){
             if(!validateTarget()) target = null;
 
-            //TODO can be lerp instead, that's smoother
-            shootWarmup = Mathf.lerpDelta(shootWarmup, isShooting() ? 1f : 0f, shootWarmupSpeed);
+            //TODO make it approach instead and add interp curves to parts
+            shootWarmup = Mathf.lerpDelta(shootWarmup, isShooting() && cons.canConsume() ? 1f : 0f, shootWarmupSpeed);
 
             wasShooting = false;
 
