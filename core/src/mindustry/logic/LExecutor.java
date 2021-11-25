@@ -566,8 +566,7 @@ public class LExecutor{
     }
 
     public static class GetLinkI implements LInstruction{
-        public int output, index;
-        public int group = 0;
+        public int output, index, group;
 
         public GetLinkI(int output, int index, int group){
             this.index = index;

@@ -313,15 +313,14 @@ public class LStatements{
     @RegisterStatement("getlink")
     public static class GetLinkStatement extends LStatement{
         private static final String[] values;
-        public String output = "result", address = "0";
-        public String group = values[0];
+        public String output = "result", address = "0", group = values[0];
 
-        static {
+        static{
             values = new String[BlockFlag.allLogic.length + 1];
 
             int i = 0;
             values[i++] = "any";
-            for(var flag : BlockFlag.allLogic) {
+            for(var flag : BlockFlag.allLogic){
                 values[i++] = flag.name();
             }
         }

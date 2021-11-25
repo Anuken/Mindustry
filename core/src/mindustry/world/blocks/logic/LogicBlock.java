@@ -199,6 +199,8 @@ public class LogicBlock extends Block{
         public float accumulator = 0;
         public Seq<LogicLink> links = new Seq<>();
         public boolean checkedDuplicates = false;
+        private int[] linksGroupNum = new int[BlockFlag.allLogic.length + 1];
+        private static final Seq<BlockFlag> logicFlagSeq = new Seq<>(BlockFlag.allLogic);
 
         /** Block of code to run after load. */
         public @Nullable Runnable loadBlock;
@@ -301,30 +303,18 @@ public class LogicBlock extends Block{
                         }
                     }
 
-                    var linksLen = new int[BlockFlag.allLogic.length + 1];
-
-                    // calculate links by type
-                    for(LogicLink link : links){
-                        if (link.active && link.valid) {
-                            var build = world.build(link.x, link.y);
-                            for(var flag : build.block().flags) {
-                                for(int i = 0; i < BlockFlag.allLogic.length; i++) {
-                                    if (flag == BlockFlag.allLogic[i]) {
-                                        linksLen[i+1]++;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
 
                     //store link objects
                     //first array is for "any", all the other are shifted by one
                     executor.links[0] = new Building[links.count(l -> l.valid && l.active)];
-
-                    for(int i = 1; i < executor.links.length; i++) {
-                        executor.links[i] = new Building[linksLen[i]];
-                        linksLen[i] = 0;
+                    linksGroupNum[0] = 0;
+                    int i = 1;
+                    for(var flag : BlockFlag.allLogic){
+                        executor.links[i] = new Building[links.count(l -> l.valid
+                                                                       && l.active
+                                                                       && world.build(l.x, l.y) != null
+                                                                       && world.build(l.x, l.y).block().flags.contains(flag))];
+                        linksGroupNum[i++] = 0;
                     }
 
                     executor.linkIds.clear();
@@ -332,25 +322,24 @@ public class LogicBlock extends Block{
                     for(LogicLink link : links){
                         if(link.active && link.valid){
                             Building build = world.build(link.x, link.y);
-                            for(var flag : build.block().flags) {
-                                for(int i = 0; i < BlockFlag.allLogic.length; i++) {
-                                    if (flag == BlockFlag.allLogic[i]) {
-                                        executor.links[i+1][linksLen[i+1]++] = build;
-                                    }
-                                }
-                            }
                             //in any case put the build in the "any" group
-                            executor.links[0][linksLen[0]++] = build;
-                            if(build != null) executor.linkIds.add(build.id);
+                            executor.links[0][linksGroupNum[0]++] = build;
+                            if(build != null){
+                                for(var flag : build.block().flags){
+                                    int index = logicFlagSeq.indexOf(flag);
+                                    if (index >= 0) executor.links[index+1][linksGroupNum[index+1]++] = build;
+                                }
+                                executor.linkIds.add(build.id);
+                            }
                         }
                     }
 
                     asm.putConst("@mapw", world.width());
                     asm.putConst("@maph", world.height());
-                    asm.putConst("@links", linksLen[0]);
-                    int i = 1;
-                    for(var flag : BlockFlag.allLogic) {
-                        asm.putConst("@links-" + flag.name(), linksLen[i++]);
+                    asm.putConst("@links", linksGroupNum[0]);
+                    i = 1;
+                    for(var flag : BlockFlag.allLogic){
+                        asm.putConst("@links-" + flag.name(), linksGroupNum[i++]);
                     }
                     asm.putConst("@ipt", instructionsPerTick);
 
