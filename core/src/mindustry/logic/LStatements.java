@@ -338,7 +338,7 @@ public class LStatements{
             table.button(b -> {
                 b.label(() -> group);
                 b.clicked(() ->
-                    showSelect(b, values, group, t -> group = t, 2, cell -> cell.size(110, 50), (c, p) -> tooltip(c, "lenum." + p)));
+                    showSelect(b, values, group, t -> group = t, 2, cell -> cell.size(110, 50), (c, p) -> { if(!p.equals(values[0])) tooltip(c, "lenum." + p); }));
             }, Styles.logict, () -> {}).size(110, 40).color(table.color).left().padLeft(2);
         }
 
