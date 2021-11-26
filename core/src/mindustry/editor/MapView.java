@@ -181,8 +181,8 @@ public class MapView extends Element implements GestureListener{
         if(Core.scene.getKeyboardFocus() == null || !(Core.scene.getKeyboardFocus() instanceof TextField) && !Core.input.keyDown(KeyCode.controlLeft)){
             float ax = Core.input.axis(Binding.move_x);
             float ay = Core.input.axis(Binding.move_y);
-            offsetx -= ax * 15f / zoom;
-            offsety -= ay * 15f / zoom;
+            offsetx -= ax * 15 * Time.delta / zoom;
+            offsety -= ay * 15 * Time.delta / zoom;
         }
 
         if(Core.input.keyTap(KeyCode.shiftLeft)){
