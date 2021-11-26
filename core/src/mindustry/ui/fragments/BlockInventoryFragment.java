@@ -93,7 +93,7 @@ public class BlockInventoryFragment extends Fragment{
                 if(holding && lastItem != null){
                     holdTime += Time.delta;
 
-                    if(holdTime >= holdWithdraw){
+                    if(holdTime >= holdWithdraw || Core.input.keyDown(KeyCode.shiftLeft)){
                         int amount = Math.min(tile.items.get(lastItem), player.unit().maxAccepted(lastItem));
                         Call.requestItem(player, tile, lastItem, amount);
                         holding = false;
