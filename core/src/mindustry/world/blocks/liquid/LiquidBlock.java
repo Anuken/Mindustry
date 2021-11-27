@@ -32,11 +32,12 @@ public class LiquidBlock extends Block{
         return new TextureRegion[]{bottomRegion, topRegion};
     }
 
-    public static void drawTiledGas(TextureRegion[] gasRegions, int size, float x, float y, float padding, Color color, float alpha){
-        TextureRegion region = gasRegions[(int)(Time.time / Liquid.animationScale * Liquid.animationFrames) % Liquid.animationFrames];
+    public static void drawTiledFrames(int size, float x, float y, float padding, Liquid liquid, float alpha){
+        TextureRegion region = renderer.fluidFrames[liquid.gas ? 1 : 0][liquid.getAnimationFrame()];
         TextureRegion toDraw = Tmp.tr1;
 
         float bounds = size/2f * tilesize - padding;
+        Color color = Tmp.c1.set(liquid.color).mul(liquid.gas ? 1f : 1f).a(1f);
 
         for(int sx = 0; sx < size; sx++){
             for(int sy = 0; sy < size; sy++){
@@ -60,7 +61,7 @@ public class LiquidBlock extends Block{
                     oy = -squishY/2f;
                 }
 
-                Drawf.liquid(toDraw, x + rightBorder + ox, y + topBorder + oy, alpha, Tmp.c1.set(color).a(1f));
+                Drawf.liquid(toDraw, x + rightBorder + ox, y + topBorder + oy, alpha, color);
             }
         }
     }

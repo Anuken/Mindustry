@@ -29,12 +29,10 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "conduit-bottom-#") TextureRegion[] botRegions;
-    public @Load(value = "@-liquid-r#", length = 4, fallback = "conduit-liquid-r#") TextureRegion[] liquidRotateRegions;
-    public @Load(value = "@-liquid", fallback = "conduit-liquid") TextureRegion liquidBaseRegion;
     public @Load("@-cap") TextureRegion capRegion;
 
-    public @Load(value = "conduit-liquid-#", length = animationFrames) TextureRegion[] gasRegions;
-    public @Load(value = "conduit-liquid-r#1-#2", lengths = {4, animationFrames}) TextureRegion[][] rotateGasRegions;
+    public @Load(value = "conduit-liquid-r#1-gas-#2", lengths = {4, animationFrames}) TextureRegion[][] rotateGasRegions;
+    public @Load(value = "conduit-liquid-r#1-liquid-#2", lengths = {4, animationFrames}) TextureRegion[][] rotateLiquidRegions;
 
     public boolean leaks = true;
     public @Nullable Block junctionReplacement, bridgeReplacement, rotBridgeReplacement;
@@ -139,12 +137,13 @@ public class Conduit extends LiquidBlock implements Autotiler{
             Draw.rect(sliced(botRegions[bits], slice), x, y, angle);
 
             int offset = yscl == -1 ? 3 : 0;
+
             //TODO move out of conduit
-            int frame = (int)(Time.time / animationScale * animationFrames) % animationFrames;
+            int frame = liquids.current().getAnimationFrame();
             TextureRegion liquidr =
                 liquids.current().gas ?
-                (bits == 1 ? rotateGasRegions[(rotation + offset) % 4][frame] : gasRegions[frame]) :
-                (bits == 1 ? liquidRotateRegions[(rotation + offset) % 4] : liquidBaseRegion);
+                (bits == 1 ? rotateGasRegions[(rotation + offset) % 4][frame] : renderer.fluidFrames[1][frame]) :
+                (bits == 1 ? rotateLiquidRegions[(rotation + offset) % 4][frame] : renderer.fluidFrames[0][frame]);
 
             //the drawing state machine sure was a great design choice with no downsides or hidden behavior!!!
             float xscl = Draw.xscl, yscl = Draw.yscl;

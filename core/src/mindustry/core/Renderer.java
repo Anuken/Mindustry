@@ -19,6 +19,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
+import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
@@ -52,6 +53,7 @@ public class Renderer implements ApplicationListener{
     public Seq<EnvRenderer> envRenderers = new Seq<>();
     public ObjectMap<String, Runnable> customBackgrounds = new ObjectMap<>();
     public TextureRegion[] bubbles = new TextureRegion[16], splashes = new TextureRegion[12];
+    public TextureRegion[][] fluidFrames = new TextureRegion[2][Liquid.animationFrames];
 
     private @Nullable CoreBuild landCore;
     private @Nullable CoreBlock launchCoreType;
@@ -110,6 +112,15 @@ public class Renderer implements ApplicationListener{
         EnvRenderers.init();
         for(int i = 0; i < bubbles.length; i++) bubbles[i] = atlas.find("bubble-" + i);
         for(int i = 0; i < splashes.length; i++) splashes[i] = atlas.find("splash-" + i);
+
+        String[] fluidTypes = {"liquid", "gas"};
+
+        for(int i = 0; i < fluidTypes.length; i++){
+
+            for(int j = 0; j < Liquid.animationFrames; j++){
+                fluidFrames[i][j] = atlas.find("fluid-" + fluidTypes[i] + "-" + j);
+            }
+        }
 
         assets.load("sprites/clouds.png", Texture.class).loaded = t -> {
             t.setWrap(TextureWrap.repeat);

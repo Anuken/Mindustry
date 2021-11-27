@@ -6,14 +6,16 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.blocks.liquid.*;
 import mindustry.world.meta.*;
 
 public class DirectionLiquidBridge extends DirectionBridge{
     public final int timerFlow = timers++;
 
     public float speed = 5f;
+    public float liquidPadding = 1f;
 
-    public @Load("@-liquid") TextureRegion liquidRegion;
+    public @Load("@-bottom") TextureRegion bottomRegion;
 
     public DirectionLiquidBridge(String name){
         super(name);
@@ -25,15 +27,23 @@ public class DirectionLiquidBridge extends DirectionBridge{
         hasLiquids = true;
     }
 
+
+    @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{bottomRegion, region, dirRegion};
+    }
+
     public class DuctBridgeBuild extends DirectionBridgeBuild{
 
         @Override
         public void draw(){
-            Draw.rect(block.region, x, y);
+            Draw.rect(bottomRegion, x, y);
 
             if(liquids.currentAmount() > 0.001f){
-                Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
+                LiquidBlock.drawTiledFrames(size, x, y, liquidPadding, liquids.current(), liquids.currentAmount() / liquidCapacity);
             }
+
+            Draw.rect(block.region, x, y);
 
             Draw.rect(dirRegion, x, y, rotdeg());
             var link = findLink();

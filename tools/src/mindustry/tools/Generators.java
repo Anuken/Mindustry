@@ -30,14 +30,27 @@ import static mindustry.tools.ImagePacker.*;
 public class Generators{
     static final int logicIconSize = (int)iconMed, maxUiIcon = 128;
 
-    private static final int keyframes = 4;
+    private static float fluid(boolean gas, double x, double y, float frame){
+        int keyframes = gas ? 4 : 3;
 
-    private static float gas(double x, double y, float frame){
+        //interpolate between the current two keyframes
         int curFrame = (int)(frame * keyframes);
         int nextFrame = (curFrame + 1) % keyframes;
         float progress = (frame * keyframes) % 1f;
-        //interpolate between the current two keyframes
-        return Mathf.lerp((float)gasFrame(x, y, curFrame), (float)gasFrame(x, y, nextFrame), progress);
+
+        if(gas){
+            float min = 0.56f;
+            float interpolated = Mathf.lerp((float)gasFrame(x, y, curFrame), (float)gasFrame(x, y, nextFrame), progress);
+            return min + (1f - min) * interpolated;
+        }else{ //liquids
+            float min = 0.84f;
+            double rx = (x + frame*32) % 32, ry = (y + frame*32) % 32;
+            //rx = x; ry = y;
+            //(float)liquidFrame(rx, ry, 0)
+            float interpolated = (float)liquidFrame(rx, ry, 2);//Mathf.lerp((float)liquidFrame(rx, ry, curFrame), (float)liquidFrame(rx, ry, nextFrame), progress);
+            //only two colors here
+            return min + (interpolated >= 0.3f ? 1f - min : 0f);
+        }
     }
 
     private static double gasFrame(double x, double y, int frame){
@@ -45,6 +58,14 @@ public class Generators{
         //calculate random space offsets for the frame cutout
         double ox = Mathf.randomSeed(frame, 200_000), oy = Mathf.randomSeed(frame, 200_000);
         double scale = 21, second = 0.3;
+        return (Simplex.rawTiled(x, y, ox, oy, s, s, scale) + Simplex.rawTiled(x, y, ox, oy, s, s, scale / 1.5) * second) / (1.0 + second);
+    }
+
+    private static double liquidFrame(double x, double y, int frame){
+        int s = 31;
+        //calculate random space offsets for the frame cutout
+        double ox = Mathf.randomSeed(frame, 1), oy = Mathf.randomSeed(frame, 1);
+        double scale = 26, second = 0.5;
         return (Simplex.rawTiled(x, y, ox, oy, s, s, scale) + Simplex.rawTiled(x, y, ox, oy, s, s, scale / 1.5) * second) / (1.0 + second);
     }
 
@@ -107,27 +128,28 @@ public class Generators{
 
         generate("gas-frames", () -> {
             int frames = Liquid.animationFrames;
-            String[] stencils = {"conduit-liquid", "conduit-liquid-r0", "conduit-liquid-r1", "conduit-liquid-r2", "conduit-liquid-r3"};
-            for(String region : stencils){
-                Pixmap base = get(region);
-                float min = 0.56f, imin = 1f - min;
+            String[] stencils = {"fluid", "conduit-liquid-r0", "conduit-liquid-r1", "conduit-liquid-r2", "conduit-liquid-r3"};
+            String[] types = {"liquid", "gas"};
+            int typeIndex = 0;
 
-                for(int i = 0; i < frames; i++){
-                    float frame = i / (float)frames;
+            for(String type : types){
+                boolean gas = typeIndex++ == 1;
+                for(String region : stencils){
+                    Pixmap base = get(region);
 
-                    Pixmap copy = base.copy();
-                    for(int x = 0; x < copy.width; x++){
-                        for(int y = 0; y < copy.height; y++){
-                            if(copy.getA(x, y) > 128){
+                    for(int i = 0; i < frames; i++){
+                        float frame = i / (float)frames;
 
-                                double value = gas(x, y, frame);
-                                float va = min + imin*(float)(value);
-
-                                copy.setRaw(x, y, Color.rgba8888(1f, 1f, 1f, va));
+                        Pixmap copy = base.copy();
+                        for(int x = 0; x < copy.width; x++){
+                            for(int y = 0; y < copy.height; y++){
+                                if(copy.getA(x, y) > 128){
+                                    copy.setRaw(x, y, Color.rgba8888(1f, 1f, 1f, fluid(gas, x, y, frame)));
+                                }
                             }
                         }
+                        save(copy, region + "-" + type + "-" + i);
                     }
-                    save(copy, region + "-" + i);
                 }
             }
         });

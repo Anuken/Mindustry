@@ -1,18 +1,13 @@
 package mindustry.world.blocks.liquid;
 
 import arc.graphics.g2d.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-
-import static mindustry.Vars.*;
 
 public class LiquidRouter extends LiquidBlock{
     /** kept only for mod compatibility reasons; all vanilla blocks have this as true */
     public boolean newDrawing = false;
     public float liquidPadding = 0f;
-
-    public @Load(value = "conduit-liquid-#", length = Liquid.animationFrames) TextureRegion[] gasRegions;
 
     public LiquidRouter(String name){
         super(name);
@@ -40,13 +35,7 @@ public class LiquidRouter extends LiquidBlock{
                 Draw.rect(bottomRegion, x, y);
 
                 if(liquids.currentAmount() > 0.001f){
-                    if(liquids.current().gas){
-                        drawTiledGas(gasRegions, size, x, y, liquidPadding, liquids.current().color, liquids.currentAmount() / liquidCapacity);
-                    }else{
-                        Draw.color(liquids.current().color, liquids.currentAmount() / liquidCapacity);
-                        Fill.square(x, y, size * tilesize/2f - liquidPadding);
-                        Draw.color();
-                    }
+                    drawTiledFrames(size, x, y, liquidPadding, liquids.current(), liquids.currentAmount() / liquidCapacity);
                 }
 
                 Draw.rect(region, x, y);

@@ -17,8 +17,8 @@ import static mindustry.entities.Puddles.*;
 /** A better name for this class would be "fluid", but it's too late for that. */
 public class Liquid extends UnlockableContent{
     //must be static and global so conduits don't conflict - DO NOT INTERACT WITH THESE IN MODS OR I WILL PERSONALLY YELL AT YOU
-    public static final int animationFrames = 40;
-    public static float animationScale = 190f;
+    public static final int animationFrames = 50;
+    public static float animationScaleGas = 190f, animationScaleLiquid = 230f;
 
     protected static final Rand rand = new Rand();
 
@@ -82,6 +82,10 @@ public class Liquid extends UnlockableContent{
                 barColor = color.cpy().a(1f);
             }
         }
+    }
+
+    public int getAnimationFrame(){
+        return (int)(Time.time / (gas ? animationScaleGas : animationScaleLiquid) * animationFrames + id*5) % animationFrames;
     }
 
     /** @return true if this liquid will boil in this global environment. */
