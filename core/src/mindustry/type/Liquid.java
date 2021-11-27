@@ -16,6 +16,10 @@ import static mindustry.entities.Puddles.*;
 
 /** A better name for this class would be "fluid", but it's too late for that. */
 public class Liquid extends UnlockableContent{
+    //must be static and global so conduits don't conflict - DO NOT INTERACT WITH THESE IN MODS OR I WILL PERSONALLY YELL AT YOU
+    public static final int animationFrames = 40;
+    public static float animationScale = 190f;
+
     protected static final Rand rand = new Rand();
 
     /** TODO If true, this fluid is treated as a gas (and does not create puddles) */
@@ -74,6 +78,9 @@ public class Liquid extends UnlockableContent{
             color.a = 0.6f;
             //for gases, gas color is implicitly their color
             gasColor = color;
+            if(barColor == null){
+                barColor = color.cpy().a(1f);
+            }
         }
     }
 

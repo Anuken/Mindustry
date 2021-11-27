@@ -30,6 +30,24 @@ import static mindustry.tools.ImagePacker.*;
 public class Generators{
     static final int logicIconSize = (int)iconMed, maxUiIcon = 128;
 
+    private static final int keyframes = 4;
+
+    private static float gas(double x, double y, float frame){
+        int curFrame = (int)(frame * keyframes);
+        int nextFrame = (curFrame + 1) % keyframes;
+        float progress = (frame * keyframes) % 1f;
+        //interpolate between the current two keyframes
+        return Mathf.lerp((float)gasFrame(x, y, curFrame), (float)gasFrame(x, y, nextFrame), progress);
+    }
+
+    private static double gasFrame(double x, double y, int frame){
+        int s = 31;
+        //calculate random space offsets for the frame cutout
+        double ox = Mathf.randomSeed(frame, 200_000), oy = Mathf.randomSeed(frame, 200_000);
+        double scale = 21, second = 0.3;
+        return (Simplex.rawTiled(x, y, ox, oy, s, s, scale) + Simplex.rawTiled(x, y, ox, oy, s, s, scale / 1.5) * second) / (1.0 + second);
+    }
+
     public static void run(){
         ObjectMap<Block, Pixmap> gens = new ObjectMap<>();
 
@@ -45,12 +63,14 @@ public class Generators{
 
                 Pixmap pixmap = new Pixmap(size, size);
 
-                pixmap.each((x, y) -> {
-                    float dst = Mathf.dst(x, y, size/2f, size/2f);
-                    if(Math.abs(dst - radius) <= stroke){
-                        pixmap.set(x, y, Color.white);
+                for(int x = 0; x < pixmap.width; x++){
+                    for(int y = 0; y < pixmap.height; y++){
+                        float dst = Mathf.dst(x, y, size/2f, size/2f);
+                        if(Math.abs(dst - radius) <= stroke){
+                            pixmap.set(x, y, Color.white);
+                        }
                     }
-                });
+                }
 
                 Fi.get("splash-" + i + ".png").writePng(pixmap);
 
@@ -82,6 +102,33 @@ public class Generators{
                 Fi.get("bubble-" + i + ".png").writePng(pixmap);
 
                 pixmap.dispose();
+            }
+        });
+
+        generate("gas-frames", () -> {
+            int frames = Liquid.animationFrames;
+            String[] stencils = {"conduit-liquid", "conduit-liquid-r0", "conduit-liquid-r1", "conduit-liquid-r2", "conduit-liquid-r3"};
+            for(String region : stencils){
+                Pixmap base = get(region);
+                float min = 0.56f, imin = 1f - min;
+
+                for(int i = 0; i < frames; i++){
+                    float frame = i / (float)frames;
+
+                    Pixmap copy = base.copy();
+                    for(int x = 0; x < copy.width; x++){
+                        for(int y = 0; y < copy.height; y++){
+                            if(copy.getA(x, y) > 128){
+
+                                double value = gas(x, y, frame);
+                                float va = min + imin*(float)(value);
+
+                                copy.setRaw(x, y, Color.rgba8888(1f, 1f, 1f, va));
+                            }
+                        }
+                    }
+                    save(copy, region + "-" + i);
+                }
             }
         });
 

@@ -60,7 +60,9 @@ public class Blocks implements ContentList{
     //crafting
     siliconSmelter, siliconCrucible, siliconArcFurnace, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
-    electrolyzer, oxidationChamber, slagHeater, slagIncinerator, heatReactor, carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer,
+
+    //erekir
+    electrolyzer, oxidationChamber, atmosphericConcentrator, slagHeater, slagIncinerator, heatReactor, carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer,
     cellSynthesisChamber,
 
     //sandbox
@@ -987,6 +989,20 @@ public class Blocks implements ContentList{
             liquidOutputDirections = new int[]{1, 3};
         }};
 
+        if(false)
+        atmosphericConcentrator = new HeatCrafter("atmospheric-concentrator"){{
+            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
+            size = 3;
+            craftTime = 60f;
+
+            liquidCapacity = 50f;
+            consumes.power(2f);
+
+            heatRequirement = 5f;
+
+            outputLiquid = new LiquidStack(Liquids.nitrogen, 4f / 60f);
+        }};
+
         oxidationChamber = new HeatProducer("oxidation-chamber"){{
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
             size = 3;
@@ -1627,12 +1643,14 @@ public class Blocks implements ContentList{
         liquidRouter = new LiquidRouter("liquid-router"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 2));
             liquidCapacity = 20f;
+            newDrawing = true;
         }};
 
         liquidContainer = new LiquidRouter("liquid-container"){{
             requirements(Category.liquid, with(Items.titanium, 10, Items.metaglass, 15));
             liquidCapacity = 700f;
             size = 2;
+            newDrawing = true;
         }};
 
         liquidTank = new LiquidRouter("liquid-tank"){{
@@ -1640,6 +1658,7 @@ public class Blocks implements ContentList{
             size = 3;
             liquidCapacity = 1800f;
             health = 500;
+            newDrawing = true;
         }};
 
         liquidJunction = new LiquidJunction("liquid-junction"){{
@@ -1705,18 +1724,24 @@ public class Blocks implements ContentList{
         reinforcedLiquidRouter = new LiquidRouter("reinforced-liquid-router"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.beryllium, 2));
             liquidCapacity = 30f;
+            newDrawing = true;
+            liquidPadding = 3f/4f;
         }};
 
         reinforcedLiquidContainer = new LiquidRouter("reinforced-liquid-container"){{
             requirements(Category.liquid, with(Items.graphite, 10, Items.beryllium, 15));
             liquidCapacity = 1000f;
             size = 2;
+            newDrawing = true;
+            liquidPadding = 6f/4f;
         }};
 
         reinforcedLiquidTank = new LiquidRouter("reinforced-liquid-tank"){{
             requirements(Category.liquid, with(Items.tungsten, 30, Items.beryllium, 40));
             size = 3;
             liquidCapacity = 2700f;
+            newDrawing = true;
+            liquidPadding = 2f;
         }};
 
         //endregion
@@ -1957,6 +1982,8 @@ public class Blocks implements ContentList{
             consumes.power(3f);
             consumes.liquid(Liquids.water, 0.2f);
         }};
+
+        //TODO higher tier impact drill, 5x5
 
         waterExtractor = new SolidPump("water-extractor"){{
             requirements(Category.production, with(Items.metaglass, 30, Items.graphite, 30, Items.lead, 30, Items.copper, 30));

@@ -20,6 +20,7 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.*;
 
 import static mindustry.Vars.*;
+import static mindustry.type.Liquid.*;
 
 public class Conduit extends LiquidBlock implements Autotiler{
     public final int timerFlow = timers++;
@@ -28,7 +29,12 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "conduit-bottom-#") TextureRegion[] botRegions;
+    public @Load(value = "@-liquid-r#", length = 4, fallback = "conduit-liquid-r#") TextureRegion[] liquidRotateRegions;
+    public @Load(value = "@-liquid", fallback = "conduit-liquid") TextureRegion liquidBaseRegion;
     public @Load("@-cap") TextureRegion capRegion;
+
+    public @Load(value = "conduit-liquid-#", length = animationFrames) TextureRegion[] gasRegions;
+    public @Load(value = "conduit-liquid-r#1-#2", lengths = {4, animationFrames}) TextureRegion[][] rotateGasRegions;
 
     public boolean leaks = true;
     public @Nullable Block junctionReplacement, bridgeReplacement, rotBridgeReplacement;
@@ -106,7 +112,6 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
         @Override
         public void draw(){
-            float rotation = rotdeg();
             int r = this.rotation;
 
             //draw extra conduits facing this one for tiling purposes
@@ -114,28 +119,40 @@ public class Conduit extends LiquidBlock implements Autotiler{
             for(int i = 0; i < 4; i++){
                 if((blending & (1 << i)) != 0){
                     int dir = r - i;
-                    float rot = i == 0 ? rotation : (dir)*90;
-                    drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, rot, i != 0 ? SliceMode.bottom : SliceMode.top);
+                    drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, i == 0 ? r : dir, i != 0 ? SliceMode.bottom : SliceMode.top);
                 }
             }
 
             Draw.z(Layer.block);
 
             Draw.scl(xscl, yscl);
-            drawAt(x, y, blendbits, rotation, SliceMode.none);
+            drawAt(x, y, blendbits, r, SliceMode.none);
             Draw.reset();
 
             if(capped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg());
             if(backCapped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg() + 180);
         }
 
-        protected void drawAt(float x, float y, int bits, float rotation, SliceMode slice){
+        protected void drawAt(float x, float y, int bits, int rotation, SliceMode slice){
+            float angle = rotation * 90f;
             Draw.color(botColor);
-            Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
+            Draw.rect(sliced(botRegions[bits], slice), x, y, angle);
 
-            Drawf.liquid(sliced(botRegions[bits], slice), x, y, smoothLiquid, liquids.current().color, rotation);
+            int offset = yscl == -1 ? 3 : 0;
+            //TODO move out of conduit
+            int frame = (int)(Time.time / animationScale * animationFrames) % animationFrames;
+            TextureRegion liquidr =
+                liquids.current().gas ?
+                (bits == 1 ? rotateGasRegions[(rotation + offset) % 4][frame] : gasRegions[frame]) :
+                (bits == 1 ? liquidRotateRegions[(rotation + offset) % 4] : liquidBaseRegion);
 
-            Draw.rect(sliced(topRegions[bits], slice), x, y, rotation);
+            //the drawing state machine sure was a great design choice with no downsides or hidden behavior!!!
+            float xscl = Draw.xscl, yscl = Draw.yscl;
+            Draw.scl(1f, 1f);
+            Drawf.liquid(sliced(liquidr, slice), x, y, smoothLiquid, liquids.current().color.write(Tmp.c1).a(1f));
+            Draw.scl(xscl, yscl);
+
+            Draw.rect(sliced(topRegions[bits], slice), x, y, angle);
         }
 
         @Override
