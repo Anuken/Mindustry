@@ -17,12 +17,13 @@ public class TechTree implements ContentList{
     static TechNode context = null;
 
     public static Seq<TechNode> all;
-    public static TechNode root;
+    public static TechNode root, rootErekir;
 
     @Override
     public void load(){
         setup();
 
+        //region serpulo
         root = node(coreShard, () -> {
 
             node(conveyor, () -> {
@@ -658,6 +659,33 @@ public class TechTree implements ContentList{
                 });
             });
         });
+
+        //endregion
+        //region erekir
+
+        rootErekir = node(coreBastion, () -> {
+            node(duct, () -> {
+                node(ductRouter, () -> {
+                    node(ductBridge, () -> {
+                        node(surgeConveyor, () -> {
+                            node(surgeRouter);
+                        });
+                    });
+
+                    node(overflowDuct, () -> {
+
+                    });
+
+                    node(reinforcedContainer, () -> {
+                        node(reinforcedVault, () -> {
+
+                        });
+                    });
+                });
+            });
+        });
+
+        //endregion
     }
 
     public static void setup(){

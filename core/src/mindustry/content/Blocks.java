@@ -1560,7 +1560,7 @@ public class Blocks implements ContentList{
         //special transport blocks
 
         duct = new Duct("duct"){{
-            requirements(Category.distribution, with(Items.graphite, 5));
+            requirements(Category.distribution, with(Items.graphite, 2));
             speed = 4f;
         }};
 
@@ -1575,12 +1575,12 @@ public class Blocks implements ContentList{
         }};
 
         ductBridge = new DuctBridge("duct-bridge"){{
-            requirements(Category.distribution, with(Items.graphite, 20));
+            requirements(Category.distribution, with(Items.graphite, 15));
             speed = 4f;
         }};
 
         ductUnloader = new DirectionalUnloader("duct-unloader"){{
-            requirements(Category.distribution, with(Items.graphite, 10));
+            requirements(Category.distribution, with(Items.graphite, 20, Items.silicon, 20));
             speed = 4f;
         }};
 
@@ -2130,7 +2130,7 @@ public class Blocks implements ContentList{
 
         coreBastion = new CoreBlock("core-bastion"){{
             //TODO cost
-            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.beryllium, 2000, Items.graphite, 2000, Items.tungsten, 1000));
+            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.graphite, 1000, Items.beryllium, 800));
 
             unitType = UnitTypes.evoke;
             health = 7000;
@@ -2192,7 +2192,7 @@ public class Blocks implements ContentList{
         }};
 
         reinforcedContainer = new StorageBlock("reinforced-container"){{
-            requirements(Category.effect, with(Items.tungsten, 250, Items.graphite, 100));
+            requirements(Category.effect, with(Items.tungsten, 100, Items.graphite, 50));
             size = 3;
             //TODO should it really be kept the same, at 1000?
             itemCapacity = 1000;
@@ -2200,7 +2200,7 @@ public class Blocks implements ContentList{
         }};
 
         reinforcedVault = new StorageBlock("reinforced-vault"){{
-            requirements(Category.effect, with(Items.tungsten, 250, Items.graphite, 100));
+            requirements(Category.effect, with(Items.tungsten, 250, Items.carbide, 125));
             size = 4;
             itemCapacity = 2500;
             health = size * size * 120;

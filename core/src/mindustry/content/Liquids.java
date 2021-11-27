@@ -58,7 +58,6 @@ public class Liquids implements ContentList{
             colorTo = Color.valueOf("9e172c");
         }};
 
-        //TODO I have doubts about this liquid's usefulness
         gallium = new Liquid("gallium", Color.valueOf("9a9dbf")){{
 
         }};
@@ -85,9 +84,5 @@ public class Liquids implements ContentList{
             gas = true;
             flammability = 2f;
         }};
-
-        //TODO dicyanoacetylene vs cyanogen
-
-        //TODO molten lead (maybe)
     }
 }
