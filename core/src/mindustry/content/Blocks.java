@@ -1,6 +1,7 @@
 package mindustry.content;
 
 import arc.graphics.*;
+import arc.math.*;
 import arc.struct.*;
 import mindustry.*;
 import mindustry.ctype.*;
@@ -965,7 +966,7 @@ public class Blocks implements ContentList{
 
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
-                new DrawLiquidRegion(Liquids.water),
+                new DrawLiquidTile(Liquids.water, 2f),
                 new DrawBubbles(Color.valueOf("7693e3")){{
                     sides = 10;
                     recurrence = 3f;
@@ -975,7 +976,6 @@ public class Blocks implements ContentList{
                 }},
                 new DrawRegion(),
                 new DrawLiquidOutputs(),
-                new DrawRegion("-top"),
                 new DrawGlowRegion(){{
                     alpha = 0.7f;
                     color = Color.valueOf("c4bdf3");
@@ -984,23 +984,33 @@ public class Blocks implements ContentList{
                 }}
             );
 
-            iconOverride = new String[]{"-bottom", "", "-top"};
+            iconOverride = new String[]{"-bottom", ""};
             outputLiquids = LiquidStack.with(Liquids.ozone, 2f * craftTime / 60, Liquids.hydrogen, 3f * craftTime / 60);
             liquidOutputDirections = new int[]{1, 3};
         }};
 
-        if(false)
         atmosphericConcentrator = new HeatCrafter("atmospheric-concentrator"){{
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
             size = 3;
-            craftTime = 60f;
+            craftTime = 10f;
+            hasLiquids = true;
 
-            liquidCapacity = 50f;
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.nitrogen, 4.1f), new DrawBlock(), new DrawHeatInput(),
+            new DrawParticles(){{
+                color = Color.valueOf("d4f0ff");
+                alpha = 0.6f;
+                particleSize = 4f;
+                particles = 10;
+                particleRad = 12f;
+                particleLife = 140f;
+            }});
+
+            liquidCapacity = 40f;
             consumes.power(2f);
 
             heatRequirement = 5f;
 
-            outputLiquid = new LiquidStack(Liquids.nitrogen, 4f / 60f);
+            outputLiquid = new LiquidStack(Liquids.nitrogen, 4f * craftTime / 60f);
         }};
 
         oxidationChamber = new HeatProducer("oxidation-chamber"){{
@@ -1016,8 +1026,8 @@ public class Blocks implements ContentList{
             rotateDraw = false;
 
             //TODO vent?
-            iconOverride = new String[]{"-bottom", "", "-top1", "-glass"};
-            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(), new DrawBlock(), new DrawHeatOutput(), new DrawRegion("-glass"));
+            iconOverride = new String[]{"-bottom", "", "-top1"};
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(), new DrawBlock(), new DrawHeatOutput());
 
             craftTime = 60f * 3f;
             liquidCapacity = 30f;
@@ -1027,8 +1037,8 @@ public class Blocks implements ContentList{
         slagHeater = new HeatProducer("slag-heater"){{
             requirements(Category.crafting, with(Items.tungsten, 30, Items.graphite, 30));
 
-            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(Liquids.slag), new DrawRegion("-top"), new DrawHeatOutput(true));
-            iconOverride = new String[]{"-bottom", "", "-top"};
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.slag, 9f), new DrawHeatOutput(true));
+            iconOverride = new String[]{"-bottom", ""};
             size = 2;
             craftTime = 60f * 1f;
             heatOutput = 2f;
@@ -1043,13 +1053,16 @@ public class Blocks implements ContentList{
         }};
 
         heatReactor = new HeatProducer("heat-reactor"){{
-            //TODO quadvent?
-            //TODO coolant?
-            //TODO extra output, should have other uses
+            //TODO gas/liquid requirement?
             requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
             size = 3;
             craftTime = 60f * 10f;
-            consumes.item(Items.fissileMatter, 1);
+
+            craftEffect = new RadialEffect(Fx.heatReactorSmoke, 4, 90f, 7f);
+
+            itemCapacity = 20;
+            consumes.item(Items.thorium, 2);
+            outputItem = new ItemStack(Items.fissileMatter, 1);
         }};
 
         carbideCrucible = new HeatCrafter("carbide-crucible"){{
@@ -1060,7 +1073,8 @@ public class Blocks implements ContentList{
             size = 3;
             itemCapacity = 20;
             hasPower = hasItems = true;
-            drawer = new DrawMulti(new DrawCrucible(), new DrawHeatInput());
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawCrucible(), new DrawBlock(), new DrawHeatInput());
+            iconOverride = new String[]{"-bottom", ""};
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.07f;
 
@@ -1127,10 +1141,10 @@ public class Blocks implements ContentList{
                 amount = 3;
             }}, new DrawLiquidRegion(Liquids.slag), new DrawBlock(), new DrawHeatInput(),
             new DrawHeatRegion(){{
-                heatColor = Color.valueOf("ff6060ff");
+                color = Color.valueOf("ff6060ff");
             }},
             new DrawHeatRegion("-vents"){{
-                heatColor.a = 1f;
+                color.a = 1f;
             }});
             iconOverride = new String[]{"-bottom", ""};
 
@@ -1147,17 +1161,19 @@ public class Blocks implements ContentList{
 
             heatRequirement = 5f;
 
-            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(Liquids.hydrogen), new DrawBlock(), new DrawRegion("-top"), new DrawHeatInput(),
-            new DrawParticlesIn(){{
-                color = Color.valueOf("d4f0ff");
-                alpha = 0.6f;
-                particleSize = 4f;
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.cyanogen),
+            new DrawParticles(){{
+                color = Color.valueOf("89e8b6");
+                alpha = 0.5f;
+                particleSize = 3f;
                 particles = 10;
-                particleRad = 12f;
-                particleLife = 140f;
-            }});
+                particleRad = 9f;
+                particleLife = 200f;
+                reverse = true;
+                particleSizeInterp = Interp.one;
+            }}, new DrawBlock(), new DrawHeatInput(), new DrawHeatRegion("-heat-top"));
 
-            iconOverride = new String[]{"-bottom", "", "-top"};
+            iconOverride = new String[]{"-bottom", ""};
 
             size = 3;
 
@@ -1165,7 +1181,7 @@ public class Blocks implements ContentList{
             outputLiquid = new LiquidStack(Liquids.cyanogen, 3f);
             craftTime = 60f * 1f;
 
-            consumes.liquid(Liquids.hydrogen, 3f / 60f);
+            consumes.liquids(LiquidStack.with(Liquids.hydrogen, 3f / 60f, Liquids.nitrogen, 2f / 60f));
             consumes.item(Items.graphite);
             consumes.power(2f);
         }};
@@ -1196,7 +1212,7 @@ public class Blocks implements ContentList{
             }}, new DrawMultiWeave(){{
                 glowColor = new Color(1f, 0.4f, 0.4f, 0.8f);
             }}, new DrawBlock(), new DrawHeatInput(), new DrawHeatRegion("-vents"){{
-                heatColor = new Color(1f, 0.4f, 0.3f, 1f);
+                color = new Color(1f, 0.4f, 0.3f, 1f);
             }});
             iconOverride = new String[]{"-bottom", "-weave", ""};
 

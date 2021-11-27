@@ -13,6 +13,7 @@ public class DrawBubbles extends DrawBlock{
     public int amount = 12, sides = 8;
     public float strokeMin = 0.2f, spread = 3f, timeScl = 30f;
     public float recurrence = 6f, radius = 3f;
+    public boolean fill = false;
 
     public DrawBubbles(Color color){
         this.color = color;
@@ -37,8 +38,13 @@ public class DrawBubbles extends DrawBlock{
             float life = 1f - ((Time.time / timeScl + rand.random(recurrence)) % recurrence);
 
             if(life > 0){
-                Lines.stroke(build.warmup() * (life + strokeMin));
-                Lines.poly(build.x + x, build.y + y, sides, (1f - life) * radius);
+                float rad = (1f - life) * radius;
+                if(fill){
+                    Fill.circle(build.x + x, build.y + y, rad);
+                }else{
+                    Lines.stroke(build.warmup() * (life + strokeMin));
+                    Lines.poly(build.x + x, build.y + y, sides, rad);
+                }
             }
         }
 

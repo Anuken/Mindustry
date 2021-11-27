@@ -1368,6 +1368,21 @@ public class Fx{
         }
     }),
 
+    heatReactorSmoke = new Effect(180f, e -> {
+        color(Color.gray);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 5; i++){
+            float len = rand.random(6f), rot = rand.range(50f) + e.rotation;
+
+            e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
+                alpha(0.9f * b.fout());
+                v.trns(rot, len * b.finpow());
+                Fill.circle(e.x + v.x, e.y + v.y, 2.4f * b.fin() + 0.6f);
+            });
+        }
+    }),
+
     berylSpark = new Effect(21f, e -> {
         color(Color.white, Pal.berylShot, e.fin());
         stroke(e.fout() * 1.1f + 0.5f);

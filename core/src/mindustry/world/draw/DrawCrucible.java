@@ -1,16 +1,15 @@
 package mindustry.world.draw;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.Interp.*;
 import arc.util.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
 public class DrawCrucible extends DrawBlock{
-    public TextureRegion top, bottom;
     public Color flameColor = Color.valueOf("f58349"), midColor = Color.valueOf("f2d585");
     public float flameRad = 1f, circleSpace = 2f, flameRadiusScl = 10f, flameRadiusMag = 0.6f, circleStroke = 1.5f;
 
@@ -21,7 +20,6 @@ public class DrawCrucible extends DrawBlock{
 
     @Override
     public void drawBase(Building build){
-        Draw.rect(bottom, build.x, build.y);
 
         if(build.warmup() > 0f && flameColor.a > 0.001f){
             Lines.stroke(circleStroke * build.warmup());
@@ -53,19 +51,8 @@ public class DrawCrucible extends DrawBlock{
             Draw.blend();
             Draw.reset();
         }
-
-        Draw.rect(build.block.region, build.x, build.y);
-        if(top.found()) Draw.rect(top, build.x, build.y);
     }
 
     @Override
-    public void load(Block block){
-        top = Core.atlas.find(block.name + "-top");
-        bottom = Core.atlas.find(block.name + "-bottom");
-    }
-
-    @Override
-    public TextureRegion[] icons(Block block){
-        return new TextureRegion[]{bottom, block.region, top};
-    }
+    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){}
 }

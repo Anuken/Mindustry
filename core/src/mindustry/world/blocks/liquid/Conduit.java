@@ -23,6 +23,9 @@ import static mindustry.Vars.*;
 import static mindustry.type.Liquid.*;
 
 public class Conduit extends LiquidBlock implements Autotiler{
+    static final float rotatePad = 6, hpad = rotatePad / 2f / 4f;
+    static final float[][] rotateOffsets = {{hpad, hpad}, {-hpad, hpad}, {-hpad, -hpad}, {hpad, -hpad}};
+
     public final int timerFlow = timers++;
     
     public Color botColor = Color.valueOf("565656");
@@ -31,8 +34,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public @Load(value = "@-bottom-#", length = 5, fallback = "conduit-bottom-#") TextureRegion[] botRegions;
     public @Load("@-cap") TextureRegion capRegion;
 
-    public @Load(value = "conduit-liquid-r#1-gas-#2", lengths = {4, animationFrames}) TextureRegion[][] rotateGasRegions;
-    public @Load(value = "conduit-liquid-r#1-liquid-#2", lengths = {4, animationFrames}) TextureRegion[][] rotateLiquidRegions;
+    /** indices: [rotation] [fluid type] [frame] */
+    public TextureRegion[][][] rotateRegions;
 
     public boolean leaks = true;
     public @Nullable Block junctionReplacement, bridgeReplacement, rotBridgeReplacement;
@@ -53,6 +56,44 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
         if(junctionReplacement == null) junctionReplacement = Blocks.liquidJunction;
         if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge)) bridgeReplacement = Blocks.bridgeConduit;
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
+        rotateRegions = new TextureRegion[4][2][animationFrames];
+
+        if(renderer != null){
+            float pad = rotatePad;
+            var frames = renderer.getFluidFrames();
+
+            for(int rot = 0; rot < 4; rot++){
+                for(int fluid = 0; fluid < 2; fluid++){
+                    for(int frame = 0; frame < animationFrames; frame++){
+                        TextureRegion base = frames[fluid][frame];
+                        TextureRegion result = new TextureRegion();
+                        result.set(base);
+
+                        if(rot == 0){
+                            result.setX(result.getX() + pad);
+                            result.setHeight(result.height - pad);
+                        }else if(rot == 1){
+                            result.setWidth(result.width - pad);
+                            result.setHeight(result.height - pad);
+                        }else if(rot == 2){
+                            result.setWidth(result.width - pad);
+                            result.setY(result.getY() + pad);
+                        }else{
+                            result.setX(result.getX() + pad);
+                            result.setY(result.getY() + pad);
+                        }
+
+                        rotateRegions[rot][fluid][frame] = result;
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -138,17 +179,21 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
             int offset = yscl == -1 ? 3 : 0;
 
-            //TODO move out of conduit
             int frame = liquids.current().getAnimationFrame();
-            TextureRegion liquidr =
-                liquids.current().gas ?
-                (bits == 1 ? rotateGasRegions[(rotation + offset) % 4][frame] : renderer.fluidFrames[1][frame]) :
-                (bits == 1 ? rotateLiquidRegions[(rotation + offset) % 4][frame] : renderer.fluidFrames[0][frame]);
+            int gas = liquids.current().gas ? 1 : 0;
+            float ox = 0f, oy = 0f;
+            int wrapRot = (rotation + offset) % 4;
+            TextureRegion liquidr = bits == 1 ? rotateRegions[wrapRot][gas][frame] : renderer.fluidFrames[gas][frame];
+
+            if(bits == 1){
+                ox = rotateOffsets[wrapRot][0];
+                oy = rotateOffsets[wrapRot][1];
+            }
 
             //the drawing state machine sure was a great design choice with no downsides or hidden behavior!!!
             float xscl = Draw.xscl, yscl = Draw.yscl;
             Draw.scl(1f, 1f);
-            Drawf.liquid(sliced(liquidr, slice), x, y, smoothLiquid, liquids.current().color.write(Tmp.c1).a(1f));
+            Drawf.liquid(sliced(liquidr, slice), x + ox, y + oy, smoothLiquid, liquids.current().color.write(Tmp.c1).a(1f));
             Draw.scl(xscl, yscl);
 
             Draw.rect(sliced(topRegions[bits], slice), x, y, angle);

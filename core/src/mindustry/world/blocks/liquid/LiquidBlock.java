@@ -50,6 +50,8 @@ public class LiquidBlock extends Block{
                 float squishX = rightBorder + tilesize/2f - bounds, squishY = topBorder + tilesize/2f - bounds;
                 float ox = 0f, oy = 0f;
 
+                if(squishX >= 8 || squishY >= 8) continue;
+
                 //cut out the parts that don't fit inside the padding
                 if(squishX > 0){
                     toDraw.setWidth(toDraw.width - squishX * 4f);

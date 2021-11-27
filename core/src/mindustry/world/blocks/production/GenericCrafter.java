@@ -29,6 +29,8 @@ public class GenericCrafter extends Block{
     /** Liquid output directions, specified in the same order as outputLiquids. Use -1 to dump in every direction. Rotations are relative to block. */
     public int[] liquidOutputDirections = {-1};
 
+    /** if true, crafters with multiple liquid outputs will dump excess when there's still space for at least one liquid type */
+    public boolean dumpExtraLiquid = true;
     public float craftTime = 80;
     public Effect craftEffect = Fx.none;
     public Effect updateEffect = Fx.none;
@@ -109,6 +111,10 @@ public class GenericCrafter extends Block{
             outputLiquid = outputLiquids[0];
         }
         outputsLiquid = outputLiquids != null;
+
+        if(outputItems != null) hasItems = true;
+        if(outputLiquids != null) hasLiquids = true;
+
         super.init();
     }
 
@@ -169,10 +175,21 @@ public class GenericCrafter extends Block{
                 }
             }
             if(outputLiquids != null){
+                boolean allFull = true;
                 for(var output : outputLiquids){
                     if(liquids.get(output.liquid) >= liquidCapacity - 0.001f){
-                        return false;
+                        if(!dumpExtraLiquid){
+                            return false;
+                        }
+                    }else{
+                        //if there's still space left, it's not full for all liquids
+                        allFull = false;
                     }
+                }
+
+                //if there is no space left for any liquid, it can't reproduce
+                if(allFull){
+                    return false;
                 }
             }
 

@@ -128,7 +128,7 @@ public class Generators{
 
         generate("gas-frames", () -> {
             int frames = Liquid.animationFrames;
-            String[] stencils = {"fluid", "conduit-liquid-r0", "conduit-liquid-r1", "conduit-liquid-r2", "conduit-liquid-r3"};
+            String[] stencils = {"fluid"};
             String[] types = {"liquid", "gas"};
             int typeIndex = 0;
 
