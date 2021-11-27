@@ -189,6 +189,11 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 if(empty && noise(x + 150, y + x*2 + 100, 4, 0.8f, 40f, 1f) > 0.71f/* && floor == Blocks.yellowStone*/){
                     ore = Blocks.oreTungsten;
                 }
+
+                //TODO design ore generation so it doesn't overlap
+                if(empty && noise(x + 999, y + 600, 4, 0.63f, 37f, 1f) < 0.25f/* && floor == Blocks.yellowStone*/){
+                    ore = Blocks.oreThorium;
+                }
             }
         });
 

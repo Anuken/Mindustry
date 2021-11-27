@@ -37,7 +37,7 @@ public class LiquidBlock extends Block{
         TextureRegion toDraw = Tmp.tr1;
 
         float bounds = size/2f * tilesize - padding;
-        Color color = Tmp.c1.set(liquid.color).mul(liquid.gas ? 1f : 1f).a(1f);
+        Color color = Tmp.c1.set(liquid.color).a(1f);
 
         for(int sx = 0; sx < size; sx++){
             for(int sy = 0; sy < size; sy++){

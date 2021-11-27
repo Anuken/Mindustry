@@ -92,16 +92,16 @@ public class BurstDrill extends Drill{
             Draw.rect(region, x, y);
             drawDefaultCracks();
 
-            if(dominantItem != null && drawMineItem){
-                Draw.color(dominantItem.color);
-                Draw.rect(itemRegion, x, y);
-                Draw.color();
-            }
-
             Draw.rect(topRegion, x, y);
             if(invertTime > 0){
                 Draw.alpha(Interp.pow3Out.apply(invertTime));
                 Draw.rect(topInvertRegion, x, y);
+                Draw.color();
+            }
+
+            if(dominantItem != null && drawMineItem){
+                Draw.color(dominantItem.color);
+                Draw.rect(itemRegion, x, y);
                 Draw.color();
             }
 
