@@ -297,7 +297,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(sector.hasBase() || sector.id == sector.planet.startSector) return true;
         //preset sectors can only be selected once unlocked
         if(sector.preset != null){
-            TechNode node = sector.preset.node();
+            TechNode node = sector.preset.techNode;
             return node == null || node.parent == null || node.parent.content.unlocked();
         }
 
@@ -416,7 +416,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     sec.isAttacked() ? Fonts.getLargeIcon("warning") :
                     !sec.hasBase() && sec.preset != null && sec.preset.unlocked() && preficon == null ?
                     Fonts.getLargeIcon("terrain") :
-                    sec.preset != null && sec.preset.locked() && sec.preset.node() != null && !sec.preset.node().parent.content.locked() ? Fonts.getLargeIcon("lock") :
+                    sec.preset != null && sec.preset.locked() && sec.preset.techNode != null && !sec.preset.techNode.parent.content.locked() ? Fonts.getLargeIcon("lock") :
                     preficon;
                 var color = sec.preset != null && !sec.hasBase() ? Team.derelict.color : Team.sharded.color;
 
@@ -950,13 +950,13 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         stable.image().color(Pal.accent).fillX().height(3f).pad(3f).row();
 
-        boolean locked = sector.preset != null && sector.preset.locked() && !sector.hasBase() && sector.preset.node() != null;
+        boolean locked = sector.preset != null && sector.preset.locked() && !sector.hasBase() && sector.preset.techNode != null;
 
         if(locked){
             stable.table(r -> {
                 r.add("@complete").colspan(2).left();
                 r.row();
-                for(Objective o : sector.preset.node().objectives){
+                for(Objective o : sector.preset.techNode.objectives){
                     if(o.complete()) continue;
 
                     r.add("> " + o.display()).color(Color.lightGray).left();

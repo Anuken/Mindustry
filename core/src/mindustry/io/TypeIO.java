@@ -8,7 +8,6 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
@@ -125,7 +124,7 @@ public class TypeIO{
             case 6: short length = read.s(); IntSeq arr = new IntSeq(); for(int i = 0; i < length; i ++) arr.add(read.i()); return arr;
             case 7: return new Point2(read.i(), read.i());
             case 8: byte len = read.b(); Point2[] out = new Point2[len]; for(int i = 0; i < len; i ++) out[i] = Point2.unpack(read.i()); return out;
-            case 9: return TechTree.getNotNull(content.getByID(ContentType.all[read.b()], read.s()));
+            case 9: return content.<UnlockableContent>getByID(ContentType.all[read.b()], read.s()).techNode;
             case 10: return read.bool();
             case 11: return read.d();
             case 12: return !box ? world.build(read.i()) : new BuildingBox(read.i());

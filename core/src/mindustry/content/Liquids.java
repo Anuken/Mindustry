@@ -1,16 +1,14 @@
 package mindustry.content;
 
 import arc.graphics.*;
-import mindustry.ctype.*;
 import mindustry.type.*;
 
-public class Liquids implements ContentList{
+public class Liquids{
     public static Liquid water, slag, oil, cryofluid, neoplasm,
     gallium,
     ozone, hydrogen, nitrogen, cyanogen;
 
-    @Override
-    public void load(){
+    public static void load(){
 
         water = new Liquid("water", Color.valueOf("596ab8")){{
             heatCapacity = 0.4f;

@@ -5,7 +5,7 @@ import mindustry.type.*;
 
 import static mindustry.content.Planets.*;
 
-public class SectorPresets implements ContentList{
+public class SectorPresets{
     public static SectorPreset
     groundZero,
     craters, biomassFacility, frozenForest, ruinousShores, windsweptIslands, stainedMountains, tarFields,
@@ -13,8 +13,7 @@ public class SectorPresets implements ContentList{
     impact0078, desolateRift, nuclearComplex, planetaryTerminal,
     coastline, navalFortress;
 
-    @Override
-    public void load(){
+    public static void load(){
         //region serpulo
 
         groundZero = new SectorPreset("groundZero", serpulo, 15){{

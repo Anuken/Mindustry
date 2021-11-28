@@ -1,12 +1,11 @@
 package mindustry.content;
 
 import arc.graphics.*;
-import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.graphics.*;
 
-public class Bullets implements ContentList{
+public class Bullets{
     public static BulletType
 
     //artillery
@@ -31,8 +30,7 @@ public class Bullets implements ContentList{
     //environment, misc.
     damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame;
 
-    @Override
-    public void load(){
+    public static void load(){
 
         //lightning bullets need to be initialized first.
         damageLightning = new BulletType(0.0001f, 0f){{

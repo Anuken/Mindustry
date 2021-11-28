@@ -7,7 +7,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
@@ -24,7 +23,7 @@ import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 import static mindustry.Vars.*;
 
-public class UnitTypes implements ContentList{
+public class UnitTypes{
     //region standard
 
     //mech
@@ -76,8 +75,7 @@ public class UnitTypes implements ContentList{
 
     //endregion
 
-    @Override
-    public void load(){
+    public static void load(){
         //region ground attack
 
         dagger = new UnitType("dagger"){{

@@ -1,17 +1,15 @@
 package mindustry.content;
 
 import arc.graphics.*;
-import mindustry.ctype.*;
 import mindustry.type.*;
 
-public class Items implements ContentList{
+public class Items{
     public static Item
     scrap, copper, lead, graphite, coal, titanium, thorium, silicon, plastanium,
     phaseFabric, surgeAlloy, sporePod, sand, blastCompound, pyratite, metaglass,
     beryllium, tungsten, oxide, carbide, fissileMatter, dormantCyst;
 
-    @Override
-    public void load(){
+    public static void load(){
         copper = new Item("copper", Color.valueOf("d99d73")){{
             hardness = 1;
             cost = 0.5f;

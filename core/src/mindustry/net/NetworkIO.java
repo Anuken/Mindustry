@@ -3,7 +3,6 @@ package mindustry.net;
 import arc.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -29,7 +28,7 @@ public class NetworkIO{
                 state.rules.researched.clear();
                 for(ContentType type : ContentType.all){
                     for(Content c : content.getBy(type)){
-                        if(c instanceof UnlockableContent u && u.unlocked() && TechTree.get(u) != null){
+                        if(c instanceof UnlockableContent u && u.unlocked() && u.techNode != null){
                             state.rules.researched.add(u.name);
                         }
                     }

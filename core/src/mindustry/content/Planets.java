@@ -6,7 +6,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ctype.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
@@ -14,15 +13,14 @@ import mindustry.maps.planet.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-public class Planets implements ContentList{
+public class Planets{
     public static Planet
     sun,
     erekir,
     tantros,
     serpulo;
 
-    @Override
-    public void load(){
+    public static void load(){
         sun = new Planet("sun", null, 4f){{
             bloom = true;
             accessible = false;
@@ -104,7 +102,7 @@ public class Planets implements ContentList{
         });
     }
 
-    private void makeAsteroid(String name, Planet parent, Block base, Block tint, float tintThresh, int pieces, float scale, Cons<AsteroidGenerator> cgen){
+    private static void makeAsteroid(String name, Planet parent, Block base, Block tint, float tintThresh, int pieces, float scale, Cons<AsteroidGenerator> cgen){
         new Planet(name, parent, 0.12f){{
             hasAtmosphere = false;
             alwaysUnlocked = true; //for testing only!

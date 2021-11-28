@@ -34,7 +34,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.type.ItemStack.*;
 
-public class Blocks implements ContentList{
+public class Blocks{
     public static Block
 
     //environment
@@ -131,8 +131,7 @@ public class Blocks implements ContentList{
     @Deprecated
     public static Block blockForge, blockLoader, blockUnloader;
 
-    @Override
-    public void load(){
+    public static void load(){
         //region environment
 
         air = new AirBlock("air");

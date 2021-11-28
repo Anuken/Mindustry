@@ -307,7 +307,7 @@ public class Logic implements ApplicationListener{
     public static void researched(Content content){
         if(!(content instanceof UnlockableContent u)) return;
 
-        var node = u.node();
+        var node = u.techNode;
 
         //unlock all direct dependencies on client, permanently
         while(node != null){

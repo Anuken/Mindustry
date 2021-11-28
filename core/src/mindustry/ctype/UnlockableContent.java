@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
@@ -35,6 +34,8 @@ public abstract class UnlockableContent extends MappableContent{
     public TextureRegion uiIcon;
     /** Icon of the full content. Unscaled.*/
     public TextureRegion fullIcon;
+    /** The tech tree node for this content, if applicable. Null if not part of a tech tree. */
+    public @Nullable TechNode techNode;
     /** Unlock state. Loaded from settings. Do not modify outside of the constructor. */
     protected boolean unlocked;
 
@@ -59,12 +60,13 @@ public abstract class UnlockableContent extends MappableContent{
         uiIcon = Core.atlas.find(getContentType().name() + "-" + name + "-ui", fullIcon);
     }
 
-    /** @return the tech node for this content. may be null. */
+    /** @deprecated use the {@link #techNode} field instead. */
+    @Deprecated
     public @Nullable TechNode node(){
-        return TechTree.get(this);
+        return techNode;
     }
 
-    /** Use fullIcon / uiIcon instead! This will be removed. */
+    /** @deprecated Use fullIcon / uiIcon instead! This will be removed. */
     @Deprecated
     public TextureRegion icon(Cicon icon){
         return icon == Cicon.full ? fullIcon : uiIcon;
