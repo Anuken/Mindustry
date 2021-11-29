@@ -99,7 +99,7 @@ public class NetServer implements ApplicationListener{
         return (state.rules.pvp ? "[accent]The " + winner.name + " team is victorious![]\n" : "[scarlet]Game over![]\n")
         + "\nNext selected map:[accent] " + Strings.stripColors(map.name()) + "[]"
         + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "."
-        + "\nNew game begins in " + roundExtraTime + " seconds."
+        + "\nNew game begins in " + roundExtraTime + " seconds.";
     };
 
     private boolean closing = false;
