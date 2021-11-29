@@ -45,6 +45,13 @@ public class ServerControl implements ApplicationListener{
     public final CommandHandler handler = new CommandHandler("");
     public final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
 
+    public GameOverMessage gameOverMessage = (player, winner, map) -> {
+        return (state.rules.pvp ? "[accent]The " + winner.name + " team is victorious![]\n" : "[scarlet]Game over![]\n")
+        + "\nNext selected map:[accent] " + Strings.stripColors(map.name()) + "[]"
+        + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "."
+        + "\nNew game begins in " + roundExtraTime + " seconds."
+    };
+
     private Fi currentLogFile;
     private boolean inExtraRound;
     private Task lastTask;
@@ -175,11 +182,7 @@ public class ServerControl implements ApplicationListener{
             Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(lastMode, state.map);
             nextMapOverride = null;
             if(map != null){
-                Call.infoMessage((state.rules.pvp
-                ? "[accent]The " + event.winner.name + " team is victorious![]\n" : "[scarlet]Game over![]\n")
-                + "\nNext selected map:[accent] " + Strings.stripColors(map.name()) + "[]"
-                + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
-                "\nNew game begins in " + roundExtraTime + " seconds.");
+                Groups.player.each(p -> Call.infoMessage(p.con, gameOverMessage.message(p, event.winner, map));
 
                 state.gameOver = true;
                 Call.updateGameOver(event.winner);
@@ -1097,5 +1100,9 @@ public class ServerControl implements ApplicationListener{
             socketThread = null;
             socketOutput = null;
         }
+    }
+
+    public interface GameOverMessage {
+        String message(Player player, Team winner, Map map);
     }
 }
