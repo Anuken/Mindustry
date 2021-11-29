@@ -30,57 +30,58 @@ public class Administration{
         load();
 
         //anti-spam
-        addChatFilter((player, message) -> {
-            long resetTime = Config.messageRateLimit.num() * 1000;
-            if(Config.antiSpam.bool() && !player.isLocal() && !player.admin){
-                //prevent people from spamming messages quickly
-                if(resetTime > 0 && Time.timeSinceMillis(player.getInfo().lastMessageTime) < resetTime){
-                    //supress message
-                    player.sendMessage("[scarlet]You may only send messages every " + Config.messageRateLimit.num() + " seconds.");
-                    player.getInfo().messageInfractions ++;
-                    //kick player for spamming and prevent connection if they've done this several times
-                    if(player.getInfo().messageInfractions >= Config.messageSpamKick.num() && Config.messageSpamKick.num() != 0){
-                        player.con.kick("You have been kicked for spamming.", 1000 * 60 * 2);
+        if (Config.antiSpam.bool()) {
+            addChatFilter((player, message) -> {
+                long resetTime = Config.messageRateLimit.num() * 1000;
+                if(!player.isLocal() && !player.admin){
+                    //prevent people from spamming messages quickly
+                    if(resetTime > 0 && Time.timeSinceMillis(player.getInfo().lastMessageTime) < resetTime){
+                        //supress message
+                        player.sendMessage("[scarlet]You may only send messages every " + Config.messageRateLimit.num() + " seconds.");
+                        player.getInfo().messageInfractions ++;
+                        //kick player for spamming and prevent connection if they've done this several times
+                        if(player.getInfo().messageInfractions >= Config.messageSpamKick.num() && Config.messageSpamKick.num() != 0){
+                            player.con.kick("You have been kicked for spamming.", 1000 * 60 * 2);
+                        }
+                        return null;
+                    }else{
+                        player.getInfo().messageInfractions = 0;
                     }
-                    return null;
-                }else{
-                    player.getInfo().messageInfractions = 0;
+
+                    //prevent players from sending the same message twice in the span of 50 seconds
+                    if(message.equals(player.getInfo().lastSentMessage) && Time.timeSinceMillis(player.getInfo().lastMessageTime) < 1000 * 50){
+                        player.sendMessage("[scarlet]You may not send the same message twice.");
+                        return null;
+                    }
+
+                    player.getInfo().lastSentMessage = message;
+                    player.getInfo().lastMessageTime = Time.millis();
                 }
 
-                //prevent players from sending the same message twice in the span of 50 seconds
-                if(message.equals(player.getInfo().lastSentMessage) && Time.timeSinceMillis(player.getInfo().lastMessageTime) < 1000 * 50){
-                    player.sendMessage("[scarlet]You may not send the same message twice.");
-                    return null;
-                }
-
-                player.getInfo().lastSentMessage = message;
-                player.getInfo().lastMessageTime = Time.millis();
-            }
-
-            return message;
-        });
+                return message;
+            });
+        }
 
         //block interaction rate limit
-        addActionFilter(action -> {
-            if(action.type != ActionType.breakBlock &&
-                action.type != ActionType.placeBlock &&
-                Config.antiSpam.bool()){
+        if (Config.antiSpam.bool()) {
+            addActionFilter(action -> {
+                if(action.type != ActionType.breakBlock && action.type != ActionType.placeBlock){
+                    Ratekeeper rate = action.player.getInfo().rate;
+                    if(rate.allow(Config.interactRateWindow.num() * 1000, Config.interactRateLimit.num())){
+                        return true;
+                    }else{
+                        if(rate.occurences > Config.interactRateKick.num()){
+                            action.player.kick("You are interacting with too many blocks.", 1000 * 30);
+                        }else if(action.player.getInfo().messageTimer.get(60f * 2f)){
+                            action.player.sendMessage("[scarlet]You are interacting with blocks too quickly.");
+                        }
 
-                Ratekeeper rate = action.player.getInfo().rate;
-                if(rate.allow(Config.interactRateWindow.num() * 1000, Config.interactRateLimit.num())){
-                    return true;
-                }else{
-                    if(rate.occurences > Config.interactRateKick.num()){
-                        action.player.kick("You are interacting with too many blocks.", 1000 * 30);
-                    }else if(action.player.getInfo().messageTimer.get(60f * 2f)){
-                        action.player.sendMessage("[scarlet]You are interacting with blocks too quickly.");
+                        return false;
                     }
-
-                    return false;
                 }
-            }
-            return true;
-        });
+                return true;
+            });
+        }
     }
 
     /** @return time at which a player would be pardoned for a kick (0 means they were never kicked) */
