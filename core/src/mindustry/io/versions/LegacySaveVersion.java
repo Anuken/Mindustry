@@ -1,4 +1,4 @@
-package mindustry.io.legacy;
+package mindustry.io.versions;
 
 import arc.util.*;
 import arc.util.io.*;

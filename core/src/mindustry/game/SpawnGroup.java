@@ -7,7 +7,7 @@ import arc.util.serialization.Json.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
-import mindustry.io.legacy.*;
+import mindustry.io.versions.*;
 import mindustry.type.*;
 
 import java.util.*;

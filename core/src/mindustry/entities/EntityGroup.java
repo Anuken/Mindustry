@@ -30,6 +30,11 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         return lastId++;
     }
 
+    /** Makes sure the next ID counter is higher than this number, so future entities cannot possibly use this ID. */
+    public static void checkNextId(int id){
+        lastId = id + 1;
+    }
+
     public EntityGroup(Class<T> type, boolean spatial, boolean mapping){
         array = new Seq<>(false, 32, type);
 

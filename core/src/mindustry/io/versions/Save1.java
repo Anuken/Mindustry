@@ -1,11 +1,11 @@
-package mindustry.io.legacy;
+package mindustry.io.versions;
 
 import java.io.*;
 
-public class Save2 extends LegacySaveVersion{
+public class Save1 extends LegacySaveVersion{
 
-    public Save2(){
-        super(2);
+    public Save1(){
+        super(1);
     }
 
     @Override

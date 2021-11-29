@@ -59,7 +59,6 @@ public class ErekirTechTree{
                 });
             });
 
-            //TODO where in the tech tree is the arc furnace placed? is it essential?
             node(siliconArcFurnace, () -> {
                 node(electrolyzer, () -> {
                     node(oxidationChamber, () -> {
@@ -81,7 +80,6 @@ public class ErekirTechTree{
                     node(slagIncinerator, () -> {
                         //when is this actually needed?
                         node(slagHeater, () -> {
-                            //TODO
                             node(slagCentrifuge, () -> {
 
                             });
@@ -97,12 +95,10 @@ public class ErekirTechTree{
             //TODO move into turbine condenser?
             node(plasmaBore, () -> {
                 node(cliffCrusher, () -> {
-                    //TODO req
                     node(largePlasmaBore, () -> {
 
                     });
 
-                    //TODO req
                     node(impactDrill, () -> {
 
                     });
@@ -154,7 +150,6 @@ public class ErekirTechTree{
 
                 nodeProduce(Liquids.ozone, () -> {
                     nodeProduce(Liquids.hydrogen, () -> {
-                        //TODO how will nitrogen be gated behind the electrolyzer?
                         nodeProduce(Liquids.nitrogen, () -> {
                             nodeProduce(Liquids.cyanogen, () -> {
 
@@ -165,12 +160,9 @@ public class ErekirTechTree{
 
                 nodeProduce(Items.tungsten, () -> {
                     nodeProduce(Items.carbide, () -> {
+                        nodeProduce(Liquids.gallium, () -> {
 
-                    });
-
-                    //TODO does it require carbide?
-                    nodeProduce(Liquids.gallium, () -> {
-
+                        });
                     });
                 });
             });

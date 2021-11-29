@@ -16,7 +16,7 @@ import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.io.legacy.*;
+import mindustry.io.versions.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;

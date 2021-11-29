@@ -1083,7 +1083,7 @@ public class Blocks{
         }};
 
         slagCentrifuge = new GenericCrafter("slag-centrifuge"){{
-            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 60, Items.oxide, 40));
+            requirements(Category.crafting, with(Items.carbide, 70, Items.graphite, 60, Items.silicon, 40, Items.oxide, 40));
 
             consumes.power(2f / 60f);
 
@@ -2077,7 +2077,7 @@ public class Blocks{
         //TODO awful name
         largePlasmaBore = new BeamDrill("large-plasma-bore"){{
             //TODO requirements
-            requirements(Category.production, with(Items.graphite, 30, Items.beryllium, 20, Items.carbide, 30));
+            requirements(Category.production, with(Items.graphite, 30, Items.oxide, 30, Items.beryllium, 20, Items.carbide, 30));
             consumes.power(0.6f);
             drillTime = 170f;
             tier = 5;

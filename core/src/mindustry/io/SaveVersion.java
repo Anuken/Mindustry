@@ -10,6 +10,7 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
@@ -316,6 +317,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
             writeChunk(stream, true, out -> {
                 out.writeByte(entity.classId());
+                out.writeInt(entity.id());
                 entity.write(Writes.get(out));
             });
         }
@@ -371,7 +373,11 @@ public abstract class SaveVersion extends SaveFileReader{
                     return;
                 }
 
+                int id = in.readInt();
+
                 Entityc entity = (Entityc)mapping[typeid].get();
+                EntityGroup.checkNextId(id);
+                entity.id(id);
                 entity.read(Reads.get(in));
                 entity.add();
             });
