@@ -20,6 +20,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
+import mindustry.maps.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
@@ -91,6 +92,14 @@ public class NetServer implements ApplicationListener{
                 return "[scarlet]Unknown command. Check [lightgray]/help[scarlet].";
             }
         }
+    };
+
+    /** A message that will be shown on the gameover. */
+    public GameOverMessage gameOverMessage = (player, winner, map) -> {
+        return (state.rules.pvp ? "[accent]The " + winner.name + " team is victorious![]\n" : "[scarlet]Game over![]\n")
+        + "\nNext selected map:[accent] " + Strings.stripColors(map.name()) + "[]"
+        + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "."
+        + "\nNew game begins in " + roundExtraTime + " seconds."
     };
 
     private boolean closing = false;
@@ -1023,5 +1032,9 @@ public class NetServer implements ApplicationListener{
 
     public interface InvalidCommandHandler{
         String handle(Player player, CommandResponse response);
+    }
+
+    public interface GameOverMessage {
+        String message(Player player, Team winner, Map map);
     }
 }
