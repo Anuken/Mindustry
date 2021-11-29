@@ -525,19 +525,18 @@ public class LogicBlock extends Block{
             write.b(compressed);
 
             //write only the non-constant variables
-            int count = Structs.count(executor.vars, v -> !v.constant);
+            int count = Structs.count(executor.vars, v -> !v.constant || v == executor.vars[LExecutor.varUnit]);
 
             write.i(count);
             for(int i = 0; i < executor.vars.length; i++){
                 Var v = executor.vars[i];
 
-                if(v.constant) continue;
+                if(v.constant && i != LExecutor.varUnit) continue;
 
                 //write the name and the object value
                 write.str(v.name);
 
                 Object value = v.isobj ? v.objval : v.numval;
-                if(value instanceof Unit) value = null; //do not save units.
                 TypeIO.writeObject(write, value);
             }
 
@@ -585,8 +584,12 @@ public class LogicBlock extends Block{
                 //load up the variables that were stored
                 for(int i = 0; i < varcount; i++){
                     BVar dest = asm.getVar(names[i]);
-                    if(dest != null && !dest.constant){
-                        dest.value = values[i] instanceof BuildingBox box ? world.build(box.pos) : values[i];
+
+                    if(dest != null && (!dest.constant || dest.id == LExecutor.varUnit)){
+                        dest.value =
+                            values[i] instanceof BuildingBox box ? box.unbox() :
+                            values[i] instanceof UnitBox box ? box.unbox() :
+                            values[i];
                     }
                 }
             });

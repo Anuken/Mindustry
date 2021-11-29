@@ -22,7 +22,7 @@ public class LAssembler{
     public LAssembler(){
         //instruction counter
         putVar("@counter").value = 0;
-        //unix timestamp
+        //timestamp
         putConst("@time", 0);
         //currently controlled unit
         putConst("@unit", null);

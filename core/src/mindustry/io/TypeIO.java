@@ -81,6 +81,9 @@ public class TypeIO{
         }else if(object instanceof Building b){
             write.b(12);
             write.i(b.pos());
+        }else if(object instanceof BuildingBox b){
+            write.b(12);
+            write.i(b.pos);
         }else if(object instanceof LAccess l){
             write.b((byte)13);
             write.s(l.ordinal());
@@ -91,15 +94,18 @@ public class TypeIO{
         }else if(object instanceof UnitCommand c){
             write.b((byte)15);
             write.b(c.ordinal());
-        }else if(object instanceof BuildingBox b){
-            write.b(12);
-            write.i(b.pos);
         }else if(object instanceof boolean[] b){
             write.b(16);
             write.i(b.length);
             for(boolean bool : b){
                 write.bool(bool);
             }
+        }else if(object instanceof Unit u){
+            write.b(17);
+            write.i(u.id);
+        }else if(object instanceof UnitBox u){
+            write.b(17);
+            write.i(u.id);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -132,6 +138,7 @@ public class TypeIO{
             case 14: int blen = read.i(); byte[] bytes = new byte[blen]; read.b(bytes); return bytes;
             case 15: return UnitCommand.all[read.b()];
             case 16: int boollen = read.i(); boolean[] bools = new boolean[boollen]; for(int i = 0; i < boollen; i ++) bools[i] = read.bool(); return bools;
+            case 17: return !box ? Groups.unit.getByID(read.i()) : new UnitBox(read.i());
             default: throw new IllegalArgumentException("Unknown object type: " + type);
         }
     }
@@ -655,6 +662,23 @@ public class TypeIO{
 
         public BuildingBox(int pos){
             this.pos = pos;
+        }
+
+        public Building unbox(){
+            return world.build(pos);
+        }
+    }
+
+    /** Represents a unit that has not been resolved yet. TODO unimplemented / unused*/
+    public static class UnitBox{
+        public int id;
+
+        public UnitBox(int id){
+            this.id = id;
+        }
+
+        public Unit unbox(){
+            return Groups.unit.getByID(id);
         }
     }
 }

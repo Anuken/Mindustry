@@ -75,8 +75,8 @@ public class PayloadConveyor extends Block{
         public int step = -1, stepAccepted = -1;
 
         @Override
-        public boolean canControlSelect(Unit player){
-            return this.item == null && !player.spawnedByCore && player.hitSize / tilesize <= payloadLimit && player.tileOn() != null && player.tileOn().build == this;
+        public boolean canControlSelect(Unit unit){
+            return this.item == null && unit.type.allowedInPayloads && !unit.spawnedByCore && unit.hitSize / tilesize <= payloadLimit && unit.tileOn() != null && unit.tileOn().build == this;
         }
 
         @Override

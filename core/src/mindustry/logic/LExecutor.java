@@ -208,7 +208,7 @@ public class LExecutor{
             }
 
             //binding to `null` was previously possible, but was too powerful and exploitable
-            if(exec.obj(type) instanceof UnitType type){
+            if(exec.obj(type) instanceof UnitType type && type.logicControllable){
                 Seq<Unit> seq = exec.team.data().unitCache(type);
 
                 if(seq != null && seq.any()){
@@ -222,7 +222,7 @@ public class LExecutor{
                     //no units of this type found
                     exec.setconst(varUnit, null);
                 }
-            }else if(exec.obj(type) instanceof Unit u && u.team == exec.team){
+            }else if(exec.obj(type) instanceof Unit u && u.team == exec.team && u.type.logicControllable){
                 //bind to specific unit object
                 exec.setconst(varUnit, u);
             }else{

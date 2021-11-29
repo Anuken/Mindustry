@@ -87,7 +87,8 @@ public class PayloadDeconstructor extends PayloadBlock{
 
         @Override
         public boolean acceptUnitPayload(Unit unit){
-            return payload == null && deconstructing == null && !unit.spawnedByCore && unit.type.getTotalRequirements().length > 0 && unit.hitSize / tilesize <= maxPayloadSize;
+            return payload == null && deconstructing == null && unit.type.allowedInPayloads && !unit.spawnedByCore
+                && unit.type.getTotalRequirements().length > 0 && unit.hitSize / tilesize <= maxPayloadSize;
         }
 
         @Override

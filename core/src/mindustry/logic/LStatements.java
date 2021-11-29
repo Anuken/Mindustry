@@ -836,7 +836,7 @@ public class LStatements{
                         i.left();
                         int c = 0;
                         for(UnitType item : Vars.content.units()){
-                            if(!item.unlockedNow() || item.isHidden()) continue;
+                            if(!item.unlockedNow() || item.isHidden() || !item.logicControllable) continue;
                             i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
                                 type = "@" + item.name;
                                 field.setText(type);

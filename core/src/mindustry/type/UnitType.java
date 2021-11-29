@@ -64,6 +64,8 @@ public class UnitType extends UnlockableContent{
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false, circleTarget = false;
     public boolean canBoost = false;
+    public boolean logicControllable = true;
+    public boolean allowedInPayloads = true;
     public boolean destructibleWreck = true;
     public float groundLayer = Layer.groundUnit;
     public float payloadCapacity = 8;
