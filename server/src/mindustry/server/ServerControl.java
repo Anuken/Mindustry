@@ -15,7 +15,6 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
-import mindustry.maps.Map;
 import mindustry.maps.*;
 import mindustry.maps.Maps.*;
 import mindustry.mod.Mods.*;
@@ -175,8 +174,10 @@ public class ServerControl implements ApplicationListener{
             Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(lastMode, state.map);
             nextMapOverride = null;
             if(map != null){
-                String message = netServer.gameOverMessage.message(p, event.winner, map);
-                if (message != null) Groups.player.each(p -> Call.infoMessage(p.con, message);
+                Groups.player.each(p -> {
+                    String msg = netServer.gameOverMessage.message(p, event.winner, map);
+                    if (msg != null) Call.infoMessage(p.con, msg);
+                }
 
                 state.gameOver = true;
                 Call.updateGameOver(event.winner);
