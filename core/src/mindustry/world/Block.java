@@ -879,6 +879,10 @@ public class Block extends UnlockableContent{
                 }
             }else if(c instanceof ConsumeLiquid i){
                 cons.get(i.liquid);
+            }else if(c instanceof ConsumeLiquids i){
+                for(var stack : i.liquids){
+                    cons.get(stack.liquid);
+                }
             }
         });
     }
