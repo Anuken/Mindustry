@@ -48,7 +48,7 @@ import static mindustry.Vars.*;
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
-    ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class);
+    ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class, TextureRegion[][][].class);
     ObjectMap<String, AssetDescriptor<?>> sounds = new ObjectMap<>();
     Seq<ParseListener> listeners = new Seq<>();
 
