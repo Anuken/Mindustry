@@ -2603,21 +2603,15 @@ public class UnitTypes{
         //endregion
         //region internal
 
-        block = new UnitType("block"){
-            {
-                speed = 0f;
-                hitSize = 0f;
-                health = 1;
-                rotateSpeed = 360f;
-                itemCapacity = 0;
-                commandLimit = 0;
-            }
-
-            @Override
-            public boolean isHidden(){
-                return true;
-            }
-        };
+        block = new UnitType("block"){{
+            speed = 0f;
+            hitSize = 0f;
+            health = 1;
+            rotateSpeed = 360f;
+            itemCapacity = 0;
+            commandLimit = 0;
+            hidden = true;
+        }};
 
         //endregion
         //region neoplasm

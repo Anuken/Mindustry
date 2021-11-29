@@ -4,7 +4,6 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
@@ -59,11 +58,12 @@ public class Blocks{
     wallOreBeryl, graphiticWall,
 
     //crafting
-    siliconSmelter, siliconCrucible, siliconArcFurnace, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
+    siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //erekir
-    electrolyzer, oxidationChamber, atmosphericConcentrator, slagHeater, slagIncinerator, heatReactor, carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer,
+    siliconArcFurnace, electrolyzer, oxidationChamber, atmosphericConcentrator, slagHeater, slagIncinerator, heatReactor,
+    carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer,
     cellSynthesisChamber,
 
     //sandbox
@@ -726,9 +726,8 @@ public class Blocks{
             consumes.power(4f);
         }};
 
-        //TODO
         siliconArcFurnace = new GenericCrafter("silicon-arc-furnace"){{
-            requirements(Category.crafting, with(Items.thorium, 200, Items.beryllium, 40, Items.tungsten, 80));
+            requirements(Category.crafting, with(Items.beryllium, 60, Items.graphite, 80));
             craftEffect = Fx.none;
             outputItem = new ItemStack(Items.silicon, 5);
             craftTime = 40f;
@@ -952,7 +951,7 @@ public class Blocks{
 
         //TODO better name
         electrolyzer = new GenericCrafter("electrolyzer"){{
-            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
+            requirements(Category.crafting, with(Items.silicon, 50, Items.graphite, 40, Items.beryllium, 40));
             size = 3;
 
             craftTime = 10f;
@@ -989,7 +988,7 @@ public class Blocks{
         }};
 
         atmosphericConcentrator = new HeatCrafter("atmospheric-concentrator"){{
-            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
+            requirements(Category.crafting, with(Items.oxide, 50, Items.beryllium, 30, Items.silicon, 40));
             size = 3;
             craftTime = 10f;
             hasLiquids = true;
@@ -1013,7 +1012,7 @@ public class Blocks{
         }};
 
         oxidationChamber = new HeatProducer("oxidation-chamber"){{
-            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
+            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 40, Items.silicon, 50));
             size = 3;
 
             outputItem = new ItemStack(Items.oxide, 1);
@@ -1053,7 +1052,7 @@ public class Blocks{
 
         heatReactor = new HeatProducer("heat-reactor"){{
             //TODO gas/liquid requirement?
-            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
+            requirements(Category.crafting, with(Items.oxide, 70, Items.graphite, 20, Items.carbide, 10, Items.thorium, 80));
             size = 3;
             craftTime = 60f * 10f;
 
@@ -1065,7 +1064,7 @@ public class Blocks{
         }};
 
         carbideCrucible = new HeatCrafter("carbide-crucible"){{
-            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 30));
+            requirements(Category.crafting, with(Items.tungsten, 90, Items.thorium, 70, Items.oxide, 50));
             craftEffect = Fx.none;
             outputItem = new ItemStack(Items.carbide, 1);
             craftTime = 60f * 3f;
@@ -1115,9 +1114,8 @@ public class Blocks{
         }};
 
         //TODO should have a useful turret ammo byproduct? scrap?
-        //original: consumes.items(with(Items.copper, 3, Items.lead, 4, Items.titanium, 2, Items.silicon, 3));
         surgeCrucible = new HeatCrafter("surge-crucible"){{
-            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 60, Items.carbide, 30));
+            requirements(Category.crafting, with(Items.silicon, 100, Items.graphite, 80, Items.carbide, 60, Items.thorium, 90));
 
             size = 3;
 
@@ -1156,7 +1154,7 @@ public class Blocks{
 
         cyanogenSynthesizer = new HeatCrafter("cyanogen-synthesizer"){{
             //TODO requirements
-            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 60, Items.carbide, 30));
+            requirements(Category.crafting, with(Items.carbide, 50, Items.silicon, 80, Items.beryllium, 80));
 
             heatRequirement = 5f;
 
@@ -1185,9 +1183,9 @@ public class Blocks{
             consumes.power(2f);
         }};
 
-        //TODO bad name
+        //TODO bad name, and there's no use for phase yet...
         phaseSynthesizer = new HeatCrafter("phase-synthesizer"){{
-            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 60, Items.carbide, 30));
+            requirements(Category.crafting, with(Items.surgeAlloy, 60, Items.carbide, 40, Items.silicon, 80, Items.thorium, 80));
 
             size = 3;
 
@@ -1446,7 +1444,7 @@ public class Blocks{
         }};
 
         buildTower = new BuildTurret("build-tower"){{
-            requirements(Category.effect, with(Items.graphite, 40, Items.beryllium, 50));
+            requirements(Category.effect, with(Items.silicon, 60, Items.tungsten, 60, Items.oxide, 40));
             outlineColor = Pal.darkOutline;
             consumes.power(3f);
             range = 120f;
@@ -1574,17 +1572,17 @@ public class Blocks{
         }};
 
         ductBridge = new DuctBridge("duct-bridge"){{
-            requirements(Category.distribution, with(Items.graphite, 15));
+            requirements(Category.distribution, with(Items.graphite, 15, Items.tungsten, 5));
             speed = 4f;
         }};
 
         ductUnloader = new DirectionalUnloader("duct-unloader"){{
-            requirements(Category.distribution, with(Items.graphite, 20, Items.silicon, 20));
+            requirements(Category.distribution, with(Items.graphite, 20, Items.silicon, 20, Items.tungsten, 10));
             speed = 4f;
         }};
 
         surgeConveyor = new StackConveyor("surge-conveyor"){{
-            requirements(Category.distribution, with(Items.surgeAlloy, 3, Items.graphite, 5));
+            requirements(Category.distribution, with(Items.surgeAlloy, 3, Items.oxide, 5));
             health = 90;
             //TODO different base speed/item capacity?
             speed = 5f / 60f;
@@ -1599,7 +1597,7 @@ public class Blocks{
         }};
 
         surgeRouter = new StackRouter("surge-router"){{
-            requirements(Category.distribution, with(Items.graphite, 10, Items.surgeAlloy, 10));
+            requirements(Category.distribution, with(Items.oxide, 10, Items.surgeAlloy, 10));
 
             speed = 6f;
 
@@ -1703,7 +1701,7 @@ public class Blocks{
 
         //TODO different name
         reinforcedPump = new Pump("reinforced-pump"){{
-            requirements(Category.liquid, with(Items.beryllium, 70, Items.tungsten, 20, Items.silicon, 20));
+            requirements(Category.liquid, with(Items.beryllium, 40, Items.tungsten, 30, Items.silicon, 20));
             //TODO CUSTOM DRAW ANIMATION - pistons - repurpose DrawBlock?
             consumes.liquid(Liquids.hydrogen, 1.5f / 60f);
 
@@ -1713,7 +1711,7 @@ public class Blocks{
         }};
 
         reinforcedConduit = new ArmoredConduit("reinforced-conduit"){{
-            requirements(Category.liquid, with(Items.beryllium, 2, Items.graphite, 1));
+            requirements(Category.liquid, with(Items.beryllium, 2));
             botColor = Pal.darkestMetal;
             leaks = true;
             liquidCapacity = 20f;
@@ -1722,14 +1720,16 @@ public class Blocks{
         }};
 
         //TODO is this necessary? junctions are not good design
+        //TODO make it leak
         reinforcedLiquidJunction = new LiquidJunction("reinforced-liquid-junction"){{
-            requirements(Category.liquid, with(Items.graphite, 3, Items.beryllium, 3));
+            requirements(Category.liquid, with(Items.tungsten, 4, Items.beryllium, 8));
+            buildCostMultiplier = 3f;
             health = 260;
             ((Conduit)reinforcedConduit).junctionReplacement = this;
         }};
 
         reinforcedBridgeConduit = new DirectionLiquidBridge("reinforced-bridge-conduit"){{
-            requirements(Category.liquid, with(Items.graphite, 4, Items.beryllium, 8));
+            requirements(Category.liquid, with(Items.tungsten, 6, Items.beryllium, 10));
             range = 4;
             hasPower = false;
 
@@ -1737,14 +1737,15 @@ public class Blocks{
         }};
 
         reinforcedLiquidRouter = new LiquidRouter("reinforced-liquid-router"){{
-            requirements(Category.liquid, with(Items.graphite, 4, Items.beryllium, 2));
+            requirements(Category.liquid, with(Items.tungsten, 4, Items.beryllium, 4));
             liquidCapacity = 30f;
             newDrawing = true;
             liquidPadding = 3f/4f;
         }};
 
+        //TODO is there a need for a container if unloaders can unload 3x3s?
         reinforcedLiquidContainer = new LiquidRouter("reinforced-liquid-container"){{
-            requirements(Category.liquid, with(Items.graphite, 10, Items.beryllium, 15));
+            requirements(Category.liquid, with(Items.tungsten, 10, Items.beryllium, 16));
             liquidCapacity = 1000f;
             size = 2;
             newDrawing = true;
@@ -1752,7 +1753,7 @@ public class Blocks{
         }};
 
         reinforcedLiquidTank = new LiquidRouter("reinforced-liquid-tank"){{
-            requirements(Category.liquid, with(Items.tungsten, 30, Items.beryllium, 40));
+            requirements(Category.liquid, with(Items.tungsten, 40, Items.beryllium, 50));
             size = 3;
             liquidCapacity = 2700f;
             newDrawing = true;
@@ -1794,14 +1795,14 @@ public class Blocks{
         }};
 
         batteryLarge = new Battery("battery-large"){{
-            requirements(Category.power, with(Items.titanium, 20, Items.lead, 40, Items.silicon, 20));
+            requirements(Category.power, with(Items.titanium, 20, Items.lead, 50, Items.silicon, 30));
             size = 3;
             consumes.powerBuffered(50000f);
             baseExplosiveness = 5f;
         }};
 
         beamNode = new BeamNode("beam-node"){{
-            requirements(Category.power, with(Items.graphite, 1, Items.beryllium, 3));
+            requirements(Category.power, with(Items.graphite, 5, Items.beryllium, 3));
             consumesPower = outputsPower = true;
             consumes.powerBuffered(1000f);
             range = 10;
@@ -1809,7 +1810,7 @@ public class Blocks{
 
         //TODO requirements
         beamTower = new BeamNode("beam-tower"){{
-            requirements(Category.power, with(Items.graphite, 10, Items.beryllium, 30));
+            requirements(Category.power, with(Items.beryllium, 30, Items.oxide, 20, Items.silicon, 10));
             size = 3;
             consumesPower = outputsPower = true;
             consumes.powerBuffered(40000f);
@@ -1909,7 +1910,7 @@ public class Blocks{
 
         //TODO work on sprite, green bits?
         turbineCondenser = new ThermalGenerator("turbine-condenser"){{
-            requirements(Category.power, with(Items.graphite, 35, Items.beryllium, 25));
+            requirements(Category.power, with(Items.graphite, 40, Items.beryllium, 40));
             attribute = Attribute.vent;
             displayEfficiencyScale = 1f / 9f;
             minEfficiency = 9f - 0.0001f;
@@ -2052,7 +2053,8 @@ public class Blocks{
         }};
 
         cliffCrusher = new WallCrafter("cliff-crusher"){{
-            requirements(Category.production, with(Items.copper, 10));
+            requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 20));
+
             consumes.power(0.9f);
 
             drillTime = 110f;
@@ -2062,7 +2064,7 @@ public class Blocks{
         }};
 
         plasmaBore = new BeamDrill("plasma-bore"){{
-            requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 10));
+            requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 30));
             consumes.power(0.2f);
             drillTime = 200f;
             tier = 4;
@@ -2658,8 +2660,9 @@ public class Blocks{
             consumes.add(new ConsumeCoolant(0.5f)).update(false);
         }};
 
+        //TODO tungsten?
         breach = new ItemTurret("breach"){{
-            requirements(Category.turret, with(Items.beryllium, 35), true);
+            requirements(Category.turret, with(Items.beryllium, 35, Items.silicon, 20), true);
             ammo(
             Items.beryllium, new BasicBulletType(7f, 30){{
                 width = 8f;

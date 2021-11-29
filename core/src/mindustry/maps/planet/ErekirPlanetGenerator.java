@@ -3,6 +3,7 @@ package mindustry.maps.planet;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.ai.*;
@@ -231,5 +232,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         state.rules.attributes.set(Attribute.heat, 0.8f);
         state.rules.environment = Env.scorching | Env.terrestrial | Env.groundWater;
         Schematics.placeLaunchLoadout(spawnX, spawnY);
+
+        //TODO this is only for testing
+        state.rules.defaultTeam.items().add(Seq.with(ItemStack.with(Items.beryllium, 200, Items.graphite, 200)));
     }
 }

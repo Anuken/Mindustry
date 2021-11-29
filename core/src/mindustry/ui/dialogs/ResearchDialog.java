@@ -34,7 +34,8 @@ import static mindustry.Vars.*;
 public class ResearchDialog extends BaseDialog{
     public final float nodeSize = Scl.scl(60f);
     public ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
-    public TechTreeNode root = new TechTreeNode(TechTree.root, null);
+    //TODO switch root system
+    public TechTreeNode root = new TechTreeNode(TechTree.rootErekir, null);
     public Rect bounds = new Rect();
     public ItemsDisplay itemDisplay;
     public View view;

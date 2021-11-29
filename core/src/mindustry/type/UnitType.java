@@ -137,6 +137,7 @@ public class UnitType extends UnlockableContent{
     /** If true, all weapons will attack the same target. */
     public boolean singleTarget = false;
     public boolean forceMultiTarget = false;
+    public boolean hidden = false;
 
     //for crawlers
     public int segments = 0;
@@ -281,6 +282,11 @@ public class UnitType extends UnlockableContent{
         for(ItemStack stack : researchRequirements()){
             cons.get(stack.item);
         }
+    }
+
+    @Override
+    public boolean isHidden(){
+        return hidden;
     }
 
     @Override
