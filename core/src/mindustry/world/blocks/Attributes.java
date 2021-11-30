@@ -25,6 +25,7 @@ public class Attributes implements JsonSerializable{
 
     public void add(Attributes other){
         check();
+        other.check();
         for(int i = 0; i < arr.length; i++){
             arr[i] += other.arr[i];
         }
@@ -32,6 +33,7 @@ public class Attributes implements JsonSerializable{
 
     public void add(Attributes other, float scl){
         check();
+        other.check();
         for(int i = 0; i < arr.length; i++){
             arr[i] += other.arr[i] * scl;
         }
