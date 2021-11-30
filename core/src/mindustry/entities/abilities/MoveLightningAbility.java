@@ -26,7 +26,7 @@ public class MoveLightningAbility extends Ability{
     public float offset = 0f;
     /** Offset along the X axis */
     public float width = 0f;
-    /** Lightning alternates which side to spawn on */
+    /** Whether the spawn side alternates */
     public boolean alternate = true;
     /** Jittering heat sprite like the shield on v5 Javelin */
     public String heatRegion = "error";
@@ -71,7 +71,7 @@ public class MoveLightningAbility extends Ability{
             float x = unit.x + Angles.trnsx(unit.rotation, offset, width * side), y = unit.y + Angles.trnsy(unit.rotation, offset, width * side);
 
             shootEffect.at(x, y, unit.rotation, color, parentizeEffects ? unit : null);
-            shootSound.at(unit);
+            shootSound.at(x, y);
 
             if(length > 0){
                 Lightning.create(unit.team, color, damage, x + unit.vel.x, y + unit.vel.y, unit.rotation, length);
