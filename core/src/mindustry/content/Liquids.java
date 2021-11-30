@@ -5,7 +5,7 @@ import mindustry.type.*;
 
 public class Liquids{
     public static Liquid water, slag, oil, cryofluid, neoplasm,
-    gallium,
+    arkycite, gallium,
     ozone, hydrogen, nitrogen, cyanogen;
 
     public static void load(){
@@ -54,6 +54,12 @@ public class Liquids{
 
             colorFrom = Color.valueOf("f98f4a");
             colorTo = Color.valueOf("9e172c");
+        }};
+
+        //TODO
+        arkycite = new Liquid("arkycite", Color.valueOf("59963e")){{
+            flammability = 0.4f;
+            viscosity = 0.7f;
         }};
 
         gallium = new Liquid("gallium", Color.valueOf("9a9dbf")){{

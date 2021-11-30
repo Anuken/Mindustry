@@ -2637,6 +2637,9 @@ public class UnitTypes{
             engineSize = 2.3f;
             engineOffset = 6.5f;
 
+            //should not appear anywhere, it's for internal use only and will despawn
+            hidden = true;
+
             setEnginesMirror(
                 new UnitEngine(24 / 4f, -24 / 4f, 2.3f, 315f)
             );

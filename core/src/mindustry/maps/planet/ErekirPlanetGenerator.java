@@ -112,7 +112,6 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                     float noise = noise(x + 782, y, 7, 0.8f, 280f, 1f);
                     if(noise > 0.62f){
                         if(noise > 0.635f){
-                            //TODO slag must be rounded, no single occurrences
                             floor = Blocks.slag;
                         }else{
                             floor = Blocks.yellowStone;

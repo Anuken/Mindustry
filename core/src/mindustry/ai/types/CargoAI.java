@@ -57,6 +57,13 @@ public class CargoAI extends AIController{
                     }
                 }
             }else{
+
+                //what if some prankster reconfigures the source while the unit is moving? we can't have that!
+                if(unloadTarget.item != itemTarget){
+                    unloadTarget = null;
+                    return;
+                }
+
                 moveTo(unloadTarget, moveRange, moveSmoothing);
 
                 //deposit in bursts, unloading can take a while

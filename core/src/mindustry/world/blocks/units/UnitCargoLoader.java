@@ -6,8 +6,10 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -47,6 +49,20 @@ public class UnitCargoLoader extends Block{
             () -> Pal.power,
             () -> (float)e.team.data().countType(unitType) / Units.getCap(e.team)
         ));
+    }
+
+    @Override
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
+        return super.canPlaceOn(tile, team, rotation) && Units.canCreate(team, unitType);
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
+        if(!Units.canCreate(Vars.player.team(), unitType)){
+            drawPlaceText(Core.bundle.get("@bar.cargounitcap"), x, y, valid);
+        }
     }
 
     public class UnitTransportSourceBuild extends Building{

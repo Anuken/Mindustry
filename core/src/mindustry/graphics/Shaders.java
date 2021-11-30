@@ -21,7 +21,7 @@ public class Shaders{
     public static UnitBuildShader build;
     public static DarknessShader darkness;
     public static LightShader light;
-    public static SurfaceShader water, mud, tar, slag, cryofluid, space, caustics;
+    public static SurfaceShader water, mud, tar, slag, cryofluid, space, caustics, arkycite;
     public static PlanetShader planet;
     public static CloudShader clouds;
     public static PlanetGridShader planetGrid;
@@ -45,6 +45,7 @@ public class Shaders{
         darkness = new DarknessShader();
         light = new LightShader();
         water = new SurfaceShader("water");
+        arkycite = new SurfaceShader("arkycite");
         mud = new SurfaceShader("mud");
         tar = new SurfaceShader("tar");
         slag = new SurfaceShader("slag");
