@@ -36,6 +36,8 @@ public class MoveLightningAbility extends Ability{
     public Effect shootEffect = Fx.sparkShoot;
     public boolean parentizeEffects;
     public Sound shootSound = Sounds.spark;
+
+    protected float side = 1f;
     
     MoveLightningAbility(){}
     
@@ -64,7 +66,7 @@ public class MoveLightningAbility extends Ability{
     public void update(Unit unit){
         float scl = Mathf.clamp((unit.vel().len() - minSpeed) / (maxSpeed - minSpeed));
         if(Mathf.chance(Time.delta * chance * scl)){
-            float x = unit.x + Angles.trnsx(unit.rotation, offset, width), y = unit.y + Angles.trnsy(unit.rotation, offset, width);
+            float x = unit.x + Angles.trnsx(unit.rotation, offset, width * side), y = unit.y + Angles.trnsy(unit.rotation, offset, width * side);
 
             shootEffect.at(x, y, unit.rotation, color, parentizeEffects ? unit : null);
             shootSound.at(unit);
@@ -76,6 +78,8 @@ public class MoveLightningAbility extends Ability{
             if(bullet != null){
                 bullet.create(unit, unit.team, x, y, unit.rotation + bulletAngle + Mathf.range(bulletSpread));
             }
+
+            side *= -1f;
         }
     }
     
