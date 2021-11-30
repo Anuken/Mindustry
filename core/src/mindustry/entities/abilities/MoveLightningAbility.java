@@ -14,7 +14,7 @@ import mindustry.gen.*;
 public class MoveLightningAbility extends Ability{
     /** Lightning damage */
     public float damage = 35f;
-    /** Chance of firing every tick. Set >= 1 to always fire lightning every tick at max speed. */
+    /** Chance of firing every tick. Set >= 1 to always fire lightning every tick at max speed */
     public float chance = 0.15f;
     /** Length of the lightning. <= 0 to disable */
     public int length = 12;
@@ -24,8 +24,10 @@ public class MoveLightningAbility extends Ability{
     public Color color = Color.valueOf("a9d8ff");
     /** Shifts where the lightning spawns along the Y axis */
     public float offset = 0f;
-    /** Offset along the X axis. */
+    /** Offset along the X axis */
     public float width = 0f;
+    /** Lightning alternates which side to spawn on */
+    public boolean alternate = true;
     /** Jittering heat sprite like the shield on v5 Javelin */
     public String heatRegion = "error";
     /** Bullet type that is fired. Can be null */
@@ -79,7 +81,7 @@ public class MoveLightningAbility extends Ability{
                 bullet.create(unit, unit.team, x, y, unit.rotation + bulletAngle + Mathf.range(bulletSpread));
             }
 
-            side *= -1f;
+            if(alternate) side *= -1f;
         }
     }
     
