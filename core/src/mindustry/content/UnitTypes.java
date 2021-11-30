@@ -67,6 +67,9 @@ public class UnitTypes{
     //special block unit type
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
 
+    //transport
+    public static @EntityDef({Unitc.class, BuildingTetherc.class}) UnitType manifold;
+
     //endregion
 
     //region neoplasm
@@ -2601,7 +2604,7 @@ public class UnitTypes{
         //TODO emanate (+ better names)
 
         //endregion
-        //region internal
+        //region internal + special
 
         block = new UnitType("block"){{
             speed = 0f;
@@ -2611,6 +2614,32 @@ public class UnitTypes{
             itemCapacity = 0;
             commandLimit = 0;
             hidden = true;
+        }};
+
+        manifold = new UnitType("manifold"){{
+            defaultController = CargoAI::new;
+            isCounted = false;
+            allowedInPayloads = false;
+            logicControllable = false;
+            envDisabled = 0;
+
+            outlineColor = Pal.darkOutline;
+            lowAltitude = false;
+            flying = true;
+            drag = 0.06f;
+            speed = 2f;
+            rotateSpeed = 9f;
+            accel = 0.1f;
+            itemCapacity = 60;
+            health = 200f;
+            hitSize = 11f;
+            commandLimit = 0;
+            engineSize = 2.3f;
+            engineOffset = 6.5f;
+
+            setEnginesMirror(
+                new UnitEngine(24 / 4f, -24 / 4f, 2.3f, 315f)
+            );
         }};
 
         //endregion

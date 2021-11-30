@@ -23,7 +23,9 @@ public enum BlockFlag{
     /** Blocks that extinguishes fires. */
     extinguisher,
     /** Just a launch pad. */
-    launchPad;
+    launchPad,
+    /** Destination for unit cargo. */
+    unitCargoUnloadPoint;
 
     public final static BlockFlag[] all = values();
 

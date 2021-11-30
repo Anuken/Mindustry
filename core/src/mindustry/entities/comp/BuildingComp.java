@@ -785,17 +785,19 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     /** Dumps any item with an accumulator. May dump multiple times per frame. Use with care. */
-    public void dumpAccumulate(){
-        dumpAccumulate(null);
+    public boolean dumpAccumulate(){
+        return dumpAccumulate(null);
     }
 
     /** Dumps any item with an accumulator. May dump multiple times per frame. Use with care. */
-    public void dumpAccumulate(Item item){
+    public boolean dumpAccumulate(Item item){
+        boolean res = false;
         dumpAccum += delta();
         while(dumpAccum >= 1f){
-            dump(item);
+            res |= dump(item);
             dumpAccum -=1f;
         }
+        return res;
     }
 
     /** Try dumping any item near the building. */

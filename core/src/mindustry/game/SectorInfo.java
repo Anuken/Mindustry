@@ -193,10 +193,10 @@ public class SectorInfo{
             stat.mean = Math.min(stat.mean, rawProduction.get(item, ExportStat::new).mean);
         });
 
-        var pads = indexer.getAllied(state.rules.defaultTeam, BlockFlag.launchPad);
+        var pads = indexer.getFlagged(state.rules.defaultTeam, BlockFlag.launchPad);
 
         //disable export when launch pads are disabled, or there aren't any active ones
-        if(pads.size() == 0 || !Seq.with(pads).contains(t -> t.build.consValid())){
+        if(pads.size == 0 || !pads.contains(t -> t.consValid())){
             export.clear();
         }
 

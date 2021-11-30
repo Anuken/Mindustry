@@ -273,7 +273,8 @@ public class LExecutor{
                             }
                         }
                         case building -> {
-                            res = Geometry.findClosest(unit.x, unit.y, exec.bool(enemy) ? indexer.getEnemy(unit.team, flag) : indexer.getAllied(unit.team, flag));
+                            Building b = Geometry.findClosest(unit.x, unit.y, exec.bool(enemy) ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag));
+                            res = b == null ? null : b.tile;
                             build = true;
                         }
                         case spawn -> {

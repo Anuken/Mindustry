@@ -525,12 +525,16 @@ public class LogicBlock extends Block{
             write.b(compressed);
 
             //write only the non-constant variables
-            int count = Structs.count(executor.vars, v -> !v.constant || v == executor.vars[LExecutor.varUnit]);
+            int count = Structs.count(executor.vars, v -> (!v.constant || v == executor.vars[LExecutor.varUnit]) && !(v.isobj && v.objval == null));
 
             write.i(count);
             for(int i = 0; i < executor.vars.length; i++){
                 Var v = executor.vars[i];
 
+                //null is the default variable value, so waste no time serializing that
+                if(v.isobj && v.objval == null) continue;
+
+                //skip constants
                 if(v.constant && i != LExecutor.varUnit) continue;
 
                 //write the name and the object value

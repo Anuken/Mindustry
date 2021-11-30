@@ -396,6 +396,9 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void drawSelect(){
+            //do not draw a pointless single outline when there's no storage
+            if(team.cores().size <= 1 && !proximity.contains(storage -> storage.items == items)) return;
+
             Lines.stroke(1f, Pal.accent);
             Cons<Building> outline = b -> {
                 for(int i = 0; i < 4; i++){

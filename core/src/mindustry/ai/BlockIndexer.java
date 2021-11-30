@@ -15,8 +15,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-import java.util.*;
-
 import static mindustry.Vars.*;
 
 /** Class used for indexing special target blocks for AI. */
@@ -37,7 +35,7 @@ public class BlockIndexer{
     /** Stores teams that are present here as tiles. */
     private Seq<Team> activeTeams = new Seq<>(Team.class);
     /** Maps teams to a map of flagged tiles by flag. */
-    private TileArray[][] flagMap = new TileArray[Team.all.length][BlockFlag.all.length];
+    private Seq<Building>[][] flagMap = new Seq[Team.all.length][BlockFlag.all.length];
     /** Counts whether a certain floor is present in the world upon load. */
     private boolean[] blocksPresent;
 
@@ -61,7 +59,7 @@ public class BlockIndexer{
 
         Events.on(WorldLoadEvent.class, event -> {
             damagedTiles = new Seq[Team.all.length];
-            flagMap = new TileArray[Team.all.length][BlockFlag.all.length];
+            flagMap = new Seq[Team.all.length][BlockFlag.all.length];
             activeTeams = new Seq<>(Team.class);
 
             clearFlags();
@@ -105,9 +103,9 @@ public class BlockIndexer{
             var flags = tile.block().flags;
             var data = team.data();
 
-            if(flags.size() > 0){
-                for(BlockFlag flag : flags){
-                    getFlagged(team)[flag.ordinal()].remove(tile);
+            if(flags.size > 0){
+                for(BlockFlag flag : flags.array){
+                    getFlagged(team)[flag.ordinal()].remove(build);
                 }
             }
 
@@ -166,12 +164,12 @@ public class BlockIndexer{
     private void clearFlags(){
         for(int i = 0; i < flagMap.length; i++){
             for(int j = 0; j < BlockFlag.all.length; j++){
-                flagMap[i][j] = new TileArray();
+                flagMap[i][j] = new Seq();
             }
         }
     }
 
-    private TileArray[] getFlagged(Team team){
+    private Seq<Building>[] getFlagged(Team team){
         return flagMap[team.id];
     }
 
@@ -190,13 +188,13 @@ public class BlockIndexer{
     }
 
     /** Get all allied blocks with a flag. */
-    public TileArray getAllied(Team team, BlockFlag type){
+    public Seq<Building> getFlagged(Team team, BlockFlag type){
         return flagMap[team.id][type.ordinal()];
     }
 
     @Nullable
-    public Tile findClosestFlag(float x, float y, Team team, BlockFlag flag){
-        return Geometry.findClosest(x, y, getAllied(team, flag));
+    public Building findClosestFlag(float x, float y, Team team, BlockFlag flag){
+        return Geometry.findClosest(x, y, getFlagged(team, flag));
     }
 
     public boolean eachBlock(Teamc team, float range, Boolf<Building> pred, Cons<Building> cons){
@@ -239,34 +237,30 @@ public class BlockIndexer{
     }
 
     /** Get all enemy blocks with a flag. */
-    public Seq<Tile> getEnemy(Team team, BlockFlag type){
-        returnArray.clear();
+    public Seq<Building> getEnemy(Team team, BlockFlag type){
+        breturnArray.clear();
         Seq<TeamData> data = state.teams.present;
         //when team data is not initialized, scan through every team. this is terrible
         if(data.isEmpty()){
             for(Team enemy : Team.all){
                 if(enemy == team) continue;
-                TileArray set = getFlagged(enemy)[type.ordinal()];
+                var set = getFlagged(enemy)[type.ordinal()];
                 if(set != null){
-                    for(Tile tile : set){
-                        returnArray.add(tile);
-                    }
+                    breturnArray.addAll(set);
                 }
             }
         }else{
             for(int i = 0; i < data.size; i++){
                 Team enemy = data.items[i].team;
                 if(enemy == team) continue;
-                TileArray set = getFlagged(enemy)[type.ordinal()];
+                var set = getFlagged(enemy)[type.ordinal()];
                 if(set != null){
-                    for(Tile tile : set){
-                        returnArray.add(tile);
-                    }
+                    breturnArray.addAll(set);
                 }
             }
         }
 
-        return returnArray;
+        return breturnArray;
     }
 
     public void notifyBuildHealed(Building build){
@@ -400,16 +394,12 @@ public class BlockIndexer{
         //only process entity changes with centered tiles
         if(tile.isCenter() && tile.build != null){
             var data = team.data();
-            if(tile.block().flags.size() > 0 && tile.isCenter()){
-                TileArray[] map = getFlagged(team);
 
-                for(BlockFlag flag : tile.block().flags){
+            if(tile.block().flags.size > 0 && tile.isCenter()){
+                var map = getFlagged(team);
 
-                    TileArray arr = map[flag.ordinal()];
-
-                    arr.add(tile);
-
-                    map[flag.ordinal()] = arr;
+                for(BlockFlag flag : tile.block().flags.array){
+                    map[flag.ordinal()].add(tile.build);
                 }
             }
 
@@ -435,35 +425,5 @@ public class BlockIndexer{
         }
         //bounds checks only needed in very specific scenarios
         if(tile.blockID() < blocksPresent.length) blocksPresent[tile.blockID()] = true;
-    }
-
-    public static class TileArray implements Iterable<Tile>{
-        Seq<Tile> tiles = new Seq<>(false, 16);
-        IntSet contained = new IntSet();
-
-        public void add(Tile tile){
-            if(contained.add(tile.pos())){
-                tiles.add(tile);
-            }
-        }
-
-        public void remove(Tile tile){
-            if(contained.remove(tile.pos())){
-                tiles.remove(tile);
-            }
-        }
-
-        public int size(){
-            return tiles.size;
-        }
-
-        public Tile first(){
-            return tiles.first();
-        }
-
-        @Override
-        public Iterator<Tile> iterator(){
-            return tiles.iterator();
-        }
     }
 }

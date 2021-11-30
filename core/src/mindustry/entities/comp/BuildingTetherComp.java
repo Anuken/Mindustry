@@ -1,5 +1,6 @@
 package mindustry.entities.comp;
 
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -11,7 +12,7 @@ abstract class BuildingTetherComp implements Unitc{
     @Import UnitType type;
     @Import Team team;
 
-    public Building building;
+    public @Nullable Building building;
 
     @Override
     public void update(){

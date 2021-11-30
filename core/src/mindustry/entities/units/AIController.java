@@ -173,8 +173,7 @@ public class AIController implements UnitController{
 
     public Teamc targetFlag(float x, float y, BlockFlag flag, boolean enemy){
         if(unit.team == Team.derelict) return null;
-        Tile target = Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getAllied(unit.team, flag));
-        return target == null ? null : target.build;
+        return Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag));
     }
 
     public Teamc target(float x, float y, float range, boolean air, boolean ground){

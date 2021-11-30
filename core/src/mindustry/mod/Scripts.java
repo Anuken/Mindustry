@@ -82,14 +82,16 @@ public class Scripts implements Disposable{
         return Vars.tree.get(path, true).readBytes();
     }
 
-    //kept for backwards compatibility
+    /** @deprecated use Vars.tree.loadSound(soundName) instead */
+    @Deprecated
     public Sound loadSound(String soundName){
         return Vars.tree.loadSound(soundName);
     }
 
-    //kept for backwards compatibility
-    public Music loadMusic(String soundName){
-        return Vars.tree.loadMusic(soundName);
+    /** @deprecated use Vars.tree.loadMusic(musicName) instead */
+    @Deprecated
+    public Music loadMusic(String musicName){
+        return Vars.tree.loadMusic(musicName);
     }
 
     /** Ask the user to select a file to read for a certain purpose like "Please upload a sprite" */

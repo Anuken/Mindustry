@@ -3,6 +3,7 @@ package mindustry.world.blocks.distribution;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -124,6 +125,20 @@ public class StackConveyor extends Block implements Autotiler{
             for(int i = 0; i < 4; i++){
                 if((blendprox & (1 << i)) == 0){
                     Draw.rect(edgeRegion, x, y, (rotation - i) * 90);
+                }
+            }
+
+            //draw inputs
+            if(state == stateLoad){
+                for(int i = 0; i < 4; i++){
+                    if((blendprox & (1 << i)) != 0 && i != 0){
+                        int dir = rotation - i;
+                        Draw.rect(sliced(regions[0], SliceMode.bottom), x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, (float)(dir*90));
+                    }
+                }
+            }else if(state == stateUnload){ //front unload
+                if((blendprox & (1)) != 0){
+                    Draw.rect(sliced(regions[0], SliceMode.top), x + Geometry.d4x(rotation) * tilesize*0.75f, y + Geometry.d4y(rotation) * tilesize*0.75f, rotation * 90f);
                 }
             }
 

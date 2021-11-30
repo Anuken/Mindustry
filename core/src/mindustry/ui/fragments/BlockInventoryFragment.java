@@ -30,7 +30,7 @@ public class BlockInventoryFragment extends Fragment{
     Table table = new Table();
     Building tile;
     float holdTime = 0f, emptyTime;
-    boolean holding;
+    boolean holding, held;
     float[] shrinkHoldTimes = new float[content.items().size];
     Item lastItem;
 
@@ -69,6 +69,20 @@ public class BlockInventoryFragment extends Fragment{
         tile = null;
     }
 
+    private void takeItem(int requested){
+        //take everything
+        int amount = Math.min(requested, player.unit().maxAccepted(lastItem));
+
+        if(amount > 0){
+            Call.requestItem(player, tile, lastItem, amount);
+            holding = false;
+            holdTime = 0f;
+            held = true;
+
+            if(net.client()) Events.fire(new WithdrawEvent(tile, player, lastItem, amount));
+        }
+    }
+
     private void rebuild(boolean actions){
         IntSet container = new IntSet();
 
@@ -90,17 +104,11 @@ public class BlockInventoryFragment extends Fragment{
                     emptyTime = 0f;
                 }
 
-                if(holding && lastItem != null){
-                    holdTime += Time.delta;
+                if(holding && lastItem != null && (holdTime += Time.delta) >= holdWithdraw){
+                    holdTime = 0f;
 
-                    if(holdTime >= holdWithdraw){
-                        int amount = Math.min(tile.items.get(lastItem), player.unit().maxAccepted(lastItem));
-                        Call.requestItem(player, tile, lastItem, amount);
-                        holding = false;
-                        holdTime = 0f;
-
-                        if(net.client()) Events.fire(new WithdrawEvent(tile, player, lastItem, amount));
-                    }
+                    //take one when held
+                    takeItem(1);
                 }
 
                 updateTablePosition();
@@ -155,23 +163,33 @@ public class BlockInventoryFragment extends Fragment{
                 });
                 image.addListener(l);
 
-                image.addListener(new InputListener(){
+                Boolp validClick = () -> !(!canPick.get() || tile == null || !tile.isValid() || tile.items == null || !tile.items.has(item));
+
+                image.addListener(new ClickListener(){
+
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                        if(!canPick.get() || tile == null || !tile.isValid() || tile.items == null || !tile.items.has(item)) return false;
-                        int amount = Math.min(1, player.unit().maxAccepted(item));
-                        if(amount > 0){
-                            Call.requestItem(player, tile, item, amount);
+                        held = false;
+                        if(validClick.get()){
                             lastItem = item;
                             holding = true;
-                            holdTime = 0f;
-                            if(net.client()) Events.fire(new WithdrawEvent(tile, player, item, amount));
                         }
-                        return true;
+
+                        return super.touchDown(event, x, y, pointer, button);
+                    }
+
+                    @Override
+                    public void clicked(InputEvent event, float x, float y){
+                        if(!validClick.get() || held) return;
+
+                        //take all
+                        takeItem(tile.items.get(lastItem = item));
                     }
 
                     @Override
                     public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
+                        super.touchUp(event, x, y, pointer, button);
+
                         holding = false;
                         lastItem = null;
                     }

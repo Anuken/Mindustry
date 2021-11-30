@@ -83,6 +83,8 @@ public class Blocks{
     duct, ductRouter, overflowDuct, ductBridge, ductUnloader,
     surgeConveyor, surgeRouter,
 
+    unitCargoLoader, unitCargoUnloadPoint,
+
     //liquid
     mechanicalPump, rotaryPump, impulsePump, conduit, pulseConduit, platedConduit, liquidRouter, liquidContainer, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
 
@@ -1554,7 +1556,7 @@ public class Blocks{
             consumes.power(1.75f);
         }};
 
-        //special transport blocks
+        //erekir transport blocks
 
         duct = new Duct("duct"){{
             requirements(Category.distribution, with(Items.graphite, 2));
@@ -1606,6 +1608,24 @@ public class Blocks{
             conductivePower = true;
             baseEfficiency = 1f;
             consumes.power(3f / 60f);
+        }};
+
+        unitCargoLoader = new UnitCargoLoader("unit-cargo-loader"){{
+            requirements(Category.distribution, with(Items.silicon, 80, Items.phaseFabric, 60, Items.carbide, 50, Items.oxide, 40));
+
+            size = 3;
+
+            consumes.power(4f / 60f);
+
+            itemCapacity = 200;
+        }};
+
+        unitCargoUnloadPoint = new UnitCargoUnloadPoint("unit-cargo-unload-point"){{
+            requirements(Category.distribution, with(Items.silicon, 60, Items.thorium, 80));
+
+            size = 2;
+
+            itemCapacity = 100;
         }};
 
         //endregion

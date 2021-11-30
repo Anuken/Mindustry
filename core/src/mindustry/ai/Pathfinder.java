@@ -394,7 +394,7 @@ public class Pathfinder implements Runnable{
     public static class EnemyCoreField extends Flowfield{
         @Override
         protected void getPositions(IntSeq out){
-            for(Tile other : indexer.getEnemy(team, BlockFlag.core)){
+            for(Building other : indexer.getEnemy(team, BlockFlag.core)){
                 out.add(other.pos());
             }
 
@@ -410,7 +410,7 @@ public class Pathfinder implements Runnable{
     public static class RallyField extends Flowfield{
         @Override
         protected void getPositions(IntSeq out){
-            for(Tile other : indexer.getAllied(team, BlockFlag.rally)){
+            for(Building other : indexer.getFlagged(team, BlockFlag.rally)){
                 out.add(other.pos());
             }
         }
