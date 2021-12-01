@@ -476,10 +476,20 @@ public class Generators{
                         wepReg = wepReg.flipX();
                     }
 
-                    image.draw(wepReg,
-                    (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.width / 2f),
-                    (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.height / 2f),
-                    true);
+                    int wx = (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.width / 2f),
+                        wy = (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.height / 2f);
+
+                    image.draw(wepReg, wx, wy, true);
+
+                    if(weapon.cellRegion.found()){
+                        Pixmap baseWeaponCell = weapon.cellRegion;
+                        Pixmap weaponCell = baseWeaponCell.copy();
+
+                        //replace with 0xffd37fff : 0xdca463ff for sharded colors?
+                        weaponCell.replace(in -> in == 0xffffffff ? 0xffa664ff : in == 0xdcc6c6ff || in == 0xdcc5c5ff ? 0xd06b53ff : 0);
+
+                        image.draw(weaponCell, wx, wy, true);
+                    }
                 }
 
                 save(image, "unit-" + type.name + "-full");
