@@ -48,6 +48,10 @@ public class ThermalGenerator extends PowerGenerator{
         super.setStats();
 
         stats.add(Stat.tiles, attribute, floating, size * size * displayEfficiencyScale, !displayEfficiency);
+
+        if(liquidOutput != null){
+            stats.add(Stat.output, StatValues.liquid(liquidOutput.liquid, liquidOutput.amount * size * size * 60f, true));
+        }
     }
 
     @Override
