@@ -355,7 +355,7 @@ public class Mods implements Loadable{
 
     /** Loads all mods from the folder, but does not call any methods on them.*/
     public void load(){
-        var files = resolveDependencies(modDirectory.findAll(f ->
+        var files = resolveDependencies(Seq.with(modDirectory.list()).filter(f ->
             f.extension().equals("jar") || f.extension().equals("zip") || (f.isDirectory() && (f.child("mod.json").exists() || f.child("mod.hjson").exists()))
         ));
 
@@ -732,8 +732,8 @@ public class Mods implements Loadable{
     /** Resolves the loading order of a list mods/plugins using their internal names.
      * It also skips non-mods files or folders. */
     public Seq<Fi> resolveDependencies(Seq<Fi> files){
-        ObjectMap<String, Fi> fileMapping = new ObjectMap<>(files.size);
-        ObjectMap<String, Seq<String>> dependencies = new ObjectMap<>(files.size);
+        ObjectMap<String, Fi> fileMapping = new ObjectMap<>();
+        ObjectMap<String, Seq<String>> dependencies = new ObjectMap<>();
 
         for(Fi file : files){
             Fi zip = file.isDirectory() ? file : new ZipFi(file);
@@ -742,9 +742,13 @@ public class Mods implements Loadable{
                 zip = zip.list()[0];
             }
 
-            ModMeta meta = findMeta(zip);
-            if(meta == null) continue;
+            ModMeta meta = null;
+            try{
+                meta = findMeta(zip);
+            }catch(Exception ignored){
+            }
 
+            if(meta == null) continue;
             dependencies.put(meta.name, meta.dependencies);
             fileMapping.put(meta.name, file);
         }
