@@ -92,7 +92,7 @@ public class Items{
         }};
 
         beryllium = new Item("beryllium", Color.valueOf("3a8f64")){{
-            hardness = 5;
+            hardness = 4;
             cost = 1.3f;
         }};
 
