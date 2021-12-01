@@ -134,11 +134,22 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         erase(spawnX, spawnY, 15);
         brush(pathfind(spawnX, spawnY, endX, endY, tile -> (tile.solid() ? 300f : 0f) + maxd - tile.dst(width/2f, height/2f)/10f, Astar.manhattan), 7);
 
+        //arkycite
+        pass((x, y) -> {
+
+            if(noise(x + 300, y - x*1.6f + 100, 4, 0.81f, 86f, 1f) > 0.71f/* && floor == Blocks.yellowStone*/){
+                floor = Blocks.arkyciteFloor;
+            }
+        });
+
         distort(10f, 12f);
         distort(5f, 7f);
 
         //smooth out slag to prevent random 1-tile patches
         median(3, 0.6, Blocks.slag);
+
+        //does arkycite need smoothing?
+        //median(3, 0.6, Blocks.arkyciteFloor);
 
         pass((x, y) -> {
             float max = 0;
