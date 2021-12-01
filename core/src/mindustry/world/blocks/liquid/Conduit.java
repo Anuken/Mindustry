@@ -133,7 +133,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         if(bridgeReplacement == null) return;
 
         if(rotBridgeReplacement instanceof DirectionBridge duct){
-            Placement.calculateBridges(plans, duct);
+            Placement.calculateBridges(plans, duct, true);
         }else{
             Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement);
         }

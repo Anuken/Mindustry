@@ -17,6 +17,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.Conveyor.*;
+import mindustry.world.blocks.distribution.Duct.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -137,7 +138,8 @@ public class StackConveyor extends Block implements Autotiler{
                     }
                 }
             }else if(state == stateUnload){ //front unload
-                if((blendprox & (1)) != 0){
+                //TOOD hacky front check
+                if((blendprox & (1)) != 0 && !(front() instanceof DuctBuild)){
                     Draw.rect(sliced(regions[0], SliceMode.top), x + Geometry.d4x(rotation) * tilesize*0.75f, y + Geometry.d4y(rotation) * tilesize*0.75f, rotation * 90f);
                 }
             }

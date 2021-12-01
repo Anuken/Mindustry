@@ -94,8 +94,10 @@ public class Blocks{
 
     //power
     combustionGenerator, thermalGenerator, steamGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
-    turbineCondenser,
     impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
+
+    //power - erekir
+    turbineCondenser, chemicalCombustionChamber,
     beamNode, beamTower,
 
     //production
@@ -1044,7 +1046,7 @@ public class Blocks{
             iconOverride = new String[]{"-bottom", "", "-top1"};
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(), new DrawBlock(), new DrawHeatOutput());
 
-            craftTime = 60f * 3f;
+            craftTime = 60f * 4f;
             liquidCapacity = 30f;
             heatOutput = 5f;
         }};
@@ -1961,6 +1963,19 @@ public class Blocks{
             hasLiquids = true;
             liquidOutput = new LiquidStack(Liquids.water, 10f / 60f / 9f);
             liquidCapacity = 20f;
+        }};
+
+        //TODO arkycite combustion: ozone + arkycite
+
+        if(false)
+        chemicalCombustionChamber = new ItemLiquidGenerator("chemical-combustion-chamber"){{
+            requirements(Category.power, with(Items.graphite, 30, Items.tungsten, 40, Items.silicon, 30));
+            powerProduction = 6f;
+            consumes.liquids(LiquidStack.with(Liquids.ozone, 1f / 60f, Liquids.arkycite, 20f / 60f));
+            size = 3;
+
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.06f;
         }};
 
         //endregion power
