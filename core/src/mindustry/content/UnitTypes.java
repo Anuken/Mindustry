@@ -2112,7 +2112,7 @@ public class UnitTypes{
 
             buildSpeed = 3f;
 
-            abilities.add(new EnergyFieldAbility(35f, 65f, 180f){{
+            abilities.add(new EnergyFieldAbility(40f, 65f, 180f){{
                 statusDuration = 60f * 6f;
                 maxTargets = 25;
             }});
@@ -2129,7 +2129,7 @@ public class UnitTypes{
                         shootEffect = Fx.sparkShoot;
                         hitEffect = Fx.pointHit;
                         maxRange = 180f;
-                        damage = 24f;
+                        damage = 25f;
                     }};
                 }});
             }

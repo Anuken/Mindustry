@@ -179,6 +179,7 @@ public class CargoAI extends AIController{
         }
     }
 
+    //unused, might change later
     void sortTargets(Seq<UnitCargoUnloadPointBuild> targets){
         //find sort by "most desirable" first
         targets.sort(Structs.comps(Structs.comparingInt(b -> b.items.total()), Structs.comparingFloat(b -> b.dst2(unit))));
