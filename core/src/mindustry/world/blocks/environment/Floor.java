@@ -15,7 +15,6 @@ import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
@@ -48,12 +47,12 @@ public class Floor extends Block{
     public float liquidMultiplier = 1f;
     /** whether this block is liquid. */
     public boolean isLiquid;
+    /** shallow water flag used for generation */
+    public boolean shallow = false;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
     /** Group of blocks that this block does not draw edges on. */
     public Block blendGroup = this;
-    /** Array of affinities to certain things. */
-    public Attributes attributes = new Attributes();
     /** Whether this ore generates in maps by default. */
     public boolean oreDefault = false;
     /** Ore generation params. */
@@ -62,6 +61,8 @@ public class Floor extends Block{
     public Block wall = Blocks.air;
     /** Decoration block. Usually a rock. May be air. */
     public Block decoration = Blocks.air;
+    /** Whether units can draw shadows over this. */
+    public boolean canShadow = true;
     /** Whether this overlay needs a surface to be on. False for floating blocks, like spawns. */
     public boolean needsSurface = true;
 
@@ -113,10 +114,6 @@ public class Floor extends Block{
 
         //keep default value if not found...
         if(wall == null) wall = Blocks.air;
-
-        if(decoration == Blocks.air){
-            decoration = content.blocks().min(b -> b instanceof Prop && b.minfo.mod == null && b.breakable ? mapColor.diff(b.mapColor) : Float.POSITIVE_INFINITY);
-        }
 
         if(isLiquid && walkEffect == Fx.none){
             walkEffect = Fx.ripple;

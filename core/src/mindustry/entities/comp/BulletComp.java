@@ -6,12 +6,15 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -118,41 +121,76 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         type.update(self());
 
         if(type.collidesTiles && type.collides && type.collidesGround){
-            world.raycastEach(World.toTile(lastX()), World.toTile(lastY()), tileX(), tileY(), (x, y) -> {
-
-                Building build = world.build(x, y);
-                if(build == null || !isAdded()) return false;
-
-                if(build.collide(self()) && type.testCollision(self(), build) && !build.dead() && (type.collidesTeam || build.team != team) && !(type.pierceBuilding && hasCollided(build.id))){
-                    boolean remove = false;
-
-                    float health = build.health;
-
-                    if(build.team != team){
-                        remove = build.collision(self());
-                    }
-
-                    if(remove || type.collidesTeam){
-                        if(!type.pierceBuilding){
-                            hit = true;
-                            remove();
-                        }else{
-                            collided.add(build.id);
-                        }
-                    }
-
-                    type.hitTile(self(), build, health, true);
-
-                    return !type.pierceBuilding;
-                }
-
-                return false;
-            });
+            tileRaycast(World.toTile(lastX()), World.toTile(lastY()), tileX(), tileY());
         }
 
         if(type.pierceCap != -1 && collided.size >= type.pierceCap){
             hit = true;
             remove();
+        }
+    }
+
+    //copy-paste of World#raycastEach, inlined for lambda capture performance.
+    @Override
+    public void tileRaycast(int x0f, int y0f, int x1, int y1){
+        int x = x0f, dx = Math.abs(x1 - x), sx = x < x1 ? 1 : -1;
+        int y = y0f, dy = Math.abs(y1 - y), sy = y < y1 ? 1 : -1;
+        int e2, err = dx - dy;
+        int ww = world.width(), wh = world.height();
+
+        while(x >= 0 && y >= 0 && x < ww && y < wh){
+            Building build = world.build(x, y);
+
+            if(type.collideFloor || type.collideTerrain){
+                Tile tile = world.tile(x, y);
+                if(
+                    type.collideFloor && (tile == null || tile.floor().hasSurface() || tile.block() != Blocks.air) ||
+                    type.collideTerrain && tile != null && tile.block() instanceof StaticWall
+                ){
+                    type.despawned(self());
+                    remove();
+                    hit = true;
+                    return;
+                }
+            }
+
+            if(build != null && isAdded() && build.collide(self()) && type.testCollision(self(), build)
+                && !build.dead() && (type.collidesTeam || build.team != team) && !(type.pierceBuilding && hasCollided(build.id))){
+
+                boolean remove = false;
+                float health = build.health;
+
+                if(build.team != team){
+                    remove = build.collision(self());
+                }
+
+                if(remove || type.collidesTeam){
+                    if(!type.pierceBuilding){
+                        hit = true;
+                        remove();
+                    }else{
+                        collided.add(build.id);
+                    }
+                }
+
+                type.hitTile(self(), build, health, true);
+
+                //stop raycasting when building is hit
+                if(type.pierceBuilding) return;
+            }
+
+            if(x == x1 && y == y1) break;
+
+            e2 = 2 * err;
+            if(e2 > -dy){
+                err -= dy;
+                x += sx;
+            }
+
+            if(e2 < dx){
+                err += dx;
+                y += sy;
+            }
         }
     }
 

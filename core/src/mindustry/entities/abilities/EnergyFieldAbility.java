@@ -10,6 +10,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -25,11 +26,11 @@ public class EnergyFieldAbility extends Ability{
     public Sound shootSound = Sounds.spark;
     public float statusDuration = 60f * 6f;
     public float x, y;
-    public boolean hitBuildings = true;
+    public boolean targetGround = true, targetAir = true, hitBuildings = true, hitUnits = true;
     public int maxTargets = 25;
     public float healPercent = 2.5f;
 
-    public float layer = Layer.bullet - 0.001f, blinkScl = 20f;
+    public float layer = Layer.bullet - 0.001f, blinkScl = 20f, blinkSize = 0.1f;
     public float effectRadius = 5f, sectorRad = 0.14f, rotateSpeed = 0.5f;
     public int sectors = 5;
     public Color color = Pal.heal;
@@ -59,7 +60,7 @@ public class EnergyFieldAbility extends Ability{
         Draw.color(color);
         Tmp.v1.trns(unit.rotation - 90, x, y).add(unit.x, unit.y);
         float rx = Tmp.v1.x, ry = Tmp.v1.y;
-        float orbRadius = effectRadius * (1f + Mathf.absin(blinkScl, 0.1f));
+        float orbRadius = effectRadius * (1f + Mathf.absin(blinkScl, blinkSize));
 
         Fill.circle(rx, ry, orbRadius);
         Draw.color();
@@ -98,14 +99,20 @@ public class EnergyFieldAbility extends Ability{
 
             all.clear();
 
-            Units.nearby(null, rx, ry, range, other -> {
-                if(other != unit){
-                    all.add(other);
-                }
-            });
+            if(hitUnits){
+                Units.nearby(null, rx, ry, range, other -> {
+                    if(other != unit && (other.isFlying() ? targetAir : targetGround)){
+                        all.add(other);
+                    }
+                });
+            }
 
-            if(hitBuildings){
-                Units.nearbyBuildings(rx, ry, range, all::add);
+            if(hitBuildings && targetGround){
+                Units.nearbyBuildings(rx, ry, range, b -> {
+                    if(b.team != Team.derelict || state.rules.coreCapture){
+                        all.add(b);
+                    }
+                });
             }
 
             all.sort(h -> h.dst2(rx, ry));

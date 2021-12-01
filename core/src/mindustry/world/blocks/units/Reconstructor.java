@@ -126,7 +126,7 @@ public class Reconstructor extends UnitBlock{
             var upgrade = upgrade(pay.unit.type);
 
             if(upgrade != null){
-                if(!upgrade.unlockedNow()){
+                if(!upgrade.unlockedNowHost()){
                     //flash "not researched"
                     pay.showOverlay(Icon.tree);
                 }
@@ -137,7 +137,7 @@ public class Reconstructor extends UnitBlock{
                 }
             }
 
-            return upgrade != null && upgrade.unlockedNow() && !upgrade.isBanned();
+            return upgrade != null && upgrade.unlockedNowHost() && !upgrade.isBanned();
         }
 
         @Override
@@ -186,6 +186,12 @@ public class Reconstructor extends UnitBlock{
         }
 
         @Override
+        public Object senseObject(LAccess sensor){
+            if(sensor == LAccess.config) return unit();
+            return super.senseObject(sensor);
+        }
+
+        @Override
         public void updateTile(){
             boolean valid = false;
 
@@ -225,14 +231,14 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public boolean shouldConsume(){
-            return constructing();
+            return constructing() && enabled;
         }
 
         public UnitType unit(){
             if(payload == null) return null;
 
             UnitType t = upgrade(payload.unit.type);
-            return t != null && t.unlockedNow() ? t : null;
+            return t != null && t.unlockedNowHost() ? t : null;
         }
 
         public boolean constructing(){
@@ -241,7 +247,7 @@ public class Reconstructor extends UnitBlock{
 
         public boolean hasUpgrade(UnitType type){
             UnitType t = upgrade(type);
-            return t != null && t.unlockedNow() && !type.isBanned();
+            return t != null && t.unlockedNowHost() && !type.isBanned();
         }
 
         public UnitType upgrade(UnitType type){

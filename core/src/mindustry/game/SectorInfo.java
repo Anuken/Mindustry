@@ -242,7 +242,8 @@ public class SectorInfo{
                 production.get(item).mean = Math.min(production.get(item).mean, rawProduction.get(item).mean);
 
                 if(export.containsKey(item)){
-                    export.get(item).mean = Math.min(export.get(item).mean, Math.max(rawProduction.get(item).mean, -production.get(item).mean));
+                    //export can, at most, be the raw items being produced from factories + the items being taken from the core
+                    export.get(item).mean = Math.min(export.get(item).mean, rawProduction.get(item).mean + Math.max(-production.get(item).mean, 0));
                 }
             }
 
@@ -288,7 +289,7 @@ public class SectorInfo{
     public void eachImport(Planet planet, Cons<Sector> cons){
         for(Sector sector : planet.sectors){
             Sector dest = sector.info.getRealDestination();
-            if(sector.hasBase() && sector.info != this && dest != null && dest.info == this){
+            if(sector.hasBase() && sector.info != this && dest != null && dest.info == this && sector.info.anyExports()){
                 cons.get(sector);
             }
         }

@@ -66,7 +66,7 @@ public class Stats{
     }
 
     public void add(Stat stat, Attribute attr, boolean floating, float scale, boolean startZero){
-        add(stat, StatValues.floors(attr, floating, scale, startZero));
+        add(stat, StatValues.blocks(attr, floating, scale, startZero));
     }
 
     /** Adds a single string value with this stat. */

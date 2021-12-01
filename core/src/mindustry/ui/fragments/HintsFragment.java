@@ -48,12 +48,12 @@ public class HintsFragment extends Fragment{
                 }else if(!current.show()){ //current became hidden
                     hide();
                 }
-            }else if(hints.size > 0 && !renderer.isCutscene()){
+            }else if(hints.size > 0){
                 //check one hint each frame to see if it should be shown.
                 Hint hint = hints.find(Hint::show);
                 if(hint != null && hint.complete()){
                     hints.remove(hint);
-                }else if(hint != null){
+                }else if(hint != null && !renderer.isCutscene() && state.isGame() && control.saves.getTotalPlaytime() > 8000){
                     display(hint);
                 }else{
                     //moused over a derelict structure
@@ -92,7 +92,7 @@ public class HintsFragment extends Fragment{
         hints.sort(Hint::order);
 
         Hint first = hints.find(Hint::show);
-        if(first != null){
+        if(first != null && !renderer.isCutscene() && state.isGame()){
             hints.remove(first);
             display(first);
         }
@@ -177,10 +177,13 @@ public class HintsFragment extends Fragment{
             && state.rules.defaultTeam.core().items.has(Blocks.coreFoundation.requirements),
             () -> ui.hints.placedBlocks.contains(Blocks.coreFoundation)),
         presetLaunch(() -> state.isCampaign()
-            && state.getSector().preset == null
-            && SectorPresets.frozenForest.unlocked()
-            && SectorPresets.frozenForest.sector.save == null,
+            && state.getSector().preset == null,
             () -> state.isCampaign() && state.getSector().preset == SectorPresets.frozenForest),
+        presetDifficulty(() -> state.isCampaign()
+            && state.getSector().preset == null
+            && state.getSector().threat >= 0.5f
+            && !SectorPresets.tarFields.sector.isCaptured(), //appear only when the player hasn't progressed much in the game yet
+            () -> state.isCampaign() && state.getSector().preset != null),
         coreIncinerate(() -> state.isCampaign() && state.rules.defaultTeam.core() != null && state.rules.defaultTeam.core().items.get(Items.copper) >= state.rules.defaultTeam.core().storageCapacity - 10, () -> false),
         coopCampaign(() -> net.client() && state.isCampaign() && SectorPresets.groundZero.sector.hasBase(), () -> false),
         ;

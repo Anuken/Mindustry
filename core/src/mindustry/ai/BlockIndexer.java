@@ -50,10 +50,12 @@ public class BlockIndexer{
         clearFlags();
 
         Events.on(TilePreChangeEvent.class, event -> {
+            if(state.isEditor()) return;
             removeIndex(event.tile);
         });
 
         Events.on(TileChangeEvent.class, event -> {
+            if(state.isEditor()) return;
             addIndex(event.tile);
         });
 
@@ -103,13 +105,13 @@ public class BlockIndexer{
             var flags = tile.block().flags;
             var data = team.data();
 
-            if(flags.size() > 0){
-                for(BlockFlag flag : flags){
+            if(flags.size > 0){
+                for(BlockFlag flag : flags.array){
                     getFlagged(team)[flag.ordinal()].remove(tile);
                 }
             }
 
-            //update the unit cap when building is remove
+            //update the unit cap when building is removed
             data.unitCap -= tile.block().unitCapModifier;
 
             //unregister building from building quadtree
@@ -202,15 +204,20 @@ public class BlockIndexer{
     }
 
     public boolean eachBlock(@Nullable Team team, float wx, float wy, float range, Boolf<Building> pred, Cons<Building> cons){
-        breturnArray.clear();
 
         if(team == null){
+            returnBool = false;
+
             allBuildings(wx, wy, range, b -> {
                 if(pred.get(b)){
-                    breturnArray.add(b);
+                    returnBool = true;
+                    cons.get(b);
                 }
             });
+            return returnBool;
         }else{
+            breturnArray.clear();
+
             var buildings = team.data().buildings;
             if(buildings == null) return false;
             buildings.intersect(wx - range, wy - range, range*2f, range*2f, b -> {
@@ -393,10 +400,10 @@ public class BlockIndexer{
         //only process entity changes with centered tiles
         if(tile.isCenter() && tile.build != null){
             var data = team.data();
-            if(tile.block().flags.size() > 0 && tile.isCenter()){
+            if(tile.block().flags.size > 0 && tile.isCenter()){
                 TileArray[] map = getFlagged(team);
 
-                for(BlockFlag flag : tile.block().flags){
+                for(BlockFlag flag : tile.block().flags.array){
 
                     TileArray arr = map[flag.ordinal()];
 

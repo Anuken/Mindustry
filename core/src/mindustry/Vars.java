@@ -26,6 +26,7 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.service.*;
+import mindustry.world.*;
 
 import java.io.*;
 import java.nio.charset.*;
@@ -40,12 +41,12 @@ public class Vars implements Loadable{
     public static boolean loadLocales = true;
     /** Whether the logger is loaded. */
     public static boolean loadedLogger = false, loadedFileLogger = false;
-    /** Whether to enable various experimental features (e.g. cliffs) */
+    /** Whether to enable various experimental features (e.g. spawn positions for spawn groups) */
     public static boolean experimental = false;
     /** Name of current Steam player. */
     public static String steamPlayerName = "";
     /** Default accessible content types used for player-selectable icons. */
-    public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block};
+    public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit};
     /** Wall darkness radius. */
     public static final int darkRadius = 4;
     /** Maximum extra padding around deployment schematics. */
@@ -87,7 +88,7 @@ public class Vars implements Loadable{
     public static final int maxNameLength = 40;
     /** displayed item size when ingame. */
     public static final float itemSize = 5f;
-    /** units outside of this bound will die instantly */
+    /** units outside this bound will die instantly */
     public static final float finalWorldBounds = 250;
     /** range for building */
     public static final float buildingRange = 220f;
@@ -132,6 +133,8 @@ public class Vars implements Loadable{
         Color.valueOf("4b5ef1"),
         Color.valueOf("2cabfe"),
     };
+    /** maximum TCP packet size */
+    public static final int maxTcpSize = 900;
     /** default server port */
     public static final int port = 6567;
     /** multicast discovery port.*/
@@ -193,12 +196,16 @@ public class Vars implements Loadable{
     public static Fi launchIDFile;
     /** empty map, indicates no current map */
     public static Map emptyMap;
+    /** empty tile for payloads */
+    public static Tile emptyTile;
     /** map file extension */
     public static final String mapExtension = "msav";
     /** save file extension */
     public static final String saveExtension = "msav";
     /** schematic file extension */
     public static final String schematicExtension = "msch";
+    /** path to the java executable */
+    public static String javaPath;
 
     /** list of all locales that can be switched to */
     public static Locale[] locales;
@@ -293,6 +300,10 @@ public class Vars implements Loadable{
         pathfinder = new Pathfinder();
         bases = new BaseRegistry();
         constants = new GlobalConstants();
+        javaPath =
+            new Fi(OS.prop("java.home")).child("bin/java").exists() ? new Fi(OS.prop("java.home")).child("bin/java").absolutePath() :
+            Core.files.local("jre/bin/java").exists() ? Core.files.local("jre/bin/java").absolutePath() :
+            "java";
 
         state = new GameState();
 
@@ -301,6 +312,10 @@ public class Vars implements Loadable{
         android = Core.app.isAndroid();
 
         modDirectory.mkdirs();
+
+        Events.on(ContentInitEvent.class, e -> {
+            emptyTile = new Tile(Short.MAX_VALUE - 20, Short.MAX_VALUE - 20);
+        });
 
         mods.load();
         maps.load();
@@ -372,7 +387,7 @@ public class Vars implements Loadable{
                 log.log(level, text);
 
                 try{
-                    writer.write("[" + Character.toUpperCase(level.name().charAt(0)) +"] " + Log.removeColors(text) + "\n");
+                    writer.write("[" + Character.toUpperCase(level.name().charAt(0)) + "] " + Log.removeColors(text) + "\n");
                     writer.flush();
                 }catch(IOException e){
                     e.printStackTrace();

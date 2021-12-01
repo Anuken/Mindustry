@@ -3,6 +3,7 @@ package mindustry.type;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.g3d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -17,12 +18,12 @@ import mindustry.maps.generators.*;
 import static mindustry.Vars.*;
 
 public class Planet extends UnlockableContent{
-    /** Default spacing between planet orbits in world units. */
-    private static final float orbitSpacing = 11f;
     /** intersect() temp var. */
     private static final Vec3 intersectResult = new Vec3();
     /** Mesh used for rendering. Created on load() - will be null on the server! */
-    public @Nullable PlanetMesh mesh;
+    public @Nullable GenericMesh mesh;
+    /** Mesh used for rendering planet clouds. Null if no clouds are present. */
+    public @Nullable GenericMesh cloudMesh;
     /** Position in global coordinates. Will be 0,0,0 until the Universe updates it. */
     public Vec3 position = new Vec3();
     /** Grid used for the sectors on the planet. Null if this planet can't be landed on. */
@@ -30,11 +31,21 @@ public class Planet extends UnlockableContent{
     /** Generator that will make the planet. Can be null for planets that don't need to be landed on. */
     public @Nullable PlanetGenerator generator;
     /** Array of sectors; directly maps to tiles in the grid. */
-    public Seq<Sector> sectors;
+    public Seq<Sector> sectors = new Seq<>();
+    /** Default spacing between planet orbits in world units. This is defined per-parent! */
+    public float orbitSpacing = 12f;
     /** Radius of this planet's sphere. Does not take into account satellites. */
     public float radius;
+    /** Camera radius offset. */
+    public float camRadius;
+    /** Minimum camera zoom value. */
+    public float minZoom = 0.5f;
+    /** Whether to draw the orbital circle. */
+    public boolean drawOrbit = true;
     /** Atmosphere radius adjustment parameters. */
     public float atmosphereRadIn = 0, atmosphereRadOut = 0.3f;
+    /** Frustrum sphere clip radius. */
+    public float clipRadius = -1f;
     /** Orbital radius around the sun. Do not change unless you know exactly what you are doing.*/
     public float orbitRadius;
     /** Total radius of this planet and all its children. */
@@ -43,12 +54,18 @@ public class Planet extends UnlockableContent{
     public float orbitTime;
     /** Time for the planet to perform a full revolution, in seconds. One day. */
     public float rotateTime = 24f * 60f;
+    /** Random orbit angle offset to prevent planets from starting out in a line. */
+    public float orbitOffset;
     /** Approx. radius of one sector. */
     public float sectorApproxRadius;
     /** Whether this planet is tidally locked relative to its parent - see https://en.wikipedia.org/wiki/Tidal_locking */
     public boolean tidalLock = false;
-    /** Whether or not this planet is listed in the planet access UI. **/
+    /** Whether this planet is listed in the planet access UI. **/
     public boolean accessible = true;
+    /** If true, a day/night cycle is simulated. */
+    public boolean updateLighting = true;
+    /** Day/night cycle parameters. */
+    public float lightSrcFrom = 0f, lightSrcTo = 0.8f, lightDstFrom = 0.2f, lightDstTo = 1f;
     /** The default starting sector displayed to the map dialog. */
     public int startSector = 0;
     /** Whether the bloom render effect is enabled. */
@@ -72,32 +89,20 @@ public class Planet extends UnlockableContent{
     /** Satellites orbiting this planet. */
     public Seq<Satellite> satellites = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
-    protected Prov<PlanetMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2);
+    protected Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2), cloudMeshLoader = () -> null;
 
-    public Planet(String name, Planet parent, int sectorSize, float radius){
+    public Planet(String name, Planet parent, float radius){
         super(name);
 
         this.radius = radius;
         this.parent = parent;
-
-        if(sectorSize > 0){
-            grid = PlanetGrid.create(sectorSize);
-
-            sectors = new Seq<>(grid.tiles.length);
-            for(int i = 0; i < grid.tiles.length; i++){
-                sectors.add(new Sector(this, grid.tiles[i]));
-            }
-
-            sectorApproxRadius = sectors.first().tile.v.dst(sectors.first().tile.corners[0].v);
-        }else{
-            sectors = new Seq<>();
-        }
+        this.orbitOffset = Mathf.randomSeed(id, 360);
 
         //total radius is initially just the radius
-        totalRadius += radius;
+        totalRadius = radius;
 
         //get orbit radius by extending past the parent's total radius
-        orbitRadius = parent == null ? 0f : (parent.totalRadius + orbitSpacing + totalRadius);
+        orbitRadius = parent == null ? 0f : (parent.totalRadius + parent.orbitSpacing + totalRadius);
 
         //orbit time is based on radius [kepler's third law]
         orbitTime = Mathf.pow(orbitRadius, 1.5f) * 1000;
@@ -110,6 +115,27 @@ public class Planet extends UnlockableContent{
 
         //calculate solar system
         for(solarSystem = this; solarSystem.parent != null; solarSystem = solarSystem.parent);
+    }
+
+    public Planet(String name, Planet parent, float radius, int sectorSize){
+        this(name, parent, radius);
+
+        if(sectorSize > 0){
+            grid = PlanetGrid.create(sectorSize);
+
+            sectors.ensureCapacity(grid.tiles.length);
+            for(int i = 0; i < grid.tiles.length; i++){
+                sectors.add(new Sector(this, grid.tiles[i]));
+            }
+
+            sectorApproxRadius = sectors.first().tile.v.dst(sectors.first().tile.corners[0].v);
+        }
+    }
+
+    /** @deprecated confusing parameter orer, use the other constructor instead */
+    @Deprecated
+    public Planet(String name, Planet parent, int sectorSize, float radius){
+        this(name, parent, radius, sectorSize);
     }
 
     public @Nullable Sector getLastSector(){
@@ -132,6 +158,11 @@ public class Planet extends UnlockableContent{
         return grid != null && generator != null && sectors.size > 0;
     }
 
+    /** @return whether this planet has any sectors to land on. */
+    public boolean isLandable(){
+        return sectors.size > 0;
+    }
+
     public void updateTotalRadius(){
         totalRadius = radius;
         for(Planet planet : children){
@@ -146,9 +177,7 @@ public class Planet extends UnlockableContent{
 
     /** Calculates orbital rotation based on universe time.*/
     public float getOrbitAngle(){
-        //applies random offset to prevent planets from starting out in a line
-        float offset = Mathf.randomSeed(id, 360);
-        return (offset + universe.secondsf() / (orbitTime / 360f)) % 360f;
+        return (orbitOffset + universe.secondsf() / (orbitTime / 360f)) % 360f;
     }
 
     /** Calulates rotation on own axis based on universe time.*/
@@ -207,9 +236,6 @@ public class Planet extends UnlockableContent{
 
     /** Regenerates the planet mesh. For debugging only. */
     public void reloadMesh(){
-        if(mesh != null){
-            mesh.dispose();
-        }
         mesh = meshLoader.get();
     }
 
@@ -218,6 +244,7 @@ public class Planet extends UnlockableContent{
         super.load();
 
         mesh = meshLoader.get();
+        cloudMesh = cloudMeshLoader.get();
     }
 
     @Override
@@ -237,14 +264,7 @@ public class Planet extends UnlockableContent{
             updateBaseCoverage();
         }
 
-    }
-
-    @Override
-    public void dispose(){
-        if(mesh != null){
-            mesh.dispose();
-            mesh = null;
-        }
+        clipRadius = Math.max(clipRadius, radius + atmosphereRadOut + 0.5f);
     }
 
     /** Gets a sector a tile position. */
@@ -287,7 +307,31 @@ public class Planet extends UnlockableContent{
         return visible;
     }
 
-    public void draw(Mat3D projection, Mat3D transform){
-        mesh.render(projection, transform);
+    public void draw(PlanetParams params, Mat3D projection, Mat3D transform){
+        mesh.render(params, projection, transform);
+    }
+
+    public void drawAtmosphere(Mesh atmosphere, Camera3D cam){
+        //atmosphere does not contribute to depth buffer
+        Gl.depthMask(false);
+
+        Blending.additive.apply();
+
+        Shaders.atmosphere.camera = cam;
+        Shaders.atmosphere.planet = this;
+        Shaders.atmosphere.bind();
+        Shaders.atmosphere.apply();
+
+        atmosphere.render(Shaders.atmosphere, Gl.triangles);
+
+        Blending.normal.apply();
+
+        Gl.depthMask(true);
+    }
+
+    public void drawClouds(PlanetParams params, Mat3D projection, Mat3D transform){
+        if(cloudMesh != null){
+            cloudMesh.render(params, projection, transform);
+        }
     }
 }

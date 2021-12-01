@@ -9,12 +9,12 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class MinerAI extends AIController{
-    boolean mining = true;
-    Item targetItem;
-    Tile ore;
+    public boolean mining = true;
+    public Item targetItem;
+    public Tile ore;
 
     @Override
-    protected void updateMovement(){
+    public void updateMovement(){
         Building core = unit.closestCore();
 
         if(!(unit.canMine()) || core == null) return;
@@ -25,7 +25,7 @@ public class MinerAI extends AIController{
 
         if(mining){
             if(timer.get(timerTarget2, 60 * 4) || targetItem == null){
-                targetItem = unit.team.data().mineItems.min(i -> indexer.hasOre(i) && unit.canMine(i), i -> core.items.get(i));
+                targetItem = unit.type.mineItems.min(i -> indexer.hasOre(i) && unit.canMine(i), i -> core.items.get(i));
             }
 
             //core full of the target item, do nothing

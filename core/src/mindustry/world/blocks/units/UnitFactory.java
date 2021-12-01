@@ -39,12 +39,15 @@ public class UnitFactory extends UnitBlock{
         rotate = true;
 
         config(Integer.class, (UnitFactoryBuild tile, Integer i) -> {
+            if(tile.currentPlan == i) return;
             tile.currentPlan = i < 0 || i >= plans.size ? -1 : i;
             tile.progress = 0;
         });
 
         config(UnitType.class, (UnitFactoryBuild tile, UnitType val) -> {
-            tile.currentPlan = plans.indexOf(p -> p.unit == val);
+            int next = plans.indexOf(p -> p.unit == val);
+            if(tile.currentPlan == next) return;
+            tile.currentPlan = next;
             tile.progress = 0;
         });
 
@@ -75,7 +78,7 @@ public class UnitFactory extends UnitBlock{
                 Core.bundle.format("bar.unitcap",
                     Fonts.getUnicodeStr(e.unit().name),
                     e.team.data().countType(e.unit()),
-                    Units.getCap(e.team)
+                    Units.getStringCap(e.team)
                 ),
             () -> Pal.power,
             () -> e.unit() == null ? 0f : (float)e.team.data().countType(e.unit()) / Units.getCap(e.team)
@@ -143,8 +146,13 @@ public class UnitFactory extends UnitBlock{
         @Override
         public Object senseObject(LAccess sensor){
             if(sensor == LAccess.config) return currentPlan == -1 ? null : plans.get(currentPlan).unit;
-            if(sensor == LAccess.progress) return Mathf.clamp(fraction());
             return super.senseObject(sensor);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return Mathf.clamp(fraction());
+            return super.sense(sensor);
         }
 
         @Override
@@ -152,10 +160,21 @@ public class UnitFactory extends UnitBlock{
             Seq<UnitType> units = Seq.with(plans).map(u -> u.unit).filter(u -> u.unlockedNow() && !u.isBanned());
 
             if(units.any()){
-                ItemSelection.buildTable(table, units, () -> currentPlan == -1 ? null : plans.get(currentPlan).unit, unit -> configure(plans.indexOf(u -> u.unit == unit)));
+                ItemSelection.buildTable(UnitFactory.this, table, units, () -> currentPlan == -1 ? null : plans.get(currentPlan).unit, unit -> configure(plans.indexOf(u -> u.unit == unit)));
             }else{
                 table.table(Styles.black3, t -> t.add("@none").color(Color.lightGray));
             }
+        }
+
+        @Override
+        public boolean onConfigureTileTapped(Building other){
+            if(this == other){
+                deselect();
+                configure(null);
+                return false;
+            }
+
+            return true;
         }
 
         @Override

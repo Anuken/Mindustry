@@ -47,10 +47,10 @@ public class HugAI extends AIController{
             })){
                 if(unit.within(target, (unit.hitSize + (target instanceof Sized s ? s.hitSize() : 1f)) * 0.6f)){
                     //circle target
-                    unit.moveAt(vec.set(target).sub(unit).rotate(90f).setLength(unit.speed()));
+                    unit.movePref(vec.set(target).sub(unit).rotate(90f).setLength(unit.speed()));
                 }else{
                     //move toward target in a straight line
-                    unit.moveAt(vec.set(target).sub(unit).limit(unit.speed()));
+                    unit.movePref(vec.set(target).sub(unit).limit(unit.speed()));
                 }
             }else if(move){
                 pathfind(Pathfinder.fieldCore);
@@ -69,13 +69,6 @@ public class HugAI extends AIController{
             unit.elevation = Mathf.approachDelta(unit.elevation, 0f, unit.type.riseSpeed);
         }
 
-        if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type.rotateShooting){
-            if(unit.type.hasWeapons()){
-                unit.lookAt(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
-            }
-        }else if(unit.moving()){
-            unit.lookAt(unit.vel().angle());
-        }
-
+        faceTarget();
     }
 }

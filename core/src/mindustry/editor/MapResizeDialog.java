@@ -15,6 +15,8 @@ public class MapResizeDialog extends BaseDialog{
 
     public MapResizeDialog(Intc2 cons){
         super("@editor.resizemap");
+
+        closeOnBack();
         shown(() -> {
             cont.clear();
             width = editor.width();
@@ -29,7 +31,7 @@ public class MapResizeDialog extends BaseDialog{
                 table.field((w ? width : height) + "", TextFieldFilter.digitsOnly, value -> {
                     int val = Integer.parseInt(value);
                     if(w) width = val; else height = val;
-                }).valid(value -> Strings.canParsePositiveInt(value) && Integer.parseInt(value) <= maxSize && Integer.parseInt(value) >= minSize).addInputDialog(3);
+                }).valid(value -> Strings.canParsePositiveInt(value) && Integer.parseInt(value) <= maxSize && Integer.parseInt(value) >= minSize).maxTextLength(3);
 
                 table.row();
             }

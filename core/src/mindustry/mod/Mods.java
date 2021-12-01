@@ -21,6 +21,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.mod.ContentParser.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
@@ -177,7 +178,7 @@ public class Mods implements Loadable{
     }
 
     private void packSprites(Seq<Fi> sprites, LoadedMod mod, boolean prefix, Seq<AsyncResult<Runnable>> tasks){
-        boolean linear = Core.settings.getBool("linear");
+        boolean linear = Core.settings.getBool("linear", true);
 
         for(Fi file : sprites){
             //read and bleed pixmaps in parallel
@@ -186,7 +187,7 @@ public class Mods implements Loadable{
                     Pixmap pix = new Pixmap(file.readBytes());
                     //only bleeds when linear filtering is on at startup
                     if(linear){
-                        Pixmaps.bleed(pix);
+                        Pixmaps.bleed(pix, 2);
                     }
                     //this returns a *runnable* which actually packs the resulting pixmap; this has to be done synchronously outside the method
                     return () -> {
@@ -225,6 +226,10 @@ public class Mods implements Loadable{
             var shadow = Core.atlas;
             //dummy texture atlas that returns the 'shadow' regions; used for mod loading
             Core.atlas = new TextureAtlas(){
+                {
+                    //needed for the correct operation of the found() method in the TextureRegion
+                    error = shadow.find("error");
+                }
 
                 @Override
                 public AtlasRegion find(String name){
@@ -265,8 +270,9 @@ public class Mods implements Loadable{
                 }
             };
 
-            TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.linear : TextureFilter.nearest;
+            TextureFilter filter = Core.settings.getBool("linear", true) ? TextureFilter.linear : TextureFilter.nearest;
 
+            Time.mark();
             //generate new icons
             for(Seq<Content> arr : content.getContentMap()){
                 arr.each(c -> {
@@ -277,6 +283,7 @@ public class Mods implements Loadable{
                     }
                 });
             }
+            Log.debug("Time to generate icons: @", Time.elapsed());
 
             //dispose old atlas data
             Core.atlas = packer.flush(filter, new TextureAtlas());
@@ -287,7 +294,7 @@ public class Mods implements Loadable{
 
         packer.dispose();
         packer = null;
-        Log.debug("Time to update textures: @", Time.elapsed());
+        Log.debug("Total time to generate & flush textures synchronously: @", Time.elapsed());
     }
 
     private PageType getPage(AtlasRegion region){
@@ -643,6 +650,11 @@ public class Mods implements Loadable{
 
     public void handleContentError(Content content, Throwable error){
         parser.markError(content, error);
+    }
+
+    /** Adds a listener for parsed JSON objects. */
+    public void addParseListener(ParseListener hook){
+        parser.listeners.add(hook);
     }
 
     /** @return a list of mods and versions, in the format name:version. */

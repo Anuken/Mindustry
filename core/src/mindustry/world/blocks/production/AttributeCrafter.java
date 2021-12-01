@@ -37,7 +37,7 @@ public class AttributeCrafter extends GenericCrafter{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.affinities, attribute, boostScale);
+        stats.add(Stat.affinities, attribute, boostScale * size * size);
     }
 
     public class AttributeCrafterBuild extends GenericCrafterBuild{
@@ -50,6 +50,11 @@ public class AttributeCrafter extends GenericCrafter{
 
         public float efficiencyScale(){
             return baseEfficiency + Math.min(maxBoost, boostScale * attrsum) + attribute.env();
+        }
+
+        @Override
+        public void pickedUp(){
+            attrsum = 0f;
         }
 
         @Override

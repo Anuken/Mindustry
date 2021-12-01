@@ -23,11 +23,9 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class PowerNode extends PowerBlock{
-    protected static boolean returnValue = false;
     protected static BuildPlan otherReq;
-
-    protected final static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     protected static int returnInt = 0;
+    protected final static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
 
     public @Load("laser") TextureRegion laser;
     public @Load("laser-end") TextureRegion laserEnd;
@@ -45,6 +43,7 @@ public class PowerNode extends PowerBlock{
         swapDiagonalPlacement = true;
         schematicPriority = -10;
         drawDisabled = false;
+        envEnabled |= Env.space;
 
         config(Integer.class, (entity, value) -> {
             PowerModule power = entity.power;
@@ -110,13 +109,15 @@ public class PowerNode extends PowerBlock{
         Core.bundle.format("bar.powerbalance",
             ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + UI.formatAmount((long)(entity.power.graph.getPowerBalance() * 60)))),
             () -> Pal.powerBar,
-            () -> Mathf.clamp(entity.power.graph.getLastPowerProduced() / entity.power.graph.getLastPowerNeeded())));
+            () -> Mathf.clamp(entity.power.graph.getLastPowerProduced() / entity.power.graph.getLastPowerNeeded())
+        ));
 
         bars.add("batteries", entity -> new Bar(() ->
         Core.bundle.format("bar.powerstored",
             (UI.formatAmount((long)entity.power.graph.getLastPowerStored())), UI.formatAmount((long)entity.power.graph.getLastCapacity())),
             () -> Pal.powerBar,
-            () -> Mathf.clamp(entity.power.graph.getLastPowerStored() / entity.power.graph.getLastCapacity())));
+            () -> Mathf.clamp(entity.power.graph.getLastPowerStored() / entity.power.graph.getLastCapacity())
+        ));
 
         bars.add("connections", entity -> new Bar(() ->
         Core.bundle.format("bar.powerlines", entity.power.links.size, maxNodes),
@@ -131,6 +132,13 @@ public class PowerNode extends PowerBlock{
 
         stats.add(Stat.powerRange, laserRange, StatUnit.blocks);
         stats.add(Stat.powerConnections, maxNodes, StatUnit.none);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        clipSize = Math.max(clipSize, laserRange * tilesize);
     }
 
     @Override
@@ -341,7 +349,7 @@ public class PowerNode extends PowerBlock{
     public static boolean insulated(int x, int y, int x2, int y2){
         return world.raycast(x, y, x2, y2, (wx, wy) -> {
             Building tile = world.build(wx, wy);
-            return tile != null && tile.block.insulated;
+            return tile != null && tile.isInsulated();
         });
     }
 
@@ -436,7 +444,7 @@ public class PowerNode extends PowerBlock{
         public void draw(){
             super.draw();
 
-            if(Mathf.zero(Renderer.laserOpacity)) return;
+            if(Mathf.zero(Renderer.laserOpacity) || isPayload()) return;
 
             Draw.z(Layer.power);
             setupColor(power.graph.getSatisfaction());

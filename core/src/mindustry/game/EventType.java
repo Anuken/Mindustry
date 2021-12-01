@@ -33,6 +33,7 @@ public class EventType{
         socketConfigChanged,
         update,
         draw,
+        drawOver,
         preDraw,
         postDraw,
         uiDrawBegin,
@@ -50,6 +51,7 @@ public class EventType{
     public static class ResizeEvent{}
     public static class MapMakeEvent{}
     public static class MapPublishEvent{}
+    public static class SaveWriteEvent{}
     public static class SaveLoadEvent{}
     public static class ClientCreateEvent{}
     public static class ServerLoadEvent{}
@@ -70,6 +72,8 @@ public class EventType{
     public static class ContentInitEvent{}
     /** Called when the client game is first loaded. */
     public static class ClientLoadEvent{}
+    /** Called after SoundControl registers its music. */
+    public static class MusicRegisterEvent{}
     /** Called *after* all the modded files have been added into Vars.tree */
     public static class FileTreeInitEvent{}
     /** Called when a game begins and the world is loaded. */
@@ -411,14 +415,29 @@ public class EventType{
         }
     }
 
-    /** Called when a unit is created in a reconstructor or factory. */
+    /** Called when a unit is created in a reconstructor, factory or other unit. */
     public static class UnitCreateEvent{
         public final Unit unit;
-        public final Building spawner;
+        public final @Nullable Building spawner;
+        public final @Nullable Unit spawnerUnit;
 
-        public UnitCreateEvent(Unit unit, Building spawner){
+        public UnitCreateEvent(Unit unit, Building spawner, Unit spawnerUnit){
             this.unit = unit;
             this.spawner = spawner;
+            this.spawnerUnit = spawnerUnit;
+        }
+
+        public UnitCreateEvent(Unit unit, Building spawner){
+            this(unit, spawner, null);
+        }
+    }
+
+    /** Called when a unit is spawned by wave. */
+    public static class UnitSpawnEvent{
+        public final Unit unit;
+
+        public UnitSpawnEvent(Unit unit) {
+            this.unit = unit;
         }
     }
 
@@ -461,7 +480,19 @@ public class EventType{
         }
     }
 
-    /** Called after connecting; when a player receives world data and is ready to play.*/
+    /**
+     * Called after player confirmed it has received world data and is ready to play.
+     * Note that if this is the first world receival, then player.con.hasConnected is false.
+     */
+    public static class PlayerConnectionConfirmed{
+        public final Player player;
+
+        public PlayerConnectionConfirmed(Player player){
+            this.player = player;
+        }
+    }
+
+    /** Called after connecting; when a player receives world data and is ready to play. Fired only once, after initial connection. */
     public static class PlayerJoin{
         public final Player player;
 
@@ -486,7 +517,7 @@ public class EventType{
             this.player = player;
         }
     }
-    
+
     public static class PlayerBanEvent{
         @Nullable
         public final Player player;
@@ -497,7 +528,7 @@ public class EventType{
             this.uuid = uuid;
         }
     }
-    
+
     public static class PlayerUnbanEvent{
         @Nullable
         public final Player player;
@@ -508,7 +539,7 @@ public class EventType{
             this.uuid = uuid;
         }
     }
-    
+
     public static class PlayerIpBanEvent{
         public final String ip;
 
@@ -516,7 +547,7 @@ public class EventType{
             this.ip = ip;
         }
     }
-    
+
     public static class PlayerIpUnbanEvent{
         public final String ip;
 
@@ -524,6 +555,16 @@ public class EventType{
             this.ip = ip;
         }
     }
-    
-}
 
+    public static class AdminRequestEvent{
+        public final Player player;
+        public final @Nullable Player other;
+        public final AdminAction action;
+
+        public AdminRequestEvent(Player player, Player other, AdminAction action){
+            this.player = player;
+            this.other = other;
+            this.action = action;
+        }
+    }
+}

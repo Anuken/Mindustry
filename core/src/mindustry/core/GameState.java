@@ -16,6 +16,8 @@ public class GameState{
     public int wave = 1;
     /** Wave countdown in ticks. */
     public float wavetime;
+    /** Logic tick. */
+    public double tick;
     /** Whether the game is in game over state. */
     public boolean gameOver = false, serverPaused = false;
     /** Server ticks/second. Only valid in multiplayer. */

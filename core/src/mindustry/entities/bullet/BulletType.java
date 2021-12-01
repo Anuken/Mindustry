@@ -49,6 +49,8 @@ public class BulletType extends Content implements Cloneable{
     public Effect despawnEffect = Fx.hitBulletSmall;
     /** Effect created when shooting. */
     public Effect shootEffect = Fx.shootSmall;
+    /** Effect created when charging completes; only usable in single-shot weapons with a firstShotDelay / shotDelay. */
+    public Effect chargeShootEffect = Fx.none;
     /** Extra smoke effect created when shooting. */
     public Effect smokeEffect = Fx.shootSmallSmoke;
     /** Sound made when hitting something or getting removed.*/
@@ -91,6 +93,10 @@ public class BulletType extends Content implements Cloneable{
     public boolean collidesAir = true, collidesGround = true;
     /** Whether this bullet types collides with anything at all. */
     public boolean collides = true;
+    /** If true, this projectile collides with non-surface floors. */
+    public boolean collideFloor = false;
+    /** If true, this projectile collides with static walls */
+    public boolean collideTerrain = false;
     /** Whether velocity is inherited from the shooter. */
     public boolean keepVelocity = true;
     /** Whether to scale lifetime (not actually velocity!) to disappear at the target position. Used for artillery. */
@@ -199,7 +205,7 @@ public class BulletType extends Content implements Cloneable{
 
     /** Returns maximum distance the bullet this bullet type has can travel. */
     public float range(){
-        return Math.max(speed * lifetime * (1f - drag), maxRange);
+        return Mathf.zero(drag) ? speed * lifetime : Math.max(speed * (1f - Mathf.pow(1f - drag, lifetime)) / drag, maxRange);
     }
 
     /** @return continuous damage in damage/sec, or -1 if not continuous. */
@@ -346,21 +352,16 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void update(Bullet b){
-        if(!headless && trailLength > 0){
-            if(b.trail == null){
-                b.trail = new Trail(trailLength);
-            }
-            b.trail.length = trailLength;
-            b.trail.update(b.x, b.y, trailInterp.apply(b.fin()));
-        }
+        updateTrail(b);
 
         if(homingPower > 0.0001f && b.time >= homingDelay){
             Teamc target;
             //home in on allies if possible
             if(healPercent > 0){
                 target = Units.closestTarget(null, b.x, b.y, homingRange,
-                    e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team,
-                    t -> collidesGround && (t.team != b.team || t.damaged()));
+                    e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team && !b.hasCollided(e.id),
+                    t -> collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id)
+                );
             }else{
                 target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id), t -> collidesGround && !b.hasCollided(t.id));
             }
@@ -384,6 +385,16 @@ public class BulletType extends Content implements Cloneable{
             if(b.timer(0, trailInterval)){
                 trailEffect.at(b.x, b.y, trailRotation ? b.rotation() : trailParam, trailColor);
             }
+        }
+    }
+    
+    public void updateTrail(Bullet b){
+        if(!headless && trailLength > 0){
+            if(b.trail == null){
+                b.trail = new Trail(trailLength);
+            }
+            b.trail.length = trailLength;
+            b.trail.update(b.x, b.y, trailInterp.apply(b.fin()));
         }
     }
 

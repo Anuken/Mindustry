@@ -7,4 +7,7 @@ import arc.math.geom.*;
 public interface HexMesher{
     float getHeight(Vec3 position);
     Color getColor(Vec3 position);
+    default boolean skip(Vec3 position){
+        return false;
+    }
 }

@@ -36,7 +36,7 @@ public class DatabaseDialog extends BaseDialog{
         cont.table(s -> {
             s.image(Icon.zoom).padRight(8);
             search = s.field(null, text -> rebuild()).growX().get();
-            search.setMessageText(Core.bundle.get("players.search"));
+            search.setMessageText("@players.search");
         }).fillX().padBottom(4).row();
 
         cont.pane(all);
@@ -98,7 +98,7 @@ public class DatabaseDialog extends BaseDialog{
                                 ui.content.show(unlock);
                             }
                         });
-                        image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName)));
+                        image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName + (enableConsole ? "\n[gray]" + unlock.name : ""))));
                     }
 
                     if((++count) % cols == 0){

@@ -10,6 +10,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -62,6 +63,21 @@ abstract class MechComp implements Posc, Flyingc, Hitboxc, Unitc, Mechc, Elevati
         walkExtension = extendScl;
     }
 
+    @Replace
+    @Override
+    public @Nullable Floor drownFloor(){
+        //large mechs can only drown when all the nearby floors are deep
+        if(hitSize >= 12 && canDrown()){
+            for(Point2 p : Geometry.d8){
+                Floor f = world.floorWorld(x + p.x * tilesize, y + p.y * tilesize);
+                if(!f.isDeep()){
+                    return null;
+                }
+            }
+        }
+        return canDrown() ? floorOn() : null;
+    }
+
     public float walkExtend(boolean scaled){
 
         //now ranges from -maxExtension to maxExtension*3
@@ -74,6 +90,17 @@ abstract class MechComp implements Posc, Flyingc, Hitboxc, Unitc, Mechc, Elevati
         else if(raw > type.mechStride) raw = type.mechStride * 2 - raw;
 
         return raw;
+    }
+
+    @Override
+    @Replace
+    public void rotateMove(Vec2 vec){
+        //mechs use baseRotation to rotate, not rotation.
+        moveAt(Tmp.v2.trns(baseRotation, vec.len()));
+
+        if(!vec.isZero()){
+            baseRotation = Angles.moveToward(baseRotation, vec.angle(), type.rotateSpeed * Math.max(Time.delta, 1));
+        }
     }
 
     @Override

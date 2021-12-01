@@ -12,6 +12,7 @@ import mindustry.game.*;
 import mindustry.game.Schematic.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
+import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
@@ -25,7 +26,6 @@ import static mindustry.Vars.*;
 
 public class BaseAI{
     private static final Vec2 axis = new Vec2(), rotator = new Vec2();
-    private static final float correctPercent = 0.5f;
     private static final int attempts = 4;
     private static final float emptyChance = 0.01f;
     private static final int timerStep = 0, timerSpawn = 1, timerRefreshPath = 2;
@@ -46,12 +46,18 @@ public class BaseAI{
     boolean calculating, startedCalculating;
     int calcCount = 0;
     int totalCalcs = 0;
+    Block wallType;
 
     public BaseAI(TeamData data){
         this.data = data;
     }
 
     public void update(){
+
+        if(wallType == null){
+            wallType = BaseGenerator.getDifficultyWall(1, data.team.rules().aiTier / 0.8f);
+        }
+
         if(data.team.rules().aiCoreSpawn && timer.get(timerSpawn, 60 * 2.5f) && data.hasCore()){
             CoreBlock block = (CoreBlock)data.core().block;
             int coreUnits = Groups.unit.count(u -> u.team == data.team && u.type == block.unitType);
@@ -88,51 +94,53 @@ public class BaseAI{
                     calculating = false;
                 }
             }else{
-                var field = pathfinder.getField(state.rules.waveTeam, Pathfinder.costGround, Pathfinder.fieldCore);
+                var field = pathfinder.getField(data.team, Pathfinder.costGround, Pathfinder.fieldCore);
 
-                int[][] weights = field.weights;
-                for(int i = 0; i < pathStep; i++){
-                    int minCost = Integer.MAX_VALUE;
-                    int cx = calcTile.x, cy = calcTile.y;
-                    boolean foundAny = false;
-                    for(Point2 p : Geometry.d4){
-                        int nx = cx + p.x, ny = cy + p.y;
+                if(field.weights != null){
+                    int[][] weights = field.weights;
+                    for(int i = 0; i < pathStep; i++){
+                        int minCost = Integer.MAX_VALUE;
+                        int cx = calcTile.x, cy = calcTile.y;
+                        boolean foundAny = false;
+                        for(Point2 p : Geometry.d4){
+                            int nx = cx + p.x, ny = cy + p.y;
 
-                        Tile other = world.tile(nx, ny);
-                        if(other != null && weights[nx][ny] < minCost && weights[nx][ny] != -1){
-                            minCost = weights[nx][ny];
-                            calcTile = other;
-                            foundAny = true;
+                            Tile other = world.tile(nx, ny);
+                            if(other != null && weights[nx][ny] < minCost && weights[nx][ny] != -1){
+                                minCost = weights[nx][ny];
+                                calcTile = other;
+                                foundAny = true;
+                            }
                         }
+
+                        //didn't find anything, break out of loop, this will trigger a clear later
+                        if(!foundAny){
+                            calcCount = Integer.MAX_VALUE;
+                            break;
+                        }
+
+                        calcPath.add(calcTile.pos());
+                        for(Point2 p : Geometry.d8){
+                            calcPath.add(Point2.pack(p.x + calcTile.x, p.y + calcTile.y));
+                        }
+
+                        //found the end.
+                        if(calcTile.build instanceof CoreBuild b && b.team != data.team){
+                            //clean up calculations and flush results
+                            calculating = false;
+                            calcCount = 0;
+                            path.clear();
+                            path.addAll(calcPath);
+                            calcPath.clear();
+                            calcTile = null;
+                            totalCalcs ++;
+                            foundPath = true;
+
+                            break;
+                        }
+
+                        calcCount ++;
                     }
-
-                    //didn't find anything, break out of loop, this will trigger a clear later
-                    if(!foundAny){
-                        calcCount = Integer.MAX_VALUE;
-                        break;
-                    }
-
-                    calcPath.add(calcTile.pos());
-                    for(Point2 p : Geometry.d8){
-                        calcPath.add(Point2.pack(p.x + calcTile.x, p.y + calcTile.y));
-                    }
-
-                    //found the end.
-                    if(calcTile.build instanceof CoreBuild b && b.team == state.rules.defaultTeam){
-                        //clean up calculations and flush results
-                        calculating = false;
-                        calcCount = 0;
-                        path.clear();
-                        path.addAll(calcPath);
-                        calcPath.clear();
-                        calcTile = null;
-                        totalCalcs ++;
-                        foundPath = true;
-
-                        break;
-                    }
-
-                    calcCount ++;
                 }
             }
         }
@@ -268,7 +276,7 @@ public class BaseAI{
     }
 
     private void tryWalls(){
-        Block wall = Blocks.copperWall;
+        Block wall = wallType;
         Building spawnt = state.rules.defaultTeam.core() != null ? state.rules.defaultTeam.core() : data.team.core();
         Tile spawn = spawnt == null ? null : spawnt.tile;
 

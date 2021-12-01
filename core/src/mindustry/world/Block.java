@@ -25,9 +25,11 @@ import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
+import mindustry.entities.bullet.*;
 import mindustry.world.meta.*;
 
 import java.lang.reflect.*;
@@ -36,8 +38,11 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Block extends UnlockableContent{
+    /** If true, buildings have an ItemModule. */
     public boolean hasItems;
+    /** If true, buildings have a LiquidModule. */
     public boolean hasLiquids;
+    /** If true, buildings have a PowerModule. */
     public boolean hasPower;
 
     public boolean outputsLiquid = false;
@@ -45,9 +50,8 @@ public class Block extends UnlockableContent{
     public boolean outputsPower = false;
     public boolean outputsPayload = false;
     public boolean acceptsPayload = false;
-    public boolean outputFacing = true;
-    public boolean noSideBlend = false;
     public boolean acceptsItems = false;
+    public boolean separateItemCapacity = false;
 
     public int itemCapacity = 10;
     public float liquidCapacity = 10f;
@@ -56,6 +60,11 @@ public class Block extends UnlockableContent{
     public final BlockBars bars = new BlockBars();
     public final Consumers consumes = new Consumers();
 
+    /** If true, this block outputs to its facing direction, when applicable.
+     * Used for blending calculations. */
+    public boolean outputFacing = true;
+    /** if true, this block does not accept input from the sides (used for armored conveyors) */
+    public boolean noSideBlend = false;
     /** whether to display flow rate */
     public boolean displayFlow = true;
     /** whether this block is visible in the editor */
@@ -78,7 +87,7 @@ public class Block extends UnlockableContent{
     public boolean solid;
     /** whether this block CAN be solid. */
     public boolean solidifes;
-    /** whether this is rotateable */
+    /** whether this is rotatable */
     public boolean rotate;
     /** number of different variant regions to use */
     public int variants = 0;
@@ -94,6 +103,8 @@ public class Block extends UnlockableContent{
     public boolean requiresWater = false;
     /** whether this block can be placed on any liquids, anywhere */
     public boolean placeableLiquid = false;
+    /** whether this block can be placed directly by the player via PlacementFragment */
+    public boolean placeablePlayer = true;
     /** whether this floor can be placed on. */
     public boolean placeableOn = true;
     /** whether this block has insulating properties. */
@@ -110,14 +121,20 @@ public class Block extends UnlockableContent{
     public boolean autoResetEnabled = true;
     /** if true, the block stops updating when disabled */
     public boolean noUpdateDisabled = false;
+    /** if true, this block updates when it's a payload in a unit. Currently unused! */
+    public boolean updateInUnits = true;
     /** Whether to use this block's color in the minimap. Only used for overlays. */
     public boolean useColor = true;
     /** item that drops from this block, used for drills */
     public @Nullable Item itemDrop = null;
+    /** Array of affinities to certain things. */
+    public Attributes attributes = new Attributes();
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
     public float baseExplosiveness = 0f;
+    /** bullet that this block spawns when destroyed */
+    public @Nullable BulletType destroyBullet = null;
     /** whether this block can be placed on edges of liquids. */
     public boolean floating = false;
     /** multiblock size */
@@ -140,7 +157,7 @@ public class Block extends UnlockableContent{
     public boolean alwaysReplace = false;
     /** if false, this block can never be replaced. */
     public boolean replaceable = true;
-    /** The block group. Unless {@link #canReplace} is overriden, blocks in the same group can replace each other. */
+    /** The block group. Unless {@link #canReplace} is overridden, blocks in the same group can replace each other. */
     public BlockGroup group = BlockGroup.none;
     /** List of block flags. Used for AI indexing. */
     public EnumSet<BlockFlag> flags = EnumSet.of();
@@ -151,6 +168,8 @@ public class Block extends UnlockableContent{
     public int unitCapModifier = 0;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
+    /** If true, the building inventory can be shown with the config. */
+    public boolean allowConfigInventory = true;
     /** If true, this block can be configured by logic. */
     public boolean logicConfigurable = false;
     /** Whether this block consumes touchDown events when tapped. */
@@ -192,10 +211,16 @@ public class Block extends UnlockableContent{
     public int outlinedIcon = -1;
     /** Whether this block has a shadow under it. */
     public boolean hasShadow = true;
-    /** Sounds made when this block is destroyed.*/
-    public Sound destroySound = Sounds.boom;
+    /** Should the sound made when this block is built change in pitch. */
+    public boolean placePitchChange = true;
+    /** Should the sound made when this block is deconstructed change in pitch. */
+    public boolean breakPitchChange = true;
+    /** Sound made when this block is built. */
+    public Sound placeSound = Sounds.place;
     /** Sound made when this block is deconstructed. */
     public Sound breakSound = Sounds.breaks;
+    /** Sounds made when this block is destroyed.*/
+    public Sound destroySound = Sounds.boom;
     /** How reflective this block is. */
     public float albedo = 0f;
     /** Environmental passive light color. */
@@ -243,7 +268,10 @@ public class Block extends UnlockableContent{
     public boolean quickRotate = true;
     /** Main subclass. Non-anonymous. */
     public @Nullable Class<?> subclass;
+    /** Determines if this block gets a higher unloader priority. */
+    public boolean highUnloadPriority = false;
 
+    public float selectScroll; //scroll position for certain blocks
     public Prov<Building> buildType = null; //initialized later
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
@@ -368,9 +396,15 @@ public class Block extends UnlockableContent{
     }
 
     /** Returns whether or not this block can be place on the specified  */
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
+        return canPlaceOn(tile, team);
+    }
+
+    /** Legacy canPlaceOn implementation, override {@link #canPlaceOn(Tile, Team, int)} instead.*/
     public boolean canPlaceOn(Tile tile, Team team){
         return true;
     }
+
 
     public boolean canBreak(Tile tile){
         return true;
@@ -394,7 +428,7 @@ public class Block extends UnlockableContent{
             stats.add(Stat.health, health, StatUnit.none);
         }
 
-        if(canBeBuilt()){
+        if(canBeBuilt() && requirements.length > 0){
             stats.add(Stat.buildTime, buildCost / 60, StatUnit.seconds);
             stats.add(Stat.buildCost, StatValues.items(false, requirements));
         }
@@ -437,7 +471,7 @@ public class Block extends UnlockableContent{
         if(hasItems && configurable){
             bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
         }
-        
+
         if(unitCapModifier != 0){
             stats.add(Stat.maxUnits, (unitCapModifier < 0 ? "-" : "+") + Math.abs(unitCapModifier));
         }
@@ -793,7 +827,7 @@ public class Block extends UnlockableContent{
         }
 
         clipSize = Math.max(clipSize, size * tilesize);
-        
+
         //only kept to ensure compatibility with v6 mods.
         if(expanded){
             clipSize += tilesize * 10f;
@@ -837,7 +871,12 @@ public class Block extends UnlockableContent{
         }
 
         if(!outputsPower && consumes.hasPower() && consumes.getPower().buffered){
-            throw new IllegalArgumentException("Consumer using buffered power: " + name);
+            Log.warn("Consumer using buffered power: @. Disabling buffered power.", name);
+            consumes.getPower().buffered = false;
+        }
+
+        if(buildVisibility == BuildVisibility.sandboxOnly){
+            hideDetails = false;
         }
     }
 
@@ -897,12 +936,17 @@ public class Block extends UnlockableContent{
                     for(int x = 0; x < base.width; x++){
                         for(int y = 0; y < base.height; y++){
                             int color = base.get(x, y);
-                            int index = color == 0xffffffff ? 0 : color == 0xdcc6c6ff ? 1 : color == 0x9d7f7fff ? 2 : -1;
+                            int index = switch(color){
+                                case 0xffffffff -> 0;
+                                case 0xdcc6c6ff, 0xdbc5c5ff -> 1;
+                                case 0x9d7f7fff, 0x9e8080ff -> 2;
+                                default -> -1;
+                            };
                             out.setRaw(x, y, index == -1 ? base.get(x, y) : team.palettei[index]);
                         }
                     }
 
-                    if(Core.settings.getBool("linear")){
+                    if(Core.settings.getBool("linear", true)){
                         Pixmaps.bleed(out);
                     }
 
@@ -923,7 +967,7 @@ public class Block extends UnlockableContent{
         if(outlineIcon){
             PixmapRegion region = Core.atlas.getPixmap(gen[outlinedIcon >= 0 ? outlinedIcon : gen.length -1]);
             Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
-            if(Core.settings.getBool("linear")){
+            if(Core.settings.getBool("linear", true)){
                 Pixmaps.bleed(out);
             }
             packer.add(PageType.main, name, out);
@@ -948,4 +992,9 @@ public class Block extends UnlockableContent{
         packer.add(PageType.editor, name + "-icon-editor", editorBase);
     }
 
+    public void flipRotation(BuildPlan req, boolean x){
+        if(x == (req.rotation % 2 == 0)){
+            req.rotation = Mathf.mod(req.rotation + 2, 4);
+        }
+    }
 }

@@ -51,6 +51,8 @@ public class ItemBridge extends Block{
         group = BlockGroup.transportation;
         noUpdateDisabled = true;
         copyConfig = false;
+        //disabled as to not be annoying
+        allowConfigInventory = false;
 
         //point2 config is relative
         config(Point2.class, (ItemBridgeBuild tile, Point2 i) -> tile.link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
@@ -181,6 +183,11 @@ public class ItemBridge extends Block{
         public float time = -8f, timeSpeed;
         public boolean wasMoved, moved;
         public float transportCounter;
+
+        @Override
+        public void pickedUp(){
+            link = -1;
+        }
 
         @Override
         public void playerPlaced(Object config){
@@ -408,7 +415,7 @@ public class ItemBridge extends Block{
         }
 
         protected boolean checkAccept(Building source, Tile other){
-            if(linked(source)) return true;
+            if(tile == null || linked(source)) return true;
 
             if(linkValid(tile, other)){
                 int rel = relativeTo(other);

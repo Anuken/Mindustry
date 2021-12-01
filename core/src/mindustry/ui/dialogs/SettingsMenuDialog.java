@@ -17,7 +17,6 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
-import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -32,7 +31,7 @@ import java.util.zip.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
-public class SettingsMenuDialog extends Dialog{
+public class SettingsMenuDialog extends BaseDialog{
     public SettingsTable graphics;
     public SettingsTable game;
     public SettingsTable sound;
@@ -48,38 +47,19 @@ public class SettingsMenuDialog extends Dialog{
         addCloseButton();
 
         cont.add(main = new SettingsTable());
-
-        hidden(() -> {
-            Sounds.back.play();
-            if(state.isGame()){
-                if(!wasPaused || net.active())
-                    state.set(State.playing);
-            }
-        });
+        shouldPause = true;
 
         shown(() -> {
             back();
-            if(state.isGame()){
-                wasPaused = state.is(State.paused);
-                state.set(State.paused);
-            }
-
             rebuildMenu();
         });
 
-        Events.on(ResizeEvent.class, event -> {
-            if(isShown() && Core.scene.getDialog() == this){
-                graphics.rebuild();
-                sound.rebuild();
-                game.rebuild();
-                updateScrollFocus();
-            }
+        onResize(() -> {
+            graphics.rebuild();
+            sound.rebuild();
+            game.rebuild();
+            updateScrollFocus();
         });
-
-        setFillParent(true);
-        title.setAlignment(Align.center);
-        titleTable.row();
-        titleTable.add(new Image()).growX().height(3f).pad(4f).get().setColor(Pal.accent);
 
         cont.clearChildren();
         cont.remove();
@@ -230,8 +210,12 @@ public class SettingsMenuDialog extends Dialog{
                         platform.shareFile(logs);
                     }else{
                         platform.showFileChooser(false, "txt", file -> {
-                            file.writeString(getLogs());
-                            app.post(() -> ui.showInfo("@crash.exported"));
+                            try{
+                                file.writeBytes(getLogs().getBytes(Strings.utf8));
+                                app.post(() -> ui.showInfo("@crash.exported"));
+                            }catch(Throwable e){
+                                ui.showException(e);
+                            }
                         });
                     }
                 }
@@ -301,6 +285,8 @@ public class SettingsMenuDialog extends Dialog{
                     control.setInput(new DesktopInput());
                     input.setUseKeyboard(true);
                 }
+            }else{
+                Core.settings.put("keyboard", false);
             }
         }
         //the issue with touchscreen support on desktop is that:
@@ -603,7 +589,7 @@ public class SettingsMenuDialog extends Dialog{
             rebuild();
         }
 
-        void rebuild(){
+        public void rebuild(){
             clearChildren();
 
             for(Setting setting : list){
@@ -624,7 +610,7 @@ public class SettingsMenuDialog extends Dialog{
             public String title;
             public @Nullable String description;
 
-            Setting(String name){
+            public Setting(String name){
                 this.name = name;
                 String winkey = "setting." + name + ".name.windows";
                 title = OS.isWindows && bundle.has(winkey) ? bundle.get(winkey) : bundle.get("setting." + name + ".name");
@@ -656,7 +642,7 @@ public class SettingsMenuDialog extends Dialog{
             boolean def;
             Boolc changed;
 
-            CheckSetting(String name, boolean def, Boolc changed){
+            public CheckSetting(String name, boolean def, Boolc changed){
                 super(name);
                 this.def = def;
                 this.changed = changed;
@@ -685,7 +671,7 @@ public class SettingsMenuDialog extends Dialog{
             int def, min, max, step;
             StringProcessor sp;
 
-            SliderSetting(String name, int def, int min, int max, int step, StringProcessor s){
+            public SliderSetting(String name, int def, int min, int max, int step, StringProcessor s){
                 super(name);
                 this.def = def;
                 this.min = min;

@@ -50,6 +50,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public final OverlayFragment frag = new OverlayFragment();
 
+    /** If any of these functions return true, input is locked. */
+    public Seq<Boolp> inputLocks = Seq.with(() -> renderer.isCutscene());
     public Interval controlInterval = new Interval();
     public @Nullable Block block;
     public boolean overrideLineRotation;
@@ -174,7 +176,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         //remove item for every controlling unit
         player.unit().eachGroup(unit -> {
-            Call.takeItems(build, item, unit.maxAccepted(item), unit);
+            Call.takeItems(build, item, Math.min(unit.maxAccepted(item), amount), unit);
 
             if(unit == player.unit()){
                 Events.fire(new WithdrawEvent(build, player, item, amount));
@@ -365,8 +367,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot control a building.");
         }
 
-        if(player.team() == build.team && build.canControlSelect(player)){
-            build.onControlSelect(player);
+        if(player.team() == build.team && build.canControlSelect(player.unit())){
+            build.onControlSelect(player.unit());
+        }
+    }
+
+    @Remote(called = Loc.server)
+    public static void unitBuildingControlSelect(Unit unit, Building build){
+        if(unit == null || unit.dead()) return;
+
+        //client skips checks to prevent ghost units
+        if(unit.team() == build.team && (net.client() || build.canControlSelect(unit))){
+            build.onControlSelect(unit);
         }
     }
 
@@ -378,15 +390,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(net.server() && !netServer.admins.allowAction(player, ActionType.control, action -> action.unit = unit)){
             throw new ValidateException(player, "Player cannot control a unit.");
         }
-
-        //TODO problem:
-        //1. server send snapshot
-        //2. client requests to control unit, becomes unit locally
-        //3. snapshot arrives, client now thinks they're in the old unit (!!!)
-        //4. server gets packet that player is in the right unit
-        //5. server sends snapshot
-        //6. client gets snapshot, realizes that they are actually in the unit they selected
-        //7. client gets switched to new unit -> rubberbanding (!!!)
 
         //clear player unit when they possess a core
         if(unit == null){ //just clear the unit (is this used?)
@@ -404,6 +407,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(!player.dead()){
                 Fx.unitSpirit.at(player.x, player.y, 0f, unit);
             }
+        }else if(net.server()){
+            //reject forwarding the packet if the unit was dead, AI or team
+            throw new ValidateException(player, "Player attempted to control invalid unit.");
         }
 
         Events.fire(new UnitControlEvent(player, unit));
@@ -439,6 +445,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+    /** Adds an input lock; if this function returns true, input is locked. Used for mod 'cutscenes' or custom camera panning. */
+    public void addLock(Boolp lock){
+        inputLocks.add(lock);
+    }
+
+    /** @return whether most input is locked, for 'cutscenes' */
+    public boolean locked(){
+        return inputLocks.contains(Boolp::get);
+    }
+
     public Eachable<BuildPlan> allRequests(){
         return cons -> {
             for(BuildPlan request : player.unit().plans()) cons.get(request);
@@ -462,8 +478,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             player.unit().updateBuilding(isBuilding);
         }
 
-        if(player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && player.unit().ammo <= 0){
+        if(player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && !player.team().rules().infiniteAmmo && player.unit().ammo <= 0){
             player.unit().type.weapons.first().noAmmoSound.at(player.unit());
+        }
+
+        //you don't want selected blocks while locked, looks weird
+        if(locked()){
+            block = null;
         }
 
         wasShooting = player.shooting;
@@ -675,9 +696,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             });
 
             //flip rotation
-            if(x == (req.rotation % 2 == 0)){
-                req.rotation = Mathf.mod(req.rotation + 2, 4);
-            }
+            req.block.flipRotation(req, x);
         });
     }
 
@@ -973,7 +992,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //consume tap event if necessary
         if(build.interactable(player.team()) && build.block.consumesTap){
             consumed = true;
-        }else if(build.interactable(player.team()) && build.block.synthetic() && !consumed){
+        }else if(build.interactable(player.team()) && build.block.synthetic() && (!consumed || build.block.allowConfigInventory)){
             if(build.block.hasItems && build.items.total() > 0){
                 frag.inv.showFor(build);
                 consumed = true;
@@ -1092,7 +1111,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         Building build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-        if(build instanceof ControlBlock cont && cont.canControl() && build.team == player.team()){
+        if(build instanceof ControlBlock cont && cont.canControl() && build.team == player.team() && cont.unit() != player.unit()){
             return cont.unit();
         }
 
@@ -1101,7 +1120,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public @Nullable Building selectedControlBuild(){
         Building build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-        if(build != null && !player.dead() && build.canControlSelect(player) && build.team == player.team()){
+        if(build != null && !player.dead() && build.canControlSelect(player.unit()) && build.team == player.team()){
             return build;
         }
         return null;
@@ -1192,6 +1211,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public boolean validPlace(int x, int y, Block type, int rotation, BuildPlan ignore){
+        //TODO with many requests, this is O(n * m), very laggy
         for(BuildPlan req : player.unit().plans()){
             if(req != ignore
                     && !req.breaking

@@ -13,36 +13,18 @@ buildscript{
         google()
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven{ url 'https://jitpack.io' }
-
-        //fake repository to download my patched robovm jar from
-        ivy{
-            url 'https://github.com/'
-
-            patternLayout {
-                artifact '/[organisation]/[module]/raw/a-single-jar-file/[revision].jar'
-            }
-
-            // This is required in Gradle 6.0+ as metadata file (ivy.xml)
-            // is mandatory. Docs linked below this code section
-            metadataSources { artifact() }
-        }
     }
 
     dependencies{
-        //use local, patched robovm gradle plugin until my PR for gradle 7.0 support is merged
-        //https://github.com/Anuken/robovm/raw/a-single-jar-file/robovm-gradle-plugin-2.3.14-SNAPSHOT.jar
-        classpath "Anuken:robovm:robovm-gradle-plugin-2.3.14-SNAPSHOT"
-        //needed for plugin above
-        classpath "com.mobidevelop.robovm:robovm-dist-compiler:2.3.13"
-
+        classpath "com.mobidevelop.robovm:robovm-gradle-plugin:2.3.14"
         classpath "com.github.Anuken.Arc:packer:$arcHash"
         classpath "com.github.Anuken.Arc:arc-core:$arcHash"
     }
 }
 
 plugins{
-    id 'org.jetbrains.kotlin.jvm' version '1.4.32'
-    id "org.jetbrains.kotlin.kapt" version "1.4.32"
+    id 'org.jetbrains.kotlin.jvm' version '1.6.0-RC'
+    id "org.jetbrains.kotlin.kapt" version "1.6.0-RC"
 }
 
 allprojects{
@@ -57,7 +39,7 @@ allprojects{
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '0b86023401880bb5e586bc404bedbaae9b1f1c94'
-        rhinoVersion = '9f792d202471fb3789eab7bb261fec13d67287e2'
+        rhinoVersion = '3c6bbadf73a904eefcc28b6fd8aa742ac575e878'
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -219,10 +201,16 @@ allprojects{
         options.compilerArgs += ["-Xlint:deprecation"]
         dependsOn clearCache
 
-        options.forkOptions.jvmArgs.addAll([
+        options.forkOptions.jvmArgs += [
+            '--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED',
             '--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
-            '--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED'
-        ])
+            '--add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
+            '--add-opens=java.base/sun.reflect.annotation=ALL-UNNAMED'
+        ]
     }
 }
 
@@ -279,7 +267,7 @@ project(":ios"){
             props.load(new FileInputStream(vfile))
         }else{
             props['app.id'] = 'io.anuke.mindustry'
-            props['app.version'] = '6.0'
+            props['app.version'] = '7.0'
             props['app.mainclass'] = 'mindustry.IOSLauncher'
             props['app.executable'] = 'IOSLauncher'
             props['app.name'] = 'Mindustry'
@@ -387,7 +375,7 @@ project(":core"){
         if(localArc() && debugged()) api arcModule("extensions:recorder")
         if(localArc()) api arcModule(":extensions:packer")
 
-        annotationProcessor 'com.github.Anuken:jabel:34e4c172e65b3928cd9eabe1993654ea79c409cd'
+        annotationProcessor 'com.github.Anuken:jabel:0.6.0'
         compileOnly project(":annotations")
         kapt project(":annotations")
     }

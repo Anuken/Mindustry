@@ -31,6 +31,8 @@ public class SolidPump extends Pump{
     public SolidPump(String name){
         super(name);
         hasPower = true;
+        //only supports ground by default
+        envEnabled = Env.terrestrial;
     }
 
     @Override
@@ -38,7 +40,7 @@ public class SolidPump extends Pump{
         drawPotentialLinks(x, y);
 
         if(attribute != null){
-            drawPlaceText(Core.bundle.formatFloat("bar.efficiency", Math.max(sumAttribute(attribute, x, y) / size / size + baseEfficiency, 0f) * 100 * percentSolid(x, y), 1), x, y, valid);
+            drawPlaceText(Core.bundle.format("bar.efficiency", Math.round(Math.max((sumAttribute(attribute, x, y)) / size / size + percentSolid(x, y) * baseEfficiency, 0f) * 100)), x, y, valid);
         }
     }
 
@@ -46,9 +48,9 @@ public class SolidPump extends Pump{
     public void setBars(){
         super.setBars();
         bars.add("efficiency", (SolidPumpBuild entity) -> new Bar(() -> Core.bundle.formatFloat("bar.pumpspeed",
-        entity.lastPump / Time.delta * 60, 1),
+        entity.lastPump * 60, 1),
         () -> Pal.ammo,
-        () -> entity.warmup));
+        () -> entity.warmup * entity.efficiency()));
     }
 
     @Override
@@ -63,9 +65,14 @@ public class SolidPump extends Pump{
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile, Team team){
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
         float sum = tile.getLinkedTilesAs(this, tempTiles).sumf(t -> canPump(t) ? baseEfficiency + (attribute != null ? t.floor().attributes.get(attribute) : 0f) : 0f);
         return sum > 0.00001f;
+    }
+
+    @Override
+    public boolean outputsItems(){
+        return false;
     }
 
     @Override
@@ -86,9 +93,19 @@ public class SolidPump extends Pump{
         public float lastPump;
 
         @Override
+        public void drawCracks(){}
+
+        @Override
+        public void pickedUp(){
+            boost = validTiles = 0f;
+        }
+
+        @Override
         public void draw(){
             Draw.rect(region, x, y);
-            Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
+            super.drawCracks();
+
+            Drawf.liquid(liquidRegion, x, y, liquids.get(result) / liquidCapacity, result.color);
             Drawf.spinSprite(rotatorRegion, x, y, pumpTime * rotateSpeed);
             Draw.rect(topRegion, x, y);
         }
@@ -105,7 +122,7 @@ public class SolidPump extends Pump{
             if(cons.valid() && typeLiquid() < liquidCapacity - 0.001f){
                 float maxPump = Math.min(liquidCapacity - typeLiquid(), pumpAmount * delta() * fraction * efficiency());
                 liquids.add(result, maxPump);
-                lastPump = maxPump;
+                lastPump = maxPump / Time.delta;
                 warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
                 if(Mathf.chance(delta() * updateEffectChance))
                     updateEffect.at(x + Mathf.range(size * 2f), y + Mathf.range(size * 2f));
@@ -114,7 +131,7 @@ public class SolidPump extends Pump{
                 lastPump = 0f;
             }
 
-            pumpTime += warmup * delta();
+            pumpTime += warmup * edelta();
 
             dumpLiquid(result);
         }
@@ -133,7 +150,7 @@ public class SolidPump extends Pump{
         }
 
         public float typeLiquid(){
-            return liquids.total();
+            return liquids.get(result);
         }
     }
 }

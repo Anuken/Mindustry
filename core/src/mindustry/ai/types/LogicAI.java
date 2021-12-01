@@ -44,7 +44,7 @@ public class LogicAI extends AIController{
     private ObjectSet<Object> radars = new ObjectSet<>();
 
     @Override
-    protected void updateMovement(){
+    public void updateMovement(){
         if(itemTimer >= 0) itemTimer -= Time.delta;
         if(payTimer >= 0) payTimer -= Time.delta;
 
@@ -114,14 +114,14 @@ public class LogicAI extends AIController{
     }
 
     @Override
-    protected void moveTo(Position target, float circleLength, float smooth){
+    public void moveTo(Position target, float circleLength, float smooth){
         if(target == null) return;
 
         vec.set(target).sub(unit);
 
         float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / smooth, -1f, 1f);
 
-        vec.setLength(unit.realSpeed() * length);
+        vec.setLength(unit.speed() * length);
         if(length < -0.5f){
             vec.rotate(180f);
         }else if(length < 0){
@@ -141,29 +141,29 @@ public class LogicAI extends AIController{
     }
 
     @Override
-    protected boolean checkTarget(Teamc target, float x, float y, float range){
+    public boolean checkTarget(Teamc target, float x, float y, float range){
         return false;
     }
 
     //always retarget
     @Override
-    protected boolean retarget(){
+    public boolean retarget(){
         return true;
     }
 
     @Override
-    protected boolean invalid(Teamc target){
+    public boolean invalid(Teamc target){
         return false;
     }
 
     @Override
-    protected boolean shouldShoot(){
+    public boolean shouldShoot(){
         return shoot && !(unit.type.canBoost && boost);
     }
 
     //always aim for the main target
     @Override
-    protected Teamc target(float x, float y, float range, boolean air, boolean ground){
+    public Teamc target(float x, float y, float range, boolean air, boolean ground){
         return switch(aimControl){
             case target -> posTarget;
             case targetp -> mainTarget;

@@ -98,7 +98,7 @@ public class PlacementFragment extends Fragment{
     boolean gridUpdate(InputHandler input){
         scrollPositions.put(currentCategory, blockPane.getScrollY());
 
-        if(Core.input.keyTap(Binding.pick) && player.isBuilder()){ //mouse eyedropper select
+        if(Core.input.keyTap(Binding.pick) && player.isBuilder() && !Core.scene.hasDialog()){ //mouse eyedropper select
             var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             Block tryRecipe = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
             Object tryConfig = build == null || !build.block.copyConfig ? null : build.config();
@@ -192,8 +192,10 @@ public class PlacementFragment extends Fragment{
         }
 
         if(Core.input.keyTap(Binding.block_info)){
-            Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block;
-            if(displayBlock != null){
+            var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            Block hovering = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
+            Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block != null ? input.block : hovering;
+            if(displayBlock != null && displayBlock.unlockedNow()){
                 ui.content.show(displayBlock);
                 Events.fire(new BlockInfoEvent());
             }
@@ -443,7 +445,7 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean unlocked(Block block){
-        return block.unlockedNow();
+        return block.unlockedNow() && block.placeablePlayer && (state.rules.hiddenBuildItems.isEmpty() || !Structs.contains(block.requirements, i -> state.rules.hiddenBuildItems.contains(i.item)));
     }
 
     boolean hasInfoBox(){

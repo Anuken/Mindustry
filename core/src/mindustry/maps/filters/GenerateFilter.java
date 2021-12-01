@@ -99,6 +99,10 @@ public abstract class GenerateFilter{
 
     //utility generation functions
 
+    protected float noise(int seedOffset, GenerateInput in, float scl, float mag){
+        return Simplex.noise2d(seedOffset + seed, 1f, 0f, 1f / scl, in.x, in.y) * mag;
+    }
+
     protected float noise(GenerateInput in, float scl, float mag){
         return Simplex.noise2d(seed, 1f, 0f, 1f / scl, in.x, in.y) * mag;
     }

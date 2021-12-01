@@ -40,8 +40,8 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
 
     @Import int id;
     @Import float x, y;
+    @Import boolean added;
 
-    transient private boolean mismatch = false;
     transient float accepting, updateTime, lastRipple = Time.time + Mathf.random(40f);
     float amount;
     Tile tile;
@@ -60,7 +60,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
         accepting = 0f;
 
         if(amount >= maxLiquid / 1.5f){
-            float deposited = Math.min((amount - maxLiquid / 1.5f) / 4f, 0.3f) * Time.delta;
+            float deposited = Math.min((amount - maxLiquid / 1.5f) / 4f, 0.3f * Time.delta);
             int targets = 0;
             for(Point2 point : Geometry.d4){
                 Tile other = world.tile(tile.x + point.x, tile.y + point.y);
@@ -79,9 +79,12 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
             return;
         }
 
-        if(Puddles.get(tile) != self()){
-            mismatch = true;
-            remove();
+        if(Puddles.get(tile) != self() && added){
+            //force removal without pool free
+            Groups.all.remove(self());
+            Groups.draw.remove(self());
+            Groups.puddle.remove(self());
+            added = false;
             return;
         }
 
@@ -134,9 +137,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
 
     @Override
     public void remove(){
-        if(!mismatch){
-            Puddles.remove(tile);
-        }
+        Puddles.remove(tile);
     }
 
     @Override

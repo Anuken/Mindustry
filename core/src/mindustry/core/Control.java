@@ -172,13 +172,19 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(BlockDestroyEvent.class, e -> {
             if(e.tile.team() == player.team()){
-                state.stats.buildingsDestroyed++;
+                state.stats.buildingsDestroyed ++;
             }
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
             if(e.unit.team() != player.team()){
-                state.stats.enemyUnitsDestroyed++;
+                state.stats.enemyUnitsDestroyed ++;
+            }
+        });
+
+        Events.on(UnitCreateEvent.class, e -> {
+            if(e.unit.team == state.rules.defaultTeam){
+                state.stats.unitsCreated++;
             }
         });
 
@@ -219,7 +225,7 @@ public class Control implements ApplicationListener, Loadable{
                     Effect.shake(5f, 5f, core);
                     core.thrusterTime = 1f;
 
-                    if(state.isCampaign() && Vars.showSectorLandInfo){
+                    if(state.isCampaign() && Vars.showSectorLandInfo && (state.rules.sector.preset == null || state.rules.sector.preset.showSectorLandInfo)){
                         ui.announce("[accent]" + state.rules.sector.name() + "\n" +
                         (state.rules.sector.info.resources.any() ? "[lightgray]" + bundle.get("sectors.resources") + "[white] " +
                         state.rules.sector.info.resources.toString(" ", u -> u.emoji()) : ""), 5);
@@ -383,6 +389,8 @@ public class Control implements ApplicationListener, Loadable{
                         Groups.fire.clear();
                         Groups.puddle.clear();
 
+                        //reset to 0, so replaced cores don't count
+                        state.rules.defaultTeam.data().unitCap = 0;
                         Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
                         //set up camera/player locations

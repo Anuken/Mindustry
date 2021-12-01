@@ -56,6 +56,10 @@ public class LoadingFragment extends Fragment{
         bar.set(() -> ((int)(progress.get() * 100) + "%"), progress, Pal.accent);
     }
 
+    public void snapProgress(){
+        bar.snap();
+    }
+
     public void setProgress(float progress){
         progValue = progress;
         if(!bar.visible){
@@ -79,6 +83,7 @@ public class LoadingFragment extends Fragment{
     }
 
     public void show(String text){
+        button.visible = false;
         nameLabel.setColor(Color.white);
         bar.visible = false;
         table.clearActions();
