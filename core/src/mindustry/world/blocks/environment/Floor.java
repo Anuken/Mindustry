@@ -115,6 +115,11 @@ public class Floor extends Block{
         //keep default value if not found...
         if(wall == null) wall = Blocks.air;
 
+        //try to load the default boulder
+        if(decoration == null){
+            decoration = content.block(name + "-boulder");
+        }
+
         if(isLiquid && walkEffect == Fx.none){
             walkEffect = Fx.ripple;
         }

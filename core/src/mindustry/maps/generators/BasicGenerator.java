@@ -11,6 +11,7 @@ import mindustry.ai.Astar.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -343,6 +344,26 @@ public abstract class BasicGenerator implements WorldGenerator{
         }
     }
 
+    public boolean nearWall(int x, int y){
+        for(Point2 p : Geometry.d8){
+            Tile other = tiles.get(x + p.x, y + p.y);
+            if(other != null && other.block() != Blocks.air){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean nearAir(int x, int y){
+        for(Point2 p : Geometry.d4){
+            Tile other = tiles.get(x + p.x, y + p.y);
+            if(other != null && other.block() == Blocks.air){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void decoration(float chance){
         pass((x, y) -> {
             for(int i = 0; i < 4; i++){
@@ -356,6 +377,30 @@ public abstract class BasicGenerator implements WorldGenerator{
                 block = floor.asFloor().decoration;
             }
         });
+    }
+
+    public void blend(Block floor, Block around, float radius){
+        float r2 = radius*radius;
+        int cap = Mathf.ceil(radius);
+        int max = tiles.width * tiles.height;
+        Floor dest = around.asFloor();
+
+        for(int i = 0; i < max; i++){
+            Tile tile = tiles.geti(i);
+            if(tile.floor() == floor){
+                for(int cx = -cap; cx <= cap; cx++){
+                    for(int cy = -cap; cy <= cap; cy++){
+                        if(cx*cx + cy*cy <= r2){
+                            Tile other = tiles.get(tile.x + cx, tile.y + cy);
+
+                            if(other != null && other.floor() != floor){
+                                other.setFloor(dest);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void brush(Seq<Tile> path, int rad){

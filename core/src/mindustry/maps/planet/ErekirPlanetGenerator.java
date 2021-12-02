@@ -92,11 +92,11 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         tile.block = tile.floor.asFloor().wall;
 
-        if(Ridged.noise3d(1, position.x, position.y, position.z, 2, 25) > 0.2){
+        if(Ridged.noise3d(1, position.x, position.y, position.z, 2, 25) > 0.19){
             tile.block = Blocks.air;
         }
 
-        if(Ridged.noise3d(2, position.x, position.y + 4f, position.z, 3, 7f) > 0.7){
+        if(Ridged.noise3d(2, position.x, position.y + 4f, position.z, 3, 6f) > 0.65){
             tile.floor = Blocks.carbonStone;
         }
     }
@@ -136,24 +136,28 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         //arkycite
         pass((x, y) -> {
+            if(nearWall(x, y)) return;
 
-            float noise = noise(x + 300, y - x*1.6f + 100, 4, 0.81f, 96f, 1f);
+            float noise = noise(x + 300, y - x*1.6f + 100, 4, 0.8f, 120f, 1f);
 
             if(noise > 0.71f){
                 floor = Blocks.arkyciteFloor;
-            }else if(noise > 0.65){
-                floor = Blocks.arkyicStone;
             }
         });
+
+        median(2, 0.6, Blocks.arkyciteFloor);
+
+        //TODO arkycite walls
+        blend(Blocks.arkyciteFloor, Blocks.arkyicStone, 4);
 
         distort(10f, 12f);
         distort(5f, 7f);
 
+        //does arkycite need smoothing?
+        median(2, 0.6, Blocks.arkyciteFloor);
+
         //smooth out slag to prevent random 1-tile patches
         median(3, 0.6, Blocks.slag);
-
-        //does arkycite need smoothing?
-        //median(3, 0.6, Blocks.arkyciteFloor);
 
         pass((x, y) -> {
             float max = 0;
@@ -171,42 +175,29 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         tiles.getn(endX, endY).setOverlay(Blocks.spawn);
 
+        //TODO tech is lazy and boring
         tech(Blocks.darkPanel3, Blocks.darkPanel5, Blocks.darkMetal);
 
         //ores
         pass((x, y) -> {
 
             if(block != Blocks.air){
-                boolean empty = false;
-                for(Point2 p : Geometry.d8){
-                    Tile other = tiles.get(x + p.x, y + p.y);
-                    if(other != null && other.block() == Blocks.air){
-                        empty = true;
-                        break;
+                //TODO use d4 instead of d8 for no out-of-reach ores?
+                if(nearAir(x, y)){
+                    if(noise(x + 78, y, 4, 0.7f, 35f, 1f) > 0.67f && block == Blocks.carbonWall){
+                        block = Blocks.graphiticWall;
+                    }else if(noise(x + 782, y, 4, 0.8f, 40f, 1f) > 0.7f && block != Blocks.carbonWall){
+                        ore = Blocks.wallOreBeryl;
                     }
                 }
+            }else if(!nearWall(x, y)){
 
-                if(empty && noise(x + 78, y, 4, 0.7f, 35f, 1f) > 0.67f && block == Blocks.carbonWall){
-                    block = Blocks.graphiticWall;
-                }else if(empty && noise(x + 782, y, 4, 0.8f, 40f, 1f) > 0.7f && block != Blocks.carbonWall){
-                    ore = Blocks.wallOreBeryl;
-                }
-            }else{
-                boolean empty = true;
-                for(Point2 p : Geometry.d8){
-                    Tile other = tiles.get(x + p.x, y + p.y);
-                    if(other != null && other.block() != Blocks.air){
-                        empty = false;
-                        break;
-                    }
-                }
-
-                if(empty && noise(x + 150, y + x*2 + 100, 4, 0.8f, 40f, 1f) > 0.71f/* && floor == Blocks.yellowStone*/){
+                if(noise(x + 150, y + x*2 + 100, 4, 0.8f, 40f, 1f) > 0.71f/* && floor == Blocks.yellowStone*/){
                     ore = Blocks.oreTungsten;
                 }
 
                 //TODO design ore generation so it doesn't overlap
-                if(empty && noise(x + 999, y + 600, 4, 0.63f, 37f, 1f) < 0.25f/* && floor == Blocks.yellowStone*/){
+                if(noise(x + 999, y + 600, 4, 0.63f, 37f, 1f) < 0.25f/* && floor == Blocks.yellowStone*/){
                     ore = Blocks.oreThorium;
                 }
             }
@@ -238,6 +229,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 tile.setOverlay(Blocks.air);
             }
         }
+
+        decoration(0.015f);
 
         //not allowed
         state.rules.hiddenBuildItems.addAll(Items.copper, Items.titanium, Items.coal, Items.lead, Items.blastCompound, Items.pyratite, Items.sporePod, Items.metaglass, Items.plastanium);

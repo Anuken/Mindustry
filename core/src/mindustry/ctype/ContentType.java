@@ -16,7 +16,8 @@ public enum ContentType{
     typeid_UNUSED,
     error,
     planet,
-    ammo_UNUSED;
+    ammo_UNUSED,
+    team;
 
     public static final ContentType[] all = values();
 }

@@ -46,7 +46,7 @@ public class Blocks{
     regolithWall, yellowStoneWall, rhyoliteWall, steamVent, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall,
     ferricStone, ferricCraters, carbonStone, beryllicStone,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
-    shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder,
+    shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
@@ -97,7 +97,8 @@ public class Blocks{
     impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
 
     //power - erekir
-    turbineCondenser, chemicalCombustionChamber,
+    //TODO rename chemicalCombustionChamber
+    turbineCondenser, chemicalCombustionChamber, pyrolysisGenerator,
     beamNode, beamTower,
 
     //production
@@ -105,7 +106,7 @@ public class Blocks{
     cliffCrusher, plasmaBore, largePlasmaBore, impactDrill,
 
     //storage
-    coreShard, coreFoundation, coreNucleus, vault, container, unloader,
+    coreShard, coreFoundation, /*TODO core foundation is a bad name, rename to fragment */ coreNucleus, vault, container, unloader,
     //storage - erekir
     coreBastion, coreCitadel, coreAcropolis, reinforcedContainer, reinforcedVault,
 
@@ -610,6 +611,11 @@ public class Blocks{
         beryllicBoulder = new Prop("beryllic-boulder"){{
             variants = 2;
             beryllicStone.asFloor().decoration = this;
+        }};
+
+        yellowStoneBoulder = new Prop("yellow-stone-boulder"){{
+            variants = 2;
+            yellowStone.asFloor().decoration = this;
         }};
 
         metalFloor = new Floor("metal-floor", 0);
@@ -1952,13 +1958,12 @@ public class Blocks{
 
         //erekir
 
-        //TODO work on sprite, green bits?
         turbineCondenser = new ThermalGenerator("turbine-condenser"){{
             requirements(Category.power, with(Items.graphite, 40, Items.beryllium, 40));
             attribute = Attribute.vent;
             displayEfficiencyScale = 1f / 9f;
             minEfficiency = 9f - 0.0001f;
-            powerProduction = 4f / 9f;
+            powerProduction = 3f / 9f;
             displayEfficiency = false;
             generateEffect = Fx.turbinegenerate;
             effectChance = 0.04f;
@@ -1972,6 +1977,7 @@ public class Blocks{
             liquidCapacity = 20f;
         }};
 
+        //TODO rename
         chemicalCombustionChamber = new SingleTypeGenerator("chemical-combustion-chamber"){{
             requirements(Category.power, with(Items.graphite, 40, Items.tungsten, 40, Items.oxide, 40f, Items.silicon, 30));
             powerProduction = 6f;
@@ -1992,6 +1998,30 @@ public class Blocks{
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.06f;
         }};
+
+        if(false)
+        pyrolysisGenerator = new SingleTypeGenerator("pyrolysis-generator"){{
+            //TODO requirements
+            requirements(Category.power, with(Items.graphite, 50, Items.carbide, 50, Items.oxide, 60f, Items.silicon, 40));
+            powerProduction = 12f;
+
+            //TODO ratios, extra requirements
+            consumes.liquids(LiquidStack.with(Liquids.slag, 20f / 60f, Liquids.arkycite, 20f / 60f));
+            size = 3;
+            useItems = false;
+
+            //TODO water output? hydrogen??
+
+            iconOverride = new String[]{"-bottom", ""};
+            generateEffect = Fx.none;
+
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.06f;
+        }};
+
+        //TODO volatile reactor;
+        //- input arkycite, ozone(?), some item(?), maybe slag or heat?
+        //- output water, power
 
         //endregion power
         //region production
