@@ -10,7 +10,7 @@ import mindustry.gen.*;
 import mindustry.world.*;
 
 public class DrawPistons extends DrawBlock{
-    public float sinMag = 4f, sinScl = 6f, sinOffset = 60f, sideOffset = 0f, lenOffset = -1f;
+    public float sinMag = 4f, sinScl = 6f, sinOffset = 50f, sideOffset = 0f, lenOffset = -1f;
     public TextureRegion region1, region2;
 
     @Override

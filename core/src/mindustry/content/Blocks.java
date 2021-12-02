@@ -1950,6 +1950,8 @@ public class Blocks{
             consumes.liquid(Liquids.cryofluid, 0.25f);
         }};
 
+        //erekir
+
         //TODO work on sprite, green bits?
         turbineCondenser = new ThermalGenerator("turbine-condenser"){{
             requirements(Category.power, with(Items.graphite, 40, Items.beryllium, 40));
