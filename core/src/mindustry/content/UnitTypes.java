@@ -2531,8 +2531,9 @@ public class UnitTypes{
         }};
 
         emanate = new UnitType("emanate"){{
-            defaultController = BuilderAI::new;
-            isCounted = false;
+            //TODO not a real enemy, should not be counted or have flying AI
+            defaultController = FlyingAI::new;
+            //isCounted = false;
             envDisabled = 0;
 
             outlineColor = Pal.darkOutline;
@@ -2547,7 +2548,7 @@ public class UnitTypes{
             rotateSpeed = 3f;
             accel = 0.11f;
             itemCapacity = 140;
-            health = 1500f;
+            health = 1300f;
             armor = 3f;
             hitSize = 36f;
             commandLimit = 9;
@@ -2599,9 +2600,6 @@ public class UnitTypes{
 
 
         }};
-
-
-        //TODO emanate (+ better names)
 
         //endregion
         //region internal + special

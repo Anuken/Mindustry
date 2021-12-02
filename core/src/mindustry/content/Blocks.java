@@ -2770,7 +2770,7 @@ public class Blocks{
         breach = new ItemTurret("breach"){{
             requirements(Category.turret, with(Items.beryllium, 35, Items.silicon, 20), true);
             ammo(
-            Items.beryllium, new BasicBulletType(7f, 30){{
+            Items.beryllium, new BasicBulletType(7f, 32){{
                 width = 8f;
                 height = 14f;
                 shootEffect = Fx.berylSpark;
@@ -2795,7 +2795,7 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
             size = 2;
             envEnabled |= Env.space;
-            reloadTime = 40f;
+            reloadTime = 35f;
             restitution = 0.03f;
             range = 180;
             shootCone = 3f;

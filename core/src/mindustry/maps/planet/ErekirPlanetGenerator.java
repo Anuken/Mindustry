@@ -184,9 +184,9 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             if(block != Blocks.air){
                 //TODO use d4 instead of d8 for no out-of-reach ores?
                 if(nearAir(x, y)){
-                    if(noise(x + 78, y, 4, 0.7f, 35f, 1f) > 0.6f && block == Blocks.carbonWall){
+                    if(block == Blocks.carbonWall && noise(x + 78, y, 4, 0.7f, 33f, 1f) > 0.59f){
                         block = Blocks.graphiticWall;
-                    }else if(noise(x + 782, y, 4, 0.8f, 38f, 1f) > 0.68f && block != Blocks.carbonWall){
+                    }else if(block != Blocks.carbonWall && noise(x + 782, y, 4, 0.8f, 37f, 1f) > 0.68f){
                         ore = Blocks.wallOreBeryl;
                     }
                 }
@@ -242,5 +242,16 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         //TODO this is only for testing
         state.rules.defaultTeam.items().add(Seq.with(ItemStack.with(Items.beryllium, 200, Items.graphite, 200)));
+
+        //TODO proper waves
+        state.rules.waves = !OS.hasProp("mindustry.debug");
+        state.rules.waveTimer = true;
+        state.rules.waveSpacing = 60f * 60f * 7.5f;
+        state.rules.spawns = Seq.with(new SpawnGroup(){{
+            type = UnitTypes.emanate;
+            spacing = 1;
+            shieldScaling = 60;
+            unitScaling = 2f;
+        }});
     }
 }
