@@ -184,20 +184,20 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             if(block != Blocks.air){
                 //TODO use d4 instead of d8 for no out-of-reach ores?
                 if(nearAir(x, y)){
-                    if(noise(x + 78, y, 4, 0.7f, 35f, 1f) > 0.67f && block == Blocks.carbonWall){
+                    if(noise(x + 78, y, 4, 0.7f, 35f, 1f) > 0.6f && block == Blocks.carbonWall){
                         block = Blocks.graphiticWall;
-                    }else if(noise(x + 782, y, 4, 0.8f, 40f, 1f) > 0.7f && block != Blocks.carbonWall){
+                    }else if(noise(x + 782, y, 4, 0.8f, 38f, 1f) > 0.68f && block != Blocks.carbonWall){
                         ore = Blocks.wallOreBeryl;
                     }
                 }
             }else if(!nearWall(x, y)){
 
-                if(noise(x + 150, y + x*2 + 100, 4, 0.8f, 40f, 1f) > 0.71f/* && floor == Blocks.yellowStone*/){
+                if(noise(x + 150, y + x*2 + 100, 4, 0.8f, 60f, 1f) > 0.76f/* && floor == Blocks.yellowStone*/){
                     ore = Blocks.oreTungsten;
                 }
 
                 //TODO design ore generation so it doesn't overlap
-                if(noise(x + 999, y + 600, 4, 0.63f, 37f, 1f) < 0.25f/* && floor == Blocks.yellowStone*/){
+                if(noise(x + 999, y + 600, 4, 0.63f, 50f, 1f) < 0.22f/* && floor == Blocks.yellowStone*/){
                     ore = Blocks.oreThorium;
                 }
             }

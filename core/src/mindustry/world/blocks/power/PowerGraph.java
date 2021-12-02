@@ -83,7 +83,8 @@ public class PowerGraph{
         return Mathf.clamp(lastPowerProduced / lastPowerNeeded);
     }
 
-    /** @return multiplier of speed at which resources should be consumed for power generation. */
+    /** @deprecated unused mechanic that always returns 1, I really don't know why you would use this outside of copy-pasted code */
+    @Deprecated
     public float getUsageFraction(){
         return 1f;
     }

@@ -1769,14 +1769,14 @@ public class Blocks{
         //TODO is this necessary? junctions are not good design
         //TODO make it leak
         reinforcedLiquidJunction = new LiquidJunction("reinforced-liquid-junction"){{
-            requirements(Category.liquid, with(Items.tungsten, 4, Items.beryllium, 8));
+            requirements(Category.liquid, with(Items.graphite, 4, Items.beryllium, 8));
             buildCostMultiplier = 3f;
             health = 260;
             ((Conduit)reinforcedConduit).junctionReplacement = this;
         }};
 
         reinforcedBridgeConduit = new DirectionLiquidBridge("reinforced-bridge-conduit"){{
-            requirements(Category.liquid, with(Items.tungsten, 6, Items.beryllium, 10));
+            requirements(Category.liquid, with(Items.graphite, 6, Items.beryllium, 10));
             range = 4;
             hasPower = false;
 
@@ -1897,7 +1897,7 @@ public class Blocks{
             ambientSoundVolume = 0.06f;
         }};
 
-        differentialGenerator = new SingleTypeGenerator("differential-generator"){{
+        differentialGenerator = new ConsumeGenerator("differential-generator"){{
             requirements(Category.power, with(Items.copper, 70, Items.titanium, 50, Items.lead, 100, Items.silicon, 65, Items.metaglass, 50));
             powerProduction = 18f;
             itemDuration = 220f;
@@ -1907,7 +1907,9 @@ public class Blocks{
             ambientSound = Sounds.steam;
             ambientSoundVolume = 0.03f;
 
-            consumes.item(Items.pyratite).optional(true, false);
+            drawer = new DrawMulti(new DrawBlock(), new DrawWarmupRegion());
+
+            consumes.item(Items.pyratite);
             consumes.liquid(Liquids.cryofluid, 0.1f);
         }};
 
@@ -1978,12 +1980,11 @@ public class Blocks{
         }};
 
         //TODO rename
-        chemicalCombustionChamber = new SingleTypeGenerator("chemical-combustion-chamber"){{
+        chemicalCombustionChamber = new ConsumeGenerator("chemical-combustion-chamber"){{
             requirements(Category.power, with(Items.graphite, 40, Items.tungsten, 40, Items.oxide, 40f, Items.silicon, 30));
             powerProduction = 6f;
             consumes.liquids(LiquidStack.with(Liquids.ozone, 1f / 60f, Liquids.arkycite, 20f / 60f));
             size = 3;
-            useItems = false;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
                 sinMag = 3f;
                 sinScl = 5f;
@@ -1995,22 +1996,36 @@ public class Blocks{
             iconOverride = new String[]{"-bottom", ""};
             generateEffect = Fx.none;
 
+            liquidCapacity = 20f * 5;
+
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.06f;
         }};
 
-        if(false)
-        pyrolysisGenerator = new SingleTypeGenerator("pyrolysis-generator"){{
+        //TODO coolr name?
+        pyrolysisGenerator = new ConsumeGenerator("pyrolysis-generator"){{
             //TODO requirements
-            requirements(Category.power, with(Items.graphite, 50, Items.carbide, 50, Items.oxide, 60f, Items.silicon, 40));
+            requirements(Category.power, with(Items.graphite, 50, Items.carbide, 50, Items.oxide, 60f, Items.silicon, 50));
             powerProduction = 12f;
 
-            //TODO ratios, extra requirements
-            consumes.liquids(LiquidStack.with(Liquids.slag, 20f / 60f, Liquids.arkycite, 20f / 60f));
-            size = 3;
-            useItems = false;
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
+                sinMag = 2.75f;
+                sinScl = 5f;
+                sides = 8;
+                sideOffset = Mathf.PI / 2f;
+            }}, new DrawRegion("-mid"), new DrawLiquidTile(Liquids.arkycite, 38f / 4f), new DrawBlock(), new DrawGlowRegion(){{
+                alpha = 1f;
+                glowScale = 6f;
+                color = Pal.slagOrange;
+            }});
 
-            //TODO water output? hydrogen??
+            //TODO ratios, extra requirements?
+            consumes.liquids(LiquidStack.with(Liquids.slag, 20f / 60f, Liquids.arkycite, 30f / 60f));
+            size = 3;
+
+            liquidCapacity = 30f * 5;
+
+            liquidOutput = new LiquidStack(Liquids.water, 5f / 60f);
 
             iconOverride = new String[]{"-bottom", ""};
             generateEffect = Fx.none;
@@ -2018,10 +2033,6 @@ public class Blocks{
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.06f;
         }};
-
-        //TODO volatile reactor;
-        //- input arkycite, ozone(?), some item(?), maybe slag or heat?
-        //- output water, power
 
         //endregion power
         //region production

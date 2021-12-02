@@ -2,6 +2,8 @@ package mindustry.world.blocks.power;
 
 import mindustry.type.*;
 
+/** @deprecated use ConsumeGenerator instead, this class does not have a sane implementation. */
+@Deprecated
 public class SingleTypeGenerator extends ItemLiquidGenerator{
     public boolean useItems = true;
 

@@ -11,6 +11,14 @@ public class DrawRotator extends DrawBlock{
     public boolean drawSpinSprite = false;
     public float spinSpeed = 2f;
 
+    public DrawRotator(boolean drawSpinSprite, float spinSpeed){
+        this.drawSpinSprite = drawSpinSprite;
+        this.spinSpeed = spinSpeed;
+    }
+
+    public DrawRotator(){
+    }
+
     @Override
     public void drawBase(Building build){
         Draw.rect(build.block.region, build.x, build.y);

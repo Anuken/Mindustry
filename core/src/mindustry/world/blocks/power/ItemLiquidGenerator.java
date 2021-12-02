@@ -25,6 +25,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
     /** The time in number of ticks during which a single item will produce power. */
     public float itemDuration = 70f;
 
+    /** Minimum liquid efficiency for a generator to accept it. */
     public float minLiquidEfficiency = 0.2f;
     /** Maximum liquid used per frame. */
     public float maxLiquidGenerate = 0.4f;
@@ -36,6 +37,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
     public boolean defaults = false;
 
     /** @deprecated unused, use a custom drawer instead */
+    @Deprecated
     public Color heatColor = Color.valueOf("ff9b59");
     /** @deprecated unused, use a custom drawer instead */
     @Deprecated
@@ -129,14 +131,17 @@ public class ItemLiquidGenerator extends PowerGenerator{
             totalTime += heat * Time.delta;
 
             //liquid takes priority over solids
+            //TODO several issues with this! - it does not work correctly, consumption should not be handled here, why am I re-implementing consumes
+            //TODO what an awful class
             if(hasLiquids && liquid != null && liquids.get(liquid) >= 0.001f){
                 float baseLiquidEfficiency = getLiquidEfficiency(liquid);
                 float maximumPossible = maxLiquidGenerate * calculationDelta;
                 float used = Math.min(liquids.get(liquid) * calculationDelta, maximumPossible);
 
-                liquids.remove(liquid, used * power.graph.getUsageFraction());
+                liquids.remove(liquid, used);
                 productionEfficiency = baseLiquidEfficiency * used / maximumPossible;
 
+                //TODO this aggressively spams the generate effect why would anyone want this why is this here
                 if(used > 0.001f && (generateTime -= delta()) <= 0f){
                     generateEffect.at(x + Mathf.range(generateEffectRnd), y + Mathf.range(generateEffectRnd));
                     generateTime = 1f;
@@ -152,7 +157,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
                 }
 
                 if(generateTime > 0f){
-                    generateTime -= Math.min(1f / itemDuration * delta() * power.graph.getUsageFraction(), generateTime);
+                    generateTime -= Math.min(1f / itemDuration * delta(), generateTime);
 
                     if(randomlyExplode && state.rules.reactorExplosions && Mathf.chance(delta() * 0.06 * Mathf.clamp(explosiveness - 0.5f))){
                         //this block is run last so that in the event of a block destruction, no code relies on the block type
