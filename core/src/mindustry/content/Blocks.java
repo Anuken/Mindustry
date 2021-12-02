@@ -39,7 +39,7 @@ public class Blocks{
     //environment
     air, spawn, cliff, deepwater, water, taintedWater, deepTaintedWater, tar, slag, cryofluid, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space, empty,
     dacite, rhyolite, rhyoliteCrater, regolith, yellowStone, redIce,
-    arkyciteFloor,
+    arkyciteFloor, arkyicStone,
     redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     redweed, purbush, coralChunk, yellowCoral,
@@ -403,6 +403,10 @@ public class Blocks{
             drownTime = 200f;
             cacheLayer = CacheLayer.arkycite;
             albedo = 0.9f;
+        }};
+
+       arkyicStone = new Floor("arkyic-stone"){{
+            variants = 3;
         }};
 
         redmat = new Floor("redmat");

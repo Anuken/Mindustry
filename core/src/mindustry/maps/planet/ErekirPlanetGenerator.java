@@ -137,8 +137,12 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         //arkycite
         pass((x, y) -> {
 
-            if(noise(x + 300, y - x*1.6f + 100, 4, 0.81f, 86f, 1f) > 0.71f/* && floor == Blocks.yellowStone*/){
+            float noise = noise(x + 300, y - x*1.6f + 100, 4, 0.81f, 96f, 1f);
+
+            if(noise > 0.71f){
                 floor = Blocks.arkyciteFloor;
+            }else if(noise > 0.65){
+                floor = Blocks.arkyicStone;
             }
         });
 

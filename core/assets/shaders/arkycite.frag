@@ -1,6 +1,6 @@
 #define HIGHP
 
-#define S1 vec4(96.0, 131.0, 66.0, 78.0) / 255.0
+#define S1 vec4(96.0, 131.0, 66.0, 255.0) / 255.0
 #define S2 vec3(132.0, 169.0, 79.0) / 255.0
 #define S3 vec3(210.0, 221.0, 118.0) / 255.0
 
@@ -46,7 +46,7 @@ void main(){
         color.rgb = S2;
     }
 
-    if(orig.r > 0.01){
+    if(orig.g > 0.01){
         color = max(S1, color);
     }
 
