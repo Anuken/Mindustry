@@ -11,6 +11,7 @@ import mindustry.entities.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
+import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -31,11 +32,17 @@ public class ItemLiquidGenerator extends PowerGenerator{
     public Effect generateEffect = Fx.generatespark;
     public float generateEffectRnd = 3f;
     public Effect explodeEffect = Fx.generatespark;
-    public Color heatColor = Color.valueOf("ff9b59");
-    public @Load("@-top") TextureRegion topRegion;
-    public @Load("@-liquid") TextureRegion liquidRegion;
     public boolean randomlyExplode = true;
     public boolean defaults = false;
+
+    /** @deprecated unused, use a custom drawer instead */
+    public Color heatColor = Color.valueOf("ff9b59");
+    /** @deprecated unused, use a custom drawer instead */
+    @Deprecated
+    public @Load("@-top") TextureRegion topRegion;
+    /** @deprecated unused, use a custom drawer instead */
+    @Deprecated
+    public @Load("@-liquid") TextureRegion liquidRegion;
 
     public ItemLiquidGenerator(boolean hasItems, boolean hasLiquids, String name){
         this(name);
@@ -46,6 +53,8 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
     public ItemLiquidGenerator(String name){
         super(name);
+
+        drawer = new DrawMulti(new DrawBlock(), new DrawWarmupRegion());
     }
 
     protected void setDefaults(){
@@ -159,19 +168,13 @@ public class ItemLiquidGenerator extends PowerGenerator{
         }
 
         @Override
-        public void draw(){
-            super.draw();
+        public float warmup(){
+            return heat;
+        }
 
-            if(hasItems){
-                Draw.color(heatColor);
-                Draw.alpha(heat * 0.4f + Mathf.absin(Time.time, 8f, 0.6f) * heat);
-                Draw.rect(topRegion, x, y);
-                Draw.reset();
-            }
-
-            if(hasLiquids){
-                Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
-            }
+        @Override
+        public float totalProgress(){
+            return totalTime;
         }
 
         @Override

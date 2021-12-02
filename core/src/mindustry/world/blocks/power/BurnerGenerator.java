@@ -2,16 +2,22 @@ package mindustry.world.blocks.power;
 
 import arc.graphics.g2d.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.draw.*;
 
+//TODO deprecate this whole class?
 public class BurnerGenerator extends ItemLiquidGenerator{
+    @Deprecated
     public @Load(value = "@-turbine#", length = 2) TextureRegion[] turbineRegions;
+    @Deprecated
     public @Load("@-cap") TextureRegion capRegion;
+    @Deprecated
     public float turbineSpeed = 2f;
 
     public BurnerGenerator(String name){
         super(true, false, name);
+
+        drawer = new DrawMulti(new DrawBlock(), new DrawWarmupRegion(), new DrawTurbines());
     }
 
     @Override
@@ -24,27 +30,7 @@ public class BurnerGenerator extends ItemLiquidGenerator{
         return item.flammability;
     }
 
-    @Override
-    public TextureRegion[] icons(){
-        return turbineRegions[0].found() ? new TextureRegion[]{region, turbineRegions[0], turbineRegions[1], capRegion} : super.icons();
-    }
-
     public class BurnerGeneratorBuild extends ItemLiquidGeneratorBuild{
 
-        @Override
-        public void draw(){
-            super.draw();
-
-            if(turbineRegions[0].found()){
-                Draw.rect(turbineRegions[0], x, y, totalTime * turbineSpeed);
-                Draw.rect(turbineRegions[1], x, y, -totalTime * turbineSpeed);
-
-                Draw.rect(capRegion, x, y);
-            }
-
-            if(hasLiquids && liquidRegion.found()){
-                Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
-            }
-        }
     }
 }

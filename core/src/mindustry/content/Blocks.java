@@ -1881,6 +1881,7 @@ public class Blocks{
             consumes.liquid(Liquids.water, 0.1f);
             hasLiquids = true;
             size = 2;
+            iconOverride = new String[]{"", "-turbine0", "-turbine1"};
 
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.06f;
@@ -1965,14 +1966,22 @@ public class Blocks{
             liquidCapacity = 20f;
         }};
 
-        //TODO arkycite combustion: ozone + arkycite
-
-        if(false)
-        chemicalCombustionChamber = new ItemLiquidGenerator("chemical-combustion-chamber"){{
-            requirements(Category.power, with(Items.graphite, 30, Items.tungsten, 40, Items.silicon, 30));
+        chemicalCombustionChamber = new SingleTypeGenerator("chemical-combustion-chamber"){{
+            requirements(Category.power, with(Items.graphite, 40, Items.tungsten, 40, Items.oxide, 40f, Items.silicon, 30));
             powerProduction = 6f;
             consumes.liquids(LiquidStack.with(Liquids.ozone, 1f / 60f, Liquids.arkycite, 20f / 60f));
             size = 3;
+            useItems = false;
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
+                sinMag = 3f;
+                sinScl = 5f;
+            }}, new DrawRegion("-mid"), new DrawLiquidTile(Liquids.arkycite, 37f / 4f), new DrawBlock(), new DrawGlowRegion(){{
+                alpha = 1f;
+                glowScale = 5f;
+                color = Color.valueOf("c967b099");
+            }});
+            iconOverride = new String[]{"-bottom", ""};
+            generateEffect = Fx.none;
 
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.06f;

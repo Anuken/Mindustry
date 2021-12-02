@@ -28,6 +28,7 @@ public class DrawLiquidRegion extends DrawBlock{
 
     @Override
     public void drawBase(Building build){
+        if(!build.block.hasLiquids) return;
 
         Liquid drawn = drawLiquid != null ? drawLiquid : build.liquids.current();
         Drawf.liquid(liquid, build.x, build.y,

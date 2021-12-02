@@ -1,25 +1,48 @@
 package mindustry.world.blocks.power;
 
 import arc.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
+import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 public class PowerGenerator extends PowerDistributor{
     /** The amount of power produced per tick in case of an efficiency of 1.0, which represents 100%. */
     public float powerProduction;
     public Stat generationType = Stat.basePowerGeneration;
+    public DrawBlock drawer = new DrawBlock();
+    public @Nullable String[] iconOverride;
 
     public PowerGenerator(String name){
         super(name);
         sync = true;
         baseExplosiveness = 5f;
         flags = EnumSet.of(BlockFlag.generator);
+    }
+
+    @Override
+    public TextureRegion[] icons(){
+        if(iconOverride != null){
+            var out = new TextureRegion[iconOverride.length];
+            for(int i = 0; i < out.length; i++){
+                out[i] = Core.atlas.find(name + iconOverride[i]);
+            }
+            return out;
+        }
+        return drawer.icons(this);
+    }
+
+    @Override
+    public void load(){
+        super.load();
+        drawer.load(this);
     }
 
     @Override
@@ -42,6 +65,11 @@ public class PowerGenerator extends PowerDistributor{
     }
 
     @Override
+    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        drawer.drawPlan(this, plan, list);
+    }
+
+    @Override
     public boolean outputsItems(){
         return false;
     }
@@ -50,6 +78,17 @@ public class PowerGenerator extends PowerDistributor{
         public float generateTime;
         /** The efficiency of the producer. An efficiency of 1.0 means 100% */
         public float productionEfficiency = 0.0f;
+
+        @Override
+        public void draw(){
+            drawer.drawBase(this);
+        }
+
+        @Override
+        public void drawLight(){
+            super.drawLight();
+            drawer.drawLights(this);
+        }
 
         @Override
         public float ambientVolume(){
