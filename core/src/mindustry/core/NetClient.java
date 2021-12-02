@@ -267,6 +267,13 @@ public class NetClient implements ApplicationListener{
             }
         }
     }
+    
+    @Remote(called = Loc.server, variants = Variant.both)
+    public static void copyText(String text){
+        if(text == null) return;
+
+        Core.app.setClipboardText(text);
+    }
 
     @Remote(called = Loc.client, variants = Variant.one)
     public static void connect(String ip, int port){
