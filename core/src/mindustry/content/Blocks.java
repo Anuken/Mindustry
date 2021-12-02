@@ -2015,7 +2015,7 @@ public class Blocks{
                 sideOffset = Mathf.PI / 2f;
             }}, new DrawRegion("-mid"), new DrawLiquidTile(Liquids.arkycite, 38f / 4f), new DrawBlock(), new DrawGlowRegion(){{
                 alpha = 1f;
-                glowScale = 6f;
+                glowScale = 5f;
                 color = Pal.slagOrange;
             }});
 

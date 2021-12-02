@@ -54,7 +54,9 @@ public class ErekirTechTree{
             node(turbineCondenser, () -> {
                 node(beamNode, () -> {
                     node(chemicalCombustionChamber, () -> {
+                        node(pyrolysisGenerator, () -> {
 
+                        });
                     });
 
                     node(beamTower, () -> {
