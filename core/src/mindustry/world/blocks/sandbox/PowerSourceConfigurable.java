@@ -1,76 +1,182 @@
 package mindustry.world.blocks.sandbox;
 
+import arc.*;
+import arc.Input.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.geom.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.util.*;
 import arc.util.io.*;
+import arc.util.pooling.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
+import mindustry.ui.dialogs.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.meta.*;
 
-public class PowerSourceConfigurable extends PowerDistributor{
+import static mindustry.Vars.*;
+
+public class PowerSourceConfigurable extends PowerNode{
+    //don't change this too much unless you want to run into issues with packet sizes
+    public int maxTextLength = 220;
+    public int maxNewlines = 24;
 
     public PowerSourceConfigurable(String name){
         super(name);
-        outputsPower = true;
-        consumesPower = false;
-        envEnabled = Env.any;
         configurable = true;
+        solid = true;
+        destructible = true;
+        drawDisabled = false;
+        envEnabled = Env.any;
+        hasPower = true;
+        outputsPower = true;
+        maxNodes = 100;
 
-        config(Float.class, (PowerSourceConfigurableBuild tile, Float power) -> {
-            tile.powerProduction = (float) Math.pow(10,power) / 60f;
-            tile.current = power;
-        });
-        configClear((PowerSourceConfigurableBuild tile) -> {
-            tile.powerProduction = 0f;
-            tile.current = 0f;
+        config(String.class, (PowerSourceConfigurableBuild tile, String text) -> {
+            if(text.length() > maxTextLength){
+                return; //no.
+            }
+
+            tile.message.ensureCapacity(text.length());
+            tile.message.setLength(0);
+
+            text = text.trim();
+            int count = 0;
+            for(int i = 0; i < text.length(); i++){
+                char c = text.charAt(i);
+                if(c == '\n'){
+                    if(count++ <= maxNewlines){
+                        tile.message.append('\n');
+                    }
+                }else{
+                    tile.message.append(c);
+                }
+            }
         });
     }
 
     public class PowerSourceConfigurableBuild extends Building{
+        public StringBuilder message = new StringBuilder();
+        float power = 0f;
 
-        public float current = 3f;
-        public float powerProduction = (float) Math.pow(10,current) / 60f;
+        @Override
+        public void drawSelect(){
+            //super.drawSelect();
+
+            if(renderer.pixelator.enabled()) return;
+
+            Font font = Fonts.outline;
+            GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+            boolean ints = font.usesIntegerPositions();
+            font.getData().setScale(1 / 4f / Scl.scl(1f));
+            font.setUseIntegerPositions(false);
+
+            try{
+                Float.parseFloat(message.toString());
+            }catch(NumberFormatException exp){
+                message.replace(0,message.length(),"@inputnumber"); //ex: "Please input a valid number"
+            }
+
+            CharSequence text = message == null || message.length() == 0 ? "[lightgray]" + Core.bundle.get("empty") : message;
+
+            l.setText(font, text, Color.white, 90f, Align.left, true);
+            float offset = 1f;
+
+            Draw.color(0f, 0f, 0f, 0.2f);
+            Fill.rect(x, y - tilesize/2f - l.height/2f - offset, l.width + offset*2f, l.height + offset*2f);
+            Draw.color();
+            font.setColor(Color.white);
+            font.draw(text, x - l.width/2f, y - tilesize/2f - offset, 90f, Align.left, true);
+            font.setUseIntegerPositions(ints);
+
+            font.getData().setScale(1f);
+
+            Pools.free(l);
+        }
 
         @Override
         public void buildConfiguration(Table table){
-            Table temp = table.table(Tex.pane).get();
-            //Styles.clearTransi
-            temp.add(new Label(() -> "power: " + powerProduction * 60f));
-            temp.row();
-            temp.slider(0f, 6f, 0.1f, current, this::configure);
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
+            table.button(Icon.pencil, () -> {
+                if(mobile){
+                    Core.input.getTextInput(new TextInput(){{
+                        text = message.toString();
+                        multiline = true;
+                        maxLength = maxTextLength;
+                        accepted = str -> {
+                            if(!str.equals(text)) configure(str);
+                        };
+                    }});
+                }else{
+                    BaseDialog dialog = new BaseDialog("@editpower");
+                    dialog.setFillParent(false);
+                    TextArea a = dialog.cont.add(new TextArea(message.toString().replace("\r", "\n"))).size(380f, 60f).get();
+                    a.setFilter((textField, c) -> {
+                        if(c == '\n'){
+                            int count = 0;
+                            for(int i = 0; i < textField.getText().length(); i++){
+                                if(textField.getText().charAt(i) == '\n'){
+                                    count++;
+                                }
+                            }
+                            return count < maxNewlines;
+                        }
+                        return true;
+                    });
+                    a.setMaxLength(maxTextLength);
+                    dialog.buttons.button("@ok", () -> {
+                        if(!a.getText().equals(message.toString())) configure(a.getText());
+                        try{
+                            power = !enabled || message.length() == 0 ? 0f : Float.parseFloat(message.toString()) / 60f;
+                        }catch(NumberFormatException exp){
+                            power = 0f;
+                        }
+                        dialog.hide();
+                    }).size(130f, 60f);
+                    dialog.update(() -> {
+                        if(tile.build != this){
+                            dialog.hide();
+                        }
+                    });
+                    dialog.show();
+                }
                 deselect();
-                configure(null);
-                return false;
-            }
-
-            return true;
+            }).size(40f);
         }
 
         @Override
-        public Float config(){
-            return powerProduction;
+        public void handleString(Object value){
+            message.setLength(0);
+            message.append(value);
+        }
+
+        @Override
+        public void updateTableAlign(Table table){
+            Vec2 pos = Core.input.mouseScreen(x, y + size * tilesize / 2f + 1);
+            table.setPosition(pos.x, pos.y, Align.bottom);
+        }
+
+        @Override
+        public String config(){
+            return message.toString();
         }
 
         @Override
         public float getPowerProduction(){
-            return enabled ? powerProduction : 0f;
+            return power;
         }
 
         @Override
         public void write(Writes write){
             super.write(write);
-            write.f(current);
+            write.str(message.toString());
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            current = read.f();
+            message = new StringBuilder(read.str());
         }
     }
 }
