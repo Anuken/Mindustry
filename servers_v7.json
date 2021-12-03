@@ -74,5 +74,9 @@
   {
     "name": "LostDustry",
     "address": ["lostdustry.northeurope.cloudapp.azure.com:6568", "lostdustry.northeurope.cloudapp.azure.com:6569", "lostdustry.northeurope.cloudapp.azure.com:6570"]
-  } 
+  },
+  {
+    "name": "ALEX",
+    "address": ["dogemindustry.ddns.net:25588"]
+  }
 ]
