@@ -309,6 +309,9 @@ public class Turret extends ReloadTurret{
                 logicControlTime -= Time.delta;
             }
 
+            //turret always reloads regardless of whether it's targeting something
+            updateReload();
+
             if(hasAmmo()){
                 if(Float.isNaN(reload)) rotation = 0;
 
@@ -412,8 +415,15 @@ public class Turret extends ReloadTurret{
             return ammo.size > 0 && ammo.peek().amount >= ammoPerShot;
         }
 
+        protected void updateReload(){
+            float multiplier = hasAmmo() ? peekAmmo().reloadMultiplier : 1f;
+            reload += delta() * multiplier * baseReloadSpeed();
+
+            //cap reload for visual reasons
+            reload = Math.min(reload, reloadTime);
+        }
+
         protected void updateShooting(){
-            reload += delta() * peekAmmo().reloadMultiplier * baseReloadSpeed();
 
             if(reload >= reloadTime && !charging){
                 BulletType type = peekAmmo();

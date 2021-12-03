@@ -117,6 +117,7 @@ public class Pal{
     logicUnits = Color.valueOf("c7b59d"),
 
     berylShot = Color.valueOf("b1dd7e"),
+    tungstenShot = Color.valueOf("768a9a"),
 
     plasticBurn = Color.valueOf("e9ead3"),
 

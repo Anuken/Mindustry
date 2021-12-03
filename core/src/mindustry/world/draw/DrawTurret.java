@@ -131,6 +131,9 @@ public class DrawTurret extends DrawBlock{
         public boolean outline = true;
         /** If true, the layer is overridden to be under the turret itself. */
         public boolean under = false;
+        /** If true, progress is inverted. */
+        public boolean invert = false;
+        public Interp interp = Interp.linear;
         public float layer = -1;
         public float outlineLayerOffset = -0.01f;
         public float rotation, rotMove;
@@ -154,10 +157,12 @@ public class DrawTurret extends DrawBlock{
             }
             float prevZ = layer > 0 ? layer : z;
 
-            float progress = useReload ? build.progress() : build.warmup();
-            if(oscMag > 0){
-                progress += oscAbs ? Mathf.absin(oscScl, oscMag) : Mathf.sin(oscScl, oscMag);
-            }
+            float progress = useReload ? 1f - build.progress() : build.warmup();
+
+            if(oscMag > 0) progress += oscAbs ? Mathf.absin(oscScl, oscMag) : Mathf.sin(oscScl, oscMag);
+            if(invert) progress = 1f - progress;
+
+            progress = interp.apply(progress);
 
             for(int i = 0; i < regions.length; i++){
                 var region = regions[i];

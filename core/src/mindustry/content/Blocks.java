@@ -2767,7 +2767,7 @@ public class Blocks{
             consumes.add(new ConsumeCoolant(0.5f)).update(false);
         }};
 
-        //TODO tungsten?
+        //TODO tungsten support?
         breach = new ItemTurret("breach"){{
             requirements(Category.turret, with(Items.beryllium, 35, Items.silicon, 20), true);
             ammo(
@@ -2783,7 +2783,21 @@ public class Blocks{
                 frontColor = Color.white;
                 trailWidth = 1.5f;
                 trailLength = 10;
-                //TODO different effect?
+                hitEffect = despawnEffect = Fx.hitBulletColor;
+            }},
+            Items.tungsten, new BasicBulletType(6.6f, 46){{
+                width = 9f;
+                height = 14f;
+                shootEffect = Fx.tungstenSpark;
+                smokeEffect = Fx.shootBigSmoke;
+                ammoMultiplier = 1;
+                reloadMultiplier = 1.4f;
+                pierce = true;
+                pierceBuilding = true;
+                hitColor = backColor = trailColor = Pal.tungstenShot;
+                frontColor = Color.white;
+                trailWidth = 1.6f;
+                trailLength = 10;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }}
             );

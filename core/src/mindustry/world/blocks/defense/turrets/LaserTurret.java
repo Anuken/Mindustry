@@ -91,6 +91,11 @@ public class LaserTurret extends PowerTurret{
         }
 
         @Override
+        protected void updateReload(){
+            //updated in updateTile() depending on coolant
+        }
+
+        @Override
         protected void updateShooting(){
             if(bulletLife > 0 && bullet != null){
                 return;

@@ -27,6 +27,13 @@ public class ReloadTurret extends BaseTurret{
     public class ReloadTurretBuild extends BaseTurretBuild{
         public float reload;
 
+        @Override
+        public void created(){
+            super.created();
+            //for visual reasons, the turret does not need reloading when placed
+            reload = reloadTime;
+        }
+
         protected void updateCooling(){
             if(reload < reloadTime){
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;

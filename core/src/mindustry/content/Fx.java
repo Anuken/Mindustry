@@ -1392,6 +1392,16 @@ public class Fx{
         });
     }),
 
+    //TODO just make it properly colored...
+    tungstenSpark = new Effect(23f, e -> {
+        color(Color.white, Pal.tungstenShot, e.fin());
+        stroke(e.fout() * 1.1f + 0.5f);
+
+        randLenVectors(e.id, 5, 28f * e.fin(), e.rotation, 10f, (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 5f + 0.5f);
+        });
+    }),
+
     shootPayloadDriver = new Effect(30f, e -> {
         color(Pal.accent);
         Lines.stroke(0.5f + 0.5f*e.fout());

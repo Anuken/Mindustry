@@ -96,12 +96,17 @@ public class ContinuousTurret extends Turret{
         }
 
         @Override
+        protected void updateReload(){
+            //continuous turrets don't have a concept of reload, they are always firing when possible
+        }
+
+        @Override
         protected void updateShooting(){
             if(bullet != null){
                 return;
             }
 
-            if(reload <= 0 && (consValid() || cheating()) && !charging){
+            if((consValid() || cheating()) && !charging){
                 BulletType type = peekAmmo();
                 shoot(type);
             }
