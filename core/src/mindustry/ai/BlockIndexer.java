@@ -105,8 +105,8 @@ public class BlockIndexer{
             var flags = tile.block().flags;
             var data = team.data();
 
-            if(flags.size() > 0){
-                for(BlockFlag flag : flags){
+            if(flags.size > 0){
+                for(BlockFlag flag : flags.array){
                     getFlagged(team)[flag.ordinal()].remove(tile);
                 }
             }
@@ -400,10 +400,10 @@ public class BlockIndexer{
         //only process entity changes with centered tiles
         if(tile.isCenter() && tile.build != null){
             var data = team.data();
-            if(tile.block().flags.size() > 0 && tile.isCenter()){
+            if(tile.block().flags.size > 0 && tile.isCenter()){
                 TileArray[] map = getFlagged(team);
 
-                for(BlockFlag flag : tile.block().flags){
+                for(BlockFlag flag : tile.block().flags.array){
 
                     TileArray arr = map[flag.ordinal()];
 

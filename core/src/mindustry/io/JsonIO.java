@@ -231,8 +231,8 @@ public class JsonIO{
                 UnitType unit = Vars.content.getByName(ContentType.unit, str);
                 return
                     item != null ? item :
-                    block != null ? block :
                     liquid != null ? liquid :
+                    block != null ? block :
                     unit;
             }
         });

@@ -121,7 +121,7 @@ public class Block extends UnlockableContent{
     public boolean autoResetEnabled = true;
     /** if true, the block stops updating when disabled */
     public boolean noUpdateDisabled = false;
-    /** if true, this block updates when a payload of a unit. Currently unused! */
+    /** if true, this block updates when it's a payload in a unit. Currently unused! */
     public boolean updateInUnits = true;
     /** Whether to use this block's color in the minimap. Only used for overlays. */
     public boolean useColor = true;
