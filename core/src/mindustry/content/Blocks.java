@@ -52,7 +52,7 @@ public class Blocks implements ContentList{
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
-    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator,
+    powerSource, powerSourceConfigurable, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator,
 
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
@@ -2132,6 +2132,11 @@ public class Blocks implements ContentList{
         powerSource = new PowerSource("power-source"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, with());
             powerProduction = 1000000f / 60f;
+            alwaysUnlocked = true;
+        }};
+
+        powerSourceConfigurable = new PowerSourceConfigurable("power-source-configurable"){{
+            requirements(Category.power, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
         }};
 

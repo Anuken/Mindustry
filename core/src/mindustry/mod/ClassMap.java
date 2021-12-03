@@ -313,6 +313,7 @@ public class ClassMap{
         classes.put("LiquidVoidBuild", mindustry.world.blocks.sandbox.LiquidVoid.LiquidVoidBuild.class);
         classes.put("PowerSource", mindustry.world.blocks.sandbox.PowerSource.class);
         classes.put("PowerSourceBuild", mindustry.world.blocks.sandbox.PowerSource.PowerSourceBuild.class);
+        classes.put("PowerSourceConfigurableBuild", mindustry.world.blocks.sandbox.PowerSourceConfigurable.PowerSourceConfigurableBuild.class);
         classes.put("PowerVoid", mindustry.world.blocks.sandbox.PowerVoid.class);
         classes.put("CoreBlock", mindustry.world.blocks.storage.CoreBlock.class);
         classes.put("CoreBuild", mindustry.world.blocks.storage.CoreBlock.CoreBuild.class);
