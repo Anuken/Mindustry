@@ -3,6 +3,7 @@ package mindustry.ctype;
 import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.TechTree.*;
@@ -86,6 +87,11 @@ public abstract class UnlockableContent extends MappableContent{
 
     /** Initializes stats on demand. Should only be called once. Only called before something is displayed. */
     public void setStats(){
+    }
+
+    /** Display any extra info after details. */
+    public void displayExtra(Table table){
+
     }
 
     /**

@@ -85,6 +85,8 @@ public class ContentInfoDialog extends BaseDialog{
             table.row();
         }
 
+        content.displayExtra(table);
+
         ScrollPane pane = new ScrollPane(table);
         cont.add(pane);
 

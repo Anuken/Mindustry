@@ -14,7 +14,11 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
-/** A unit that can command other units. */
+/**
+ * A unit that can command other units.
+ * @deprecated This mechanic is likely to be removed or completely reworked in the future.
+ * */
+@Deprecated
 @Component
 abstract class CommanderComp implements Entityc, Posc{
     private static final Seq<FormationMember> members = new Seq<>();

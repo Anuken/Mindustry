@@ -1056,7 +1056,7 @@ public class Blocks{
             iconOverride = new String[]{"-bottom", "", "-top1"};
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(), new DrawBlock(), new DrawHeatOutput());
 
-            craftTime = 60f * 4f;
+            craftTime = 60f * 3f;
             liquidCapacity = 30f;
             heatOutput = 5f;
         }};
@@ -1248,6 +1248,7 @@ public class Blocks{
         }};
 
         //TODO needs to be completely redone from the ground up
+        if(false)
         cellSynthesisChamber = new LiquidConverter("cell-synthesis-chamber"){{
             //TODO booster mechanics?
             requirements(Category.crafting, with(Items.thorium, 100, Items.phaseFabric, 120, Items.titanium, 150, Items.surgeAlloy, 70));

@@ -40,6 +40,7 @@ public class ContentLoader{
 
     /** Creates all base types. */
     public void createBaseContent(){
+        TeamEntries.load();
         Items.load();
         StatusEffects.load();
         Liquids.load();
