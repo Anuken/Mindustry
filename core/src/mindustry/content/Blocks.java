@@ -2840,7 +2840,7 @@ public class Blocks{
             range = 180;
             shootCone = 3f;
             health = 300 * size * size;
-            rotateSpeed = 1.8f;
+            rotateSpeed = 1.6f;
 
             limitRange();
         }};
@@ -2947,7 +2947,7 @@ public class Blocks{
 
             ammo(
             //TODO ammo types to be defined later
-            Items.fissileMatter, new ArtilleryBulletType(2f, 40, "shell"){{
+            Items.fissileMatter, new ArtilleryBulletType(2.5f, 40, "shell"){{
                 //TODO FX; smoke, shockwave, not green bomb
                 hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
                 despawnEffect = Fx.none;
@@ -2955,11 +2955,11 @@ public class Blocks{
                 lifetime = 140f;
                 height = 16f;
                 width = 14.2f;
-                ammoMultiplier = 4f;
                 splashDamageRadius = 60f;
                 splashDamage = 100f;
                 backColor = hitColor = trailColor = Pal.berylShot;
                 frontColor = Color.valueOf("f0ffde");
+                ammoMultiplier = 1f;
 
                 status = StatusEffects.blasted;
 
