@@ -66,10 +66,7 @@ public class MendProjector extends Block{
     }
 
     public class MendBuild extends Building implements Ranged{
-        float heat;
-        float charge = Mathf.random(reload);
-        float phaseHeat;
-        float smoothEfficiency;
+        public float heat, charge = Mathf.random(reload), phaseHeat, smoothEfficiency;
 
         @Override
         public float range(){

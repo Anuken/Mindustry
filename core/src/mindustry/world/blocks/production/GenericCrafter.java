@@ -1,6 +1,5 @@
 package mindustry.world.blocks.production;
 
-import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
@@ -40,8 +39,6 @@ public class GenericCrafter extends Block{
     public boolean legacyReadWarmup = false;
 
     public DrawBlock drawer = new DrawBlock();
-    /** If set, the icon is overridden to be these strings, in order. Each string is a suffix. */
-    public @Nullable String[] iconOverride = null;
 
     public GenericCrafter(String name){
         super(name);
@@ -129,14 +126,7 @@ public class GenericCrafter extends Block{
 
     @Override
     public TextureRegion[] icons(){
-        if(iconOverride != null){
-            var out = new TextureRegion[iconOverride.length];
-            for(int i = 0; i < out.length; i++){
-                out[i] = Core.atlas.find(name + iconOverride[i]);
-            }
-            return out;
-        }
-        return drawer.icons(this);
+        return drawer.finalIcons(this);
     }
 
     @Override

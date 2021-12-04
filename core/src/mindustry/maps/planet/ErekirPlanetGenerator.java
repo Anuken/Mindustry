@@ -189,6 +189,10 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                     }else if(block != Blocks.carbonWall && noise(x + 782, y, 4, 0.8f, 37f, 1f) > 0.68f){
                         ore = Blocks.wallOreBeryl;
                     }
+                    //TODO generate tungsten, or not?
+                    //else if(block == Blocks.yellowStoneWall && noise(x, y + 942, 4, 0.7f, 38f, 1f) > 0.71f){
+                    //    ore = Blocks.wallOreTungsten;
+                    //}
                 }
             }else if(!nearWall(x, y)){
 

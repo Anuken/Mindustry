@@ -1,5 +1,6 @@
 package mindustry.world.draw;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
@@ -14,6 +15,9 @@ import mindustry.world.blocks.production.GenericCrafter.*;
  * This is used mostly for mods. */
 public class DrawBlock{
     protected static final Rand rand = new Rand();
+
+    /** If set, the icon is overridden to be these strings, in order. Each string is a suffix. */
+    public @Nullable String[] iconOverride = null;
 
     /** @deprecated no longer called! not specific to generic crafters! */
     @Deprecated
@@ -50,6 +54,17 @@ public class DrawBlock{
     /** @return the generated icons to be used for this block. */
     public TextureRegion[] icons(Block block){
         return new TextureRegion[]{block.region};
+    }
+
+    public final TextureRegion[] finalIcons(Block block){
+        if(iconOverride != null){
+            var out = new TextureRegion[iconOverride.length];
+            for(int i = 0; i < out.length; i++){
+                out[i] = Core.atlas.find(block.name + iconOverride[i]);
+            }
+            return out;
+        }
+        return icons(block);
     }
 
     public GenericCrafter expectCrafter(Block block){

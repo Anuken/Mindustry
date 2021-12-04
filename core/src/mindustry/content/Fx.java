@@ -1353,6 +1353,12 @@ public class Fx{
         });
     }),
 
+    regenParticle = new Effect(100f, e -> {
+        color(Pal.accent);
+
+        Fill.square(e.x, e.y, e.fslope() * 1.5f + 0.14f, 45f);
+    }),
+
     surgeCruciSmoke = new Effect(160f, e -> {
         color(Pal.slagOrange);
         alpha(0.6f);

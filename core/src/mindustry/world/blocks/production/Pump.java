@@ -73,7 +73,7 @@ public class Pump extends LiquidBlock{
 
     @Override
     public TextureRegion[] icons(){
-        return draw.icons(this);
+        return draw.finalIcons(this);
     }
 
     @Override

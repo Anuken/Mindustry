@@ -56,7 +56,7 @@ public class Blocks{
     oreTungsten,
 
     //wall ores
-    wallOreBeryl, graphiticWall,
+    wallOreBeryl, graphiticWall, wallOreTungsten,
 
     //crafting
     siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -72,9 +72,14 @@ public class Blocks{
 
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
-    phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriveProjector, overdriveDome, forceProjector, shockMine,
-    buildTower,
+    phaseWall, phaseWallLarge, surgeWall, surgeWallLarge,
+    mender, mendProjector, overdriveProjector, overdriveDome, forceProjector, shockMine,
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
+
+    //defense - erekir
+    buildTower,
+    //TODO name
+    regenProjector,
 
     //transport
     conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
@@ -689,6 +694,8 @@ public class Blocks{
             variants = 3;
         }};
 
+        wallOreTungsten = new WallOreBlock(Items.tungsten);
+
         //endregion
         //region crafting
 
@@ -1011,7 +1018,7 @@ public class Blocks{
                 }}
             );
 
-            iconOverride = new String[]{"-bottom", ""};
+            drawer.iconOverride = new String[]{"-bottom", ""};
             outputLiquids = LiquidStack.with(Liquids.ozone, 2f * craftTime / 60, Liquids.hydrogen, 3f * craftTime / 60);
             liquidOutputDirections = new int[]{1, 3};
         }};
@@ -1052,9 +1059,8 @@ public class Blocks{
 
             rotateDraw = false;
 
-            //TODO vent?
-            iconOverride = new String[]{"-bottom", "", "-top1"};
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(), new DrawBlock(), new DrawHeatOutput());
+            drawer.iconOverride = new String[]{"-bottom", "", "-top1"};
 
             craftTime = 60f * 3f;
             liquidCapacity = 30f;
@@ -1065,7 +1071,7 @@ public class Blocks{
             requirements(Category.crafting, with(Items.tungsten, 30, Items.graphite, 30));
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.slag, 9f), new DrawHeatOutput(true));
-            iconOverride = new String[]{"-bottom", ""};
+            drawer.iconOverride = new String[]{"-bottom", ""};
             size = 2;
             craftTime = 60f * 1f;
             heatOutput = 2f;
@@ -1101,7 +1107,7 @@ public class Blocks{
             itemCapacity = 20;
             hasPower = hasItems = true;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawCrucible(), new DrawBlock(), new DrawHeatInput());
-            iconOverride = new String[]{"-bottom", ""};
+            drawer.iconOverride = new String[]{"-bottom", ""};
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.07f;
 
@@ -1134,7 +1140,7 @@ public class Blocks{
             }
 
             drawer = new DrawMulti(drawers.and(new DrawBlock()));
-            iconOverride = new String[]{"-bottom", ""};
+            drawer.iconOverride = new String[]{"-bottom", ""};
 
             craftTime = 60f * 2f;
 
@@ -1172,7 +1178,7 @@ public class Blocks{
             new DrawHeatRegion("-vents"){{
                 color.a = 1f;
             }});
-            iconOverride = new String[]{"-bottom", ""};
+            drawer.iconOverride = new String[]{"-bottom", ""};
 
             consumes.item(Items.silicon, 3);
             //TODO must consume from 2 pumps, 1, or 1.5?
@@ -1199,7 +1205,7 @@ public class Blocks{
                 particleSizeInterp = Interp.one;
             }}, new DrawBlock(), new DrawHeatInput(), new DrawHeatRegion("-heat-top"));
 
-            iconOverride = new String[]{"-bottom", ""};
+            drawer.iconOverride = new String[]{"-bottom", ""};
 
             size = 3;
 
@@ -1240,7 +1246,7 @@ public class Blocks{
             }}, new DrawBlock(), new DrawHeatInput(), new DrawHeatRegion("-vents"){{
                 color = new Color(1f, 0.4f, 0.3f, 1f);
             }});
-            iconOverride = new String[]{"-bottom", "-weave", ""};
+            drawer.iconOverride = new String[]{"-bottom", "-weave", ""};
 
             consumes.items(with(Items.thorium, 2, Items.sand, 6));
             consumes.liquid(Liquids.ozone, 2f / 60f);
@@ -1479,8 +1485,27 @@ public class Blocks{
             consumes.power(3f);
             range = 120f;
             size = 3;
-            health = 80;
             buildSpeed = 1.5f;
+        }};
+
+        //TODO green looks bad switch to orange
+        regenProjector = new RegenProjector("regen-projector"){{
+            requirements(Category.effect, with(Items.silicon, 60, Items.tungsten, 60, Items.oxide, 40));
+            size = 3;
+            consumes.power(1f);
+            rangeWidth = 4;
+            rangeLength = 20;
+
+            consumes.liquid(Liquids.hydrogen, 1f / 60f);
+
+            healPercent = 4f / 60f;
+
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.hydrogen, 9f / 4f), new DrawSideRegion(true), new DrawGlowRegion(){{
+                //color = Color.valueOf("1eff21");
+            }}, new DrawGlowRegion(true){{
+                suffix = "-side-glow";
+                alpha = 1f;
+            }});
         }};
 
         //endregion
@@ -1892,7 +1917,7 @@ public class Blocks{
             consumes.liquid(Liquids.water, 0.1f);
             hasLiquids = true;
             size = 2;
-            iconOverride = new String[]{"", "-turbine0", "-turbine1"};
+            drawer.iconOverride = new String[]{"", "-turbine0", "-turbine1"};
 
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.06f;
@@ -1994,7 +2019,7 @@ public class Blocks{
                 glowScale = 5f;
                 color = Color.valueOf("c967b099");
             }});
-            iconOverride = new String[]{"-bottom", ""};
+            drawer.iconOverride = new String[]{"-bottom", ""};
             generateEffect = Fx.none;
 
             liquidCapacity = 20f * 5;
@@ -2028,7 +2053,7 @@ public class Blocks{
 
             liquidOutput = new LiquidStack(Liquids.water, 5f / 60f);
 
-            iconOverride = new String[]{"-bottom", ""};
+            drawer.iconOverride = new String[]{"-bottom", ""};
             generateEffect = Fx.none;
 
             ambientSound = Sounds.smelter;
@@ -2785,13 +2810,13 @@ public class Blocks{
                 trailLength = 10;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }},
-            Items.tungsten, new BasicBulletType(6.6f, 46){{
+            Items.tungsten, new BasicBulletType(6.6f, 47){{
                 width = 9f;
                 height = 14f;
                 shootEffect = Fx.tungstenSpark;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 1;
-                reloadMultiplier = 1.4f;
+                reloadMultiplier = 0.7f;
                 pierce = true;
                 pierceBuilding = true;
                 hitColor = backColor = trailColor = Pal.tungstenShot;

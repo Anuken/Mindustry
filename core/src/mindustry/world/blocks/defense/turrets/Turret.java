@@ -148,7 +148,7 @@ public class Turret extends ReloadTurret{
 
     @Override
     public TextureRegion[] icons(){
-        return draw.icons(this);
+        return draw.finalIcons(this);
     }
 
     @Override

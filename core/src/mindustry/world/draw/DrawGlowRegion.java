@@ -17,6 +17,7 @@ public class DrawGlowRegion extends DrawBlock{
     public float alpha = 0.9f, glowScale = 10f, glowIntensity = 0.5f;
     public float rotateSpeed = 0f;
     public float layer = Layer.blockAdditive;
+    public boolean rotate = false;
     public Color color = Color.red.cpy();
     public TextureRegion region;
 
@@ -25,6 +26,10 @@ public class DrawGlowRegion extends DrawBlock{
 
     public DrawGlowRegion(float layer){
         this.layer = layer;
+    }
+
+    public DrawGlowRegion(boolean rotate){
+        this.rotate = rotate;
     }
 
     @Override
@@ -36,7 +41,7 @@ public class DrawGlowRegion extends DrawBlock{
         Draw.blend(blending);
         Draw.color(color);
         Draw.alpha((Mathf.absin(build.totalProgress(), glowScale, alpha) * glowIntensity + 1f - glowIntensity) * build.warmup() * alpha);
-        Draw.rect(region, build.x, build.y, build.totalProgress() * rotateSpeed);
+        Draw.rect(region, build.x, build.y, build.totalProgress() * rotateSpeed + (rotate ? build.rotdeg() : 0f));
         Draw.reset();
         Draw.blend();
         Draw.z(z);

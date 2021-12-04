@@ -18,7 +18,6 @@ public class PowerGenerator extends PowerDistributor{
     public float powerProduction;
     public Stat generationType = Stat.basePowerGeneration;
     public DrawBlock drawer = new DrawBlock();
-    public @Nullable String[] iconOverride;
 
     public PowerGenerator(String name){
         super(name);
@@ -29,14 +28,7 @@ public class PowerGenerator extends PowerDistributor{
 
     @Override
     public TextureRegion[] icons(){
-        if(iconOverride != null){
-            var out = new TextureRegion[iconOverride.length];
-            for(int i = 0; i < out.length; i++){
-                out[i] = Core.atlas.find(name + iconOverride[i]);
-            }
-            return out;
-        }
-        return drawer.icons(this);
+        return drawer.finalIcons(this);
     }
 
     @Override

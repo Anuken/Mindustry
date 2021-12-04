@@ -48,7 +48,7 @@ def transformColors = { List<List<String>> list ->
 transformColors([["4a4b53", "6e7080", "989aa4"], ["3a5651", "3a8f64", "92dd7e"], ["bf92f9", "8a73c6", "665c9f"], /*["6e7080", "989aa4", "b0bac0"],*/ ["bc5452", "ea8878", "feb380"],
                  ["de9458", "f8c266", "ffe18f"], ["feb380", "ea8878", "bc5452"], ["d4816b", "eab678", "ffd37f"], ["d57c65", "e3ae6f", "f7e97e"],
                  ["ffffff", "dcc6c6", "9d7f7f"], ["df7646", "b23a4d", "752249"], ["3c3837", "515151", "646567"],
-                 ["5757c1", "6f80e8", "88a4ff"], ["8f665b", "b28768", "c9a58f"], ["4c5878", "768a9a", "a0b0c8"]])
+                 ["5757c1", "6f80e8", "88a4ff"], ["8f665b", "b28768", "c9a58f"], ["4c5878", "768a9a", "a0b0c8"], ["62ae7f", "62ae7f", "84f491"]])
 
 def antialias = { File file ->
     if(!doAntialias) return
