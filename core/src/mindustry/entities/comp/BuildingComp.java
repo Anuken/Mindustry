@@ -510,12 +510,18 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void created(){}
 
+    /** @return whether this block is currently "active" and should be consuming requirements. */
     public boolean shouldConsume(){
         return enabled;
     }
 
     public boolean productionValid(){
         return true;
+    }
+
+    /** @return whether this building is currently "burning" a trigger consumer (an item) - if true, valid() on those will return true. */
+    public boolean consumeTriggerValid(){
+        return false;
     }
 
     public float getPowerProduction(){

@@ -52,7 +52,7 @@ public class ConsumeItems extends Consume{
 
     @Override
     public boolean valid(Building build){
-        return build.items != null && build.items.has(items);
+        return build.consumeTriggerValid() || build.items.has(items);
     }
 
     @Override

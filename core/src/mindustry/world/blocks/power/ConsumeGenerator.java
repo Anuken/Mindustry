@@ -11,7 +11,6 @@ import mindustry.world.meta.*;
 
 /**
  * A generator that just takes in certain items or liquids. Basically SingleTypeGenerator, but not unreliable garbage.
- * TODO at the moment, these generators require at least one item in their inventory to work, meaning they cannot be "kickstarted" with only one item.
  */
 public class ConsumeGenerator extends PowerGenerator{
     /** The time in number of ticks during which a single item will produce power. */
@@ -72,9 +71,6 @@ public class ConsumeGenerator extends PowerGenerator{
             productionEfficiency = valid ? 1f : 0f;
             totalTime += warmup * Time.delta;
 
-            //generation time always goes down
-            generateTime -= Math.min(1f / itemDuration * delta(), generateTime);
-
             //randomly produce the effect
             if(valid && Mathf.chanceDelta(effectChance)){
                 generateEffect.at(x + Mathf.range(generateEffectRange), y + Mathf.range(generateEffectRange));
@@ -82,7 +78,7 @@ public class ConsumeGenerator extends PowerGenerator{
 
             //take in items periodically
             if(hasItems && valid && generateTime <= 0f && items.any()){
-                cons.trigger();
+                consume();
                 generateTime = 1f;
             }
 
@@ -91,6 +87,14 @@ public class ConsumeGenerator extends PowerGenerator{
                 liquids.add(liquidOutput.liquid, added);
                 dumpLiquid(liquidOutput.liquid);
             }
+
+            //generation time always goes down, but only at the end so consumeTriggerValid doesn't assume fake items
+            generateTime -= Math.min(1f / itemDuration * delta(), generateTime);
+        }
+
+        @Override
+        public boolean consumeTriggerValid(){
+            return generateTime > 0;
         }
 
         @Override

@@ -54,6 +54,6 @@ public class ConsumeItemDynamic extends Consume{
 
     @Override
     public boolean valid(Building build){
-        return build.items != null && build.items.has(items.get(build));
+        return build.consumeTriggerValid() || build.items.has(items.get(build));
     }
 }

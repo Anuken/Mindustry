@@ -53,9 +53,11 @@ public class ConsumeItemFilter extends Consume{
 
     @Override
     public boolean valid(Building build){
+        if(build.consumeTriggerValid()) return true;
+
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
-            if(build.items != null && build.items.has(item) && this.filter.get(item)){
+            if(this.filter.get(item) && build.items.has(item)){
                 return true;
             }
         }
