@@ -35,7 +35,7 @@ public class ReloadTurret extends BaseTurret{
         }
 
         protected void updateCooling(){
-            if(reload < reloadTime){
+            if(reload < reloadTime && acceptCoolant){
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
                 Liquid liquid = liquids.current();
 

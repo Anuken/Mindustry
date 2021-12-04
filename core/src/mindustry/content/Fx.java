@@ -339,6 +339,34 @@ public class Fx{
         Lines.spikes(e.x, e.y, 1f + e.fin() * 6f, e.fout() * 4f, 6);
     }),
 
+    titanExplosion = new Effect(30f, 160f, e -> {
+        color(Pal.berylShot);
+        stroke(e.fout() * 3f);
+        float circleRad = 6f + e.finpow() * 60f;
+        Lines.circle(e.x, e.y, circleRad);
+        Lines.spikes(e.x, e.y, circleRad + 6f, 32f * e.foutpow(), 10);
+    }),
+
+    titanSmoke = new Effect(300f, 300f, b -> {
+        float intensity = 3f;
+
+        color(Pal.berylShot, 0.7f);
+        for(int i = 0; i < 4; i++){
+            rand.setSeed(b.id*2 + i);
+            float lenScl = rand.random(0.5f, 1f);
+            int fi = i;
+            b.scaled(b.lifetime * lenScl, e -> {
+                randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 22f * intensity, (x, y, in, out) -> {
+                    float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
+                    float rad = fout * ((2f + intensity) * 2.35f);
+
+                    Fill.circle(e.x + x, e.y + y, rad);
+                    Drawf.light(e.x + x, e.y + y, rad * 2.5f, Pal.berylShot, 0.5f);
+                });
+            });
+        }
+    }).layer(Layer.bullet - 4f),
+
     greenBomb = new Effect(40f, 100f, e -> {
         color(Pal.heal);
         stroke(e.fout() * 2f);
@@ -1337,6 +1365,13 @@ public class Fx{
         Drawf.tri(e.x, e.y, w, 5f * e.fout(), e.rotation + 180f);
     }),
 
+    shootTitan = new Effect(10, e -> {
+        color(Pal.lightOrange, Pal.berylShot, e.fin());
+        float w = 1.3f + 10 * e.fout();
+        Drawf.tri(e.x, e.y, w, 35f * e.fout(), e.rotation);
+        Drawf.tri(e.x, e.y, w, 6f * e.fout(), e.rotation + 180f);
+    }),
+
     shootBigSmoke = new Effect(17f, e -> {
         color(Pal.lighterOrange, Color.lightGray, Color.gray, e.fin());
 
@@ -1351,6 +1386,17 @@ public class Fx{
         randLenVectors(e.id, 9, e.finpow() * 23f, e.rotation, 20f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 2.4f + 0.2f);
         });
+    }),
+
+    shootSmokeTitan = new Effect(70f, e -> {
+        rand.setSeed(e.id);
+        for(int i = 0; i < 13; i++){
+            v.trns(e.rotation + rand.range(30f), rand.random(e.finpow() * 40f));
+            e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
+                color(Pal.berylShot, Pal.lightishGray, b.fin());
+                Fill.circle(e.x + v.x, e.y + v.y, b.fout() * 3.4f + 0.3f);
+            });
+        }
     }),
 
     regenParticle = new Effect(100f, e -> {

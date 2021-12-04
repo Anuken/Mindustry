@@ -140,6 +140,7 @@ public class BulletType extends Content implements Cloneable{
     /** Any value <= 0 disables the trail. */
     public int trailLength = -1;
     public float trailWidth = 2f;
+    public float trailSinMag = 0f, trailSinScl = 3f;
 
     /** Use a negative value to disable splash damage. */
     public float splashDamageRadius = -1f;
@@ -396,7 +397,7 @@ public class BulletType extends Content implements Cloneable{
                 b.trail = new Trail(trailLength);
             }
             b.trail.length = trailLength;
-            b.trail.update(b.x, b.y, trailInterp.apply(b.fin()));
+            b.trail.update(b.x, b.y, trailInterp.apply(b.fin()) * (1f + (trailSinMag > 0 ? Mathf.absin(Time.time, trailSinScl, trailSinMag) : 0f)));
         }
     }
 

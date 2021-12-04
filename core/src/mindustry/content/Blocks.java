@@ -119,7 +119,7 @@ public class Blocks{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
     //turrets - erekir
-    breach, fracture, sublimate,
+    breach, fracture, sublimate, titan,
 
     //units
     commandCenter,
@@ -2271,7 +2271,7 @@ public class Blocks{
             size = 4;
             thrusterLength = 34/4f;
 
-            unitCapModifier = 20;
+            unitCapModifier = 16;
             researchCostMultiplier = 0.07f;
         }};
 
@@ -2280,12 +2280,12 @@ public class Blocks{
             requirements(Category.effect, with(Items.beryllium, 7000, Items.graphite, 7000, Items.tungsten, 5000, Items.carbide, 5000));
 
             unitType = UnitTypes.incite;
-            health = 14000;
+            health = 18000;
             itemCapacity = 11000;
             size = 5;
             thrusterLength = 40/4f;
 
-            unitCapModifier = 30;
+            unitCapModifier = 24;
             researchCostMultiplier = 0.11f;
         }};
 
@@ -2294,12 +2294,12 @@ public class Blocks{
             requirements(Category.effect, with(Items.beryllium, 11000, Items.graphite, 11000, Items.tungsten, 9000, Items.carbide, 10000));
 
             unitType = UnitTypes.emanate;
-            health = 22000;
+            health = 30000;
             itemCapacity = 16000;
             size = 6;
             thrusterLength = 48/4f;
 
-            unitCapModifier = 40;
+            unitCapModifier = 32;
             researchCostMultiplier = 0.11f;
         }};
 
@@ -2794,7 +2794,7 @@ public class Blocks{
 
         //TODO tungsten support?
         breach = new ItemTurret("breach"){{
-            requirements(Category.turret, with(Items.beryllium, 35, Items.silicon, 20), true);
+            requirements(Category.turret, with(Items.beryllium, 35, Items.silicon, 20));
             ammo(
             Items.beryllium, new BasicBulletType(7f, 32){{
                 width = 8f;
@@ -2847,7 +2847,7 @@ public class Blocks{
 
         //TODO implementation; splash damage? shotgun? AA? I have no ideas
         fracture = new ItemTurret("fracture"){{
-            requirements(Category.turret, with(Items.tungsten, 35, Items.silicon, 35), true);
+            requirements(Category.turret, with(Items.tungsten, 35, Items.silicon, 35));
             ammo(
             Items.tungsten, new BasicBulletType(5f, 20){{
                 velocityInaccuracy = 0.2f;
@@ -2891,7 +2891,7 @@ public class Blocks{
         //TODO bad name
         sublimate = new ContinuousTurret("sublimate"){{
             //TODO requirements
-            requirements(Category.turret, with(Items.tungsten, 35, Items.silicon, 35), true);
+            requirements(Category.turret, with(Items.tungsten, 35, Items.silicon, 35));
 
             draw = new DrawTurret("reinforced-"){{
                 liquidDraw = Liquids.ozone;
@@ -2899,7 +2899,9 @@ public class Blocks{
                 Color heatc = Color.valueOf("fa2859");
                 heatColor = heatc;
 
-                parts.addAll(new RegionPart("-back"){{
+                parts.addAll(
+                new RegionPart("-back"){{
+                    useReload = false;
                     rotMove = 40f;
                     x = 22 / 4f;
                     y = -1f / 4f;
@@ -2908,6 +2910,7 @@ public class Blocks{
                     heatColor = heatc;
                 }},
                 new RegionPart("-front"){{
+                    useReload = false;
                     rotMove = 40f;
                     x = 20 / 4f;
                     y = 17f / 4f;
@@ -2917,6 +2920,7 @@ public class Blocks{
                     heatColor = heatc;
                 }},
                 new RegionPart("-nozzle"){{
+                    useReload = false;
                     moveX = 8f / 4f;
                     heatColor = Color.valueOf("f03b0e");
                 }});
@@ -2934,6 +2938,91 @@ public class Blocks{
                 //pierceMax = 3;
             }};
             shootLength = 7f;
+            size = 3;
+        }};
+
+        titan = new ItemTurret("titan"){{
+            //TODO requirements
+            requirements(Category.turret, with(Items.carbide, 120, Items.surgeAlloy, 80, Items.silicon, 80, Items.beryllium, 120));
+
+            ammo(
+            //TODO ammo types to be defined later
+            Items.fissileMatter, new ArtilleryBulletType(2f, 40, "shell"){{
+                //TODO FX; smoke, shockwave, not green bomb
+                hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
+                despawnEffect = Fx.none;
+                knockback = 1.5f;
+                lifetime = 140f;
+                height = 16f;
+                width = 14.2f;
+                ammoMultiplier = 4f;
+                splashDamageRadius = 60f;
+                splashDamage = 100f;
+                backColor = hitColor = trailColor = Pal.berylShot;
+                frontColor = Color.valueOf("f0ffde");
+
+                status = StatusEffects.blasted;
+
+                trailLength = 32;
+                trailWidth = 2.64f;
+                trailSinScl = 2.5f;
+                trailSinMag = 1f;
+                trailEffect = Fx.none;
+                trailColor = backColor;
+                despawnShake = 7f;
+
+                //TODO better shoot
+                shootEffect = Fx.shootTitan;
+                smokeEffect = Fx.shootSmokeTitan;
+
+                //does the trail need to shrink?
+                trailInterp = v -> Math.max(Mathf.slope(v), 0.8f);
+                shrinkX = 0.2f;
+                shrinkY = 0.1f;
+            }}
+            );
+
+            targetAir = false;
+            shootShake = 4f;
+            recoilAmount = 1f;
+            reloadTime = 60f * 2f;
+            shootLength = 7f;
+            rotateSpeed = 2.5f;
+
+            acceptCoolant = false;
+
+            draw = new DrawTurret("reinforced-"){{
+                Color heatc = Color.valueOf("f03b0e");
+                Interp in = Interp.pow2In;
+
+                parts.addAll(
+                new RegionPart("-barrel"){{
+                    moveY = -5f;
+                    heatColor = heatc;
+                    mirror = false;
+                    interp = in;
+                }},
+                new RegionPart("-side"){{
+                    moveY = -1f;
+                    rotMove = -40f;
+                    moveX = 2f;
+                    useReload = false;
+                    under = true;
+                    heatColor = Pal.berylShot.cpy().mul(1.1f);
+                    useProgressHeat = true;
+                    interp = Interp.pow2Out;
+                }}
+                );
+            }};
+
+            restitution = 0.02f;
+            shootWarmupSpeed = 0.08f;
+
+            outlineColor = Pal.darkOutline;
+
+            consumes.liquids(LiquidStack.with(Liquids.hydrogen, 1f / 60f));
+
+            range = 360f;
             size = 3;
         }};
 

@@ -124,15 +124,18 @@ public class DrawTurret extends DrawBlock{
         public TextureRegion[] outlines;
 
         /** If true, turret reload is used as the measure of progress. Otherwise, warmup is used. */
-        public boolean useReload = false;
+        public boolean useReload = true;
         /** If true, parts are mirrored across the turret. Requires -1 and -2 regions. */
         public boolean mirror = true;
         /** If true, an outline is drawn under the part. */
         public boolean outline = true;
         /** If true, the layer is overridden to be under the turret itself. */
         public boolean under = false;
+        /** If true, the base + outline regions are drawn. Set to false for heat-only regions. */
+        public boolean drawRegion = true;
         /** If true, progress is inverted. */
         public boolean invert = false;
+        public boolean useProgressHeat = false;
         public Interp interp = Interp.linear;
         public float layer = -1;
         public float outlineLayerOffset = -0.01f;
@@ -176,18 +179,18 @@ public class DrawTurret extends DrawBlock{
 
                 Draw.xscl = i == 0 ? 1 : -1;
 
-                if(outline){
+                if(outline && drawRegion){
                     Draw.z(prevZ + outlineLayerOffset);
                     Draw.rect(outlines[i], rx, ry, rot);
                     Draw.z(prevZ);
                 }
 
-                if(region.found()){
+                if(drawRegion && region.found()){
                     Draw.rect(region, rx, ry, rot);
                 }
 
                 if(heat.found()){
-                    Drawf.additive(heat, heatColor.write(Tmp.c1).a(build.heat), rx, ry, rot, Layer.turretHeat);
+                    Drawf.additive(heat, heatColor.write(Tmp.c1).a(useProgressHeat ? build.warmup() : build.heat), rx, ry, rot, Layer.turretHeat);
                 }
 
                 Draw.xscl = 1f;
@@ -200,19 +203,21 @@ public class DrawTurret extends DrawBlock{
         public void load(Block block){
             if(under) layer = Layer.turret - 0.0001f;
 
-            if(mirror){
-                regions = new TextureRegion[]{
+            if(drawRegion){
+                if(mirror){
+                    regions = new TextureRegion[]{
                     Core.atlas.find(block.name + suffix + "1"),
                     Core.atlas.find(block.name + suffix + "2")
-                };
+                    };
 
-                outlines = new TextureRegion[]{
+                    outlines = new TextureRegion[]{
                     Core.atlas.find(block.name + suffix + "1-outline"),
                     Core.atlas.find(block.name + suffix + "2-outline")
-                };
-            }else{
-                regions = new TextureRegion[]{Core.atlas.find(block.name + suffix)};
-                outlines = new TextureRegion[]{Core.atlas.find(block.name + suffix + "-outline")};
+                    };
+                }else{
+                    regions = new TextureRegion[]{Core.atlas.find(block.name + suffix)};
+                    outlines = new TextureRegion[]{Core.atlas.find(block.name + suffix + "-outline")};
+                }
             }
 
             heat = Core.atlas.find(block.name + suffix + "-heat");
@@ -220,7 +225,7 @@ public class DrawTurret extends DrawBlock{
 
         @Override
         public void getOutlines(Seq<TextureRegion> out){
-            if(outline){
+            if(outline && drawRegion){
                 out.addAll(regions);
             }
         }

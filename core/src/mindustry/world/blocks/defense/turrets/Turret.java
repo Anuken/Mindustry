@@ -296,6 +296,7 @@ public class Turret extends ReloadTurret{
 
             wasShooting = false;
 
+            //TODO do not lerp
             recoil = Mathf.lerpDelta(recoil, 0f, restitution);
             heat = Mathf.lerpDelta(heat, 0f, cooldown);
 
