@@ -328,7 +328,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         team.data().updateCount(type, 1);
 
         //check if over unit cap
-        if(count() > cap() && !spawnedByCore && !dead && !state.rules.editor){
+        if(type.useUnitCap && count() > cap() && !spawnedByCore && !dead && !state.rules.editor){
             Call.unitCapDeath(self());
             team.data().updateCount(type, -1);
         }
@@ -513,7 +513,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //if this unit crash landed (was flying), damage stuff in a radius
-        if(type.flying && !spawnedByCore){
+        if(type.flying && !spawnedByCore && !type.createWreck){
             Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f, true, false, true);
         }
 
@@ -577,7 +577,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         dead = true;
 
         //don't waste time when the unit is already on the ground, just destroy it
-        if(!type.flying){
+        if(!type.flying || !type.createWreck){
             destroy();
         }
     }

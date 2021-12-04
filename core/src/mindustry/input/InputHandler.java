@@ -395,7 +395,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
-        }else if(unit.isAI() && unit.team == player.team() && !unit.dead){
+        }else if(unit.isAI() && unit.team == player.team() && !unit.dead && unit.type.playerControllable){
             if(net.client() && player.isLocal()){
                 player.justSwitchFrom = player.unit();
                 player.justSwitchTo = unit;
@@ -495,7 +495,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             controlledType = player.unit().type;
         }
 
-        if(controlledType != null && player.dead()){
+        if(controlledType != null && player.dead() && controlledType.playerControllable){
             Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type == controlledType && !u.dead);
 
             if(unit != null){
@@ -509,7 +509,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void checkUnit(){
-        if(controlledType != null){
+        if(controlledType != null && controlledType.playerControllable){
             Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type == controlledType && !u.dead);
             if(unit == null && controlledType == UnitTypes.block){
                 unit = world.buildWorld(player.x, player.y) instanceof ControlBlock cont && cont.canControl() ? cont.unit() : null;
@@ -1101,7 +1101,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public @Nullable Unit selectedUnit(){
-        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, Unitc::isAI);
+        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> u.isAI() && u.type.playerControllable);
         if(unit != null){
             unit.hitbox(Tmp.r1);
             Tmp.r1.grow(6f);
