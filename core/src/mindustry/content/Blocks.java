@@ -1494,7 +1494,7 @@ public class Blocks{
             size = 3;
             consumes.power(1f);
             rangeWidth = 4;
-            rangeLength = 20;
+            rangeLength = 22;
 
             consumes.liquid(Liquids.hydrogen, 1f / 60f);
 
