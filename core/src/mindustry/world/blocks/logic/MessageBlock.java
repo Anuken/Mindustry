@@ -10,6 +10,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
@@ -87,7 +88,7 @@ public class MessageBlock extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            table.button(Icon.pencil, () -> {
+            table.button(Icon.pencil, Styles.clearTransi, () -> {
                 if(mobile){
                     Core.input.getTextInput(new TextInput(){{
                         text = message.toString();
@@ -114,6 +115,8 @@ public class MessageBlock extends Block{
                         return true;
                     });
                     a.setMaxLength(maxTextLength);
+                    dialog.cont.row();
+                    dialog.cont.add("").update(b -> b.setText(a.getText().length() + " / " + maxTextLength)).color(Color.lightGray);
                     dialog.buttons.button("@ok", () -> {
                         if(!a.getText().equals(message.toString())) configure(a.getText());
                         dialog.hide();
@@ -123,10 +126,25 @@ public class MessageBlock extends Block{
                             dialog.hide();
                         }
                     });
+                    dialog.closeOnBack(() -> {
+                        if(!a.getText().equals(message.toString())){
+                            configure(a.getText());
+                        }
+                    });
                     dialog.show();
                 }
                 deselect();
             }).size(40f);
+        }
+
+        @Override
+        public boolean onConfigureTileTapped(Building other){
+            if(this == other){
+                deselect();
+                return false;
+            }
+
+            return true;
         }
 
         @Override
