@@ -340,7 +340,7 @@ public class Fx{
     }),
 
     titanExplosion = new Effect(30f, 160f, e -> {
-        color(Pal.berylShot);
+        color(e.color);
         stroke(e.fout() * 3f);
         float circleRad = 6f + e.finpow() * 60f;
         Lines.circle(e.x, e.y, circleRad);
@@ -356,7 +356,7 @@ public class Fx{
     titanSmoke = new Effect(300f, 300f, b -> {
         float intensity = 3f;
 
-        color(Pal.berylShot, 0.7f);
+        color(b.color, 0.7f);
         for(int i = 0; i < 4; i++){
             rand.setSeed(b.id*2 + i);
             float lenScl = rand.random(0.5f, 1f);
@@ -1372,7 +1372,7 @@ public class Fx{
     }),
 
     shootTitan = new Effect(10, e -> {
-        color(Pal.lightOrange, Pal.berylShot, e.fin());
+        color(Pal.lightOrange, e.color, e.fin());
         float w = 1.3f + 10 * e.fout();
         Drawf.tri(e.x, e.y, w, 35f * e.fout(), e.rotation);
         Drawf.tri(e.x, e.y, w, 6f * e.fout(), e.rotation + 180f);
@@ -1399,7 +1399,7 @@ public class Fx{
         for(int i = 0; i < 13; i++){
             v.trns(e.rotation + rand.range(30f), rand.random(e.finpow() * 40f));
             e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
-                color(Pal.berylShot, Pal.lightishGray, b.fin());
+                color(e.color, Pal.lightishGray, b.fin());
                 Fill.circle(e.x + v.x, e.y + v.y, b.fout() * 3.4f + 0.3f);
             });
         }
@@ -1441,8 +1441,8 @@ public class Fx{
         }
     }),
 
-    berylSpark = new Effect(21f, e -> {
-        color(Color.white, Pal.berylShot, e.fin());
+    colorSpark = new Effect(21f, e -> {
+        color(Color.white, e.color, e.fin());
         stroke(e.fout() * 1.1f + 0.5f);
 
         randLenVectors(e.id, 5, 27f * e.fin(), e.rotation, 9f, (x, y) -> {

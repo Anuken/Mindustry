@@ -23,7 +23,6 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.blocks.*;
-import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
@@ -42,54 +41,74 @@ public class Turret extends ReloadTurret{
     public Effect ammoUseEffect = Fx.none;
     public Sound shootSound = Sounds.shoot;
 
-    //general info
-    public int maxAmmo = 30;
-    public int ammoPerShot = 1;
+    public Effect chargeEffect = Fx.none;
+    public Effect chargeBeginEffect = Fx.none;
+    public Sound chargeSound = Sounds.none;
+
+    //visuals
     public float ammoEjectBack = 1f;
-    public float inaccuracy = 0f;
-    public float velocityInaccuracy = 0f;
     public float shootWarmupSpeed = 0.1f;
-    public int shots = 1;
-    public float spread = 4f;
     public float recoilAmount = 1f;
     public float restitution = 0.02f;
     public float cooldown = 0.02f;
-    public float coolantUsage = 0.2f;
-    public float shootCone = 8f;
+    public float elevation = -1f;
     public float shootShake = 0f;
+
+    public int maxAmmo = 30;
+    public int ammoPerShot = 1;
+
+    //TODO all the fields below should be deprecated and moved into a ShootPattern class or similar
+    //TODO ...however, it would be nice to unify the weapon and turret systems into one.
+
+    // below
+    /** Bullet angle randomness in degrees. */
+    public float inaccuracy = 0f;
+    /** Fraction of bullet velocity that is random. */
+    public float velocityInaccuracy = 0f;
+    /** Number of bullets fired per volley. */
+    public int shots = 1;
+    /**
+     * Spread between bullets in degrees.
+     * For some dumb reason, this is also used for the "alternation width", and it's too late to change anything.
+     * */
+    public float spread = 4f;
+    /** Maximum angle difference in degrees at which turret will still try to shoot. */
+    public float shootCone = 8f;
+    /** Length of turret shoot point. */
     public float shootLength = -1;
+    /** Random spread of projectile across width. This looks stupid. */
     public float xRand = 0f;
     /** Currently used for artillery only. */
     public float minRange = 0f;
+    /** Ticks between shots if shots > 1. */
     public float burstSpacing = 0;
+    /** An inflexible and terrible idea. */
     public boolean alternate = false;
     /** If true, this turret will accurately target moving targets with respect to charge time. */
     public boolean accurateDelay = false;
-    public boolean targetAir = true;
-    public boolean targetGround = true;
-    public boolean targetHealing = false;
-    public boolean playerControllable = true;
-    public boolean displayAmmoMultiplier = true;
 
     //charging
     public float chargeTime = -1f;
     public int chargeEffects = 5;
     public float chargeMaxDelay = 10f;
-    public Effect chargeEffect = Fx.none;
-    public Effect chargeBeginEffect = Fx.none;
-    public Sound chargeSound = Sounds.none;
 
+    //see above
+
+    public boolean targetAir = true;
+    public boolean targetGround = true;
+    public boolean targetHealing = false;
+    public boolean playerControllable = true;
+    public boolean displayAmmoMultiplier = true;
     public Sortf unitSort = UnitSorts.closest;
-
-    /** @deprecated loaded in {@link #draw} instead, unused */
-    public @Deprecated @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
-    /** @deprecated loaded in {@link #draw} instead, unused */
-    public @Deprecated @Load("@-heat") TextureRegion heatRegion;
-
-    public float elevation = -1f;
 
     public DrawBlock draw = new DrawTurret();
 
+    /** @deprecated loaded in {@link #draw} instead, unused */
+    @Deprecated
+    public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
+    /** @deprecated loaded in {@link #draw} instead, unused */
+    @Deprecated
+    public @Load("@-heat") TextureRegion heatRegion;
     /** @deprecated use bulletOffset; this will always be zero. **/
     @Deprecated
     protected Vec2 tr = new Vec2();
@@ -128,11 +147,6 @@ public class Turret extends ReloadTurret{
 
     @Override
     public void init(){
-        if(acceptCoolant && !consumes.has(ConsumeType.liquid)){
-            hasLiquids = true;
-            consumes.add(new ConsumeCoolant(coolantUsage)).update(false).boost();
-        }
-        
         if(shootLength < 0) shootLength = size * tilesize / 2f;
         if(elevation < 0) elevation = size / 2f;
 
@@ -436,6 +450,7 @@ public class Turret extends ReloadTurret{
         }
 
         protected void shoot(BulletType type){
+            //TODO absolute disaster here, combining shot patterns fails in unpredictable ways and I don't want to touch anything in case it breaks mods
 
             //when charging is enabled, use the charge shoot pattern
             if(chargeTime > 0){
@@ -470,6 +485,7 @@ public class Turret extends ReloadTurret{
                     int ii = i;
                     Time.run(burstSpacing * i, () -> {
                         if(dead || !hasAmmo()) return;
+
                         bulletOffset.trns(rotation, shootLength, Mathf.range(xRand));
                         bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (ii - (int)(shots / 2f)) * spread);
                         effects();
@@ -485,7 +501,7 @@ public class Turret extends ReloadTurret{
                 if(alternate){
                     float i = (shotCounter % shots) - (shots-1)/2f;
 
-                    bulletOffset.trns(rotation - 90, spread * i + Mathf.range(xRand), shootLength);
+                    bulletOffset.trns(rotation - 90, (spread) * i + Mathf.range(xRand), shootLength);
                     bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
                 }else{
                     bulletOffset.trns(rotation, shootLength, Mathf.range(xRand));
@@ -511,11 +527,13 @@ public class Turret extends ReloadTurret{
         }
 
         protected void effects(){
-            Effect fshootEffect = shootEffect == Fx.none ? peekAmmo().shootEffect : shootEffect;
-            Effect fsmokeEffect = smokeEffect == Fx.none ? peekAmmo().smokeEffect : smokeEffect;
+            var bullet = peekAmmo();
+            //TODO "shoot" and "smoke" should just be MultiEffects there's no reason to have them separate
+            Effect fshootEffect = shootEffect == Fx.none ? bullet.shootEffect : shootEffect;
+            Effect fsmokeEffect = smokeEffect == Fx.none ? bullet.smokeEffect : smokeEffect;
 
-            fshootEffect.at(x + bulletOffset.x, y + bulletOffset.y, rotation);
-            fsmokeEffect.at(x + bulletOffset.x, y + bulletOffset.y, rotation);
+            fshootEffect.at(x + bulletOffset.x, y + bulletOffset.y, rotation, bullet.hitColor);
+            fsmokeEffect.at(x + bulletOffset.x, y + bulletOffset.y, rotation, bullet.hitColor);
             shootSound.at(x + bulletOffset.x, y + bulletOffset.y, Mathf.random(0.9f, 1.1f));
 
             if(shootShake > 0){

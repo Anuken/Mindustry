@@ -350,6 +350,8 @@ public class Weapon implements Cloneable{
         BulletType ammo = bullet;
         float lifeScl = ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(shootX, shootY, aimX, aimY) / ammo.range()) : 1f;
 
+        //TODO far too complicated and similar to Turret
+
         sequenceNum = 0;
         if(delay){
             Angles.shotgun(shots, spacing, rotation, f -> {
@@ -396,8 +398,8 @@ public class Weapon implements Cloneable{
         }
 
         ejectEffect.at(mountX, mountY, rotation * side);
-        ammo.shootEffect.at(shootX, shootY, rotation, parentize ? unit : null);
-        ammo.smokeEffect.at(shootX, shootY, rotation, parentize ? unit : null);
+        ammo.shootEffect.at(shootX, shootY, rotation, ammo.hitColor, parentize ? unit : null);
+        ammo.smokeEffect.at(shootX, shootY, rotation, ammo.hitColor, parentize ? unit : null);
         unit.apply(shootStatus, shootStatusDuration);
     }
 

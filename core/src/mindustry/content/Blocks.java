@@ -119,7 +119,7 @@ public class Blocks{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
     //turrets - erekir
-    breach, fracture, sublimate, titan,
+    breach, fracture, horde, sublimate, titan,
 
     //units
     commandCenter,
@@ -128,6 +128,7 @@ public class Blocks{
     repairPoint, repairTurret,
 
     //payloads
+    //TODO small deconstructor
     payloadConveyor, payloadRouter, payloadPropulsionTower, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
 
     //logic
@@ -2799,7 +2800,7 @@ public class Blocks{
             Items.beryllium, new BasicBulletType(7f, 32){{
                 width = 8f;
                 height = 14f;
-                shootEffect = Fx.berylSpark;
+                shootEffect = Fx.colorSpark;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 1;
                 pierce = true;
@@ -2853,7 +2854,7 @@ public class Blocks{
                 velocityInaccuracy = 0.2f;
                 width = 6f;
                 height = 12f;
-                shootEffect = Fx.berylSpark;
+                shootEffect = Fx.colorSpark;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 2;
                 pierce = true;
@@ -2888,10 +2889,64 @@ public class Blocks{
             limitRange();
         }};
 
+        //TODO implementation, better name
+        horde = new ItemTurret("horde"){{
+            requirements(Category.turret, with(Items.tungsten, 35, Items.silicon, 35));
+            ammo(
+            Items.scrap, new MissileBulletType(4.2f, 15){{
+                velocityInaccuracy = 0.2f;
+                shootEffect = Fx.colorSpark;
+                smokeEffect = Fx.shootBigSmoke;
+                ammoMultiplier = 1;
+                hitColor = backColor = trailColor = Color.valueOf("ea8878");
+                frontColor = Color.valueOf("feb380");
+                trailWidth = 2f;
+                trailLength = 12;
+
+                splashDamage = 15f;
+                splashDamageRadius = 30f;
+
+                weaveMag = 5;
+                weaveScale = 4;
+                velocityInaccuracy = 0.1f;
+                ammoMultiplier = 3f;
+
+                //TODO different effect?
+                hitEffect = despawnEffect = Fx.blastExplosion;
+            }}
+            );
+
+            acceptCoolant = false;
+            //TODO
+            consumes.liquid(Liquids.hydrogen, 1.5f / 60f);
+            shots = 9;
+            burstSpacing = 2f;
+
+            //TODO this works but looks bad
+            spread = 0f;
+            shootLength = 6.5f;
+            xRand = 13f;
+            recoilAmount = 0f;
+
+            draw = new DrawTurret("reinforced-");
+            outlineColor = Pal.darkOutline;
+            size = 3;
+            envEnabled |= Env.space;
+            reloadTime = 60f * 1.5f;
+            range = 190;
+            shootCone = 15f;
+            inaccuracy = 20f;
+            health = 300 * size * size;
+            rotateSpeed = 3f;
+
+            //???
+            //limitRange();
+        }};
+
         //TODO bad name
         sublimate = new ContinuousTurret("sublimate"){{
             //TODO requirements
-            requirements(Category.turret, with(Items.tungsten, 35, Items.silicon, 35));
+            requirements(Category.turret, with(Items.tungsten, 50, Items.silicon, 60, Items.oxide, 30, Items.carbide, 40));
 
             draw = new DrawTurret("reinforced-"){{
                 liquidDraw = Liquids.ozone;
@@ -2942,13 +2997,11 @@ public class Blocks{
         }};
 
         titan = new ItemTurret("titan"){{
-            //TODO requirements
             requirements(Category.turret, with(Items.carbide, 120, Items.surgeAlloy, 80, Items.silicon, 80, Items.beryllium, 120));
 
             ammo(
-            //TODO ammo types to be defined later
+            //TODO 1 more ammo type, decide on base type
             Items.fissileMatter, new ArtilleryBulletType(2.5f, 40, "shell"){{
-                //TODO FX; smoke, shockwave, not green bomb
                 hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
                 despawnEffect = Fx.none;
                 knockback = 1.5f;
@@ -2957,8 +3010,8 @@ public class Blocks{
                 width = 14.2f;
                 splashDamageRadius = 60f;
                 splashDamage = 100f;
-                backColor = hitColor = trailColor = Pal.berylShot;
-                frontColor = Color.valueOf("f0ffde");
+                backColor = hitColor = trailColor = Color.valueOf("5b6b82");
+                frontColor = Color.valueOf("a0b0c8");
                 ammoMultiplier = 1f;
 
                 status = StatusEffects.blasted;
@@ -2971,11 +3024,9 @@ public class Blocks{
                 trailColor = backColor;
                 despawnShake = 7f;
 
-                //TODO better shoot
                 shootEffect = Fx.shootTitan;
                 smokeEffect = Fx.shootSmokeTitan;
 
-                //does the trail need to shrink?
                 trailInterp = v -> Math.max(Mathf.slope(v), 0.8f);
                 shrinkX = 0.2f;
                 shrinkY = 0.1f;
@@ -2992,27 +3043,23 @@ public class Blocks{
             acceptCoolant = false;
 
             draw = new DrawTurret("reinforced-"){{
-                Color heatc = Color.valueOf("f03b0e");
-                Interp in = Interp.pow2In;
-
                 parts.addAll(
                 new RegionPart("-barrel"){{
                     moveY = -5f;
-                    heatColor = heatc;
+                    heatColor = Color.valueOf("f03b0e");
                     mirror = false;
-                    interp = in;
+                    interp = Interp.pow2In;
                 }},
                 new RegionPart("-side"){{
+                    moveX = 2f;
                     moveY = -1f;
                     rotMove = -40f;
-                    moveX = 2f;
                     useReload = false;
                     under = true;
-                    heatColor = Pal.berylShot.cpy().mul(1.1f);
+                    heatColor = Color.valueOf("768a9a");
                     useProgressHeat = true;
                     interp = Interp.pow2Out;
-                }}
-                );
+                }});
             }};
 
             restitution = 0.02f;

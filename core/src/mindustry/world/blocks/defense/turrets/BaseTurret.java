@@ -16,6 +16,7 @@ public class BaseTurret extends Block{
     public float range = 80f;
     public float rotateSpeed = 5;
 
+    public float coolantUsage = 0.2f;
     public boolean acceptCoolant = true;
     /** Effect displayed when coolant is used. */
     public Effect coolEffect = Fx.fuelburn;
@@ -38,7 +39,7 @@ public class BaseTurret extends Block{
     public void init(){
         if(acceptCoolant && !consumes.has(ConsumeType.liquid)){
             hasLiquids = true;
-            consumes.add(new ConsumeCoolant(0.2f)).update(false).boost();
+            consumes.add(new ConsumeCoolant(coolantUsage)).update(false).boost();
         }
 
         super.init();
