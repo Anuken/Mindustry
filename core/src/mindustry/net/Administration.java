@@ -302,13 +302,13 @@ public class Administration{
     public boolean adminPlayer(String id, String usid){
         PlayerInfo info = getCreateInfo(id);
 
-        if(info.admin) return true;
+        var wasAdmin = info.admin;
 
         info.adminUsid = usid;
         info.admin = true;
         save();
 
-        return false;
+        return wasAdmin;
     }
 
     /**
