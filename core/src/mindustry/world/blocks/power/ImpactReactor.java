@@ -145,7 +145,7 @@ public class ImpactReactor extends PowerGenerator{
 
             Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
 
-            Effect.shake(6f, 16f, x, y);
+            Effect.shake(1.5f * size, 4f * size, x, y);
             explodeEffect.at(x, y);
         }
 
