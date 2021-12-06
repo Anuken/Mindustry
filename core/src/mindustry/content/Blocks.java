@@ -129,7 +129,7 @@ public class Blocks{
 
     //payloads
     //TODO small deconstructor
-    payloadConveyor, payloadRouter, payloadPropulsionTower, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
+    payloadConveyor, payloadRouter, payloadPropulsionTower, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
 
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
@@ -3242,6 +3242,15 @@ public class Blocks{
             range = 1000f;
             maxPayloadSize = 3.5f;
             consumes.power(6f);
+        }};
+
+        if(false)
+        smallDeconstructor = new PayloadDeconstructor("small-deconstructor"){{
+            requirements(Category.units, with(Items.thorium, 80, Items.silicon, 80, Items.graphite, 80));
+            itemCapacity = 100;
+            consumes.power(1f);
+            size = 3;
+            deconstructSpeed = 1f;
         }};
 
         deconstructor = new PayloadDeconstructor("deconstructor"){{
