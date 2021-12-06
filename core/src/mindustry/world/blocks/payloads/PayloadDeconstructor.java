@@ -7,6 +7,7 @@ import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
@@ -187,6 +188,12 @@ public class PayloadDeconstructor extends PayloadBlock{
                 payload = null;
                 progress = 0f;
             }
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return progress;
+            return super.sense(sensor);
         }
 
         @Override

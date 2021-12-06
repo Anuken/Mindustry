@@ -43,8 +43,12 @@ public class ErekirTechTree{
                         });
                     });
 
-                    node(deconstructor, () -> {
+                    node(smallDeconstructor, () -> {
                         node(largeConstructor, () -> {
+
+                        });
+
+                        node(deconstructor, () -> {
 
                         });
                     });

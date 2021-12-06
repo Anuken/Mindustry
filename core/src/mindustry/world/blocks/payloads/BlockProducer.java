@@ -9,6 +9,7 @@ import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -134,6 +135,12 @@ public abstract class BlockProducer extends PayloadBlock{
 
             Draw.z(Layer.blockBuilding + 1.1f);
             Draw.rect(topRegion, x, y);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return progress;
+            return super.sense(sensor);
         }
 
         @Override

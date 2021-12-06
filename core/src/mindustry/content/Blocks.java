@@ -3244,7 +3244,6 @@ public class Blocks{
             consumes.power(6f);
         }};
 
-        if(false)
         smallDeconstructor = new PayloadDeconstructor("small-deconstructor"){{
             requirements(Category.units, with(Items.thorium, 80, Items.silicon, 80, Items.graphite, 80));
             itemCapacity = 100;

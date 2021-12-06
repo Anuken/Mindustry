@@ -781,6 +781,10 @@ public class Block extends UnlockableContent{
         return buildVisibility != BuildVisibility.hidden && buildVisibility != BuildVisibility.debugOnly;
     }
 
+    public boolean environmentBuildable(){
+        return (state.rules.hiddenBuildItems.isEmpty() || !Structs.contains(requirements, i -> state.rules.hiddenBuildItems.contains(i.item)));
+    }
+
     public boolean isStatic(){
         return cacheLayer == CacheLayer.walls;
     }
