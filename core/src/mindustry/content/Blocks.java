@@ -2199,7 +2199,7 @@ public class Blocks{
         plasmaBore = new BeamDrill("plasma-bore"){{
             requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 30));
             consumes.power(0.2f);
-            drillTime = 200f;
+            drillTime = 150f;
             tier = 4;
             size = 2;
             range = 3; //TODO make it 2?
@@ -2212,7 +2212,7 @@ public class Blocks{
             //TODO requirements
             requirements(Category.production, with(Items.graphite, 30, Items.oxide, 30, Items.beryllium, 20, Items.carbide, 30));
             consumes.power(0.6f);
-            drillTime = 170f;
+            drillTime = 110f;
             tier = 5;
             size = 3;
             range = 6;
