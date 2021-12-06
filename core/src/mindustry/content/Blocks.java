@@ -2202,7 +2202,7 @@ public class Blocks{
             drillTime = 150f;
             tier = 4;
             size = 2;
-            range = 3; //TODO make it 2?
+            range = 3;
 
             consumes.liquid(Liquids.hydrogen, 1f / 60f).boost();
         }};
