@@ -2,13 +2,9 @@ package mindustry.world.blocks.production;
 
 import arc.*;
 import arc.math.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
-import mindustry.world.blocks.heat.*;
 import mindustry.world.meta.*;
-
-import java.util.*;
 
 /** A crafter that requires contact from heater blocks to craft. */
 public class HeatCrafter extends GenericCrafter{
@@ -48,19 +44,8 @@ public class HeatCrafter extends GenericCrafter{
 
         @Override
         public void updateTile(){
-            Arrays.fill(sideHeat, 0f);
-            heat = 0f;
+            heat = calculateHeat(sideHeat);
 
-            for(var edge : getEdges()){
-                Building build = nearby(edge.x, edge.y);
-                if(build != null && build.team == team && build instanceof HeatBlock heater && (!build.block.rotate || (relativeTo(build) + 2) % 4 == build.rotation)){
-                    //heat is distributed across building size
-                    float add = heater.heat() / build.block.size;
-
-                    sideHeat[Mathf.mod(relativeTo(build), 4)] += add;
-                    heat += add;
-                }
-            }
             super.updateTile();
         }
 

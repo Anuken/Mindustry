@@ -176,7 +176,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         tiles.getn(endX, endY).setOverlay(Blocks.spawn);
 
         //TODO tech is lazy and boring
-        tech(Blocks.darkPanel3, Blocks.darkPanel5, Blocks.darkMetal);
+        //tech(Blocks.darkPanel3, Blocks.darkPanel5, Blocks.darkMetal);
 
         //ores
         pass((x, y) -> {
@@ -234,7 +234,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             }
         }
 
-        decoration(0.015f);
+        decoration(0.017f);
 
         //not allowed
         state.rules.hiddenBuildItems.addAll(Items.copper, Items.titanium, Items.coal, Items.lead, Items.blastCompound, Items.pyratite, Items.sporePod, Items.metaglass, Items.plastanium);

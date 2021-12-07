@@ -22,6 +22,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.blocks.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
@@ -56,6 +57,8 @@ public class Turret extends ReloadTurret{
 
     public int maxAmmo = 30;
     public int ammoPerShot = 1;
+    public float heatRequirement = -1f;
+    public float maxHeatEfficiency = 3f;
 
     //TODO all the fields below should be deprecated and moved into a ShootPattern class or similar
     //TODO ...however, it would be nice to unify the weapon and turret systems into one.
@@ -143,6 +146,20 @@ public class Turret extends ReloadTurret{
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
+        if(heatRequirement > 0) stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+
+        if(heatRequirement > 0){
+            bars.add("heat", (TurretBuild entity) ->
+            new Bar(() ->
+            Core.bundle.format("bar.heatpercent", (int)entity.heatReq, (int)(Math.min(entity.heatReq / heatRequirement, maxHeatEfficiency) * 100)),
+            () -> Pal.lightOrange,
+            () -> entity.heatReq / heatRequirement));
+        }
     }
 
     @Override
@@ -193,6 +210,9 @@ public class Turret extends ReloadTurret{
         public Vec2 targetPos = new Vec2();
         public BlockUnitc unit = (BlockUnitc)UnitTypes.block.create(team);
         public boolean wasShooting, charging;
+
+        public float heatReq;
+        public float[] sideHeat = new float[4];
 
         @Override
         public float warmup(){
@@ -324,6 +344,10 @@ public class Turret extends ReloadTurret{
                 logicControlTime -= Time.delta;
             }
 
+            if(heatRequirement > 0){
+                heatReq = calculateHeat(sideHeat);
+            }
+
             //turret always reloads regardless of whether it's targeting something
             updateReload();
 
@@ -401,6 +425,14 @@ public class Turret extends ReloadTurret{
 
         public boolean shouldTurn(){
             return !charging;
+        }
+
+        @Override
+        public float efficiency(){
+            if(heatRequirement > 0){
+                return Math.min(heatReq / heatRequirement, maxHeatEfficiency) * super.efficiency();
+            }
+            return super.efficiency();
         }
 
         /** Consume ammo and return a type. */

@@ -33,12 +33,15 @@ import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.heat.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.modules.*;
+
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -279,6 +282,23 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * @return whether the configuration UI should be shown. */
     public boolean configTapped(){
         return true;
+    }
+
+    public float calculateHeat(float[] sideHeat){
+        Arrays.fill(sideHeat, 0f);
+        float heat = 0f;
+
+        for(var edge : block.getEdges()){
+            Building build = nearby(edge.x, edge.y);
+            if(build != null && build.team == team && build instanceof HeatBlock heater && (!build.block.rotate || (relativeTo(build) + 2) % 4 == build.rotation)){
+                //heat is distributed across building size
+                float add = heater.heat() / build.block.size;
+
+                sideHeat[Mathf.mod(relativeTo(build), 4)] += add;
+                heat += add;
+            }
+        }
+        return heat;
     }
 
     public void applyBoost(float intensity, float duration){
