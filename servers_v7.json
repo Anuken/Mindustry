@@ -25,7 +25,7 @@
   },
   {
     "name": "DarkDustry",
-    "address": ["darkdustry.ml", "darkdustry.ml:6000", "darkdustry.ml:7000", "darkdustry.ml:8000", "darkdustry.ml:9000"] 
+    "address": ["darkdustry.ml", "darkdustry.ml:5000", "darkdustry.ml:6000", "darkdustry.ml:7000", "darkdustry.ml:8000", "darkdustry.ml:9000"] 
   },
   {
     "name": "Chaotic Neutral",
@@ -74,5 +74,9 @@
   {
     "name": "LostDustry",
     "address": ["lostdustry.northeurope.cloudapp.azure.com:6568", "lostdustry.northeurope.cloudapp.azure.com:6569", "lostdustry.northeurope.cloudapp.azure.com:6570"]
-  } 
+  },
+  {
+    "name": "ALEX",
+    "address": ["dogemindustry.ddns.net:25588"]
+  }
 ]
