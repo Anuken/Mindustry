@@ -32,13 +32,15 @@ public class ForceProjector extends Block{
     public float cooldownNormal = 1.75f;
     public float cooldownLiquid = 1.5f;
     public float cooldownBrokenBase = 0.35f;
+    public float coolantConsumption = 0.1f;
+    public boolean consumeCoolant = true;
     public Effect absorbEffect = Fx.absorb;
     public Effect shieldBreakEffect = Fx.shieldBreak;
     public @Load("@-top") TextureRegion topRegion;
 
-    static ForceBuild paramEntity;
-    static Effect paramEffect;
-    static final Cons<Bullet> shieldConsumer = trait -> {
+    protected static ForceBuild paramEntity;
+    protected static Effect paramEffect;
+    protected static final Cons<Bullet> shieldConsumer = trait -> {
         if(trait.team != paramEntity.team && trait.type.absorbable && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, trait.x(), trait.y())){
             trait.absorb();
             paramEffect.at(trait);
@@ -55,10 +57,13 @@ public class ForceProjector extends Block{
         hasPower = true;
         hasLiquids = true;
         hasItems = true;
+        envEnabled |= Env.space;
         ambientSound = Sounds.shield;
         ambientSoundVolume = 0.08f;
-        consumes.add(new ConsumeCoolant(0.1f)).boost().update(false);
-        envEnabled |= Env.space;
+
+        if(consumeCoolant){
+            consumes.add(new ConsumeCoolant(coolantConsumption)).boost().update(false);
+        }
     }
 
     @Override
@@ -80,12 +85,17 @@ public class ForceProjector extends Block{
 
     @Override
     public void setStats(){
-        stats.timePeriod = phaseUseTime;
+        boolean consItems = consumes.has(ConsumeType.item);
+
+        if(consItems) stats.timePeriod = phaseUseTime;
         super.setStats();
         stats.add(Stat.shieldHealth, shieldHealth, StatUnit.none);
         stats.add(Stat.cooldownTime, (int) (shieldHealth / cooldownBrokenBase / 60f), StatUnit.seconds);
-        stats.add(Stat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
-        stats.add(Stat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
+
+        if(consItems){
+            stats.add(Stat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
+            stats.add(Stat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
+        }
     }
 
     @Override
@@ -146,9 +156,9 @@ public class ForceProjector extends Block{
 
             warmup = Mathf.lerpDelta(warmup, efficiency(), 0.1f);
 
-            if(buildup > 0){
+            if(buildup > 0 && consumes.has(ConsumeType.liquid)){
                 float scale = !broken ? cooldownNormal : cooldownBrokenBase;
-                ConsumeLiquidFilter cons = consumes.get(ConsumeType.liquid);
+                Consume cons = consumes.get(ConsumeType.liquid);
                 if(cons.valid(this)){
                     cons.update(this);
                     scale *= (cooldownLiquid * (1f + (liquids.current().heatCapacity - 0.4f) * 0.9f));

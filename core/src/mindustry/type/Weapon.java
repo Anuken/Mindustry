@@ -29,6 +29,8 @@ public class Weapon implements Cloneable{
     public String name;
     /** bullet shot */
     public BulletType bullet = Bullets.standardCopper;
+    /** unit, to spawn at bullet, e.g. missile. TODO prevent bullet creation */
+    public @Nullable UnitType unitSpawned;
     /** shell ejection effect */
     public Effect ejectEffect = Fx.none;
     /** whether to consume ammo when ammo is enabled in rules */
@@ -403,13 +405,24 @@ public class Weapon implements Cloneable{
         unit.apply(shootStatus, shootStatusDuration);
     }
 
-    protected Bullet bullet(Unit unit, float shootX, float shootY, float angle, float lifescl){
+    protected @Nullable Bullet bullet(Unit unit, float shootX, float shootY, float angle, float lifescl){
         float xr = Mathf.range(xRand);
+        float
+            x = shootX + Angles.trnsx(angle, 0, xr),
+            y = shootY + Angles.trnsy(angle, 0, xr);
 
-        return bullet.create(unit, unit.team,
-        shootX + Angles.trnsx(angle, 0, xr),
-        shootY + Angles.trnsy(angle, 0, xr),
-        angle, (1f - velocityRnd) + Mathf.random(velocityRnd), lifescl);
+        if(unitSpawned == null){
+            return bullet.create(unit, unit.team, x, y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd), lifescl);
+        }else{
+            Unit spawned = unitSpawned.create(unit.team);
+            spawned.set(x, y);
+            spawned.rotation = angle;
+            //immediately spawn at top speed, since it was launched
+            spawned.vel.trns(angle, unitSpawned.speed);
+            spawned.add();
+            //TODO assign AI target here?
+            return null;
+        }
     }
 
     public Weapon copy(){

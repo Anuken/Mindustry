@@ -43,7 +43,7 @@ public class UnitType extends UnlockableContent{
 
     /** If true, the unit is always at elevation 1. */
     public boolean flying;
-    /** If `flying` and this is true, the unit can appear on the title screen */
+    /** If `flying` and this is true, the unit can appear on the title screen. TODO remove with new menu*/
     public boolean onTitleScreen = true;
     /** Creates a new instance of this unit class. */
     public Prov<? extends Unit> constructor;
@@ -60,6 +60,7 @@ public class UnitType extends UnlockableContent{
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
     public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, riseSpeed = 0.08f, fallSpeed = 0.018f;
     public float health = 200f, range = -1, miningRange = 70f, armor = 0f, maxRange = -1f, buildRange = Vars.buildingRange;
+    public float lifetime = 60f * 5f; //for missiles only
     public float crashDamageMultiplier = 1f;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false, circleTarget = false;
@@ -135,7 +136,7 @@ public class UnitType extends UnlockableContent{
     public float lightRadius = -1f, lightOpacity = 0.6f;
     public Color lightColor = Pal.powerLight;
     public boolean drawCell = true, drawItems = true, drawShields = true, drawBody = true;
-    public int trailLength = 3;
+    public int trailLength = 0;
     public float trailX = 4f, trailY = -3f, trailScl = 1f;
     /** Whether the unit can heal blocks. Initialized in init() */
     public boolean canHeal = false;
@@ -182,6 +183,9 @@ public class UnitType extends UnlockableContent{
         unit.ammo = ammoCapacity; //fill up on ammo upon creation
         unit.elevation = flying ? 1f : 0;
         unit.heal();
+        if(unit instanceof TimedKillc u){
+            u.lifetime(lifetime);
+        }
         return unit;
     }
 
@@ -811,9 +815,8 @@ public class UnitType extends UnlockableContent{
         float scale = unit.elevation;
         float offset = engineOffset/2f + engineOffset/2f*scale;
 
-        if(unit instanceof Trailc){
-            Trail trail = ((Trailc)unit).trail();
-            trail.draw(unit.team.color, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * scale) * trailScl);
+        if(trailLength > 0 && !naval){
+            drawTrail(unit);
         }
 
         Draw.color(engineColor == null ? unit.team.color : engineColor);
@@ -829,6 +832,14 @@ public class UnitType extends UnlockableContent{
             (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) / 2f  * scale
         );
         Draw.color();
+    }
+
+    public void drawTrail(Unit unit){
+        if(unit.trail == null){
+            unit.trail = new Trail(trailLength);
+        }
+        Trail trail = unit.trail;
+        trail.draw(unit.team.color, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * unit.elevation) * trailScl);
     }
 
     public void drawEngines(Unit unit){

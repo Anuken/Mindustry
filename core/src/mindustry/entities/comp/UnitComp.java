@@ -20,6 +20,7 @@ import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -45,6 +46,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     UnitType type = UnitTypes.alpha;
     boolean spawnedByCore;
     double flag;
+
+    transient @Nullable Trail trail;
 
     transient float shadowAlpha = -1f;
     transient Seq<Ability> abilities = new Seq<>(0);
@@ -339,6 +342,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void remove(){
         team.data().updateCount(type, -1);
         controller.removed(self());
+
+        //make sure trail doesn't just go poof
+        if(trail != null && trail.size() > 0){
+            Fx.trailFade.at(x, y, trail.width(), team.color, trail.copy());
+        }
     }
 
     @Override
@@ -388,6 +396,16 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             for(Ability a : abilities){
                 a.update(self());
             }
+        }
+
+        if(trail != null){
+            trail.length = type.trailLength;
+
+            float scale = elevation();
+            float offset = type.engineOffset/2f + type.engineOffset/2f*scale;
+
+            float cx = x + Angles.trnsx(rotation + 180, offset), cy = y + Angles.trnsy(rotation + 180, offset);
+            trail.update(cx, cy);
         }
 
         drag = type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f) * dragMultiplier * state.rules.dragMultiplier;

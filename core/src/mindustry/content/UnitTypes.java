@@ -72,6 +72,9 @@ public class UnitTypes{
 
     //endregion
 
+    //missile definition, needed for codegen
+    public static @EntityDef({Unitc.class, TimedKillc.class}) UnitType missile;
+
     //region neoplasm
 
     public static @EntityDef({Unitc.class, Crawlc.class}) UnitType scuttler;
@@ -598,7 +601,11 @@ public class UnitTypes{
                 shootSound = Sounds.explosion;
                 x = shootY = 0f;
                 mirror = false;
-                bullet = new BombBulletType(0f, 0f, "clear"){{
+                bullet = new BulletType(){{
+                    collidesTiles = false;
+                    collides = false;
+                    hitSound = Sounds.explosion;
+
                     hitEffect = Fx.pulverize;
                     lifetime = 10f;
                     speed = 1f;
@@ -1461,7 +1468,6 @@ public class UnitTypes{
             health = 280;
             accel = 0.4f;
             rotateSpeed = 3.3f;
-            trailLength = 20;
             rotateShooting = false;
 
             armor = 2f;
@@ -2413,6 +2419,9 @@ public class UnitTypes{
             }});
         }};
 
+        //endregion
+        //region erekir - core
+
         //TODO bad name
         evoke = new UnitType("evoke"){{
             defaultController = BuilderAI::new;
@@ -2438,8 +2447,8 @@ public class UnitTypes{
             engineSize = 0;
 
             setEnginesMirror(
-                new UnitEngine(21 / 4f, 19 / 4f, 2.2f, 45f),
-                new UnitEngine(23 / 4f, -22 / 4f, 2.2f, 315f)
+            new UnitEngine(21 / 4f, 19 / 4f, 2.2f, 45f),
+            new UnitEngine(23 / 4f, -22 / 4f, 2.2f, 315f)
             );
 
             weapons.add(new Weapon(){{
@@ -2470,6 +2479,30 @@ public class UnitTypes{
                     smokeEffect = Fx.shootBigSmoke;
                     buildingDamageMultiplier = 0.4f;
                 }};
+
+                //TODO REMOVE
+                /*
+                unitSpawned = new MissileUnitType("duo"){{
+                    trailScl = 1.1f;
+                    speed = 3f;
+                    weapons.add(new Weapon(){{
+                        shootOnDeath = true;
+                        bullet = new BulletType(){{
+                            collidesTiles = false;
+                            collides = false;
+                            hitSound = Sounds.explosion;
+
+                            lifetime = 10f;
+                            speed = 1f;
+                            splashDamageRadius = 55f;
+                            instantDisappear = true;
+                            splashDamage = 90f;
+                            killShooter = true;
+                            hittable = false;
+                            collidesAir = true;
+                        }};
+                    }});
+                }};*/
             }});
         }};
 
@@ -2597,8 +2630,6 @@ public class UnitTypes{
                 }});
                 i ++;
             }
-
-
         }};
 
         //endregion
