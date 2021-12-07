@@ -21,6 +21,7 @@ public class MissileUnitType extends UnitType{
         constructor = TimedKillUnit::create;
         envEnabled = Env.any;
         envDisabled = Env.none;
+        physics = false;
         trailLength = 7;
         hidden = true;
         rotateSpeed = 2f;

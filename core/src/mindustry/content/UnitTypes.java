@@ -2479,30 +2479,6 @@ public class UnitTypes{
                     smokeEffect = Fx.shootBigSmoke;
                     buildingDamageMultiplier = 0.4f;
                 }};
-
-                //TODO REMOVE
-                /*
-                unitSpawned = new MissileUnitType("duo"){{
-                    trailScl = 1.1f;
-                    speed = 3f;
-                    weapons.add(new Weapon(){{
-                        shootOnDeath = true;
-                        bullet = new BulletType(){{
-                            collidesTiles = false;
-                            collides = false;
-                            hitSound = Sounds.explosion;
-
-                            lifetime = 10f;
-                            speed = 1f;
-                            splashDamageRadius = 55f;
-                            instantDisappear = true;
-                            splashDamage = 90f;
-                            killShooter = true;
-                            hittable = false;
-                            collidesAir = true;
-                        }};
-                    }});
-                }};*/
             }});
         }};
 

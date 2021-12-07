@@ -131,6 +131,8 @@ public class UnitType extends UnlockableContent{
     public Color engineColorInner = Color.white;
     public Seq<UnitEngine> engines = new Seq<>();
     public float strafePenalty = 0.5f;
+    /** If false, this unit does not physically collide with others. */
+    public boolean physics = true;
     public float hitSize = 6f;
     public float itemOffsetY = 3f;
     public float lightRadius = -1f, lightOpacity = 0.6f;

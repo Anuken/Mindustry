@@ -36,9 +36,9 @@ public class PhysicsProcess implements AsyncProcess{
             return false;
         });
 
-        //find Unit without bodies and assign them
+        //find Units without bodies and assign them
         for(Unit entity : group){
-            if(entity == null || entity.type == null) continue;
+            if(entity == null || entity.type == null || !entity.type.physics) continue;
 
             if(entity.physref == null){
                 PhysicsBody body = new PhysicsBody();
