@@ -171,6 +171,10 @@ public class ForceProjector extends Block{
                 hit -= 1f / 5f * Time.delta;
             }
 
+            deflectBullets();
+        }
+
+        public void deflectBullets(){
             float realRadius = realRadius();
 
             if(realRadius > 0 && !broken){
