@@ -34,6 +34,15 @@ public class Units{
     }
 
     @Remote(called = Loc.server)
+    public static void unitEnvDeath(Unit unit){
+        if(unit != null){
+            unit.dead = true;
+            Fx.unitEnvKill.at(unit);
+            Core.app.post(() -> Call.unitDestroy(unit.id));
+        }
+    }
+
+    @Remote(called = Loc.server)
     public static void unitDeath(int uid){
         Unit unit = Groups.unit.getByID(uid);
 

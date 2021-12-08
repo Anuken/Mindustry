@@ -1513,7 +1513,8 @@ public class Blocks{
             //TODO
             requirements(Category.effect, with(Items.surgeAlloy, 100, Items.silicon, 125));
             size = 3;
-            radius = 50f;
+            width = 50f;
+            length = 36;
             shieldHealth = 2000f;
             cooldownNormal = 3f;
             cooldownBrokenBase = 0.35f;

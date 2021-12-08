@@ -155,12 +155,15 @@ public class ForceProjector extends Block{
 
             warmup = Mathf.lerpDelta(warmup, efficiency(), 0.1f);
 
-            if(buildup > 0 && consumes.has(ConsumeType.liquid)){
+            if(buildup > 0){
                 float scale = !broken ? cooldownNormal : cooldownBrokenBase;
-                Consume cons = consumes.get(ConsumeType.liquid);
-                if(cons.valid(this)){
-                    cons.update(this);
-                    scale *= (cooldownLiquid * (1f + (liquids.current().heatCapacity - 0.4f) * 0.9f));
+
+                if(consumes.has(ConsumeType.liquid)){
+                    Consume cons = consumes.get(ConsumeType.liquid);
+                    if(cons.valid(this)){
+                        cons.update(this);
+                        scale *= (cooldownLiquid * (1f + (liquids.current().heatCapacity - 0.4f) * 0.9f));
+                    }
                 }
 
                 buildup -= delta() * scale;

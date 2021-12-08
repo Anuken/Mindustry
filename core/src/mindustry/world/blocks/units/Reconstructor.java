@@ -111,7 +111,7 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public boolean acceptUnitPayload(Unit unit){
-            return hasUpgrade(unit.type);
+            return hasUpgrade(unit.type) && !upgrade(unit.type).isBanned();
         }
 
         @Override

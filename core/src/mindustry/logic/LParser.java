@@ -138,8 +138,7 @@ public class LParser{
                 try{
                     st = LogicIO.read(tokens, tok);
                 }catch(Exception e){
-                    //log invalid statements
-                    Log.err(e);
+                    //replace invalid statements
                     st = new InvalidStatement();
                 }
 
