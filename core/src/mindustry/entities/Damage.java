@@ -334,14 +334,14 @@ public class Damage{
     /** Applies a status effect to all enemy units in a range. */
     public static void status(Team team, float x, float y, float radius, StatusEffect effect, float duration, boolean air, boolean ground){
         Cons<Unit> cons = entity -> {
-            if(entity.team == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
+            if(entity.team == team || !entity.within(x, y, radius + entity.type.hitSize) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
                 return;
             }
 
             entity.apply(effect, duration);
         };
 
-        rect.setSize(radius * 2).setCenter(x, y);
+        rect.setSize((radius + 100) * 2).setCenter(x, y);
         if(team != null){
             Units.nearbyEnemies(team, rect, cons);
         }else{
@@ -357,10 +357,11 @@ public class Damage{
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground){
         Cons<Unit> cons = entity -> {
-            if(entity.team == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
+            if(entity.team == team || !entity.within(x, y, radius + entity.type.hitSize) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
                 return;
             }
-            float amount = calculateDamage(x, y, entity.getX(), entity.getY(), radius, damage);
+            float realDist = Math.max(0, Mathf.dst(x, y, entity.getX(), entity.getY()) - entity.type.hitSize);
+            float amount = calculateDamage(realDist, radius, damage);
             entity.damage(amount);
             //TODO better velocity displacement
             float dst = tr.set(entity.getX() - x, entity.getY() - y).len();
@@ -371,7 +372,8 @@ public class Damage{
             }
         };
 
-        rect.setSize(radius * 2).setCenter(x, y);
+        //100 is over any existing hitSizes, but modded units may be a problem
+        rect.setSize((radius + 100) * 2).setCenter(x, y);
         if(team != null){
             Units.nearbyEnemies(team, rect, cons);
         }else{
@@ -475,6 +477,10 @@ public class Damage{
 
     private static float calculateDamage(float x, float y, float tx, float ty, float radius, float damage){
         float dist = Mathf.dst(x, y, tx, ty);
+        return calculateDamage(dist, radius, damage)
+    }
+
+    private static float calculateDamage(float dist, float radius, float damage){
         float falloff = 0.4f;
         float scaled = Mathf.lerp(1f - dist / radius, 1f, falloff);
         return damage * scaled;
