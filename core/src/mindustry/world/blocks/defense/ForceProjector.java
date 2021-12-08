@@ -1,6 +1,5 @@
 package mindustry.world.blocks.defense;
 
-import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -229,7 +228,7 @@ public class ForceProjector extends Block{
 
                 Draw.color(team.color, Color.white, Mathf.clamp(hit));
 
-                if(Core.settings.getBool("animatedshields")){
+                if(renderer.animateShields){
                     Fill.poly(x, y, 6, radius);
                 }else{
                     Lines.stroke(1.5f);

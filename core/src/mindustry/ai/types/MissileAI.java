@@ -3,6 +3,7 @@ package mindustry.ai.types;
 import mindustry.entities.units.*;
 
 public class MissileAI extends AIController{
+    //TODO store 'main' target and use that as a fallback
 
     //TODO UNPREDICTABLE TARGETING
     @Override
