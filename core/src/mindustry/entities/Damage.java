@@ -372,7 +372,7 @@ public class Damage{
             }
         };
 
-        //100 is over any existing hitSizes, but modded units may be a problem
+        //100 is over any existing hitSize, but modded units may be a problem
         rect.setSize((radius + 100) * 2).setCenter(x, y);
         if(team != null){
             Units.nearbyEnemies(team, rect, cons);
@@ -477,7 +477,7 @@ public class Damage{
 
     private static float calculateDamage(float x, float y, float tx, float ty, float radius, float damage){
         float dist = Mathf.dst(x, y, tx, ty);
-        return calculateDamage(dist, radius, damage)
+        return calculateDamage(dist, radius, damage);
     }
 
     private static float calculateDamage(float dist, float radius, float damage){
