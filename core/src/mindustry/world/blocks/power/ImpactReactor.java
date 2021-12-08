@@ -26,6 +26,7 @@ public class ImpactReactor extends PowerGenerator{
     public float itemDuration = 60f;
     public int explosionRadius = 23;
     public int explosionDamage = 1900;
+    public float explosionShake = 6f;
     public Effect explodeEffect = Fx.impactReactorExplosion;
 
     public Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
@@ -145,7 +146,7 @@ public class ImpactReactor extends PowerGenerator{
 
             Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
 
-            Effect.shake(6f, 16f, x, y);
+            Effect.shake(explosionShake, explosionShake * 2.5f, x, y);
             explodeEffect.at(x, y);
         }
 
