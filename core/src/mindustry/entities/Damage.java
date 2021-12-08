@@ -341,7 +341,7 @@ public class Damage{
             entity.apply(effect, duration);
         };
 
-        rect.setSize((radius + 100) * 2).setCenter(x, y);
+        rect.setSize(radius * 2).setCenter(x, y);
         if(team != null){
             Units.nearbyEnemies(team, rect, cons);
         }else{
@@ -373,7 +373,7 @@ public class Damage{
         };
 
         //100 is over any existing hitSize, but modded units may be a problem
-        rect.setSize((radius + 100) * 2).setCenter(x, y);
+        rect.setSize(radius * 2).setCenter(x, y);
         if(team != null){
             Units.nearbyEnemies(team, rect, cons);
         }else{
