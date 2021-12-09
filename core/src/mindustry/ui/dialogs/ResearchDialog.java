@@ -34,8 +34,8 @@ import static mindustry.Vars.*;
 public class ResearchDialog extends BaseDialog{
     public final float nodeSize = Scl.scl(60f);
     public ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
-    //TODO switch root system
-    public TechTreeNode root = new TechTreeNode(TechTree.rootErekir, null);
+    public TechTreeNode root = new TechTreeNode(TechTree.roots.first(), null);
+    public TechNode lastNode = root.node;
     public Rect bounds = new Rect();
     public ItemsDisplay itemDisplay;
     public View view;
@@ -45,13 +45,47 @@ public class ResearchDialog extends BaseDialog{
     public ResearchDialog(){
         super("");
 
-        titleTable.remove();
+        titleTable.clear();
+        titleTable.button(b -> {
+            //TODO custom icon here.
+            b.image(Icon.tree).padRight(8).size(iconMed);
+            b.add().growX();
+            b.label(() -> root.node.localizedName()).color(Pal.accent);
+            b.add().growX();
+            b.add().size(iconMed);
+        }, () -> {
+            new BaseDialog("@techtree.select"){{
+                cont.pane(t -> {
+                    t.table(Tex.button, in -> {
+                        in.defaults().width(300f).height(60f);
+                        for(TechNode node : TechTree.roots){
+                            in.button(node.localizedName(), Styles.cleart, () -> {
+                                rebuildTree(node);
+                                hide();
+                            }).row();
+                        }
+                    });
+                });
+
+                addCloseButton();
+            }}.show();
+        }).minWidth(300f);
+
         margin(0f).marginBottom(8);
         cont.stack(view = new View(), itemDisplay = new ItemsDisplay()).grow();
+
+        titleTable.toFront();
 
         shouldPause = true;
 
         shown(() -> {
+            Planet currPlanet = ui.planet.isShown() ?
+                ui.planet.state.planet :
+                state.isCampaign() ? state.rules.sector.planet : null;
+
+            if(currPlanet != null && currPlanet.techTree != null){
+                switchTree(currPlanet.techTree);
+            }
 
             items = new ItemSeq(){
                 //store sector item amounts for modifications
@@ -176,6 +210,28 @@ public class ResearchDialog extends BaseDialog{
         });
     }
 
+    public void switchTree(TechNode node){
+        if(lastNode == node || node == null) return;
+        nodes.clear();
+        root = new TechTreeNode(node, null);
+        lastNode = node;
+        view.rebuildAll();
+    }
+
+    public void rebuildTree(TechNode node){
+        switchTree(node);
+        view.panX = 0f;
+        view.panY = -200f;
+        view.setScale(1f);
+
+        view.hoverNode = null;
+        view.infoTable.remove();
+        view.infoTable.clear();
+
+        checkNodes(root);
+        treeLayout();
+    }
+
     void treeLayout(){
         float spacing = 20f;
         LayoutNode node = new LayoutNode(root, null);
@@ -293,6 +349,13 @@ public class ResearchDialog extends BaseDialog{
         public Table infoTable = new Table();
 
         {
+            rebuildAll();
+        }
+
+        public void rebuildAll(){
+            clear();
+            hoverNode = null;
+            infoTable.clear();
             infoTable.touchable = Touchable.enabled;
 
             for(TechTreeNode node : nodes){

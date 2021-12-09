@@ -6,7 +6,7 @@ import static mindustry.content.TechTree.*;
 public class ErekirTechTree{
 
     public static void load(){
-        rootErekir = node(coreBastion, () -> {
+        Planets.erekir.techTree = nodeRoot("erekir", coreBastion, () -> {
             node(duct, () -> {
                 node(ductRouter, () -> {
                     node(ductBridge, () -> {
@@ -142,11 +142,13 @@ public class ErekirTechTree{
             });
 
             node(breach, () -> {
-                //fracture turret is broken and thus not listed
 
-                //TODO big tech jump here; incomplete turret
-                node(sublimate, () -> {
+                node(fracture, () -> {
 
+                    //TODO big tech jump here; incomplete turret
+                    node(sublimate, () -> {
+
+                    });
                 });
             });
 

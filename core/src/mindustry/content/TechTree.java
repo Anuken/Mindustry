@@ -12,8 +12,14 @@ public class TechTree{
     private static TechNode context = null;
 
     public static Seq<TechNode> all = new Seq<>();
-    //TODO deprecate and refactor the root system
-    public static TechNode root, rootErekir;
+    public static Seq<TechNode> roots = new Seq<>();
+
+    public static TechNode nodeRoot(String name, UnlockableContent content, Runnable children){
+        var root = node(content, content.researchRequirements(), children);
+        root.name = name;
+        roots.add(root);
+        return root;
+    }
 
     public static TechNode node(UnlockableContent content, Runnable children){
         return node(content, content.researchRequirements(), children);
@@ -69,6 +75,8 @@ public class TechTree{
     public static class TechNode{
         /** Depth in tech tree. */
         public int depth;
+        /** Name for root node - used in tech tree selector. */
+        public @Nullable String name;
         /** Requirement node. */
         public @Nullable TechNode parent;
         /** Content to be researched. */
@@ -101,6 +109,10 @@ public class TechTree{
 
             content.techNode = this;
             all.add(this);
+        }
+
+        public String localizedName(){
+            return Core.bundle.get("techtree." + name);
         }
 
         public void setupRequirements(ItemStack[] requirements){

@@ -9,6 +9,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
@@ -86,6 +87,8 @@ public class Planet extends UnlockableContent{
     public Planet solarSystem;
     /** All planets orbiting this one, in ascending order of radius. */
     public Seq<Planet> children = new Seq<>();
+    /** Default root node shown when the tech tree is opened here. */
+    public @Nullable TechNode techTree;
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
     protected Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2), cloudMeshLoader = () -> null;
 

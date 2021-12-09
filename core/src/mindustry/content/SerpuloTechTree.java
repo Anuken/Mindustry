@@ -12,7 +12,7 @@ import static mindustry.content.UnitTypes.*;
 public class SerpuloTechTree{
 
     public static void load(){
-        root = node(coreShard, () -> {
+        Planets.serpulo.techTree = nodeRoot("serpulo", coreShard, () -> {
 
             node(conveyor, () -> {
 

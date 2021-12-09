@@ -1096,7 +1096,8 @@ public class Blocks{
             craftEffect = new RadialEffect(Fx.heatReactorSmoke, 4, 90f, 7f);
 
             itemCapacity = 20;
-            consumes.item(Items.thorium, 2);
+            consumes.item(Items.thorium, 3);
+            consumes.liquid(Liquids.nitrogen, 1f / 60f);
             outputItem = new ItemStack(Items.fissileMatter, 1);
         }};
 
@@ -2854,7 +2855,7 @@ public class Blocks{
             restitution = 0.03f;
             range = 180;
             shootCone = 3f;
-            health = 300 * size * size;
+            health = 350 * size * size;
             rotateSpeed = 1.6f;
 
             limitRange();
@@ -2862,9 +2863,9 @@ public class Blocks{
 
         //TODO implementation; splash damage? shotgun? AA? I have no ideas
         fracture = new ItemTurret("fracture"){{
-            requirements(Category.turret, with(Items.tungsten, 35, Items.silicon, 35));
+            requirements(Category.turret, with(Items.tungsten, 30, Items.graphite, 30, Items.silicon, 35));
             ammo(
-            Items.tungsten, new ContinuousFlameBulletType(45f){{
+            Items.tungsten, new ContinuousFlameBulletType(50f){{
                 length = 105f;
                 shootEffect = Fx.randLifeSpark;
                 width = 4.5f;
@@ -2903,7 +2904,7 @@ public class Blocks{
             range = 90;
             shootCone = 15f;
             inaccuracy = 0f;
-            health = 300 * size * size;
+            health = 420 * size * size;
             rotateSpeed = 3f;
         }};
 
@@ -2954,7 +2955,7 @@ public class Blocks{
             range = 190;
             shootCone = 15f;
             inaccuracy = 20f;
-            health = 300 * size * size;
+            health = 400 * size * size;
             rotateSpeed = 3f;
 
             //???
