@@ -71,6 +71,7 @@ public class UnitType extends UnlockableContent{
     public boolean createWreck = true;
     public boolean useUnitCap = true;
     public boolean destructibleWreck = true;
+    public boolean squareShadow = false;
     public float groundLayer = Layer.groundUnit;
     public float payloadCapacity = 8;
     public float aimDst = -1f;
@@ -496,7 +497,13 @@ public class UnitType extends UnlockableContent{
         legBaseRegion = Core.atlas.find(name + "-leg-base", name + "-leg");
         baseRegion = Core.atlas.find(name + "-base");
         cellRegion = Core.atlas.find(name + "-cell", Core.atlas.find("power-cell"));
-        softShadowRegion = Core.atlas.find("circle-shadow");
+        //when linear filtering is on, it's acceptable to use the relatively low-res 'particle' region
+        softShadowRegion =
+            squareShadow ? Core.atlas.find("square-shadow") :
+            hitSize <= 10f || (Core.settings != null && Core.settings.getBool("linear", true)) ?
+                Core.atlas.find("particle") :
+                Core.atlas.find("circle-shadow");
+
         outlineRegion = Core.atlas.find(name + "-outline");
         shadowRegion = fullIcon;
 

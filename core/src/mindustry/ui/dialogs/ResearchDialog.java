@@ -48,7 +48,7 @@ public class ResearchDialog extends BaseDialog{
         titleTable.clear();
         titleTable.button(b -> {
             //TODO custom icon here.
-            b.image(Icon.tree).padRight(8).size(iconMed);
+            b.imageDraw(() -> root.node.icon()).padRight(8).size(iconMed);
             b.add().growX();
             b.label(() -> root.node.localizedName()).color(Pal.accent);
             b.add().growX();

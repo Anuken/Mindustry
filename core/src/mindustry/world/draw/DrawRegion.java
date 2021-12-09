@@ -13,6 +13,7 @@ public class DrawRegion extends DrawBlock{
     public TextureRegion region;
     public String suffix = "";
     public boolean spinSprite = false;
+    public boolean drawPlan = true;
     public float rotateSpeed, x, y;
     /** Any number <=0 disables layer changes. */
     public float layer = -1;
@@ -38,6 +39,7 @@ public class DrawRegion extends DrawBlock{
 
     @Override
     public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
+        if(!drawPlan) return;
         Draw.rect(region, plan.drawx(), plan.drawy());
     }
 

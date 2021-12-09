@@ -168,6 +168,7 @@ public class DrawTurret extends DrawBlock{
             progress = interp.apply(progress);
 
             for(int i = 0; i < regions.length; i++){
+                //can be null if drawRegion == false
                 var region = regions[i];
                 float sign = i == 1 ? -1 : 1;
                 Tmp.v1.set((x + moveX * progress) * sign, y + moveY * progress).rotate((build.rotation - 90));
@@ -218,6 +219,8 @@ public class DrawTurret extends DrawBlock{
                     regions = new TextureRegion[]{Core.atlas.find(block.name + suffix)};
                     outlines = new TextureRegion[]{Core.atlas.find(block.name + suffix + "-outline")};
                 }
+            }else{
+                regions = new TextureRegion[1];
             }
 
             heat = Core.atlas.find(block.name + suffix + "-heat");

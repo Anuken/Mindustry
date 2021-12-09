@@ -64,8 +64,8 @@ public class Blocks{
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //erekir
-    siliconArcFurnace, electrolyzer, oxidationChamber, atmosphericConcentrator, slagHeater, slagIncinerator, heatReactor,
-    carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer,
+    siliconArcFurnace, electrolyzer, oxidationChamber, atmosphericConcentrator, electricHeater, slagIncinerator,
+    carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer, heatReactor,
     cellSynthesisChamber,
 
     //sandbox
@@ -104,7 +104,7 @@ public class Blocks{
 
     //power - erekir
     //TODO rename chemicalCombustionChamber
-    turbineCondenser, chemicalCombustionChamber, pyrolysisGenerator,
+    turbineCondenser, ventCondenser, chemicalCombustionChamber, pyrolysisGenerator,
     beamNode, beamTower,
 
     //production
@@ -1055,7 +1055,7 @@ public class Blocks{
 
             outputItem = new ItemStack(Items.oxide, 1);
 
-            consumes.liquid(Liquids.ozone, 2f / 60f);
+            consumes.liquid(Liquids.ozone, 1f / 60f);
             consumes.item(Items.beryllium);
             consumes.power(1f);
 
@@ -1069,15 +1069,13 @@ public class Blocks{
             heatOutput = 5f;
         }};
 
-        slagHeater = new HeatProducer("slag-heater"){{
+        electricHeater = new HeatProducer("electric-heater"){{
             requirements(Category.crafting, with(Items.tungsten, 30, Items.graphite, 30));
 
-            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.slag, 9f), new DrawHeatOutput(true));
-            drawer.iconOverride = new String[]{"-bottom", ""};
+            drawer = new DrawMulti(new DrawHeatOutput(true));
+            drawer.iconOverride = new String[]{""};
             size = 2;
-            craftTime = 60f * 1f;
             heatOutput = 2f;
-            consumes.liquid(Liquids.slag, 20f / 60f);
             consumes.power(0.5f / 60f);
         }};
 
@@ -1085,20 +1083,6 @@ public class Blocks{
             requirements(Category.crafting, with(Items.tungsten, 15));
             size = 1;
             consumes.liquid(Liquids.slag, 2f / 60f);
-        }};
-
-        heatReactor = new HeatProducer("heat-reactor"){{
-            //TODO gas/liquid requirement?
-            requirements(Category.crafting, with(Items.oxide, 70, Items.graphite, 20, Items.carbide, 10, Items.thorium, 80));
-            size = 3;
-            craftTime = 60f * 10f;
-
-            craftEffect = new RadialEffect(Fx.heatReactorSmoke, 4, 90f, 7f);
-
-            itemCapacity = 20;
-            consumes.item(Items.thorium, 3);
-            consumes.liquid(Liquids.nitrogen, 1f / 60f);
-            outputItem = new ItemStack(Items.fissileMatter, 1);
         }};
 
         carbideCrucible = new HeatCrafter("carbide-crucible"){{
@@ -1254,6 +1238,20 @@ public class Blocks{
             consumes.items(with(Items.thorium, 2, Items.sand, 6));
             consumes.liquid(Liquids.ozone, 2f / 60f);
             consumes.power(8f);
+        }};
+
+        heatReactor = new HeatProducer("heat-reactor"){{
+            //TODO gas/liquid requirement?
+            requirements(Category.crafting, with(Items.oxide, 70, Items.graphite, 20, Items.carbide, 10, Items.thorium, 80));
+            size = 3;
+            craftTime = 60f * 10f;
+
+            craftEffect = new RadialEffect(Fx.heatReactorSmoke, 4, 90f, 7f);
+
+            itemCapacity = 20;
+            consumes.item(Items.thorium, 3);
+            consumes.liquid(Liquids.nitrogen, 1f / 60f);
+            outputItem = new ItemStack(Items.fissileMatter, 1);
         }};
 
         //TODO needs to be completely redone from the ground up
@@ -2017,7 +2015,7 @@ public class Blocks{
             spinSpeed = 0.6f;
             spinners = true;
             hasLiquids = true;
-            liquidOutput = new LiquidStack(Liquids.water, 10f / 60f / 9f);
+            outputLiquid = new LiquidStack(Liquids.water, 10f / 60f / 9f);
             liquidCapacity = 20f;
         }};
 
@@ -2132,23 +2130,6 @@ public class Blocks{
             consumes.liquid(Liquids.water, 0.1f).boost();
         }};
 
-        //TODO should be crusher or something
-        impactDrill = new BurstDrill("impact-drill"){{
-            requirements(Category.production, with(Items.silicon, 60, Items.beryllium, 90, Items.graphite, 50));
-            drillTime = 60f * 12f;
-            size = 4;
-            hasPower = true;
-            tier = 6;
-            drillEffect = new MultiEffect(Fx.mineImpact, Fx.drillSteam);
-            shake = 4f;
-            itemCapacity = 40;
-
-            consumes.power(3f);
-            consumes.liquid(Liquids.water, 0.2f);
-        }};
-
-        //TODO higher tier impact drill, 5x5
-
         waterExtractor = new SolidPump("water-extractor"){{
             requirements(Category.production, with(Items.metaglass, 30, Items.graphite, 30, Items.lead, 30, Items.copper, 30));
             result = Liquids.water;
@@ -2200,6 +2181,31 @@ public class Blocks{
             consumes.liquid(Liquids.water, 0.15f);
         }};
 
+        //TODO output heat
+        ventCondenser = new AttributeCrafter("vent-condenser"){{
+            requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 60));
+            attribute = Attribute.vent;
+            displayEfficiencyScale = 1f / 9f;
+            minEfficiency = 9f - 0.0001f;
+            displayEfficiency = false;
+            craftEffect = Fx.turbinegenerate;
+            drawer = new DrawMulti(new DrawBlock(), new DrawRegion("-rotator-blur"){{
+                spinSprite = true;
+                drawPlan = false;
+                rotateSpeed = 6f;
+            }});
+            drawer.iconOverride = new String[]{"", "-rotator"};
+            ignoreLiquidFullness = true;
+            craftTime = 30f;
+            size = 3;
+            ambientSound = Sounds.hum;
+            ambientSoundVolume = 0.06f;
+            hasLiquids = true;
+            outputLiquid = new LiquidStack(Liquids.water, 30f / 60f / 9f);
+            consumes.power(0.5f);
+            liquidCapacity = 20f;
+        }};
+
         cliffCrusher = new WallCrafter("cliff-crusher"){{
             requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 20));
 
@@ -2235,6 +2241,23 @@ public class Blocks{
 
             consumes.liquid(Liquids.hydrogen, 2f / 60f).boost();
         }};
+
+        //TODO should be crusher or something
+        impactDrill = new BurstDrill("impact-drill"){{
+            requirements(Category.production, with(Items.silicon, 60, Items.beryllium, 90, Items.graphite, 50));
+            drillTime = 60f * 12f;
+            size = 4;
+            hasPower = true;
+            tier = 6;
+            drillEffect = new MultiEffect(Fx.mineImpact, Fx.drillSteam);
+            shake = 4f;
+            itemCapacity = 40;
+
+            consumes.power(3f);
+            consumes.liquid(Liquids.water, 0.2f);
+        }};
+
+        //TODO higher tier impact drill, 5x5
 
         //endregion
         //region storage
@@ -2891,15 +2914,22 @@ public class Blocks{
             consumes.liquid(Liquids.hydrogen, 1.5f / 60f);
             shots = 1;
 
-            //TODO cool reload animation
-            draw = new DrawTurret("reinforced-");
+            draw = new DrawTurret("reinforced-"){{
+                parts.addAll(new RegionPart("-glow"){{
+                    drawRegion = false;
+                    heatColor = Color.valueOf("768a9a");
+                    useReload = false;
+                    useProgressHeat = true;
+                }});
+            }};
             shootShake = 1f;
-            shootLength = 5f;
+            shootLength = 4f;
             outlineColor = Pal.darkOutline;
             size = 2;
             envEnabled |= Env.space;
             reloadTime = 25f;
             restitution = 0.1f;
+            cooldown = 0.04f;
             recoilAmount = 2.5f;
             range = 90;
             shootCone = 15f;

@@ -1,10 +1,12 @@
 package mindustry.content;
 
 import arc.*;
+import arc.scene.style.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 
 /** Class for storing a list of TechNodes with some utility tree builder methods; context dependent. See {@link SerpuloTechTree#load} source for example usage. */
@@ -75,6 +77,8 @@ public class TechTree{
     public static class TechNode{
         /** Depth in tech tree. */
         public int depth;
+        /** Icon displayed in tech tree selector. */
+        public @Nullable Drawable icon;
         /** Name for root node - used in tech tree selector. */
         public @Nullable String name;
         /** Requirement node. */
@@ -109,6 +113,10 @@ public class TechTree{
 
             content.techNode = this;
             all.add(this);
+        }
+
+        public Drawable icon(){
+            return icon == null ? Icon.tree : icon;
         }
 
         public String localizedName(){

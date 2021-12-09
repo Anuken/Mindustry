@@ -1,8 +1,10 @@
 package mindustry.world.blocks.production;
 
 import arc.*;
+import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 /** A crafter that gains efficiency from attribute tiles. */
@@ -11,6 +13,9 @@ public class AttributeCrafter extends GenericCrafter{
     public float baseEfficiency = 1f;
     public float boostScale = 1f;
     public float maxBoost = 1f;
+    public float minEfficiency = -1f;
+    public float displayEfficiencyScale = 1f;
+    public boolean displayEfficiency = true;
 
     public AttributeCrafter(String name){
         super(name);
@@ -18,6 +23,10 @@ public class AttributeCrafter extends GenericCrafter{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
+        if(!displayEfficiency) return;
+
         drawPlaceText(Core.bundle.format("bar.efficiency",
         (int)((baseEfficiency + Math.min(maxBoost, boostScale * sumAttribute(attribute, x, y))) * 100f)), x, y, valid);
     }
@@ -28,9 +37,15 @@ public class AttributeCrafter extends GenericCrafter{
 
         bars.add("efficiency", (AttributeCrafterBuild entity) ->
             new Bar(() ->
-            Core.bundle.format("bar.efficiency", (int)(entity.efficiencyScale() * 100)),
+            Core.bundle.format("bar.efficiency", (int)(entity.efficiencyScale() * 100 * displayEfficiencyScale)),
             () -> Pal.lightOrange,
             entity::efficiencyScale));
+    }
+
+    @Override
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
+        //make sure there's enough efficiency at this location
+        return tile.getLinkedTilesAs(this, tempTiles).sumf(other -> other.floor().attributes.get(attribute)) > minEfficiency;
     }
 
     @Override

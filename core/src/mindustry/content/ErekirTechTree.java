@@ -75,27 +75,29 @@ public class ErekirTechTree{
                 });
             });
 
-            node(siliconArcFurnace, () -> {
-                node(electrolyzer, () -> {
-                    node(oxidationChamber, () -> {
-                        node(atmosphericConcentrator, () -> {
-                            node(cyanogenSynthesizer, () -> {
+            node(ventCondenser, () -> {
+                node(siliconArcFurnace, () -> {
+                    node(electrolyzer, () -> {
+                        node(oxidationChamber, () -> {
+                            node(electricHeater, () -> {
+                                node(atmosphericConcentrator, () -> {
+                                    node(cyanogenSynthesizer, () -> {
 
-                            });
-                        });
+                                    });
+                                });
 
-                        node(carbideCrucible, () -> {
-                            node(surgeCrucible, () -> {
-                                node(phaseSynthesizer, () -> {
+                                node(carbideCrucible, () -> {
+                                    node(surgeCrucible, () -> {
+                                        node(phaseSynthesizer, () -> {
 
+                                        });
+                                    });
                                 });
                             });
                         });
-                    });
 
-                    node(slagIncinerator, () -> {
-                        //when is this actually needed?
-                        node(slagHeater, () -> {
+                        node(slagIncinerator, () -> {
+
                             node(slagCentrifuge, () -> {
 
                             });

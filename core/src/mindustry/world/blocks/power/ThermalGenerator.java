@@ -22,7 +22,7 @@ public class ThermalGenerator extends PowerGenerator{
     public float displayEfficiencyScale = 1f;
     public boolean spinners = false;
     public boolean displayEfficiency = true;
-    public @Nullable LiquidStack liquidOutput;
+    public @Nullable LiquidStack outputLiquid;
     public Attribute attribute = Attribute.heat;
 
     public @Load("@-rotator") TextureRegion rotatorRegion;
@@ -34,7 +34,7 @@ public class ThermalGenerator extends PowerGenerator{
 
     @Override
     public void init(){
-        if(liquidOutput != null){
+        if(outputLiquid != null){
             outputsLiquid = true;
             hasLiquids = true;
         }
@@ -49,8 +49,8 @@ public class ThermalGenerator extends PowerGenerator{
 
         stats.add(Stat.tiles, attribute, floating, size * size * displayEfficiencyScale, !displayEfficiency);
 
-        if(liquidOutput != null){
-            stats.add(Stat.output, StatValues.liquid(liquidOutput.liquid, liquidOutput.amount * size * size * 60f, true));
+        if(outputLiquid != null){
+            stats.add(Stat.output, StatValues.liquid(outputLiquid.liquid, outputLiquid.amount * size * size * 60f, true));
         }
     }
 
@@ -88,10 +88,10 @@ public class ThermalGenerator extends PowerGenerator{
 
             spinRotation += productionEfficiency * spinSpeed;
 
-            if(liquidOutput != null){
-                float added = Math.min(productionEfficiency * delta() * liquidOutput.amount, liquidCapacity - liquids.get(liquidOutput.liquid));
-                liquids.add(liquidOutput.liquid, added);
-                dumpLiquid(liquidOutput.liquid);
+            if(outputLiquid != null){
+                float added = Math.min(productionEfficiency * delta() * outputLiquid.amount, liquidCapacity - liquids.get(outputLiquid.liquid));
+                liquids.add(outputLiquid.liquid, added);
+                dumpLiquid(outputLiquid.liquid);
             }
         }
 

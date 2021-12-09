@@ -30,6 +30,7 @@ public class GenericCrafter extends Block{
 
     /** if true, crafters with multiple liquid outputs will dump excess when there's still space for at least one liquid type */
     public boolean dumpExtraLiquid = true;
+    public boolean ignoreLiquidFullness = false;
     public float craftTime = 80;
     public Effect craftEffect = Fx.none;
     public Effect updateEffect = Fx.none;
@@ -115,10 +116,6 @@ public class GenericCrafter extends Block{
         super.init();
     }
 
-    public void drawPlanBase(BuildPlan req, Eachable<BuildPlan> list){
-        super.drawRequestRegion(req, list);
-    }
-
     @Override
     public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
         drawer.drawPlan(this, plan, list);
@@ -164,7 +161,7 @@ public class GenericCrafter extends Block{
                     }
                 }
             }
-            if(outputLiquids != null){
+            if(outputLiquids != null && !ignoreLiquidFullness){
                 boolean allFull = true;
                 for(var output : outputLiquids){
                     if(liquids.get(output.liquid) >= liquidCapacity - 0.001f){
