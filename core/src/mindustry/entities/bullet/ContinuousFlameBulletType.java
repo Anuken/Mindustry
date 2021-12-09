@@ -91,7 +91,7 @@ public class ContinuousFlameBulletType extends ContinuousBulletType{
 
     @Override
     public float currentLength(Bullet b){
-        return length * b.fslope();
+        return length * b.fin(lengthInterp);
     }
 
     @Override

@@ -10,6 +10,7 @@ public class ContinuousBulletType extends BulletType{
     public float shake = 0f;
     public float damageInterval = 5f;
     public boolean largeHit = false;
+    public boolean continuous = true;
     public boolean laserAbsorb = true;
     /** can't use pierceCap here for... many reasons. DO NOT USE, BUGGY */
     public int pierceMax = -1;
@@ -29,11 +30,13 @@ public class ContinuousBulletType extends BulletType{
 
     @Override
     public float continuousDamage(){
+        if(!continuous) return -1f;
         return damage / damageInterval * 60f;
     }
 
     @Override
     public float estimateDPS(){
+        if(!continuous) return super.estimateDPS();
         //assume firing duration is about 100 by default, may not be accurate there's no way of knowing in this method
         //assume it pierces 3 blocks/units
         return damage * 100f / damageInterval * 3f;
@@ -52,16 +55,30 @@ public class ContinuousBulletType extends BulletType{
     }
 
     @Override
+    public void init(Bullet b){
+        super.init(b);
+
+        if(!continuous){
+            applyDamage(b);
+        }
+    }
+
+    @Override
     public void update(Bullet b){
+        if(!continuous) return;
 
         //damage every 5 ticks
         if(b.timer(1, damageInterval)){
-            Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), currentLength(b), largeHit, laserAbsorb, pierceMax);
+            applyDamage(b);
         }
 
         if(shake > 0){
             Effect.shake(shake, shake, b);
         }
+    }
+
+    public void applyDamage(Bullet b){
+        Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), currentLength(b), largeHit, laserAbsorb, pierceMax);
     }
 
     public float currentLength(Bullet b){

@@ -95,6 +95,16 @@ public class Logic implements ApplicationListener{
             }
         });
 
+        Events.on(PlayEvent.class, e -> {
+            //reset weather on play
+            var randomWeather = state.rules.weather.copy().shuffle();
+            float sum = 0f;
+            for(var weather : randomWeather){
+                weather.cooldown = sum + Mathf.random(weather.maxFrequency);
+                sum += weather.cooldown;
+            }
+        });
+
         Events.on(WorldLoadEvent.class, e -> {
             //enable infinite ammo for wave team by default
             state.rules.waveTeam.rules().infiniteAmmo = true;

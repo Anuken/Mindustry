@@ -2,6 +2,7 @@ package mindustry.content;
 
 import arc.graphics.*;
 import arc.math.*;
+import arc.math.Interp.*;
 import arc.struct.*;
 import mindustry.*;
 import mindustry.entities.*;
@@ -2863,20 +2864,24 @@ public class Blocks{
         fracture = new ItemTurret("fracture"){{
             requirements(Category.turret, with(Items.tungsten, 35, Items.silicon, 35));
             ammo(
-            Items.tungsten, new ContinuousFlameBulletType(20f){{
-                length = 90f;
-                shootEffect = Fx.colorSpark;
+            Items.tungsten, new ContinuousFlameBulletType(45f){{
+                length = 105f;
+                shootEffect = Fx.randLifeSpark;
+                width = 4.5f;
+                colors = new Color[]{Color.valueOf("e8e6ff").a(0.55f), Color.valueOf("819aeb").a(0.7f), Color.valueOf("786bed").a(0.8f), Color.valueOf("c3cdfa"), Color.white};
                 smokeEffect = Fx.shootBigSmoke;
+                continuous = false;
                 ammoMultiplier = 2;
                 pierce = true;
                 knockback = 4f;
                 status = StatusEffects.slow;
                 hitColor = Items.tungsten.color;
-                lifetime = 16f;
+                lifetime = 19f;
                 despawnEffect = Fx.none;
                 drawFlare = false;
-                lengthInterp = f -> Interp.pow2In.apply(1f - f);
-                //TODO different effect?
+                collidesAir = true;
+                Interp in = new PowIn(1.6f);
+                lengthInterp = f -> in.apply(1f - f);
                 hitEffect = Fx.hitBulletColor;
             }}
             );
@@ -2887,13 +2892,14 @@ public class Blocks{
 
             //TODO cool reload animation
             draw = new DrawTurret("reinforced-");
-            shootShake = 2f;
-            shootLength = 6f;
+            shootShake = 1f;
+            shootLength = 5f;
             outlineColor = Pal.darkOutline;
             size = 2;
             envEnabled |= Env.space;
-            reloadTime = 30f;
-            restitution = 0.03f;
+            reloadTime = 25f;
+            restitution = 0.1f;
+            recoilAmount = 2.5f;
             range = 90;
             shootCone = 15f;
             inaccuracy = 0f;

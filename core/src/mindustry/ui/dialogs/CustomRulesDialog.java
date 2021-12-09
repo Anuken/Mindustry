@@ -3,7 +3,6 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.math.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
@@ -410,19 +409,6 @@ public class CustomRulesDialog extends BaseDialog{
             add.addCloseButton();
             add.show();
         }).width(170f);
-
-        //reset cooldown to random number
-        dialog.hidden(() -> {
-            float sum = 0;
-            Seq<WeatherEntry> sh = rules.weather.copy();
-            sh.shuffle();
-
-            for(WeatherEntry w : sh){
-                //add the previous cooldowns to the sum so weather events are staggered and don't happen all at once.
-                w.cooldown = sum + Mathf.random(w.minFrequency, w.maxFrequency);
-                sum += w.cooldown;
-            }
-        });
 
         dialog.show();
     }
