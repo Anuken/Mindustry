@@ -41,6 +41,7 @@ public enum Stat{
     buildSpeedMultiplier,
     reactive,
     healing,
+    immunities,
 
     itemCapacity(StatCat.items),
     itemsMoved(StatCat.items),

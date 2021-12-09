@@ -20,6 +20,7 @@ public class ContinuousFlameBulletType extends ContinuousBulletType{
     public Color flareColor = Color.valueOf("e189f5");
     public float flareWidth = 3f, flareInnerScl = 0.5f, flareLength = 40f, flareInnerLenScl = 0.5f, flareLayer = Layer.bullet - 0.0001f, flareRotSpeed = 1.2f;
     public boolean rotateFlare = false;
+    public Interp lengthInterp = Interp.slope;
 
     /** Lengths, widths, ellipse panning, and offsets, all as fractions of the base width and length. Stored as an 'interleaved' array of values: LWPO1 LWPO2 LWPO3... */
     public float[] lengthWidthPanOffsets = {
@@ -53,7 +54,7 @@ public class ContinuousFlameBulletType extends ContinuousBulletType{
 
     @Override
     public void draw(Bullet b){
-        float mult = b.fslope();
+        float mult = b.fin(lengthInterp);
         float realLength = (pierceMax <= 0 ? length : Damage.findPierceLength(b, pierceMax, length)) * mult;
 
         float sin = Mathf.sin(Time.time, oscScl, oscMag);

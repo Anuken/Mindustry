@@ -2863,31 +2863,32 @@ public class Blocks{
         fracture = new ItemTurret("fracture"){{
             requirements(Category.turret, with(Items.tungsten, 35, Items.silicon, 35));
             ammo(
-            Items.tungsten, new BasicBulletType(5f, 20){{
-                velocityInaccuracy = 0.2f;
-                width = 6f;
-                height = 12f;
+            Items.tungsten, new ContinuousFlameBulletType(20f){{
+                length = 90f;
                 shootEffect = Fx.colorSpark;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 2;
                 pierce = true;
-                pierceBuilding = true;
-                hitColor = backColor = trailColor = Items.tungsten.color;
-                frontColor = Color.white;
-                trailWidth = 1f;
-                trailLength = 4;
+                knockback = 4f;
+                status = StatusEffects.slow;
+                hitColor = Items.tungsten.color;
+                lifetime = 16f;
+                despawnEffect = Fx.none;
+                drawFlare = false;
+                lengthInterp = f -> Interp.pow2In.apply(1f - f);
                 //TODO different effect?
-                hitEffect = despawnEffect = Fx.hitBulletColor;
+                hitEffect = Fx.hitBulletColor;
             }}
             );
 
             acceptCoolant = false;
             consumes.liquid(Liquids.hydrogen, 1.5f / 60f);
-            shots = 5;
+            shots = 1;
 
             //TODO cool reload animation
             draw = new DrawTurret("reinforced-");
-            shootLength = 8f;
+            shootShake = 2f;
+            shootLength = 6f;
             outlineColor = Pal.darkOutline;
             size = 2;
             envEnabled |= Env.space;
@@ -2895,11 +2896,9 @@ public class Blocks{
             restitution = 0.03f;
             range = 90;
             shootCone = 15f;
-            inaccuracy = 20f;
+            inaccuracy = 0f;
             health = 300 * size * size;
-            rotateSpeed = 1.8f;
-
-            limitRange();
+            rotateSpeed = 3f;
         }};
 
         //TODO implementation, better name

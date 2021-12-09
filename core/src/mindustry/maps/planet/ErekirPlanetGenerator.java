@@ -250,9 +250,9 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         //TODO proper waves
         state.rules.waves = !OS.hasProp("mindustry.debug");
         state.rules.waveTimer = true;
-        state.rules.waveSpacing = 60f * 60f * 7.5f;
+        state.rules.waveSpacing = 60f * 60f * 10f;
         state.rules.spawns = Seq.with(new SpawnGroup(){{
-            type = UnitTypes.emanate;
+            type = UnitTypes.fortress;
             spacing = 1;
             shieldScaling = 60;
             unitScaling = 2f;

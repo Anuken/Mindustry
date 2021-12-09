@@ -348,6 +348,17 @@ public class UnitType extends UnlockableContent{
         if(weapons.any()){
             stats.add(Stat.weapons, StatValues.weapons(this, weapons));
         }
+
+        if(immunities.size > 0){
+            var imm = immunities.toSeq().sort();
+            //it's redundant to list wet for naval units
+            if(naval){
+                imm.remove(StatusEffects.wet);
+            }
+            for(var i : imm){
+                stats.add(Stat.immunities, i.emoji() + " " + i.localizedName);
+            }
+        }
     }
 
     @CallSuper
