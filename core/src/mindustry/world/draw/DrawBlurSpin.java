@@ -14,8 +14,9 @@ public class DrawBlurSpin extends DrawBlock{
     public String suffix = "";
     public float rotateSpeed = 1f, x, y, blurThresh = 0.7f;
 
-    public DrawBlurSpin(String suffix){
+    public DrawBlurSpin(String suffix, float speed){
         this.suffix = suffix;
+        rotateSpeed = speed;
     }
 
     public DrawBlurSpin(){

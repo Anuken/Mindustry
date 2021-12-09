@@ -1073,6 +1073,7 @@ public class Blocks{
             requirements(Category.crafting, with(Items.tungsten, 30, Items.graphite, 30));
 
             drawer = new DrawMulti(new DrawHeatOutput(true));
+            rotateDraw = false;
             drawer.iconOverride = new String[]{""};
             size = 2;
             heatOutput = 2f;
@@ -2015,7 +2016,7 @@ public class Blocks{
             spinSpeed = 0.6f;
             spinners = true;
             hasLiquids = true;
-            outputLiquid = new LiquidStack(Liquids.water, 10f / 60f / 9f);
+            outputLiquid = new LiquidStack(Liquids.water, 5f / 60f / 9f);
             liquidCapacity = 20f;
         }};
 
@@ -2189,11 +2190,9 @@ public class Blocks{
             baseEfficiency = 0f;
             displayEfficiency = false;
             craftEffect = Fx.turbinegenerate;
-            drawer = new DrawMulti(new DrawBlock(), new DrawBlurSpin("-rotator"){{
-                rotateSpeed = 6f;
-            }});
-            ignoreLiquidFullness = true;
-            craftTime = 50f;
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawBlurSpin("-rotator", 6f), new DrawRegion("-mid"), new DrawLiquidTile(Liquids.water, 38f / 4f), new DrawBlock());
+            drawer.iconOverride = new String[]{"-bottom", "-rotator", ""};
+            craftTime = 120f;
             size = 3;
             ambientSound = Sounds.hum;
             ambientSoundVolume = 0.06f;

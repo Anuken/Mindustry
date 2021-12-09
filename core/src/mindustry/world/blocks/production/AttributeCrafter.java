@@ -72,6 +72,7 @@ public class AttributeCrafter extends GenericCrafter{
         @Override
         public void pickedUp(){
             attrsum = 0f;
+            warmup = 0f;
         }
 
         @Override
