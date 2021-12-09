@@ -31,6 +31,8 @@ public class GenericCrafter extends Block{
     /** if true, crafters with multiple liquid outputs will dump excess when there's still space for at least one liquid type */
     public boolean dumpExtraLiquid = true;
     public boolean ignoreLiquidFullness = false;
+    /** if true, liquid will be outputted continuously regardless of craft time */
+    public boolean continuousLiquidOutput = false;
     public float craftTime = 80;
     public Effect craftEffect = Fx.none;
     public Effect updateEffect = Fx.none;
@@ -64,7 +66,7 @@ public class GenericCrafter extends Block{
         }
 
         if(outputLiquids != null){
-            stats.add(Stat.output, StatValues.liquids(craftTime, outputLiquids));
+            stats.add(Stat.output, StatValues.liquids(continuousLiquidOutput ? 1f : craftTime, outputLiquids));
         }
     }
 
@@ -188,8 +190,15 @@ public class GenericCrafter extends Block{
             if(consValid()){
 
                 progress += getProgressIncrease(craftTime);
-                totalProgress += delta() * efficiency();
                 warmup = Mathf.approachDelta(warmup, warmupTarget(), warmupSpeed);
+
+                //continuously output based on efficiency
+                if(outputLiquids != null && continuousLiquidOutput){
+                    float inc = getProgressIncrease(1f);
+                    for(var output : outputLiquids){
+                        handleLiquid(this, output.liquid, Math.min(output.amount * inc, liquidCapacity - liquids.get(output.liquid)));
+                    }
+                }
 
                 if(Mathf.chanceDelta(updateEffectChance)){
                     updateEffect.at(x + Mathf.range(size * 4f), y + Mathf.range(size * 4));
@@ -197,6 +206,9 @@ public class GenericCrafter extends Block{
             }else{
                 warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
             }
+
+            //TODO may look bad, revert to edelta() if so
+            totalProgress += warmup * Time.delta;
 
             if(progress >= 1f){
                 craft();
@@ -230,7 +242,7 @@ public class GenericCrafter extends Block{
                 }
             }
 
-            if(outputLiquids != null){
+            if(outputLiquids != null && !continuousLiquidOutput){
                 for(var output : outputLiquids){
                     handleLiquid(this, output.liquid, output.amount);
                 }

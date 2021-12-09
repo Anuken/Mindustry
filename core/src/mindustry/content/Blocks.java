@@ -2185,23 +2185,22 @@ public class Blocks{
         ventCondenser = new AttributeCrafter("vent-condenser"){{
             requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 60));
             attribute = Attribute.vent;
-            displayEfficiencyScale = 1f / 9f;
             minEfficiency = 9f - 0.0001f;
+            baseEfficiency = 0f;
             displayEfficiency = false;
             craftEffect = Fx.turbinegenerate;
-            drawer = new DrawMulti(new DrawBlock(), new DrawRegion("-rotator-blur"){{
-                spinSprite = true;
-                drawPlan = false;
+            drawer = new DrawMulti(new DrawBlock(), new DrawBlurSpin("-rotator"){{
                 rotateSpeed = 6f;
             }});
-            drawer.iconOverride = new String[]{"", "-rotator"};
             ignoreLiquidFullness = true;
-            craftTime = 30f;
+            craftTime = 50f;
             size = 3;
             ambientSound = Sounds.hum;
             ambientSoundVolume = 0.06f;
             hasLiquids = true;
-            outputLiquid = new LiquidStack(Liquids.water, 30f / 60f / 9f);
+            continuousLiquidOutput = true;
+            boostScale = 1f / 9f;
+            outputLiquid = new LiquidStack(Liquids.water, 30f / 60f);
             consumes.power(0.5f);
             liquidCapacity = 20f;
         }};

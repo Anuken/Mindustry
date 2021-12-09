@@ -35,6 +35,8 @@ public class AttributeCrafter extends GenericCrafter{
     public void setBars(){
         super.setBars();
 
+        if(!displayEfficiency) return;
+
         bars.add("efficiency", (AttributeCrafterBuild entity) ->
             new Bar(() ->
             Core.bundle.format("bar.efficiency", (int)(entity.efficiencyScale() * 100 * displayEfficiencyScale)),
@@ -45,14 +47,14 @@ public class AttributeCrafter extends GenericCrafter{
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         //make sure there's enough efficiency at this location
-        return tile.getLinkedTilesAs(this, tempTiles).sumf(other -> other.floor().attributes.get(attribute)) > minEfficiency;
+        return baseEfficiency + tile.getLinkedTilesAs(this, tempTiles).sumf(other -> other.floor().attributes.get(attribute)) >= minEfficiency;
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.affinities, attribute, boostScale * size * size);
+        stats.add(baseEfficiency <= 0.0001f ? Stat.tiles : Stat.affinities, attribute, floating, boostScale * size * size, !displayEfficiency);
     }
 
     public class AttributeCrafterBuild extends GenericCrafterBuild{
