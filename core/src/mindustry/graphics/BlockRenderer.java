@@ -21,7 +21,8 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class BlockRenderer{
-    public static final int crackRegions = 8, maxCrackSize = 9;
+    //TODO cracks take up far to much space, so I had to limit it to 7. this means larger blocks won't have cracks - draw tiling mirrored stuff instead?
+    public static final int crackRegions = 8, maxCrackSize = 7;
 
     private static final int initialRequests = 32 * 32;
     private static final Color shadowColor = new Color(0, 0, 0, 0.71f), blendShadowColor = Color.white.cpy().lerp(Color.black, shadowColor.a);

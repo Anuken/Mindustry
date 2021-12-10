@@ -21,6 +21,8 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 public class Tile implements Position, QuadTreeObject, Displayable{
+    private static boolean tileChangeLock = false;
+    private static boolean tilePreChangeLock = false;
     private static final TileChangeEvent tileChange = new TileChangeEvent();
     private static final TilePreChangeEvent preChange = new TilePreChangeEvent();
     private static final ObjectSet<Building> tileSet = new ObjectSet<>();
@@ -530,9 +532,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     protected void preChanged(){
-        if(!world.isGenerating()){
-            Events.fire(preChange.set(this));
-        }
+        firePreChange();
 
         if(build != null){
             //only call removed() for the center block - this only gets called once.
@@ -552,7 +552,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                             //reset entity and block *manually* - thus, preChanged() will not be called anywhere else, for multiblocks
                             if(other != this){ //do not remove own entity so it can be processed in changed()
                                 //manually call pre-change event for other tile
-                                Events.fire(preChange.set(other));
+                                other.firePreChange();
 
                                 other.build = null;
                                 other.block = Blocks.air;
@@ -619,7 +619,34 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     protected void fireChanged(){
         if(!world.isGenerating()){
-            Events.fire(tileChange.set(this));
+
+            //A TileChangeEvent may cause other TileChangeEvents to occur, and if that happens, allocate a new instance.
+            boolean wasLocked = tileChangeLock;
+            var eventInst = wasLocked ? new TileChangeEvent() : tileChange;
+            tileChangeLock = true;
+
+            Events.fire(eventInst.set(this));
+
+            //unlock after it's done
+            if(!wasLocked){
+                tileChangeLock = false;
+            }
+        }
+    }
+
+    protected void firePreChange(){
+        if(!world.isGenerating()){
+
+            //same as above
+            boolean wasLocked = tilePreChangeLock;
+            var eventInst = wasLocked ? new TilePreChangeEvent() : preChange;
+            tilePreChangeLock = true;
+
+            Events.fire(eventInst.set(this));
+
+            if(!wasLocked){
+                tilePreChangeLock = false;
+            }
         }
     }
 
