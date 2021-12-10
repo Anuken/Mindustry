@@ -114,6 +114,33 @@ public class MinimapRenderer{
         }
 
         Draw.reset();
+        if(withLabels){
+            drawSpawns(x, y, w, h, scaling);
+        }
+    }
+
+    public void drawSpawns(float x, float y, float w, float h, float scaling){
+        if(!state.rules.showSpawns || !state.hasSpawns() || !state.rules.waves) return;
+
+        TextureRegion icon = Icon.units.getRegion();
+
+        Lines.stroke(3f);
+
+        Draw.color(state.rules.waveTeam.color, Tmp.c2.set(state.rules.waveTeam.color).value(1.2f), Mathf.absin(Time.time, 16f, 1f));
+
+        for(Tile tile : spawner.getSpawns()){
+            float tx = ((tile.x + 0.5f) / world.width()) * w;
+            float ty = ((tile.y + 0.5f) / world.height()) * h;
+
+            float rad = (state.rules.dropZoneRadius / (baseSize / 2f)) * 5f * scaling;
+            float curve = Mathf.curve(Time.time % 240f, 120f, 240f);
+
+            Draw.rect(icon, x + tx, y + ty, icon.width, icon.height);
+            Lines.circle(x + tx, y + ty, rad);
+            if(curve > 0f) Lines.circle(x + tx, y + ty, rad * Interp.pow3Out.apply(curve));
+        }
+
+        Draw.reset();
     }
 
     public void drawEntities(float x, float y, float w, float h){

@@ -35,6 +35,7 @@ public class MinimapFragment extends Fragment{
                 float ratio = (float)renderer.minimap.getTexture().height / renderer.minimap.getTexture().width;
                 TextureRegion reg = Draw.wrap(renderer.minimap.getTexture());
                 Draw.rect(reg, w/2f + panx*zoom, h/2f + pany*zoom, size, size * ratio);
+
                 renderer.minimap.drawEntities(w/2f + panx*zoom - size/2f, h/2f + pany*zoom - size/2f * ratio, size, size * ratio, zoom, true);
             }
 

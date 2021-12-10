@@ -997,7 +997,7 @@ public class Blocks{
 
             liquidCapacity = 50f;
 
-            consumes.liquid(Liquids.water, 5f / 60f);
+            consumes.liquid(Liquids.water, 10f / 60f);
             consumes.power(2f);
 
             drawer = new DrawMulti(
@@ -1021,7 +1021,8 @@ public class Blocks{
             );
 
             drawer.iconOverride = new String[]{"-bottom", ""};
-            outputLiquids = LiquidStack.with(Liquids.ozone, 2f * craftTime / 60, Liquids.hydrogen, 3f * craftTime / 60);
+            continuousLiquidOutput = true;
+            outputLiquids = LiquidStack.with(Liquids.ozone, 2f * 2f / 60, Liquids.hydrogen, 2f * 3f / 60);
             liquidOutputDirections = new int[]{1, 3};
         }};
 
@@ -1055,7 +1056,7 @@ public class Blocks{
 
             outputItem = new ItemStack(Items.oxide, 1);
 
-            consumes.liquid(Liquids.ozone, 1f / 60f);
+            consumes.liquid(Liquids.ozone, 2f / 60f);
             consumes.item(Items.beryllium);
             consumes.power(1f);
 
@@ -1076,7 +1077,7 @@ public class Blocks{
             rotateDraw = false;
             drawer.iconOverride = new String[]{""};
             size = 2;
-            heatOutput = 2f;
+            heatOutput = 3f;
             consumes.power(0.5f / 60f);
         }};
 
@@ -2043,7 +2044,7 @@ public class Blocks{
             ambientSoundVolume = 0.06f;
         }};
 
-        //TODO coolr name?
+        //TODO cooler name?
         pyrolysisGenerator = new ConsumeGenerator("pyrolysis-generator"){{
             //TODO requirements
             requirements(Category.power, with(Items.graphite, 50, Items.carbide, 50, Items.oxide, 60f, Items.silicon, 50));
@@ -2182,7 +2183,7 @@ public class Blocks{
             consumes.liquid(Liquids.water, 0.15f);
         }};
 
-        //TODO output heat
+        //TODO output heat?
         ventCondenser = new AttributeCrafter("vent-condenser"){{
             requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 60));
             attribute = Attribute.vent;
@@ -2201,7 +2202,7 @@ public class Blocks{
             boostScale = 1f / 9f;
             outputLiquid = new LiquidStack(Liquids.water, 30f / 60f);
             consumes.power(0.5f);
-            liquidCapacity = 20f;
+            liquidCapacity = 60f;
         }};
 
         cliffCrusher = new WallCrafter("cliff-crusher"){{

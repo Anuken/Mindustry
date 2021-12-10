@@ -36,6 +36,7 @@ public enum LAccess{
     mineX,
     mineY,
     mining,
+    speed,
     team,
     type,
     flag,
