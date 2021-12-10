@@ -34,6 +34,7 @@ import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.heat.*;
+import mindustry.world.blocks.heat.HeatConductor.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
@@ -285,17 +286,36 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public float calculateHeat(float[] sideHeat){
+        return calculateHeat(sideHeat, null);
+    }
+
+    //TODO can cameFrom be an IntSet?
+    public float calculateHeat(float[] sideHeat, @Nullable IntSet cameFrom){
         Arrays.fill(sideHeat, 0f);
+        if(cameFrom != null) cameFrom.clear();
+
         float heat = 0f;
 
         for(var edge : block.getEdges()){
             Building build = nearby(edge.x, edge.y);
-            if(build != null && build.team == team && build instanceof HeatBlock heater && (!build.block.rotate || (relativeTo(build) + 2) % 4 == build.rotation)){
-                //heat is distributed across building size
-                float add = heater.heat() / build.block.size;
+            if(build != null && build.team == team && build instanceof HeatBlock heater && (!build.block.rotate || (relativeTo(build) + 2) % 4 == build.rotation)){ //TODO hacky
 
-                sideHeat[Mathf.mod(relativeTo(build), 4)] += add;
-                heat += add;
+                //if there's a cycle, ignore its heat
+                if(!(build instanceof HeatConductorBuild hc && hc.cameFrom.contains(id()))){
+                    //heat is distributed across building size
+                    float add = heater.heat() / build.block.size;
+
+                    sideHeat[Mathf.mod(relativeTo(build), 4)] += add;
+                    heat += add;
+                }
+
+                //register traversed cycles
+                if(cameFrom != null){
+                    cameFrom.add(build.id);
+                    if(build instanceof HeatConductorBuild hc){
+                        cameFrom.addAll(hc.cameFrom);
+                    }
+                }
             }
         }
         return heat;

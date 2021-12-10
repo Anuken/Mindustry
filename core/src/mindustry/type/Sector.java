@@ -9,6 +9,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.game.Saves.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -85,6 +86,12 @@ public class Sector{
 
     public void loadInfo(){
         info = Core.settings.getJson(planet.name + "-s-" + id + "-info", SectorInfo.class, SectorInfo::new);
+
+        //fix an old naming bug; this doesn't happen with new saves, but old saves need manual fixes
+        if(info.resources.contains(Blocks.water)){
+            info.resources.remove(Blocks.water);
+            info.resources.add(Liquids.water);
+        }
     }
 
     /** Removes any sector info. */

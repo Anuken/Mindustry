@@ -4,6 +4,7 @@ import arc.*;
 import arc.math.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.heat.*;
 import mindustry.world.meta.*;
 
 /** A crafter that requires contact from heater blocks to craft. */
@@ -35,9 +36,10 @@ public class HeatCrafter extends GenericCrafter{
         super.setStats();
 
         stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
+        stats.add(Stat.maxEfficiency, (int)(maxEfficiency * 100f), StatUnit.percent);
     }
 
-    public class HeatCrafterBuild extends GenericCrafterBuild{
+    public class HeatCrafterBuild extends GenericCrafterBuild implements HeatConsumer{
         //TODO sideHeat could be smooth
         public float[] sideHeat = new float[4];
         public float heat = 0f;
@@ -49,8 +51,14 @@ public class HeatCrafter extends GenericCrafter{
             super.updateTile();
         }
 
+        @Override
         public float heatRequirement(){
             return heatRequirement;
+        }
+
+        @Override
+        public float[] sideHeat(){
+            return sideHeat;
         }
 
         @Override

@@ -89,7 +89,9 @@ public class ErekirTechTree{
                                 node(carbideCrucible, () -> {
                                     node(surgeCrucible, () -> {
                                         node(phaseSynthesizer, () -> {
+                                            node(phaseHeater, () -> {
 
+                                            });
                                         });
                                     });
                                 });

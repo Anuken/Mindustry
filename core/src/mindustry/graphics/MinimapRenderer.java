@@ -114,6 +114,8 @@ public class MinimapRenderer{
         }
 
         Draw.reset();
+
+        //TODO might be useful in the standard minimap too
         if(withLabels){
             drawSpawns(x, y, w, h, scaling);
         }

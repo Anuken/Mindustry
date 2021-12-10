@@ -225,10 +225,10 @@ public class JsonIO{
             public UnlockableContent read(Json json, JsonValue jsonData, Class type){
                 if(jsonData.isNull()) return null;
                 String str = jsonData.asString();
-                Item item = Vars.content.getByName(ContentType.item, str);
-                Liquid liquid = Vars.content.getByName(ContentType.liquid, str);
-                Block block = Vars.content.getByName(ContentType.block, str);
-                UnitType unit = Vars.content.getByName(ContentType.unit, str);
+                Item item = Vars.content.item(str);
+                Liquid liquid = Vars.content.liquid(str);
+                Block block = Vars.content.block(str);
+                UnitType unit = Vars.content.unit(str);
                 return
                     item != null ? item :
                     liquid != null ? liquid :

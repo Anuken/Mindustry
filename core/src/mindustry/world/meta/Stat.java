@@ -61,6 +61,7 @@ public enum Stat{
     input(StatCat.crafting),
     output(StatCat.crafting),
     productionTime(StatCat.crafting),
+    maxEfficiency(StatCat.crafting),
     drillTier(StatCat.crafting),
     drillSpeed(StatCat.crafting),
     linkRange(StatCat.crafting),

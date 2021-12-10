@@ -45,7 +45,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
     @Override
     public float getSizeScl(){
-        return 2000;
+        return 2000 * 1.06f;
     }
 
     @Override
@@ -92,7 +92,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         tile.block = tile.floor.asFloor().wall;
 
-        if(Ridged.noise3d(1, position.x, position.y, position.z, 2, 25) > 0.19){
+        if(Ridged.noise3d(1, position.x, position.y, position.z, 2, 14) > 0.15){
             tile.block = Blocks.air;
         }
 
@@ -160,6 +160,10 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         median(3, 0.6, Blocks.slag);
 
         pass((x, y) -> {
+            if((floor == Blocks.arkyciteFloor || floor == Blocks.arkyicStone) && block.isStatic()){
+                block = Blocks.arkyicWall;
+            }
+
             float max = 0;
             for(Point2 p : Geometry.d8){
                 max = Math.max(max, world.getDarkness(x + p.x, y + p.y));

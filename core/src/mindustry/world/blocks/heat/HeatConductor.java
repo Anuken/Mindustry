@@ -1,6 +1,8 @@
 package mindustry.world.blocks.heat;
 
+import arc.*;
 import arc.graphics.g2d.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -10,12 +12,13 @@ import mindustry.world.*;
 import mindustry.world.draw.*;
 
 public class HeatConductor extends Block{
-    public float visualMaxHeat = 10f;
+    public float visualMaxHeat = 15f;
     public DrawBlock drawer = new DrawBlock();
 
     public HeatConductor(String name){
         super(name);
         update = solid = rotate = true;
+        rotateDraw = false;
         size = 3;
     }
 
@@ -23,7 +26,8 @@ public class HeatConductor extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.add("heat", (HeatConductorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat / visualMaxHeat));
+        //TODO show number
+        bars.add("heat", (HeatConductorBuild entity) -> new Bar(() -> Core.bundle.format("bar.heatamount", (int)entity.heat), () -> Pal.lightOrange, () -> entity.heat / visualMaxHeat));
     }
 
     @Override
@@ -43,8 +47,10 @@ public class HeatConductor extends Block{
         return drawer.finalIcons(this);
     }
 
-    public class HeatConductorBuild extends Building implements HeatBlock{
+    public class HeatConductorBuild extends Building implements HeatBlock, HeatConsumer{
         public float heat = 0f;
+        public float[] sideHeat = new float[4];
+        public IntSet cameFrom = new IntSet();
 
         @Override
         public void draw(){
@@ -58,8 +64,18 @@ public class HeatConductor extends Block{
         }
 
         @Override
+        public float[] sideHeat(){
+            return sideHeat;
+        }
+
+        @Override
+        public float heatRequirement(){
+            return visualMaxHeat;
+        }
+
+        @Override
         public void updateTile(){
-            heat = calculateHeat(null);
+            heat = calculateHeat(sideHeat, cameFrom);
         }
 
         @Override

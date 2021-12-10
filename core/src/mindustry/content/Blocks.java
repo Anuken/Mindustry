@@ -44,7 +44,7 @@ public class Blocks{
     redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     redweed, purbush, coralChunk, yellowCoral,
-    regolithWall, yellowStoneWall, rhyoliteWall, steamVent, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall,
+    regolithWall, yellowStoneWall, rhyoliteWall, steamVent, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall, arkyicWall,
     ferricStone, ferricCraters, carbonStone, beryllicStone,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
@@ -64,7 +64,7 @@ public class Blocks{
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //erekir
-    siliconArcFurnace, electrolyzer, oxidationChamber, atmosphericConcentrator, electricHeater, slagIncinerator,
+    siliconArcFurnace, electrolyzer, oxidationChamber, atmosphericConcentrator, electricHeater, phaseHeater, heatRedirector, slagIncinerator,
     carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer, heatReactor,
     cellSynthesisChamber,
 
@@ -517,6 +517,11 @@ public class Blocks{
         beryllicStoneWall = new StaticWall("beryllic-stone-wall"){{
             beryllicStone.asFloor().wall = this;
             attributes.set(Attribute.silicate, 1.2f);
+        }};
+
+        arkyicWall = new StaticWall("arkyic-wall"){{
+            variants = 3;
+            arkyciteFloor.asFloor().wall = arkyicStone.asFloor().wall = this;
         }};
 
         redIceWall = new StaticWall("red-ice-wall"){{
@@ -1079,6 +1084,25 @@ public class Blocks{
             size = 2;
             heatOutput = 3f;
             consumes.power(0.5f / 60f);
+        }};
+
+        phaseHeater = new HeatProducer("phase-heater"){{
+            requirements(Category.crafting, with(Items.oxide, 30, Items.carbide, 30));
+
+            drawer = new DrawMulti(new DrawHeatOutput(true));
+            drawer.iconOverride = new String[]{""};
+            size = 2;
+            heatOutput = 10f;
+            craftTime = 60f * 8f;
+            consumes.item(Items.phaseFabric);
+            consumes.power(0.5f / 60f);
+        }};
+
+        heatRedirector = new HeatConductor("heat-redirector"){{
+            requirements(Category.crafting, with(Items.tungsten, 10, Items.graphite, 10));
+
+            size = 3;
+            drawer = new DrawMulti(new DrawHeatOutput(true), new DrawHeatInput("-heat"));
         }};
 
         slagIncinerator = new ItemIncinerator("slag-incinerator"){{
