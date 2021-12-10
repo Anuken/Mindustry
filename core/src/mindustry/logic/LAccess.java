@@ -31,6 +31,7 @@ public enum LAccess{
     size,
     dead,
     range, 
+    speed,
     shooting,
     boosting,
     mineX,
