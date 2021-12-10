@@ -56,7 +56,6 @@ public class Liquids{
             colorTo = Color.valueOf("9e172c");
         }};
 
-        //TODO
         arkycite = new Liquid("arkycite", Color.valueOf("84a94b")){{
             flammability = 0.4f;
             viscosity = 0.7f;

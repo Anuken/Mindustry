@@ -1168,7 +1168,7 @@ public class Blocks{
             size = 3;
 
             itemCapacity = 20;
-            heatRequirement = 5f;
+            heatRequirement = 10f;
             craftTime = 60f * 3f;
             liquidCapacity = 80f * 5;
 

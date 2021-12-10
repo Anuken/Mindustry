@@ -6,7 +6,7 @@ import static mindustry.content.TechTree.*;
 public class ErekirTechTree{
 
     public static void load(){
-        Planets.erekir.techTree = nodeRoot("erekir", coreBastion, () -> {
+        Planets.erekir.techTree = nodeRoot("erekir", coreBastion, true, () -> {
             node(duct, () -> {
                 node(ductRouter, () -> {
                     node(ductBridge, () -> {
@@ -57,9 +57,11 @@ public class ErekirTechTree{
 
             node(turbineCondenser, () -> {
                 node(beamNode, () -> {
-                    node(chemicalCombustionChamber, () -> {
-                        node(pyrolysisGenerator, () -> {
+                    node(ventCondenser, () -> {
+                        node(chemicalCombustionChamber, () -> {
+                            node(pyrolysisGenerator, () -> {
 
+                            });
                         });
                     });
 
@@ -75,38 +77,40 @@ public class ErekirTechTree{
                 });
             });
 
-            node(ventCondenser, () -> {
-                node(siliconArcFurnace, () -> {
-                    node(electrolyzer, () -> {
-                        node(oxidationChamber, () -> {
-                            node(electricHeater, () -> {
-                                node(atmosphericConcentrator, () -> {
-                                    node(cyanogenSynthesizer, () -> {
+            node(siliconArcFurnace, () -> {
+                node(electrolyzer, () -> {
+                    node(oxidationChamber, () -> {
+                        node(electricHeater, () -> {
+                            node(heatRedirector, () -> {
 
-                                    });
+                            });
+
+                            node(atmosphericConcentrator, () -> {
+                                node(cyanogenSynthesizer, () -> {
+
                                 });
+                            });
 
-                                node(carbideCrucible, () -> {
-                                    node(surgeCrucible, () -> {
-                                        node(phaseSynthesizer, () -> {
-                                            node(phaseHeater, () -> {
+                            node(carbideCrucible, () -> {
+                                node(surgeCrucible, () -> {
+                                    node(phaseSynthesizer, () -> {
+                                        node(phaseHeater, () -> {
 
-                                            });
                                         });
                                     });
                                 });
                             });
                         });
+                    });
 
-                        node(slagIncinerator, () -> {
+                    node(slagIncinerator, () -> {
 
-                            node(slagCentrifuge, () -> {
+                        node(slagCentrifuge, () -> {
 
-                            });
+                        });
 
-                            node(heatReactor, () -> {
+                        node(heatReactor, () -> {
 
-                            });
                         });
                     });
                 });

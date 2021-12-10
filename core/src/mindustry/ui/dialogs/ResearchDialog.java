@@ -45,7 +45,9 @@ public class ResearchDialog extends BaseDialog{
     public ResearchDialog(){
         super("");
 
+        titleTable.remove();
         titleTable.clear();
+        titleTable.top();
         titleTable.button(b -> {
             //TODO custom icon here.
             b.imageDraw(() -> root.node.icon()).padRight(8).size(iconMed);
@@ -59,6 +61,8 @@ public class ResearchDialog extends BaseDialog{
                     t.table(Tex.button, in -> {
                         in.defaults().width(300f).height(60f);
                         for(TechNode node : TechTree.roots){
+                            if(node.requiresUnlock && !node.content.unlocked() && node != getPrefRoot()) continue;
+
                             in.button(node.localizedName(), Styles.cleart, () -> {
                                 rebuildTree(node);
                                 hide();
@@ -72,11 +76,19 @@ public class ResearchDialog extends BaseDialog{
         }).minWidth(300f);
 
         margin(0f).marginBottom(8);
-        cont.stack(view = new View(), itemDisplay = new ItemsDisplay()).grow();
+        cont.stack(titleTable, view = new View(), itemDisplay = new ItemsDisplay()).grow();
 
         titleTable.toFront();
 
         shouldPause = true;
+
+        onResize(() -> {
+            if(Core.graphics.isPortrait()){
+                itemDisplay.marginTop(60f);
+            }else{
+                itemDisplay.marginTop(0f);
+            }
+        });
 
         shown(() -> {
             Planet currPlanet = ui.planet.isShown() ?
@@ -208,6 +220,13 @@ public class ResearchDialog extends BaseDialog{
                 view.clamp();
             }
         });
+    }
+
+    public @Nullable TechNode getPrefRoot(){
+        Planet currPlanet = ui.planet.isShown() ?
+            ui.planet.state.planet :
+            state.isCampaign() ? state.rules.sector.planet : null;
+        return currPlanet == null ? null : currPlanet.techTree;
     }
 
     public void switchTree(TechNode node){
