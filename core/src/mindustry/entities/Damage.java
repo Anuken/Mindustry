@@ -181,7 +181,7 @@ public class Damage{
 
                 if(collide && tile.team != team && tile.collide(hitter)){
                     tile.collision(hitter);
-                    hitter.type.hit(hitter, tile.x, tile.y);
+                    hitter.type.hit(hitter, cx * tilesize, cy * tilesize);
                 }
 
                 //try to heal the tile
