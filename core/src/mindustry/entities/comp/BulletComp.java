@@ -118,8 +118,6 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     @Override
     public void update(){
-        type.update(self());
-
         if(type.collidesTiles && type.collides && type.collidesGround){
             tileRaycast(World.toTile(lastX()), World.toTile(lastY()), tileX(), tileY());
         }
@@ -128,6 +126,8 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
             hit = true;
             remove();
         }
+        
+        type.update(self());
     }
 
     //copy-paste of World#raycastEach, inlined for lambda capture performance.

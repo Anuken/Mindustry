@@ -352,6 +352,8 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void update(Bullet b){
+        updateTrail(b);
+
         if(homingPower > 0.0001f && b.time >= homingDelay){
             Teamc target;
             //home in on allies if possible
@@ -368,8 +370,6 @@ public class BulletType extends Content implements Cloneable{
                 b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), homingPower * Time.delta * 50f));
             }
         }
-
-        updateTrail(b);
 
         if(weaveMag > 0){
             b.vel.rotate(Mathf.sin(b.time + Mathf.PI * weaveScale/2f, weaveScale, weaveMag * (Mathf.randomSeed(b.id, 0, 1) == 1 ? -1 : 1)) * Time.delta);
