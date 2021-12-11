@@ -57,7 +57,7 @@ public class StackConveyor extends Block implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        if(tile.build instanceof StackConveyorBuild b && b.block == this.block){
+        if(tile.build instanceof StackConveyorBuild b && b.block == this){
             int state = b.state;
             if(state == stateLoad){ //standard conveyor mode
                 return otherblock.outputsItems() && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
@@ -65,13 +65,13 @@ public class StackConveyor extends Block implements Autotiler{
                 return otherblock.acceptsItems &&
                     (!otherblock.noSideBlend || lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock)) &&
                     (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) ||
-                    (otherblock instanceof StackConveyor && otherblock.block == this.block && facing(otherx, othery, otherrot, tile.x, tile.y))) &&
-                    !(world.build(otherx, othery) instanceof StackConveyorBuild s && s.block == this.block && s.state == stateUnload) &&
-                    !(world.build(otherx, othery) instanceof StackConveyorBuild s2 && s2.block == this.block && s2.state == stateMove &&
+                    (otherblock instanceof StackConveyor && otherblock.block == this && facing(otherx, othery, otherrot, tile.x, tile.y))) &&
+                    !(world.build(otherx, othery) instanceof StackConveyorBuild s && s.block == this && s.state == stateUnload) &&
+                    !(world.build(otherx, othery) instanceof StackConveyorBuild s2 && s2.block == this && s2.state == stateMove &&
                         !facing(otherx, othery, otherrot, tile.x, tile.y));
             }
         }
-        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof StackConveyor && otherblock.block == this.block;
+        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof StackConveyor && otherblock.block == this;
     }
 
     @Override
@@ -93,7 +93,7 @@ public class StackConveyor extends Block implements Autotiler{
     @Override
     public boolean rotatedOutput(int x, int y){
         Building tile = world.build(x, y);
-        if(tile instanceof StackConveyorBuild s && s.block == this.block){
+        if(tile instanceof StackConveyorBuild s && s.block == this){
             return s.state != stateUnload;
         }
         return super.rotatedOutput(x, y);
@@ -258,7 +258,7 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public void overwrote(Seq<Building> builds){
-            if(builds.first() instanceof ConveyorBuild build && build.block == this.block){
+            if(builds.first() instanceof ConveyorBuild build && build.block == this){
                 Item item = build.items.first();
                 if(item != null){
                     handleStack(item, build.items.get(item), null);
