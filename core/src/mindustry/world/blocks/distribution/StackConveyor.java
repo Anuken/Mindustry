@@ -65,13 +65,13 @@ public class StackConveyor extends Block implements Autotiler{
                 return otherblock.acceptsItems &&
                     (!otherblock.noSideBlend || lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock)) &&
                     (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) ||
-                    (otherblock instanceof StackConveyor && otherblock.block == this && facing(otherx, othery, otherrot, tile.x, tile.y))) &&
+                    (otherblock instanceof StackConveyor && otherblock == this && facing(otherx, othery, otherrot, tile.x, tile.y))) &&
                     !(world.build(otherx, othery) instanceof StackConveyorBuild s && s.block == this && s.state == stateUnload) &&
                     !(world.build(otherx, othery) instanceof StackConveyorBuild s2 && s2.block == this && s2.state == stateMove &&
                         !facing(otherx, othery, otherrot, tile.x, tile.y));
             }
         }
-        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof StackConveyor && otherblock.block == this;
+        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof StackConveyor && otherblock == this;
     }
 
     @Override
@@ -258,7 +258,7 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public void overwrote(Seq<Building> builds){
-            if(builds.first() instanceof ConveyorBuild build && build.block == this){
+            if(builds.first() instanceof ConveyorBuild build && build.block == this.block){
                 Item item = build.items.first();
                 if(item != null){
                     handleStack(item, build.items.get(item), null);
