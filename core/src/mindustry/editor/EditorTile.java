@@ -103,6 +103,15 @@ public class EditorTile extends Tile{
     }
 
     @Override
+    protected void firePreChanged(){
+        if(skip()){
+            super.firePreChanged();
+        }else{
+            update();
+        }
+    }
+
+    @Override
     public void recache(){
         if(skip()){
             super.recache();

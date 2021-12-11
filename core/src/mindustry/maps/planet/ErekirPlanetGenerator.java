@@ -92,7 +92,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         tile.block = tile.floor.asFloor().wall;
 
-        if(Ridged.noise3d(1, position.x, position.y, position.z, 2, 14) > 0.15){
+        if(Ridged.noise3d(1, position.x, position.y, position.z, 2, 14) > 0.14){
             tile.block = Blocks.air;
         }
 

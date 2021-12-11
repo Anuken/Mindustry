@@ -532,7 +532,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     protected void preChanged(){
-        firePreChange();
+        firePreChanged();
 
         if(build != null){
             //only call removed() for the center block - this only gets called once.
@@ -552,7 +552,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                             //reset entity and block *manually* - thus, preChanged() will not be called anywhere else, for multiblocks
                             if(other != this){ //do not remove own entity so it can be processed in changed()
                                 //manually call pre-change event for other tile
-                                other.firePreChange();
+                                other.firePreChanged();
 
                                 other.build = null;
                                 other.block = Blocks.air;
@@ -634,7 +634,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
     }
 
-    protected void firePreChange(){
+    protected void firePreChanged(){
         if(!world.isGenerating()){
 
             //same as above

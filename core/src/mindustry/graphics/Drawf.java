@@ -82,6 +82,13 @@ public class Drawf{
         Draw.reset();
     }
 
+    public static void dashRect(Color color, Rect rect){
+        dashLine(color, rect.x, rect.y, rect.x + rect.width, rect.y);
+        dashLine(color, rect.x, rect.y, rect.x, rect.y + rect.height);
+        dashLine(color, rect.x + rect.width, rect.y, rect.x + rect.width, rect.y + rect.height);
+        dashLine(color, rect.x, rect.y + rect.height, rect.x + rect.width, rect.y + rect.height);
+    }
+
     public static void target(float x, float y, float rad, Color color){
         target(x, y, rad, 1, color);
     }
