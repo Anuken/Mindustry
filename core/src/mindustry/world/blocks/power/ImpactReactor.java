@@ -72,7 +72,7 @@ public class ImpactReactor extends PowerGenerator{
     }
 
     public class ImpactReactorBuild extends GeneratorBuild{
-        public float warmup;
+        public float warmup, totalProgress;
 
         @Override
         public void updateTile(){
@@ -95,7 +95,14 @@ public class ImpactReactor extends PowerGenerator{
                 warmup = Mathf.lerpDelta(warmup, 0f, 0.01f);
             }
 
+            totalProgress += warmup * Time.delta;
+
             productionEfficiency = Mathf.pow(warmup, 5f);
+        }
+
+        @Override
+        public float totalProgress(){
+            return totalProgress;
         }
 
         @Override
@@ -113,7 +120,7 @@ public class ImpactReactor extends PowerGenerator{
 
                 Draw.color(plasma1, plasma2, (float)i / plasmaRegions.length);
                 Draw.alpha((0.3f + Mathf.absin(Time.time, 2f + i * 2f, 0.3f + i * 0.05f)) * warmup);
-                Draw.rect(plasmaRegions[i], x, y, r, r, Time.time * (12 + i * 6f) * warmup);
+                Draw.rect(plasmaRegions[i], x, y, r, r, totalProgress * (12 + i * 6f));
             }
             Draw.blend();
 

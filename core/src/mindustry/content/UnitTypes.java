@@ -15,6 +15,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.ammo.*;
+import mindustry.type.unit.*;
 import mindustry.type.weapons.*;
 import mindustry.world.meta.*;
 
@@ -69,6 +70,10 @@ public class UnitTypes{
 
     //transport
     public static @EntityDef({Unitc.class, BuildingTetherc.class}) UnitType manifold;
+
+    //tank
+    //TODO tank comp
+    public static @EntityDef({Unitc.class, Tankc.class}) UnitType vanquish;
 
     //endregion
 
@@ -1372,8 +1377,8 @@ public class UnitTypes{
             lowAltitude = false;
             flying = true;
             circleTarget = true;
-            engineOffset = 12f;
-            engineSize = 6f;
+            engineOffset = 13f;
+            engineSize = 7f;
             rotateShooting = false;
             hitSize = 36f;
             payloadCapacity = (3 * 3) * tilePayload;
@@ -2417,6 +2422,13 @@ public class UnitTypes{
                     homingPower = 0.04f;
                 }};
             }});
+        }};
+
+        //endregion
+        //region erekir - tank
+
+        vanquish = new TankUnitType("vanquish"){{
+            hitSize = 28f;
         }};
 
         //endregion

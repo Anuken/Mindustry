@@ -1,8 +1,9 @@
-package mindustry.type;
+package mindustry.type.unit;
 
 import mindustry.content.*;
 import mindustry.entities.abilities.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 
 /** This is just a preset. Contains no new behavior. */
 public class NeoplasmUnitType extends UnitType{

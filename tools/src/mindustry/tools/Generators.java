@@ -514,6 +514,7 @@ public class Generators{
                 outliner.get(type.legBaseRegion);
                 outliner.get(type.baseJointRegion);
                 if(sample instanceof Legsc) outliner.get(type.legRegion);
+                if(sample instanceof Tankc) outliner.get(type.treadRegion);
 
                 Pixmap image = type.segments > 0 ? get(type.segmentRegions[0]) : outline.get(get(type.region));
 
@@ -529,7 +530,12 @@ public class Generators{
                     save(image, type.name);
                 }
 
-                save(image, type.name + "-outline");
+                //outline only needs to be different if there's a weapon that draws under; most units don't have this, and it saves significant space.
+                if(type.weapons.contains(w -> !w.top)){
+                    save(image, type.name + "-outline");
+                }else{
+                    replace(type.name, image);
+                }
 
                 //draw mech parts
                 if(sample instanceof Mechc){

@@ -1,7 +1,8 @@
-package mindustry.type;
+package mindustry.type.unit;
 
 import mindustry.ai.types.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.meta.*;
 
 /** Field template for unit types. No new functionality. */

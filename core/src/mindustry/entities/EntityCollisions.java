@@ -11,9 +11,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class EntityCollisions{
-    //range for tile collision scanning
-    private static final int r = 1;
-    //move in 1-unit chunks
+    //move in 1-unit chunks (can this be made more efficient?)
     private static final float seg = 1f;
 
     //tile collisions
@@ -42,10 +40,12 @@ public class EntityCollisions{
         if(Math.abs(deltax) < 0.0001f & Math.abs(deltay) < 0.0001f) return;
 
         boolean movedx = false;
+        entity.hitboxTile(r1);
+        int r = Math.max(Math.round(r1.width / tilesize), 1);
 
         while(Math.abs(deltax) > 0 || !movedx){
             movedx = true;
-            moveDelta(entity, Math.min(Math.abs(deltax), seg) * Mathf.sign(deltax), 0, true, solidCheck);
+            moveDelta(entity, Math.min(Math.abs(deltax), seg) * Mathf.sign(deltax), 0, r, true, solidCheck);
 
             if(Math.abs(deltax) >= seg){
                 deltax -= seg * Mathf.sign(deltax);
@@ -58,7 +58,7 @@ public class EntityCollisions{
 
         while(Math.abs(deltay) > 0 || !movedy){
             movedy = true;
-            moveDelta(entity, 0, Math.min(Math.abs(deltay), seg) * Mathf.sign(deltay), false, solidCheck);
+            moveDelta(entity, 0, Math.min(Math.abs(deltay), seg) * Mathf.sign(deltay), r, false, solidCheck);
 
             if(Math.abs(deltay) >= seg){
                 deltay -= seg * Mathf.sign(deltay);
@@ -68,7 +68,7 @@ public class EntityCollisions{
         }
     }
 
-    public void moveDelta(Hitboxc entity, float deltax, float deltay, boolean x, SolidPred solidCheck){
+    public void moveDelta(Hitboxc entity, float deltax, float deltay, int r, boolean x, SolidPred solidCheck){
         entity.hitboxTile(r1);
         entity.hitboxTile(r2);
         r1.x += deltax;

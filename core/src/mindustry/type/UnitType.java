@@ -71,7 +71,10 @@ public class UnitType extends UnlockableContent{
     public boolean createWreck = true;
     public boolean useUnitCap = true;
     public boolean destructibleWreck = true;
-    public boolean squareShadow = false;
+    /** If true, this modded unit always has a -outline region generated for its base. Normally, outlines are ignored if there are no top = false weapons. */
+    public boolean alwaysCreateOutline = false;
+    /** If true, this unit has a square shadow. TODO physics? */
+    public boolean squareShape = false;
     public float groundLayer = Layer.groundUnit;
     public float payloadCapacity = 8;
     public float aimDst = -1f;
@@ -162,7 +165,7 @@ public class UnitType extends UnlockableContent{
 
     public Seq<Weapon> weapons = new Seq<>();
     public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion,
-        softShadowRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion;
+        softShadowRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion, treadRegion;
     public TextureRegion[] wreckRegions;
     public TextureRegion[] segmentRegions, segmentOutlineRegions;
 
@@ -494,12 +497,13 @@ public class UnitType extends UnlockableContent{
         jointRegion = Core.atlas.find(name + "-joint");
         baseJointRegion = Core.atlas.find(name + "-joint-base");
         footRegion = Core.atlas.find(name + "-foot");
+        treadRegion = Core.atlas.find(name + "-treads");
         legBaseRegion = Core.atlas.find(name + "-leg-base", name + "-leg");
         baseRegion = Core.atlas.find(name + "-base");
         cellRegion = Core.atlas.find(name + "-cell", Core.atlas.find("power-cell"));
         //when linear filtering is on, it's acceptable to use the relatively low-res 'particle' region
         softShadowRegion =
-            squareShadow ? Core.atlas.find("square-shadow") :
+            squareShape ? Core.atlas.find("square-shadow") :
             hitSize <= 10f || (Core.settings != null && Core.settings.getBool("linear", true)) ?
                 Core.atlas.find("particle") :
                 Core.atlas.find("circle-shadow");
@@ -522,16 +526,16 @@ public class UnitType extends UnlockableContent{
         clipSize = Math.max(region.width * 2f, clipSize);
     }
 
-    private void makeOutline(MultiPacker packer, TextureRegion region){
+    private void makeOutline(MultiPacker packer, TextureRegion region, boolean makeNew){
         if(region instanceof AtlasRegion at && region.found()){
             String name = at.name;
-            if(!packer.has(name + "-outline")){
+            if(!makeNew || !packer.has(name + "-outline")){
                 PixmapRegion base = Core.atlas.getPixmap(region);
                 var result = Pixmaps.outline(base, outlineColor, outlineRadius);
                 if(Core.settings.getBool("linear", true)){
                     Pixmaps.bleed(result);
                 }
-                packer.add(PageType.main, name + "-outline", result);
+                packer.add(PageType.main, name + (makeNew ? "-outline" : ""), result);
             }
         }
     }
@@ -542,10 +546,13 @@ public class UnitType extends UnlockableContent{
 
         //currently does not create outlines for legs or base regions due to older mods having them outlined by default
         if(outlines){
-            makeOutline(packer, region);
+
+            //outlines only created when weapons are drawn under w/ merged outlines
+            makeOutline(packer, region, alwaysCreateOutline || weapons.contains(w -> !w.top));
+
             for(Weapon weapon : weapons){
                 if(!weapon.name.isEmpty()){
-                    makeOutline(packer, weapon.region);
+                    makeOutline(packer, weapon.region, true);
                 }
             }
         }
@@ -684,6 +691,10 @@ public class UnitType extends UnlockableContent{
             legOffset.add(Tmp.v1.trns(mech.baseRotation() + 90, 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 1f/Mathf.PI, 1) * mechFrontSway, 0f, unit.elevation)));
 
             unit.trns(legOffset.x, legOffset.y);
+        }
+
+        if(unit instanceof Tankc){
+            drawTank((Unit & Tankc)unit);
         }
 
         if(unit instanceof Legsc){
@@ -948,6 +959,10 @@ public class UnitType extends UnlockableContent{
         if(lightRadius > 0){
             Drawf.light(unit.team, unit.x, unit.y, lightRadius, lightColor, lightOpacity);
         }
+    }
+
+    public <T extends Unit & Tankc> void drawTank(T unit){
+        Draw.rect(treadRegion, unit.x, unit.y, unit.rotation - 90);
     }
 
     public <T extends Unit & Legsc> void drawLegs(T unit){
