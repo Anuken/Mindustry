@@ -2429,10 +2429,89 @@ public class UnitTypes{
 
         vanquish = new TankUnitType("vanquish"){{
             hitSize = 28f;
+            treadPullOffset = 4;
             speed = 0.6f;
             health = 10000;
             armor = 20f;
             treadRect = new Rect(22f, 16f, 28f, 130f);
+
+            weapons.add(new Weapon("vanquish-weapon"){{
+                layerOffset = 0.0001f;
+                reload = 120f;
+                shootY = 7f;
+                shake = 2f;
+                recoil = 4f;
+                rotate = true;
+                rotateSpeed = 1f;
+                mirror = false;
+                x = 0f;
+                y = -4;
+                shadow = 30f;
+
+                //TODO better bullet / weapon
+                bullet = new ArtilleryBulletType(2f, 20, "shell"){{
+                    hitEffect = Fx.massiveExplosion;
+                    knockback = 0.8f;
+                    lifetime = 100f;
+                    width = height = 14f;
+                    collidesTiles = false;
+                    splashDamageRadius = 60f;
+                    splashDamage = 60f;
+                    backColor = Color.valueOf("feb380");
+                    frontColor = Color.white;
+
+                    width = 9f;
+                    height = 15f;
+
+                    status = StatusEffects.blasted;
+                    lightning = 5;
+
+                    trailLength = 28;
+                    trailWidth = 4f;
+                    trailEffect = Fx.none;
+                    trailColor = backColor;
+
+                    shrinkX = 0.1f;
+                    shrinkY = 0.5f;
+
+                    fragBullets = 9;
+                    fragVelocityMin = 0.7f;
+                    fragLifeMin = 0.1f;
+                    fragBullet = new BasicBulletType(5f, 15){{
+                        width = 7f;
+                        height = 9f;
+                        lifetime = 20f;
+                        backColor = Color.valueOf("feb380");
+                        frontColor = Color.white;
+                    }};
+                }};
+            }});
+
+            int i = 0;
+            for(float f : new float[]{34f / 4f, -36f / 4f}){
+                int fi = i ++;
+                weapons.add(new Weapon("vanquish-point-weapon"){{
+                    reload = 35f + fi * 5;
+                    x = 48f / 4f;
+                    y = f;
+                    shootY = 5.5f;
+                    recoil = 2f;
+                    rotate = true;
+                    rotateSpeed = 2f;
+
+                    bullet = new BasicBulletType(4.5f, 14){{
+                        width = 6.5f;
+                        height = 11f;
+                        shootEffect = Fx.sparkShoot;
+                        smokeEffect = Fx.shootBigSmoke;
+                        hitColor = backColor = trailColor = Color.valueOf("feb380");
+                        frontColor = Color.white;
+                        trailWidth = 1.5f;
+                        trailLength = 6;
+                        hitEffect = despawnEffect = Fx.hitBulletColor;
+                    }};
+                }});
+            }
         }};
 
         //endregion

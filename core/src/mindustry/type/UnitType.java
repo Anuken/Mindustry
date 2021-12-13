@@ -121,6 +121,7 @@ public class UnitType extends UnlockableContent{
 
     public Rect treadRect = new Rect();
     public int treadFrames = 18;
+    public int treadPullOffset = 0;
 
     public int itemCapacity = -1;
     public int ammoCapacity = -1;
@@ -442,12 +443,12 @@ public class UnitType extends UnlockableContent{
         }
 
         if(treadEffect == null){
-            treadEffect = new Effect(45, e -> {
+            treadEffect = new Effect(50, e -> {
                 color(Tmp.c1.set(e.color).mul(1.5f));
                 Fx.rand.setSeed(e.id);
                 for(int i = 0; i < 3; i++){
                     Fx.v.trns(e.rotation + Fx.rand.range(40f), Fx.rand.random(6f * e.finpow()));
-                    Fill.circle(e.x + Fx.v.x + Fx.rand.range(3f), e.y + Fx.v.y + Fx.rand.range(3f), e.fout() * hitSize / 28f * 3f * Fx.rand.random(0.8f, 1.1f) + 0.3f);
+                    Fill.circle(e.x + Fx.v.x + Fx.rand.range(4f), e.y + Fx.v.y + Fx.rand.range(4f), e.fout() * hitSize / 28f * 3f * Fx.rand.random(0.8f, 1.1f) + 0.3f);
                 }
             }).layer(Layer.debris);
         }

@@ -516,7 +516,7 @@ public class Generators{
                     Pixmap slice = pix.crop((int)type.treadRect.x, (int)type.treadRect.y, 1, (int)type.treadRect.height);
                     int frames = type.treadFrames;
                     for(int i = 0; i < frames; i++){
-                        int pullOffset = 4;
+                        int pullOffset = type.treadPullOffset;
                         Pixmap frame = new Pixmap(slice.width, slice.height);
                         for(int y = 0; y < slice.height; y++){
                             int idx = y + i;

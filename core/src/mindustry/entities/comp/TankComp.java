@@ -34,7 +34,7 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
                 float yOffset = (treadRegion.height/2f - (treadRect.y + treadRect.height/2f)) / 4f;
 
                 for(int i : Mathf.signs){
-                    Tmp.v1.set(xOffset * i, yOffset - treadRect.height / 2f / 4f).rotate(rotation - 90);
+                    Tmp.v1.set(xOffset * i, yOffset - treadRect.height / 2f / 4f - 2f).rotate(rotation - 90);
 
                     Effect.floorDustAngle(type.treadEffect, Tmp.v1.x + x, Tmp.v1.y + y, rotation + 180f);
                 }
@@ -49,8 +49,6 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
             treadTime += len;
             walked = false;
         }
-
-        //TODO treads should create dust, see MechComp
     }
 
     @Replace
