@@ -1199,7 +1199,7 @@ public class Blocks{
             consumes.item(Items.silicon, 3);
             //TODO must consume from 2 pumps, 1, or 1.5?
             //TODO consume hydrogen/ozone?
-            consumes.liquid(Liquids.slag, 2f * 80f / 60f);
+            consumes.liquid(Liquids.slag, 80f / 60f);
             consumes.power(2f); //TODO necessary?
         }};
 
