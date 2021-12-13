@@ -2438,17 +2438,36 @@ public class UnitTypes{
             weapons.add(new Weapon("vanquish-weapon"){{
                 layerOffset = 0.0001f;
                 reload = 120f;
-                shootY = 7f;
-                shake = 2f;
+                shootY = 71f / 4f;
+                shake = 3f;
                 recoil = 4f;
                 rotate = true;
                 rotateSpeed = 1f;
                 mirror = false;
                 x = 0f;
-                y = -4;
+                y = 0;
                 shadow = 30f;
 
+                bullet = new BasicBulletType(7f, 50){{
+                    sprite = "missile-large";
+                    width = 9f;
+                    height = 15f;
+                    lifetime = 33f;
+                    hitSize = 6f;
+                    shootEffect = Fx.shootTitan;
+                    smokeEffect = Fx.shootSmokeTitan;
+                    pierceCap = 2;
+                    pierce = true;
+                    pierceBuilding = true;
+                    hitColor = backColor = trailColor = Color.valueOf("feb380");
+                    frontColor = Color.white;
+                    trailWidth = 3f;
+                    trailLength = 8;
+                    hitEffect = despawnEffect = Fx.blastExplosion;
+                }};
+
                 //TODO better bullet / weapon
+                /*
                 bullet = new ArtilleryBulletType(2f, 20, "shell"){{
                     hitEffect = Fx.massiveExplosion;
                     knockback = 0.8f;
@@ -2476,15 +2495,15 @@ public class UnitTypes{
 
                     fragBullets = 9;
                     fragVelocityMin = 0.7f;
-                    fragLifeMin = 0.1f;
-                    fragBullet = new BasicBulletType(5f, 15){{
+                    fragLifeMin = 0f;
+                    fragBullet = new BasicBulletType(3.5f, 15){{
                         width = 7f;
                         height = 9f;
-                        lifetime = 20f;
+                        lifetime = 25f;
                         backColor = Color.valueOf("feb380");
                         frontColor = Color.white;
                     }};
-                }};
+                }};*/
             }});
 
             int i = 0;
