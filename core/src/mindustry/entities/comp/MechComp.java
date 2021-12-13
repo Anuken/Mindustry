@@ -1,15 +1,12 @@
 package mindustry.entities.comp;
 
-import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
@@ -52,11 +49,7 @@ abstract class MechComp implements Posc, Flyingc, Hitboxc, Unitc, Mechc, Elevati
             }
 
             if(type.mechStepParticles){
-                Tile tile = world.tileWorld(cx, cy);
-                if(tile != null){
-                    Color color = tile.floor().mapColor;
-                    Fx.unitLand.at(cx, cy, hitSize/8f, color);
-                }
+                Effect.floorDust(cx, cy, hitSize/8f);
             }
         }
 

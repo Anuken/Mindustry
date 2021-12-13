@@ -166,6 +166,22 @@ public class Effect{
         shake(intensity, duration, loc.getX(), loc.getY());
     }
 
+    public static void floorDust(float x, float y, float size){
+        Tile tile = world.tileWorld(x, y);
+        if(tile != null){
+            Color color = tile.floor().mapColor;
+            Fx.unitLand.at(x, y, size, color);
+        }
+    }
+
+    public static void floorDustAngle(Effect effect, float x, float y, float angle){
+        Tile tile = world.tileWorld(x, y);
+        if(tile != null){
+            Color color = tile.floor().mapColor;
+            effect.at(x, y, angle, color);
+        }
+    }
+
     public static void create(Effect effect, float x, float y, float rotation, Color color, Object data){
         if(headless || effect == Fx.none || !Core.settings.getBool("effects")) return;
 

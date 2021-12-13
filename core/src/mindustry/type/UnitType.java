@@ -34,6 +34,7 @@ import mindustry.world.blocks.units.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
+import static arc.graphics.g2d.Draw.*;
 import static mindustry.Vars.*;
 
 //TODO document
@@ -92,6 +93,7 @@ public class UnitType extends UnlockableContent{
     public Effect fallEffect = Fx.fallSmoke;
     public Effect fallThrusterEffect = Fx.fallSmoke;
     public Effect deathExplosionEffect = Fx.dynamicExplosion;
+    public @Nullable Effect treadEffect;
     /** Additional sprites that are drawn with the unit. */
     public Seq<UnitDecal> decals = new Seq<>();
     public Seq<Ability> abilities = new Seq<>();
@@ -116,6 +118,9 @@ public class UnitType extends UnlockableContent{
     public float mechStepShake = -1f;
     public boolean mechStepParticles = false;
     public Color mechLegColor = Pal.darkMetal;
+
+    public Rect treadRect = new Rect();
+    public int treadFrames = 18;
 
     public int itemCapacity = -1;
     public int ammoCapacity = -1;
@@ -166,8 +171,7 @@ public class UnitType extends UnlockableContent{
     public Seq<Weapon> weapons = new Seq<>();
     public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion,
         softShadowRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion, treadRegion;
-    public TextureRegion[] wreckRegions;
-    public TextureRegion[] segmentRegions, segmentOutlineRegions;
+    public TextureRegion[] wreckRegions, segmentRegions, segmentOutlineRegions, treadRegions;
 
     protected float buildTime = -1f;
     protected @Nullable ItemStack[] totalRequirements, cachedRequirements, firstRequirements;
@@ -437,6 +441,17 @@ public class UnitType extends UnlockableContent{
             mechStepParticles = hitSize > 15f;
         }
 
+        if(treadEffect == null){
+            treadEffect = new Effect(45, e -> {
+                color(Tmp.c1.set(e.color).mul(1.5f));
+                Fx.rand.setSeed(e.id);
+                for(int i = 0; i < 3; i++){
+                    Fx.v.trns(e.rotation + Fx.rand.range(40f), Fx.rand.random(6f * e.finpow()));
+                    Fill.circle(e.x + Fx.v.x + Fx.rand.range(3f), e.y + Fx.v.y + Fx.rand.range(3f), e.fout() * hitSize / 28f * 3f * Fx.rand.random(0.8f, 1.1f) + 0.3f);
+                }
+            }).layer(Layer.debris);
+        }
+
         canHeal = weapons.contains(w -> w.bullet.healPercent > 0f);
 
         //add mirrored weapon variants
@@ -498,6 +513,12 @@ public class UnitType extends UnlockableContent{
         baseJointRegion = Core.atlas.find(name + "-joint-base");
         footRegion = Core.atlas.find(name + "-foot");
         treadRegion = Core.atlas.find(name + "-treads");
+        if(treadRegion.found()){
+            treadRegions = new TextureRegion[treadFrames];
+            for(int i = 0; i < treadFrames; i++){
+                treadRegions[i] = Core.atlas.find(name + "-treads" + i);
+            }
+        }
         legBaseRegion = Core.atlas.find(name + "-leg-base", name + "-leg");
         baseRegion = Core.atlas.find(name + "-base");
         cellRegion = Core.atlas.find(name + "-cell", Core.atlas.find("power-cell"));
@@ -963,6 +984,18 @@ public class UnitType extends UnlockableContent{
 
     public <T extends Unit & Tankc> void drawTank(T unit){
         Draw.rect(treadRegion, unit.x, unit.y, unit.rotation - 90);
+
+        if(treadRegion.found()){
+            int frame = (int)(unit.treadTime()) % treadFrames;
+            var region = treadRegions[frame];
+            float xOffset = treadRegion.width/2f - (treadRect.x + treadRect.width/2f);
+            float yOffset = treadRegion.height/2f - (treadRect.y + treadRect.height/2f);
+
+            for(int i : Mathf.signs){
+                Tmp.v1.set(xOffset * i, yOffset).rotate(unit.rotation - 90);
+                Draw.rect(region, unit.x + Tmp.v1.x / 4f, unit.y + Tmp.v1.y / 4f, treadRect.width / 4f, region.height / 4f, unit.rotation - 90);
+            }
+        }
     }
 
     public <T extends Unit & Legsc> void drawLegs(T unit){

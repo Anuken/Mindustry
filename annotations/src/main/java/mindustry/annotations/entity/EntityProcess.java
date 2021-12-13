@@ -800,12 +800,12 @@ public class EntityProcess extends BaseProcessor{
                     }
                 }
 
-                write(def.builder, imports.asArray());
+                write(def.builder, imports.toSeq());
             }
 
             //write base classes last
             for(TypeSpec.Builder b : baseClasses){
-                write(b, imports.asArray());
+                write(b, imports.toSeq());
             }
 
             //TODO nulls were an awful idea
@@ -878,7 +878,7 @@ public class EntityProcess extends BaseProcessor{
 
                 nullsBuilder.addField(FieldSpec.builder(type, Strings.camelize(baseName)).initializer("new " + className + "()").addModifiers(Modifier.FINAL, Modifier.STATIC, Modifier.PUBLIC).build());
 
-                write(nullBuilder, imports.asArray());
+                write(nullBuilder, imports.toSeq());
             }
 
             write(nullsBuilder);
@@ -934,7 +934,7 @@ public class EntityProcess extends BaseProcessor{
                 out.addAll(getDependencies(comp));
             }
 
-            defComponents.put(type, out.asArray());
+            defComponents.put(type, out.toSeq());
         }
 
         return defComponents.get(type);
@@ -961,7 +961,7 @@ public class EntityProcess extends BaseProcessor{
 
             //remove it again just in case
             out.remove(component);
-            componentDependencies.put(component, result.asArray());
+            componentDependencies.put(component, result.toSeq());
         }
 
         return componentDependencies.get(component);

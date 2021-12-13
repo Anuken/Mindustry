@@ -21,8 +21,8 @@ import static arc.math.Angles.*;
 import static mindustry.Vars.*;
 
 public class Fx{
-    private static final Rand rand = new Rand();
-    private static final Vec2 v = new Vec2();
+    public static final Rand rand = new Rand();
+    public static final Vec2 v = new Vec2();
 
     public static final Effect
 
@@ -310,8 +310,16 @@ public class Fx{
 
     unitLand = new Effect(30, e -> {
         color(Tmp.c1.set(e.color).mul(1.1f));
+        //TODO doesn't respect rotation / size
         randLenVectors(e.id, 6, 17f * e.finpow(), (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.3f);
+        });
+    }).layer(Layer.debris),
+
+    unitDust = new Effect(30, e -> {
+        color(Tmp.c1.set(e.color).mul(1.3f));
+        randLenVectors(e.id, 3, 8f * e.finpow(), e.rotation, 30f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 3f + 0.3f);
         });
     }).layer(Layer.debris),
 

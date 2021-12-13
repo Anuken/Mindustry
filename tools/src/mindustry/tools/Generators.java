@@ -509,6 +509,28 @@ public class Generators{
                     }
                 }
 
+                //generate tank animation
+                if(sample instanceof Tankc){
+                    Pixmap pix = get(type.treadRegion);
+                    //slice is always 1 pixel wide
+                    Pixmap slice = pix.crop((int)type.treadRect.x, (int)type.treadRect.y, 1, (int)type.treadRect.height);
+                    int frames = type.treadFrames;
+                    for(int i = 0; i < frames; i++){
+                        int pullOffset = 4;
+                        Pixmap frame = new Pixmap(slice.width, slice.height);
+                        for(int y = 0; y < slice.height; y++){
+                            int idx = y + i;
+                            if(idx >= slice.height){
+                                idx -= slice.height;
+                                idx += pullOffset;
+                            }
+
+                            frame.setRaw(0, y, slice.getRaw(0, idx));
+                        }
+                        save(frame, type.name + "-treads" + i);
+                    }
+                }
+
                 outliner.get(type.jointRegion);
                 outliner.get(type.footRegion);
                 outliner.get(type.legBaseRegion);

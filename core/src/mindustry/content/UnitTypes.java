@@ -2429,6 +2429,10 @@ public class UnitTypes{
 
         vanquish = new TankUnitType("vanquish"){{
             hitSize = 28f;
+            speed = 0.6f;
+            health = 10000;
+            armor = 20f;
+            treadRect = new Rect(22f, 16f, 28f, 130f);
         }};
 
         //endregion

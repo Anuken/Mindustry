@@ -119,7 +119,7 @@ public class EntityCollisions{
 
     @SuppressWarnings("unchecked")
     public <T extends Hitboxc> void updatePhysics(EntityGroup<T> group){
-        QuadTree tree = group.tree();
+        var tree = group.tree();
         tree.clear();
 
         group.each(s -> {
