@@ -510,4 +510,9 @@ public class Damage{
         float scaled = Mathf.lerp(1f - dist / radius, 1f, falloff);
         return damage * scaled;
     }
+
+    /** @return resulting armor calculated based off of damage */
+    public static float applyArmor(float damage, float armor){
+        return Math.max(damage - armor, minArmorDamage * damage);
+    }
 }

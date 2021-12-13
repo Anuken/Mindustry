@@ -3,10 +3,9 @@ package mindustry.entities.comp;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-
-import static mindustry.Vars.*;
 
 @Component
 abstract class ShieldComp implements Healthc, Posc{
@@ -24,11 +23,8 @@ abstract class ShieldComp implements Healthc, Posc{
     @Replace
     @Override
     public void damage(float amount){
-        //apply armor
-        amount = Math.max(amount - armor, minArmorDamage * amount);
-        amount /= healthMultiplier;
-
-        rawDamage(amount);
+        //apply armor and scaling effects
+        rawDamage(Damage.applyArmor(amount, armor) / healthMultiplier);
     }
 
     @Replace

@@ -134,6 +134,8 @@ public class Block extends UnlockableContent{
     public Attributes attributes = new Attributes();
     /** tile entity health */
     public int health = -1;
+    /** damage absorption, similar to unit armor */
+    public float armor = 0f;
     /** base block explosiveness */
     public float baseExplosiveness = 0f;
     /** bullet that this block spawns when destroyed */
@@ -429,6 +431,9 @@ public class Block extends UnlockableContent{
 
         if(synthetic()){
             stats.add(Stat.health, health, StatUnit.none);
+            if(armor > 0){
+                stats.add(Stat.armor, armor, StatUnit.none);
+            }
         }
 
         if(canBeBuilt() && requirements.length > 0){

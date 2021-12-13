@@ -72,7 +72,7 @@ public class Blocks{
     powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator,
 
     //defense
-    copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
+    copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, tungstenWall, tungstenWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge,
     mender, mendProjector, overdriveProjector, overdriveDome, forceProjector, shockMine,
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
@@ -127,6 +127,9 @@ public class Blocks{
     groundFactory, airFactory, navalFactory,
     additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor,
     repairPoint, repairTurret,
+
+    //unit - erekir
+    tankAssembler,
 
     //payloads
     //TODO small deconstructor
@@ -1353,6 +1356,19 @@ public class Blocks{
             insulated = true;
             absorbLasers = true;
             schematicPriority = 10;
+        }};
+
+        tungstenWall = new Wall("tungsten-wall"){{
+            requirements(Category.defense, with(Items.tungsten, 6));
+            health = 180 * wallHealthMultiplier;
+            armor = 7f;
+        }};
+
+        tungstenWallLarge = new Wall("tungsten-wall-large"){{
+            requirements(Category.defense, ItemStack.mult(tungstenWall.requirements, 4));
+            health = 180 * wallHealthMultiplier * 4;
+            armor = 7f;
+            size = 2;
         }};
 
         thoriumWall = new Wall("thorium-wall"){{
@@ -3291,6 +3307,15 @@ public class Blocks{
             coolantUse = 0.16f;
             coolantMultiplier = 1.6f;
             acceptCoolant = true;
+        }};
+
+        //endregion
+        //region units - erekir
+
+        tankAssembler = new UnitAssembler("tank-assembler"){{
+            size = 3;
+            output = UnitTypes.vanquish;
+            requirements = BlockStack.list(Blocks.thoriumWallLarge, 4);
         }};
 
         //endregion

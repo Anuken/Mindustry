@@ -2446,7 +2446,7 @@ public class UnitTypes{
                 mirror = false;
                 x = 0f;
                 y = 0;
-                shadow = 30f;
+                shadow = 28f;
 
                 bullet = new BasicBulletType(7f, 50){{
                     sprite = "missile-large";
@@ -2465,45 +2465,6 @@ public class UnitTypes{
                     trailLength = 8;
                     hitEffect = despawnEffect = Fx.blastExplosion;
                 }};
-
-                //TODO better bullet / weapon
-                /*
-                bullet = new ArtilleryBulletType(2f, 20, "shell"){{
-                    hitEffect = Fx.massiveExplosion;
-                    knockback = 0.8f;
-                    lifetime = 100f;
-                    width = height = 14f;
-                    collidesTiles = false;
-                    splashDamageRadius = 60f;
-                    splashDamage = 60f;
-                    backColor = Color.valueOf("feb380");
-                    frontColor = Color.white;
-
-                    width = 9f;
-                    height = 15f;
-
-                    status = StatusEffects.blasted;
-                    lightning = 5;
-
-                    trailLength = 28;
-                    trailWidth = 4f;
-                    trailEffect = Fx.none;
-                    trailColor = backColor;
-
-                    shrinkX = 0.1f;
-                    shrinkY = 0.5f;
-
-                    fragBullets = 9;
-                    fragVelocityMin = 0.7f;
-                    fragLifeMin = 0f;
-                    fragBullet = new BasicBulletType(3.5f, 15){{
-                        width = 7f;
-                        height = 9f;
-                        lifetime = 25f;
-                        backColor = Color.valueOf("feb380");
-                        frontColor = Color.white;
-                    }};
-                }};*/
             }});
 
             int i = 0;
@@ -2526,7 +2487,7 @@ public class UnitTypes{
                         hitColor = backColor = trailColor = Color.valueOf("feb380");
                         frontColor = Color.white;
                         trailWidth = 1.5f;
-                        trailLength = 6;
+                        trailLength = 4;
                         hitEffect = despawnEffect = Fx.hitBulletColor;
                     }};
                 }});
@@ -2708,9 +2669,6 @@ public class UnitTypes{
                         height = 12f;
                         shootEffect = Fx.sparkShoot;
                         smokeEffect = Fx.shootBigSmoke;
-                        pierceCap = 2;
-                        pierce = true;
-                        pierceBuilding = true;
                         hitColor = backColor = trailColor = Pal.bulletYellowBack;
                         frontColor = Color.white;
                         trailWidth = 1.5f;

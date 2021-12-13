@@ -1549,7 +1549,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(Mathf.zero(dm)){
             damage = health + 1;
         }else{
-            damage /= dm;
+            damage = Damage.applyArmor(damage, block.armor) / dm;
         }
 
         Call.tileDamage(self(), health - handleDamage(damage));
