@@ -783,6 +783,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return null;
     }
 
+    public @Nullable BlockSeq getBlockPayloads(){
+        return null;
+    }
+
     /**
      * Tries to put this item into a nearby container, if there are no available
      * containers, it gets added to the block's inventory.

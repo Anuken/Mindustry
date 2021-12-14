@@ -9,24 +9,20 @@ import mindustry.ui.*;
 import mindustry.world.meta.*;
 
 public class ConsumePayloads extends Consume{
-    //TODO bad, should be part of Building + dynamic
-    protected Func<Building, BlockSeq> inventory;
-
     public Seq<BlockStack> payloads;
 
-    public <T extends Building> ConsumePayloads(Seq<BlockStack> payloads, Func<T, BlockSeq> inventory){
+    public <T extends Building> ConsumePayloads(Seq<BlockStack> payloads){
         this.payloads = payloads;
-        this.inventory = (Func<Building, BlockSeq>)inventory;
     }
 
     @Override
     public boolean valid(Building build){
-        return inventory.get(build).contains(payloads);
+        return build.getBlockPayloads().contains(payloads);
     }
 
     @Override
     public void trigger(Building build){
-        inventory.get(build).remove(payloads);
+        build.getBlockPayloads().remove(payloads);
     }
 
     @Override
@@ -43,7 +39,7 @@ public class ConsumePayloads extends Consume{
 
     @Override
     public void build(Building build, Table table){
-        var inv = inventory.get(build);
+        var inv = build.getBlockPayloads();
 
         table.table(c -> {
             int i = 0;

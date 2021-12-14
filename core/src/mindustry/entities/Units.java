@@ -135,6 +135,10 @@ public class Units{
         return anyEntities(tile, true);
     }
 
+    public static boolean anyEntities(float x, float y, float size){
+        return anyEntities(x - size/2f, y - size/2f, size, size, true);
+    }
+
     public static boolean anyEntities(float x, float y, float width, float height){
         return anyEntities(x, y, width, height, true);
     }

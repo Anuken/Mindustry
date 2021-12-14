@@ -3312,6 +3312,7 @@ public class Blocks{
         //endregion
         //region units - erekir
 
+        //TODO 5x5?
         //TODO completely unfinished
         tankAssembler = new UnitAssembler("tank-assembler"){{
             requirements(Category.units, with(Items.graphite, 10));

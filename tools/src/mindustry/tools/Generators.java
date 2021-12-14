@@ -559,6 +559,12 @@ public class Generators{
                     replace(type.name, image);
                 }
 
+                //draw treads
+                if(sample instanceof Tankc){
+                    image.draw(get(type.treadRegion), true);
+                    image.draw(get(type.region), true);
+                }
+
                 //draw mech parts
                 if(sample instanceof Mechc){
                     drawCenter(image, get(type.baseRegion));

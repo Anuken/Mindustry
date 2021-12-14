@@ -1,6 +1,7 @@
 package mindustry.world.blocks.units;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -40,6 +41,7 @@ public class UnitAssembler extends PayloadBlock{
         update = solid = true;
         rotate = true;
         rotateDraw = false;
+        acceptsPayload = true;
     }
 
     @Override
@@ -87,7 +89,7 @@ public class UnitAssembler extends PayloadBlock{
 
     @Override
     public void init(){
-        consumes.add(new ConsumePayloads(requirements, (UnitAssemblerBuild build) -> build.blocks));
+        consumes.add(new ConsumePayloads(requirements));
 
         super.init();
     }
@@ -95,6 +97,8 @@ public class UnitAssembler extends PayloadBlock{
     public class UnitAssemblerBuild extends PayloadBlockBuild<BuildPayload>{
         public Seq<Unit> units = new Seq<>();
         public BlockSeq blocks = new BlockSeq();
+
+        public boolean wasOccupied = false;
 
         //TODO progress
         //TODO how should payloads be stored exactly? counts of blocks? intmap? references?
@@ -130,8 +134,10 @@ public class UnitAssembler extends PayloadBlock{
 
             Vec2 spawn = getUnitSpawn();
 
+            wasOccupied = checkSolid(spawn);
+
             //check if all requirements are met
-            if(consValid() & Units.canCreate(team, output)){
+            if(!wasOccupied && consValid() & Units.canCreate(team, output)){
 
                 //TODO ???? should this even be part of a trigger
                 consume();
@@ -172,7 +178,21 @@ public class UnitAssembler extends PayloadBlock{
             Draw.mixcol(Pal.accent, 1f);
             Draw.alpha(0.4f + Mathf.absin(10f, 0.2f));
             Draw.rect(output.fullIcon, spawn.x, spawn.y);
+
+            //TODO dash rect for output, fades in/out
+            Draw.color(!wasOccupied ? Color.green : Color.red);
+            Lines.square(spawn.x, spawn.y, output.hitSize/2f);
+
             Draw.reset();
+        }
+
+        public boolean checkSolid(Vec2 v){
+            return !output.flying && (collisions.overlapsTile(Tmp.r1.setCentered(v.x, v.y, output.hitSize), EntityCollisions::solid) || Units.anyEntities(v.x, v.y, output.hitSize));
+        }
+
+        @Override
+        public BlockSeq getBlockPayloads(){
+            return blocks;
         }
 
         @Override
@@ -184,6 +204,7 @@ public class UnitAssembler extends PayloadBlock{
             //payloads.add((BuildPayload)payload);
         }
 
+        //TODO doesn't accept from payload source
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             return payload instanceof BuildPayload bp && requirements.contains(b -> b.block == bp.block() && blocks.get(bp.block()) < b.amount);

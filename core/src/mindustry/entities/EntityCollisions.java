@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -94,9 +95,11 @@ public class EntityCollisions{
         entity.trns(r1.x - r2.x, r1.y - r2.y);
     }
 
-    public boolean overlapsTile(Rect rect){
+    public boolean overlapsTile(Rect rect, @Nullable SolidPred solidChecker){
+        if(solidChecker == null) return false;
+
         rect.getCenter(vector);
-        int r = 1;
+        int r = Math.max(Math.round(r1.width / tilesize), 1);
 
         //assumes tiles are centered
         int tilex = Math.round(vector.x / tilesize);
@@ -105,10 +108,9 @@ public class EntityCollisions{
         for(int dx = -r; dx <= r; dx++){
             for(int dy = -r; dy <= r; dy++){
                 int wx = dx + tilex, wy = dy + tiley;
-                if(solid(wx, wy)){
-                    r2.setSize(tilesize).setCenter(wx * tilesize, wy * tilesize);
+                if(solidChecker.solid(wx, wy)){
 
-                    if(r2.overlaps(rect)){
+                    if(r2.setCentered(wx * tilesize, wy * tilesize, tilesize).overlaps(rect)){
                         return true;
                     }
                 }
