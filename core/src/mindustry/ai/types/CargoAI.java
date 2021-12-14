@@ -29,6 +29,8 @@ public class CargoAI extends AIController{
 
         var build = tether.building();
 
+        if(build.items == null) return;
+
         //empty, approach the loader, even if there's nothing to pick up (units hanging around doing nothing looks bad)
         if(!unit.hasItem()){
             moveTo(build, moveRange, moveSmoothing);

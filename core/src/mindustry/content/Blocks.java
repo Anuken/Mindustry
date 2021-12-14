@@ -3312,10 +3312,13 @@ public class Blocks{
         //endregion
         //region units - erekir
 
+        //TODO completely unfinished
         tankAssembler = new UnitAssembler("tank-assembler"){{
+            requirements(Category.units, with(Items.graphite, 10));
             size = 3;
             output = UnitTypes.vanquish;
-            requirements = BlockStack.list(Blocks.thoriumWallLarge, 4);
+            droneType = UnitTypes.manifold;
+            requirements = BlockStack.list(Blocks.thoriumWallLarge, 4, Blocks.duct, 2);
         }};
 
         //endregion

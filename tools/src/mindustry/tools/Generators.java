@@ -486,7 +486,7 @@ public class Generators{
         });
 
         generate("unit-icons", () -> content.units().each(type -> {
-            if(type.isHidden()) return; //hidden units don't generate
+            if(type.internal) return; //internal hidden units don't generate
 
             ObjectSet<String> outlined = new ObjectSet<>();
 

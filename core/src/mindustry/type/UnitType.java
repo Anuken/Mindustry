@@ -156,6 +156,7 @@ public class UnitType extends UnlockableContent{
     public boolean singleTarget = false;
     public boolean forceMultiTarget = false;
     public boolean hidden = false;
+    public boolean internal = false;
 
     //for crawlers
     public int segments = 0;

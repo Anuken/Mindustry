@@ -124,6 +124,11 @@ public class Duct extends Block implements Autotiler{
             Draw.reset();
         }
 
+        @Override
+        public void payloadDraw(){
+            Draw.rect(fullIcon, x, y);
+        }
+
         protected void drawAt(float x, float y, int bits, float rotation, SliceMode slice){
             Draw.z(Layer.blockUnder);
             Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);

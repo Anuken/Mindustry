@@ -47,6 +47,7 @@ public class BuildTurret extends BaseTurret{
         //this is super hacky, but since blocks are initialized before units it does not run into init/concurrent modification issues
         unitType = new UnitType("turret-unit-" + name){{
             hidden = true;
+            internal = true;
             speed = 0f;
             hitSize = 0f;
             health = 1;

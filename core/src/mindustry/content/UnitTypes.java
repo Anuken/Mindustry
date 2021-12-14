@@ -2691,6 +2691,7 @@ public class UnitTypes{
             itemCapacity = 0;
             commandLimit = 0;
             hidden = true;
+            internal = true;
         }};
 
         manifold = new UnitType("manifold"){{

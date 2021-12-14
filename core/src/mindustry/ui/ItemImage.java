@@ -44,4 +44,8 @@ public class ItemImage extends Stack{
             }));
         }
     }
+
+    public ItemImage(BlockStack stack){
+        this(stack.block.uiIcon, stack.amount);
+    }
 }
