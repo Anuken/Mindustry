@@ -68,8 +68,8 @@ public class UnitTypes{
     //special block unit type
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
 
-    //transport
-    public static @EntityDef({Unitc.class, BuildingTetherc.class}) UnitType manifold;
+    //special tethered
+    public static @EntityDef({Unitc.class, BuildingTetherc.class}) UnitType manifold, assemblyDrone;
 
     //tank
     //TODO tank comp
@@ -2714,13 +2714,34 @@ public class UnitTypes{
             commandLimit = 0;
             engineSize = 2.3f;
             engineOffset = 6.5f;
-
-            //should not appear anywhere, it's for internal use only and will despawn
             hidden = true;
 
             setEnginesMirror(
                 new UnitEngine(24 / 4f, -24 / 4f, 2.3f, 315f)
             );
+        }};
+
+        assemblyDrone = new UnitType("assembly-drone"){{
+            defaultController = AssemblerAI::new;
+
+            flying = true;
+            drag = 0.06f;
+            accel = 0.11f;
+            speed = 1.3f;
+            health = 90;
+            engineSize = 2f;
+            engineOffset = 6.5f;
+
+            outlineColor = Pal.darkOutline;
+            isCounted = false;
+            hidden = true;
+            useUnitCap = false;
+            logicControllable = false;
+            playerControllable = false;
+            allowedInPayloads = false;
+            createWreck = false;
+            envEnabled = Env.any;
+            envDisabled = Env.none;
         }};
 
         //endregion

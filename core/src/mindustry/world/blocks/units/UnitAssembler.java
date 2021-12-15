@@ -1,13 +1,13 @@
 package mindustry.world.blocks.units;
 
 import arc.*;
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -17,6 +17,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -29,10 +30,11 @@ import static mindustry.Vars.*;
  * */
 public class UnitAssembler extends PayloadBlock{
     public int areaSize = 11;
-    public UnitType droneType;
+    public UnitType droneType = UnitTypes.assemblyDrone;
     public int dronesCreated = 4;
 
     //TODO should be different for every tier.
+    public float buildTime = 60f * 5f;
     public Seq<BlockStack> requirements = new Seq<>();
     public UnitType output;
 
@@ -42,6 +44,7 @@ public class UnitAssembler extends PayloadBlock{
         rotate = true;
         rotateDraw = false;
         acceptsPayload = true;
+        flags = EnumSet.of(BlockFlag.unitAssembler);
     }
 
     @Override
@@ -66,7 +69,7 @@ public class UnitAssembler extends PayloadBlock{
         super.setBars();
 
         //TODO progress bar
-        //bars.add("progress", (UnitAssemblerBuild e) -> new Bar("bar.progress", Pal.ammo, e::fraction));
+        bars.add("progress", (UnitAssemblerBuild e) -> new Bar("bar.progress", Pal.ammo, () -> e.progress));
 
         bars.add("units", (UnitAssemblerBuild e) ->
             new Bar(() ->
@@ -95,8 +98,12 @@ public class UnitAssembler extends PayloadBlock{
     }
 
     public class UnitAssemblerBuild extends PayloadBlockBuild<BuildPayload>{
+        protected IntSeq readUnits = new IntSeq();
+
         public Seq<Unit> units = new Seq<>();
         public BlockSeq blocks = new BlockSeq();
+        public float progress, warmup;
+        public float invalidWarmup = 0f;
 
         public boolean wasOccupied = false;
 
@@ -111,10 +118,20 @@ public class UnitAssembler extends PayloadBlock{
 
         @Override
         public void updateTile(){
+            if(!readUnits.isEmpty()){
+                units.clear();
+                readUnits.each(i -> {
+                    var unit = Groups.unit.getByID(i);
+                    if(unit != null){
+                        units.add(unit);
+                    }
+                });
+                readUnits.clear();
+            }
+
             units.removeAll(u -> !u.isAdded() || u.dead);
 
-            //units annoying, disabled for now
-            if(false && efficiency() > 0 && units.size < dronesCreated){
+            if(efficiency() > 0 && units.size < dronesCreated){
                 //TODO build animation? distribute spawning?
                 var unit = droneType.create(team);
                 if(unit instanceof BuildingTetherc bt){
@@ -134,23 +151,40 @@ public class UnitAssembler extends PayloadBlock{
 
             Vec2 spawn = getUnitSpawn();
 
+            //arrange units around perimeter
+            for(int i = 0; i < units.size; i++){
+                var unit = units.get(i);
+                if(unit.controller() instanceof AssemblerAI ai){
+                    ai.targetPos.trns(i * 90f + 45f, areaSize / 2f * Mathf.sqrt2 * tilesize).add(spawn);
+                }
+            }
+
             wasOccupied = checkSolid(spawn);
+            float eff =  (units.size / (float)dronesCreated);
+
+            invalidWarmup = Mathf.lerpDelta(invalidWarmup, wasOccupied ? 1f : 0f, 0.1f);
 
             //check if all requirements are met
-            if(!wasOccupied && consValid() & Units.canCreate(team, output)){
+            if(!wasOccupied && consValid() && Units.canCreate(team, output)){
+                warmup = Mathf.lerpDelta(warmup, efficiency(), 0.1f);
 
-                //TODO ???? should this even be part of a trigger
-                consume();
+                if((progress += edelta() * eff / buildTime) >= 1f){
+                    //TODO ???? should this even be part of a trigger
+                    consume();
 
-                //TODO actually just goes poof
-                var unit = output.create(team);
-                unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
-                unit.rotation = 90f;
-                unit.add();
+                    //TODO actually just goes poof
+                    var unit = output.create(team);
+                    unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
+                    unit.rotation = 90f;
+                    unit.add();
+                    progress = 0f;
 
-                Fx.spawn.at(unit);
+                    Fx.spawn.at(unit);
 
-                blocks.clear();
+                    blocks.clear();
+                }
+            }else{
+                warmup = Mathf.lerpDelta(warmup, 0f, 0.1f);
             }
 
             //TODO drones need to indicate that they are in position and actually play an animation
@@ -160,6 +194,12 @@ public class UnitAssembler extends PayloadBlock{
         public void draw(){
             Draw.rect(region, x, y);
             //Draw.rect(outRegion, x, y, rotdeg());
+
+            for(int i = 0; i < 4; i++){
+                if(blends(i) && i != rotation){
+                    Draw.rect(inRegion, x, y, (i * 90) - 180);
+                }
+            }
 
             Draw.z(Layer.blockOver);
 
@@ -172,16 +212,51 @@ public class UnitAssembler extends PayloadBlock{
 
             Vec2 spawn = getUnitSpawn();
 
-            //TODO which layer?
-            Draw.z(Layer.power - 1f);
+            Draw.alpha(progress);
 
-            Draw.mixcol(Pal.accent, 1f);
-            Draw.alpha(0.4f + Mathf.absin(10f, 0.2f));
             Draw.rect(output.fullIcon, spawn.x, spawn.y);
 
+            //TODO which layer?
+            Draw.z(Layer.buildBeam);
+
+            Draw.mixcol(Tmp.c1.set(Pal.accent).lerp(Pal.remove, invalidWarmup), 1f);
+            Draw.alpha(0.8f + Mathf.absin(10f, 0.2f));
+            Draw.rect(output.fullIcon, spawn.x, spawn.y);
+
+            Draw.alpha(warmup * Draw.getColor().a);
+            int c = 0;
+            for(var unit : units){
+                if(!Angles.within(unit.rotation, c * 90f + 45f + 180f, 15f)) continue;
+
+                float
+                    px = unit.x + Angles.trnsx(unit.rotation, unit.type.buildBeamOffset),
+                    py = unit.y + Angles.trnsy(unit.rotation, unit.type.buildBeamOffset);
+
+                Drawf.buildBeam(px, py, spawn.x, spawn.y, output.hitSize/2f);
+                c ++;
+            }
+
+            Draw.z(Layer.overlayUI - 1);
+
+            var color = Tmp.c3.set(Pal.accent).lerp(Pal.remove, invalidWarmup).a(efficiency());
+
+            //TODO dashes bad
+
+            float outSize = output.hitSize + 9f;
+            float hs = size * tilesize/2f, ha = outSize/2f;
+
+            Draw.reset();
             //TODO dash rect for output, fades in/out
-            Draw.color(!wasOccupied ? Color.green : Color.red);
-            Lines.square(spawn.x, spawn.y, output.hitSize/2f);
+            Drawf.dashSquare(color, spawn.x, spawn.y, outSize);
+
+            for(int i : Mathf.signs){
+                Tmp.v1.trns(rotation * 90, hs, hs * i).add(x, y);
+
+                Tmp.v2.trns(rotation * 90, -ha, ha * i).add(spawn);
+                Draw.color();
+
+                Drawf.dashLine(color, Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
+            }
 
             Draw.reset();
         }
@@ -204,7 +279,6 @@ public class UnitAssembler extends PayloadBlock{
             //payloads.add((BuildPayload)payload);
         }
 
-        //TODO doesn't accept from payload source
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             return payload instanceof BuildPayload bp && requirements.contains(b -> b.block == bp.block() && blocks.get(bp.block()) < b.amount);
@@ -214,7 +288,13 @@ public class UnitAssembler extends PayloadBlock{
         public void write(Writes write){
             super.write(write);
 
-            //blocks.write(write);
+            write.f(progress);
+            write.b(units.size);
+            for(var unit : units){
+                write.i(unit.id);
+            }
+
+            blocks.write(write);
 
             //TODO save:
             //- unit IDs
@@ -225,8 +305,14 @@ public class UnitAssembler extends PayloadBlock{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
+            progress = read.f();
+            int count = read.b();
+            readUnits.clear();
+            for(int i = 0; i < count; i++){
+                readUnits.add(read.i());
+            }
 
-            //blocks.read(read);
+            blocks.read(read);
         }
     }
 }

@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.struct.Queue;
 import arc.util.*;
 import mindustry.*;
@@ -27,8 +26,6 @@ import static mindustry.Vars.*;
 
 @Component
 abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
-    static final Vec2[] vecs = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
-
     @Import float x, y, rotation, buildSpeedMultiplier;
     @Import UnitType type;
     @Import Team team;
@@ -289,22 +286,6 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         float px = x + Angles.trnsx(rotation, focusLen);
         float py = y + Angles.trnsy(rotation, focusLen);
 
-        float sz = Vars.tilesize * size / 2f;
-        float ang = angleTo(tx, ty);
-
-        vecs[0].set(tx - sz, ty - sz);
-        vecs[1].set(tx + sz, ty - sz);
-        vecs[2].set(tx - sz, ty + sz);
-        vecs[3].set(tx + sz, ty + sz);
-
-        Arrays.sort(vecs, Structs.comparingFloat(vec -> -Angles.angleDist(angleTo(vec), ang)));
-
-        Vec2 close = Geometry.findClosest(x, y, vecs);
-
-        float x1 = vecs[0].x, y1 = vecs[0].y,
-        x2 = close.x, y2 = close.y,
-        x3 = vecs[1].x, y3 = vecs[1].y;
-
         Draw.z(Layer.buildBeam);
 
         Draw.alpha(buildAlpha);
@@ -313,17 +294,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             Fill.square(plan.drawx(), plan.drawy(), size * tilesize/2f);
         }
 
-        if(renderer.animateShields){
-            if(close != vecs[0] && close != vecs[1]){
-                Fill.tri(px, py, x1, y1, x2, y2);
-                Fill.tri(px, py, x3, y3, x2, y2);
-            }else{
-                Fill.tri(px, py, x1, y1, x3, y3);
-            }
-        }else{
-            Lines.line(px, py, x1, y1);
-            Lines.line(px, py, x3, y3);
-        }
+        Drawf.buildBeam(px, py, tx, ty, Vars.tilesize * size / 2f);
 
         Fill.square(px, py, 1.8f + Mathf.absin(Time.time, 2.2f, 1.1f), rotation + 45);
 

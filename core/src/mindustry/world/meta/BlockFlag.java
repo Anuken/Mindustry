@@ -22,10 +22,11 @@ public enum BlockFlag{
     reactor,
     /** Blocks that extinguishes fires. */
     extinguisher,
-    /** Just a launch pad. */
+
+    //single-block identifiers
     launchPad,
-    /** Destination for unit cargo. */
-    unitCargoUnloadPoint;
+    unitCargoUnloadPoint,
+    unitAssembler;
 
     public final static BlockFlag[] all = values();
 

@@ -3320,6 +3320,9 @@ public class Blocks{
             output = UnitTypes.vanquish;
             droneType = UnitTypes.manifold;
             requirements = BlockStack.list(Blocks.thoriumWallLarge, 4, Blocks.duct, 2);
+            consumes.power(1f);
+
+            droneType = UnitTypes.assemblyDrone;
         }};
 
         //endregion

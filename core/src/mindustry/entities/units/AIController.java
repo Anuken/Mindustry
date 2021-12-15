@@ -244,7 +244,10 @@ public class AIController implements UnitController{
             vec.setZero();
         }
 
-        unit.moveAt(vec);
+        //do not move when infinite vectors are used.
+        if(vec.isNaN() || vec.isInfinite()) return;
+
+        unit.movePref(vec);
     }
 
     @Override

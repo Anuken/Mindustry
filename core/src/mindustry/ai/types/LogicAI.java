@@ -1,7 +1,6 @@
 package mindustry.ai.types;
 
 import arc.math.*;
-import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
@@ -111,33 +110,6 @@ public class LogicAI extends AIController{
 
     public boolean checkTargetTimer(Object radar){
         return radars.add(radar);
-    }
-
-    @Override
-    public void moveTo(Position target, float circleLength, float smooth){
-        if(target == null) return;
-
-        vec.set(target).sub(unit);
-
-        float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / smooth, -1f, 1f);
-
-        vec.setLength(unit.speed() * length);
-        if(length < -0.5f){
-            vec.rotate(180f);
-        }else if(length < 0){
-            vec.setZero();
-        }
-
-        //do not move when infinite vectors are used.
-        if(vec.isNaN() || vec.isInfinite()) return;
-
-        if(unit.type.omniMovement){
-            unit.approach(vec);
-        }else{
-            unit.rotateMove(vec);
-        }
-
-
     }
 
     @Override

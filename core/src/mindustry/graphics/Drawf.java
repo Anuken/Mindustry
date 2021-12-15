@@ -13,10 +13,13 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
 public class Drawf{
-    private static FloatSeq points = new FloatSeq();
+    private static final Vec2[] vecs = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
+    private static final FloatSeq points = new FloatSeq();
 
     public static void flame(float x, float y, int divisions, float rotation, float length, float width, float pan){
         flame(x, y, divisions, rotation, length, width, pan, 0f);
@@ -62,6 +65,35 @@ public class Drawf{
         points.add(Tmp.v1.x + baseX, Tmp.v1.y + baseY);
     }
 
+    public static void buildBeam(float x, float y, float tx, float ty, float radius){
+        float ang = Angles.angle(x, y, tx, ty);
+
+        vecs[0].set(tx - radius, ty - radius);
+        vecs[1].set(tx + radius, ty - radius);
+        vecs[2].set(tx - radius, ty + radius);
+        vecs[3].set(tx + radius, ty + radius);
+
+        Arrays.sort(vecs, Structs.comparingFloat(vec -> -Angles.angleDist(Angles.angle(x, y, vec.x, vec.y), ang)));
+
+        Vec2 close = Geometry.findClosest(x, y, vecs);
+
+        float x1 = vecs[0].x, y1 = vecs[0].y,
+        x2 = close.x, y2 = close.y,
+        x3 = vecs[1].x, y3 = vecs[1].y;
+
+        if(renderer.animateShields){
+            if(close != vecs[0] && close != vecs[1]){
+                Fill.tri(x, y, x1, y1, x2, y2);
+                Fill.tri(x, y, x3, y3, x2, y2);
+            }else{
+                Fill.tri(x, y, x1, y1, x3, y3);
+            }
+        }else{
+            Lines.line(x, y, x1, y1);
+            Lines.line(x, y, x3, y3);
+        }
+    }
+
     public static void additive(TextureRegion region, Color color, float x, float y, float rotation, float layer){
         float pz = Draw.z();
         Draw.z(layer);
@@ -82,11 +114,19 @@ public class Drawf{
         Draw.reset();
     }
 
+    public static void dashSquare(Color color, float x, float y, float size){
+        dashRect(color, x - size/2f, y - size/2f, size, size);
+    }
+
     public static void dashRect(Color color, Rect rect){
-        dashLine(color, rect.x, rect.y, rect.x + rect.width, rect.y);
-        dashLine(color, rect.x + rect.width, rect.y, rect.x + rect.width, rect.y + rect.height);
-        dashLine(color, rect.x + rect.width, rect.y + rect.height, rect.x, rect.y + rect.height);
-        dashLine(color, rect.x, rect.y + rect.height, rect.x, rect.y);
+        dashRect(color, rect.x, rect.y, rect.width, rect.height);
+    }
+
+    public static void dashRect(Color color, float x, float y, float width, float height){
+        dashLine(color, x, y, x + width, y);
+        dashLine(color, x + width, y, x + width, y + height);
+        dashLine(color, x + width, y + height, x, y + height);
+        dashLine(color, x, y + height, x, y);
     }
 
     public static void target(float x, float y, float rad, Color color){

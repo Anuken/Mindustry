@@ -561,7 +561,7 @@ public class Generators{
 
                 //draw treads
                 if(sample instanceof Tankc){
-                    image.draw(get(type.treadRegion), true);
+                    image.draw(outline.get(get(type.treadRegion)), true);
                     image.draw(get(type.region), true);
                 }
 
