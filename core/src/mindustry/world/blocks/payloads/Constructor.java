@@ -6,7 +6,6 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
-import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.storage.*;
@@ -24,6 +23,7 @@ public class Constructor extends BlockProducer{
 
         size = 3;
         configurable = true;
+        clearOnDoubleTap = true;
 
         configClear((ConstructorBuild tile) -> tile.recipe = null);
         config(Block.class, (ConstructorBuild tile, Block block) -> {
@@ -57,17 +57,6 @@ public class Constructor extends BlockProducer{
         @Override
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(Constructor.this, table, content.blocks().select(Constructor.this::canProduce), () -> recipe, this::configure);
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
-                deselect();
-                configure(null);
-                return false;
-            }
-
-            return true;
         }
 
         @Override

@@ -1,6 +1,8 @@
 package mindustry.mod;
 
 import arc.struct.*;
+import mindustry.world.blocks.payloads.*;
+
 /** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */
 @SuppressWarnings("deprecation")
 public class ClassMap{
@@ -152,10 +154,10 @@ public class ClassMap{
         classes.put("MassDriverBuild", mindustry.world.blocks.distribution.MassDriver.MassDriverBuild.class);
         classes.put("OverflowGate", mindustry.world.blocks.distribution.OverflowGate.class);
         classes.put("OverflowGateBuild", mindustry.world.blocks.distribution.OverflowGate.OverflowGateBuild.class);
-        classes.put("PayloadConveyor", mindustry.world.blocks.distribution.PayloadConveyor.class);
-        classes.put("PayloadConveyorBuild", mindustry.world.blocks.distribution.PayloadConveyor.PayloadConveyorBuild.class);
-        classes.put("PayloadRouter", mindustry.world.blocks.distribution.PayloadRouter.class);
-        classes.put("PayloadRouterBuild", mindustry.world.blocks.distribution.PayloadRouter.PayloadRouterBuild.class);
+        classes.put("PayloadConveyor", PayloadConveyor.class);
+        classes.put("PayloadConveyorBuild", PayloadConveyor.PayloadConveyorBuild.class);
+        classes.put("PayloadRouter", PayloadRouter.class);
+        classes.put("PayloadRouterBuild", PayloadRouter.PayloadRouterBuild.class);
         classes.put("Router", mindustry.world.blocks.distribution.Router.class);
         classes.put("RouterBuild", mindustry.world.blocks.distribution.Router.RouterBuild.class);
         classes.put("Sorter", mindustry.world.blocks.distribution.Sorter.class);

@@ -7,13 +7,27 @@ import mindustry.world.*;
 
 public class BlockSeq{
     private ObjectIntMap<Block> blocks = new ObjectIntMap<>();
+    private int total;
+
+    public boolean isEmpty(){
+        return total == 0;
+    }
+
+    public boolean any(){
+        return total > 0;
+    }
+
+    public int total(){
+        return total;
+    }
 
     public void add(Block block){
-        blocks.increment(block);
+        add(block, 1);
     }
 
     public void add(Block block, int amount){
         blocks.increment(block, amount);
+        total += amount;
     }
 
     public void remove(Block block){
@@ -30,6 +44,7 @@ public class BlockSeq{
 
     public void clear(){
         blocks.clear();
+        total = 0;
     }
 
     public int get(Block block){
@@ -42,6 +57,10 @@ public class BlockSeq{
 
     public boolean contains(Block block, int amount){
         return get(block) >= amount;
+    }
+
+    public boolean contains(Block block){
+        return get(block) >= 1;
     }
 
     public boolean contains(BlockStack stack){
@@ -57,9 +76,10 @@ public class BlockSeq{
     }
 
     public void read(Reads read){
+        total = 0;
         short amount = read.s();
         for(int i = 0; i < amount; i++){
-            blocks.put(Vars.content.block(read.s()), read.i());
+            add(Vars.content.block(read.s()), read.i());
         }
     }
 }

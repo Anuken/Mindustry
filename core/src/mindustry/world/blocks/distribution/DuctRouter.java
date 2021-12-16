@@ -33,6 +33,7 @@ public class DuctRouter extends Block{
         configurable = true;
         saveConfig = true;
         rotate = true;
+        clearOnDoubleTap = true;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
 
         config(Item.class, (DuctRouterBuild tile, Item item) -> tile.sortItem = item);
@@ -108,17 +109,6 @@ public class DuctRouter extends Block{
         @Override
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(DuctRouter.this, table, content.items(), () -> sortItem, this::configure);
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
-                deselect();
-                configure(null);
-                return false;
-            }
-
-            return true;
         }
 
         @Nullable

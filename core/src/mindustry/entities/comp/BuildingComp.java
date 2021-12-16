@@ -1365,6 +1365,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * @return whether or not this block should be deselected.
      */
     public boolean onConfigureTileTapped(Building other){
+        if(block.clearOnDoubleTap){
+            if(self() == other){
+                deselect();
+                configure(null);
+                return false;
+            }
+            return true;
+        }
         return self() != other;
     }
 

@@ -31,6 +31,7 @@ public class PayloadSource extends PayloadBlock{
         //make sure to display large units.
         clipSize = 120;
         noUpdateDisabled = true;
+        clearOnDoubleTap = true;
 
         config(Block.class, (PayloadSourceBuild build, Block block) -> {
             if(canProduce(block) && build.block != block){
@@ -89,17 +90,6 @@ public class PayloadSource extends PayloadBlock{
                 content.blocks().select(PayloadSource.this::canProduce).<UnlockableContent>as()
                 .and(content.units().select(PayloadSource.this::canProduce).as()),
             () -> (UnlockableContent)config(), this::configure);
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
-                deselect();
-                configure(null);
-                return false;
-            }
-
-            return true;
         }
 
         @Override

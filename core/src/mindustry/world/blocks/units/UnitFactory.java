@@ -35,6 +35,7 @@ public class UnitFactory extends UnitBlock{
         hasItems = true;
         solid = true;
         configurable = true;
+        clearOnDoubleTap = true;
         outputsPayload = true;
         rotate = true;
 
@@ -164,17 +165,6 @@ public class UnitFactory extends UnitBlock{
             }else{
                 table.table(Styles.black3, t -> t.add("@none").color(Color.lightGray));
             }
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
-                deselect();
-                configure(null);
-                return false;
-            }
-
-            return true;
         }
 
         @Override

@@ -25,6 +25,7 @@ public class Drawf{
         flame(x, y, divisions, rotation, length, width, pan, 0f);
     }
 
+    //TODO offset unused
     public static void flame(float x, float y, int divisions, float rotation, float length, float width, float pan, float offset){
         float len1 = length * pan, len2 = length * (1f - pan);
 
@@ -107,7 +108,8 @@ public class Drawf{
 
     public static void dashLine(Color color, float x, float y, float x2, float y2){
         int segments = (int)(Math.max(Math.abs(x - x2), Math.abs(y - y2)) / tilesize * 2);
-        Lines.stroke(3f, Pal.gray);
+        Lines.stroke(3f);
+        Draw.color(Pal.gray, color.a);
         Lines.dashLine(x, y, x2, y2, segments);
         Lines.stroke(1f, color);
         Lines.dashLine(x, y, x2, y2, segments);

@@ -27,6 +27,7 @@ public class UnitCargoUnloadPoint extends Block{
         hasItems = true;
         configurable = true;
         saveConfig = true;
+        clearOnDoubleTap = true;
         flags = EnumSet.of(BlockFlag.unitCargoUnloadPoint);
 
         config(Item.class, (UnitCargoUnloadPointBuild build, Item item) -> build.item = item);
@@ -74,17 +75,6 @@ public class UnitCargoUnloadPoint extends Block{
         @Override
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(UnitCargoUnloadPoint.this, table, content.items(), () -> item, this::configure);
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
-                deselect();
-                configure(null);
-                return false;
-            }
-
-            return true;
         }
 
         @Override

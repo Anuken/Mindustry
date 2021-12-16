@@ -76,6 +76,8 @@ public class Block extends UnlockableContent{
     public boolean saveConfig = false;
     /** whether to allow copying the config through middle click */
     public boolean copyConfig = true;
+    /** if true, double-tapping this configurable block clears configuration. */
+    public boolean clearOnDoubleTap = false;
     /** whether this block has a tile entity that updates */
     public boolean update;
     /** whether this block has health and can be destroyed */

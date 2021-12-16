@@ -32,6 +32,7 @@ public class LiquidSource extends Block{
         displayFlow = false;
         group = BlockGroup.liquids;
         envEnabled = Env.any;
+        clearOnDoubleTap = true;
 
         config(Liquid.class, (LiquidSourceBuild tile, Liquid l) -> tile.source = l);
         configClear((LiquidSourceBuild tile) -> tile.source = null);
@@ -85,17 +86,6 @@ public class LiquidSource extends Block{
         @Override
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(LiquidSource.this, table, content.liquids(), () -> source, this::configure);
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
-                deselect();
-                configure(null);
-                return false;
-            }
-
-            return true;
         }
 
         @Override

@@ -1,6 +1,5 @@
 package mindustry.world.consumers;
 
-import arc.func.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import mindustry.gen.*;
@@ -11,7 +10,7 @@ import mindustry.world.meta.*;
 public class ConsumePayloads extends Consume{
     public Seq<BlockStack> payloads;
 
-    public <T extends Building> ConsumePayloads(Seq<BlockStack> payloads){
+    public ConsumePayloads(Seq<BlockStack> payloads){
         this.payloads = payloads;
     }
 

@@ -26,6 +26,7 @@ public class ItemSource extends Block{
         saveConfig = true;
         noUpdateDisabled = true;
         envEnabled = Env.any;
+        clearOnDoubleTap = true;
 
         config(Item.class, (ItemSourceBuild tile, Item item) -> tile.outputItem = item);
         configClear((ItemSourceBuild tile) -> tile.outputItem = null);
@@ -89,17 +90,6 @@ public class ItemSource extends Block{
         @Override
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(ItemSource.this, table, content.items(), () -> outputItem, this::configure);
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
-                deselect();
-                configure(null);
-                return false;
-            }
-
-            return true;
         }
 
         @Override

@@ -68,7 +68,6 @@ public class UnitAssembler extends PayloadBlock{
     public void setBars(){
         super.setBars();
 
-        //TODO progress bar
         bars.add("progress", (UnitAssemblerBuild e) -> new Bar("bar.progress", Pal.ammo, () -> e.progress));
 
         bars.add("units", (UnitAssemblerBuild e) ->

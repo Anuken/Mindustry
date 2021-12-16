@@ -34,6 +34,7 @@ public class DirectionalUnloader extends Block{
         noUpdateDisabled = true;
         unloadable = false;
         envDisabled = Env.none;
+        clearOnDoubleTap = true;
 
         config(Item.class, (DirectionalUnloaderBuild tile, Item item) -> tile.unloadItem = item);
         configClear((DirectionalUnloaderBuild tile) -> tile.unloadItem = null);
@@ -123,17 +124,6 @@ public class DirectionalUnloader extends Block{
         @Override
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(DirectionalUnloader.this, table, content.items(), () -> unloadItem, this::configure);
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
-                deselect();
-                configure(null);
-                return false;
-            }
-
-            return true;
         }
 
         @Override

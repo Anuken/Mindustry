@@ -23,6 +23,8 @@ import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.logic.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.blocks.payloads.PayloadConveyor;
+import mindustry.world.blocks.payloads.PayloadRouter;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
@@ -3321,6 +3323,7 @@ public class Blocks{
             droneType = UnitTypes.manifold;
             requirements = BlockStack.list(Blocks.thoriumWallLarge, 4, Blocks.duct, 2);
             consumes.power(1f);
+            areaSize = 13;
 
             droneType = UnitTypes.assemblyDrone;
         }};
