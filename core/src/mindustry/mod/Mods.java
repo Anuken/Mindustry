@@ -1118,8 +1118,8 @@ public class Mods implements Loadable{
     }
 
     public static class ModLoadException extends RuntimeException{
-        public ModLoadException(String message, Object ...args){
-            super(Strings.format(message, args));
+        public ModLoadException(String message){
+            super(message);
         }
     }
 
