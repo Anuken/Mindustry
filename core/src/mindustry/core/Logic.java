@@ -97,7 +97,7 @@ public class Logic implements ApplicationListener{
 
         Events.on(PlayEvent.class, e -> {
             //reset weather on play
-            var randomWeather = state.rules.weather.copy().shuffle();
+            var randomWeather = state.rules.weather.copy().shuffled();
             float sum = 0f;
             for(var weather : randomWeather){
                 weather.cooldown = sum + Mathf.random(weather.maxFrequency);

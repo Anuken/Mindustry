@@ -29,6 +29,7 @@ public class PayloadRouter extends PayloadConveyor{
         outputsPayload = true;
         outputFacing = false;
         configurable = true;
+        clearOnDoubleTap = true;
 
         config(Block.class, (PayloadRouterBuild tile, Block item) -> tile.sorted = item);
         config(UnitType.class, (PayloadRouterBuild tile, UnitType item) -> tile.sorted = item);
@@ -163,8 +164,6 @@ public class PayloadRouter extends PayloadConveyor{
             if(item != null){
                 item.draw();
             }
-
-            //TODO draw sort item
         }
 
         @Override
