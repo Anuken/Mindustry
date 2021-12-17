@@ -78,5 +78,9 @@
   {
     "name": "ALEX",
     "address": ["dogemindustry.ddns.net:25588"]
+  },
+    {
+    "name": "Mindustry-server",
+    "address": ["mindustry.fun"]
   }
 ]
