@@ -44,7 +44,7 @@ public class ConsumeModule extends BlockModule{
         for(Consume cons : entity.block.consumes.all()){
             if(cons.isOptional()) continue;
 
-            if(docons && cons.isUpdate() && prevValid && cons.valid(entity)){
+            if(docons && cons.isUpdate() && prevValid && entity.consValid()){
                 cons.update(entity);
             }
 
@@ -52,7 +52,7 @@ public class ConsumeModule extends BlockModule{
         }
 
         for(Consume cons : entity.block.consumes.optionals()){
-            if(docons && cons.isUpdate() && prevValid && cons.valid(entity)){
+            if(docons && cons.isUpdate() && prevValid && entity.consValid()){
                 cons.update(entity);
             }
 
