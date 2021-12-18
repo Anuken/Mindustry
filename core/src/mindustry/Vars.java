@@ -382,7 +382,6 @@ public class Vars implements Loadable{
         try{
             Writer writer = settings.getDataDirectory().child("last_log.txt").writer(false);
             LogHandler log = Log.logger;
-            //ignore it
             Log.logger = (level, text) -> {
                 log.log(level, text);
 

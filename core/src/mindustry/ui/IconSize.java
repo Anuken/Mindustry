@@ -1,5 +1,7 @@
 package mindustry.ui;
 
+/** @deprecated completely pointless */
+@Deprecated
 public enum IconSize{
     def(48),
     small(32),

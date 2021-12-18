@@ -2439,7 +2439,7 @@ public class UnitTypes{
                 layerOffset = 0.0001f;
                 reload = 120f;
                 shootY = 71f / 4f;
-                shake = 3f;
+                shake = 4f;
                 recoil = 4f;
                 rotate = true;
                 rotateSpeed = 1f;

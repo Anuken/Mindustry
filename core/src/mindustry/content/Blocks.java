@@ -132,6 +132,7 @@ public class Blocks{
 
     //unit - erekir
     tankAssembler,
+    basicAssemblerModule,
 
     //payloads
     //TODO small deconstructor
@@ -3319,13 +3320,18 @@ public class Blocks{
         tankAssembler = new UnitAssembler("tank-assembler"){{
             requirements(Category.units, with(Items.graphite, 10));
             size = 3;
-            output = UnitTypes.vanquish;
             droneType = UnitTypes.manifold;
-            requirements = BlockStack.list(Blocks.thoriumWallLarge, 4, Blocks.duct, 2);
+            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 5f, BlockStack.list(Blocks.thoriumWallLarge, 4, Blocks.duct, 2)));
             consumes.power(1f);
             areaSize = 13;
 
             droneType = UnitTypes.assemblyDrone;
+        }};
+
+        basicAssemblerModule = new UnitAssemblerModule("basic-assembler-module"){{
+            requirements(Category.units, with(Items.graphite, 10));
+
+            size = 3;
         }};
 
         //endregion

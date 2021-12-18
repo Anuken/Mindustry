@@ -116,6 +116,10 @@ public class Drawf{
         Draw.reset();
     }
 
+    public static void dashLineBasic(float x, float y, float x2, float y2){
+        Lines.dashLine(x, y, x2, y2, (int)(Math.max(Math.abs(x - x2), Math.abs(y - y2)) / tilesize * 2));
+    }
+
     public static void dashSquare(Color color, float x, float y, float size){
         dashRect(color, x - size/2f, y - size/2f, size, size);
     }
@@ -129,6 +133,17 @@ public class Drawf{
         dashLine(color, x + width, y, x + width, y + height);
         dashLine(color, x + width, y + height, x, y + height);
         dashLine(color, x, y + height, x, y);
+    }
+
+    public static void dashSquareBasic(float x, float y, float size){
+        dashRectBasic(x - size/2f, y - size/2f, size, size);
+    }
+
+    public static void dashRectBasic(float x, float y, float width, float height){
+        dashLineBasic(x, y, x + width, y);
+        dashLineBasic(x + width, y, x + width, y + height);
+        dashLineBasic(x + width, y + height, x, y + height);
+        dashLineBasic( x, y + height, x, y);
     }
 
     public static void target(float x, float y, float rad, Color color){

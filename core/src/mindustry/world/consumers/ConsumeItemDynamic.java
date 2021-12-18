@@ -9,6 +9,7 @@ import mindustry.ui.*;
 public class ConsumeItemDynamic extends Consume{
     public final Func<Building, ItemStack[]> items;
 
+    @SuppressWarnings("unchecked")
     public <T extends Building> ConsumeItemDynamic(Func<T, ItemStack[]> items){
         this.items = (Func<Building, ItemStack[]>)items;
     }

@@ -1,9 +1,11 @@
 package mindustry.world.blocks.units;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -15,7 +17,9 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.blocks.units.UnitAssemblerModule.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -33,10 +37,7 @@ public class UnitAssembler extends PayloadBlock{
     public UnitType droneType = UnitTypes.assemblyDrone;
     public int dronesCreated = 4;
 
-    //TODO should be different for every tier.
-    public float buildTime = 60f * 5f;
-    public Seq<BlockStack> requirements = new Seq<>();
-    public UnitType output;
+    public Seq<AssemblerUnitPlan> plans = new Seq<>(4);
 
     public UnitAssembler(String name){
         super(name);
@@ -73,12 +74,12 @@ public class UnitAssembler extends PayloadBlock{
         bars.add("units", (UnitAssemblerBuild e) ->
             new Bar(() ->
             Core.bundle.format("bar.unitcap",
-                Fonts.getUnicodeStr(output.name),
-                e.team.data().countType(output),
+                Fonts.getUnicodeStr(e.unit().name),
+                e.team.data().countType(e.unit()),
                 Units.getStringCap(e.team)
             ),
             () -> Pal.power,
-            () -> (float)e.team.data().countType(output) / Units.getCap(e.team)
+            () -> (float)e.team.data().countType(e.unit()) / Units.getCap(e.team)
         ));
     }
 
@@ -91,28 +92,164 @@ public class UnitAssembler extends PayloadBlock{
 
     @Override
     public void init(){
-        consumes.add(new ConsumePayloads(requirements));
+        consumes.add(new ConsumePayloadDynamic((UnitAssemblerBuild build) -> build.plan().requirements));
 
         super.init();
+    }
+
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.output, table -> {
+            Seq<AssemblerUnitPlan> p = plans.select(u -> u.unit.unlockedNow());
+            table.row();
+            for(var plan : p){
+                if(plan.unit.unlockedNow()){
+                    table.image(plan.unit.uiIcon).size(8 * 3).padRight(2).right();
+                    table.add(plan.unit.localizedName).left();
+                    table.add(Strings.autoFixed(plan.time / 60f, 1) + " " + Core.bundle.get("unit.seconds")).color(Color.lightGray).padLeft(12).left();
+                    table.row();
+                    table.add().right();
+                    table.table(t -> {
+                        t.left();
+                        for(var stack : plan.requirements){
+                            t.add(new ItemImage(stack)).padRight(4).padTop(4).left();
+                        }
+                    }).left().fillX().padLeft(-8 * 3f - 2).padBottom(6).row();
+                }
+            }
+        });
+    }
+
+    public static class AssemblerUnitPlan{
+        public UnitType unit;
+        public Seq<BlockStack> requirements;
+        public float time;
+
+        public AssemblerUnitPlan(UnitType unit, float time, Seq<BlockStack> requirements){
+            this.unit = unit;
+            this.time = time;
+            this.requirements = requirements;
+        }
+
+        AssemblerUnitPlan(){}
     }
 
     public class UnitAssemblerBuild extends PayloadBlockBuild<BuildPayload>{
         protected IntSeq readUnits = new IntSeq();
 
         public Seq<Unit> units = new Seq<>();
+        public Seq<UnitAssemblerModuleBuild> modules = new Seq<>();
         public BlockSeq blocks = new BlockSeq();
         public float progress, warmup;
         public float invalidWarmup = 0f;
+        public int currentTier = 0;
 
         public boolean wasOccupied = false;
-
-        //TODO progress
-        //TODO how should payloads be stored exactly? counts of blocks? intmap? references?
 
         public Vec2 getUnitSpawn(){
             float len = tilesize * (areaSize + size)/2f;
             float unitX = x + Geometry.d4x(rotation) * len, unitY = y + Geometry.d4y(rotation) * len;
             return Tmp.v4.set(unitX, unitY);
+        }
+
+        public boolean moduleFits(Block other, float ox, float oy, int rotation){
+            float
+            dx = ox + Geometry.d4x(rotation) * (other.size/2 + 1) * tilesize,
+            dy = oy + Geometry.d4y(rotation) * (other.size/2 + 1) * tilesize;
+
+            Vec2 spawn = getUnitSpawn();
+
+            if(Tile.relativeTo(ox, oy, spawn.x, spawn.y) != rotation){
+                return false;
+            }
+
+            float dst = Math.max(Math.abs(dx - spawn.x), Math.abs(dy - spawn.y));
+            return Mathf.equal(dst, tilesize * areaSize / 2f - tilesize/2f);
+        }
+
+        public void updateModules(UnitAssemblerModuleBuild build){
+            modules.addUnique(build);
+            checkTier();
+            //TODO tier check
+        }
+
+        public void removeModule(UnitAssemblerModuleBuild build){
+            modules.remove(build);
+            checkTier();
+        }
+
+        public void checkTier(){
+            modules.sort(b -> b.tier());
+            int max = 0;
+            for(int i = 0; i < modules.size; i++){
+                var mod = modules.get(i);
+                if(mod.tier() == max || mod.tier() == max + 1){
+                    max = mod.tier();
+                }else{
+                    //tier gap, TODO warning?
+                    break;
+                }
+            }
+            currentTier = max;
+        }
+
+        public UnitType unit(){
+            return plan().unit;
+        }
+
+        public AssemblerUnitPlan plan(){
+            //clamp plan pos
+            return plans.get(Math.min(currentTier, plans.size - 1));
+        }
+
+        @Override
+        public void drawSelect(){
+            for(var module : modules){
+                Drawf.selected(module, Pal.accent);
+            }
+
+            //TODO draw area
+        }
+
+        //is this necessary? wastes a lot of space
+        /*
+        @Override
+        public void displayConsumption(Table table){
+            super.displayConsumption(table);
+            table.row();
+
+            table.table(t -> {
+                t.left();
+                for(var mod : modules){
+                    //TODO crosses for missing reqs?
+                    t.image(mod.block.uiIcon).size(iconMed).padRight(4).padTop(4);
+                }
+            }).fillX().row();
+        }*/
+
+        @Override
+        public void display(Table table){
+            super.display(table);
+
+            table.row();
+            table.table(t -> {
+                t.left().defaults().left();
+
+                Block prev = null;
+                for(int i = 0; i < modules.size; i++){
+                    var mod = modules.get(i);
+                    if(prev == mod.block) continue;
+                    //TODO crosses for missing reqs?
+                    t.image(mod.block.uiIcon).size(iconMed).padRight(4);
+
+                    prev = mod.block;
+                }
+
+                t.label(() -> "[accent] -> []" + unit().emoji() + " " + unit().name);
+            }).pad(4).padLeft(0f).fillX().left();
         }
 
         @Override
@@ -146,8 +283,6 @@ public class UnitAssembler extends PayloadBlock{
 
             //TODO units should move stuff into position
 
-            //TODO check if area is occupied
-
             Vec2 spawn = getUnitSpawn();
 
             //arrange units around perimeter
@@ -163,16 +298,18 @@ public class UnitAssembler extends PayloadBlock{
 
             invalidWarmup = Mathf.lerpDelta(invalidWarmup, wasOccupied ? 1f : 0f, 0.1f);
 
+            var plan = plan();
+
             //check if all requirements are met
-            if(!wasOccupied && consValid() && Units.canCreate(team, output)){
+            if(!wasOccupied && consValid() && Units.canCreate(team, plan.unit)){
                 warmup = Mathf.lerpDelta(warmup, efficiency(), 0.1f);
 
-                if((progress += edelta() * eff / buildTime) >= 1f){
+                if((progress += edelta() * eff / plan.time) >= 1f){
                     //TODO ???? should this even be part of a trigger
                     consume();
 
                     //TODO actually just goes poof
-                    var unit = output.create(team);
+                    var unit = plan.unit.create(team);
                     unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
                     unit.rotation = 90f;
                     unit.add();
@@ -194,6 +331,7 @@ public class UnitAssembler extends PayloadBlock{
             Draw.rect(region, x, y);
             //Draw.rect(outRegion, x, y, rotdeg());
 
+            //draw input conveyors
             for(int i = 0; i < 4; i++){
                 if(blends(i) && i != rotation){
                     Draw.rect(inRegion, x, y, (i * 90) - 180);
@@ -213,14 +351,17 @@ public class UnitAssembler extends PayloadBlock{
 
             Draw.alpha(progress);
 
-            Draw.rect(output.fullIcon, spawn.x, spawn.y);
+            var plan = plan();
+
+            Draw.rect(plan.unit.fullIcon, spawn.x, spawn.y);
 
             //TODO which layer?
             Draw.z(Layer.buildBeam);
 
+            //draw unit outline
             Draw.mixcol(Tmp.c1.set(Pal.accent).lerp(Pal.remove, invalidWarmup), 1f);
             Draw.alpha(0.8f + Mathf.absin(10f, 0.2f));
-            Draw.rect(output.fullIcon, spawn.x, spawn.y);
+            Draw.rect(plan.unit.fullIcon, spawn.x, spawn.y);
 
             Draw.alpha(warmup * Draw.getColor().a);
             int c = 0;
@@ -231,23 +372,32 @@ public class UnitAssembler extends PayloadBlock{
                     px = unit.x + Angles.trnsx(unit.rotation, unit.type.buildBeamOffset),
                     py = unit.y + Angles.trnsy(unit.rotation, unit.type.buildBeamOffset);
 
-                Drawf.buildBeam(px, py, spawn.x, spawn.y, output.hitSize/2f);
+                Drawf.buildBeam(px, py, spawn.x, spawn.y, plan.unit.hitSize/2f);
                 c ++;
             }
 
-            Draw.z(Layer.overlayUI - 1);
+            Draw.reset();
 
-            var color = Tmp.c3.set(Pal.accent).lerp(Pal.remove, invalidWarmup).a(efficiency());
+            Draw.z(Layer.buildBeam);
 
-            //TODO dashes bad
+            float fulls = areaSize * tilesize/2f;
 
-            float outSize = output.hitSize + 9f;
-            float hs = size * tilesize/2f, ha = outSize/2f;
+            //draw full area
+            Lines.stroke(2f, Pal.accent);
+            Drawf.dashRectBasic(spawn.x - fulls, spawn.y - fulls, fulls*2f, fulls*2f);
 
             Draw.reset();
-            //TODO dash rect for output, fades in/out
-            Drawf.dashSquare(color, spawn.x, spawn.y, outSize);
 
+            float outSize = plan.unit.hitSize + 9f;
+            float hs = size * tilesize/2f, ha = outSize/2f;
+
+            Lines.stroke(2f, Tmp.c3.set(Pal.accent).lerp(Pal.remove, invalidWarmup).a(efficiency()));
+
+            //draw small square for area
+            //TODO dash rect for output, fades in/out
+            Drawf.dashSquareBasic(spawn.x, spawn.y, outSize);
+
+            /*
             for(int i : Mathf.signs){
                 Tmp.v1.trns(rotation * 90, hs, hs * i).add(x, y);
 
@@ -255,12 +405,20 @@ public class UnitAssembler extends PayloadBlock{
                 Draw.color();
 
                 Drawf.dashLine(color, Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
-            }
+            }*/
+
+            Draw.reset();
+
+            Draw.z(Layer.overlayUI - 1);
+
+            //TODO dashes bad
+
 
             Draw.reset();
         }
 
         public boolean checkSolid(Vec2 v){
+            var output = unit();
             return !output.flying && (collisions.overlapsTile(Tmp.r1.setCentered(v.x, v.y, output.hitSize), EntityCollisions::solid) || Units.anyEntities(v.x, v.y, output.hitSize));
         }
 
@@ -280,7 +438,8 @@ public class UnitAssembler extends PayloadBlock{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
-            return payload instanceof BuildPayload bp && requirements.contains(b -> b.block == bp.block() && blocks.get(bp.block()) < b.amount);
+            var plan = plan();
+            return payload instanceof BuildPayload bp && plan.requirements.contains(b -> b.block == bp.block() && blocks.get(bp.block()) < b.amount);
         }
 
         @Override

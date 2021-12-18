@@ -90,6 +90,17 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return -1;
     }
 
+    public static int relativeTo(float x, float y, float cx, float cy){
+        if(Math.abs(x - cx) > Math.abs(y - cy)){
+            if(x <= cx - 1) return 0;
+            if(x >= cx + 1) return 2;
+        }else{
+            if(y <= cy - 1) return 1;
+            if(y >= cy + 1) return 3;
+        }
+        return -1;
+    }
+
     public byte absoluteRelativeTo(int cx, int cy){
 
         //very straightforward for odd sizes

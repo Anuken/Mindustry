@@ -26,7 +26,10 @@ public enum BlockFlag{
     //single-block identifiers
     launchPad,
     unitCargoUnloadPoint,
-    unitAssembler;
+    unitAssembler,
+
+    /** @deprecated not used anywhere */
+    @Deprecated resupply;
 
     public final static BlockFlag[] all = values();
 
