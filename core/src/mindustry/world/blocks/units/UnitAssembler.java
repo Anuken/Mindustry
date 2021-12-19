@@ -92,11 +92,11 @@ public class UnitAssembler extends PayloadBlock{
 
     @Override
     public void init(){
+        clipSize = Math.max(clipSize, (areaSize + size) * tilesize * 2);
         consumes.add(new ConsumePayloadDynamic((UnitAssemblerBuild build) -> build.plan().requirements));
 
         super.init();
     }
-
 
     @Override
     public void setStats(){
@@ -137,6 +137,16 @@ public class UnitAssembler extends PayloadBlock{
         AssemblerUnitPlan(){}
     }
 
+    public static class YeetData{
+        public Vec2 target;
+        public Block block;
+
+        public YeetData(Vec2 target, Block block){
+            this.target = target;
+            this.block = block;
+        }
+    }
+
     public class UnitAssemblerBuild extends PayloadBlockBuild<BuildPayload>{
         protected IntSeq readUnits = new IntSeq();
 
@@ -146,7 +156,6 @@ public class UnitAssembler extends PayloadBlock{
         public float progress, warmup;
         public float invalidWarmup = 0f;
         public int currentTier = 0;
-
         public boolean wasOccupied = false;
 
         public Vec2 getUnitSpawn(){
@@ -173,7 +182,6 @@ public class UnitAssembler extends PayloadBlock{
         public void updateModules(UnitAssemblerModuleBuild build){
             modules.addUnique(build);
             checkTier();
-            //TODO tier check
         }
 
         public void removeModule(UnitAssemblerModuleBuild build){
@@ -211,7 +219,7 @@ public class UnitAssembler extends PayloadBlock{
                 Drawf.selected(module, Pal.accent);
             }
 
-            //TODO draw area
+            //TODO draw area when no power
         }
 
         //is this necessary? wastes a lot of space
@@ -265,10 +273,10 @@ public class UnitAssembler extends PayloadBlock{
                 readUnits.clear();
             }
 
-            units.removeAll(u -> !u.isAdded() || u.dead);
+            units.removeAll(u -> !u.isAdded() || u.dead || !(u.controller() instanceof AssemblerAI));
 
+            //TODO build up units, don't spawn immediately in batches
             if(efficiency() > 0 && units.size < dronesCreated){
-                //TODO build animation? distribute spawning?
                 var unit = droneType.create(team);
                 if(unit instanceof BuildingTetherc bt){
                     bt.building(this);
@@ -281,20 +289,26 @@ public class UnitAssembler extends PayloadBlock{
                 units.add(unit);
             }
 
-            //TODO units should move stuff into position
+            //TODO units should pick up and move payloads into position
 
             Vec2 spawn = getUnitSpawn();
+
+            if(moveInPayload() && !wasOccupied){
+                yeetPayload(payload);
+                payload = null;
+            }
 
             //arrange units around perimeter
             for(int i = 0; i < units.size; i++){
                 var unit = units.get(i);
-                if(unit.controller() instanceof AssemblerAI ai){
-                    ai.targetPos.trns(i * 90f + 45f, areaSize / 2f * Mathf.sqrt2 * tilesize).add(spawn);
-                }
+                var ai = (AssemblerAI)unit.controller();
+
+                ai.targetPos.trns(i * 90f + 45f, areaSize / 2f * Mathf.sqrt2 * tilesize).add(spawn);
+                ai.targetAngle = i * 90f + 45f + 180f;
             }
 
             wasOccupied = checkSolid(spawn);
-            float eff =  (units.size / (float)dronesCreated);
+            float eff =  (units.count(u -> ((AssemblerAI)u.controller()).inPosition()) / (float)dronesCreated);
 
             invalidWarmup = Mathf.lerpDelta(invalidWarmup, wasOccupied ? 1f : 0f, 0.1f);
 
@@ -312,7 +326,8 @@ public class UnitAssembler extends PayloadBlock{
                     var unit = plan.unit.create(team);
                     unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
                     unit.rotation = 90f;
-                    unit.add();
+                    //TODO annoying so nothing is created yet
+                    //unit.add();
                     progress = 0f;
 
                     Fx.spawn.at(unit);
@@ -329,7 +344,6 @@ public class UnitAssembler extends PayloadBlock{
         @Override
         public void draw(){
             Draw.rect(region, x, y);
-            //Draw.rect(outRegion, x, y, rotdeg());
 
             //draw input conveyors
             for(int i = 0; i < 4; i++){
@@ -340,12 +354,13 @@ public class UnitAssembler extends PayloadBlock{
 
             Draw.z(Layer.blockOver);
 
-            //payRotation = rotdeg();
-            //drawPayload();
+            payRotation = rotdeg();
+            drawPayload();
 
             Draw.z(Layer.blockOver + 0.1f);
 
-            Draw.rect(topRegion, x, y);
+            //TODO top?
+            //Draw.rect(topRegion, x, y);
 
             Vec2 spawn = getUnitSpawn();
 
@@ -355,7 +370,6 @@ public class UnitAssembler extends PayloadBlock{
 
             Draw.rect(plan.unit.fullIcon, spawn.x, spawn.y);
 
-            //TODO which layer?
             Draw.z(Layer.buildBeam);
 
             //draw unit outline
@@ -364,16 +378,16 @@ public class UnitAssembler extends PayloadBlock{
             Draw.rect(plan.unit.fullIcon, spawn.x, spawn.y);
 
             Draw.alpha(warmup * Draw.getColor().a);
-            int c = 0;
+
+            //draw build beams
             for(var unit : units){
-                if(!Angles.within(unit.rotation, c * 90f + 45f + 180f, 15f)) continue;
+                if(!((AssemblerAI)unit.controller()).inPosition()) continue;
 
                 float
                     px = unit.x + Angles.trnsx(unit.rotation, unit.type.buildBeamOffset),
                     py = unit.y + Angles.trnsy(unit.rotation, unit.type.buildBeamOffset);
 
                 Drawf.buildBeam(px, py, spawn.x, spawn.y, plan.unit.hitSize/2f);
-                c ++;
             }
 
             Draw.reset();
@@ -389,37 +403,30 @@ public class UnitAssembler extends PayloadBlock{
             Draw.reset();
 
             float outSize = plan.unit.hitSize + 9f;
-            float hs = size * tilesize/2f, ha = outSize/2f;
-
-            Lines.stroke(2f, Tmp.c3.set(Pal.accent).lerp(Pal.remove, invalidWarmup).a(efficiency()));
 
             //draw small square for area
-            //TODO dash rect for output, fades in/out
+            Lines.stroke(2f, Tmp.c3.set(Pal.accent).lerp(Pal.remove, invalidWarmup).a(efficiency()));
             Drawf.dashSquareBasic(spawn.x, spawn.y, outSize);
-
-            /*
-            for(int i : Mathf.signs){
-                Tmp.v1.trns(rotation * 90, hs, hs * i).add(x, y);
-
-                Tmp.v2.trns(rotation * 90, -ha, ha * i).add(spawn);
-                Draw.color();
-
-                Drawf.dashLine(color, Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
-            }*/
-
-            Draw.reset();
-
-            Draw.z(Layer.overlayUI - 1);
-
-            //TODO dashes bad
-
 
             Draw.reset();
         }
 
         public boolean checkSolid(Vec2 v){
             var output = unit();
-            return !output.flying && (collisions.overlapsTile(Tmp.r1.setCentered(v.x, v.y, output.hitSize), EntityCollisions::solid) || Units.anyEntities(v.x, v.y, output.hitSize));
+            return !output.flying && (collisions.overlapsTile(Tmp.r1.setCentered(v.x, v.y, output.hitSize), EntityCollisions::solid) || Units.anyEntities(v.x, v.y, output.hitSize * 1.4f));
+        }
+
+        /** @return true if this block is ready to produce units, e.g. requirements met */
+        public boolean ready(){
+            return consValid() && !wasOccupied;
+        }
+
+        public void yeetPayload(BuildPayload payload){
+            var spawn = getUnitSpawn();
+            blocks.add(payload.block(), 1);
+            float rot = payload.angleTo(spawn);
+            Fx.shootPayloadDriver.at(payload.x(), payload.y(), rot);
+            Fx.payloadDeposit.at(payload.x(), payload.y(), rot, new YeetData(spawn.cpy(), payload.block()));
         }
 
         @Override
@@ -428,18 +435,9 @@ public class UnitAssembler extends PayloadBlock{
         }
 
         @Override
-        public void handlePayload(Building source, Payload payload){
-            //super.handlePayload(source, payload);
-
-            blocks.add(((BuildPayload)payload).block());
-
-            //payloads.add((BuildPayload)payload);
-        }
-
-        @Override
         public boolean acceptPayload(Building source, Payload payload){
             var plan = plan();
-            return payload instanceof BuildPayload bp && plan.requirements.contains(b -> b.block == bp.block() && blocks.get(bp.block()) < b.amount);
+            return this.payload == null && payload instanceof BuildPayload bp && plan.requirements.contains(b -> b.block == bp.block() && blocks.get(bp.block()) < b.amount);
         }
 
         @Override
@@ -453,11 +451,6 @@ public class UnitAssembler extends PayloadBlock{
             }
 
             blocks.write(write);
-
-            //TODO save:
-            //- unit IDs
-            //- progress
-            //- payloads in position (should they have positions?)
         }
 
         @Override

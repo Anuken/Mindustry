@@ -13,6 +13,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.units.UnitAssembler.*;
 
 import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
@@ -225,6 +226,17 @@ public class Fx{
             Fill.square(e.x + x, e.y + y, 1f + e.fout() * (3f + e.rotation));
         });
     }),
+
+    payloadDeposit = new Effect(30f, e -> {
+        if(!(e.data instanceof YeetData data)) return;
+        Tmp.v1.set(e.x, e.y).lerp(data.target, e.finpow());
+        float x = Tmp.v1.x, y = Tmp.v1.y;
+
+        scl(e.fout(Interp.pow3Out) * 1.05f);
+        Drawf.squareShadow(x, y, data.block.size * tilesize * 1.85f, 1f);
+        mixcol(Pal.accent, e.fin());
+        rect(data.block.fullIcon, x, y);
+    }).layer(Layer.flyingUnitLow - 5f),
 
     select = new Effect(23, e -> {
         color(Pal.accent);

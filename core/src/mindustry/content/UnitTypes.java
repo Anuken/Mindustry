@@ -68,8 +68,8 @@ public class UnitTypes{
     //special block unit type
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
 
-    //special tethered
-    public static @EntityDef({Unitc.class, BuildingTetherc.class}) UnitType manifold, assemblyDrone;
+    //special tethered (has payload capability, because it's necessary sometimes)
+    public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone, payloadDrone;
 
     //tank
     //TODO tank comp
@@ -2431,7 +2431,7 @@ public class UnitTypes{
             hitSize = 28f;
             treadPullOffset = 4;
             speed = 0.6f;
-            health = 10000;
+            health = 9000;
             armor = 20f;
             treadRect = new Rect(22f, 16f, 28f, 130f);
 
@@ -2448,7 +2448,7 @@ public class UnitTypes{
                 y = 0;
                 shadow = 28f;
 
-                bullet = new BasicBulletType(7f, 50){{
+                bullet = new BasicBulletType(7f, 90){{
                     sprite = "missile-large";
                     width = 9f;
                     height = 15f;
@@ -2743,6 +2743,10 @@ public class UnitTypes{
             envEnabled = Env.any;
             envDisabled = Env.none;
         }};
+
+        //payloadDrone = new UnitType("payload-drone"){{
+
+        //}};
 
         //endregion
         //region neoplasm

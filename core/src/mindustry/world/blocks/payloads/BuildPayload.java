@@ -85,13 +85,15 @@ public class BuildPayload implements Payload{
 
     @Override
     public void drawShadow(float alpha){
-        Drawf.shadow(build.x, build.y, build.block.size * tilesize * 2f, alpha);
+        Drawf.squareShadow(build.x, build.y, build.block.size * tilesize * 1.85f, alpha);
     }
 
     @Override
     public void draw(){
-        drawShadow(1f);
         float prevZ = Draw.z();
+        Draw.z(prevZ - 0.0001f);
+        drawShadow(1f);
+        Draw.z(prevZ);
         Draw.zTransform(z -> z >= Layer.flyingUnitLow ? z : 0.0011f + Mathf.clamp(z, prevZ - 0.001f, prevZ + 0.9f));
         build.tile = emptyTile;
         build.payloadDraw();

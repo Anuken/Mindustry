@@ -81,7 +81,7 @@ public class UnitAssemblerModule extends PayloadBlock{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
-            return link != null && payload == null && link.acceptPayload(source, payload);
+            return link != null && this.payload == null && link.acceptPayload(source, payload);
         }
 
         @Override
@@ -108,10 +108,9 @@ public class UnitAssemblerModule extends PayloadBlock{
                 findLink();
             }
 
-            if(moveInPayload()){
-                if(link != null && link.moduleFits(block, x, y, rotation) && link.acceptPayload(this, payload)){
-                    link.handlePayload(this, payload);
-                }
+            if(moveInPayload() && link != null && link.moduleFits(block, x, y, rotation) && link.acceptPayload(this, payload)){
+                link.yeetPayload(payload);
+                payload = null;
             }
         }
 

@@ -224,6 +224,12 @@ public class Drawf{
         shadow(x, y, rad, 1f);
     }
 
+    public static void squareShadow(float x, float y, float rad, float alpha){
+        Draw.color(0, 0, 0, 0.4f * alpha);
+        Draw.rect("square-shadow", x, y, rad * Draw.xscl, rad * Draw.yscl);
+        Draw.color();
+    }
+
     public static void shadow(float x, float y, float rad, float alpha){
         Draw.color(0, 0, 0, 0.4f * alpha);
         Draw.rect("circle-shadow", x, y, rad * Draw.xscl, rad * Draw.yscl);

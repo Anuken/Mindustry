@@ -1,22 +1,26 @@
 package mindustry.ai.types;
 
+import arc.math.*;
 import arc.math.geom.*;
 import mindustry.entities.units.*;
-import mindustry.gen.*;
-import mindustry.world.blocks.units.UnitAssembler.*;
 
 public class AssemblerAI extends AIController{
     public Vec2 targetPos = new Vec2();
+    public float targetAngle;
 
     @Override
     public void updateMovement(){
         //TODO
         if(!targetPos.isZero()){
-            moveTo(targetPos, 8f, 11f);
+            moveTo(targetPos, 1f, 3f);
         }
 
-        if(unit instanceof BuildingTetherc tether && tether.building() instanceof UnitAssemblerBuild assembler){
-            unit.lookAt(assembler.getUnitSpawn());
+        if(unit.within(targetPos, 5f)){
+            unit.lookAt(targetAngle);
         }
+    }
+
+    public boolean inPosition(){
+        return unit.within(targetPos, 10f) && Angles.within(unit.rotation, targetAngle, 15f);
     }
 }

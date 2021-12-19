@@ -3319,7 +3319,7 @@ public class Blocks{
         //TODO completely unfinished
         tankAssembler = new UnitAssembler("tank-assembler"){{
             requirements(Category.units, with(Items.graphite, 10));
-            size = 3;
+            size = 5;
             droneType = UnitTypes.manifold;
             plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 5f, BlockStack.list(Blocks.thoriumWallLarge, 4, Blocks.duct, 2)));
             consumes.power(1f);

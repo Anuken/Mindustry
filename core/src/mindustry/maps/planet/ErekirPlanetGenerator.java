@@ -252,12 +252,12 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         state.rules.defaultTeam.items().add(Seq.with(ItemStack.with(Items.beryllium, 300, Items.graphite, 300)));
 
         //TODO proper waves
-        state.rules.waves = false;
+        state.rules.waves = true;
         state.rules.showSpawns = true;
         state.rules.waveTimer = true;
-        state.rules.waveSpacing = 60f * 60f * 10f;
+        state.rules.waveSpacing = 60f * 60f * 15f;
         state.rules.spawns = Seq.with(new SpawnGroup(){{
-            type = UnitTypes.fortress;
+            type = UnitTypes.vanquish;
             spacing = 1;
             shieldScaling = 60;
             unitScaling = 2f;
