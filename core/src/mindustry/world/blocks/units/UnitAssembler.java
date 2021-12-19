@@ -10,6 +10,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.ai.types.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -33,6 +34,9 @@ import static mindustry.Vars.*;
  * 3.
  * */
 public class UnitAssembler extends PayloadBlock{
+    public @Load("@-side1") TextureRegion sideRegion1;
+    public @Load("@-side2") TextureRegion sideRegion2;
+
     public int areaSize = 11;
     public UnitType droneType = UnitTypes.assemblyDrone;
     public int dronesCreated = 4;
@@ -87,7 +91,7 @@ public class UnitAssembler extends PayloadBlock{
     @Override
     public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
         Draw.rect(region, plan.drawx(), plan.drawy());
-        //Draw.rect(outRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
+        Draw.rect(plan.rotation >= 2 ? sideRegion2 : sideRegion1, plan.drawx(), plan.drawy(), plan.rotation * 90);
         Draw.rect(topRegion, plan.drawx(), plan.drawy());
     }
 
@@ -358,6 +362,8 @@ public class UnitAssembler extends PayloadBlock{
                     Draw.rect(inRegion, x, y, (i * 90) - 180);
                 }
             }
+
+            Draw.rect(rotation >= 2 ? sideRegion2 : sideRegion1, x, y, rotdeg());
 
             Draw.z(Layer.blockOver);
 
