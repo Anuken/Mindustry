@@ -20,6 +20,7 @@ public class UnitAssemblerModule extends PayloadBlock{
         super(name);
         rotate = true;
         rotateDraw = false;
+        acceptsPayload = true;
     }
 
     @Override
@@ -81,7 +82,7 @@ public class UnitAssemblerModule extends PayloadBlock{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
-            return link != null && this.payload == null && link.acceptPayload(source, payload);
+            return link != null && this.payload == null && link.acceptPayload(this, payload);
         }
 
         @Override

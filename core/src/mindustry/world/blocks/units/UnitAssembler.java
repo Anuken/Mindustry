@@ -36,6 +36,7 @@ public class UnitAssembler extends PayloadBlock{
     public int areaSize = 11;
     public UnitType droneType = UnitTypes.assemblyDrone;
     public int dronesCreated = 4;
+    public float droneConstructTime = 60f * 3f;
 
     public Seq<AssemblerUnitPlan> plans = new Seq<>(4);
 
@@ -137,6 +138,7 @@ public class UnitAssembler extends PayloadBlock{
         AssemblerUnitPlan(){}
     }
 
+    /** hbgwerjhbagjegwg */
     public static class YeetData{
         public Vec2 target;
         public Block block;
@@ -153,10 +155,12 @@ public class UnitAssembler extends PayloadBlock{
         public Seq<Unit> units = new Seq<>();
         public Seq<UnitAssemblerModuleBuild> modules = new Seq<>();
         public BlockSeq blocks = new BlockSeq();
-        public float progress, warmup;
+        public float progress, warmup, droneWarmup;
         public float invalidWarmup = 0f;
         public int currentTier = 0;
         public boolean wasOccupied = false;
+
+        public float droneProgress, totalDroneProgress;
 
         public Vec2 getUnitSpawn(){
             float len = tilesize * (areaSize + size)/2f;
@@ -275,8 +279,10 @@ public class UnitAssembler extends PayloadBlock{
 
             units.removeAll(u -> !u.isAdded() || u.dead || !(u.controller() instanceof AssemblerAI));
 
-            //TODO build up units, don't spawn immediately in batches
-            if(efficiency() > 0 && units.size < dronesCreated){
+            droneWarmup = Mathf.lerpDelta(droneWarmup, units.size < dronesCreated ? efficiency() : 0f, 0.1f);
+            totalDroneProgress += droneWarmup * Time.delta;
+
+            if(units.size < dronesCreated && (droneProgress += edelta() / droneConstructTime) >= 1f){
                 var unit = droneType.create(team);
                 if(unit instanceof BuildingTetherc bt){
                     bt.building(this);
@@ -287,6 +293,7 @@ public class UnitAssembler extends PayloadBlock{
 
                 Fx.spawn.at(unit);
                 units.add(unit);
+                droneProgress = 0f;
             }
 
             //TODO units should pick up and move payloads into position
@@ -359,8 +366,15 @@ public class UnitAssembler extends PayloadBlock{
 
             Draw.z(Layer.blockOver + 0.1f);
 
-            //TODO top?
-            //Draw.rect(topRegion, x, y);
+            Draw.rect(topRegion, x, y);
+
+            //draw drone construction
+            if(droneWarmup > 0){
+                //TODO draw it - better animations?
+                Draw.draw(Layer.blockOver + 0.2f, () -> {
+                    Drawf.construct(this, droneType.fullIcon, Pal.accent, 0f, droneProgress, droneWarmup, totalDroneProgress, 14f);
+                });
+            }
 
             Vec2 spawn = getUnitSpawn();
 
@@ -437,7 +451,8 @@ public class UnitAssembler extends PayloadBlock{
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             var plan = plan();
-            return this.payload == null && payload instanceof BuildPayload bp && plan.requirements.contains(b -> b.block == bp.block() && blocks.get(bp.block()) < b.amount);
+            return (this.payload == null || source instanceof UnitAssemblerModuleBuild) &&
+                    payload instanceof BuildPayload bp && plan.requirements.contains(b -> b.block == bp.block() && blocks.get(bp.block()) < b.amount);
         }
 
         @Override

@@ -387,8 +387,12 @@ public class Drawf{
     public static void construct(Building t, TextureRegion region, float rotation, float progress, float speed, float time){
         construct(t, region, Pal.accent, rotation, progress, speed, time);
     }
-        
+
     public static void construct(Building t, TextureRegion region, Color color, float rotation, float progress, float speed, float time){
+        construct(t, region, color, rotation, progress, speed, time, t.block.size * tilesize - 4f);
+    }
+        
+    public static void construct(Building t, TextureRegion region, Color color, float rotation, float progress, float speed, float time, float size){
         Shaders.build.region = region;
         Shaders.build.progress = progress;
         Shaders.build.color.set(color);
@@ -402,7 +406,7 @@ public class Drawf{
         Draw.color(Pal.accent);
         Draw.alpha(speed);
 
-        Lines.lineAngleCenter(t.x + Mathf.sin(time, 20f, Vars.tilesize / 2f * t.block.size - 2f), t.y, 90, t.block.size * Vars.tilesize - 4f);
+        Lines.lineAngleCenter(t.x + Mathf.sin(time, 20f, size / 2f), t.y, 90, size);
 
         Draw.reset();
     }
