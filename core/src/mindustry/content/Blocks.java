@@ -3322,7 +3322,7 @@ public class Blocks{
             size = 5;
             droneType = UnitTypes.manifold;
             plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 5f, BlockStack.list(Blocks.thoriumWallLarge, 4, Blocks.duct, 2)));
-            consumes.power(1f);
+            consumes.power(2f);
             areaSize = 13;
 
             droneType = UnitTypes.assemblyDrone;
@@ -3330,6 +3330,7 @@ public class Blocks{
 
         basicAssemblerModule = new UnitAssemblerModule("basic-assembler-module"){{
             requirements(Category.units, with(Items.graphite, 10));
+            consumes.power(0.5f);
 
             size = 3;
         }};

@@ -292,6 +292,14 @@ public class Fx{
         Lines.poly(e.x, e.y, 4, 5f + e.fin() * 12f);
     }),
 
+    unitAssemble = new Effect(70, e -> {
+        if(!(e.data instanceof Unit unit)) return;
+
+        alpha(e.fout());
+        mixcol(Pal.accent, e.fout());
+        rect(unit.type.fullIcon, unit.x, unit.y, unit.rotation - 90);
+    }).layer(Layer.flyingUnit + 5f),
+
     padlaunch = new Effect(10, e -> {
         stroke(4f * e.fout());
         color(Pal.accent);

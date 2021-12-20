@@ -3,6 +3,8 @@ package mindustry.world.blocks.units;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.annotations.Annotations.*;
+import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -14,6 +16,9 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class UnitAssemblerModule extends PayloadBlock{
+    public @Load("@-side1") TextureRegion sideRegion1;
+    public @Load("@-side2") TextureRegion sideRegion2;
+
     public int tier = 1;
 
     public UnitAssemblerModule(String name){
@@ -36,6 +41,18 @@ public class UnitAssemblerModule extends PayloadBlock{
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         return getLink(team, tile.x, tile.y, rotation) != null;
+    }
+
+    @Override
+    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        Draw.rect(region, plan.drawx(), plan.drawy());
+        Draw.rect(plan.rotation >= 2 ? sideRegion2 : sideRegion1, plan.drawx(), plan.drawy(), plan.rotation * 90);
+        Draw.rect(topRegion, plan.drawx(), plan.drawy());
+    }
+
+    @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region, sideRegion1, topRegion};
     }
 
     public @Nullable UnitAssemblerBuild getLink(Team team, int x, int y, int rotation){
@@ -73,6 +90,8 @@ public class UnitAssemblerModule extends PayloadBlock{
                 }
             }
 
+            Draw.rect(rotation >= 2 ? sideRegion2 : sideRegion1, x, y, rotdeg());
+
             Draw.z(Layer.blockOver);
             payRotation = rotdeg();
             drawPayload();
@@ -109,7 +128,7 @@ public class UnitAssemblerModule extends PayloadBlock{
                 findLink();
             }
 
-            if(moveInPayload() && link != null && link.moduleFits(block, x, y, rotation) && link.acceptPayload(this, payload)){
+            if(moveInPayload() && link != null && link.moduleFits(block, x, y, rotation) && link.acceptPayload(this, payload) && consValid()){
                 link.yeetPayload(payload);
                 payload = null;
             }

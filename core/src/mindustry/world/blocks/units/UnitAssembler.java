@@ -96,6 +96,11 @@ public class UnitAssembler extends PayloadBlock{
     }
 
     @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region, sideRegion1, topRegion};
+    }
+
+    @Override
     public void init(){
         clipSize = Math.max(clipSize, (areaSize + size) * tilesize * 2);
         consumes.add(new ConsumePayloadDynamic((UnitAssemblerBuild build) -> build.plan().requirements));
@@ -338,10 +343,10 @@ public class UnitAssembler extends PayloadBlock{
                     unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
                     unit.rotation = 90f;
                     //TODO annoying so nothing is created yet
-                    //unit.add();
+                    unit.add();
                     progress = 0f;
 
-                    Fx.spawn.at(unit);
+                    Fx.unitAssemble.at(unit.x, unit.y, 0f, unit);
 
                     blocks.clear();
                 }
@@ -383,21 +388,43 @@ public class UnitAssembler extends PayloadBlock{
             }
 
             Vec2 spawn = getUnitSpawn();
-
-            Draw.alpha(progress);
+            float sx = spawn.x, sy = spawn.y;
 
             var plan = plan();
 
-            Draw.rect(plan.unit.fullIcon, spawn.x, spawn.y);
+            Draw.draw(Layer.blockBuilding, () -> {
+                Draw.color(Pal.accent, warmup);
+
+                Shaders.blockbuild.region = plan.unit.fullIcon;
+                Shaders.blockbuild.time = Time.time;
+                //margin due to units not taking up whole region
+                Shaders.blockbuild.progress = Mathf.clamp(progress + 0.05f);
+
+                Draw.rect(plan.unit.fullIcon, sx, sy);
+                Draw.flush();
+                Draw.color();
+            });
+
+            /*
+            Tmp.tr1.set(plan.unit.fullIcon);
+            Tmp.tr1.setY(Tmp.tr1.getY() + plan.unit.fullIcon.height * (1f - progress));
+
+            //TODO what if building animation
+            Draw.rect(Tmp.tr1, spawn.x, spawn.y + (Tmp.tr1.height/2f - plan.unit.fullIcon.height/2f) * Draw.scl, Tmp.tr1.width * Draw.scl, Tmp.tr1.height * Draw.scl);
+            Lines.stroke(1f, Pal.accent);
+            Draw.alpha(warmup);
+            Lines.lineAngleCenter(spawn.x, spawn.y - plan.unit.fullIcon.height/2f * Draw.scl + plan.unit.fullIcon.height * progress * Draw.scl, 0f, plan.unit.fullIcon.width * 0.9f * Draw.scl);*/
+
+            Draw.reset();
 
             Draw.z(Layer.buildBeam);
 
             //draw unit outline
             Draw.mixcol(Tmp.c1.set(Pal.accent).lerp(Pal.remove, invalidWarmup), 1f);
-            Draw.alpha(0.8f + Mathf.absin(10f, 0.2f));
             Draw.rect(plan.unit.fullIcon, spawn.x, spawn.y);
 
-            Draw.alpha(warmup * Draw.getColor().a);
+            //build beams do not draw when invalid
+            Draw.alpha(Math.min(1f - invalidWarmup, warmup));
 
             //draw build beams
             for(var unit : units){
@@ -424,9 +451,11 @@ public class UnitAssembler extends PayloadBlock{
 
             float outSize = plan.unit.hitSize + 9f;
 
-            //draw small square for area
-            Lines.stroke(2f, Tmp.c3.set(Pal.accent).lerp(Pal.remove, invalidWarmup).a(efficiency()));
-            Drawf.dashSquareBasic(spawn.x, spawn.y, outSize);
+            if(invalidWarmup > 0){
+                //draw small square for area
+                Lines.stroke(2f, Tmp.c3.set(Pal.accent).lerp(Pal.remove, invalidWarmup).a(invalidWarmup));
+                Drawf.dashSquareBasic(spawn.x, spawn.y, outSize);
+            }
 
             Draw.reset();
         }
