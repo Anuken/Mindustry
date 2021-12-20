@@ -1530,12 +1530,13 @@ public class Blocks{
             requirements(Category.effect, with(Items.silicon, 60, Items.tungsten, 60, Items.oxide, 40));
             outlineColor = Pal.darkOutline;
             consumes.power(3f);
-            range = 120f;
+            range = 150f;
             size = 3;
             buildSpeed = 1.5f;
         }};
 
         //TODO green looks bad switch to orange
+        //TODO orange also looks bad hhhh
         regenProjector = new RegenProjector("regen-projector"){{
             requirements(Category.effect, with(Items.silicon, 60, Items.tungsten, 60, Items.oxide, 40));
             size = 3;
