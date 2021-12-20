@@ -1163,7 +1163,8 @@ public class Blocks{
 
             craftTime = 60f * 2f;
 
-            outputLiquid = new LiquidStack(Liquids.gallium, 2f);
+            continuousLiquidOutput = true;
+            outputLiquid = new LiquidStack(Liquids.gallium, 1f / 60f);
             outputItem = new ItemStack(Items.scrap, 1);
         }};
 
@@ -3315,8 +3316,7 @@ public class Blocks{
         //endregion
         //region units - erekir
 
-        //TODO 5x5?
-        //TODO completely unfinished
+        //TODO requirements
         tankAssembler = new UnitAssembler("tank-assembler"){{
             requirements(Category.units, with(Items.graphite, 10));
             size = 5;
@@ -3324,6 +3324,9 @@ public class Blocks{
             plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 5f, BlockStack.list(Blocks.thoriumWallLarge, 4, Blocks.duct, 2)));
             consumes.power(2f);
             areaSize = 13;
+
+            //TODO unit production is rarely continuous, can be double
+            consumes.liquid(Liquids.gallium, 1f / 60f);
 
             droneType = UnitTypes.assemblyDrone;
         }};

@@ -227,6 +227,12 @@ public class UnitAssembler extends PayloadBlock{
         }
 
         @Override
+        public boolean shouldConsume(){
+            //liquid is only consumed when building is being done
+            return enabled && !wasOccupied && Units.canCreate(team, plan().unit) && consumes.get(ConsumeType.payload).valid(this);
+        }
+
+        @Override
         public void drawSelect(){
             for(var module : modules){
                 Drawf.selected(module, Pal.accent);
