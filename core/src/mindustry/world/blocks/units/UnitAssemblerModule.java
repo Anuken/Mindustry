@@ -106,7 +106,7 @@ public class UnitAssemblerModule extends PayloadBlock{
 
         @Override
         public void drawSelect(){
-            //TODO draw area
+            //TODO draw area?
             if(link != null){
                 Drawf.selected(link, Pal.accent);
             }

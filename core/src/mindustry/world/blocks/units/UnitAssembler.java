@@ -26,13 +26,6 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-/**
- * Steps:
- * 0. place the assembler with the rectangle indicating build area
- * 1. wait for power/consValid
- * 2. print / create the 3-5 drones for free, make sure they're tethered - build speed depends on drone active fraction
- * 3.
- * */
 public class UnitAssembler extends PayloadBlock{
     public @Load("@-side1") TextureRegion sideRegion1;
     public @Load("@-side2") TextureRegion sideRegion2;
@@ -66,7 +59,6 @@ public class UnitAssembler extends PayloadBlock{
         Tmp.r1.x += Geometry.d4x(rotation) * len;
         Tmp.r1.y += Geometry.d4y(rotation) * len;
 
-        //TODO better visuals here? dashLine looks bad
         Drawf.dashRect(valid ? Pal.accent : Pal.remove, Tmp.r1);
     }
 
@@ -237,25 +229,7 @@ public class UnitAssembler extends PayloadBlock{
             for(var module : modules){
                 Drawf.selected(module, Pal.accent);
             }
-
-            //TODO draw area when no power
         }
-
-        //is this necessary? wastes a lot of space
-        /*
-        @Override
-        public void displayConsumption(Table table){
-            super.displayConsumption(table);
-            table.row();
-
-            table.table(t -> {
-                t.left();
-                for(var mod : modules){
-                    //TODO crosses for missing reqs?
-                    t.image(mod.block.uiIcon).size(iconMed).padRight(4).padTop(4);
-                }
-            }).fillX().row();
-        }*/
 
         @Override
         public void display(Table table){
@@ -311,8 +285,6 @@ public class UnitAssembler extends PayloadBlock{
                 droneProgress = 0f;
             }
 
-            //TODO units should pick up and move payloads into position
-
             Vec2 spawn = getUnitSpawn();
 
             if(moveInPayload() && !wasOccupied){
@@ -341,14 +313,11 @@ public class UnitAssembler extends PayloadBlock{
                 warmup = Mathf.lerpDelta(warmup, efficiency(), 0.1f);
 
                 if((progress += edelta() * eff / plan.time) >= 1f){
-                    //TODO ???? should this even be part of a trigger
                     consume();
 
-                    //TODO actually just goes poof
                     var unit = plan.unit.create(team);
                     unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
                     unit.rotation = 90f;
-                    //TODO annoying so nothing is created yet
                     unit.add();
                     progress = 0f;
 
@@ -359,8 +328,6 @@ public class UnitAssembler extends PayloadBlock{
             }else{
                 warmup = Mathf.lerpDelta(warmup, 0f, 0.1f);
             }
-
-            //TODO drones need to indicate that they are in position and actually play an animation
         }
 
         @Override
@@ -387,7 +354,6 @@ public class UnitAssembler extends PayloadBlock{
 
             //draw drone construction
             if(droneWarmup > 0){
-                //TODO draw it - better animations?
                 Draw.draw(Layer.blockOver + 0.2f, () -> {
                     Drawf.construct(this, droneType.fullIcon, Pal.accent, 0f, droneProgress, droneWarmup, totalDroneProgress, 14f);
                 });
@@ -410,16 +376,6 @@ public class UnitAssembler extends PayloadBlock{
                 Draw.flush();
                 Draw.color();
             });
-
-            /*
-            Tmp.tr1.set(plan.unit.fullIcon);
-            Tmp.tr1.setY(Tmp.tr1.getY() + plan.unit.fullIcon.height * (1f - progress));
-
-            //TODO what if building animation
-            Draw.rect(Tmp.tr1, spawn.x, spawn.y + (Tmp.tr1.height/2f - plan.unit.fullIcon.height/2f) * Draw.scl, Tmp.tr1.width * Draw.scl, Tmp.tr1.height * Draw.scl);
-            Lines.stroke(1f, Pal.accent);
-            Draw.alpha(warmup);
-            Lines.lineAngleCenter(spawn.x, spawn.y - plan.unit.fullIcon.height/2f * Draw.scl + plan.unit.fullIcon.height * progress * Draw.scl, 0f, plan.unit.fullIcon.width * 0.9f * Draw.scl);*/
 
             Draw.reset();
 

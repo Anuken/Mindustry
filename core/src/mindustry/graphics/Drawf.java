@@ -95,10 +95,18 @@ public class Drawf{
         }
     }
 
+    public static void additive(TextureRegion region, Color color, float x, float y, float rotation){
+        additive(region, color, x, y, rotation, Layer.blockAdditive);
+    }
+
     public static void additive(TextureRegion region, Color color, float x, float y, float rotation, float layer){
+        additive(region, color, 1f, x, y, rotation, layer);
+    }
+
+    public static void additive(TextureRegion region, Color color, float alpha, float x, float y, float rotation, float layer){
         float pz = Draw.z();
         Draw.z(layer);
-        Draw.color(color);
+        Draw.color(color, alpha * color.a);
         Draw.blend(Blending.additive);
         Draw.rect(region, x, y, rotation);
         Draw.blend();

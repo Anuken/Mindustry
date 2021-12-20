@@ -1,6 +1,8 @@
 package mindustry.world.blocks.defense;
 
+import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -25,11 +27,13 @@ public class BuildTurret extends BaseTurret{
     public int targetInterval = 30;
 
     public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
+    public @Load("@-glow") TextureRegion glowRegion;
     public float buildSpeed = 1f;
     public float buildBeamOffset = 5f;
     //created in init()
     public @Nullable UnitType unitType;
     public float elevation = -1f;
+    public Color heatColor = Pal.accent.cpy().a(0.9f);
 
     public BuildTurret(String name){
         super(name);
@@ -70,6 +74,7 @@ public class BuildTurret extends BaseTurret{
         public BlockUnitc unit = (BlockUnitc)unitType.create(team);
         public @Nullable Unit following;
         public @Nullable BlockPlan lastPlan;
+        public float warmup;
 
         {
             unit.rotation(90f);
@@ -102,6 +107,8 @@ public class BuildTurret extends BaseTurret{
 
             unit.buildSpeedMultiplier(efficiency() * timeScale);
             unit.speedMultiplier(efficiency() * timeScale);
+
+            warmup = Mathf.lerpDelta(warmup, unit.activelyBuilding() ? 1f : 0f, 0.1f);
 
             if(!isControlled()){
                 unit.updateBuilding(true);
@@ -210,7 +217,16 @@ public class BuildTurret extends BaseTurret{
             Drawf.shadow(region, x - elevation, y - elevation, rotation - 90);
             Draw.rect(region, x, y, rotation - 90);
 
+            if(glowRegion.found()){
+                Drawf.additive(glowRegion, heatColor, warmup, x, y, rotation - 90f, Layer.turretHeat);
+            }
+
             unit.drawBuilding();
+        }
+
+        @Override
+        public float warmup(){
+            return warmup;
         }
 
         @Override

@@ -133,47 +133,6 @@ def antialias = { File file ->
     new Fi(file).writePng(out)
 }
 
-def tileImage = { File file ->
-    def image = new Pixmap(new Fi(file))
-
-    for(x in 0..image.width-1){
-        for(y in 0..image.height-1){
-            if(x > (image.height - 1 - y)){
-                def rx = image.height - 1 - y
-                def ry = x
-
-                image.setRaw(x, y, image.getRaw(rx, image.height - 1 - ry))
-            }
-        }
-    }
-
-    def result = new Pixmap(image.width * 2, image.height * 2)
-
-    result.draw(image.flipX(), 0, 0)
-    result.draw(image, image.width, 0)
-    result.draw(image.flipX().flipY(), 0, image.height)
-    result.draw(image.flipY(), image.width, image.height)
-
-    for(x in 0..result.width-1){
-        for(y in 0..result.height-1){
-            int p = result.getRaw(x, y)
-            if(x <= y){
-                List<Color> list = colorMap.get(p)
-                int index = colorIndexMap.get(p, -1)
-
-                if(index != -1){
-                    int resultIndex = (x == y ? 1 : index == 2 ? 0 : index == 0 ? 2 : 1);
-                    result.setRaw(x, y, list[resultIndex].rgba())
-                }
-            }
-        }
-    }
-
-    new Fi(file).writePng(result)
-    result.dispose()
-    image.dispose()
-}
-
 task antialiasImages(){
     doLast{
         for(def img : project.getProperty("images").split(",")){
