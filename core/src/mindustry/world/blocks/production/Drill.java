@@ -169,7 +169,7 @@ public class Drill extends Block{
         return new TextureRegion[]{region, rotatorRegion, topRegion};
     }
 
-    void countOre(Tile tile){
+    protected void countOre(Tile tile){
         returnItem = null;
         returnCount = 0;
 
