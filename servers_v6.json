@@ -53,7 +53,7 @@
   },
   {
     "name": "Omega",
-    "address": ["yeeth.mindustry.me:2004","185.86.230.61:25570"] 
+    "address": ["yeeth.mindustry.me:6568"] 
   },
   {
     "name": "Obvilion Network",
@@ -97,11 +97,11 @@
   },
   {
     "name": "Mindustry Español",
-    "address": ["panel.mindustry.me:2011", "yeeth.mindustry.me:6573", "panel.mindustry.me:2000", "panel.mindustry.me:2026"]
+    "address": ["yeeth.mindustry.me:6578", "yeeth.mindustry.me:6573", "yeeth.mindustry.me:6577", "yeeth.mindustry.me:6576"]
   },
   {
     "name": "CreateDustry",
-    "address": ["144.76.120.74:18645"]
+    "address": ["129.151.66.139:26032"]
   },
   {
     "name": "NukeDustry",

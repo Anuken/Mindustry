@@ -576,7 +576,9 @@ public class ServerControl implements ApplicationListener{
                 if(arg.length == 1){
                     info("'@' is currently @.", c.name(), c.get());
                 }else{
-                    if(c.isBool()){
+                    if (arg[1].equals("default")){
+                        c.set(c.defaultValue);
+                    }else if(c.isBool()){
                         c.set(arg[1].equals("on") || arg[1].equals("true"));
                     }else if(c.isNum()){
                         try{
