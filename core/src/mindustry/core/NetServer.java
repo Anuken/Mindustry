@@ -568,6 +568,34 @@ public class NetServer implements ApplicationListener{
         player.con.hasDisconnected = true;
     }
 
+    //these functions are for debugging only, and will be removed!
+
+    @Remote(targets = Loc.client, variants = Variant.one)
+    public static void requestDebugStatus(Player player){
+        int flags =
+            (player.con.hasDisconnected ? 1 : 0) |
+            (player.con.hasConnected ? 2 : 0) |
+            (player.isAdded() ? 4 : 0) |
+            (player.con.hasBegunConnecting ? 8 : 0);
+
+        Call.debugStatusClient(player.con, flags);
+        Call.debugStatusClientUnreliable(player.con, flags);
+    }
+
+    @Remote(variants = Variant.both, priority = PacketPriority.high)
+    public static void debugStatusClient(int value){
+        Log.info("[RELIABLE] Debug status received. disconnected = @, connected = @, added = @, begunConnecting = @",
+            (value & 1) != 0, (value & 2) != 0, (value & 4) != 0, (value & 8) != 0
+        );
+    }
+
+    @Remote(variants = Variant.both, priority = PacketPriority.high, unreliable = true)
+    public static void debugStatusClientUnreliable(int value){
+        Log.info("[UNRELIABLE] Debug status received. disconnected = @, connected = @, added = @, begunConnecting = @",
+        (value & 1) != 0, (value & 2) != 0, (value & 4) != 0, (value & 8) != 0
+        );
+    }
+
     @Remote(targets = Loc.client)
     public static void serverPacketReliable(Player player, String type, String contents){
         if(netServer.customPacketHandlers.containsKey(type)){
