@@ -1541,7 +1541,7 @@ public class Blocks{
             requirements(Category.effect, with(Items.silicon, 60, Items.tungsten, 60, Items.oxide, 40));
             size = 3;
             consumes.power(1f);
-            rangeWidth = 4;
+            rangeWidth = 6;
             rangeLength = 22;
 
             consumes.liquid(Liquids.hydrogen, 1f / 60f);
@@ -3103,8 +3103,8 @@ public class Blocks{
                 width = 14.2f;
                 splashDamageRadius = 60f;
                 splashDamage = 100f;
-                backColor = hitColor = trailColor = Color.valueOf("5b6b82");
-                frontColor = Color.valueOf("a0b0c8");
+                backColor = hitColor = trailColor = Color.valueOf("bb68c3");
+                frontColor = Color.white;
                 ammoMultiplier = 1f;
 
                 status = StatusEffects.blasted;
@@ -3114,7 +3114,6 @@ public class Blocks{
                 trailSinScl = 2.5f;
                 trailSinMag = 1f;
                 trailEffect = Fx.none;
-                trailColor = backColor;
                 despawnShake = 7f;
 
                 shootEffect = Fx.shootTitan;

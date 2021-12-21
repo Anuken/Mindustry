@@ -4,8 +4,8 @@ import arc.graphics.*;
 import mindustry.type.*;
 
 public class Liquids{
-    public static Liquid water, slag, oil, cryofluid, neoplasm,
-    arkycite, gallium,
+    public static Liquid water, slag, oil, cryofluid,
+    arkycite, gallium, neoplasm,
     ozone, hydrogen, nitrogen, cyanogen;
 
     public static void load(){
