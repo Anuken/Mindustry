@@ -22,6 +22,8 @@ public abstract class NetConnection{
     public long connectTime = Time.millis();
     /** ID of last received client snapshot. */
     public int lastReceivedClientSnapshot = -1;
+    /** Count of snapshots sent from server. */
+    public int snapshotsSent;
     /** Timestamp of last received snapshot. */
     public long lastReceivedClientTime;
     /** Build requests that have been recently rejected. This is cleared every snapshot. */
