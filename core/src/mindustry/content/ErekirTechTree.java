@@ -69,10 +69,12 @@ public class ErekirTechTree{
 
                     });
 
-                    //TODO more tiers of build tower or "support" structures like overdrive projectors
-                    //TODO method of repairing blocks of damage
-                    node(buildTower, () -> {
 
+                    node(regenProjector, () -> {
+                        //TODO more tiers of build tower or "support" structures like overdrive projectors
+                        node(buildTower, () -> {
+
+                        });
                     });
                 });
             });

@@ -255,12 +255,13 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         state.rules.waves = true;
         state.rules.showSpawns = true;
         state.rules.waveTimer = true;
-        state.rules.waveSpacing = 60f * 60f * 15f;
+        state.rules.waveSpacing = 60f * 60f * 7.5f;
         state.rules.spawns = Seq.with(new SpawnGroup(){{
             type = UnitTypes.vanquish;
             spacing = 1;
             shieldScaling = 60;
             unitScaling = 2f;
+            healthFraction = 0.2f;
         }});
     }
 }

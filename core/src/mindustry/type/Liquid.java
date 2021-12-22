@@ -22,7 +22,7 @@ public class Liquid extends UnlockableContent{
 
     protected static final Rand rand = new Rand();
 
-    /** TODO If true, this fluid is treated as a gas (and does not create puddles) */
+    /** If true, this fluid is treated as a gas (and does not create puddles) */
     public boolean gas = false;
     /** Color used in pipes and on the ground. */
     public Color color;

@@ -236,6 +236,29 @@ public class BlockIndexer{
         return size > 0;
     }
 
+    /** Does not work with null teams. */
+    public boolean eachBlock(Team team, Rect rect, Boolf<Building> pred, Cons<Building> cons){
+        breturnArray.clear();
+
+        var buildings = team.data().buildings;
+        if(buildings == null) return false;
+        buildings.intersect(rect, b -> {
+            if(pred.get(b)){
+                breturnArray.add(b);
+            }
+        });
+
+        int size = breturnArray.size;
+        var items = breturnArray.items;
+        for(int i = 0; i < size; i++){
+            cons.get(items[i]);
+            items[i] = null;
+        }
+        breturnArray.size = 0;
+
+        return size > 0;
+    }
+
     /** Get all enemy blocks with a flag. */
     public Seq<Building> getEnemy(Team team, BlockFlag type){
         breturnArray.clear();

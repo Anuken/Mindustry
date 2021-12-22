@@ -1527,7 +1527,7 @@ public class Blocks{
         }};
 
         buildTower = new BuildTurret("build-tower"){{
-            requirements(Category.effect, with(Items.silicon, 60, Items.tungsten, 60, Items.oxide, 40));
+            requirements(Category.effect, with(Items.silicon, 80, Items.carbide, 30, Items.oxide, 40, Items.thorium, 30));
             outlineColor = Pal.darkOutline;
             consumes.power(3f);
             range = 150f;
@@ -1538,21 +1538,25 @@ public class Blocks{
         //TODO green looks bad switch to orange
         //TODO orange also looks bad hhhh
         regenProjector = new RegenProjector("regen-projector"){{
-            requirements(Category.effect, with(Items.silicon, 60, Items.tungsten, 60, Items.oxide, 40));
+            requirements(Category.effect, with(Items.silicon, 60, Items.tungsten, 60, Items.oxide, 30));
             size = 3;
             consumes.power(1f);
-            rangeWidth = 6;
-            rangeLength = 22;
+            range = 28;
 
             consumes.liquid(Liquids.hydrogen, 1f / 60f);
 
             healPercent = 4f / 60f;
 
-            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.hydrogen, 9f / 4f), new DrawSideRegion(true), new DrawGlowRegion(){{
-                //color = Color.valueOf("1eff21");
-            }}, new DrawGlowRegion(true){{
-                suffix = "-side-glow";
-                alpha = 1f;
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.hydrogen, 9f / 4f), new DrawBlock(), new DrawGlowRegion(){{
+                color = Color.orange;//Color.valueOf("1eff21");
+            }}, new DrawPulseShape(false){{
+                //radiusScl = 0.95f;
+                layer = Layer.effect;
+            }}, new DrawShape(){{
+                layer = Layer.effect;
+                radius = 3.5f;
+                useWarmupRadius = true;
+                timeScl = 2f;
             }});
         }};
 

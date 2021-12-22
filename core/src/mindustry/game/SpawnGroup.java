@@ -42,6 +42,8 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
     public int unitAmount = 1;
     /** If not -1, the unit will only spawn in spawnpoints with these packed coordinates. */
     public int spawn = -1;
+    /** Fraction of health that unit is spawned with. */
+    public float healthFraction = 1f;
     /** Seq of payloads that this unit will spawn with. */
     public @Nullable Seq<UnitType> payloads;
     /** Status effect applied to the spawned unit. Null to disable. */
@@ -91,6 +93,7 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
         }
 
         unit.shield = getShield(wave);
+        unit.health = unit.maxHealth * healthFraction;
 
         //load up spawn payloads
         if(payloads != null && unit instanceof Payloadc pay){
@@ -118,6 +121,7 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
         if(unitAmount != 1) json.writeValue("amount", unitAmount);
         if(effect != null) json.writeValue("effect", effect.name);
         if(spawn != -1) json.writeValue("spawn", spawn);
+        if(healthFraction != 1f) json.writeValue("healthFraction", healthFraction);
         if(payloads != null && payloads.size > 0){
             json.writeValue("payloads", payloads.map(u -> u.name).toArray(String.class));
         }
@@ -138,6 +142,7 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
         shieldScaling = data.getFloat("shieldScaling", 0);
         unitAmount = data.getInt("amount", 1);
         spawn = data.getInt("spawn", -1);
+        healthFraction = data.getFloat("healthFraction", 1f);
         if(data.has("payloads")){
             payloads = Seq.with(json.readValue(String[].class, data.get("payloads"))).map(s -> content.getByName(ContentType.unit, s));
         }
