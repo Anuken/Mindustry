@@ -544,22 +544,20 @@ public class UI implements ApplicationListener, Loadable{
     /** Shows a menu that fires a callback when an option is selected. If nothing is selected, -1 is returned. */
     public void showMenu(String title, String message, String[][] options, Intc callback){
         new Dialog(title){{
+            setFillParent(true);
+            removeChild(titleTable);
+            cont.add(titleTable).width(400f);
+
+            cont.row();
+            cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent).bottom();
             cont.row();
             cont.pane(table -> {
-                Table cont, buttons;
-                table.add(cont = new Table()).expand().fill();
+                table.add(message).width(400f).wrap().get().setAlignment(Align.center);
                 table.row();
-                table.add(buttons = new Table()).fillX();
-
-                cont.row();
-                cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent);
-                cont.row();
-                cont.add(message).width(400f).wrap().get().setAlignment(Align.center);
-                cont.row();
 
                 int option = 0;
                 for(var optionsRow : options){
-                    Table buttonRow = buttons.row().table().get().row();
+                    Table buttonRow = table.row().table().get().row();
                     int fullWidth = 400 - (optionsRow.length - 1) * 8; // adjust to count padding as well
                     int width = fullWidth / optionsRow.length;
                     int lastWidth = fullWidth - width * (optionsRow.length - 1); // take the rest of space for uneven table
@@ -576,7 +574,7 @@ public class UI implements ApplicationListener, Loadable{
                         option++;
                     }
                 }
-            }).scrollY(true).grow().height(scene.getHeight()).bottom();
+            }).growX();
             closeOnBack(() -> callback.get(-1));
         }}.show();
     }
