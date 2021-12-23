@@ -45,6 +45,14 @@ public class ServerControl implements ApplicationListener{
     public final CommandHandler handler = new CommandHandler("");
     public final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
 
+    public Runnable serverInput = () -> {
+        Scanner scan = new Scanner(System.in);
+        while(scan.hasNext()){
+            String line = scan.nextLine();
+            Core.app.post(() -> handleCommandString(line));
+        }
+    };
+
     private Fi currentLogFile;
     private boolean inExtraRound;
     private Task lastTask;
@@ -56,14 +64,6 @@ public class ServerControl implements ApplicationListener{
     private ServerSocket serverSocket;
     private PrintWriter socketOutput;
     private String suggested;
-
-    private Runnable serverInput = () -> {
-        Scanner scan = new Scanner(System.in);
-        while(scan.hasNext()){
-            String line = scan.nextLine();
-            Core.app.post(() -> handleCommandString(line));
-        }
-    };
 
     public ServerControl(String[] args){
         setup(args);
