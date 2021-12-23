@@ -5,11 +5,9 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.Interp.*;
 import arc.util.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.world.*;
 
-public class DrawCrucible extends DrawBlock{
+public class DrawCrucible extends DrawPartial{
     public Color flameColor = Color.valueOf("f58349"), midColor = Color.valueOf("f2d585");
     public float flameRad = 1f, circleSpace = 2f, flameRadiusScl = 10f, flameRadiusMag = 0.6f, circleStroke = 1.5f;
 
@@ -53,6 +51,4 @@ public class DrawCrucible extends DrawBlock{
         }
     }
 
-    @Override
-    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){}
 }

@@ -3,14 +3,13 @@ package mindustry.world.draw;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
 /** Not standalone. */
-public class DrawLiquidRegion extends DrawBlock{
+public class DrawLiquidRegion extends DrawPartial{
     public Liquid drawLiquid;
     public TextureRegion liquid;
     public String suffix = "-liquid";
@@ -22,9 +21,6 @@ public class DrawLiquidRegion extends DrawBlock{
 
     public DrawLiquidRegion(){
     }
-
-    @Override
-    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){}
 
     @Override
     public void drawBase(Building build){

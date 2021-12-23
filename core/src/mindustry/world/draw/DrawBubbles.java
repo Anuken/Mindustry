@@ -3,11 +3,9 @@ package mindustry.world.draw;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.world.*;
 
-public class DrawBubbles extends DrawBlock{
+public class DrawBubbles extends DrawPartial{
     public Color color = Color.valueOf("7457ce");
 
     public int amount = 12, sides = 8;
@@ -21,9 +19,6 @@ public class DrawBubbles extends DrawBlock{
 
     public DrawBubbles(){
     }
-
-    @Override
-    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){}
 
     @Override
     public void drawBase(Building build){

@@ -4,14 +4,12 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
 /** Not standalone. */
-public class DrawGlowRegion extends DrawBlock{
+public class DrawGlowRegion extends DrawPartial{
     public Blending blending = Blending.additive;
     public String suffix = "-glow";
     public float alpha = 0.9f, glowScale = 10f, glowIntensity = 0.5f;
@@ -56,7 +54,4 @@ public class DrawGlowRegion extends DrawBlock{
     public void load(Block block){
         region = Core.atlas.find(block.name + suffix);
     }
-
-    @Override
-    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){}
 }

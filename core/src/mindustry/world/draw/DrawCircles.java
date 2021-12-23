@@ -4,11 +4,9 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.world.*;
 
-public class DrawCircles extends DrawBlock{
+public class DrawCircles extends DrawPartial{
     public Color color = Color.valueOf("7457ce");
 
     public int amount = 5, sides = 15;
@@ -22,9 +20,6 @@ public class DrawCircles extends DrawBlock{
 
     public DrawCircles(){
     }
-
-    @Override
-    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){}
 
     @Override
     public void drawBase(Building build){

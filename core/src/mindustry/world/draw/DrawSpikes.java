@@ -2,12 +2,9 @@ package mindustry.world.draw;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.util.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.world.*;
 
-public class DrawSpikes extends DrawBlock{
+public class DrawSpikes extends DrawPartial{
     public Color color = Color.valueOf("7457ce");
 
     public int amount = 10, layers = 1;
@@ -20,9 +17,6 @@ public class DrawSpikes extends DrawBlock{
 
     public DrawSpikes(){
     }
-
-    @Override
-    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){}
 
     @Override
     public void drawBase(Building build){
