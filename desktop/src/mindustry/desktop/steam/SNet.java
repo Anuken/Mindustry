@@ -105,11 +105,8 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             }
         }));
 
-        Events.on(WaveEvent.class, e -> {
-            if(currentLobby != null && net.server()){
-                smat.setLobbyData(currentLobby, "wave", state.wave + "");
-            }
-        });
+        Events.on(WaveEvent.class, e -> updateWave());
+        Events.run(Trigger.newGame, this::updateWave);
     }
 
     public boolean isSteamClient(){
@@ -199,6 +196,14 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         if(currentLobby != null && net.server()){
             smat.setLobbyType(currentLobby, Core.settings.getBool("publichost") ? LobbyType.Public : LobbyType.FriendsOnly);
             smat.setLobbyMemberLimit(currentLobby, Core.settings.getInt("playerlimit"));
+        }
+    }
+    
+    void updateWave(){
+        if(currentLobby != null && net.server()){
+            smat.setLobbyData(currentLobby, "mapname", state.map.name());
+            smat.setLobbyData(currentLobby, "wave", state.wave + "");
+            smat.setLobbyData(currentLobby, "gamemode", state.rules.mode().name() + "");
         }
     }
 
