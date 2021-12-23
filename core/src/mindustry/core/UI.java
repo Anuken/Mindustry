@@ -29,6 +29,7 @@ import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.ui.fragments.*;
 
+import static arc.Core.scene;
 import static arc.scene.actions.Actions.*;
 import static mindustry.Vars.*;
 
@@ -544,30 +545,38 @@ public class UI implements ApplicationListener, Loadable{
     public void showMenu(String title, String message, String[][] options, Intc callback){
         new Dialog(title){{
             cont.row();
-            cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent);
-            cont.row();
-            cont.add(message).width(400f).wrap().get().setAlignment(Align.center);
-            cont.row();
+            cont.pane(table -> {
+                Table cont, buttons;
+                table.add(cont = new Table()).expand().fill();
+                table.row();
+                table.add(buttons = new Table()).fillX();
 
-            int option = 0;
-            for(var optionsRow : options){
-                Table buttonRow = buttons.row().table().get().row();
-                int fullWidth = 400 - (optionsRow.length - 1) * 8; // adjust to count padding as well
-                int width = fullWidth / optionsRow.length;
-                int lastWidth = fullWidth - width * (optionsRow.length - 1); // take the rest of space for uneven table
+                cont.row();
+                cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent);
+                cont.row();
+                cont.add(message).width(400f).wrap().get().setAlignment(Align.center);
+                cont.row();
 
-                for(int i = 0; i < optionsRow.length; i++){
-                    if(optionsRow[i] == null) continue;
+                int option = 0;
+                for(var optionsRow : options){
+                    Table buttonRow = buttons.row().table().get().row();
+                    int fullWidth = 400 - (optionsRow.length - 1) * 8; // adjust to count padding as well
+                    int width = fullWidth / optionsRow.length;
+                    int lastWidth = fullWidth - width * (optionsRow.length - 1); // take the rest of space for uneven table
 
-                    String optionName = optionsRow[i];
-                    int finalOption = option;
-                    buttonRow.button(optionName, () -> {
-                        callback.get(finalOption);
-                        hide();
-                    }).size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
-                    option++;
+                    for(int i = 0; i < optionsRow.length; i++){
+                        if(optionsRow[i] == null) continue;
+
+                        String optionName = optionsRow[i];
+                        int finalOption = option;
+                        buttonRow.button(optionName, () -> {
+                            callback.get(finalOption);
+                            hide();
+                        }).size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
+                        option++;
+                    }
                 }
-            }
+            }).scrollY(true).grow().height(scene.getHeight()).bottom();
             closeOnBack(() -> callback.get(-1));
         }}.show();
     }
