@@ -188,9 +188,9 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             if(block != Blocks.air){
                 //TODO use d4 instead of d8 for no out-of-reach ores?
                 if(nearAir(x, y)){
-                    if(block == Blocks.carbonWall && noise(x + 78, y, 4, 0.7f, 33f, 1f) > 0.59f){
+                    if(block == Blocks.carbonWall && noise(x + 78, y, 4, 0.7f, 33f, 1f) > 0.52f){
                         block = Blocks.graphiticWall;
-                    }else if(block != Blocks.carbonWall && noise(x + 782, y, 4, 0.8f, 36f, 1f) > 0.66f){
+                    }else if(block != Blocks.carbonWall && noise(x + 782, y, 4, 0.8f, 38f, 1f) > 0.68f){
                         ore = Blocks.wallOreBeryl;
                     }
                     //TODO generate tungsten, or not?
@@ -200,12 +200,12 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 }
             }else if(!nearWall(x, y)){
 
-                if(noise(x + 150, y + x*2 + 100, 4, 0.8f, 60f, 1f) > 0.75f/* && floor == Blocks.yellowStone*/){
+                if(noise(x + 150, y + x*2 + 100, 4, 0.8f, 55f, 1f) > 0.76f/* && floor == Blocks.yellowStone*/){
                     ore = Blocks.oreTungsten;
                 }
 
                 //TODO design ore generation so it doesn't overlap
-                if(noise(x + 999, y + 600, 4, 0.63f, 50f, 1f) < 0.21f/* && floor == Blocks.yellowStone*/){
+                if(noise(x + 999, y + 600, 4, 0.63f, 50f, 1f) < 0.2f/* && floor == Blocks.yellowStone*/){
                     ore = Blocks.oreThorium;
                 }
             }
@@ -261,7 +261,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             spacing = 1;
             shieldScaling = 60;
             unitScaling = 2f;
-            healthFraction = 0.2f;
+            healthFraction = 0.1f;
         }});
     }
 }

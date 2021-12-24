@@ -2896,7 +2896,7 @@ public class Blocks{
         breach = new ItemTurret("breach"){{
             requirements(Category.turret, with(Items.beryllium, 35, Items.silicon, 20));
             ammo(
-            Items.beryllium, new BasicBulletType(7f, 32){{
+            Items.beryllium, new BasicBulletType(7f, 40){{
                 width = 8f;
                 height = 14f;
                 shootEffect = Fx.colorSpark;
@@ -2910,7 +2910,7 @@ public class Blocks{
                 trailLength = 10;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }},
-            Items.tungsten, new BasicBulletType(6.6f, 47){{
+            Items.tungsten, new BasicBulletType(6.6f, 55){{
                 width = 9f;
                 height = 14f;
                 shootEffect = Fx.tungstenSpark;
@@ -2949,7 +2949,7 @@ public class Blocks{
         fracture = new ItemTurret("fracture"){{
             requirements(Category.turret, with(Items.tungsten, 30, Items.graphite, 30, Items.silicon, 35));
             ammo(
-            Items.tungsten, new ContinuousFlameBulletType(50f){{
+            Items.tungsten, new ContinuousFlameBulletType(55f){{
                 length = 105f;
                 shootEffect = Fx.randLifeSpark;
                 width = 4.5f;
