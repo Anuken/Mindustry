@@ -74,7 +74,7 @@ public class Blocks{
     powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator,
 
     //defense
-    copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, tungstenWall, tungstenWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
+    copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, berylliumWall, berylliumWallLarge, tungstenWall, tungstenWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge,
     mender, mendProjector, overdriveProjector, overdriveDome, forceProjector, shockMine,
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
@@ -1362,16 +1362,29 @@ public class Blocks{
             schematicPriority = 10;
         }};
 
+        berylliumWall = new Wall("beryllium-wall"){{
+            requirements(Category.defense, with(Items.beryllium, 6));
+            health = 130 * wallHealthMultiplier;
+            armor = 2f;
+        }};
+
+        berylliumWallLarge = new Wall("beryllium-wall-large"){{
+            requirements(Category.defense, ItemStack.mult(berylliumWall.requirements, 4));
+            health = 130 * wallHealthMultiplier * 4;
+            armor = 2f;
+            size = 2;
+        }};
+
         tungstenWall = new Wall("tungsten-wall"){{
             requirements(Category.defense, with(Items.tungsten, 6));
             health = 180 * wallHealthMultiplier;
-            armor = 7f;
+            armor = 10f;
         }};
 
         tungstenWallLarge = new Wall("tungsten-wall-large"){{
             requirements(Category.defense, ItemStack.mult(tungstenWall.requirements, 4));
             health = 180 * wallHealthMultiplier * 4;
-            armor = 7f;
+            armor = 10f;
             size = 2;
         }};
 
