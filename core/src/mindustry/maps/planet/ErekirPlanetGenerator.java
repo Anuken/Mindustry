@@ -249,7 +249,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         Schematics.placeLaunchLoadout(spawnX, spawnY);
 
         //TODO this is only for testing
-        state.rules.defaultTeam.items().add(Seq.with(ItemStack.with(Items.beryllium, 300, Items.graphite, 300)));
+        state.rules.defaultTeam.items().add(Seq.with(ItemStack.with(Items.beryllium, 1000, Items.graphite, 1000)));
 
         //TODO proper waves
         state.rules.waves = true;

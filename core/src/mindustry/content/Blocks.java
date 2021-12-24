@@ -1125,7 +1125,7 @@ public class Blocks{
             size = 3;
             itemCapacity = 20;
             hasPower = hasItems = true;
-            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawCrucible(), new DrawBlock(), new DrawHeatInput());
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawCrucibleFlame(), new DrawBlock(), new DrawHeatInput());
             drawer.iconOverride = new String[]{"-bottom", ""};
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.07f;
@@ -1677,17 +1677,17 @@ public class Blocks{
         //erekir transport blocks
 
         duct = new Duct("duct"){{
-            requirements(Category.distribution, with(Items.graphite, 2));
+            requirements(Category.distribution, with(Items.graphite, 1));
             speed = 4f;
         }};
 
         ductRouter = new DuctRouter("duct-router"){{
-            requirements(Category.distribution, with(Items.graphite, 10));
+            requirements(Category.distribution, with(Items.graphite, 8));
             speed = 4f;
         }};
 
         overflowDuct = new OverflowDuct("overflow-duct"){{
-            requirements(Category.distribution, with(Items.graphite, 10));
+            requirements(Category.distribution, with(Items.graphite, 8));
             speed = 4f;
         }};
 

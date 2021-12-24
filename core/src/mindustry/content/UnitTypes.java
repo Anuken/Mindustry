@@ -2495,6 +2495,37 @@ public class UnitTypes{
         }};
 
         //endregion
+        //region erekir - mech
+
+        //TODO
+
+        //endregion
+        //region erekir - flying
+
+        //TODO
+
+        //endregion
+        //region erekir - neoplasm
+
+        if(false)
+            scuttler = new NeoplasmUnitType("scuttler"){{
+                health = 20000;
+                armor = 17;
+                hitSize = 48f;
+                omniMovement = false;
+                rotateSpeed = 1.7f;
+                drownTimeMultiplier = 4f;
+                drawCell = false;
+                segments = 4;
+                drawBody = false;
+                crawlDamage = 2f;
+
+                segmentScl = 4f;
+                segmentPhase = 5f;
+                speed = 1f;
+            }};
+
+        //endregion
         //region erekir - core
 
         //TODO bad name
@@ -2747,27 +2778,6 @@ public class UnitTypes{
         //payloadDrone = new UnitType("payload-drone"){{
 
         //}};
-
-        //endregion
-        //region neoplasm
-
-        if(false)
-        scuttler = new NeoplasmUnitType("scuttler"){{
-            health = 20000;
-            armor = 17;
-            hitSize = 48f;
-            omniMovement = false;
-            rotateSpeed = 1.7f;
-            drownTimeMultiplier = 4f;
-            drawCell = false;
-            segments = 4;
-            drawBody = false;
-            crawlDamage = 2f;
-
-            segmentScl = 4f;
-            segmentPhase = 5f;
-            speed = 1f;
-        }};
 
         //endregion
     }
