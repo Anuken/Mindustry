@@ -568,6 +568,38 @@ public class NetServer implements ApplicationListener{
         player.con.hasDisconnected = true;
     }
 
+    //these functions are for debugging only, and will be removed!
+
+    @Remote(targets = Loc.client, variants = Variant.one)
+    public static void requestDebugStatus(Player player){
+        int flags =
+            (player.con.hasDisconnected ? 1 : 0) |
+            (player.con.hasConnected ? 2 : 0) |
+            (player.isAdded() ? 4 : 0) |
+            (player.con.hasBegunConnecting ? 8 : 0);
+
+        Call.debugStatusClient(player.con, flags, player.con.lastReceivedClientSnapshot, player.con.snapshotsSent);
+        Call.debugStatusClientUnreliable(player.con, flags, player.con.lastReceivedClientSnapshot, player.con.snapshotsSent);
+    }
+
+    @Remote(variants = Variant.both, priority = PacketPriority.high)
+    public static void debugStatusClient(int value, int lastClientSnapshot, int snapshotsSent){
+        logClientStatus(true, value, lastClientSnapshot, snapshotsSent);
+    }
+
+    @Remote(variants = Variant.both, priority = PacketPriority.high, unreliable = true)
+    public static void debugStatusClientUnreliable(int value, int lastClientSnapshot, int snapshotsSent){
+        logClientStatus(false, value, lastClientSnapshot, snapshotsSent);
+    }
+
+    static void logClientStatus(boolean reliable, int value, int lastClientSnapshot, int snapshotsSent){
+        Log.info("@ Debug status received. disconnected = @, connected = @, added = @, begunConnecting = @ lastClientSnapshot = @, snapshotsSent = @",
+        reliable ? "[RELIABLE]" : "[UNRELIABLE]",
+        (value & 1) != 0, (value & 2) != 0, (value & 4) != 0, (value & 8) != 0,
+        lastClientSnapshot, snapshotsSent
+        );
+    }
+
     @Remote(targets = Loc.client)
     public static void serverPacketReliable(Player player, String type, String contents){
         if(netServer.customPacketHandlers.containsKey(type)){
@@ -931,6 +963,7 @@ public class NetServer implements ApplicationListener{
             Call.entitySnapshot(player.con, (short)sent, syncStream.toByteArray());
         }
 
+        player.con.snapshotsSent ++;
     }
 
     String fixName(String name){

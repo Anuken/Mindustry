@@ -13,7 +13,7 @@
   },
   {
     "name": "Omega",
-    "address": ["yeeth.mindustry.me", "yeeth.mindustry.me:2006", "yeeth.mindustry.me:2003","yeeth.mindustry.me:2002", "yeeth.mindustry.me:2001", "yeeth.mindustry.me:2007", "yeeth.mindustry.me:2005"]
+    "address": ["yeeth.mindustry.me:5002", "yeeth.mindustry.me:5003", "yeeth.mindustry.me:5004","yeeth.mindustry.me:5005", "yeeth.mindustry.me:5006", "yeeth.mindustry.me:5007", "yeeth.mindustry.me", "yeeth.mindustry.me:4006"]
   },
   {
     "name": "MeowLand",
@@ -21,11 +21,7 @@
   },
   {
     "name": "DarkDustry",
-    "address": ["darkdustry.ml", "darkdustry.ml:6000", "darkdustry.ml:7000", "darkdustry.ml:8000", "darkdustry.ml:9000"] 
-  },
-  {
-    "name": "SkaarjDustry",
-    "address": ["skaarjproject.duckdns.org"]
+    "address": ["darkdustry.ml", "darkdustry.ml:5000", "darkdustry.ml:6000", "darkdustry.ml:7000", "darkdustry.ml:8000", "darkdustry.ml:9000"] 
   },
   {
     "name": "Chaotic Neutral",
@@ -33,7 +29,7 @@
   },
   {
     "name": "XCore",
-    "address": ["35.202.253.94", "35.202.253.94:2000"]
+    "address": ["skaarjproject.duckdns.org:2000"]
   },
   {
     "name": "Obvilion Network",
@@ -74,5 +70,9 @@
   {
     "name": "LostDustry",
     "address": ["lostdustry.northeurope.cloudapp.azure.com:6568", "lostdustry.northeurope.cloudapp.azure.com:6569", "lostdustry.northeurope.cloudapp.azure.com:6570"]
-  } 
+  },
+  {
+    "name": "ALEX",
+    "address": ["dogemindustry.ddns.net:25588"]
+  }
 ]

@@ -228,7 +228,12 @@ public class JsonIO{
                 Item item = Vars.content.getByName(ContentType.item, str);
                 Liquid liquid = Vars.content.getByName(ContentType.liquid, str);
                 Block block = Vars.content.getByName(ContentType.block, str);
-                return item != null ? item : liquid == null ? block : liquid;
+                UnitType unit = Vars.content.getByName(ContentType.unit, str);
+                return
+                    item != null ? item :
+                    liquid != null ? liquid :
+                    block != null ? block :
+                    unit;
             }
         });
 

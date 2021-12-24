@@ -264,12 +264,20 @@ public class ContentLoader{
         return getByID(ContentType.item, id);
     }
 
+    public Item item(String name){
+        return getByName(ContentType.item, name);
+    }
+
     public Seq<Liquid> liquids(){
         return getBy(ContentType.liquid);
     }
 
     public Liquid liquid(int id){
         return getByID(ContentType.liquid, id);
+    }
+
+    public Liquid liquid(String name){
+        return getByName(ContentType.liquid, name);
     }
 
     public Seq<BulletType> bullets(){
@@ -284,8 +292,16 @@ public class ContentLoader{
         return getBy(ContentType.status);
     }
 
+    public StatusEffect statusEffect(String name){
+        return getByName(ContentType.status, name);
+    }
+
     public Seq<SectorPreset> sectors(){
         return getBy(ContentType.sector);
+    }
+
+    public SectorPreset sector(String name){
+        return getByName(ContentType.sector, name);
     }
 
     public Seq<UnitType> units(){
@@ -296,7 +312,15 @@ public class ContentLoader{
         return getByID(ContentType.unit, id);
     }
 
+    public UnitType unit(String name){
+        return getByName(ContentType.unit, name);
+    }
+
     public Seq<Planet> planets(){
         return getBy(ContentType.planet);
+    }
+
+    public Planet planet(String name){
+        return getByName(ContentType.planet, name);
     }
 }

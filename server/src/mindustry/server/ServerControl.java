@@ -45,6 +45,14 @@ public class ServerControl implements ApplicationListener{
     public final CommandHandler handler = new CommandHandler("");
     public final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
 
+    public Runnable serverInput = () -> {
+        Scanner scan = new Scanner(System.in);
+        while(scan.hasNext()){
+            String line = scan.nextLine();
+            Core.app.post(() -> handleCommandString(line));
+        }
+    };
+
     private Fi currentLogFile;
     private boolean inExtraRound;
     private Task lastTask;
@@ -146,10 +154,6 @@ public class ServerControl implements ApplicationListener{
         });
 
         customMapDirectory.mkdirs();
-
-        Thread thread = new Thread(this::readCommands, "Server Controls");
-        thread.setDaemon(true);
-        thread.start();
 
         if(Version.build == -1){
             warn("&lyYour server is running a custom build, which means that client checking is disabled.");
@@ -258,7 +262,13 @@ public class ServerControl implements ApplicationListener{
 
         toggleSocket(Config.socketInput.bool());
 
-        info("Server loaded. Type @ for help.", "'help'");
+        Events.on(ServerLoadEvent.class, e -> {
+            Thread thread = new Thread(serverInput, "Server Controls");
+            thread.setDaemon(true);
+            thread.start();
+
+            info("Server loaded. Type @ for help.", "'help'");
+        });
     }
 
     protected void registerCommands(){
@@ -576,7 +586,9 @@ public class ServerControl implements ApplicationListener{
                 if(arg.length == 1){
                     info("'@' is currently @.", c.name(), c.get());
                 }else{
-                    if(c.isBool()){
+                    if (arg[1].equals("default")){
+                        c.set(c.defaultValue);
+                    }else if(c.isBool()){
                         c.set(arg[1].equals("on") || arg[1].equals("true"));
                     }else if(c.isNum()){
                         try{
@@ -961,15 +973,7 @@ public class ServerControl implements ApplicationListener{
         mods.eachClass(p -> p.registerServerCommands(handler));
     }
 
-    private void readCommands(){
-        Scanner scan = new Scanner(System.in);
-        while(scan.hasNext()){
-            String line = scan.nextLine();
-            Core.app.post(() -> handleCommandString(line));
-        }
-    }
-
-    private void handleCommandString(String line){
+    public void handleCommandString(String line){
         CommandResponse response = handler.handleMessage(line);
 
         if(response.type == ResponseType.unknownCommand){

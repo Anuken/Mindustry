@@ -29,6 +29,7 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
+import mindustry.entities.bullet.*;
 import mindustry.world.meta.*;
 
 import java.lang.reflect.*;
@@ -120,7 +121,7 @@ public class Block extends UnlockableContent{
     public boolean autoResetEnabled = true;
     /** if true, the block stops updating when disabled */
     public boolean noUpdateDisabled = false;
-    /** if true, this block updates when a payload of a unit. Currently unused! */
+    /** if true, this block updates when it's a payload in a unit. Currently unused! */
     public boolean updateInUnits = true;
     /** Whether to use this block's color in the minimap. Only used for overlays. */
     public boolean useColor = true;
@@ -132,6 +133,8 @@ public class Block extends UnlockableContent{
     public int health = -1;
     /** base block explosiveness */
     public float baseExplosiveness = 0f;
+    /** bullet that this block spawns when destroyed */
+    public @Nullable BulletType destroyBullet = null;
     /** whether this block can be placed on edges of liquids. */
     public boolean floating = false;
     /** multiblock size */

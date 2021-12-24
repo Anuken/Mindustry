@@ -330,7 +330,7 @@ public class StatValues{
                     }
 
                     if(type.status != StatusEffects.none){
-                        sep(bt, (type.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName);
+                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName);
                     }
 
                     if(type.fragBullet != null){
