@@ -1700,12 +1700,12 @@ public class Blocks{
         }};
 
         overflowDuct = new OverflowDuct("overflow-duct"){{
-            requirements(Category.distribution, with(Items.graphite, 8));
+            requirements(Category.distribution, with(Items.graphite, 8, Items.beryllium, 8));
             speed = 4f;
         }};
 
         ductBridge = new DuctBridge("duct-bridge"){{
-            requirements(Category.distribution, with(Items.graphite, 15, Items.tungsten, 5));
+            requirements(Category.distribution, with(Items.graphite, 15, Items.beryllium, 10));
             speed = 4f;
         }};
 

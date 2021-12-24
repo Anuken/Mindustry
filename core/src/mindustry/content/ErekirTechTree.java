@@ -80,39 +80,41 @@ public class ErekirTechTree{
             });
 
             node(siliconArcFurnace, () -> {
-                node(electrolyzer, () -> {
-                    node(oxidationChamber, () -> {
-                        node(electricHeater, () -> {
-                            node(heatRedirector, () -> {
-
-                            });
-
-                            node(atmosphericConcentrator, () -> {
-                                node(cyanogenSynthesizer, () -> {
+                node(cliffCrusher, () -> {
+                    node(electrolyzer, () -> {
+                        node(oxidationChamber, () -> {
+                            node(electricHeater, () -> {
+                                node(heatRedirector, () -> {
 
                                 });
-                            });
 
-                            node(carbideCrucible, () -> {
-                                node(surgeCrucible, () -> {
-                                    node(phaseSynthesizer, () -> {
-                                        node(phaseHeater, () -> {
+                                node(atmosphericConcentrator, () -> {
+                                    node(cyanogenSynthesizer, () -> {
 
+                                    });
+                                });
+
+                                node(carbideCrucible, () -> {
+                                    node(surgeCrucible, () -> {
+                                        node(phaseSynthesizer, () -> {
+                                            node(phaseHeater, () -> {
+
+                                            });
                                         });
                                     });
                                 });
                             });
                         });
-                    });
 
-                    node(slagIncinerator, () -> {
+                        node(slagIncinerator, () -> {
 
-                        node(slagCentrifuge, () -> {
+                            node(slagCentrifuge, () -> {
 
-                        });
+                            });
 
-                        node(heatReactor, () -> {
+                            node(heatReactor, () -> {
 
+                            });
                         });
                     });
                 });
@@ -120,14 +122,13 @@ public class ErekirTechTree{
 
             //TODO move into turbine condenser?
             node(plasmaBore, () -> {
-                node(cliffCrusher, () -> {
-                    node(largePlasmaBore, () -> {
 
-                    });
+                node(largePlasmaBore, () -> {
 
-                    node(impactDrill, () -> {
+                });
 
-                    });
+                node(impactDrill, () -> {
+
                 });
             });
 
