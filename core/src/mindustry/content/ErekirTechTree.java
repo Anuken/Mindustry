@@ -152,6 +152,17 @@ public class ErekirTechTree{
             });
 
             node(breach, () -> {
+                node(berylliumWall, () -> {
+                    node(berylliumWallLarge, () -> {
+
+                    });
+
+                    node(tungstenWall, () -> {
+                        node(tungstenWallLarge, () -> {
+
+                        });
+                    });
+                });
 
                 node(fracture, () -> {
 
