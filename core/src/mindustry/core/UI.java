@@ -29,7 +29,6 @@ import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.ui.fragments.*;
 
-import static arc.Core.scene;
 import static arc.scene.actions.Actions.*;
 import static mindustry.Vars.*;
 
