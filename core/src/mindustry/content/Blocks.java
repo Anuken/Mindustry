@@ -2286,7 +2286,7 @@ public class Blocks{
             size = 2;
             range = 3;
 
-            consumes.liquid(Liquids.hydrogen, 0.5f / 60f).boost();
+            consumes.liquid(Liquids.hydrogen, 0.25f / 60f).boost();
         }};
 
         //TODO awful name
@@ -2300,7 +2300,7 @@ public class Blocks{
             range = 6;
             laserWidth = 0.7f;
 
-            consumes.liquid(Liquids.hydrogen, 1f / 60f).boost();
+            consumes.liquid(Liquids.hydrogen, 0.5f / 60f).boost();
         }};
 
         //TODO should be crusher or something
