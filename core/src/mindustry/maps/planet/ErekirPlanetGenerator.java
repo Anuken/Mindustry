@@ -133,6 +133,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         erase(spawnX, spawnY, 15);
         brush(pathfind(spawnX, spawnY, endX, endY, tile -> (tile.solid() ? 300f : 0f) + maxd - tile.dst(width/2f, height/2f)/10f, Astar.manhattan), 7);
+        erase(endX, endY, 12);
 
         //arkycite
         pass((x, y) -> {
@@ -176,6 +177,9 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         });
 
         inverseFloodFill(tiles.getn(spawnX, spawnY));
+
+        //make sure enemies have room
+        erase(endX, endY, 6);
 
         tiles.getn(endX, endY).setOverlay(Blocks.spawn);
 
