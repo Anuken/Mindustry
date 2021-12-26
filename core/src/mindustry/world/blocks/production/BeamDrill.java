@@ -33,7 +33,7 @@ public class BeamDrill extends Block{
     public int tier = 1;
     public float laserWidth = 0.65f;
     /** How many times faster the drill will progress when boosted by an optional consumer. */
-    public float optionalBoostIntensity = 2f; //TODO would be nice to change laser color when this is active.
+    public float optionalBoostIntensity = 2.5f; //TODO would be nice to change laser color when this is active.
 
     public Color sparkColor = Color.valueOf("fd9e81"), glowColor = Color.white;
     public float glowIntensity = 0.2f, pulseIntensity = 0.07f;

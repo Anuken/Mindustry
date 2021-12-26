@@ -2286,7 +2286,7 @@ public class Blocks{
             size = 2;
             range = 3;
 
-            consumes.liquid(Liquids.hydrogen, 1f / 60f).boost();
+            consumes.liquid(Liquids.hydrogen, 0.5f / 60f).boost();
         }};
 
         //TODO awful name
@@ -2300,7 +2300,7 @@ public class Blocks{
             range = 6;
             laserWidth = 0.7f;
 
-            consumes.liquid(Liquids.hydrogen, 2f / 60f).boost();
+            consumes.liquid(Liquids.hydrogen, 1f / 60f).boost();
         }};
 
         //TODO should be crusher or something
@@ -2929,7 +2929,6 @@ public class Blocks{
 
             //TODO no coolant?
 
-            acceptCoolant = false;
             draw = new DrawTurret("reinforced-");
             shootLength = 0f;
             outlineColor = Pal.darkOutline;
@@ -2945,18 +2944,17 @@ public class Blocks{
             limitRange();
         }};
 
-        //TODO implementation; splash damage? shotgun? AA? I have no ideas
         fracture = new ItemTurret("fracture"){{
-            requirements(Category.turret, with(Items.tungsten, 30, Items.graphite, 30, Items.silicon, 35));
+            requirements(Category.turret, with(Items.beryllium, 10, Items.graphite, 30, Items.silicon, 35));
             ammo(
-            Items.tungsten, new ContinuousFlameBulletType(55f){{
+            Items.graphite, new ContinuousFlameBulletType(65f){{
                 length = 105f;
                 shootEffect = Fx.randLifeSpark;
                 width = 4.5f;
                 colors = new Color[]{Color.valueOf("e8e6ff").a(0.55f), Color.valueOf("819aeb").a(0.7f), Color.valueOf("786bed").a(0.8f), Color.valueOf("c3cdfa"), Color.white};
                 smokeEffect = Fx.shootBigSmoke;
                 continuous = false;
-                ammoMultiplier = 2;
+                ammoMultiplier = 4;
                 pierce = true;
                 knockback = 4f;
                 status = StatusEffects.slow;
@@ -2970,10 +2968,6 @@ public class Blocks{
                 hitEffect = Fx.hitBulletColor;
             }}
             );
-
-            acceptCoolant = false;
-            consumes.liquid(Liquids.hydrogen, 1.5f / 60f);
-            shots = 1;
 
             draw = new DrawTurret("reinforced-"){{
                 parts.addAll(new RegionPart("-glow"){{
