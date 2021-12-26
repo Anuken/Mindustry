@@ -68,6 +68,26 @@ public class Objectives{
         }
     }
 
+    public static class OnPlanet implements Objective{
+        public Planet planet;
+
+        public OnPlanet(Planet planet){
+            this.planet = planet;
+        }
+
+        protected OnPlanet(){}
+
+        @Override
+        public boolean complete(){
+            return planet.sectors.contains(Sector::hasBase);
+        }
+
+        @Override
+        public String display(){
+            return Core.bundle.format("requirement.onplanet", planet.localizedName);
+        }
+    }
+
     /** Defines a specific objective for a game. */
     public interface Objective{
 

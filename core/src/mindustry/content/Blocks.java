@@ -2377,7 +2377,7 @@ public class Blocks{
 
         coreCitadel = new CoreBlock("core-citadel"){{
             //TODO cost
-            requirements(Category.effect, with(Items.beryllium, 7000, Items.graphite, 7000, Items.tungsten, 5000, Items.carbide, 5000));
+            requirements(Category.effect, with(Items.silicon, 5000, Items.beryllium, 7000, Items.tungsten, 5000, Items.carbide, 5000));
 
             unitType = UnitTypes.incite;
             health = 18000;
@@ -2391,7 +2391,7 @@ public class Blocks{
 
         coreAcropolis = new CoreBlock("core-acropolis"){{
             //TODO cost
-            requirements(Category.effect, with(Items.beryllium, 11000, Items.graphite, 11000, Items.tungsten, 9000, Items.carbide, 10000));
+            requirements(Category.effect, with(Items.beryllium, 11000, Items.silicon, 11000, Items.tungsten, 9000, Items.carbide, 10000, Items.oxide, 8000));
 
             unitType = UnitTypes.emanate;
             health = 30000;

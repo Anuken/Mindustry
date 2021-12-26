@@ -29,7 +29,7 @@ public class PayloadConveyor extends Block{
         update = true;
         outputsPayload = true;
         noUpdateDisabled = true;
-        envEnabled |= Env.space;
+        envEnabled |= Env.space | Env.underwater;
         sync = true;
     }
 

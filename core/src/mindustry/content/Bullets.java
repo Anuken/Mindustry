@@ -103,7 +103,7 @@ public class Bullets{
             width = height = 13f;
             collidesTiles = false;
             splashDamageRadius = 25f * 0.75f;
-            splashDamage = 35f;
+            splashDamage = 40f;
             status = StatusEffects.burning;
             statusDuration = 60f * 12f;
             frontColor = Pal.lightishOrange;
@@ -268,7 +268,7 @@ public class Bullets{
             shrinkY = 0f;
             homingPower = 0.08f;
             splashDamageRadius = 20f;
-            splashDamage = 20f * 1.5f;
+            splashDamage = 30f * 1.5f;
             makeFire = true;
             ammoMultiplier = 5f;
             hitEffect = Fx.blastExplosion;
@@ -334,7 +334,7 @@ public class Bullets{
 
             ammoMultiplier = 5;
 
-            splashDamage = 10f;
+            splashDamage = 12f;
             splashDamageRadius = 22f;
 
             makeFire = true;
@@ -375,8 +375,8 @@ public class Bullets{
             pierceBuilding = true;
             knockback = 0.6f;
             ammoMultiplier = 3;
-            splashDamage = 15f;
-            splashDamageRadius = 24f;
+            splashDamage = 20f;
+            splashDamageRadius = 25f;
         }};
 
         fireball = new FireBulletType(1f, 4);

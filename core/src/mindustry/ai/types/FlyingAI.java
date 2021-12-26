@@ -23,7 +23,7 @@ public class FlyingAI extends AIController{
         }
 
         if(target == null && command() == UnitCommand.attack && state.rules.waves && unit.team == state.rules.defaultTeam){
-            moveTo(getClosestSpawner(), state.rules.dropZoneRadius + 120f);
+            moveTo(getClosestSpawner(), state.rules.dropZoneRadius + 130f);
         }
 
         if(command() == UnitCommand.rally){

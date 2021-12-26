@@ -1,11 +1,16 @@
 package mindustry.content;
 
+import arc.struct.*;
+import mindustry.game.Objectives.*;
+
 import static mindustry.content.Blocks.*;
 import static mindustry.content.TechTree.*;
 
 public class ErekirTechTree{
 
     public static void load(){
+        Seq<Objective> erekirSector = Seq.with(new OnPlanet(Planets.erekir));
+
         Planets.erekir.techTree = nodeRoot("erekir", coreBastion, true, () -> {
             node(duct, () -> {
                 node(ductRouter, () -> {
@@ -34,7 +39,7 @@ public class ErekirTechTree{
                     });
                 });
 
-                node(constructor, () -> {
+                node(constructor, erekirSector, () -> {
                     node(payloadLoader, () -> {
                         node(payloadUnloader, () -> {
                             node(payloadPropulsionTower, () -> {
@@ -57,7 +62,7 @@ public class ErekirTechTree{
 
             node(turbineCondenser, () -> {
                 node(beamNode, () -> {
-                    node(ventCondenser, () -> {
+                    node(ventCondenser, erekirSector, () -> {
                         node(chemicalCombustionChamber, () -> {
                             node(pyrolysisGenerator, () -> {
 
@@ -81,7 +86,7 @@ public class ErekirTechTree{
 
             node(siliconArcFurnace, () -> {
                 node(cliffCrusher, () -> {
-                    node(electrolyzer, () -> {
+                    node(electrolyzer, erekirSector, () -> {
                         node(oxidationChamber, () -> {
                             node(electricHeater, () -> {
                                 node(heatRedirector, () -> {
@@ -123,16 +128,14 @@ public class ErekirTechTree{
             //TODO move into turbine condenser?
             node(plasmaBore, () -> {
 
-                node(largePlasmaBore, () -> {
+                node(impactDrill, erekirSector, () -> {
+                    node(largePlasmaBore, () -> {
 
-                });
-
-                node(impactDrill, () -> {
-
+                    });
                 });
             });
 
-            node(reinforcedConduit, () -> {
+            node(reinforcedConduit, erekirSector, () -> {
                 node(reinforcedPump, () -> {
                     //TODO T2 pump
                 });
@@ -174,7 +177,6 @@ public class ErekirTechTree{
                 });
             });
 
-            //TODO requirements for these
             node(coreCitadel, () -> {
                 node(coreAcropolis, () -> {
 

@@ -26,7 +26,7 @@ public class PayloadBlock extends Block{
         update = true;
         sync = true;
         group = BlockGroup.payloads;
-        envEnabled |= Env.space;
+        envEnabled |= Env.space | Env.underwater;
     }
 
     public static boolean blends(Building build, int direction){
