@@ -218,7 +218,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         //vents
         outer:
         for(Tile tile : tiles){
-            if(floor == Blocks.rhyolite && rand.chance(0.001)){
+            if(floor == Blocks.rhyolite && rand.chance(0.0011)){
                 int radius = 2;
                 for(int x = -radius; x <= radius; x++){
                     for(int y = -radius; y <= radius; y++){

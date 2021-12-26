@@ -2086,7 +2086,7 @@ public class Blocks{
         //TODO rename
         chemicalCombustionChamber = new ConsumeGenerator("chemical-combustion-chamber"){{
             requirements(Category.power, with(Items.graphite, 40, Items.tungsten, 40, Items.oxide, 40f, Items.silicon, 30));
-            powerProduction = 6f;
+            powerProduction = 8f;
             consumes.liquids(LiquidStack.with(Liquids.ozone, 1f / 60f, Liquids.arkycite, 20f / 60f));
             size = 3;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
@@ -2110,7 +2110,7 @@ public class Blocks{
         pyrolysisGenerator = new ConsumeGenerator("pyrolysis-generator"){{
             //TODO requirements
             requirements(Category.power, with(Items.graphite, 50, Items.carbide, 50, Items.oxide, 60f, Items.silicon, 50));
-            powerProduction = 12f;
+            powerProduction = 16f;
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
                 sinMag = 2.75f;
@@ -2270,7 +2270,7 @@ public class Blocks{
         cliffCrusher = new WallCrafter("cliff-crusher"){{
             requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 20));
 
-            consumes.power(0.9f);
+            consumes.power(0.8f);
 
             drillTime = 110f;
             size = 2;
@@ -2280,7 +2280,7 @@ public class Blocks{
 
         plasmaBore = new BeamDrill("plasma-bore"){{
             requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 30));
-            consumes.power(0.2f);
+            consumes.power(0.15f);
             drillTime = 150f;
             tier = 4;
             size = 2;
@@ -2293,8 +2293,8 @@ public class Blocks{
         largePlasmaBore = new BeamDrill("large-plasma-bore"){{
             //TODO requirements
             requirements(Category.production, with(Items.graphite, 30, Items.oxide, 30, Items.beryllium, 20, Items.carbide, 30));
-            consumes.power(0.6f);
-            drillTime = 110f;
+            consumes.power(0.8f);
+            drillTime = 100f;
             tier = 5;
             size = 3;
             range = 6;
