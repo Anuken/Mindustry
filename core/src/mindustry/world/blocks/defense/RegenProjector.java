@@ -85,8 +85,6 @@ public class RegenProjector extends Block{
 
         @Override
         public void updateTile(){
-            //TODO particles when heal suppressed
-
             if(lastChange != world.tileChanges){
                 lastChange = world.tileChanges;
                 updateTargets();

@@ -2502,7 +2502,6 @@ public class UnitTypes{
         //endregion
         //region erekir - flying
 
-        //TODO orb, suppress healing
         quell = new UnitType("quell"){{
             envDisabled = 0;
 
