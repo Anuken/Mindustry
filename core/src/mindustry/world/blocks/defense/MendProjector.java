@@ -68,7 +68,7 @@ public class MendProjector extends Block{
     /** @return whether a building has regen/healing suppressed; if so, spawns particles on it. */
     public static boolean checkSuppression(Building build){
         if(build.isHealSuppressed()){
-            if(Mathf.chanceDelta(0.04)){
+            if(Mathf.chanceDelta(0.03)){
                 Fx.regenSuppressParticle.at(build.x + Mathf.range(build.block.size * tilesize/2f - 1f), build.y + Mathf.range(build.block.size * tilesize/2f - 1f));
             }
 

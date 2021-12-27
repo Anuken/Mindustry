@@ -1447,7 +1447,7 @@ public class Fx{
         Fill.square(e.x, e.y, e.fslope() * 1.5f + 0.14f, 45f);
     }),
 
-    regenSuppressParticle = new Effect(30f, e -> {
+    regenSuppressParticle = new Effect(35f, e -> {
         color(Pal.sapBullet, e.color, e.fin());
         stroke(e.fout() * 1.4f + 0.5f);
 

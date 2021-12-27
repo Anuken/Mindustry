@@ -1,10 +1,12 @@
 package mindustry.world.blocks.defense;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -29,6 +31,7 @@ public class RegenProjector extends Block{
     public DrawBlock drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawSideRegion(true));
 
     public float effectChance = 0.013f;
+    public Color baseColor = Pal.accent;
     public Effect effect = Fx.regenParticle;
 
     public RegenProjector(String name){
@@ -47,7 +50,13 @@ public class RegenProjector extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
+        x *= tilesize;
+        y *= tilesize;
+
         Drawf.dashSquare(Pal.accent, x, y, range * tilesize);
+        indexer.eachBlock(Vars.player.team(), Tmp.r1.setCentered(x, y, range * tilesize), b -> true, t -> {
+            Drawf.selected(t, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f)));
+        });
     }
 
     @Override
@@ -140,9 +149,9 @@ public class RegenProjector extends Block{
         public void drawSelect(){
             super.drawSelect();
 
-            Drawf.dashSquare(Pal.accent, x, y, range * tilesize);
+            Drawf.dashSquare(baseColor, x, y, range * tilesize);
             for(var target : targets){
-                Drawf.selected(target, Pal.accent);
+                Drawf.selected(target, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f)));
             }
         }
 
