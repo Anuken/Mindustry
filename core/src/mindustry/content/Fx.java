@@ -1732,11 +1732,14 @@ public class Fx{
     }),
 
     lancerLaserChargeBegin = new Effect(60f, e -> {
+        float margin = 1f - Mathf.curve(e.fin(), 0.9f);
+        float fin = Math.min(margin, e.fin());
+
         color(Pal.lancerLaser);
-        Fill.circle(e.x, e.y, e.fin() * 3f);
+        Fill.circle(e.x, e.y, fin * 3f);
 
         color();
-        Fill.circle(e.x, e.y, e.fin() * 2f);
+        Fill.circle(e.x, e.y, fin * 2f);
     }),
 
     lightningCharge = new Effect(38f, e -> {

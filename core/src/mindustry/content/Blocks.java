@@ -3074,8 +3074,8 @@ public class Blocks{
 
             consumes.liquids(LiquidStack.with(Liquids.hydrogen, 1f / 60f));
 
-            range = 360f;
-            size = 3;
+            range = 390f;
+            size = 4;
         }};
 
         //endregion
