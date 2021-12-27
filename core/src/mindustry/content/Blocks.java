@@ -2895,7 +2895,7 @@ public class Blocks{
         breach = new ItemTurret("breach"){{
             requirements(Category.turret, with(Items.beryllium, 80, Items.silicon, 50));
             ammo(
-            Items.beryllium, new BasicBulletType(7f, 70){{
+            Items.beryllium, new BasicBulletType(7f, 80){{
                 width = 12f;
                 height = 20f;
                 shootEffect = Fx.colorSpark;
