@@ -78,7 +78,7 @@ public class Turret extends ReloadTurret{
     /** Maximum angle difference in degrees at which turret will still try to shoot. */
     public float shootCone = 8f;
     /** Length of turret shoot point. */
-    public float shootLength = -1;
+    public float shootLength = Float.NEGATIVE_INFINITY;
     /** Random spread of projectile across width. This looks stupid. */
     public float xRand = 0f;
     /** Currently used for artillery only. */
@@ -164,7 +164,7 @@ public class Turret extends ReloadTurret{
 
     @Override
     public void init(){
-        if(shootLength < 0) shootLength = size * tilesize / 2f;
+        if(shootLength == Float.NEGATIVE_INFINITY) shootLength = size * tilesize / 2f;
         if(elevation < 0) elevation = size / 2f;
 
         super.init();

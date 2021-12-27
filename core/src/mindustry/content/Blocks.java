@@ -2893,11 +2893,14 @@ public class Blocks{
 
         breach = new ItemTurret("breach"){{
             requirements(Category.turret, with(Items.beryllium, 200, Items.silicon, 150, Items.graphite, 80));
+
+            Effect sfe = new MultiEffect(Fx.shootBigColor, Fx.colorSparkBig);
+
             ammo(
-            Items.beryllium, new BasicBulletType(7f, 90){{
+            Items.beryllium, new BasicBulletType(7.5f, 90){{
                 width = 12f;
                 height = 20f;
-                shootEffect = Fx.colorSparkBig;
+                shootEffect = sfe;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 1;
                 pierce = true;
@@ -2908,10 +2911,10 @@ public class Blocks{
                 trailLength = 10;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }},
-            Items.tungsten, new BasicBulletType(7.5f, 160){{
+            Items.tungsten, new BasicBulletType(8f, 160){{
                 width = 13f;
                 height = 19f;
-                shootEffect = Fx.colorSparkBig;
+                shootEffect = sfe;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 1;
                 reloadMultiplier = 1f;
@@ -2928,9 +2931,10 @@ public class Blocks{
 
             //TODO no coolant?
 
+            shootShake = 1f;
             ammoPerShot = 6;
             draw = new DrawTurret("reinforced-");
-            shootLength = 0f;
+            shootLength = -2;
             outlineColor = Pal.darkOutline;
             size = 3;
             envEnabled |= Env.space;

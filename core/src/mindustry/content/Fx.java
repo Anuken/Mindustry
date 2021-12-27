@@ -1407,6 +1407,13 @@ public class Fx{
         Drawf.tri(e.x, e.y, w, 5f * e.fout(), e.rotation + 180f);
     }),
 
+    shootBigColor = new Effect(11, e -> {
+        color(e.color, Color.gray, e.fin());
+        float w = 1.2f +9 * e.fout();
+        Drawf.tri(e.x, e.y, w, 32f * e.fout(), e.rotation);
+        Drawf.tri(e.x, e.y, w, 3f * e.fout(), e.rotation + 180f);
+    }),
+
     shootTitan = new Effect(10, e -> {
         color(Pal.lightOrange, e.color, e.fin());
         float w = 1.3f + 10 * e.fout();
@@ -1512,9 +1519,9 @@ public class Fx{
 
     colorSparkBig = new Effect(25f, e -> {
         color(Color.white, e.color, e.fin());
-        stroke(e.fout() * 1.3f + 0.5f);
+        stroke(e.fout() * 1.3f + 0.7f);
 
-        randLenVectors(e.id, 8, 37f * e.fin(), e.rotation, 10f, (x, y) -> {
+        randLenVectors(e.id, 8, 41f * e.fin(), e.rotation, 10f, (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 6f + 0.5f);
         });
     }),
