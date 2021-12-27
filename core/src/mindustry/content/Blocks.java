@@ -2,7 +2,6 @@ package mindustry.content;
 
 import arc.graphics.*;
 import arc.math.*;
-import arc.math.Interp.*;
 import arc.struct.*;
 import mindustry.*;
 import mindustry.entities.*;
@@ -22,9 +21,9 @@ import mindustry.world.blocks.heat.*;
 import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.logic.*;
-import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.payloads.PayloadConveyor;
 import mindustry.world.blocks.payloads.PayloadRouter;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
@@ -2428,7 +2427,7 @@ public class Blocks{
             requirements(Category.effect, with(Items.tungsten, 100, Items.graphite, 50));
             size = 3;
             //TODO should it really be kept the same, at 1000?
-            itemCapacity = 1000;
+            itemCapacity = 1200;
             health = size * size * 120;
         }};
 
@@ -2893,9 +2892,9 @@ public class Blocks{
         }};
 
         breach = new ItemTurret("breach"){{
-            requirements(Category.turret, with(Items.beryllium, 80, Items.silicon, 50));
+            requirements(Category.turret, with(Items.beryllium, 200, Items.silicon, 150, Items.graphite, 80));
             ammo(
-            Items.beryllium, new BasicBulletType(7f, 80){{
+            Items.beryllium, new BasicBulletType(7f, 90){{
                 width = 12f;
                 height = 20f;
                 shootEffect = Fx.colorSpark;
@@ -2909,7 +2908,7 @@ public class Blocks{
                 trailLength = 10;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }},
-            Items.tungsten, new BasicBulletType(7.5f, 140){{
+            Items.tungsten, new BasicBulletType(7.5f, 160){{
                 width = 13f;
                 height = 19f;
                 shootEffect = Fx.colorSpark;
@@ -2929,7 +2928,7 @@ public class Blocks{
 
             //TODO no coolant?
 
-            ammoPerShot = 4;
+            ammoPerShot = 6;
             draw = new DrawTurret("reinforced-");
             shootLength = 0f;
             outlineColor = Pal.darkOutline;
@@ -2939,114 +2938,10 @@ public class Blocks{
             restitution = 0.03f;
             range = 190;
             shootCone = 3f;
-            health = 350 * size * size;
+            health = 360 * size * size;
             rotateSpeed = 1.6f;
 
             limitRange();
-        }};
-
-        //TODO 3x3, different mechanics - not a fuse clone
-        fracture = new ItemTurret("fracture"){{
-            requirements(Category.turret, with(Items.beryllium, 10, Items.graphite, 30, Items.silicon, 35));
-            ammo(
-            Items.graphite, new ContinuousFlameBulletType(65f){{
-                length = 105f;
-                shootEffect = Fx.randLifeSpark;
-                width = 4.5f;
-                colors = new Color[]{Color.valueOf("e8e6ff").a(0.55f), Color.valueOf("819aeb").a(0.7f), Color.valueOf("786bed").a(0.8f), Color.valueOf("c3cdfa"), Color.white};
-                smokeEffect = Fx.shootBigSmoke;
-                continuous = false;
-                ammoMultiplier = 4;
-                pierce = true;
-                knockback = 4f;
-                status = StatusEffects.slow;
-                hitColor = Items.tungsten.color;
-                lifetime = 19f;
-                despawnEffect = Fx.none;
-                drawFlare = false;
-                collidesAir = true;
-                Interp in = new PowIn(1.6f);
-                lengthInterp = f -> in.apply(1f - f);
-                hitEffect = Fx.hitBulletColor;
-            }}
-            );
-
-            draw = new DrawTurret("reinforced-"){{
-                parts.addAll(new RegionPart("-glow"){{
-                    drawRegion = false;
-                    heatColor = Color.valueOf("768a9a");
-                    useReload = false;
-                    useProgressHeat = true;
-                }});
-            }};
-            shootShake = 1f;
-            shootLength = 4f;
-            outlineColor = Pal.darkOutline;
-            size = 2;
-            envEnabled |= Env.space;
-            reloadTime = 25f;
-            restitution = 0.1f;
-            cooldown = 0.04f;
-            recoilAmount = 2.5f;
-            range = 90;
-            shootCone = 15f;
-            inaccuracy = 0f;
-            health = 420 * size * size;
-            rotateSpeed = 3f;
-        }};
-
-        //TODO implementation, better name
-        horde = new ItemTurret("horde"){{
-            requirements(Category.turret, with(Items.tungsten, 35, Items.silicon, 35));
-            ammo(
-            Items.scrap, new MissileBulletType(4.2f, 15){{
-                velocityInaccuracy = 0.2f;
-                shootEffect = Fx.colorSpark;
-                smokeEffect = Fx.shootBigSmoke;
-                ammoMultiplier = 1;
-                hitColor = backColor = trailColor = Color.valueOf("ea8878");
-                frontColor = Color.valueOf("feb380");
-                trailWidth = 2f;
-                trailLength = 12;
-
-                splashDamage = 15f;
-                splashDamageRadius = 30f;
-
-                weaveMag = 5;
-                weaveScale = 4;
-                velocityInaccuracy = 0.1f;
-                ammoMultiplier = 3f;
-
-                //TODO different effect?
-                hitEffect = despawnEffect = Fx.blastExplosion;
-            }}
-            );
-
-            acceptCoolant = false;
-            //TODO
-            consumes.liquid(Liquids.hydrogen, 1.5f / 60f);
-            shots = 9;
-            burstSpacing = 2f;
-
-            //TODO this works but looks bad
-            spread = 0f;
-            shootLength = 6.5f;
-            xRand = 13f;
-            recoilAmount = 0f;
-
-            draw = new DrawTurret("reinforced-");
-            outlineColor = Pal.darkOutline;
-            size = 3;
-            envEnabled |= Env.space;
-            reloadTime = 60f * 1.5f;
-            range = 190;
-            shootCone = 15f;
-            inaccuracy = 20f;
-            health = 400 * size * size;
-            rotateSpeed = 3f;
-
-            //???
-            //limitRange();
         }};
 
         //TODO bad name
