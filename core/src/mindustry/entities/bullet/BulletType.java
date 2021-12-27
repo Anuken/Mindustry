@@ -114,6 +114,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean backMove = true;
     /** Bullet range override. */
     public float maxRange = -1f;
+    /** When used in a turret with multiple ammo types, this can be set to a non-zero value to influence range. */
+    public float rangeChange = 0f;
     /** % of block health healed **/
     public float healPercent = 0f;
     /** Whether to make fire on impact */

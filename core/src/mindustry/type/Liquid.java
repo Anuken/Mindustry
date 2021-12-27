@@ -42,6 +42,8 @@ public class Liquid extends UnlockableContent{
     public float viscosity = 0.5f;
     /** how prone to exploding this liquid is, when heated. 0 = nothing, 1 = nuke */
     public float explosiveness;
+    /** if false, this liquid cannot be a coolant */
+    public boolean coolant = true;
     /** The associated status effect. */
     public StatusEffect effect = StatusEffects.none;
     /** Effect shown in puddles. */
@@ -70,6 +72,8 @@ public class Liquid extends UnlockableContent{
         super.init();
 
         if(gas){
+            //gases can't be coolants
+            coolant = false;
             //always "boils", it's a gas
             boilPoint = -1;
             //ensure no accidental global mutation

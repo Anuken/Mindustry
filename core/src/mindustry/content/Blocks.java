@@ -2892,13 +2892,12 @@ public class Blocks{
             consumes.add(new ConsumeCoolant(0.5f)).update(false);
         }};
 
-        //TODO tungsten support?
         breach = new ItemTurret("breach"){{
-            requirements(Category.turret, with(Items.beryllium, 35, Items.silicon, 20));
+            requirements(Category.turret, with(Items.beryllium, 80, Items.silicon, 50));
             ammo(
-            Items.beryllium, new BasicBulletType(7f, 40){{
-                width = 8f;
-                height = 14f;
+            Items.beryllium, new BasicBulletType(7f, 70){{
+                width = 12f;
+                height = 20f;
                 shootEffect = Fx.colorSpark;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 1;
@@ -2906,37 +2905,39 @@ public class Blocks{
                 pierceBuilding = true;
                 hitColor = backColor = trailColor = Pal.berylShot;
                 frontColor = Color.white;
-                trailWidth = 1.5f;
+                trailWidth = 2.1f;
                 trailLength = 10;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }},
-            Items.tungsten, new BasicBulletType(6.6f, 55){{
-                width = 9f;
-                height = 14f;
-                shootEffect = Fx.tungstenSpark;
+            Items.tungsten, new BasicBulletType(7.5f, 140){{
+                width = 13f;
+                height = 19f;
+                shootEffect = Fx.colorSpark;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 1;
-                reloadMultiplier = 0.7f;
+                reloadMultiplier = 1f;
                 pierce = true;
                 pierceBuilding = true;
                 hitColor = backColor = trailColor = Pal.tungstenShot;
                 frontColor = Color.white;
-                trailWidth = 1.6f;
-                trailLength = 10;
+                trailWidth = 2.2f;
+                trailLength = 11;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
+                rangeChange = 40f;
             }}
             );
 
             //TODO no coolant?
 
+            ammoPerShot = 4;
             draw = new DrawTurret("reinforced-");
             shootLength = 0f;
             outlineColor = Pal.darkOutline;
-            size = 2;
+            size = 3;
             envEnabled |= Env.space;
-            reloadTime = 35f;
+            reloadTime = 40f;
             restitution = 0.03f;
-            range = 180;
+            range = 190;
             shootCone = 3f;
             health = 350 * size * size;
             rotateSpeed = 1.6f;
@@ -2944,6 +2945,7 @@ public class Blocks{
             limitRange();
         }};
 
+        //TODO 3x3, different mechanics - not a fuse clone
         fracture = new ItemTurret("fracture"){{
             requirements(Category.turret, with(Items.beryllium, 10, Items.graphite, 30, Items.silicon, 35));
             ammo(

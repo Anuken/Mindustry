@@ -39,7 +39,8 @@ public class ItemTurret extends Turret{
     public void limitRange(float margin){
         for(var entry : ammoTypes.copy().entries()){
             var copy = entry.value.copy();
-            copy.lifetime = (range + margin) / copy.speed;
+            float realRange = copy.rangeChange + range;
+            copy.lifetime = (realRange + margin) / copy.speed;
             ammoTypes.put(entry.key, copy);
         }
     }

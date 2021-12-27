@@ -215,6 +215,14 @@ public class Turret extends ReloadTurret{
         public float[] sideHeat = new float[4];
 
         @Override
+        public float range(){
+            if(hasAmmo()){
+                return range + peekAmmo().rangeChange;
+            }
+            return range;
+        }
+
+        @Override
         public float warmup(){
             return shootWarmup;
         }
@@ -408,6 +416,8 @@ public class Turret extends ReloadTurret{
         }
 
         protected void findTarget(){
+            float range = range();
+
             if(targetAir && !targetGround){
                 target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded(), unitSort);
             }else{
@@ -553,7 +563,7 @@ public class Turret extends ReloadTurret{
         }
 
         protected void bullet(BulletType type, float angle){
-            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + bulletOffset.x, y + bulletOffset.y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f;
+            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + bulletOffset.x, y + bulletOffset.y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range() / type.range()) : 1f;
 
             type.create(this, team, x + bulletOffset.x, y + bulletOffset.y, angle, 1f + Mathf.range(velocityInaccuracy), lifeScl);
         }

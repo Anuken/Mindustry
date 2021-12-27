@@ -69,7 +69,7 @@ public class BaseTurret extends Block{
 
         @Override
         public void drawSelect(){
-            Drawf.dashCircle(x, y, range, team.color);
+            Drawf.dashCircle(x, y, range(), team.color);
         }
     }
 }
