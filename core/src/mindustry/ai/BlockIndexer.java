@@ -78,8 +78,6 @@ public class BlockIndexer{
                 var drop = tile.drop();
 
                 if(drop != null){
-                    allOres.put(drop, 0);
-
                     int qx = (tile.x / quadrantSize);
                     int qy = (tile.y / quadrantSize);
 
