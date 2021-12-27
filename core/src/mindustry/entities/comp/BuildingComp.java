@@ -76,6 +76,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     LiquidModule liquids;
     ConsumeModule cons;
 
+    public transient float healSuppressionTime = -1f;
+
     private transient float timeScale = 1f, timeScaleDuration;
     private transient float dumpAccum;
 
@@ -327,6 +329,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             timeScaleDuration = Math.max(timeScaleDuration, duration);
         }
         timeScale = Math.max(timeScale, intensity);
+    }
+
+    public void applyHealSuppression(float amount){
+        healSuppressionTime = Math.max(healSuppressionTime, Time.time + amount);
+    }
+
+    public boolean isHealSuppressed(){
+        return Time.time <= healSuppressionTime;
     }
 
     public Building nearby(int dx, int dy){

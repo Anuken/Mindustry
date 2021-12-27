@@ -85,6 +85,8 @@ public class RegenProjector extends Block{
 
         @Override
         public void updateTile(){
+            //TODO particles when heal suppressed
+
             if(lastChange != world.tileChanges){
                 lastChange = world.tileChanges;
                 updateTargets();
@@ -95,10 +97,15 @@ public class RegenProjector extends Block{
             totalTime += warmup * Time.delta;
             didRegen = false;
 
+            //no healing when suppressed
+            if(MendProjector.checkSuppression(this)){
+                return;
+            }
+
             if(consValid()){
                 //use Math.max to prevent stacking
                 for(Building build : targets){
-                    if(!build.damaged()) continue;
+                    if(!build.damaged() || build.isHealSuppressed()) continue;
 
                     didRegen = true;
 

@@ -51,7 +51,7 @@ public class UnitTypes{
 
     //air + payload
     public static @EntityDef({Unitc.class, Payloadc.class}) UnitType mega,
-    incite, emanate;
+    incite, emanate, quell;
 
     //air + payload, legacy
     public static @EntityDef(value = {Unitc.class, Payloadc.class}, legacy = true) UnitType quad;
@@ -2502,7 +2502,36 @@ public class UnitTypes{
         //endregion
         //region erekir - flying
 
-        //TODO
+        //TODO orb, suppress healing
+        quell = new UnitType("quell"){{
+            envDisabled = 0;
+
+            outlineColor = Pal.darkOutline;
+            lowAltitude = false;
+            flying = true;
+            drag = 0.06f;
+            speed = 1.1f;
+            rotateSpeed = 3.5f;
+            accel = 0.1f;
+            health = 3000f;
+            armor = 4f;
+            hitSize = 36f;
+            payloadCapacity = Mathf.sqr(3f) * tilePayload;
+
+            engineSize = 4.8f;
+            engineOffset = 61 / 4f;
+
+            abilities.add(new SuppressionFieldAbility(){{
+                orbRadius = 5.3f;
+            }});
+
+            float es = 3.9f;
+
+            setEnginesMirror(
+            new UnitEngine(62 / 4f, -60 / 4f, es, 315f),
+            new UnitEngine(72 / 4f, -29 / 4f, 3f, 315f)
+            );
+        }};
 
         //endregion
         //region erekir - neoplasm
@@ -2646,9 +2675,8 @@ public class UnitTypes{
         }};
 
         emanate = new UnitType("emanate"){{
-            //TODO not a real enemy, should not be counted or have flying AI
-            defaultController = FlyingAI::new;
-            //isCounted = false;
+            defaultController = BuilderAI::new;
+            isCounted = false;
             envDisabled = 0;
 
             outlineColor = Pal.darkOutline;

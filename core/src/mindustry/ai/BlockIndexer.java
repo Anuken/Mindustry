@@ -238,6 +238,8 @@ public class BlockIndexer{
 
     /** Does not work with null teams. */
     public boolean eachBlock(Team team, Rect rect, Boolf<Building> pred, Cons<Building> cons){
+        if(team == null) return false;
+
         breturnArray.clear();
 
         var buildings = team.data().buildings;

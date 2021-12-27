@@ -1447,6 +1447,30 @@ public class Fx{
         Fill.square(e.x, e.y, e.fslope() * 1.5f + 0.14f, 45f);
     }),
 
+    regenSuppressParticle = new Effect(30f, e -> {
+        color(Pal.sapBullet, e.color, e.fin());
+        stroke(e.fout() * 1.4f + 0.5f);
+
+        randLenVectors(e.id, 4, 17f * e.fin(), (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3f + 0.5f);
+        });
+    }),
+
+    regenSuppressSeek = new Effect(140f, e -> {
+        e.lifetime = Mathf.randomSeed(e.id, 120f, 200f);
+
+        if(!(e.data instanceof Position to)) return;
+
+        Tmp.v2.set(to).sub(e.x, e.y).nor().rotate90(1).scl(Mathf.randomSeedRange(e.id, 1f) * 50f);
+
+        Tmp.bz2.set(Tmp.v1.set(e.x, e.y), Tmp.v2.add(e.x, e.y), Tmp.v3.set(to));
+
+        Tmp.bz2.valueAt(Tmp.v4, e.fout());
+
+        color(Pal.sapBullet);
+        Fill.circle(Tmp.v4.x, Tmp.v4.y, e.fslope() * 2f + 0.1f);
+    }).followParent(false).rotWithParent(false),
+
     surgeCruciSmoke = new Effect(160f, e -> {
         color(Pal.slagOrange);
         alpha(0.6f);
