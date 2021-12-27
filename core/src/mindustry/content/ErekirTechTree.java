@@ -168,10 +168,10 @@ public class ErekirTechTree{
                     });
                 });
 
-                node(fracture, () -> {
 
-                    //TODO big tech jump here; incomplete turret
-                    node(sublimate, () -> {
+                //TODO implement
+                node(sublimate, () -> {
+                    node(titan, () -> {
 
                     });
                 });

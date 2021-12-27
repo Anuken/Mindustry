@@ -121,7 +121,7 @@ public class Blocks{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
     //turrets - erekir
-    breach, fracture, horde, sublimate, titan,
+    breach, sublimate, titan,
 
     //units
     commandCenter,
@@ -2897,7 +2897,7 @@ public class Blocks{
             Items.beryllium, new BasicBulletType(7f, 90){{
                 width = 12f;
                 height = 20f;
-                shootEffect = Fx.colorSpark;
+                shootEffect = Fx.colorSparkBig;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 1;
                 pierce = true;
@@ -2911,7 +2911,7 @@ public class Blocks{
             Items.tungsten, new BasicBulletType(7.5f, 160){{
                 width = 13f;
                 height = 19f;
-                shootEffect = Fx.colorSpark;
+                shootEffect = Fx.colorSparkBig;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 1;
                 reloadMultiplier = 1f;
@@ -2935,6 +2935,7 @@ public class Blocks{
             size = 3;
             envEnabled |= Env.space;
             reloadTime = 40f;
+            recoilAmount = 2f;
             restitution = 0.03f;
             range = 190;
             shootCone = 3f;

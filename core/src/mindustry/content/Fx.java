@@ -1510,6 +1510,15 @@ public class Fx{
         });
     }),
 
+    colorSparkBig = new Effect(25f, e -> {
+        color(Color.white, e.color, e.fin());
+        stroke(e.fout() * 1.3f + 0.5f);
+
+        randLenVectors(e.id, 8, 37f * e.fin(), e.rotation, 10f, (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 6f + 0.5f);
+        });
+    }),
+
     randLifeSpark = new Effect(24f, e -> {
         color(Color.white, e.color, e.fin());
         stroke(e.fout() * 1.5f + 0.5f);
@@ -1522,16 +1531,6 @@ public class Fx{
                 lineAngle(e.x + v.x, e.y + v.y, ang, p.fout() * 7f + 0.5f);
             });
         }
-    }),
-
-    //TODO just make it properly colored...
-    tungstenSpark = new Effect(23f, e -> {
-        color(Color.white, Pal.tungstenShot, e.fin());
-        stroke(e.fout() * 1.1f + 0.5f);
-
-        randLenVectors(e.id, 5, 28f * e.fin(), e.rotation, 10f, (x, y) -> {
-            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 5f + 0.5f);
-        });
     }),
 
     shootPayloadDriver = new Effect(30f, e -> {
