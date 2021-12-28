@@ -60,6 +60,14 @@ public class ItemStack implements Comparable<ItemStack>{
         return stacks;
     }
 
+    public static ItemStack[] copy(ItemStack[] stacks){
+        var out = new ItemStack[stacks.length];
+        for(int i = 0; i < out.length; i++){
+            out[i] = stacks[i].copy();
+        }
+        return out;
+    }
+
     @Override
     public int compareTo(ItemStack itemStack){
         return item.compareTo(itemStack.item);

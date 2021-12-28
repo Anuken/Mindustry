@@ -2891,7 +2891,7 @@ public class Blocks{
         }};
 
         breach = new ItemTurret("breach"){{
-            requirements(Category.turret, with(Items.beryllium, 200, Items.silicon, 150, Items.graphite, 80));
+            requirements(Category.turret, with(Items.beryllium, 300, Items.silicon, 150, Items.graphite, 100));
 
             Effect sfe = new MultiEffect(Fx.shootBigColor, Fx.colorSparkBig);
 
@@ -2929,7 +2929,7 @@ public class Blocks{
             );
 
             //TODO no coolant?
-            coolantUsage = 10f / 60f;
+            coolantUsage = 15f / 60f;
             coolantOverride = Liquids.water;
             coolantMultiplier = 6f;
 
@@ -2954,7 +2954,7 @@ public class Blocks{
         //TODO bad name
         sublimate = new ContinuousTurret("sublimate"){{
             //TODO requirements
-            requirements(Category.turret, with(Items.tungsten, 120, Items.silicon, 160, Items.oxide, 50));
+            requirements(Category.turret, with(Items.tungsten, 150, Items.silicon, 160, Items.oxide, 50));
 
             draw = new DrawTurret("reinforced-"){{
                 liquidDraw = Liquids.ozone;

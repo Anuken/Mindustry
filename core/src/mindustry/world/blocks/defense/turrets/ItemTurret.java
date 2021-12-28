@@ -133,6 +133,7 @@ public class ItemTurret extends Turret{
 
         @Override
         public void handleItem(Building source, Item item){
+            //TODO instead of all this "entry" crap, turrets could just accept only one type of ammo at a time - simpler for both users and the code
 
             if(item == Items.pyratite){
                 Events.fire(Trigger.flameAmmo);

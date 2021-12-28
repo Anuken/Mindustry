@@ -9,6 +9,8 @@ import mindustry.game.Objectives.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
+import java.util.*;
+
 /** Class for storing a list of TechNodes with some utility tree builder methods; context dependent. See {@link SerpuloTechTree#load} source for example usage. */
 public class TechTree{
     private static TechNode context = null;
@@ -66,6 +68,10 @@ public class TechTree{
         return nodeProduce(content, new Seq<>(), children);
     }
 
+    public static @Nullable TechNode context(){
+        return context;
+    }
+
     /** @deprecated use {@link UnlockableContent#techNode} instead. */
     @Deprecated
     public static @Nullable TechNode get(UnlockableContent content){
@@ -90,6 +96,8 @@ public class TechTree{
         public boolean requiresUnlock = false;
         /** Requirement node. */
         public @Nullable TechNode parent;
+        /** Multipliers for research costs on a per-item basis. Inherits from parent. */
+        public @Nullable ObjectFloatMap<Item> researchCostMultipliers;
         /** Content to be researched. */
         public UnlockableContent content;
         /** Item requirements for this content. */
@@ -102,11 +110,26 @@ public class TechTree{
         public final Seq<TechNode> children = new Seq<>();
 
         public TechNode(@Nullable TechNode parent, UnlockableContent content, ItemStack[] requirements){
-            if(parent != null) parent.children.add(this);
+            if(parent != null){
+                parent.children.add(this);
+                researchCostMultipliers = parent.researchCostMultipliers;
+            }else if(researchCostMultipliers == null){
+                researchCostMultipliers = new ObjectFloatMap<>();
+            }
 
             this.parent = parent;
             this.content = content;
             this.depth = parent == null ? 0 : parent.depth + 1;
+
+            if(researchCostMultipliers.size > 0){
+                requirements = ItemStack.copy(requirements);
+                for(ItemStack requirement : requirements){
+                    requirement.amount = (int)(requirement.amount * researchCostMultipliers.get(requirement.item, 1));
+                }
+
+                Log.info("@ = @", content, Arrays.toString(requirements));
+            }
+
             setupRequirements(requirements);
 
             var used = new ObjectSet<Content>();
