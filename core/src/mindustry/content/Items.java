@@ -51,6 +51,7 @@ public class Items{
             hardness = 4;
             radioactivity = 1f;
             cost = 1.1f;
+            healthScaling = 0.2f;
         }};
 
         scrap = new Item("scrap", Color.valueOf("777777")){{
@@ -65,16 +66,19 @@ public class Items{
             flammability = 0.1f;
             explosiveness = 0.2f;
             cost = 1.3f;
+            healthScaling = 0.1f;
         }};
 
         phaseFabric = new Item("phase-fabric", Color.valueOf("f4ba6e")){{
             cost = 1.3f;
             radioactivity = 0.6f;
+            healthScaling = 0.25f;
         }};
 
         surgeAlloy = new Item("surge-alloy", Color.valueOf("f3e979")){{
             cost = 1.2f;
             charge = 0.75f;
+            healthScaling = 0.25f;
         }};
 
         sporePod = new Item("spore-pod", Color.valueOf("7457ce")){{
@@ -88,25 +92,29 @@ public class Items{
 
         pyratite = new Item("pyratite", Color.valueOf("ffaa5f")){{
             flammability = 1.4f;
-            explosiveness = 0.4f;
+            explosiveness = 0.5f;
         }};
 
         beryllium = new Item("beryllium", Color.valueOf("3a8f64")){{
             hardness = 4;
             cost = 1.3f;
+            healthScaling = 0.6f;
         }};
 
         tungsten = new Item("tungsten", Color.valueOf("768a9a")){{
             hardness = 5;
             cost = 1.5f;
+            healthScaling = 0.8f;
         }};
 
         oxide = new Item("oxide", Color.valueOf("e4ffd6")){{
-            cost = 1.1f;
+            cost = 1.2f;
+            healthScaling = 0.5f;
         }};
 
         carbide = new Item("carbide", Color.valueOf("89769a")){{
-            cost = 1.3f;
+            cost = 1.6f;
+            healthScaling = 1.1f;
         }};
 
         fissileMatter = new Item("fissile-matter", Color.valueOf("5e988d")){{

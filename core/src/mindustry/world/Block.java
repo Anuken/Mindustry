@@ -134,7 +134,9 @@ public class Block extends UnlockableContent{
     public @Nullable Item itemDrop = null;
     /** Array of affinities to certain things. */
     public Attributes attributes = new Attributes();
-    /** tile entity health */
+    /** Health per square tile that this block occupies; essentially, this is multiplied by size * size. Overridden if health is > 0. If <0, the default is 40. */
+    public float scaledHealth = -1;
+    /** building health; -1 to use scaledHealth */
     public int health = -1;
     /** damage absorption, similar to unit armor */
     public float armor = 0f;
@@ -914,7 +916,25 @@ public class Block extends UnlockableContent{
     public void init(){
         //initialize default health based on size
         if(health == -1){
-            health = size * size * 40;
+            boolean round = false;
+            if(scaledHealth < 0){
+                scaledHealth = 40;
+
+                float scaling = 1f;
+                for(var stack : requirements){
+                    scaling += stack.item.healthScaling;
+                }
+
+                if(scaling > 1){
+                    Log.info("@: @ -> @", name, scaledHealth * size * size, (Mathf.round(scaledHealth * scaling, 5) * size * size));
+                }
+                scaledHealth *= scaling;
+                round = true;
+            }
+
+            health = round ?
+                Mathf.round(size * size * scaledHealth, 5) :
+                (int)(size * size * scaledHealth);
         }
 
         clipSize = Math.max(clipSize, size * tilesize);

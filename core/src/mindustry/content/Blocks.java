@@ -134,7 +134,6 @@ public class Blocks{
     basicAssemblerModule,
 
     //payloads
-    //TODO small deconstructor
     payloadConveyor, payloadRouter, payloadPropulsionTower, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
 
     //logic
@@ -1492,7 +1491,7 @@ public class Blocks{
             range = 85f;
             healPercent = 11f;
             phaseBoost = 15f;
-            health = 80 * size * size;
+            scaledHealth = 80;
             consumes.item(Items.phaseFabric).boost();
         }};
 
@@ -2406,14 +2405,14 @@ public class Blocks{
             requirements(Category.effect, with(Items.titanium, 100));
             size = 2;
             itemCapacity = 300;
-            health = size * size * 55;
+            scaledHealth = 55;
         }};
 
         vault = new StorageBlock("vault"){{
             requirements(Category.effect, with(Items.titanium, 250, Items.thorium, 125));
             size = 3;
             itemCapacity = 1000;
-            health = size * size * 55;
+            scaledHealth = 55;
         }};
 
         //TODO move tabs?
@@ -2428,14 +2427,14 @@ public class Blocks{
             size = 3;
             //TODO should it really be kept the same, at 1000?
             itemCapacity = 1200;
-            health = size * size * 120;
+            scaledHealth = 120;
         }};
 
         reinforcedVault = new StorageBlock("reinforced-vault"){{
             requirements(Category.effect, with(Items.tungsten, 250, Items.carbide, 125));
             size = 4;
             itemCapacity = 2500;
-            health = size * size * 120;
+            scaledHealth = 120;
         }};
 
         //endregion
@@ -2484,7 +2483,7 @@ public class Blocks{
             inaccuracy = 17f;
             shootCone = 35f;
 
-            health = 200 * size * size;
+            scaledHealth = 200;
             shootSound = Sounds.shootSnap;
 
             limitRange(2);
@@ -2541,7 +2540,7 @@ public class Blocks{
             liquidCapacity = 10f;
             shootEffect = Fx.shootLiquid;
             range = 110f;
-            health = 250 * size * size;
+            scaledHealth = 250;
             flags = EnumSet.of(BlockFlag.turret, BlockFlag.extinguisher);
         }};
 
@@ -2562,7 +2561,7 @@ public class Blocks{
             chargeBeginEffect = Fx.lancerLaserChargeBegin;
             heatColor = Color.red;
             size = 2;
-            health = 280 * size * size;
+            scaledHealth = 280;
             targetAir = false;
             shootSound = Sounds.laser;
 
@@ -2609,7 +2608,7 @@ public class Blocks{
             scaledForce = 6f;
             range = 240f;
             damage = 0.3f;
-            health = 160 * size * size;
+            scaledHealth = 160;
             rotateSpeed = 10;
 
             consumes.powerCond(3f, (TractorBeamBuild e) -> e.target != null);
@@ -2629,7 +2628,7 @@ public class Blocks{
             range = 240f;
             xRand = 6f;
             size = 2;
-            health = 300 * size * size;
+            scaledHealth = 300;
             shootSound = Sounds.missile;
 
             limitRange(5f);
@@ -2657,7 +2656,7 @@ public class Blocks{
             spread = 0f;
             shots = 4;
             ammoUseEffect = Fx.casing2;
-            health = 240 * size * size;
+            scaledHealth = 240;
             shootSound = Sounds.shootBig;
 
             limitRange();
@@ -2666,7 +2665,7 @@ public class Blocks{
         segment = new PointDefenseTurret("segment"){{
             requirements(Category.turret, with(Items.silicon, 130, Items.thorium, 80, Items.phaseFabric, 40, Items.titanium, 40));
 
-            health = 250 * size * size;
+            scaledHealth = 250;
             range = 180f;
             hasPower = true;
             consumes.powerCond(8f, (PointDefenseBuild b) -> b.target != null);
@@ -2695,7 +2694,7 @@ public class Blocks{
             liquidCapacity = 40f;
             shootEffect = Fx.shootLiquid;
             range = 190f;
-            health = 250 * size * size;
+            scaledHealth = 250;
             flags = EnumSet.of(BlockFlag.turret, BlockFlag.extinguisher);
         }};
 
@@ -2712,7 +2711,7 @@ public class Blocks{
             shootCone = 30;
             size = 3;
 
-            health = 220 * size * size;
+            scaledHealth = 220;
             shootSound = Sounds.shotgun;
 
             float brange = range + 10f;
@@ -2761,7 +2760,7 @@ public class Blocks{
             range = 290f;
             minRange = 50f;
 
-            health = 130 * size * size;
+            scaledHealth = 130;
             shootSound = Sounds.artillery;
         }};
 
@@ -2783,7 +2782,7 @@ public class Blocks{
             shootCone = 30f;
             shootSound = Sounds.shootSnap;
 
-            health = 145 * size * size;
+            scaledHealth = 145;
             limitRange();
         }};
 
@@ -2824,7 +2823,7 @@ public class Blocks{
 
             coolantMultiplier = 0.4f;
 
-            health = 150 * size * size;
+            scaledHealth = 150;
             coolantUsage = 1f;
 
             consumes.powerCond(10f, TurretBuild::isActive);
@@ -2852,7 +2851,7 @@ public class Blocks{
             shootCone = 24f;
             shootSound = Sounds.shootBig;
 
-            health = 160 * size * size;
+            scaledHealth = 160;
             coolantUsage = 1f;
 
             limitRange();
@@ -2887,7 +2886,7 @@ public class Blocks{
                 ammoMultiplier = 1f;
             }};
 
-            health = 200 * size * size;
+            scaledHealth = 200;
             consumes.add(new ConsumeCoolant(0.5f)).update(false);
         }};
 
@@ -2943,7 +2942,7 @@ public class Blocks{
             restitution = 0.03f;
             range = 190;
             shootCone = 3f;
-            health = 360 * size * size;
+            scaledHealth = 280;
             rotateSpeed = 1.6f;
 
             limitRange();
@@ -2952,7 +2951,7 @@ public class Blocks{
         //TODO bad name
         sublimate = new ContinuousTurret("sublimate"){{
             //TODO requirements
-            requirements(Category.turret, with(Items.tungsten, 50, Items.silicon, 60, Items.oxide, 30, Items.carbide, 40));
+            requirements(Category.turret, with(Items.tungsten, 120, Items.silicon, 160, Items.oxide, 50));
 
             draw = new DrawTurret("reinforced-"){{
                 liquidDraw = Liquids.ozone;
@@ -2988,15 +2987,17 @@ public class Blocks{
             }};
             outlineColor = Pal.darkOutline;
 
+            //TODO also consume hydrogen as a different ammo
             consumes.liquids(LiquidStack.with(Liquids.cyanogen, 3f / 60f, Liquids.ozone, 2f / 60f));
 
             range = 170f;
 
-            //TODO multi ammo
             shootType = new ContinuousFlameBulletType(){{
-                damage = 4f;
+                damage = 5f;
                 length = range;
             }};
+
+            scaledHealth = 320;
             shootLength = 7f;
             size = 3;
         }};
@@ -3006,15 +3007,15 @@ public class Blocks{
 
             ammo(
             //TODO 1 more ammo type, decide on base type
-            Items.fissileMatter, new ArtilleryBulletType(2.5f, 60, "shell"){{
+            Items.fissileMatter, new ArtilleryBulletType(2.5f, 100, "shell"){{
                 hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
                 despawnEffect = Fx.none;
                 knockback = 2f;
                 lifetime = 140f;
-                height = 17f;
-                width = 16f;
+                height = 19f;
+                width = 17f;
                 splashDamageRadius = 65f;
-                splashDamage = 150f;
+                splashDamage = 250f;
                 backColor = hitColor = trailColor = Color.valueOf("ea8878").lerp(Color.valueOf("feb380"), 0.5f);
                 frontColor = Color.white;
                 ammoMultiplier = 1f;
@@ -3022,9 +3023,9 @@ public class Blocks{
                 status = StatusEffects.blasted;
 
                 trailLength = 32;
-                trailWidth = 2.85f;
+                trailWidth = 3.35f;
                 trailSinScl = 2.5f;
-                trailSinMag = 1f;
+                trailSinMag = 0.5f;
                 trailEffect = Fx.none;
                 despawnShake = 7f;
 
@@ -3040,7 +3041,7 @@ public class Blocks{
             targetAir = false;
             shootShake = 4f;
             recoilAmount = 1f;
-            reloadTime = 60f * 2f;
+            reloadTime = 60f * 3f;
             shootLength = 7f;
             rotateSpeed = 2.5f;
 
@@ -3073,6 +3074,7 @@ public class Blocks{
 
             consumes.liquids(LiquidStack.with(Liquids.hydrogen, 2f / 60f));
 
+            scaledHealth = 300;
             range = 390f;
             size = 4;
         }};
@@ -3083,7 +3085,7 @@ public class Blocks{
         commandCenter = new CommandCenter("command-center"){{
             requirements(Category.units, ItemStack.with(Items.copper, 200, Items.lead, 250, Items.silicon, 250, Items.graphite, 100));
             size = 2;
-            health = size * size * 55;
+            scaledHealth = 55;
         }};
 
         groundFactory = new UnitFactory("ground-factory"){{
@@ -3411,7 +3413,7 @@ public class Blocks{
             hasPower = true;
             consumes.power(10f);
             buildCostMultiplier = 0.5f;
-            health = size * size * 80;
+            scaledHealth = 80;
         }};
 
         //endregion campaign

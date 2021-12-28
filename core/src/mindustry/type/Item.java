@@ -32,7 +32,9 @@ public class Item extends UnlockableContent{
      * 1 cost = 1 tick added to build time
      */
     public float cost = 1f;
-    /** if true, this item is of lowest priority to drills. */
+    /** When this item is present in the build cost, a block's <b>default</b> health is multiplied by 1 + scaling, where 'scaling' is summed together for all item requirement types. */
+    public float healthScaling = 0f;
+    /** if true, this item is of the lowest priority to drills. */
     public boolean lowPriority;
 
     /** If >0, this item is animated. */

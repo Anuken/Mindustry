@@ -23,6 +23,7 @@ public class SuppressionFieldAbility extends Ability{
     public Color color1 = Pal.sap.cpy().mul(1.6f), color2 = Pal.sap;
     public float layer = Layer.effect;
 
+    public float x = 0f, y = 0f;
     public int particles = 15;
     public float particleSize = 4f;
     public float particleLen = 7f;
@@ -78,12 +79,14 @@ public class SuppressionFieldAbility extends Ability{
         Draw.z(layer);
 
         float rad = orbRadius + Mathf.absin(orbSinScl, orbSinMag);
+        Tmp.v1.set(x, y).rotate(unit.rotation - 90f);
+        float rx = unit.x + Tmp.v1.x, ry = unit.y + Tmp.v1.y;
 
         Draw.color(color2);
-        Fill.circle(unit.x, unit.y, rad);
+        Fill.circle(rx, ry, rad);
 
         Draw.color(color1);
-        Fill.circle(unit.x, unit.y, rad * orbMidScl);
+        Fill.circle(rx, ry, rad * orbMidScl);
 
         float base = (Time.time / particleLife);
         rand.setSeed(unit.id);
@@ -93,8 +96,8 @@ public class SuppressionFieldAbility extends Ability{
             float angle = rand.random(360f) + (Time.time / rotateScl + unit.rotation) % 360f;
             float len = particleLen * particleInterp.apply(fout);
             Fill.circle(
-            unit.x + Angles.trnsx(angle, len),
-            unit.y + Angles.trnsy(angle, len),
+            rx + Angles.trnsx(angle, len),
+            ry + Angles.trnsy(angle, len),
             particleSize * Mathf.slope(fin)
             );
         }
@@ -103,7 +106,7 @@ public class SuppressionFieldAbility extends Ability{
         if(heat > 0.001f){
             Draw.color(Pal.sapBullet);
             Lines.stroke(1.2f * heat * Mathf.absin(10f, 1f));
-            Lines.circle(unit.x, unit.y, range);
+            Lines.circle(rx, ry, range);
         }
 
         Draw.reset();

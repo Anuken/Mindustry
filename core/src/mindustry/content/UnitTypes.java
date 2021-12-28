@@ -2513,7 +2513,7 @@ public class UnitTypes{
             rotateSpeed = 3.5f;
             accel = 0.1f;
             health = 3000f;
-            armor = 4f;
+            armor = 5f;
             hitSize = 36f;
             payloadCapacity = Mathf.sqr(3f) * tilePayload;
 
@@ -2522,6 +2522,7 @@ public class UnitTypes{
 
             abilities.add(new SuppressionFieldAbility(){{
                 orbRadius = 5.3f;
+                y = 1f;
             }});
 
             float es = 3.9f;
