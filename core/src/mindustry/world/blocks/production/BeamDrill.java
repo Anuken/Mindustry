@@ -25,6 +25,11 @@ public class BeamDrill extends Block{
     public @Load("drill-laser") TextureRegion laser;
     public @Load("drill-laser-end") TextureRegion laserEnd;
     public @Load("drill-laser-center") TextureRegion laserCenter;
+
+    public @Load("drill-laser-boost") TextureRegion laserBoost;
+    public @Load("drill-laser-boost-end") TextureRegion laserEndBoost;
+    public @Load("drill-laser-boost-center") TextureRegion laserCenterBoost;
+
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-glow") TextureRegion glowRegion;
 
@@ -33,7 +38,7 @@ public class BeamDrill extends Block{
     public int tier = 1;
     public float laserWidth = 0.65f;
     /** How many times faster the drill will progress when boosted by an optional consumer. */
-    public float optionalBoostIntensity = 2.5f; //TODO would be nice to change laser color when this is active.
+    public float optionalBoostIntensity = 2.5f;
 
     public Color sparkColor = Color.valueOf("fd9e81"), glowColor = Color.white;
     public float glowIntensity = 0.2f, pulseIntensity = 0.07f;
@@ -41,6 +46,7 @@ public class BeamDrill extends Block{
     public int sparks = 7;
     public float sparkRange = 10f, sparkLife = 27f, sparkRecurrence = 4f, sparkSpread = 45f, sparkSize = 3.5f;
 
+    public Color boostHeatColor = Color.sky.cpy().mul(0.87f);
     public Color heatColor = new Color(1f, 0.35f, 0.35f, 0.9f);
     public float heatPulse = 0.3f, heatPulseScl = 7f;
 
@@ -185,7 +191,7 @@ public class BeamDrill extends Block{
         public @Nullable Item lastItem;
 
         public float time;
-        public float warmup;
+        public float warmup, boostWarmup;
         public float lastDrillSpeed;
 
         @Override
@@ -245,7 +251,10 @@ public class BeamDrill extends Block{
             float multiplier = 1f;
 
             if(cons.optionalValid()){
+                boostWarmup = Mathf.lerpDelta(boostWarmup, 1f, 0.1f);
                 multiplier *= optionalBoostIntensity;
+            }else{
+                boostWarmup = Mathf.lerpDelta(boostWarmup, 0f, 0.1f);
             }
 
             lastDrillSpeed = (facingAmount * multiplier * timeScale) / drillTime;
@@ -291,26 +300,46 @@ public class BeamDrill extends Block{
                     Draw.z(Layer.power - 1);
                     Draw.mixcol(glowColor, Mathf.absin(Time.time + i*5 + id*9, glowScl, glowIntensity));
                     if(Math.abs(p.x - face.x) + Math.abs(p.y - face.y) == 0){
-                        Draw.rect(laserCenter, lx, ly, width * laserCenter.width * Draw.scl, width * laserCenter.height * Draw.scl);
+                        Draw.scl(width);
+
+                        if(boostWarmup < 0.99f){
+                            Draw.alpha(1f - boostWarmup);
+                            Draw.rect(laserCenter, lx, ly);
+                        }
+
+                        if(boostWarmup > 0.01f){
+                            Draw.alpha(boostWarmup);
+                            Draw.rect(laserCenterBoost, lx, ly);
+                        }
+
+                        Draw.scl();
                     }else{
-                        Drawf.laser(team, laser, laserEnd,
-                        (p.x - dir.x/2f) * tilesize,
-                        (p.y - dir.y/2f) * tilesize,
-                        lx, ly,
-                        width);
+                        float lsx = (p.x - dir.x/2f) * tilesize, lsy = (p.y - dir.y/2f) * tilesize;
+
+                        if(boostWarmup < 0.99f){
+                            Draw.alpha(1f - boostWarmup);
+                            Drawf.laser(team, laser, laserEnd, lsx, lsy, lx, ly, width);
+                        }
+
+                        if(boostWarmup > 0.001f){
+                            Draw.alpha(boostWarmup);
+                            Drawf.laser(team, laserBoost, laserEndBoost, lsx, lsy, lx, ly, width);
+                        }
                     }
+                    Draw.color();
                     Draw.mixcol();
 
                     Draw.z(Layer.effect);
                     Lines.stroke(warmup);
                     rand.setState(i, id);
                     Color col = face.wallDrop().color;
+                    Color spark = Tmp.c3.set(sparkColor).lerp(boostHeatColor, boostWarmup);
                     for(int j = 0; j < sparks; j++){
                         float fin = (Time.time / sparkLife + rand.random(sparkRecurrence + 1f)) % sparkRecurrence;
                         float or = rand.range(2f);
                         Tmp.v1.set(sparkRange * fin, 0).rotate(rotdeg() + rand.range(sparkSpread));
 
-                        Draw.color(sparkColor, col, fin);
+                        Draw.color(spark, col, fin);
                         float px = Tmp.v1.x, py = Tmp.v1.y;
                         if(fin <= 1f) Lines.lineAngle(lx + px + or * ddx, ly + py + or * ddy, Angles.angle(px, py), Mathf.slope(fin) * sparkSize);
                     }
@@ -321,7 +350,7 @@ public class BeamDrill extends Block{
             if(glowRegion.found()){
                 Draw.z(Layer.blockAdditive);
                 Draw.blend(Blending.additive);
-                Draw.color(heatColor, warmup * (heatColor.a * (1f - heatPulse + Mathf.absin(heatPulseScl, heatPulse))));
+                Draw.color(Tmp.c1.set(heatColor).lerp(boostHeatColor, boostWarmup), warmup * (heatColor.a * (1f - heatPulse + Mathf.absin(heatPulseScl, heatPulse))));
                 Draw.rect(glowRegion, x, y, rotdeg());
                 Draw.blend();
                 Draw.color();

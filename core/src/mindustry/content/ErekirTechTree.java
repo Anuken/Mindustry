@@ -2,6 +2,7 @@ package mindustry.content;
 
 import arc.struct.*;
 import mindustry.game.Objectives.*;
+import mindustry.type.*;
 
 import static mindustry.content.Blocks.*;
 import static mindustry.content.TechTree.*;
@@ -10,6 +11,13 @@ public class ErekirTechTree{
 
     public static void load(){
         Seq<Objective> erekirSector = Seq.with(new OnPlanet(Planets.erekir));
+
+        //TODO use these multipliers!
+        var costMultipliers = new ObjectFloatMap<Item>();
+        costMultipliers.put(Items.silicon, 4);
+        costMultipliers.put(Items.surgeAlloy, 4);
+        costMultipliers.put(Items.thorium, 6);
+        costMultipliers.put(Items.graphite, 5);
 
         Planets.erekir.techTree = nodeRoot("erekir", coreBastion, true, () -> {
             node(duct, () -> {

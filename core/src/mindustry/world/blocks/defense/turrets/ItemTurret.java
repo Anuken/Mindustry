@@ -199,7 +199,7 @@ public class ItemTurret extends Turret{
     }
 
     public class ItemEntry extends AmmoEntry{
-        protected Item item;
+        public Item item;
 
         ItemEntry(Item item, int amount){
             this.item = item;
@@ -209,6 +209,14 @@ public class ItemTurret extends Turret{
         @Override
         public BulletType type(){
             return ammoTypes.get(item);
+        }
+
+        @Override
+        public String toString(){
+            return "ItemEntry{" +
+            "item=" + item +
+            ", amount=" + amount +
+            '}';
         }
     }
 }

@@ -69,15 +69,14 @@ public class UnitTypes{
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
 
     //special tethered (has payload capability, because it's necessary sometimes)
-    public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone, payloadDrone;
+    public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone;
 
     //tank
-    //TODO tank comp
     public static @EntityDef({Unitc.class, Tankc.class}) UnitType vanquish;
 
     //endregion
 
-    //missile definition, needed for codegen
+    //missile definition, unused here but needed for codegen
     public static @EntityDef({Unitc.class, TimedKillc.class}) UnitType missile;
 
     //region neoplasm
@@ -2525,10 +2524,8 @@ public class UnitTypes{
                 y = 1f;
             }});
 
-            float es = 3.9f;
-
             setEnginesMirror(
-            new UnitEngine(62 / 4f, -60 / 4f, es, 315f),
+            new UnitEngine(62 / 4f, -60 / 4f, 3.9f, 315f),
             new UnitEngine(72 / 4f, -29 / 4f, 3f, 315f)
             );
         }};

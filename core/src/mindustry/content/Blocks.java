@@ -121,7 +121,7 @@ public class Blocks{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
     //turrets - erekir
-    breach, sublimate, titan,
+    breach, sublimate, titan, afflict,
 
     //units
     commandCenter,
@@ -2266,7 +2266,7 @@ public class Blocks{
         }};
 
         cliffCrusher = new WallCrafter("cliff-crusher"){{
-            requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 20));
+            requirements(Category.production, with(Items.graphite, 25, Items.beryllium, 20));
 
             consumes.power(0.8f);
 
@@ -2282,7 +2282,7 @@ public class Blocks{
             drillTime = 150f;
             tier = 4;
             size = 2;
-            range = 3;
+            range = 4;
 
             consumes.liquid(Liquids.hydrogen, 0.25f / 60f).boost();
         }};
@@ -2929,6 +2929,9 @@ public class Blocks{
             );
 
             //TODO no coolant?
+            coolantUsage = 10f / 60f;
+            coolantOverride = Liquids.water;
+            coolantMultiplier = 6f;
 
             shootShake = 1f;
             ammoPerShot = 6;
@@ -2997,6 +3000,7 @@ public class Blocks{
                 length = range;
             }};
 
+            acceptCoolant = false;
             scaledHealth = 320;
             shootLength = 7f;
             size = 3;
@@ -3045,7 +3049,8 @@ public class Blocks{
             shootLength = 7f;
             rotateSpeed = 2.5f;
 
-            acceptCoolant = false;
+            coolantUsage = 30f / 60f;
+            coolantOverride = Liquids.water;
 
             draw = new DrawTurret("reinforced-"){{
                 parts.addAll(

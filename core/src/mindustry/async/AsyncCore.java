@@ -77,7 +77,7 @@ public class AsyncCore{
 
     private void complete(){
         //wait for all threads to stop processing
-        for(Future future : futures){
+        for(var future : futures){
             try{
                 future.get();
             }catch(Throwable t){

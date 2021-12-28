@@ -92,7 +92,7 @@ public class Items{
 
         pyratite = new Item("pyratite", Color.valueOf("ffaa5f")){{
             flammability = 1.4f;
-            explosiveness = 0.5f;
+            explosiveness = 0.4f;
         }};
 
         beryllium = new Item("beryllium", Color.valueOf("3a8f64")){{
@@ -113,7 +113,7 @@ public class Items{
         }};
 
         carbide = new Item("carbide", Color.valueOf("89769a")){{
-            cost = 1.6f;
+            cost = 1.4f;
             healthScaling = 1.1f;
         }};
 

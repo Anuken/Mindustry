@@ -1,11 +1,13 @@
 package mindustry.world.blocks.defense.turrets;
 
 import arc.struct.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -22,6 +24,8 @@ public class BaseTurret extends Block{
     public Effect coolEffect = Fx.fuelburn;
     /** How much reload is lowered by for each unit of liquid of heat capacity. */
     public float coolantMultiplier = 5f;
+    /** Liquid that is used by coolant; null to use default. */
+    public @Nullable Liquid coolantOverride;
 
     public BaseTurret(String name){
         super(name);
@@ -39,7 +43,7 @@ public class BaseTurret extends Block{
     public void init(){
         if(acceptCoolant && !consumes.has(ConsumeType.liquid)){
             hasLiquids = true;
-            consumes.add(new ConsumeCoolant(coolantUsage)).update(false).boost();
+            consumes.add(coolantOverride != null ? new ConsumeLiquid(coolantOverride, coolantUsage) : new ConsumeCoolant(coolantUsage)).update(false).boost();
         }
 
         super.init();
