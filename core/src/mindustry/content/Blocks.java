@@ -2992,38 +2992,37 @@ public class Blocks{
 
             range = 170f;
 
-            //TODO unfinished, needs damage + proper mechanics
+            //TODO multi ammo
             shootType = new ContinuousFlameBulletType(){{
                 damage = 4f;
                 length = range;
-                //pierceMax = 3;
             }};
             shootLength = 7f;
             size = 3;
         }};
 
         titan = new ItemTurret("titan"){{
-            requirements(Category.turret, with(Items.carbide, 120, Items.surgeAlloy, 80, Items.silicon, 80, Items.beryllium, 120));
+            requirements(Category.turret, with(Items.carbide, 250, Items.surgeAlloy, 160, Items.silicon, 300, Items.beryllium, 400));
 
             ammo(
             //TODO 1 more ammo type, decide on base type
-            Items.fissileMatter, new ArtilleryBulletType(2.5f, 40, "shell"){{
+            Items.fissileMatter, new ArtilleryBulletType(2.5f, 60, "shell"){{
                 hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
                 despawnEffect = Fx.none;
-                knockback = 1.5f;
+                knockback = 2f;
                 lifetime = 140f;
-                height = 16f;
-                width = 14.2f;
-                splashDamageRadius = 60f;
-                splashDamage = 100f;
-                backColor = hitColor = trailColor = Color.valueOf("bb68c3");
+                height = 17f;
+                width = 16f;
+                splashDamageRadius = 65f;
+                splashDamage = 150f;
+                backColor = hitColor = trailColor = Color.valueOf("ea8878").lerp(Color.valueOf("feb380"), 0.5f);
                 frontColor = Color.white;
                 ammoMultiplier = 1f;
 
                 status = StatusEffects.blasted;
 
                 trailLength = 32;
-                trailWidth = 2.64f;
+                trailWidth = 2.85f;
                 trailSinScl = 2.5f;
                 trailSinMag = 1f;
                 trailEffect = Fx.none;
@@ -3050,18 +3049,18 @@ public class Blocks{
             draw = new DrawTurret("reinforced-"){{
                 parts.addAll(
                 new RegionPart("-barrel"){{
-                    moveY = -5f;
+                    moveY = -5f * 4f / 3f;
                     heatColor = Color.valueOf("f03b0e");
                     mirror = false;
                     interp = Interp.pow2In;
                 }},
                 new RegionPart("-side"){{
-                    moveX = 2f;
-                    moveY = -1f;
+                    moveX = 2f * 4f / 3f;
+                    moveY = -0.5f;
                     rotMove = -40f;
                     useReload = false;
                     under = true;
-                    heatColor = Color.valueOf("768a9a");
+                    heatColor = Color.red.cpy();
                     useProgressHeat = true;
                     interp = Interp.pow2Out;
                 }});
@@ -3072,7 +3071,7 @@ public class Blocks{
 
             outlineColor = Pal.darkOutline;
 
-            consumes.liquids(LiquidStack.with(Liquids.hydrogen, 1f / 60f));
+            consumes.liquids(LiquidStack.with(Liquids.hydrogen, 2f / 60f));
 
             range = 390f;
             size = 4;

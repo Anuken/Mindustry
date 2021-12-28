@@ -191,7 +191,7 @@ public class DrawTurret extends DrawBlock{
                 }
 
                 if(heat.found()){
-                    Drawf.additive(heat, heatColor.write(Tmp.c1).a(useProgressHeat ? build.warmup() : build.heat), rx, ry, rot, Layer.turretHeat);
+                    Drawf.additive(heat, heatColor.write(Tmp.c1).a((useProgressHeat ? build.warmup() : build.heat) * heatColor.a), rx, ry, rot, Layer.turretHeat);
                 }
 
                 Draw.xscl = 1f;
