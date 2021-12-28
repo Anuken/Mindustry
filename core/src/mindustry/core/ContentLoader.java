@@ -102,10 +102,10 @@ public class ContentLoader{
         Events.fire(new ContentInitEvent());
     }
 
-    /** Calls Content#load() on everything. Use only after all modules have been created on the client.*/
+    /** Calls Content#load() and Content#loadIcon() on everything. Use only after all modules have been created on the client.*/
     public void load(){
-        initialize(Content::loadIcon);
         initialize(Content::load);
+        initialize(Content::loadIcon);
     }
 
     /** Initializes all content with the specified function. */
