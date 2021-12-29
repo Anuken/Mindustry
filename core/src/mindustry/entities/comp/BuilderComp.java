@@ -35,7 +35,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
 
     private transient BuildPlan lastActive;
     private transient int lastSize;
-    private transient float buildAlpha = 0f;
+    transient float buildAlpha = 0f;
 
     public boolean canBuild(){
         return type.buildSpeed > 0 && buildSpeedMultiplier > 0;
@@ -257,13 +257,14 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
     }
 
     public void drawBuilding(){
+        //TODO make this more generic so it works with builder "weapons"
         boolean active = activelyBuilding();
         if(!active && lastActive == null) return;
 
         Draw.z(Layer.flyingUnit);
 
         BuildPlan plan = active ? buildPlan() : lastActive;
-        Tile tile = world.tile(plan.x, plan.y);
+        Tile tile = plan.tile();
         var core = team.core();
 
         if(tile == null || !within(plan, state.rules.infiniteResources ? Float.MAX_VALUE : type.buildRange)){
@@ -278,14 +279,32 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             Draw.z(Layer.flyingUnit);
         }
 
+        if(type.drawBuildBeam){
+            float focusLen = type.buildBeamOffset + Mathf.absin(Time.time, 3f, 0.6f);
+            float px = x + Angles.trnsx(rotation, focusLen);
+            float py = y + Angles.trnsy(rotation, focusLen);
+
+            drawBuildingBeam(px, py);
+        }
+    }
+
+    public void drawBuildingBeam(float px, float py){
+        boolean active = activelyBuilding();
+        if(!active && lastActive == null) return;
+
+        Draw.z(Layer.flyingUnit);
+
+        BuildPlan plan = active ? buildPlan() : lastActive;
+        Tile tile = world.tile(plan.x, plan.y);
+
+        if(tile == null || !within(plan, state.rules.infiniteResources ? Float.MAX_VALUE : type.buildRange)){
+            return;
+        }
+
         int size = plan.breaking ? active ? tile.block().size : lastSize : plan.block.size;
         float tx = plan.drawx(), ty = plan.drawy();
 
         Lines.stroke(1f, plan.breaking ? Pal.remove : Pal.accent);
-        float focusLen = type.buildBeamOffset + Mathf.absin(Time.time, 3f, 0.6f);
-        float px = x + Angles.trnsx(rotation, focusLen);
-        float py = y + Angles.trnsy(rotation, focusLen);
-
         Draw.z(Layer.buildBeam);
 
         Draw.alpha(buildAlpha);

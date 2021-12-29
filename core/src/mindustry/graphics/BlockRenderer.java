@@ -401,6 +401,16 @@ public class BlockRenderer{
                 }
             }
         }
+
+        //TODO remove
+        Draw.z(Layer.overlayUI);
+        Lines.stroke(1f, Color.green);
+
+        blockTree.intersect(camera.bounds(Tmp.r1), tile -> {
+            Lines.rect(tile.getHitbox(Tmp.r2));
+        });
+
+        Draw.reset();
     }
 
     static class BlockQuadtree extends QuadTree<Tile>{

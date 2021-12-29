@@ -2680,7 +2680,7 @@ public class UnitTypes{
             targetAir = false;
             mineSpeed = 8f;
             mineTier = 3;
-            buildSpeed = 1.4f;
+            buildSpeed = 2f;
             drag = 0.06f;
             speed = 2.6f;
             rotateSpeed = 3f;
@@ -2702,21 +2702,23 @@ public class UnitTypes{
             new UnitEngine(49 / 4f, -62 / 4f, es, 315f)
             );
 
-            Vec2[] positions = {new Vec2(30f, 50f), new Vec2(60f, -15f)};
+            Vec2[] positions = {/*new Vec2(30f, 50f), */new Vec2(60f, -15f)};
             int i = 0;
 
             for(var pos : positions){
                 int fi = i;
-                weapons.add(new Weapon("incite-weapon"){{
+                //TODO change to BuildWeapon properly, remove standard build beam and rotation
+                weapons.add(new BuildWeapon("incite-weapon"){{
                     rotate = true;
                     reload = fi == 0 ? 25f : 35f;
-                    rotateSpeed = 4f;
+                    rotateSpeed = 7f;
                     x = pos.x/4f;
                     y = pos.y/4f;
                     shootY = 5.75f;
                     recoil = 2f;
-                    rotationLimit = 90f;
-                    layerOffset = -0.01f;
+
+                    drawBuildBeam = false;
+                    rotateToBuilding = false;
 
                     bullet = new BasicBulletType(5f, 17){{
                         width = 7f;

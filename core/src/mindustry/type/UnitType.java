@@ -80,6 +80,8 @@ public class UnitType extends UnlockableContent{
     public float payloadCapacity = 8;
     public float aimDst = -1f;
     public float buildBeamOffset = 3.8f;
+    public boolean drawBuildBeam = true;
+    public boolean rotateToBuilding = true;
     public int commandLimit = 8;
     public float commandRadius = 150f;
     public float visualElevation = -1f;
