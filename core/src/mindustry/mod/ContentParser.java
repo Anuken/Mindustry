@@ -271,6 +271,7 @@ public class ContentParser{
                             case "item" -> block.consumes.item(find(ContentType.item, child.asString()));
                             case "items" -> block.consumes.add((Consume)parser.readValue(ConsumeItems.class, child));
                             case "liquid" -> block.consumes.add((Consume)parser.readValue(ConsumeLiquid.class, child));
+                            case "liquids" -> block.consumes.add((Consume)parser.readValue(ConsumeLiquids.class, child));
                             case "coolant" -> block.consumes.add((Consume)parser.readValue(ConsumeCoolant.class, child));
                             case "power" -> {
                                 if(child.isNumber()){
