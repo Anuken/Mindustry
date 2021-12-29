@@ -10,6 +10,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -91,6 +92,14 @@ public class Effect{
         layer = l;
         this.layerDuration = duration;
         return this;
+    }
+
+    public WrapEffect wrap(Color color){
+        return new WrapEffect(this, color);
+    }
+
+    public WrapEffect wrap(Color color, float rotation){
+        return new WrapEffect(this, color, rotation);
     }
 
     public void at(Position pos){

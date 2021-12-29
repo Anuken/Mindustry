@@ -95,6 +95,10 @@ public class Drawf{
         }
     }
 
+    public static void additive(TextureRegion region, Color color, float x, float y){
+        additive(region, color, x, y, 0f, Layer.blockAdditive);
+    }
+
     public static void additive(TextureRegion region, Color color, float x, float y, float rotation){
         additive(region, color, x, y, rotation, Layer.blockAdditive);
     }

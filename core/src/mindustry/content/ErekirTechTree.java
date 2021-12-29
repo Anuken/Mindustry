@@ -139,7 +139,9 @@ public class ErekirTechTree{
 
                 node(impactDrill, erekirSector, () -> {
                     node(largePlasmaBore, () -> {
+                        node(eruptionDrill, () -> {
 
+                        });
                     });
                 });
             });

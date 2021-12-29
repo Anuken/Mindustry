@@ -110,7 +110,7 @@ public class Blocks{
 
     //production
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
-    cliffCrusher, plasmaBore, largePlasmaBore, impactDrill,
+    cliffCrusher, plasmaBore, largePlasmaBore, impactDrill, eruptionDrill,
 
     //storage
     coreShard, coreFoundation, /*TODO core foundation is a bad name, rename to fragment */ coreNucleus, vault, container, unloader,
@@ -998,7 +998,7 @@ public class Blocks{
 
         //TODO better name
         electrolyzer = new GenericCrafter("electrolyzer"){{
-            requirements(Category.crafting, with(Items.silicon, 50, Items.graphite, 40, Items.beryllium, 40));
+            requirements(Category.crafting, with(Items.silicon, 50, Items.graphite, 40, Items.beryllium, 50));
             size = 3;
 
             craftTime = 10f;
@@ -1007,7 +1007,7 @@ public class Blocks{
             liquidCapacity = 50f;
 
             consumes.liquid(Liquids.water, 10f / 60f);
-            consumes.power(2f);
+            consumes.power(1f);
 
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
@@ -1036,7 +1036,7 @@ public class Blocks{
         }};
 
         atmosphericConcentrator = new HeatCrafter("atmospheric-concentrator"){{
-            requirements(Category.crafting, with(Items.oxide, 50, Items.beryllium, 30, Items.silicon, 40));
+            requirements(Category.crafting, with(Items.oxide, 50, Items.beryllium, 60, Items.silicon, 40));
             size = 3;
             craftTime = 10f;
             hasLiquids = true;
@@ -1060,14 +1060,14 @@ public class Blocks{
         }};
 
         oxidationChamber = new HeatProducer("oxidation-chamber"){{
-            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 40, Items.silicon, 50));
+            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 40, Items.silicon, 50, Items.beryllium, 50));
             size = 3;
 
             outputItem = new ItemStack(Items.oxide, 1);
 
             consumes.liquid(Liquids.ozone, 2f / 60f);
             consumes.item(Items.beryllium);
-            consumes.power(1f);
+            consumes.power(0.5f);
 
             rotateDraw = false;
 
@@ -1091,7 +1091,7 @@ public class Blocks{
         }};
 
         phaseHeater = new HeatProducer("phase-heater"){{
-            requirements(Category.crafting, with(Items.oxide, 30, Items.carbide, 30));
+            requirements(Category.crafting, with(Items.oxide, 30, Items.carbide, 30, Items.beryllium, 30));
 
             drawer = new DrawMulti(new DrawHeatOutput(true));
             drawer.iconOverride = new String[]{""};
@@ -1207,7 +1207,7 @@ public class Blocks{
 
         cyanogenSynthesizer = new HeatCrafter("cyanogen-synthesizer"){{
             //TODO requirements
-            requirements(Category.crafting, with(Items.carbide, 50, Items.silicon, 80, Items.beryllium, 80));
+            requirements(Category.crafting, with(Items.carbide, 50, Items.silicon, 80, Items.beryllium, 90));
 
             heatRequirement = 5f;
 
@@ -1238,7 +1238,7 @@ public class Blocks{
 
         //TODO bad name, and there's no use for phase yet...
         phaseSynthesizer = new HeatCrafter("phase-synthesizer"){{
-            requirements(Category.crafting, with(Items.surgeAlloy, 60, Items.carbide, 40, Items.silicon, 80, Items.thorium, 80));
+            requirements(Category.crafting, with(Items.surgeAlloy, 70, Items.carbide, 90, Items.silicon, 100, Items.thorium, 100, Items.beryllium, 200));
 
             size = 3;
 
@@ -1272,7 +1272,6 @@ public class Blocks{
         }};
 
         heatReactor = new HeatProducer("heat-reactor"){{
-            //TODO gas/liquid requirement?
             requirements(Category.crafting, with(Items.oxide, 70, Items.graphite, 20, Items.carbide, 10, Items.thorium, 80));
             size = 3;
             craftTime = 60f * 10f;
@@ -1549,7 +1548,7 @@ public class Blocks{
         //TODO green looks bad switch to orange
         //TODO orange also looks bad hhhh
         regenProjector = new RegenProjector("regen-projector"){{
-            requirements(Category.effect, with(Items.silicon, 60, Items.tungsten, 60, Items.oxide, 30));
+            requirements(Category.effect, with(Items.silicon, 60, Items.tungsten, 60, Items.oxide, 30, Items.beryllium, 80));
             size = 3;
             consumes.power(1f);
             range = 28;
@@ -2303,12 +2302,12 @@ public class Blocks{
 
         //TODO should be crusher or something
         impactDrill = new BurstDrill("impact-drill"){{
-            requirements(Category.production, with(Items.silicon, 60, Items.beryllium, 90, Items.graphite, 50));
+            requirements(Category.production, with(Items.silicon, 60, Items.beryllium, 90, Items.graphite, 60));
             drillTime = 60f * 12f;
             size = 4;
             hasPower = true;
             tier = 6;
-            drillEffect = new MultiEffect(Fx.mineImpact, Fx.drillSteam);
+            drillEffect = new MultiEffect(Fx.mineImpact, Fx.drillSteam, Fx.mineImpactWave.wrap(Pal.redLight, 40f));
             shake = 4f;
             itemCapacity = 40;
 
@@ -2316,7 +2315,31 @@ public class Blocks{
             consumes.liquid(Liquids.water, 0.2f);
         }};
 
-        //TODO higher tier impact drill, 5x5
+        //TODO bad name
+        eruptionDrill = new BurstDrill("eruption-drill"){{
+            requirements(Category.production, with(Items.silicon, 200, Items.beryllium, 250, Items.oxide, 80, Items.carbide, 80));
+            drillTime = 60f * 9f;
+            size = 5;
+            hasPower = true;
+            tier = 7;
+            //TODO better effect
+            drillEffect = new MultiEffect(
+                Fx.mineImpact,
+                Fx.drillSteam,
+                Fx.dynamicSpikes.wrap(Liquids.hydrogen.color, 30f),
+                Fx.mineImpactWave.wrap(Liquids.hydrogen.color, 45f)
+            );
+            shake = 4f;
+            itemCapacity = 50;
+            arrowOffset = 2f;
+            arrowSpacing = 5f;
+            arrows = 2;
+            glowColor.a = 0.6f;
+
+            //TODO different requirements
+            consumes.power(6f);
+            consumes.liquids(LiquidStack.with(Liquids.water, 0.5f, Liquids.hydrogen, 4f / 60f));
+        }};
 
         //endregion
         //region storage
@@ -2375,7 +2398,7 @@ public class Blocks{
 
         coreCitadel = new CoreBlock("core-citadel"){{
             //TODO cost
-            requirements(Category.effect, with(Items.silicon, 5000, Items.beryllium, 7000, Items.tungsten, 5000, Items.carbide, 5000));
+            requirements(Category.effect, with(Items.silicon, 5000, Items.beryllium, 8000, Items.tungsten, 5000, Items.carbide, 5000));
 
             unitType = UnitTypes.incite;
             health = 18000;
@@ -2389,7 +2412,7 @@ public class Blocks{
 
         coreAcropolis = new CoreBlock("core-acropolis"){{
             //TODO cost
-            requirements(Category.effect, with(Items.beryllium, 11000, Items.silicon, 11000, Items.tungsten, 9000, Items.carbide, 10000, Items.oxide, 8000));
+            requirements(Category.effect, with(Items.beryllium, 12000, Items.silicon, 11000, Items.tungsten, 9000, Items.carbide, 10000, Items.oxide, 8000));
 
             unitType = UnitTypes.emanate;
             health = 30000;
@@ -2423,7 +2446,7 @@ public class Blocks{
         }};
 
         reinforcedContainer = new StorageBlock("reinforced-container"){{
-            requirements(Category.effect, with(Items.tungsten, 100, Items.graphite, 50));
+            requirements(Category.effect, with(Items.tungsten, 100, Items.graphite, 50, Items.beryllium, 50));
             size = 3;
             //TODO should it really be kept the same, at 1000?
             itemCapacity = 1200;
@@ -2431,7 +2454,7 @@ public class Blocks{
         }};
 
         reinforcedVault = new StorageBlock("reinforced-vault"){{
-            requirements(Category.effect, with(Items.tungsten, 250, Items.carbide, 125));
+            requirements(Category.effect, with(Items.tungsten, 250, Items.carbide, 125, Items.beryllium, 100));
             size = 4;
             itemCapacity = 2500;
             scaledHealth = 120;
@@ -2954,7 +2977,7 @@ public class Blocks{
         //TODO bad name
         sublimate = new ContinuousTurret("sublimate"){{
             //TODO requirements
-            requirements(Category.turret, with(Items.tungsten, 150, Items.silicon, 160, Items.oxide, 50));
+            requirements(Category.turret, with(Items.tungsten, 150, Items.silicon, 160, Items.oxide, 50, Items.beryllium, 200));
 
             draw = new DrawTurret("reinforced-"){{
                 liquidDraw = Liquids.ozone;

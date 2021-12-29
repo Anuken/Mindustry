@@ -409,6 +409,24 @@ public class Fx{
         }
     }).layer(Layer.bullet - 4f),
 
+    dynamicSpikes = new Effect(40f, 100f, e -> {
+        color(e.color);
+        stroke(e.fout() * 2f);
+        float circleRad = 4f + e.finpow() * e.rotation;
+        Lines.circle(e.x, e.y, circleRad);
+
+        for(int i = 0; i < 4; i++){
+            Drawf.tri(e.x, e.y, 6f, e.rotation * 1.5f * e.fout(), i*90);
+        }
+
+        color();
+        for(int i = 0; i < 4; i++){
+            Drawf.tri(e.x, e.y, 3f, e.rotation * 1.45f / 3f * e.fout(), i*90);
+        }
+
+        Drawf.light(e.x, e.y, circleRad * 1.6f, Pal.heal, e.fout());
+    }),
+
     greenBomb = new Effect(40f, 100f, e -> {
         color(Pal.heal);
         stroke(e.fout() * 2f);
@@ -2073,22 +2091,21 @@ public class Fx{
         randLenVectors(e.id, 12, 5f + e.finpow() * 22f, (x, y) -> {
             Fill.square(e.x + x, e.y + y, e.fout() * 2.5f + 0.5f, 45);
         });
+    }),
 
-        color(Pal.redLight);
+    mineImpactWave = new Effect(50f, e -> {
+        color(e.color);
 
-        e.scaled(50f, b -> {
-            stroke(b.fout() * 1.5f);
+        stroke(e.fout() * 1.5f);
 
-            randLenVectors(e.id, 12, 4f + b.finpow() * 40f, (x, y) -> {
-                lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), b.fout() * 5 + 1f);
-            });
+        randLenVectors(e.id, 12, 4f + e.finpow() * e.rotation, (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 5 + 1f);
         });
 
         e.scaled(30f, b -> {
             Lines.stroke(5f * b.fout());
             Lines.circle(e.x, e.y, b.finpow() * 28f);
         });
-
     }),
 
     payloadReceive = new Effect(30, e -> {

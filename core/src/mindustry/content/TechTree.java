@@ -9,8 +9,6 @@ import mindustry.game.Objectives.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
-import java.util.*;
-
 /** Class for storing a list of TechNodes with some utility tree builder methods; context dependent. See {@link SerpuloTechTree#load} source for example usage. */
 public class TechTree{
     private static TechNode context = null;
@@ -126,8 +124,6 @@ public class TechTree{
                 for(ItemStack requirement : requirements){
                     requirement.amount = (int)(requirement.amount * researchCostMultipliers.get(requirement.item, 1));
                 }
-
-                Log.info("@ = @", content, Arrays.toString(requirements));
             }
 
             setupRequirements(requirements);

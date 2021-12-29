@@ -14,12 +14,15 @@ public class BurstDrill extends Drill{
     public Interp speedCurve = Interp.pow2In;
 
     public @Load("@-top-invert") TextureRegion topInvertRegion;
+    public @Load("@-glow") TextureRegion glowRegion;
     public @Load("@-arrow") TextureRegion arrowRegion;
     public @Load("@-arrow-blur") TextureRegion arrowBlurRegion;
 
     public float invertedTime = 200f;
-    public float arrowSpacing = 4f;
+    public float arrowSpacing = 4f, arrowOffset = 0f;
+    public int arrows = 3;
     public Color arrowColor = Color.valueOf("feb380"), baseArrowColor = Color.valueOf("6e7080");
+    public Color glowColor = arrowColor.cpy();
 
     public BurstDrill(String name){
         super(name);
@@ -93,7 +96,7 @@ public class BurstDrill extends Drill{
             drawDefaultCracks();
 
             Draw.rect(topRegion, x, y);
-            if(invertTime > 0){
+            if(invertTime > 0 && topInvertRegion.found()){
                 Draw.alpha(Interp.pow3Out.apply(invertTime));
                 Draw.rect(topInvertRegion, x, y);
                 Draw.color();
@@ -106,13 +109,12 @@ public class BurstDrill extends Drill{
             }
 
             float fract = smoothProgress;
-            int arrows = 3;
             Draw.color(arrowColor);
             for(int i = 0; i < 4; i++){
                 for(int j = 0; j < arrows; j++){
                     float arrowFract = (arrows - 1 - j);
                     float a = Mathf.clamp(fract * arrows - arrowFract);
-                    Tmp.v1.trns(i * 90 + 45, j * arrowSpacing);
+                    Tmp.v1.trns(i * 90 + 45, j * arrowSpacing + arrowOffset);
 
                     //TODO maybe just use arrow alpha and draw gray on the base?
                     Draw.z(Layer.block);
@@ -121,14 +123,20 @@ public class BurstDrill extends Drill{
 
                     Draw.color(arrowColor);
 
-                    Draw.z(Layer.blockAdditive);
-                    Draw.blend(Blending.additive);
-                    Draw.alpha(Mathf.pow(a, 10f));
-                    Draw.rect(arrowBlurRegion, x + Tmp.v1.x, y + Tmp.v1.y, i * 90);
-                    Draw.blend();
+                    if(arrowBlurRegion.found()){
+                        Draw.z(Layer.blockAdditive);
+                        Draw.blend(Blending.additive);
+                        Draw.alpha(Mathf.pow(a, 10f));
+                        Draw.rect(arrowBlurRegion, x + Tmp.v1.x, y + Tmp.v1.y, i * 90);
+                        Draw.blend();
+                    }
                 }
             }
             Draw.color();
+
+            if(glowRegion.found()){
+                Drawf.additive(glowRegion, Tmp.c2.set(glowColor).a(Mathf.pow(fract, 3f) * glowColor.a), x, y);
+            }
         }
     }
 }
