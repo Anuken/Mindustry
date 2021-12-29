@@ -2563,7 +2563,6 @@ public class UnitTypes{
             outlineColor = Pal.darkOutline;
             lowAltitude = false;
             flying = true;
-            targetAir = false;
             mineSpeed = 6.5f;
             mineTier = 1;
             buildSpeed = 0.8f;
@@ -2584,32 +2583,31 @@ public class UnitTypes{
             );
 
             weapons.add(new Weapon(){{
-                reload = 55f;
+                reload = 17f;
                 x = 0f;
                 y = 1f;
                 top = false;
                 mirror = false;
 
-                bullet = new ArtilleryBulletType(3f, 11){{
-                    trailLength = 8;
-                    trailWidth = 2.4f;
-                    collidesTiles = true;
-                    collides = true;
-                    trailEffect = Fx.none;
-                    trailColor = Pal.bulletYellowBack;
-                    homingPower = 0.01f;
-                    splashDamage = 10;
-                    splashDamageRadius = 20f;
-                    weaveMag = 2f;
-                    weaveScale = 4f;
-                    width = 10f;
-                    height = 13f;
+                bullet = new LaserBoltBulletType(){{
+                    speed = 4.2f;
+                    frontColor = Color.white;
+                    backColor = hitColor = trailColor = Pal.accent;
 
-                    lifetime = 50f;
-                    hitEffect = Fx.blastExplosion;
-                    shootEffect = Fx.shootBig;
-                    smokeEffect = Fx.shootBigSmoke;
-                    buildingDamageMultiplier = 0.4f;
+                    height = 6f;
+                    trailLength = 5;
+                    trailWidth = 2f;
+
+                    healColor = Pal.accent;
+                    healPercent = 1f;
+                    healAmount = 25f;
+                    collidesTeam = true;
+
+                    lifetime = 35f;
+                    shootEffect = Fx.colorSpark;
+                    hitEffect = smokeEffect = despawnEffect = Fx.hitLaserColor;
+
+                    damage = 10;
                 }};
             }});
         }};

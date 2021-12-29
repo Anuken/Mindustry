@@ -752,6 +752,14 @@ public class Fx{
         Drawf.light(e.x, e.y, 23f, Pal.heal, e.fout() * 0.7f);
     }),
 
+    hitLaserColor = new Effect(8, e -> {
+        color(Color.white, e.color, e.fin());
+        stroke(0.5f + e.fout());
+        Lines.circle(e.x, e.y, e.fin() * 5f);
+
+        Drawf.light(e.x, e.y, 23f, e.color, e.fout() * 0.7f);
+    }),
+
     hitYellowLaser = new Effect(8, e -> {
         color(Color.white, Pal.lightTrail, e.fin());
         stroke(0.5f + e.fout());

@@ -454,7 +454,7 @@ public class UnitType extends UnlockableContent{
             }).layer(Layer.debris);
         }
 
-        canHeal = weapons.contains(w -> w.bullet.healPercent > 0f);
+        canHeal = weapons.contains(w -> w.bullet.heals());
 
         //add mirrored weapon variants
         Seq<Weapon> mapped = new Seq<>();

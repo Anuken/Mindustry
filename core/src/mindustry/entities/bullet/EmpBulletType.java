@@ -28,7 +28,7 @@ public class EmpBulletType extends BasicBulletType{
                     }
 
                     if(other.block.hasPower && other.damaged()){
-                        other.heal(healPercent / 100f * other.maxHealth());
+                        other.heal(healPercent / 100f * other.maxHealth() + healAmount);
                         Fx.healBlockFull.at(other.x, other.y, other.block.size, hitColor);
                         applyEffect.at(other, other.block.size * 7f);
                     }

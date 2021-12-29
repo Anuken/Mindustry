@@ -131,6 +131,7 @@ public class Blocks{
 
     //unit - erekir
     tankAssembler,
+    shipAssembler,
     basicAssemblerModule,
 
     //payloads
@@ -3264,15 +3265,25 @@ public class Blocks{
         tankAssembler = new UnitAssembler("tank-assembler"){{
             requirements(Category.units, with(Items.graphite, 10));
             size = 5;
-            droneType = UnitTypes.manifold;
-            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 5f, BlockStack.list(Blocks.thoriumWallLarge, 4, Blocks.duct, 2)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 10f, BlockStack.list(Blocks.thoriumWallLarge, 4, Blocks.duct, 2)));
+            consumes.power(2f);
+            areaSize = 13;
+
+            //TODO unit production is rarely continuous, can be double
+            consumes.liquid(Liquids.gallium, 1f / 60f);
+        }};
+
+        //TODO requirements
+        shipAssembler = new UnitAssembler("ship-assembler"){{
+            requirements(Category.units, with(Items.graphite, 10));
+            size = 5;
+            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 4f, BlockStack.list(Blocks.thoriumWallLarge, 4, Blocks.duct, 2)));
             consumes.power(2f);
             areaSize = 13;
 
             //TODO unit production is rarely continuous, can be double
             consumes.liquid(Liquids.gallium, 1f / 60f);
 
-            droneType = UnitTypes.assemblyDrone;
         }};
 
         basicAssemblerModule = new UnitAssemblerModule("basic-assembler-module"){{

@@ -329,6 +329,10 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.healpercent", Strings.autoFixed(type.healPercent, 2)));
                     }
 
+                    if(type.healAmount > 0f){
+                        sep(bt, Core.bundle.format("bullet.healamount", Strings.autoFixed(type.healAmount, 2)));
+                    }
+
                     if(type.pierce || type.pierceCap != -1){
                         sep(bt, type.pierceCap == -1 ? "@bullet.infinitepierce" : Core.bundle.format("bullet.pierce", type.pierceCap));
                     }

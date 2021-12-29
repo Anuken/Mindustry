@@ -118,6 +118,8 @@ public class BulletType extends Content implements Cloneable{
     public float rangeChange = 0f;
     /** % of block health healed **/
     public float healPercent = 0f;
+    /** flat amount of block health healed */
+    public float healAmount = 0f;
     /** Whether to make fire on impact */
     public boolean makeFire = false;
     /** Whether to create hit effects on despawn. Forced to true if this bullet has any special effects like splash damage. */
@@ -131,6 +133,7 @@ public class BulletType extends Content implements Cloneable{
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
     public @Nullable BulletType fragBullet = null;
     public Color hitColor = Color.white;
+    public Color healColor = Pal.heal;
 
     public Color trailColor = Pal.missileYellowBack;
     public float trailChance = -0.0001f;
@@ -218,8 +221,12 @@ public class BulletType extends Content implements Cloneable{
         return -1f;
     }
 
+    public boolean heals(){
+        return healPercent > 0 || healAmount > 0;
+    }
+
     public boolean testCollision(Bullet bullet, Building tile){
-        return healPercent <= 0.001f || tile.team != bullet.team || tile.healthf() < 1f;
+        return !heals() || tile.team != bullet.team || tile.healthf() < 1f;
     }
 
     /** If direct is false, this is an indirect hit and the tile was already damaged.
@@ -229,9 +236,9 @@ public class BulletType extends Content implements Cloneable{
             Fires.create(build.tile);
         }
 
-        if(healPercent > 0f && build.team == b.team && !(build.block instanceof ConstructBlock)){
-            Fx.healBlockFull.at(build.x, build.y, build.block.size, Pal.heal);
-            build.heal(healPercent / 100f * build.maxHealth);
+        if(heals()&& build.team == b.team && !(build.block instanceof ConstructBlock)){
+            Fx.healBlockFull.at(build.x, build.y, build.block.size, healColor);
+            build.heal(healPercent / 100f * build.maxHealth + healAmount);
         }else if(build.team != b.team && direct){
             hit(b);
         }
@@ -291,10 +298,10 @@ public class BulletType extends Content implements Cloneable{
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
             }
 
-            if(healPercent > 0f){
+            if(heals()){
                 indexer.eachBlock(b.team, x, y, splashDamageRadius, Building::damaged, other -> {
-                    Fx.healBlockFull.at(other.x, other.y, other.block.size, Pal.heal);
-                    other.heal(healPercent / 100f * other.maxHealth());
+                    Fx.healBlockFull.at(other.x, other.y, other.block.size, healColor);
+                    other.heal(healPercent / 100f * other.maxHealth() + healAmount);
                 });
             }
 
@@ -362,7 +369,7 @@ public class BulletType extends Content implements Cloneable{
         if(homingPower > 0.0001f && b.time >= homingDelay){
             Teamc target;
             //home in on allies if possible
-            if(healPercent > 0){
+            if(heals()){
                 target = Units.closestTarget(null, b.x, b.y, homingRange,
                     e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team && !b.hasCollided(e.id),
                     t -> collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id)
