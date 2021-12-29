@@ -30,7 +30,7 @@ public class RegenProjector extends Block{
 
     public DrawBlock drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawSideRegion(true));
 
-    public float effectChance = 0.013f;
+    public float effectChance = 0.003f;
     public Color baseColor = Pal.accent;
     public Effect effect = Fx.regenParticle;
 
@@ -53,7 +53,7 @@ public class RegenProjector extends Block{
         x *= tilesize;
         y *= tilesize;
 
-        Drawf.dashSquare(Pal.accent, x, y, range * tilesize);
+        Drawf.dashSquare(baseColor, x, y, range * tilesize);
         indexer.eachBlock(Vars.player.team(), Tmp.r1.setCentered(x, y, range * tilesize), b -> true, t -> {
             Drawf.selected(t, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f)));
         });
@@ -111,7 +111,7 @@ public class RegenProjector extends Block{
 
             if(consValid()){
                 //use Math.max to prevent stacking
-                for(Building build : targets){
+                for(var build : targets){
                     if(!build.damaged() || build.isHealSuppressed()) continue;
 
                     didRegen = true;
@@ -121,7 +121,7 @@ public class RegenProjector extends Block{
                     float value = mendMap.get(pos);
                     mendMap.put(pos, Math.min(Math.max(value, healPercent * edelta() * build.block.health / 100f), build.block.health - build.health));
 
-                    if(Mathf.chanceDelta(effectChance)){
+                    if(value <= 0 && Mathf.chanceDelta(effectChance * build.block.size * build.block.size)){
                         effect.at(build.x + Mathf.range(build.block.size * tilesize/2f - 1f), build.y + Mathf.range(build.block.size * tilesize/2f - 1f));
                     }
                 }

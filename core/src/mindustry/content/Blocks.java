@@ -1545,28 +1545,30 @@ public class Blocks{
             buildSpeed = 1.5f;
         }};
 
-        //TODO green looks bad switch to orange
-        //TODO orange also looks bad hhhh
         regenProjector = new RegenProjector("regen-projector"){{
             requirements(Category.effect, with(Items.silicon, 60, Items.tungsten, 60, Items.oxide, 30, Items.beryllium, 80));
             size = 3;
             consumes.power(1f);
             range = 28;
+            baseColor = Pal.regen;
 
             consumes.liquid(Liquids.hydrogen, 1f / 60f);
 
             healPercent = 4f / 60f;
 
+            Color col = Color.valueOf("8ca9e8");
+
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.hydrogen, 9f / 4f), new DrawBlock(), new DrawGlowRegion(){{
-                color = Color.orange;//Color.valueOf("1eff21");
+                color = Color.sky;
             }}, new DrawPulseShape(false){{
-                //radiusScl = 0.95f;
                 layer = Layer.effect;
+                color = col;
             }}, new DrawShape(){{
                 layer = Layer.effect;
                 radius = 3.5f;
                 useWarmupRadius = true;
                 timeScl = 2f;
+                color = col;
             }});
         }};
 
@@ -2338,7 +2340,7 @@ public class Blocks{
 
             //TODO different requirements
             consumes.power(6f);
-            consumes.liquids(LiquidStack.with(Liquids.water, 0.5f, Liquids.hydrogen, 4f / 60f));
+            consumes.liquids(LiquidStack.with(Liquids.water, 0.4f, Liquids.hydrogen, 4f / 60f));
         }};
 
         //endregion

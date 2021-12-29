@@ -1467,7 +1467,7 @@ public class Fx{
     }),
 
     regenParticle = new Effect(100f, e -> {
-        color(Pal.accent);
+        color(Pal.regen);
 
         Fill.square(e.x, e.y, e.fslope() * 1.5f + 0.14f, 45f);
     }),
