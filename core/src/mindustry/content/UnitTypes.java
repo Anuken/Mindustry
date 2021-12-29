@@ -2603,11 +2603,11 @@ public class UnitTypes{
                     healAmount = 25f;
                     collidesTeam = true;
 
-                    lifetime = 35f;
+                    lifetime = 31f;
                     shootEffect = Fx.colorSpark;
                     hitEffect = smokeEffect = despawnEffect = Fx.hitLaserColor;
 
-                    damage = 10;
+                    damage = 1;
                 }};
             }});
         }};
