@@ -23,6 +23,7 @@ import static mindustry.Vars.*;
 public class BlockRenderer{
     //TODO cracks take up far to much space, so I had to limit it to 7. this means larger blocks won't have cracks - draw tiling mirrored stuff instead?
     public static final int crackRegions = 8, maxCrackSize = 7;
+    public static boolean drawQuadtreeDebug = false;
 
     private static final int initialRequests = 32 * 32;
     private static final Color shadowColor = new Color(0, 0, 0, 0.71f), blendShadowColor = Color.white.cpy().lerp(Color.black, shadowColor.a);
@@ -402,15 +403,17 @@ public class BlockRenderer{
             }
         }
 
-        //TODO remove
-        Draw.z(Layer.overlayUI);
-        Lines.stroke(1f, Color.green);
+        if(drawQuadtreeDebug){
+            //TODO remove
+            Draw.z(Layer.overlayUI);
+            Lines.stroke(1f, Color.green);
 
-        blockTree.intersect(camera.bounds(Tmp.r1), tile -> {
-            Lines.rect(tile.getHitbox(Tmp.r2));
-        });
+            blockTree.intersect(camera.bounds(Tmp.r1), tile -> {
+                Lines.rect(tile.getHitbox(Tmp.r2));
+            });
 
-        Draw.reset();
+            Draw.reset();
+        }
     }
 
     static class BlockQuadtree extends QuadTree<Tile>{

@@ -46,7 +46,6 @@ public class BuildWeapon extends Weapon{
         super.draw(unit, mount);
 
         if(unit.activelyBuilding()){
-
             float
             rotation = unit.rotation - 90,
             weaponRotation  = rotation + (rotate ? mount.rotation : 0),
@@ -57,7 +56,5 @@ public class BuildWeapon extends Weapon{
 
             unit.drawBuildingBeam(px, py);
         }
-
-
     }
 }

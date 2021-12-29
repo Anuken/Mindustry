@@ -2694,6 +2694,9 @@ public class UnitTypes{
             engineSize = 0;
             payloadCapacity = Mathf.sqr(3f) * tilePayload;
 
+            drawBuildBeam = false;
+            rotateToBuilding = false;
+
             float es = 3.8f;
 
             setEnginesMirror(
@@ -2716,9 +2719,6 @@ public class UnitTypes{
                     y = pos.y/4f;
                     shootY = 5.75f;
                     recoil = 2f;
-
-                    drawBuildBeam = false;
-                    rotateToBuilding = false;
 
                     bullet = new BasicBulletType(5f, 17){{
                         width = 7f;
