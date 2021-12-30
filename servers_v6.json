@@ -1,7 +1,7 @@
 [
   {
     "name": "Infection",
-    "address": ["plague-continued.ml"]
+    "address": ["plague-continued.ml:5555"]
   },
   {
     "name": "RCM",
