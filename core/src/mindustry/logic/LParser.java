@@ -31,9 +31,11 @@ public class LParser{
         return new LParser(text).parse();
     }
 
-    void comment(){
+    String comment(){
         //read until \n or eof
+        int from = pos;
         while(pos < chars.length && chars[pos++] != '\n');
+        return new String(chars, from, pos - from);
     }
 
     void error(String message){
@@ -96,7 +98,9 @@ public class LParser{
             expectNext = false;
 
             if(c == '#'){
-                comment();
+                tokens[tok++] = "#";
+                pos+=2;
+                tokens[tok++] = comment();
                 break;
             }else if(c == '"'){
                 tokens[tok ++] = string();

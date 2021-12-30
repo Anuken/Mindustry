@@ -23,8 +23,7 @@ import static mindustry.world.blocks.logic.LogicDisplay.*;
 
 public class LStatements{
 
-    //TODO broken
-    //@RegisterStatement("#")
+    @RegisterStatement("#")
     public static class CommentStatement extends LStatement{
         public String comment = "";
 
