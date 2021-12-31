@@ -2705,6 +2705,7 @@ public class UnitTypes{
             new UnitEngine(49 / 4f, -62 / 4f, es, 315f)
             );
 
+            //TODO repair weapon
             Vec2[] positions = {/*new Vec2(30f, 50f), */new Vec2(60f, -15f)};
             int i = 0;
 
