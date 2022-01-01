@@ -1,5 +1,9 @@
 [
   {
+    "name": "Infection",
+    "address": ["plague-continued.ml:5555"]
+  },
+  {
     "name": "RCM",
     "address": ["185.104.248.61", "easyplay.su"]
   },
