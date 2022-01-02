@@ -97,12 +97,12 @@ public class Trail{
 
     /** Removes the last point from the trail at intervals. */
     public void shorten(){
-        if((counter += Time.delta) >= 0.99f){
+        if((counter += Time.delta) >= 1f){
             if(points.size >= 3){
                 points.removeRange(0, 2);
             }
 
-            counter = 0f;
+            counter %= 1f;
         }
     }
 
