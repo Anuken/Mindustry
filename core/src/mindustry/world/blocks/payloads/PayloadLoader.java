@@ -18,7 +18,7 @@ public class PayloadLoader extends PayloadBlock{
     public float loadTime = 2f;
     public int itemsLoaded = 8;
     public float liquidsLoaded = 40f;
-    public int maxBlockSize = 2;
+    public int maxBlockSize = 3;
 
     public PayloadLoader(String name){
         super(name);
@@ -102,11 +102,11 @@ public class PayloadLoader extends PayloadBlock{
 
             Draw.rect(outRegion, x, y, rotdeg());
 
+            //drawn below payload so 3x3 blocks don't look even even weirder
+            Draw.rect(topRegion, x, y);
+
             Draw.z(Layer.blockOver);
             drawPayload();
-
-            Draw.z(Layer.blockOver + 0.1f);
-            Draw.rect(topRegion, x, y);
         }
 
         @Override
