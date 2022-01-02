@@ -57,7 +57,7 @@ public abstract class NetConnection{
     }
 
     /** Kick with an arbitrary reason, and a kick duration in milliseconds. */
-    private void kick(String reason, KickReason kickType, long kickDuration){
+    private void kick(String reason, @Nullable KickReason kickType, long kickDuration){
         if(kicked) return;
 
         Log.info("Kicking connection @ / @; Reason: @", address, uuid, reason == null ? kickType.name() : reason.replace("\n", " "));
