@@ -399,6 +399,7 @@ public class ServerControl implements ApplicationListener{
                 if(state.rules.waves){
                     info("  @ seconds until next wave.", (int)(state.wavetime / 60));
                 }
+                info("  @ total units / @ enemy units", Groups.unit.size());
 
                 info("  @ FPS, @ MB used.", Core.graphics.getFramesPerSecond(), Core.app.getJavaHeap() / 1024 / 1024);
 
