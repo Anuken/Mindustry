@@ -19,7 +19,8 @@ import static mindustry.Vars.*;
 import static mindustry.server.ServerControl.*;
 
 public class ServerLauncher implements ApplicationListener{
-    static String[] args;
+    public static String[] args;
+    public static ServerControl serverControl;
 
     public static void main(String[] args){
         try{
@@ -68,7 +69,7 @@ public class ServerLauncher implements ApplicationListener{
         Core.app.addListener(new ApplicationListener(){public void update(){ asyncCore.begin(); }});
         Core.app.addListener(logic = new Logic());
         Core.app.addListener(netServer = new NetServer());
-        Core.app.addListener(new ServerControl(args));
+        Core.app.addListener(serverControl = new ServerControl(args));
         Core.app.addListener(new ApplicationListener(){public void update(){ asyncCore.end(); }});
 
         mods.eachClass(Mod::init);
