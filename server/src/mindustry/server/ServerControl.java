@@ -35,8 +35,8 @@ import static arc.util.Log.*;
 import static mindustry.Vars.*;
 
 public class ServerControl implements ApplicationListener{
-    private static final int roundExtraTime = 12;
-    private static final int maxLogLength = 1024 * 512;
+    public static final int roundExtraTime = 12;
+    public static final int maxLogLength = 1024 * 512;
 
     protected static String[] tags = {"&lc&fb[D]&fr", "&lb&fb[I]&fr", "&ly&fb[W]&fr", "&lr&fb[E]", ""};
     protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"),
@@ -53,17 +53,17 @@ public class ServerControl implements ApplicationListener{
         }
     };
 
-    private Fi currentLogFile;
-    private boolean inExtraRound;
-    private Task lastTask;
-    private Gamemode lastMode;
-    private @Nullable Map nextMapOverride;
-    private Interval autosaveCount = new Interval();
+    public Fi currentLogFile;
+    public boolean inExtraRound;
+    public Task lastTask;
+    public Gamemode lastMode;
+    public @Nullable Map nextMapOverride;
+    public String suggested;
 
+    private Interval autosaveCount = new Interval();
     private Thread socketThread;
     private ServerSocket serverSocket;
     private PrintWriter socketOutput;
-    private String suggested;
 
     public ServerControl(String[] args){
         setup(args);
