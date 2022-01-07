@@ -359,6 +359,42 @@ public class NetClient implements ApplicationListener{
         Groups.player.removeByID(playerid);
     }
 
+    public static void readSyncEntity(DataInputStream input, Reads read) throws IOException{
+        int id = input.readInt();
+        byte typeID = input.readByte();
+
+        Syncc entity = Groups.sync.getByID(id);
+        boolean add = false, created = false;
+
+        if(entity == null && id == player.id()){
+            entity = player;
+            add = true;
+        }
+
+        //entity must not be added yet, so create it
+        if(entity == null){
+            entity = (Syncc)EntityMapping.map(typeID).get();
+            entity.id(id);
+            if(!netClient.isEntityUsed(entity.id())){
+                add = true;
+            }
+            created = true;
+        }
+
+        //read the entity
+        entity.readSync(read);
+
+        if(created){
+            //snap initial starting position
+            entity.snapSync();
+        }
+
+        if(add){
+            entity.add();
+            netClient.addRemovedEntity(entity.id());
+        }
+    }
+
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
     public static void entitySnapshot(short amount, byte[] data){
         try{
@@ -366,39 +402,7 @@ public class NetClient implements ApplicationListener{
             DataInputStream input = netClient.dataStream;
 
             for(int j = 0; j < amount; j++){
-                int id = input.readInt();
-                byte typeID = input.readByte();
-
-                Syncc entity = Groups.sync.getByID(id);
-                boolean add = false, created = false;
-
-                if(entity == null && id == player.id()){
-                    entity = player;
-                    add = true;
-                }
-
-                //entity must not be added yet, so create it
-                if(entity == null){
-                    entity = (Syncc)EntityMapping.map(typeID).get();
-                    entity.id(id);
-                    if(!netClient.isEntityUsed(entity.id())){
-                        add = true;
-                    }
-                    created = true;
-                }
-
-                //read the entity
-                entity.readSync(Reads.get(input));
-
-                if(created){
-                    //snap initial starting position
-                    entity.snapSync();
-                }
-
-                if(add){
-                    entity.add();
-                    netClient.addRemovedEntity(entity.id());
-                }
+                readSyncEntity(input, Reads.get(input));
             }
         }catch(IOException e){
             throw new RuntimeException(e);

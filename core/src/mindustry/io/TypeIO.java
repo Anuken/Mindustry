@@ -667,6 +667,13 @@ public class TypeIO{
         public Building unbox(){
             return world.build(pos);
         }
+
+        @Override
+        public String toString(){
+            return "BuildingBox{" +
+            "pos=" + pos +
+            '}';
+        }
     }
 
     /** Represents a unit that has not been resolved yet. TODO unimplemented / unused*/
@@ -679,6 +686,13 @@ public class TypeIO{
 
         public Unit unbox(){
             return Groups.unit.getByID(id);
+        }
+
+        @Override
+        public String toString(){
+            return "UnitBox{" +
+            "id=" + id +
+            '}';
         }
     }
 }
