@@ -220,6 +220,8 @@ public class Block extends UnlockableContent{
     public int outlinedIcon = -1;
     /** Whether this block has a shadow under it. */
     public boolean hasShadow = true;
+    /** If true, a custom shadow (name-shadow) is drawn under this block. */
+    public boolean customShadow = false;
     /** Should the sound made when this block is built change in pitch. */
     public boolean placePitchChange = true;
     /** Should the sound made when this block is deconstructed change in pitch. */
@@ -288,6 +290,7 @@ public class Block extends UnlockableContent{
     protected TextureRegion[] editorVariantRegions;
 
     public TextureRegion region, editorIcon;
+    public @Load("@-shadow") TextureRegion customShadowRegion;
     public @Load("@-team") TextureRegion teamRegion;
     public TextureRegion[] teamRegions, variantRegions;
 
@@ -914,6 +917,11 @@ public class Block extends UnlockableContent{
     @Override
     @CallSuper
     public void init(){
+        //disable standard shadow
+        if(customShadow){
+            hasShadow = false;
+        }
+
         //initialize default health based on size
         if(health == -1){
             boolean round = false;

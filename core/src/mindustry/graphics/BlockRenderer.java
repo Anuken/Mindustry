@@ -24,9 +24,9 @@ public class BlockRenderer{
     //TODO cracks take up far to much space, so I had to limit it to 7. this means larger blocks won't have cracks - draw tiling mirrored stuff instead?
     public static final int crackRegions = 8, maxCrackSize = 7;
     public static boolean drawQuadtreeDebug = false;
+    public static final Color shadowColor = new Color(0, 0, 0, 0.71f), blendShadowColor = Color.white.cpy().lerp(Color.black, shadowColor.a);
 
     private static final int initialRequests = 32 * 32;
-    private static final Color shadowColor = new Color(0, 0, 0, 0.71f), blendShadowColor = Color.white.cpy().lerp(Color.black, shadowColor.a);
 
     public final FloorRenderer floor = new FloorRenderer();
     public TextureRegion[][] cracks;
@@ -369,6 +369,12 @@ public class BlockRenderer{
                 Draw.z(Layer.block);
 
                 if(entity != null){
+                    if(block.customShadow){
+                        Draw.z(Layer.block - 1);
+                        entity.drawCustomShadow();
+                        Draw.z(Layer.block);
+                    }
+
                     if(entity.damaged()){
                         entity.drawCracks();
                         Draw.z(Layer.block);

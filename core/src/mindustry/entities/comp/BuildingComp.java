@@ -1022,6 +1022,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
+    public void drawCustomShadow(){
+        Draw.color(0f, 0f, 0f, BlockRenderer.shadowColor.a);
+        Draw.rect(block.customShadowRegion, x, y, drawrot());
+        Draw.color();
+    }
+
     public void drawCracks(){
         if(!damaged() || block.size > BlockRenderer.maxCrackSize) return;
         int id = pos();
