@@ -126,13 +126,9 @@ public class OverlayRenderer{
             Draw.mixcol(Pal.accent, 1f);
             Draw.alpha(unitFade);
             Building build = (select instanceof BlockUnitc b ? b.tile() : select instanceof Building b ? b : null);
+            TextureRegion region = build != null ? build.block.fullIcon : select instanceof Unit u ? u.icon() : Core.atlas.white();
 
-            if(build != null){
-                //special selection for block "units"
-                Fill.square(build.x, build.y, build.block.size * tilesize/2f);
-            }else if(select instanceof Unit u){
-                Draw.rect(u.type.fullIcon, u.x, u.y, u.rotation - 90);
-            }
+            Draw.rect(region, select.getX(), select.getY(), select instanceof Unit u && !(select instanceof BlockUnitc) ? u.rotation - 90f : 0f);
 
             for(int i = 0; i < 4; i++){
                 float rot = i * 90f + 45f + (-Time.time) % 360f;
