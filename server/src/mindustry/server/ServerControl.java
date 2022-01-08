@@ -52,12 +52,13 @@ public class ServerControl implements ApplicationListener{
             Core.app.post(() -> handleCommandString(line));
         }
     };
+    
+    public @Nullable Map nextMapOverride;
 
     private Fi currentLogFile;
     private boolean inExtraRound;
     private Task lastTask;
     private Gamemode lastMode;
-    private @Nullable Map nextMapOverride;
     private Interval autosaveCount = new Interval();
 
     private Thread socketThread;
