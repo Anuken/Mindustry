@@ -49,7 +49,6 @@ public class NuclearReactor extends PowerGenerator{
 
     public NuclearReactor(String name){
         super(name);
-        updateInUnits = false;
         itemCapacity = 30;
         liquidCapacity = 30;
         hasItems = true;

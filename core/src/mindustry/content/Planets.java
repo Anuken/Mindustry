@@ -50,8 +50,6 @@ public class Planets{
             totalRadius += 2.6f;
             lightSrcTo = 0.5f;
             lightDstFrom = 0.2f;
-            //TODO
-            alwaysUnlocked = true;
         }};
 
         makeAsteroid("gier", erekir, Blocks.ferricStoneWall, Blocks.carbonWall, 0.4f, 7, 1f, gen -> {
@@ -76,7 +74,6 @@ public class Planets{
             startSector = 10;
             atmosphereRadIn = -0.01f;
             atmosphereRadOut = 0.3f;
-            alwaysUnlocked = true;
         }};
 
         serpulo = new Planet("serpulo", sun, 1f, 3){{
@@ -105,7 +102,6 @@ public class Planets{
     private static void makeAsteroid(String name, Planet parent, Block base, Block tint, float tintThresh, int pieces, float scale, Cons<AsteroidGenerator> cgen){
         new Planet(name, parent, 0.12f){{
             hasAtmosphere = false;
-            alwaysUnlocked = true; //for testing only!
             updateLighting = false;
             sectors.add(new Sector(this, Ptile.empty));
             camRadius = 0.68f * scale;

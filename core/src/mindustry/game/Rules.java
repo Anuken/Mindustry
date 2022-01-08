@@ -49,6 +49,8 @@ public class Rules{
     public boolean fire = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
+    /** EXPERIMENTAL! If true, blocks will update in units and share power. */
+    public boolean unitPayloadUpdate = false;
     /** Whether cores add to unit limit */
     public boolean unitCapVariable = true;
     /** If true, unit spawn points are shown. */

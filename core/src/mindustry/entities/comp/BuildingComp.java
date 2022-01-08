@@ -1465,7 +1465,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(power != null){
             power.graph = new PowerGraph();
             power.links.clear();
-            power.status = 0f;
+            if(block.consumes.hasPower() && !block.consumes.getPower().buffered){
+                power.status = 0f;
+            }
         }
     }
 

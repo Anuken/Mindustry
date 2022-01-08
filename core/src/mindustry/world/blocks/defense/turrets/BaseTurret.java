@@ -36,7 +36,6 @@ public class BaseTurret extends Block{
         priority = TargetPriority.turret;
         group = BlockGroup.turrets;
         flags = EnumSet.of(BlockFlag.turret);
-        updateInUnits = false;
     }
 
     @Override
