@@ -1668,7 +1668,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         Events.fire(new BlockDestroyEvent(tile));
         block.destroySound.at(tile);
         onDestroyed();
-        tile.remove();
+        if(tile != emptyTile){
+            tile.remove();
+        }
         remove();
         afterDestroyed();
     }
