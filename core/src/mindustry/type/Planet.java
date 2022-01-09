@@ -276,7 +276,8 @@ public class Planet extends UnlockableContent{
             }
         }
 
-        launchCandidates = candidates;
+        //TODO currently, mutual launch candidates are simply a nuisance.
+        //launchCandidates = candidates;
 
         clipRadius = Math.max(clipRadius, radius + atmosphereRadOut + 0.5f);
     }

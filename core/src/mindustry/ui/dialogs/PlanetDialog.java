@@ -172,6 +172,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         rebuildButtons();
         mode = look;
+        state.otherCamPos = null;
         selected = hovered = launchSector = null;
         launching = false;
 
@@ -259,6 +260,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         //automatically select next planets; TODO pan!
         if(sector.planet.launchCandidates.size == 1){
             state.planet = sector.planet.launchCandidates.first();
+            state.otherCamPos = sector.planet.position;
+            state.otherCamAlpha = 0f;
         }
 
         //TODO pan over to correct planet
@@ -284,6 +287,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         zoom = 1f;
         state.zoom = 1f;
         state.uiAlpha = 0f;
+        state.otherCamPos = null;
         launchSector = sector;
 
         mode = select;
@@ -668,6 +672,19 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     @Override
     public void act(float delta){
         super.act(delta);
+
+        //update lerp
+        if(state.otherCamPos != null){
+            state.otherCamAlpha = Mathf.lerpDelta(state.otherCamAlpha, 1f, 0.05f);
+            state.camPos.set(0f, camLength, 0.1f);
+
+            if(Mathf.equal(state.otherCamAlpha, 1f, 0.01f)){
+                //cam.position.set(params.otherCamPos).lerp(params.planet.position, params.otherCamAlpha).add(params.camPos);
+                state.camPos.set(Tmp.v31.set(state.otherCamPos).lerp(state.planet.position, state.otherCamAlpha).add(state.camPos).sub(state.planet.position));
+
+                state.otherCamPos = null;
+            }
+        }
 
         if(hovered != null && !mobile && state.planet.hasGrid()){
             addChild(hoverLabel);
