@@ -183,42 +183,53 @@ public class SectorDamage{
 
         if(core == null || spawns.isEmpty()) return;
 
+        boolean airOnly = !state.rules.spawns.contains(g -> !g.type.flying);
+
         Tile start = spawns.first();
-
-        var field = pathfinder.getField(state.rules.waveTeam, Pathfinder.costGround, Pathfinder.fieldCore);
         Seq<Tile> path = new Seq<>();
-        boolean found = false;
 
-        if(field != null && field.weights != null){
-            int[][] weights = field.weights;
-            int count = 0;
-            Tile current = start;
-            while(count < world.width() * world.height()){
-                int minCost = Integer.MAX_VALUE;
-                int cx = current.x, cy = current.y;
-                for(Point2 p : Geometry.d4){
-                    int nx = cx + p.x, ny = cy + p.y;
+        //TODO would be nice if this worked in a more generic way, with two different calculations and paths
+        if(airOnly){
+            world.raycastEach(start.x, start.y, core.tileX(), core.tileY(), (x, y) -> {
+                path.add(world.rawTile(x, y));
+                return false;
+            });
+        }else{
+            var field = pathfinder.getField(state.rules.waveTeam, Pathfinder.costGround, Pathfinder.fieldCore);
+            boolean found = false;
 
-                    Tile other = world.tile(nx, ny);
-                    if(other != null && weights[nx][ny] < minCost && weights[nx][ny] != -1){
-                       minCost = weights[nx][ny];
-                       current = other;
+            if(field != null && field.weights != null){
+                int[][] weights = field.weights;
+                int count = 0;
+                Tile current = start;
+                while(count < world.width() * world.height()){
+                    int minCost = Integer.MAX_VALUE;
+                    int cx = current.x, cy = current.y;
+                    for(Point2 p : Geometry.d4){
+                        int nx = cx + p.x, ny = cy + p.y;
+
+                        Tile other = world.tile(nx, ny);
+                        if(other != null && weights[nx][ny] < minCost && weights[nx][ny] != -1){
+                            minCost = weights[nx][ny];
+                            current = other;
+                        }
                     }
+
+                    path.add(current);
+
+                    if(current.build == core){
+                        found = true;
+                        break;
+                    }
+
+                    count ++;
                 }
-
-                path.add(current);
-
-                if(current.build == core){
-                    found = true;
-                    break;
-                }
-
-                count ++;
             }
-        }
 
-        if(!found){
-            path = Astar.pathfind(start, core.tile, SectorDamage::cost, t -> !(t.block().isStatic() && t.solid()));
+            if(!found){
+                path.clear();
+                path.addAll(Astar.pathfind(start, core.tile, SectorDamage::cost, t -> !(t.block().isStatic() && t.solid())));
+            }
         }
 
         //create sparse tile array for fast range query

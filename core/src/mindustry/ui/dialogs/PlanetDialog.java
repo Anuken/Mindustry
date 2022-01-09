@@ -679,7 +679,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             state.camPos.set(0f, camLength, 0.1f);
 
             if(Mathf.equal(state.otherCamAlpha, 1f, 0.01f)){
-                //cam.position.set(params.otherCamPos).lerp(params.planet.position, params.otherCamAlpha).add(params.camPos);
+                //TODO change zoom too
                 state.camPos.set(Tmp.v31.set(state.otherCamPos).lerp(state.planet.position, state.otherCamAlpha).add(state.camPos).sub(state.planet.position));
 
                 state.otherCamPos = null;
@@ -1031,29 +1031,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.pack();
         stable.setPosition(x, y, Align.center);
 
-        //do not fade out for now, TODO remove?
-        /*
-        stable.update(() -> {
-            if(selected != null){
-                if(launching){
-                    stable.color.sub(0, 0, 0, 0.05f * Time.delta);
-                }else{
-                    if(!state.planet.hasGrid()){
-                        stable.color.a = 1f;
-                    }else{
-                        //fade out UI when not facing selected sector
-                        Tmp.v31.set(selected.tile.v).rotate(Vec3.Y, -state.planet.getRotation()).scl(-1f).nor();
-                        float dot = planets.cam.direction.dot(Tmp.v31);
-                        stable.color.a = Math.max(dot, 0f)*2f;
-                        if(dot*2f <= -0.1f){
-                            selected = null;
-                            updateSelected();
-                        }
-                    }
-                }
-            }
-        });*/
-
         stable.act(0f);
     }
 
@@ -1087,12 +1064,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(mode == look && !sector.hasBase()){
             shouldHide = false;
             Sector from = findLauncher(sector);
-            if(from == null || mode == planetLaunch){
-                //TODO use the standard nucleus core schematic.
-                if(mode == planetLaunch){
-                    listener.get(sector);
-                }
-
+            if(from == null){
                 //clear loadout information, so only the basic loadout gets used
                 universe.clearLoadoutInfo();
                 //free launch.
@@ -1136,7 +1108,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
         }else if(mode == select){
             listener.get(sector);
+        }else if(mode == planetLaunch){ //TODO make sure it doesn't have a base already.
+
+            //TODO animation
+            //schematic selection and cost handled by listener
+            listener.get(sector);
+            control.playSector(sector);
         }else{
+            //sector should have base here
             control.playSector(sector);
         }
 

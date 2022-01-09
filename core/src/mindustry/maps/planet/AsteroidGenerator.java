@@ -118,8 +118,8 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
         wallOre(Blocks.beryllicStoneWall, Blocks.wallOreBeryl, 50f, 0.62f * berylliumScale);
 
         //TODO:
-        //- copper maybe should not exist
-        //- consider replacing certain ores with something else
+        //- enemy wave spawns
+        //- never ending
 
         //titanium
         pass((x, y) -> {
@@ -131,6 +131,10 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
             }
         });
 
+        int spawnSide = rand.random(3);
+        int sizeOffset = width / 2 - 1;
+        tiles.getn(sizeOffset * Geometry.d8edge[spawnSide].x + width/2, sizeOffset * Geometry.d8edge[spawnSide].y + height/2).setOverlay(Blocks.spawn);
+
         Schematics.placeLaunchLoadout(sx, sy);
 
         state.rules.planetBackground = new PlanetParams(){{
@@ -139,9 +143,19 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
             camPos = new Vec3(1.2388899f, 1.6047299f, 2.4758825f);
         }};
         //state.rules.backgroundTexture = "sprites/space.png";
-        state.rules.dragMultiplier = 0.7f; //yes, yes space has 0 drag but 0% drag is very annoying
+        state.rules.dragMultiplier = 0.7f; //yes, space actually has 0 drag but true 0% drag is very annoying
         state.rules.borderDarkness = false;
         state.rules.environment = Env.space;
+        state.rules.waves = true;
+        //TODO maybe make this on by default everywhere
+        state.rules.showSpawns = true;
+        //TODO better wavegen, do it by hand even
+        state.rules.spawns = Waves.generate(0.5f, rand, false, true, false);
+    }
+
+    @Override
+    public Schematic getDefaultLoadout(){
+        return Loadouts.spaceNucleus;
     }
 
     @Override

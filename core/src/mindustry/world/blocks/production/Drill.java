@@ -73,6 +73,8 @@ public class Drill extends Block{
         hasItems = true;
         ambientSound = Sounds.drill;
         ambientSoundVolume = 0.018f;
+        //drills work in space I guess
+        envEnabled |= Env.space;
     }
 
     @Override

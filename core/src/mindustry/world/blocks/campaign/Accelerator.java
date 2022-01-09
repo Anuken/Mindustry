@@ -20,6 +20,7 @@ import static mindustry.Vars.*;
 public class Accelerator extends Block{
     public @Load("launch-arrow") TextureRegion arrowRegion;
 
+    //TODO dynamic
     public Block launching = Blocks.coreNucleus;
     public int[] capacities = {};
 
@@ -111,7 +112,12 @@ public class Accelerator extends Block{
 
             ui.planet.showPlanetLaunch(state.rules.sector, sector -> {
                 //TODO cutscene, etc...
+
+                //TODO should consume resources based on destination schem
                 consume();
+
+                universe.clearLoadoutInfo();
+                universe.updateLoadout(sector.planet.generator.getDefaultLoadout().findCore(), sector.planet.generator.getDefaultLoadout());
             });
 
             Events.fire(Trigger.acceleratorUse);

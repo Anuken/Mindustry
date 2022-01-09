@@ -832,6 +832,7 @@ public class Blocks{
             size = 2;
             hasPower = true;
             drawer = new DrawWeave();
+            envEnabled |= Env.space;
 
             ambientSound = Sounds.techloop;
             ambientSoundVolume = 0.02f;
@@ -994,6 +995,7 @@ public class Blocks{
         incinerator = new Incinerator("incinerator"){{
             requirements(Category.crafting, with(Items.graphite, 5, Items.lead, 15));
             health = 90;
+            envEnabled |= Env.space;
             consumes.power(0.50f);
         }};
 
@@ -2146,6 +2148,8 @@ public class Blocks{
             tier = 2;
             drillTime = 600;
             size = 2;
+            //mechanical drill doesn't work in space
+            envEnabled ^= Env.space;
 
             consumes.liquid(Liquids.water, 0.05f).boost();
         }};
@@ -2167,7 +2171,6 @@ public class Blocks{
             tier = 4;
             updateEffect = Fx.pulverizeMedium;
             drillEffect = Fx.mineBig;
-            envEnabled |= Env.space;
 
             consumes.power(1.10f);
             consumes.liquid(Liquids.water, 0.08f).boost();
@@ -2570,6 +2573,7 @@ public class Blocks{
             flags = EnumSet.of(BlockFlag.turret, BlockFlag.extinguisher);
         }};
 
+        //TODO these may work in space, but what's the point?
         lancer = new PowerTurret("lancer"){{
             requirements(Category.turret, with(Items.copper, 60, Items.lead, 70, Items.silicon, 50));
             range = 165f;
@@ -2656,6 +2660,7 @@ public class Blocks{
             size = 2;
             scaledHealth = 300;
             shootSound = Sounds.missile;
+            envEnabled |= Env.space;
 
             limitRange(5f);
         }};
@@ -2699,6 +2704,7 @@ public class Blocks{
             shootLength = 5f;
             bulletDamage = 30f;
             reloadTime = 8f;
+            envEnabled |= Env.space;
         }};
 
         tsunami = new LiquidTurret("tsunami"){{
@@ -2736,6 +2742,7 @@ public class Blocks{
             restitution = 0.1f;
             shootCone = 30;
             size = 3;
+            envEnabled |= Env.space;
 
             scaledHealth = 220;
             shootSound = Sounds.shotgun;
@@ -2846,6 +2853,7 @@ public class Blocks{
             shootCone = 2f;
             shootSound = Sounds.railgun;
             unitSort = UnitSorts.strongest;
+            envEnabled |= Env.space;
 
             coolantMultiplier = 0.4f;
 
@@ -2898,6 +2906,7 @@ public class Blocks{
             shootSound = Sounds.laserbig;
             loopSound = Sounds.beam;
             loopSoundVolume = 2f;
+            envEnabled |= Env.space;
 
             shootType = new ContinuousLaserBulletType(78){{
                 length = 200f;
