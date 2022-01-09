@@ -89,6 +89,8 @@ public class Planet extends UnlockableContent{
     public Seq<Planet> children = new Seq<>();
     /** Default root node shown when the tech tree is opened here. */
     public @Nullable TechNode techTree;
+    /** Planets that can be launched to from this one. Made mutual in init(). */
+    public Seq<Planet> launchCandidates = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
     protected Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2), cloudMeshLoader = () -> null;
 
@@ -264,6 +266,17 @@ public class Planet extends UnlockableContent{
 
             updateBaseCoverage();
         }
+
+        //make planet launch candidates mutual.
+        var candidates = launchCandidates.copy();
+
+        for(Planet planet : content.planets()){
+            if(planet.launchCandidates.contains(this)){
+                candidates.addUnique(planet);
+            }
+        }
+
+        launchCandidates = candidates;
 
         clipRadius = Math.max(clipRadius, radius + atmosphereRadOut + 0.5f);
     }

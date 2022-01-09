@@ -109,8 +109,9 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
         //copper only generates on ferric stone
         ore(Blocks.oreCopper, Blocks.ferricStone, 5f, 0.8f * copperScale);
 
-        //thorium only generates on beryllic stone
+        //thorium only generates on beryllic stone and graphitic stone
         ore(Blocks.oreThorium, Blocks.beryllicStone, 4f, 0.9f * thoriumScl);
+        ore(Blocks.oreThorium, Blocks.carbonStone, 4f, 0.9f * thoriumScl);
 
         wallOre(Blocks.carbonWall, Blocks.graphiticWall, 35f, 0.57f * graphiteScale);
 

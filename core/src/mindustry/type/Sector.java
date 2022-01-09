@@ -126,6 +126,10 @@ public class Sector{
 
     public String name(){
         if(preset != null && info.name == null) return preset.localizedName;
+        //single-sector "planets" use their own name for the sector name.
+        if(info.name == null && planet.sectors.size == 1){
+            return planet.localizedName;
+        }
         return info.name == null ? id + "" : info.name;
     }
 

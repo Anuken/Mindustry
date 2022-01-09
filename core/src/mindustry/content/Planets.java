@@ -18,7 +18,10 @@ public class Planets{
     sun,
     erekir,
     tantros,
-    serpulo;
+    serpulo,
+    gier,
+    notva,
+    verilus;
 
     public static void load(){
         sun = new Planet("sun", null, 4f){{
@@ -52,7 +55,8 @@ public class Planets{
             lightDstFrom = 0.2f;
         }};
 
-        makeAsteroid("gier", erekir, Blocks.ferricStoneWall, Blocks.carbonWall, 0.4f, 7, 1f, gen -> {
+        //TODO names
+        gier = makeAsteroid("gier", erekir, Blocks.ferricStoneWall, Blocks.carbonWall, 0.4f, 7, 1f, gen -> {
             gen.min = 25;
             gen.max = 35;
             gen.carbonChance = 0.6f;
@@ -60,7 +64,7 @@ public class Planets{
             gen.berylChance = 0.1f;
         });
 
-        makeAsteroid("notva", sun, Blocks.ferricStoneWall, Blocks.beryllicStoneWall, 0.55f, 9, 1.3f, gen -> {
+        notva = makeAsteroid("notva", sun, Blocks.ferricStoneWall, Blocks.beryllicStoneWall, 0.55f, 9, 1.3f, gen -> {
             gen.berylChance = 0.8f;
             gen.iceChance = 0f;
             gen.carbonChance = 0.01f;
@@ -91,16 +95,20 @@ public class Planets{
             landCloudColor = Pal.spore.cpy().a(0.5f);
         }};
 
-        makeAsteroid("verlius", sun, Blocks.stoneWall, Blocks.iceWall, 0.5f, 12, 2f, gen -> {
+        verilus = makeAsteroid("verlius", sun, Blocks.stoneWall, Blocks.iceWall, 0.5f, 12, 2f, gen -> {
             gen.berylChance = 0f;
             gen.iceChance = 0.6f;
             gen.carbonChance = 0.1f;
             gen.ferricChance = 0f;
         });
+
+        //define launch candidates after all planets initialize
+        serpulo.launchCandidates.add(gier);
+        gier.launchCandidates.add(erekir);
     }
 
-    private static void makeAsteroid(String name, Planet parent, Block base, Block tint, float tintThresh, int pieces, float scale, Cons<AsteroidGenerator> cgen){
-        new Planet(name, parent, 0.12f){{
+    private static Planet makeAsteroid(String name, Planet parent, Block base, Block tint, float tintThresh, int pieces, float scale, Cons<AsteroidGenerator> cgen){
+        return new Planet(name, parent, 0.12f){{
             hasAtmosphere = false;
             updateLighting = false;
             sectors.add(new Sector(this, Ptile.empty));
