@@ -269,7 +269,7 @@ public class Turret extends ReloadTurret{
             }
 
             if(hasAmmo()){
-                if(Float.isNaN(reload)) rotation = 0;
+                if(Float.isNaN(reload)) reload = 0;
 
                 if(timer(timerTarget, targetInterval)){
                     findTarget();
