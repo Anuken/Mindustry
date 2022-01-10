@@ -16,7 +16,7 @@ buildscript{
     }
 
     dependencies{
-        classpath "com.mobidevelop.robovm:robovm-gradle-plugin:2.3.14"
+        classpath "com.mobidevelop.robovm:robovm-gradle-plugin:2.3.15"
         classpath "com.github.Anuken.Arc:packer:$arcHash"
         classpath "com.github.Anuken.Arc:arc-core:$arcHash"
     }

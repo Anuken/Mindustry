@@ -124,6 +124,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean makeFire = false;
     /** Whether to create hit effects on despawn. Forced to true if this bullet has any special effects like splash damage. */
     public boolean despawnHit = false;
+    /** If true, unit armor is ignored in damage calculations. Ignored for building armor. */
+    public boolean pierceArmor = false;
 
     //additional effects
 
@@ -246,7 +248,11 @@ public class BulletType extends Content implements Cloneable{
 
     public void hitEntity(Bullet b, Hitboxc entity, float health){
         if(entity instanceof Healthc h){
-            h.damage(b.damage);
+            if(pierceArmor){
+                h.damagePierce(b.damage);
+            }else{
+                h.damage(b.damage);
+            }
         }
 
         if(entity instanceof Unit unit){

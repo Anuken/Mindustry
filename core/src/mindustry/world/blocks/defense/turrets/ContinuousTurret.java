@@ -2,6 +2,7 @@ package mindustry.world.blocks.defense.turrets;
 
 import arc.math.*;
 import arc.struct.*;
+import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
@@ -10,7 +11,7 @@ import mindustry.world.meta.*;
 
 /** A turret that fires a continuous beam bullet with no reload or coolant necessary. The bullet only disappears when the turret stops shooting. */
 public class ContinuousTurret extends Turret{
-    public BulletType shootType;
+    public BulletType shootType = Bullets.standardCopper;
 
     public ContinuousTurret(String name){
         super(name);
@@ -81,7 +82,7 @@ public class ContinuousTurret extends Turret{
                     heat = 1f;
                     recoil = recoilAmount;
 
-                    if(isShooting()){
+                    if(isShooting() && hasAmmo()){
                         bullet.time = bullet.lifetime * bullet.type.optimalLifeFract * shootWarmup;
                     }
                 }
@@ -106,9 +107,8 @@ public class ContinuousTurret extends Turret{
                 return;
             }
 
-            if((consValid() || cheating()) && !charging){
-                BulletType type = peekAmmo();
-                shoot(type);
+            if(consValid() && !charging){
+                shoot(peekAmmo());
             }
         }
 

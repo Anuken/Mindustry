@@ -349,6 +349,10 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.lightning", type.lightning, type.lightningDamage < 0 ? type.damage : type.lightningDamage));
                     }
 
+                    if(type.pierceArmor){
+                        sep(bt, "@bullet.armorpierce");
+                    }
+
                     if(type.status != StatusEffects.none){
                         sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName);
                     }

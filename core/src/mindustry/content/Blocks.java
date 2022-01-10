@@ -1034,7 +1034,7 @@ public class Blocks{
 
             drawer.iconOverride = new String[]{"-bottom", ""};
             continuousLiquidOutput = true;
-            outputLiquids = LiquidStack.with(Liquids.ozone, 2f * 2f / 60, Liquids.hydrogen, 2f * 3f / 60);
+            outputLiquids = LiquidStack.with(Liquids.ozone, 4f / 60, Liquids.hydrogen, 6f / 60);
             liquidOutputDirections = new int[]{1, 3};
         }};
 
@@ -2991,12 +2991,11 @@ public class Blocks{
         }};
 
         //TODO bad name
-        sublimate = new ContinuousTurret("sublimate"){{
+        sublimate = new ContinuousLiquidTurret("sublimate"){{
             //TODO requirements
             requirements(Category.turret, with(Items.tungsten, 150, Items.silicon, 160, Items.oxide, 50, Items.beryllium, 200));
 
             draw = new DrawTurret("reinforced-"){{
-                liquidDraw = Liquids.ozone;
 
                 Color heatc = Color.valueOf("fa2859");
                 heatColor = heatc;
@@ -3029,15 +3028,29 @@ public class Blocks{
             }};
             outlineColor = Pal.darkOutline;
 
-            //TODO also consume hydrogen as a different ammo
-            consumes.liquids(LiquidStack.with(Liquids.cyanogen, 3f / 60f, Liquids.ozone, 2f / 60f));
+            liquidConsumed = 4f / 60f;
 
-            range = 170f;
+            range = 130f;
 
-            shootType = new ContinuousFlameBulletType(){{
-                damage = 5f;
+            //TODO balance, set up, where is liquid/sec displayed? status effects maybe?
+            ammo(
+            Liquids.ozone, new ContinuousFlameBulletType(){{
+                damage = 7f;
                 length = range;
-            }};
+
+                colors = new Color[]{Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white};
+            }},
+            Liquids.cyanogen, new ContinuousFlameBulletType(){{
+                damage = 14f;
+                rangeChange = 50f;
+                length = range + rangeChange;
+
+                colors = new Color[]{Color.valueOf("465ab8").a(0.55f), Color.valueOf("66a6d2").a(0.7f), Color.valueOf("89e8b6").a(0.8f), Color.valueOf("cafcbe"), Color.white};
+                flareColor = Color.valueOf("89e8b6");
+
+                lightColor = hitColor = flareColor;
+            }}
+            );
 
             acceptCoolant = false;
             scaledHealth = 320;

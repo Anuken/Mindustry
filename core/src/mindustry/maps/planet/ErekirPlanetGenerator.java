@@ -75,7 +75,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         if(ice < 0.6){
             if(result == Blocks.rhyolite || result == Blocks.yellowStone || result == Blocks.regolith){
-                return Blocks.redIce;
+                return Blocks.dacite; //TODO perhaps something else
             }
         }
 
