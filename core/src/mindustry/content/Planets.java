@@ -104,6 +104,8 @@ public class Planets{
 
         //define launch candidates after all planets initialize
         serpulo.launchCandidates.add(gier);
+
+        //TODO WHAT IF THERE'S NO TRANSITION??
         gier.launchCandidates.add(erekir);
     }
 

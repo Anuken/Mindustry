@@ -134,6 +134,7 @@ public class RegenProjector extends Block{
                     var build = world.build(entry.key);
                     if(build != null){
                         build.heal(entry.value);
+                        build.recentlyHealed();
                     }
                 }
                 mendMap.clear();

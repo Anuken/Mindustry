@@ -9,6 +9,8 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.world.blocks.defense.MendProjector.*;
+import mindustry.world.blocks.defense.RegenProjector.*;
 
 import static mindustry.Vars.*;
 
@@ -48,11 +50,14 @@ public class SuppressionFieldAbility extends Ability{
                     float prev = build.healSuppressionTime;
                     build.applyHealSuppression(reload + 1f);
 
-                    any = true;
+                    //TODO maybe should be block field instead of instanceof check
+                    if(build.wasRecentlyHealed(60f * 12f) || (build instanceof MendBuild || build instanceof RegenProjectorBuild)){
+                        any = true;
 
-                    //add prev check so ability spam doesn't lead to particle spam (essentially, recently suppressed blocks don't get new particles)
-                    if(!headless && prev - Time.time <= reload/2f){
-                        builds.add(build);
+                        //add prev check so ability spam doesn't lead to particle spam (essentially, recently suppressed blocks don't get new particles)
+                        if(!headless && prev - Time.time <= reload/2f){
+                            builds.add(build);
+                        }
                     }
                 }
             });

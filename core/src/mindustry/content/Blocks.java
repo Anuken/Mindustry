@@ -1644,6 +1644,7 @@ public class Blocks{
             arrowTimeScl = 2.75f;
             hasPower = true;
             pulse = true;
+            envEnabled |= Env.space;
             consumes.power(0.30f);
         }};
 
