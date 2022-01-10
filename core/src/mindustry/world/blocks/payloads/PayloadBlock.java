@@ -6,8 +6,11 @@ import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -244,6 +247,50 @@ public class PayloadBlock extends Block{
             payVector.set(read.f(), read.f());
             payRotation = read.f();
             payload = Payload.read(read);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(payload instanceof BuildPayload block){
+                return switch(sensor){
+                    case totalItems -> (block.build.items == null) ? 0 : block.build.items.total();
+                    case totalLiquids -> (block.build.liquids == null) ? 0 : block.build.liquids.total();
+                    default -> super.sense(sensor);
+                };
+            }
+            return switch(sensor){
+                case totalItems -> Float.NaN;
+                case totalLiquids -> Float.NaN;
+                default -> super.sense(sensor);
+            };
+        }
+
+        @Override
+        public Object senseObject(LAccess sensor){
+            return switch(sensor){
+                case firstItem -> (!(payload instanceof BuildPayload block) || block.build.items == null) ? null : block.build.items.first();
+                default -> super.senseObject(sensor);
+            };
+        }
+
+        @Override
+        public double sense(Content content){
+            if(content instanceof Item i){
+                if(payload instanceof BuildPayload block && block.build.items != null){
+                    return block.build.items.get(i);
+                }else{
+                    return Float.NaN;
+                }
+            }else if(content instanceof Liquid l){
+                if(payload instanceof BuildPayload block && block.build.liquids != null){
+                    return block.build.liquids.get(l);
+                }else{
+                    return Float.NaN;
+                }
+            }
+            return super.sense(content);
+            // uses super even though both cases are covered
+            // you never know when something is added
         }
     }
 }

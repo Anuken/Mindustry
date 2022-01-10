@@ -1,12 +1,17 @@
 package mindustry.world.blocks.payloads;
 
+import arc.graphics.Color;
+import arc.scene.ui.layout.Table;
 import mindustry.gen.*;
+import mindustry.logic.LAccess;
 import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
 public class PayloadUnloader extends PayloadLoader{
     public int offloadSpeed = 4;
+    public int itemLoadMin = 0;
+    public boolean exporting = false;
 
     public PayloadUnloader(String name){
         super(name);
@@ -23,6 +28,12 @@ public class PayloadUnloader extends PayloadLoader{
     }
 
     public class PayloadUnloaderBuild extends PayloadLoaderBuild{
+
+        @Override
+        public void handlePayload(Building source, Payload payload){
+            super.handlePayload(source, payload);
+            exporting = false;
+        }
 
         @Override
         public boolean acceptItem(Building source, Item item){
@@ -53,7 +64,7 @@ public class PayloadUnloader extends PayloadLoader{
                         //load up items a set amount of times
                         for(int j = 0; j < itemsLoaded && !full(); j++){
                             for(int i = 0; i < items.length(); i++){
-                                if(payload.build.items.get(i) > 0){
+                                if(payload.build.items.get(i) > itemLoadMin){
                                     Item item = content.item(i);
                                     payload.build.items.remove(item, 1);
                                     items.add(item, 1);
@@ -89,10 +100,42 @@ public class PayloadUnloader extends PayloadLoader{
 
         @Override
         public boolean shouldExport(){
-            return payload != null && (
-                (!payload.block().hasItems || payload.build.items.empty()) &&
-                (!payload.block().hasLiquids || payload.build.liquids.currentAmount() <= 0.001f)
-            );
+            if(payload == null){
+                return false;
+            }
+            if(exporting){
+                return true;
+            }
+            boolean result = true;
+            for(int i = 0; i < content.items().size; i++){
+                if(payload.block().hasItems && payload.build.items.get(i) > itemLoadMin){
+                    result = false;
+                    break;
+                }
+            }
+            return result && (!payload.block().hasLiquids || payload.build.liquids.currentAmount() <= 0.001f);
+        }
+
+        @Override
+        public void control(LAccess type, double p1, double p2, double p3, double p4){
+            if(type == LAccess.shoot){
+                exporting = true;
+            }else if(type == LAccess.config){
+                p1 += 0.0001;
+                itemLoadMin = (int)p1;
+            }
+        }
+
+        @Override
+        public void displayBars(Table table){
+            super.displayBars(table);
+            if(itemLoadMin != 0){
+                table.table(e -> {
+                    e.row();
+                    e.left();
+                    e.label(() -> "Item Load Min: " + itemLoadMin).color(Color.lightGray);
+                }).left();
+            }
         }
     }
 }
