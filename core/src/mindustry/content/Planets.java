@@ -103,10 +103,8 @@ public class Planets{
         });
 
         //define launch candidates after all planets initialize
-        serpulo.launchCandidates.add(gier);
-
-        //TODO WHAT IF THERE'S NO TRANSITION??
-        gier.launchCandidates.add(erekir);
+        //TODO how will it use the nucleus???
+        serpulo.launchCandidates.add(erekir);
     }
 
     private static Planet makeAsteroid(String name, Planet parent, Block base, Block tint, float tintThresh, int pieces, float scale, Cons<AsteroidGenerator> cgen){

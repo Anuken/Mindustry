@@ -37,6 +37,8 @@ public class Drill extends Block{
     public float liquidBoostIntensity = 1.6f;
     /** Speed at which the drill speeds up. */
     public float warmupSpeed = 0.015f;
+    /** Special exemption item that this drill can't mine. */
+    public @Nullable Item blockedItem;
 
     //return variables for countOre
     protected @Nullable Item returnItem;
@@ -146,7 +148,7 @@ public class Drill extends Block{
                 Draw.color();
             }
         }else{
-            Tile to = tile.getLinkedTilesAs(this, tempTiles).find(t -> t.drop() != null && t.drop().hardness > tier);
+            Tile to = tile.getLinkedTilesAs(this, tempTiles).find(t -> t.drop() != null && t.drop().hardness > tier && t.drop() != blockedItem);
             Item item = to == null ? null : to.drop();
             if(item != null){
                 drawPlaceText(Core.bundle.get("bar.drilltierreq"), x, y, valid);
@@ -158,7 +160,7 @@ public class Drill extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.drillTier, StatValues.blocks(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= tier));
+        stats.add(Stat.drillTier, StatValues.blocks(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= tier && f.itemDrop != blockedItem));
 
         stats.add(Stat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
         if(liquidBoostIntensity != 1){
@@ -207,7 +209,7 @@ public class Drill extends Block{
     public boolean canMine(Tile tile){
         if(tile == null || tile.block().isStatic()) return false;
         Item drops = tile.drop();
-        return drops != null && drops.hardness <= tier;
+        return drops != null && drops.hardness <= tier && drops != blockedItem;
     }
 
     public class DrillBuild extends Building{

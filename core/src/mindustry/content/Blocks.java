@@ -2298,11 +2298,12 @@ public class Blocks{
             //TODO requirements
             requirements(Category.production, with(Items.graphite, 30, Items.oxide, 30, Items.beryllium, 20, Items.carbide, 30));
             consumes.power(0.8f);
-            drillTime = 100f;
+            drillTime = 120f;
             tier = 5;
             size = 3;
             range = 6;
             laserWidth = 0.7f;
+            itemCapacity = 20;
 
             consumes.liquid(Liquids.hydrogen, 0.5f / 60f).boost();
         }};
@@ -2317,6 +2318,8 @@ public class Blocks{
             drillEffect = new MultiEffect(Fx.mineImpact, Fx.drillSteam, Fx.mineImpactWave.wrap(Pal.redLight, 40f));
             shake = 4f;
             itemCapacity = 40;
+            //can't mine thorium for balance reasons, needs better drill
+            blockedItem = Items.thorium;
 
             consumes.power(3f);
             consumes.liquid(Liquids.water, 0.2f);
