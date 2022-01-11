@@ -33,7 +33,7 @@
   },
   {
     "name": "XCore",
-    "address": ["node.procord.ga:2707"]
+    "address": ["node.procord.vip:2707"]
   },
   {
     "name": "Obvilion Network",
