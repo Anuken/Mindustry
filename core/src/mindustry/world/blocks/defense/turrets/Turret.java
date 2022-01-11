@@ -440,7 +440,7 @@ public class Turret extends ReloadTurret{
                     tr.trns(rotation, shootLength, Mathf.range(xRand));
 
                     for(int i = 0; i < shots; i++){
-                        bullet(type, rotation + Mathf.range(inaccuracy + peekAmmo().inaccuracy) + (i - (int)(shots / 2f)) * spread);
+                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - (int)(shots / 2f)) * spread);
                     }
                 }
 
