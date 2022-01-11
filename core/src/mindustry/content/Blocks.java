@@ -132,6 +132,7 @@ public class Blocks{
     //unit - erekir
     tankAssembler,
     shipAssembler,
+    mechAssembler,
     basicAssemblerModule,
 
     //payloads
@@ -2993,7 +2994,7 @@ public class Blocks{
         //TODO bad name
         sublimate = new ContinuousLiquidTurret("sublimate"){{
             //TODO requirements
-            requirements(Category.turret, with(Items.tungsten, 150, Items.silicon, 160, Items.oxide, 50, Items.beryllium, 200));
+            requirements(Category.turret, with(Items.tungsten, 150, Items.silicon, 160, Items.oxide, 50, Items.beryllium, 250));
 
             draw = new DrawTurret("reinforced-"){{
 
@@ -3035,15 +3036,17 @@ public class Blocks{
             //TODO balance, set up, where is liquid/sec displayed? status effects maybe?
             ammo(
             Liquids.ozone, new ContinuousFlameBulletType(){{
-                damage = 7f;
+                damage = 9f;
                 length = range;
+                knockback = 1f;
 
                 colors = new Color[]{Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white};
             }},
             Liquids.cyanogen, new ContinuousFlameBulletType(){{
-                damage = 14f;
-                rangeChange = 50f;
+                damage = 20f;
+                rangeChange = 70f;
                 length = range + rangeChange;
+                knockback = 2f;
 
                 colors = new Color[]{Color.valueOf("465ab8").a(0.55f), Color.valueOf("66a6d2").a(0.7f), Color.valueOf("89e8b6").a(0.8f), Color.valueOf("cafcbe"), Color.white};
                 flareColor = Color.valueOf("89e8b6");
@@ -3311,6 +3314,8 @@ public class Blocks{
             consumes.liquid(Liquids.gallium, 1f / 60f);
 
         }};
+
+        //TODO mech assembler
 
         basicAssemblerModule = new UnitAssemblerModule("basic-assembler-module"){{
             requirements(Category.units, with(Items.graphite, 10));

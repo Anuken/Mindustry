@@ -27,6 +27,8 @@ public class ContinuousTurret extends Turret{
         super.setStats();
 
         stats.add(Stat.ammo, StatValues.ammo(ObjectMap.of(this, shootType)));
+        stats.remove(Stat.reload);
+        stats.remove(Stat.inaccuracy);
     }
 
     public class ContinuousTurretBuild extends TurretBuild{
@@ -107,7 +109,7 @@ public class ContinuousTurret extends Turret{
                 return;
             }
 
-            if(consValid() && !charging){
+            if(cons.canConsume() && !charging){
                 shoot(peekAmmo());
             }
         }

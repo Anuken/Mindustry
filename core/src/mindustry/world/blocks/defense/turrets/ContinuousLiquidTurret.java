@@ -33,12 +33,14 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         super.setStats();
 
         stats.remove(Stat.ammo);
+        //TODO looks bad
+        stats.add(Stat.ammo, StatValues.number(liquidConsumed * 60f, StatUnit.perSecond, true));
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
     }
 
     @Override
     public void init(){
-        //TODO use ammoMultiplier here?
+        //TODO display ammoMultiplier.
         consumes.add(new ConsumeLiquidFilter(i -> ammoTypes.containsKey(i), liquidConsumed){
             @Override
             public boolean valid(Building build){
@@ -48,6 +50,12 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
             @Override
             public void display(Stats stats){
 
+            }
+
+            @Override
+            protected float use(Building entity){
+                BulletType type = ammoTypes.get(entity.liquids.current());
+                return Math.min(amount * entity.edelta(), entity.block.liquidCapacity) / (type == null ? 1f : type.ammoMultiplier);
             }
         });
 

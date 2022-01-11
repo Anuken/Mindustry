@@ -34,13 +34,23 @@ public class StatValues{
         return table ->  table.add(!value ? "@no" : "@yes");
     }
 
-    public static StatValue number(float value, StatUnit unit){
+    public static StatValue number(float value, StatUnit unit, boolean merge){
         return table -> {
             int precision = Math.abs((int)value - value) <= 0.001f ? 0 : Math.abs((int)(value * 10) - value * 10) <= 0.001f ? 1 : 2;
 
-            table.add(Strings.fixed(value, precision));
-            table.add((unit.space ? " " : "") + unit.localized());
+            String l1 = Strings.fixed(value, precision), l2 = (unit.space ? " " : "") + unit.localized();
+
+            if(merge){
+                table.add(l1 + l2);
+            }else{
+                table.add(l1);
+                table.add(l2);
+            }
         };
+    }
+
+    public static StatValue number(float value, StatUnit unit){
+        return number(value, unit, false);
     }
 
     public static StatValue liquid(Liquid liquid, float amount, boolean perSecond){
