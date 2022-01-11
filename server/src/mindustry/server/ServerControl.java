@@ -45,6 +45,14 @@ public class ServerControl implements ApplicationListener{
     public final CommandHandler handler = new CommandHandler("");
     public final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
 
+    public Runnable serverInput = () -> {
+        Scanner scan = new Scanner(System.in);
+        while(scan.hasNext()){
+            String line = scan.nextLine();
+            Core.app.post(() -> handleCommandString(line));
+        }
+    };
+
     private Fi currentLogFile;
     private boolean inExtraRound;
     private Task lastTask;
@@ -146,10 +154,6 @@ public class ServerControl implements ApplicationListener{
         });
 
         customMapDirectory.mkdirs();
-
-        Thread thread = new Thread(this::readCommands, "Server Controls");
-        thread.setDaemon(true);
-        thread.start();
 
         if(Version.build == -1){
             warn("&lyYour server is running a custom build, which means that client checking is disabled.");
@@ -258,7 +262,13 @@ public class ServerControl implements ApplicationListener{
 
         toggleSocket(Config.socketInput.bool());
 
-        info("Server loaded. Type @ for help.", "'help'");
+        Events.on(ServerLoadEvent.class, e -> {
+            Thread thread = new Thread(serverInput, "Server Controls");
+            thread.setDaemon(true);
+            thread.start();
+
+            info("Server loaded. Type @ for help.", "'help'");
+        });
     }
 
     protected void registerCommands(){
@@ -397,10 +407,9 @@ public class ServerControl implements ApplicationListener{
                 info("  Playing on map &fi@ / Wave @", Strings.capitalize(Strings.stripColors(state.map.name())), state.wave);
 
                 if(state.rules.waves){
-                    info("  @ enemies.", state.enemies);
-                }else{
                     info("  @ seconds until next wave.", (int)(state.wavetime / 60));
                 }
+                info("  @ units / @ enemies", Groups.unit.size(), state.enemies);
 
                 info("  @ FPS, @ MB used.", Core.graphics.getFramesPerSecond(), Core.app.getJavaHeap() / 1024 / 1024);
 
@@ -455,7 +464,6 @@ public class ServerControl implements ApplicationListener{
 
             info("&fi&lcServer: &fr@", "&lw" + arg[0]);
         });
-
 
         handler.register("pause", "<on/off>", "Pause or unpause the game.", arg -> {
             boolean pause = arg[0].equals("on");
@@ -963,15 +971,7 @@ public class ServerControl implements ApplicationListener{
         mods.eachClass(p -> p.registerServerCommands(handler));
     }
 
-    private void readCommands(){
-        Scanner scan = new Scanner(System.in);
-        while(scan.hasNext()){
-            String line = scan.nextLine();
-            Core.app.post(() -> handleCommandString(line));
-        }
-    }
-
-    private void handleCommandString(String line){
+    public void handleCommandString(String line){
         CommandResponse response = handler.handleMessage(line);
 
         if(response.type == ResponseType.unknownCommand){
