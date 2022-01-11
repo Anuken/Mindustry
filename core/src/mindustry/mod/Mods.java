@@ -31,6 +31,8 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Mods implements Loadable{
+    private static final String[] metaFiles = {"mod.json", "mod.hjson", "plugin.json", "plugin.hjson"};
+
     private AsyncExecutor async = new AsyncExecutor();
     private Json json = new Json();
     private @Nullable Scripts scripts;
@@ -356,7 +358,7 @@ public class Mods implements Loadable{
     /** Loads all mods from the folder, but does not call any methods on them.*/
     public void load(){
         var files = resolveDependencies(Seq.with(modDirectory.list()).filter(f ->
-            f.extension().equals("jar") || f.extension().equals("zip") || (f.isDirectory() && (f.child("mod.json").exists() || f.child("mod.hjson").exists()))
+            f.extEquals("jar") || f.extEquals("zip") || (f.isDirectory() && (f.child("mod.json").exists() || f.child("mod.hjson").exists()))
         ));
 
         for(Fi file : files){
@@ -714,11 +716,12 @@ public class Mods implements Loadable{
     /** Tries to find the config file of a mod/plugin. */
     @Nullable
     public ModMeta findMeta(Fi file){
-        Fi metaFile =
-            file.child("mod.json").exists() ?       file.child("mod.json") :
-            file.child("mod.hjson").exists() ?      file.child("mod.hjson") :
-            file.child("plugin.json").exists() ?    file.child("plugin.json") :
-            file.child("plugin.hjson");
+        Fi metaFile = null;
+        for(String name : metaFiles){
+            if((metaFile = file.child(name)).exists()){
+                break;
+            }
+        }
 
         if(!metaFile.exists()){
             return null;
