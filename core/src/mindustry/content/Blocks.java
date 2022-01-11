@@ -3131,8 +3131,9 @@ public class Blocks{
             shootWarmupSpeed = 0.08f;
 
             outlineColor = Pal.darkOutline;
+            acceptCoolant = false;
 
-            consumes.liquids(LiquidStack.with(Liquids.hydrogen, 2f / 60f));
+            consumes.liquid(Liquids.hydrogen, 5f / 60f);
 
             scaledHealth = 300;
             range = 390f;
