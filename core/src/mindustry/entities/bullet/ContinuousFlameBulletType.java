@@ -31,7 +31,7 @@ public class ContinuousFlameBulletType extends ContinuousBulletType{
         0.25f, 0.7f, 0.1f, 0.03f
     };
 
-    public Color[] colors = {Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white};
+    public Color[] colors = {Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white.cpy()};
 
     public ContinuousFlameBulletType(float damage){
         this.damage = damage;

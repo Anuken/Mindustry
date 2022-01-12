@@ -29,6 +29,8 @@ public class Reconstructor extends UnitBlock{
 
     public Reconstructor(String name){
         super(name);
+        regionRotated1 = 1;
+        regionRotated2 = 2;
     }
 
     @Override

@@ -32,6 +32,7 @@ public class PayloadSource extends PayloadBlock{
         clipSize = 120;
         noUpdateDisabled = true;
         clearOnDoubleTap = true;
+        regionRotated1 = 1;
 
         config(Block.class, (PayloadSourceBuild build, Block block) -> {
             if(canProduce(block) && build.block != block){

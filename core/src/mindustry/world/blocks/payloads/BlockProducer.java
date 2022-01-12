@@ -30,6 +30,7 @@ public abstract class BlockProducer extends PayloadBlock{
         hasItems = true;
         hasPower = true;
         rotate = true;
+        regionRotated1 = 1;
 
         consumes.add(new ConsumeItemDynamic((BlockProducerBuild e) -> e.recipe() != null ? e.recipe().requirements : ItemStack.empty));
     }

@@ -289,6 +289,8 @@ public class Block extends UnlockableContent{
     protected TextureRegion[] generatedIcons;
     protected TextureRegion[] editorVariantRegions;
 
+    /** Regions indexes from icons() that are rotated. If either of these is not -1, other regions won't be rotated in ConstructBlocks. */
+    public int regionRotated1 = -1, regionRotated2 = -1;
     public TextureRegion region, editorIcon;
     public @Load("@-shadow") TextureRegion customShadowRegion;
     public @Load("@-team") TextureRegion teamRegion;

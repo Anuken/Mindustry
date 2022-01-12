@@ -38,6 +38,7 @@ public class UnitFactory extends UnitBlock{
         clearOnDoubleTap = true;
         outputsPayload = true;
         rotate = true;
+        regionRotated1 = 1;
 
         config(Integer.class, (UnitFactoryBuild tile, Integer i) -> {
             if(tile.currentPlan == i) return;
