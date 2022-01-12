@@ -115,7 +115,7 @@ abstract class CommanderComp implements Entityc, Posc{
         //reset controlled units
         for(Unit unit : controlling){
             if(unit.controller().isBeingControlled(self())){
-                unit.controller(unit.type.createController());
+                unit.controller(unit.type.createController(unit));
             }
         }
 

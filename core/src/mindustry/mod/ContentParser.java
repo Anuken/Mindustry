@@ -341,6 +341,11 @@ public class ContentParser{
                     value.remove("controller");
                 }
 
+                if(value.has("unitBasedController")){
+                    unit.unitBasedDefaultController = transform(resolve(value.getString("unitBasedController"), FlyingAI.class), Unit.class);
+                    value.remove("unitBasedController");
+                }
+
                 //read extra default waves
                 if(value.has("waves")){
                     JsonValue waves = value.remove("waves");
@@ -621,6 +626,21 @@ public class ContentParser{
             return () -> {
                 try{
                     return cons.newInstance();
+                }catch(Exception e){
+                    throw new RuntimeException(e);
+                }
+            };
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    private <U, T> Func<U, T> transform(Class<T> type, Class<U> arg){
+        try{
+            Constructor<T> cons = type.getDeclaredConstructor(arg);
+            return u -> {
+                try{
+                    return cons.newInstance(u);
                 }catch(Exception e){
                     throw new RuntimeException(e);
                 }
