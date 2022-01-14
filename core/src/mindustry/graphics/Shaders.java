@@ -97,6 +97,7 @@ public class Shaders{
         public Vec3 lightDir = new Vec3(1, 1, 1).nor();
         public Color ambientColor = Color.white.cpy();
         public Vec3 camDir = new Vec3();
+        public Vec3 camPos = new Vec3();
         public Planet planet;
 
         public PlanetShader(){
@@ -110,6 +111,7 @@ public class Shaders{
             setUniformf("u_lightdir", lightDir);
             setUniformf("u_ambientColor", ambientColor.r, ambientColor.g, ambientColor.b);
             setUniformf("u_camdir", camDir);
+            setUniformf("u_campos", renderer.planets.cam.position);
         }
     }
 

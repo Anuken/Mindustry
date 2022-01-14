@@ -228,8 +228,8 @@ public class PlanetRenderer implements Disposable{
         batch.flush(Gl.lineStrip);
     }
 
-    public void drawBorders(Sector sector, Color base){
-        Color color = Tmp.c1.set(base).a(base.a + 0.3f + Mathf.absin(Time.globalTime, 5f, 0.3f));
+    public void drawBorders(Sector sector, Color base, float alpha){
+        Color color = Tmp.c1.set(base).a((base.a + 0.3f + Mathf.absin(Time.globalTime, 5f, 0.3f)) * alpha);
 
         float r1 = 1f;
         float r2 = outlineRad + 0.001f;
@@ -284,8 +284,8 @@ public class PlanetRenderer implements Disposable{
         }
     }
 
-    public void drawSelection(Sector sector){
-        drawSelection(sector, Pal.accent, 0.04f, 0.001f);
+    public void drawSelection(Sector sector, float alpha){
+        drawSelection(sector, Tmp.c1.set(Pal.accent).a(alpha), 0.04f, 0.001f);
     }
 
     public void drawSelection(Sector sector, Color color, float stroke, float length){

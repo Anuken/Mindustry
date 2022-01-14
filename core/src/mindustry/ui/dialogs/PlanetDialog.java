@@ -366,19 +366,19 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         Sector current = Vars.state.getSector() != null && Vars.state.getSector().isBeingPlayed() && Vars.state.getSector().planet == state.planet ? Vars.state.getSector() : null;
 
         if(current != null){
-            planets.fill(current, hoverColor, -0.001f);
+            planets.fill(current, hoverColor.write(Tmp.c1).mulA(state.uiAlpha), -0.001f);
         }
 
         //draw hover border
         if(hovered != null){
-            planets.fill(hovered, hoverColor, -0.001f);
-            planets.drawBorders(hovered, borderColor);
+            planets.fill(hovered, hoverColor.write(Tmp.c1).mulA(state.uiAlpha), -0.001f);
+            planets.drawBorders(hovered, borderColor, state.uiAlpha);
         }
 
         //draw selected borders
         if(selected != null){
-            planets.drawSelection(selected);
-            planets.drawBorders(selected, borderColor);
+            planets.drawSelection(selected, state.uiAlpha);
+            planets.drawBorders(selected, borderColor, state.uiAlpha);
         }
 
         planets.batch.flush(Gl.triangles);
@@ -443,9 +443,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         Draw.reset();
 
-        if(hovered != null){
+        if(hovered != null && state.uiAlpha > 0.01f){
             planets.drawPlane(hovered, () -> {
                 Draw.color(hovered.isAttacked() ? Pal.remove : Color.white, Pal.accent, Mathf.absin(5f, 1f));
+                Draw.alpha(state.uiAlpha);
 
                 var icon = hovered.locked() && !canSelect(hovered) ? Fonts.getLargeIcon("lock") : hovered.isAttacked() ? Fonts.getLargeIcon("warning") : hovered.icon();
 
@@ -690,6 +691,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             addChild(hoverLabel);
             hoverLabel.toFront();
             hoverLabel.touchable = Touchable.disabled;
+            hoverLabel.color.a = state.uiAlpha;
 
             Vec3 pos = planets.cam.project(Tmp.v31.set(hovered.tile.v).setLength(PlanetRenderer.outlineRad).rotate(Vec3.Y, -state.planet.getRotation()).add(state.planet.position));
             hoverLabel.setPosition(pos.x - Core.scene.marginLeft, pos.y - Core.scene.marginBottom, Align.center);
