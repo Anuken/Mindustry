@@ -1045,7 +1045,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             return;
         }
 
-        if(sector.preset != null && sector.preset.locked() && !sector.hasBase()){
+        if(sector.preset != null && sector.preset.locked() && sector.preset.techNode != null && !sector.hasBase()){
             return;
         }
 

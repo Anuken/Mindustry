@@ -40,6 +40,8 @@ public class FileMapGenerator implements WorldGenerator{
         world.setGenerating(true);
 
         tiles = world.tiles;
+
+        //TODO why is this hardcoded into the map generator
         Item[] items = {Items.blastCompound, Items.pyratite, Items.copper, Items.thorium, Items.copper, Items.lead};
 
         for(Tile tile : tiles){

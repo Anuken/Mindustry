@@ -42,6 +42,8 @@ public class ResearchDialog extends BaseDialog{
 
     public ItemSeq items;
 
+    private boolean showTechSelect;
+
     public ResearchDialog(){
         super("");
 
@@ -63,17 +65,22 @@ public class ResearchDialog extends BaseDialog{
                         for(TechNode node : TechTree.roots){
                             if(node.requiresUnlock && !node.content.unlocked() && node != getPrefRoot()) continue;
 
-                            in.button(node.localizedName(), Styles.cleart, () -> {
+                            //TODO toggle
+                            in.button(node.localizedName(), node.icon(), Styles.clearTogglet, iconMed, () -> {
+                                if(node == lastNode){
+                                    return;
+                                }
+
                                 rebuildTree(node);
                                 hide();
-                            }).row();
+                            }).marginLeft(12f).checked(node == lastNode).row();
                         }
                     });
                 });
 
                 addCloseButton();
             }}.show();
-        }).minWidth(300f);
+        }).visible(() -> showTechSelect = TechTree.roots.count(node -> !(node.requiresUnlock && !node.content.unlocked())) > 1).minWidth(300f);
 
         margin(0f).marginBottom(8);
         cont.stack(titleTable, view = new View(), itemDisplay = new ItemsDisplay()).grow();
@@ -82,15 +89,19 @@ public class ResearchDialog extends BaseDialog{
 
         shouldPause = true;
 
-        onResize(() -> {
-            if(Core.graphics.isPortrait()){
+        Runnable checkMargin = () -> {
+            if(Core.graphics.isPortrait() && showTechSelect){
                 itemDisplay.marginTop(60f);
             }else{
                 itemDisplay.marginTop(0f);
             }
-        });
+        };
+
+        onResize(checkMargin);
 
         shown(() -> {
+            checkMargin.run();
+
             Planet currPlanet = ui.planet.isShown() ?
                 ui.planet.state.planet :
                 state.isCampaign() ? state.rules.sector.planet : null;

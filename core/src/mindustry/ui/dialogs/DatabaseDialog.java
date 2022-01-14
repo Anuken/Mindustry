@@ -64,7 +64,7 @@ public class DatabaseDialog extends BaseDialog{
             all.table(list -> {
                 list.left();
 
-                int cols = (int)Mathf.clamp((Core.graphics.getWidth() - Scl.scl(30)) / Scl.scl(32 + 10), 1, 22);
+                int cols = (int)Mathf.clamp((Core.graphics.getWidth() - Scl.scl(30)) / Scl.scl(32 + 12), 1, 22);
                 int count = 0;
 
                 for(int i = 0; i < array.size; i++){

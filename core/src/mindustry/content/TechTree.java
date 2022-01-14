@@ -6,7 +6,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
-import mindustry.gen.*;
 import mindustry.type.*;
 
 /** Class for storing a list of TechNodes with some utility tree builder methods; context dependent. See {@link SerpuloTechTree#load} source for example usage. */
@@ -142,7 +141,7 @@ public class TechTree{
         }
 
         public Drawable icon(){
-            return icon == null ? Icon.tree : icon;
+            return icon == null ? new TextureRegionDrawable(content.uiIcon) : icon;
         }
 
         public String localizedName(){

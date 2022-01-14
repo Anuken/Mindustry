@@ -115,6 +115,10 @@ public class Renderer implements ApplicationListener{
 
         loadFluidFrames();
 
+        Events.on(ClientLoadEvent.class, e -> {
+            loadFluidFrames();
+        });
+
         assets.load("sprites/clouds.png", Texture.class).loaded = t -> {
             t.setWrap(TextureWrap.repeat);
             t.setFilter(TextureFilter.linear);
@@ -130,8 +134,6 @@ public class Renderer implements ApplicationListener{
     }
 
     public void loadFluidFrames(){
-        if(fluidFrames != null) return;
-
         fluidFrames = new TextureRegion[2][Liquid.animationFrames];
 
         String[] fluidTypes = {"liquid", "gas"};
@@ -145,7 +147,9 @@ public class Renderer implements ApplicationListener{
     }
 
     public TextureRegion[][] getFluidFrames(){
-        loadFluidFrames();
+        if(fluidFrames == null){
+            loadFluidFrames();
+        }
         return fluidFrames;
     }
 
