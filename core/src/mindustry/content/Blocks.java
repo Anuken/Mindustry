@@ -633,7 +633,7 @@ public class Blocks{
 
         yellowStoneBoulder = new Prop("yellow-stone-boulder"){{
             variants = 2;
-            yellowStone.asFloor().decoration = this;
+            yellowStone.asFloor().decoration = regolith.asFloor().decoration = this;
         }};
 
         metalFloor = new Floor("metal-floor", 0);

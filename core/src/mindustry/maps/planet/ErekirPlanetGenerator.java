@@ -132,8 +132,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         float maxd = Mathf.dst(width/2f, height/2f);
 
         erase(spawnX, spawnY, 15);
-        brush(pathfind(spawnX, spawnY, endX, endY, tile -> (tile.solid() ? 300f : 0f) + maxd - tile.dst(width/2f, height/2f)/10f, Astar.manhattan), 7);
-        erase(endX, endY, 12);
+        brush(pathfind(spawnX, spawnY, endX, endY, tile -> (tile.solid() ? 300f : 0f) + maxd - tile.dst(width/2f, height/2f)/10f, Astar.manhattan), 9);
+        erase(endX, endY, 15);
 
         //arkycite
         pass((x, y) -> {
