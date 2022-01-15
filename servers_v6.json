@@ -1,7 +1,7 @@
 [
   {
-    "name": "Infection",
-    "address": ["plague-continued.ml:5555", "plague-continued.ml:5004"]
+    "name": "Omega & Infection",
+    "address": ["yeeth.mindustry.me:6568", "plague-continued.ml:5555", "plague-continued.ml:5004", "yeeth.mindustry.me:5002"]
   },
   {
     "name": "RCM",
@@ -54,10 +54,6 @@
   {
     "name": "Korea",
     "address": ["mindustry.initd.kr"]
-  },
-  {
-    "name": "Omega",
-    "address": ["yeeth.mindustry.me:6568"] 
   },
   {
     "name": "Obvilion Network",
