@@ -70,9 +70,9 @@ public class ArtilleryBulletType extends BasicBulletType{
         Draw.mixcol(mix, mix.a);
 
         Draw.color(backColor);
-        Draw.rect(backRegion, b.x, b.y, width * xscale, height * yscale, b.rotation() - offset);
+        Draw.rect(backRegion, b.x, b.y, width * xscale, height * yscale, b.rotation() + offset);
         Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x, b.y, width * xscale, height * yscale, b.rotation() - offset);
+        Draw.rect(frontRegion, b.x, b.y, width * xscale, height * yscale, b.rotation() + offset);
 
         Draw.reset();
     }
