@@ -1,6 +1,9 @@
 package mindustry.entities.bullet;
 
+import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 
@@ -58,12 +61,19 @@ public class ArtilleryBulletType extends BasicBulletType{
     @Override
     public void draw(Bullet b){
         drawTrail(b);
-        float xscale = (1f - shrinkX + b.fslope() * (shrinkX)), yscale = (1f - shrinkY + b.fslope() * (shrinkY)), rot = b.rotation();
+        float xscale = 1f - shrinkX + b.fslope() * shrinkX;
+        float yscale = 1f - shrinkY + b.fslope() * shrinkY;
+        float offset = -90 + (spin != 0 ? Mathf.randomSeed(b.id, 360f) + b.time * spin : 0f);
+
+        Color mix = Tmp.c1.set(mixColorFrom).lerp(mixColorTo, b.fin());
+
+        Draw.mixcol(mix, mix.a);
 
         Draw.color(backColor);
-        Draw.rect(backRegion, b.x, b.y, width * xscale, height * yscale, rot - 90);
+        Draw.rect(backRegion, b.x, b.y, width * xscale, height * yscale, b.rotation() - offset);
         Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x, b.y, width * xscale, height * yscale, rot - 90);
-        Draw.color();
+        Draw.rect(frontRegion, b.x, b.y, width * xscale, height * yscale, b.rotation() - offset);
+
+        Draw.reset();
     }
 }

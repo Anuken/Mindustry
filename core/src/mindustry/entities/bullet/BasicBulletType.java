@@ -43,8 +43,8 @@ public class BasicBulletType extends BulletType{
     @Override
     public void draw(Bullet b){
         super.draw(b);
-        float height = this.height * ((1f - shrinkY) + shrinkY * b.fout());
-        float width = this.width * ((1f - shrinkX) + shrinkX * b.fout());
+        float xscale = 1f - shrinkX * b.fin();
+        float yscale = 1f - shrinkY * b.fin();
         float offset = -90 + (spin != 0 ? Mathf.randomSeed(b.id, 360f) + b.time * spin : 0f);
 
         Color mix = Tmp.c1.set(mixColorFrom).lerp(mixColorTo, b.fin());
@@ -52,9 +52,9 @@ public class BasicBulletType extends BulletType{
         Draw.mixcol(mix, mix.a);
 
         Draw.color(backColor);
-        Draw.rect(backRegion, b.x, b.y, width, height, b.rotation() + offset);
+        Draw.rect(backRegion, b.x, b.y, width * xscale, height * yscale, b.rotation() - offset);
         Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x, b.y, width, height, b.rotation() + offset);
+        Draw.rect(frontRegion, b.x, b.y, width * xscale, height * yscale, b.rotation() - offset);
 
         Draw.reset();
     }
