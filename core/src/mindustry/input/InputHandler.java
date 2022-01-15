@@ -1269,18 +1269,23 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         int endRotation = -1;
+        var start = world.build(startX, startY);
+        var end = world.build(endX, endY);
         if(diagonal){
-            var start = world.build(startX, startY);
-            var end = world.build(endX, endY);
             if(block != null && start instanceof ChainedBuilding && end instanceof ChainedBuilding
                     && block.canReplace(end.block) && block.canReplace(start.block)){
                 points = Placement.upgradeLine(startX, startY, endX, endY);
-                endRotation = end.rotation;
             }else{
                 points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
             }
         }else{
             points = Placement.normalizeLine(startX, startY, endX, endY);
+        }
+        if(points.size > 1 && end instanceof ChainedBuilding){
+            Point2 secondToLast = points.get(points.size - 2);
+            if (!(world.build(secondToLast.x, secondToLast.y) instanceof ChainedBuilding)) {
+                endRotation = end.rotation;
+            }
         }
 
         if(block != null){
