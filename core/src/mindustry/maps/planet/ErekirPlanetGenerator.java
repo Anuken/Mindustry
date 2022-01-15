@@ -75,7 +75,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         if(ice < 0.6){
             if(result == Blocks.rhyolite || result == Blocks.yellowStone || result == Blocks.regolith){
-                return Blocks.dacite; //TODO perhaps something else
+                //TODO bio(?) luminescent stuff
+                return Blocks.ferricStone; //TODO perhaps something else
             }
         }
 
@@ -136,6 +137,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         erase(endX, endY, 15);
 
         //arkycite
+        //TODO arkycite biome
         pass((x, y) -> {
             if(nearWall(x, y)) return;
 
@@ -148,7 +150,6 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         median(2, 0.6, Blocks.arkyciteFloor);
 
-        //TODO arkycite walls
         blend(Blocks.arkyciteFloor, Blocks.arkyicStone, 4);
 
         distort(10f, 12f);

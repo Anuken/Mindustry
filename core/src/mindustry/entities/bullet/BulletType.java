@@ -112,8 +112,10 @@ public class BulletType extends Content implements Cloneable{
     /** Whether to move the bullet back depending on delta to fix some delta-time related issues.
      * Do not change unless you know what you're doing. */
     public boolean backMove = true;
-    /** Bullet range override. */
+    /** Bullet range positive override. */
     public float maxRange = -1f;
+    /** When > 0, overrides range even if smaller than base range. */
+    public float rangeOverride = -1f;
     /** When used in a turret with multiple ammo types, this can be set to a non-zero value to influence range. */
     public float rangeChange = 0f;
     /** % of block health healed **/
@@ -215,6 +217,7 @@ public class BulletType extends Content implements Cloneable{
 
     /** Returns maximum distance the bullet this bullet type has can travel. */
     public float range(){
+        if(rangeOverride > 0) return rangeOverride;
         return Mathf.zero(drag) ? speed * lifetime : Math.max(speed * (1f - Mathf.pow(1f - drag, lifetime)) / drag, maxRange);
     }
 

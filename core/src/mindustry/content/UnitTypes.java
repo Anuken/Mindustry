@@ -2509,7 +2509,7 @@ public class UnitTypes{
             flying = true;
             drag = 0.06f;
             speed = 1.1f;
-            rotateSpeed = 3.5f;
+            rotateSpeed = 3.2f;
             accel = 0.1f;
             health = 3000f;
             armor = 5f;
@@ -2522,6 +2522,40 @@ public class UnitTypes{
             abilities.add(new SuppressionFieldAbility(){{
                 orbRadius = 5.3f;
                 y = 1f;
+            }});
+
+            weapons.add(new Weapon("quell-weapon"){{
+                x = 51 / 4f;
+                y = 5 / 4f;
+                rotate = true;
+                rotateSpeed = 2f;
+                reload = 60f;
+                layerOffset = -0.001f;
+                recoil = 1f;
+                rotationLimit = 60f;
+
+                bullet = new BulletType(){{
+                    shootEffect = Fx.shootBig;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    shake = 1f;
+                }};
+
+                unitSpawned = new MissileUnitType("quell-missile"){{
+                    speed = 4f;
+                    maxRange = 80f;
+
+                    weapons.add(new Weapon(){{
+                        shootOnDeath = true;
+                        bullet = new BulletType(){{
+                            rangeOverride = 20f;
+                            despawnEffect = Fx.blastExplosion;
+                            killShooter = true;
+                            //TODO status?
+                            splashDamageRadius = 60f;
+                            splashDamage = 230f;
+                        }};
+                    }});
+                }};
             }});
 
             setEnginesMirror(

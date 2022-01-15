@@ -1,7 +1,6 @@
 package mindustry.core;
 
 import arc.*;
-import arc.assets.*;
 import arc.assets.loaders.*;
 import arc.assets.loaders.MusicLoader.*;
 import arc.assets.loaders.SoundLoader.*;
@@ -18,7 +17,7 @@ public class FileTree implements FileHandleResolver{
     private ObjectMap<String, Music> loadedMusic = new ObjectMap<>();
 
     public void addFile(String path, Fi f){
-        files.put(path, f);
+        files.put(path.replace('\\', '/'), f);
     }
 
     /** Gets an asset file.*/
@@ -61,7 +60,7 @@ public class FileTree implements FileHandleResolver{
             String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
 
             var sound = new Sound();
-            AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundParameter(sound));
+            var desc = Core.assets.load(path, Sound.class, new SoundParameter(sound));
             desc.errored = Throwable::printStackTrace;
 
             return sound;
@@ -80,7 +79,7 @@ public class FileTree implements FileHandleResolver{
             String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
 
             var music = new Music();
-            AssetDescriptor<?> desc = Core.assets.load(path, Music.class, new MusicParameter(music));
+            var desc = Core.assets.load(path, Music.class, new MusicParameter(music));
             desc.errored = Throwable::printStackTrace;
 
             return music;

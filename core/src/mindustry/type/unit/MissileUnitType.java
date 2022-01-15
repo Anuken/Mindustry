@@ -25,7 +25,9 @@ public class MissileUnitType extends UnitType{
         physics = false;
         trailLength = 7;
         hidden = true;
-        rotateSpeed = 2f;
+        speed = 4f;
+        lifetime = 60f * 3f;
+        rotateSpeed = 3f;
         range = 30f;
         //TODO weapons, etc
     }
