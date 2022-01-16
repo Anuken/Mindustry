@@ -253,7 +253,7 @@ public class ContentParser{
 
             if(locate(ContentType.block, name) != null){
                 if(value.has("type")){
-                    Log.warn("Warning: '" + name + "' re-declares a type. This will be interpreted as a new block. If you wish to override a vanilla block, omit the 'type' section, as vanilla block `type`s cannot be changed.");
+                    Log.warn("Warning: '" + currentMod.name + "-" + name + "' re-declares a type. This will be interpreted as a new block. If you wish to override a vanilla block, omit the 'type' section, as vanilla block `type`s cannot be changed.");
                     block = make(resolve(value.getString("type", ""), Block.class), mod + "-" + name);
                 }else{
                     block = locate(ContentType.block, name);

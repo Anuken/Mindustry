@@ -907,6 +907,8 @@ public class UnitTypes{
                 rotate = true;
                 shadow = 30f;
 
+                rotationLimit = 80f;
+
                 bullet = new ArtilleryBulletType(3f, 50){{
                     hitEffect = Fx.sapExplosion;
                     knockback = 0.8f;
@@ -2529,7 +2531,7 @@ public class UnitTypes{
                 y = 5 / 4f;
                 rotate = true;
                 rotateSpeed = 2f;
-                reload = 60f;
+                reload = 70f;
                 layerOffset = -0.001f;
                 recoil = 1f;
                 rotationLimit = 60f;
@@ -2541,18 +2543,23 @@ public class UnitTypes{
                 }};
 
                 unitSpawned = new MissileUnitType("quell-missile"){{
-                    speed = 4f;
+                    speed = 3.8f;
                     maxRange = 80f;
+                    outlineColor = Pal.darkOutline;
+                    health = 45;
 
                     weapons.add(new Weapon(){{
+                        shootCone = 360f;
+                        mirror = false;
+                        reload = 1f;
                         shootOnDeath = true;
                         bullet = new BulletType(){{
                             rangeOverride = 20f;
-                            despawnEffect = Fx.blastExplosion;
+                            shootEffect = Fx.massiveExplosion;
                             killShooter = true;
                             //TODO status?
-                            splashDamageRadius = 60f;
-                            splashDamage = 230f;
+                            splashDamageRadius = 40f;
+                            splashDamage = 120f;
                         }};
                     }});
                 }};
