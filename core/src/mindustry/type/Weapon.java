@@ -151,6 +151,8 @@ public class Weapon implements Cloneable{
 
     //TODO copy-pasted code
     public void drawOutline(Unit unit, WeaponMount mount){
+        if(!outlineRegion.found()) return;
+
         //apply layer offset, roll it back at the end
         float z = Draw.z();
         Draw.z(z + layerOffset);
@@ -173,6 +175,8 @@ public class Weapon implements Cloneable{
     }
     
     public void draw(Unit unit, WeaponMount mount){
+        if(!region.found()) return;
+
         //apply layer offset, roll it back at the end
         float z = Draw.z();
         Draw.z(z + layerOffset);
@@ -434,7 +438,7 @@ public class Weapon implements Cloneable{
     }
 
     public void load(){
-        region = Core.atlas.find(name, Core.atlas.find("clear"));
+        region = Core.atlas.find(name);
         heatRegion = Core.atlas.find(name + "-heat");
         outlineRegion = Core.atlas.find(name + "-outline");
     }

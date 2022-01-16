@@ -503,9 +503,19 @@ public class Generators{
                     }
                 };
 
-                for(Weapon weapon : type.weapons){
+                Seq<Weapon> weapons = type.weapons;
+                weapons.each(Weapon::load);
+                weapons.removeAll(w -> !w.region.found());
+
+                for(Weapon weapon : weapons){
                     if(outlined.add(weapon.name) && has(weapon.name)){
-                        save(outline.get(get(weapon.name)), weapon.name + "-outline");
+                        //only non-top weapons need separate outline sprites (this is mostly just mechs)
+                        if(!weapon.top){
+                            save(outline.get(get(weapon.name)), weapon.name + "-outline");
+                        }else{
+                            //replace weapon with outlined version, no use keeping standard around
+                            outliner.get(weapon.region);
+                        }
                     }
                 }
 
@@ -575,9 +585,7 @@ public class Generators{
 
                 //TODO draw under for layerOffset < 0
                 //draw weapon outlines on base
-                for(Weapon weapon : type.weapons){
-                    weapon.load();
-
+                for(Weapon weapon : weapons){
                     image.draw(weapon.flipSprite ? outline.get(get(weapon.region)).flipX() : outline.get(get(weapon.region)),
                     (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.width / 2f),
                     (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.height / 2f),
@@ -598,9 +606,7 @@ public class Generators{
                     image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2, true);
                 }
 
-                for(Weapon weapon : type.weapons){
-                    weapon.load();
-
+                for(Weapon weapon : weapons){
                     Pixmap wepReg = weapon.top ? outline.get(get(weapon.region)) : get(weapon.region);
                     if(weapon.flipSprite){
                         wepReg = wepReg.flipX();

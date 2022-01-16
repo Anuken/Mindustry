@@ -34,7 +34,7 @@ public class UnitTypes{
     public static @EntityDef(value = {Unitc.class, Mechc.class}, legacy = true) UnitType nova, pulsar, quasar;
 
     //legs
-    public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax;
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax, bulwark;
 
     //legs, legacy
     public static @EntityDef(value = {Unitc.class, Legsc.class}, legacy = true) UnitType spiroct, arkyid, toxopid;
@@ -2440,7 +2440,7 @@ public class UnitTypes{
                 layerOffset = 0.0001f;
                 reload = 120f;
                 shootY = 71f / 4f;
-                shake = 4f;
+                shake = 5f;
                 recoil = 4f;
                 rotate = true;
                 rotateSpeed = 1f;
@@ -2448,12 +2448,14 @@ public class UnitTypes{
                 x = 0f;
                 y = 0;
                 shadow = 28f;
+                heatColor = Color.valueOf("f9350f");
+                cooldownTime = 80f;
 
-                bullet = new BasicBulletType(7f, 90){{
+                bullet = new BasicBulletType(8f, 100){{
                     sprite = "missile-large";
-                    width = 9f;
+                    width = 9.5f;
                     height = 15f;
-                    lifetime = 33f;
+                    lifetime = 32f;
                     hitSize = 6f;
                     shootEffect = Fx.shootTitan;
                     smokeEffect = Fx.shootSmokeTitan;
@@ -2462,7 +2464,7 @@ public class UnitTypes{
                     pierceBuilding = true;
                     hitColor = backColor = trailColor = Color.valueOf("feb380");
                     frontColor = Color.white;
-                    trailWidth = 3f;
+                    trailWidth = 3.1f;
                     trailLength = 8;
                     hitEffect = despawnEffect = Fx.blastExplosion;
                 }};
@@ -2498,7 +2500,93 @@ public class UnitTypes{
         //endregion
         //region erekir - mech
 
-        //TODO
+        bulwark = new UnitType("bulwark"){{
+            drag = 0.1f;
+            speed = 0.62f;
+            hitSize = 23f;
+            health = 8000;
+            armor = 6f;
+            outlineColor = Pal.darkOutline;
+            envDisabled = Env.space;
+
+            //TODO shield ability
+
+            rotateSpeed = 2.7f;
+
+            legCount = 4;
+            legLength = 15f;
+            legTrns = 0.45f;
+            legMoveSpace = 1.4f;
+            rippleScale = 2f;
+            landShake = 0.5f;
+            legExtension = -5f;
+            legBaseOffset = 5f;
+
+            ammoType = new PowerAmmoType(2000);
+
+            legSplashDamage = 32;
+            legSplashRange = 30;
+            drownTimeMultiplier = 2f;
+
+            hovering = true;
+            visualElevation = 0.65f;
+            groundLayer = Layer.legUnit;
+
+            weapons.add(new Weapon("bulwark-weapon"){{
+                mirror = true;
+                top = false;
+
+                x = 62/4f;
+                y = 1f;
+                shootY = 47 / 4f;
+                recoil = 3f;
+                reload = 40f;
+                shake = 3f;
+                cooldownTime = 40f;
+
+                shots = 3;
+                inaccuracy = 3f;
+                velocityRnd = 0.33f;
+                heatColor = Color.red;
+
+                bullet = new MissileBulletType(4.2f, 30){{
+                    homingPower = 0.2f;
+                    weaveMag = 4;
+                    weaveScale = 4;
+                    lifetime = 60f;
+                    //TODO better
+                    shootEffect = Fx.shootBig2;
+                    smokeEffect = Fx.shootSmokeTitan;
+                    splashDamage = 50f;
+                    splashDamageRadius = 30f;
+                    frontColor = Color.white;
+                    hitSound = Sounds.none;
+                    width = height = 10f;
+
+                    lightColor = trailColor = backColor = Color.valueOf("8ca9e8");
+                    lightRadius = 40f;
+                    lightOpacity = 0.7f;
+
+                    trailWidth = 2.8f;
+                    trailLength = 20;
+                    trailChance = -1f;
+
+                    despawnEffect = Fx.none;
+                    hitEffect = new ExplosionEffect(){{
+                        lifetime = 20f;
+                        waveStroke = 2f;
+                        waveColor = sparkColor = trailColor;
+                        waveRad = 12f;
+                        smokeSize = 0f;
+                        smokeSizeBase = 0f;
+                        sparks = 10;
+                        sparkRad = 35f;
+                        sparkLen = 4f;
+                        sparkStroke = 1.5f;
+                    }};
+                }};
+            }});
+        }};
 
         //endregion
         //region erekir - flying

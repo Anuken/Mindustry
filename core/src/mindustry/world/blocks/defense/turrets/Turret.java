@@ -463,8 +463,9 @@ public class Turret extends ReloadTurret{
             return ammo.peek().type();
         }
 
-        /** @return  whether the turret has ammo. */
+        /** @return whether the turret has ammo. */
         public boolean hasAmmo(){
+            //used for "side-ammo" like gas in some turrets
             if(!cons.canConsume()) return false;
 
             //skip first entry if it has less than the required amount of ammo
