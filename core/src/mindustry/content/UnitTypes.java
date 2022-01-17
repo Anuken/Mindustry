@@ -2655,7 +2655,7 @@ public class UnitTypes{
                             shootEffect = Fx.massiveExplosion;
                             killShooter = true;
                             //TODO status?
-                            splashDamageRadius = 40f;
+                            splashDamageRadius = 30f;
                             splashDamage = 120f;
                         }};
                     }});
