@@ -2509,11 +2509,10 @@ public class UnitTypes{
             outlineColor = Pal.darkOutline;
             envDisabled = Env.space;
 
-            //new ForceFieldAbility(60f, 0.3f, 400f, 60f * 6);
-            abilities.add(new ShieldSectorAbility(){{
+            abilities.add(new ShieldArcAbility(){{
                 region = "bulwark-shield";
                 radius = 34f;
-                sectorAngle = 85f;
+                angle = 82f;
                 regen = 0.4f;
                 cooldown = 60f * 8f;
                 max = 1500f;
@@ -2521,7 +2520,7 @@ public class UnitTypes{
                 width = 6f;
             }});
 
-            rotateSpeed = 2.2f;
+            rotateSpeed = 2.1f;
 
             legCount = 4;
             legLength = 15f;

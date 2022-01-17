@@ -14,15 +14,15 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
-public class ShieldSectorAbility extends Ability{
+public class ShieldArcAbility extends Ability{
     private static Unit paramUnit;
-    private static ShieldSectorAbility paramField;
+    private static ShieldArcAbility paramField;
     private static Vec2 paramPos = new Vec2();
     private static final Cons<Bullet> shieldConsumer = b -> {
         if(b.team != paramUnit.team && b.type.absorbable && paramField.data > 0 &&
             !paramPos.within(b, paramField.radius + paramField.width/2f) &&
             Tmp.v1.set(b).add(b.vel).within(paramPos, paramField.radius + paramField.width/2f) &&
-            Angles.within(paramPos.angleTo(b), paramUnit.rotation + paramField.angleOffset, paramField.sectorAngle / 2f)){
+            Angles.within(paramPos.angleTo(b), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f)){
 
             b.absorb();
             Fx.absorb.at(b);
@@ -47,8 +47,8 @@ public class ShieldSectorAbility extends Ability{
     public float max = 200f;
     /** Cooldown after the shield is broken, in ticks. */
     public float cooldown = 60f * 5;
-    /** Angle of shield sector. */
-    public float sectorAngle = 80f;
+    /** Angle of shield arc. */
+    public float angle = 80f;
     /** Offset parameters for shield. */
     public float angleOffset = 0f, x = 0f, y = 0f;
     /** If true, only activates when shooting. */
@@ -56,8 +56,8 @@ public class ShieldSectorAbility extends Ability{
     /** Width of shield line. */
     public float width = 6f;
 
-    /** Whether to draw the sector line. */
-    public boolean drawSector = true;
+    /** Whether to draw the arc line. */
+    public boolean drawArc = true;
     /** If not null, will be drawn on top. */
     public @Nullable String region;
     /** If true, sprite position will be influenced by x/y. */
@@ -109,9 +109,9 @@ public class ShieldSectorAbility extends Ability{
                     Draw.yscl = 1f;
                 }
 
-                if(drawSector){
+                if(drawArc){
                     Lines.stroke(width * widthScale);
-                    Lines.swirl(pos.x, pos.y, radius, sectorAngle / 360f, unit.rotation + angleOffset - sectorAngle / 2f);
+                    Lines.arc(pos.x, pos.y, radius, angle / 360f, unit.rotation + angleOffset - angle / 2f);
                 }
             }else{
                 //TODO
