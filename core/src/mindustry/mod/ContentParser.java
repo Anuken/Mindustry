@@ -400,7 +400,9 @@ public class ContentParser{
             case "legs" -> LegsUnit::create;
             case "naval" -> UnitWaterMove::create;
             case "payload" -> PayloadUnit::create;
-            default -> throw new RuntimeException("Invalid unit type: '" + value + "'. Must be 'flying/mech/legs/naval/payload'.");
+            case "missile" -> TimedKillUnit::create;
+            case "tether" -> BuildingTetherPayloadUnit::create;
+            default -> throw new RuntimeException("Invalid unit type: '" + value + "'. Must be 'flying/mech/legs/naval/payload/missile/tether'.");
         };
     }
 
