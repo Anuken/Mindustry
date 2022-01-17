@@ -8,16 +8,20 @@
     "address": ["baseduser.eu.org:6569", "v7.thedimas.pp.ua", "yeeth.mindustry.me:7000", "yeeth.mindustry.me:4000", "yeeth.mindustry.me:2000", "yeeth.mindustry.me:3000"]
   },
   {
+    "name": "SMokeOfAnarchy",
+    "address": "SMokeOfAnarchy.duckdns.org"
+  },
+  {
     "name": "hexpvp.ml",
     "address": "hexpvp.ml"
   },
   {
     "name": "Omega",
-    "address": ["yeeth.mindustry.me:5002", "yeeth.mindustry.me:5003", "yeeth.mindustry.me:5004","yeeth.mindustry.me:5005", "yeeth.mindustry.me:5006", "yeeth.mindustry.me:5007", "yeeth.mindustry.me", "yeeth.mindustry.me:4006"]
+    "address": ["n3.mindustry.me:5002", "n3.mindustry.me:5003", "n3.mindustry.me:5004","n3.mindustry.me:5005", "n3.mindustry.me:5006", "n3.mindustry.me:5007", "n3.mindustry.me", "n3.mindustry.me:4006"]
   },
   {
     "name": "MeowLand",
-    "address": ["34.134.111.15", "fifr4.quackhost.uk:21013", "34.134.111.15:4000", "34.134.111.15:7000"]
+    "address": ["kgstudios.ddns.net:6565"]
   },
   {
     "name": "DarkDustry",
@@ -29,7 +33,7 @@
   },
   {
     "name": "XCore",
-    "address": ["skaarjproject.duckdns.org:2000"]
+    "address": ["node.procord.vip:2707", "eu-fsn-01.vapur.host:24603"]
   },
   {
     "name": "Obvilion Network",
@@ -74,5 +78,9 @@
   {
     "name": "ALEX",
     "address": ["dogemindustry.ddns.net:25588"]
+  },
+  {
+    "name": "Beyond Anarchy",
+    "address": ["45.156.25.49"]
   }
 ]
