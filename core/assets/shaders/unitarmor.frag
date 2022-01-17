@@ -17,14 +17,7 @@ void main(){
 	vec4 c = texture2D(u_texture, v_texCoords);
 
     c.a *= u_progress;
-
-    if(c.a > 0.01){
-        float f = step(abs(sin(coords.y*3.0 + u_time)), 0.9);
-        c.a *= f;
-        //c.rgb = mix(c.rgb, u_color.rgb, f * u_color.a);
-    }
-
-   // c.a *= (1.0-coords.y);
+    c.a *= step(abs(sin(coords.y*3.0 + u_time)), 0.9);
 
     gl_FragColor = c * v_color;
 }

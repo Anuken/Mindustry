@@ -3,6 +3,7 @@ package mindustry.maps;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -318,7 +319,7 @@ public class SectorDamage{
             if(unit.team == state.rules.defaultTeam){
                 sumHealth += unit.health*healthMult + unit.shield;
                 sumDps += unit.type.dpsEstimate;
-                if(unit.abilities.find(a -> a instanceof RepairFieldAbility) instanceof RepairFieldAbility h){
+                if(Structs.find(unit.abilities, a -> a instanceof RepairFieldAbility) instanceof RepairFieldAbility h){
                     sumRps += h.amount / h.reload * 60f;
                 }
             }else{

@@ -243,6 +243,7 @@ public class UnitType extends UnlockableContent{
         table.table(bars -> {
             bars.defaults().growX().height(20f).pad(4);
 
+            //TODO overlay shields
             bars.add(new Bar("stat.health", Pal.health, unit::healthf).blink(Color.white));
             bars.row();
 
@@ -454,6 +455,10 @@ public class UnitType extends UnlockableContent{
                     Fill.circle(e.x + Fx.v.x + Fx.rand.range(4f), e.y + Fx.v.y + Fx.rand.range(4f), e.fout() * hitSize / 28f * 3f * Fx.rand.random(0.8f, 1.1f) + 0.3f);
                 }
             }).layer(Layer.debris);
+        }
+
+        for(Ability ab : abilities){
+            ab.init(this);
         }
 
         canHeal = weapons.contains(w -> w.bullet.heals());
@@ -770,11 +775,9 @@ public class UnitType extends UnlockableContent{
             Draw.z(z);
         }
 
-        if(unit.abilities.size > 0){
-            for(Ability a : unit.abilities){
-                Draw.reset();
-                a.draw(unit);
-            }
+        for(Ability a : unit.abilities){
+            Draw.reset();
+            a.draw(unit);
         }
 
         Draw.reset();

@@ -6,7 +6,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
 import mindustry.ai.types.*;
@@ -43,6 +42,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Import WeaponMount[] mounts;
 
     private UnitController controller;
+    Ability[] abilities = {};
     UnitType type = UnitTypes.alpha;
     boolean spawnedByCore;
     double flag;
@@ -50,7 +50,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     transient @Nullable Trail trail;
 
     transient float shadowAlpha = -1f;
-    transient Seq<Ability> abilities = new Seq<>(0);
     transient float healTime;
     private transient float resupplyTime = Mathf.random(10f);
     private transient boolean wasPlayer;
@@ -308,8 +307,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         if(controller == null) controller(type.createController());
         if(mounts().length != type.weapons.size) setupWeapons(type);
-        if(abilities.size != type.abilities.size){
-            abilities = type.abilities.map(Ability::copy);
+        if(abilities.length != type.abilities.size){
+            abilities = new Ability[type.abilities.size];
+            for(int i = 0; i < type.abilities.size; i ++){
+                abilities[i] = type.abilities.get(i).copy();
+            }
         }
     }
 
@@ -393,10 +395,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             }
         }
 
-        if(abilities.size > 0){
-            for(Ability a : abilities){
-                a.update(self());
-            }
+        for(Ability a : abilities){
+            a.update(self());
         }
 
         if(trail != null){
@@ -546,10 +546,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             }
         }
 
-        if(abilities.size > 0){
-            for(Ability a : abilities){
-                a.death(self());
-            }
+        for(Ability a : abilities){
+            a.death(self());
         }
 
         remove();

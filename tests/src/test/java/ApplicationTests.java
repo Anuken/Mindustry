@@ -350,13 +350,22 @@ public class ApplicationTests{
     }
 
     @Test
-    void load(){
+    void saveLoad(){
         world.loadMap(testMap);
         Map map = state.map;
+
+        float hp = 30f;
+
+        Unit unit = UnitTypes.dagger.spawn(Team.sharded, 20f, 30f);
+        unit.health = hp;
 
         SaveIO.save(saveDirectory.child("0.msav"));
         resetWorld();
         SaveIO.load(saveDirectory.child("0.msav"));
+
+        Unit spawned = Groups.unit.find(u -> u.type == UnitTypes.dagger);
+        assertNotNull(spawned, "Saved daggers must persist");
+        assertEquals(hp, spawned.health, "Spawned dagger health must save.");
 
         assertEquals(world.width(), map.width);
         assertEquals(world.height(), map.height);

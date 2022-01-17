@@ -2503,16 +2503,25 @@ public class UnitTypes{
         bulwark = new UnitType("bulwark"){{
             drag = 0.1f;
             speed = 0.62f;
-            hitSize = 23f;
-            health = 8000;
-            armor = 6f;
+            hitSize = 19f;
+            health = 7300;
+            armor = 5f;
             outlineColor = Pal.darkOutline;
             envDisabled = Env.space;
 
-            //TODO shield ability looks bad
-            //abilities.add(new ArmorPlateAbility());
+            //new ForceFieldAbility(60f, 0.3f, 400f, 60f * 6);
+            abilities.add(new ShieldSectorAbility(){{
+                region = "bulwark-shield";
+                radius = 34f;
+                sectorAngle = 85f;
+                regen = 0.4f;
+                cooldown = 60f * 8f;
+                max = 1500f;
+                y = -20f;
+                width = 6f;
+            }});
 
-            rotateSpeed = 2.7f;
+            rotateSpeed = 2.2f;
 
             legCount = 4;
             legLength = 15f;
@@ -2554,7 +2563,7 @@ public class UnitTypes{
                     homingPower = 0.2f;
                     weaveMag = 4;
                     weaveScale = 4;
-                    lifetime = 60f;
+                    lifetime = 55f;
                     //TODO better
                     shootEffect = Fx.shootBig2;
                     smokeEffect = Fx.shootSmokeTitan;

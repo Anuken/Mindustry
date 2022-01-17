@@ -11,6 +11,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
@@ -185,6 +186,31 @@ public class TypeIO{
         read.skip(read.b() * (1 + 4 + 4));
 
         return noMounts;
+    }
+
+    public static Ability[] readAbilities(Reads read, Ability[] abilities){
+        byte len = read.b();
+        for(int i = 0; i < len; i++){
+            float data = read.f();
+            if(abilities.length > i){
+                abilities[i].data = data;
+            }
+        }
+        return abilities;
+    }
+
+    public static void writeAbilities(Writes write, Ability[] abilities){
+        write.b(abilities.length);
+        for(var a : abilities){
+            write.f(a.data);
+        }
+    }
+
+    static final Ability[] noAbilities = {};
+
+    public static Ability[] readAbilities(Reads read){
+        read.skip(read.b());
+        return noAbilities;
     }
 
     public static void writeUnit(Writes write, Unit unit){
