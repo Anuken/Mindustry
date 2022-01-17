@@ -3295,7 +3295,7 @@ public class Blocks{
         tankAssembler = new UnitAssembler("tank-assembler"){{
             requirements(Category.units, with(Items.graphite, 10));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 10f, BlockStack.list(Blocks.thoriumWallLarge, 4, Blocks.duct, 2)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 10f, BlockStack.list(Blocks.tungstenWallLarge, 5, Blocks.duct, 2)));
             consumes.power(2f);
             areaSize = 13;
 
@@ -3307,7 +3307,7 @@ public class Blocks{
         shipAssembler = new UnitAssembler("ship-assembler"){{
             requirements(Category.units, with(Items.graphite, 10));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 4f, BlockStack.list(Blocks.thoriumWallLarge, 4, Blocks.duct, 2)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 4f, BlockStack.list(Blocks.tungstenWallLarge, 5, Blocks.plasmaBore, 2)));
             consumes.power(2f);
             areaSize = 13;
 
@@ -3316,7 +3316,18 @@ public class Blocks{
 
         }};
 
-        //TODO mech assembler
+        //TODO requirements
+        mechAssembler = new UnitAssembler("mech-assembler"){{
+            requirements(Category.units, with(Items.graphite, 10));
+            size = 5;
+            plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 4f, BlockStack.list(Blocks.tungstenWallLarge, 5, Blocks.duct, 2)));
+            consumes.power(2f);
+            areaSize = 13;
+
+            //TODO unit production is rarely continuous, can be double
+            consumes.liquid(Liquids.gallium, 1f / 60f);
+
+        }};
 
         basicAssemblerModule = new UnitAssemblerModule("basic-assembler-module"){{
             requirements(Category.units, with(Items.graphite, 10));

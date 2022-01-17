@@ -15,16 +15,16 @@ void main(){
     vec2 v = vec2(1.0/u_texsize.x, 1.0/u_texsize.y);
 
 	vec4 c = texture2D(u_texture, v_texCoords);
-    float alpha = c.a;
 
     c.a *= u_progress;
 
     if(c.a > 0.01){
-        float f = step(abs(sin(coords.x*2.0 + u_time)), 0.9);
-        c = mix(c, u_color, f * u_color.a);
+        float f = step(abs(sin(coords.y*3.0 + u_time)), 0.9);
+        c.a *= f;
+        //c.rgb = mix(c.rgb, u_color.rgb, f * u_color.a);
     }
 
-    c.a *= alpha;
+   // c.a *= (1.0-coords.y);
 
     gl_FragColor = c * v_color;
 }

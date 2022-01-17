@@ -2455,7 +2455,7 @@ public class UnitTypes{
                     sprite = "missile-large";
                     width = 9.5f;
                     height = 15f;
-                    lifetime = 32f;
+                    lifetime = 30f;
                     hitSize = 6f;
                     shootEffect = Fx.shootTitan;
                     smokeEffect = Fx.shootSmokeTitan;
@@ -2509,7 +2509,8 @@ public class UnitTypes{
             outlineColor = Pal.darkOutline;
             envDisabled = Env.space;
 
-            //TODO shield ability
+            //TODO shield ability looks bad
+            //abilities.add(new ArmorPlateAbility());
 
             rotateSpeed = 2.7f;
 
@@ -2549,7 +2550,7 @@ public class UnitTypes{
                 velocityRnd = 0.33f;
                 heatColor = Color.red;
 
-                bullet = new MissileBulletType(4.2f, 30){{
+                bullet = new MissileBulletType(4.2f, 34){{
                     homingPower = 0.2f;
                     weaveMag = 4;
                     weaveScale = 4;
@@ -2557,7 +2558,7 @@ public class UnitTypes{
                     //TODO better
                     shootEffect = Fx.shootBig2;
                     smokeEffect = Fx.shootSmokeTitan;
-                    splashDamage = 50f;
+                    splashDamage = 40f;
                     splashDamageRadius = 30f;
                     frontColor = Color.white;
                     hitSound = Sounds.none;

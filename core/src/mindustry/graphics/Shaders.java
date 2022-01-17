@@ -19,6 +19,7 @@ public class Shaders{
     public static @Nullable ShieldShader shield;
     public static BuildBeamShader buildBeam;
     public static UnitBuildShader build;
+    public static UnitArmorShader armor;
     public static DarknessShader darkness;
     public static LightShader light;
     public static SurfaceShader water, mud, tar, slag, cryofluid, space, caustics, arkycite;
@@ -42,6 +43,7 @@ public class Shaders{
         }
         buildBeam = new BuildBeamShader();
         build = new UnitBuildShader();
+        armor = new UnitArmorShader();
         darkness = new DarknessShader();
         light = new LightShader();
         water = new SurfaceShader("water");
@@ -193,6 +195,24 @@ public class Shaders{
         public void apply(){
             setUniformf("u_time", time);
             setUniformf("u_color", color);
+            setUniformf("u_progress", progress);
+            setUniformf("u_uv", region.u, region.v);
+            setUniformf("u_uv2", region.u2, region.v2);
+            setUniformf("u_texsize", region.texture.width, region.texture.height);
+        }
+    }
+
+    public static class UnitArmorShader extends LoadShader{
+        public float progress, time;
+        public TextureRegion region;
+
+        public UnitArmorShader(){
+            super("unitarmor", "default");
+        }
+
+        @Override
+        public void apply(){
+            setUniformf("u_time", time);
             setUniformf("u_progress", progress);
             setUniformf("u_uv", region.u, region.v);
             setUniformf("u_uv2", region.u2, region.v2);
