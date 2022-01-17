@@ -589,6 +589,30 @@ public class SettingsMenuDialog extends BaseDialog{
             rebuild();
         }
 
+        public void textPref(String name, String def){
+            list.add(new TextSetting(name, def, null));
+            settings.defaults(name, def);
+            rebuild();
+        }
+
+        public void textPref(String name, String def, Cons<String> changed){
+            list.add(new TextSetting(name, def, changed));
+            settings.defaults(name, def);
+            rebuild();
+        }
+
+        public void areaTextPref(String name, String def){
+            list.add(new AreaTextSetting(name, def, null));
+            settings.defaults(name, def);
+            rebuild();
+        }
+
+        public void areaTextPref(String name, String def, Cons<String> changed){
+            list.add(new AreaTextSetting(name, def, changed));
+            settings.defaults(name, def);
+            rebuild();
+        }
+
         public void rebuild(){
             clearChildren();
 
@@ -719,7 +743,7 @@ public class SettingsMenuDialog extends BaseDialog{
             public void add(SettingsTable table){
                 TextField field = new TextField();
 
-                field.update(() -> field.setText(settings.getString(name, def)));
+                field.update(() -> field.setText(settings.getString(name)));
 
                 field.changed(() -> {
                     settings.put(name, field.getText());
@@ -750,7 +774,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 area.setPrefRows(5);
 
                 area.update(() -> {
-                    area.setText(settings.getString(name, def));
+                    area.setText(settings.getString(name));
                     area.setWidth(table.getWidth());
                 });
 
