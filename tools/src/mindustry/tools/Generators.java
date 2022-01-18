@@ -668,13 +668,12 @@ public class Generators{
 
         generate("ore-icons", () -> {
             content.blocks().<OreBlock>each(b -> b instanceof OreBlock, ore -> {
-                String prefix = ore instanceof WallOreBlock ? "wall-ore-" : "ore-";
-                Item item = ore.itemDrop;
+                ore.load();
                 int shadowColor = Color.rgba8888(0, 0, 0, 0.3f);
 
                 for(int i = 0; i < ore.variants; i++){
                     //get base image to draw on
-                    Pixmap base = get((ore instanceof WallOreBlock ? "wall-" : "") + item.name + (i + 1));
+                    Pixmap base = get(ore.variantRegions[i]);
                     Pixmap image = base.copy();
 
                     int offset = image.width / tilesize - 1;
@@ -688,9 +687,11 @@ public class Generators{
                         }
                     }
 
+                    replace(ore.variantRegions[i], image);
+
                     image.draw(base, true);
-                    save(image, "../blocks/environment/" + prefix + item.name + (i + 1));
-                    save(image, "../editor/editor-" + prefix + item.name + (i + 1));
+                    save(image, "../blocks/environment/" + ore.name + (i + 1));
+                    save(image, "../editor/editor-" + ore.name + (i + 1));
 
                     save(image, "block-" + ore.name + "-full");
                     save(image, "../ui/block-" + ore.name + "-ui");

@@ -6,7 +6,7 @@ import mindustry.type.*;
 public class WallOreBlock extends OreBlock{
 
     public WallOreBlock(Item ore){
-        super("wall-ore-" + ore.name, ore);
+        super("ore-wall-" + ore.name, ore);
     }
 
     //mods only

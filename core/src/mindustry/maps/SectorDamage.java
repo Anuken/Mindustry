@@ -255,7 +255,7 @@ public class SectorDamage{
         //first, calculate the total health of blocks in the path
 
         //radius around the path that gets counted
-        int radius = 5;
+        int radius = 6;
         IntSet counted = new IntSet();
 
         for(Tile t : sparse2){
@@ -335,6 +335,7 @@ public class SectorDamage{
         Seq<Vec2> waveDps = new Seq<>(), waveHealth = new Seq<>();
         int groundSpawns = Math.max(spawner.countFlyerSpawns(), 1), airSpawns = Math.max(spawner.countGroundSpawns(), 1);
 
+        //TODO storing all this is dumb when you can just calculate it exactly from the rules...
         for(int wave = state.wave; wave < state.wave + 10; wave ++){
             float sumWaveDps = 0f, sumWaveHealth = 0f;
 

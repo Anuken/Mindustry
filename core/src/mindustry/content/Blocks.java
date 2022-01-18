@@ -55,7 +55,7 @@ public class Blocks{
 
     //ores
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
-    oreTungsten,
+    oreTungsten, oreCrystalThorium,
 
     //wall ores
     wallOreBeryl, graphiticWall, wallOreTungsten,
@@ -697,8 +697,7 @@ public class Blocks{
 
         oreTungsten = new OreBlock(Items.tungsten);
 
-        //endregion
-        //region wall ore
+        oreCrystalThorium = new OreBlock("ore-crystal-thorium", Items.thorium);
 
         wallOreBeryl = new WallOreBlock(Items.beryllium);
 

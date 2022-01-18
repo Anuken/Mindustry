@@ -44,7 +44,11 @@ public class OreBlock extends OverlayFloor{
     @OverrideCallSuper
     public void createIcons(MultiPacker packer){
         for(int i = 0; i < variants; i++){
-            PixmapRegion shadow = Core.atlas.getPixmap(itemDrop.name + (i + 1));
+            //use name (e.g. "ore-copper1"), fallback to "copper1" as per the old naming system
+            PixmapRegion shadow = Core.atlas.has(name + (i + 1)) ?
+                Core.atlas.getPixmap(name + (i + 1)) :
+                Core.atlas.getPixmap(itemDrop.name + (i + 1));
+
             Pixmap image = shadow.crop();
 
             int offset = image.width / tilesize - 1;
