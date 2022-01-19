@@ -51,7 +51,7 @@ public class ServerControl implements ApplicationListener{
         }
     };
 
-    public Cons<GameOverEvent> gameOver = () -> {
+    public Cons<GameOverEvent> gameOver = event -> {
         if(state.rules.waves){
             info("Game over! Reached wave @ with @ players online on map @.", state.wave, Groups.player.size(), Strings.capitalize(Strings.stripColors(state.map.name())));
         }else{
