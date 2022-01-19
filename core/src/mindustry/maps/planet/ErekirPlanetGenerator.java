@@ -25,7 +25,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
     Block[][] arr = {
     //{Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.basalt}
-    {Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.crystallineStone, Blocks.basalt}
+    //TODO basalt bad
+    {Blocks.regolith, Blocks.regolith, Blocks.beryllicStone, Blocks.crystallineStone, Blocks.basalt}
     };
 
     @Override
@@ -77,7 +78,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         if(ice < 0.6){
             if(result == Blocks.rhyolite || result == Blocks.yellowStone || result == Blocks.regolith){
                 //TODO bio(?) luminescent stuff
-                return Blocks.ferricStone; //TODO perhaps something else
+                return Blocks.ferricStone; //TODO perhaps something else. what about ice?
             }
         }
 
@@ -98,7 +99,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             tile.block = Blocks.air;
         }
 
-        if(Ridged.noise3d(2, position.x, position.y + 4f, position.z, 3, 6f) > 0.65){
+        if(Ridged.noise3d(2, position.x, position.y + 4f, position.z, 3, 6f) > 0.6){
             tile.floor = Blocks.carbonStone;
         }
     }
