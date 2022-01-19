@@ -407,10 +407,9 @@ public class ServerControl implements ApplicationListener{
                 info("  Playing on map &fi@ / Wave @", Strings.capitalize(Strings.stripColors(state.map.name())), state.wave);
 
                 if(state.rules.waves){
-                    info("  @ enemies.", state.enemies);
-                }else{
                     info("  @ seconds until next wave.", (int)(state.wavetime / 60));
                 }
+                info("  @ units / @ enemies", Groups.unit.size(), state.enemies);
 
                 info("  @ FPS, @ MB used.", Core.graphics.getFramesPerSecond(), Core.app.getJavaHeap() / 1024 / 1024);
 
@@ -465,7 +464,6 @@ public class ServerControl implements ApplicationListener{
 
             info("&fi&lcServer: &fr@", "&lw" + arg[0]);
         });
-
 
         handler.register("pause", "<on/off>", "Pause or unpause the game.", arg -> {
             boolean pause = arg[0].equals("on");

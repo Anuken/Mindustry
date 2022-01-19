@@ -1,7 +1,7 @@
 [
   {
     "name": "Infection",
-    "address": ["plague-continued.ml:5555"]
+    "address": ["plague-continued.ml:5555", "plague-continued.ml:5004"]
   },
   {
     "name": "RCM",
@@ -33,7 +33,7 @@
   },
   {
     "name": "TWS",
-    "address": ["twsmindustry.24x7.hk:6701", "twsmindustry.24x7.hk:6702"]
+    "address": ["twsmindustry.24x7.hk:6701", "twsmindustry.24x7.hk:6702", "twsmindustry.24x7.hk:6969"]
   },
   {
     "name": "mindustry.ddns.net",
@@ -57,7 +57,7 @@
   },
   {
     "name": "Omega",
-    "address": ["yeeth.mindustry.me:6568"] 
+    "address": ["yeeth.mindustry.me:6568","yeeth.mindustry.me:5002"] 
   },
   {
     "name": "Obvilion Network",
@@ -89,7 +89,7 @@
   },
   {
     "name": "Hungarian",
-    "address": ["survival.humindustry.tk", "148.251.175.124:25601"]
+    "address": ["hudustry.ddns.net"]
   },
   {
     "name": "Xpdustry",
@@ -121,7 +121,7 @@
   },
   {
     "name": "Shard",
-    "address": ["shard.mcv.kr"]
+    "address": ["59.12.120.171"]
   },
   {
     "name": "OMNIDUSTRY",

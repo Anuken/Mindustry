@@ -381,7 +381,11 @@ public class ContentParser{
 
             if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
 
-            return new SectorPreset(name, locate(ContentType.planet, value.getString("planet", "serpulo")), value.getInt("sector"));
+            SectorPreset out = new SectorPreset(name, locate(ContentType.planet, value.getString("planet", "serpulo")), value.getInt("sector"));
+            value.remove("sector");
+            value.remove("planet");
+            read(() -> readFields(out, value));
+            return out;
         }
     );
 
