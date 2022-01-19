@@ -140,6 +140,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         //arkycite
         //TODO arkycite biome
+        //TODO ice biome
         pass((x, y) -> {
             if(nearWall(x, y)) return;
 
@@ -184,10 +185,9 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         //make sure enemies have room
         erase(endX, endY, 6);
 
-        tiles.getn(endX, endY).setOverlay(Blocks.spawn);
+        //TODO enemies get stuck on 1x1 passages.
 
-        //TODO tech is lazy and boring
-        //tech(Blocks.darkPanel3, Blocks.darkPanel5, Blocks.darkMetal);
+        tiles.getn(endX, endY).setOverlay(Blocks.spawn);
 
         //ores
         pass((x, y) -> {
@@ -199,10 +199,6 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                     }else if(block != Blocks.carbonWall && noise(x + 782, y, 4, 0.8f, 38f, 1f) > 0.665f){
                         ore = Blocks.wallOreBeryl;
                     }
-                    //TODO generate tungsten, or not?
-                    //else if(block == Blocks.yellowStoneWall && noise(x, y + 942, 4, 0.7f, 38f, 1f) > 0.71f){
-                    //    ore = Blocks.wallOreTungsten;
-                    //}
                 }
             }else if(!nearWall(x, y)){
 

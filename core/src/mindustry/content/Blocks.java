@@ -49,7 +49,8 @@ public class Blocks{
     ferricStone, ferricCraters, carbonStone, beryllicStone, crystallineStone, crystalFloor,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
     //boulders
-    shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder, arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystallineBoulder,
+    shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
+    arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystallineBoulder, redIceBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
@@ -670,6 +671,11 @@ public class Blocks{
         crystallineBoulder = new Prop("crystalline-boulder"){{
             variants = 2;
             crystallineStone.asFloor().decoration = this;
+        }};
+
+        redIceBoulder = new Prop("red-ice-boulder"){{
+            variants = 3;
+            redIce.asFloor().decoration = this;
         }};
 
         metalFloor = new Floor("metal-floor", 0);
