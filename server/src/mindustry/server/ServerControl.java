@@ -2,6 +2,7 @@ package mindustry.server;
 
 import arc.*;
 import arc.files.*;
+import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Timer;
@@ -35,9 +36,6 @@ import static arc.util.Log.*;
 import static mindustry.Vars.*;
 
 public class ServerControl implements ApplicationListener{
-    private static final int roundExtraTime = 12;
-    private static final int maxLogLength = 1024 * 512;
-
     protected static String[] tags = {"&lc&fb[D]&fr", "&lb&fb[I]&fr", "&ly&fb[W]&fr", "&lr&fb[E]", ""};
     protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"),
         autosaveDate = DateTimeFormatter.ofPattern("MM-dd-yyyy_HH-mm-ss");
@@ -53,13 +51,43 @@ public class ServerControl implements ApplicationListener{
         }
     };
 
-    private Fi currentLogFile;
-    private boolean inExtraRound;
-    private Task lastTask;
-    private Gamemode lastMode;
-    private @Nullable Map nextMapOverride;
-    private Interval autosaveCount = new Interval();
+    public Cons<GameOverEvent> gameOver = () -> {
+        if(state.rules.waves){
+            info("Game over! Reached wave @ with @ players online on map @.", state.wave, Groups.player.size(), Strings.capitalize(Strings.stripColors(state.map.name())));
+        }else{
+            info("Game over! Team @ is victorious with @ players online on map @.", event.winner.name, Groups.player.size(), Strings.capitalize(Strings.stripColors(state.map.name())));
+        }
 
+        //set next map to be played
+        Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(lastMode, state.map);
+        nextMapOverride = null;
+        if(map != null){
+            Call.infoMessage((state.rules.pvp
+            ? "[accent]The " + event.winner.name + " team is victorious![]\n" : "[scarlet]Game over![]\n")
+            + "\nNext selected map:[accent] " + Strings.stripColors(map.name()) + "[]"
+            + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
+            "\nNew game begins in " + roundExtraTime + " seconds.");
+
+            state.gameOver = true;
+            Call.updateGameOver(event.winner);
+
+            info("Selected next map to be @.", Strings.stripColors(map.name()));
+
+            play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
+        }else{
+            netServer.kickAll(KickReason.gameover);
+            state.set(State.menu);
+            net.closeServer();
+        }
+    }
+
+    public boolean inExtraRound;
+    public Task lastTask;
+    public Gamemode lastMode;
+    public @Nullable Map nextMapOverride;
+
+    private Fi currentLogFile;
+    private Interval autosaveCount = new Interval();
     private Thread socketThread;
     private ServerSocket serverSocket;
     private PrintWriter socketOutput;
@@ -169,33 +197,7 @@ public class ServerControl implements ApplicationListener{
 
         Events.on(GameOverEvent.class, event -> {
             if(inExtraRound) return;
-            if(state.rules.waves){
-                info("Game over! Reached wave @ with @ players online on map @.", state.wave, Groups.player.size(), Strings.capitalize(Strings.stripColors(state.map.name())));
-            }else{
-                info("Game over! Team @ is victorious with @ players online on map @.", event.winner.name, Groups.player.size(), Strings.capitalize(Strings.stripColors(state.map.name())));
-            }
-
-            //set next map to be played
-            Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(lastMode, state.map);
-            nextMapOverride = null;
-            if(map != null){
-                Call.infoMessage((state.rules.pvp
-                ? "[accent]The " + event.winner.name + " team is victorious![]\n" : "[scarlet]Game over![]\n")
-                + "\nNext selected map:[accent] " + Strings.stripColors(map.name()) + "[]"
-                + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
-                "\nNew game begins in " + roundExtraTime + " seconds.");
-
-                state.gameOver = true;
-                Call.updateGameOver(event.winner);
-
-                info("Selected next map to be @.", Strings.stripColors(map.name()));
-
-                play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
-            }else{
-                netServer.kickAll(KickReason.gameover);
-                state.set(State.menu);
-                net.closeServer();
-            }
+            gameOver.get(event);
         });
 
         //reset autosave on world load
@@ -230,8 +232,8 @@ public class ServerControl implements ApplicationListener{
                     try{
                         SaveIO.save(file);
                         info("Autosave completed.");
-                    }catch(Throwable e){
-                        err("Autosave failed.", e);
+                    }catch(Throwable t){
+                        err("Autosave failed.", t);
                     }
                 }
             }
@@ -243,7 +245,6 @@ public class ServerControl implements ApplicationListener{
         });
 
         Events.on(PlayEvent.class, e -> {
-
             try{
                 JsonValue value = JsonIO.json.fromJson(null, Core.settings.getString("globalrules"));
                 JsonIO.json.readFields(state.rules, value);
@@ -353,7 +354,7 @@ public class ServerControl implements ApplicationListener{
 
                 netServer.openServer();
             }catch(MapException e){
-                err(e.map.name() + ": " + e.getMessage());
+                err("@: @", e.map.name(), e.getMessage());
             }
         });
 
