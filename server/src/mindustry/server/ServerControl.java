@@ -43,6 +43,11 @@ public class ServerControl implements ApplicationListener{
     public final CommandHandler handler = new CommandHandler("");
     public final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
 
+    public boolean inExtraRound;
+    public Task lastTask;
+    public Gamemode lastMode;
+    public @Nullable Map nextMapOverride;
+
     public Runnable serverInput = () -> {
         Scanner scan = new Scanner(System.in);
         while(scan.hasNext()){
@@ -80,11 +85,6 @@ public class ServerControl implements ApplicationListener{
             net.closeServer();
         }
     };
-
-    public boolean inExtraRound;
-    public Task lastTask;
-    public Gamemode lastMode;
-    public @Nullable Map nextMapOverride;
 
     private Fi currentLogFile;
     private Interval autosaveCount = new Interval();
