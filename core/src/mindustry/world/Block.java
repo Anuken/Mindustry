@@ -294,7 +294,7 @@ public class Block extends UnlockableContent{
     public TextureRegion region, editorIcon;
     public @Load("@-shadow") TextureRegion customShadowRegion;
     public @Load("@-team") TextureRegion teamRegion;
-    public TextureRegion[] teamRegions, variantRegions;
+    public TextureRegion[] teamRegions, variantRegions, variantShadowRegions;
 
     protected static final Seq<Tile> tempTiles = new Seq<>();
     protected static final Seq<Building> tempTileEnts = new Seq<>();
@@ -314,12 +314,20 @@ public class Block extends UnlockableContent{
         if(tile.build != null){
             tile.build.draw();
         }else{
-            if(variants == 0){
-                Draw.rect(region, tile.drawx(), tile.drawy());
-            }else{
-                Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.drawx(), tile.drawy());
-            }
+            Draw.rect(
+                variants == 0 ? region :
+                variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))],
+            tile.drawx(), tile.drawy());
         }
+    }
+
+    public void drawShadow(Tile tile){
+        Draw.color(0f, 0f, 0f, BlockRenderer.shadowColor.a);
+        Draw.rect(
+            variants == 0 ? customShadowRegion :
+            variantShadowRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantShadowRegions.length - 1))],
+        tile.drawx(), tile.drawy(), tile.build == null ? 0f : tile.build.drawrot());
+        Draw.color();
     }
 
     public float percentSolid(int x, int y){
@@ -1019,6 +1027,13 @@ public class Block extends UnlockableContent{
                 variantRegions[i] = Core.atlas.find(name + (i + 1));
             }
             region = variantRegions[0];
+
+            if(customShadow){
+                variantShadowRegions = new TextureRegion[variants];
+                for(int i = 0; i < variants; i++){
+                    variantShadowRegions[i] = Core.atlas.find(name + "-shadow" + (i + 1));
+                }
+            }
         }
     }
 

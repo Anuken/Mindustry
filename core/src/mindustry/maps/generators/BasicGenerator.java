@@ -364,6 +364,21 @@ public abstract class BasicGenerator implements WorldGenerator{
         return false;
     }
 
+    public boolean near(int cx, int cy, int rad, Block block){
+        for(int x = -rad; x <= rad; x++){
+            for(int y = -rad; y <= rad; y++){
+                int wx = cx + x, wy = cy + y;
+                if(Structs.inBounds(wx, wy, width, height) && Mathf.within(x, y, rad)){
+                    Tile other = tiles.getn(wx, wy);
+                    if(other.block() == block){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public void decoration(float chance){
         pass((x, y) -> {
             for(int i = 0; i < 4; i++){

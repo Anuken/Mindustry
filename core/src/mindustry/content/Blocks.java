@@ -45,10 +45,11 @@ public class Blocks{
     redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     redweed, purbush, coralChunk, yellowCoral,
-    regolithWall, yellowStoneWall, rhyoliteWall, steamVent, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall, arkyicWall,
-    ferricStone, ferricCraters, carbonStone, beryllicStone,
+    regolithWall, yellowStoneWall, rhyoliteWall, steamVent, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall, arkyicWall, crystallineStoneWall,
+    ferricStone, ferricCraters, carbonStone, beryllicStone, crystallineStone, crystalFloor,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
-    shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
+    //boulders
+    shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder, arkyicBoulder, crystalCluster, crystallineBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
@@ -398,6 +399,14 @@ public class Blocks{
             variants = 4;
         }};
 
+        crystallineStone = new Floor("crystalline-stone"){{
+            variants = 5;
+        }};
+
+        crystalFloor = new Floor("crystal-floor"){{
+            variants = 4;
+        }};
+
         redIce = new Floor("red-ice"){{
             //TODO red ice boulder
             dragMultiplier = 0.4f;
@@ -530,6 +539,11 @@ public class Blocks{
             arkyciteFloor.asFloor().wall = arkyicStone.asFloor().wall = this;
         }};
 
+        crystallineStoneWall = new StaticWall("crystalline-stone-wall"){{
+            variants = 4;
+            crystallineStone.asFloor().wall = crystalFloor.asFloor().wall = this;
+        }};
+
         redIceWall = new StaticWall("red-ice-wall"){{
             redIce.asFloor().wall = this;
         }};
@@ -634,6 +648,24 @@ public class Blocks{
         yellowStoneBoulder = new Prop("yellow-stone-boulder"){{
             variants = 2;
             yellowStone.asFloor().decoration = regolith.asFloor().decoration = this;
+        }};
+
+        //1px outline + 4.50 gaussian shadow in gimp
+        arkyicBoulder = new Prop("arkyic-boulder"){{
+            variants = 3;
+            customShadow = true;
+            arkyicStone.asFloor().decoration = this;
+        }};
+
+        //TODO better visuals, maybe make tree
+        crystalCluster = new TallBlock("crystal-cluster"){{
+            variants = 3;
+            clipSize = 128f;
+        }};
+
+        crystallineBoulder = new Prop("crystalline-boulder"){{
+            variants = 2;
+            crystallineStone.asFloor().decoration = this;
         }};
 
         metalFloor = new Floor("metal-floor", 0);

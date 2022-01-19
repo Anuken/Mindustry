@@ -368,12 +368,13 @@ public class BlockRenderer{
                 Draw.reset();
                 Draw.z(Layer.block);
 
+                if(block.customShadow){
+                    Draw.z(Layer.block - 1);
+                    block.drawShadow(tile);
+                    Draw.z(Layer.block);
+                }
+
                 if(entity != null){
-                    if(block.customShadow){
-                        Draw.z(Layer.block - 1);
-                        entity.drawCustomShadow();
-                        Draw.z(Layer.block);
-                    }
 
                     if(entity.damaged()){
                         entity.drawCracks();

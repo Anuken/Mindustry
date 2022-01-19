@@ -24,7 +24,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
     public float heightScl = 0.9f, octaves = 8, persistence = 0.7f, heightPow = 3f, heightMult = 1.6f;
 
     Block[][] arr = {
-    {Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.basalt}
+    //{Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.basalt}
+    {Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.crystallineStone, Blocks.basalt}
     };
 
     @Override
@@ -210,9 +211,17 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 }
 
                 //TODO design ore generation so it doesn't overlap
-                if(noise(x + 999, y + 600, 4, 0.63f, 50f, 1f) < 0.2f/* && floor == Blocks.yellowStone*/){
-                    ore = Blocks.oreThorium;
+                if(noise(x + 999, y + 600 - x, 4, 0.63f, 50f, 1f) < 0.25f && floor == Blocks.crystallineStone){
+                    ore = Blocks.oreCrystalThorium;
                 }
+
+                if(noise(x + 999, y + 600 - x, 5, 0.8f, 50f, 1f) < 0.38f && floor == Blocks.crystallineStone){
+                    floor = Blocks.crystalFloor;
+                }
+            }
+
+            if(block == Blocks.air && floor == Blocks.crystallineStone && rand.chance(0.08) && nearWall(x, y) && !near(x, y, 4, Blocks.crystalCluster)){
+                block = Blocks.crystalCluster;
             }
         });
 
