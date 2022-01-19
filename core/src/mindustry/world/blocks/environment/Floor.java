@@ -130,6 +130,16 @@ public class Floor extends Block{
     }
 
     @Override
+    public TextureRegion getDisplayIcon(Tile tile){
+        return liquidDrop == null ? super.getDisplayIcon(tile) : liquidDrop.uiIcon;
+    }
+
+    @Override
+    public String getDisplayName(Tile tile){
+        return liquidDrop == null ? super.getDisplayName(tile) : liquidDrop.localizedName;
+    }
+
+    @Override
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
         packer.add(PageType.editor, "editor-" + name, Core.atlas.getPixmap(fullIcon));

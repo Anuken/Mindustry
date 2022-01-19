@@ -192,7 +192,6 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         pass((x, y) -> {
 
             if(block != Blocks.air){
-                //TODO use d4 instead of d8 for no out-of-reach ores?
                 if(nearAir(x, y)){
                     if(block == Blocks.carbonWall && noise(x + 78, y, 4, 0.7f, 33f, 1f) > 0.52f){
                         block = Blocks.graphiticWall;

@@ -476,7 +476,7 @@ public class PlacementFragment extends Fragment{
             }
 
             //if the tile has a drop, display the drop
-            if(hoverTile.drop() != null || hoverTile.wallDrop() != null){
+            if(hoverTile.drop() != null || hoverTile.wallDrop() != null || hoverTile.floor().liquidDrop != null){
                 return hoverTile;
             }
         }
