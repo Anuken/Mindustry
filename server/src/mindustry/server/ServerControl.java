@@ -79,7 +79,7 @@ public class ServerControl implements ApplicationListener{
             state.set(State.menu);
             net.closeServer();
         }
-    }
+    };
 
     public boolean inExtraRound;
     public Task lastTask;
