@@ -687,9 +687,10 @@ public class Generators{
                         }
                     }
 
+                    image.draw(base, true);
+
                     replace(ore.variantRegions[i], image);
 
-                    image.draw(base, true);
                     save(image, "../blocks/environment/" + ore.name + (i + 1));
                     save(image, "../editor/editor-" + ore.name + (i + 1));
 

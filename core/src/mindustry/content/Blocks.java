@@ -49,7 +49,7 @@ public class Blocks{
     ferricStone, ferricCraters, carbonStone, beryllicStone, crystallineStone, crystalFloor,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
     //boulders
-    shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder, arkyicBoulder, crystalCluster, crystallineBoulder,
+    shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder, arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystallineBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
@@ -657,8 +657,12 @@ public class Blocks{
             arkyicStone.asFloor().decoration = this;
         }};
 
-        //TODO better visuals, maybe make tree
         crystalCluster = new TallBlock("crystal-cluster"){{
+            variants = 3;
+            clipSize = 128f;
+        }};
+
+        vibrantCrystalCluster = new TallBlock("vibrant-crystal-cluster"){{
             variants = 3;
             clipSize = 128f;
         }};

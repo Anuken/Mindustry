@@ -215,13 +215,15 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                     ore = Blocks.oreCrystalThorium;
                 }
 
-                if(noise(x + 999, y + 600 - x, 5, 0.8f, 50f, 1f) < 0.38f && floor == Blocks.crystallineStone){
-                    floor = Blocks.crystalFloor;
-                }
             }
 
-            if(block == Blocks.air && floor == Blocks.crystallineStone && rand.chance(0.08) && nearWall(x, y) && !near(x, y, 4, Blocks.crystalCluster)){
-                block = Blocks.crystalCluster;
+            if(noise(x + 999, y + 600 - x, 5, 0.8f, 50f, 1f) < 0.38f && floor == Blocks.crystallineStone){
+                floor = Blocks.crystalFloor;
+            }
+
+            if(block == Blocks.air && (floor == Blocks.crystallineStone || floor == Blocks.crystalFloor) && rand.chance(0.09) && nearWall(x, y)
+                && !near(x, y, 4, Blocks.crystalCluster) && !near(x, y, 4, Blocks.vibrantCrystalCluster)){
+                block = floor == Blocks.crystalFloor ? Blocks.vibrantCrystalCluster : Blocks.crystalCluster;
             }
         });
 
