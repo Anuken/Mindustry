@@ -48,7 +48,7 @@ public class ContentLoader{
         clear();
     }
 
-    /** Clears all initialized content.*/
+    /** Clears all initialized content. */
     public void clear(){
         contentNameMap = new ObjectMap[ContentType.all.length];
         contentMap = new Seq[ContentType.all.length];
@@ -75,7 +75,7 @@ public class ContentLoader{
         }
     }
 
-    /** Logs content statistics.*/
+    /** Logs content statistics. */
     public void logContent(){
         //check up ID mapping, make sure it's linear (debug only)
         for(Seq<Content> arr : contentMap){
@@ -95,14 +95,14 @@ public class ContentLoader{
         Log.debug("-------------------");
     }
 
-    /** Calls Content#init() on everything. Use only after all modules have been created.*/
+    /** Calls Content#init() on everything. Use only after all modules have been created. */
     public void init(){
         initialize(Content::init);
         if(constants != null) constants.init();
         Events.fire(new ContentInitEvent());
     }
 
-    /** Calls Content#load() on everything. Use only after all modules have been created on the client.*/
+    /** Calls Content#loadIcon() and Content#load() on everything. Use only after all modules have been created on the client. */
     public void load(){
         initialize(Content::loadIcon);
         initialize(Content::load);
