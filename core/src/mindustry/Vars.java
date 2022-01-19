@@ -141,6 +141,10 @@ public class Vars implements Loadable{
     public static final int multicastPort = 20151;
     /** multicast group for discovery.*/
     public static final String multicastGroup = "227.2.7.7";
+    /** extra time after the end of the game. */
+    public static final int roundExtraTime = 12;
+    /** maximum log file size. */
+    public static final int maxLogLength = 1024 * 512;
     /** whether the graphical game client has loaded */
     public static boolean clientLoaded = false;
     /** max GL texture size */
