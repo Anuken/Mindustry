@@ -50,7 +50,7 @@ public class Blocks{
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
     //boulders
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
-    arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystallineBoulder, redIceBoulder,
+    arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystallineBoulder, redIceBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
@@ -666,6 +666,13 @@ public class Blocks{
         vibrantCrystalCluster = new TallBlock("vibrant-crystal-cluster"){{
             variants = 3;
             clipSize = 128f;
+        }};
+
+        crystalBlocks = new TallBlock("crystal-blocks"){{
+            variants = 3;
+            clipSize = 128f;
+            shadowAlpha = 0.5f;
+            shadowOffset = -2.5f;
         }};
 
         crystallineBoulder = new Prop("crystalline-boulder"){{

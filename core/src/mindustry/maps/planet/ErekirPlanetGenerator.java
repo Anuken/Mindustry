@@ -221,6 +221,16 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 && !near(x, y, 4, Blocks.crystalCluster) && !near(x, y, 4, Blocks.vibrantCrystalCluster)){
                 block = floor == Blocks.crystalFloor ? Blocks.vibrantCrystalCluster : Blocks.crystalCluster;
             }
+
+            //TODO test, different placement
+            if(block == Blocks.regolithWall && rand.chance(0.16) && nearAir(x, y) && !near(x, y, 3, Blocks.crystalBlocks)){
+                block = Blocks.crystalBlocks;
+            }
+
+            //this is annoying as blocks under it can't be seen
+            //if(block == Blocks.air && floor == Blocks.regolith && rand.chance(0.004) && !near(x, y, 3, Blocks.crystalBlocks)){
+            //    block = Blocks.crystalBlocks;
+            //}
         });
 
         //vents
