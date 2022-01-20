@@ -41,7 +41,7 @@ public class MenuRenderer implements Disposable{
     private void generate(){
         world.beginMapLoad();
         Tiles tiles = world.resize(width, height);
-        Seq<Block> ores = content.blocks().select(b -> b instanceof OreBlock && !(b instanceof WallOreBlock));
+        Seq<Block> ores = content.blocks().select(b -> b instanceof OreBlock ore && !ore.wallOre);
         shadows = new FrameBuffer(width, height);
         int offset = Mathf.random(100000);
         int s1 = offset, s2 = offset + 1, s3 = offset + 2;

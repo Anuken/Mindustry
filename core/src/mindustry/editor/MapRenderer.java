@@ -104,8 +104,8 @@ public class MapRenderer implements Disposable{
         Tile tile = editor.tiles().getn(wx, wy);
 
         Team team = tile.team();
-        Block floor = tile.floor();
-        Block overlay = tile.overlay();
+        Floor floor = tile.floor();
+        Floor overlay = tile.overlay();
         Block wall = tile.block();
 
         TextureRegion region;
@@ -113,7 +113,7 @@ public class MapRenderer implements Disposable{
         int idxWall = (wx % chunkSize) + (wy % chunkSize) * chunkSize;
         int idxDecal = (wx % chunkSize) + (wy % chunkSize) * chunkSize + chunkSize * chunkSize;
         boolean center = tile.isCenter();
-        boolean useSyntheticWall = wall.synthetic() || overlay instanceof WallOreBlock;
+        boolean useSyntheticWall = wall.synthetic() || overlay.wallOre;
 
         //draw synthetic wall or floor
         if(wall != Blocks.air && useSyntheticWall){
@@ -148,7 +148,7 @@ public class MapRenderer implements Disposable{
 
             offsetX = tilesize / 2f - region.width / 2f * Draw.scl;
             offsetY = tilesize / 2f - region.height / 2f * Draw.scl;
-        }else if((wall == Blocks.air || overlay instanceof WallOreBlock) && !overlay.isAir()){
+        }else if((wall == Blocks.air || overlay.wallOre) && !overlay.isAir()){
             region = overlay.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, tile.overlay().editorVariantRegions().length - 1)];
         }else{
             region = clearEditor;

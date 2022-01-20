@@ -36,8 +36,8 @@ public class StaticWall extends Prop{
         }
 
         //draw ore on top
-        if(tile.overlay() instanceof WallOreBlock ore){
-            ore.drawBase(tile);
+        if(tile.overlay().wallOre){
+            tile.overlay().drawBase(tile);
         }
     }
 

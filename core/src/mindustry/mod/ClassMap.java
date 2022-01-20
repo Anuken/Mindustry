@@ -177,7 +177,6 @@ public class ClassMap{
         classes.put("StaticTree", mindustry.world.blocks.environment.StaticTree.class);
         classes.put("StaticWall", mindustry.world.blocks.environment.StaticWall.class);
         classes.put("TreeBlock", mindustry.world.blocks.environment.TreeBlock.class);
-        classes.put("WallOreBlock", mindustry.world.blocks.environment.WallOreBlock.class);
         classes.put("WobbleProp", mindustry.world.blocks.environment.WobbleProp.class);
         classes.put("BlockForge", mindustry.world.blocks.experimental.BlockForge.class);
         classes.put("BlockForgeBuild", mindustry.world.blocks.experimental.BlockForge.BlockForgeBuild.class);

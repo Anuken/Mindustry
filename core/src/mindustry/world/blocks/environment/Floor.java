@@ -65,6 +65,8 @@ public class Floor extends Block{
     public boolean canShadow = true;
     /** Whether this overlay needs a surface to be on. False for floating blocks, like spawns. */
     public boolean needsSurface = true;
+    /** If true, this ore is allowed on walls. */
+    public boolean wallOre = false;
 
     protected TextureRegion[][] edges;
     protected Seq<Block> blenders = new Seq<>();

@@ -529,7 +529,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     public @Nullable Item wallDrop(){
         return block.solid ?
             block.itemDrop != null ? block.itemDrop :
-            overlay instanceof WallOreBlock ? overlay.itemDrop :
+            overlay.wallOre ? overlay.itemDrop :
             null : null;
     }
 

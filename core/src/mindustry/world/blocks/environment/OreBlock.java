@@ -35,7 +35,7 @@ public class OreBlock extends OverlayFloor{
     }
 
     public void setup(Item ore){
-        this.localizedName = ore.localizedName;
+        this.localizedName = ore.localizedName + (wallOre ? " " + Core.bundle.get("wallore") : "");
         this.itemDrop = ore;
         this.mapColor.set(ore.color);
     }

@@ -748,14 +748,19 @@ public class Blocks{
 
         oreCrystalThorium = new OreBlock("ore-crystal-thorium", Items.thorium);
 
-        wallOreBeryl = new WallOreBlock(Items.beryllium);
+        wallOreBeryl = new OreBlock("ore-wall-beryllium", Items.beryllium){{
+            wallOre = true;
+        }};
 
         graphiticWall = new StaticWall("graphitic-wall"){{
             itemDrop = Items.graphite;
             variants = 3;
         }};
 
-        wallOreTungsten = new WallOreBlock(Items.tungsten);
+        //TODO merge with standard ore?
+        wallOreTungsten = new OreBlock("ore-wall-tungsten", Items.tungsten){{
+            wallOre = true;
+        }};
 
         //endregion
         //region crafting
