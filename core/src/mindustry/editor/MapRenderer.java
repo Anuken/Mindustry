@@ -91,6 +91,13 @@ public class MapRenderer implements Disposable{
         }
     }
 
+    private TextureRegion getIcon(Block wall, int index){
+        return !wall.editorIcon().found() ?
+            clearEditor : wall.variants > 0 ?
+            wall.editorVariantRegions()[Mathf.randomSeed(index, 0, wall.editorVariantRegions().length - 1)] :
+            wall.editorIcon();
+    }
+
     private void render(int wx, int wy){
         int x = wx / chunkSize, y = wy / chunkSize;
         IndexedRenderer mesh = chunks[x][y];
@@ -98,6 +105,7 @@ public class MapRenderer implements Disposable{
 
         Team team = tile.team();
         Block floor = tile.floor();
+        Block overlay = tile.overlay();
         Block wall = tile.block();
 
         TextureRegion region;
@@ -105,9 +113,11 @@ public class MapRenderer implements Disposable{
         int idxWall = (wx % chunkSize) + (wy % chunkSize) * chunkSize;
         int idxDecal = (wx % chunkSize) + (wy % chunkSize) * chunkSize + chunkSize * chunkSize;
         boolean center = tile.isCenter();
+        boolean useSyntheticWall = wall.synthetic() || overlay instanceof WallOreBlock;
 
-        if(wall != Blocks.air && wall.synthetic()){
-            region = !wall.editorIcon().found() || !center ? clearEditor : wall.editorIcon();
+        //draw synthetic wall or floor
+        if(wall != Blocks.air && useSyntheticWall){
+            region = !center ? clearEditor : getIcon(wall, idxWall);
 
             float width = region.width * Draw.scl, height = region.height * Draw.scl;
 
@@ -124,14 +134,12 @@ public class MapRenderer implements Disposable{
 
         float offsetX = -(wall.size / 3) * tilesize, offsetY = -(wall.size / 3) * tilesize;
 
+        //draw non-synthetic wall or ore
         if((wall.update || wall.destructible) && center){
             mesh.setColor(team.color);
             region = Core.atlas.find("block-border-editor");
-        }else if(!wall.synthetic() && wall != Blocks.air && center){
-            region = !wall.editorIcon().found() ?
-                clearEditor : wall.variants > 0 ?
-                wall.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, wall.editorVariantRegions().length - 1)] :
-                wall.editorIcon();
+        }else if(!useSyntheticWall && wall != Blocks.air && center){
+            region = getIcon(wall, idxWall);
 
             if(wall == Blocks.cliff){
                 mesh.setColor(Tmp.c1.set(floor.mapColor).mul(1.6f));
@@ -140,8 +148,8 @@ public class MapRenderer implements Disposable{
 
             offsetX = tilesize / 2f - region.width / 2f * Draw.scl;
             offsetY = tilesize / 2f - region.height / 2f * Draw.scl;
-        }else if(wall == Blocks.air && !tile.overlay().isAir()){
-            region = tile.overlay().editorVariantRegions()[Mathf.randomSeed(idxWall, 0, tile.overlay().editorVariantRegions().length - 1)];
+        }else if((wall == Blocks.air || overlay instanceof WallOreBlock) && !overlay.isAir()){
+            region = overlay.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, tile.overlay().editorVariantRegions().length - 1)];
         }else{
             region = clearEditor;
         }

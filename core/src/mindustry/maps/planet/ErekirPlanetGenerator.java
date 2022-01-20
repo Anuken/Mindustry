@@ -223,7 +223,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             }
 
             //TODO test, different placement
-            if(block == Blocks.regolithWall && rand.chance(0.16) && nearAir(x, y) && !near(x, y, 3, Blocks.crystalBlocks)){
+            //TODO this biome should have more blocks in gneeral
+            if(block == Blocks.regolithWall && rand.chance(0.2) && nearAir(x, y) && !near(x, y, 3, Blocks.crystalBlocks)){
                 block = Blocks.crystalBlocks;
             }
 
