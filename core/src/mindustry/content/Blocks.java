@@ -46,7 +46,7 @@ public class Blocks{
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     redweed, purbush, coralChunk, yellowCoral,
     regolithWall, yellowStoneWall, rhyoliteWall, steamVent, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall, arkyicWall, crystallineStoneWall,
-    ferricStone, ferricCraters, carbonStone, beryllicStone, crystallineStone, crystalFloor,
+    ferricStone, ferricCraters, carbonStone, beryllicStone, crystallineStone, crystalFloor, yellowStonePlates,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
     //boulders
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
@@ -407,6 +407,10 @@ public class Blocks{
             variants = 4;
         }};
 
+        yellowStonePlates = new Floor("yellow-stone-plates"){{
+            variants = 3;
+        }};
+
         redIce = new Floor("red-ice"){{
             //TODO red ice boulder
             dragMultiplier = 0.4f;
@@ -510,7 +514,7 @@ public class Blocks{
         }};
 
         yellowStoneWall = new StaticWall("yellow-stone-wall"){{
-            yellowStone.asFloor().wall = slag.asFloor().wall = this;
+            yellowStone.asFloor().wall = slag.asFloor().wall = yellowStonePlates.asFloor().wall = this;
             attributes.set(Attribute.silicate, 1.5f);
         }};
 
@@ -647,7 +651,7 @@ public class Blocks{
 
         yellowStoneBoulder = new Prop("yellow-stone-boulder"){{
             variants = 2;
-            yellowStone.asFloor().decoration = regolith.asFloor().decoration = this;
+            yellowStone.asFloor().decoration = regolith.asFloor().decoration = yellowStonePlates.asFloor().decoration = this;
         }};
 
         //1px outline + 4.50 gaussian shadow in gimp

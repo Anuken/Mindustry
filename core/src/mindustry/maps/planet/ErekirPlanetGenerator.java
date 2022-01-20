@@ -24,9 +24,9 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
     public float heightScl = 0.9f, octaves = 8, persistence = 0.7f, heightPow = 3f, heightMult = 1.6f;
 
     Block[][] arr = {
-    //{Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.basalt}
+    {Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.carbonStone}
     //TODO basalt bad
-    {Blocks.regolith, Blocks.regolith, Blocks.beryllicStone, Blocks.crystallineStone, Blocks.basalt}
+    //{Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.crystallineStone, Blocks.carbonStone}
     };
 
     @Override
@@ -155,7 +155,11 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         blend(Blocks.arkyciteFloor, Blocks.arkyicStone, 4);
 
+        //TODO may overwrite floor blocks under walls and look bad
+        blend(Blocks.slag, Blocks.yellowStonePlates, 4);
+
         distort(10f, 12f);
+
         distort(5f, 7f);
 
         //does arkycite need smoothing?
@@ -178,6 +182,9 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 if(block == Blocks.air) block = Blocks.yellowStoneWall;
             }
 
+            if(floor == Blocks.yellowStonePlates && noise(x + 78 + y, y, 3, 0.8f, 8f, 1f) > 0.38f){
+                floor = Blocks.yellowStone;
+            }
         });
 
         inverseFloodFill(tiles.getn(spawnX, spawnY));
