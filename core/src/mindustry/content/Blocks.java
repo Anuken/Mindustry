@@ -40,7 +40,7 @@ public class Blocks{
 
     //environment
     air, spawn, cliff, deepwater, water, taintedWater, deepTaintedWater, tar, slag, cryofluid, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space, empty,
-    dacite, rhyolite, rhyoliteCrater, regolith, yellowStone, redIce,
+    dacite, rhyolite, rhyoliteCrater, roughRhyolite, regolith, yellowStone, redIce,
     arkyciteFloor, arkyicStone,
     redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
@@ -50,7 +50,7 @@ public class Blocks{
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
     //boulders
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
-    arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystallineBoulder, redIceBoulder,
+    arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystallineBoulder, redIceBoulder, rhyoliteBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
@@ -367,6 +367,11 @@ public class Blocks{
             blendGroup = rhyolite;
         }};
 
+        roughRhyolite = new Floor("rough-rhyolite"){{
+            attributes.set(Attribute.water, -1f);
+            variants = 3;
+        }};
+
         steamVent = new SteamVent("steam-vent"){{
             parent = blendGroup = rhyolite;
             attributes.set(Attribute.vent, 1f);
@@ -519,7 +524,7 @@ public class Blocks{
         }};
 
         rhyoliteWall = new StaticWall("rhyolite-wall"){{
-            rhyolite.asFloor().wall = rhyoliteCrater.asFloor().wall = this;
+            rhyolite.asFloor().wall = rhyoliteCrater.asFloor().wall = roughRhyolite.asFloor().wall = this;
             attributes.set(Attribute.silicate, 1f);
         }};
 
@@ -686,6 +691,11 @@ public class Blocks{
         redIceBoulder = new Prop("red-ice-boulder"){{
             variants = 3;
             redIce.asFloor().decoration = this;
+        }};
+
+        rhyoliteBoulder = new Prop("rhyolite-boulder"){{
+            variants = 3;
+            rhyolite.asFloor().decoration = roughRhyolite.asFloor().decoration = this;
         }};
 
         metalFloor = new Floor("metal-floor", 0);

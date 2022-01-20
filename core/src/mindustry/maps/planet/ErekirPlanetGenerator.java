@@ -169,6 +169,11 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         median(3, 0.6, Blocks.slag);
 
         pass((x, y) -> {
+            //rough rhyolite
+            if(noise(x, y + 600 + x, 5, 0.86f, 60f, 1f) < 0.41f && floor == Blocks.rhyolite){
+                floor = Blocks.roughRhyolite;
+            }
+
             if((floor == Blocks.arkyciteFloor || floor == Blocks.arkyicStone) && block.isStatic()){
                 block = Blocks.arkyicWall;
             }
@@ -244,7 +249,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         //vents
         outer:
         for(Tile tile : tiles){
-            if(floor == Blocks.rhyolite && rand.chance(0.0011)){
+            if(floor == Blocks.rhyolite && rand.chance(0.0015)){
                 int radius = 2;
                 for(int x = -radius; x <= radius; x++){
                     for(int y = -radius; y <= radius; y++){

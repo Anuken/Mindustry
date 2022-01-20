@@ -2538,7 +2538,7 @@ public class UnitTypes{
             drownTimeMultiplier = 2f;
 
             hovering = true;
-            visualElevation = 0.65f;
+            visualElevation = 0.4f;
             groundLayer = Layer.legUnit;
 
             weapons.add(new Weapon("bulwark-weapon"){{
