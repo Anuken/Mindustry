@@ -687,6 +687,7 @@ public class LExecutor{
         //radar instructions are special in that they cache their output and only change it at fixed intervals.
         //this prevents lag from spam of radar instructions
         public Healthc lastTarget;
+        public Object lastSourceBuild;
         public Interval timer = new Interval();
 
         static float bestValue = 0f;
@@ -720,7 +721,7 @@ public class LExecutor{
 
                 //timers update on a fixed 30 tick interval
                 //units update on a special timer per controller instance
-                if((base instanceof Building && timer.get(30f)) || (ai != null && ai.checkTargetTimer(this))){
+                if((base instanceof Building && (timer.get(30f) || lastSourceBuild != base)) || (ai != null && ai.checkTargetTimer(this))){
                     //if any of the targets involve enemies
                     boolean enemies = target1 == RadarTarget.enemy || target2 == RadarTarget.enemy || target3 == RadarTarget.enemy;
                     boolean allies = target1 == RadarTarget.ally || target2 == RadarTarget.ally || target3 == RadarTarget.ally;
@@ -744,9 +745,18 @@ public class LExecutor{
                         find(r, range, sortDir, r.team());
                     }
 
+                    if(ai != null){
+                        ai.execCache.put(this, best);
+                    }
+
+                    lastSourceBuild = base;
                     lastTarget = targeted = best;
                 }else{
-                    targeted = lastTarget;
+                    if(ai != null){
+                        targeted = (Healthc)ai.execCache.get(this);
+                    }else{
+                        targeted = lastTarget;
+                    }
                 }
 
                 exec.setobj(output, targeted);

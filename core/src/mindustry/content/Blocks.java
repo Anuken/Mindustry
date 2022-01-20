@@ -82,7 +82,6 @@ public class Blocks{
 
     //defense - erekir
     buildTower,
-    //TODO name
     regenProjector, barrierProjector,
 
     //transport
