@@ -170,6 +170,12 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             return this;
         }
 
+        //view current planet by default
+        if(Vars.state.rules.sector != null){
+            state.planet = Vars.state.rules.sector.planet;
+            settings.put("lastplanet", state.planet.name);
+        }
+
         rebuildButtons();
         mode = look;
         state.otherCamPos = null;

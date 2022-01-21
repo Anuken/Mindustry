@@ -13,7 +13,6 @@ import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -29,7 +28,8 @@ public class MenuRenderer implements Disposable{
     private float time = 0f;
     private float flyerRot = 45f;
     private int flyers = Mathf.chance(0.2) ? Mathf.random(35) : Mathf.random(15);
-    private UnitType flyerType = content.units().select(u -> !u.isHidden() && u.hitSize <= 20f && u.flying && u.onTitleScreen && u.region.found()).random();
+    //no longer random or "dynamic", mod units in the menu look jarring, and it's not worth the configuration effort
+    private UnitType flyerType = Seq.with(UnitTypes.flare, UnitTypes.horizon, UnitTypes.zenith, UnitTypes.mono, UnitTypes.poly, UnitTypes.mega, UnitTypes.alpha, UnitTypes.beta, UnitTypes.gamma).random();
 
     public MenuRenderer(){
         Time.mark();
@@ -41,7 +41,8 @@ public class MenuRenderer implements Disposable{
     private void generate(){
         world.beginMapLoad();
         Tiles tiles = world.resize(width, height);
-        Seq<Block> ores = content.blocks().select(b -> b instanceof OreBlock ore && !ore.wallOre);
+        //only uses base game ores now, mod ones usually contrast too much with the floor
+        Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreLead, Blocks.oreScrap, Blocks.oreCoal, Blocks.oreTitanium, Blocks.oreThorium);
         shadows = new FrameBuffer(width, height);
         int offset = Mathf.random(100000);
         int s1 = offset, s2 = offset + 1, s3 = offset + 2;
