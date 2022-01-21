@@ -190,7 +190,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 if(block == Blocks.air) block = Blocks.yellowStoneWall;
             }
 
-            if(floor == Blocks.yellowStonePlates && noise(x + 78 + y, y, 3, 0.8f, 7f, 1f) > 0.41f){
+            if(floor == Blocks.yellowStonePlates && noise(x + 78 + y, y, 3, 0.8f, 6f, 1f) > 0.44f){
                 floor = Blocks.yellowStone;
             }
         });

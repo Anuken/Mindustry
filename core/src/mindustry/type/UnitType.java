@@ -320,7 +320,7 @@ public class UnitType extends UnlockableContent{
         stats.add(Stat.health, health);
         stats.add(Stat.armor, armor);
         stats.add(Stat.speed, speed * 60f / tilesize, StatUnit.tilesSecond);
-        stats.add(Stat.size, hitSize / tilesize, StatUnit.blocksSquared);
+        stats.add(Stat.size, StatValues.squared(hitSize / tilesize, StatUnit.blocksSquared));
         stats.add(Stat.itemCapacity, itemCapacity);
         stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
         stats.add(Stat.commandLimit, commandLimit);
@@ -349,7 +349,7 @@ public class UnitType extends UnlockableContent{
             stats.addPercent(Stat.buildSpeed, buildSpeed);
         }
         if(inst instanceof Payloadc){
-            stats.add(Stat.payloadCapacity, (payloadCapacity / (tilesize * tilesize)), StatUnit.blocksSquared);
+            stats.add(Stat.payloadCapacity, StatValues.squared(Mathf.sqrt(payloadCapacity / (tilesize * tilesize)), StatUnit.blocksSquared));
         }
 
         var reqs = getFirstRequirements();

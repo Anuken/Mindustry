@@ -34,11 +34,22 @@ public class StatValues{
         return table ->  table.add(!value ? "@no" : "@yes");
     }
 
+    public static String fixValue(float value){
+        int precision = Math.abs((int)value - value) <= 0.001f ? 0 : Math.abs((int)(value * 10) - value * 10) <= 0.001f ? 1 : 2;
+        return Strings.fixed(value, precision);
+    }
+
+    public static StatValue squared(float value, StatUnit unit){
+        return table -> {
+            String fixed = fixValue(value);
+            table.add(fixed + "x" + fixed);
+            table.add((unit.space ? " " : "") + unit.localized());
+        };
+    }
+
     public static StatValue number(float value, StatUnit unit, boolean merge){
         return table -> {
-            int precision = Math.abs((int)value - value) <= 0.001f ? 0 : Math.abs((int)(value * 10) - value * 10) <= 0.001f ? 1 : 2;
-
-            String l1 = Strings.fixed(value, precision), l2 = (unit.space ? " " : "") + unit.localized();
+            String l1 = fixValue(value), l2 = (unit.space ? " " : "") + unit.localized();
 
             if(merge){
                 table.add(l1 + l2);

@@ -54,7 +54,7 @@ public class PayloadConveyor extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.payloadCapacity, (payloadLimit), StatUnit.blocksSquared);
+        stats.add(Stat.payloadCapacity, StatValues.squared(payloadLimit, StatUnit.blocksSquared));
     }
 
     @Override

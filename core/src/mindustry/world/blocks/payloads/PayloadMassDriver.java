@@ -78,7 +78,7 @@ public class PayloadMassDriver extends PayloadBlock{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.payloadCapacity, maxPayloadSize, StatUnit.blocksSquared);
+        stats.add(Stat.payloadCapacity, StatValues.squared(maxPayloadSize, StatUnit.blocksSquared));
         stats.add(Stat.reload, 60f / (chargeTime + reloadTime), StatUnit.seconds);
     }
 
