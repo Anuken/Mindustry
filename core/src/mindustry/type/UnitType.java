@@ -605,7 +605,7 @@ public class UnitType extends UnlockableContent{
             drawShadow(unit);
         }
 
-        Draw.z(z - 0.02f);
+        Draw.z(z - 0.03f);
 
         if(mech != null){
             drawMech(mech);
@@ -623,7 +623,7 @@ public class UnitType extends UnlockableContent{
             drawLegs((Unit & Legsc)unit);
         }
 
-        Draw.z(Math.min(z - 0.01f, Layer.bullet - 1f));
+        Draw.z(Math.min(z - 0.02f, Layer.bullet - 1f));
 
         if(unit instanceof Payloadc){
             drawPayload((Unit & Payloadc)unit);
@@ -631,10 +631,13 @@ public class UnitType extends UnlockableContent{
 
         drawSoftShadow(unit);
 
-        Draw.z(z);
+        Draw.z(z - 0.1f);
 
         if(drawBody) drawOutline(unit);
         drawWeaponOutlines(unit);
+
+        Draw.z(z);
+
         if(engineSize > 0) drawEngine(unit);
         if(drawBody) drawBody(unit);
         if(drawCell) drawCell(unit);
