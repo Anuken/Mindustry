@@ -141,6 +141,9 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         //arkycite
         //TODO arkycite biome
         //TODO ice biome
+
+        //TODO arkycite is too disruptive to terrain, needs certain conditions and sub-biomes.
+        if(false)
         pass((x, y) -> {
             if(nearWall(x, y)) return;
 
@@ -187,7 +190,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 if(block == Blocks.air) block = Blocks.yellowStoneWall;
             }
 
-            if(floor == Blocks.yellowStonePlates && noise(x + 78 + y, y, 3, 0.8f, 8f, 1f) > 0.38f){
+            if(floor == Blocks.yellowStonePlates && noise(x + 78 + y, y, 3, 0.8f, 7f, 1f) > 0.41f){
                 floor = Blocks.yellowStone;
             }
         });
@@ -249,7 +252,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         //vents
         outer:
         for(Tile tile : tiles){
-            if(floor == Blocks.rhyolite && rand.chance(0.0015)){
+            if(floor == Blocks.rhyolite && rand.chance(0.0016)){
                 int radius = 2;
                 for(int x = -radius; x <= radius; x++){
                     for(int y = -radius; y <= radius; y++){

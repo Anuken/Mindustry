@@ -13,9 +13,9 @@ public class ErekirTechTree{
         Seq<Objective> erekirSector = Seq.with(new OnPlanet(Planets.erekir));
 
         var costMultipliers = new ObjectFloatMap<Item>();
-        costMultipliers.put(Items.silicon, 6);
+        costMultipliers.put(Items.silicon, 7);
         costMultipliers.put(Items.surgeAlloy, 4);
-        costMultipliers.put(Items.thorium, 7);
+        costMultipliers.put(Items.thorium, 8);
         costMultipliers.put(Items.graphite, 6);
 
         Planets.erekir.techTree = nodeRoot("erekir", coreBastion, true, () -> {

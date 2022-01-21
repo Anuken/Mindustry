@@ -7,8 +7,8 @@ public class Attribute{
     public static Attribute[] all = {};
     public static ObjectMap<String, Attribute> map = new ObjectMap<>();
 
-    public static final Attribute
     /** Heat content. Used for thermal generator yield. */
+    public static final Attribute
     heat = add("heat"),
     /** Spore content. Used for cultivator yield. */
     spores = add("spores"),
@@ -18,8 +18,8 @@ public class Attribute{
     oil = add("oil"),
     /** Light coverage. Negative values decrease solar panel efficiency. */
     light = add("light"),
-    /** Silicate content. Used for sand extraction. */
-    silicate = add("silicate"),
+    /** Used for sand extraction. */
+    sand = add("sand"),
     /** Used for erekir vents only. */
     vent = add("vent");
 

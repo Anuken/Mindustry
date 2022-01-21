@@ -34,7 +34,7 @@ public class WallCrafter extends Block{
     public float updateEffectChance = 0.02f;
     public float rotateSpeed = 2f;
     /** Attribute to check for wall output. */
-    public Attribute attribute = Attribute.silicate;
+    public Attribute attribute = Attribute.sand;
 
     public Item output = Items.sand;
 

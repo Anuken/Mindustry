@@ -490,7 +490,7 @@ public class Blocks{
         }};
 
         stoneWall = new StaticWall("stone-wall"){{
-            attributes.set(Attribute.silicate, 1f);
+            attributes.set(Attribute.sand, 1f);
         }};
 
         sporeWall = new StaticWall("spore-wall"){{
@@ -510,37 +510,37 @@ public class Blocks{
 
         duneWall = new StaticWall("dune-wall"){{
             basalt.asFloor().wall = darksandWater.asFloor().wall = darksandTaintedWater.asFloor().wall = this;
-            attributes.set(Attribute.silicate, 2f);
+            attributes.set(Attribute.sand, 2f);
         }};
 
         regolithWall = new StaticWall("regolith-wall"){{
             regolith.asFloor().wall = this;
-            attributes.set(Attribute.silicate, 1f);
+            attributes.set(Attribute.sand, 1f);
         }};
 
         yellowStoneWall = new StaticWall("yellow-stone-wall"){{
             yellowStone.asFloor().wall = slag.asFloor().wall = yellowStonePlates.asFloor().wall = this;
-            attributes.set(Attribute.silicate, 1.5f);
+            attributes.set(Attribute.sand, 1.5f);
         }};
 
         rhyoliteWall = new StaticWall("rhyolite-wall"){{
             rhyolite.asFloor().wall = rhyoliteCrater.asFloor().wall = roughRhyolite.asFloor().wall = this;
-            attributes.set(Attribute.silicate, 1f);
+            attributes.set(Attribute.sand, 1f);
         }};
 
         carbonWall = new StaticWall("carbon-wall"){{
             carbonStone.asFloor().wall = this;
-            attributes.set(Attribute.silicate, 0.7f);
+            attributes.set(Attribute.sand, 0.7f);
         }};
 
         ferricStoneWall = new StaticWall("ferric-stone-wall"){{
             ferricStone.asFloor().wall = this;
-            attributes.set(Attribute.silicate, 0.5f);
+            attributes.set(Attribute.sand, 0.5f);
         }};
 
         beryllicStoneWall = new StaticWall("beryllic-stone-wall"){{
             beryllicStone.asFloor().wall = this;
-            attributes.set(Attribute.silicate, 1.2f);
+            attributes.set(Attribute.sand, 1.2f);
         }};
 
         arkyicWall = new StaticWall("arkyic-wall"){{
@@ -559,7 +559,7 @@ public class Blocks{
 
         sandWall = new StaticWall("sand-wall"){{
             sandWater.asFloor().wall = water.asFloor().wall = deepwater.asFloor().wall = this;
-            attributes.set(Attribute.silicate, 2f);
+            attributes.set(Attribute.sand, 2f);
         }};
 
         saltWall = new StaticWall("salt-wall");
@@ -2345,7 +2345,7 @@ public class Blocks{
 
             drillTime = 110f;
             size = 2;
-            attribute = Attribute.silicate;
+            attribute = Attribute.sand;
             output = Items.sand;
         }};
 
@@ -2469,7 +2469,7 @@ public class Blocks{
             size = 4;
             thrusterLength = 34/4f;
 
-            unitCapModifier = 16;
+            unitCapModifier = 8;
             researchCostMultiplier = 0.07f;
         }};
 
@@ -2483,7 +2483,7 @@ public class Blocks{
             size = 5;
             thrusterLength = 40/4f;
 
-            unitCapModifier = 24;
+            unitCapModifier = 16;
             researchCostMultiplier = 0.11f;
         }};
 
@@ -2497,7 +2497,7 @@ public class Blocks{
             size = 6;
             thrusterLength = 48/4f;
 
-            unitCapModifier = 32;
+            unitCapModifier = 24;
             researchCostMultiplier = 0.11f;
         }};
 
@@ -3205,6 +3205,34 @@ public class Blocks{
             range = 390f;
             size = 4;
         }};
+
+        /*
+        afflict = new ContinuousTurret("afflict"){{
+            requirements(Category.turret, with(Items.carbide, 250, Items.surgeAlloy, 160, Items.silicon, 300, Items.beryllium, 400));
+
+            //TODO bullet.
+
+            shootShake = 4f;
+            recoilAmount = 1f;
+            reloadTime = 60f * 3f;
+            shootLength = 7f;
+            rotateSpeed = 2.5f;
+
+            coolantUsage = 30f / 60f;
+            coolantOverride = Liquids.water;
+
+            draw = new DrawTurret("reinforced-");
+
+            restitution = 0.02f;
+            shootWarmupSpeed = 0.08f;
+
+            outlineColor = Pal.darkOutline;
+            acceptCoolant = false;
+
+            scaledHealth = 300;
+            range = 390f;
+            size = 4;
+        }};*/
 
         //endregion
         //region units
