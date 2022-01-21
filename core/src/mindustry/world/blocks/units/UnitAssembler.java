@@ -14,6 +14,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -46,20 +47,35 @@ public class UnitAssembler extends PayloadBlock{
         flags = EnumSet.of(BlockFlag.unitAssembler);
     }
 
+    public Rect getRect(Rect rect, float x, float y, int rotation){
+        rect.setCentered(x, y, areaSize * tilesize);
+        float len = tilesize * (areaSize + size)/2f;
+
+        rect.x += Geometry.d4x(rotation) * len;
+        rect.y += Geometry.d4y(rotation) * len;
+
+        return rect;
+    }
+
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
         x *= tilesize;
         y *= tilesize;
+        x += offset;
+        y += offset;
 
-        Tmp.r1.setCentered(x, y, areaSize * tilesize);
-        float len = tilesize * (areaSize + size)/2f;
+        Rect rect = getRect(Tmp.r1, x, y, rotation);
 
-        Tmp.r1.x += Geometry.d4x(rotation) * len;
-        Tmp.r1.y += Geometry.d4y(rotation) * len;
+        Drawf.dashRect(valid ? Pal.accent : Pal.remove, rect);
+    }
 
-        Drawf.dashRect(valid ? Pal.accent : Pal.remove, Tmp.r1);
+    @Override
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
+        //overlapping construction areas not allowed.
+        Rect rect = getRect(Tmp.r1, tile.worldx() + offset, tile.worldy() + offset, rotation).grow(0.1f);
+        return !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
     }
 
     @Override

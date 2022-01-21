@@ -1453,7 +1453,7 @@ public class UnitTypes{
             engineSize = 7.8f;
             rotateShooting = false;
             hitSize = 66f;
-            payloadCapacity = (5.3f * 5.3f) * tilePayload;
+            payloadCapacity = (5.5f * 5.5f) * tilePayload;
             buildSpeed = 4f;
             drawShields = false;
             commandLimit = 6;
