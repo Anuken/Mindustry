@@ -3387,7 +3387,7 @@ public class Blocks{
 
         //TODO requirements
         tankAssembler = new UnitAssembler("tank-assembler"){{
-            requirements(Category.units, with(Items.graphite, 10));
+            requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 200, Items.tungsten, 500));
             size = 5;
             plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 10f, BlockStack.list(Blocks.tungstenWallLarge, 5, Blocks.duct, 2)));
             consumes.power(2f);
@@ -3399,7 +3399,7 @@ public class Blocks{
 
         //TODO requirements
         shipAssembler = new UnitAssembler("ship-assembler"){{
-            requirements(Category.units, with(Items.graphite, 10));
+            requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 200, Items.tungsten, 500));
             size = 5;
             plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 4f, BlockStack.list(Blocks.tungstenWallLarge, 5, Blocks.plasmaBore, 2)));
             consumes.power(2f);
@@ -3412,7 +3412,7 @@ public class Blocks{
 
         //TODO requirements
         mechAssembler = new UnitAssembler("mech-assembler"){{
-            requirements(Category.units, with(Items.graphite, 10));
+            requirements(Category.units, with(Items.graphite, 600, Items.carbide, 600, Items.oxide, 200, Items.tungsten, 500));
             size = 5;
             plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 4f, BlockStack.list(Blocks.tungstenWallLarge, 5, Blocks.duct, 2)));
             consumes.power(2f);

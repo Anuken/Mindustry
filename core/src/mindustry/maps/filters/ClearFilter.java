@@ -12,7 +12,7 @@ public class ClearFilter extends GenerateFilter{
 
     @Override
     public FilterOption[] options(){
-        return new BlockOption[]{
+        return new FilterOption[]{
             new BlockOption("target", () -> target, b -> target = b, anyOptional),
             new BlockOption("replacement", () -> replace, b -> replace = b, anyOptional)
         };

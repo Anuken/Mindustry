@@ -111,6 +111,10 @@ public abstract class GenerateFilter{
         return Simplex.noise2d(seed, octaves, persistence, 1f / scl, in.x, in.y) * mag;
     }
 
+    protected float noise(float x, float y, float scl, float mag, float octaves, float persistence){
+        return Simplex.noise2d(seed, octaves, persistence, 1f / scl, x, y) * mag;
+    }
+
     protected float rnoise(float x, float y, float scl, float mag){
         return Ridged.noise2d(seed + 1, (int)(x), (int)(y), 1f / scl) * mag;
     }

@@ -1,6 +1,5 @@
 package mindustry.content;
 
-import mindustry.ctype.*;
 import mindustry.type.*;
 
 import static mindustry.content.Planets.*;
@@ -11,7 +10,10 @@ public class SectorPresets{
     craters, biomassFacility, frozenForest, ruinousShores, windsweptIslands, stainedMountains, tarFields,
     fungalPass, extractionOutpost, saltFlats, overgrowth,
     impact0078, desolateRift, nuclearComplex, planetaryTerminal,
-    coastline, navalFortress;
+    coastline, navalFortress,
+
+    onset
+    ;
 
     public static void load(){
         //region serpulo
@@ -108,5 +110,15 @@ public class SectorPresets{
         }};
 
         //endregion
+        //region erekir
+
+        /*
+        onset = new SectorPreset("onset", erekir, 15){{
+            addStartingItems = true;
+            captureWave = 10;
+            difficulty = 1;
+        }};*/
+
+        //endreigon
     }
 }

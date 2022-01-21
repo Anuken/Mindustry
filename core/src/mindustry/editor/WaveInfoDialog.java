@@ -11,6 +11,7 @@ import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -36,12 +37,16 @@ public class WaveInfoDialog extends BaseDialog{
     private Sort sort = Sort.begin;
     private boolean reverseSort = false;
     private float updateTimer, updatePeriod = 1f;
+    private boolean checkedSpawns;
     private WaveGraph graph = new WaveGraph();
 
     public WaveInfoDialog(){
         super("@waves.title");
 
-        shown(this::setup);
+        shown(() -> {
+            checkedSpawns = false;
+            setup();
+        });
         hidden(() -> state.rules.spawns = groups);
 
         addCloseListener();
@@ -321,25 +326,66 @@ public class WaveInfoDialog extends BaseDialog{
 
                         //spawn positions are clunky and thus experimental for now
                         if(experimental){
+                            //health fractions are generally not useful
+                            t.table(p -> {
+                                p.stack(new Slider(0f, 1f, 0.01f, false){{
+                                    setValue(group.healthFraction);
+                                    moved(val -> group.healthFraction = val);
+                                }}, new Label("", Styles.outlineLabel){{
+                                    update(() -> setText(Core.bundle.format("waves.health", (int)(group.healthFraction * 100))));
+                                    touchable = Touchable.disabled;
+                                    setAlignment(Align.center);
+                                    setColor(Color.white);
+                                }}).width(300f).height(44f);
+                            }).row();
+
                             t.table(a -> {
-                                a.add("spawn at ");
+                                a.add("spawn: ");
 
-                                a.field(group.spawn == -1 ? "" : Point2.x(group.spawn) + "", TextFieldFilter.digitsOnly, text -> {
-                                    if(Strings.canParsePositiveInt(text)){
-                                        group.spawn = Point2.pack(Strings.parseInt(text), Point2.y(group.spawn));
-                                        Log.info(group.spawn);
+                                a.button("", () -> {
+                                    if(!checkedSpawns){
+                                        //recalculate waves when changed
+                                        Vars.spawner.reset();
+                                        checkedSpawns = true;
                                     }
-                                }).width(70f);
 
-                                a.add(",");
+                                    BaseDialog dialog = new BaseDialog("Spawn Select");
+                                    dialog.cont.pane(p -> {
+                                        p.background(Tex.button).margin(10f);
+                                        int i = 0;
+                                        int cols = 4;
+                                        int max = 20;
 
-                                a.field(group.spawn == -1 ? "" : Point2.y(group.spawn) + "", TextFieldFilter.digitsOnly, text -> {
-                                    if(Strings.canParsePositiveInt(text)){
-                                        group.spawn = Point2.pack(Point2.x(group.spawn), Strings.parseInt(text));
-                                        Log.info(group.spawn);
-                                    }
-                                }).width(70f);
-                            }).padBottom(8f).padTop(-8f).row();
+                                        if(spawner.getSpawns().size >= max){
+                                            p.add("[lightgray](first " + max + ")").colspan(cols).padBottom(4).row();
+                                        }
+
+                                        for(var spawn : spawner.getSpawns()){
+                                            p.button(spawn.x + ", " + spawn.y, Styles.clearTogglet, () -> {
+                                                group.spawn = Point2.pack(spawn.x, spawn.y);
+                                                dialog.hide();
+                                            }).size(110f, 45f).checked(spawn.pos() == group.spawn);
+
+                                            if(++i % cols == 0){
+                                                p.row();
+                                            }
+
+                                            //only display first 20 spawns, you don't need to see more.
+                                            if(i >= 20){
+                                                break;
+                                            }
+                                        }
+
+                                        if(spawner.getSpawns().isEmpty()){
+                                            p.add("[scarlet]no spawns found in map");
+                                        }
+                                    });
+                                    dialog.setFillParent(false);
+                                    dialog.addCloseButton();
+                                    dialog.show();
+                                }).width(160f).height(36f).get().getLabel().setText(() -> group.spawn == -1 ? "<all>" : Point2.x(group.spawn) + ", " + Point2.y(group.spawn));
+
+                            }).padBottom(8f).row();
                         }
                     }
                 }).width(340f).pad(8);
