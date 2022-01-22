@@ -21,7 +21,6 @@ import static mindustry.Vars.*;
 public class SerpuloPlanetGenerator extends PlanetGenerator{
     //alternate, less direct generation (wip)
     public static boolean alt = false;
-    static final int seed = 0;
 
     BaseGenerator basegen = new BaseGenerator();
     float scl = 5f;
@@ -120,7 +119,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         tile.floor = getBlock(position);
         tile.block = tile.floor.asFloor().wall;
 
-        if(Ridged.noise3d(1, position.x, position.y, position.z, 2, 22) > 0.31){
+        if(Ridged.noise3d(seed + 1, position.x, position.y, position.z, 2, 22) > 0.31){
             tile.block = Blocks.air;
         }
     }

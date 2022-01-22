@@ -16,13 +16,15 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class TantrosPlanetGenerator extends PlanetGenerator{
-    static final int seed = 1;
-
     Color c1 = Color.valueOf("5057a6"), c2 = Color.valueOf("272766"), out = new Color();
 
     Block[][] arr = {
     {Blocks.redmat, Blocks.redmat, Blocks.darksand, Blocks.bluemat, Blocks.bluemat}
     };
+
+    {
+        baseSeed = 1;
+    }
 
     @Override
     public void generateSector(Sector sector){

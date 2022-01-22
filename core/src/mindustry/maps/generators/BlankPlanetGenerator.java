@@ -30,10 +30,10 @@ public class BlankPlanetGenerator extends PlanetGenerator{
     }
 
     @Override
-    public void generate(Tiles tiles, Sector sec){
+    public void generate(Tiles tiles, Sector sec, int seed){
         this.tiles = tiles;
         this.sector = sec;
-        this.rand.setSeed(sec.id);
+        this.rand.setSeed(sec.id + seed + baseSeed);
 
         tiles.fill();
 

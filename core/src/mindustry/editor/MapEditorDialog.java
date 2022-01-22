@@ -38,6 +38,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private MapLoadDialog loadDialog;
     private MapResizeDialog resizeDialog;
     private MapGenerateDialog generateDialog;
+    private SectorGenerateDialog sectorGenDialog;
     private ScrollPane pane;
     private BaseDialog menu;
     private Table blockSelection;
@@ -54,6 +55,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         view = new MapView();
         infoDialog = new MapInfoDialog();
         generateDialog = new MapGenerateDialog(true);
+        sectorGenDialog = new SectorGenerateDialog();
 
         menu = new BaseDialog("@menu");
         menu.addCloseButton();
@@ -161,7 +163,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
             menu.cont.row();
         }
 
-        menu.cont.button("@editor.ingame", Icon.right, this::playtest).padTop(!steam ? -3 : 1).size(swidth * 2f + 10, 60f);
+        //wip feature
+        if(experimental){
+            menu.cont.button("@editor.sectorgenerate", Icon.terrain, () -> {
+                menu.hide();
+                sectorGenDialog.show();
+            }).padTop(!steam ? -3 : 1).size(swidth * 2f + 10, 60f);
+            menu.cont.row();
+        }
+
+        menu.cont.button("@editor.ingame", Icon.right, this::playtest).padTop(!steam && !experimental ? -3 : 1).size(swidth * 2f + 10, 60f);
 
         menu.cont.row();
 

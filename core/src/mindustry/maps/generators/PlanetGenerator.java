@@ -16,6 +16,9 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public abstract class PlanetGenerator extends BasicGenerator implements HexMesher{
+    public int baseSeed = 0;
+    public int seed = 0;
+
     protected IntSeq ints = new IntSeq();
     protected Sector sector;
 
@@ -128,10 +131,11 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         return res % 2 == 0 ? res : res + 1;
     }
 
-    public void generate(Tiles tiles, Sector sec){
+    public void generate(Tiles tiles, Sector sec, int seed){
         this.tiles = tiles;
+        this.seed = seed + baseSeed;
         this.sector = sec;
-        this.rand.setSeed(sec.id);
+        this.rand.setSeed(sec.id + seed + baseSeed);
 
         TileGen gen = new TileGen();
         tiles.each((x, y) -> {

@@ -18,8 +18,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ErekirPlanetGenerator extends PlanetGenerator{
-    static final int seed = 2;
-
     public float scl = 2f;
     public float heightScl = 0.9f, octaves = 8, persistence = 0.7f, heightPow = 3f, heightMult = 1.6f;
 
@@ -29,6 +27,10 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
     //TODO basalt bad
     //{Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.crystallineStone, Blocks.carbonStone}
     };
+
+    {
+        baseSeed = 2;
+    }
 
     @Override
     public void generateSector(Sector sector){
@@ -96,11 +98,11 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         tile.block = tile.floor.asFloor().wall;
 
-        if(Ridged.noise3d(1, position.x, position.y, position.z, 2, 14) > 0.14){
+        if(Ridged.noise3d(seed + 1, position.x, position.y, position.z, 2, 14) > 0.14){
             tile.block = Blocks.air;
         }
 
-        if(Ridged.noise3d(2, position.x, position.y + 4f, position.z, 3, 6f) > 0.6){
+        if(Ridged.noise3d(seed + 2, position.x, position.y + 4f, position.z, 3, 6f) > 0.6){
             tile.floor = Blocks.carbonStone;
         }
     }
@@ -256,6 +258,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             //    block = Blocks.crystalBlocks;
             //}
         });
+
+        trimDark();
 
         //vents
         outer:

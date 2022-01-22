@@ -248,6 +248,10 @@ public class World{
     }
 
     public void loadSector(Sector sector){
+        loadSector(sector, 0);
+    }
+
+    public void loadSector(Sector sector, int seedOffset){
         setSectorRules(sector);
 
         int size = sector.getSize();
@@ -256,7 +260,7 @@ public class World{
                 sector.preset.generator.generate(tiles);
                 sector.preset.rules.get(state.rules); //apply extra rules
             }else if(sector.planet.generator != null){
-                sector.planet.generator.generate(tiles, sector);
+                sector.planet.generator.generate(tiles, sector, seedOffset);
             }else{
                 throw new RuntimeException("Sector " + sector.id + " on planet " + sector.planet.name + " has no generator or preset defined. Provide a planet generator or preset map.");
             }

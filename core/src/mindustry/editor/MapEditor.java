@@ -67,6 +67,10 @@ public class MapEditor{
         renderer.resize(width(), height());
     }
 
+    public void updateRenderer(){
+        renderer.resize(width(), height());
+    }
+
     public void load(Runnable r){
         loading = true;
         r.run();

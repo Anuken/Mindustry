@@ -408,7 +408,7 @@ public abstract class BasicGenerator implements WorldGenerator{
                         if(cx*cx + cy*cy <= r2){
                             Tile other = tiles.get(tile.x + cx, tile.y + cy);
 
-                            if(other != null){
+                            if(other != null && other.floor() != floor){
                                 other.setFloor(dest);
                             }
                         }
