@@ -45,7 +45,8 @@ public enum EditorTool{
             });
         }
     },
-    pencil(KeyCode.b, "replace", "square", "drawteams"){
+    //the "under liquid" rendering is too buggy to make public
+    pencil(KeyCode.b, "replace", "square", "drawteams"/*, "underliquid"*/){
         {
             edit = true;
             draggable = true;
@@ -61,10 +62,12 @@ public enum EditorTool{
                 editor.drawBlocksReplace(x, y);
             }else if(mode == 1){
                 //square mode
-                editor.drawBlocks(x, y, true, tile -> true);
+                editor.drawBlocks(x, y, true, false, tile -> true);
             }else if(mode == 2){
                 //draw teams
                 editor.drawCircle(x, y, tile -> tile.setTeam(editor.drawTeam));
+            }else if(mode == 3){
+                editor.drawBlocks(x, y, false, true, tile -> tile.floor().isLiquid);
             }
 
         }

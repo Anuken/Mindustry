@@ -40,17 +40,17 @@ public class Blocks{
 
     //environment
     air, spawn, cliff, deepwater, water, taintedWater, deepTaintedWater, tar, slag, cryofluid, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space, empty,
-    dacite, rhyolite, rhyoliteCrater, roughRhyolite, regolith, yellowStone, redIce,
+    dacite, rhyolite, rhyoliteCrater, roughRhyolite, regolith, yellowStone, redIce, redStone, denseRedStone,
     arkyciteFloor, arkyicStone,
     redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     redweed, purbush, coralChunk, yellowCoral,
-    regolithWall, yellowStoneWall, rhyoliteWall, steamVent, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall, arkyicWall, crystallineStoneWall,
+    regolithWall, yellowStoneWall, rhyoliteWall, steamVent, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall, arkyicWall, crystallineStoneWall, redStoneWall, redDiamondWall,
     ferricStone, ferricCraters, carbonStone, beryllicStone, crystallineStone, crystalFloor, yellowStonePlates,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
     //boulders
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
-    arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystallineBoulder, redIceBoulder, rhyoliteBoulder,
+    arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystallineBoulder, redIceBoulder, rhyoliteBoulder, redStoneBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
@@ -180,6 +180,7 @@ public class Blocks{
             drownTime = 200f;
             cacheLayer = CacheLayer.water;
             albedo = 0.9f;
+            supportsOverlay = true;
         }};
 
         water = new Floor("shallow-water"){{
@@ -191,6 +192,7 @@ public class Blocks{
             isLiquid = true;
             cacheLayer = CacheLayer.water;
             albedo = 0.9f;
+            supportsOverlay = true;
         }};
 
         taintedWater = new Floor("tainted-water"){{
@@ -203,6 +205,7 @@ public class Blocks{
             cacheLayer = CacheLayer.water;
             albedo = 0.9f;
             attributes.set(Attribute.spores, 0.15f);
+            supportsOverlay = true;
         }};
 
         deepTaintedWater = new Floor("deep-tainted-water"){{
@@ -216,6 +219,7 @@ public class Blocks{
             cacheLayer = CacheLayer.water;
             albedo = 0.9f;
             attributes.set(Attribute.spores, 0.15f);
+            supportsOverlay = true;
         }};
 
         darksandTaintedWater = new ShallowLiquid("darksand-tainted-water"){{
@@ -223,18 +227,21 @@ public class Blocks{
             statusDuration = 60f;
             albedo = 0.9f;
             attributes.set(Attribute.spores, 0.1f);
+            supportsOverlay = true;
         }};
 
         sandWater = new ShallowLiquid("sand-water"){{
             speedMultiplier = 0.8f;
             statusDuration = 50f;
             albedo = 0.9f;
+            supportsOverlay = true;
         }};
 
         darksandWater = new ShallowLiquid("darksand-water"){{
             speedMultiplier = 0.8f;
             statusDuration = 50f;
             albedo = 0.9f;
+            supportsOverlay = true;
         }};
 
         tar = new Floor("tar"){{
@@ -416,6 +423,16 @@ public class Blocks{
             variants = 3;
         }};
 
+        redStone = new Floor("red-stone"){{
+            attributes.set(Attribute.water, -1f);
+            variants = 4;
+        }};
+
+        denseRedStone = new Floor("dense-red-stone"){{
+            attributes.set(Attribute.water, -1f);
+            variants = 4;
+        }};
+
         redIce = new Floor("red-ice"){{
             //TODO red ice boulder
             dragMultiplier = 0.4f;
@@ -555,6 +572,15 @@ public class Blocks{
 
         redIceWall = new StaticWall("red-ice-wall"){{
             redIce.asFloor().wall = this;
+        }};
+
+        redStoneWall = new StaticWall("red-stone-wall"){{
+            redStone.asFloor().wall = denseRedStone.asFloor().wall = this;
+            attributes.set(Attribute.sand, 1.5f);
+        }};
+
+        redDiamondWall = new StaticTree("red-diamond-wall"){{
+            variants = 3;
         }};
 
         sandWall = new StaticWall("sand-wall"){{
@@ -697,6 +723,12 @@ public class Blocks{
             variants = 3;
             rhyolite.asFloor().decoration = roughRhyolite.asFloor().decoration = this;
         }};
+
+        redStoneBoulder = new Prop("red-stone-boulder"){{
+            variants = 4;
+            denseRedStone.asFloor().decoration = redStone.asFloor().decoration = this;
+        }};
+
 
         metalFloor = new Floor("metal-floor", 0);
         metalFloorDamaged = new Floor("metal-floor-damaged", 3);

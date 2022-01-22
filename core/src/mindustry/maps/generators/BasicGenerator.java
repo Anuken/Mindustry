@@ -402,13 +402,13 @@ public abstract class BasicGenerator implements WorldGenerator{
 
         for(int i = 0; i < max; i++){
             Tile tile = tiles.geti(i);
-            if(tile.floor() == floor){
+            if(tile.floor() == floor || tile.block() == floor){
                 for(int cx = -cap; cx <= cap; cx++){
                     for(int cy = -cap; cy <= cap; cy++){
                         if(cx*cx + cy*cy <= r2){
                             Tile other = tiles.get(tile.x + cx, tile.y + cy);
 
-                            if(other != null && other.floor() != floor){
+                            if(other != null){
                                 other.setFloor(dest);
                             }
                         }

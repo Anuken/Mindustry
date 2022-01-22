@@ -25,6 +25,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
     Block[][] arr = {
     {Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.carbonStone}
+    //{Blocks.redStone, Blocks.redStone, Blocks.redStone, Blocks.rhyolite, Blocks.carbonStone}
     //TODO basalt bad
     //{Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.crystallineStone, Blocks.carbonStone}
     };
@@ -193,9 +194,16 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             if(floor == Blocks.yellowStonePlates && noise(x + 78 + y, y, 3, 0.8f, 6f, 1f) > 0.44f){
                 floor = Blocks.yellowStone;
             }
+
+            if(floor == Blocks.redStone && noise(x + 78 - y, y, 4, 0.73f, 20f, 1f) > 0.65f){
+                floor = Blocks.denseRedStone;
+            }
         });
 
         inverseFloodFill(tiles.getn(spawnX, spawnY));
+
+        //TODO veins, blend after inverse flood fill?
+        blend(Blocks.redStoneWall, Blocks.denseRedStone, 4);
 
         //make sure enemies have room
         erase(endX, endY, 6);

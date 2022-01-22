@@ -16,6 +16,8 @@ import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
 public class Floor extends Block{
@@ -47,6 +49,10 @@ public class Floor extends Block{
     public float liquidMultiplier = 1f;
     /** whether this block is liquid. */
     public boolean isLiquid;
+    /** for liquid floors, this is the opacity of the overlay drawn on top. */
+    public float overlayAlpha = 0.65f;
+    /** whether this floor supports an overlay floor */
+    public boolean supportsOverlay = false;
     /** shallow water flag used for generation */
     public boolean shallow = false;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
@@ -67,10 +73,13 @@ public class Floor extends Block{
     public boolean needsSurface = true;
     /** If true, this ore is allowed on walls. */
     public boolean wallOre = false;
+    /** Actual ID used for blend groups. Internal. */
+    public int blendId = -1;
 
     protected TextureRegion[][] edges;
     protected Seq<Block> blenders = new Seq<>();
     protected Bits blended = new Bits(256);
+    protected int[] dirs = new int[8];
     protected TextureRegion edgeRegion;
 
     public Floor(String name){
@@ -108,6 +117,8 @@ public class Floor extends Block{
     @Override
     public void init(){
         super.init();
+
+        blendId = blendGroup.id;
 
         if(wall == Blocks.air){
             wall = content.block(name + "-wall");
@@ -168,14 +179,21 @@ public class Floor extends Block{
         Mathf.rand.setSeed(tile.pos());
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
 
+        Draw.alpha(1f);
         drawEdges(tile);
         drawOverlay(tile);
     }
 
     public void drawOverlay(Tile tile){
         Floor floor = tile.overlay();
-        if(floor != Blocks.air && floor != this){ //ore should never have itself on top, but it's possible, so prevent a crash in that case
+        if(floor != Blocks.air && floor != this){
+            if(isLiquid){
+                Draw.alpha(overlayAlpha);
+            }
             floor.drawBase(tile);
+            if(isLiquid){
+                Draw.alpha(1f);
+            }
         }
     }
 
@@ -206,6 +224,7 @@ public class Floor extends Block{
     public void drawNonLayer(Tile tile, CacheLayer layer){
         Mathf.rand.setSeed(tile.pos());
 
+        Arrays.fill(dirs, 0);
         blenders.clear();
         blended.clear();
 
@@ -215,38 +234,44 @@ public class Floor extends Block{
             if(other != null && other.floor().cacheLayer == layer && other.floor().edges() != null){
                 if(!blended.getAndSet(other.floor().id)){
                     blenders.add(other.floor());
+                    dirs[i] = other.floorID();
                 }
             }
         }
 
-        drawBlended(tile);
+        drawBlended(tile, false);
     }
 
     protected void drawEdges(Tile tile){
         blenders.clear();
         blended.clear();
+        Arrays.fill(dirs, 0);
+        CacheLayer realCache = tile.floor().cacheLayer;
 
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
             Tile other = tile.nearby(point);
-            if(other != null && doEdge(other.floor()) && other.floor().cacheLayer == cacheLayer && other.floor().edges() != null){
+
+            if(other != null && doEdge(tile, other, other.floor()) && other.floor().cacheLayer == realCache && other.floor().edges() != null){
+
                 if(!blended.getAndSet(other.floor().id)){
                     blenders.add(other.floor());
                 }
+                dirs[i] = other.floorID();
             }
         }
 
-        drawBlended(tile);
+        drawBlended(tile, true);
     }
 
-    protected void drawBlended(Tile tile){
+    protected void drawBlended(Tile tile, boolean checkId){
         blenders.sort(a -> a.id);
 
         for(Block block : blenders){
             for(int i = 0; i < 8; i++){
                 Point2 point = Geometry.d8[i];
                 Tile other = tile.nearby(point);
-                if(other != null && other.floor() == block){
+                if(other != null && other.floor() == block && (!checkId || dirs[i] == block.id)){
                     TextureRegion region = edge((Floor)block, 1 - point.x, 1 - point.y);
                     Draw.rect(region, tile.worldx(), tile.worldy());
                 }
@@ -258,7 +283,7 @@ public class Floor extends Block{
     protected void drawEdgesFlat(Tile tile, boolean sameLayer){
         for(int i = 0; i < 4; i++){
             Tile other = tile.nearby(i);
-            if(other != null && doEdge(other.floor())){
+            if(other != null && doEdge(tile, other, other.floor())){
                 Color color = other.floor().mapColor;
                 Draw.color(color.r, color.g, color.b, 1f);
                 Draw.rect(edgeRegion, tile.worldx(), tile.worldy(), i*90);
@@ -267,13 +292,19 @@ public class Floor extends Block{
         Draw.color();
     }
 
+    public int realBlendId(Tile tile){
+        if(tile.floor().isLiquid && !tile.overlay().isAir() && !(tile.overlay() instanceof OreBlock)){
+            return -((tile.overlay().blendId) | (tile.floor().blendId << 15));
+        }
+        return blendId;
+    }
 
     protected TextureRegion[][] edges(){
         return ((Floor)blendGroup).edges;
     }
 
-    protected boolean doEdge(Floor other){
-        return other.blendGroup.id > blendGroup.id || edges() == null;
+    protected boolean doEdge(Tile tile, Tile otherTile, Floor other){
+        return other.realBlendId(otherTile) > realBlendId(tile) || edges() == null;
     }
 
     TextureRegion edge(Floor block, int x, int y){

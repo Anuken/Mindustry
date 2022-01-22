@@ -149,6 +149,9 @@ public class MapRenderer implements Disposable{
             offsetX = tilesize / 2f - region.width / 2f * Draw.scl;
             offsetY = tilesize / 2f - region.height / 2f * Draw.scl;
         }else if((wall == Blocks.air || overlay.wallOre) && !overlay.isAir()){
+            if(floor.isLiquid){
+                mesh.setColor(Tmp.c1.set(1f, 1f, 1f, floor.overlayAlpha));
+            }
             region = overlay.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, tile.overlay().editorVariantRegions().length - 1)];
         }else{
             region = clearEditor;
