@@ -278,6 +278,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 unit.spawnedByCore = true;
                 player.unit(unit);
             }
+
+            player.checkSpawn();
         });
     }
 

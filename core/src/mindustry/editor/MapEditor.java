@@ -68,6 +68,22 @@ public class MapEditor{
     }
 
     public void updateRenderer(){
+        Tiles tiles = world.tiles;
+        Seq<Building> builds = new Seq<>();
+
+        for(int i = 0; i < tiles.width * tiles.height; i++){
+            Tile tile = tiles.geti(i);
+            var build = tile.build;
+            if(build != null){
+                builds.add(build);
+            }
+            tiles.seti(i, new EditorTile(tile.x, tile.y, tile.floorID(), tile.overlayID(), build == null ? tile.blockID() : 0));
+        }
+
+        for(var build : builds){
+            tiles.get(build.tileX(), build.tileY()).setBlock(build.block, build.team, build.rotation, () -> build);
+        }
+
         renderer.resize(width(), height());
     }
 

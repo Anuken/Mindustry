@@ -39,6 +39,11 @@ public class Tiles implements Iterable<Tile>{
         array[y*width + x] = tile;
     }
 
+    /** set a tile at a raw array position; does not range-check. use with caution. */
+    public void seti(int i, Tile tile){
+        array[i] = tile;
+    }
+
     /** @return whether these coordinates are in bounds */
     public boolean in(int x, int y){
         return x >= 0 && x < width && y >= 0 && y < height;

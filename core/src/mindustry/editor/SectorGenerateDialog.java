@@ -87,7 +87,16 @@ public class SectorGenerateDialog extends BaseDialog{
         ui.loadAnd(() -> {
             editor.clearOp();
             editor.load(() -> {
-                world.loadSector(planet.sectors.get(sector), seed);
+                var sectorobj = planet.sectors.get(sector);
+
+                //remove presets during generation: massive hack, but it works
+                var preset = sectorobj.preset;
+                sectorobj.preset = null;
+
+                world.loadSector(sectorobj, seed);
+
+                sectorobj.preset = preset;
+
                 editor.updateRenderer();
                 state.rules.sector = null;
                 //clear extra filters
