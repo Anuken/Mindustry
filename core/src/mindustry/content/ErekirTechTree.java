@@ -5,6 +5,7 @@ import mindustry.game.Objectives.*;
 import mindustry.type.*;
 
 import static mindustry.content.Blocks.*;
+import static mindustry.content.SectorPresets.*;
 import static mindustry.content.TechTree.*;
 
 public class ErekirTechTree{
@@ -180,8 +181,8 @@ public class ErekirTechTree{
                 });
 
 
-                //TODO implement
                 node(sublimate, () -> {
+                    //TODO implement
                     node(titan, () -> {
 
                     });
@@ -192,6 +193,11 @@ public class ErekirTechTree{
                 node(coreAcropolis, () -> {
 
                 });
+            });
+
+            //TODO more sectors
+            node(onset, () -> {
+
             });
 
             nodeProduce(Items.beryllium, () -> {

@@ -324,6 +324,11 @@ public class Control implements ApplicationListener, Loadable{
                 control.saves.resetSave();
             }
 
+            //for planet launches, mostly
+            if(sector.preset != null){
+                sector.preset.quietUnlock();
+            }
+
             ui.planet.hide();
             SaveSlot slot = sector.save;
             sector.planet.setLastSector(sector);
