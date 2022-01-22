@@ -39,7 +39,7 @@ public class Tiles implements Iterable<Tile>{
         array[y*width + x] = tile;
     }
 
-    /** set a tile at a raw array position; does not range-check. use with caution. */
+    /** set a tile at a raw array position; used for fast iteration / 1-D for-loops */
     public void seti(int i, Tile tile){
         array[i] = tile;
     }

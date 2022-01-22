@@ -112,12 +112,11 @@ public class SectorPresets{
         //endregion
         //region erekir
 
-        /*
-        onset = new SectorPreset("onset", erekir, 15){{
+        onset = new SectorPreset("onset", erekir, 10){{
             addStartingItems = true;
             captureWave = 10;
             difficulty = 1;
-        }};*/
+        }};
 
         //endreigon
     }
