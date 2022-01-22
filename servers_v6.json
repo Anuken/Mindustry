@@ -1,5 +1,9 @@
 [
   {
+    "name": "Tendhost",
+    "address": ["tendhost.ddns.net:6567"]
+  },
+  {
     "name": "{AA}",
     "address": ["aamindustry.play.ai", "aamindustry.play.ai:6571", "aamindustry.play.ai:6572", "aamindustry.play.ai:6573", "aamindustry.play.ai:6574"]
   },
