@@ -3,7 +3,6 @@ package mindustry.maps.planet;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.ai.*;
@@ -298,20 +297,6 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         state.rules.environment = Env.scorching | Env.terrestrial | Env.groundWater;
         Schematics.placeLaunchLoadout(spawnX, spawnY);
 
-        //TODO this is only for testing
-        state.rules.defaultTeam.items().add(Seq.with(ItemStack.with(Items.beryllium, 1000, Items.graphite, 1000)));
-
-        //TODO proper waves
-        state.rules.waves = true;
         state.rules.showSpawns = true;
-        state.rules.waveTimer = true;
-        state.rules.waveSpacing = 60f * 60f * 7.5f;
-        state.rules.spawns = Seq.with(new SpawnGroup(){{
-            type = UnitTypes.vanquish;
-            spacing = 1;
-            shieldScaling = 60;
-            unitScaling = 2f;
-            healthFraction = 0.1f;
-        }});
     }
 }
