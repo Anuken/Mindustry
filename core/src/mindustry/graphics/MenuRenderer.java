@@ -53,7 +53,9 @@ public class MenuRenderer implements Disposable{
             new Block[]{Blocks.sand, Blocks.sandWall},
             new Block[]{Blocks.shale, Blocks.shaleWall},
             new Block[]{Blocks.ice, Blocks.iceWall},
-            new Block[]{Blocks.moss, Blocks.sporePine}
+            new Block[]{Blocks.moss, Blocks.sporePine},
+            new Block[]{Blocks.dirt, Blocks.dirtWall},
+            new Block[]{Blocks.dacite, Blocks.daciteWall}
         );
         Block[] selected2 = Structs.select(
             new Block[]{Blocks.basalt, Blocks.duneWall},

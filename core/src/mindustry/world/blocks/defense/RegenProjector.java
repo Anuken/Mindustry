@@ -27,6 +27,8 @@ public class RegenProjector extends Block{
     public int range = 14;
     //per frame
     public float healPercent = 12f / 60f;
+    public float optionalMultiplier = 2f;
+    public float optionalUseTime = 60f * 8f;
 
     public DrawBlock drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawSideRegion(true));
 
@@ -80,10 +82,20 @@ public class RegenProjector extends Block{
         drawer.load(this);
     }
 
+    @Override
+    public void setStats(){
+        stats.timePeriod = optionalUseTime;
+        super.setStats();
+
+        stats.add(Stat.repairTime, (int)(1f / (healPercent / 100f) / 60f), StatUnit.seconds);
+        stats.add(Stat.range, range, StatUnit.blocks);
+        stats.add(Stat.boostEffect, optionalMultiplier, StatUnit.timesSpeed);
+    }
+
     public class RegenProjectorBuild extends Building{
         public Seq<Building> targets = new Seq<>();
         public int lastChange = -2;
-        public float warmup, totalTime;
+        public float warmup, totalTime, optionalTimer;
         public boolean didRegen = false;
 
         public void updateTargets(){
@@ -110,6 +122,13 @@ public class RegenProjector extends Block{
             }
 
             if(consValid()){
+                if(cons.optionalValid() && (optionalTimer += Time.delta) >= optionalUseTime){
+                    cons.trigger();
+                    optionalUseTime = 0f;
+                }
+
+                float healAmount = (cons.optionalValid() ? optionalMultiplier : 1f) * healPercent;
+
                 //use Math.max to prevent stacking
                 for(var build : targets){
                     if(!build.damaged() || build.isHealSuppressed()) continue;
@@ -119,7 +138,7 @@ public class RegenProjector extends Block{
                     int pos = build.pos();
                     //TODO periodic effect
                     float value = mendMap.get(pos);
-                    mendMap.put(pos, Math.min(Math.max(value, healPercent * edelta() * build.block.health / 100f), build.block.health - build.health));
+                    mendMap.put(pos, Math.min(Math.max(value, healAmount * edelta() * build.block.health / 100f), build.block.health - build.health));
 
                     if(value <= 0 && Mathf.chanceDelta(effectChance * build.block.size * build.block.size)){
                         effect.at(build.x + Mathf.range(build.block.size * tilesize/2f - 1f), build.y + Mathf.range(build.block.size * tilesize/2f - 1f));
