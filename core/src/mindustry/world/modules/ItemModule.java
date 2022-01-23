@@ -348,4 +348,22 @@ public class ItemModule extends BlockModule{
     public interface ItemCalculator{
         float get(Item item, int amount);
     }
+
+    @Override
+    public String toString(){
+        var res = new StringBuilder();
+        res.append("ItemModule{");
+        boolean any = false;
+        for(int i = 0; i < items.length; i++){
+            if(items[i] != 0){
+                res.append(content.items().get(i).name).append(":").append(items[i]).append(",");
+                any = true;
+            }
+        }
+        if(any){
+            res.setLength(res.length() - 1);
+        }
+        res.append("}");
+        return res.toString();
+    }
 }

@@ -100,7 +100,7 @@ public class ThermalGenerator extends PowerGenerator{
             super.draw();
 
             if(spinners){
-                Drawf.spinSprite(blurRegion.found() ? blurRegion : rotatorRegion, x, y, spinRotation);
+                Drawf.spinSprite(blurRegion.found() && enabled && productionEfficiency > 0 ? blurRegion : rotatorRegion, x, y, spinRotation);
             }
         }
 

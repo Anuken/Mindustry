@@ -2710,7 +2710,7 @@ public class UnitTypes{
             speed = 2.9f;
             rotateSpeed = 9f;
             accel = 0.1f;
-            itemCapacity = 40;
+            itemCapacity = 60;
             health = 300f;
             armor = 1f;
             hitSize = 9f;
@@ -2770,7 +2770,7 @@ public class UnitTypes{
             speed = 2.8f;
             rotateSpeed = 5f;
             accel = 0.11f;
-            itemCapacity = 70;
+            itemCapacity = 90;
             health = 600f;
             armor = 2f;
             hitSize = 18f;
