@@ -1137,6 +1137,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             //TODO animation
             //schematic selection and cost handled by listener
             listener.get(sector);
+            //unlock right before launch
+            sector.planet.unlockedOnLand.each(UnlockableContent::unlock);
             control.playSector(sector);
         }else{
             //sector should have base here

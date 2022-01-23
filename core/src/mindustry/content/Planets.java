@@ -57,6 +57,12 @@ public class Planets{
             totalRadius += 2.6f;
             lightSrcTo = 0.5f;
             lightDstFrom = 0.2f;
+
+            unlockedOnLand.addAll(
+            Blocks.plasmaBore, Blocks.duct,
+            Blocks.turbineCondenser, Blocks.breach,
+            Blocks.coreCitadel
+            );
         }};
 
         //TODO names
