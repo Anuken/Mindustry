@@ -1,23 +1,15 @@
 [
   {
-    "name": "{AA}",
-    "address": ["aamindustry.play.ai", "aamindustry.play.ai:6571", "aamindustry.play.ai:6572", "aamindustry.play.ai:6573", "aamindustry.play.ai:6574"]
-  },
-  {
     "name": "Yeet Hosting",
     "address": ["n3.mindustry.me:5004"]
   },
   {
     "name": "RCM",
-    "address": ["185.104.248.61", "easyplay.su"]
-  },
-  {
-    "name": "Atanner",
-    "address": ["atannergaming.com:13000"]
+    "address": ["easyplay.su"]
   },
   {
     "name": "C.A.M.S.",
-    "address": ["baseduser.eu.org:6568", "nikochio.ddns.net", "play.thedimas.pp.ua"]
+    "address": ["play.thedimas.pp.ua"]
   },
   {
     "name": "ECAN",
@@ -45,11 +37,7 @@
   },
   {
     "name": "ALEX",
-    "address": ["alexmindustryhub.ddns.net:6568", "dogemindustry.ddns.net:25586", "alexmindustry.ddns.net:25587", "alexmindustryattac.ddns.net:25800","alexmindustryturbo.ddns.net:25581","alexmindustryhex.ddns.net:25583"]
-  },
-  {
-    "name": "Minty [subzero]",
-    "address": ["minty-server.ddns.net"]
+    "address": ["alexmindustryhub.ddns.net:6568", "dogemindustry.ddns.net:25586", "alexmindustry.ddns.net:25587", "alexmindustryattac.ddns.net:25800", "alexmindustryhex.ddns.net:25583"]
   },
   {
     "name": "Korea",
@@ -57,7 +45,7 @@
   },
   {
     "name": "Omega",
-    "address": ["yeeth.mindustry.me:6568","yeeth.mindustry.me:5002"] 
+    "address": ["yeeth.mindustry.me:6568", "yeeth.mindustry.me:5002"]
   },
   {
     "name": "Obvilion Network",
@@ -72,16 +60,12 @@
     "address": ["game.mindustry.party"]
   },
   {
-    "name": "TSR", 
+    "name": "TSR",
     "address": ["ult4.falix.gg:26904"]
   },
   {
-    "name": "Sakura", 
+    "name": "Sakura",
     "address": ["160.16.207.141", "160.16.207.141:21527", "160.16.207.141:31587", "160.16.207.141:26810"]
-  },
-  {
-    "name": "MeowLand",
-    "address": ["34.134.111.15"]
   },
   {
     "name": "M-DE",
@@ -96,10 +80,6 @@
     "address": ["xpdustry.fr"]
   },
   {
-    "name": "CxZx",
-    "address": ["usfr2.forcehost.net:25578"]
-  },
-  {
     "name": "Mindustry Español",
     "address": ["yeeth.mindustry.me:6578", "yeeth.mindustry.me:6573", "yeeth.mindustry.me:6577", "yeeth.mindustry.me:6576"]
   },
@@ -108,12 +88,8 @@
     "address": ["129.151.66.139:26032"]
   },
   {
-    "name": "NukeDustry",
-    "address": ["nukedustry.tk:7777", "nukedustry.tk:8888"]
-  },
-  {
     "name": "MindustryBR",
-    "address": ["mindustryptbr.ddns.net", "mindustryptbr.myddns.me", "n2.mindustry.me:4002", "n2.mindustry.me:4007"]
+    "address": ["mindustryptbr.ddns.net", "n2.mindustry.me:4002", "n2.mindustry.me:4007"]
   },
   {
     "name": "Conservatory",
@@ -126,5 +102,5 @@
   {
     "name": "OMNIDUSTRY",
     "address": ["109.94.209.233"]
-  } 
+  }
 ]
