@@ -293,6 +293,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         player.clearUnit();
 
+        //remove player unit
+        Unit unit = Groups.unit.find(u -> u.spawnedByCore);
+        if(unit != null){
+            unit.remove();
+        }
+
         Map returned = null;
 
         if(name.isEmpty()){

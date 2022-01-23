@@ -42,9 +42,7 @@ public class SerpuloTechTree{
                             node(titaniumConveyor, Seq.with(new SectorComplete(craters)), () -> {
                                 node(phaseConveyor, () -> {
                                     node(massDriver, () -> {
-                                        node(payloadPropulsionTower, () -> {
 
-                                        });
                                     });
                                 });
 
