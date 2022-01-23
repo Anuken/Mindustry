@@ -44,7 +44,7 @@ public class Blocks{
     arkyciteFloor, arkyicStone,
     redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
-    redweed, purbush, coralChunk, yellowCoral,
+    redweed, purbush, yellowCoral,
     regolithWall, yellowStoneWall, rhyoliteWall, steamVent, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall, arkyicWall, crystallineStoneWall, redStoneWall, redDiamondWall,
     ferricStone, ferricCraters, carbonStone, beryllicStone, crystallineStone, crystalFloor, yellowStonePlates,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
@@ -629,10 +629,6 @@ public class Blocks{
             spread = 40f;
             sclMin = 60f;
             sclMax = 100f;
-        }};
-
-        coralChunk = new StaticCoralWall("coralchunk"){{
-
         }};
 
         boulder = new Prop("boulder"){{
