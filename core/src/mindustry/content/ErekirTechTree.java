@@ -18,7 +18,7 @@ public class ErekirTechTree{
         costMultipliers.put(Items.surgeAlloy, 4);
         costMultipliers.put(Items.phaseFabric, 4);
         costMultipliers.put(Items.thorium, 9);
-        costMultipliers.put(Items.graphite, 8);
+        costMultipliers.put(Items.graphite, 9);
 
         Planets.erekir.techTree = nodeRoot("erekir", coreBastion, true, () -> {
             context().researchCostMultipliers = costMultipliers;
@@ -71,6 +71,18 @@ public class ErekirTechTree{
                 });
             });
 
+            //TODO move into turbine condenser?
+            node(plasmaBore, () -> {
+
+                node(impactDrill, erekirSector, () -> {
+                    node(largePlasmaBore, () -> {
+                        node(eruptionDrill, () -> {
+
+                        });
+                    });
+                });
+            });
+
             node(turbineCondenser, () -> {
                 node(beamNode, () -> {
                     node(ventCondenser, erekirSector, () -> {
@@ -93,75 +105,63 @@ public class ErekirTechTree{
                         });
                     });
                 });
-            });
 
-            node(siliconArcFurnace, () -> {
-                node(cliffCrusher, () -> {
-                    node(electrolyzer, erekirSector, () -> {
-                        node(oxidationChamber, () -> {
-                            node(electricHeater, () -> {
-                                node(heatRedirector, () -> {
+                node(reinforcedConduit, erekirSector, () -> {
+                    node(reinforcedPump, () -> {
+                        //TODO T2 pump
+                    });
+
+                    node(reinforcedLiquidJunction, () -> {
+                        node(reinforcedBridgeConduit, () -> {
+
+                        });
+
+                        node(reinforcedLiquidRouter, () -> {
+                            node(reinforcedLiquidContainer, () -> {
+                                node(reinforcedLiquidTank, () -> {
 
                                 });
+                            });
+                        });
+                    });
+                });
 
-                                node(atmosphericConcentrator, () -> {
-                                    node(cyanogenSynthesizer, () -> {
+                node(siliconArcFurnace, () -> {
+                    node(cliffCrusher, () -> {
+                        node(electrolyzer, erekirSector, () -> {
+                            node(oxidationChamber, () -> {
+                                node(electricHeater, () -> {
+                                    node(heatRedirector, () -> {
 
                                     });
-                                });
 
-                                node(carbideCrucible, () -> {
-                                    node(surgeCrucible, () -> {
-                                        node(phaseSynthesizer, () -> {
-                                            node(phaseHeater, () -> {
+                                    node(atmosphericConcentrator, () -> {
+                                        node(cyanogenSynthesizer, () -> {
 
+                                        });
+                                    });
+
+                                    node(carbideCrucible, () -> {
+                                        node(surgeCrucible, () -> {
+                                            node(phaseSynthesizer, () -> {
+                                                node(phaseHeater, () -> {
+
+                                                });
                                             });
                                         });
                                     });
                                 });
                             });
-                        });
 
-                        node(slagIncinerator, () -> {
+                            node(slagIncinerator, () -> {
 
-                            node(slagCentrifuge, () -> {
+                                node(slagCentrifuge, () -> {
 
-                            });
+                                });
 
-                            node(heatReactor, () -> {
+                                node(heatReactor, () -> {
 
-                            });
-                        });
-                    });
-                });
-            });
-
-            //TODO move into turbine condenser?
-            node(plasmaBore, () -> {
-
-                node(impactDrill, erekirSector, () -> {
-                    node(largePlasmaBore, () -> {
-                        node(eruptionDrill, () -> {
-
-                        });
-                    });
-                });
-            });
-
-            node(reinforcedConduit, erekirSector, () -> {
-                node(reinforcedPump, () -> {
-                    //TODO T2 pump
-                });
-
-                node(reinforcedLiquidJunction, () -> {
-                    node(reinforcedBridgeConduit, () -> {
-
-                    });
-
-                    node(reinforcedLiquidRouter, () -> {
-                        node(reinforcedLiquidContainer, () -> {
-                            node(reinforcedLiquidTank, () -> {
-
+                                });
                             });
                         });
                     });

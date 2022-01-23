@@ -761,7 +761,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         if(state.planet.hasGrid()){
-            hovered = state.planet.getSector(planets.cam.getMouseRay(), PlanetRenderer.outlineRad);
+            hovered = Core.scene.getDialog() == this ? state.planet.getSector(planets.cam.getMouseRay(), PlanetRenderer.outlineRad) : null;
         }else if(state.planet.isLandable()){
             boolean wasNull = selected == null;
             //always have the first sector selected.

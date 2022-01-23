@@ -2700,9 +2700,11 @@ public class UnitTypes{
 
             outlineColor = Pal.darkOutline;
             lowAltitude = false;
+            mineWalls = true;
+            mineFloor = false;
             flying = true;
-            mineSpeed = 6.5f;
-            mineTier = 1;
+            mineSpeed = 4f;
+            mineTier = 4;
             buildSpeed = 0.8f;
             drag = 0.06f;
             speed = 2.9f;
@@ -2758,9 +2760,11 @@ public class UnitTypes{
             outlineColor = Pal.darkOutline;
             lowAltitude = false;
             flying = true;
+            mineWalls = true;
             targetAir = false;
-            mineSpeed = 8f;
-            mineTier = 2;
+            mineFloor = false;
+            mineSpeed = 5f;
+            mineTier = 4;
             buildSpeed = 1.4f;
             drag = 0.06f;
             speed = 2.8f;
@@ -2816,8 +2820,10 @@ public class UnitTypes{
             lowAltitude = false;
             flying = true;
             targetAir = false;
-            mineSpeed = 8f;
-            mineTier = 3;
+            mineWalls = true;
+            mineFloor = false;
+            mineSpeed = 6f;
+            mineTier = 4;
             buildSpeed = 2f;
             drag = 0.06f;
             speed = 2.6f;
