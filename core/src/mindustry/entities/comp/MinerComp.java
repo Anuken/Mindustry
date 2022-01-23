@@ -23,7 +23,8 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
     transient float mineTimer;
     @Nullable @SyncLocal Tile mineTile;
 
-    public boolean canMine(Item item){
+    public boolean canMine(@Nullable Item item){
+        if(item == null) return false;
         return type.mineTier >= item.hardness;
     }
 
@@ -35,9 +36,28 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
         return mineTile != null && !this.<Unit>self().activelyBuilding();
     }
 
+    public @Nullable Item getMineResult(@Nullable Tile tile){
+        if(tile == null) return null;
+        Item result;
+        if(type.mineFloor && tile.block() == Blocks.air){
+            result = tile.drop();
+        }else if(type.mineWalls){
+            result = tile.wallDrop();
+        }else{
+            return null;
+        }
+
+        return canMine(result) ? result : null;
+    }
+
     public boolean validMine(Tile tile, boolean checkDst){
-        return !(tile == null || tile.block() != Blocks.air || (!within(tile.worldx(), tile.worldy(), type.miningRange) && checkDst)
-        || tile.drop() == null || !canMine(tile.drop()));
+        if(tile == null) return false;
+
+        if(checkDst && !within(tile.worldx(), tile.worldy(), type.miningRange)){
+            return false;
+        }
+
+        return getMineResult(tile) != null;
     }
 
     public boolean validMine(Tile tile){
@@ -50,9 +70,12 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
 
     @Override
     public void update(){
-        Building core = closestCore();
+        if(mineTile == null) return;
 
-        if(core != null && mineTile != null && mineTile.drop() != null && !acceptsItem(mineTile.drop()) && within(core, mineTransferRange) && !offloadImmediately()){
+        Building core = closestCore();
+        Item item = getMineResult(mineTile);
+
+        if(core != null && item != null && !acceptsItem(item) && within(core, mineTransferRange) && !offloadImmediately()){
             int accepted = core.acceptStack(item(), stack().amount, this);
             if(accepted > 0){
                 Call.transferItemTo(self(), item(), accepted,
@@ -65,8 +88,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
         if((!net.client() || isLocal()) && !validMine(mineTile)){
             mineTile = null;
             mineTimer = 0f;
-        }else if(mining()){
-            Item item = mineTile.drop();
+        }else if(mining() && item != null){
             mineTimer += Time.delta *type.mineSpeed;
 
             if(Mathf.chance(0.06 * Time.delta)){
