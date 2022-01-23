@@ -49,6 +49,7 @@ public class BlockConfigFragment extends Fragment{
     }
 
     public void showConfig(Building tile){
+        if(configTile != null) configTile.onConfigureClosed();
         if(tile.configTapped()){
             configTile = tile;
 
