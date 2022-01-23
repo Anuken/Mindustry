@@ -1,6 +1,7 @@
 package mindustry.content;
 
 import arc.graphics.*;
+import arc.struct.*;
 import mindustry.type.*;
 
 public class Items{
@@ -8,6 +9,9 @@ public class Items{
     scrap, copper, lead, graphite, coal, titanium, thorium, silicon, plastanium,
     phaseFabric, surgeAlloy, sporePod, sand, blastCompound, pyratite, metaglass,
     beryllium, tungsten, oxide, carbide, fissileMatter, dormantCyst;
+
+    //TODO remove, these are for debugging only
+    public static final Seq<Item> serpuloItems = new Seq<>(), erekirItems = new Seq<>();
 
     public static void load(){
         copper = new Item("copper", Color.valueOf("d99d73")){{
@@ -124,5 +128,15 @@ public class Items{
         dormantCyst = new Item("dormant-cyst", Color.valueOf("df824d")){{
             flammability = 0.1f;
         }};
+
+        serpuloItems.addAll(
+        scrap, copper, lead, graphite, coal, titanium, thorium, silicon, plastanium,
+        phaseFabric, surgeAlloy, sporePod, sand, blastCompound, pyratite, metaglass
+        );
+
+        erekirItems.addAll(
+        scrap, graphite, thorium, silicon, phaseFabric, surgeAlloy, sand,
+        beryllium, tungsten, oxide, carbide, fissileMatter, dormantCyst
+        );
     }
 }

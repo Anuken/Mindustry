@@ -176,6 +176,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             settings.put("lastplanet", state.planet.name);
         }
 
+        if(!selectable(state.planet)){
+            state.planet = Planets.serpulo;
+        }
+
         rebuildButtons();
         mode = look;
         state.otherCamPos = null;
@@ -255,7 +259,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         dialog.add("@sectors.captured");
     }
 
-    //TODO unimplemented, cutscene needed
+    //TODO not fully implemented, cutscene needed
     public void showPlanetLaunch(Sector sector, Cons<Sector> listener){
         selected = null;
         hovered = null;
@@ -263,11 +267,20 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         this.listener = listener;
         launchSector = sector;
 
-        //automatically select next planets; TODO pan!
+        //automatically select next planets;
         if(sector.planet.launchCandidates.size == 1){
             state.planet = sector.planet.launchCandidates.first();
             state.otherCamPos = sector.planet.position;
             state.otherCamAlpha = 0f;
+
+            //unlock and highlight sector
+            var destSec = state.planet.sectors.get(state.planet.startSector);
+            var preset = destSec.preset;
+            if(preset != null){
+                preset.unlock();
+            }
+            selected = destSec;
+            updateSelected();
         }
 
         //TODO pan over to correct planet
@@ -471,7 +484,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         //TODO what if any sector is selectable?
         //TODO launch criteria - which planets can be launched to? Where should this be defined? Should planets even be selectable?
         if(mode == planetLaunch) return launchSector != null && planet != launchSector.planet && launchSector.planet.launchCandidates.contains(planet);
-        return planet == state.planet || (planet.alwaysUnlocked && planet.isLandable()) || planet.sectors.contains(Sector::hasBase);
+        return (planet.alwaysUnlocked && planet.isLandable()) || planet.sectors.contains(Sector::hasBase);
     }
 
     void setup(){
@@ -690,6 +703,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 state.camPos.set(Tmp.v31.set(state.otherCamPos).lerp(state.planet.position, state.otherCamAlpha).add(state.camPos).sub(state.planet.position));
 
                 state.otherCamPos = null;
+                //announce new sector
+                newPresets.add(state.planet.sectors.get(state.planet.startSector));
+
             }
         }
 

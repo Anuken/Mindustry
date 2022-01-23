@@ -34,6 +34,11 @@ public class GroundAI extends AIController{
                 if(spawner == null && core == null) move = false;
             }
 
+            //no reason to move if there's nothing there
+            if(core == null && (!state.rules.waves || getClosestSpawner() == null)){
+                move = false;
+            }
+
             if(move) pathfind(Pathfinder.fieldCore);
         }
 

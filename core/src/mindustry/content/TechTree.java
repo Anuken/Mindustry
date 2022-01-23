@@ -1,6 +1,7 @@
 package mindustry.content;
 
 import arc.*;
+import arc.func.*;
 import arc.scene.style.*;
 import arc.struct.*;
 import arc.util.*;
@@ -138,6 +139,14 @@ public class TechTree{
 
             content.techNode = this;
             all.add(this);
+        }
+
+        /** Recursively iterates through everything that is a child of this node. Includes itself. */
+        public void each(Cons<TechNode> consumer){
+            consumer.get(this);
+            for(var child : children){
+                child.each(consumer);
+            }
         }
 
         public Drawable icon(){

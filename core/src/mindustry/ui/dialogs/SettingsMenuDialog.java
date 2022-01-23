@@ -116,6 +116,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
             t.button("@settings.clearresearch", Icon.trash, style, () -> {
                 ui.showConfirm("@confirm", "@settings.clearresearch.confirm", () -> {
+                    Core.settings.put("lastplanet", "serpulo");
                     universe.clearLoadoutInfo();
                     for(TechNode node : TechTree.all){
                         node.reset();

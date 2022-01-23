@@ -76,6 +76,14 @@ public class MobileInput extends InputHandler implements GestureListener{
     /** Control building last tapped. */
     public @Nullable Building buildingTapped;
 
+    {
+        Events.on(UnitDestroyEvent.class, e -> {
+            if(e.unit != null && e.unit.isPlayer() && e.unit.getPlayer().isLocal() && e.unit.type.weapons.contains(w -> w.bullet.killShooter)){
+                manualShooting = false;
+            }
+        });
+    }
+
     //region utility methods
 
     /** Check and assign targets for a specific position. */

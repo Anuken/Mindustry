@@ -247,7 +247,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             }
 
             //TODO test, different placement
-            //TODO this biome should have more blocks in gneeral
+            //TODO this biome should have more blocks in general
             if(block == Blocks.regolithWall && rand.chance(0.2) && nearAir(x, y) && !near(x, y, 3, Blocks.crystalBlocks)){
                 block = Blocks.crystalBlocks;
             }
@@ -294,7 +294,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         //it is very hot
         state.rules.attributes.set(Attribute.heat, 0.8f);
-        state.rules.environment = Env.scorching | Env.terrestrial | Env.groundWater;
+        state.rules.environment = Env.scorching | Env.terrestrial;
         Schematics.placeLaunchLoadout(spawnX, spawnY);
 
         state.rules.showSpawns = true;

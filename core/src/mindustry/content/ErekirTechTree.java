@@ -16,6 +16,7 @@ public class ErekirTechTree{
         var costMultipliers = new ObjectFloatMap<Item>();
         costMultipliers.put(Items.silicon, 7);
         costMultipliers.put(Items.surgeAlloy, 4);
+        costMultipliers.put(Items.phaseFabric, 4);
         costMultipliers.put(Items.thorium, 8);
         costMultipliers.put(Items.graphite, 6);
 
