@@ -118,6 +118,6 @@ public class SectorPresets{
             difficulty = 1;
         }};
 
-        //endreigon
+        //endregion
     }
 }

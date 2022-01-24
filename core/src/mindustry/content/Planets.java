@@ -57,6 +57,8 @@ public class Planets{
             totalRadius += 2.6f;
             lightSrcTo = 0.5f;
             lightDstFrom = 0.2f;
+
+            unlockedOnLand.add(Blocks.coreBastion);
         }};
 
         //TODO names
