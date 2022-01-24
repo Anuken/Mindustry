@@ -66,6 +66,7 @@ public class PlacementFragment extends Fragment{
     public PlacementFragment(){
         Events.on(WorldLoadEvent.class, event -> {
             Core.app.post(() -> {
+                currentCategory = Category.distribution;
                 control.input.block = null;
                 rebuild();
             });
@@ -87,7 +88,7 @@ public class PlacementFragment extends Fragment{
     }
 
     void rebuild(){
-        currentCategory = Category.distribution;
+        //category does not change on rebuild anymore, only on new world load
         Group group = toggler.parent;
         int index = toggler.getZIndex();
         toggler.remove();
