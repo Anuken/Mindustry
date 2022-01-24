@@ -362,7 +362,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
     public void readWorldEntities(DataInput stream) throws IOException{
         //entityMapping is null in older save versions, so use the default
-        Prov[] mapping = this.entityMapping == null ? EntityMapping.idMap : this.entityMapping;
+        var mapping = this.entityMapping == null ? EntityMapping.idMap : this.entityMapping;
 
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){

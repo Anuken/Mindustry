@@ -50,7 +50,8 @@ public class ErekirTechTree{
                     });
                 });
 
-                node(constructor, erekirSector, () -> {
+                //TODO further in? no use for these without units.
+                node(constructor, Seq.with(new Research(siliconArcFurnace), erekirSector.first()), () -> {
                     node(payloadLoader, () -> {
                         node(payloadUnloader, () -> {
                             node(payloadPropulsionTower, () -> {

@@ -1795,7 +1795,7 @@ public class Blocks{
         }};
 
         ductRouter = new DuctRouter("duct-router"){{
-            requirements(Category.distribution, with(Items.graphite, 8));
+            requirements(Category.distribution, with(Items.graphite, 8, Items.beryllium, 4));
             speed = 4f;
         }};
 
