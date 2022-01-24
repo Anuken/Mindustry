@@ -58,6 +58,7 @@ public class BeamDrill extends Block{
         update = true;
         solid = true;
         drawArrow = false;
+        regionRotated1 = 1;
 
         envEnabled |= Env.space;
     }
