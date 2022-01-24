@@ -165,7 +165,7 @@ public class MapIO{
         if(wall.synthetic()){
             return team.color.rgba();
         }
-        return (wall.solid ? wall.mapColor : !overlay.useColor ? floor.mapColor : overlay.mapColor).rgba();
+        return (((Floor)overlay).wallOre ? overlay.mapColor : wall.solid ? wall.mapColor : !overlay.useColor ? floor.mapColor : overlay.mapColor).rgba();
     }
 
     public static Pixmap writeImage(Tiles tiles){

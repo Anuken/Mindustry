@@ -2384,7 +2384,7 @@ public class Blocks{
         plasmaBore = new BeamDrill("plasma-bore"){{
             requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 30));
             consumes.power(0.15f);
-            drillTime = 150f;
+            drillTime = 160f;
             tier = 4;
             size = 2;
             range = 4;

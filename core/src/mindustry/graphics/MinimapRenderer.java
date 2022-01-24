@@ -9,6 +9,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -37,6 +38,24 @@ public class MinimapRenderer{
             //TODO don't update when the minimap is off?
             if(!ui.editor.isShown()){
                 update(event.tile);
+
+                //update floor below block.
+                if(event.tile.block().solid && event.tile.y > 0){
+                    Tile tile = world.tile(event.tile.x, event.tile.y - 1);
+                    if(tile.block() == Blocks.air){
+                        update(tile);
+                    }
+                }
+            }
+        });
+
+        Events.on(TilePreChangeEvent.class, e -> {
+            //update floor below a *recently removed* block.
+            if(e.tile.block().solid && e.tile.y > 0){
+                Tile tile = world.tile(e.tile.x, e.tile.y - 1);
+                if(tile.block() == Blocks.air){
+                    Core.app.post(() -> update(tile));
+                }
             }
         });
 
@@ -204,6 +223,10 @@ public class MinimapRenderer{
         int bc = tile.block().minimapColor(tile);
         Color color = Tmp.c1.set(bc == 0 ? MapIO.colorFor(tile.block(), tile.floor(), tile.overlay(), tile.team()) : bc);
         color.mul(1f - Mathf.clamp(world.getDarkness(tile.x, tile.y) / 4f));
+
+        if(tile.block() == Blocks.air && tile.y < world.height() - 1 && world.tile(tile.x, tile.y + 1).block().solid){
+            color.mul(0.7f);
+        }
 
         return color.rgba();
     }
