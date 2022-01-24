@@ -2702,6 +2702,7 @@ public class UnitTypes{
             lowAltitude = false;
             mineWalls = true;
             mineFloor = false;
+            mineHardnessScaling = false;
             flying = true;
             mineSpeed = 4f;
             mineTier = 4;
@@ -2763,6 +2764,7 @@ public class UnitTypes{
             mineWalls = true;
             targetAir = false;
             mineFloor = false;
+            mineHardnessScaling = false;
             mineSpeed = 5f;
             mineTier = 4;
             buildSpeed = 1.4f;
@@ -2822,6 +2824,7 @@ public class UnitTypes{
             targetAir = false;
             mineWalls = true;
             mineFloor = false;
+            mineHardnessScaling = false;
             mineSpeed = 6f;
             mineTier = 4;
             buildSpeed = 2f;

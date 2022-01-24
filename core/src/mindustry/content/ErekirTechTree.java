@@ -168,7 +168,7 @@ public class ErekirTechTree{
                 });
             });
 
-            node(breach, () -> {
+            node(breach, Seq.with(new Research(siliconArcFurnace)), () -> {
                 node(berylliumWall, () -> {
                     node(berylliumWallLarge, () -> {
 

@@ -2181,6 +2181,7 @@ public class Blocks{
             hasLiquids = true;
             outputLiquid = new LiquidStack(Liquids.water, 5f / 60f / 9f);
             liquidCapacity = 20f;
+            researchCostMultiplier = 0.2f;
         }};
 
         //TODO rename
@@ -2386,6 +2387,7 @@ public class Blocks{
             tier = 4;
             size = 2;
             range = 4;
+            researchCostMultiplier = 0.2f;
 
             consumes.liquid(Liquids.hydrogen, 0.25f / 60f).boost();
         }};

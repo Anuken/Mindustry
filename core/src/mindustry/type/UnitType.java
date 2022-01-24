@@ -128,6 +128,7 @@ public class UnitType extends UnlockableContent{
     public AmmoType ammoType = new ItemAmmoType(Items.copper);
     public int mineTier = -1;
     public boolean mineWalls = false, mineFloor = true;
+    public boolean mineHardnessScaling = true;
     public float buildSpeed = -1f, mineSpeed = 1f;
     public Sound mineSound = Sounds.minebeam;
     public float mineSoundVolume = 0.6f;
