@@ -2057,6 +2057,7 @@ public class Blocks{
             consumesPower = outputsPower = true;
             consumes.powerBuffered(1000f);
             range = 10;
+            researchCostMultiplier = 0.8f;
         }};
 
         //TODO requirements

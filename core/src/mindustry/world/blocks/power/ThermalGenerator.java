@@ -30,6 +30,7 @@ public class ThermalGenerator extends PowerGenerator{
 
     public ThermalGenerator(String name){
         super(name);
+        noUpdateDisabled = true;
     }
 
     @Override
