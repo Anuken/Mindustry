@@ -114,7 +114,7 @@ public class SectorPresets{
 
         onset = new SectorPreset("onset", erekir, 10){{
             addStartingItems = true;
-            captureWave = 2;
+            captureWave = 3;
             difficulty = 1;
         }};
 
