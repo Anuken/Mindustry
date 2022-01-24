@@ -299,6 +299,7 @@ public class World{
             Liquid liquid = tile.floor().liquidDrop;
             if(tile.floor().itemDrop != null) content.add(tile.floor().itemDrop);
             if(tile.overlay().itemDrop != null) content.add(tile.overlay().itemDrop);
+            if(tile.wallDrop() != null) content.add(tile.wallDrop());
             if(liquid != null) content.add(liquid);
         }
 
