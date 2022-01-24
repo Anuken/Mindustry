@@ -1791,6 +1791,8 @@ public class Blocks{
 
         duct = new Duct("duct"){{
             requirements(Category.distribution, with(Items.graphite, 1));
+            //TODO bad idea? should this just require 1 beryllium?
+            buildVisibility = BuildVisibility.berylliumOnly;
             speed = 4f;
         }};
 

@@ -87,7 +87,7 @@ public class PlacementFragment extends Fragment{
     }
 
     void rebuild(){
-        currentCategory = Category.turret;
+        currentCategory = Category.distribution;
         Group group = toggler.parent;
         int index = toggler.getZIndex();
         toggler.remove();
@@ -400,6 +400,8 @@ public class PlacementFragment extends Fragment{
                         Seq<Block> blocks = getUnlockedByCategory(cat);
                         categoryEmpty[cat.ordinal()] = blocks.isEmpty();
                     }
+                    
+                    boolean needsAssign = categoryEmpty[currentCategory.ordinal()];
 
                     int f = 0;
                     for(Category cat : getCategories()){
@@ -408,6 +410,11 @@ public class PlacementFragment extends Fragment{
                         if(categoryEmpty[cat.ordinal()]){
                             categories.image(Styles.black6);
                             continue;
+                        }
+                        
+                        if(needsAssign){
+                            currentCategory = cat;
+                            needsAssign = false;
                         }
 
                         categories.button(ui.getIcon(cat.name()), Styles.clearToggleTransi, () -> {

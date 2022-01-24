@@ -2,6 +2,7 @@ package mindustry.world.meta;
 
 import arc.func.*;
 import mindustry.*;
+import mindustry.content.*;
 
 public enum BuildVisibility{
     hidden(() -> false),
@@ -11,6 +12,7 @@ public enum BuildVisibility{
     sandboxOnly(() -> Vars.state == null || Vars.state.rules.infiniteResources),
     campaignOnly(() -> Vars.state == null || Vars.state.isCampaign()),
     lightingOnly(() -> Vars.state == null || Vars.state.rules.lighting || Vars.state.isCampaign()),
+    berylliumOnly(() -> !Vars.state.rules.hiddenBuildItems.contains(Items.beryllium)),
     ammoOnly(() -> Vars.state == null || Vars.state.rules.unitAmmo);
 
     private final Boolp visible;
