@@ -12,7 +12,14 @@ Do not submit something without at least running the game to see if it compiles.
 If you are submitting a new block, make sure it has a name and description, and that it works correctly in-game. If you are changing existing block mechanics, test them out first.
 
 ### Do not make large changes before discussing them first.
-If you are interested in adding a large mechanic/feature or changing large amounts of code, first contact me (Anuken) via [Discord](https://discord.gg/mindustry) (preferred method) or via e-mail (*anukendev@gmail.com*).  
+If you are interested in adding a large mechanic/feature or changing large amounts of code, use **Early Pull Request** strategy:
+1. Fork this repository.
+2. Add an empty commit to start your work off: `git commit --allow-empty -m "[changes you are going to make]"`
+3. Once you've pushed this empty commit, open a **draft** *pull request*.
+4. Discuss your changes.
+5. Make your changes.
+6. Ask the maintainer to do a review when you're done.
+
 For most changes, this should not be necessary. I just want to know if you're doing something big so I can offer advice and/or make sure you're not wasting your time on it.
 
 ### Do not make formatting PRs.
