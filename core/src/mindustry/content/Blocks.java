@@ -1096,7 +1096,7 @@ public class Blocks{
 
         //TODO better name
         electrolyzer = new GenericCrafter("electrolyzer"){{
-            requirements(Category.crafting, with(Items.silicon, 50, Items.graphite, 40, Items.beryllium, 50));
+            requirements(Category.crafting, with(Items.silicon, 50, Items.graphite, 40, Items.beryllium, 90, Items.tungsten, 40));
             size = 3;
 
             craftTime = 10f;

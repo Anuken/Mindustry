@@ -68,6 +68,26 @@ public class Objectives{
         }
     }
 
+    public static class OnSector implements Objective{
+        public SectorPreset preset;
+
+        public OnSector(SectorPreset zone){
+            this.preset = zone;
+        }
+
+        protected OnSector(){}
+
+        @Override
+        public boolean complete(){
+            return preset.sector.hasBase();
+        }
+
+        @Override
+        public String display(){
+            return Core.bundle.format("requirement.onsector", preset.localizedName);
+        }
+    }
+
     public static class OnPlanet implements Objective{
         public Planet planet;
 

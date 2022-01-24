@@ -20,6 +20,8 @@ public class ErekirTechTree{
         costMultipliers.put(Items.thorium, 9);
         costMultipliers.put(Items.graphite, 9);
 
+        //TODO gate behind capture
+
         Planets.erekir.techTree = nodeRoot("erekir", coreBastion, true, () -> {
             context().researchCostMultipliers = costMultipliers;
 
