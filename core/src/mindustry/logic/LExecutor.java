@@ -383,6 +383,10 @@ public class LExecutor{
                             unit.clearBuilding();
                         }
                     }
+                    case unbind -> {
+                        //TODO is this a good idea? will allocate
+                        unit.resetController();
+                    }
                     case within -> {
                         exec.setnum(p4, unit.within(x1, y1, d1) ? 1 : 0);
                     }
