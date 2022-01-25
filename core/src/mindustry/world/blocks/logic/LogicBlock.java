@@ -91,8 +91,8 @@ public class LogicBlock extends Block{
 
     public static byte[] compress(byte[] bytes, Seq<LogicLink> links){
         try{
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            DataOutputStream stream = new DataOutputStream(new DeflaterOutputStream(baos));
+            var baos = new ByteArrayOutputStream();
+            var stream = new DataOutputStream(new DeflaterOutputStream(baos));
 
             //current version of config format
             stream.write(1);

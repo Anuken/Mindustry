@@ -20,8 +20,9 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
     public float scl = 2f;
     public float heightScl = 0.9f, octaves = 8, persistence = 0.7f, heightPow = 3f, heightMult = 1.6f;
 
+    //TODO flat array?
     Block[][] arr = {
-    {Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.carbonStone}
+    {Blocks.regolith, Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.carbonStone}
     //{Blocks.redStone, Blocks.redStone, Blocks.redStone, Blocks.rhyolite, Blocks.carbonStone}
     //TODO basalt bad
     //{Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.crystallineStone, Blocks.carbonStone}
@@ -65,6 +66,10 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         return position.dst(0, 0, 1)*2.2f - Simplex.noise3d(seed, 8, 0.54f, 1.4f, 10f + position.x, 10f + position.y, 10f + position.z) * 2.9f;
     }
 
+    public static float arkThresh = 0.28f, arkScl = 0.83f;
+    public static int arkSeed = 7, arkOct = 2;
+    public static float liqThresh = 0.64f, liqScl = 87f, redThresh = 3.1f, noArkThresh = 0.3f;
+
     Block getBlock(Vec3 position){
         float ice = rawTemp(position);
         Tmp.v32.set(position);
@@ -72,11 +77,12 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         float height = rawHeight(position);
         Tmp.v31.set(position);
         position = Tmp.v33.set(position).scl(scl);
-        float temp = Simplex.noise3d(seed, 8, 0.6, 1f/2f, 10f + position.x, 10f + position.y + 99f, 10f + position.z);
+        //float temp = Simplex.noise3d(seed, 8, 0.6, 1f/2f, 10f + position.x, 10f + position.y + 99f, 10f + position.z);
+        //Mathf.clamp((int)(temp * arr.length), 0, arr[0].length - 1)
         height *= 1.2f;
         height = Mathf.clamp(height);
 
-        Block result = arr[Mathf.clamp((int)(temp * arr.length), 0, arr[0].length - 1)][Mathf.clamp((int)(height * arr[0].length), 0, arr[0].length - 1)];
+        Block result = arr[0][Mathf.clamp((int)(height * arr[0].length), 0, arr[0].length - 1)];
 
         if(ice < 0.6){
             if(result == Blocks.rhyolite || result == Blocks.yellowStone || result == Blocks.regolith){
@@ -87,11 +93,19 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         position = Tmp.v32;
 
+        //TODO arkycite should NOT generate around slag.
+
         //TODO tweak this to make it more natural
         //TODO edge distortion?
-        //TODO should be part of planet visuals...?
-        if(result != Blocks.slag && Ridged.noise3d(seed + 3, position.x + 2f, position.y + 5f, position.z + 1f, 2, 0.89f) > 0.24){
+        if(ice < redThresh - noArkThresh && Ridged.noise3d(seed + arkSeed, position.x + 2f, position.y + 8f, position.z + 1f, arkOct, arkScl) > arkThresh){
+            //TODO arkyic in middle
             result = Blocks.beryllicStone;
+        }
+
+        if(ice > redThresh){
+            result = Blocks.redStone;
+        }else if(ice > redThresh - 0.33f){
+            result = Blocks.regolith;
         }
 
         return result;
@@ -136,6 +150,10 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                         }
                         ore = Blocks.air;
                     }
+
+                    if(noise > 0.5f && floor == Blocks.beryllicStone){
+                        floor = Blocks.yellowStone;
+                    }
                 }
             });
         }
@@ -167,9 +185,9 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
             if(nearWall(x, y)) return;
 
-            float noise = noise(x + 300, y - x*1.6f + 100, 4, 0.8f, 80f, 1f);
+            float noise = noise(x + 300, y - x*1.6f + 100, 4, 0.8f, liqScl, 1f);
 
-            if(noise > 0.6f){
+            if(noise > liqThresh){
                 floor = Blocks.arkyciteFloor;
             }
         });
