@@ -84,8 +84,6 @@ public class PowerNode extends PowerBlock{
         });
 
         config(Point2[].class, (tile, value) -> {
-            tile.power.links.clear();
-
             IntSeq old = new IntSeq(tile.power.links);
 
             //clear old
