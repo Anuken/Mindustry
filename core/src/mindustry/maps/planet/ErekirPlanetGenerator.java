@@ -67,6 +67,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
     Block getBlock(Vec3 position){
         float ice = rawTemp(position);
+        Tmp.v32.set(position);
 
         float height = rawHeight(position);
         Tmp.v31.set(position);
@@ -82,6 +83,15 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 //TODO bio(?) luminescent stuff
                 return Blocks.ferricStone; //TODO perhaps something else. what about ice?
             }
+        }
+
+        position = Tmp.v32;
+
+        //TODO tweak this to make it more natural
+        //TODO edge distortion?
+        //TODO should be part of planet visuals...?
+        if(result != Blocks.slag && Ridged.noise3d(seed + 3, position.x + 2f, position.y + 5f, position.z + 1f, 2, 0.89f) > 0.24){
+            result = Blocks.beryllicStone;
         }
 
         return result;
@@ -101,9 +111,12 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             tile.block = Blocks.air;
         }
 
+        //TODO only certain places should have carbon stone...
         if(Ridged.noise3d(seed + 2, position.x, position.y + 4f, position.z, 3, 6f) > 0.6){
             tile.floor = Blocks.carbonStone;
         }
+
+
     }
 
     @Override
@@ -141,17 +154,22 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         erase(endX, endY, 15);
 
         //arkycite
-        //TODO arkycite biome
         //TODO ice biome
 
         //TODO arkycite is too disruptive to terrain, needs certain conditions and sub-biomes.
-        if(false)
         pass((x, y) -> {
+            if(floor != Blocks.beryllicStone) return;
+
+            //TODO bad
+            if(Math.abs(noise(x, y + 500f, 5, 0.6f, 40f, 1f) - 0.5f) < 0.09f){
+                floor = Blocks.arkyicStone;
+            }
+
             if(nearWall(x, y)) return;
 
-            float noise = noise(x + 300, y - x*1.6f + 100, 4, 0.8f, 120f, 1f);
+            float noise = noise(x + 300, y - x*1.6f + 100, 4, 0.8f, 80f, 1f);
 
-            if(noise > 0.71f){
+            if(noise > 0.6f){
                 floor = Blocks.arkyciteFloor;
             }
         });
