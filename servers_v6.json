@@ -1,4 +1,8 @@
 [
+    {
+    "name": "X-DUSTRY",
+    "address": ["xproject.zapto.org"]
+  },
   {
     "name": "{AA}",
     "address": ["aamindustry.play.ai", "aamindustry.play.ai:6571", "aamindustry.play.ai:6572", "aamindustry.play.ai:6573", "aamindustry.play.ai:6574"]
