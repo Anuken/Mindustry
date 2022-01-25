@@ -114,5 +114,9 @@
   {
     "name": "HexedPvP",
     "address": ["001.finland.eu.hosts.dynamichost.xyz:23664"]
+  },
+  {
+    "name": "Patato",
+    "address": ["mindustry.vicp.io"]
   }
 ]
