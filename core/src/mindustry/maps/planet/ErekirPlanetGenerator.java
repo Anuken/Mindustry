@@ -351,7 +351,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         //it is very hot
         state.rules.attributes.set(Attribute.heat, 0.8f);
-        state.rules.environment = Env.scorching | Env.terrestrial;
+        state.rules.environment = sector.planet.defaultEnv;
         Schematics.placeLaunchLoadout(spawnX, spawnY);
 
         //all sectors are wave sectors

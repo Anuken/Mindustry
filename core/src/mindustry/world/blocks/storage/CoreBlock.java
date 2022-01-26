@@ -50,9 +50,9 @@ public class CoreBlock extends StorageBlock{
         loopSoundVolume = 1f;
         drawDisabled = false;
         canOverdrive = false;
+        envEnabled |= Env.space;
 
         //support everything
-        envEnabled = Env.any;
         replaceable = false;
         rebuildable = false;
     }

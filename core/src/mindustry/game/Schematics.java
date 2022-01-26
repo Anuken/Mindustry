@@ -411,7 +411,7 @@ public class Schematics implements Loadable{
 
     /** Places the last launch loadout at the coordinates and fills it with the launch resources. */
     public static void placeLaunchLoadout(int x, int y){
-        placeLoadout(universe.getLastLoadout(), x, y);
+        placeLoadout(universe.getLastLoadout(), x, y, state.rules.defaultTeam, state.rules.sector == null ? Blocks.air : state.rules.sector.planet.drillOverlay);
         if(world.tile(x, y).build == null) throw new RuntimeException("No core at loadout coordinates!");
         world.tile(x, y).build.items.add(universe.getLaunchResources());
     }
@@ -455,7 +455,7 @@ public class Schematics implements Loadable{
                 tile.build.configureAny(config);
             }
 
-            if(st.block instanceof Drill){
+            if(st.block instanceof Drill && resource != Blocks.air){
                 tile.getLinkedTiles(t -> t.setOverlay(resource));
             }
 

@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -116,6 +117,11 @@ public class LaunchLoadoutDialog extends BaseDialog{
             for(var entry : schematics.getLoadouts()){
                 if(entry.key.size <= core.size){
                     for(Schematic s : entry.value){
+                        if(s.tiles.contains(tile -> !tile.block.supportsEnv(sector.planet.defaultEnv) ||
+                            //make sure block can be built here.
+                            (!state.rules.hiddenBuildItems.isEmpty() && Structs.contains(tile.block.requirements, stack -> state.rules.hiddenBuildItems.contains(stack.item))))){
+                            continue;
+                        }
 
                         t.button(b -> b.add(new SchematicImage(s)), Styles.togglet, () -> {
                             selected = s;

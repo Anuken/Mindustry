@@ -12,6 +12,7 @@ import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.planet.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 public class Planets{
     public static Planet
@@ -50,6 +51,8 @@ public class Planets{
             );
             landCloudColor = Color.valueOf("ed6542");
             atmosphereColor = Color.valueOf("f07218");
+            defaultEnv = Env.scorching | Env.terrestrial;
+            drillOverlay = Blocks.air;
             startSector = 10;
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;

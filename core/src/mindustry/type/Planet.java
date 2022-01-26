@@ -9,12 +9,15 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.generators.*;
+import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -63,6 +66,10 @@ public class Planet extends UnlockableContent{
     public boolean tidalLock = false;
     /** Whether this planet is listed in the planet access UI. **/
     public boolean accessible = true;
+    /** Environment flags for sectors on this planet. */
+    public int defaultEnv = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
+    /** Default block placed under drills upon launching. */
+    public Block drillOverlay = Blocks.oreCopper;
     /** If true, a day/night cycle is simulated. */
     public boolean updateLighting = true;
     /** Day/night cycle parameters. */
