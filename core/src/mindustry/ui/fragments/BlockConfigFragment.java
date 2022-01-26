@@ -49,6 +49,7 @@ public class BlockConfigFragment extends Fragment{
     }
 
     public void showConfig(Building tile){
+        if(configTile != null) configTile.onConfigureClosed();
         if(tile.configTapped()){
             configTile = tile;
 
@@ -82,6 +83,7 @@ public class BlockConfigFragment extends Fragment{
     }
 
     public void hideConfig(){
+        if(configTile != null) configTile.onConfigureClosed();
         configTile = null;
         table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interp.pow3Out), Actions.visible(false));
     }

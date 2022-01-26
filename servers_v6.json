@@ -11,6 +11,10 @@
     "name": "RCM",
     "address": ["185.104.248.61", "easyplay.su"]
   },
+    {
+    "name": "Tendhost",
+    "address": ["tendhost.ddns.net"]
+  },
   {
     "name": "Atanner",
     "address": ["atannergaming.com:13000"]
