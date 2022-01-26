@@ -20,13 +20,12 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
     public float scl = 2f;
     public float heightScl = 0.9f, octaves = 8, persistence = 0.7f, heightPow = 3f, heightMult = 1.6f;
 
-    //TODO flat array?
-    Block[][] arr = {
-    {Blocks.regolith, Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.carbonStone}
-    //{Blocks.redStone, Blocks.redStone, Blocks.redStone, Blocks.rhyolite, Blocks.carbonStone}
-    //TODO basalt bad
-    //{Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.crystallineStone, Blocks.carbonStone}
-    };
+    //TODO inline/remove
+    public static float arkThresh = 0.28f, arkScl = 0.83f;
+    public static int arkSeed = 7, arkOct = 2;
+    public static float liqThresh = 0.64f, liqScl = 87f, redThresh = 3.1f, noArkThresh = 0.3f;
+
+    Block[] terrain = {Blocks.regolith, Blocks.regolith, Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.carbonStone};
 
     {
         baseSeed = 2;
@@ -66,10 +65,6 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         return position.dst(0, 0, 1)*2.2f - Simplex.noise3d(seed, 8, 0.54f, 1.4f, 10f + position.x, 10f + position.y, 10f + position.z) * 2.9f;
     }
 
-    public static float arkThresh = 0.28f, arkScl = 0.83f;
-    public static int arkSeed = 7, arkOct = 2;
-    public static float liqThresh = 0.64f, liqScl = 87f, redThresh = 3.1f, noArkThresh = 0.3f;
-
     Block getBlock(Vec3 position){
         float ice = rawTemp(position);
         Tmp.v32.set(position);
@@ -82,7 +77,12 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         height *= 1.2f;
         height = Mathf.clamp(height);
 
-        Block result = arr[0][Mathf.clamp((int)(height * arr[0].length), 0, arr[0].length - 1)];
+        Block result = terrain[Mathf.clamp((int)(height * terrain.length), 0, terrain.length - 1)];
+
+        //TODO veins?
+        if(ice < 0.3){
+            return Blocks.crystallineStone;
+        }
 
         if(ice < 0.6){
             if(result == Blocks.rhyolite || result == Blocks.yellowStone || result == Blocks.regolith){
@@ -102,7 +102,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         if(ice > redThresh){
             result = Blocks.redStone;
-        }else if(ice > redThresh - 0.3f){
+        }else if(ice > redThresh - 0.4f){
+            //TODO this may increase the amount of regolith, but it's too obvious a transition.
             result = Blocks.regolith;
         }
 
@@ -127,8 +128,6 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         if(Ridged.noise3d(seed + 2, position.x, position.y + 4f, position.z, 3, 6f) > 0.6){
             tile.floor = Blocks.carbonStone;
         }
-
-
     }
 
     @Override
@@ -158,8 +157,16 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         cells(4);
 
+        //regolith walls for more dense terrain
+        pass((x, y) -> {
+            if(floor == Blocks.regolith && noise(x, y, 3, 0.4f, 13f, 1f) > 0.59f){
+                block = Blocks.regolithWall;
+            }
+        });
+
         //TODO: yellow regolith biome tweaks
-        //TODO: crystal biome
+        //TODO: crystal biome on the dark side w/ terrain tweaks
+        //TODO ice biome
 
         float length = width/3f;
         Vec2 trns = Tmp.v1.trns(rand.random(360f), length);
@@ -173,9 +180,6 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         erase(endX, endY, 15);
 
         //arkycite
-        //TODO ice biome
-
-        //TODO arkycite is too disruptive to terrain, needs certain conditions and sub-biomes.
         pass((x, y) -> {
             if(floor != Blocks.beryllicStone) return;
 
@@ -233,7 +237,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 floor = Blocks.yellowStone;
             }
 
-            if(floor == Blocks.redStone && noise(x + 78 - y, y, 4, 0.73f, 20f, 1f) > 0.65f){
+            if(floor == Blocks.redStone && noise(x + 78 - y, y, 4, 0.73f, 19f, 1f) > 0.63f){
                 floor = Blocks.denseRedStone;
             }
         });
@@ -285,7 +289,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 ore = Blocks.air;
             }
 
-            if(block == Blocks.arkyicWall && rand.chance(0.2) && nearAir(x, y) && !near(x, y, 3, Blocks.crystalOrbs)){
+            if(block == Blocks.arkyicWall && rand.chance(0.23) && nearAir(x, y) && !near(x, y, 3, Blocks.crystalOrbs)){
                 block = Blocks.crystalOrbs;
                 ore = Blocks.air;
             }
@@ -304,16 +308,15 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         });
 
         //remove props near ores, they're too annoying
-        //TODO for standard ores too maybe?
         pass((x, y) -> {
-            if(ore.asFloor().wallOre || block.itemDrop != null){
+            if(ore.asFloor().wallOre || block.itemDrop != null || (block == Blocks.air && ore != Blocks.air)){
                 removeWall(x, y, 3, b -> b instanceof TallBlock);
             }
         });
 
         trimDark();
 
-        //TODO vents everywhere!
+        //TODO vents everywhere! rhyolite patches? or different vents?
         //vents
         outer:
         for(Tile tile : tiles){
@@ -351,6 +354,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         state.rules.environment = Env.scorching | Env.terrestrial;
         Schematics.placeLaunchLoadout(spawnX, spawnY);
 
+        //all sectors are wave sectors
+        state.rules.waves = true;
         state.rules.showSpawns = true;
     }
 }

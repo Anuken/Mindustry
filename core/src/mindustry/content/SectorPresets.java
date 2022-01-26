@@ -119,7 +119,7 @@ public class SectorPresets{
         }};
 
         aware = new SectorPreset("aware", erekir, 88){{
-            captureWave = 5;
+            captureWave = 6;
             difficulty = 3;
         }};
 
