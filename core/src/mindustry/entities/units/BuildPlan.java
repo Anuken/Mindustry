@@ -2,6 +2,7 @@ package mindustry.entities.units;
 
 import arc.func.*;
 import arc.math.geom.*;
+import arc.math.geom.QuadTree.*;
 import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -10,7 +11,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 /** Class for storing build requests. Can be either a place or remove request. */
-public class BuildPlan implements Position{
+public class BuildPlan implements Position, QuadTreeObject{
     /** Position and rotation of this request. */
     public int x, y, rotation;
     /** Block being placed. If null, this is a breaking request.*/
@@ -155,6 +156,15 @@ public class BuildPlan implements Position{
 
     public @Nullable Building build(){
         return world.build(x, y);
+    }
+
+    @Override
+    public void hitbox(Rect out){
+        if(block != null){
+            out.setCentered(x * tilesize + block.offset, y * tilesize + block.offset, block.size * tilesize);
+        }else{
+            out.setCentered(x * tilesize, y * tilesize, tilesize);
+        }
     }
 
     @Override

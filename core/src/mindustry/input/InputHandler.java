@@ -70,11 +70,29 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public Seq<BuildPlan> lineRequests = new Seq<>();
     public Seq<BuildPlan> selectRequests = new Seq<>();
 
+    private Seq<BuildPlan> plansOut = new Seq<>(BuildPlan.class);
+    private QuadTree<BuildPlan> playerPlanTree = new QuadTree<>(new Rect());
+
+    private final Eachable<BuildPlan> allRequests = cons -> {
+        player.unit().plans().each(cons);
+        selectRequests.each(cons);
+        lineRequests.each(cons);
+    };
+
+    private final Eachable<BuildPlan> allSelectLines = cons -> {
+        selectRequests.each(cons);
+        lineRequests.each(cons);
+    };
+
     public InputHandler(){
         Events.on(UnitDestroyEvent.class, e -> {
             if(e.unit != null && e.unit.isPlayer() && e.unit.getPlayer().isLocal() && e.unit.type.weapons.contains(w -> w.bullet.killShooter)){
                 player.shooting = false;
             }
+        });
+
+        Events.on(WorldLoadEvent.class, e -> {
+            playerPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
         });
     }
 
@@ -439,7 +457,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             player.unit().clearCommand();
         }else if(player.unit().type.commandLimit > 0){
 
-            //TODO try out some other formations
             player.unit().commandNearby(new CircleFormation());
             Fx.commandSend.at(player, player.unit().type.commandRadius);
         }
@@ -456,11 +473,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public Eachable<BuildPlan> allRequests(){
-        return cons -> {
-            for(BuildPlan request : player.unit().plans()) cons.get(request);
-            for(BuildPlan request : selectRequests) cons.get(request);
-            for(BuildPlan request : lineRequests) cons.get(request);
-        };
+        return allRequests;
     }
 
     public boolean isUsingSchematic(){
@@ -468,6 +481,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void update(){
+        playerPlanTree.clear();
+        player.unit().plans.each(playerPlanTree::insert);
+
         player.typing = ui.chatfrag.shown();
 
         if(player.dead()){
@@ -836,10 +852,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.reset();
         Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
         Draw.alpha(1f);
-        request.block.drawRequestConfigTop(request, cons -> {
-            selectRequests.each(cons);
-            lineRequests.each(cons);
-        });
+        request.block.drawRequestConfigTop(request, allSelectLines);
         Draw.reset();
     }
 
@@ -1209,15 +1222,22 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public boolean validPlace(int x, int y, Block type, int rotation, BuildPlan ignore){
-        //TODO with many requests, this is O(n * m), very laggy
-        for(BuildPlan req : player.unit().plans()){
-            if(req != ignore
-                    && !req.breaking
-                    && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
-                    && !(type.canReplace(req.block) && Tmp.r1.equals(Tmp.r2))){
-                return false;
+        if(player.unit().plans.size > 0){
+            Tmp.r1.setCentered(x * tilesize + type.offset, y * tilesize + type.offset, type.size * tilesize);
+            plansOut.clear();
+            playerPlanTree.intersect(Tmp.r1, plansOut);
+
+            for(int i = 0; i < plansOut.size; i++){
+                var req = plansOut.items[i];
+                if(req != ignore
+                && !req.breaking
+                && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
+                && !(type.canReplace(req.block) && Tmp.r1.equals(Tmp.r2))){
+                    return false;
+                }
             }
         }
+
         return Build.validPlace(type, player.team(), x, y, rotation);
     }
 

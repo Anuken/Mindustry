@@ -24,6 +24,20 @@ public class Units{
     private static int intResult;
     private static Building buildResult;
 
+    //prevents allocations in anyEntities
+    private static boolean anyEntityGround;
+    private static float aeX, aeY, aeW, aeH;
+    private static final Cons<Unit> anyEntityLambda = unit -> {
+        if(boolResult) return;
+        if((unit.isGrounded() && !unit.hovering) == anyEntityGround){
+            unit.hitboxTile(hitrect);
+
+            if(hitrect.overlaps(aeX, aeY, aeW, aeH)){
+                boolResult = true;
+            }
+        }
+    };
+
     @Remote(called = Loc.server)
     public static void unitCapDeath(Unit unit){
         if(unit != null){
@@ -145,18 +159,13 @@ public class Units{
 
     public static boolean anyEntities(float x, float y, float width, float height, boolean ground){
         boolResult = false;
+        anyEntityGround = ground;
+        aeX = x;
+        aeY = y;
+        aeW = width;
+        aeH = height;
 
-        nearby(x, y, width, height, unit -> {
-            if(boolResult) return;
-            if((unit.isGrounded() && !unit.hovering) == ground){
-                unit.hitboxTile(hitrect);
-
-                if(hitrect.overlaps(x, y, width, height)){
-                    boolResult = true;
-                }
-            }
-        });
-
+        nearby(x, y, width, height, anyEntityLambda);
         return boolResult;
     }
 
