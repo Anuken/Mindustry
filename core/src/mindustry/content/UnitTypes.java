@@ -2434,6 +2434,7 @@ public class UnitTypes{
             speed = 0.6f;
             health = 9000;
             armor = 20f;
+            areaDamage = 6.5f;
             treadRect = new Rect(22f, 16f, 28f, 130f);
 
             weapons.add(new Weapon("vanquish-weapon"){{
@@ -2682,7 +2683,7 @@ public class UnitTypes{
                 drawCell = false;
                 segments = 4;
                 drawBody = false;
-                crawlDamage = 2f;
+                areaDamage = 2f;
 
                 segmentScl = 4f;
                 segmentPhase = 5f;

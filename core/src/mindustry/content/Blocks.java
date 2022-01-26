@@ -3057,7 +3057,7 @@ public class Blocks{
                 trailLength = 10;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }},
-            Items.tungsten, new BasicBulletType(8f, 160){{
+            Items.tungsten, new BasicBulletType(8f, 180){{
                 width = 13f;
                 height = 19f;
                 shootEffect = sfe;
@@ -3075,13 +3075,12 @@ public class Blocks{
             }}
             );
 
-            //TODO no coolant?
             coolantUsage = 15f / 60f;
             coolantOverride = Liquids.water;
             coolantMultiplier = 6f;
 
             shootShake = 1f;
-            ammoPerShot = 6;
+            ammoPerShot = 4;
             draw = new DrawTurret("reinforced-");
             shootLength = -2;
             outlineColor = Pal.darkOutline;
