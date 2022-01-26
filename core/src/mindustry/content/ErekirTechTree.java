@@ -11,6 +11,7 @@ import static mindustry.content.TechTree.*;
 public class ErekirTechTree{
 
     public static void load(){
+        //TODO might be unnecessary with no asteroids
         Seq<Objective> erekirSector = Seq.with(new OnPlanet(Planets.erekir));
 
         var costMultipliers = new ObjectFloatMap<Item>();
@@ -25,7 +26,7 @@ public class ErekirTechTree{
         Planets.erekir.techTree = nodeRoot("erekir", coreBastion, true, () -> {
             context().researchCostMultipliers = costMultipliers;
 
-            node(duct, () -> {
+            node(duct, erekirSector, () -> {
                 node(ductRouter, () -> {
                     node(ductBridge, () -> {
                         node(surgeConveyor, () -> {
@@ -76,8 +77,7 @@ public class ErekirTechTree{
 
             //TODO move into turbine condenser?
             node(plasmaBore, () -> {
-
-                node(impactDrill, erekirSector, () -> {
+                node(impactDrill, Seq.with(new OnSector(aware)), () -> {
                     node(largePlasmaBore, () -> {
                         node(eruptionDrill, () -> {
 
@@ -88,7 +88,7 @@ public class ErekirTechTree{
 
             node(turbineCondenser, () -> {
                 node(beamNode, () -> {
-                    node(ventCondenser, erekirSector, () -> {
+                    node(ventCondenser, Seq.with(new OnSector(aware)), () -> {
                         node(chemicalCombustionChamber, () -> {
                             node(pyrolysisGenerator, () -> {
 
@@ -109,8 +109,9 @@ public class ErekirTechTree{
                     });
                 });
 
-                node(reinforcedConduit, erekirSector, () -> {
-                    node(reinforcedPump, () -> {
+                node(reinforcedConduit, () -> {
+                    //TODO so should this be *on* or *complete*?
+                    node(reinforcedPump, Seq.with(new SectorComplete(aware)), () -> {
                         //TODO T2 pump
                     });
 
@@ -131,7 +132,7 @@ public class ErekirTechTree{
 
                 node(siliconArcFurnace, () -> {
                     node(cliffCrusher, () -> {
-                        node(electrolyzer, erekirSector, () -> {
+                        node(electrolyzer, () -> {
                             node(oxidationChamber, () -> {
                                 node(electricHeater, () -> {
                                     node(heatRedirector, () -> {
@@ -201,7 +202,9 @@ public class ErekirTechTree{
 
             //TODO more sectors
             node(onset, () -> {
+                node(aware, Seq.with(new SectorComplete(onset), new Research(ductRouter)), () -> {
 
+                });
             });
 
             nodeProduce(Items.beryllium, () -> {

@@ -364,6 +364,20 @@ public abstract class BasicGenerator implements WorldGenerator{
         return false;
     }
 
+    public void removeWall(int cx, int cy, int rad, Boolf<Block> pred){
+        for(int x = -rad; x <= rad; x++){
+            for(int y = -rad; y <= rad; y++){
+                int wx = cx + x, wy = cy + y;
+                if(Structs.inBounds(wx, wy, width, height) && Mathf.within(x, y, rad)){
+                    Tile other = tiles.getn(wx, wy);
+                    if(pred.get(other.block())){
+                        other.setBlock(Blocks.air);
+                    }
+                }
+            }
+        }
+    }
+
     public boolean near(int cx, int cy, int rad, Block block){
         for(int x = -rad; x <= rad; x++){
             for(int y = -rad; y <= rad; y++){

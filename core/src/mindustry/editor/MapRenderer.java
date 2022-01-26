@@ -115,15 +115,21 @@ public class MapRenderer implements Disposable{
         boolean center = tile.isCenter();
         boolean useSyntheticWall = wall.synthetic() || overlay.wallOre;
 
-        //draw synthetic wall or floor
+        //draw synthetic wall or floor OR standard wall if wall ore
         if(wall != Blocks.air && useSyntheticWall){
             region = !center ? clearEditor : getIcon(wall, idxWall);
 
-            float width = region.width * Draw.scl, height = region.height * Draw.scl;
+            float width = region.width * Draw.scl, height = region.height * Draw.scl, ox = wall.offset + (tilesize - width) / 2f, oy = wall.offset + (tilesize - height) / 2f;
+
+            //force fit to tile
+            if(overlay.wallOre && !wall.synthetic()){
+                width = height = tilesize;
+                ox = oy = 0f;
+            }
 
             mesh.draw(idxWall, region,
-            wx * tilesize + wall.offset + (tilesize - width) / 2f,
-            wy * tilesize + wall.offset + (tilesize - height) / 2f,
+            wx * tilesize + ox,
+            wy * tilesize + oy,
             width, height,
             tile.build == null || !wall.rotate ? 0 : tile.build.rotdeg());
         }else{
@@ -159,10 +165,8 @@ public class MapRenderer implements Disposable{
 
         float width = region.width * Draw.scl, height = region.height * Draw.scl;
         if(!wall.synthetic() && wall != Blocks.air && !wall.isMultiblock()){
-            offsetX = 0;
-            offsetY = 0;
-            width = tilesize;
-            height = tilesize;
+            offsetX = offsetY = 0f;
+            width = height = tilesize;
         }
 
         mesh.draw(idxDecal, region, wx * tilesize + offsetX, wy * tilesize + offsetY, width, height);

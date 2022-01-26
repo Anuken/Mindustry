@@ -93,8 +93,6 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         position = Tmp.v32;
 
-        //TODO arkycite should NOT generate around slag.
-
         //TODO tweak this to make it more natural
         //TODO edge distortion?
         if(ice < redThresh - noArkThresh && Ridged.noise3d(seed + arkSeed, position.x + 2f, position.y + 8f, position.z + 1f, arkOct, arkScl) > arkThresh){
@@ -104,7 +102,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         if(ice > redThresh){
             result = Blocks.redStone;
-        }else if(ice > redThresh - 0.33f){
+        }else if(ice > redThresh - 0.3f){
             result = Blocks.regolith;
         }
 
@@ -159,6 +157,9 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         }
 
         cells(4);
+
+        //TODO: yellow regolith biome tweaks
+        //TODO: crystal biome
 
         float length = width/3f;
         Vec2 trns = Tmp.v1.trns(rand.random(360f), length);
@@ -259,6 +260,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                     }else if(block != Blocks.carbonWall && noise(x + 782, y, 4, 0.8f, 38f, 1f) > 0.665f){
                         ore = Blocks.wallOreBeryl;
                     }
+
                 }
             }else if(!nearWall(x, y)){
 
@@ -280,12 +282,19 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             if(block == Blocks.air && (floor == Blocks.crystallineStone || floor == Blocks.crystalFloor) && rand.chance(0.09) && nearWall(x, y)
                 && !near(x, y, 4, Blocks.crystalCluster) && !near(x, y, 4, Blocks.vibrantCrystalCluster)){
                 block = floor == Blocks.crystalFloor ? Blocks.vibrantCrystalCluster : Blocks.crystalCluster;
+                ore = Blocks.air;
+            }
+
+            if(block == Blocks.arkyicWall && rand.chance(0.2) && nearAir(x, y) && !near(x, y, 3, Blocks.crystalOrbs)){
+                block = Blocks.crystalOrbs;
+                ore = Blocks.air;
             }
 
             //TODO test, different placement
             //TODO this biome should have more blocks in general
-            if(block == Blocks.regolithWall && rand.chance(0.2) && nearAir(x, y) && !near(x, y, 3, Blocks.crystalBlocks)){
+            if(block == Blocks.regolithWall && rand.chance(0.3) && nearAir(x, y) && !near(x, y, 3, Blocks.crystalBlocks)){
                 block = Blocks.crystalBlocks;
+                ore = Blocks.air;
             }
 
             //this is annoying as blocks under it can't be seen
@@ -294,8 +303,17 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             //}
         });
 
+        //remove props near ores, they're too annoying
+        //TODO for standard ores too maybe?
+        pass((x, y) -> {
+            if(ore.asFloor().wallOre || block.itemDrop != null){
+                removeWall(x, y, 3, b -> b instanceof TallBlock);
+            }
+        });
+
         trimDark();
 
+        //TODO vents everywhere!
         //vents
         outer:
         for(Tile tile : tiles){

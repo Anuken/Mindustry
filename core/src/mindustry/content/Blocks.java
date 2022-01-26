@@ -50,7 +50,7 @@ public class Blocks{
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
     //boulders
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
-    arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystallineBoulder, redIceBoulder, rhyoliteBoulder, redStoneBoulder,
+    arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystalOrbs, crystallineBoulder, redIceBoulder, rhyoliteBoulder, redStoneBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
@@ -705,6 +705,13 @@ public class Blocks{
             shadowOffset = -2.5f;
         }};
 
+        crystalOrbs = new TallBlock("crystal-orbs"){{
+            variants = 3;
+            clipSize = 128f;
+            shadowAlpha = 0.5f;
+            shadowOffset = -2.5f;
+        }};
+
         crystallineBoulder = new Prop("crystalline-boulder"){{
             variants = 2;
             crystallineStone.asFloor().decoration = this;
@@ -724,7 +731,6 @@ public class Blocks{
             variants = 4;
             denseRedStone.asFloor().decoration = redStone.asFloor().decoration = this;
         }};
-
 
         metalFloor = new Floor("metal-floor", 0);
         metalFloorDamaged = new Floor("metal-floor-damaged", 3);
