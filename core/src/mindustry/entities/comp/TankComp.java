@@ -7,6 +7,7 @@ import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -19,6 +20,7 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
     @Import float x, y, hitSize, rotation, speedMultiplier;
     @Import boolean hovering;
     @Import UnitType type;
+    @Import Team team;
 
     transient private float treadEffectTime, lastSlowdown = 1f;
 
@@ -48,7 +50,6 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
         }
 
         //calculate overlapping tiles so it slows down when going "over" walls
-        //TODO is this a necessary mechanic?
         int r = Math.max(Math.round(hitSize * 0.6f / tilesize), 1);
 
         int solids = 0, total = (r*2+1)*(r*2+1);
@@ -57,6 +58,14 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
                 Tile t = Vars.world.tileWorld(x + dx*tilesize, y + dy*tilesize);
                 if(t == null ||  t.solid()){
                     solids ++;
+                }
+
+                //TODO should this apply to the player team(s)? currently PvE due to balancing
+                if(walked && t != null && t.build != null && t.build.team != team && (state.rules.waves && team == state.rules.waveTeam)
+                    //damage radius is 1 tile smaller to prevent it from just touching walls as it passes
+                    && Math.max(Math.abs(dx), Math.abs(dy)) <= r - 1){
+
+                    t.build.damage(team, type.areaDamage * Time.delta);
                 }
             }
         }
