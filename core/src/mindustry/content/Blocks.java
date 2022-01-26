@@ -3463,6 +3463,7 @@ public class Blocks{
 
         }};
 
+        //TODO requirements
         basicAssemblerModule = new UnitAssemblerModule("basic-assembler-module"){{
             requirements(Category.units, with(Items.graphite, 10));
             consumes.power(0.5f);

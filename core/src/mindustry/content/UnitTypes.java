@@ -2434,7 +2434,7 @@ public class UnitTypes{
             speed = 0.6f;
             health = 9000;
             armor = 20f;
-            areaDamage = 6.5f;
+            areaDamage = 8f;
             treadRect = new Rect(22f, 16f, 28f, 130f);
 
             weapons.add(new Weapon("vanquish-weapon"){{
