@@ -267,6 +267,7 @@ public class BeamDrill extends Block{
                     Item drop = tile == null ? null : tile.wallDrop();
                     if(items.total() < itemCapacity && drop != null){
                         items.add(drop, 1);
+                        produced(drop);
                     }
                 }
                 time %= drillTime;
