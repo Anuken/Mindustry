@@ -3038,7 +3038,7 @@ public class Blocks{
         }};
 
         breach = new ItemTurret("breach"){{
-            requirements(Category.turret, with(Items.beryllium, 300, Items.silicon, 150, Items.graphite, 100));
+            requirements(Category.turret, with(Items.beryllium, 300, Items.silicon, 150, Items.graphite, 150));
 
             Effect sfe = new MultiEffect(Fx.shootBigColor, Fx.colorSparkBig);
 
@@ -3080,7 +3080,7 @@ public class Blocks{
             coolantMultiplier = 6f;
 
             shootShake = 1f;
-            ammoPerShot = 4;
+            ammoPerShot = 5;
             draw = new DrawTurret("reinforced-");
             shootLength = -2;
             outlineColor = Pal.darkOutline;

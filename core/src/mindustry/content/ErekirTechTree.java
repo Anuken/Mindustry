@@ -40,13 +40,13 @@ public class ErekirTechTree{
                         });
                     });
 
-                    node(overflowDuct, () -> {
-                        node(ductUnloader, () -> {
-
-                        });
-                    });
-
                     node(reinforcedContainer, () -> {
+                        node(overflowDuct, () -> {
+                            node(ductUnloader, () -> {
+
+                            });
+                        });
+
                         node(reinforcedVault, () -> {
 
                         });
