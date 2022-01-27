@@ -316,24 +316,78 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         trimDark();
 
-        //TODO vents everywhere! rhyolite patches? or different vents?
+        int minVents = rand.random(4, 8);
+        int ventCount = 0;
+
+        //TODO vents everywhere! rhyolite patches
         //vents
         outer:
         for(Tile tile : tiles){
-            if(floor == Blocks.rhyolite && rand.chance(0.0016)){
+            var floor = tile.floor();
+            if((floor == Blocks.rhyolite || floor == Blocks.roughRhyolite) && rand.chance(0.002)){
                 int radius = 2;
                 for(int x = -radius; x <= radius; x++){
                     for(int y = -radius; y <= radius; y++){
                         Tile other = tiles.get(x + tile.x, y + tile.y);
-                        if(other == null || other.floor() != Blocks.rhyolite || other.block().solid){
+                        if(other == null || (other.floor() != Blocks.rhyolite && other.floor() != Blocks.roughRhyolite) || other.block().solid){
                             continue outer;
                         }
                     }
                 }
 
+                ventCount ++;
                 for(var pos : SteamVent.offsets){
                     Tile other = tiles.get(pos.x + tile.x + 1, pos.y + tile.y + 1);
                     other.setFloor(Blocks.steamVent.asFloor());
+                }
+            }
+        }
+
+        int iterations = 0;
+        int maxIterations = 5;
+
+        //try to add additional vents, but only several times to prevent infinite loops in bad maps
+        while(ventCount < minVents && iterations++ < maxIterations){
+            outer:
+            for(Tile tile : tiles){
+                if(rand.chance(0.0003)){
+                    int radius = 1;
+                    for(int x = -radius; x <= radius; x++){
+                        for(int y = -radius; y <= radius; y++){
+                            Tile other = tiles.get(x + tile.x, y + tile.y);
+                            //skip solids / other vents / arkycite / slag
+                            if(other == null || other.block().solid || other.floor() == Blocks.steamVent || other.floor() == Blocks.slag || other.floor() == Blocks.arkyciteFloor){
+                                continue outer;
+                            }
+                        }
+                    }
+
+                    ventCount ++;
+                    for(var pos : SteamVent.offsets){
+                        Tile other = tiles.get(pos.x + tile.x + 1, pos.y + tile.y + 1);
+                        other.setFloor(Blocks.steamVent.asFloor());
+                    }
+
+                    //"circle" for blending
+                    //TODO should it replace akrycite? slag?
+                    int crad = rand.random(6, 14), crad2 = crad * crad;
+                    for(int cx = -crad; cx <= crad; cx++){
+                        for(int cy = -crad; cy <= crad; cy++){
+                            int rx = cx + tile.x, ry = cy + tile.y;
+                            //skew circle Y
+                            float rcy = cy + cx*0.9f;
+                            if(cx*cx + rcy*rcy <= crad2 - noise(rx, ry + rx*2f, 2, 0.7f, 8f, crad2 * 1.1f)){
+                                Tile dest = tiles.get(rx, ry);
+                                if(dest != null && dest.floor() != Blocks.steamVent && dest.floor() != Blocks.roughRhyolite && dest.floor() != Blocks.arkyciteFloor && dest.floor() != Blocks.slag){
+                                    dest.setFloor(rand.chance(0.08) ? Blocks.rhyoliteCrater.asFloor() : Blocks.rhyolite.asFloor());
+                                    if(dest.block().isStatic()){
+                                        dest.setBlock(Blocks.rhyoliteWall);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
         }

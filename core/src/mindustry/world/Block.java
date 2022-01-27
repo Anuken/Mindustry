@@ -417,7 +417,7 @@ public class Block extends UnlockableContent{
         return hasItems;
     }
 
-    /** Returns whether or not this block can be place on the specified  */
+    /** Returns whether this block can be place on the specified  */
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         return canPlaceOn(tile, team);
     }

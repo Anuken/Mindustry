@@ -1374,14 +1374,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         table.setPosition(pos.x, pos.y, Align.top);
     }
 
-    /** Returns whether or not a hand cursor should be shown over this block. */
+    /** Returns whether a hand cursor should be shown over this block. */
     public Cursor getCursor(){
         return block.configurable && interactable(player.team()) ? SystemCursor.hand : SystemCursor.arrow;
     }
 
     /**
      * Called when another tile is tapped while this block is selected.
-     * @return whether or not this block should be deselected.
+     * @return whether this block should be deselected.
      */
     public boolean onConfigureTileTapped(Building other){
         if(block.clearOnDoubleTap){
