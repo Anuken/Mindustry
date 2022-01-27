@@ -1301,7 +1301,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
         if(points.size > 1 && end instanceof ChainedBuilding){
             Point2 secondToLast = points.get(points.size - 2);
-            if (!(world.build(secondToLast.x, secondToLast.y) instanceof ChainedBuilding)){
+            if(!(world.build(secondToLast.x, secondToLast.y) instanceof ChainedBuilding)){
                 endRotation = end.rotation;
             }
         }

@@ -53,7 +53,7 @@ public class ErekirTechTree{
                     });
                 });
 
-                //TODO further in? no use for these without units.
+                //TODO should only be unlocked in unit sector
                 node(constructor, Seq.with(new Research(siliconArcFurnace), erekirSector.first()), () -> {
                     node(payloadLoader, () -> {
                         node(payloadUnloader, () -> {
@@ -110,9 +110,9 @@ public class ErekirTechTree{
                 });
 
                 node(reinforcedConduit, () -> {
-                    //TODO so should this be *on* or *complete*?
-                    node(reinforcedPump, Seq.with(new OnSector(aware)), () -> {
-                        //TODO T2 pump
+                    //TODO maybe should be even later
+                    node(reinforcedPump, Seq.with(new SectorComplete(aware)), () -> {
+                        //TODO T2 pump, consume cyanogen or similar
                     });
 
                     node(reinforcedLiquidJunction, () -> {
@@ -122,7 +122,7 @@ public class ErekirTechTree{
 
                         node(reinforcedLiquidRouter, () -> {
                             node(reinforcedLiquidContainer, () -> {
-                                node(reinforcedLiquidTank, () -> {
+                                node(reinforcedLiquidTank, Seq.with(new SectorComplete(aware)), () -> {
 
                                 });
                             });
@@ -132,7 +132,8 @@ public class ErekirTechTree{
 
                 node(siliconArcFurnace, () -> {
                     node(cliffCrusher, () -> {
-                        node(electrolyzer, () -> {
+                        //TODO should be gated on landing of 3rd sector, not complete?
+                        node(electrolyzer, Seq.with(new SectorComplete(aware)), () -> {
                             node(oxidationChamber, () -> {
                                 node(electricHeater, () -> {
                                     node(heatRedirector, () -> {

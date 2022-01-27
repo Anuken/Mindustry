@@ -130,7 +130,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
             Seq<String> result = new Seq<>();
             for(String s : rawSource.split("\n", -1)){
                 result.add(s);
-                if (s.startsWith("package ")){
+                if(s.startsWith("package ")){
                     result.add("");
                     for (String i : imports){
                         result.add(i);
