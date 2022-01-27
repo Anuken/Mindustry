@@ -24,7 +24,6 @@ public class LiquidConverter extends GenericCrafter{
 
         ConsumeLiquid cl = consumes.get(ConsumeType.liquid);
         cl.update(false);
-        outputLiquid.amount = cl.amount;
         super.init();
     }
 

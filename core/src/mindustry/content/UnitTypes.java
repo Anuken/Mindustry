@@ -2062,6 +2062,7 @@ public class UnitTypes{
                         weaveMag = 4;
                         weaveScale = 4;
                         lifetime = 60f;
+                        keepVelocity = false;
                         shootEffect = Fx.shootHeal;
                         smokeEffect = Fx.hitLaser;
                         splashDamage = 13f;

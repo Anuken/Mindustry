@@ -1395,6 +1395,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return self() != other;
     }
 
+    /**
+     * Called when this block's config menu is closed
+     */
+    public void onConfigureClosed(){}
+
     /** Returns whether this config menu should show when the specified player taps it. */
     public boolean shouldShowConfigure(Player player){
         return true;
