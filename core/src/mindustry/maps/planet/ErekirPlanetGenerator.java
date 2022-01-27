@@ -316,7 +316,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         trimDark();
 
-        int minVents = rand.random(4, 8);
+        int minVents = rand.random(5, 8);
         int ventCount = 0;
 
         //TODO vents everywhere! rhyolite patches
@@ -350,7 +350,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         while(ventCount < minVents && iterations++ < maxIterations){
             outer:
             for(Tile tile : tiles){
-                if(rand.chance(0.0003)){
+                if(rand.chance(0.00017)){
                     int radius = 1;
                     for(int x = -radius; x <= radius; x++){
                         for(int y = -radius; y <= radius; y++){
