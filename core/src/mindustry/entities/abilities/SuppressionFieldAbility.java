@@ -21,8 +21,8 @@ public class SuppressionFieldAbility extends Ability{
     public float reload = 60f * 1.5f;
     public float range = 200f;
 
-    public float orbRadius = 4.5f, orbMidScl = 0.62f, orbSinScl = 8f, orbSinMag = 1f;
-    public Color color1 = Pal.sap.cpy().mul(1.6f), color2 = Pal.sap;
+    public float orbRadius = 4.1f, orbMidScl = 0.33f, orbSinScl = 8f, orbSinMag = 1f;
+    public Color color = Pal.sap.cpy().mul(1.6f);
     public float layer = Layer.effect;
 
     public float x = 0f, y = 0f;
@@ -32,7 +32,7 @@ public class SuppressionFieldAbility extends Ability{
     public float rotateScl = 3f;
     public float particleLife = 110f;
     public Interp particleInterp = f -> Interp.circleOut.apply(Interp.slope.apply(f));
-    public Color particleColor = Pal.sap.cpy().a(0.8f);
+    public Color particleColor = Pal.sap.cpy();
 
     public float applyParticleChance = 13f;
 
@@ -87,12 +87,6 @@ public class SuppressionFieldAbility extends Ability{
         Tmp.v1.set(x, y).rotate(unit.rotation - 90f);
         float rx = unit.x + Tmp.v1.x, ry = unit.y + Tmp.v1.y;
 
-        Draw.color(color2);
-        Fill.circle(rx, ry, rad);
-
-        Draw.color(color1);
-        Fill.circle(rx, ry, rad * orbMidScl);
-
         float base = (Time.time / particleLife);
         rand.setSeed(unit.id);
         Draw.color(particleColor);
@@ -106,6 +100,14 @@ public class SuppressionFieldAbility extends Ability{
             particleSize * Mathf.slope(fin)
             );
         }
+
+        Lines.stroke(2f);
+
+        Draw.color(color);
+        Lines.circle(rx, ry, rad);
+
+        Draw.color(color);
+        Fill.circle(rx, ry, rad * orbMidScl);
 
         //TODO improve
         if(heat > 0.001f){

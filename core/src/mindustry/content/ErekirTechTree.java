@@ -111,7 +111,7 @@ public class ErekirTechTree{
 
                 node(reinforcedConduit, () -> {
                     //TODO so should this be *on* or *complete*?
-                    node(reinforcedPump, Seq.with(new SectorComplete(aware)), () -> {
+                    node(reinforcedPump, Seq.with(new OnSector(aware)), () -> {
                         //TODO T2 pump
                     });
 
