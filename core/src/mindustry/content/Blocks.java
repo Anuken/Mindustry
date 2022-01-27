@@ -2509,6 +2509,7 @@ public class Blocks{
             itemCapacity = 8000;
             size = 4;
             thrusterLength = 34/4f;
+            armor = 5f;
 
             unitCapModifier = 8;
             researchCostMultiplier = 0.07f;
@@ -2523,6 +2524,7 @@ public class Blocks{
             itemCapacity = 11000;
             size = 5;
             thrusterLength = 40/4f;
+            armor = 10f;
 
             unitCapModifier = 16;
             researchCostMultiplier = 0.11f;
@@ -2537,6 +2539,7 @@ public class Blocks{
             itemCapacity = 16000;
             size = 6;
             thrusterLength = 48/4f;
+            armor = 15f;
 
             unitCapModifier = 24;
             researchCostMultiplier = 0.11f;

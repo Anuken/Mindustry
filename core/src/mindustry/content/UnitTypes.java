@@ -2453,7 +2453,7 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
-                bullet = new BasicBulletType(8f, 100){{
+                bullet = new BasicBulletType(8f, 110){{
                     sprite = "missile-large";
                     width = 9.5f;
                     height = 15f;
@@ -2484,7 +2484,7 @@ public class UnitTypes{
                     rotate = true;
                     rotateSpeed = 2f;
 
-                    bullet = new BasicBulletType(4.5f, 14){{
+                    bullet = new BasicBulletType(4.5f, 20){{
                         width = 6.5f;
                         height = 11f;
                         shootEffect = Fx.sparkShoot;
