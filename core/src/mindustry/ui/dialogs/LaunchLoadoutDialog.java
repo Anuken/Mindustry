@@ -6,6 +6,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -26,6 +27,8 @@ public class LaunchLoadoutDialog extends BaseDialog{
     Schematic selected;
     //validity of loadout items
     boolean valid;
+    //last calculated capacity
+    int lastCapacity;
 
     public LaunchLoadoutDialog(){
         super("@configure");
@@ -44,7 +47,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         //updates sum requirements
         Runnable update = () -> {
-            int cap = selected.findCore().itemCapacity;
+            int cap = lastCapacity = (int)(Vars.launchCapacityMultiplier * selected.findCore().itemCapacity);
 
             //cap resources based on core type
             ItemSeq resources = universe.getLaunchResources();
@@ -91,7 +94,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
             ItemSeq realItems = sitems.copy();
             selected.requirements().each(realItems::remove);
 
-            loadout.show(selected.findCore().itemCapacity, realItems, out, UnlockableContent::unlocked, out::clear, () -> {}, () -> {
+            loadout.show(lastCapacity, realItems, out, UnlockableContent::unlocked, out::clear, () -> {}, () -> {
                 universe.updateLaunchResources(new ItemSeq(out));
                 update.run();
                 rebuildItems.run();
@@ -139,6 +142,8 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         }).growX().scrollX(false);
 
+        cont.row();
+        cont.label(() -> Core.bundle.format("launch.capacity", lastCapacity)).row();
         cont.row();
         cont.pane(items);
         cont.row();

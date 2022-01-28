@@ -56,6 +56,9 @@ public class LaunchPad extends Block{
         super.setBars();
 
         bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
+
+        //TODO is "bar.launchcooldown" the right terminology?
+        bars.add("progress", (LaunchPadBuild build) -> new Bar(() -> Core.bundle.get("bar.launchcooldown"), () -> Pal.ammo, () -> Mathf.clamp(build.launchCounter / launchTime)));
     }
 
     @Override
@@ -73,8 +76,8 @@ public class LaunchPad extends Block{
 
         @Override
         public boolean shouldConsume(){
-            //TODO do not consume after reload / disable?
-            return true;
+            //TODO add launch costs, maybe legacy version
+            return launchCounter < launchTime && enabled;
         }
 
         @Override

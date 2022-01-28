@@ -90,6 +90,7 @@ public class Planets{
             atmosphereRadOut = 0.3f;
         }};
 
+        //TODO hide beryllium and others on load in rules
         serpulo = new Planet("serpulo", sun, 1f, 3){{
             generator = new SerpuloPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
