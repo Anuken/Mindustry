@@ -134,6 +134,7 @@ public class Blocks{
     tankAssembler,
     shipAssembler,
     mechAssembler,
+    //TODO maybe making it 5x5 would be more appropriate, seems kinda cheap.
     basicAssemblerModule,
 
     //payloads
@@ -143,6 +144,7 @@ public class Blocks{
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
 
     //campaign
+    //TODO launch pad on erekir, 5x5, uses nuclear(?) fuel
     launchPad, interplanetaryAccelerator
 
     ;

@@ -86,8 +86,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         if(ice < 0.6){
             if(result == Blocks.rhyolite || result == Blocks.yellowStone || result == Blocks.regolith){
-                //TODO bio(?) luminescent stuff
-                return Blocks.ferricStone; //TODO perhaps something else. what about ice?
+                //TODO bio(?) luminescent stuff? ice?
+                return Blocks.carbonStone; //TODO perhaps something else.
             }
         }
 
@@ -273,13 +273,13 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 }
 
                 //TODO design ore generation so it doesn't overlap
-                if(noise(x + 999, y + 600 - x, 4, 0.63f, 50f, 1f) < 0.25f && floor == Blocks.crystallineStone){
+                if(noise(x + 999, y + 600 - x, 4, 0.63f, 45f, 1f) < 0.29f && floor == Blocks.crystallineStone){
                     ore = Blocks.oreCrystalThorium;
                 }
 
             }
 
-            if(noise(x + 999, y + 600 - x, 5, 0.8f, 50f, 1f) < 0.38f && floor == Blocks.crystallineStone){
+            if(noise(x + 999, y + 600 - x, 5, 0.8f, 45f, 1f) < 0.44f && floor == Blocks.crystallineStone){
                 floor = Blocks.crystalFloor;
             }
 
@@ -350,7 +350,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         while(ventCount < minVents && iterations++ < maxIterations){
             outer:
             for(Tile tile : tiles){
-                if(rand.chance(0.00017)){
+                if(rand.chance(0.00018)){
                     int radius = 1;
                     for(int x = -radius; x <= radius; x++){
                         for(int y = -radius; y <= radius; y++){
@@ -401,6 +401,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         decoration(0.017f);
 
         //not allowed
+        //TODO use Items.serpuloItems
         state.rules.hiddenBuildItems.addAll(Items.copper, Items.titanium, Items.coal, Items.lead, Items.blastCompound, Items.pyratite, Items.sporePod, Items.metaglass, Items.plastanium);
 
         //it is very hot

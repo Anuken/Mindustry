@@ -194,7 +194,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
             void joinLiquid(int x1, int y1, int x2, int y2){
                 float nscl = rand.random(100f, 140f) * 6f;
-                int rad = rand.random(5, 10);
+                int rad = rand.random(7, 11);
                 int avoid = 2 + rad;
                 var path = pathfind(x1, y1, x2, y2, tile -> (tile.solid() || !tile.floor().isLiquid ? 70f : 0f) + noise(tile.x, tile.y, 2, 0.4f, 1f / nscl) * 500, Astar.manhattan);
                 path.each(t -> {

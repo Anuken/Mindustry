@@ -49,8 +49,8 @@ public class Vars implements Loadable{
     public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit};
     /** Wall darkness radius. */
     public static final int darkRadius = 4;
-    /** Maximum extra padding around deployment schematics. */
-    public static final int maxLoadoutSchematicPad = 5;
+    /** Maximum extra padding around deployment schematics. TODO 4, or 5?*/
+    public static final int maxLoadoutSchematicPad = 4;
     /** Maximum schematic size.*/
     public static final int maxSchematicSize = 32;
     /** All schematic base64 starts with this string.*/
