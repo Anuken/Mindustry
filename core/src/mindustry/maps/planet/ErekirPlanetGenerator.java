@@ -400,10 +400,6 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         decoration(0.017f);
 
-        //not allowed
-        //TODO use Items.serpuloItems
-        state.rules.hiddenBuildItems.addAll(Items.copper, Items.titanium, Items.coal, Items.lead, Items.blastCompound, Items.pyratite, Items.sporePod, Items.metaglass, Items.plastanium);
-
         //it is very hot
         state.rules.attributes.set(Attribute.heat, 0.8f);
         state.rules.environment = sector.planet.defaultEnv;

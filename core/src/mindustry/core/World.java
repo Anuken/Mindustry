@@ -304,6 +304,8 @@ public class World{
         }
 
         state.rules.cloudColor = sector.planet.landCloudColor;
+        state.rules.hiddenBuildItems.clear();
+        state.rules.hiddenBuildItems.addAll(sector.planet.hiddenItems);
         sector.info.resources = content.toSeq();
         sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
         sector.saveInfo();

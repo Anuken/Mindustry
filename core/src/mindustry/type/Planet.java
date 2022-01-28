@@ -98,6 +98,8 @@ public class Planet extends UnlockableContent{
     public @Nullable TechNode techTree;
     /** Planets that can be launched to from this one. Made mutual in init(). */
     public Seq<Planet> launchCandidates = new Seq<>();
+    /** Items not available on this planet. */
+    public Seq<Item> hiddenItems = new Seq<>();
     /** Content (usually planet-specific) that is unlocked upon landing here. */
     public Seq<UnlockableContent> unlockedOnLand = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
