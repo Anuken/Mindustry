@@ -12,7 +12,7 @@ jobs:
       with:
         java-version: 16
     - name: Compile
-      run: ./gradlew assembleDebug
+      run: cd; chmod +x ./gradlew; ./gradlew assembleDebug
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
