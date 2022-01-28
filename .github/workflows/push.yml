@@ -7,29 +7,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Trigger BE build
-      if: ${{ github.repository == 'Anuken/Mindustry' }}
-      run: |
-        git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
-        cd ../MindustryBuilds
-        BNUM=$(($GITHUB_RUN_NUMBER + 20000))
-        git tag ${BNUM}
-        git config --global user.name "Github Actions"
-        git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/Anuken/MindustryBuilds ${BNUM}
-    - name: Set up JDK 17
+    - name: Set up java
       uses: actions/setup-java@v1
       with:
-        java-version: 17
-    - name: Update bundles
-      if: ${{ github.repository == 'Anuken/Mindustry' }}
-      run: |
-        ./gradlew updateBundles
-
-        if [ -n "$(git status --porcelain)" ]; then
-          git add core/assets/bundles/*
-          git commit -m "Automatic bundle update"
-          git push
-        fi
-    - name: Run unit tests
-      run: ./gradlew clean cleanTest test --stacktrace
+        java-version: 16
+    - name: Compile
+      run: ./gradlew assembleDebug
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: susdustry
+        path: build/libs/${{ github.event.repository.name }}.apk
