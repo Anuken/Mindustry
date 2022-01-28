@@ -355,10 +355,13 @@ public class Mods implements Loadable{
 
     /** Loads all mods from the folder, but does not call any methods on them.*/
     public void load(){
-        for(Fi file : modDirectory.list()){
-            if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && (file.child("mod.json").exists() || file.child("mod.hjson").exists()))) continue;
+        var files = resolveDependencies(Seq.with(modDirectory.list()).filter(f ->
+            f.extension().equals("jar") || f.extension().equals("zip") || (f.isDirectory() && (f.child("mod.json").exists() || f.child("mod.hjson").exists()))
+        ));
 
+        for(Fi file : files){
             Log.debug("[Mods] Loading mod @", file);
+
             try{
                 LoadedMod mod = loadMod(file);
                 mods.add(mod);
@@ -373,7 +376,7 @@ public class Mods implements Loadable{
         }
 
         //load workshop mods now
-        for(Fi file : platform.getWorkshopContent(LoadedMod.class)){
+        for(Fi file : resolveDependencies(platform.getWorkshopContent(LoadedMod.class))){
             try{
                 LoadedMod mod = loadMod(file);
                 mods.add(mod);
@@ -708,6 +711,86 @@ public class Mods implements Loadable{
         }
     }
 
+    /** Tries to find the config file of a mod/plugin. */
+    @Nullable
+    public ModMeta findMeta(Fi file){
+        Fi metaFile =
+            file.child("mod.json").exists() ?       file.child("mod.json") :
+            file.child("mod.hjson").exists() ?      file.child("mod.hjson") :
+            file.child("plugin.json").exists() ?    file.child("plugin.json") :
+            file.child("plugin.hjson");
+
+        if(!metaFile.exists()){
+            return null;
+        }
+
+        ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaFile.readString()).toString(Jformat.plain));
+        meta.cleanup();
+        return meta;
+    }
+
+    /** Resolves the loading order of a list mods/plugins using their internal names.
+     * It also skips non-mods files or folders. */
+    public Seq<Fi> resolveDependencies(Seq<Fi> files){
+        ObjectMap<String, Fi> fileMapping = new ObjectMap<>();
+        ObjectMap<String, Seq<String>> dependencies = new ObjectMap<>();
+
+        for(Fi file : files){
+            Fi zip = file.isDirectory() ? file : new ZipFi(file);
+
+            if(zip.list().length == 1 && zip.list()[0].isDirectory()){
+                zip = zip.list()[0];
+            }
+
+            ModMeta meta = null;
+            try{
+                meta = findMeta(zip);
+            }catch(Exception ignored){
+            }
+
+            if(meta == null) continue;
+            dependencies.put(meta.name, meta.dependencies);
+            fileMapping.put(meta.name, file);
+        }
+
+        ObjectSet<String> visited = new ObjectSet<>();
+        OrderedSet<String> ordered = new OrderedSet<>();
+
+        for(String modName : dependencies.keys()){
+            if(!ordered.contains(modName)){
+                // Adds the loaded mods at the beginning of the list
+                ordered.add(modName, 0);
+                resolveDependencies(modName, dependencies, ordered, visited);
+                visited.clear();
+            }
+        }
+
+        // Adds the invalid mods
+        for(String missingMod : dependencies.keys()){
+            if(!ordered.contains(missingMod)) ordered.add(missingMod, 0);
+        }
+
+        Seq<Fi> resolved = ordered.orderedItems().map(fileMapping::get);
+        // Since the resolver explores the dependencies from leaves to the root, reverse the seq
+        resolved.reverse();
+        return resolved;
+    }
+
+    /** Recursive search of dependencies */
+    public void resolveDependencies(String modName, ObjectMap<String, Seq<String>> dependencies, OrderedSet<String> ordered, ObjectSet<String> visited){
+        visited.add(modName);
+
+        for(String dependency : dependencies.get(modName)){
+            // Checks if the dependency tree isn't circular and that the dependency is not missing
+            if(!visited.contains(dependency) && dependencies.containsKey(dependency)){
+                // Skips if the dependency was already explored in a separate tree
+                if(ordered.contains(dependency)) continue;
+                ordered.add(dependency);
+                resolveDependencies(dependency, dependencies, ordered, visited);
+            }
+        }
+    }
+
     /** Loads a mod file+meta, but does not add it to the list.
      * Note that directories can be loaded as mods. */
     private LoadedMod loadMod(Fi sourceFile) throws Exception{
@@ -727,19 +810,13 @@ public class Mods implements Loadable{
                 zip = zip.list()[0];
             }
 
-            Fi metaf =
-                zip.child("mod.json").exists() ? zip.child("mod.json") :
-                zip.child("mod.hjson").exists() ? zip.child("mod.hjson") :
-                zip.child("plugin.json").exists() ? zip.child("plugin.json") :
-                zip.child("plugin.hjson");
+            ModMeta meta = findMeta(zip);
 
-            if(!metaf.exists()){
-                Log.warn("Mod @ doesn't have a '[mod/plugin].[h]json' file, skipping.", sourceFile);
+            if(meta == null){
+                Log.warn("Mod @ doesn't have a '[mod/plugin].[h]json' file, skipping.", zip);
                 throw new ModLoadException("Invalid file: No mod.json found.");
             }
 
-            ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaf.readString()).toString(Jformat.plain));
-            meta.cleanup();
             String camelized = meta.name.replace(" ", "");
             String mainClass = meta.main == null ? camelized.toLowerCase(Locale.ROOT) + "." + camelized + "Mod" : meta.main;
             String baseName = meta.name.toLowerCase(Locale.ROOT).replace(" ", "-");
