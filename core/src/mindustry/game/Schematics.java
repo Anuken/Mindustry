@@ -58,6 +58,7 @@ public class Schematics implements Loadable{
     private OrderedMap<Schematic, FrameBuffer> previews = new OrderedMap<>();
     private ObjectSet<Schematic> errored = new ObjectSet<>();
     private ObjectMap<CoreBlock, Seq<Schematic>> loadouts = new ObjectMap<>();
+    private ObjectMap<CoreBlock, Schematic> defaultLoadouts = new ObjectMap<>();
     private FrameBuffer shadowBuffer;
     private Texture errorTexture;
     private long lastClearTime;
@@ -288,19 +289,28 @@ public class Schematics implements Loadable{
         return loadouts;
     }
 
+    public @Nullable Schematic getDefaultLoadout(CoreBlock block){
+        return defaultLoadouts.get(block);
+    }
+
     /** Checks a schematic for deployment validity and adds it to the cache. */
-    private void checkLoadout(Schematic s, boolean validate){
+    private void checkLoadout(Schematic s, boolean customSchem){
         Stile core = s.tiles.find(t -> t.block instanceof CoreBlock);
         if(core == null) return;
         int cores = s.tiles.count(t -> t.block instanceof CoreBlock);
         int maxSize = getMaxLaunchSize(core.block);
 
         //make sure a core exists, and that the schematic is small enough.
-        if((validate && (s.width > maxSize || s.height > maxSize
+        if((customSchem && (s.width > maxSize || s.height > maxSize
             || s.tiles.contains(t -> t.block.buildVisibility == BuildVisibility.sandboxOnly || !t.block.unlocked()) || cores > 1))) return;
 
         //place in the cache
         loadouts.get((CoreBlock)core.block, Seq::new).add(s);
+
+        //save non-custom loadout
+        if(!customSchem){
+            defaultLoadouts.put((CoreBlock)core.block, s);
+        }
     }
 
     public int getMaxLaunchSize(Block block){

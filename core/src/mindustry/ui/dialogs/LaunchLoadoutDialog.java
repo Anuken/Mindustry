@@ -115,31 +115,38 @@ public class LaunchLoadoutDialog extends BaseDialog{
         cont.add(Core.bundle.format("launch.from", sector.name())).row();
 
         cont.pane(t -> {
-            int i = 0;
+            int[] i = {0};
 
-            for(var entry : schematics.getLoadouts()){
-                if(entry.key.size <= core.size){
-                    for(Schematic s : entry.value){
-                        if(s.tiles.contains(tile -> !tile.block.supportsEnv(sector.planet.defaultEnv) ||
-                            //make sure block can be built here.
-                            (!state.rules.hiddenBuildItems.isEmpty() && Structs.contains(tile.block.requirements, stack -> state.rules.hiddenBuildItems.contains(stack.item))))){
-                            continue;
-                        }
+            Cons<Schematic> handler = s -> {
+                if(s.tiles.contains(tile -> !tile.block.supportsEnv(sector.planet.defaultEnv) ||
+                //make sure block can be built here.
+                (!state.rules.hiddenBuildItems.isEmpty() && Structs.contains(tile.block.requirements, stack -> state.rules.hiddenBuildItems.contains(stack.item))))){
+                    return;
+                }
 
-                        t.button(b -> b.add(new SchematicImage(s)), Styles.togglet, () -> {
-                            selected = s;
-                            update.run();
-                            rebuildItems.run();
-                        }).group(group).pad(4).checked(s == selected).size(200f);
+                t.button(b -> b.add(new SchematicImage(s)), Styles.togglet, () -> {
+                    selected = s;
+                    update.run();
+                    rebuildItems.run();
+                }).group(group).pad(4).checked(s == selected).size(200f);
 
-                        if(++i % cols == 0){
-                            t.row();
+                if(++i[0] % cols == 0){
+                    t.row();
+                }
+            };
+
+            if(sector.planet.allowLaunchSchematics || schematics.getDefaultLoadout(core) == null){
+                for(var entry : schematics.getLoadouts()){
+                    if(entry.key.size <= core.size){
+                        for(Schematic s : entry.value){
+                            handler.get(s);
                         }
                     }
                 }
+            }else{
+                //only allow launching with the standard loadout schematic
+                handler.get(schematics.getDefaultLoadout(core));
             }
-
-
         }).growX().scrollX(false);
 
         cont.row();

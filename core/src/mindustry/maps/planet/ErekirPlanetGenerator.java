@@ -17,7 +17,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ErekirPlanetGenerator extends PlanetGenerator{
-    public float scl = 2f;
+    //public float scl = 2f;
     public float heightScl = 0.9f, octaves = 8, persistence = 0.7f, heightPow = 3f, heightMult = 1.6f;
 
     //TODO inline/remove
@@ -71,7 +71,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         float height = rawHeight(position);
         Tmp.v31.set(position);
-        position = Tmp.v33.set(position).scl(scl);
+        //position = Tmp.v33.set(position).scl(scl);
         //float temp = Simplex.noise3d(seed, 8, 0.6, 1f/2f, 10f + position.x, 10f + position.y + 99f, 10f + position.z);
         //Mathf.clamp((int)(temp * arr.length), 0, arr[0].length - 1)
         height *= 1.2f;
