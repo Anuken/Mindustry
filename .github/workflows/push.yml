@@ -7,14 +7,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@v2
+    - name: Set up PATH
+      run: |
+        echo "${ANDROID_HOME}/build-tools/30.0.1"
     - name: Set up java
       uses: actions/setup-java@v1
       with:
-        java-version: 16
+        java-version: 17
     - name: Compile
-      run: ls
+      run: |
+        chmod +x ./gradlew
+        ./gradlew tools:pack
+        ./gradlew deploy
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: susdustry
-        path: build/libs/${{ github.event.repository.name }}.apk
+        path: android/build/outputs/apk/standard
