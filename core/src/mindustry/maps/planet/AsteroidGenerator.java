@@ -117,10 +117,6 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
 
         wallOre(Blocks.beryllicStoneWall, Blocks.wallOreBeryl, 50f, 0.62f * berylliumScale);
 
-        //TODO:
-        //- enemy wave spawns
-        //- never ending
-
         //titanium
         pass((x, y) -> {
             if(floor != Blocks.stone) return;
@@ -142,7 +138,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
             zoom = 1f;
             camPos = new Vec3(1.2388899f, 1.6047299f, 2.4758825f);
         }};
-        //state.rules.backgroundTexture = "sprites/space.png";
+
         state.rules.dragMultiplier = 0.7f; //yes, space actually has 0 drag but true 0% drag is very annoying
         state.rules.borderDarkness = false;
         state.rules.environment = Env.space;

@@ -24,6 +24,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
     public static float arkThresh = 0.28f, arkScl = 0.83f;
     public static int arkSeed = 7, arkOct = 2;
     public static float liqThresh = 0.64f, liqScl = 87f, redThresh = 3.1f, noArkThresh = 0.3f;
+    public static int crystalSeed = 8, crystalOct = 2;
+    public static float crystalScl = 0.9f, crystalMag = 0.3f;
 
     Block[] terrain = {Blocks.regolith, Blocks.regolith, Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.carbonStone};
 
@@ -44,6 +46,12 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
     @Override
     public Color getColor(Vec3 position){
         Block block = getBlock(position);
+
+        //more obvious color
+        if(block == Blocks.crystallineStone) block = Blocks.crystalFloor;
+        //TODO this might be too green
+        //if(block == Blocks.beryllicStone) block = Blocks.arkyicStone;
+
         return Tmp.c1.set(block.mapColor).a(1f - block.albedo);
     }
 
@@ -71,16 +79,12 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         float height = rawHeight(position);
         Tmp.v31.set(position);
-        //position = Tmp.v33.set(position).scl(scl);
-        //float temp = Simplex.noise3d(seed, 8, 0.6, 1f/2f, 10f + position.x, 10f + position.y + 99f, 10f + position.z);
-        //Mathf.clamp((int)(temp * arr.length), 0, arr[0].length - 1)
         height *= 1.2f;
         height = Mathf.clamp(height);
 
         Block result = terrain[Mathf.clamp((int)(height * terrain.length), 0, terrain.length - 1)];
 
-        //TODO veins?
-        if(ice < 0.3){
+        if(ice < 0.3 + Math.abs(Ridged.noise3d(seed + crystalSeed, position.x + 4f, position.y + 8f, position.z + 1f, crystalOct, crystalScl)) * crystalMag){
             return Blocks.crystallineStone;
         }
 
@@ -268,12 +272,12 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 }
             }else if(!nearWall(x, y)){
 
-                if(noise(x + 150, y + x*2 + 100, 4, 0.8f, 55f, 1f) > 0.76f/* && floor == Blocks.yellowStone*/){
+                if(noise(x + 150, y + x*2 + 100, 4, 0.8f, 55f, 1f) > 0.76f){
                     ore = Blocks.oreTungsten;
                 }
 
                 //TODO design ore generation so it doesn't overlap
-                if(noise(x + 999, y + 600 - x, 4, 0.63f, 45f, 1f) < 0.29f && floor == Blocks.crystallineStone){
+                if(noise(x + 999, y + 600 - x, 4, 0.63f, 45f, 1f) < 0.27f && floor == Blocks.crystallineStone){
                     ore = Blocks.oreCrystalThorium;
                 }
 
