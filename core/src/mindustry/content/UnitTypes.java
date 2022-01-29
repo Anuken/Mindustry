@@ -2603,6 +2603,7 @@ public class UnitTypes{
         //region erekir - flying
 
         quell = new UnitType("quell"){{
+            defaultController = FlyingFollowAI::new;
             envDisabled = 0;
 
             outlineColor = Pal.darkOutline;
@@ -2639,6 +2640,8 @@ public class UnitTypes{
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke2;
                     shake = 1f;
+                    speed = 0f;
+                    keepVelocity = false;
                 }};
 
                 unitSpawned = new MissileUnitType("quell-missile"){{

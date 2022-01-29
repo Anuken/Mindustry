@@ -125,6 +125,7 @@ public class AIController implements UnitController{
 
         for(var mount : unit.mounts){
             Weapon weapon = mount.weapon;
+            float wrange = weapon.range();
 
             //let uncontrollable weapons do their own thing
             if(!weapon.controllable) continue;
@@ -136,10 +137,10 @@ public class AIController implements UnitController{
                 mount.target = target;
             }else{
                 if(ret){
-                    mount.target = findTarget(mountX, mountY, weapon.bullet.range(), weapon.bullet.collidesAir, weapon.bullet.collidesGround);
+                    mount.target = findTarget(mountX, mountY, wrange, weapon.bullet.collidesAir, weapon.bullet.collidesGround);
                 }
 
-                if(checkTarget(mount.target, mountX, mountY, weapon.bullet.range())){
+                if(checkTarget(mount.target, mountX, mountY, wrange)){
                     mount.target = null;
                 }
             }
@@ -147,7 +148,7 @@ public class AIController implements UnitController{
             boolean shoot = false;
 
             if(mount.target != null){
-                shoot = mount.target.within(mountX, mountY, weapon.bullet.range() + (mount.target instanceof Sized s ? s.hitSize()/2f : 0f)) && shouldShoot();
+                shoot = mount.target.within(mountX, mountY, wrange + (mount.target instanceof Sized s ? s.hitSize()/2f : 0f)) && shouldShoot();
 
                 Vec2 to = Predict.intercept(unit, mount.target, weapon.bullet.speed);
                 mount.aimX = to.x;

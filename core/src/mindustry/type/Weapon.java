@@ -216,6 +216,10 @@ public class Weapon implements Cloneable{
         Draw.z(z);
     }
 
+    public float range(){
+        return unitSpawned != null ? unitSpawned.lifetime * unitSpawned.speed : bullet.range();
+    }
+
     public void update(Unit unit, WeaponMount mount){
         boolean can = unit.canShoot();
         float lastReload = mount.reload;

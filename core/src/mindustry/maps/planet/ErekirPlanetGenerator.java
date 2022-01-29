@@ -17,7 +17,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ErekirPlanetGenerator extends PlanetGenerator{
-    //public float scl = 2f;
     public float heightScl = 0.9f, octaves = 8, persistence = 0.7f, heightPow = 3f, heightMult = 1.6f;
 
     //TODO inline/remove
@@ -407,6 +406,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         //it is very hot
         state.rules.attributes.set(Attribute.heat, 0.8f);
         state.rules.environment = sector.planet.defaultEnv;
+
+        //TODO remove slag and arkycite around core.
         Schematics.placeLaunchLoadout(spawnX, spawnY);
 
         //all sectors are wave sectors
