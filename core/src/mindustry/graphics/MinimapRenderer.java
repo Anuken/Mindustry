@@ -226,6 +226,8 @@ public class MinimapRenderer{
 
         if(tile.block() == Blocks.air && tile.y < world.height() - 1 && world.tile(tile.x, tile.y + 1).block().solid){
             color.mul(0.7f);
+        }else if(tile.floor().isLiquid && (tile.y >= world.height() - 1 || !world.tile(tile.x, tile.y + 1).floor().isLiquid)){
+            color.mul(0.84f, 0.84f, 0.9f, 1f);
         }
 
         return color.rgba();

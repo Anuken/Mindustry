@@ -1,7 +1,6 @@
 package mindustry.ai.types;
 
 import arc.math.*;
-import arc.util.*;
 import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -23,7 +22,6 @@ public class FlyingFollowAI extends FlyingAI{
 
         if(shouldFaceTarget()){
             unit.lookAt(target);
-            Log.info("lookAt target = @", target);
         }else if(following != null){
             unit.lookAt(following);
         }
