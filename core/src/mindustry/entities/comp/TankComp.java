@@ -32,9 +32,10 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
         //dust
         if(walked && !headless){
             treadEffectTime += Time.delta;
-            if(treadEffectTime >= 6f){
+            if(treadEffectTime >= 6f && type.treadRects.length > 0){
                 var treadRegion = type.treadRegion;
-                var treadRect = type.treadRect;
+                //first rect should always be at the back
+                var treadRect = type.treadRects[0];
 
                 float xOffset = (treadRegion.width/2f - (treadRect.x + treadRect.width/2f)) / 4f;
                 float yOffset = (treadRegion.height/2f - (treadRect.y + treadRect.height/2f)) / 4f;

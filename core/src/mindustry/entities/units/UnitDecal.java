@@ -9,6 +9,7 @@ public class UnitDecal{
     public float x, y, rotation;
     public float layer = Layer.flyingUnit + 1f;
     public float xScale = 1f, yScale = 1f;
+    public Blending blending = Blending.normal;
     public Color color = Color.white;
 
     public UnitDecal(String region, float x, float y, float rotation, float layer, Color color){

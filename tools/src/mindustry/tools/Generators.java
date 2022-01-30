@@ -521,22 +521,27 @@ public class Generators{
                 //generate tank animation
                 if(sample instanceof Tankc){
                     Pixmap pix = get(type.treadRegion);
-                    //slice is always 1 pixel wide
-                    Pixmap slice = pix.crop((int)type.treadRect.x, (int)type.treadRect.y, 1, (int)type.treadRect.height);
-                    int frames = type.treadFrames;
-                    for(int i = 0; i < frames; i++){
-                        int pullOffset = type.treadPullOffset;
-                        Pixmap frame = new Pixmap(slice.width, slice.height);
-                        for(int y = 0; y < slice.height; y++){
-                            int idx = y + i;
-                            if(idx >= slice.height){
-                                idx -= slice.height;
-                                idx += pullOffset;
-                            }
 
-                            frame.setRaw(0, y, slice.getRaw(0, idx));
+                    for(int r = 0; r < type.treadRects.length; r++){
+                        Rect treadRect = type.treadRects[r];
+                        //slice is always 1 pixel wide
+                        Pixmap slice = pix.crop((int)treadRect.x, (int)treadRect.y, 1, (int)treadRect.height);
+                        int frames = type.treadFrames;
+                        for(int i = 0; i < frames; i++){
+                            int pullOffset = type.treadPullOffset;
+                            Pixmap frame = new Pixmap(slice.width, slice.height);
+                            for(int y = 0; y < slice.height; y++){
+                                int idx = y + i;
+                                if(idx >= slice.height){
+                                    idx -= slice.height;
+                                    idx += pullOffset;
+                                    idx = Mathf.mod(idx, slice.height);
+                                }
+
+                                frame.setRaw(0, y, slice.getRaw(0, idx));
+                            }
+                            save(frame, type.name + "-treads" + r + "-" + i);
                         }
-                        save(frame, type.name + "-treads" + i);
                     }
                 }
 

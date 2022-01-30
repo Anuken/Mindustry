@@ -11,6 +11,7 @@ import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -72,7 +73,7 @@ public class UnitTypes{
     public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone;
 
     //tank
-    public static @EntityDef({Unitc.class, Tankc.class}) UnitType vanquish;
+    public static @EntityDef({Unitc.class, Tankc.class}) UnitType vanquish, conquer;
 
     //endregion
 
@@ -2436,7 +2437,7 @@ public class UnitTypes{
             health = 9000;
             armor = 20f;
             areaDamage = 12f;
-            treadRect = new Rect(22f, 16f, 28f, 130f);
+            treadRects = new Rect[]{new Rect(22, 16, 28, 130)};
 
             weapons.add(new Weapon("vanquish-weapon"){{
                 layerOffset = 0.0001f;
@@ -2497,6 +2498,20 @@ public class UnitTypes{
                     }};
                 }});
             }
+        }};
+
+        conquer = new TankUnitType("conquer"){{
+            hitSize = 44f;
+            treadPullOffset = 1;
+            speed = 0.48f;
+            health = 20000;
+            armor = 25f;
+            areaDamage = 22f;
+            rotateSpeed = 0.9f;
+            treadRects = new Rect[]{new Rect(27, 152, 56, 73), new Rect(24, 51, 29, 17), new Rect(59, 18, 39, 19)};
+            decals.add(new UnitDecal("conquer-glow", 0, 0, 0, -1, Pal.turretHeat.cpy()){{
+                blending = Blending.additive;
+            }});
         }};
 
         //endregion

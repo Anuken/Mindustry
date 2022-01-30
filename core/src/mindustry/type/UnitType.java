@@ -119,7 +119,7 @@ public class UnitType extends UnlockableContent{
     public boolean mechStepParticles = false;
     public Color mechLegColor = Pal.darkMetal;
 
-    public Rect treadRect = new Rect();
+    public Rect[] treadRects = {};
     public int treadFrames = 18;
     public int treadPullOffset = 0;
 
@@ -176,7 +176,8 @@ public class UnitType extends UnlockableContent{
     public Seq<Weapon> weapons = new Seq<>();
     public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion,
         softShadowRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion, treadRegion;
-    public TextureRegion[] wreckRegions, segmentRegions, segmentOutlineRegions, treadRegions;
+    public TextureRegion[] wreckRegions, segmentRegions, segmentOutlineRegions;
+    public TextureRegion[][] treadRegions;
 
     protected float buildTime = -1f;
     protected @Nullable ItemStack[] totalRequirements, cachedRequirements, firstRequirements;
@@ -524,9 +525,11 @@ public class UnitType extends UnlockableContent{
         footRegion = Core.atlas.find(name + "-foot");
         treadRegion = Core.atlas.find(name + "-treads");
         if(treadRegion.found()){
-            treadRegions = new TextureRegion[treadFrames];
-            for(int i = 0; i < treadFrames; i++){
-                treadRegions[i] = Core.atlas.find(name + "-treads" + i);
+            treadRegions = new TextureRegion[treadRects.length][treadFrames];
+            for(int r = 0; r < treadRects.length; r++){
+                for(int i = 0; i < treadFrames; i++){
+                    treadRegions[r][i] = Core.atlas.find(name + "-treads" + r + "-" + i);
+                }
             }
         }
         legBaseRegion = Core.atlas.find(name + "-leg-base", name + "-leg");
@@ -767,10 +770,12 @@ public class UnitType extends UnlockableContent{
         if(decals.size > 0){
             float base = unit.rotation - 90;
             for(var d : decals){
-                Draw.z(d.layer);
+                Draw.blend(d.blending);
+                Draw.z(d.layer <= 0f ? z : d.layer);
                 Draw.scl(d.xScale, d.yScale);
                 Draw.color(d.color);
                 Draw.rect(d.region, unit.x + Angles.trnsx(base, d.x, d.y), unit.y + Angles.trnsy(base, d.x, d.y), base + d.rotation);
+                Draw.blend();
             }
             Draw.reset();
             Draw.z(z);
@@ -995,13 +1000,16 @@ public class UnitType extends UnlockableContent{
 
         if(treadRegion.found()){
             int frame = (int)(unit.treadTime()) % treadFrames;
-            var region = treadRegions[frame];
-            float xOffset = treadRegion.width/2f - (treadRect.x + treadRect.width/2f);
-            float yOffset = treadRegion.height/2f - (treadRect.y + treadRect.height/2f);
+            for(int i = 0; i < treadRects.length; i ++){
+                var region = treadRegions[i][frame];
+                var treadRect = treadRects[i];
+                float xOffset = treadRegion.width/2f - (treadRect.x + treadRect.width/2f);
+                float yOffset = treadRegion.height/2f - (treadRect.y + treadRect.height/2f);
 
-            for(int i : Mathf.signs){
-                Tmp.v1.set(xOffset * i, yOffset).rotate(unit.rotation - 90);
-                Draw.rect(region, unit.x + Tmp.v1.x / 4f, unit.y + Tmp.v1.y / 4f, treadRect.width / 4f, region.height / 4f, unit.rotation - 90);
+                for(int side : Mathf.signs){
+                    Tmp.v1.set(xOffset * side, yOffset).rotate(unit.rotation - 90);
+                    Draw.rect(region, unit.x + Tmp.v1.x / 4f, unit.y + Tmp.v1.y / 4f, treadRect.width / 4f, region.height / 4f, unit.rotation - 90);
+                }
             }
         }
     }
