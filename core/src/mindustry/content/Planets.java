@@ -100,6 +100,8 @@ public class Planets{
                 new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Pal.spore, 0.55f).a(0.75f), 2, 0.45f, 1f, 0.41f)
             );
 
+            allowWaveSimulation = true;
+            allowSectorInvasion = true;
             allowLaunchSchematics = true;
             atmosphereColor = Color.valueOf("3c1b8f");
             atmosphereRadIn = 0.02f;

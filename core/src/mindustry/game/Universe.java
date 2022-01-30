@@ -194,7 +194,7 @@ public class Universe{
                         }
 
                         int wavesPassed = (int)(sector.info.secondsPassed*60f / sector.info.waveSpacing);
-                        boolean attacked = sector.info.waves;
+                        boolean attacked = sector.info.waves && sector.planet.allowWaveSimulation;
 
                         if(attacked){
                             sector.info.wavesPassed = wavesPassed;
@@ -243,7 +243,7 @@ public class Universe{
                     }
 
                     //queue random invasions
-                    if(!sector.isAttacked() && sector.info.minutesCaptured > invasionGracePeriod && sector.info.hasSpawns){
+                    if(!sector.isAttacked() && sector.planet.allowSectorInvasion && sector.info.minutesCaptured > invasionGracePeriod && sector.info.hasSpawns){
                         int count = sector.near().count(Sector::hasEnemyBase);
 
                         //invasion chance depends on # of nearby bases

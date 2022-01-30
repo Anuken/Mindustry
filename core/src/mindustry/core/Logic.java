@@ -64,25 +64,28 @@ public class Logic implements ApplicationListener{
                 SectorInfo info = state.rules.sector.info;
                 info.write();
 
-                //how much wave time has passed
-                int wavesPassed = info.wavesPassed;
+                //only simulate waves if the planet allows it
+                if(state.rules.sector.planet.allowWaveSimulation){
+                    //how much wave time has passed
+                    int wavesPassed = info.wavesPassed;
 
-                //wave has passed, remove all enemies, they are assumed to be dead
-                if(wavesPassed > 0){
-                    Groups.unit.each(u -> {
-                        if(u.team == state.rules.waveTeam){
-                            u.remove();
-                        }
-                    });
-                }
+                    //wave has passed, remove all enemies, they are assumed to be dead
+                    if(wavesPassed > 0){
+                        Groups.unit.each(u -> {
+                            if(u.team == state.rules.waveTeam){
+                                u.remove();
+                            }
+                        });
+                    }
 
-                //simulate passing of waves
-                if(wavesPassed > 0){
-                    //simulate wave counter moving forward
-                    state.wave += wavesPassed;
-                    state.wavetime = state.rules.waveSpacing;
+                    //simulate passing of waves
+                    if(wavesPassed > 0){
+                        //simulate wave counter moving forward
+                        state.wave += wavesPassed;
+                        state.wavetime = state.rules.waveSpacing;
 
-                    SectorDamage.applyCalculatedDamage();
+                        SectorDamage.applyCalculatedDamage();
+                    }
                 }
 
                 //reset values

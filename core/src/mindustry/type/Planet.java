@@ -90,6 +90,10 @@ public class Planet extends UnlockableContent{
     public boolean hasAtmosphere = true;
     /** Whether to allow users to specify a custom launch schematic for this map. */
     public boolean allowLaunchSchematics = false;
+    /** Whether to allow sectors to simulate waves in the background. */
+    public boolean allowWaveSimulation = false;
+    /** Whether to simulate sector invasions from enemy bases. */
+    public boolean allowSectorInvasion = false;
     /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system.*/
     public @Nullable Planet parent;
     /** The root parent of the whole solar system this planet is in. */

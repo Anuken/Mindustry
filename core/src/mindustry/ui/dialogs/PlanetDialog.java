@@ -412,12 +412,13 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(state.uiAlpha > 0.001f){
             for(Sector sec : planet.sectors){
                 if(sec.hasBase()){
-                    for(Sector enemy : sec.near()){
-                        if(enemy.hasEnemyBase()){
-                            planets.drawArc(planet, enemy.tile.v, sec.tile.v, Team.crux.color.write(Tmp.c2).a(state.uiAlpha), Color.clear, 0.24f, 110f, 25);
+                    if(planet.allowSectorInvasion){
+                        for(Sector enemy : sec.near()){
+                            if(enemy.hasEnemyBase()){
+                                planets.drawArc(planet, enemy.tile.v, sec.tile.v, Team.crux.color.write(Tmp.c2).a(state.uiAlpha), Color.clear, 0.24f, 110f, 25);
+                            }
                         }
                     }
-
 
                     if(selected != null && selected != sec && selected.hasBase()){
                         //imports
@@ -889,10 +890,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
     void addSurvivedInfo(Sector sector, Table table, boolean wrap){
         if(!wrap){
-            table.add(Core.bundle.format("sectors.underattack", (int)(sector.info.damage * 100))).wrapLabel(wrap).row();
+            table.add(sector.planet.allowWaveSimulation ? Core.bundle.format("sectors.underattack", (int)(sector.info.damage * 100)) : "@sectors.underattack.nodamage").wrapLabel(wrap).row();
         }
 
-        if(sector.info.wavesSurvived >= 0 && sector.info.wavesSurvived - sector.info.wavesPassed >= 0 && !sector.isBeingPlayed()){
+        if(sector.planet.allowWaveSimulation && sector.info.wavesSurvived >= 0 && sector.info.wavesSurvived - sector.info.wavesPassed >= 0 && !sector.isBeingPlayed()){
             int toCapture = sector.info.attack || sector.info.winWave <= 1 ? -1 : sector.info.winWave - (sector.info.wave + sector.info.wavesPassed);
             boolean plus = (sector.info.wavesSurvived - sector.info.wavesPassed) >= SectorDamage.maxRetWave - 1;
             table.add(Core.bundle.format("sectors.survives", Math.min(sector.info.wavesSurvived - sector.info.wavesPassed, toCapture <= 0 ? 200 : toCapture) +
@@ -1019,7 +1020,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         if(sector.isAttacked()){
             addSurvivedInfo(sector, stable, false);
-        }else if(sector.hasBase() && sector.near().contains(Sector::hasEnemyBase)){
+        }else if(sector.hasBase() && sector.planet.allowSectorInvasion && sector.near().contains(Sector::hasEnemyBase)){
             stable.add("@sectors.vulnerable");
             stable.row();
         }else if(!sector.hasBase() && sector.hasEnemyBase()){
@@ -1071,6 +1072,33 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         if(sector.preset != null && sector.preset.locked() && sector.preset.techNode != null && !sector.hasBase()){
             return;
+        }
+
+        //make sure there are no under-attack sectors (other than this one)
+        //TODO abandon button?
+        for(Planet planet : content.planets()){
+            if(!planet.allowWaveSimulation){
+                int attackedCount = planet.sectors.count(s -> s.isAttacked() && s != sector);
+
+                //if there are two or more attacked sectors... something went wrong, don't show the dialog to prevent softlock
+                if(attackedCount < 2){
+                    Sector attacked = planet.sectors.find(s -> s.isAttacked() && s != sector);
+                    if(attacked != null){
+                        BaseDialog dialog = new BaseDialog("@sector.noswitch.title");
+                        dialog.cont.add(bundle.format("sector.noswitch", attacked.name(), attacked.planet.localizedName)).maxWidth(400f).labelAlign(Align.center).center().wrap();
+                        dialog.addCloseButton();
+                        dialog.buttons.button("@sector.view", Icon.eyeSmall, () -> {
+                            dialog.hide();
+                            lookAt(attacked);
+                            selected = attacked;
+                            updateSelected();
+                        });
+                        dialog.show();
+
+                        return;
+                    }
+                }
+            }
         }
 
         boolean shouldHide = true;

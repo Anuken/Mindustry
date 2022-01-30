@@ -204,7 +204,9 @@ public class SectorInfo{
             state.rules.sector.saveInfo();
         }
 
-        SectorDamage.writeParameters(this);
+        if(state.rules.sector != null && state.rules.sector.planet.allowWaveSimulation){
+            SectorDamage.writeParameters(this);
+        }
     }
 
     /** Update averages of various stats, updates some special sector logic.
