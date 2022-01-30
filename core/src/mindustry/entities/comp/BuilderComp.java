@@ -33,6 +33,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
     @SyncLocal Queue<BuildPlan> plans = new Queue<>(1);
     @SyncLocal boolean updateBuilding = true;
 
+    private transient float buildCounter;
     private transient BuildPlan lastActive;
     private transient int lastSize;
     transient float buildAlpha = 0f;
@@ -61,85 +62,91 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : type.buildRange;
         boolean infinite = state.rules.infiniteResources || team().rules().infiniteResources;
 
-        Iterator<BuildPlan> it = plans.iterator();
-        while(it.hasNext()){
-            BuildPlan req = it.next();
-            Tile tile = world.tile(req.x, req.y);
-            if(tile == null || (req.breaking && tile.block() == Blocks.air) || (!req.breaking && ((tile.build != null && tile.build.rotation == req.rotation) || !req.block.rotate) && tile.block() == req.block)){
-                it.remove();
-            }
-        }
+        buildCounter += Time.delta;
 
-        var core = core();
+        while(buildCounter >= 1){
+            buildCounter -= 1f;
 
-        //nothing to build.
-        if(buildPlan() == null) return;
-
-        //find the next build request
-        if(plans.size > 1){
-            int total = 0;
-            BuildPlan req;
-            while((!within((req = buildPlan()).tile(), finalPlaceDst) || shouldSkip(req, core)) && total < plans.size){
-                plans.removeFirst();
-                plans.addLast(req);
-                total++;
-            }
-        }
-
-        BuildPlan current = buildPlan();
-        Tile tile = current.tile();
-
-        lastActive = current;
-        buildAlpha = 1f;
-        if(current.breaking) lastSize = tile.block().size;
-
-        if(!within(tile, finalPlaceDst)) return;
-
-        if(!headless){
-            Vars.control.sound.loop(Sounds.build, tile, 0.51f);
-        }
-
-        if(!(tile.build instanceof ConstructBuild cb)){
-            if(!current.initialized && !current.breaking && Build.validPlace(current.block, team, current.x, current.y, current.rotation)){
-                boolean hasAll = infinite || current.isRotation(team) || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item, Math.min(Mathf.round(i.amount * state.rules.buildCostMultiplier), 1)));
-
-                if(hasAll){
-                    Call.beginPlace(self(), current.block, team, current.x, current.y, current.rotation);
-                }else{
-                    current.stuck = true;
+            Iterator<BuildPlan> it = plans.iterator();
+            while(it.hasNext()){
+                BuildPlan req = it.next();
+                Tile tile = world.tile(req.x, req.y);
+                if(tile == null || (req.breaking && tile.block() == Blocks.air) || (!req.breaking && ((tile.build != null && tile.build.rotation == req.rotation) || !req.block.rotate) && tile.block() == req.block)){
+                    it.remove();
                 }
-            }else if(!current.initialized && current.breaking && Build.validBreak(team, current.x, current.y)){
-                Call.beginBreak(self(), team, current.x, current.y);
-            }else{
-                plans.removeFirst();
-                return;
             }
-        }else if((tile.team() != team && tile.team() != Team.derelict) || (!current.breaking && (cb.current != current.block || cb.tile != current.tile()))){
-            plans.removeFirst();
-            return;
+
+            var core = core();
+
+            //nothing to build.
+            if(buildPlan() == null) continue;
+
+            //find the next build request
+            if(plans.size > 1){
+                int total = 0;
+                BuildPlan req;
+                while((!within((req = buildPlan()).tile(), finalPlaceDst) || shouldSkip(req, core)) && total < plans.size){
+                    plans.removeFirst();
+                    plans.addLast(req);
+                    total++;
+                }
+            }
+
+            BuildPlan current = buildPlan();
+            Tile tile = current.tile();
+
+            lastActive = current;
+            buildAlpha = 1f;
+            if(current.breaking) lastSize = tile.block().size;
+
+            if(!within(tile, finalPlaceDst)) continue;
+
+            if(!headless){
+                Vars.control.sound.loop(Sounds.build, tile, 0.51f);
+            }
+
+            if(!(tile.build instanceof ConstructBuild cb)){
+                if(!current.initialized && !current.breaking && Build.validPlace(current.block, team, current.x, current.y, current.rotation)){
+                    boolean hasAll = infinite || current.isRotation(team) || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item, Math.min(Mathf.round(i.amount * state.rules.buildCostMultiplier), 1)));
+
+                    if(hasAll){
+                        Call.beginPlace(self(), current.block, team, current.x, current.y, current.rotation);
+                    }else{
+                        current.stuck = true;
+                    }
+                }else if(!current.initialized && current.breaking && Build.validBreak(team, current.x, current.y)){
+                    Call.beginBreak(self(), team, current.x, current.y);
+                }else{
+                    plans.removeFirst();
+                    continue;
+                }
+            }else if((tile.team() != team && tile.team() != Team.derelict) || (!current.breaking && (cb.current != current.block || cb.tile != current.tile()))){
+                plans.removeFirst();
+                continue;
+            }
+
+            if(tile.build instanceof ConstructBuild && !current.initialized){
+                Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, team, self(), current.breaking)));
+                current.initialized = true;
+            }
+
+            //if there is no core to build with or no build entity, stop building!
+            if((core == null && !infinite) || !(tile.build instanceof ConstructBuild entity)){
+                continue;
+            }
+
+            float bs = 1f / entity.buildCost * Time.delta * type.buildSpeed * buildSpeedMultiplier * state.rules.buildSpeed(team);
+
+            //otherwise, update it.
+            if(current.breaking){
+                entity.deconstruct(self(), core, bs);
+            }else{
+                entity.construct(self(), core, bs, current.config);
+            }
+
+            current.stuck = Mathf.equal(current.progress, entity.progress);
+            current.progress = entity.progress;
         }
-
-        if(tile.build instanceof ConstructBuild && !current.initialized){
-            Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, team, self(), current.breaking)));
-            current.initialized = true;
-        }
-
-        //if there is no core to build with or no build entity, stop building!
-        if((core == null && !infinite) || !(tile.build instanceof ConstructBuild entity)){
-            return;
-        }
-
-        float bs = 1f / entity.buildCost * Time.delta * type.buildSpeed * buildSpeedMultiplier * state.rules.buildSpeed(team);
-
-        //otherwise, update it.
-        if(current.breaking){
-            entity.deconstruct(self(), core, bs);
-        }else{
-            entity.construct(self(), core, bs, current.config);
-        }
-
-        current.stuck = Mathf.equal(current.progress, entity.progress);
-        current.progress = entity.progress;
     }
 
     /** Draw all current build plans. Does not draw the beam effect, only the positions. */
