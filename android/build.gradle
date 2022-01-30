@@ -41,9 +41,6 @@ android{
             assets.srcDirs = ['assets', 'src/main/assets', '../core/assets/']
             jniLibs.srcDirs = ['libs']
         }
-        gp{
-            java.srcDirs = ['srcgp']
-        }
 
         androidTest.setRoot('tests')
     }
@@ -95,34 +92,11 @@ android{
         }
     }
 
-    buildTypes{
-        all{
-            minifyEnabled = true
-            shrinkResources = true
-            //this is the ONLY WAY I could find to force r8 to keep its filthy hands off of my default interfaces.
-            //may have undesirable side effects
-            debuggable = true
-            proguardFiles("proguard-rules.pro")
-        }
-    }
-
     if(project.hasProperty("RELEASE_STORE_FILE") || System.getenv("CI") == "true"){
         buildTypes{
             release{
                 signingConfig signingConfigs.release
             }
-        }
-    }
-
-    // Specifies one flavor dimension.
-    flavorDimensions "version"
-    productFlavors{
-        standard{
-
-        }
-        gp{
-            applicationIdSuffix ".gp"
-            versionNameSuffix "-gp"
         }
     }
 }
@@ -135,9 +109,6 @@ dependencies{
 
     natives "com.github.Anuken.Arc:natives-android:${getArcHash()}"
     natives "com.github.Anuken.Arc:natives-freetype-android:${getArcHash()}"
-
-    gpImplementation "com.google.android.gms:play-services-games:21.0.0"
-    gpImplementation "com.google.android.gms:play-services-auth:19.0.0"
 
     //TODO dynamically find best android platform jar instead of hard-coding to 30
     def sdkFile = new File((String)findSdkDir(), "/platforms/android-30/android.jar")

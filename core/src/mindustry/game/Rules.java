@@ -31,7 +31,7 @@ public class Rules{
     public boolean pvp;
     /** Whether to pause the wave timer until all enemies are destroyed. */
     public boolean waitEnemies = false;
-    /** Determinates if gamemode is attack mode. */
+    /** Determines if gamemode is attack mode. */
     public boolean attackMode = false;
     /** Whether this is the editor gamemode. */
     public boolean editor = false;
