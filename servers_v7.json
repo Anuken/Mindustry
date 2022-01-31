@@ -78,5 +78,9 @@
   {
     "name": "Beyond Anarchy",
     "address": ["45.156.25.49"]
+  },
+  {
+    "name": "LocalHost",
+    "adress": ["localhost", "127.0.0.1"]
   }
 ]
