@@ -454,7 +454,7 @@ public class UnitType extends UnlockableContent{
                 Fx.rand.setSeed(e.id);
                 for(int i = 0; i < 3; i++){
                     Fx.v.trns(e.rotation + Fx.rand.range(40f), Fx.rand.random(6f * e.finpow()));
-                    Fill.circle(e.x + Fx.v.x + Fx.rand.range(4f), e.y + Fx.v.y + Fx.rand.range(4f), e.fout() * hitSize / 28f * 3f * Fx.rand.random(0.8f, 1.1f) + 0.3f);
+                    Fill.circle(e.x + Fx.v.x + Fx.rand.range(4f), e.y + Fx.v.y + Fx.rand.range(4f), Math.min(e.fout(), e.fin() * e.lifetime / 8f) * hitSize / 28f * 3f * Fx.rand.random(0.8f, 1.1f) + 0.3f);
                 }
             }).layer(Layer.debris);
         }
@@ -555,6 +555,10 @@ public class UnitType extends UnlockableContent{
         for(int i = 0; i < segments; i++){
             segmentRegions[i] = Core.atlas.find(name + "-segment" + i);
             segmentOutlineRegions[i] = Core.atlas.find(name + "-segment-outline" + i);
+        }
+
+        for(var decal : decals){
+            decal.loadedRegion = Core.atlas.find(decal.region);
         }
 
         clipSize = Math.max(region.width * 2f, clipSize);
@@ -774,7 +778,7 @@ public class UnitType extends UnlockableContent{
                 Draw.z(d.layer <= 0f ? z : d.layer);
                 Draw.scl(d.xScale, d.yScale);
                 Draw.color(d.color);
-                Draw.rect(d.region, unit.x + Angles.trnsx(base, d.x, d.y), unit.y + Angles.trnsy(base, d.x, d.y), base + d.rotation);
+                Draw.rect(d.loadedRegion, unit.x + Angles.trnsx(base, d.x, d.y), unit.y + Angles.trnsy(base, d.x, d.y), base + d.rotation);
                 Draw.blend();
             }
             Draw.reset();

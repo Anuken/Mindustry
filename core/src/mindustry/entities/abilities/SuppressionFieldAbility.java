@@ -31,6 +31,7 @@ public class SuppressionFieldAbility extends Ability{
     public float particleLen = 7f;
     public float rotateScl = 3f;
     public float particleLife = 110f;
+    public boolean active = true;
     public Interp particleInterp = f -> Interp.circleOut.apply(Interp.slope.apply(f));
     public Color particleColor = Pal.sap.cpy();
 
@@ -42,6 +43,8 @@ public class SuppressionFieldAbility extends Ability{
 
     @Override
     public void update(Unit unit){
+        if(!active) return;
+
         if((timer += Time.delta) >= reload){
             any = false;
             builds.clear();
@@ -88,7 +91,7 @@ public class SuppressionFieldAbility extends Ability{
         float rx = unit.x + Tmp.v1.x, ry = unit.y + Tmp.v1.y;
 
         float base = (Time.time / particleLife);
-        rand.setSeed(unit.id);
+        rand.setSeed(unit.id + hashCode());
         Draw.color(particleColor);
         for(int i = 0; i < particles; i++){
             float fin = (rand.random(1f) + base) % 1f, fout = 1f - fin;
@@ -110,7 +113,7 @@ public class SuppressionFieldAbility extends Ability{
         Fill.circle(rx, ry, rad * orbMidScl);
 
         //TODO improve
-        if(heat > 0.001f){
+        if(heat > 0.001f && false){
             Draw.color(Pal.sapBullet);
             Lines.stroke(1.2f * heat * Mathf.absin(10f, 1f));
             Lines.circle(rx, ry, range);

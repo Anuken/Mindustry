@@ -52,7 +52,7 @@ public class UnitTypes{
 
     //air + payload
     public static @EntityDef({Unitc.class, Payloadc.class}) UnitType mega,
-    incite, emanate, quell;
+    incite, emanate, quell, disrupt;
 
     //air + payload, legacy
     public static @EntityDef(value = {Unitc.class, Payloadc.class}, legacy = true) UnitType quad;
@@ -2509,8 +2509,45 @@ public class UnitTypes{
             areaDamage = 22f;
             rotateSpeed = 0.9f;
             treadRects = new Rect[]{new Rect(27, 152, 56, 73), new Rect(24, 51, 29, 17), new Rect(59, 18, 39, 19)};
-            decals.add(new UnitDecal("conquer-glow", 0, 0, 0, -1, Pal.turretHeat.cpy()){{
-                blending = Blending.additive;
+
+            //TODO maybe different sprite, weapon impl
+            weapons.add(new Weapon("conquer-weapon"){{
+                layerOffset = 0.0001f;
+                reload = 120f;
+                shootY = 71f / 4f;
+                shake = 5f;
+                recoil = 4f;
+                rotate = true;
+                rotateSpeed = 0.6f;
+                mirror = false;
+                x = 0f;
+                shadow = 32f;
+                y = -5f;
+                heatColor = Color.valueOf("f9350f");
+                cooldownTime = 80f;
+
+                bullet = new BasicBulletType(8f, 110){{
+                    sprite = "missile-large";
+                    width = 9.5f;
+                    height = 15f;
+                    lifetime = 30f;
+                    hitSize = 6f;
+                    shootEffect = Fx.shootTitan;
+                    smokeEffect = Fx.shootSmokeTitan;
+                    pierceCap = 2;
+                    pierce = true;
+                    pierceBuilding = true;
+                    hitColor = backColor = trailColor = Color.valueOf("feb380");
+                    frontColor = Color.white;
+                    trailWidth = 3.1f;
+                    trailLength = 8;
+                    hitEffect = despawnEffect = Fx.blastExplosion;
+                }};
+            }});
+
+            //TODO could change color when shooting
+            decals.add(new UnitDecal("conquer-glow", Pal.turretHeat.cpy(), Blending.additive){{
+                layer = -1f;
             }});
         }};
 
@@ -2685,6 +2722,95 @@ public class UnitTypes{
             setEnginesMirror(
             new UnitEngine(62 / 4f, -60 / 4f, 3.9f, 315f),
             new UnitEngine(72 / 4f, -29 / 4f, 3f, 315f)
+            );
+        }};
+
+        disrupt = new UnitType("disrupt"){{
+            defaultController = FlyingFollowAI::new;
+            envDisabled = 0;
+
+            outlineColor = Pal.darkOutline;
+            lowAltitude = false;
+            flying = true;
+            drag = 0.07f;
+            speed = 1f;
+            rotateSpeed = 2.5f;
+            accel = 0.1f;
+            health = 10000f;
+            armor = 7f;
+            hitSize = 46f;
+            payloadCapacity = Mathf.sqr(6f) * tilePayload;
+
+            engineSize = 6f;
+            engineOffset = 25.25f;
+
+            float orbRad = 5f, partRad = 3f;
+            int parts = 10;
+
+            abilities.add(new SuppressionFieldAbility(){{
+                orbRadius = orbRad;
+                particleSize = partRad;
+                y = 10f;
+                particles = parts;
+            }});
+
+            for(int i : Mathf.signs){
+                abilities.add(new SuppressionFieldAbility(){{
+                    orbRadius = orbRad;
+                    particleSize = partRad;
+                    y = -33f / 4f;
+                    x = 43f * i / 4f;
+                    particles = parts;
+                    //visual only, the middle one does the actual suppressing
+                    active = false;
+                }});
+            }
+
+            if(false)
+            weapons.add(new Weapon("quell-weapon"){{
+                x = 51 / 4f;
+                y = 5 / 4f;
+                rotate = true;
+                rotateSpeed = 2f;
+                reload = 70f;
+                layerOffset = -0.001f;
+                recoil = 1f;
+                rotationLimit = 60f;
+
+                bullet = new BulletType(){{
+                    shootEffect = Fx.shootBig;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    shake = 1f;
+                    speed = 0f;
+                    keepVelocity = false;
+                }};
+
+                unitSpawned = new MissileUnitType("quell-missile"){{
+                    speed = 3.8f;
+                    maxRange = 80f;
+                    outlineColor = Pal.darkOutline;
+                    health = 45;
+
+                    weapons.add(new Weapon(){{
+                        shootCone = 360f;
+                        mirror = false;
+                        reload = 1f;
+                        shootOnDeath = true;
+                        bullet = new BulletType(){{
+                            rangeOverride = 20f;
+                            shootEffect = Fx.massiveExplosion;
+                            killShooter = true;
+                            //TODO status?
+                            splashDamageRadius = 30f;
+                            splashDamage = 120f;
+                        }};
+                    }});
+                }};
+            }});
+
+            setEnginesMirror(
+            new UnitEngine(95 / 4f, -56 / 4f, 5f, 330f),
+            new UnitEngine(89 / 4f, -95 / 4f, 4f, 315f)
             );
         }};
 

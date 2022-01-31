@@ -17,5 +17,4 @@ public class TankUnitType extends UnitType{
         outlineColor = Pal.darkOutline;
     }
 
-
 }
