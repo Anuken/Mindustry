@@ -3105,7 +3105,7 @@ public class Blocks{
         //TODO bad name
         sublimate = new ContinuousLiquidTurret("sublimate"){{
             //TODO requirements
-            requirements(Category.turret, with(Items.tungsten, 150, Items.silicon, 160, Items.oxide, 50, Items.beryllium, 250));
+            requirements(Category.turret, with(Items.tungsten, 150, Items.silicon, 200, Items.oxide, 40, Items.beryllium, 400));
 
             draw = new DrawTurret("reinforced-"){{
 
@@ -3147,14 +3147,14 @@ public class Blocks{
             //TODO balance, set up, where is liquid/sec displayed? status effects maybe?
             ammo(
             Liquids.ozone, new ContinuousFlameBulletType(){{
-                damage = 9f;
+                damage = 85f;
                 length = range;
                 knockback = 1f;
 
                 colors = new Color[]{Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white};
             }},
             Liquids.cyanogen, new ContinuousFlameBulletType(){{
-                damage = 20f;
+                damage = 180f;
                 rangeChange = 70f;
                 length = range + rangeChange;
                 knockback = 2f;

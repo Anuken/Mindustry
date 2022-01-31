@@ -11,7 +11,6 @@ import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -35,7 +34,7 @@ public class UnitTypes{
     public static @EntityDef(value = {Unitc.class, Mechc.class}, legacy = true) UnitType nova, pulsar, quasar;
 
     //legs
-    public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax, bulwark;
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax, bulwark, krepost;
 
     //legs, legacy
     public static @EntityDef(value = {Unitc.class, Legsc.class}, legacy = true) UnitType spiroct, arkyid, toxopid;
@@ -2508,7 +2507,7 @@ public class UnitTypes{
             armor = 25f;
             areaDamage = 22f;
             rotateSpeed = 0.9f;
-            treadRects = new Rect[]{new Rect(27, 152, 56, 73), new Rect(24, 51, 29, 17), new Rect(59, 18, 39, 19)};
+            treadRects = new Rect[]{new Rect(27, 152, 56, 73), new Rect(24, 51 - 9, 29, 17), new Rect(59, 18 - 9, 39, 19)};
 
             //TODO maybe different sprite, weapon impl
             weapons.add(new Weapon("conquer-weapon"){{
@@ -2522,7 +2521,7 @@ public class UnitTypes{
                 mirror = false;
                 x = 0f;
                 shadow = 32f;
-                y = -5f;
+                y = -8f;
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
@@ -2546,9 +2545,9 @@ public class UnitTypes{
             }});
 
             //TODO could change color when shooting
-            decals.add(new UnitDecal("conquer-glow", Pal.turretHeat.cpy(), Blending.additive){{
-                layer = -1f;
-            }});
+            //decals.add(new UnitDecal("conquer-glow", Pal.turretHeat.cpy(), Blending.additive){{
+            //    layer = -1f;
+            //}});
         }};
 
         //endregion

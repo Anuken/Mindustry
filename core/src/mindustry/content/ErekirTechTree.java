@@ -89,7 +89,7 @@ public class ErekirTechTree{
             node(turbineCondenser, () -> {
                 node(beamNode, () -> {
                     node(ventCondenser, Seq.with(new OnSector(aware)), () -> {
-                        node(chemicalCombustionChamber, () -> {
+                        node(chemicalCombustionChamber, Seq.with(new OnSector(three)), () -> {
                             node(pyrolysisGenerator, () -> {
 
                             });
@@ -111,7 +111,7 @@ public class ErekirTechTree{
 
                 node(reinforcedConduit, () -> {
                     //TODO maybe should be even later
-                    node(reinforcedPump, Seq.with(new SectorComplete(aware)), () -> {
+                    node(reinforcedPump, Seq.with(new OnSector(three)), () -> {
                         //TODO T2 pump, consume cyanogen or similar
                     });
 
@@ -122,7 +122,7 @@ public class ErekirTechTree{
 
                         node(reinforcedLiquidRouter, () -> {
                             node(reinforcedLiquidContainer, () -> {
-                                node(reinforcedLiquidTank, Seq.with(new SectorComplete(aware)), () -> {
+                                node(reinforcedLiquidTank, Seq.with(new SectorComplete(three)), () -> {
 
                                 });
                             });
@@ -132,8 +132,7 @@ public class ErekirTechTree{
 
                 node(siliconArcFurnace, () -> {
                     node(cliffCrusher, () -> {
-                        //TODO should be gated on landing of 3rd sector, not complete?
-                        node(electrolyzer, Seq.with(new SectorComplete(aware)), () -> {
+                        node(electrolyzer, Seq.with(new OnSector(three)), () -> {
                             node(oxidationChamber, () -> {
                                 node(electricHeater, () -> {
                                     node(heatRedirector, () -> {
@@ -204,7 +203,9 @@ public class ErekirTechTree{
             //TODO more sectors
             node(onset, () -> {
                 node(aware, Seq.with(new SectorComplete(onset), new Research(ductRouter)), () -> {
+                    node(three, Seq.with(new SectorComplete(aware), new Research(reinforcedContainer), new Research(ductUnloader), new Research(ventCondenser)), () -> {
 
+                    });
                 });
             });
 
