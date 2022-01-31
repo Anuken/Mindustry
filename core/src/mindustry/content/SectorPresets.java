@@ -124,7 +124,7 @@ public class SectorPresets{
         }};
 
         three = new SectorPreset("three", erekir, 32){{
-            captureWave = 100;
+            captureWave = 8;
             difficulty = 8;
         }};
 
