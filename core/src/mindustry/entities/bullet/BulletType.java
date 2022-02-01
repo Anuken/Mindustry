@@ -50,15 +50,15 @@ public class BulletType extends Content implements Cloneable{
     /** Effect created when shooting. */
     public Effect shootEffect = Fx.shootSmall;
     /** Shooting effect color. */
-    public Color shootColor;
+    public @Nullable Color shootColor;
     /** Effect created when charging completes; only usable in single-shot weapons with a firstShotDelay / shotDelay. */
     public Effect chargeShootEffect = Fx.none;
     /** Charging completion effect color */
-    public Color chargeShootColor;
+    public @Nullable Color chargeShootColor;
     /** Extra smoke effect created when shooting. */
     public Effect smokeEffect = Fx.shootSmallSmoke;
     /** Smoke effect color */
-    public Color smokeColor;
+    public @Nullable Color smokeColor;
     /** Sound made when hitting something or getting removed.*/
     public Sound hitSound = Sounds.none;
     /** Sound made when hitting something or getting removed.*/
