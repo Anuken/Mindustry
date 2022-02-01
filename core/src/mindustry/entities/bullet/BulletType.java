@@ -127,6 +127,14 @@ public class BulletType extends Content implements Cloneable{
 
     //additional effects
 
+    /**
+     * Should status and despawnHit should be automatically set.
+     *
+     * By default, status is set to StatusEffect.shocked when lightning > 0,
+     * and despawnHit is set to true if there's splash damage, frag, or lightning
+     */
+    public boolean autoDefaults = true;
+
     public float fragCone = 360f;
     public float fragAngle = 0f;
     public int fragBullets = 9;
@@ -411,18 +419,20 @@ public class BulletType extends Content implements Cloneable{
             //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
         }
 
-        if(lightning > 0){
-            if(status == StatusEffects.none){
-                status = StatusEffects.shocked;
+        if(autoDefaults){
+            if(lightning > 0){
+                if(status == StatusEffects.none){
+                    status = StatusEffects.shocked;
+                }
+            }
+
+            if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
+                despawnHit = true;
             }
         }
 
         if(lightningType == null){
             lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
-        }
-
-        if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
-            despawnHit = true;
         }
 
         if(lightRadius == -1){
