@@ -127,6 +127,7 @@ public class Pal{
 
     redLight = Color.valueOf("feb380"),
     slagOrange = Color.valueOf("ffa166"),
+    techBlue = Color.valueOf("8ca9e8"),
 
     vent = Color.valueOf("6b4e4e");
 }

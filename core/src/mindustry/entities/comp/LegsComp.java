@@ -62,18 +62,18 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
     }
 
     public void resetLegs(float legLength){
-        float rot = baseRotation;
         int count = type.legCount;
 
         this.legs = new Leg[count];
 
-        float spacing = 360f / count;
-
         for(int i = 0; i < legs.length; i++){
             Leg l = new Leg();
 
-            l.joint.trns(i * spacing + rot, legLength/2f + type.legBaseOffset).add(x, y);
-            l.base.trns(i * spacing + rot, legLength + type.legBaseOffset).add(x, y);
+            float dstRot = legAngle(i) + (type.lockLegBase ? rotation - baseRotation : baseRotation);
+            Vec2 baseOffset = legOffset(Tmp.v5, i).add(x, y);
+
+            l.joint.trns(dstRot, legLength/2f).add(baseOffset);
+            l.base.trns(dstRot, legLength).add(baseOffset);
 
             legs[i] = l;
         }
@@ -100,13 +100,14 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         float moveSpeed = type.legSpeed;
         int div = Math.max(legs.length / type.legGroupSize, 2);
         moveSpace = legLength / 1.6f / (div / 2f) * type.legMoveSpace;
-        totalLength += Mathf.dst(deltaX(), deltaY());
+        //TODO should move legs even when still, based on speed. also, to prevent "slipping", make sure legs move when they are too far from their destination
+        totalLength += type.legContinuousMove ? type.speed : Mathf.dst(deltaX(), deltaY());
 
         float trns = moveSpace * 0.85f * type.legTrns;
 
         //rotation + offset vector
-        Vec2 moveOffset = Tmp.v4.trns(rot, trns);
         boolean moving = moving();
+        Vec2 moveOffset = !moving ? Tmp.v4.setZero() : Tmp.v4.trns(Angles.angle(deltaX(), deltaY()), trns);
 
         lastDeepFloor = null;
         int deeps = 0;
@@ -116,6 +117,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             Vec2 baseOffset = legOffset(Tmp.v5, i).add(x, y);
             Leg l = legs[i];
 
+            //TODO is limiting twice necessary?
             l.joint.sub(baseOffset).limit(type.maxStretch * legLength/2f).add(baseOffset);
             l.base.sub(baseOffset).limit(type.maxStretch * legLength).add(baseOffset);
 
@@ -141,7 +143,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             if(l.group != group){
 
                 //create effect when transitioning to a group it can't move in
-                if(!move && i % div == l.group){
+                if(!move && (moving || !type.legContinuousMove) && i % div == l.group){
                     if(floor.isLiquid){
                         floor.walkEffect.at(l.base.x, l.base.y, type.rippleScale, floor.mapColor);
                         floor.walkSound.at(x, y, 1f, floor.walkSoundVolume);
@@ -179,6 +181,10 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             }
 
             l.joint.lerpDelta(jointDest, moveSpeed / 4f);
+
+            //limit again after updating
+            l.joint.sub(baseOffset).limit(type.maxStretch * legLength/2f).add(baseOffset);
+            l.base.sub(baseOffset).limit(type.maxStretch * legLength).add(baseOffset);
         }
 
         //when at least 1 leg is touching land, it can't drown

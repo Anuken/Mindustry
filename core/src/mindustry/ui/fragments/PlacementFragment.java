@@ -11,6 +11,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -484,7 +485,7 @@ public class PlacementFragment extends Fragment{
             }
 
             //if the tile has a drop, display the drop
-            if(hoverTile.drop() != null || hoverTile.wallDrop() != null || hoverTile.floor().liquidDrop != null){
+            if((hoverTile.drop() != null && hoverTile.block() == Blocks.air) || hoverTile.wallDrop() != null || hoverTile.floor().liquidDrop != null){
                 return hoverTile;
             }
         }

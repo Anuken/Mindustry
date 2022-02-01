@@ -414,8 +414,8 @@ public class Weapon implements Cloneable{
     }
 
     protected @Nullable Bullet bullet(Unit unit, float shootX, float shootY, float angle, float lifescl){
-        float xr = Mathf.range(xRand);
         float
+            xr = Mathf.range(xRand),
             x = shootX + Angles.trnsx(angle, 0, xr),
             y = shootY + Angles.trnsy(angle, 0, xr);
 

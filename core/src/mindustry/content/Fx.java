@@ -1463,6 +1463,17 @@ public class Fx{
         });
     }),
 
+    shootSmokeTris = new Effect(30f, e -> {
+        color(Color.white, e.color, e.fin());
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 10; i++){
+            float rot = e.rotation + rand.range(22f);
+            v.trns(rot, rand.random(e.finpow() * 24f));
+            Fill.poly(e.x + v.x, e.y + v.y, 4, e.fout() * 3.8f + 0.2f, rand.random(360f));
+        }
+    }),
+
     shootSmokeTitan = new Effect(70f, e -> {
         rand.setSeed(e.id);
         for(int i = 0; i < 13; i++){

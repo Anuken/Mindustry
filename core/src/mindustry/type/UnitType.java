@@ -113,7 +113,7 @@ public class UnitType extends UnlockableContent{
     public float legSplashDamage = 0f, legSplashRange = 5;
     public float legStraightLength = 1f;
     /** If true, legs are locked to the base of the unit instead of being on an implicit rotating "mount". */
-    public boolean lockLegBase = false;
+    public boolean lockLegBase = false, legContinuousMove;
     public float baseLegStraightness, legStraightness;
     /** TODO neither of these appear to do much */
     public boolean flipBackLegs = true, flipLegSide = false;
@@ -1043,7 +1043,6 @@ public class UnitType extends UnlockableContent{
         for(int j = legs.length - 1; j >= 0; j--){
             int i = (j % 2 == 0 ? j/2 : legs.length - 1 - j/2);
             Leg leg = legs[i];
-            float angle = unit.legAngle(i);
             boolean flip = i >= legs.length/2f;
             int flips = Mathf.sign(flip);
 
@@ -1074,8 +1073,13 @@ public class UnitType extends UnlockableContent{
             if(jointRegion.found()){
                 Draw.rect(jointRegion, leg.joint.x, leg.joint.y);
             }
+        }
 
-            if(baseJointRegion.found()){
+        //base joints are drawn after everything else
+        if(baseJointRegion.found()){
+            for(int j = legs.length - 1; j >= 0; j--){
+                //TODO does the index / draw order really matter?
+                Vec2 position = unit.legOffset(legOffset, (j % 2 == 0 ? j/2 : legs.length - 1 - j/2)).add(unit);
                 Draw.rect(baseJointRegion, position.x, position.y, rotation);
             }
         }

@@ -2556,7 +2556,7 @@ public class UnitTypes{
         bulwark = new UnitType("bulwark"){{
             drag = 0.1f;
             speed = 0.62f;
-            hitSize = 19f;
+            hitSize = 23f;
             health = 7300;
             armor = 5f;
             outlineColor = Pal.darkOutline;
@@ -2625,7 +2625,7 @@ public class UnitTypes{
                     hitSound = Sounds.none;
                     width = height = 10f;
 
-                    lightColor = trailColor = backColor = Color.valueOf("8ca9e8");
+                    lightColor = trailColor = backColor = Pal.techBlue;
                     lightRadius = 40f;
                     lightOpacity = 0.7f;
 
@@ -2653,24 +2653,25 @@ public class UnitTypes{
         krepost = new UnitType("krepost"){{
             drag = 0.1f;
             speed = 1f;
-            hitSize = 19f;
-            health = 7300;
-            armor = 5f;
+            hitSize = 44f;
+            health = 18000;
+            armor = 8f;
             outlineColor = Pal.darkOutline;
             envDisabled = Env.space;
-            rotateSpeed = 1.8f;
+            rotateSpeed = 1.6f;
             lockLegBase = true;
-            legStraightness = 1f;
-            baseLegStraightness = 0.6f;
+            legContinuousMove = true;
+            legStraightness = 0.6f;
+            baseLegStraightness = 0.5f;
 
             legCount = 8;
             legLength = 30f;
-            legTrns = 2f;
+            legTrns = 2.1f;
             legMoveSpace = 1.05f;
             rippleScale = 1.2f;
             landShake = 0.5f;
             legGroupSize = 2;
-            legExtension = -5f;
+            legExtension = -6f;
             legBaseOffset = 19f;
             legStraightLength = 0.9f;
             maxStretch = 1.2f;
@@ -2684,6 +2685,65 @@ public class UnitTypes{
             hovering = true;
             visualElevation = 0.4f;
             groundLayer = Layer.legUnit;
+
+            weapons.add(new Weapon("krepost-weapon"){{
+                mirror = true;
+                rotationLimit = 30f;
+                rotateSpeed = 0.4f;
+                rotate = true;
+
+                x = 43/4f;
+                y = -20f / 4f;
+                shootY = 39 / 4f;
+                shootX = -5f / 4f;
+                recoil = 3f;
+                reload = 30f;
+                shake = 3f;
+                cooldownTime = 20f;
+
+                shots = 3;
+                shotDelay = 3f;
+                inaccuracy = 2f;
+                velocityRnd = 0.1f;
+                heatColor = Color.red;
+
+                bullet = new BasicBulletType(9f, 75){{
+                    pierceCap = 2;
+                    pierceBuilding = true;
+
+                    lifetime = 30f;
+                    shootEffect = Fx.shootBigColor;
+                    smokeEffect = Fx.shootSmokeTris;
+                    frontColor = Color.white;
+                    hitSound = Sounds.none;
+                    width = 12f;
+                    height = 20f;
+
+                    lightColor = trailColor = hitColor = backColor = Pal.techBlue;
+                    lightRadius = 40f;
+                    lightOpacity = 0.7f;
+
+                    trailWidth = 2.2f;
+                    trailLength = 8;
+                    trailChance = -1f;
+
+                    despawnEffect = Fx.none;
+
+                    //TODO diff effect
+                    hitEffect = despawnEffect = new ExplosionEffect(){{
+                        lifetime = 30f;
+                        waveStroke = 2f;
+                        waveColor = sparkColor = trailColor;
+                        waveRad = 5f;
+                        smokeSize = 0f;
+                        smokeSizeBase = 0f;
+                        sparks = 5;
+                        sparkRad = 20f;
+                        sparkLen = 6f;
+                        sparkStroke = 2f;
+                    }};
+                }};
+            }});
         }};
 
         //endregion

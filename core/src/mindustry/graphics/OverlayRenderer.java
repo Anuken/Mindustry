@@ -57,6 +57,10 @@ public class OverlayRenderer{
             }
         }
 
+        if(pos.isEmpty()){
+            return;
+        }
+
         //if this is laggy, it could be shoved in another thread.
         var result = Voronoi.generate(pos.toArray(Vec2.class), 0, world.unitWidth(), 0, world.unitHeight());
         for(var edge : result){
