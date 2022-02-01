@@ -460,11 +460,13 @@ public class Turret extends ReloadTurret{
         }
 
         protected void effects(){
-            Effect fshootEffect = shootEffect == Fx.none ? peekAmmo().shootEffect : shootEffect;
-            Effect fsmokeEffect = smokeEffect == Fx.none ? peekAmmo().smokeEffect : smokeEffect;
+            BulletType b = peekAmmo();
 
-            fshootEffect.at(x + tr.x, y + tr.y, rotation);
-            fsmokeEffect.at(x + tr.x, y + tr.y, rotation);
+            Effect fshootEffect = shootEffect == Fx.none ? b.shootEffect : shootEffect;
+            Effect fsmokeEffect = smokeEffect == Fx.none ? b.smokeEffect : smokeEffect;
+
+            fshootEffect.at(x + tr.x, y + tr.y, rotation, b.shootColor);
+            fsmokeEffect.at(x + tr.x, y + tr.y, rotation, b.smokeColor);
             shootSound.at(x + tr.x, y + tr.y, Mathf.random(0.9f, 1.1f));
 
             if(shootShake > 0){

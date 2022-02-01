@@ -357,7 +357,7 @@ public class Weapon implements Cloneable{
                 if(!continuous){
                     shootSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
                 }
-                ammo.chargeShootEffect.at(shootX + unit.x - baseX, shootY + unit.y - baseY, rotation, parentize ? unit : null);
+                ammo.chargeShootEffect.at(shootX + unit.x - baseX, shootY + unit.y - baseY, rotation, ammo.chargeShootColor, parentize ? unit : null);
             });
         }else{
             unit.vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
@@ -367,8 +367,8 @@ public class Weapon implements Cloneable{
         }
 
         ejectEffect.at(mountX, mountY, rotation * side);
-        ammo.shootEffect.at(shootX, shootY, rotation, parentize ? unit : null);
-        ammo.smokeEffect.at(shootX, shootY, rotation, parentize ? unit : null);
+        ammo.shootEffect.at(shootX, shootY, rotation, ammo.shootColor, parentize ? unit : null);
+        ammo.smokeEffect.at(shootX, shootY, rotation, ammo.smokeColor, parentize ? unit : null);
         unit.apply(shootStatus, shootStatusDuration);
     }
 

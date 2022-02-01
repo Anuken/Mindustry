@@ -44,6 +44,15 @@ public class LiquidBulletType extends BulletType{
     }
 
     @Override
+    public void init(){
+        if(shootColor == null) shootColor = liquid.color;
+        if(chargeShootColor == null) chargeShootColor = liquid.color;
+        if(smokeColor == null) smokeColor = liquid.color;
+
+        super.init();
+    }
+
+    @Override
     public void update(Bullet b){
         super.update(b);
 

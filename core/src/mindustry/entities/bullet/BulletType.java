@@ -49,10 +49,16 @@ public class BulletType extends Content implements Cloneable{
     public Effect despawnEffect = Fx.hitBulletSmall;
     /** Effect created when shooting. */
     public Effect shootEffect = Fx.shootSmall;
+    /** Shooting effect color. */
+    public Color shootColor;
     /** Effect created when charging completes; only usable in single-shot weapons with a firstShotDelay / shotDelay. */
     public Effect chargeShootEffect = Fx.none;
+    /** Charging completion effect color */
+    public Color chargeShootColor;
     /** Extra smoke effect created when shooting. */
     public Effect smokeEffect = Fx.shootSmallSmoke;
+    /** Smoke effect color */
+    public Color smokeColor;
     /** Sound made when hitting something or getting removed.*/
     public Sound hitSound = Sounds.none;
     /** Sound made when hitting something or getting removed.*/
@@ -422,7 +428,12 @@ public class BulletType extends Content implements Cloneable{
         if(lightRadius == -1){
             lightRadius = Math.max(18, hitSize * 5f);
         }
+
         drawSize = Math.max(drawSize, trailLength * speed * 2f);
+
+        if(shootColor == null) shootColor = Color.white;
+        if(chargeShootColor == null) chargeShootColor = Color.white;
+        if(smokeColor == null) smokeColor = Color.white;
     }
 
     @Override
