@@ -17,7 +17,9 @@ import mindustry.world.blocks.environment.*;
 
 @Component
 abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
-    @Import float x, y;
+    private static final Vec2 straightVec = new Vec2();
+
+    @Import float x, y, rotation;
     @Import UnitType type;
     @Import Team team;
 
@@ -83,6 +85,10 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             baseRotation = Angles.moveToward(baseRotation, Mathf.angle(deltaX(), deltaY()), type.rotateSpeed);
         }
 
+        if(type.lockLegBase){
+            baseRotation = rotation;
+        }
+
         float rot = baseRotation;
         float legLength = type.legLength;
 
@@ -106,8 +112,8 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         int deeps = 0;
 
         for(int i = 0; i < legs.length; i++){
-            float dstRot = legAngle(rot, i);
-            Vec2 baseOffset = Tmp.v5.trns(dstRot, type.legBaseOffset).add(x, y);
+            float dstRot = legAngle(i);
+            Vec2 baseOffset = legOffset(Tmp.v5, i).add(x, y);
             Leg l = legs[i];
 
             l.joint.sub(baseOffset).limit(type.maxStretch * legLength/2f).add(baseOffset);
@@ -121,6 +127,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             //back legs have reversed directions
             boolean backLeg = Math.abs((i + 0.5f) - legs.length/2f) <= 0.501f;
             if(backLeg && type.flipBackLegs) side = !side;
+            if(type.flipLegSide) side = !side;
 
             l.moving = move;
             l.stage = moving ? stageF % 1f : Mathf.lerpDelta(l.stage, 0f, 0.1f);
@@ -180,9 +187,29 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         }
     }
 
+    Vec2 legOffset(Vec2 out, int index){
+        out.trns(defaultLegAngle(index), type.legBaseOffset);
+
+        if(type.legStraightness > 0){
+            straightVec.trns(defaultLegAngle(index) - baseRotation, type.legBaseOffset);
+            straightVec.y = Mathf.sign(straightVec.y) * type.legBaseOffset * type.legStraightLength;
+            straightVec.rotate(baseRotation);
+            out.lerp(straightVec, type.baseLegStraightness);
+        }
+
+        return out;
+    }
+
     /** @return outwards facing angle of leg at the specified index. */
-    float legAngle(float rotation, int index){
-        return rotation + 360f / legs.length * index + (360f / legs.length / 2f);
+    float legAngle(int index){
+        if(type.legStraightness > 0){
+            return Mathf.slerp(defaultLegAngle(index), (index >= legs.length/2 ? -90 : 90f) + baseRotation, type.legStraightness);
+        }
+        return defaultLegAngle(index);
+    }
+
+    float defaultLegAngle(int index){
+        return baseRotation + 360f / legs.length * index + (360f / legs.length / 2f);
     }
 
 }

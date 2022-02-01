@@ -111,7 +111,12 @@ public class UnitType extends UnlockableContent{
     public int legCount = 4, legGroupSize = 2;
     public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0, legLengthScl = 1f, kinematicScl = 1f, maxStretch = 1.75f;
     public float legSplashDamage = 0f, legSplashRange = 5;
-    public boolean flipBackLegs = true;
+    public float legStraightLength = 1f;
+    /** If true, legs are locked to the base of the unit instead of being on an implicit rotating "mount". */
+    public boolean lockLegBase = false;
+    public float baseLegStraightness, legStraightness;
+    /** TODO neither of these appear to do much */
+    public boolean flipBackLegs = true, flipLegSide = false;
 
     public float mechSideSway = 0.54f, mechFrontSway = 0.1f;
     public float mechStride = -1f;
@@ -1028,23 +1033,25 @@ public class UnitType extends UnlockableContent{
         float rotation = unit.baseRotation();
         float invDrown = 1f - unit.drownTime;
 
-        for(Leg leg : legs){
-            Drawf.shadow(leg.base.x, leg.base.y, ssize, invDrown);
+        if(footRegion.found()){
+            for(Leg leg : legs){
+                Drawf.shadow(leg.base.x, leg.base.y, ssize, invDrown);
+            }
         }
 
         //legs are drawn front first
         for(int j = legs.length - 1; j >= 0; j--){
             int i = (j % 2 == 0 ? j/2 : legs.length - 1 - j/2);
             Leg leg = legs[i];
-            float angle = unit.legAngle(rotation, i);
+            float angle = unit.legAngle(i);
             boolean flip = i >= legs.length/2f;
             int flips = Mathf.sign(flip);
 
-            Vec2 position = legOffset.trns(angle, legBaseOffset).add(unit);
+            Vec2 position = unit.legOffset(legOffset, i).add(unit);
 
             Tmp.v1.set(leg.base).sub(leg.joint).inv().setLength(legExtension);
 
-            if(leg.moving && visualElevation > 0){
+            if(footRegion.found() && leg.moving && visualElevation > 0){
                 float scl = visualElevation * invDrown;
                 float elev = Mathf.slope(1f - leg.stage) * scl;
                 Draw.color(Pal.shadow);
@@ -1054,7 +1061,9 @@ public class UnitType extends UnlockableContent{
 
             Draw.mixcol(Tmp.c3, Tmp.c3.a);
 
-            Draw.rect(footRegion, leg.base.x, leg.base.y, position.angleTo(leg.base));
+            if(footRegion.found()){
+                Draw.rect(footRegion, leg.base.x, leg.base.y, position.angleTo(leg.base));
+            }
 
             Lines.stroke(legRegion.height * Draw.scl * flips);
             Lines.line(legRegion, position.x, position.y, leg.joint.x, leg.joint.y, false);

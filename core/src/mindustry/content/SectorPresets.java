@@ -125,7 +125,7 @@ public class SectorPresets{
 
         three = new SectorPreset("three", erekir, 32){{
             captureWave = 8;
-            difficulty = 8;
+            difficulty = 5;
         }};
 
         //endregion

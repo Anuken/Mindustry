@@ -92,6 +92,17 @@ android{
         }
     }
 
+    buildTypes{
+        all{
+            minifyEnabled = true
+            shrinkResources = true
+            //this is the ONLY WAY I could find to force r8 to keep its filthy hands off of my default interfaces.
+            //may have undesirable side effects
+            debuggable = true
+            proguardFiles("proguard-rules.pro")
+        }
+    }
+
     if(project.hasProperty("RELEASE_STORE_FILE") || System.getenv("CI") == "true"){
         buildTypes{
             release{

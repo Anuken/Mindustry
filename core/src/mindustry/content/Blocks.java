@@ -3147,14 +3147,14 @@ public class Blocks{
             //TODO balance, set up, where is liquid/sec displayed? status effects maybe?
             ammo(
             Liquids.ozone, new ContinuousFlameBulletType(){{
-                damage = 85f;
+                damage = 90f;
                 length = range;
                 knockback = 1f;
 
                 colors = new Color[]{Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white};
             }},
             Liquids.cyanogen, new ContinuousFlameBulletType(){{
-                damage = 180f;
+                damage = 200f;
                 rangeChange = 70f;
                 length = range + rangeChange;
                 knockback = 2f;
@@ -3167,7 +3167,7 @@ public class Blocks{
             );
 
             acceptCoolant = false;
-            scaledHealth = 320;
+            scaledHealth = 330;
             shootLength = 7f;
             size = 3;
         }};

@@ -2650,6 +2650,42 @@ public class UnitTypes{
             }});
         }};
 
+        krepost = new UnitType("krepost"){{
+            drag = 0.1f;
+            speed = 1f;
+            hitSize = 19f;
+            health = 7300;
+            armor = 5f;
+            outlineColor = Pal.darkOutline;
+            envDisabled = Env.space;
+            rotateSpeed = 1.8f;
+            lockLegBase = true;
+            legStraightness = 1f;
+            baseLegStraightness = 0.6f;
+
+            legCount = 8;
+            legLength = 30f;
+            legTrns = 2f;
+            legMoveSpace = 1.05f;
+            rippleScale = 1.2f;
+            landShake = 0.5f;
+            legGroupSize = 2;
+            legExtension = -5f;
+            legBaseOffset = 19f;
+            legStraightLength = 0.9f;
+            maxStretch = 1.2f;
+
+            ammoType = new PowerAmmoType(2000);
+
+            legSplashDamage = 32;
+            legSplashRange = 32;
+            drownTimeMultiplier = 2f;
+
+            hovering = true;
+            visualElevation = 0.4f;
+            groundLayer = Layer.legUnit;
+        }};
+
         //endregion
         //region erekir - flying
 
