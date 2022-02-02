@@ -154,7 +154,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
 
     @Override
     public Schematic getDefaultLoadout(){
-        return Loadouts.spaceNucleus;
+        return Loadouts.basicNucleus;
     }
 
     @Override
