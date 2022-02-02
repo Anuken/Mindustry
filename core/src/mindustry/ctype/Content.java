@@ -31,7 +31,7 @@ public abstract class Content implements Comparable<Content>{
      */
     public void load(){}
 
-    /** Called right after load(). */
+    /** Called right before load(). */
     public void loadIcon(){}
 
     /** @return whether an error occurred during mod loading. */

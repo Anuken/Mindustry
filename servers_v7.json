@@ -17,7 +17,7 @@
   },
   {
     "name": "Omega",
-    "address": ["n3.mindustry.me:5002", "n3.mindustry.me:5003", "n3.mindustry.me:5004","n3.mindustry.me:5005", "n3.mindustry.me:5006", "n3.mindustry.me:5007", "n3.mindustry.me", "n3.mindustry.me:4006"]
+    "address": ["omegam.mindustry.me:5002", "omegam.mindustry.me:5003", "omegam.mindustry.me:5005", "omegam.mindustry.me:5006", "omegam.mindustry.me:5007", "omegam.mindustry.me", "omegam.mindustry.me:4006"]
   },
   {
     "name": "MeowLand",
@@ -33,7 +33,7 @@
   },
   {
     "name": "XCore",
-    "address": ["node.procord.vip:2707", "eu-fsn-01.vapur.host:24603"]
+    "address": ["node.procord.vip:2707", "de14.halexnodes.net:40036"]
   },
   {
     "name": "Obvilion Network",
@@ -50,10 +50,6 @@
   {
     "name": "SubZero",
     "address": ["minty-server.ddns.net"]
-  },
-  {
-    "name": "Shiza Minigames",
-    "address": ["shizashizashiza.ml"]
   },
   {
     "name": "Phoenix Network",
