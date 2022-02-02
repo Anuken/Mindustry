@@ -30,7 +30,6 @@ import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.power.*;
-import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -421,20 +420,20 @@ public class Schematics implements Loadable{
 
     /** Places the last launch loadout at the coordinates and fills it with the launch resources. */
     public static void placeLaunchLoadout(int x, int y){
-        placeLoadout(universe.getLastLoadout(), x, y, state.rules.defaultTeam, state.rules.sector == null ? Blocks.air : state.rules.sector.planet.drillOverlay);
+        placeLoadout(universe.getLastLoadout(), x, y, state.rules.defaultTeam);
         if(world.tile(x, y).build == null) throw new RuntimeException("No core at loadout coordinates!");
         world.tile(x, y).build.items.add(universe.getLaunchResources());
     }
 
     public static void placeLoadout(Schematic schem, int x, int y){
-        placeLoadout(schem, x, y, state.rules.defaultTeam, Blocks.oreCopper);
+        placeLoadout(schem, x, y, state.rules.defaultTeam);
     }
 
-    public static void placeLoadout(Schematic schem, int x, int y, Team team, Block resource){
-        placeLoadout(schem, x, y, team, resource, true);
+    public static void placeLoadout(Schematic schem, int x, int y, Team team){
+        placeLoadout(schem, x, y, team, true);
     }
 
-    public static void placeLoadout(Schematic schem, int x, int y, Team team, Block resource, boolean check){
+    public static void placeLoadout(Schematic schem, int x, int y, Team team, boolean check){
         Stile coreTile = schem.tiles.find(s -> s.block instanceof CoreBlock);
         Seq<Tile> seq = new Seq<>();
         if(coreTile == null) throw new IllegalArgumentException("Loadout schematic has no core tile!");
@@ -463,10 +462,6 @@ public class Schematics implements Loadable{
             Object config = st.config;
             if(tile.build != null){
                 tile.build.configureAny(config);
-            }
-
-            if(st.block instanceof Drill && resource != Blocks.air){
-                tile.getLinkedTiles(t -> t.setOverlay(resource));
             }
 
             if(tile.build instanceof CoreBuild cb){

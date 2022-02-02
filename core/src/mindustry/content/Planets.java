@@ -52,7 +52,6 @@ public class Planets{
             landCloudColor = Color.valueOf("ed6542");
             atmosphereColor = Color.valueOf("f07218");
             defaultEnv = Env.scorching | Env.terrestrial;
-            drillOverlay = Blocks.air;
             startSector = 10;
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;

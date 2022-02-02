@@ -2360,5 +2360,20 @@ public class Fx{
         }
 
         Lines.endLine();
-    }).followParent(false).rotWithParent(false);
+    }).followParent(false).rotWithParent(false),
+
+    legDestroy = new Effect(90f, 100f, e -> {
+        if(!(e.data instanceof LegDestroyData data)) return;
+        rand.setSeed(e.id);
+
+        e.lifetime = rand.random(70f, 130f);
+
+        Tmp.v1.trns(rand.random(360f), rand.random(data.region.width / 8f) * e.finpow());
+        float ox = Tmp.v1.x, oy = Tmp.v1.y;
+
+        alpha(e.foutpowdown());
+
+        stroke(data.region.height * scl);
+        line(data.region, data.a.x + ox, data.a.y + oy, data.b.x + ox, data.b.y + oy, false);
+    }).layer(Layer.groundUnit + 5f);
 }

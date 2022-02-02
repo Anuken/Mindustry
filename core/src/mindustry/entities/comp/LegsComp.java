@@ -15,6 +15,8 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.blocks.environment.*;
 
+import static mindustry.Vars.*;
+
 @Component
 abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
     private static final Vec2 straightVec = new Vec2();
@@ -57,6 +59,31 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         resetLegs(1f);
     }
 
+    @MethodPriority(-1)
+    @Override
+    public void destroy(){
+        if(!isAdded() || Vars.headless) return;
+
+        float legExplodeRad = type.legRegion.height  / 4f / 1.45f;
+
+        //create effects for legs being destroyed
+        for(int i = 0; i < legs.length; i++){
+            Leg l = legs[i];
+
+            Vec2 base = legOffset(Tmp.v1, i).add(x, y);
+
+            Tmp.v2.set(l.base).sub(l.joint).inv().setLength(type.legExtension);
+
+            for(Vec2 vec : new Vec2[]{base, l.joint, l.base}){
+                Damage.dynamicExplosion(vec.x, vec.y, 0f, 0f, 0f, legExplodeRad, state.rules.damageExplosions, false, team, type.deathExplosionEffect);
+            }
+
+            Fx.legDestroy.at(base.x, base.y, 0f, new LegDestroyData(base.cpy(), l.joint, type.legRegion));
+            Fx.legDestroy.at(l.joint.x, l.joint.y, 0f, new LegDestroyData(l.joint.cpy().add(Tmp.v2), l.base, type.legBaseRegion));
+
+        }
+    }
+
     public void resetLegs(){
         resetLegs(type.legLength);
     }
@@ -89,7 +116,6 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             baseRotation = rotation;
         }
 
-        float rot = baseRotation;
         float legLength = type.legLength;
 
         //set up initial leg positions
