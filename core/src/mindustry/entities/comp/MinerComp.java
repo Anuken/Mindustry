@@ -67,37 +67,42 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
             mineTimer = 0f;
         }else if(mining()){
             Item item = mineTile.drop();
-            mineTimer += Time.delta *type.mineSpeed;
+            if(item != null){
+                mineTimer += Time.delta *type.mineSpeed;
 
-            if(Mathf.chance(0.06 * Time.delta)){
-                Fx.pulverizeSmall.at(mineTile.worldx() + Mathf.range(tilesize / 2f), mineTile.worldy() + Mathf.range(tilesize / 2f), 0f, item.color);
-            }
-
-            if(mineTimer >= 50f + item.hardness*15f){
-                mineTimer = 0;
-
-                if(state.rules.sector != null && team() == state.rules.defaultTeam) state.rules.sector.info.handleProduction(item, 1);
-
-                if(core != null && within(core, mineTransferRange) && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
-                    //add item to inventory before it is transferred
-                    if(item() == item && !net.client()) addItem(item);
-                    Call.transferItemTo(self(), item, 1,
-                    mineTile.worldx() + Mathf.range(tilesize / 2f),
-                    mineTile.worldy() + Mathf.range(tilesize / 2f), core);
-                }else if(acceptsItem(item)){
-                    //this is clientside, since items are synced anyway
-                    InputHandler.transferItemToUnit(item,
-                    mineTile.worldx() + Mathf.range(tilesize / 2f),
-                    mineTile.worldy() + Mathf.range(tilesize / 2f),
-                    this);
-                }else{
-                    mineTile = null;
-                    mineTimer = 0f;
+                if(Mathf.chance(0.06 * Time.delta)){
+                    Fx.pulverizeSmall.at(mineTile.worldx() + Mathf.range(tilesize / 2f), mineTile.worldy() + Mathf.range(tilesize / 2f), 0f, item.color);
                 }
-            }
 
-            if(!headless){
-                control.sound.loop(type.mineSound, this, type.mineSoundVolume);
+                if(mineTimer >= 50f + item.hardness*15f){
+                    mineTimer = 0;
+
+                    if(state.rules.sector != null && team() == state.rules.defaultTeam) state.rules.sector.info.handleProduction(item, 1);
+
+                    if(core != null && within(core, mineTransferRange) && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
+                        //add item to inventory before it is transferred
+                        if(item() == item && !net.client()) addItem(item);
+                        Call.transferItemTo(self(), item, 1,
+                        mineTile.worldx() + Mathf.range(tilesize / 2f),
+                        mineTile.worldy() + Mathf.range(tilesize / 2f), core);
+                    }else if(acceptsItem(item)){
+                        //this is clientside, since items are synced anyway
+                        InputHandler.transferItemToUnit(item,
+                        mineTile.worldx() + Mathf.range(tilesize / 2f),
+                        mineTile.worldy() + Mathf.range(tilesize / 2f),
+                        this);
+                    }else{
+                        mineTile = null;
+                        mineTimer = 0f;
+                    }
+                }
+
+                if(!headless){
+                    control.sound.loop(type.mineSound, this, type.mineSoundVolume);
+                }
+            } else { //don't even try
+                mineTile = null;
+                mineTimer = 0f;
             }
         }
     }
