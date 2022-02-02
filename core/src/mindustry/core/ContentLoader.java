@@ -48,7 +48,7 @@ public class ContentLoader{
         clear();
     }
 
-    /** Clears all initialized content.*/
+    /** Clears all initialized content. */
     public void clear(){
         contentNameMap = new ObjectMap[ContentType.all.length];
         contentMap = new Seq[ContentType.all.length];
@@ -75,7 +75,7 @@ public class ContentLoader{
         }
     }
 
-    /** Logs content statistics.*/
+    /** Logs content statistics. */
     public void logContent(){
         //check up ID mapping, make sure it's linear (debug only)
         for(Seq<Content> arr : contentMap){
@@ -95,14 +95,14 @@ public class ContentLoader{
         Log.debug("-------------------");
     }
 
-    /** Calls Content#init() on everything. Use only after all modules have been created.*/
+    /** Calls Content#init() on everything. Use only after all modules have been created. */
     public void init(){
         initialize(Content::init);
         if(constants != null) constants.init();
         Events.fire(new ContentInitEvent());
     }
 
-    /** Calls Content#load() on everything. Use only after all modules have been created on the client.*/
+    /** Calls Content#loadIcon() and Content#load() on everything. Use only after all modules have been created on the client. */
     public void load(){
         initialize(Content::loadIcon);
         initialize(Content::load);
@@ -149,11 +149,6 @@ public class ContentLoader{
         }
         pixmap.dispose();
         ColorMapper.load();
-    }
-
-    public void dispose(){
-        initialize(Content::dispose);
-        clear();
     }
 
     /** Get last piece of content created for error-handling purposes. */
@@ -269,12 +264,20 @@ public class ContentLoader{
         return getByID(ContentType.item, id);
     }
 
+    public Item item(String name){
+        return getByName(ContentType.item, name);
+    }
+
     public Seq<Liquid> liquids(){
         return getBy(ContentType.liquid);
     }
 
     public Liquid liquid(int id){
         return getByID(ContentType.liquid, id);
+    }
+
+    public Liquid liquid(String name){
+        return getByName(ContentType.liquid, name);
     }
 
     public Seq<BulletType> bullets(){
@@ -289,8 +292,16 @@ public class ContentLoader{
         return getBy(ContentType.status);
     }
 
+    public StatusEffect statusEffect(String name){
+        return getByName(ContentType.status, name);
+    }
+
     public Seq<SectorPreset> sectors(){
         return getBy(ContentType.sector);
+    }
+
+    public SectorPreset sector(String name){
+        return getByName(ContentType.sector, name);
     }
 
     public Seq<UnitType> units(){
@@ -301,7 +312,15 @@ public class ContentLoader{
         return getByID(ContentType.unit, id);
     }
 
+    public UnitType unit(String name){
+        return getByName(ContentType.unit, name);
+    }
+
     public Seq<Planet> planets(){
         return getBy(ContentType.planet);
+    }
+
+    public Planet planet(String name){
+        return getByName(ContentType.planet, name);
     }
 }

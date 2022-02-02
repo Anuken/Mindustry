@@ -33,7 +33,7 @@ public class BlockIndexer{
     /** Stores all damaged tile entities by team. */
     private Seq<Building>[] damagedTiles = new Seq[Team.all.length];
     /** All ores available on this map. */
-    private ObjectSet<Item> allOres = new ObjectSet<>();
+    private ObjectIntMap<Item> allOres = new ObjectIntMap<>();
     /** Stores teams that are present here as tiles. */
     private Seq<Team> activeTeams = new Seq<>(Team.class);
     /** Maps teams to a map of flagged tiles by flag. */
@@ -78,8 +78,6 @@ public class BlockIndexer{
                 var drop = tile.drop();
 
                 if(drop != null){
-                    allOres.add(drop);
-
                     int qx = (tile.x / quadrantSize);
                     int qy = (tile.y / quadrantSize);
 
@@ -92,6 +90,7 @@ public class BlockIndexer{
                             ores[drop.id][qx][qy] = new IntSeq(false, 16);
                         }
                         ores[drop.id][qx][qy].add(tile.pos());
+                        allOres.increment(drop);
                     }
                 }
             }
@@ -105,8 +104,8 @@ public class BlockIndexer{
             var flags = tile.block().flags;
             var data = team.data();
 
-            if(flags.size() > 0){
-                for(BlockFlag flag : flags){
+            if(flags.size > 0){
+                for(BlockFlag flag : flags.array){
                     getFlagged(team)[flag.ordinal()].remove(tile);
                 }
             }
@@ -150,9 +149,11 @@ public class BlockIndexer{
             //when the drop can be mined, record the ore position
             if(tile.block() == Blocks.air && !seq.contains(pos)){
                 seq.add(pos);
+                allOres.increment(drop);
             }else{
                 //otherwise, it likely became blocked, remove it (even if it wasn't there)
                 seq.removeValue(pos);
+                allOres.increment(drop, -1);
             }
         }
 
@@ -177,7 +178,7 @@ public class BlockIndexer{
 
     /** @return whether this item is present on this map. */
     public boolean hasOre(Item item){
-        return allOres.contains(item);
+        return allOres.get(item) > 0;
     }
 
     /** Returns all damaged tiles by team. */
@@ -400,10 +401,10 @@ public class BlockIndexer{
         //only process entity changes with centered tiles
         if(tile.isCenter() && tile.build != null){
             var data = team.data();
-            if(tile.block().flags.size() > 0 && tile.isCenter()){
+            if(tile.block().flags.size > 0 && tile.isCenter()){
                 TileArray[] map = getFlagged(team);
 
-                for(BlockFlag flag : tile.block().flags){
+                for(BlockFlag flag : tile.block().flags.array){
 
                     TileArray arr = map[flag.ordinal()];
 

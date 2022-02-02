@@ -22,6 +22,8 @@ public abstract class NetConnection{
     public long connectTime = Time.millis();
     /** ID of last received client snapshot. */
     public int lastReceivedClientSnapshot = -1;
+    /** Count of snapshots sent from server. */
+    public int snapshotsSent;
     /** Timestamp of last received snapshot. */
     public long lastReceivedClientTime;
     /** Build requests that have been recently rejected. This is cleared every snapshot. */
@@ -90,7 +92,7 @@ public abstract class NetConnection{
             cid = begin.id;
 
             while(stream.stream.available() > 0){
-                byte[] bytes = new byte[Math.min(512, stream.stream.available())];
+                byte[] bytes = new byte[Math.min(maxTcpSize, stream.stream.available())];
                 stream.stream.read(bytes);
 
                 StreamChunk chunk = new StreamChunk();

@@ -381,7 +381,7 @@ public class ModsDialog extends BaseDialog{
 
                         }).tooltip(c.localizedName);
 
-                        if(++i % Math.min(Core.graphics.getWidth() / Scl.scl(110), 14) == 0) cs.row();
+                        if(++i % (int)Math.min(Core.graphics.getWidth() / Scl.scl(110), 14) == 0) cs.row();
                     }
                 }).grow();
                 d.addCloseButton();

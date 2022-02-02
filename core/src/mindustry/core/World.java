@@ -8,6 +8,7 @@ import arc.math.geom.Geometry.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
@@ -246,15 +247,17 @@ public class World{
             if(sector.preset != null){
                 sector.preset.generator.generate(tiles);
                 sector.preset.rules.get(state.rules); //apply extra rules
-            }else{
+            }else if(sector.planet.generator != null){
                 sector.planet.generator.generate(tiles, sector);
+            }else{
+                throw new RuntimeException("Sector " + sector.id + " on planet " + sector.planet.name + " has no generator or preset defined. Provide a planet generator or preset map.");
             }
             //just in case
             state.rules.sector = sector;
         });
 
         //postgenerate for bases
-        if(sector.preset == null){
+        if(sector.preset == null && sector.planet.generator != null){
             sector.planet.generator.postGenerate(tiles);
         }
 
@@ -477,12 +480,14 @@ public class World{
 
     //TODO optimize; this is very slow and called too often!
     public float getDarkness(int x, int y){
-        int edgeBlend = 2;
-
         float dark = 0;
-        int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (tiles.width - 1)), Math.abs(y - (tiles.height - 1)))));
-        if(edgeDst <= edgeBlend){
-            dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
+
+        if(Vars.state.rules.borderDarkness){
+            int edgeBlend = 2;
+            int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (tiles.width - 1)), Math.abs(y - (tiles.height - 1)))));
+            if(edgeDst <= edgeBlend){
+                dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
+            }
         }
 
         if(state.hasSector() && state.getSector().preset == null){

@@ -50,6 +50,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public final OverlayFragment frag = new OverlayFragment();
 
+    /** If any of these functions return true, input is locked. */
+    public Seq<Boolp> inputLocks = Seq.with(() -> renderer.isCutscene());
     public Interval controlInterval = new Interval();
     public @Nullable Block block;
     public boolean overrideLineRotation;
@@ -174,7 +176,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         //remove item for every controlling unit
         player.unit().eachGroup(unit -> {
-            Call.takeItems(build, item, unit.maxAccepted(item), unit);
+            Call.takeItems(build, item, Math.min(unit.maxAccepted(item), amount), unit);
 
             if(unit == player.unit()){
                 Events.fire(new WithdrawEvent(build, player, item, amount));
@@ -365,8 +367,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot control a building.");
         }
 
-        if(player.team() == build.team && build.canControlSelect(player)){
-            build.onControlSelect(player);
+        if(player.team() == build.team && build.canControlSelect(player.unit())){
+            build.onControlSelect(player.unit());
+        }
+    }
+
+    @Remote(called = Loc.server)
+    public static void unitBuildingControlSelect(Unit unit, Building build){
+        if(unit == null || unit.dead()) return;
+
+        //client skips checks to prevent ghost units
+        if(unit.team() == build.team && (net.client() || build.canControlSelect(unit))){
+            build.onControlSelect(unit);
         }
     }
 
@@ -433,6 +445,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+    /** Adds an input lock; if this function returns true, input is locked. Used for mod 'cutscenes' or custom camera panning. */
+    public void addLock(Boolp lock){
+        inputLocks.add(lock);
+    }
+
+    /** @return whether most input is locked, for 'cutscenes' */
+    public boolean locked(){
+        return inputLocks.contains(Boolp::get);
+    }
+
     public Eachable<BuildPlan> allRequests(){
         return cons -> {
             for(BuildPlan request : player.unit().plans()) cons.get(request);
@@ -458,6 +480,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && !player.team().rules().infiniteAmmo && player.unit().ammo <= 0){
             player.unit().type.weapons.first().noAmmoSound.at(player.unit());
+        }
+
+        //you don't want selected blocks while locked, looks weird
+        if(locked()){
+            block = null;
         }
 
         wasShooting = player.shooting;
@@ -669,9 +696,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             });
 
             //flip rotation
-            if(x == (req.rotation % 2 == 0)){
-                req.rotation = Mathf.mod(req.rotation + 2, 4);
-            }
+            req.block.flipRotation(req, x);
         });
     }
 
@@ -1086,7 +1111,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         Building build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-        if(build instanceof ControlBlock cont && cont.canControl() && build.team == player.team()){
+        if(build instanceof ControlBlock cont && cont.canControl() && build.team == player.team() && cont.unit() != player.unit()){
             return cont.unit();
         }
 
@@ -1095,7 +1120,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public @Nullable Building selectedControlBuild(){
         Building build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-        if(build != null && !player.dead() && build.canControlSelect(player) && build.team == player.team()){
+        if(build != null && !player.dead() && build.canControlSelect(player.unit()) && build.team == player.team()){
             return build;
         }
         return null;
@@ -1186,6 +1211,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public boolean validPlace(int x, int y, Block type, int rotation, BuildPlan ignore){
+        //TODO with many requests, this is O(n * m), very laggy
         for(BuildPlan req : player.unit().plans()){
             if(req != ignore
                     && !req.breaking
@@ -1243,18 +1269,23 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         int endRotation = -1;
+        var start = world.build(startX, startY);
+        var end = world.build(endX, endY);
         if(diagonal){
-            var start = world.build(startX, startY);
-            var end = world.build(endX, endY);
             if(block != null && start instanceof ChainedBuilding && end instanceof ChainedBuilding
                     && block.canReplace(end.block) && block.canReplace(start.block)){
                 points = Placement.upgradeLine(startX, startY, endX, endY);
-                endRotation = end.rotation;
             }else{
                 points = Placement.pathfindLine(block != null && block.conveyorPlacement, startX, startY, endX, endY);
             }
         }else{
             points = Placement.normalizeLine(startX, startY, endX, endY);
+        }
+        if(points.size > 1 && end instanceof ChainedBuilding){
+            Point2 secondToLast = points.get(points.size - 2);
+            if (!(world.build(secondToLast.x, secondToLast.y) instanceof ChainedBuilding)){
+                endRotation = end.rotation;
+            }
         }
 
         if(block != null){

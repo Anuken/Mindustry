@@ -163,6 +163,19 @@ public class JsonIO{
             }
         });
 
+        json.setSerializer(Planet.class, new Serializer<>(){
+            @Override
+            public void write(Json json, Planet object, Class knownType){
+                json.writeValue(object.name);
+            }
+
+            @Override
+            public Planet read(Json json, JsonValue jsonData, Class type){
+                Planet block = Vars.content.getByName(ContentType.planet, jsonData.asString());
+                return block == null ? Planets.serpulo : block;
+            }
+        });
+
         json.setSerializer(Weather.class, new Serializer<>(){
             @Override
             public void write(Json json, Weather object, Class knownType){
@@ -215,7 +228,12 @@ public class JsonIO{
                 Item item = Vars.content.getByName(ContentType.item, str);
                 Liquid liquid = Vars.content.getByName(ContentType.liquid, str);
                 Block block = Vars.content.getByName(ContentType.block, str);
-                return item != null ? item : liquid == null ? block : liquid;
+                UnitType unit = Vars.content.getByName(ContentType.unit, str);
+                return
+                    item != null ? item :
+                    liquid != null ? liquid :
+                    block != null ? block :
+                    unit;
             }
         });
 

@@ -78,7 +78,7 @@ public class UnitFactory extends UnitBlock{
                 Core.bundle.format("bar.unitcap",
                     Fonts.getUnicodeStr(e.unit().name),
                     e.team.data().countType(e.unit()),
-                    Units.getCap(e.team)
+                    Units.getStringCap(e.team)
                 ),
             () -> Pal.power,
             () -> e.unit() == null ? 0f : (float)e.team.data().countType(e.unit()) / Units.getCap(e.team)
@@ -160,10 +160,21 @@ public class UnitFactory extends UnitBlock{
             Seq<UnitType> units = Seq.with(plans).map(u -> u.unit).filter(u -> u.unlockedNow() && !u.isBanned());
 
             if(units.any()){
-                ItemSelection.buildTable(table, units, () -> currentPlan == -1 ? null : plans.get(currentPlan).unit, unit -> configure(plans.indexOf(u -> u.unit == unit)));
+                ItemSelection.buildTable(UnitFactory.this, table, units, () -> currentPlan == -1 ? null : plans.get(currentPlan).unit, unit -> configure(plans.indexOf(u -> u.unit == unit)));
             }else{
                 table.table(Styles.black3, t -> t.add("@none").color(Color.lightGray));
             }
+        }
+
+        @Override
+        public boolean onConfigureTileTapped(Building other){
+            if(this == other){
+                deselect();
+                configure(null);
+                return false;
+            }
+
+            return true;
         }
 
         @Override

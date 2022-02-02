@@ -108,7 +108,7 @@ public class Damage{
         furthest = null;
 
         boolean found = world.raycast(b.tileX(), b.tileY(), World.toTile(b.x + Tmp.v1.x), World.toTile(b.y + Tmp.v1.y),
-        (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team && furthest.block().absorbLasers);
+        (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team && (furthest.build != null && furthest.build.absorbLasers()));
 
         return found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
     }
@@ -461,11 +461,12 @@ public class Damage{
     }
 
     private static void completeDamage(Team team, float x, float y, float radius, float damage){
+
         int trad = (int)(radius / tilesize);
         for(int dx = -trad; dx <= trad; dx++){
             for(int dy = -trad; dy <= trad; dy++){
                 Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
-                if(tile != null && tile.build != null && (team == null ||team.isEnemy(tile.team())) && dx*dx + dy*dy <= trad){
+                if(tile != null && tile.build != null && (team == null ||team.isEnemy(tile.team())) && dx*dx + dy*dy <= trad*trad){
                     tile.build.damage(team, damage);
                 }
             }

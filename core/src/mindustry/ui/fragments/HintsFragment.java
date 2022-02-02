@@ -177,9 +177,7 @@ public class HintsFragment extends Fragment{
             && state.rules.defaultTeam.core().items.has(Blocks.coreFoundation.requirements),
             () -> ui.hints.placedBlocks.contains(Blocks.coreFoundation)),
         presetLaunch(() -> state.isCampaign()
-            && state.getSector().preset == null
-            && SectorPresets.frozenForest.unlocked()
-            && SectorPresets.frozenForest.sector.save == null,
+            && state.getSector().preset == null,
             () -> state.isCampaign() && state.getSector().preset == SectorPresets.frozenForest),
         presetDifficulty(() -> state.isCampaign()
             && state.getSector().preset == null

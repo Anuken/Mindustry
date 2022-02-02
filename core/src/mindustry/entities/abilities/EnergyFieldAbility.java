@@ -30,7 +30,7 @@ public class EnergyFieldAbility extends Ability{
     public int maxTargets = 25;
     public float healPercent = 2.5f;
 
-    public float layer = Layer.bullet - 0.001f, blinkScl = 20f;
+    public float layer = Layer.bullet - 0.001f, blinkScl = 20f, blinkSize = 0.1f;
     public float effectRadius = 5f, sectorRad = 0.14f, rotateSpeed = 0.5f;
     public int sectors = 5;
     public Color color = Pal.heal;
@@ -60,7 +60,7 @@ public class EnergyFieldAbility extends Ability{
         Draw.color(color);
         Tmp.v1.trns(unit.rotation - 90, x, y).add(unit.x, unit.y);
         float rx = Tmp.v1.x, ry = Tmp.v1.y;
-        float orbRadius = effectRadius * (1f + Mathf.absin(blinkScl, 0.1f));
+        float orbRadius = effectRadius * (1f + Mathf.absin(blinkScl, blinkSize));
 
         Fill.circle(rx, ry, orbRadius);
         Draw.color();
@@ -70,7 +70,7 @@ public class EnergyFieldAbility extends Ability{
 
         for(int i = 0; i < sectors; i++){
             float rot = unit.rotation + i * 360f/sectors - Time.time * rotateSpeed;
-            Lines.swirl(rx, ry, orbRadius + 3f, sectorRad, rot);
+            Lines.arc(rx, ry, orbRadius + 3f, sectorRad, rot);
         }
 
         Lines.stroke(Lines.getStroke() * curStroke);
@@ -78,7 +78,7 @@ public class EnergyFieldAbility extends Ability{
         if(curStroke > 0){
             for(int i = 0; i < sectors; i++){
                 float rot = unit.rotation + i * 360f/sectors + Time.time * rotateSpeed;
-                Lines.swirl(rx, ry, range, sectorRad, rot);
+                Lines.arc(rx, ry, range, sectorRad, rot);
             }
         }
 

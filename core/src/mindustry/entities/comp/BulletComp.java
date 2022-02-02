@@ -6,12 +6,15 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -137,6 +140,20 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
             Building build = world.build(x, y);
+
+            if(type.collideFloor || type.collideTerrain){
+                Tile tile = world.tile(x, y);
+                if(
+                    type.collideFloor && (tile == null || tile.floor().hasSurface() || tile.block() != Blocks.air) ||
+                    type.collideTerrain && tile != null && tile.block() instanceof StaticWall
+                ){
+                    type.despawned(self());
+                    remove();
+                    hit = true;
+                    return;
+                }
+            }
+
             if(build != null && isAdded() && build.collide(self()) && type.testCollision(self(), build)
                 && !build.dead() && (type.collidesTeam || build.team != team) && !(type.pierceBuilding && hasCollided(build.id))){
 

@@ -11,7 +11,7 @@ import mindustry.graphics.*;
 import static mindustry.Vars.*;
 
 public class BaseDialog extends Dialog{
-    private boolean wasPaused;
+    protected boolean wasPaused;
     protected boolean shouldPause;
 
     public BaseDialog(String title, DialogStyle style){

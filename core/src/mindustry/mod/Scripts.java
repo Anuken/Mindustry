@@ -1,9 +1,6 @@
 package mindustry.mod;
 
 import arc.*;
-import arc.assets.*;
-import arc.assets.loaders.MusicLoader.*;
-import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
 import arc.func.*;
@@ -85,30 +82,14 @@ public class Scripts implements Disposable{
         return Vars.tree.get(path, true).readBytes();
     }
 
+    //kept for backwards compatibility
     public Sound loadSound(String soundName){
-        if(Vars.headless) return new Sound();
-
-        String name = "sounds/" + soundName;
-        String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
-
-        var sound = new Sound();
-        AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundParameter(sound));
-        desc.errored = Throwable::printStackTrace;
-
-        return sound;
+        return Vars.tree.loadSound(soundName);
     }
 
+    //kept for backwards compatibility
     public Music loadMusic(String soundName){
-        if(Vars.headless) return new Music();
-
-        String name = "music/" + soundName;
-        String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
-
-        var music = new Music();
-        AssetDescriptor<?> desc = Core.assets.load(path, Music.class, new MusicParameter(music));
-        desc.errored = Throwable::printStackTrace;
-
-        return music;
+        return Vars.tree.loadMusic(soundName);
     }
 
     /** Ask the user to select a file to read for a certain purpose like "Please upload a sprite" */

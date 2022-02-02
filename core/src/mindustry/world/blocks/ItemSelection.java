@@ -5,20 +5,29 @@ import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
 public class ItemSelection{
-    private static float scrollPos = 0f;
 
     public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer){
         buildTable(table, items, holder, consumer, true);
     }
-    
+
+    public static <T extends UnlockableContent> void buildTable(Block block, Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer){
+        buildTable(block, table, items, holder, consumer, true);
+    }
+
     public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect){
+        buildTable(null, table, items, holder, consumer, closeSelect);
+    }
+    
+    public static <T extends UnlockableContent> void buildTable(@Nullable Block block, Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect){
 
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         group.setMinCheckCount(0);
@@ -52,10 +61,13 @@ public class ItemSelection{
 
         ScrollPane pane = new ScrollPane(cont, Styles.smallPane);
         pane.setScrollingDisabled(true, false);
-        pane.setScrollYForce(scrollPos);
-        pane.update(() -> {
-            scrollPos = pane.getScrollY();
-        });
+
+        if(block != null){
+            pane.setScrollYForce(block.selectScroll);
+            pane.update(() -> {
+                block.selectScroll = pane.getScrollY();
+            });
+        }
 
         pane.setOverscroll(false, false);
         table.add(pane).maxHeight(Scl.scl(40 * 5));

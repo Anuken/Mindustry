@@ -49,6 +49,7 @@ public class NuclearReactor extends PowerGenerator{
 
     public NuclearReactor(String name){
         super(name);
+        updateInUnits = false;
         itemCapacity = 30;
         liquidCapacity = 30;
         hasItems = true;
@@ -56,6 +57,7 @@ public class NuclearReactor extends PowerGenerator{
         rebuildable = false;
         flags = EnumSet.of(BlockFlag.reactor, BlockFlag.generator);
         schematicPriority = -5;
+        envEnabled = Env.any;
     }
 
     @Override
@@ -75,6 +77,7 @@ public class NuclearReactor extends PowerGenerator{
 
     public class NuclearReactorBuild extends GeneratorBuild{
         public float heat;
+        public float flash;
 
         @Override
         public void updateTile(){
@@ -129,13 +132,14 @@ public class NuclearReactor extends PowerGenerator{
         public void onDestroyed(){
             super.onDestroyed();
 
-            Sounds.explosionbig.at(tile);
+            Sounds.explosionbig.at(this);
 
             int fuel = items.get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
 
             if((fuel < 5 && heat < 0.5f) || !state.rules.reactorExplosions) return;
 
             Effect.shake(6f, 16f, x, y);
+            // * ((float)fuel / itemCapacity) to scale based on fullness
             Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
 
             explodeEffect.at(x, y);
@@ -159,10 +163,9 @@ public class NuclearReactor extends PowerGenerator{
             Draw.rect(topRegion, x, y);
 
             if(heat > flashThreshold){
-                float flash = 1f + ((heat - flashThreshold) / (1f - flashThreshold)) * 5.4f;
-                flash += flash * Time.delta;
+                flash += (1f + ((heat - flashThreshold) / (1f - flashThreshold)) * 5.4f) * Time.delta;
                 Draw.color(Color.red, Color.yellow, Mathf.absin(flash, 9f, 1f));
-                Draw.alpha(0.6f);
+                Draw.alpha(0.3f);
                 Draw.rect(lightsRegion, x, y);
             }
 

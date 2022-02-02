@@ -17,7 +17,6 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
-import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -32,7 +31,7 @@ import java.util.zip.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
-public class SettingsMenuDialog extends Dialog{
+public class SettingsMenuDialog extends BaseDialog{
     public SettingsTable graphics;
     public SettingsTable game;
     public SettingsTable sound;
@@ -48,38 +47,19 @@ public class SettingsMenuDialog extends Dialog{
         addCloseButton();
 
         cont.add(main = new SettingsTable());
-
-        hidden(() -> {
-            Sounds.back.play();
-            if(state.isGame()){
-                if(!wasPaused || net.active())
-                    state.set(State.playing);
-            }
-        });
+        shouldPause = true;
 
         shown(() -> {
             back();
-            if(state.isGame()){
-                wasPaused = state.is(State.paused);
-                state.set(State.paused);
-            }
-
             rebuildMenu();
         });
 
-        Events.on(ResizeEvent.class, event -> {
-            if(isShown() && Core.scene.getDialog() == this){
-                graphics.rebuild();
-                sound.rebuild();
-                game.rebuild();
-                updateScrollFocus();
-            }
+        onResize(() -> {
+            graphics.rebuild();
+            sound.rebuild();
+            game.rebuild();
+            updateScrollFocus();
         });
-
-        setFillParent(true);
-        title.setAlignment(Align.center);
-        titleTable.row();
-        titleTable.add(new Image()).growX().height(3f).pad(4f).get().setColor(Pal.accent);
 
         cont.clearChildren();
         cont.remove();
@@ -609,6 +589,30 @@ public class SettingsMenuDialog extends Dialog{
             rebuild();
         }
 
+        public void textPref(String name, String def){
+            list.add(new TextSetting(name, def, null));
+            settings.defaults(name, def);
+            rebuild();
+        }
+
+        public void textPref(String name, String def, Cons<String> changed){
+            list.add(new TextSetting(name, def, changed));
+            settings.defaults(name, def);
+            rebuild();
+        }
+
+        public void areaTextPref(String name, String def){
+            list.add(new AreaTextSetting(name, def, null));
+            settings.defaults(name, def);
+            rebuild();
+        }
+
+        public void areaTextPref(String name, String def, Cons<String> changed){
+            list.add(new AreaTextSetting(name, def, changed));
+            settings.defaults(name, def);
+            rebuild();
+        }
+
         public void rebuild(){
             clearChildren();
 
@@ -724,6 +728,67 @@ public class SettingsMenuDialog extends Dialog{
                 table.row();
             }
         }
+        
+        public static class TextSetting extends Setting{
+            String def;
+            Cons<String> changed;
 
+            public TextSetting(String name, String def, Cons<String> changed){
+                super(name);
+                this.def = def;
+                this.changed = changed;
+            }
+
+            @Override
+            public void add(SettingsTable table){
+                TextField field = new TextField();
+
+                field.update(() -> field.setText(settings.getString(name)));
+
+                field.changed(() -> {
+                    settings.put(name, field.getText());
+                    if(changed != null){
+                        changed.get(field.getText());
+                    }
+                });
+
+                Table prefTable = table.table().left().padTop(3f).get();
+                prefTable.add(field);
+                prefTable.label(() -> title);
+                addDesc(prefTable);
+                table.row();
+            }
+        }
+
+        public static class AreaTextSetting extends TextSetting{
+            String def;
+            Cons<String> changed;
+    
+            public AreaTextSetting(String name, String def, Cons<String> changed){
+                super(name, def, changed);
+            }
+
+            @Override
+            public void add(SettingsTable table){
+                TextArea area = new TextArea("");
+                area.setPrefRows(5);
+
+                area.update(() -> {
+                    area.setText(settings.getString(name));
+                    area.setWidth(table.getWidth());
+                });
+
+                area.changed(() -> {
+                    settings.put(name, area.getText());
+                    if(changed != null){
+                        changed.get(area.getText());
+                    }
+                });
+
+                addDesc(table.label(() -> title).left().padTop(3f).get());
+                table.row().add(area).left();
+                table.row();
+            }
+        }
     }
 }

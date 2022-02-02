@@ -14,6 +14,7 @@ import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.logic.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -28,6 +29,7 @@ public class LightBlock extends Block{
         update = true;
         configurable = true;
         saveConfig = true;
+        envEnabled |= Env.space;
         swapDiagonalPlacement = true;
 
         config(Integer.class, (LightBuild tile, Integer value) -> tile.color = value);
@@ -61,7 +63,7 @@ public class LightBlock extends Block{
         @Override
         public void control(LAccess type, double p1, double p2, double p3, double p4){
             if(type == LAccess.color){
-                color = Color.rgba8888((float)p1, (float)p2, (float)p3, 1f);
+                color = Color.rgba8888(Mathf.clamp((float)p1), Mathf.clamp((float)p2), Mathf.clamp((float)p3), 1f);
             }
 
             super.control(type, p1, p2, p3, p4);
