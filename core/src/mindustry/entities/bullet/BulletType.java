@@ -424,7 +424,7 @@ public class BulletType extends Content implements Cloneable{
             lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
         }
 
-        if(lightRadius == -1){
+        if(lightRadius <= -1){
             lightRadius = Math.max(18, hitSize * 5f);
         }
         
