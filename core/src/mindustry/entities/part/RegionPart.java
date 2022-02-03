@@ -17,10 +17,10 @@ public class RegionPart extends WeaponPart{
     /** If true, turret reload is used as the measure of progress. Otherwise, warmup is used. */
     public boolean useReload = true;
     /** If true, parts are mirrored across the turret. Requires -1 and -2 regions. */
-    public boolean mirror = true;
+    public boolean mirror = false;
     /** If true, an outline is drawn under the part. */
     public boolean outline = true;
-    /** If true, the layer is overridden to be under the turret itself. */
+    /** If true, the layer is overridden to be under the weapon/turret itself. */
     public boolean under = false;
     /** If true, the base + outline regions are drawn. Set to false for heat-only regions. */
     public boolean drawRegion = true;
@@ -35,7 +35,7 @@ public class RegionPart extends WeaponPart{
     public float x, y, moveX, moveY;
     public float oscMag = 0f, oscScl = 7f;
     public boolean oscAbs = false;
-    public @Nullable Color color;
+    public @Nullable Color color, colorTo;
     public Color heatColor = Pal.turretHeat.cpy();
 
     public RegionPart(String region){
@@ -48,10 +48,10 @@ public class RegionPart extends WeaponPart{
     @Override
     public void draw(PartParams params){
         float z = Draw.z();
-        if(layer > 0){
-            Draw.z(layer);
-        }
-        float prevZ = layer > 0 ? layer : z;
+        if(layer > 0) Draw.z(layer);
+        if(under) Draw.z(z - 0.0001f);
+
+        float prevZ = Draw.z();
         float progress = useReload ? 1f - params.reload : params.warmup;
 
         if(oscMag > 0) progress += oscAbs ? Mathf.absin(oscScl, oscMag) : Mathf.sin(oscScl, oscMag);
@@ -75,12 +75,16 @@ public class RegionPart extends WeaponPart{
 
             if(outline && drawRegion){
                 Draw.z(prevZ + outlineLayerOffset);
-                Draw.rect(outlines[i], rx, ry, rot);
+                Draw.rect(outlines[Math.min(i, regions.length - 1)], rx, ry, rot);
                 Draw.z(prevZ);
             }
 
             if(drawRegion && region.found()){
-                if(color != null) Draw.color(color);
+                if(color != null && colorTo != null){
+                    Draw.color(color, colorTo, progress);
+                }else if(color != null){
+                    Draw.color(color);
+                }
                 Draw.blend(blending);
                 Draw.rect(region, rx, ry, rot);
                 Draw.blend();
@@ -88,7 +92,7 @@ public class RegionPart extends WeaponPart{
             }
 
             if(heat.found()){
-                Drawf.additive(heat, heatColor.write(Tmp.c1).a((useProgressHeat ? params.warmup : params.heat) * heatColor.a), rx, ry, rot, Layer.turretHeat);
+                Drawf.additive(heat, heatColor.write(Tmp.c1).a((useProgressHeat ? params.warmup : params.heat) * heatColor.a), rx, ry, rot, turretShading ? Layer.turretHeat : z + 1f);
             }
 
             Draw.xscl = 1f;
@@ -99,8 +103,6 @@ public class RegionPart extends WeaponPart{
 
     @Override
     public void load(String name){
-        if(under) layer = Layer.turret - 0.0001f;
-
         if(drawRegion){
             //TODO l/r
             if(mirror && turretShading){

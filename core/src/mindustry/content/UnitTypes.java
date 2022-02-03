@@ -979,6 +979,7 @@ public class UnitTypes{
             commandLimit = 4;
             circleTarget = true;
             hitSize = 7;
+            itemCapacity = 15;
 
             weapons.add(new Weapon(){{
                 y = 0f;
@@ -2513,7 +2514,7 @@ public class UnitTypes{
 
             //TODO maybe different sprite, weapon impl
             weapons.add(new Weapon("conquer-weapon"){{
-                layerOffset = 0.0001f;
+                layerOffset = 0.1f;
                 reload = 120f;
                 shootY = 32.5f;
                 shake = 5f;
@@ -2527,11 +2528,22 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
-                parts.add(new RegionPart("-glow"){{
+                parts.add(
+                new RegionPart("-glow"){{
                     color = Color.red;
                     blending = Blending.additive;
                     outline = mirror = false;
-                }});
+                }},
+                new RegionPart("-sinks"){{
+                    useReload = false;
+                    mirror = true;
+                    under = true;
+                    moveX = 15f / 4f;
+                    moveY = -13f / 4f;
+                    x = 34 / 4f;
+                    y = -36 / 4f;
+                }}
+                );
 
                 bullet = new BasicBulletType(8f, 110){{
                     sprite = "missile-large";
@@ -2660,7 +2672,7 @@ public class UnitTypes{
 
         krepost = new UnitType("krepost"){{
             drag = 0.1f;
-            speed = 1f;
+            speed = 1.1f;
             hitSize = 44f;
             health = 18000;
             armor = 8f;

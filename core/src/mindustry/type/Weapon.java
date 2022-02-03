@@ -92,6 +92,8 @@ public class Weapon implements Cloneable{
     public float rotationLimit = 361f;
     /** ticks to cool down the heat region */
     public float cooldownTime = 20f;
+    /** lerp speed for shoot warmup, only used for parts */
+    public float shootWarmupSpeed = 0.1f;
     /** random sound pitch range */
     public float soundPitchMin = 0.8f, soundPitchMax = 1f;
     /** whether shooter rotation is ignored when shooting. */
@@ -216,7 +218,7 @@ public class Weapon implements Cloneable{
                 Draw.z(Layer.turret);
             }*/
 
-            var params = WeaponPart.params.set(0f, Mathf.clamp(mount.reload / reload), mount.heat, wx, wy, weaponRotation + 90);
+            var params = WeaponPart.params.set(mount.warmup, 1f - Mathf.clamp(mount.reload / reload), mount.heat, wx, wy, weaponRotation + 90);
 
             for(var part : parts){
                 part.draw(params);
@@ -237,6 +239,7 @@ public class Weapon implements Cloneable{
         float lastReload = mount.reload;
         mount.reload = Math.max(mount.reload - Time.delta * unit.reloadMultiplier, 0);
         mount.recoil = Mathf.approachDelta(mount.recoil, 0, (Math.abs(recoil) * unit.reloadMultiplier) / recoilTime);
+        mount.warmup = Mathf.lerpDelta(mount.warmup, can && mount.shoot ? 1f : 0f, shootWarmupSpeed);
 
         //rotate if applicable
         if(rotate && (mount.rotate || mount.shoot) && can){

@@ -107,6 +107,17 @@ public class TypeIO{
         }else if(object instanceof UnitBox u){
             write.b(17);
             write.i(u.id);
+        }else if(object instanceof Vec2[] vecs){
+            write.b(18);
+            write.s(vecs.length);
+            for(Vec2 v : vecs){
+                write.f(v.x);
+                write.f(v.y);
+            }
+        }else if(object instanceof Vec2 v){
+            write.b((byte)19);
+            write.f(v.x);
+            write.f(v.y);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -121,27 +132,53 @@ public class TypeIO{
     @Nullable
     public static Object readObjectBoxed(Reads read, boolean box){
         byte type = read.b();
-        switch(type){
-            case 0: return null;
-            case 1: return read.i();
-            case 2: return read.l();
-            case 3: return read.f();
-            case 4: return readString(read);
-            case 5: return content.getByID(ContentType.all[read.b()], read.s());
-            case 6: short length = read.s(); IntSeq arr = new IntSeq(); for(int i = 0; i < length; i ++) arr.add(read.i()); return arr;
-            case 7: return new Point2(read.i(), read.i());
-            case 8: byte len = read.b(); Point2[] out = new Point2[len]; for(int i = 0; i < len; i ++) out[i] = Point2.unpack(read.i()); return out;
-            case 9: return content.<UnlockableContent>getByID(ContentType.all[read.b()], read.s()).techNode;
-            case 10: return read.bool();
-            case 11: return read.d();
-            case 12: return !box ? world.build(read.i()) : new BuildingBox(read.i());
-            case 13: return LAccess.all[read.s()];
-            case 14: int blen = read.i(); byte[] bytes = new byte[blen]; read.b(bytes); return bytes;
-            case 15: return UnitCommand.all[read.b()];
-            case 16: int boollen = read.i(); boolean[] bools = new boolean[boollen]; for(int i = 0; i < boollen; i ++) bools[i] = read.bool(); return bools;
-            case 17: return !box ? Groups.unit.getByID(read.i()) : new UnitBox(read.i());
-            default: throw new IllegalArgumentException("Unknown object type: " + type);
-        }
+        return switch(type){
+            case 0 -> null;
+            case 1 -> read.i();
+            case 2 -> read.l();
+            case 3 -> read.f();
+            case 4 -> readString(read);
+            case 5 -> content.getByID(ContentType.all[read.b()], read.s());
+            case 6 -> {
+                short length = read.s();
+                IntSeq arr = new IntSeq(); for(int i = 0; i < length; i ++) arr.add(read.i());
+                yield arr;
+            }
+            case 7 -> new Point2(read.i(), read.i());
+            case 8 -> {
+                byte len = read.b();
+                Point2[] out = new Point2[len];
+                for(int i = 0; i < len; i ++) out[i] = Point2.unpack(read.i());
+                yield out;
+            }
+            case 9 -> content.<UnlockableContent>getByID(ContentType.all[read.b()], read.s()).techNode;
+            case 10 -> read.bool();
+            case 11 -> read.d();
+            case 12 -> !box ? world.build(read.i()) : new BuildingBox(read.i());
+            case 13 -> LAccess.all[read.s()];
+            case 14 -> {
+                int blen = read.i();
+                byte[] bytes = new byte[blen];
+                read.b(bytes);
+                yield bytes;
+            }
+            case 15 -> UnitCommand.all[read.b()];
+            case 16 -> {
+                int boollen = read.i();
+                boolean[] bools = new boolean[boollen];
+                for(int i = 0; i < boollen; i ++) bools[i] = read.bool();
+                yield bools;
+            }
+            case 17 -> !box ? Groups.unit.getByID(read.i()) : new UnitBox(read.i());
+            case 18 -> {
+                int len = read.s();
+                Vec2[] out = new Vec2[len];
+                for(int i = 0; i < len; i ++) out[i] = new Vec2(read.f(), read.f());
+                yield out;
+            }
+            case 19 -> new Vec2(read.f(), read.f());
+            default -> throw new IllegalArgumentException("Unknown object type: " + type);
+        };
     }
 
     public static void writePayload(Writes writes, Payload payload){
