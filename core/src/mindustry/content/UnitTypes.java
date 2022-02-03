@@ -2529,6 +2529,7 @@ public class UnitTypes{
                 shootWarmupSpeed = 0.06f;
                 cooldownTime = 110f;
                 heatColor = Color.valueOf("f9350f");
+                minWarmup = 0.9f;
 
                 parts.addAll(
                 new RegionPart("-glow"){{
@@ -2588,13 +2589,13 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(8.5f, 250){{
+                bullet = new BasicBulletType(8f, 250){{
                     sprite = "missile-large";
                     width = 12f;
                     height = 20f;
-                    lifetime = 30f;
+                    lifetime = 35f;
                     hitSize = 6f;
-                    shootEffect = Fx.shootTitan;
+
                     smokeEffect = Fx.shootSmokeTitan;
                     pierceCap = 3;
                     pierce = true;
@@ -2602,8 +2603,71 @@ public class UnitTypes{
                     hitColor = backColor = trailColor = Color.valueOf("feb380");
                     frontColor = Color.white;
                     trailWidth = 4f;
-                    trailLength = 8;
-                    hitEffect = despawnEffect = Fx.blastExplosion;
+                    trailLength = 9;
+                    hitEffect = despawnEffect = Fx.massiveExplosion;
+
+                    shootEffect = new ExplosionEffect(){{
+                        lifetime = 40f;
+                        waveStroke = 4f;
+                        waveColor = sparkColor = trailColor;
+                        waveRad = 15f;
+                        smokeSize = 5f;
+                        smokes = 8;
+                        smokeSizeBase = 0f;
+                        smokeColor = trailColor;
+                        sparks = 8;
+                        sparkRad = 40f;
+                        sparkLen = 4f;
+                        sparkStroke = 3f;
+                    }};
+
+                    //trailChance = 0.1f;
+                    trailInterval = 3f;
+                    trailParam = 4f;
+
+                    int count = 6;
+                    for(int j = 0; j < count; j++){
+                        int s = j;
+                        for(int i : Mathf.signs){
+                            float fin = 0.05f + (j + 1) / (float)count;
+                            float spd = speed;
+                            float life = lifetime / Mathf.lerp(fin, 1f, 0.5f);
+                            spawnBullets.add(new BasicBulletType(spd * (fin), 40){{
+                                drag = 0.002f;
+                                width = 8f;
+                                height = 10f;
+                                lifetime = life + 5f;
+                                weaveRandom = false;
+                                hitSize = 5f;
+                                pierceCap = 2;
+                                pierce = true;
+                                pierceBuilding = true;
+                                hitColor = backColor = trailColor = Color.valueOf("feb380");
+                                frontColor = Color.white;
+                                trailWidth = 2.5f;
+                                trailLength = 7;
+                                weaveScale = (3f + s/2f) / 1.2f;
+                                weaveMag = i * (4f - fin * 2f);
+
+                                splashDamage = 40f;
+                                splashDamageRadius = 25f;
+                                despawnEffect = new ExplosionEffect(){{
+                                    lifetime = 50f;
+                                    waveStroke = 4f;
+                                    waveColor = sparkColor = trailColor;
+                                    waveRad = 30f;
+                                    smokeSize = 7f;
+                                    smokes = 6;
+                                    smokeSizeBase = 0f;
+                                    smokeColor = trailColor;
+                                    sparks = 5;
+                                    sparkRad = 30f;
+                                    sparkLen = 3f;
+                                    sparkStroke = 1.5f;
+                                }};
+                            }});
+                        }
+                    }
                 }};
             }});
 

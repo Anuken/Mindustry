@@ -1482,13 +1482,13 @@ public class Blocks{
         tungstenWall = new Wall("tungsten-wall"){{
             requirements(Category.defense, with(Items.tungsten, 6));
             health = 180 * wallHealthMultiplier;
-            armor = 10f;
+            armor = 14f;
         }};
 
         tungstenWallLarge = new Wall("tungsten-wall-large"){{
             requirements(Category.defense, ItemStack.mult(tungstenWall.requirements, 4));
             health = 180 * wallHealthMultiplier * 4;
-            armor = 10f;
+            armor = 14f;
             size = 2;
         }};
 

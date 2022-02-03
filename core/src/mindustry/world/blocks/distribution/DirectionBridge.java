@@ -183,21 +183,10 @@ public class DirectionBridge extends Block{
             for(int dir = 0; dir < 4; dir++){
                 if(dir != rotation){
                     int dx = Geometry.d4x(dir), dy = Geometry.d4y(dir);
-                    int length = range;
-                    Building found = null;
-
-                    //find the link
-                    for(int i = 1; i <= range; i++){
-                        Tile other = world.tile(tile.x + dx * i, tile.y + dy * i);
-
-                        if(other != null && other.build instanceof DirectionBridgeBuild build && build.block == DirectionBridge.this && build.team == player.team() && (build.rotation + 2) % 4 == dir){
-                            length = i;
-                            found = other.build;
-                            break;
-                        }
-                    }
+                    Building found = occupied[(dir + 2) % 4];
 
                     if(found != null){
+                        int length = Math.max(Math.abs(found.tileX() - tileX()), Math.abs(found.tileY() - tileY()));
                         Drawf.dashLine(Pal.place,
                         found.x - dx * (tilesize / 2f + 2),
                         found.y - dy * (tilesize / 2f + 2),

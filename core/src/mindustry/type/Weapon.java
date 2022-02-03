@@ -92,6 +92,8 @@ public class Weapon implements Cloneable{
     public float rotationLimit = 361f;
     /** ticks to cool down the heat region */
     public float cooldownTime = 20f;
+    /** minimum weapon warmup before firing (this is not linear, do NOT use 1!) */
+    public float minWarmup = 0f;
     /** lerp speed for shoot warmup, only used for parts */
     public float shootWarmupSpeed = 0.1f, smoothReloadSpeed = 0.15f;
     /** random sound pitch range */
@@ -342,6 +344,7 @@ public class Weapon implements Cloneable{
         can && //must be able to shoot
         (!useAmmo || unit.ammo > 0 || !state.rules.unitAmmo || unit.team.rules().infiniteAmmo) && //check ammo
         (!alternate || wasFlipped == flipSprite) &&
+        mount.warmup >= minWarmup && //must be warmed up
         unit.vel.len() >= minShootVelocity && //check velocity requirements
         mount.reload <= 0.0001f && //reload has to be 0
         Angles.within(rotate ? mount.rotation : unit.rotation, mount.targetRotation, shootCone) //has to be within the cone

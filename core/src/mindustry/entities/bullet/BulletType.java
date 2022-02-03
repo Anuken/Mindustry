@@ -142,6 +142,7 @@ public class BulletType extends Content implements Cloneable{
     public @Nullable BulletType fragBullet = null;
     public Color hitColor = Color.white;
     public Color healColor = Pal.heal;
+    /** Bullets spawned when this bullet is created. Rarely necessary, used for visuals. */
     public Seq<BulletType> spawnBullets = new Seq<>();
 
     public Color trailColor = Pal.missileYellowBack;
@@ -178,7 +179,8 @@ public class BulletType extends Content implements Cloneable{
     public @Nullable BulletType lightningType = null;
 
     public float weaveScale = 1f;
-    public float weaveMag = -1f;
+    public float weaveMag = 0f;
+    public boolean weaveRandom = true;
     public float hitShake = 0f, despawnShake = 0f;
 
     public int puddles;
@@ -375,6 +377,12 @@ public class BulletType extends Content implements Cloneable{
         if(instantDisappear){
             b.time = lifetime;
         }
+
+        if(spawnBullets.size > 0){
+            for(var bullet : spawnBullets){
+                bullet.create(b, b.x, b.y, b.rotation());
+            }
+        }
     }
 
     public void update(Bullet b){
@@ -397,8 +405,8 @@ public class BulletType extends Content implements Cloneable{
             }
         }
 
-        if(weaveMag > 0){
-            b.vel.rotate(Mathf.sin(b.time + Mathf.PI * weaveScale/2f, weaveScale, weaveMag * (Mathf.randomSeed(b.id, 0, 1) == 1 ? -1 : 1)) * Time.delta);
+        if(weaveMag != 0){
+            b.vel.rotateRadExact((float)Math.sin((b.time + Math.PI * weaveScale/2f) / weaveScale) * weaveMag * (weaveRandom ? (Mathf.randomSeed(b.id, 0, 1) == 1 ? -1 : 1) : 1f) * Time.delta * Mathf.degRad);
         }
 
         if(trailChance > 0){
