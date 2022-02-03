@@ -65,7 +65,8 @@ public class DrawTurret extends DrawBlock{
                 Draw.z(Layer.turret);
             }
 
-            var params = WeaponPart.params.set(build.warmup(), tb.progress(), tb.heat, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
+            //TODO no smooth reload
+            var params = WeaponPart.params.set(build.warmup(), 1f - tb.progress(), 1f - tb.progress(), tb.heat, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
 
             for(var part : parts){
                 part.draw(params);

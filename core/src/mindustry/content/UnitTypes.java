@@ -2518,7 +2518,7 @@ public class UnitTypes{
                 reload = 120f;
                 shootY = 32.5f;
                 shake = 5f;
-                recoil = 4f;
+                recoil = 5f;
                 rotate = true;
                 rotateSpeed = 0.6f;
                 mirror = false;
@@ -2530,45 +2530,63 @@ public class UnitTypes{
                 cooldownTime = 110f;
                 heatColor = Color.valueOf("f9350f");
 
-                parts.add(
+                parts.addAll(
                 new RegionPart("-glow"){{
                     color = Color.red;
                     blending = Blending.additive;
                     outline = mirror = false;
                 }},
                 new RegionPart("-sides"){{
-                    useReload = false;
+                    progress = PartProgress.warmup;
                     mirror = true;
                     under = true;
-                    moveX = 0.5f;
-                    moveY = 0.5f;
+                    moveX = 0.75f;
+                    moveY = 0.75f;
                     rotMove = 82f;
-                    x = 38 / 4f;
-                    y = 9 / 4f;
+                    x = 37 / 4f;
+                    y = 8 / 4f;
                 }},
                 new RegionPart("-sinks"){{
-                    useReload = false;
+                    progress = PartProgress.warmup;
                     mirror = true;
                     under = true;
                     heatColor = new Color(1f, 0.1f, 0.1f);
-                    moveX = 15f / 4f;
-                    moveY = -13f / 4f;
-                    x = 34 / 4f;
-                    y = -36 / 4f;
+                    moveX = 17f / 4f;
+                    moveY = -15f / 4f;
+                    x = 32 / 4f;
+                    y = -34 / 4f;
                 }},
                 new RegionPart("-sinks-heat"){{
                     blending = Blending.additive;
-                    useReload = false;
+                    progress = PartProgress.warmup;
                     mirror = true;
                     outline = false;
                     colorTo = new Color(1f, 0f, 0f, 0.5f);
                     color = colorTo.cpy().a(0f);
-                    moveX = 15f / 4f;
-                    moveY = -13f / 4f;
-                    x = 34 / 4f;
-                    y = -36 / 4f;
+                    moveX = 17f / 4f;
+                    moveY = -15f / 4f;
+                    x = 32 / 4f;
+                    y = -34 / 4f;
                 }}
                 );
+
+                //TODO this is a bit over-the-top
+                for(int i = 1; i <= 3; i++){
+                    int fi = i;
+                    parts.add(new RegionPart("-blade"){{
+                        progress = PartProgress.warmup.delay((3 - fi) * 0.3f).blend(PartProgress.reload, 0.3f);
+                        heatProgress = PartProgress.heat.add(0.3f).min(PartProgress.warmup);
+                        heatColor = new Color(1f, 0.1f, 0.1f);
+                        mirror = true;
+                        under = true;
+                        rotMove = -40f * fi;
+                        moveX = 3f;
+                        layerOffset = -0.002f;
+
+                        x = 11 / 4f;
+                        y = 0 / 4f;
+                    }});
+                }
 
                 bullet = new BasicBulletType(8.5f, 250){{
                     sprite = "missile-large";

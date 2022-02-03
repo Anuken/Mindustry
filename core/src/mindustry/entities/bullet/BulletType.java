@@ -5,6 +5,7 @@ import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
@@ -138,6 +139,7 @@ public class BulletType extends Content implements Cloneable{
     public @Nullable BulletType fragBullet = null;
     public Color hitColor = Color.white;
     public Color healColor = Pal.heal;
+    public Seq<BulletType> spawnBullets = new Seq<>();
 
     public Color trailColor = Pal.missileYellowBack;
     public float trailChance = -0.0001f;

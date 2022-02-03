@@ -3115,7 +3115,7 @@ public class Blocks{
 
                 parts.addAll(
                 new RegionPart("-back"){{
-                    useReload = false;
+                    progress = PartProgress.warmup;
                     mirror = true;
                     rotMove = 40f;
                     x = 22 / 4f;
@@ -3125,7 +3125,7 @@ public class Blocks{
                     heatColor = heatc;
                 }},
                 new RegionPart("-front"){{
-                    useReload = false;
+                    progress = PartProgress.warmup;
                     mirror = true;
                     rotMove = 40f;
                     x = 20 / 4f;
@@ -3136,7 +3136,7 @@ public class Blocks{
                     heatColor = heatc;
                 }},
                 new RegionPart("-nozzle"){{
-                    useReload = false;
+                    progress = PartProgress.warmup;
                     mirror = true;
                     moveX = 8f / 4f;
                     heatColor = Color.valueOf("f03b0e");
@@ -3235,10 +3235,9 @@ public class Blocks{
                     moveX = 2f * 4f / 3f;
                     moveY = -0.5f;
                     rotMove = -40f;
-                    useReload = false;
+                    progress = heatProgress = PartProgress.warmup;
                     under = true;
                     heatColor = Color.red.cpy();
-                    useProgressHeat = true;
                     interp = Interp.pow2Out;
                 }});
             }};

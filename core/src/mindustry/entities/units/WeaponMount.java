@@ -20,6 +20,8 @@ public class WeaponMount{
     public float heat;
     /** lerps to 1 when shooting, 0 when not */
     public float warmup;
+    /** lerps to reload time */
+    public float smoothReload;
     /** aiming position in world coordinates */
     public float aimX, aimY;
     /** whether to shoot right now */

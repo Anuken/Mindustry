@@ -9,32 +9,33 @@ import arc.util.*;
 import mindustry.graphics.*;
 
 public class RegionPart extends WeaponPart{
+    protected PartParams childParam = new PartParams();
+
     public String suffix = "";
     public TextureRegion heat;
     public TextureRegion[] regions = {};
     public TextureRegion[] outlines = {};
 
-    /** If true, turret reload is used as the measure of progress. Otherwise, warmup is used. */
-    public boolean useReload = true;
     /** If true, parts are mirrored across the turret. Requires -1 and -2 regions. */
     public boolean mirror = false;
     /** If true, an outline is drawn under the part. */
     public boolean outline = true;
     /** If true, the base + outline regions are drawn. Set to false for heat-only regions. */
     public boolean drawRegion = true;
-    /** If true, progress is inverted. */
-    public boolean invert = false;
+    /** Progress function for determining position/rotation. */
+    public PartProgress progress = PartProgress.warmup;
+    /** Progress function for heat alpha. */
+    public PartProgress heatProgress = PartProgress.heat;
     public Blending blending = Blending.normal;
-    public boolean useProgressHeat = false;
     public Interp interp = Interp.linear;
-    public float layer = -1;
-    public float outlineLayerOffset = -0.01f;
+    public float layer = -1, layerOffset = 0f;
+    public float outlineLayerOffset = -0.001f;
     public float rotation, rotMove;
     public float x, y, moveX, moveY;
-    public float oscMag = 0f, oscScl = 7f;
     public boolean oscAbs = false;
     public @Nullable Color color, colorTo;
     public Color heatColor = Pal.turretHeat.cpy();
+    public @Nullable WeaponPart child;
 
     public RegionPart(String region){
         this.suffix = region;
@@ -49,26 +50,27 @@ public class RegionPart extends WeaponPart{
         if(layer > 0) Draw.z(layer);
         //TODO 'under' should not be special cased like this...
         if(under && turretShading) Draw.z(z - 0.0001f);
+        Draw.z(Draw.z() + layerOffset);
 
         float prevZ = Draw.z();
-        float progress = useReload ? 1f - params.reload : params.warmup;
+        float prog = progress.get(params);
 
-        if(oscMag > 0) progress += oscAbs ? Mathf.absin(oscScl, oscMag) : Mathf.sin(oscScl, oscMag);
-        if(invert) progress = 1f - progress;
+        prog = interp.apply(prog);
+        int len = mirror && params.sideOverride == -1 ? 2 : 1;
 
-        progress = interp.apply(progress);
-        int len = mirror ? 2 : 1;
+        for(int s = 0; s < len; s++){
+            //use specific side if necessary
+            int i = params.sideOverride == -1 ? s : params.sideOverride;
 
-        for(int i = 0; i < len; i++){
             //can be null
             var region = drawRegion ? regions[Math.min(i, regions.length - 1)] : null;
             float sign = i == 1 ? -1 : 1;
-            Tmp.v1.set((x + moveX * progress) * sign, y + moveY * progress).rotate((params.rotation - 90));
+            Tmp.v1.set((x + moveX * prog) * sign, y + moveY * prog).rotate(params.rotation - 90);
 
             float
                 rx = params.x + Tmp.v1.x,
                 ry = params.y + Tmp.v1.y,
-                rot = i * sign + rotMove * progress * sign + params.rotation - 90;
+                rot = rotMove * prog * sign + params.rotation - 90;
 
             Draw.xscl = i == 0 ? 1 : -1;
 
@@ -80,7 +82,7 @@ public class RegionPart extends WeaponPart{
 
             if(drawRegion && region.found()){
                 if(color != null && colorTo != null){
-                    Draw.color(color, colorTo, progress);
+                    Draw.color(color, colorTo, prog);
                 }else if(color != null){
                     Draw.color(color);
                 }
@@ -91,13 +93,27 @@ public class RegionPart extends WeaponPart{
             }
 
             if(heat.found()){
-                Drawf.additive(heat, heatColor.write(Tmp.c1).a((useProgressHeat ? params.warmup : params.heat) * heatColor.a), rx, ry, rot, turretShading ? Layer.turretHeat : z + 1f);
+                Drawf.additive(heat, heatColor.write(Tmp.c1).a(heatProgress.get(params) * heatColor.a), rx, ry, rot, turretShading ? Layer.turretHeat : z + 1f);
             }
 
             Draw.xscl = 1f;
         }
 
         Draw.z(z);
+
+        //draw child, if applicable - only at the end
+        //TODO lots of copy-paste here
+        if(child != null){
+            for(int s = 0; s < len; s++){
+                int i = (params.sideOverride == -1 ? s : params.sideOverride);
+                float sign = i == 1 ? -1 : 1;
+                Tmp.v1.set((x + moveX * prog) * sign, y + moveY * prog).rotate(params.rotation - 90);
+
+                childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.x + Tmp.v1.x, params.y + Tmp.v1.y, i * sign + rotMove * prog * sign + params.rotation);
+                childParam.sideOverride = i;
+                child.draw(childParam);
+            }
+        }
     }
 
     @Override
@@ -121,12 +137,18 @@ public class RegionPart extends WeaponPart{
         }
 
         heat = Core.atlas.find(name + suffix + "-heat");
+        if(child != null){
+            child.load(name);
+        }
     }
 
     @Override
     public void getOutlines(Seq<TextureRegion> out){
         if(outline && drawRegion){
             out.addAll(regions);
+        }
+        if(child != null){
+            child.getOutlines(out);
         }
     }
 }
