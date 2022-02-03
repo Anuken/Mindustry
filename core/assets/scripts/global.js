@@ -205,3 +205,5 @@ const ResizeEvent = Packages.mindustry.game.EventType.ResizeEvent
 const LoseEvent = Packages.mindustry.game.EventType.LoseEvent
 const WinEvent = Packages.mindustry.game.EventType.WinEvent
 const Trigger = Packages.mindustry.game.EventType.Trigger
+const PlayerConnectionConfirmed = Packages.mindustry.game.EventType.PlayerConnectionConfirmed
+const AdminRequestEvent = Packages.mindustry.game.EventType.AdminRequestEvent
