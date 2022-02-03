@@ -24,6 +24,7 @@ import mindustry.entities.Units.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
+import mindustry.entities.part.*;
 import mindustry.game.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
@@ -123,6 +124,13 @@ public class ContentParser{
                 return make(resolve(data.asString()));
             }
             var bc = resolve(data.getString("type", ""), DrawBlock.class);
+            data.remove("type");
+            var result = make(bc);
+            readFields(result, data);
+            return result;
+        });
+        put(WeaponPart.class, (type, data) -> {
+            var bc = resolve(data.getString("type", ""), RegionPart.class);
             data.remove("type");
             var result = make(bc);
             readFields(result, data);

@@ -14,6 +14,7 @@ import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.part.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -125,6 +126,8 @@ public class Weapon implements Cloneable{
     public float shootStatusDuration = 60f * 5f;
     /** whether this weapon should fire when its owner dies */
     public boolean shootOnDeath = false;
+    /** extra animated parts */
+    public Seq<WeaponPart> parts = new Seq<>();
 
     public Weapon(String name){
         this.name = name;
@@ -163,13 +166,9 @@ public class Weapon implements Cloneable{
         wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -mount.recoil),
         wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -mount.recoil);
 
-        if(outlineRegion.found()){
-            Draw.rect(outlineRegion,
-            wx, wy,
-            outlineRegion.width * Draw.scl * -Mathf.sign(flipSprite),
-            outlineRegion.height * Draw.scl,
-            weaponRotation);
-        }
+        Draw.xscl = -Mathf.sign(flipSprite);
+        Draw.rect(outlineRegion, wx, wy, weaponRotation);
+        Draw.xscl = 1f;
 
         Draw.z(z);
     }
@@ -195,23 +194,36 @@ public class Weapon implements Cloneable{
             drawOutline(unit, mount);
         }
 
-        Draw.rect(region,
-        wx, wy,
-        region.width * Draw.scl * -Mathf.sign(flipSprite),
-        region.height * Draw.scl,
-        weaponRotation);
+        Draw.xscl = -Mathf.sign(flipSprite);
+
+        Draw.rect(region, wx, wy, weaponRotation);
 
         if(heatRegion.found() && mount.heat > 0){
             Draw.color(heatColor, mount.heat);
             Draw.blend(Blending.additive);
-            Draw.rect(heatRegion,
-            wx, wy,
-            heatRegion.width * Draw.scl * -Mathf.sign(flipSprite),
-            heatRegion.height * Draw.scl,
-            weaponRotation);
+            Draw.rect(heatRegion, wx, wy, weaponRotation);
             Draw.blend();
             Draw.color();
         }
+
+        if(parts.size > 0){
+            //TODO does it need an outline?
+            /*
+            if(outline.found()){
+                //draw outline under everything when parts are involved
+                Draw.z(Layer.turret - 0.01f);
+                Draw.rect(outline, build.x + tb.recoilOffset.x, build.y + tb.recoilOffset.y, tb.drawrot());
+                Draw.z(Layer.turret);
+            }*/
+
+            var params = WeaponPart.params.set(0f, Mathf.clamp(mount.reload / reload), mount.heat, wx, wy, weaponRotation + 90);
+
+            for(var part : parts){
+                part.draw(params);
+            }
+        }
+
+        Draw.xscl = 1f;
 
         Draw.z(z);
     }
@@ -445,6 +457,12 @@ public class Weapon implements Cloneable{
         region = Core.atlas.find(name);
         heatRegion = Core.atlas.find(name + "-heat");
         outlineRegion = Core.atlas.find(name + "-outline");
+
+        //TODO outlinedRegions
+        for(var part : parts){
+            part.turretShading = false;
+            part.load(name);
+        }
     }
 
 }

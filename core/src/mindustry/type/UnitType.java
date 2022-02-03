@@ -583,9 +583,31 @@ public class UnitType extends UnlockableContent{
         }
     }
 
+    public void getRegionsToOutline(Seq<TextureRegion> out){
+        for(Weapon weapon : weapons){
+            for(var part : weapon.parts){
+                part.getOutlines(out);
+            }
+        }
+    }
+
     @Override
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
+
+        var toOutline = new Seq<TextureRegion>();
+        getRegionsToOutline(toOutline);
+
+        for(var region : toOutline){
+            if(region instanceof AtlasRegion atlas){
+                String regionName = atlas.name;
+                Pixmap outlined = Pixmaps.outline(Core.atlas.getPixmap(region), outlineColor, outlineRadius);
+
+                if(Core.settings.getBool("linear", true)) Pixmaps.bleed(outlined);
+
+                packer.add(PageType.main, regionName + "-outline", outlined);
+            }
+        }
 
         //currently does not create outlines for legs or base regions due to older mods having them outlined by default
         if(outlines){

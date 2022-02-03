@@ -11,6 +11,8 @@ import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
+import mindustry.entities.part.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -2432,10 +2434,10 @@ public class UnitTypes{
         vanquish = new TankUnitType("vanquish"){{
             hitSize = 28f;
             treadPullOffset = 4;
-            speed = 0.6f;
+            speed = 0.63f;
             health = 9000;
             armor = 20f;
-            areaDamage = 12f;
+            areaDamage = 13f;
             treadRects = new Rect[]{new Rect(22, 16, 28, 130)};
 
             weapons.add(new Weapon("vanquish-weapon"){{
@@ -2513,17 +2515,23 @@ public class UnitTypes{
             weapons.add(new Weapon("conquer-weapon"){{
                 layerOffset = 0.0001f;
                 reload = 120f;
-                shootY = 71f / 4f;
+                shootY = 32.5f;
                 shake = 5f;
                 recoil = 4f;
                 rotate = true;
                 rotateSpeed = 0.6f;
                 mirror = false;
                 x = 0f;
-                shadow = 32f;
-                y = -8f;
+                y = -2f;
+                shadow = 50f;
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
+
+                parts.add(new RegionPart("-glow"){{
+                    color = Color.red;
+                    blending = Blending.additive;
+                    outline = mirror = false;
+                }});
 
                 bullet = new BasicBulletType(8f, 110){{
                     sprite = "missile-large";
@@ -2545,9 +2553,9 @@ public class UnitTypes{
             }});
 
             //TODO could change color when shooting
-            //decals.add(new UnitDecal("conquer-glow", Pal.turretHeat.cpy(), Blending.additive){{
-            //    layer = -1f;
-            //}});
+            decals.add(new UnitDecal("conquer-glow", Color.red, Blending.additive){{
+                layer = -1f;
+            }});
         }};
 
         //endregion

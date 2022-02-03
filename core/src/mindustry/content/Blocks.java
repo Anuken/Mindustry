@@ -7,6 +7,7 @@ import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
+import mindustry.entities.part.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -3648,7 +3649,7 @@ public class Blocks{
         }};
 
         switchBlock = new SwitchBlock("switch"){{
-            requirements(Category.logic, with(Items.graphite, 5));
+            requirements(Category.logic, with(Items.graphite, 5, Items.copper, 5));
         }};
 
         microProcessor = new LogicBlock("micro-processor"){{
@@ -3683,13 +3684,13 @@ public class Blocks{
         }};
 
         memoryCell = new MemoryBlock("memory-cell"){{
-            requirements(Category.logic, with(Items.graphite, 30, Items.silicon, 30));
+            requirements(Category.logic, with(Items.graphite, 30, Items.silicon, 30, Items.copper, 30));
 
             memoryCapacity = 64;
         }};
 
         memoryBank = new MemoryBlock("memory-bank"){{
-            requirements(Category.logic, with(Items.graphite, 80, Items.silicon, 80, Items.phaseFabric, 30));
+            requirements(Category.logic, with(Items.graphite, 80, Items.silicon, 80, Items.phaseFabric, 30, Items.copper, 30));
 
             memoryCapacity = 512;
             size = 2;

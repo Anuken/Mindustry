@@ -1,11 +1,11 @@
 package mindustry.world.draw;
 
 import arc.*;
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.entities.part.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -17,7 +17,7 @@ import mindustry.world.blocks.defense.turrets.Turret.*;
 public class DrawTurret extends DrawBlock{
     protected static final Rand rand = new Rand();
 
-    public Seq<TurretPart> parts = new Seq<>();
+    public Seq<WeaponPart> parts = new Seq<>();
     public String basePrefix = "";
     /** Overrides the liquid to draw in the liquid region. */
     public @Nullable Liquid liquidDraw;
@@ -59,13 +59,16 @@ public class DrawTurret extends DrawBlock{
 
         if(parts.size > 0){
             if(outline.found()){
+                //draw outline under everything when parts are involved
                 Draw.z(Layer.turret - 0.01f);
                 Draw.rect(outline, build.x + tb.recoilOffset.x, build.y + tb.recoilOffset.y, tb.drawrot());
                 Draw.z(Layer.turret);
             }
 
+            var params = WeaponPart.params.set(build.warmup(), tb.progress(), tb.heat, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
+
             for(var part : parts){
-                part.draw(tb);
+                part.draw(params);
             }
         }
     }
@@ -102,7 +105,8 @@ public class DrawTurret extends DrawBlock{
         base = Core.atlas.find(block.name + "-base");
 
         for(var part : parts){
-            part.load(block);
+            part.turretShading = true;
+            part.load(block.name);
         }
 
         //TODO test this for mods, e.g. exotic
@@ -115,128 +119,5 @@ public class DrawTurret extends DrawBlock{
     public TextureRegion[] icons(Block block){
         TextureRegion showTop = preview.found() ? preview : block.region;
         return top.found() ? new TextureRegion[]{base, showTop, top} : new TextureRegion[]{base, showTop};
-    }
-
-    public static class RegionPart extends TurretPart{
-        public String suffix = "";
-        public TextureRegion heat;
-        public TextureRegion[] regions;
-        public TextureRegion[] outlines;
-
-        /** If true, turret reload is used as the measure of progress. Otherwise, warmup is used. */
-        public boolean useReload = true;
-        /** If true, parts are mirrored across the turret. Requires -1 and -2 regions. */
-        public boolean mirror = true;
-        /** If true, an outline is drawn under the part. */
-        public boolean outline = true;
-        /** If true, the layer is overridden to be under the turret itself. */
-        public boolean under = false;
-        /** If true, the base + outline regions are drawn. Set to false for heat-only regions. */
-        public boolean drawRegion = true;
-        /** If true, progress is inverted. */
-        public boolean invert = false;
-        public boolean useProgressHeat = false;
-        public Interp interp = Interp.linear;
-        public float layer = -1;
-        public float outlineLayerOffset = -0.01f;
-        public float rotation, rotMove;
-        public float x, y, moveX, moveY;
-        public float oscMag = 0f, oscScl = 7f;
-        public boolean oscAbs = false;
-        public Color heatColor = Pal.turretHeat.cpy();
-
-        public RegionPart(String region){
-            this.suffix = region;
-        }
-
-        public RegionPart(){
-        }
-
-        @Override
-        public void draw(TurretBuild build){
-            float z = Draw.z();
-            if(layer > 0){
-                Draw.z(layer);
-            }
-            float prevZ = layer > 0 ? layer : z;
-
-            float progress = useReload ? 1f - build.progress() : build.warmup();
-
-            if(oscMag > 0) progress += oscAbs ? Mathf.absin(oscScl, oscMag) : Mathf.sin(oscScl, oscMag);
-            if(invert) progress = 1f - progress;
-
-            progress = interp.apply(progress);
-
-            for(int i = 0; i < regions.length; i++){
-                //can be null if drawRegion == false
-                var region = regions[i];
-                float sign = i == 1 ? -1 : 1;
-                Tmp.v1.set((x + moveX * progress) * sign, y + moveY * progress).rotate((build.rotation - 90));
-
-                float
-                    rx = build.x + Tmp.v1.x + build.recoilOffset.x,
-                    ry = build.y + Tmp.v1.y + build.recoilOffset.y,
-                    rot = i * sign + rotMove * progress * sign + build.rotation - 90;
-
-                Draw.xscl = i == 0 ? 1 : -1;
-
-                if(outline && drawRegion){
-                    Draw.z(prevZ + outlineLayerOffset);
-                    Draw.rect(outlines[i], rx, ry, rot);
-                    Draw.z(prevZ);
-                }
-
-                if(drawRegion && region.found()){
-                    Draw.rect(region, rx, ry, rot);
-                }
-
-                if(heat.found()){
-                    Drawf.additive(heat, heatColor.write(Tmp.c1).a((useProgressHeat ? build.warmup() : build.heat) * heatColor.a), rx, ry, rot, Layer.turretHeat);
-                }
-
-                Draw.xscl = 1f;
-            }
-
-            Draw.z(z);
-        }
-
-        @Override
-        public void load(Block block){
-            if(under) layer = Layer.turret - 0.0001f;
-
-            if(drawRegion){
-                if(mirror){
-                    regions = new TextureRegion[]{
-                    Core.atlas.find(block.name + suffix + "1"),
-                    Core.atlas.find(block.name + suffix + "2")
-                    };
-
-                    outlines = new TextureRegion[]{
-                    Core.atlas.find(block.name + suffix + "1-outline"),
-                    Core.atlas.find(block.name + suffix + "2-outline")
-                    };
-                }else{
-                    regions = new TextureRegion[]{Core.atlas.find(block.name + suffix)};
-                    outlines = new TextureRegion[]{Core.atlas.find(block.name + suffix + "-outline")};
-                }
-            }else{
-                regions = new TextureRegion[1];
-            }
-
-            heat = Core.atlas.find(block.name + suffix + "-heat");
-        }
-
-        @Override
-        public void getOutlines(Seq<TextureRegion> out){
-            if(outline && drawRegion){
-                out.addAll(regions);
-            }
-        }
-    }
-
-    public static abstract class TurretPart{
-        public abstract void draw(TurretBuild build);
-        public abstract void load(Block block);
-        public void getOutlines(Seq<TextureRegion> out){}
     }
 }

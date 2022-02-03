@@ -329,11 +329,9 @@ public class Generators{
                     }
                 }
 
-                if(toOutline != null){
-                    for(TextureRegion region : toOutline){
-                        Pixmap pix = get(region).outline(block.outlineColor, block.outlineRadius);
-                        save(pix, ((GenRegion)region).name + "-outline");
-                    }
+                for(TextureRegion region : toOutline){
+                    Pixmap pix = get(region).outline(block.outlineColor, block.outlineRadius);
+                    save(pix, ((GenRegion)region).name + "-outline");
                 }
 
                 if(regions.length == 0){
@@ -501,6 +499,14 @@ public class Generators{
                         replace(t, outline.get(get(t)));
                     }
                 };
+
+                Seq<TextureRegion> toOutline = new Seq<>();
+                type.getRegionsToOutline(toOutline);
+
+                for(TextureRegion region : toOutline){
+                    Pixmap pix = get(region).outline(type.outlineColor, type.outlineRadius);
+                    save(pix, ((GenRegion)region).name + "-outline");
+                }
 
                 Seq<Weapon> weapons = type.weapons;
                 weapons.each(Weapon::load);
