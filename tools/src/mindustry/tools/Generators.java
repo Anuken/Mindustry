@@ -515,7 +515,7 @@ public class Generators{
                 for(Weapon weapon : weapons){
                     if(outlined.add(weapon.name) && has(weapon.name)){
                         //only non-top weapons need separate outline sprites (this is mostly just mechs)
-                        if(!weapon.top){
+                        if(!weapon.top || weapon.parts.contains(p -> p.under)){
                             save(outline.get(get(weapon.name)), weapon.name + "-outline");
                         }else{
                             //replace weapon with outlined version, no use keeping standard around

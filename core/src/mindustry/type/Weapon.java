@@ -25,7 +25,7 @@ import static mindustry.Vars.*;
 public class Weapon implements Cloneable{
     /** temporary weapon sequence number */
     static int sequenceNum = 0;
-    
+
     /** displayed weapon region */
     public String name;
     /** bullet shot */
@@ -129,7 +129,7 @@ public class Weapon implements Cloneable{
     /** whether this weapon should fire when its owner dies */
     public boolean shootOnDeath = false;
     /** extra animated parts */
-    public Seq<WeaponPart> parts = new Seq<>();
+    public Seq<WeaponPart> parts = new Seq<>(WeaponPart.class);
 
     public Weapon(String name){
         this.name = name;
@@ -158,10 +158,6 @@ public class Weapon implements Cloneable{
     public void drawOutline(Unit unit, WeaponMount mount){
         if(!outlineRegion.found()) return;
 
-        //apply layer offset, roll it back at the end
-        float z = Draw.z();
-        Draw.z(z + layerOffset);
-
         float
         rotation = unit.rotation - 90,
         weaponRotation  = rotation + (rotate ? mount.rotation : 0),
@@ -171,10 +167,8 @@ public class Weapon implements Cloneable{
         Draw.xscl = -Mathf.sign(flipSprite);
         Draw.rect(outlineRegion, wx, wy, weaponRotation);
         Draw.xscl = 1f;
-
-        Draw.z(z);
     }
-    
+
     public void draw(Unit unit, WeaponMount mount){
         if(!region.found()) return;
 
@@ -198,6 +192,17 @@ public class Weapon implements Cloneable{
 
         Draw.xscl = -Mathf.sign(flipSprite);
 
+        if(parts.size > 0){
+            WeaponPart.params.set(mount.warmup, 1f - Mathf.clamp(mount.reload / reload), mount.heat, wx, wy, weaponRotation + 90);
+
+            for(int i = 0; i < parts.size; i++){
+                var part = parts.items[i];
+                if(part.under){
+                    part.draw(WeaponPart.params);
+                }
+            }
+        }
+
         Draw.rect(region, wx, wy, weaponRotation);
 
         if(heatRegion.found() && mount.heat > 0){
@@ -218,10 +223,11 @@ public class Weapon implements Cloneable{
                 Draw.z(Layer.turret);
             }*/
 
-            var params = WeaponPart.params.set(mount.warmup, 1f - Mathf.clamp(mount.reload / reload), mount.heat, wx, wy, weaponRotation + 90);
-
-            for(var part : parts){
-                part.draw(params);
+            for(int i = 0; i < parts.size; i++){
+                var part = parts.items[i];
+                if(!part.under){
+                    part.draw(WeaponPart.params);
+                }
             }
         }
 
@@ -361,8 +367,8 @@ public class Weapon implements Cloneable{
     protected Vec2 getShootPos(Unit unit, WeaponMount mount, Vec2 out){
         float weaponRot = unit.rotation - 90 + (rotate ? mount.rotation : 0);
         return out.set(unit.x, unit.y)
-            .add(Angles.trnsx(unit.rotation - 90, x, y), Angles.trnsy(unit.rotation - 90, x, y))
-            .add(Angles.trnsx(weaponRot, this.shootX, this.shootY), Angles.trnsx(weaponRot, this.shootX, this.shootY));
+        .add(Angles.trnsx(unit.rotation - 90, x, y), Angles.trnsy(unit.rotation - 90, x, y))
+        .add(Angles.trnsx(weaponRot, this.shootX, this.shootY), Angles.trnsx(weaponRot, this.shootX, this.shootY));
     }
 
     protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float aimX, float aimY, float mountX, float mountY, float rotation, int side){
@@ -430,9 +436,9 @@ public class Weapon implements Cloneable{
 
     protected @Nullable Bullet bullet(Unit unit, float shootX, float shootY, float angle, float lifescl){
         float
-            xr = Mathf.range(xRand),
-            x = shootX + Angles.trnsx(angle, 0, xr),
-            y = shootY + Angles.trnsy(angle, 0, xr);
+        xr = Mathf.range(xRand),
+        x = shootX + Angles.trnsx(angle, 0, xr),
+        y = shootY + Angles.trnsy(angle, 0, xr);
 
         if(unitSpawned == null){
             return bullet.create(unit, unit.team, x, y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd), lifescl);

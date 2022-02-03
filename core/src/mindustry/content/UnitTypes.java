@@ -2526,7 +2526,9 @@ public class UnitTypes{
                 y = -2f;
                 shadow = 50f;
                 heatColor = Color.valueOf("f9350f");
-                cooldownTime = 80f;
+                shootWarmupSpeed = 0.06f;
+                cooldownTime = 110f;
+                heatColor = Color.valueOf("f9350f");
 
                 parts.add(
                 new RegionPart("-glow"){{
@@ -2534,10 +2536,33 @@ public class UnitTypes{
                     blending = Blending.additive;
                     outline = mirror = false;
                 }},
+                new RegionPart("-sides"){{
+                    useReload = false;
+                    mirror = true;
+                    under = true;
+                    moveX = 0.5f;
+                    moveY = 0.5f;
+                    rotMove = 82f;
+                    x = 38 / 4f;
+                    y = 9 / 4f;
+                }},
                 new RegionPart("-sinks"){{
                     useReload = false;
                     mirror = true;
                     under = true;
+                    heatColor = new Color(1f, 0.1f, 0.1f);
+                    moveX = 15f / 4f;
+                    moveY = -13f / 4f;
+                    x = 34 / 4f;
+                    y = -36 / 4f;
+                }},
+                new RegionPart("-sinks-heat"){{
+                    blending = Blending.additive;
+                    useReload = false;
+                    mirror = true;
+                    outline = false;
+                    colorTo = new Color(1f, 0f, 0f, 0.5f);
+                    color = colorTo.cpy().a(0f);
                     moveX = 15f / 4f;
                     moveY = -13f / 4f;
                     x = 34 / 4f;
@@ -2545,20 +2570,20 @@ public class UnitTypes{
                 }}
                 );
 
-                bullet = new BasicBulletType(8f, 110){{
+                bullet = new BasicBulletType(8.5f, 250){{
                     sprite = "missile-large";
-                    width = 9.5f;
-                    height = 15f;
+                    width = 12f;
+                    height = 20f;
                     lifetime = 30f;
                     hitSize = 6f;
                     shootEffect = Fx.shootTitan;
                     smokeEffect = Fx.shootSmokeTitan;
-                    pierceCap = 2;
+                    pierceCap = 3;
                     pierce = true;
                     pierceBuilding = true;
                     hitColor = backColor = trailColor = Color.valueOf("feb380");
                     frontColor = Color.white;
-                    trailWidth = 3.1f;
+                    trailWidth = 4f;
                     trailLength = 8;
                     hitEffect = despawnEffect = Fx.blastExplosion;
                 }};

@@ -20,8 +20,6 @@ public class RegionPart extends WeaponPart{
     public boolean mirror = false;
     /** If true, an outline is drawn under the part. */
     public boolean outline = true;
-    /** If true, the layer is overridden to be under the weapon/turret itself. */
-    public boolean under = false;
     /** If true, the base + outline regions are drawn. Set to false for heat-only regions. */
     public boolean drawRegion = true;
     /** If true, progress is inverted. */
@@ -49,7 +47,8 @@ public class RegionPart extends WeaponPart{
     public void draw(PartParams params){
         float z = Draw.z();
         if(layer > 0) Draw.z(layer);
-        if(under) Draw.z(z - 0.0001f);
+        //TODO 'under' should not be special cased like this...
+        if(under && turretShading) Draw.z(z - 0.0001f);
 
         float prevZ = Draw.z();
         float progress = useReload ? 1f - params.reload : params.warmup;

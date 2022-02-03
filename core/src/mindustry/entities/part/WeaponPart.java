@@ -8,6 +8,8 @@ public abstract class WeaponPart{
 
     /** If true, turret shading is used. Don't touch this, it is set up in unit/block init()! */
     public boolean turretShading;
+    /** If true, the layer is overridden to be under the weapon/turret itself. */
+    public boolean under = false;
 
     public abstract void draw(PartParams params);
     public abstract void load(String name);

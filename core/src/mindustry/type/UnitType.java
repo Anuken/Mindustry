@@ -613,7 +613,7 @@ public class UnitType extends UnlockableContent{
         if(outlines){
 
             //outlines only created when weapons are drawn under w/ merged outlines
-            makeOutline(packer, region, alwaysCreateOutline || weapons.contains(w -> !w.top));
+            makeOutline(packer, region, alwaysCreateOutline || weapons.contains(w -> !w.top || w.parts.contains(p -> p.under)));
 
             for(Weapon weapon : weapons){
                 if(!weapon.name.isEmpty()){
@@ -981,7 +981,13 @@ public class UnitType extends UnlockableContent{
 
         for(WeaponMount mount : unit.mounts){
             if(!mount.weapon.top){
+                //apply layer offset, roll it back at the end
+                float z = Draw.z();
+                Draw.z(z + mount.weapon.layerOffset);
+
                 mount.weapon.drawOutline(unit, mount);
+
+                Draw.z(z);
             }
         }
 
