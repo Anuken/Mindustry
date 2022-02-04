@@ -7,6 +7,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
+//TODO very strange idle behavior sometimes
 public class FlyingAI extends AIController{
 
     @Override

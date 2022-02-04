@@ -6,6 +6,7 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 
+//TODO generally strange behavior
 /** AI/wave team only! This is used for wave support flyers. */
 public class FlyingFollowAI extends FlyingAI{
     public Teamc following;
