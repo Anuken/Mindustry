@@ -25,6 +25,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
+import mindustry.entities.part.WeaponPart.*;
 import mindustry.game.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
@@ -135,6 +136,40 @@ public class ContentParser{
             var result = make(bc);
             readFields(result, data);
             return result;
+        });
+        put(PartProgress.class, (type, data) -> {
+            //simple case: it's a string or number constant
+            if(data.isString()) return field(PartProgress.class, data.asString());
+            if(data.isNumber()) return PartProgress.constant(data.asFloat());
+
+            if(!data.has("type")){
+                throw new RuntimeException("PartProgress object need a 'type' string field. Check the PartProgress class for a list of constants.");
+            }
+
+            PartProgress base = (PartProgress)field(PartProgress.class, data.getString("type"));
+
+            //no operations I guess (why would you do this?)
+            if(!data.has("operation")){
+                return base;
+            }
+
+            //this is the name of the method to call
+            String op = data.getString("operation");
+
+            //I have to hard-code this, no easy way of getting parameter names, unfortunately
+            return switch(op){
+                case "inv" -> base.inv();
+                case "delay" -> base.delay(data.getFloat("amount"));
+                case "shorten" -> base.shorten(data.getFloat("amount"));
+                case "add" -> base.add(data.getFloat("amount"));
+                case "blend" -> base.blend(parser.readValue(PartProgress.class, data.get("other")), data.getFloat("amount"));
+                case "mul" -> base.mul(parser.readValue(PartProgress.class, data.get("other")));
+                case "min" -> base.min(parser.readValue(PartProgress.class, data.get("other")));
+                case "sin" -> base.sin(data.getFloat("scl"), data.getFloat("mag"));
+                case "absin" -> base.sin(data.getFloat("scl"), data.getFloat("mag"));
+                case "curve" -> base.curve(parser.readValue(Interp.class, data.get("interp")));
+                default -> throw new RuntimeException("Unknown operation '" + op + "', check PartProgress class for a list of methods.");
+            };
         });
         put(Sound.class, (type, data) -> {
             if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);

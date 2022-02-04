@@ -54,6 +54,10 @@ public abstract class WeaponPart{
             return p -> 1f - get(p);
         }
 
+        default PartProgress add(float amount){
+            return p -> Mathf.clamp(get(p) + amount);
+        }
+
         default PartProgress delay(float amount){
             return p -> Mathf.clamp((get(p) - amount) / (1f - amount));
         }
@@ -84,10 +88,6 @@ public abstract class WeaponPart{
 
         default PartProgress apply(PartProgress other, PartFunc func){
             return p -> func.get(get(p), other.get(p));
-        }
-
-        default PartProgress add(float amount){
-            return p -> Mathf.clamp(get(p) + amount);
         }
 
         default PartProgress curve(Interp interp){
