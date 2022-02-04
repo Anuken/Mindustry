@@ -14,6 +14,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.defense.MendProjector.*;
+import mindustry.world.blocks.defense.RegenProjector.*;
 
 import static mindustry.Vars.*;
 
@@ -29,6 +31,34 @@ public class Damage{
     private static Building tmpBuilding;
     private static Unit tmpUnit;
     private static IntFloatMap damages = new IntFloatMap();
+    private static Seq<Building> builds = new Seq<>();
+
+    public static void applySuppression(Team team, float x, float y, float range, float reload, float maxDelay, float applyParticleChance, @Nullable Position source){
+        builds.clear();
+        indexer.eachBlock(null, x, y, range, build -> build.team != team, build -> {
+            float prev = build.healSuppressionTime;
+            build.applyHealSuppression(reload + 1f);
+
+            //TODO maybe should be block field instead of instanceof check
+            if(build.wasRecentlyHealed(60f * 12f) || (build instanceof MendBuild || build instanceof RegenProjectorBuild)){
+
+                //add prev check so ability spam doesn't lead to particle spam (essentially, recently suppressed blocks don't get new particles)
+                if(!headless && prev - Time.time <= reload/2f){
+                    builds.add(build);
+                }
+            }
+        });
+
+        //to prevent particle spam, the amount of particles is to remain constant (scales with number of buildings)
+        float scaledChance = applyParticleChance / builds.size;
+        for(var build : builds){
+            if(Mathf.chance(scaledChance)){
+                Time.run(Mathf.random(maxDelay), () -> {
+                    Fx.regenSuppressSeek.at(build.x + Mathf.range(build.block.size * tilesize / 2f), build.y + Mathf.range(build.block.size * tilesize / 2f), 0f, source);
+                });
+            }
+        }
+    }
 
     /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage){

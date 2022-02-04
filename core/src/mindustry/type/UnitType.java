@@ -593,6 +593,9 @@ public class UnitType extends UnlockableContent{
                 part.getOutlines(out);
             }
         }
+        for(var part : parts){
+            part.getOutlines(out);
+        }
     }
 
     @Override
@@ -810,6 +813,9 @@ public class UnitType extends UnlockableContent{
                 DrawPart.params.set(first.warmup, first.reload / weapons.first().reload, first.smoothReload, first.heat, unit.x, unit.y, unit.rotation);
             }else{
                 DrawPart.params.set(0f, 0f, 0f, 0f, unit.x, unit.y, unit.rotation);
+            }
+            if(unit instanceof Scaled s){
+                DrawPart.params.life = s.fin();
             }
             for(int i = 0; i < parts.size; i++){
                 var part = parts.items[i];

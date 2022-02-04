@@ -5,6 +5,7 @@ import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -171,6 +172,8 @@ public class BulletType extends Content implements Cloneable{
     /** Use a negative value to disable homing delay. */
     public float homingDelay = -1f;
 
+    public float suppressionRange = -1f, suppressionDuration = 60f * 8f, suppressionEffectChance = 50f;
+
     public Color lightningColor = Pal.surge;
     public int lightning;
     public int lightningLength = 5, lightningLengthRand = 0;
@@ -308,6 +311,11 @@ public class BulletType extends Content implements Cloneable{
 
         if(incendChance > 0 && Mathf.chance(incendChance)){
             Damage.createIncend(x, y, incendSpread, incendAmount);
+        }
+
+        if(suppressionRange > 0){
+            //bullets are pooled, require separate Vec2 instance
+            Damage.applySuppression(b.team, b.x, b.y, suppressionRange, suppressionDuration, 0f, suppressionEffectChance, new Vec2(b.x, b.y));
         }
 
         if(splashDamageRadius > 0 && !b.absorbed){

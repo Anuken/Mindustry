@@ -3,7 +3,6 @@ package mindustry.entities.part;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.graphics.*;
@@ -30,7 +29,6 @@ public class RegionPart extends DrawPart{
     /** Progress function for heat alpha. */
     public PartProgress heatProgress = PartProgress.heat;
     public Blending blending = Blending.normal;
-    public Interp interp = Interp.linear;
     public float layer = -1, layerOffset = 0f;
     public float outlineLayerOffset = -0.001f;
     public float rotation, rotMove;
@@ -64,7 +62,6 @@ public class RegionPart extends DrawPart{
         float prevZ = Draw.z();
         float prog = progress.get(params);
 
-        prog = interp.apply(prog);
         int len = mirror && params.sideOverride == -1 ? 2 : 1;
 
         for(int s = 0; s < len; s++){

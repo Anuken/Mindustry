@@ -19,7 +19,7 @@ public abstract class DrawPart{
     /** Parameters for drawing a part in draw(). */
     public static class PartParams{
         //TODO document
-        public float warmup, reload, smoothReload, heat;
+        public float warmup, reload, smoothReload, heat, life;
         public float x, y, rotation;
         public int sideOverride = -1;
 
@@ -32,6 +32,7 @@ public abstract class DrawPart{
             this.y = y;
             this.rotation = rotation;
             this.sideOverride = -1;
+            this.life = 0f;
             return this;
         }
     }
@@ -45,7 +46,9 @@ public abstract class DrawPart{
         /** Weapon warmup, 0 when not firing, 1 when actively shooting. Not equivalent to heat. */
         warmup = p -> p.warmup,
         /** Weapon heat, 1 when just fired, 0, when it has cooled down (duration depends on weapon) */
-        heat = p -> p.heat;
+        heat = p -> p.heat,
+        /** Lifetime fraction, 0 to 1. Only for missiles. */
+        life = p -> p.life;
 
         float get(PartParams p);
 
@@ -78,7 +81,7 @@ public abstract class DrawPart{
         }
 
         default PartProgress mul(float amount){
-            return p -> get(p) * amount;
+            return p -> Mathf.clamp(get(p) * amount);
         }
 
         default PartProgress min(PartProgress other){

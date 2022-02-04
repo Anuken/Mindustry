@@ -3225,20 +3225,20 @@ public class Blocks{
             draw = new DrawTurret("reinforced-"){{
                 parts.addAll(
                 new RegionPart("-barrel"){{
+                    progress = PartProgress.warmup.curve(Interp.pow2In);
                     moveY = -5f * 4f / 3f;
                     heatColor = Color.valueOf("f03b0e");
                     mirror = false;
-                    interp = Interp.pow2In;
                 }},
                 new RegionPart("-side"){{
+                    heatProgress = PartProgress.warmup;
+                    progress = PartProgress.warmup.curve(Interp.pow2Out);
                     mirror = true;
                     moveX = 2f * 4f / 3f;
                     moveY = -0.5f;
                     rotMove = -40f;
-                    progress = heatProgress = PartProgress.warmup;
                     under = true;
                     heatColor = Color.red.cpy();
-                    interp = Interp.pow2Out;
                 }});
             }};
 

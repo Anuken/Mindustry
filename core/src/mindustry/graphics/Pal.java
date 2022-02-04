@@ -16,6 +16,8 @@ public class Pal{
     sapBullet = Color.valueOf("bf92f9"),
     sapBulletBack = Color.valueOf("6d56bf"),
 
+    suppress = Pal.sap.cpy().mul(1.6f),
+
     regen = Color.valueOf("d1efff"),
 
     reactorPurple = Color.valueOf("bf92f9"),

@@ -2923,7 +2923,7 @@ public class UnitTypes{
                         mirror = false;
                         reload = 1f;
                         shootOnDeath = true;
-                        bullet = new ExplosionBulletType(120f, 30f){{
+                        bullet = new ExplosionBulletType(110f, 22f){{
                             shootEffect = Fx.massiveExplosion;
                         }};
                     }});
@@ -2977,14 +2977,13 @@ public class UnitTypes{
                 }});
             }
 
-            //TODO needs weapons! cool missiles or something
             weapons.add(new Weapon("disrupt-weapon"){{
                 x = 78f / 4f;
                 y = -10f / 4f;
                 mirror = true;
                 rotate = true;
                 rotateSpeed = 0.4f;
-                reload = 60f;
+                reload = 70f;
                 layerOffset = -20f;
                 recoil = 1f;
                 rotationLimit = 22f;
@@ -3010,8 +3009,9 @@ public class UnitTypes{
                 }});
 
                 bullet = new BulletType(){{
-                    shootEffect = Fx.shootBig;
-                    smokeEffect = Fx.shootBigSmoke2;
+                    shootEffect = Fx.sparkShoot;
+                    smokeEffect = Fx.shootSmokeTitan;
+                    hitColor = Pal.suppress;
                     shake = 1f;
                     speed = 0f;
                     keepVelocity = false;
@@ -3023,14 +3023,52 @@ public class UnitTypes{
                     outlineColor = Pal.darkOutline;
                     health = 45;
                     homingDelay = 10f;
+                    lowAltitude = true;
+                    engineSize = 3f;
+                    deathExplosionEffect = Fx.none;
+
+                    parts.add(new ShapePart(){{
+                        layer = Layer.effect;
+                        circle = true;
+                        y = -0.25f;
+                        radius = 1.5f;
+                        color = Pal.suppress;
+                        colorTo = Color.white;
+                        progress = PartProgress.life.curve(Interp.pow5In);
+                    }});
+
+                    parts.add(new RegionPart("-fin"){{
+                        mirror = true;
+                        progress = PartProgress.life.mul(3f).curve(Interp.pow5In);
+                        rotMove = 32f;
+                        rotation = -6f;
+                        moveY = 1.5f;
+                        x = 3f / 4f;
+                        y = -6f / 4f;
+                    }});
 
                     weapons.add(new Weapon(){{
                         shootCone = 360f;
                         mirror = false;
                         reload = 1f;
                         shootOnDeath = true;
-                        bullet = new ExplosionBulletType(120f, 30f){{
-                            shootEffect = Fx.massiveExplosion;
+                        bullet = new ExplosionBulletType(135f, 25f){{
+                            suppressionRange = 140f;
+                            shootEffect = new ExplosionEffect(){{
+                                lifetime = 50f;
+                                waveStroke = 5f;
+                                waveLife = 8f;
+                                waveColor = Color.white;
+                                sparkColor = smokeColor = Pal.suppress;
+                                waveRad = 40f;
+                                smokeSize = 4f;
+                                smokes = 7;
+                                smokeSizeBase = 0f;
+                                sparks = 10;
+                                sparkRad = 40f;
+                                sparkLen = 6f;
+                                sparkStroke = 2f;
+                            }};
                         }};
                     }});
                 }};
