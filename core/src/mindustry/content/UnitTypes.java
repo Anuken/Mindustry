@@ -2508,11 +2508,10 @@ public class UnitTypes{
             speed = 0.48f;
             health = 20000;
             armor = 25f;
-            areaDamage = 22f;
-            rotateSpeed = 0.9f;
+            areaDamage = 30f;
+            rotateSpeed = 0.8f;
             treadRects = new Rect[]{new Rect(27, 152, 56, 73), new Rect(24, 51 - 9, 29, 17), new Rect(59, 18 - 9, 39, 19)};
 
-            //TODO maybe different sprite, weapon impl
             weapons.add(new Weapon("conquer-weapon"){{
                 layerOffset = 0.1f;
                 reload = 120f;
@@ -2571,7 +2570,6 @@ public class UnitTypes{
                 }}
                 );
 
-                //TODO this is a bit over-the-top
                 for(int i = 1; i <= 3; i++){
                     int fi = i;
                     parts.add(new RegionPart("-blade"){{
@@ -2585,7 +2583,6 @@ public class UnitTypes{
                         layerOffset = -0.002f;
 
                         x = 11 / 4f;
-                        y = 0 / 4f;
                     }});
                 }
 
@@ -2621,10 +2618,6 @@ public class UnitTypes{
                         sparkStroke = 3f;
                     }};
 
-                    //trailChance = 0.1f;
-                    trailInterval = 3f;
-                    trailParam = 4f;
-
                     int count = 6;
                     for(int j = 0; j < count; j++){
                         int s = j;
@@ -2632,7 +2625,7 @@ public class UnitTypes{
                             float fin = 0.05f + (j + 1) / (float)count;
                             float spd = speed;
                             float life = lifetime / Mathf.lerp(fin, 1f, 0.5f);
-                            spawnBullets.add(new BasicBulletType(spd * (fin), 40){{
+                            spawnBullets.add(new BasicBulletType(spd * fin, 45){{
                                 drag = 0.002f;
                                 width = 8f;
                                 height = 10f;
@@ -2671,10 +2664,7 @@ public class UnitTypes{
                 }};
             }});
 
-            //TODO could change color when shooting
-            decals.add(new UnitDecal("conquer-glow", Color.red, Blending.additive){{
-                layer = -1f;
-            }});
+            decals.add(new UnitDecal("conquer-glow", Color.red, Blending.additive, -1f));
         }};
 
         //endregion
@@ -2988,6 +2978,7 @@ public class UnitTypes{
                 }});
             }
 
+            //TODO needs weapons! cool missiles or something
             if(false)
             weapons.add(new Weapon("quell-weapon"){{
                 x = 51 / 4f;

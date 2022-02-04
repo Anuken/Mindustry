@@ -24,9 +24,10 @@ public class UnitDecal{
         this.color = color;
     }
 
-    public UnitDecal(String region, Color color, Blending blending){
+    public UnitDecal(String region, Color color, Blending blending, float layer){
         this.region = region;
         this.color = color;
+        this.layer = layer;
         this.blending = blending;
     }
 

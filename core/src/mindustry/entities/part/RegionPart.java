@@ -32,10 +32,9 @@ public class RegionPart extends WeaponPart{
     public float outlineLayerOffset = -0.001f;
     public float rotation, rotMove;
     public float x, y, moveX, moveY;
-    public boolean oscAbs = false;
     public @Nullable Color color, colorTo;
     public Color heatColor = Pal.turretHeat.cpy();
-    public @Nullable WeaponPart child;
+    public Seq<WeaponPart> children = new Seq<>();
 
     public RegionPart(String region){
         this.suffix = region;
@@ -103,7 +102,7 @@ public class RegionPart extends WeaponPart{
 
         //draw child, if applicable - only at the end
         //TODO lots of copy-paste here
-        if(child != null){
+        if(children.size > 0){
             for(int s = 0; s < len; s++){
                 int i = (params.sideOverride == -1 ? s : params.sideOverride);
                 float sign = i == 1 ? -1 : 1;
@@ -111,7 +110,9 @@ public class RegionPart extends WeaponPart{
 
                 childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.x + Tmp.v1.x, params.y + Tmp.v1.y, i * sign + rotMove * prog * sign + params.rotation);
                 childParam.sideOverride = i;
-                child.draw(childParam);
+                for(var child : children){
+                    child.draw(childParam);
+                }
             }
         }
     }
@@ -137,7 +138,7 @@ public class RegionPart extends WeaponPart{
         }
 
         heat = Core.atlas.find(name + suffix + "-heat");
-        if(child != null){
+        for(var child : children){
             child.load(name);
         }
     }
@@ -147,7 +148,7 @@ public class RegionPart extends WeaponPart{
         if(outline && drawRegion){
             out.addAll(regions);
         }
-        if(child != null){
+        for(var child : children){
             child.getOutlines(out);
         }
     }
