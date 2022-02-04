@@ -2529,7 +2529,7 @@ public class Blocks{
             thrusterLength = 40/4f;
             armor = 10f;
 
-            unitCapModifier = 12;
+            unitCapModifier = 10;
             researchCostMultiplier = 0.11f;
         }};
 
@@ -2544,7 +2544,7 @@ public class Blocks{
             thrusterLength = 48/4f;
             armor = 15f;
 
-            unitCapModifier = 16;
+            unitCapModifier = 14;
             researchCostMultiplier = 0.11f;
         }};
 

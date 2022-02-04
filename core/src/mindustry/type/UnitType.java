@@ -20,6 +20,7 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
+import mindustry.entities.part.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -59,7 +60,6 @@ public class UnitType extends UnlockableContent{
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
     public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, riseSpeed = 0.08f, fallSpeed = 0.018f;
     public float health = 200f, range = -1, miningRange = 70f, armor = 0f, maxRange = -1f, buildRange = Vars.buildingRange;
-    public float lifetime = 60f * 5f; //for missiles only
     public float crashDamageMultiplier = 1f;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false, circleTarget = false;
@@ -68,6 +68,7 @@ public class UnitType extends UnlockableContent{
     public boolean playerControllable = true;
     public boolean allowedInPayloads = true;
     public boolean createWreck = true;
+    public boolean createScorch = true;
     public boolean useUnitCap = true;
     public boolean destructibleWreck = true;
     /** If true, this modded unit always has a -outline region generated for its base. Normally, outlines are ignored if there are no top = false weapons. */
@@ -94,8 +95,8 @@ public class UnitType extends UnlockableContent{
     public Effect fallThrusterEffect = Fx.fallSmoke;
     public Effect deathExplosionEffect = Fx.dynamicExplosion;
     public @Nullable Effect treadEffect;
-    /** Additional sprites that are drawn with the unit. */
-    public Seq<UnitDecal> decals = new Seq<>();
+    /** Extra (usually animated) parts */
+    public Seq<DrawPart> parts = new Seq<>(DrawPart.class);
     public Seq<Ability> abilities = new Seq<>();
     /** Flags to target based on priority. Null indicates that the closest target should be found. The closest enemy core is used as a fallback. */
     public BlockFlag[] targetFlags = {null};
@@ -137,6 +138,10 @@ public class UnitType extends UnlockableContent{
     public float buildSpeed = -1f, mineSpeed = 1f;
     public Sound mineSound = Sounds.minebeam;
     public float mineSoundVolume = 0.6f;
+
+    //missiles only!
+    public float lifetime = 60f * 5f;
+    public float homingDelay = 10f;
 
     /** This is a VERY ROUGH estimate of unit DPS. */
     public float dpsEstimate = -1;
@@ -522,6 +527,9 @@ public class UnitType extends UnlockableContent{
     public void load(){
         super.load();
 
+        for(var part : parts){
+            part.load(name);
+        }
         weapons.each(Weapon::load);
         region = Core.atlas.find(name);
         legRegion = Core.atlas.find(name + "-leg");
@@ -560,10 +568,6 @@ public class UnitType extends UnlockableContent{
         for(int i = 0; i < segments; i++){
             segmentRegions[i] = Core.atlas.find(name + "-segment" + i);
             segmentOutlineRegions[i] = Core.atlas.find(name + "-segment-outline" + i);
-        }
-
-        for(var decal : decals){
-            decal.loadedRegion = Core.atlas.find(decal.region);
         }
 
         clipSize = Math.max(region.width * 2f, clipSize);
@@ -798,18 +802,19 @@ public class UnitType extends UnlockableContent{
             unit.trns(-legOffset.x, -legOffset.y);
         }
 
-        if(decals.size > 0){
-            float base = unit.rotation - 90;
-            for(var d : decals){
-                Draw.blend(d.blending);
-                Draw.z(d.layer <= 0f ? z : d.layer);
-                Draw.scl(d.xScale, d.yScale);
-                Draw.color(d.color);
-                Draw.rect(d.loadedRegion, unit.x + Angles.trnsx(base, d.x, d.y), unit.y + Angles.trnsy(base, d.x, d.y), base + d.rotation);
-                Draw.blend();
+        //TODO how/where do I draw under?
+        if(parts.size > 0){
+            //TODO does it need an outline?
+            WeaponMount first = unit.mounts.length > 0 ? unit.mounts[0] : null;
+            if(unit.mounts.length > 0){
+                DrawPart.params.set(first.warmup, first.reload / weapons.first().reload, first.smoothReload, first.heat, unit.x, unit.y, unit.rotation);
+            }else{
+                DrawPart.params.set(0f, 0f, 0f, 0f, unit.x, unit.y, unit.rotation);
             }
-            Draw.reset();
-            Draw.z(z);
+            for(int i = 0; i < parts.size; i++){
+                var part = parts.items[i];
+                part.draw(DrawPart.params);
+            }
         }
 
         for(Ability a : unit.abilities){

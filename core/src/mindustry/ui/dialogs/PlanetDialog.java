@@ -1077,7 +1077,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         //make sure there are no under-attack sectors (other than this one)
         //TODO abandon button?
         for(Planet planet : content.planets()){
-            if(!planet.allowWaveSimulation){
+            if(!planet.allowWaveSimulation && !debugSelect){
                 int attackedCount = planet.sectors.count(s -> s.isAttacked() && s != sector);
 
                 //if there are two or more attacked sectors... something went wrong, don't show the dialog to prevent softlock

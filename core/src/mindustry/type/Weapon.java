@@ -10,6 +10,7 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.types.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -131,7 +132,7 @@ public class Weapon implements Cloneable{
     /** whether this weapon should fire when its owner dies */
     public boolean shootOnDeath = false;
     /** extra animated parts */
-    public Seq<WeaponPart> parts = new Seq<>(WeaponPart.class);
+    public Seq<DrawPart> parts = new Seq<>(DrawPart.class);
 
     public Weapon(String name){
         this.name = name;
@@ -195,12 +196,12 @@ public class Weapon implements Cloneable{
         Draw.xscl = -Mathf.sign(flipSprite);
 
         if(parts.size > 0){
-            WeaponPart.params.set(mount.warmup, mount.reload / reload, mount.smoothReload, mount.heat, wx, wy, weaponRotation + 90);
+            DrawPart.params.set(mount.warmup, mount.reload / reload, mount.smoothReload, mount.heat, wx, wy, weaponRotation + 90);
 
             for(int i = 0; i < parts.size; i++){
                 var part = parts.items[i];
                 if(part.under){
-                    part.draw(WeaponPart.params);
+                    part.draw(DrawPart.params);
                 }
             }
         }
@@ -217,18 +218,10 @@ public class Weapon implements Cloneable{
 
         if(parts.size > 0){
             //TODO does it need an outline?
-            /*
-            if(outline.found()){
-                //draw outline under everything when parts are involved
-                Draw.z(Layer.turret - 0.01f);
-                Draw.rect(outline, build.x + tb.recoilOffset.x, build.y + tb.recoilOffset.y, tb.drawrot());
-                Draw.z(Layer.turret);
-            }*/
-
             for(int i = 0; i < parts.size; i++){
                 var part = parts.items[i];
                 if(!part.under){
-                    part.draw(WeaponPart.params);
+                    part.draw(DrawPart.params);
                 }
             }
         }
@@ -380,10 +373,8 @@ public class Weapon implements Cloneable{
         float baseX = offset.x, baseY = offset.y, baseRot = unit.rotation + mount.rotation;
         boolean delay = firstShotDelay + shotDelay > 0f;
 
-        (delay ? chargeSound : continuous ? Sounds.none : shootSound).at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
-
-        BulletType ammo = bullet;
-        float lifeScl = ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(shootX, shootY, aimX, aimY) / ammo.range()) : 1f;
+        float lifeScl = bullet.scaleVelocity ? Mathf.clamp(Mathf.dst(shootX, shootY, aimX, aimY) / bullet.range()) : 1f;
+        Unit parent = bullet.keepVelocity || parentizeEffects ? unit : null;
 
         //TODO far too complicated and similar to Turret
 
@@ -393,6 +384,7 @@ public class Weapon implements Cloneable{
                 Time.run(sequenceNum * shotDelay + firstShotDelay, () -> {
                     if(!unit.isAdded()) return;
 
+                    //TODO this is a flawed system, recalculate everything instead.
                     getShootPos(unit, mount, offset).sub(baseX, baseY);
 
                     float rotOffset = unit.rotation + mount.rotation - baseRot;
@@ -407,13 +399,11 @@ public class Weapon implements Cloneable{
             Angles.shotgun(shots, spacing, rotation, f -> mount.bullet = bullet(unit, shootX, shootY, f + Mathf.range(inaccuracy), lifeScl));
         }
 
-        boolean parentize = ammo.keepVelocity || parentizeEffects;
-
         if(delay){
             Time.run(firstShotDelay, () -> {
                 if(!unit.isAdded()) return;
 
-                unit.vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
+                unit.vel.add(Tmp.v1.trns(rotation + 180f, bullet.recoil));
                 Effect.shake(shake, shake, shootX, shootY);
                 mount.recoil = recoil;
                 mount.heat = 1f;
@@ -423,19 +413,24 @@ public class Weapon implements Cloneable{
 
                 getShootPos(unit, mount, offset).sub(baseX, baseY);
 
-                ammo.chargeShootEffect.at(shootX + offset.x, shootY + offset.y, rotation, parentize ? unit : null);
+                bullet.chargeShootEffect.at(shootX + offset.x, shootY + offset.y, rotation, parent);
             });
         }else{
-            unit.vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
+            unit.vel.add(Tmp.v1.trns(rotation + 180f, bullet.recoil));
             Effect.shake(shake, shake, shootX, shootY);
             mount.recoil = recoil;
             mount.heat = 1f;
         }
 
-        ejectEffect.at(mountX, mountY, rotation * side);
-        ammo.shootEffect.at(shootX, shootY, rotation, ammo.hitColor, parentize ? unit : null);
-        ammo.smokeEffect.at(shootX, shootY, rotation, ammo.hitColor, parentize ? unit : null);
+        (delay ? chargeSound : continuous ? Sounds.none : shootSound).at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
+        effects(parent, mountX, mountY, shootX, shootY, rotation, side);
         unit.apply(shootStatus, shootStatusDuration);
+    }
+
+    protected void effects(Unit parent, float mountX, float mountY, float shootX, float shootY, float rotation, int side){
+        ejectEffect.at(mountX, mountY, rotation * side);
+        bullet.shootEffect.at(shootX, shootY, rotation, bullet.hitColor, parent);
+        bullet.smokeEffect.at(shootX, shootY, rotation, bullet.hitColor, parent);
     }
 
     protected @Nullable Bullet bullet(Unit unit, float shootX, float shootY, float angle, float lifescl){
@@ -452,6 +447,9 @@ public class Weapon implements Cloneable{
             spawned.rotation = angle;
             //immediately spawn at top speed, since it was launched
             spawned.vel.trns(angle, unitSpawned.speed);
+            if(spawned.controller() instanceof MissileAI ai){
+                ai.shooter = unit;
+            }
             spawned.add();
             //TODO assign AI target here?
             return null;

@@ -1,17 +1,20 @@
 package mindustry.ai.types;
 
+import arc.util.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 
 public class MissileAI extends AIController{
-    //TODO store 'main' target and use that as a fallback
+    public @Nullable Unit shooter;
 
-    //TODO UNPREDICTABLE TARGETING
     @Override
     public void updateMovement(){
         unloadPayloads();
 
-        if(target != null){
-            unit.lookAt(target);
+        float time = unit instanceof TimedKillc t ? t.time() : 1000000f;
+
+        if(time >= unit.type.homingDelay && shooter != null){
+            unit.lookAt(shooter.aimX, shooter.aimY);
         }
 
         //move forward forever
@@ -26,8 +29,7 @@ public class MissileAI extends AIController{
     }
 
     @Override
-    public boolean retarget(){
-        //more frequent retarget. TODO won't this lag?
-        return timer.get(timerTarget, 10f);
+    public void updateTargeting(){
+        //no
     }
 }

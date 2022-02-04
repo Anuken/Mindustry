@@ -13,6 +13,7 @@ public class MissileUnitType extends UnitType{
 
         playerControllable = false;
         createWreck = false;
+        createScorch = false;
         logicControllable = false;
         isCounted = false;
         useUnitCap = false;
@@ -26,8 +27,8 @@ public class MissileUnitType extends UnitType{
         trailLength = 7;
         hidden = true;
         speed = 4f;
-        lifetime = 60f * 3f;
-        rotateSpeed = 3f;
+        lifetime = 60f * 1.6f;
+        rotateSpeed = 2.5f;
         range = 30f;
         //TODO weapons, etc
     }

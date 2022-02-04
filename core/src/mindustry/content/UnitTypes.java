@@ -12,7 +12,6 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -2503,7 +2502,7 @@ public class UnitTypes{
         }};
 
         conquer = new TankUnitType("conquer"){{
-            hitSize = 44f;
+            hitSize = 46f;
             treadPullOffset = 1;
             speed = 0.48f;
             health = 20000;
@@ -2664,7 +2663,12 @@ public class UnitTypes{
                 }};
             }});
 
-            decals.add(new UnitDecal("conquer-glow", Color.red, Blending.additive, -1f));
+            parts.add(new RegionPart("-glow"){{
+                color = Color.red;
+                blending = Blending.additive;
+                layer = -1f;
+                outline = false;
+            }});
         }};
 
         //endregion
@@ -2919,13 +2923,8 @@ public class UnitTypes{
                         mirror = false;
                         reload = 1f;
                         shootOnDeath = true;
-                        bullet = new BulletType(){{
-                            rangeOverride = 20f;
+                        bullet = new ExplosionBulletType(120f, 30f){{
                             shootEffect = Fx.massiveExplosion;
-                            killShooter = true;
-                            //TODO status?
-                            splashDamageRadius = 30f;
-                            splashDamage = 120f;
                         }};
                     }});
                 }};
@@ -2946,7 +2945,7 @@ public class UnitTypes{
             flying = true;
             drag = 0.07f;
             speed = 1f;
-            rotateSpeed = 2.5f;
+            rotateSpeed = 2f;
             accel = 0.1f;
             health = 10000f;
             armor = 7f;
@@ -2979,16 +2978,36 @@ public class UnitTypes{
             }
 
             //TODO needs weapons! cool missiles or something
-            if(false)
-            weapons.add(new Weapon("quell-weapon"){{
-                x = 51 / 4f;
-                y = 5 / 4f;
+            weapons.add(new Weapon("disrupt-weapon"){{
+                x = 78f / 4f;
+                y = -10f / 4f;
+                mirror = true;
                 rotate = true;
-                rotateSpeed = 2f;
-                reload = 70f;
-                layerOffset = -0.001f;
+                rotateSpeed = 0.4f;
+                reload = 60f;
+                layerOffset = -20f;
                 recoil = 1f;
-                rotationLimit = 60f;
+                rotationLimit = 22f;
+                minWarmup = 0.95f;
+                shootWarmupSpeed = 0.1f;
+                shootY = 2f;
+                shootCone = 40f;
+                shots = 3;
+                shotDelay = 5f;
+                inaccuracy = 28f;
+
+                parts.add(new RegionPart("-blade"){{
+                    heatProgress = PartProgress.warmup;
+                    progress = PartProgress.warmup.blend(PartProgress.reload, 0.15f);
+                    heatColor = Color.valueOf("9c50ff");
+                    x = 5 / 4f;
+                    y = 0f;
+                    rotMove = -33f;
+                    moveY = -1f;
+                    moveX = -1f;
+                    under = true;
+                    mirror = true;
+                }});
 
                 bullet = new BulletType(){{
                     shootEffect = Fx.shootBig;
@@ -2998,24 +3017,20 @@ public class UnitTypes{
                     keepVelocity = false;
                 }};
 
-                unitSpawned = new MissileUnitType("quell-missile"){{
-                    speed = 3.8f;
+                unitSpawned = new MissileUnitType("disrupt-missile"){{
+                    speed = 4.5f;
                     maxRange = 80f;
                     outlineColor = Pal.darkOutline;
                     health = 45;
+                    homingDelay = 10f;
 
                     weapons.add(new Weapon(){{
                         shootCone = 360f;
                         mirror = false;
                         reload = 1f;
                         shootOnDeath = true;
-                        bullet = new BulletType(){{
-                            rangeOverride = 20f;
+                        bullet = new ExplosionBulletType(120f, 30f){{
                             shootEffect = Fx.massiveExplosion;
-                            killShooter = true;
-                            //TODO status?
-                            splashDamageRadius = 30f;
-                            splashDamage = 120f;
                         }};
                     }});
                 }};
@@ -3107,7 +3122,8 @@ public class UnitTypes{
                     shootEffect = Fx.colorSpark;
                     hitEffect = smokeEffect = despawnEffect = Fx.hitLaserColor;
 
-                    damage = 1;
+                    //TODO 0, or 1?
+                    damage = 0;
                 }};
             }});
         }};

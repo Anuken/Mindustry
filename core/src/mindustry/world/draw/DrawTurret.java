@@ -17,7 +17,7 @@ import mindustry.world.blocks.defense.turrets.Turret.*;
 public class DrawTurret extends DrawBlock{
     protected static final Rand rand = new Rand();
 
-    public Seq<WeaponPart> parts = new Seq<>();
+    public Seq<DrawPart> parts = new Seq<>();
     public String basePrefix = "";
     /** Overrides the liquid to draw in the liquid region. */
     public @Nullable Liquid liquidDraw;
@@ -66,7 +66,7 @@ public class DrawTurret extends DrawBlock{
             }
 
             //TODO no smooth reload
-            var params = WeaponPart.params.set(build.warmup(), 1f - tb.progress(), 1f - tb.progress(), tb.heat, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
+            var params = DrawPart.params.set(build.warmup(), 1f - tb.progress(), 1f - tb.progress(), tb.heat, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
 
             for(var part : parts){
                 part.draw(params);

@@ -387,11 +387,17 @@ public class Damage{
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground){
+        damage(team, x, y, radius, damage, complete, air, ground, false);
+    }
+
+    /** Damages all entities and blocks in a radius that are enemies of the team. */
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled){
         Cons<Unit> cons = entity -> {
-            if(entity.team == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
+            if(entity.team == team || !entity.within(x, y, radius + (scaled ? entity.hitSize / 2f : 0f)) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
                 return;
             }
-            float amount = calculateDamage(x, y, entity.getX(), entity.getY(), radius, damage);
+
+            float amount = calculateDamage(scaled ? Math.max(0, entity.dst(x, y) - entity.type.hitSize/2) : entity.dst(x, y), radius, damage);
             entity.damage(amount);
             //TODO better velocity displacement
             float dst = tr.set(entity.getX() - x, entity.getY() - y).len();
@@ -504,8 +510,7 @@ public class Damage{
         }
     }
 
-    private static float calculateDamage(float x, float y, float tx, float ty, float radius, float damage){
-        float dist = Mathf.dst(x, y, tx, ty);
+    private static float calculateDamage(float dist, float radius, float damage){
         float falloff = 0.4f;
         float scaled = Mathf.lerp(1f - dist / radius, 1f, falloff);
         return damage * scaled;

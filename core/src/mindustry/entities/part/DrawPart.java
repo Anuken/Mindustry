@@ -4,7 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 
-public abstract class WeaponPart{
+public abstract class DrawPart{
     public static final PartParams params = new PartParams();
 
     /** If true, turret shading is used. Don't touch this, it is set up in unit/block init()! */
@@ -37,11 +37,14 @@ public abstract class WeaponPart{
     }
 
     public interface PartProgress{
+        /** Reload of the weapon - 1 right after shooting, 0 when ready to fire*/
         PartProgress
-
         reload = p -> p.reload,
+        /** Reload, but smoothed out, so there is no sudden jump between 0-1. */
         smoothReload = p -> p.smoothReload,
+        /** Weapon warmup, 0 when not firing, 1 when actively shooting. Not equivalent to heat. */
         warmup = p -> p.warmup,
+        /** Weapon heat, 1 when just fired, 0, when it has cooled down (duration depends on weapon) */
         heat = p -> p.heat;
 
         float get(PartParams p);
@@ -72,6 +75,10 @@ public abstract class WeaponPart{
 
         default PartProgress mul(PartProgress other){
             return p -> get(p) * other.get(p);
+        }
+
+        default PartProgress mul(float amount){
+            return p -> get(p) * amount;
         }
 
         default PartProgress min(PartProgress other){

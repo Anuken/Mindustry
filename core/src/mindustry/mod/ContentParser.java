@@ -25,7 +25,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
-import mindustry.entities.part.WeaponPart.*;
+import mindustry.entities.part.DrawPart.*;
 import mindustry.game.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
@@ -130,13 +130,14 @@ public class ContentParser{
             readFields(result, data);
             return result;
         });
-        put(WeaponPart.class, (type, data) -> {
+        put(DrawPart.class, (type, data) -> {
             var bc = resolve(data.getString("type", ""), RegionPart.class);
             data.remove("type");
             var result = make(bc);
             readFields(result, data);
             return result;
         });
+        //TODO this is untested
         put(PartProgress.class, (type, data) -> {
             //simple case: it's a string or number constant
             if(data.isString()) return field(PartProgress.class, data.asString());
@@ -166,7 +167,7 @@ public class ContentParser{
                 case "mul" -> base.mul(parser.readValue(PartProgress.class, data.get("other")));
                 case "min" -> base.min(parser.readValue(PartProgress.class, data.get("other")));
                 case "sin" -> base.sin(data.getFloat("scl"), data.getFloat("mag"));
-                case "absin" -> base.sin(data.getFloat("scl"), data.getFloat("mag"));
+                case "absin" -> base.absin(data.getFloat("scl"), data.getFloat("mag"));
                 case "curve" -> base.curve(parser.readValue(Interp.class, data.get("interp")));
                 default -> throw new RuntimeException("Unknown operation '" + op + "', check PartProgress class for a list of methods.");
             };

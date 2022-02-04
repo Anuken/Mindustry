@@ -8,10 +8,13 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.graphics.*;
 
-public class RegionPart extends WeaponPart{
+public class RegionPart extends DrawPart{
     protected PartParams childParam = new PartParams();
 
+    /** Appended to unit/weapon/block name and drawn. */
     public String suffix = "";
+    /** Overrides suffix if set. */
+    public @Nullable String name;
     public TextureRegion heat;
     public TextureRegion[] regions = {};
     public TextureRegion[] outlines = {};
@@ -34,10 +37,17 @@ public class RegionPart extends WeaponPart{
     public float x, y, moveX, moveY;
     public @Nullable Color color, colorTo;
     public Color heatColor = Pal.turretHeat.cpy();
-    public Seq<WeaponPart> children = new Seq<>();
+    public Seq<DrawPart> children = new Seq<>();
 
     public RegionPart(String region){
         this.suffix = region;
+    }
+
+    public RegionPart(String region, Blending blending, Color color){
+        this.suffix = region;
+        this.blending = blending;
+        this.color = color;
+        outline = false;
     }
 
     public RegionPart(){
@@ -119,25 +129,27 @@ public class RegionPart extends WeaponPart{
 
     @Override
     public void load(String name){
+        String realName = this.name == null ? name + suffix : this.name;
+
         if(drawRegion){
             //TODO l/r
             if(mirror && turretShading){
                 regions = new TextureRegion[]{
-                Core.atlas.find(name + suffix + "1"),
-                Core.atlas.find(name + suffix + "2")
+                Core.atlas.find(realName + "1"),
+                Core.atlas.find(realName + "2")
                 };
 
                 outlines = new TextureRegion[]{
-                Core.atlas.find(name + suffix + "1-outline"),
-                Core.atlas.find(name + suffix + "2-outline")
+                Core.atlas.find(realName + "1-outline"),
+                Core.atlas.find(realName + "2-outline")
                 };
             }else{
-                regions = new TextureRegion[]{Core.atlas.find(name + suffix)};
-                outlines = new TextureRegion[]{Core.atlas.find(name + suffix + "-outline")};
+                regions = new TextureRegion[]{Core.atlas.find(realName)};
+                outlines = new TextureRegion[]{Core.atlas.find(realName + "-outline")};
             }
         }
 
-        heat = Core.atlas.find(name + suffix + "-heat");
+        heat = Core.atlas.find(realName + "-heat");
         for(var child : children){
             child.load(name);
         }

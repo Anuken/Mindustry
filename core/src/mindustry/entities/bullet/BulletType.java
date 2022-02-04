@@ -80,6 +80,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean instantDisappear;
     /** Damage dealt in splash. 0 to disable.*/
     public float splashDamage = 0f;
+    /** If true, splash damage is "correctly" affected by unit hitbox size. Used for projectiles that do not collide / have splash as their main source of damage. */
+    public boolean scaledSplashDamage = false;
     /** Knockback in velocity. */
     public float knockback;
     /** Should knockback follow the bullet's direction */
@@ -142,6 +144,7 @@ public class BulletType extends Content implements Cloneable{
     public @Nullable BulletType fragBullet = null;
     public Color hitColor = Color.white;
     public Color healColor = Pal.heal;
+    public Effect healEffect = Fx.healBlockFull;
     /** Bullets spawned when this bullet is created. Rarely necessary, used for visuals. */
     public Seq<BulletType> spawnBullets = new Seq<>();
 
@@ -249,7 +252,7 @@ public class BulletType extends Content implements Cloneable{
         }
 
         if(heals()&& build.team == b.team && !(build.block instanceof ConstructBlock)){
-            Fx.healBlockFull.at(build.x, build.y, build.block.size, healColor);
+            healEffect.at(build.x, build.y, build.block.size, healColor);
             build.heal(healPercent / 100f * build.maxHealth + healAmount);
         }else if(build.team != b.team && direct){
             hit(b);
@@ -308,7 +311,7 @@ public class BulletType extends Content implements Cloneable{
         }
 
         if(splashDamageRadius > 0 && !b.absorbed){
-            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
+            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), false, collidesAir, collidesGround, scaledSplashDamage);
 
             if(status != StatusEffects.none){
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
@@ -316,7 +319,7 @@ public class BulletType extends Content implements Cloneable{
 
             if(heals()){
                 indexer.eachBlock(b.team, x, y, splashDamageRadius, Building::damaged, other -> {
-                    Fx.healBlockFull.at(other.x, other.y, other.block.size, healColor);
+                    healEffect.at(other.x, other.y, other.block.size, healColor);
                     other.heal(healPercent / 100f * other.maxHealth() + healAmount);
                 });
             }
@@ -375,7 +378,7 @@ public class BulletType extends Content implements Cloneable{
         }
 
         if(instantDisappear){
-            b.time = lifetime;
+            b.time = lifetime + 1f;
         }
 
         if(spawnBullets.size > 0){
