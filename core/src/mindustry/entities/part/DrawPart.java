@@ -21,7 +21,7 @@ public abstract class DrawPart{
         //TODO document
         public float warmup, reload, smoothReload, heat, life;
         public float x, y, rotation;
-        public int sideOverride = -1;
+        public int sideOverride = -1, sideMultiplier = 1;
 
         public PartParams set(float warmup, float reload, float smoothReload, float heat, float x, float y, float rotation){
             this.warmup = warmup;
@@ -33,6 +33,7 @@ public abstract class DrawPart{
             this.rotation = rotation;
             this.sideOverride = -1;
             this.life = 0f;
+            this.sideMultiplier = 1;
             return this;
         }
     }

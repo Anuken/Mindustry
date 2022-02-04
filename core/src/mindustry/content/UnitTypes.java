@@ -2821,12 +2821,29 @@ public class UnitTypes{
                 reload = 30f;
                 shake = 3f;
                 cooldownTime = 20f;
+                layerOffset = 0.02f;
 
                 shots = 3;
                 shotDelay = 3f;
                 inaccuracy = 2f;
                 velocityRnd = 0.1f;
                 heatColor = Color.red;
+
+                for(int i = 0; i < 3; i++){
+                    int fi = i;
+                    parts.add(new RegionPart("-blade"){{
+                        under = true;
+                        layerOffset = -0.001f;
+                        heatColor = Pal.techBlue;
+                        heatProgress = PartProgress.heat.add(0.2f).min(PartProgress.warmup);
+                        progress = PartProgress.warmup.blend(PartProgress.reload, 0.2f);
+                        x = 11 / 4f;
+                        y = 10f / 4f;
+                        moveY = 1f - fi * 3f;
+                        moveX = fi * 0.5f;
+                        rotMove = -30f - fi * 15f;
+                    }});
+                }
 
                 bullet = new BasicBulletType(9f, 75){{
                     pierceCap = 2;
@@ -3052,7 +3069,7 @@ public class UnitTypes{
                         mirror = false;
                         reload = 1f;
                         shootOnDeath = true;
-                        bullet = new ExplosionBulletType(135f, 25f){{
+                        bullet = new ExplosionBulletType(145f, 25f){{
                             suppressionRange = 140f;
                             shootEffect = new ExplosionEffect(){{
                                 lifetime = 50f;

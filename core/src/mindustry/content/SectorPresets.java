@@ -123,7 +123,7 @@ public class SectorPresets{
             difficulty = 3;
         }};
 
-        three = new SectorPreset("three", erekir, 32){{
+        three = new SectorPreset("three", erekir, 36){{
             captureWave = 8;
             difficulty = 5;
         }};

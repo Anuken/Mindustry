@@ -32,7 +32,7 @@ public class ShapePart extends DrawPart{
             //use specific side if necessary
             int i = params.sideOverride == -1 ? s : params.sideOverride;
 
-            float sign = i == 1 ? -1 : 1;
+            float sign = (i == 0 ? 1 : -1) * params.sideMultiplier;
             Tmp.v1.set((x + moveX * prog) * sign, y + moveY * prog).rotate(params.rotation - 90);
 
             float

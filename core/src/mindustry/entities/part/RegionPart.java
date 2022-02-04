@@ -70,7 +70,7 @@ public class RegionPart extends DrawPart{
 
             //can be null
             var region = drawRegion ? regions[Math.min(i, regions.length - 1)] : null;
-            float sign = i == 1 ? -1 : 1;
+            float sign = (i == 0 ? 1 : -1) * params.sideMultiplier;
             Tmp.v1.set((x + moveX * prog) * sign, y + moveY * prog).rotate(params.rotation - 90);
 
             float
@@ -78,7 +78,7 @@ public class RegionPart extends DrawPart{
                 ry = params.y + Tmp.v1.y,
                 rot = rotMove * prog * sign + params.rotation - 90;
 
-            Draw.xscl = i == 0 ? 1 : -1;
+            Draw.xscl = sign;
 
             if(outline && drawRegion){
                 Draw.z(prevZ + outlineLayerOffset);
@@ -112,10 +112,12 @@ public class RegionPart extends DrawPart{
         if(children.size > 0){
             for(int s = 0; s < len; s++){
                 int i = (params.sideOverride == -1 ? s : params.sideOverride);
-                float sign = i == 1 ? -1 : 1;
+                float sign = (i == 1 ? -1 : 1) * params.sideMultiplier;
                 Tmp.v1.set((x + moveX * prog) * sign, y + moveY * prog).rotate(params.rotation - 90);
 
                 childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.x + Tmp.v1.x, params.y + Tmp.v1.y, i * sign + rotMove * prog * sign + params.rotation);
+                childParam.sideMultiplier = params.sideMultiplier;
+                childParam.life = params.life;
                 childParam.sideOverride = i;
                 for(var child : children){
                     child.draw(childParam);

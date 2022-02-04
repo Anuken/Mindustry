@@ -193,10 +193,9 @@ public class Weapon implements Cloneable{
             drawOutline(unit, mount);
         }
 
-        Draw.xscl = -Mathf.sign(flipSprite);
-
         if(parts.size > 0){
             DrawPart.params.set(mount.warmup, mount.reload / reload, mount.smoothReload, mount.heat, wx, wy, weaponRotation + 90);
+            DrawPart.params.sideMultiplier = flipSprite ? -1 : 1;
 
             for(int i = 0; i < parts.size; i++){
                 var part = parts.items[i];
@@ -205,6 +204,8 @@ public class Weapon implements Cloneable{
                 }
             }
         }
+
+        Draw.xscl = -Mathf.sign(flipSprite);
 
         Draw.rect(region, wx, wy, weaponRotation);
 
