@@ -15,11 +15,11 @@ public class ErekirTechTree{
         Seq<Objective> erekirSector = Seq.with(new OnPlanet(Planets.erekir));
 
         var costMultipliers = new ObjectFloatMap<Item>();
-        costMultipliers.put(Items.silicon, 8);
+        costMultipliers.put(Items.silicon, 9);
         costMultipliers.put(Items.surgeAlloy, 4);
         costMultipliers.put(Items.phaseFabric, 4);
         costMultipliers.put(Items.thorium, 9);
-        costMultipliers.put(Items.graphite, 9);
+        costMultipliers.put(Items.graphite, 10);
 
         //TODO gate behind capture
 

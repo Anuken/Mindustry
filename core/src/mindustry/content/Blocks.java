@@ -1105,9 +1105,10 @@ public class Blocks{
 
         //TODO better name
         electrolyzer = new GenericCrafter("electrolyzer"){{
-            requirements(Category.crafting, with(Items.silicon, 50, Items.graphite, 40, Items.beryllium, 90, Items.tungsten, 40));
+            requirements(Category.crafting, with(Items.silicon, 50, Items.graphite, 40, Items.beryllium, 130, Items.tungsten, 80));
             size = 3;
 
+            researchCostMultiplier = 1.2f;
             craftTime = 10f;
             rotate = true;
 
@@ -1143,7 +1144,7 @@ public class Blocks{
         }};
 
         atmosphericConcentrator = new HeatCrafter("atmospheric-concentrator"){{
-            requirements(Category.crafting, with(Items.oxide, 50, Items.beryllium, 60, Items.silicon, 40));
+            requirements(Category.crafting, with(Items.oxide, 60, Items.beryllium, 180, Items.silicon, 150));
             size = 3;
             craftTime = 10f;
             hasLiquids = true;
@@ -1158,6 +1159,7 @@ public class Blocks{
                 particleLife = 140f;
             }});
 
+            researchCostMultiplier = 1.1f;
             liquidCapacity = 40f;
             consumes.power(2f);
 
@@ -1167,10 +1169,11 @@ public class Blocks{
         }};
 
         oxidationChamber = new HeatProducer("oxidation-chamber"){{
-            requirements(Category.crafting, with(Items.tungsten, 60, Items.graphite, 40, Items.silicon, 50, Items.beryllium, 50));
+            requirements(Category.crafting, with(Items.tungsten, 120, Items.graphite, 80, Items.silicon, 100, Items.beryllium, 120));
             size = 3;
 
             outputItem = new ItemStack(Items.oxide, 1);
+            researchCostMultiplier = 1.1f;
 
             consumes.liquid(Liquids.ozone, 2f / 60f);
             consumes.item(Items.beryllium);
@@ -1188,6 +1191,8 @@ public class Blocks{
 
         electricHeater = new HeatProducer("electric-heater"){{
             requirements(Category.crafting, with(Items.tungsten, 30, Items.graphite, 30));
+
+            researchCostMultiplier = 4f;
 
             drawer = new DrawMulti(new DrawHeatOutput(true));
             rotateDraw = false;
@@ -1211,6 +1216,8 @@ public class Blocks{
 
         heatRedirector = new HeatConductor("heat-redirector"){{
             requirements(Category.crafting, with(Items.tungsten, 10, Items.graphite, 10));
+
+            researchCostMultiplier = 10f;
 
             size = 3;
             drawer = new DrawMulti(new DrawHeatOutput(true), new DrawHeatInput("-heat"));
