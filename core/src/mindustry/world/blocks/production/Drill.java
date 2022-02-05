@@ -325,8 +325,10 @@ public class Drill extends Block{
             float ts = 0.6f;
 
             Draw.rect(region, x, y);
+            Draw.z(Layer.blockCracks);
             drawDefaultCracks();
 
+            Draw.z(Layer.blockAfterCracks);
             if(drawRim){
                 Draw.color(heatColor);
                 Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Time.time, 3f, s)));

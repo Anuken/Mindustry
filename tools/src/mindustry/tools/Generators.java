@@ -275,7 +275,7 @@ public class Generators{
                         }
                     }
 
-                    Fi.get("cracks-" + size + "-" + i + ".png").writePng(output);
+                    Fi.get("../rubble/cracks-" + size + "-" + i + ".png").writePng(output);
                 }
             }
         });
@@ -560,6 +560,16 @@ public class Generators{
 
                 Pixmap image = type.segments > 0 ? get(type.segmentRegions[0]) : outline.get(get(type.region));
 
+                Func<Weapon, Pixmap> weaponRegion = weapon -> Core.atlas.has(weapon.name + "-preview") ? get(weapon.name + "-preview") : get(weapon.region);
+                Cons2<Weapon, Pixmap> drawWeapon = (weapon, pixmap) ->
+                image.draw(weapon.flipSprite ? pixmap.flipX() : pixmap,
+                (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.width / 2f),
+                (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.height / 2f),
+                true
+                );
+
+                boolean anyUnder = false;
+
                 //draw each extra segment on top before it is saved as outline
                 if(sample instanceof Crawlc){
                     for(int i = 0; i < type.segments; i++){
@@ -579,6 +589,17 @@ public class Generators{
                     replace(type.name, image);
                 }
 
+                //draw weapons that are under the base
+                for(Weapon weapon : weapons.select(w -> w.layerOffset < 0)){
+                    drawWeapon.get(weapon, outline.get(weaponRegion.get(weapon)));
+                    anyUnder = true;
+                }
+
+                //draw over the weapons under the image
+                if(anyUnder){
+                    image.draw(outline.get(get(type.region)), true);
+                }
+
                 //draw treads
                 if(sample instanceof Tankc){
                     image.draw(outline.get(get(type.treadRegion)), true);
@@ -593,14 +614,12 @@ public class Generators{
                     image.draw(get(type.region), true);
                 }
 
-                //TODO draw under for layerOffset < 0
                 //draw weapon outlines on base
                 for(Weapon weapon : weapons){
-                    image.draw(weapon.flipSprite ? outline.get(get(weapon.region)).flipX() : outline.get(get(weapon.region)),
-                    (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.width / 2f),
-                    (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.height / 2f),
-                    true
-                    );
+                    //skip weapons under unit
+                    if(weapon.layerOffset < 0) continue;
+
+                    drawWeapon.get(weapon, outline.get(weaponRegion.get(weapon)));
                 }
 
                 //draw base region on top to mask weapons
@@ -610,24 +629,23 @@ public class Generators{
                     Pixmap baseCell = get(type.cellRegion);
                     Pixmap cell = baseCell.copy();
 
-                //replace with 0xffd37fff : 0xdca463ff for sharded colors?
-                cell.replace(in -> in == 0xffffffff ? 0xffa664ff : in == 0xdcc6c6ff || in == 0xdcc5c5ff ? 0xd06b53ff : 0);
+                    //replace with 0xffd37fff : 0xdca463ff for sharded colors?
+                    cell.replace(in -> in == 0xffffffff ? 0xffa664ff : in == 0xdcc6c6ff || in == 0xdcc5c5ff ? 0xd06b53ff : 0);
 
                     image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2, true);
                 }
 
                 for(Weapon weapon : weapons){
-                    Pixmap wepReg = weapon.top ? outline.get(get(weapon.region)) : get(weapon.region);
-                    if(weapon.flipSprite){
-                        wepReg = wepReg.flipX();
-                    }
+                    //skip weapons under unit
+                    if(weapon.layerOffset < 0) continue;
 
-                    image.draw(wepReg,
-                    (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.width / 2f),
-                    (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.height / 2f),
-                    true);
+                    Pixmap reg = weaponRegion.get(weapon);
+                    Pixmap wepReg = weapon.top ? outline.get(reg) : reg;
+
+                    drawWeapon.get(weapon, wepReg);
                 }
 
+                //TODO I can save a LOT of space by not creating a full icon.
                 save(image, "unit-" + type.name + "-full");
 
                 Rand rand = new Rand();

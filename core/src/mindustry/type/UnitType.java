@@ -171,6 +171,8 @@ public class UnitType extends UnlockableContent{
     public boolean forceMultiTarget = false;
     public boolean hidden = false;
     public boolean internal = false;
+    /** A sample of the unit that this type creates. Do not modify! */
+    public Unit sample;
 
     //for crawlers
     public int segments = 0;
@@ -522,6 +524,9 @@ public class UnitType extends UnlockableContent{
                 dpsEstimate /= 25f;
             }
         }
+
+        //only do this after everything else was initialized
+        sample = constructor.get();
     }
 
     @CallSuper

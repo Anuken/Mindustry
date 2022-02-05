@@ -46,7 +46,9 @@ public class Blocks{
     redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     redweed, purbush, yellowCoral,
-    regolithWall, yellowStoneWall, rhyoliteWall, steamVent, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall, arkyicWall, crystallineStoneWall, redStoneWall, redDiamondWall,
+    //TODO rename steamvent to rhyolite vent, maybe add red vent or crystal vent
+    rhyoliteVent, carbonVent, arkyicVent, yellowStoneVent, redStoneVent,
+    regolithWall, yellowStoneWall, rhyoliteWall, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall, arkyicWall, crystallineStoneWall, redStoneWall, redDiamondWall,
     ferricStone, ferricCraters, carbonStone, beryllicStone, crystallineStone, crystalFloor, yellowStonePlates,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
     //boulders
@@ -382,11 +384,6 @@ public class Blocks{
             variants = 3;
         }};
 
-        steamVent = new SteamVent("steam-vent"){{
-            parent = blendGroup = rhyolite;
-            attributes.set(Attribute.vent, 1f);
-        }};
-
         regolith = new Floor("regolith"){{
             attributes.set(Attribute.water, -1f);
         }};
@@ -457,8 +454,36 @@ public class Blocks{
             albedo = 0.9f;
         }};
 
-       arkyicStone = new Floor("arkyic-stone"){{
+        arkyicStone = new Floor("arkyic-stone"){{
             variants = 3;
+        }};
+
+        //TODO different vent colors
+        rhyoliteVent = new SteamVent("rhyolite-vent"){{
+            parent = blendGroup = rhyolite;
+            attributes.set(Attribute.steam, 1f);
+        }};
+
+        carbonVent = new SteamVent("carbon-vent"){{
+            parent = blendGroup = carbonStone;
+            attributes.set(Attribute.steam, 1f);
+        }};
+
+        arkyicVent = new SteamVent("arkyic-vent"){{
+            parent = blendGroup = arkyicStone;
+            attributes.set(Attribute.steam, 1f);
+        }};
+
+        yellowStoneVent = new SteamVent("yellow-stone-vent"){{
+            //TODO ...or regolith
+            parent = blendGroup = yellowStone;
+            attributes.set(Attribute.steam, 1f);
+        }};
+
+        redStoneVent = new SteamVent("red-stone-vent"){{
+            //TODO ...or regolith
+            parent = blendGroup = denseRedStone;
+            attributes.set(Attribute.steam, 1f);
         }};
 
         redmat = new Floor("redmat");
@@ -879,10 +904,10 @@ public class Blocks{
         }};
 
         siliconArcFurnace = new GenericCrafter("silicon-arc-furnace"){{
-            requirements(Category.crafting, with(Items.beryllium, 60, Items.graphite, 80));
+            requirements(Category.crafting, with(Items.beryllium, 70, Items.graphite, 80));
             craftEffect = Fx.none;
-            outputItem = new ItemStack(Items.silicon, 5);
-            craftTime = 40f;
+            outputItem = new ItemStack(Items.silicon, 4);
+            craftTime = 50f;
             size = 3;
             hasPower = true;
             hasLiquids = false;
@@ -1138,6 +1163,7 @@ public class Blocks{
             );
 
             drawer.iconOverride = new String[]{"-bottom", ""};
+            regionRotated1 = 3;
             continuousLiquidOutput = true;
             outputLiquids = LiquidStack.with(Liquids.ozone, 4f / 60, Liquids.hydrogen, 6f / 60);
             liquidOutputDirections = new int[]{1, 3};
@@ -1184,6 +1210,7 @@ public class Blocks{
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(), new DrawBlock(), new DrawHeatOutput());
             drawer.iconOverride = new String[]{"-bottom", "", "-top1"};
 
+            regionRotated1 = 2;
             craftTime = 60f * 3f;
             liquidCapacity = 30f;
             heatOutput = 5f;
@@ -2185,7 +2212,7 @@ public class Blocks{
 
         turbineCondenser = new ThermalGenerator("turbine-condenser"){{
             requirements(Category.power, with(Items.graphite, 40, Items.beryllium, 40));
-            attribute = Attribute.vent;
+            attribute = Attribute.steam;
             displayEfficiencyScale = 1f / 9f;
             minEfficiency = 9f - 0.0001f;
             powerProduction = 3f / 9f;
@@ -2369,7 +2396,7 @@ public class Blocks{
         //TODO output heat?
         ventCondenser = new AttributeCrafter("vent-condenser"){{
             requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 60));
-            attribute = Attribute.vent;
+            attribute = Attribute.steam;
             minEfficiency = 9f - 0.0001f;
             baseEfficiency = 0f;
             displayEfficiency = false;

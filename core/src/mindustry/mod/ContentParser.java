@@ -149,13 +149,17 @@ public class ContentParser{
 
             PartProgress base = (PartProgress)field(PartProgress.class, data.getString("type"));
 
+            JsonValue opval =
+                data.has("operation") ? data.get("operation") :
+                data.has("op") ? data.get("op") : null;
+
             //no operations I guess (why would you do this?)
-            if(!data.has("operation")){
+            if(opval == null){
                 return base;
             }
 
             //this is the name of the method to call
-            String op = data.getString("operation");
+            String op = opval.asString();
 
             //I have to hard-code this, no easy way of getting parameter names, unfortunately
             return switch(op){

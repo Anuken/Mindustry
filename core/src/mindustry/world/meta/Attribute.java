@@ -21,7 +21,7 @@ public class Attribute{
     /** Used for sand extraction. */
     sand = add("sand"),
     /** Used for erekir vents only. */
-    vent = add("vent");
+    steam = add("steam");
 
     public final int id;
     public final String name;

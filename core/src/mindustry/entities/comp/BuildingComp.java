@@ -1036,6 +1036,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         int id = pos();
         TextureRegion region = renderer.blocks.cracks[block.size - 1][Mathf.clamp((int)((1f - healthf()) * BlockRenderer.crackRegions), 0, BlockRenderer.crackRegions-1)];
         Draw.colorl(0.2f, 0.1f + (1f - healthf())* 0.6f);
+        //TODO could be random, flipped, pseudorandom, etc
         Draw.rect(region, x, y, (id%4)*90);
         Draw.color();
     }

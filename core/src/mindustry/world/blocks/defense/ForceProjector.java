@@ -39,12 +39,12 @@ public class ForceProjector extends Block{
 
     protected static ForceBuild paramEntity;
     protected static Effect paramEffect;
-    protected static final Cons<Bullet> shieldConsumer = trait -> {
-        if(trait.team != paramEntity.team && trait.type.absorbable && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, trait.x(), trait.y())){
-            trait.absorb();
-            paramEffect.at(trait);
+    protected static final Cons<Bullet> shieldConsumer = bullet -> {
+        if(bullet.team != paramEntity.team && bullet.type.absorbable && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, bullet.x, bullet.y)){
+            bullet.absorb();
+            paramEffect.at(bullet);
             paramEntity.hit = 1f;
-            paramEntity.buildup += trait.damage();
+            paramEntity.buildup += bullet.damage;
         }
     };
 

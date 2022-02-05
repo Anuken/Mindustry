@@ -324,10 +324,9 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         trimDark();
 
-        int minVents = rand.random(5, 8);
+        int minVents = rand.random(6, 8);
         int ventCount = 0;
 
-        //TODO vents everywhere! rhyolite patches
         //vents
         outer:
         for(Tile tile : tiles){
@@ -346,7 +345,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 ventCount ++;
                 for(var pos : SteamVent.offsets){
                     Tile other = tiles.get(pos.x + tile.x + 1, pos.y + tile.y + 1);
-                    other.setFloor(Blocks.steamVent.asFloor());
+                    other.setFloor(Blocks.rhyoliteVent.asFloor());
                 }
             }
         }
@@ -358,22 +357,52 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         while(ventCount < minVents && iterations++ < maxIterations){
             outer:
             for(Tile tile : tiles){
-                if(rand.chance(0.00018)){
+                if(rand.chance(0.00018 * (1 + iterations))){
+                    //skip crystals, but only when directly on them
+                    if(tile.floor() == Blocks.crystallineStone || tile.floor() == Blocks.crystalFloor){
+                        continue;
+                    }
+
                     int radius = 1;
                     for(int x = -radius; x <= radius; x++){
                         for(int y = -radius; y <= radius; y++){
                             Tile other = tiles.get(x + tile.x, y + tile.y);
                             //skip solids / other vents / arkycite / slag
-                            if(other == null || other.block().solid || other.floor() == Blocks.steamVent || other.floor() == Blocks.slag || other.floor() == Blocks.arkyciteFloor){
+                            if(other == null || other.block().solid || other.floor().attributes.get(Attribute.steam) != 0 || other.floor() == Blocks.slag || other.floor() == Blocks.arkyciteFloor){
                                 continue outer;
                             }
                         }
                     }
 
+                    Block
+                    floor = Blocks.rhyolite,
+                    secondFloor = Blocks.rhyoliteCrater,
+                    vent = Blocks.rhyoliteVent;
+
+                    int xDir = 1;
+                    //set target material depending on what's encountered
+                    if(tile.floor() == Blocks.beryllicStone || tile.floor() == Blocks.arkyicStone){
+                        floor = secondFloor = Blocks.arkyicStone;
+                        vent = Blocks.arkyicVent;
+                    }else if(tile.floor() == Blocks.yellowStone || tile.floor() == Blocks.yellowStonePlates || tile.floor() == Blocks.regolith){
+                        floor = Blocks.yellowStone;
+                        secondFloor = Blocks.yellowStonePlates;
+                        vent = Blocks.yellowStoneVent;
+                    }else if(tile.floor() == Blocks.redStone || tile.floor() == Blocks.denseRedStone){
+                        floor = Blocks.denseRedStone;
+                        secondFloor = Blocks.redStone;
+                        vent = Blocks.redStoneVent;
+                        xDir = -1;
+                    }else if(tile.floor() == Blocks.carbonStone){
+                        floor = secondFloor = Blocks.carbonStone;
+                        vent = Blocks.carbonVent;
+                    }
+
+
                     ventCount ++;
                     for(var pos : SteamVent.offsets){
                         Tile other = tiles.get(pos.x + tile.x + 1, pos.y + tile.y + 1);
-                        other.setFloor(Blocks.steamVent.asFloor());
+                        other.setFloor(vent.asFloor());
                     }
 
                     //"circle" for blending
@@ -384,12 +413,14 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                             int rx = cx + tile.x, ry = cy + tile.y;
                             //skew circle Y
                             float rcy = cy + cx*0.9f;
-                            if(cx*cx + rcy*rcy <= crad2 - noise(rx, ry + rx*2f, 2, 0.7f, 8f, crad2 * 1.1f)){
+                            if(cx*cx + rcy*rcy <= crad2 - noise(rx, ry + rx * 2f * xDir, 2, 0.7f, 8f, crad2 * 1.1f)){
                                 Tile dest = tiles.get(rx, ry);
-                                if(dest != null && dest.floor() != Blocks.steamVent && dest.floor() != Blocks.roughRhyolite && dest.floor() != Blocks.arkyciteFloor && dest.floor() != Blocks.slag){
-                                    dest.setFloor(rand.chance(0.08) ? Blocks.rhyoliteCrater.asFloor() : Blocks.rhyolite.asFloor());
+                                if(dest != null && dest.floor().attributes.get(Attribute.steam) == 0 && dest.floor() != Blocks.roughRhyolite && dest.floor() != Blocks.arkyciteFloor && dest.floor() != Blocks.slag){
+
+                                    dest.setFloor(rand.chance(0.08) ? secondFloor.asFloor() : floor.asFloor());
+
                                     if(dest.block().isStatic()){
-                                        dest.setBlock(Blocks.rhyoliteWall);
+                                        dest.setBlock(floor.asFloor().wall);
                                     }
                                 }
                             }

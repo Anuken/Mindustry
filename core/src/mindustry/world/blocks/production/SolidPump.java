@@ -103,7 +103,9 @@ public class SolidPump extends Pump{
         @Override
         public void draw(){
             Draw.rect(region, x, y);
+            Draw.z(Layer.blockCracks);
             super.drawCracks();
+            Draw.z(Layer.blockAfterCracks);
 
             Drawf.liquid(liquidRegion, x, y, liquids.get(result) / liquidCapacity, result.color);
             Drawf.spinSprite(rotatorRegion, x, y, pumpTime * rotateSpeed);

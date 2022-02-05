@@ -26,6 +26,12 @@ public class Layer{
     //base block layer - most blocks go here
     block = 30,
 
+    //layer for cracks over blocks, batched to prevent excessive texture swaps
+    blockCracks = 30f + 0.1f,
+
+    //some blocks need to draw stuff after cracks
+    blockAfterCracks = 30f + 0.2f,
+
     //informal layer used for additive blending overlay, grouped together to reduce draw calls
     blockAdditive = 31,
 

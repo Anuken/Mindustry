@@ -359,7 +359,7 @@ public class BlockRenderer{
         for(int i = 0; i < tileview.size; i++){
             Tile tile = tileview.items[i];
             Block block = tile.block();
-            Building entity = tile.build;
+            Building build = tile.build;
 
             Draw.z(Layer.block);
 
@@ -374,20 +374,21 @@ public class BlockRenderer{
                     Draw.z(Layer.block);
                 }
 
-                if(entity != null){
+                if(build != null){
 
-                    if(entity.damaged()){
-                        entity.drawCracks();
+                    if(build.damaged()){
+                        Draw.z(Layer.blockCracks);
+                        build.drawCracks();
                         Draw.z(Layer.block);
                     }
 
-                    if(entity.team != player.team()){
-                        entity.drawTeam();
+                    if(build.team != player.team()){
+                        build.drawTeam();
                         Draw.z(Layer.block);
                     }
 
-                    if(entity.team == player.team() && renderer.drawStatus && block.consumes.any()){
-                        entity.drawStatus();
+                    if(build.team == player.team() && renderer.drawStatus && block.consumes.any()){
+                        build.drawStatus();
                     }
                 }
                 Draw.reset();
