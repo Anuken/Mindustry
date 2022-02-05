@@ -151,7 +151,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                         ore = Blocks.air;
                     }
 
-                    if(noise > 0.5f && floor == Blocks.beryllicStone){
+                    //TODO this needs to be tweaked
+                    if(noise > 0.55f && floor == Blocks.beryllicStone){
                         floor = Blocks.yellowStone;
                     }
                 }
@@ -221,6 +222,10 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             //rough rhyolite
             if(noise(x, y + 600 + x, 5, 0.86f, 60f, 1f) < 0.41f && floor == Blocks.rhyolite){
                 floor = Blocks.roughRhyolite;
+            }
+
+            if(floor == Blocks.slag && Mathf.within(x, y, spawnX, spawnY, 30f + noise(x, y, 2, 0.8f, 9f, 15f))){
+                floor = Blocks.yellowStonePlates;
             }
 
             if((floor == Blocks.arkyciteFloor || floor == Blocks.arkyicStone) && block.isStatic()){

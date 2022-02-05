@@ -2940,7 +2940,7 @@ public class UnitTypes{
                         mirror = false;
                         reload = 1f;
                         shootOnDeath = true;
-                        bullet = new ExplosionBulletType(110f, 22f){{
+                        bullet = new ExplosionBulletType(130f, 22f){{
                             shootEffect = Fx.massiveExplosion;
                         }};
                     }});
