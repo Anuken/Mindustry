@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
 public class Units{
     private static final Rect hitrect = new Rect();
     private static Unit result;
-    private static float cdist;
+    private static float cdist, cpriority;
     private static boolean boolResult;
     private static int intResult;
     private static Building buildResult;
@@ -271,14 +271,16 @@ public class Units{
 
         result = null;
         cdist = 0f;
+        cpriority = -99999f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
             if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.within(x, y, range + e.hitSize/2f)) return;
 
             float cost = sort.cost(e, x, y);
-            if(result == null || cost < cdist){
+            if((result == null || cost < cdist) && e.type.targetPriority >= cpriority){
                 result = e;
                 cdist = cost;
+                cpriority = e.type.targetPriority;
             }
         });
 

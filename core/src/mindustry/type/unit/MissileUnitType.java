@@ -30,6 +30,7 @@ public class MissileUnitType extends UnitType{
         lifetime = 60f * 1.7f;
         rotateSpeed = 2.5f;
         range = 30f;
+        targetPriority = -1f;
         //TODO weapons, etc
     }
 }
