@@ -2676,9 +2676,9 @@ public class UnitTypes{
 
         bulwark = new UnitType("bulwark"){{
             drag = 0.1f;
-            speed = 0.62f;
+            speed = 0.6f;
             hitSize = 23f;
-            health = 7300;
+            health = 7000;
             armor = 5f;
             outlineColor = Pal.darkOutline;
             envDisabled = Env.space;
@@ -2687,7 +2687,7 @@ public class UnitTypes{
                 region = "bulwark-shield";
                 radius = 34f;
                 angle = 82f;
-                regen = 0.4f;
+                regen = 0.6f;
                 cooldown = 60f * 8f;
                 max = 1500f;
                 y = -20f;
