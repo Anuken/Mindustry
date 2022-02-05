@@ -200,6 +200,8 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
         type.draw(self());
         type.drawLight(self());
+        
+        Draw.reset();
     }
 
     public void initVel(float angle, float amount){
