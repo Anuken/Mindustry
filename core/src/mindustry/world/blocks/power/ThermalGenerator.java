@@ -49,6 +49,8 @@ public class ThermalGenerator extends PowerGenerator{
         super.setStats();
 
         stats.add(Stat.tiles, attribute, floating, size * size * displayEfficiencyScale, !displayEfficiency);
+        stats.remove(generationType);
+        stats.add(generationType, powerProduction * 60.0f / displayEfficiencyScale, StatUnit.powerSecond);
 
         if(outputLiquid != null){
             stats.add(Stat.output, StatValues.liquid(outputLiquid.liquid, outputLiquid.amount * size * size * 60f, true));

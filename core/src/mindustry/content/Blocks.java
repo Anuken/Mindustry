@@ -2432,7 +2432,7 @@ public class Blocks{
             //can't mine thorium for balance reasons, needs better drill
             blockedItem = Items.thorium;
 
-            consumes.power(3f);
+            consumes.power(160f / 60f);
             consumes.liquid(Liquids.water, 0.2f);
         }};
 
