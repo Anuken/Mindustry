@@ -475,13 +475,11 @@ public class Blocks{
         }};
 
         yellowStoneVent = new SteamVent("yellow-stone-vent"){{
-            //TODO ...or regolith
             parent = blendGroup = yellowStone;
             attributes.set(Attribute.steam, 1f);
         }};
 
         redStoneVent = new SteamVent("red-stone-vent"){{
-            //TODO ...or regolith
             parent = blendGroup = denseRedStone;
             attributes.set(Attribute.steam, 1f);
         }};

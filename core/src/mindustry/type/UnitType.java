@@ -331,8 +331,6 @@ public class UnitType extends UnlockableContent{
 
     @Override
     public void setStats(){
-        Unit inst = constructor.get();
-
         stats.add(Stat.health, health);
         stats.add(Stat.armor, armor);
         stats.add(Stat.speed, speed * 60f / tilesize, StatUnit.tilesSecond);
@@ -364,7 +362,7 @@ public class UnitType extends UnlockableContent{
         if(buildSpeed > 0){
             stats.addPercent(Stat.buildSpeed, buildSpeed);
         }
-        if(inst instanceof Payloadc){
+        if(sample instanceof Payloadc){
             stats.add(Stat.payloadCapacity, StatValues.squared(Mathf.sqrt(payloadCapacity / (tilesize * tilesize)), StatUnit.blocksSquared));
         }
 
