@@ -324,7 +324,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         trimDark();
 
-        int minVents = rand.random(6, 8);
+        int minVents = rand.random(6, 9);
         int ventCount = 0;
 
         //vents
