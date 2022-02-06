@@ -20,7 +20,7 @@ import static mindustry.Vars.*;
 
 public class RegenProjector extends Block{
     private static final IntSet taken = new IntSet();
-    //map ID to mend amount
+    //map building pos to mend amount (TODO just use buildings as keys? no lookup)
     private static final IntFloatMap mendMap = new IntFloatMap();
     private static long lastUpdateFrame = -1;
 

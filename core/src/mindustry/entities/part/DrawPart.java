@@ -57,20 +57,28 @@ public abstract class DrawPart{
             return p -> value;
         }
 
+        default float getClamp(PartParams p){
+            return Mathf.clamp(get(p));
+        }
+
         default PartProgress inv(){
             return p -> 1f - get(p);
         }
 
+        default PartProgress clamp(){
+            return p -> Mathf.clamp(get(p));
+        }
+
         default PartProgress add(float amount){
-            return p -> Mathf.clamp(get(p) + amount);
+            return p -> get(p) + amount;
         }
 
         default PartProgress delay(float amount){
-            return p -> Mathf.clamp((get(p) - amount) / (1f - amount));
+            return p -> (get(p) - amount) / (1f - amount);
         }
 
         default PartProgress shorten(float amount){
-            return p -> Mathf.clamp(get(p) / (1f - amount));
+            return p -> get(p) / (1f - amount);
         }
 
         default PartProgress blend(PartProgress other, float amount){
@@ -82,7 +90,7 @@ public abstract class DrawPart{
         }
 
         default PartProgress mul(float amount){
-            return p -> Mathf.clamp(get(p) * amount);
+            return p -> get(p) * amount;
         }
 
         default PartProgress min(PartProgress other){
@@ -90,11 +98,11 @@ public abstract class DrawPart{
         }
 
         default PartProgress sin(float scl, float mag){
-            return p -> Mathf.clamp(get(p) + Mathf.sin(scl, mag));
+            return p -> get(p) + Mathf.sin(scl, mag);
         }
 
         default PartProgress absin(float scl, float mag){
-            return p -> Mathf.clamp(get(p) + Mathf.absin(scl, mag));
+            return p -> get(p) + Mathf.absin(scl, mag);
         }
 
         default PartProgress apply(PartProgress other, PartFunc func){

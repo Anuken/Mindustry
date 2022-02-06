@@ -25,7 +25,7 @@ public class ShapePart extends DrawPart{
 
         Draw.z(Draw.z() + layerOffset);
 
-        float prog = progress.get(params);
+        float prog = progress.getClamp(params);
         int len = mirror && params.sideOverride == -1 ? 2 : 1;
 
         for(int s = 0; s < len; s++){

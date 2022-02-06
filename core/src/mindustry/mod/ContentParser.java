@@ -9,6 +9,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
@@ -30,7 +31,10 @@ import mindustry.game.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.graphics.g3d.*;
 import mindustry.io.*;
+import mindustry.maps.generators.*;
+import mindustry.maps.planet.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.type.ammo.*;
@@ -164,6 +168,7 @@ public class ContentParser{
             //I have to hard-code this, no easy way of getting parameter names, unfortunately
             return switch(op){
                 case "inv" -> base.inv();
+                case "clamp" -> base.clamp();
                 case "delay" -> base.delay(data.getFloat("amount"));
                 case "shorten" -> base.shorten(data.getFloat("amount"));
                 case "add" -> base.add(data.getFloat("amount"));
@@ -175,6 +180,64 @@ public class ContentParser{
                 case "curve" -> base.curve(parser.readValue(Interp.class, data.get("interp")));
                 default -> throw new RuntimeException("Unknown operation '" + op + "', check PartProgress class for a list of methods.");
             };
+        });
+        put(PlanetGenerator.class, (type, data) -> {
+            var result = new AsteroidGenerator(); //only one type for now
+            readFields(result, data);
+            return result;
+        });
+        put(GenericMesh.class, (type, data) -> {
+            if(!data.isObject()) throw new RuntimeException("Meshes must be objects.");
+            if(!(currentContent instanceof Planet planet)) throw new RuntimeException("Meshes can only be parsed as parts of planets.");
+
+            String tname = Strings.capitalize(data.getString("type", "NoiseMesh"));
+
+            return switch(tname){
+                //TODO NoiseMesh is bad
+                case "NoiseMesh" -> new NoiseMesh(planet,
+                    data.getInt("seed", 0), data.getInt("divisions", 1), data.getFloat("radius", 1f),
+                    data.getInt("octaves", 1), data.getFloat("persistence", 0.5f), data.getFloat("scale", 1f), data.getFloat("mag", 0.5f),
+                    Color.valueOf(data.getString("color1", data.getString("color", "ffffff"))),
+                    Color.valueOf(data.getString("color2", data.getString("color", "ffffff"))),
+                    data.getInt("colorOct", 1), data.getFloat("colorPersistence", 0.5f), data.getFloat("colorScale", 1f),
+                    data.getFloat("colorThreshold", 0.5f));
+                case "MultiMesh" -> new MultiMesh(parser.readValue(GenericMesh[].class, data.get("meshes")));
+                case "MatMesh" -> new MatMesh(parser.readValue(GenericMesh.class, data.get("mesh")), parser.readValue(Mat3D.class, data.get("mat")));
+                default -> throw new RuntimeException("Unknown mesh type: " + tname);
+            };
+        });
+        put(Mat3D.class, (type, data) -> {
+            if(data == null) return new Mat3D();
+
+            //transform x y z format
+            if(data.has("x") && data.has("y") && data.has("z")){
+                return new Mat3D().translate(data.getFloat("x", 0f), data.getFloat("y", 0f), data.getFloat("z", 0f));
+            }
+
+            //transform array format
+            if(data.isArray() && data.size == 3){
+                return new Mat3D().setToTranslation(new Vec3(data.asFloatArray()));
+            }
+
+            Mat3D mat = new Mat3D();
+
+            //TODO this is kinda bad
+            for(var val : data){
+                switch(val.name){
+                    case "translate", "trans" -> mat.translate(parser.readValue(Vec3.class, data));
+                    case "scale", "scl" -> mat.scale(parser.readValue(Vec3.class, data));
+                    case "rotate", "rot" -> mat.rotate(parser.readValue(Vec3.class, data), data.getFloat("degrees", 0f));
+                    case "multiply", "mul" -> mat.mul(parser.readValue(Mat3D.class, data));
+                    case "x", "y", "z" -> {}
+                    default -> throw new RuntimeException("Unknown matrix transformation: '" + val.name + "'");
+                }
+            }
+
+            return mat;
+        });
+        put(Vec3.class, (type, data) -> {
+            if(data.isArray()) return new Vec3(data.asFloatArray());
+            return new Vec3(data.getFloat("x", 0f), data.getFloat("y", 0f), data.getFloat("z", 0f));
         });
         put(Sound.class, (type, data) -> {
             if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
@@ -202,6 +265,7 @@ public class ContentParser{
             readFields(obj, data);
             return obj;
         });
+
         put(Ability.class, (type, data) -> {
             Class<? extends Ability> oc = resolve(data.getString("type", ""));
             data.remove("type");
@@ -437,6 +501,21 @@ public class ContentParser{
             value.remove("planet");
             read(() -> readFields(out, value));
             return out;
+        },
+        ContentType.planet, (TypeParser<Planet>)(mod, name, value) -> {
+            if(value.isString()) return locate(ContentType.planet, name);
+
+            Planet parent = locate(ContentType.planet, value.getString("parent"));
+            Planet planet = new Planet(name, parent, value.getFloat("radius", 1f), value.getInt("sectorSize", 0));
+
+            //TODO unimplemented; still needs generator + mesh
+            if(value.has("mesh")){
+                planet.meshLoader = () -> parser.readValue(GenericMesh.class, value.get("mesh"));
+            }
+
+            //TODO unimplemented!!
+            read(() -> readFields(planet, value));
+            return planet;
         }
     );
 

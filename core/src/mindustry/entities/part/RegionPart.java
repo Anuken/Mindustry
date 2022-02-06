@@ -60,7 +60,7 @@ public class RegionPart extends DrawPart{
         Draw.z(Draw.z() + layerOffset);
 
         float prevZ = Draw.z();
-        float prog = progress.get(params);
+        float prog = progress.getClamp(params);
 
         int len = mirror && params.sideOverride == -1 ? 2 : 1;
 
@@ -99,7 +99,7 @@ public class RegionPart extends DrawPart{
             }
 
             if(heat.found()){
-                Drawf.additive(heat, heatColor.write(Tmp.c1).a(heatProgress.get(params) * heatColor.a), rx, ry, rot, turretShading ? Layer.turretHeat : z + 1f);
+                Drawf.additive(heat, heatColor.write(Tmp.c1).a(heatProgress.getClamp(params) * heatColor.a), rx, ry, rot, turretShading ? Layer.turretHeat : z + 1f);
             }
 
             Draw.xscl = 1f;
