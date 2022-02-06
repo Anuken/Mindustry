@@ -2,6 +2,7 @@ package mindustry.maps.planet;
 
 import arc.math.*;
 import arc.math.geom.*;
+import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.game.*;
@@ -21,7 +22,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
 
     public float thoriumScl = 1f, copperScale = 1f, leadScale = 1f, graphiteScale = 1f, berylliumScale = 1f;
 
-    Rand rand;
+    @Nullable Rand rand;
     int seed;
 
     void asteroid(int ax, int ay, int radius){

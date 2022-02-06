@@ -21,12 +21,10 @@ public abstract class BasicGenerator implements WorldGenerator{
     protected Rand rand = new Rand();
 
     protected int width, height;
-    protected Tiles tiles;
+    protected @Nullable Tiles tiles;
 
     //for drawing
-    protected Block floor;
-    protected Block block;
-    protected Block ore;
+    protected @Nullable Block floor, block, ore;
 
     @Override
     public void generate(Tiles tiles){

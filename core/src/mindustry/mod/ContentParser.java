@@ -32,6 +32,7 @@ import mindustry.game.Objectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
+import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.io.*;
 import mindustry.maps.generators.*;
 import mindustry.maps.planet.*;
@@ -499,6 +500,7 @@ public class ContentParser{
             SectorPreset out = new SectorPreset(name, locate(ContentType.planet, value.getString("planet", "serpulo")), value.getInt("sector"));
             value.remove("sector");
             value.remove("planet");
+            currentContent = out;
             read(() -> readFields(out, value));
             return out;
         },
@@ -508,12 +510,14 @@ public class ContentParser{
             Planet parent = locate(ContentType.planet, value.getString("parent"));
             Planet planet = new Planet(name, parent, value.getFloat("radius", 1f), value.getInt("sectorSize", 0));
 
-            //TODO unimplemented; still needs generator + mesh
             if(value.has("mesh")){
                 planet.meshLoader = () -> parser.readValue(GenericMesh.class, value.get("mesh"));
             }
 
-            //TODO unimplemented!!
+            //always one sector right now...
+            planet.sectors.add(new Sector(planet, Ptile.empty));
+
+            currentContent = planet;
             read(() -> readFields(planet, value));
             return planet;
         }
