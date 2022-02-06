@@ -155,7 +155,7 @@ public class Conveyor extends Block implements Autotiler{
 
             Draw.rect(regions[blendbits][frame], x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
 
-            Draw.z(Layer.block - 0.1f);
+            Draw.z(Layer.block - 0.15f);
 
             for(int i = 0; i < len; i++){
                 Item item = ids[i];
@@ -176,7 +176,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void drawCracks(){
-            Draw.z(Layer.block - 0.15f);
+            Draw.z(Layer.block - 0.1f);
             super.drawCracks();
         }
 
