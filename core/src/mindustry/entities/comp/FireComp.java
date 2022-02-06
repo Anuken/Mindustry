@@ -28,7 +28,6 @@ abstract class FireComp implements Timedc, Posc, Syncc, Drawc{
     public static final TextureRegion[] regions = new TextureRegion[frames];
 
     @Import float time, lifetime, x, y;
-    @Import int id;
 
     Tile tile;
     private transient Block block;

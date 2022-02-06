@@ -1,5 +1,6 @@
 package mindustry.world.blocks.environment;
 
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -7,6 +8,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.graphics.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -27,6 +29,7 @@ public class SteamVent extends Floor{
 
     public Block parent = Blocks.air;
     public Effect effect = Fx.ventSteam;
+    public Color effectColor = Pal.vent;
     public float effectSpacing = 15f;
 
     static{
@@ -58,7 +61,7 @@ public class SteamVent extends Floor{
     @Override
     public void renderUpdate(UpdateRenderState state){
         if(state.tile.block() == Blocks.air && (state.data += Time.delta) >= effectSpacing){
-            effect.at(state.tile.x * tilesize - tilesize, state.tile.y * tilesize - tilesize);
+            effect.at(state.tile.x * tilesize - tilesize, state.tile.y * tilesize - tilesize, effectColor);
             state.data = 0f;
         }
     }

@@ -19,7 +19,7 @@ public class ErekirTechTree{
         costMultipliers.put(Items.surgeAlloy, 4);
         costMultipliers.put(Items.phaseFabric, 4);
         costMultipliers.put(Items.thorium, 9);
-        costMultipliers.put(Items.graphite, 10);
+        costMultipliers.put(Items.graphite, 9);
 
         //TODO gate behind capture
 
@@ -54,7 +54,9 @@ public class ErekirTechTree{
                 });
 
                 //TODO should only be unlocked in unit sector
-                node(constructor, Seq.with(new Research(siliconArcFurnace), erekirSector.first()), () -> {
+                node(constructor, Seq.with(new Research(siliconArcFurnace), new OnSector(four)), () -> {
+
+                    //TODO further limitations
                     node(payloadLoader, () -> {
                         node(payloadUnloader, () -> {
                             node(payloadPropulsionTower, () -> {
@@ -78,7 +80,7 @@ public class ErekirTechTree{
             //TODO move into turbine condenser?
             node(plasmaBore, () -> {
                 node(impactDrill, Seq.with(new OnSector(aware)), () -> {
-                    node(largePlasmaBore, () -> {
+                    node(largePlasmaBore, Seq.with(new OnSector(four)), () -> {
                         node(eruptionDrill, () -> {
 
                         });
@@ -96,14 +98,14 @@ public class ErekirTechTree{
                         });
                     });
 
-                    node(beamTower, () -> {
+                    node(beamTower, Seq.with(new OnSector(four)), () -> {
 
                     });
 
 
                     node(regenProjector, () -> {
                         //TODO more tiers of build tower or "support" structures like overdrive projectors
-                        node(buildTower, () -> {
+                        node(buildTower, Seq.with(new OnSector(four)), () -> {
 
                         });
                     });
@@ -134,7 +136,7 @@ public class ErekirTechTree{
                     node(cliffCrusher, () -> {
                         node(electrolyzer, Seq.with(new OnSector(three)), () -> {
                             node(oxidationChamber, () -> {
-                                node(electricHeater, () -> {
+                                node(electricHeater, Seq.with(new OnSector(four)), () -> {
                                     node(heatRedirector, () -> {
 
                                     });
@@ -157,7 +159,7 @@ public class ErekirTechTree{
                                 });
                             });
 
-                            node(slagIncinerator, () -> {
+                            node(slagIncinerator, Seq.with(new OnSector(four)), () -> {
 
                                 node(slagCentrifuge, () -> {
 
@@ -194,7 +196,7 @@ public class ErekirTechTree{
                 });
             });
 
-            node(coreCitadel, () -> {
+            node(coreCitadel, Seq.with(new SectorComplete(four)), () -> {
                 node(coreAcropolis, () -> {
 
                 });
@@ -204,7 +206,9 @@ public class ErekirTechTree{
             node(onset, () -> {
                 node(aware, Seq.with(new SectorComplete(onset), new Research(ductRouter)), () -> {
                     node(three, Seq.with(new SectorComplete(aware), new Research(reinforcedContainer), new Research(ductUnloader), new Research(ventCondenser)), () -> {
+                        node(four, Seq.with(new SectorComplete(three), new Research(electrolyzer), new Research(oxidationChamber), new Research(chemicalCombustionChamber)), () -> {
 
+                        });
                     });
                 });
             });

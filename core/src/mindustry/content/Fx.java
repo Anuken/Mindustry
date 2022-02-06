@@ -1046,7 +1046,7 @@ public class Fx{
     }),
 
     ventSteam = new Effect(140f, e -> {
-        color(Pal.vent, e.fslope() * 0.85f);
+        color(e.color, e.fslope() * 0.85f);
 
         float length = 3f + e.finpow() * 10f;
         rand.setSeed(e.id);

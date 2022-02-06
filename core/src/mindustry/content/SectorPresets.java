@@ -12,7 +12,7 @@ public class SectorPresets{
     impact0078, desolateRift, nuclearComplex, planetaryTerminal,
     coastline, navalFortress,
 
-    onset, aware, three
+    onset, aware, three, four
     ;
 
     public static void load(){
@@ -126,6 +126,10 @@ public class SectorPresets{
         three = new SectorPreset("three", erekir, 36){{
             captureWave = 8;
             difficulty = 5;
+        }};
+
+        four = new SectorPreset("four", erekir, 29){{
+            difficulty = 6;
         }};
 
         //endregion
