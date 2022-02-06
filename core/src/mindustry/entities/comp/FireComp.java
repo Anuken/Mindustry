@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -115,7 +116,7 @@ abstract class FireComp implements Timedc, Posc, Syncc, Drawc{
             }
         }
 
-        Draw.alpha(Mathf.clamp(warmup / warmupDuration));
+        Draw.color(Color.white, Mathf.clamp(warmup / warmupDuration));
         Draw.z(Layer.effect);
         Draw.rect(regions[Math.min((int)animation, regions.length - 1)], x + Mathf.randomSeedRange((int)y, 2), y + Mathf.randomSeedRange((int)x, 2));
         Draw.reset();
