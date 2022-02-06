@@ -44,6 +44,7 @@ public class RegenProjector extends Block{
         hasPower = true;
         hasItems = true;
         emitLight = true;
+        suppressable = true;
         envEnabled |= Env.space;
         rotateDraw = false;
     }
@@ -117,7 +118,7 @@ public class RegenProjector extends Block{
             didRegen = false;
 
             //no healing when suppressed
-            if(MendProjector.checkSuppression(this)){
+            if(checkSuppression()){
                 return;
             }
 

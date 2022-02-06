@@ -1679,7 +1679,7 @@ public class Blocks{
             requirements(Category.effect, with(Items.silicon, 80, Items.carbide, 30, Items.oxide, 40, Items.thorium, 30));
             outlineColor = Pal.darkOutline;
             consumes.power(3f);
-            range = 150f;
+            range = 160f;
             size = 3;
             buildSpeed = 1.5f;
         }};

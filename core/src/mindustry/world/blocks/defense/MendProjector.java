@@ -36,6 +36,7 @@ public class MendProjector extends Block{
         hasItems = true;
         emitLight = true;
         lightRadius = 50f;
+        suppressable = true;
         envEnabled |= Env.space;
     }
 
@@ -65,19 +66,6 @@ public class MendProjector extends Block{
         indexer.eachBlock(player.team(), x * tilesize + offset, y * tilesize + offset, range, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
     }
 
-    /** @return whether a building has regen/healing suppressed; if so, spawns particles on it. */
-    public static boolean checkSuppression(Building build){
-        if(build.isHealSuppressed()){
-            if(Mathf.chanceDelta(0.03)){
-                Fx.regenSuppressParticle.at(build.x + Mathf.range(build.block.size * tilesize/2f - 1f), build.y + Mathf.range(build.block.size * tilesize/2f - 1f));
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
     public class MendBuild extends Building implements Ranged{
         public float heat, charge = Mathf.random(reload), phaseHeat, smoothEfficiency;
 
@@ -88,7 +76,7 @@ public class MendProjector extends Block{
 
         @Override
         public void updateTile(){
-            boolean canHeal = !checkSuppression(this);
+            boolean canHeal = !checkSuppression();
 
             smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency(), 0.08f);
             heat = Mathf.lerpDelta(heat, consValid() && canHeal ? 1f : 0f, 0.08f);

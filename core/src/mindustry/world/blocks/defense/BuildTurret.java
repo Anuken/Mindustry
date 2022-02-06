@@ -40,6 +40,7 @@ public class BuildTurret extends BaseTurret{
         group = BlockGroup.turrets;
         sync = false;
         rotateSpeed = 10f;
+        suppressable = true;
     }
 
     @Override
@@ -104,6 +105,8 @@ public class BuildTurret extends BaseTurret{
             if(unit.activelyBuilding()){
                 unit.lookAt(angleTo(unit.buildPlan()));
             }
+
+            checkSuppression();
 
             unit.buildSpeedMultiplier(efficiency() * timeScale);
             unit.speedMultiplier(efficiency() * timeScale);
@@ -198,6 +201,11 @@ public class BuildTurret extends BaseTurret{
 
             //at 0 build speed the unit thinks it can't build, so make it >0 after updating
             unit.buildSpeedMultiplier(Math.max(unit.buildSpeedMultiplier(), 0.00001f));
+        }
+
+        @Override
+        public float efficiency(){
+            return super.efficiency() * (isHealSuppressed() ? 0f : 1f);
         }
 
         @Override

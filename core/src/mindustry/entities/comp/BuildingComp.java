@@ -1100,6 +1100,19 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         Draw.color();
     }
 
+    /** @return whether a building has regen/healing suppressed; if so, spawns particles on it. */
+    public boolean checkSuppression(){
+        if(isHealSuppressed()){
+            if(Mathf.chanceDelta(0.03)){
+                Fx.regenSuppressParticle.at(x + Mathf.range(block.size * tilesize/2f - 1f), y + Mathf.range(block.size * tilesize/2f - 1f));
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     /** Called after the block is placed by this client. */
     @CallSuper
     public void playerPlaced(Object config){
