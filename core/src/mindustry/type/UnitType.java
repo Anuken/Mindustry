@@ -682,6 +682,7 @@ public class UnitType extends UnlockableContent{
 
     /** @return item requirements based on reconstructors or factories found; returns previous unit in array if provided */
     public @Nullable ItemStack[] getRequirements(@Nullable UnitType[] prevReturn, @Nullable float[] timeReturn){
+        //find reconstructor
         var rec = (Reconstructor)content.blocks().find(b -> b instanceof Reconstructor re && re.upgrades.contains(u -> u[1] == this));
 
         if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems ci){
@@ -693,6 +694,7 @@ public class UnitType extends UnlockableContent{
             }
             return ci.items;
         }else{
+            //find a factory
             var factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory uf && uf.plans.contains(p -> p.unit == this));
             if(factory != null){
 
@@ -701,6 +703,23 @@ public class UnitType extends UnlockableContent{
                     timeReturn[0] = plan.time;
                 }
                 return plan.requirements;
+            }else{
+                //find an assembler
+                var assembler = (UnitAssembler)content.blocks().find(u -> u instanceof UnitAssembler a && a.plans.contains(p -> p.unit == this));
+                if(assembler != null){
+                    var plan = assembler.plans.find(p -> p.unit == this);
+
+                    if(timeReturn != null){
+                        timeReturn[0] = plan.time;
+                    }
+                    ItemSeq reqs = new ItemSeq();
+                    for(var bstack : plan.requirements){
+                        for(var stack : bstack.block.requirements){
+                            reqs.add(stack.item, stack.amount * bstack.amount);
+                        }
+                    }
+                    return reqs.toArray();
+                }
             }
         }
         return null;

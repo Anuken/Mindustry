@@ -173,6 +173,22 @@ public class Units{
         return boolResult;
     }
 
+    public static boolean anyEntities(float x, float y, float width, float height, Boolf<Unit> check){
+        boolResult = false;
+
+        nearby(x, y, width, height, unit -> {
+            if(boolResult) return;
+            if(check.get(unit)){
+                unit.hitboxTile(hitrect);
+
+                if(hitrect.overlaps(aeX, aeY, aeW, aeH)){
+                    boolResult = true;
+                }
+            }
+        });
+        return boolResult;
+    }
+
     /** Returns the nearest damaged tile. */
     public static Building findDamagedTile(Team team, float x, float y){
         return indexer.getDamaged(team).min(b -> b.dst2(x, y));

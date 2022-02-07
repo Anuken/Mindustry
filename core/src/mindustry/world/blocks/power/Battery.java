@@ -30,7 +30,7 @@ public class Battery extends PowerDistributor{
         @Override
         public void draw(){
             Draw.color(emptyLightColor, fullLightColor, power.status);
-            Fill.square(x, y, tilesize * size / 2f - 1);
+            Fill.square(x, y, (tilesize * size / 2f - 1) * Draw.xscl);
             Draw.color();
 
             Draw.rect(topRegion, x, y);

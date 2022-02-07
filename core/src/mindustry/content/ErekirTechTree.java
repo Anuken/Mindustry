@@ -21,6 +21,9 @@ public class ErekirTechTree{
         costMultipliers.put(Items.thorium, 9);
         costMultipliers.put(Items.graphite, 9);
 
+        //TODO remove
+        Objective tmpNever = new Research(Items.fissileMatter);
+
         //TODO gate behind capture
 
         Planets.erekir.techTree = nodeRoot("erekir", coreBastion, true, () -> {
@@ -199,6 +202,30 @@ public class ErekirTechTree{
             node(coreCitadel, Seq.with(new SectorComplete(four)), () -> {
                 node(coreAcropolis, () -> {
 
+                });
+            });
+
+            node(tankAssembler, Seq.with(new OnSector(four), new Research(constructor), new Research(slagCentrifuge), new Research(Liquids.gallium)), () -> {
+                node(UnitTypes.vanquish, () -> {
+                    node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
+
+                    });
+                });
+
+                node(shipAssembler, Seq.with(tmpNever), () -> {
+                    node(UnitTypes.quell, () -> {
+                        node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
+
+                        });
+                    });
+
+                    node(mechAssembler, () -> {
+                        node(UnitTypes.bulwark, () -> {
+                            node(UnitTypes.krepost, Seq.with(tmpNever), () -> {
+
+                            });
+                        });
+                    });
                 });
             });
 

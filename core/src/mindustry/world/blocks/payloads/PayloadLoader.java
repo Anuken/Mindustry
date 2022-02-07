@@ -2,6 +2,7 @@ package mindustry.world.blocks.payloads;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
@@ -19,12 +20,17 @@ public class PayloadLoader extends PayloadBlock{
     public int itemsLoaded = 8;
     public float liquidsLoaded = 40f;
     public int maxBlockSize = 3;
+    public float maxPowerConsumption = 40f;
+
+    //initialized in init(), do not touch
+    protected float basePowerUse = 0f;
 
     public PayloadLoader(String name){
         super(name);
  
         hasItems = true;
         hasLiquids = true;
+        hasPower = true;
         itemCapacity = 100;
         liquidCapacity = 100f;
         update = true;
@@ -47,7 +53,9 @@ public class PayloadLoader extends PayloadBlock{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", (PayloadLoaderBuild entity) -> new Bar(() -> Core.bundle.format("bar.items", entity.payload == null ? 0 : entity.payload.build.items.total()), () -> Pal.items, entity::fraction));
+        bars.add("progress", (PayloadLoaderBuild build) -> new Bar(() ->
+            Core.bundle.format(build.payload != null && build.payload.block().hasItems ? "bar.items" : "bar.loadprogress",
+                build.payload == null || !build.payload.block().hasItems ? 0 : build.payload.build.items.total()), () -> Pal.items, build::fraction));
     }
 
     @Override
@@ -58,6 +66,14 @@ public class PayloadLoader extends PayloadBlock{
         Draw.rect(topRegion, plan.drawx(), plan.drawy());
     }
 
+    @Override
+    public void init(){
+        basePowerUse = consumes.hasPower() ? consumes.getPower().usage : 0f;
+        consumes.powerDynamic((PayloadLoaderBuild loader) -> loader.hasBattery() && !loader.exporting ? maxPowerConsumption + basePowerUse : basePowerUse);
+
+        super.init();
+    }
+
     public class PayloadLoaderBuild extends PayloadBlockBuild<BuildPayload>{
         public boolean exporting = false;
 
@@ -65,9 +81,14 @@ public class PayloadLoader extends PayloadBlock{
         public boolean acceptPayload(Building source, Payload payload){
             return super.acceptPayload(source, payload) &&
                 payload.fits(maxBlockSize) &&
-                payload instanceof BuildPayload build &&
-                ((build.build.block.hasItems && build.block().unloadable && build.block().itemCapacity >= 10 && build.block().size <= maxBlockSize) ||
-                build.build.block().hasLiquids && build.block().liquidCapacity >= 10f);
+                payload instanceof BuildPayload build && (
+                //item container
+                (build.build.block.hasItems && build.block().unloadable && build.block().itemCapacity >= 10 && build.block().size <= maxBlockSize) ||
+                //liquid container
+                (build.build.block().hasLiquids && build.block().liquidCapacity >= 10f) ||
+                //battery
+                (build.build.block.consumes.hasPower() && build.build.block.consumes.getPower().buffered)
+            );
         }
 
         @Override
@@ -150,18 +171,45 @@ public class PayloadLoader extends PayloadBlock{
                         liquids.remove(liq, flow);
                     }
                 }
+
+                //load up power
+                if(hasBattery()){
+                    //base power input that in raw units
+                    float powerInput = power.status * (basePowerUse + maxPowerConsumption);
+                    //how much is actually usable
+                    float availableInput = Math.max(powerInput - basePowerUse, 0f);
+
+                    //charge the battery
+                    float cap = payload.block().consumes.getPower().capacity;
+                    payload.build.power.status += availableInput / cap * Time.delta;
+
+                    //export if full
+                    if(payload.build.power.status >= 1f){
+                        exporting = true;
+                        payload.build.power.status = Mathf.clamp(payload.build.power.status);
+                    }
+                }
             }
         }
 
         public float fraction(){
-            return payload == null ? 0f : payload.build.items.total() / (float)payload.build.block.itemCapacity;
+            return payload == null ? 0f :
+                payload.build.items != null ? payload.build.items.total() / (float)payload.build.block.itemCapacity :
+                payload.build.liquids != null ? payload.build.liquids.currentAmount() / payload.block().liquidCapacity :
+                hasBattery() ? payload.build.power.status :
+                0f;
         }
 
         public boolean shouldExport(){
             return payload != null && (
                 exporting ||
                 (payload.block().hasLiquids && liquids.currentAmount() >= 0.1f && payload.build.liquids.currentAmount() >= payload.block().liquidCapacity - 0.001f) ||
-                (payload.block().hasItems && items.any() && payload.block().separateItemCapacity && content.items().contains(i -> payload.build.items.get(i) >= payload.block().itemCapacity)));
+                (payload.block().hasItems && items.any() && payload.block().separateItemCapacity && content.items().contains(i -> payload.build.items.get(i) >= payload.block().itemCapacity)) ||
+                (hasBattery() && payload.build.power.status >= 0.999999999f));
+        }
+
+        public boolean hasBattery(){
+            return payload != null && payload.block().hasPower && payload.block().consumes.getPower().buffered;
         }
 
         @Override

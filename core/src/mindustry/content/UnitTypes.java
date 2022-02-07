@@ -2737,7 +2737,7 @@ public class UnitTypes{
                 velocityRnd = 0.33f;
                 heatColor = Color.red;
 
-                bullet = new MissileBulletType(4.2f, 34){{
+                bullet = new MissileBulletType(4.2f, 40){{
                     homingPower = 0.2f;
                     weaveMag = 4;
                     weaveScale = 4;
@@ -2745,7 +2745,7 @@ public class UnitTypes{
                     //TODO better
                     shootEffect = Fx.shootBig2;
                     smokeEffect = Fx.shootSmokeTitan;
-                    splashDamage = 40f;
+                    splashDamage = 50f;
                     splashDamageRadius = 30f;
                     frontColor = Color.white;
                     hitSound = Sounds.none;
@@ -2918,7 +2918,7 @@ public class UnitTypes{
                 y = 5 / 4f;
                 rotate = true;
                 rotateSpeed = 2f;
-                reload = 70f;
+                reload = 60f;
                 layerOffset = -0.001f;
                 recoil = 1f;
                 rotationLimit = 60f;

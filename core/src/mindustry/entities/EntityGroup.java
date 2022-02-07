@@ -32,7 +32,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
 
     /** Makes sure the next ID counter is higher than this number, so future entities cannot possibly use this ID. */
     public static void checkNextId(int id){
-        lastId = id + 1;
+        lastId = Math.max(lastId, id + 1);
     }
 
     public EntityGroup(Class<T> type, boolean spatial, boolean mapping){
@@ -45,6 +45,18 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         if(mapping){
             map = new IntMap<>();
         }
+    }
+
+    /** @return entities with colliding IDs, or an empty array. */
+    public Seq<T> checkIDCollisions(){
+        Seq<T> out = new Seq<>();
+        IntSet ints = new IntSet();
+        each(u -> {
+            if(!ints.add(u.id())){
+                out.add(u);
+            }
+        });
+        return out;
     }
 
     public void sort(Comparator<? super T> comp){

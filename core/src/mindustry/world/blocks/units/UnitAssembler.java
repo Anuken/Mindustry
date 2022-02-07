@@ -172,7 +172,7 @@ public class UnitAssembler extends PayloadBlock{
         public Seq<Unit> units = new Seq<>();
         public Seq<UnitAssemblerModuleBuild> modules = new Seq<>();
         public BlockSeq blocks = new BlockSeq();
-        public float progress, warmup, droneWarmup, powerWarmup;
+        public float progress, warmup, droneWarmup, powerWarmup, sameTypeWarmup;
         public float invalidWarmup = 0f;
         public int currentTier = 0;
         public boolean wasOccupied = false;
@@ -318,10 +318,12 @@ public class UnitAssembler extends PayloadBlock{
                 ai.targetAngle = i * 90f + 45f + 180f;
             }
 
-            wasOccupied = checkSolid(spawn);
+            wasOccupied = checkSolid(spawn, false);
+            boolean visualOccupied = checkSolid(spawn, true);
             float eff =  (units.count(u -> ((AssemblerAI)u.controller()).inPosition()) / (float)dronesCreated);
 
-            invalidWarmup = Mathf.lerpDelta(invalidWarmup, wasOccupied ? 1f : 0f, 0.1f);
+            sameTypeWarmup = Mathf.lerpDelta(sameTypeWarmup, wasOccupied && !visualOccupied ? 0f : 1f, 0.1f);
+            invalidWarmup = Mathf.lerpDelta(invalidWarmup, visualOccupied ? 1f : 0f, 0.1f);
 
             var plan = plan();
 
@@ -401,7 +403,7 @@ public class UnitAssembler extends PayloadBlock{
 
             //draw unit silhouette
             Draw.mixcol(Tmp.c1.set(Pal.accent).lerp(Pal.remove, invalidWarmup), 1f);
-            Draw.alpha(powerWarmup);
+            Draw.alpha(Math.min(powerWarmup, sameTypeWarmup));
             Draw.rect(plan.unit.fullIcon, spawn.x, spawn.y);
 
             //build beams do not draw when invalid
@@ -442,9 +444,12 @@ public class UnitAssembler extends PayloadBlock{
             Draw.reset();
         }
 
-        public boolean checkSolid(Vec2 v){
+        public boolean checkSolid(Vec2 v, boolean same){
             var output = unit();
-            return !output.flying && (collisions.overlapsTile(Tmp.r1.setCentered(v.x, v.y, output.hitSize), EntityCollisions::solid) || Units.anyEntities(v.x, v.y, output.hitSize * 1.4f));
+            //TODO CHECK TO MAKE SURE IT'S NOT THE SAME UNIT
+            float hsize = output.hitSize * 1.4f;
+            return !output.flying && (collisions.overlapsTile(Tmp.r1.setCentered(v.x, v.y, output.hitSize), EntityCollisions::solid) ||
+                (!same ? Units.anyEntities(v.x, v.y, hsize) : Units.anyEntities(v.x - hsize/2f, v.y - hsize/2f, hsize, hsize, u -> u.type != output && u.isGrounded())));
         }
 
         /** @return true if this block is ready to produce units, e.g. requirements met */
