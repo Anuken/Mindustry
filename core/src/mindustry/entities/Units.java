@@ -181,7 +181,7 @@ public class Units{
             if(check.get(unit)){
                 unit.hitboxTile(hitrect);
 
-                if(hitrect.overlaps(aeX, aeY, aeW, aeH)){
+                if(hitrect.overlaps(x, y, width, height)){
                     boolResult = true;
                 }
             }

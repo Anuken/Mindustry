@@ -2131,7 +2131,7 @@ public class Blocks{
             laserRange = 1000f;
             autolink = false;
             laserColor2 = Color.valueOf("ffd9c2");
-            laserScale = 0.65f;
+            laserScale = 0.8f;
         }};
 
         combustionGenerator = new BurnerGenerator("combustion-generator"){{

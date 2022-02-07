@@ -447,8 +447,9 @@ public class UnitAssembler extends PayloadBlock{
         public boolean checkSolid(Vec2 v, boolean same){
             var output = unit();
             float hsize = output.hitSize * 1.4f;
-            return !output.flying && (collisions.overlapsTile(Tmp.r1.setCentered(v.x, v.y, output.hitSize), EntityCollisions::solid) ||
-                (!same ? Units.anyEntities(v.x, v.y, hsize) : Units.anyEntities(v.x - hsize/2f, v.y - hsize/2f, hsize, hsize, u -> u.type != output && u.isGrounded())));
+            return ((!output.flying && collisions.overlapsTile(Tmp.r1.setCentered(v.x, v.y, output.hitSize), EntityCollisions::solid)) ||
+                Units.anyEntities(v.x - hsize/2f, v.y - hsize/2f, hsize, hsize, u -> (!same || u.type != output) &&
+                    ((u.type.allowLegStep && output.allowLegStep) || (output.flying && u.isFlying()) || (!output.flying && u.isGrounded()))));
         }
 
         /** @return true if this block is ready to produce units, e.g. requirements met */

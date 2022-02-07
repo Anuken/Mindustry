@@ -34,6 +34,7 @@ public class AIController implements UnitController{
     @Override
     public void updateUnit(){
         if(disabled()){
+            stopShooting();
             return;
         }
 
@@ -47,6 +48,13 @@ public class AIController implements UnitController{
         updateVisuals();
         updateTargeting();
         updateMovement();
+    }
+
+    public void stopShooting(){
+        for(var mount : unit.mounts){
+            //ignore mount controllable stats too, they should not shoot either
+            mount.shoot = false;
+        }
     }
 
     public boolean disabled(){
