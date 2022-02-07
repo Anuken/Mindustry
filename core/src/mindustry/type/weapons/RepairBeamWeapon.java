@@ -30,6 +30,7 @@ public class RepairBeamWeapon extends Weapon{
     public float beamWidth = 1f;
     public float pulseRadius = 6f;
     public float pulseStroke = 2f;
+    public float widthSinMag = 0f, widthSinScl = 4f;
 
     public TextureRegion laser, laserEnd, laserTop, laserTopEnd;
 
@@ -157,7 +158,7 @@ public class RepairBeamWeapon extends Weapon{
 
         float z = Draw.z();
         RepairPoint.drawBeam(wx, wy, unit.rotation + mount.rotation, shootY, unit.id, mount.target == null || controllable ? null : (Sized)mount.target, unit.team, heal.strength,
-            pulseStroke, pulseRadius, beamWidth, heal.lastEnd, heal.offset, laserColor, laserTopColor,
+            pulseStroke, pulseRadius, beamWidth + Mathf.absin(widthSinScl, widthSinMag), heal.lastEnd, heal.offset, laserColor, laserTopColor,
             laser, laserEnd, laserTop, laserTopEnd);
         Draw.z(z);
     }

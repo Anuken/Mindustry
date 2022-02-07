@@ -3153,6 +3153,7 @@ public class UnitTypes{
             );
 
             weapons.add(new RepairBeamWeapon(){{
+                widthSinMag = 0.11f;
                 reload = 25f;
                 x = 0f;
                 y = 6.5f;
@@ -3205,13 +3206,14 @@ public class UnitTypes{
             engineSize = 3.1f;
 
             setEnginesMirror(
-            new UnitEngine(27 / 4f, -1 / 4f, 2.4f, 315f)
+            new UnitEngine(25 / 4f, -1 / 4f, 2.4f, 300f)
             );
 
             weapons.add(new RepairBeamWeapon(){{
+                widthSinMag = 0.11f;
                 reload = 25f;
                 x = 0f;
-                y = 6.5f;
+                y = 7.5f;
                 rotate = false;
                 shootY = 0f;
                 beamWidth = 0.7f;
@@ -3232,6 +3234,17 @@ public class UnitTypes{
                     maxRange = 60f;
                 }};
             }});
+
+            drawBuildBeam = false;
+
+            weapons.add(new BuildWeapon("build-weapon"){{
+                rotate = true;
+                rotateSpeed = 7f;
+                x = 14/4f;
+                y = 15/4f;
+                layerOffset = -0.001f;
+                shootY = 3f;
+            }});
         }};
 
         emanate = new ErekirUnitType("emanate"){{
@@ -3249,7 +3262,7 @@ public class UnitTypes{
             mineTier = 4;
             buildSpeed = 1.4f;
             drag = 0.08f;
-            speed = 7.1f;
+            speed = 7.2f;
             rotateSpeed = 8f;
             accel = 0.08f;
             itemCapacity = 110;
@@ -3257,15 +3270,16 @@ public class UnitTypes{
             armor = 3f;
             hitSize = 12f;
 
-            engineOffset = 7.4f;
-            engineSize = 3.3f;
+            engineOffset = 7.5f;
+            engineSize = 3.4f;
 
             setEnginesMirror(
-            new UnitEngine(34 / 4f, -12 / 4f, 2.7f, 315f),
-            new UnitEngine(27 / 4f, -34 / 4f, 2.7f, 315f)
+            new UnitEngine(35 / 4f, -13 / 4f, 2.7f, 315f),
+            new UnitEngine(28 / 4f, -35 / 4f, 2.7f, 315f)
             );
 
             weapons.add(new RepairBeamWeapon(){{
+                widthSinMag = 0.11f;
                 reload = 25f;
                 x = 19f/4f;
                 y = 19f/4f;

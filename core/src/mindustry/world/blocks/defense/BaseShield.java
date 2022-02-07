@@ -80,17 +80,16 @@ public class BaseShield extends Block{
 
         @Override
         public void updateTile(){
-            //TODO smooth radius
-            float radius = radius();
-
             broken = efficiency() <= 0.0001f;
             smoothRadius = Mathf.lerpDelta(smoothRadius, radius * efficiency(), 0.04f);
 
-            if(radius > 0 && !broken){
+            float rad = radius();
+
+            if(rad > 0 && !broken){
                 paramBuild = this;
                 //paramEffect = absorbEffect;
-                Groups.bullet.intersect(x - radius, y - radius, radius * 2f, radius * 2f, bulletConsumer);
-                Units.nearbyEnemies(team, x, y, radius + 10f, unitConsumer);
+                Groups.bullet.intersect(x - rad, y - rad, rad * 2f, rad * 2f, bulletConsumer);
+                Units.nearbyEnemies(team, x, y, rad + 10f, unitConsumer);
             }
         }
 
