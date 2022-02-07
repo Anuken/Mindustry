@@ -5,7 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -15,7 +15,7 @@ import static mindustry.Vars.*;
 
 public class BaseShield extends Block{
     //TODO game rule? or field? should vary by base.
-    //public float radius = 400f;
+    public float radius = 200f;
 
     protected static BaseShieldBuild paramBuild;
     //protected static Effect paramEffect;
@@ -35,20 +35,41 @@ public class BaseShield extends Block{
         float overlapDst = (unit.hitSize/2f + paramBuild.radius()) - unit.dst(paramBuild);
 
         if(overlapDst > 0){
-            if(overlapDst > unit.hitSize){
+            if(overlapDst > unit.hitSize * 1.5f){
                 //instakill units that are stuck inside the shield (TODO or maybe damage them instead?)
                 unit.kill();
             }else{
-                unit.move(Tmp.v1.set(unit).sub(paramBuild).setLength(overlapDst));
+                //stop
+                unit.vel.setZero();
+                //get out
+                unit.move(Tmp.v1.set(unit).sub(paramBuild).setLength(overlapDst + 0.01f));
+
+                if(Mathf.chanceDelta(0.12f * Time.delta)){
+                    Fx.circleColorSpark.at(unit.x, unit.y, paramBuild.team.color);
+                }
             }
         }
     };
-
 
     public BaseShield(String name){
         super(name);
 
         hasPower = true;
+        update = solid = true;
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        clipSize = Math.max(clipSize, radius * 2f + 8f);
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, radius, player.team().color);
     }
 
     public class BaseShieldBuild extends Building{
@@ -60,17 +81,26 @@ public class BaseShield extends Block{
             //TODO smooth radius
             float radius = radius();
 
+            broken = efficiency() <= 0.0001f;
+
             if(radius > 0 && !broken){
                 paramBuild = this;
                 //paramEffect = absorbEffect;
                 Groups.bullet.intersect(x - radius, y - radius, radius * 2f, radius * 2f, bulletConsumer);
-                Units.nearbyEnemies(team,x ,y, radius, unitConsumer);
+                Units.nearbyEnemies(team, x, y, radius + 10f, unitConsumer);
             }
         }
 
         public float radius(){
             //TODO bad rule?
-            return Vars.state.rules.enemyCoreBuildRadius;
+            return radius * efficiency();
+        }
+
+        @Override
+        public void drawSelect(){
+            super.drawSelect();
+
+            Drawf.dashCircle(x, y, radius, team.color);
         }
 
         @Override

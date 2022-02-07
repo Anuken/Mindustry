@@ -3185,54 +3185,51 @@ public class UnitTypes{
             envDisabled = 0;
 
             lowAltitude = false;
-            flying = true;
             mineWalls = true;
-            targetAir = false;
             mineFloor = false;
             mineHardnessScaling = false;
-            mineSpeed = 5f;
+            flying = true;
+            mineSpeed = 4f;
             mineTier = 4;
-            buildSpeed = 1.4f;
-            drag = 0.06f;
-            speed = 2.8f;
-            rotateSpeed = 5f;
-            accel = 0.11f;
+            buildSpeed = 1.1f;
+            drag = 0.08f;
+            speed = 6.5f;
+            rotateSpeed = 8f;
+            accel = 0.09f;
             itemCapacity = 90;
-            health = 600f;
+            health = 500f;
             armor = 2f;
-            hitSize = 18f;
-            buildBeamOffset = 10f;
-            engineSize = 0;
-            payloadCapacity = Mathf.sqr(2f) * tilePayload;
+            hitSize = 11f;
+
+            engineOffset = 15 / 4f;
+            engineSize = 4;
 
             setEnginesMirror(
-            new UnitEngine(34 / 4f, 31 / 4f, 3f, 45f),
-            new UnitEngine(35 / 4f, -38 / 4f, 3f, 315f)
+            new UnitEngine(23 / 4f, 4 / 4f, 2.4f, 315f)
             );
 
-            weapons.add(new Weapon("incite-weapon"){{
-                reload = 30f;
-                x = 4f;
-                y = 6.25f;
-                shootY = 5.75f;
-                recoil = 2f;
-                top = false;
-                layerOffset = -0.01f;
+            weapons.add(new RepairBeamWeapon(){{
+                reload = 25f;
+                x = 0f;
+                y = 6.5f;
                 rotate = false;
+                shootY = 0f;
+                beamWidth = 0.7f;
+                repairSpeed = 0.3f;
+                aimDst = 0f;
+                shootCone = 15f;
+                fractionRepair = true;
+                mirror = false;
 
-                bullet = new BasicBulletType(5f, 15){{
-                    width = 7f;
-                    height = 12f;
-                    shootEffect = Fx.sparkShoot;
-                    smokeEffect = Fx.shootBigSmoke;
-                    pierceCap = 2;
-                    pierce = true;
-                    pierceBuilding = true;
-                    hitColor = backColor = trailColor = Pal.bulletYellowBack;
-                    frontColor = Color.white;
-                    trailWidth = 1.5f;
-                    trailLength = 7;
-                    hitEffect = despawnEffect = Fx.hitBulletColor;
+                targetUnits = false;
+                targetBuildings = true;
+                autoTarget = false;
+                controllable = true;
+                laserColor = Pal.accent;
+                healColor = Pal.accent;
+
+                bullet = new BulletType(){{
+                    maxRange = 60f;
                 }};
             }});
         }};

@@ -30,7 +30,10 @@ public class BaseGenerator{
     private Seq<Tile> cores;
 
     public static Block getDifficultyWall(int size, float difficulty){
-        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == size && !b.insulated && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
+        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == size
+            && !b.insulated && b.buildVisibility == BuildVisibility.shown
+            && !(b instanceof Door)
+            && !(Structs.contains(b.requirements, i -> state.rules.hiddenBuildItems.contains(i.item))));
         wallsSmall.sort(b -> b.buildCost);
         return wallsSmall.getFrac(difficulty * 0.91f);
     }

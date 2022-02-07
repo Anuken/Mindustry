@@ -1553,6 +1553,15 @@ public class Fx{
         }
     }),
 
+    circleColorSpark = new Effect(21f, e -> {
+        color(Color.white, e.color, e.fin());
+        stroke(e.fout() * 1.1f + 0.5f);
+
+        randLenVectors(e.id, 9, 27f * e.fin(), 9f, (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 5f + 0.5f);
+        });
+    }),
+
     colorSpark = new Effect(21f, e -> {
         color(Color.white, e.color, e.fin());
         stroke(e.fout() * 1.1f + 0.5f);

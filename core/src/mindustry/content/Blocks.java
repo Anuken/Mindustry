@@ -86,6 +86,8 @@ public class Blocks{
     //defense - erekir
     buildTower,
     regenProjector, barrierProjector,
+    //campaign only
+    shieldProjector,
 
     //transport
     conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
@@ -1713,8 +1715,9 @@ public class Blocks{
             }});
         }};
 
+        //TODO implement
+        if(false)
         barrierProjector = new DirectionalForceProjector("barrier-projector"){{
-            //TODO
             requirements(Category.effect, with(Items.surgeAlloy, 100, Items.silicon, 125));
             size = 3;
             width = 50f;
@@ -1724,6 +1727,16 @@ public class Blocks{
             cooldownBrokenBase = 0.35f;
 
             consumes.power(4f);
+        }};
+
+        //TODO 5x5??
+        shieldProjector = new BaseShield("shield-projector"){{
+            category = Category.effect;
+            buildVisibility = BuildVisibility.editorOnly;
+
+            size = 3;
+
+            consumes.power(5f);
         }};
 
         //endregion
@@ -2231,7 +2244,7 @@ public class Blocks{
         //TODO rename
         chemicalCombustionChamber = new ConsumeGenerator("chemical-combustion-chamber"){{
             requirements(Category.power, with(Items.graphite, 40, Items.tungsten, 40, Items.oxide, 40f, Items.silicon, 30));
-            powerProduction = 8f;
+            powerProduction = 9f;
             consumes.liquids(LiquidStack.with(Liquids.ozone, 1f / 60f, Liquids.arkycite, 20f / 60f));
             size = 3;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
@@ -2255,7 +2268,7 @@ public class Blocks{
         pyrolysisGenerator = new ConsumeGenerator("pyrolysis-generator"){{
             //TODO requirements
             requirements(Category.power, with(Items.graphite, 50, Items.carbide, 50, Items.oxide, 60f, Items.silicon, 50));
-            powerProduction = 16f;
+            powerProduction = 18f;
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
                 sinMag = 2.75f;

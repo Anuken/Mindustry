@@ -65,8 +65,6 @@ public class Vars implements Loadable{
     public static final String ghApi = "https://api.github.com";
     /** URL for discord invite. */
     public static final String discordURL = "https://discord.gg/mindustry";
-    /** URL for sending crash reports to. Currently offline. */
-    public static final String crashReportURL = "http://192.99.169.18/report";
     /** URL the links to the wiki's modding guide.*/
     public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/1-modding/";
     /** URL to the JSON file containing all the BE servers. Only queried in BE. */
