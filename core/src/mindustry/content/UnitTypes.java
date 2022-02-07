@@ -3201,11 +3201,11 @@ public class UnitTypes{
             armor = 2f;
             hitSize = 11f;
 
-            engineOffset = 15 / 4f;
-            engineSize = 4;
+            engineOffset = 7.2f;
+            engineSize = 3.1f;
 
             setEnginesMirror(
-            new UnitEngine(23 / 4f, 4 / 4f, 2.4f, 315f)
+            new UnitEngine(27 / 4f, -1 / 4f, 2.4f, 315f)
             );
 
             weapons.add(new RepairBeamWeapon(){{
