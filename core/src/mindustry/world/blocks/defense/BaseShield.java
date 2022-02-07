@@ -16,6 +16,7 @@ import static mindustry.Vars.*;
 public class BaseShield extends Block{
     //TODO game rule? or field? should vary by base.
     public float radius = 200f;
+    public int sides = 24;
 
     protected static BaseShieldBuild paramBuild;
     //protected static Effect paramEffect;
@@ -119,7 +120,7 @@ public class BaseShield extends Block{
                 Draw.color(team.color, Color.white, Mathf.clamp(hit));
 
                 if(renderer.animateShields){
-                    Fill.circle(x, y, radius);
+                    Fill.poly(x, y, sides, radius);
                 }else{
                     Lines.stroke(1.5f);
                     Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));

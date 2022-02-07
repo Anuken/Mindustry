@@ -3189,7 +3189,7 @@ public class UnitTypes{
             mineFloor = false;
             mineHardnessScaling = false;
             flying = true;
-            mineSpeed = 4f;
+            mineSpeed = 5f;
             mineTier = 4;
             buildSpeed = 1.1f;
             drag = 0.08f;
@@ -3241,67 +3241,54 @@ public class UnitTypes{
             envDisabled = 0;
 
             lowAltitude = false;
-            flying = true;
-            targetAir = false;
             mineWalls = true;
             mineFloor = false;
             mineHardnessScaling = false;
+            flying = true;
             mineSpeed = 6f;
             mineTier = 4;
-            buildSpeed = 2f;
-            drag = 0.06f;
-            speed = 2.6f;
-            rotateSpeed = 3f;
-            accel = 0.11f;
-            itemCapacity = 140;
-            health = 1300f;
+            buildSpeed = 1.4f;
+            drag = 0.08f;
+            speed = 7.1f;
+            rotateSpeed = 8f;
+            accel = 0.08f;
+            itemCapacity = 110;
+            health = 700f;
             armor = 3f;
-            hitSize = 36f;
-            buildBeamOffset = 72f / 4f;
-            engineSize = 0;
-            payloadCapacity = Mathf.sqr(3f) * tilePayload;
+            hitSize = 12f;
 
-            drawBuildBeam = false;
-            rotateToBuilding = false;
-
-            float es = 3.8f;
+            engineOffset = 7.4f;
+            engineSize = 3.3f;
 
             setEnginesMirror(
-            new UnitEngine(49 / 4f, 51 / 4f, es, 45f),
-            new UnitEngine(67 / 4f, -30 / 4f, es, 315f),
-            new UnitEngine(49 / 4f, -62 / 4f, es, 315f)
+            new UnitEngine(34 / 4f, -12 / 4f, 2.7f, 315f),
+            new UnitEngine(27 / 4f, -34 / 4f, 2.7f, 315f)
             );
 
-            //TODO repair weapon
-            Vec2[] positions = {/*new Vec2(30f, 50f), */new Vec2(60f, -15f)};
-            int i = 0;
+            weapons.add(new RepairBeamWeapon(){{
+                reload = 25f;
+                x = 19f/4f;
+                y = 19f/4f;
+                rotate = false;
+                shootY = 0f;
+                beamWidth = 0.7f;
+                repairSpeed = 0.2f;
+                aimDst = 0f;
+                shootCone = 16f;
+                fractionRepair = true;
+                mirror = true;
 
-            for(var pos : positions){
-                int fi = i;
-                //TODO change to BuildWeapon properly, remove standard build beam and rotation
-                weapons.add(new BuildWeapon("incite-weapon"){{
-                    rotate = true;
-                    reload = fi == 0 ? 25f : 35f;
-                    rotateSpeed = 7f;
-                    x = pos.x/4f;
-                    y = pos.y/4f;
-                    shootY = 5.75f;
-                    recoil = 2f;
+                targetUnits = false;
+                targetBuildings = true;
+                autoTarget = false;
+                controllable = true;
+                laserColor = Pal.accent;
+                healColor = Pal.accent;
 
-                    bullet = new BasicBulletType(5f, 17){{
-                        width = 7f;
-                        height = 12f;
-                        shootEffect = Fx.sparkShoot;
-                        smokeEffect = Fx.shootBigSmoke;
-                        hitColor = backColor = trailColor = Pal.bulletYellowBack;
-                        frontColor = Color.white;
-                        trailWidth = 1.5f;
-                        trailLength = 7;
-                        hitEffect = despawnEffect = Fx.hitBulletColor;
-                    }};
-                }});
-                i ++;
-            }
+                bullet = new BulletType(){{
+                    maxRange = 65f;
+                }};
+            }});
         }};
 
         //endregion

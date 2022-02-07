@@ -284,7 +284,7 @@ public class UnitAssembler extends PayloadBlock{
 
             units.removeAll(u -> !u.isAdded() || u.dead || !(u.controller() instanceof AssemblerAI));
 
-            powerWarmup = Mathf.lerpDelta(powerWarmup, efficiency(), 0.1f);
+            powerWarmup = Mathf.lerpDelta(powerWarmup, efficiency() > 0.0001f ? 1f : 0f, 0.1f);
             droneWarmup = Mathf.lerpDelta(droneWarmup, units.size < dronesCreated ? efficiency() : 0f, 0.1f);
             totalDroneProgress += droneWarmup * Time.delta;
 
