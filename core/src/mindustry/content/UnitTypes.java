@@ -2674,14 +2674,12 @@ public class UnitTypes{
         //endregion
         //region erekir - mech
 
-        bulwark = new UnitType("bulwark"){{
+        bulwark = new ErekirUnitType("bulwark"){{
             drag = 0.1f;
             speed = 0.6f;
             hitSize = 23f;
             health = 7000;
             armor = 5f;
-            outlineColor = Pal.darkOutline;
-            envDisabled = Env.space;
 
             abilities.add(new ShieldArcAbility(){{
                 region = "bulwark-shield";
@@ -2771,14 +2769,12 @@ public class UnitTypes{
             }});
         }};
 
-        krepost = new UnitType("krepost"){{
+        krepost = new ErekirUnitType("krepost"){{
             drag = 0.1f;
             speed = 1.1f;
             hitSize = 44f;
             health = 18000;
             armor = 8f;
-            outlineColor = Pal.darkOutline;
-            envDisabled = Env.space;
             rotateSpeed = 1.6f;
             lockLegBase = true;
             legContinuousMove = true;
@@ -2887,11 +2883,10 @@ public class UnitTypes{
         //endregion
         //region erekir - flying
 
-        quell = new UnitType("quell"){{
+        quell = new ErekirUnitType("quell"){{
             defaultController = FlyingFollowAI::new;
             envDisabled = 0;
 
-            outlineColor = Pal.darkOutline;
             lowAltitude = false;
             flying = true;
             drag = 0.06f;
@@ -2953,11 +2948,10 @@ public class UnitTypes{
             );
         }};
 
-        disrupt = new UnitType("disrupt"){{
+        disrupt = new ErekirUnitType("disrupt"){{
             defaultController = FlyingFollowAI::new;
             envDisabled = 0;
 
-            outlineColor = Pal.darkOutline;
             lowAltitude = false;
             flying = true;
             drag = 0.07f;
@@ -3122,12 +3116,11 @@ public class UnitTypes{
         //region erekir - core
 
         //TODO bad name
-        evoke = new UnitType("evoke"){{
+        evoke = new ErekirUnitType("evoke"){{
             defaultController = BuilderAI::new;
             isCounted = false;
             envDisabled = 0;
 
-            outlineColor = Pal.darkOutline;
             lowAltitude = false;
             mineWalls = true;
             mineFloor = false;
@@ -3136,15 +3129,14 @@ public class UnitTypes{
             mineSpeed = 4f;
             mineTier = 4;
             buildSpeed = 0.8f;
-            drag = 0.06f;
-            speed = 2.9f;
-            rotateSpeed = 9f;
-            accel = 0.1f;
+            drag = 0.08f;
+            speed = 5.3f;
+            rotateSpeed = 7f;
+            accel = 0.09f;
             itemCapacity = 60;
             health = 300f;
             armor = 1f;
             hitSize = 9f;
-            commandLimit = 5;
             engineSize = 0;
 
             setEnginesMirror(
@@ -3152,43 +3144,37 @@ public class UnitTypes{
             new UnitEngine(23 / 4f, -22 / 4f, 2.2f, 315f)
             );
 
-            weapons.add(new Weapon(){{
-                reload = 17f;
+            weapons.add(new RepairBeamWeapon(){{
+                reload = 25f;
                 x = 0f;
-                y = 1f;
-                top = false;
+                y = 6.5f;
+                rotate = false;
+                shootY = 0f;
+                beamWidth = 0.7f;
+                repairSpeed = 0.25f;
+                aimDst = 0f;
+                shootCone = 15f;
+                fractionRepair = true;
                 mirror = false;
 
-                bullet = new LaserBoltBulletType(){{
-                    speed = 4.2f;
-                    frontColor = Color.white;
-                    backColor = hitColor = trailColor = Pal.accent;
+                targetUnits = false;
+                targetBuildings = true;
+                autoTarget = false;
+                controllable = true;
+                laserColor = Pal.accent;
+                healColor = Pal.accent;
 
-                    height = 6f;
-                    trailLength = 5;
-                    trailWidth = 2f;
-
-                    healColor = Pal.accent;
-                    healPercent = 1f;
-                    healAmount = 25f;
-                    collidesTeam = true;
-
-                    lifetime = 31f;
-                    shootEffect = Fx.colorSpark;
-                    hitEffect = smokeEffect = despawnEffect = Fx.hitLaserColor;
-
-                    //TODO 0, or 1?
-                    damage = 0;
+                bullet = new BulletType(){{
+                    maxRange = 70f;
                 }};
             }});
         }};
 
-        incite = new UnitType("incite"){{
+        incite = new ErekirUnitType("incite"){{
             defaultController = BuilderAI::new;
             isCounted = false;
             envDisabled = 0;
 
-            outlineColor = Pal.darkOutline;
             lowAltitude = false;
             flying = true;
             mineWalls = true;
@@ -3206,7 +3192,6 @@ public class UnitTypes{
             health = 600f;
             armor = 2f;
             hitSize = 18f;
-            commandLimit = 7;
             buildBeamOffset = 10f;
             engineSize = 0;
             payloadCapacity = Mathf.sqr(2f) * tilePayload;
@@ -3243,12 +3228,11 @@ public class UnitTypes{
             }});
         }};
 
-        emanate = new UnitType("emanate"){{
+        emanate = new ErekirUnitType("emanate"){{
             defaultController = BuilderAI::new;
             isCounted = false;
             envDisabled = 0;
 
-            outlineColor = Pal.darkOutline;
             lowAltitude = false;
             flying = true;
             targetAir = false;
@@ -3266,7 +3250,6 @@ public class UnitTypes{
             health = 1300f;
             armor = 3f;
             hitSize = 36f;
-            commandLimit = 9;
             buildBeamOffset = 72f / 4f;
             engineSize = 0;
             payloadCapacity = Mathf.sqr(3f) * tilePayload;
@@ -3328,14 +3311,14 @@ public class UnitTypes{
             internal = true;
         }};
 
-        manifold = new UnitType("manifold"){{
+        manifold = new ErekirUnitType("manifold"){{
             defaultController = CargoAI::new;
+            defaultAI = true;
             isCounted = false;
             allowedInPayloads = false;
             logicControllable = false;
             envDisabled = 0;
 
-            outlineColor = Pal.darkOutline;
             lowAltitude = false;
             flying = true;
             drag = 0.06f;
@@ -3345,7 +3328,6 @@ public class UnitTypes{
             itemCapacity = 60;
             health = 200f;
             hitSize = 11f;
-            commandLimit = 0;
             engineSize = 2.3f;
             engineOffset = 6.5f;
             hidden = true;
@@ -3355,9 +3337,10 @@ public class UnitTypes{
             );
         }};
 
-        assemblyDrone = new UnitType("assembly-drone"){{
+        assemblyDrone = new ErekirUnitType("assembly-drone"){{
             defaultController = AssemblerAI::new;
 
+            defaultAI = true;
             flying = true;
             drag = 0.06f;
             accel = 0.11f;

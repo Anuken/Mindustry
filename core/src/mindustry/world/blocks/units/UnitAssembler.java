@@ -172,7 +172,7 @@ public class UnitAssembler extends PayloadBlock{
         public Seq<Unit> units = new Seq<>();
         public Seq<UnitAssemblerModuleBuild> modules = new Seq<>();
         public BlockSeq blocks = new BlockSeq();
-        public float progress, warmup, droneWarmup;
+        public float progress, warmup, droneWarmup, powerWarmup;
         public float invalidWarmup = 0f;
         public int currentTier = 0;
         public boolean wasOccupied = false;
@@ -284,6 +284,7 @@ public class UnitAssembler extends PayloadBlock{
 
             units.removeAll(u -> !u.isAdded() || u.dead || !(u.controller() instanceof AssemblerAI));
 
+            powerWarmup = Mathf.lerpDelta(powerWarmup, efficiency(), 0.1f);
             droneWarmup = Mathf.lerpDelta(droneWarmup, units.size < dronesCreated ? efficiency() : 0f, 0.1f);
             totalDroneProgress += droneWarmup * Time.delta;
 
@@ -380,6 +381,7 @@ public class UnitAssembler extends PayloadBlock{
 
             var plan = plan();
 
+            //draw the unit construction as outline
             Draw.draw(Layer.blockBuilding, () -> {
                 Draw.color(Pal.accent, warmup);
 
@@ -397,8 +399,9 @@ public class UnitAssembler extends PayloadBlock{
 
             Draw.z(Layer.buildBeam);
 
-            //draw unit outline
+            //draw unit silhouette
             Draw.mixcol(Tmp.c1.set(Pal.accent).lerp(Pal.remove, invalidWarmup), 1f);
+            Draw.alpha(powerWarmup);
             Draw.rect(plan.unit.fullIcon, spawn.x, spawn.y);
 
             //build beams do not draw when invalid
@@ -423,6 +426,7 @@ public class UnitAssembler extends PayloadBlock{
 
             //draw full area
             Lines.stroke(2f, Pal.accent);
+            Draw.alpha(powerWarmup);
             Drawf.dashRectBasic(spawn.x - fulls, spawn.y - fulls, fulls*2f, fulls*2f);
 
             Draw.reset();

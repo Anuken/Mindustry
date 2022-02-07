@@ -465,6 +465,10 @@ public class Weapon implements Cloneable{
         }
     }
 
+    public void init(){
+
+    }
+
     public void load(){
         region = Core.atlas.find(name);
         heatRegion = Core.atlas.find(name + "-heat");

@@ -33,6 +33,10 @@ public class AIController implements UnitController{
 
     @Override
     public void updateUnit(){
+        if(disabled()){
+            return;
+        }
+
         //use fallback AI when possible
         if(useFallback() && (fallback != null || (fallback = fallback()) != null)){
             if(fallback.unit != unit) fallback.unit(unit);
@@ -43,6 +47,10 @@ public class AIController implements UnitController{
         updateVisuals();
         updateTargeting();
         updateMovement();
+    }
+
+    public boolean disabled(){
+        return !unit.team.isAI() && !unit.type.defaultAI;
     }
 
     @Nullable

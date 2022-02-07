@@ -98,17 +98,17 @@ public class RepairPoint extends Block{
         return new TextureRegion[]{baseRegion, region};
     }
 
-    public static void drawBeam(float x, float y, float rotation, float length, int id, Sized target, Team team,
+    public static void drawBeam(float x, float y, float rotation, float length, int id, @Nullable Sized target, Team team,
                                 float strength, float pulseStroke, float pulseRadius, float beamWidth,
                                 Vec2 lastEnd, Vec2 offset,
                                 Color laserColor, Color laserTopColor,
                                 TextureRegion laser, TextureRegion laserEnd, TextureRegion laserTop, TextureRegion laserTopEnd){
+        rand.setSeed(id + (target instanceof Entityc e ? e.id() : 0));
+
         if(target != null){
             float
             originX = x + Angles.trnsx(rotation, length),
             originY = y + Angles.trnsy(rotation, length);
-
-            rand.setSeed(id + (target instanceof Entityc e ? e.id() : 0));
 
             lastEnd.set(target).sub(originX, originY);
             lastEnd.setLength(Math.max(2f, lastEnd.len()));

@@ -67,6 +67,10 @@ public class UnitType extends UnlockableContent{
     public boolean logicControllable = true;
     public boolean playerControllable = true;
     public boolean allowedInPayloads = true;
+    /** If false, this unit has no AI when not controlled by a player, regardless of AI controller. */
+    public boolean defaultAI = true;
+    /** TODO If true, core units need to "dock" to this unit to work, and can un-dock at the unit instead of respawning at core. */
+    public boolean coreUnitDock = false;
     public boolean createWreck = true;
     public boolean createScorch = true;
     public boolean useUnitCap = true;
@@ -502,6 +506,8 @@ public class UnitType extends UnlockableContent{
             }
         }
         this.weapons = mapped;
+
+        weapons.each(Weapon::init);
 
         //dynamically create ammo capacity based on firing rate
         if(ammoCapacity < 0){

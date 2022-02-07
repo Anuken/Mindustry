@@ -2,6 +2,7 @@ package mindustry.type.unit;
 
 import mindustry.ai.types.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 
@@ -31,6 +32,7 @@ public class MissileUnitType extends UnitType{
         rotateSpeed = 2.5f;
         range = 30f;
         targetPriority = -1f;
-        //TODO weapons, etc
+        outlineColor = Pal.darkOutline;
+        //TODO weapon configs, etc?
     }
 }
