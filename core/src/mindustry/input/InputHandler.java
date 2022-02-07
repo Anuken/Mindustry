@@ -34,6 +34,7 @@ import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
 import java.util.*;
@@ -419,7 +420,20 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 player.justSwitchTo = unit;
             }
 
+            //TODO range check for docking
+            var before = player.unit();
+
             player.unit(unit);
+
+            //TODO test this in multiplayer
+            if(unit.type.coreUnitDock && before != null && !before.isNull()){
+                if(before.spawnedByCore){
+                    unit.dockedType = before.type;
+                }else if(before.dockedType != null){
+                    //direct dock transfer???
+                    unit.dockedType = before.dockedType;
+                }
+            }
 
             Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, unit));
             if(!player.dead()){
@@ -436,6 +450,38 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unitClear(Player player){
         if(player == null) return;
+
+        //TODO test this in multiplayer
+        if(!player.dead() && player.unit().type.coreUnitDock && !player.unit().spawnedByCore){
+            //TODO respawn ON the unit, with an animation?
+            var docked = player.unit().dockedType;
+            if(docked == null){
+                var closest = player.bestCore();
+                if(closest != null){
+                    docked = ((CoreBlock)closest.block).unitType;
+                }
+            }
+
+            if(docked != null){
+                //TODO animation, etc
+                Fx.spawn.at(player);
+
+                if(!net.client()){
+                    Unit unit = docked.create(player.team());
+                    unit.set(player.unit());
+                    unit.rotation(player.unit().rotation);
+                    //unit.impulse(0f, -3f);
+                    //TODO should there be an impulse?
+                    unit.controller(player);
+                    unit.spawnedByCore(true);
+                    unit.add();
+                }
+
+                return;
+            }
+
+        }
+        //should only get to this code if docking failed or this isn't a docking unit
 
         //problem: this gets called on both ends. it shouldn't be.
         Fx.spawn.at(player);

@@ -357,7 +357,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         while(ventCount < minVents && iterations++ < maxIterations){
             outer:
             for(Tile tile : tiles){
-                if(rand.chance(0.00018 * (1 + iterations))){
+                if(rand.chance(0.00018 * (1 + iterations)) && !Mathf.within(tile.x, tile.y, spawnX, spawnY, 5f)){
                     //skip crystals, but only when directly on them
                     if(tile.floor() == Blocks.crystallineStone || tile.floor() == Blocks.crystalFloor){
                         continue;

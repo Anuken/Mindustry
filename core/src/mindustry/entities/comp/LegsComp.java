@@ -30,6 +30,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
     transient float moveSpace;
     transient float baseRotation;
     transient Floor lastDeepFloor;
+    transient Vec2 curMoveOffset = new Vec2();
 
     @Replace
     @Override
@@ -134,6 +135,8 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         //rotation + offset vector
         boolean moving = moving();
         Vec2 moveOffset = !moving ? Tmp.v4.setZero() : Tmp.v4.trns(Angles.angle(deltaX(), deltaY()), trns);
+        //make it smooth, not jumpy
+        moveOffset = curMoveOffset.lerpDelta(moveOffset, 0.1f);
 
         lastDeepFloor = null;
         int deeps = 0;

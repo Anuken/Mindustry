@@ -48,6 +48,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     double flag;
 
     transient @Nullable Trail trail;
+    //TODO could be better represented as a unit
+    transient @Nullable UnitType dockedType;
 
     transient float shadowAlpha = -1f;
     transient float healTime;

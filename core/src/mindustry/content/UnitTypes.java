@@ -2681,6 +2681,13 @@ public class UnitTypes{
             health = 7000;
             armor = 5f;
 
+            lockLegBase = true;
+            legContinuousMove = true;
+            legGroupSize = 3;
+            legStraightness = 0.4f;
+            baseLegStraightness = 0.5f;
+            maxStretch = 1.3f;
+
             abilities.add(new ShieldArcAbility(){{
                 region = "bulwark-shield";
                 radius = 34f;
@@ -2694,7 +2701,7 @@ public class UnitTypes{
 
             rotateSpeed = 2.1f;
 
-            legCount = 4;
+            legCount = 6;
             legLength = 15f;
             legTrns = 0.45f;
             legMoveSpace = 1.4f;
@@ -3117,6 +3124,7 @@ public class UnitTypes{
 
         //TODO bad name
         evoke = new ErekirUnitType("evoke"){{
+            coreUnitDock = false;
             defaultController = BuilderAI::new;
             isCounted = false;
             envDisabled = 0;
@@ -3165,12 +3173,13 @@ public class UnitTypes{
                 healColor = Pal.accent;
 
                 bullet = new BulletType(){{
-                    maxRange = 70f;
+                    maxRange = 60f;
                 }};
             }});
         }};
 
         incite = new ErekirUnitType("incite"){{
+            coreUnitDock = false;
             defaultController = BuilderAI::new;
             isCounted = false;
             envDisabled = 0;
@@ -3229,6 +3238,7 @@ public class UnitTypes{
         }};
 
         emanate = new ErekirUnitType("emanate"){{
+            coreUnitDock = false;
             defaultController = BuilderAI::new;
             isCounted = false;
             envDisabled = 0;
