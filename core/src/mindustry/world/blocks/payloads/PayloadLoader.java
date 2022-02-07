@@ -21,6 +21,7 @@ public class PayloadLoader extends PayloadBlock{
     public float liquidsLoaded = 40f;
     public int maxBlockSize = 3;
     public float maxPowerConsumption = 40f;
+    public boolean loadPowerDynamic = true;
 
     //initialized in init(), do not touch
     protected float basePowerUse = 0f;
@@ -68,8 +69,10 @@ public class PayloadLoader extends PayloadBlock{
 
     @Override
     public void init(){
-        basePowerUse = consumes.hasPower() ? consumes.getPower().usage : 0f;
-        consumes.powerDynamic((PayloadLoaderBuild loader) -> loader.hasBattery() && !loader.exporting ? maxPowerConsumption + basePowerUse : basePowerUse);
+        if(loadPowerDynamic){
+            basePowerUse = consumes.hasPower() ? consumes.getPower().usage : 0f;
+            consumes.powerDynamic((PayloadLoaderBuild loader) -> loader.hasBattery() && !loader.exporting ? maxPowerConsumption + basePowerUse : basePowerUse);
+        }
 
         super.init();
     }
@@ -181,7 +184,7 @@ public class PayloadLoader extends PayloadBlock{
 
                     //charge the battery
                     float cap = payload.block().consumes.getPower().capacity;
-                    payload.build.power.status += availableInput / cap * Time.delta;
+                    payload.build.power.status += availableInput / cap * edelta();
 
                     //export if full
                     if(payload.build.power.status >= 1f){
