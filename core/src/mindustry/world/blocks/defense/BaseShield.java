@@ -76,6 +76,7 @@ public class BaseShield extends Block{
     public class BaseShieldBuild extends Building{
         public boolean broken = false; //TODO
         public float hit = 0f;
+        public float smoothRadius;
 
         @Override
         public void updateTile(){
@@ -83,6 +84,7 @@ public class BaseShield extends Block{
             float radius = radius();
 
             broken = efficiency() <= 0.0001f;
+            smoothRadius = Mathf.lerpDelta(smoothRadius, radius * efficiency(), 0.04f);
 
             if(radius > 0 && !broken){
                 paramBuild = this;
@@ -94,7 +96,7 @@ public class BaseShield extends Block{
 
         public float radius(){
             //TODO bad rule?
-            return radius * efficiency();
+            return smoothRadius;
         }
 
         @Override
