@@ -2816,7 +2816,7 @@ public class UnitTypes{
                 rotateSpeed = 0.4f;
                 rotate = true;
 
-                x = 43/4f;
+                x = 43 / 4f;
                 y = -20f / 4f;
                 shootY = 39 / 4f;
                 shootX = -5f / 4f;

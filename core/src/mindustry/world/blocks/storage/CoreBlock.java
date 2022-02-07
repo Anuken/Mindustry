@@ -134,7 +134,8 @@ public class CoreBlock extends StorageBlock{
         if(previous instanceof CoreBlock){
             tile.setBlock(this, tile.team());
             Fx.placeBlock.at(tile, tile.block().size);
-            Fx.upgradeCore.at(tile, tile.block().size);
+            Fx.upgradeCore.at(tile.drawx(), tile.drawy(), 0f, tile.block());
+            Fx.upgradeCoreBloom.at(tile, tile.block().size);
 
             //set up the correct items
             if(nextItems != null){

@@ -190,9 +190,17 @@ public class Fx{
     }),
 
     upgradeCore = new Effect(120f, e -> {
-        color(Color.white, Pal.accent, e.fin());
+        if(!(e.data instanceof Block block)) return;
+
+        mixcol(Tmp.c1.set(Color.white).lerp(Pal.accent, e.fin()), 1f);
         alpha(e.fout());
-        Fill.square(e.x, e.y, tilesize / 2f * e.rotation);
+        rect(block.fullIcon, e.x, e.y);
+    }).layer(Layer.turret - 5f),
+
+    upgradeCoreBloom = new Effect(80f, e -> {
+        color(Pal.accent);
+        stroke(4f * e.fout());
+        Lines.square(e.x, e.y, tilesize / 2f * e.rotation + 2f);
     }),
 
     placeBlock = new Effect(16, e -> {

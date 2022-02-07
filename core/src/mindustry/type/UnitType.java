@@ -85,6 +85,8 @@ public class UnitType extends UnlockableContent{
     public float buildBeamOffset = 3.8f;
     /** WIP: Units of low priority will always be ignored in favor of those with higher priority, regardless of distance. */
     public float targetPriority = 0f;
+    /** If false, this unit is not targeted by anything. */
+    public boolean targetable = true;
     public boolean drawBuildBeam = true;
     public boolean rotateToBuilding = true;
     public int commandLimit = 8;
@@ -289,6 +291,10 @@ public class UnitType extends UnlockableContent{
                 }).growX().left().height(0f).pad(0f);
             }
         }).growX();
+
+        if(coreUnitDock && !defaultAI){
+            table.row().add("@units.nocontroller").growX().left().row();
+        }
 
         if(unit.controller() instanceof LogicAI){
             table.row();
