@@ -112,7 +112,7 @@ public class Blocks{
     //power - erekir
     //TODO rename chemicalCombustionChamber
     turbineCondenser, ventCondenser, chemicalCombustionChamber, pyrolysisGenerator,
-    beamNode, beamTower,
+    beamNode, beamTower, beamLink,
 
     //production
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
@@ -1731,8 +1731,7 @@ public class Blocks{
 
         //TODO 5x5??
         shieldProjector = new BaseShield("shield-projector"){{
-            category = Category.effect;
-            buildVisibility = BuildVisibility.editorOnly;
+            requirements(Category.effect, BuildVisibility.editorOnly, with());
 
             size = 3;
 
@@ -2123,6 +2122,16 @@ public class Blocks{
             consumesPower = outputsPower = true;
             consumes.powerBuffered(40000f);
             range = 23;
+        }};
+
+        beamLink = new LongPowerNode("beam-link"){{
+            requirements(Category.power, BuildVisibility.editorOnly, with());
+            size = 3;
+            maxNodes = 1;
+            laserRange = 1000f;
+            autolink = false;
+            laserColor2 = Color.valueOf("ffd9c2");
+            laserScale = 0.65f;
         }};
 
         combustionGenerator = new BurnerGenerator("combustion-generator"){{
