@@ -10,7 +10,7 @@ import mindustry.graphics.*;
 
 public class LongPowerNode extends PowerNode{
     public @Load("@-glow") TextureRegion glow;
-    public Color glowColor = Color.valueOf("cbfd81").a(0.6f);
+    public Color glowColor = Color.valueOf("cbfd81").a(0.45f);
     public float glowScl = 16f, glowMag = 0.6f;
 
     public LongPowerNode(String name){
