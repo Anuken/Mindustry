@@ -3488,28 +3488,26 @@ public class Blocks{
         //endregion
         //region units - erekir
 
-        //TODO requirements
         tankAssembler = new UnitAssembler("tank-assembler"){{
             requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 200, Items.tungsten, 500));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 10f, BlockStack.list(Blocks.tungstenWallLarge, 6, Blocks.duct, 14, Blocks.cliffCrusher, 10)));
+            //TODO requirements?
+            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 35f, BlockStack.list(Blocks.tungstenWallLarge, 6, Blocks.duct, 14, Blocks.cliffCrusher, 10)));
             consumes.power(3f);
             areaSize = 13;
 
-            //TODO unit production is rarely continuous, can be double
-            consumes.liquid(Liquids.gallium, 1f / 60f);
+            consumes.liquid(Liquids.gallium, 2f / 60f);
         }};
 
         //TODO requirements
         shipAssembler = new UnitAssembler("ship-assembler"){{
             requirements(Category.units, with(Items.beryllium, 700, Items.oxide, 150, Items.tungsten, 500, Items.silicon, 800));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 4f, BlockStack.list(Blocks.tungstenWallLarge, 5, Blocks.plasmaBore, 2)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 25f, BlockStack.list(Blocks.tungstenWallLarge, 5, Blocks.plasmaBore, 2)));
             consumes.power(2f);
             areaSize = 13;
 
-            //TODO unit production is rarely continuous, can be double
-            consumes.liquid(Liquids.gallium, 1f / 60f);
+            consumes.liquid(Liquids.gallium, 2f / 60f);
 
         }};
 
@@ -3517,12 +3515,11 @@ public class Blocks{
         mechAssembler = new UnitAssembler("mech-assembler"){{
             requirements(Category.units, with(Items.graphite, 600, Items.carbide, 600, Items.oxide, 200, Items.tungsten, 500));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 4f, BlockStack.list(Blocks.tungstenWallLarge, 5, Blocks.duct, 2)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 40f, BlockStack.list(Blocks.tungstenWallLarge, 5, Blocks.duct, 2)));
             consumes.power(2f);
             areaSize = 13;
 
-            //TODO unit production is rarely continuous, can be double
-            consumes.liquid(Liquids.gallium, 1f / 60f);
+            consumes.liquid(Liquids.gallium, 2f / 60f);
 
         }};
 
