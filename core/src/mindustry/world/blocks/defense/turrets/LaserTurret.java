@@ -23,12 +23,6 @@ public class LaserTurret extends PowerTurret{
     }
 
     @Override
-    public void init(){
-        consumes.power(powerUse);
-        super.init();
-    }
-
-    @Override
     public void setStats(){
         super.setStats();
 

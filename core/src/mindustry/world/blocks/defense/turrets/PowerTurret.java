@@ -7,7 +7,9 @@ import mindustry.world.meta.*;
 
 public class PowerTurret extends Turret{
     public BulletType shootType;
-    public float powerUse = 1f;
+    /** @deprecated just consume power directly instead. */
+    @Deprecated
+    public float powerUse = -1f;
 
     public PowerTurret(String name){
         super(name);
@@ -22,7 +24,9 @@ public class PowerTurret extends Turret{
 
     @Override
     public void init(){
-        consumes.power(powerUse);
+        if(powerUse > 0){
+            consumes.power(powerUse);
+        }
         super.init();
     }
 

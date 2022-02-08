@@ -2758,7 +2758,6 @@ public class Blocks{
             recoilAmount = 2f;
             reloadTime = 80f;
             cooldown = 0.03f;
-            powerUse = 6f;
             shootShake = 2f;
             shootEffect = Fx.lancerLaserShoot;
             smokeEffect = Fx.none;
@@ -2769,6 +2768,8 @@ public class Blocks{
             scaledHealth = 280;
             targetAir = false;
             shootSound = Sounds.laser;
+
+            consumes.power(6f);
 
             shootType = new LaserBulletType(140){{
                 colors = new Color[]{Pal.lancerLaser.cpy().a(0.4f), Pal.lancerLaser, Color.white};
@@ -2793,7 +2794,7 @@ public class Blocks{
             reloadTime = 35f;
             shootCone = 40f;
             rotateSpeed = 8f;
-            powerUse = 3.3f;
+            consumes.power(3.3f);
             targetAir = false;
             range = 90f;
             shootEffect = Fx.lightningShoot;
@@ -3077,7 +3078,7 @@ public class Blocks{
             reloadTime = 90f;
             firingMoveFract = 0.5f;
             shootDuration = 230f;
-            powerUse = 17f;
+            consumes.power(17f);
             shootSound = Sounds.laserbig;
             loopSound = Sounds.beam;
             loopSoundVolume = 2f;
