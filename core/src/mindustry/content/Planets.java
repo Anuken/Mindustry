@@ -102,6 +102,7 @@ public class Planets{
             allowWaveSimulation = true;
             allowSectorInvasion = true;
             allowLaunchSchematics = true;
+            defaultAI = true;
             atmosphereColor = Color.valueOf("3c1b8f");
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;

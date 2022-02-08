@@ -115,9 +115,10 @@ public class Logic implements ApplicationListener{
             if(state.isCampaign()){
                 //enable building AI on campaign unless the preset disables it
                 //TODO should be configurable, I don't want building AI everywhere.
-                if(!(state.getSector().preset != null && !state.getSector().preset.useAI)){
+                if(state.getSector().planet.defaultAI && !(state.getSector().preset != null && !state.getSector().preset.useAI)){
                     state.rules.waveTeam.rules().ai = true;
                 }
+
                 state.rules.coreIncinerates = true;
                 state.rules.waveTeam.rules().aiTier = state.getSector().threat * 0.8f;
                 state.rules.waveTeam.rules().infiniteResources = true;

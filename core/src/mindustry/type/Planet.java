@@ -90,6 +90,8 @@ public class Planet extends UnlockableContent{
     public boolean allowWaveSimulation = false;
     /** Whether to simulate sector invasions from enemy bases. */
     public boolean allowSectorInvasion = false;
+    /** If true, builder AI is turned on for all sectors on this planet by default. */
+    public boolean defaultAI = false;
     /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system.*/
     public @Nullable Planet parent;
     /** The root parent of the whole solar system this planet is in. */
