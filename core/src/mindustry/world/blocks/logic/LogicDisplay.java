@@ -102,7 +102,7 @@ public class LogicDisplay extends Block{
             Draw.blend(Blending.disabled);
             Draw.draw(Draw.z(), () -> {
                 if(buffer != null){
-                    Draw.rect(Draw.wrap(buffer.getTexture()), x, y, buffer.getWidth() * Draw.scl, -buffer.getHeight() * Draw.scl);
+                    Draw.rect(Draw.wrap(buffer.getTexture()), x, y, size * 32 * Draw.scl - 4, -(size * 32 * Draw.scl - 4));
                 }
             });
             Draw.blend();
