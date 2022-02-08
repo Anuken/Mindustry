@@ -49,6 +49,8 @@ public class UnitType extends UnlockableContent{
     public Prov<? extends Unit> constructor;
     /** The default AI controller to assign on creation. */
     public Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
+    /** Function that chooses AI controller based on unit entity. */
+    public Func<Unit, ? extends UnitController> unitBasedDefaultController = u -> defaultController.get();
 
     /** Environmental flags that are *all* required for this unit to function. 0 = any environment */
     public int envRequired = 0;
@@ -208,8 +210,14 @@ public class UnitType extends UnlockableContent{
         constructor = EntityMapping.map(this.name);
     }
 
+    /** @deprecated use the createController method instead */
+    @Deprecated
     public UnitController createController(){
         return defaultController.get();
+    }
+
+    public UnitController createController(Unit unit){
+        return unitBasedDefaultController.get(unit);
     }
 
     public Unit create(Team team){

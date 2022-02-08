@@ -183,6 +183,12 @@ public class Fx{
         }
     }),
 
+    moveCommand = new Effect(15, e -> {
+        color(Pal.command);
+        stroke(e.fout() * 5f);
+        Lines.circle(e.x, e.y, 6f + e.fin() * 2f);
+    }).layer(Layer.effect - 20f),
+
     commandSend = new Effect(28, e -> {
         color(Pal.command);
         stroke(e.fout() * 2f);

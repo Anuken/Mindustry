@@ -12,6 +12,8 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.types.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -112,6 +114,27 @@ public class DesktopInput extends InputHandler{
 
         if(Core.input.keyDown(Binding.schematic_select) && !Core.scene.hasKeyboard() && mode != breaking){
             drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
+        }
+
+        for(Unit unit : selectedUnits){
+            CommandAI ai = (CommandAI)unit.controller();
+            //draw target line
+            if(ai.targetPos != null){
+                Tmp.v1.set(ai.targetPos).sub(unit).setLength(unit.hitSize / 2f);
+
+                Drawf.dashLine(Pal.accent, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, ai.targetPos.x, ai.targetPos.y);
+            }
+
+            Drawf.square(unit.x, unit.y, unit.hitSize / 1.4f + 1f);
+        }
+
+        //draw command overlay UI
+        if(commandMode){
+            Unit sel = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
+
+            if(sel != null){
+                Drawf.square(sel.x, sel.y, sel.hitSize / 1.4f + Mathf.absin(4f, 1f), selectedUnits.contains(sel) ? Pal.remove : Pal.accent);
+            }
         }
 
         Draw.reset();
@@ -220,10 +243,18 @@ public class DesktopInput extends InputHandler{
                 Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * panScale, -1, 1) * camSpeed;
                 Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * panScale, -1, 1) * camSpeed;
             }
-
         }
 
+        commandMode = input.keyDown(Binding.commandMode) && !locked && state.rules.unitCommand && block == null;
         shouldShoot = !scene.hasMouse() && !locked;
+
+        //TODO should selected units be cleared out of command mode?
+        if(!commandMode){
+            selectedUnits.clear();
+        }
+
+        //validate commanding units
+        selectedUnits.removeAll(u -> !u.isCommandable());
 
         if(!scene.hasMouse() && !locked){
             if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){
@@ -503,6 +534,26 @@ public class DesktopInput extends InputHandler{
                 sreq = req;
             }else if(req != null && req.breaking){
                 deleting = true;
+            }else if(commandMode){
+                Unit unit = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
+                if(unit != null){
+                    if(selectedUnits.contains(unit)){
+                        selectedUnits.remove(unit);
+                    }else{
+                        selectedUnits.add(unit);
+                    }
+                }else if(selectedUnits.size > 0){
+                    //move to location - TODO right click instead?
+
+                    //TODO all this needs to be synced, done with packets, etc
+                    Vec2 target = input.mouseWorld().cpy();
+
+                    for(var sel : selectedUnits){
+                        ((CommandAI)sel.controller()).commandPosition(target);
+                    }
+
+                    Fx.moveCommand.at(target);
+                }
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
                 if(!tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && !tileTapped(selected.build) && !player.unit().activelyBuilding() && !droppingItem
@@ -520,7 +571,7 @@ public class DesktopInput extends InputHandler{
         }else if(Core.input.keyTap(Binding.deselect) && !selectRequests.isEmpty()){
             selectRequests.clear();
             lastSchematic = null;
-        }else if(Core.input.keyTap(Binding.break_block) && !Core.scene.hasMouse() && player.isBuilder()){
+        }else if(Core.input.keyTap(Binding.break_block) && !Core.scene.hasMouse() && player.isBuilder() && !commandMode){
             //is recalculated because setting the mode to breaking removes potential multiblock cursor offset
             deleting = false;
             mode = breaking;

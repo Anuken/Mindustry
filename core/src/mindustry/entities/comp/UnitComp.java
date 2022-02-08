@@ -259,7 +259,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public void resetController(){
-        controller(type.createController());
+        controller(type.createController(self()));
     }
 
     @Override
@@ -291,6 +291,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return controller instanceof AIController;
     }
 
+    public boolean isCommandable(){
+        return controller instanceof CommandAI;
+    }
+
     public int count(){
         return team.data().countType(type);
     }
@@ -307,7 +311,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         this.hitSize = type.hitSize;
         this.hovering = type.hovering;
 
-        if(controller == null) controller(type.createController());
+        if(controller == null) controller(type.createController(self()));
         if(mounts().length != type.weapons.size) setupWeapons(type);
         if(abilities.length != type.abilities.size){
             abilities = new Ability[type.abilities.size];
@@ -328,7 +332,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void afterRead(){
         afterSync();
         //reset controller state
-        controller(type.createController());
+        controller(type.createController(self()));
     }
 
     @Override

@@ -8,7 +8,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
-import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -236,23 +235,19 @@ public class Teams{
         public UnitCommand command = UnitCommand.attack;
 
         /** Quadtree for all buildings of this team. Null if not active. */
-        @Nullable
-        public QuadTree<Building> buildings;
+        public @Nullable QuadTree<Building> buildings;
         /** Current unit cap. Do not modify externally. */
         public int unitCap;
         /** Total unit count. */
         public int unitCount;
         /** Counts for each type of unit. Do not access directly. */
-        @Nullable
-        public int[] typeCounts;
+        public @Nullable int[] typeCounts;
         /** Quadtree for units of this team. Do not access directly. */
-        @Nullable
-        public QuadTree<Unit> tree;
+        public @Nullable QuadTree<Unit> tree;
         /** Units of this team. Updated each frame. */
         public Seq<Unit> units = new Seq<>();
         /** Units of this team by type. Updated each frame. */
-        @Nullable
-        public Seq<Unit>[] unitsByType;
+        public @Nullable Seq<Unit>[] unitsByType;
 
         public TeamData(Team team){
             this.team = team;

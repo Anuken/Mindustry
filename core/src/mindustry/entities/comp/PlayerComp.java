@@ -82,7 +82,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         textFadeTime = 0f;
         x = y = 0f;
         if(!dead()){
-            unit.controller(unit.type.createController());
+            unit.resetController();
             unit = Nulls.unit;
         }
     }
@@ -203,7 +203,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
         if(this.unit != Nulls.unit){
             //un-control the old unit
-            this.unit.controller(this.unit.type.createController());
+            this.unit.resetController();
         }
         this.unit = unit;
         if(unit != Nulls.unit){

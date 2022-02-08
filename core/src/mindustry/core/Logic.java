@@ -4,6 +4,7 @@ import arc.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -114,9 +115,14 @@ public class Logic implements ApplicationListener{
 
             if(state.isCampaign()){
                 //enable building AI on campaign unless the preset disables it
-                //TODO should be configurable, I don't want building AI everywhere.
+                //TODO should be (more) configurable, I don't want building AI everywhere.
                 if(state.getSector().planet.defaultAI && !(state.getSector().preset != null && !state.getSector().preset.useAI)){
                     state.rules.waveTeam.rules().ai = true;
+                }
+
+                //TODO unit commanding is not allowed on serpulo until I test it properly
+                if(state.getSector().planet != Planets.serpulo){
+                    state.rules.unitCommand = true;
                 }
 
                 state.rules.coreIncinerates = true;

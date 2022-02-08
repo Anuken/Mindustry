@@ -3535,7 +3535,8 @@ public class Blocks{
             size = 3;
         }};
 
-        //TODO setup, sprite, balance...
+        //TODO setup, sprite, balance... or just scrap it completely.
+        if(false)
         droneCenter = new DroneCenter("drone-center"){{
             requirements(Category.units, with(Items.graphite, 10));
 

@@ -48,6 +48,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Maximum line length. */
     final static int maxLength = 100;
     final static Rect r1 = new Rect(), r2 = new Rect();
+    final static Seq<Unit> tmpUnits = new Seq<>();
 
     public final OverlayFragment frag = new OverlayFragment();
 
@@ -70,6 +71,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public BuildPlan brequest = new BuildPlan();
     public Seq<BuildPlan> lineRequests = new Seq<>();
     public Seq<BuildPlan> selectRequests = new Seq<>();
+
+    //for RTS controls
+    public Seq<Unit> selectedUnits = new Seq<>();
+    public boolean commandMode = false;
 
     private Seq<BuildPlan> plansOut = new Seq<>(BuildPlan.class);
     private QuadTree<BuildPlan> playerPlanTree = new QuadTree<>(new Rect());
@@ -1183,6 +1188,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return null;
     }
 
+    public @Nullable Unit selectedCommandUnit(float x, float y){
+        var tree = player.team().data().tree();
+        tmpUnits.clear();
+        float rad = 4f;
+        tree.intersect(x - rad/2f, y - rad/2f, rad, rad, tmpUnits);
+        return tmpUnits.min(u -> u.isCommandable(), u -> u.dst(x, y) - u.hitSize/2f);
+    }
+
     public void remove(){
         Core.input.removeProcessor(this);
         frag.remove();
@@ -1225,7 +1238,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean canShoot(){
         return block == null && !onConfigurable() && !isDroppingItem() && !player.unit().activelyBuilding() &&
-            !(player.unit() instanceof Mechc && player.unit().isFlying()) && !player.unit().mining();
+            !(player.unit() instanceof Mechc && player.unit().isFlying()) && !player.unit().mining() && !commandMode;
     }
 
     public boolean onConfigurable(){
