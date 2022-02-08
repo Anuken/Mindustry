@@ -29,6 +29,7 @@ public class LogicDisplay extends Block{
     public int maxSides = 25;
 
     public int displaySize = 64;
+    public float scaleFactor = 1f
 
     public LogicDisplay(String name){
         super(name);
@@ -102,7 +103,7 @@ public class LogicDisplay extends Block{
             Draw.blend(Blending.disabled);
             Draw.draw(Draw.z(), () -> {
                 if(buffer != null){
-                    Draw.rect(Draw.wrap(buffer.getTexture()), x, y, size * 32 * Draw.scl - 4, -(size * 32 * Draw.scl - 4));
+                    Draw.rect(Draw.wrap(buffer.getTexture()), x, y, scaleFactor * Draw.scl, -scaleFactor * Draw.scl);
                 }
             });
             Draw.blend();
