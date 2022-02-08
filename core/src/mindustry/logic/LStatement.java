@@ -30,11 +30,22 @@ public abstract class LStatement{
     public LStatement copy(){
         StringBuilder build = new StringBuilder();
         write(build);
-        Seq<LStatement> read = LAssembler.read(build.toString());
+        //assume privileged when copying, because there's no way privileged instructions can appear here anyway, and the instructions get validated on load anyway
+        Seq<LStatement> read = LAssembler.read(build.toString(), true);
         return read.size == 0 ? null : read.first();
     }
 
     public boolean hidden(){
+        return false;
+    }
+
+    /** Privileged instructions are only allowed in world processors. */
+    public boolean privileged(){
+        return false;
+    }
+
+    /** If true, this statement is considered useless with privileged processors and is not allowed in them. */
+    public boolean nonPrivileged(){
         return false;
     }
 

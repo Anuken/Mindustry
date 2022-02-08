@@ -1050,4 +1050,108 @@ public class LStatements{
             return new UnitLocateI(locate, flag, builder.var(enemy), builder.var(ore), builder.var(outX), builder.var(outY), builder.var(outFound), builder.var(outBuild));
         }
     }
+
+    @RegisterStatement("getblock")
+    public static class GetBlockStatement extends LStatement{
+        public TileLayer layer = TileLayer.block;
+        public String result = "result", x = "0", y = "0";
+
+        @Override
+        public void build(Table table){
+            fields(table, result, str -> result = str);
+
+            table.add(" = get ");
+
+            row(table);
+
+            table.button(b -> {
+                b.label(() -> layer.name());
+                b.clicked(() -> showSelect(b, TileLayer.all, layer, o -> layer = o));
+            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
+
+            table.add(" at ");
+
+            fields(table, x, str -> x = str);
+            table.add(", ");
+            fields(table, y, str -> y = str);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicWorld;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new GetBlockI(builder.var(x), builder.var(y), builder.var(result), layer);
+        }
+    }
+
+    @RegisterStatement("setblock")
+    public static class SetBlockStatement extends LStatement{
+        public TileLayer layer = TileLayer.block;
+        public String block = "@air", x = "0", y = "0", team = "@derelict", rotation = "0";
+
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+            table.add("set");
+
+            table.button(b -> {
+                b.label(() -> layer.name());
+                b.clicked(() -> showSelect(b, TileLayer.settable, layer, o -> {
+                    layer = o;
+                    rebuild(table);
+                }));
+            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
+
+            row(table);
+
+            table.add(" at ");
+
+            fields(table, x, str -> x = str);
+            table.add(", ");
+            fields(table, y, str -> y = str);
+
+            row(table);
+
+            table.add(" to ");
+
+            fields(table, block, str -> block = str);
+
+            if(layer == TileLayer.block){
+                row(table);
+
+                table.add("team ");
+                fields(table, team, str -> team = str);
+
+                table.add(" rotation ");
+                fields(table, rotation, str -> rotation = str);
+            }
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicWorld;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SetBlockI(builder.var(x), builder.var(y), builder.var(block), builder.var(team), builder.var(rotation), layer);
+        }
+    }
 }

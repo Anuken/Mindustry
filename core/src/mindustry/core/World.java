@@ -530,7 +530,7 @@ public class World{
         }
 
         Tile tile = world.tile(x, y);
-        if(tile != null && tile.block().solid && tile.block().fillsTile && !tile.block().synthetic()){
+        if(tile != null && tile.isDarkened()){
             dark = Math.max(dark, tile.data);
         }
 

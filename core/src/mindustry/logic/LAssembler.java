@@ -22,20 +22,28 @@ public class LAssembler{
     public LAssembler(){
         //instruction counter
         putVar("@counter").value = 0;
-        //timestamp
-        putConst("@time", 0);
         //currently controlled unit
         putConst("@unit", null);
         //reference to self
         putConst("@this", null);
-        //global tick
-        putConst("@tick", 0);
     }
 
+    /** @deprecated use the one with the privileged parameter */
+    @Deprecated
     public static LAssembler assemble(String data){
+        return assemble(data, false);
+    }
+
+    /** @deprecated use the one with the privileged parameter */
+    @Deprecated
+    public static Seq<LStatement> read(String text){
+        return read(text, false);
+    }
+
+    public static LAssembler assemble(String data, boolean privileged){
         LAssembler asm = new LAssembler();
 
-        Seq<LStatement> st = read(data);
+        Seq<LStatement> st = read(data, privileged);
 
         asm.instructions = st.map(l -> l.build(asm)).filter(l -> l != null).toArray(LInstruction.class);
         return asm;
@@ -51,8 +59,11 @@ public class LAssembler{
         return out.toString();
     }
 
-    public static Seq<LStatement> read(String data){
-        return LParser.parse(data);
+    /** Parses a sequence of statements from a string. */
+    public static Seq<LStatement> read(String text, boolean privileged){
+        //don't waste time parsing null/empty text
+        if(text == null || text.isEmpty()) return new Seq<>();
+        return new LParser(text, privileged).parse();
     }
 
     /** @return a variable ID by name.

@@ -61,6 +61,7 @@ public interface Autotiler{
         BuildPlan[] directionals = AutotilerHolder.directionals;
 
         Arrays.fill(directionals, null);
+        //TODO this is O(n^2), very slow, should use quadtree or intmap or something instead
         list.each(other -> {
             if(other.breaking || other == req) return;
 

@@ -16,6 +16,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 import mindustry.world.blocks.logic.MemoryBlock.*;
@@ -31,10 +32,8 @@ public class LExecutor{
     //special variables
     public static final int
     varCounter = 0,
-    varTime = 1,
-    varUnit = 2,
-    varThis = 3,
-    varTick = 4;
+    varUnit = 1,
+    varThis = 2;
 
     public static final int
     maxGraphicsBuffer = 256,
@@ -43,6 +42,7 @@ public class LExecutor{
 
     public LInstruction[] instructions = {};
     public Var[] vars = {};
+    public Var counter;
     public int[] binds;
 
     public LongSeq graphicsBuffer = new LongSeq();
@@ -50,30 +50,22 @@ public class LExecutor{
     public Building[] links = {};
     public IntSet linkIds = new IntSet();
     public Team team = Team.derelict;
+    public boolean privileged = false;
 
     public boolean initialized(){
-        return instructions != null && vars != null && instructions.length > 0;
+        return instructions.length > 0;
     }
 
     /** Runs a single instruction. */
     public void runOnce(){
-        //set up time; note that @time is now only updated once every invocation and directly based off of @tick.
-        //having time be based off of user system time was a very bad idea.
-        vars[varTime].numval = state.tick / 60.0 * 1000.0;
-        vars[varTick].numval = state.tick;
-
         //reset to start
-        if(vars[varCounter].numval >= instructions.length || vars[varCounter].numval < 0){
-            vars[varCounter].numval = 0;
+        if(counter.numval >= instructions.length || counter.numval < 0){
+            counter.numval = 0;
         }
 
-        if(vars[varCounter].numval < instructions.length){
-            instructions[(int)(vars[varCounter].numval++)].run(this);
+        if(counter.numval < instructions.length){
+            instructions[(int)(counter.numval++)].run(this);
         }
-    }
-
-    public void load(String data){
-        load(LAssembler.assemble(data));
     }
 
     /** Loads with a specified assembler. Resets all variables. */
@@ -95,6 +87,8 @@ public class LExecutor{
                 dest.objval = var.value;
             }
         });
+
+        counter = vars[varCounter];
     }
 
     //region utility
@@ -560,7 +554,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Object obj = exec.obj(target);
-            if(obj instanceof Building b && b.team == exec.team && exec.linkIds.contains(b.id)){
+            if(obj instanceof Building b && (exec.privileged || (b.team == exec.team && exec.linkIds.contains(b.id)))){
                 if(type.isObj && exec.var(p1).isobj){
                     b.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
                 }else{
@@ -921,7 +915,7 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless) return;
 
-            if(exec.building(target) instanceof LogicDisplayBuild d && d.team == exec.team){
+            if(exec.building(target) instanceof LogicDisplayBuild d && (d.team == exec.team || exec.privileged)){
                 if(d.commands.size + exec.graphicsBuffer.size < maxDisplayBuffer){
                     for(int i = 0; i < exec.graphicsBuffer.size; i++){
                         d.commands.addLast(exec.graphicsBuffer.items[i]);
@@ -1067,6 +1061,7 @@ public class LExecutor{
         }
     }
 
+    //TODO lookup color instruction and inverse lookup
     public static class LookupI implements LInstruction{
         public int dest;
         public int from;
@@ -1087,6 +1082,79 @@ public class LExecutor{
         }
     }
 
+    //endregion
+    //region privileged / world instructions
+
+    public static class GetBlockI implements LInstruction{
+        public int x, y;
+        public int dest;
+        public TileLayer layer = TileLayer.block;
+
+        public GetBlockI(int x, int y, int dest, TileLayer layer){
+            this.x = x;
+            this.y = y;
+            this.dest = dest;
+            this.layer = layer;
+        }
+
+        public GetBlockI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            Tile tile = world.tile(exec.numi(x), exec.numi(y));
+            if(tile == null){
+                exec.setobj(dest, null);
+            }else{
+                exec.setobj(dest, switch(layer){
+                    case floor -> tile.floor();
+                    case ore -> tile.overlay();
+                    case block -> tile.block();
+                    case building -> tile.build;
+                });
+            }
+        }
+    }
+
+    public static class SetBlockI implements LInstruction{
+        public int x, y;
+        public int block;
+        public int team, rotation;
+        public TileLayer layer = TileLayer.block;
+
+        public SetBlockI(int x, int y, int block, int team, int rotation, TileLayer layer){
+            this.x = x;
+            this.y = y;
+            this.block = block;
+            this.team = team;
+            this.rotation = rotation;
+            this.layer = layer;
+        }
+
+        public SetBlockI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            Tile tile = world.tile(exec.numi(x), exec.numi(y));
+            if(tile != null && exec.obj(block) instanceof Block b){
+                //TODO this can be quite laggy...
+                switch(layer){
+                    case ore -> {
+                        if(b instanceof OverlayFloor o) tile.setOverlay(o);
+                    }
+                    case floor -> {
+                        if(b instanceof Floor f) tile.setFloor(f);
+                    }
+                    case block -> {
+                        Team t = exec.obj(team) instanceof Team steam ? steam : Team.derelict;
+                        tile.setBlock(b, t, Mathf.clamp(exec.numi(rotation), 0, 3));
+                    }
+                    //building case not allowed
+                }
+            }
+        }
+    }
 
     //endregion
 }

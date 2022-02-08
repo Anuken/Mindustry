@@ -149,6 +149,7 @@ public class Blocks{
 
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
+    worldProcessor,
 
     //campaign
     //TODO launch pad on erekir, 5x5, uses nuclear(?) fuel
@@ -3776,6 +3777,16 @@ public class Blocks{
             displaySize = 176;
 
             size = 6;
+        }};
+
+        worldProcessor = new LogicBlock("world-processor"){{
+            //currently incomplete, debugOnly for now
+            requirements(Category.logic, BuildVisibility.debugOnly, with());
+
+            instructionsPerTick = 2;
+            forceDark = true;
+            privileged = true;
+            size = 1;
         }};
 
         //endregion

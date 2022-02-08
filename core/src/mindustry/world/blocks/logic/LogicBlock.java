@@ -1,5 +1,7 @@
 package mindustry.world.blocks.logic;
 
+import arc.Graphics.*;
+import arc.Graphics.Cursor.*;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
@@ -32,6 +34,7 @@ public class LogicBlock extends Block{
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
     public float range = 8 * 10;
+    public boolean privileged;
 
     public LogicBlock(String name){
         super(name);
@@ -44,9 +47,15 @@ public class LogicBlock extends Block{
         //universal, no real requirements
         envEnabled = Env.any;
 
-        config(byte[].class, (LogicBuild build, byte[] data) -> build.readCompressed(data, true));
+        config(byte[].class, (LogicBuild build, byte[] data) -> {
+            if(!accessible()) return;
+
+            build.readCompressed(data, true);
+        });
 
         config(Integer.class, (LogicBuild entity, Integer pos) -> {
+            if(!accessible()) return;
+
             //if there is no valid link in the first place, nobody cares
             if(!entity.validLink(world.build(pos))) return;
             var lbuild = world.build(pos);
@@ -69,6 +78,15 @@ public class LogicBlock extends Block{
 
             entity.updateCode(entity.code, true, null);
         });
+    }
+
+    public boolean accessible(){
+        return !privileged || state.rules.editor;
+    }
+
+    @Override
+    public boolean canBreak(Tile tile){
+        return accessible();
     }
 
     public static String getLinkName(Block block){
@@ -124,12 +142,16 @@ public class LogicBlock extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.linkRange, range / 8, StatUnit.blocks);
-        stats.add(Stat.instructions, instructionsPerTick * 60, StatUnit.perSecond);
+        if(!privileged){
+            stats.add(Stat.linkRange, range / 8, StatUnit.blocks);
+            stats.add(Stat.instructions, instructionsPerTick * 60, StatUnit.perSecond);
+        }
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        if(privileged) return;
+
         Drawf.circles(x*tilesize + offset, y*tilesize + offset, range);
     }
 
@@ -202,6 +224,10 @@ public class LogicBlock extends Block{
 
         /** Block of code to run after load. */
         public @Nullable Runnable loadBlock;
+
+        {
+            executor.privileged = privileged;
+        }
 
         public void readCompressed(byte[] data, boolean relative){
             try(DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)))){
@@ -292,7 +318,7 @@ public class LogicBlock extends Block{
 
                 try{
                     //create assembler to store extra variables
-                    LAssembler asm = LAssembler.assemble(str);
+                    LAssembler asm = LAssembler.assemble(str, privileged);
 
                     //store connections
                     for(LogicLink link : links){
@@ -344,9 +370,27 @@ public class LogicBlock extends Block{
                     executor.load(asm);
                 }catch(Exception e){
                     //handle malformed code and replace it with nothing
-                    executor.load(code = "");
+                    executor.load(LAssembler.assemble(code = "", privileged));
                 }
             }
+        }
+
+        //editor-only processors cannot be damaged or destroyed
+        @Override
+        public boolean collide(Bullet other){
+            return !privileged;
+        }
+
+        @Override
+        public void damage(float damage){
+            if(!privileged){
+                super.damage(damage);
+            }
+        }
+
+        @Override
+        public Cursor getCursor(){
+            return !accessible() ? SystemCursor.arrow : super.getCursor();
         }
 
         //logic blocks cause write problems when picked up
@@ -426,15 +470,13 @@ public class LogicBlock extends Block{
                 updateCode(code, true, null);
             }
 
-            if(enabled){
+            if(enabled && executor.initialized()){
                 accumulator += edelta() * instructionsPerTick * (consValid() ? 1 : 0);
 
                 if(accumulator > maxInstructionScale * instructionsPerTick) accumulator = maxInstructionScale * instructionsPerTick;
 
                 for(int i = 0; i < (int)accumulator; i++){
-                    if(executor.initialized()){
-                        executor.runOnce();
-                    }
+                    executor.runOnce();
                     accumulator --;
                 }
             }
@@ -460,7 +502,9 @@ public class LogicBlock extends Block{
         public void drawConfigure(){
             super.drawConfigure();
 
-            Drawf.circles(x, y, range);
+            if(!privileged){
+                Drawf.circles(x, y, range);
+            }
 
             for(LogicLink l : links){
                 Building build = world.build(l.x, l.y);
@@ -486,19 +530,25 @@ public class LogicBlock extends Block{
         }
 
         public boolean validLink(Building other){
-            return other != null && other.isValid() && other.team == team && other.within(this, range + other.block.size*tilesize/2f) && !(other instanceof ConstructBuild);
+            return other != null && other.isValid() && (privileged || (other.team == team && other.within(this, range + other.block.size*tilesize/2f))) && !(other instanceof ConstructBuild);
         }
 
         @Override
         public void buildConfiguration(Table table){
+            if(!accessible()){
+                //go away
+                deselect();
+                return;
+            }
+
             table.button(Icon.pencil, Styles.clearTransi, () -> {
-                ui.logic.show(code, executor, code -> configure(compress(code, relativeConnections())));
+                ui.logic.show(code, executor, privileged, code -> configure(compress(code, relativeConnections())));
             }).size(40);
         }
 
         @Override
         public boolean onConfigureTileTapped(Building other){
-            if(this == other){
+            if(this == other || !accessible()){
                 deselect();
                 return false;
             }

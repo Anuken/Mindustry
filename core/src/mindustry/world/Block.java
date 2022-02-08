@@ -162,6 +162,8 @@ public class Block extends UnlockableContent{
     public CacheLayer cacheLayer = CacheLayer.normal;
     /** Special flag; if false, floor will be drawn under this block even if it is cached. */
     public boolean fillsTile = true;
+    /** If true, this block can be covered by darkness / fog even if synthetic. */
+    public boolean forceDark = false;
     /** whether this block can be replaced in all cases */
     public boolean alwaysReplace = false;
     /** if false, this block can never be replaced. */

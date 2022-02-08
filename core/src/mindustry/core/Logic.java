@@ -402,6 +402,8 @@ public class Logic implements ApplicationListener{
                 }
                 Time.update();
 
+                constants.update();
+
                 //weather is serverside
                 if(!net.client() && !state.isEditor()){
                     updateWeather();
