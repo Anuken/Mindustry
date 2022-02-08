@@ -3499,7 +3499,7 @@ public class Blocks{
             consumes.power(3f);
             areaSize = 13;
 
-            consumes.liquid(Liquids.gallium, 2f / 60f);
+            //consumes.liquid(Liquids.gallium, 2f / 60f);
         }};
 
         //TODO requirements
@@ -3510,7 +3510,7 @@ public class Blocks{
             consumes.power(2f);
             areaSize = 13;
 
-            consumes.liquid(Liquids.gallium, 2f / 60f);
+            //consumes.liquid(Liquids.gallium, 2f / 60f);
 
         }};
 
@@ -3522,7 +3522,7 @@ public class Blocks{
             consumes.power(2f);
             areaSize = 13;
 
-            consumes.liquid(Liquids.gallium, 2f / 60f);
+            //consumes.liquid(Liquids.gallium, 2f / 60f);
 
         }};
 
