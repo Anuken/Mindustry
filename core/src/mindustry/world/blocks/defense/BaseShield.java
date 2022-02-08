@@ -80,12 +80,11 @@ public class BaseShield extends Block{
 
         @Override
         public void updateTile(){
-            broken = efficiency() <= 0.0001f;
-            smoothRadius = Mathf.lerpDelta(smoothRadius, radius * efficiency(), 0.04f);
+            smoothRadius = Mathf.lerpDelta(smoothRadius, radius * efficiency(), 0.05f);
 
             float rad = radius();
 
-            if(rad > 0 && !broken){
+            if(rad > 1){
                 paramBuild = this;
                 //paramEffect = absorbEffect;
                 Groups.bullet.intersect(x - rad, y - rad, rad * 2f, rad * 2f, bulletConsumer);
@@ -94,7 +93,6 @@ public class BaseShield extends Block{
         }
 
         public float radius(){
-            //TODO bad rule?
             return smoothRadius;
         }
 
@@ -125,10 +123,9 @@ public class BaseShield extends Block{
                 }else{
                     Lines.stroke(1.5f);
                     Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));
-                    Fill.circle(x, y, radius);
+                    Fill.poly(x, y, sides, radius);
                     Draw.alpha(1f);
-                    //TODO
-                    Lines.poly(x, y, 60, radius);
+                    Lines.poly(x, y, sides, radius);
                     Draw.reset();
                 }
             }

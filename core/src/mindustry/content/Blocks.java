@@ -142,6 +142,8 @@ public class Blocks{
     //TODO maybe making it 5x5 would be more appropriate, seems kinda cheap.
     basicAssemblerModule,
 
+    droneCenter,
+
     //payloads
     payloadConveyor, payloadRouter, payloadPropulsionTower, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
 
@@ -3529,6 +3531,16 @@ public class Blocks{
             consumes.power(0.5f);
 
             size = 3;
+        }};
+
+        //TODO setup, sprite, balance...
+        droneCenter = new DroneCenter("drone-center"){{
+            requirements(Category.units, with(Items.graphite, 10));
+
+            size = 3;
+            consumes.power(3f);
+
+            droneType = UnitTypes.effectDrone;
         }};
 
         //endregion

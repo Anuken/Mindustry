@@ -70,7 +70,7 @@ public class UnitTypes{
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
 
     //special tethered (has payload capability, because it's necessary sometimes)
-    public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone;
+    public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone, effectDrone;
 
     //tank
     public static @EntityDef({Unitc.class, Tankc.class}) UnitType vanquish, conquer;
@@ -3190,7 +3190,7 @@ public class UnitTypes{
             mineFloor = false;
             mineHardnessScaling = false;
             flying = true;
-            mineSpeed = 5f;
+            mineSpeed = 4.5f;
             mineTier = 4;
             buildSpeed = 1.1f;
             drag = 0.08f;
@@ -3258,11 +3258,11 @@ public class UnitTypes{
             mineFloor = false;
             mineHardnessScaling = false;
             flying = true;
-            mineSpeed = 6f;
+            mineSpeed = 5f;
             mineTier = 4;
             buildSpeed = 1.4f;
             drag = 0.08f;
-            speed = 7.2f;
+            speed = 7.3f;
             rotateSpeed = 8f;
             accel = 0.08f;
             itemCapacity = 110;
@@ -3288,7 +3288,7 @@ public class UnitTypes{
                 beamWidth = 0.7f;
                 repairSpeed = 0.2f;
                 aimDst = 0f;
-                shootCone = 16f;
+                shootCone = 40f;
                 fractionRepair = true;
                 mirror = true;
 
@@ -3367,6 +3367,23 @@ public class UnitTypes{
             createWreck = false;
             envEnabled = Env.any;
             envDisabled = Env.none;
+        }};
+
+        effectDrone = new ErekirUnitType("effect-drone"){{
+            flying = true;
+            drag = 0.08f;
+            speed = 3f;
+            drawCell = false;
+            logicControllable = playerControllable = allowedInPayloads = isCounted = false;
+            hidden = true;
+
+            engineSize = 0f;
+            float es = 2.5f, ew = 14.5f / 4f;
+
+            setEnginesMirror(
+            new UnitEngine(ew, ew, es, 45f),
+            new UnitEngine(ew, -ew, es, 315f)
+            );
         }};
 
         //payloadDrone = new UnitType("payload-drone"){{
