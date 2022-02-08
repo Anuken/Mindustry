@@ -1829,6 +1829,7 @@ public class Blocks implements ContentList{
 
             maxAmmo = 40;
             ammoPerShot = 5;
+            powerUse = 10f;
             rotateSpeed = 2f;
             reloadTime = 200f;
             ammoUseEffect = Fx.casing3Double;
@@ -1846,8 +1847,6 @@ public class Blocks implements ContentList{
 
             health = 150 * size * size;
             coolantUsage = 1f;
-
-            consumes.powerCond(10f, TurretBuild::isActive);
         }};
 
         spectre = new ItemTurret("spectre"){{

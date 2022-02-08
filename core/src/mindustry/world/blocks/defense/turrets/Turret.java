@@ -53,6 +53,7 @@ public class Turret extends ReloadTurret{
     public float restitution = 0.02f;
     public float cooldown = 0.02f;
     public float coolantUsage = 0.2f;
+    public float powerUse;
     public float shootCone = 8f;
     public float shootShake = 0f;
     public float shootLength = -1;
@@ -119,6 +120,11 @@ public class Turret extends ReloadTurret{
 
     @Override
     public void init(){
+        if(powerUse > 0){
+            hasPower = true;
+            consumes.powerCond(powerUse, TurretBuild::isActive);
+        }
+
         if(acceptCoolant && !consumes.has(ConsumeType.liquid)){
             hasLiquids = true;
             consumes.add(new ConsumeCoolant(coolantUsage)).update(false).boost();

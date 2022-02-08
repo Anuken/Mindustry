@@ -25,7 +25,7 @@ public class LaserTurret extends PowerTurret{
 
     @Override
     public void init(){
-        consumes.powerCond(powerUse, entity -> ((LaserTurretBuild)entity).bullet != null || ((LaserTurretBuild)entity).target != null);
+        consumes.powerCond(powerUse, entity -> ((LaserTurretBuild)entity).bullet != null || ((LaserTurretBuild)entity).isActive());
         super.init();
     }
 

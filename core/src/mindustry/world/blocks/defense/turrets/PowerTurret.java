@@ -7,11 +7,10 @@ import mindustry.world.meta.*;
 
 public class PowerTurret extends Turret{
     public BulletType shootType;
-    public float powerUse = 1f;
 
     public PowerTurret(String name){
         super(name);
-        hasPower = true;
+        powerUse = 1f;
         envEnabled |= Env.space;
     }
 
@@ -19,12 +18,6 @@ public class PowerTurret extends Turret{
     public void setStats(){
         super.setStats();
         stats.add(Stat.ammo, StatValues.ammo(ObjectMap.of(this, shootType)));
-    }
-
-    @Override
-    public void init(){
-        consumes.powerCond(powerUse, TurretBuild::isActive);
-        super.init();
     }
 
     public class PowerTurretBuild extends TurretBuild{
