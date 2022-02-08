@@ -117,7 +117,7 @@
   },
   {
     "name": "MindustryBR",
-    "address": ["mindustryptbr.ddns.net", "mindustryptbr.myddns.me", "n2.mindustry.me:4002", "n2.mindustry.me:4007"]
+    "address": ["mindustryptbr.ddns.net:25579"]
   },
   {
     "name": "Conservatory",
