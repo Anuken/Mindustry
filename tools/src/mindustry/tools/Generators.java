@@ -582,8 +582,8 @@ public class Generators{
                     save(image, type.name);
                 }
 
-                //outline only needs to be different if there's a weapon that draws under; most units don't have this, and it saves significant space.
-                if(type.weapons.contains(w -> !w.top)){
+                //outline is currently never needed, although it could theoretically be necessary
+                if(type.needsBodyOutline()){
                     save(image, type.name + "-outline");
                 }else{
                     replace(type.name, image);

@@ -615,6 +615,10 @@ public class UnitType extends UnlockableContent{
         }
     }
 
+    public boolean needsBodyOutline(){
+        return alwaysCreateOutline;
+    }
+
     @Override
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
@@ -636,8 +640,8 @@ public class UnitType extends UnlockableContent{
         //currently does not create outlines for legs or base regions due to older mods having them outlined by default
         if(outlines){
 
-            //outlines only created when weapons are drawn under w/ merged outlines
-            makeOutline(packer, region, alwaysCreateOutline || weapons.contains(w -> !w.top || w.parts.contains(p -> p.under)));
+            //outlines only created when forced at the moment
+            makeOutline(packer, region, alwaysCreateOutline);
 
             for(Weapon weapon : weapons){
                 if(!weapon.name.isEmpty()){
