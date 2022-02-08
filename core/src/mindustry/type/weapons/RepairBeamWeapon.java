@@ -17,6 +17,8 @@ import mindustry.type.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 /**
  * Note that this weapon requires a bullet with a positive maxRange.
  * Rotation must be set to true. Fixed repair points are not supported.
@@ -122,10 +124,16 @@ public class RepairBeamWeapon extends Weapon{
             heal.lastEnd.sub(wx, wy).limit(range()).add(wx, wy);
 
             if(targetBuildings){
-                var build = Vars.world.buildWorld(mount.aimX, mount.aimY);
-                if(build != null && build.team == unit.team){
-                    heal.target = build;
-                }
+                //snap to closest building
+                Vars.world.raycastEachWorld(wx, wy, mount.aimX, mount.aimY, (x, y) -> {
+                    var build = Vars.world.build(x, y);
+                    if(build != null && build.team == unit.team && build.damaged()){
+                        heal.target = build;
+                        heal.lastEnd.set(x * tilesize, y * tilesize);
+                        return true;
+                    }
+                    return false;
+                });
             }
             if(targetUnits){
                 //TODO does not support healing units manually yet

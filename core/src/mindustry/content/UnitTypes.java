@@ -3154,7 +3154,7 @@ public class UnitTypes{
 
             weapons.add(new RepairBeamWeapon(){{
                 widthSinMag = 0.11f;
-                reload = 25f;
+                reload = 20f;
                 x = 0f;
                 y = 6.5f;
                 rotate = false;
@@ -3211,7 +3211,7 @@ public class UnitTypes{
 
             weapons.add(new RepairBeamWeapon(){{
                 widthSinMag = 0.11f;
-                reload = 25f;
+                reload = 20f;
                 x = 0f;
                 y = 7.5f;
                 rotate = false;
@@ -3280,7 +3280,7 @@ public class UnitTypes{
 
             weapons.add(new RepairBeamWeapon(){{
                 widthSinMag = 0.11f;
-                reload = 25f;
+                reload = 20f;
                 x = 19f/4f;
                 y = 19f/4f;
                 rotate = false;
