@@ -120,6 +120,11 @@ public class ChatFragment extends Table{
         }
     }
 
+    protected void rect(float x, float y, float w, float h){
+        //prevents texture bindings; the string lookup is irrelevant as it is only called <10 times per frame, and maps are very fast anyway
+        Draw.rect("whiteui", x + w/2f, y + h/2f, w, h);
+    }
+
     @Override
     public void draw(){
         float opacity = Core.settings.getInt("chatopacity") / 100f;
@@ -128,7 +133,7 @@ public class ChatFragment extends Table{
         Draw.color(shadowColor);
 
         if(shown){
-            Fill.crect(offsetx, chatfield.y + scene.marginBottom, chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
+            rect(offsetx, chatfield.y + scene.marginBottom, chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
         }
 
         super.draw();
@@ -159,7 +164,7 @@ public class ChatFragment extends Table{
                 font.getCache().setAlphas(opacity);
             }
 
-            Fill.crect(offsetx, theight - layout.height - 2, textWidth + Scl.scl(4f), layout.height + textspacing);
+            rect(offsetx, theight - layout.height - 2, textWidth + Scl.scl(4f), layout.height + textspacing);
             Draw.color(shadowColor);
             Draw.alpha(opacity * shadowColor.a);
 

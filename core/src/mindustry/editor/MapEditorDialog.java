@@ -298,7 +298,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         Map map = save();
 
         if(map != null){
-            //skip dialog, play with survival or attack when shift clicked
+            //skip dialog, play immediately when shift clicked
             if(Core.input.shift()){
                 hide();
                 //auto pick best fit
@@ -309,8 +309,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 );
             }else{
                 playtestDialog.playListener = this::hide;
-                //TODO skip dialog? or reuse
-                //TODO set playtesting map, do not create save.
                 playtestDialog.show(map, true);
             }
         }

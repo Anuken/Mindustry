@@ -104,6 +104,10 @@ public class ScriptConsoleFragment extends Table{
         add(chatfield).padBottom(offsety).padLeft(offsetx).growX().padRight(offsetx).height(28);
     }
 
+    protected void rect(float x, float y, float w, float h){
+        Draw.rect("whiteui", x + w/2f, y + h/2f, w, h);
+    }
+
     @Override
     public void draw(){
         float opacity = 1f;
@@ -112,7 +116,7 @@ public class ScriptConsoleFragment extends Table{
         Draw.color(shadowColor);
 
         if(open){
-            Fill.crect(offsetx, chatfield.y + scene.marginBottom, chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
+            rect(offsetx, chatfield.y + scene.marginBottom, chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
         }
 
         super.draw();
@@ -143,7 +147,7 @@ public class ScriptConsoleFragment extends Table{
                 font.getCache().setAlphas(opacity);
             }
 
-            Fill.crect(offsetx, theight - layout.height - 2, textWidth + Scl.scl(4f), layout.height + textspacing);
+            rect(offsetx, theight - layout.height - 2, textWidth + Scl.scl(4f), layout.height + textspacing);
             Draw.color(shadowColor);
             Draw.alpha(opacity * shadowColor.a);
 
