@@ -29,7 +29,7 @@ public class LogicDisplay extends Block{
     public int maxSides = 25;
 
     public int displaySize = 64;
-    public float scaleFactor = 1f
+    public float scaleFactor = 1f;
 
     public LogicDisplay(String name){
         super(name);
