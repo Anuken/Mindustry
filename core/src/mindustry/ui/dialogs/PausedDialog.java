@@ -105,12 +105,17 @@ public class PausedDialog extends BaseDialog{
         }else{
             quit.run();
         }
-
     }
 
     public void runExitSave(){
         if(state.isEditor() && !wasClient){
             ui.editor.resumeEditing();
+            return;
+        }else if(state.playtestingMap != null){
+            //no exit save here
+            var testing = state.playtestingMap;
+            logic.reset();
+            ui.editor.resumeAfterPlaytest(testing);
             return;
         }
 

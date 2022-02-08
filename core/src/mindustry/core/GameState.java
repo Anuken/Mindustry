@@ -34,6 +34,8 @@ public class GameState{
     public Teams teams = new Teams();
     /** Number of enemies in the game; only used clientside in servers. */
     public int enemies;
+    /** Map being playtested (not edited!) */
+    public @Nullable Map playtestingMap;
     /** Current game state. */
     private State state = State.menu;
 

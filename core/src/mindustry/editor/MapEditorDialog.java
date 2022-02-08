@@ -39,6 +39,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private MapResizeDialog resizeDialog;
     private MapGenerateDialog generateDialog;
     private SectorGenerateDialog sectorGenDialog;
+    private MapPlayDialog playtestDialog;
     private ScrollPane pane;
     private BaseDialog menu;
     private Table blockSelection;
@@ -56,6 +57,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         infoDialog = new MapInfoDialog();
         generateDialog = new MapGenerateDialog(true);
         sectorGenDialog = new SectorGenerateDialog();
+        playtestDialog = new MapPlayDialog();
 
         menu = new BaseDialog("@menu");
         menu.addCloseButton();
@@ -122,6 +124,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     file.writePng(out);
                     out.dispose();
                 })));
+
+            t.row();
+
+            t.button("@editor.ingame", Icon.right, this::editInGame);
+
+            t.button("@editor.playtest", Icon.play, this::playtest);
         });
 
         menu.cont.row();
@@ -172,14 +180,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
             menu.cont.row();
         }
 
-        menu.cont.button("@editor.ingame", Icon.right, this::playtest).padTop(!steam && !experimental ? -3 : 1).size(swidth * 2f + 10, 60f);
-
         menu.cont.row();
 
         menu.cont.button("@quit", Icon.exit, () -> {
             tryExit();
             menu.hide();
-        }).size(swidth * 2f + 10, 60f);
+        }).padTop(!steam && !experimental ? -3 : 1).size(swidth * 2f + 10, 60f);
 
         resizeDialog = new MapResizeDialog((x, y) -> {
             if(!(editor.width() == x && editor.height() == y)){
@@ -249,7 +255,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         editor.renderer.updateAll();
     }
 
-    private void playtest(){
+    private void editInGame(){
         menu.hide();
         ui.loadAnd(() -> {
             lastSavedRules = state.rules;
@@ -281,6 +287,33 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             player.checkSpawn();
         });
+    }
+
+    public void resumeAfterPlaytest(Map map){
+        beginEditMap(map.file);
+    }
+
+    private void playtest(){
+        menu.hide();
+        Map map = save();
+
+        if(map != null){
+            //skip dialog, play with survival or attack when shift clicked
+            if(Core.input.shift()){
+                hide();
+                //auto pick best fit
+                control.playMap(map, map.applyRules(
+                    Gamemode.survival.valid(map) ? Gamemode.survival :
+                    Gamemode.attack.valid(map) ? Gamemode.attack :
+                    Gamemode.sandbox), true
+                );
+            }else{
+                playtestDialog.playListener = this::hide;
+                //TODO skip dialog? or reuse
+                //TODO set playtesting map, do not create save.
+                playtestDialog.show(map, true);
+            }
+        }
     }
 
     public @Nullable Map save(){

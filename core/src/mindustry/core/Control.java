@@ -295,17 +295,31 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     public void playMap(Map map, Rules rules){
+        playMap(map, rules, false);
+    }
+
+    public void playMap(Map map, Rules rules, boolean playtest){
         ui.loadAnd(() -> {
             logic.reset();
             world.loadMap(map, rules);
             state.rules = rules;
+            if(playtest) state.playtestingMap = map;
             state.rules.sector = null;
             state.rules.editor = false;
             logic.play();
-            if(settings.getBool("savecreate") && !world.isInvalidMap()){
+            if(settings.getBool("savecreate") && !world.isInvalidMap() && !playtest){
                 control.saves.addSave(map.name() + " " + new SimpleDateFormat("MMM dd h:mm", Locale.getDefault()).format(new Date()));
             }
             Events.fire(Trigger.newGame);
+
+            //booted out of map, resume editing
+            if(world.isInvalidMap() && playtest){
+                Dialog current = scene.getDialog();
+                ui.editor.resumeAfterPlaytest(map);
+                if(current != null){
+                    current.update(current::toFront);
+                }
+            }
         });
     }
 
