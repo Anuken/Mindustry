@@ -1157,11 +1157,11 @@ public class LExecutor{
         }
     }
 
-    public static class SpawnUniI implements LInstruction{
+    public static class SpawnUnitI implements LInstruction{
         public int type, x, y, rotation, team, result;
         public boolean effect;
 
-        public SpawnUniI(int type, int x, int y, int rotation, int team, boolean effect, int result){
+        public SpawnUnitI(int type, int x, int y, int rotation, int team, boolean effect, int result){
             this.type = type;
             this.x = x;
             this.y = y;
@@ -1171,7 +1171,7 @@ public class LExecutor{
             this.result = result;
         }
 
-        public SpawnUniI(){
+        public SpawnUnitI(){
         }
 
         @Override

@@ -1202,7 +1202,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new SpawnUniI(builder.var(type), builder.var(x), builder.var(y), builder.var(rotation), builder.var(team), effect, builder.var(result));
+            return new SpawnUnitI(builder.var(type), builder.var(x), builder.var(y), builder.var(rotation), builder.var(team), effect, builder.var(result));
         }
     }
 }

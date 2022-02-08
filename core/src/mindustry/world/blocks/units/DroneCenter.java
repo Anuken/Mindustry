@@ -141,8 +141,7 @@ public class DroneCenter extends Block{
         }
     }
 
-    public static class EffectDroneAI extends AIController{
-        //TODO non static?
+    public class EffectDroneAI extends AIController{
 
         @Override
         public void updateUnit(){
@@ -150,18 +149,16 @@ public class DroneCenter extends Block{
             if(!(tether.building() instanceof DroneCenterBuild build)) return;
             if(build.target == null) return;
 
-            DroneCenter block = (DroneCenter)build.block;
-
             target = build.target;
 
             //TODO what angle?
-            moveTo(target, build.target.hitSize / 1.8f + block.droneRange - 10f);
+            moveTo(target, build.target.hitSize / 1.8f + droneRange - 10f);
 
             unit.lookAt(target);
 
             //TODO low power? status effects may not be the best way to do this...
-            if(unit.within(target, block.droneRange + build.target.hitSize)){
-                build.target.apply(block.status, block.statusDuration);
+            if(unit.within(target, droneRange + build.target.hitSize)){
+                build.target.apply(status, statusDuration);
             }
         }
     }

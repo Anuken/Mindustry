@@ -3575,6 +3575,7 @@ public class Blocks{
             deconstructSpeed = 1f;
         }};
 
+        //TODO consider usefulness and applicability to serpulo
         deconstructor = new PayloadDeconstructor("deconstructor"){{
             requirements(Category.units, with(Items.thorium, 250, Items.silicon, 200, Items.graphite, 250));
             itemCapacity = 250;
@@ -3583,8 +3584,9 @@ public class Blocks{
             deconstructSpeed = 2f;
         }};
 
+        //TODO move completely to erekir tech tree?
         constructor = new Constructor("constructor"){{
-            requirements(Category.units, with(Items.silicon, 50, Items.thorium, 70, Items.graphite, 50));
+            requirements(Category.units, with(Items.silicon, 80, Items.graphite, 120));
             hasPower = true;
             consumes.power(2f);
             size = 3;
@@ -3592,7 +3594,7 @@ public class Blocks{
 
         //yes this block is pretty much useless
         largeConstructor = new Constructor("large-constructor"){{
-            requirements(Category.units, with(Items.silicon, 100, Items.thorium, 150, Items.graphite, 50, Items.phaseFabric, 40));
+            requirements(Category.units, with(Items.silicon, 150, Items.graphite, 150, Items.phaseFabric, 40));
             hasPower = true;
             consumes.power(2f);
             maxBlockSize = 4;
