@@ -156,7 +156,7 @@ public class Turret extends ReloadTurret{
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
         public BlockUnitc unit = (BlockUnitc)UnitTypes.block.create(team);
-        public boolean wasShooting, charging;
+        public boolean wasRotating, wasShooting, charging;
 
         @Override
         public boolean canControl(){
@@ -219,7 +219,7 @@ public class Turret extends ReloadTurret{
         }
 
         public boolean isActive(){
-            return (target != null || wasShooting) && enabled;
+            return (wasRotating || wasShooting) && enabled;
         }
 
         public void targetPosition(Posc pos){
@@ -261,6 +261,7 @@ public class Turret extends ReloadTurret{
         public void updateTile(){
             if(!validateTarget()) target = null;
 
+            wasRotating = false;
             wasShooting = false;
 
             recoil = Mathf.lerpDelta(recoil, 0f, restitution);
@@ -344,6 +345,7 @@ public class Turret extends ReloadTurret{
 
         protected void turnToTarget(float targetRot){
             rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * delta() * baseReloadSpeed());
+            wasRotating = Mathf.mod(rotation, 360f) != Mathf.mod(targetRot, 360f);
         }
 
         public boolean shouldTurn(){
