@@ -216,7 +216,7 @@ public class LExecutor{
                     //no units of this type found
                     exec.setconst(varUnit, null);
                 }
-            }else if(exec.obj(type) instanceof Unit u && u.team == exec.team && u.type.logicControllable){
+            }else if(exec.obj(type) instanceof Unit u && (u.team == exec.team || exec.privileged) && u.type.logicControllable){
                 //bind to specific unit object
                 exec.setconst(varUnit, u);
             }else{
@@ -966,6 +966,7 @@ public class LExecutor{
                 obj instanceof Building build ? build.block.name :
                 obj instanceof Unit unit ? unit.type.name :
                 obj instanceof Enum<?> e ? e.name() :
+                obj instanceof Team team ? team.name :
                 "[object]";
         }
     }
@@ -1152,6 +1153,37 @@ public class LExecutor{
                     }
                     //building case not allowed
                 }
+            }
+        }
+    }
+
+    public static class SpawnUniI implements LInstruction{
+        public int type, x, y, rotation, team, result;
+        public boolean effect;
+
+        public SpawnUniI(int type, int x, int y, int rotation, int team, boolean effect, int result){
+            this.type = type;
+            this.x = x;
+            this.y = y;
+            this.rotation = rotation;
+            this.team = team;
+            this.effect = effect;
+            this.result = result;
+        }
+
+        public SpawnUniI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(exec.obj(type) instanceof UnitType type && !type.hidden && exec.obj(team) instanceof Team team && Units.canCreate(team, type)){
+                //random offset to prevent stacking
+                var unit = type.spawn(team, World.unconv(exec.numf(x)) + Mathf.range(0.01f), World.unconv(exec.numf(y)) + Mathf.range(0.01f));
+                unit.rotation = exec.numf(rotation);
+                if(effect){
+                    spawner.spawnEffect(unit);
+                }
+                exec.setobj(result, unit);
             }
         }
     }

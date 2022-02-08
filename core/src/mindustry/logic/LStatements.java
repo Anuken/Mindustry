@@ -1154,4 +1154,55 @@ public class LStatements{
             return new SetBlockI(builder.var(x), builder.var(y), builder.var(block), builder.var(team), builder.var(rotation), layer);
         }
     }
+
+    @RegisterStatement("spawn")
+    public static class SpawnUnitStatement extends LStatement{
+        public String type = "@dagger", x = "10", y = "10", rotation = "90", team = "@sharded", result = "result";
+        public boolean effect = true;
+
+        @Override
+        public void build(Table table){
+            fields(table, result, str -> result = str);
+
+            table.add(" = spawn ");
+            field(table, type, str -> type = str);
+
+            row(table);
+
+            table.add(" at ");
+            fields(table, x, str -> x = str);
+
+            table.add(", ");
+            fields(table, y, str -> y = str);
+
+            table.row();
+
+            table.add();
+
+            table.add("team ");
+            field(table, team, str -> team = str);
+
+            table.add(" rot ");
+            fields(table, rotation, str -> rotation = str).left();
+
+            //effect mostly unnecessary and looks bad
+            //row(table);
+            //table.check("effect", effect, val -> effect = val);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicWorld;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SpawnUniI(builder.var(type), builder.var(x), builder.var(y), builder.var(rotation), builder.var(team), effect, builder.var(result));
+        }
+    }
 }

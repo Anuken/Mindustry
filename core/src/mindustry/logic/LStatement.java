@@ -105,8 +105,8 @@ public abstract class LStatement{
         return field(table, value, setter).width(85f).padRight(10).left();
     }
 
-    protected void fields(Table table, String value, Cons<String> setter){
-        field(table, value, setter).width(85f);
+    protected Cell<TextField> fields(Table table, String value, Cons<String> setter){
+        return field(table, value, setter).width(85f);
     }
 
     protected void row(Table table){

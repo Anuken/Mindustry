@@ -9,6 +9,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -52,6 +53,10 @@ public class GlobalConstants{
         put("@ctrlFormation", ctrlFormation);
 
         //store base content
+
+        for(Team team : Team.baseTeams){
+            put("@" + team.name, team);
+        }
 
         for(Item item : Vars.content.items()){
             put("@" + item.name, item);

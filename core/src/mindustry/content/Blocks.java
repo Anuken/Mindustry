@@ -3744,9 +3744,7 @@ public class Blocks{
             hasLiquids = true;
 
             instructionsPerTick = 25;
-
             range = 8 * 42;
-
             size = 3;
         }};
 
@@ -3783,7 +3781,8 @@ public class Blocks{
             //currently incomplete, debugOnly for now
             requirements(Category.logic, BuildVisibility.debugOnly, with());
 
-            instructionsPerTick = 2;
+            //TODO customizable IPT
+            instructionsPerTick = 8;
             forceDark = true;
             privileged = true;
             size = 1;

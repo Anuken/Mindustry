@@ -118,6 +118,9 @@ public class TypeIO{
             write.b((byte)19);
             write.f(v.x);
             write.f(v.y);
+        }else if(object instanceof Team t){
+            write.b((byte)20);
+            write.b(t.id);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -177,6 +180,7 @@ public class TypeIO{
                 yield out;
             }
             case 19 -> new Vec2(read.f(), read.f());
+            case 20 -> Team.all[read.ub()];
             default -> throw new IllegalArgumentException("Unknown object type: " + type);
         };
     }

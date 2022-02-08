@@ -384,6 +384,7 @@ public class UnitAssembler extends PayloadBlock{
             var plan = plan();
 
             //draw the unit construction as outline
+            //TODO flashes when no gallium
             Draw.draw(Layer.blockBuilding, () -> {
                 Draw.color(Pal.accent, warmup);
 
@@ -419,6 +420,9 @@ public class UnitAssembler extends PayloadBlock{
 
                 Drawf.buildBeam(px, py, spawn.x, spawn.y, plan.unit.hitSize/2f);
             }
+
+            //fill square in middle
+            Fill.square(spawn.x, spawn.y, plan.unit.hitSize/2f);
 
             Draw.reset();
 

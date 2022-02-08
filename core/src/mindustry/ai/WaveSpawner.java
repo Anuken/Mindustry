@@ -198,7 +198,8 @@ public class WaveSpawner{
         }
     }
 
-    private void spawnEffect(Unit unit){
+    /** Applies the standard wave spawn effects to a unit - invincibility, unmoving. */
+    public void spawnEffect(Unit unit){
         unit.rotation = unit.angleTo(world.width()/2f * tilesize, world.height()/2f * tilesize);
         unit.apply(StatusEffects.unmoving, 30f);
         unit.apply(StatusEffects.invincible, 60f);
