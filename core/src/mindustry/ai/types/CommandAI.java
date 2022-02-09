@@ -21,13 +21,19 @@ public class CommandAI extends AIController{
             targetPos.set(attackTarget);
         }
 
+
+
         if(targetPos != null){
-            moveTo(targetPos, attackTarget != null ? unit.type.range - 10f : 5f);
+            moveTo(targetPos, attackTarget != null ? unit.type.range - 10f : 0f);
 
             if(unit.isFlying()){
                 unit.lookAt(targetPos);
             }else{
                 faceTarget();
+            }
+
+            if(attackTarget == null && unit.within(targetPos, Math.max(5f, unit.hitSize) / 2.9f)){
+                targetPos = null;
             }
         }else if(target != null){
             faceTarget();
