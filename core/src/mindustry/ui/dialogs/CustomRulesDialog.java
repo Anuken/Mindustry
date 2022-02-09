@@ -171,6 +171,7 @@ public class CustomRulesDialog extends BaseDialog{
         main.row();
 
         title("@rules.title.unit");
+        check("@rules.unitcommand", b -> rules.unitCommand = b, () -> rules.unitCommand);
         check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
         check("@rules.unitcapvariable", b -> rules.unitCapVariable = b, () -> rules.unitCapVariable);
         number("@rules.unitcap", true, f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
