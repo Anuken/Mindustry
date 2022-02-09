@@ -1249,10 +1249,6 @@ public class UnitType extends UnlockableContent{
     }
 
     public void applyOutlineColor(Unit unit){
-        if(unit.isBoss()){
-            Draw.mixcol(unit.team.color, Mathf.absin(7f, 1f));
-        }
-
         if(unit.drownTime > 0 && unit.lastDrownFloor != null){
             Draw.color(Color.white, Tmp.c1.set(unit.lastDrownFloor.mapColor).mul(0.8f), unit.drownTime * 0.9f);
         }

@@ -14,14 +14,10 @@ public class CommandAI extends AIController{
         updateVisuals();
         updateTargeting();
 
-        //TODO
-
         if(attackTarget != null){
             if(targetPos == null) targetPos = new Vec2();
             targetPos.set(attackTarget);
         }
-
-
 
         if(targetPos != null){
             moveTo(targetPos, attackTarget != null ? unit.type.range - 10f : 0f);

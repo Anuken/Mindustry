@@ -15,7 +15,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class PayloadConveyor extends Block{
-    public float moveTime = 40f, moveForce = 201f;
+    public float moveTime = 45f, moveForce = 201f;
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-edge") TextureRegion edgeRegion;
     public Interp interp = Interp.pow5;

@@ -145,7 +145,8 @@ public class Blocks{
     droneCenter,
 
     //payloads
-    payloadConveyor, payloadRouter, payloadPropulsionTower, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
+    payloadConveyor, payloadRouter, reinforcedPayloadConveyor, reinforcedPayloadRouter, payloadPropulsionTower, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
+
 
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
@@ -3550,12 +3551,26 @@ public class Blocks{
         //region payloads
 
         payloadConveyor = new PayloadConveyor("payload-conveyor"){{
-            requirements(Category.units, with(Items.graphite, 10));
+            requirements(Category.units, with(Items.graphite, 10, Items.copper, 10));
             canOverdrive = false;
         }};
 
         payloadRouter = new PayloadRouter("payload-router"){{
-            requirements(Category.units, with(Items.graphite, 15));
+            requirements(Category.units, with(Items.graphite, 15, Items.copper, 10));
+            canOverdrive = false;
+        }};
+
+        reinforcedPayloadConveyor = new PayloadConveyor("reinforced-payload-conveyor"){{
+            requirements(Category.units, with(Items.tungsten, 10));
+            moveTime = 35f;
+            canOverdrive = false;
+            health = 800;
+        }};
+
+        reinforcedPayloadRouter = new PayloadRouter("reinforced-payload-router"){{
+            requirements(Category.units, with(Items.tungsten, 15));
+            moveTime = 35f;
+            health = 800;
             canOverdrive = false;
         }};
 
@@ -3570,7 +3585,7 @@ public class Blocks{
         }};
 
         smallDeconstructor = new PayloadDeconstructor("small-deconstructor"){{
-            requirements(Category.units, with(Items.thorium, 80, Items.silicon, 80, Items.graphite, 80));
+            requirements(Category.units, with(Items.beryllium, 100, Items.silicon, 100, Items.oxide, 50, Items.graphite, 80));
             itemCapacity = 100;
             consumes.power(1f);
             size = 3;
@@ -3579,7 +3594,7 @@ public class Blocks{
 
         //TODO consider usefulness and applicability to serpulo
         deconstructor = new PayloadDeconstructor("deconstructor"){{
-            requirements(Category.units, with(Items.thorium, 250, Items.silicon, 200, Items.graphite, 250));
+            requirements(Category.units, with(Items.beryllium, 250, Items.oxide, 100, Items.silicon, 250, Items.carbide, 250));
             itemCapacity = 250;
             consumes.power(3f);
             size = 5;
@@ -3588,7 +3603,7 @@ public class Blocks{
 
         //TODO move completely to erekir tech tree?
         constructor = new Constructor("constructor"){{
-            requirements(Category.units, with(Items.silicon, 80, Items.graphite, 120));
+            requirements(Category.units, with(Items.silicon, 100, Items.beryllium, 150, Items.tungsten, 80));
             hasPower = true;
             consumes.power(2f);
             size = 3;
@@ -3596,7 +3611,7 @@ public class Blocks{
 
         //yes this block is pretty much useless
         largeConstructor = new Constructor("large-constructor"){{
-            requirements(Category.units, with(Items.silicon, 150, Items.graphite, 150, Items.phaseFabric, 40));
+            requirements(Category.units, with(Items.silicon, 150, Items.oxide, 150, Items.tungsten, 200, Items.phaseFabric, 40));
             hasPower = true;
             consumes.power(2f);
             maxBlockSize = 4;
