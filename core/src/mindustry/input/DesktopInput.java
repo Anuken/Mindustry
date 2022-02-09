@@ -134,7 +134,7 @@ public class DesktopInput extends InputHandler{
         if(commandMode && !commandRect){
             Unit sel = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
 
-            if(sel != null){
+            if(sel != null && !(!multiSelect() && selectedUnits.size == 1 && selectedUnits.contains(sel))){
                 drawCommand(sel);
             }
         }
@@ -537,8 +537,12 @@ public class DesktopInput extends InputHandler{
         if(Core.input.keyRelease(Binding.select) && commandRect){
             if(!tappedOne){
                 var units = selectedCommandUnits(commandRectX, commandRectY, input.mouseWorldX() - commandRectX, input.mouseWorldY() - commandRectY);
-                //tiny brain method of unique addition
-                selectedUnits.removeAll(units);
+                if(multiSelect()){
+                    //tiny brain method of unique addition
+                    selectedUnits.removeAll(units);
+                }else if(units.size > 0){
+                    selectedUnits.clear();
+                }
                 selectedUnits.addAll(units);
             }
             commandRect = false;
@@ -660,6 +664,11 @@ public class DesktopInput extends InputHandler{
         }
     }
 
+    //TODO
+    public boolean multiSelect(){
+        return false;
+    }
+
     @Override
     public boolean tap(float x, float y, int count, KeyCode button){
         if(scene.hasMouse()) return false;
@@ -668,10 +677,15 @@ public class DesktopInput extends InputHandler{
 
         Unit unit = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
         if(unit != null){
-            if(selectedUnits.contains(unit)){
-                selectedUnits.remove(unit);
-            }else{
+            if(!multiSelect()){
+                selectedUnits.clear();
                 selectedUnits.add(unit);
+            }else{
+                if(selectedUnits.contains(unit)){
+                    selectedUnits.remove(unit);
+                }else{
+                    selectedUnits.add(unit);
+                }
             }
         }else if(selectedUnits.size > 0){
             //move to location - TODO right click instead?
