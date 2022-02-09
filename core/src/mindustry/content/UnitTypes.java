@@ -1846,6 +1846,7 @@ public class UnitTypes{
                 x = y = shootX = shootY = 0f;
                 shootSound = Sounds.mineDeploy;
                 rotateSpeed = 180f;
+                targetAir = false;
 
                 bullet = new BasicBulletType(){{
                     sprite = "mine-bullet";

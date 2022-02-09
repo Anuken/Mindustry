@@ -248,6 +248,10 @@ public class AIController implements UnitController{
     }
 
     public void moveTo(Position target, float circleLength, float smooth){
+        moveTo(target, circleLength, smooth, unit.isFlying());
+    }
+
+    public void moveTo(Position target, float circleLength, float smooth, boolean keepDistance){
         if(target == null) return;
 
         vec.set(target).sub(unit);
@@ -256,7 +260,11 @@ public class AIController implements UnitController{
 
         vec.setLength(unit.speed() * length);
         if(length < -0.5f){
-            vec.rotate(180f);
+            if(keepDistance){
+                vec.rotate(180f);
+            }else{
+                vec.setZero();
+            }
         }else if(length < 0){
             vec.setZero();
         }
@@ -264,7 +272,15 @@ public class AIController implements UnitController{
         //do not move when infinite vectors are used.
         if(vec.isNaN() || vec.isInfinite()) return;
 
-        unit.movePref(vec);
+        if(!unit.type.omniMovement && unit.type.rotateMoveFirst){
+            float angle = vec.angle();
+            unit.lookAt(angle);
+            if(Angles.within(unit.rotation, angle, 3f)){
+                unit.movePref(vec);
+            }
+        }else{
+            unit.movePref(vec);
+        }
     }
 
     @Override

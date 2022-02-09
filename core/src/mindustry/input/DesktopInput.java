@@ -14,7 +14,6 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.types.*;
-import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -122,14 +121,19 @@ public class DesktopInput extends InputHandler{
             CommandAI ai = (CommandAI)unit.controller();
             //draw target line
             if(ai.targetPos != null){
-                Tmp.v1.set(ai.targetPos).sub(unit).setLength(unit.hitSize / 2f);
+                Position lineDest = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
 
-                Drawf.line(Pal.accent, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, ai.targetPos.x, ai.targetPos.y);
+                Tmp.v1.set(lineDest).sub(unit).setLength(unit.hitSize / 2f);
+
+                Drawf.line(Pal.accent, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, lineDest.getX(), lineDest.getY());
             }
 
             Drawf.square(unit.x, unit.y, unit.hitSize / 1.4f + 1f);
-        }
 
+            if(ai.attackTarget != null){
+                Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
+            }
+        }
 
         if(commandMode && !commandRect){
             Unit sel = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
@@ -689,29 +693,20 @@ public class DesktopInput extends InputHandler{
             }
         }else if(selectedUnits.size > 0){
             //move to location - TODO right click instead?
-            //TODO all this needs to be synced, done with packets, etc
             Vec2 target = input.mouseWorld().cpy();
 
-            Teamc build = world.buildWorld(target.x, target.y);
+            Teamc attack = world.buildWorld(target.x, target.y);
 
-            if(build == null || build.team() == player.team()){
-                build = selectedEnemyUnit(target.x, target.y);
+            if(attack == null || attack.team() == player.team()){
+                attack = selectedEnemyUnit(target.x, target.y);
             }
 
-            if(build != null && build.team() != player.team()){
-                for(var sel : selectedUnits){
-                    ((CommandAI)sel.controller()).commandTarget(build);
-                }
-
-                Fx.attackCommand.at(build);
-            }else{
-                for(var sel : selectedUnits){
-                    ((CommandAI)sel.controller()).commandPosition(target);
-                }
-
-                Fx.moveCommand.at(target);
+            int[] ids = new int[selectedUnits.size];
+            for(int i = 0; i < ids.length; i++){
+                ids[i] = selectedUnits.get(i).id;
             }
 
+            Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
 
         }
 

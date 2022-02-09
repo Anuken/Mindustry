@@ -621,6 +621,9 @@ public class Administration{
         /** valid only for removePlanned events only; contains packed positions. */
         public @Nullable int[] plans;
 
+        /** valid only for command unit events */
+        public @Nullable int[] unitIDs;
+
         public PlayerAction set(Player player, ActionType type, Tile tile){
             this.player = player;
             this.type = type;
@@ -650,7 +653,7 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits
     }
 
 }

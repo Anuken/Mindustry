@@ -1,6 +1,5 @@
 package mindustry.world.blocks.defense;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -147,8 +146,8 @@ public class RegenProjector extends Block{
                 }
             }
 
-            if(lastUpdateFrame != Core.graphics.getFrameId()){
-                lastUpdateFrame = Core.graphics.getFrameId();
+            if(lastUpdateFrame != state.updateId){
+                lastUpdateFrame = state.updateId;
 
                 for(var entry : mendMap.entries()){
                     var build = world.build(entry.key);

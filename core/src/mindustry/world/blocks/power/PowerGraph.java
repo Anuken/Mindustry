@@ -1,11 +1,12 @@
 package mindustry.world.blocks.power;
 
-import arc.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.world.consumers.*;
+
+import static mindustry.Vars.*;
 
 public class PowerGraph{
     private static final Queue<Building> queue = new Queue<>();
@@ -206,7 +207,7 @@ public class PowerGraph{
     }
 
     public void update(){
-        if(Core.graphics.getFrameId() == lastFrameUpdated){
+        if(state.updateId == lastFrameUpdated){
             return;
         }else if(!consumers.isEmpty() && consumers.first().cheating()){
             //when cheating, just set status to 1
@@ -218,7 +219,7 @@ public class PowerGraph{
             return;
         }
 
-        lastFrameUpdated = Core.graphics.getFrameId();
+        lastFrameUpdated = state.updateId;
 
         float powerNeeded = getPowerNeeded();
         float powerProduced = getPowerProduced();

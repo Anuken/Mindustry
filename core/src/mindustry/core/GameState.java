@@ -18,6 +18,8 @@ public class GameState{
     public float wavetime;
     /** Logic tick. */
     public double tick;
+    /** Continuously ticks up every non-paused update. */
+    public long updateId;
     /** Whether the game is in game over state. */
     public boolean gameOver = false, serverPaused = false;
     /** Server ticks/second. Only valid in multiplayer. */

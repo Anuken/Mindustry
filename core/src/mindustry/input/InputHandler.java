@@ -14,6 +14,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.formations.patterns.*;
+import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -186,6 +187,36 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Fx.itemTransfer.at(x, y, amount, item.color, to);
         if(done != null){
             Time.run(Fx.itemTransfer.lifetime, done);
+        }
+    }
+
+    @Remote(called = Loc.both, targets = Loc.both, forward = true)
+    public static void commandUnits(Player player, int[] unitIds, @Nullable Building buildTarget, @Nullable Unit unitTarget, @Nullable Vec2 posTarget){
+        if(player == null || unitIds == null) return;
+
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> {
+            event.unitIDs = unitIds;
+        })){
+            throw new ValidateException(player, "Player cannot command units.");
+        }
+
+        Teamc teamTarget = buildTarget == null ? unitTarget : buildTarget;
+
+        for(int id : unitIds){
+            Unit unit = Groups.unit.getByID(id);
+            if(unit.team == player.team() && unit.controller() instanceof CommandAI ai){
+                if(teamTarget != null && teamTarget.team() != player.team()){
+                    ai.commandTarget(teamTarget);
+                }else if(posTarget != null){
+                    ai.commandPosition(posTarget);
+                }
+            }
+
+            if(teamTarget != null){
+                Fx.attackCommand.at(teamTarget);
+            }else{
+                Fx.moveCommand.at(posTarget);
+            }
         }
     }
 

@@ -200,18 +200,18 @@ public class SectorDamage{
             boolean found = false;
 
             if(field != null && field.weights != null){
-                int[][] weights = field.weights;
+                int[] weights = field.weights;
                 int count = 0;
                 Tile current = start;
-                while(count < world.width() * world.height()){
+                while(count < weights.length){
                     int minCost = Integer.MAX_VALUE;
                     int cx = current.x, cy = current.y;
                     for(Point2 p : Geometry.d4){
-                        int nx = cx + p.x, ny = cy + p.y;
+                        int nx = cx + p.x, ny = cy + p.y, packed = world.packArray(nx, ny);
 
                         Tile other = world.tile(nx, ny);
-                        if(other != null && weights[nx][ny] < minCost && weights[nx][ny] != -1){
-                            minCost = weights[nx][ny];
+                        if(other != null && weights[packed] < minCost && weights[packed] != -1){
+                            minCost = weights[packed];
                             current = other;
                         }
                     }

@@ -397,7 +397,7 @@ public class Logic implements ApplicationListener{
             if(!state.isPaused()){
                 float delta = Core.graphics.getDeltaTime();
                 state.tick += Float.isNaN(delta) || Float.isInfinite(delta) ? 0f : delta * 60f;
-
+                state.updateId ++;
                 state.teams.updateTeamStats();
 
                 if(state.isCampaign()){

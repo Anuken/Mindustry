@@ -99,6 +99,8 @@ public class UnitType extends UnlockableContent{
     /** If true, this unit cannot drown, and will not be affected by the floor under it. */
     public boolean hovering = false;
     public boolean omniMovement = true;
+    /** If true, the unit faces its moving direction before actually moving. */
+    public boolean rotateMoveFirst = false;
     public boolean showHeal = true;
     public Color healColor = Pal.heal;
     public Effect fallEffect = Fx.fallSmoke;

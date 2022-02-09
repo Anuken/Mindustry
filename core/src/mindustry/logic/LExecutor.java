@@ -1,6 +1,5 @@
 package mindustry.logic;
 
-import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -1055,9 +1054,9 @@ public class LExecutor{
                 exec.var(varCounter).numval --;
             }
 
-            if(Core.graphics.getFrameId() != frameId){
+            if(state.updateId != frameId){
                 curTime += Time.delta / 60f;
-                frameId = Core.graphics.getFrameId();
+                frameId = state.updateId;
             }
         }
     }

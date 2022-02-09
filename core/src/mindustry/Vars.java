@@ -232,6 +232,7 @@ public class Vars implements Loadable{
     public static WaveSpawner spawner;
     public static BlockIndexer indexer;
     public static Pathfinder pathfinder;
+    public static ControlPathfinder controlPath;
 
     public static Control control;
     public static Logic logic;
@@ -298,6 +299,7 @@ public class Vars implements Loadable{
         spawner = new WaveSpawner();
         indexer = new BlockIndexer();
         pathfinder = new Pathfinder();
+        controlPath = new ControlPathfinder();
         bases = new BaseRegistry();
         constants = new GlobalConstants();
         javaPath =

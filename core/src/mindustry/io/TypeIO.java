@@ -391,6 +391,23 @@ public class TypeIO{
         }else if(control instanceof LogicAI logic && logic.controller != null){
             write.b(3);
             write.i(logic.controller.pos());
+        }else if(control instanceof CommandAI ai){
+            write.b(4);
+            write.bool(ai.attackTarget != null);
+            write.bool(ai.targetPos != null);
+
+            if(ai.targetPos != null){
+                write.f(ai.targetPos.x);
+                write.f(ai.targetPos.y);
+            }
+            if(ai.attackTarget != null){
+                write.b(ai.attackTarget instanceof Building ? 1 : 0);
+                if(ai.attackTarget instanceof Building b){
+                    write.i(b.pos());
+                }else{
+                    write.i(((Unit)ai.attackTarget).id);
+                }
+            }
         }else{
             write.b(2);
         }
@@ -424,6 +441,29 @@ public class TypeIO{
                 out.controller = world.build(pos);
                 return out;
             }
+        }else if(type == 4){
+            CommandAI ai = prev instanceof CommandAI pai ? pai : new CommandAI();
+
+            boolean hasAttack = read.bool(), hasPos = read.bool();
+            if(hasPos){
+                if(ai.targetPos == null) ai.targetPos = new Vec2();
+                ai.targetPos.set(read.f(), read.f());
+            }else{
+                ai.targetPos = null;
+            }
+
+            if(hasAttack){
+                byte entityType = read.b();
+                if(entityType == 1){
+                    ai.attackTarget = world.build(read.i());
+                }else{
+                    ai.attackTarget = Groups.unit.getByID(read.i());
+                }
+            }else{
+                ai.attackTarget = null;
+            }
+
+            return ai;
         }else{
             //there are two cases here:
             //1: prev controller was not a player, carry on
