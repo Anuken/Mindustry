@@ -20,7 +20,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Pathfinder implements Runnable{
-    private static final long maxUpdate = Time.millisToNanos(7);
+    private static final long maxUpdate = Time.millisToNanos(5);
     private static final int updateFPS = 60;
     private static final int updateInterval = 1000 / updateFPS;
 
@@ -202,9 +202,9 @@ public class Pathfinder implements Runnable{
                 if(state.isPlaying()){
                     queue.run();
 
-                    //total update time no longer than maxUpdate
+                    //each update time (not total!) no longer than maxUpdate
                     for(Flowfield data : threadList){
-                        updateFrontier(data, maxUpdate / threadList.size);
+                        updateFrontier(data, maxUpdate);
                     }
                 }
 
