@@ -48,7 +48,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Maximum line length. */
     final static int maxLength = 100;
     final static Rect r1 = new Rect(), r2 = new Rect();
-    final static Seq<Unit> tmpUnits = new Seq<>();
+    final static Seq<Unit> tmpUnits = new Seq<>(false);
 
     public final OverlayFragment frag = new OverlayFragment();
 
@@ -75,6 +75,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     //for RTS controls
     public Seq<Unit> selectedUnits = new Seq<>();
     public boolean commandMode = false;
+    public boolean commandRect = false;
+    public boolean tappedOne = false;
+    public float commandRectX, commandRectY;
 
     private Seq<BuildPlan> plansOut = new Seq<>(BuildPlan.class);
     private QuadTree<BuildPlan> playerPlanTree = new QuadTree<>(new Rect());
@@ -1194,6 +1197,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         float rad = 4f;
         tree.intersect(x - rad/2f, y - rad/2f, rad, rad, tmpUnits);
         return tmpUnits.min(u -> u.isCommandable(), u -> u.dst(x, y) - u.hitSize/2f);
+    }
+
+    public Seq<Unit> selectedCommandUnits(float x, float y, float w, float h){
+        var tree = player.team().data().tree();
+        tmpUnits.clear();
+        float rad = 4f;
+        tree.intersect(Tmp.r1.set(x - rad/2f, y - rad/2f, rad*2f + w, rad*2f + h).normalize(), tmpUnits);
+        tmpUnits.removeAll(u -> !u.isCommandable());
+        return tmpUnits;
     }
 
     public void remove(){

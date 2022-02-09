@@ -5,6 +5,7 @@ import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
@@ -24,7 +25,6 @@ import mindustry.ui.*;
 import mindustry.world.*;
 
 import static arc.Core.*;
-import static mindustry.Vars.net;
 import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
 
@@ -116,28 +116,45 @@ public class DesktopInput extends InputHandler{
             drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
         }
 
+        //draw command overlay UI
+
         for(Unit unit : selectedUnits){
             CommandAI ai = (CommandAI)unit.controller();
             //draw target line
             if(ai.targetPos != null){
                 Tmp.v1.set(ai.targetPos).sub(unit).setLength(unit.hitSize / 2f);
 
-                Drawf.dashLine(Pal.accent, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, ai.targetPos.x, ai.targetPos.y);
+                Drawf.line(Pal.accent, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, ai.targetPos.x, ai.targetPos.y);
             }
 
             Drawf.square(unit.x, unit.y, unit.hitSize / 1.4f + 1f);
         }
 
-        //draw command overlay UI
-        if(commandMode){
+
+        if(commandMode && !commandRect){
             Unit sel = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
 
             if(sel != null){
-                Drawf.square(sel.x, sel.y, sel.hitSize / 1.4f + Mathf.absin(4f, 1f), selectedUnits.contains(sel) ? Pal.remove : Pal.accent);
+                drawCommand(sel);
             }
         }
 
+        if(commandRect){
+            float x2 = input.mouseWorldX(), y2 = input.mouseWorldY();
+            var units = selectedCommandUnits(commandRectX, commandRectY, x2 - commandRectX, y2 - commandRectY);
+            for(var unit : units){
+                drawCommand(unit);
+            }
+
+            Draw.color(Pal.accent, 0.3f);
+            Fill.crect(commandRectX, commandRectY, x2 - commandRectX, y2 - commandRectY);
+        }
+
         Draw.reset();
+    }
+
+    public void drawCommand(Unit sel){
+        Drawf.square(sel.x, sel.y, sel.hitSize / 1.4f + Mathf.absin(4f, 1f), selectedUnits.contains(sel) ? Pal.remove : Pal.accent);
     }
 
     @Override
@@ -516,7 +533,19 @@ public class DesktopInput extends InputHandler{
             lastLineY = cursorY;
         }
 
+        //select some units
+        if(Core.input.keyRelease(Binding.select) && commandRect){
+            if(!tappedOne){
+                var units = selectedCommandUnits(commandRectX, commandRectY, input.mouseWorldX() - commandRectX, input.mouseWorldY() - commandRectY);
+                //tiny brain method of unique addition
+                selectedUnits.removeAll(units);
+                selectedUnits.addAll(units);
+            }
+            commandRect = false;
+        }
+
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
+            tappedOne = false;
             BuildPlan req = getRequest(cursorX, cursorY);
 
             if(Core.input.keyDown(Binding.break_block)){
@@ -535,25 +564,9 @@ public class DesktopInput extends InputHandler{
             }else if(req != null && req.breaking){
                 deleting = true;
             }else if(commandMode){
-                Unit unit = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
-                if(unit != null){
-                    if(selectedUnits.contains(unit)){
-                        selectedUnits.remove(unit);
-                    }else{
-                        selectedUnits.add(unit);
-                    }
-                }else if(selectedUnits.size > 0){
-                    //move to location - TODO right click instead?
-
-                    //TODO all this needs to be synced, done with packets, etc
-                    Vec2 target = input.mouseWorld().cpy();
-
-                    for(var sel : selectedUnits){
-                        ((CommandAI)sel.controller()).commandPosition(target);
-                    }
-
-                    Fx.moveCommand.at(target);
-                }
+                commandRect = true;
+                commandRectX = input.mouseWorldX();
+                commandRectY = input.mouseWorldY();
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
                 if(!tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && !tileTapped(selected.build) && !player.unit().activelyBuilding() && !droppingItem
@@ -645,6 +658,35 @@ public class DesktopInput extends InputHandler{
                 Core.settings.put("lasersopacity", 0);
             }
         }
+    }
+
+    @Override
+    public boolean tap(float x, float y, int count, KeyCode button){
+        if(scene.hasMouse()) return false;
+
+        tappedOne = true;
+
+        Unit unit = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
+        if(unit != null){
+            if(selectedUnits.contains(unit)){
+                selectedUnits.remove(unit);
+            }else{
+                selectedUnits.add(unit);
+            }
+        }else if(selectedUnits.size > 0){
+            //move to location - TODO right click instead?
+
+            //TODO all this needs to be synced, done with packets, etc
+            Vec2 target = input.mouseWorld().cpy();
+
+            for(var sel : selectedUnits){
+                ((CommandAI)sel.controller()).commandPosition(target);
+            }
+
+            Fx.moveCommand.at(target);
+        }
+
+        return super.tap(x, y, count, button);
     }
 
     @Override

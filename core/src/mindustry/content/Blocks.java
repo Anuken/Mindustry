@@ -3507,7 +3507,7 @@ public class Blocks{
         shipAssembler = new UnitAssembler("ship-assembler"){{
             requirements(Category.units, with(Items.beryllium, 700, Items.oxide, 150, Items.tungsten, 500, Items.silicon, 800));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 25f, BlockStack.list(Blocks.tungstenWallLarge, 5, Blocks.plasmaBore, 2)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 25f, BlockStack.list(Blocks.berylliumWallLarge, 4, Blocks.duct, 10, Blocks.plasmaBore, 4)));
             consumes.power(2f);
             areaSize = 13;
 
