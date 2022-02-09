@@ -215,9 +215,7 @@ public class Pathfinder implements Runnable{
                     return;
                 }
             }catch(Throwable e){
-                //TODO remove in production!
-                Threads.throwAppException(e);
-                //e.printStackTrace();
+                e.printStackTrace();
             }
         }
     }
@@ -403,7 +401,7 @@ public class Pathfinder implements Runnable{
                 }
             }
 
-            //every 100 iterations, check the time spent - this prevents extra calls to nano time, which itself is slow
+            //every N iterations, check the time spent - this prevents extra calls to nano time, which itself is slow
             if(nsToRun >= 0 && (counter++) >= 200){
                 counter = 0;
                 if(Time.timeSinceNanos(start) >= nsToRun){

@@ -45,9 +45,7 @@ public class ControlPathfinder implements Runnable{
 
     //static access probably faster than object access
     static int wwidth, wheight;
-
-    //MAIN THREAD DATA
-
+    //increments each tile change
     static volatile int worldUpdateId;
 
     /** Current pathfinding thread */
@@ -56,9 +54,10 @@ public class ControlPathfinder implements Runnable{
     int lastTargetId = 1;
     /** handles task scheduling on the update thread. */
     TaskQueue queue = new TaskQueue();
+    /** requests per-unit */
     ObjectMap<Unit, PathRequest> requests = new ObjectMap<>();
 
-    //PATHFINDING THREAD DATA
+    /** pathfinding thread access only! */
     Seq<PathRequest> threadRequests = new Seq<>();
 
     public ControlPathfinder(){
@@ -149,7 +148,7 @@ public class ControlPathfinder implements Runnable{
             var req = new PathRequest();
             req.unit = unit;
             req.pathType = pathType;
-            req.destination = destination;
+            req.destination.set(destination);
             req.curId = pathId;
             req.lastUpdateId = state.updateId;
             req.lastWorldUpdate = worldUpdateId;
@@ -168,7 +167,7 @@ public class ControlPathfinder implements Runnable{
                 req.foundEnd = false;
             }
 
-            req.destination = destination;
+            req.destination.set(destination);
             req.curId = pathId;
 
             if(req.done){
@@ -366,11 +365,12 @@ public class ControlPathfinder implements Runnable{
         volatile boolean done = false;
         volatile boolean foundEnd = false;
 
+        final Vec2 destination = new Vec2();
+        final Vec2 lastDestination = new Vec2();
+
         volatile Unit unit;
         volatile int pathType;
-        volatile Vec2 destination;
         volatile int lastWorldUpdate;
-        volatile float stuckTime;
 
         //TODO only access on main thread??
         int pathIndex;
@@ -400,7 +400,7 @@ public class ControlPathfinder implements Runnable{
             lastId = curId;
 
             //re-do everything when world updates
-            if(Time.timeSinceMillis(lastTime) > 1000 * 1 && worldUpdateId != lastWorldUpdate){
+            if(Time.timeSinceMillis(lastTime) > 1000 * 2 && (worldUpdateId != lastWorldUpdate || !destination.epsilonEquals(lastDestination, 2f))){
                 lastTime = Time.millis();
                 lastWorldUpdate = worldUpdateId;
                 pathIndex = 0;
@@ -496,7 +496,7 @@ public class ControlPathfinder implements Runnable{
         void clear(){
             done = false;
 
-            //TODO horribly expensive
+            //TODO could be less expensive?
             frontier = new PathfindQueue(20);
             cameFrom.clear();
             costs.clear();
@@ -511,9 +511,7 @@ public class ControlPathfinder implements Runnable{
 
             foundEnd = false;
             result.clear();
-
-            //closed = new GridBits(world.width(), world.height());
-            //queue = new PathfindQueue(16);
+            lastDestination.set(destination);
         }
     }
 }

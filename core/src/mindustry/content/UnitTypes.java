@@ -2782,7 +2782,7 @@ public class UnitTypes{
             speed = 1.1f;
             hitSize = 44f;
             health = 18000;
-            armor = 8f;
+            armor = 9f;
             rotateSpeed = 1.6f;
             lockLegBase = true;
             legContinuousMove = true;
@@ -2849,7 +2849,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(9f, 75){{
+                bullet = new BasicBulletType(9f, 85){{
                     pierceCap = 2;
                     pierceBuilding = true;
 
