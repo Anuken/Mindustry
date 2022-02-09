@@ -70,7 +70,7 @@ public class ControlPathfinder implements Runnable{
                     //}
 
                     for(var entry : requests){
-
+                        entry.value.update(maxUpdate / requests.size);
                     }
                 }
 

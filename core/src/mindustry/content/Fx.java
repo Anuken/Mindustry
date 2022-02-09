@@ -183,11 +183,17 @@ public class Fx{
         }
     }),
 
-    moveCommand = new Effect(15, e -> {
+    moveCommand = new Effect(20, e -> {
         color(Pal.command);
         stroke(e.fout() * 5f);
         Lines.circle(e.x, e.y, 6f + e.fin() * 2f);
-    }).layer(Layer.effect - 20f),
+    }).layer(Layer.overlayUI),
+
+    attackCommand = new Effect(20, e -> {
+        color(Pal.remove);
+        stroke(e.fout() * 5f);
+        poly(e.x, e.y, 4, 7f + e.fin() * 2f);
+    }).layer(Layer.overlayUI),
 
     commandSend = new Effect(28, e -> {
         color(Pal.command);

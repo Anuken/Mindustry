@@ -1199,6 +1199,20 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return tmpUnits.min(u -> u.isCommandable(), u -> u.dst(x, y) - u.hitSize/2f);
     }
 
+    public @Nullable Unit selectedEnemyUnit(float x, float y){
+        tmpUnits.clear();
+        float rad = 4f;
+
+        Seq<TeamData> data = state.teams.present;
+        for(int i = 0; i < data.size; i++){
+            if(data.items[i].team != player.team()){
+                data.items[i].tree().intersect(x - rad / 2f, y - rad / 2f, rad, rad, tmpUnits);
+            }
+        }
+
+        return tmpUnits.min(u -> u.dst(x, y) - u.hitSize/2f);
+    }
+
     public Seq<Unit> selectedCommandUnits(float x, float y, float w, float h){
         var tree = player.team().data().tree();
         tmpUnits.clear();

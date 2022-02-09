@@ -3269,6 +3269,7 @@ public class UnitTypes{
             health = 700f;
             armor = 3f;
             hitSize = 12f;
+            buildBeamOffset = 8f;
 
             engineOffset = 7.5f;
             engineSize = 3.4f;

@@ -675,15 +675,30 @@ public class DesktopInput extends InputHandler{
             }
         }else if(selectedUnits.size > 0){
             //move to location - TODO right click instead?
-
             //TODO all this needs to be synced, done with packets, etc
             Vec2 target = input.mouseWorld().cpy();
 
-            for(var sel : selectedUnits){
-                ((CommandAI)sel.controller()).commandPosition(target);
+            Teamc build = world.buildWorld(target.x, target.y);
+
+            if(build == null || build.team() == player.team()){
+                build = selectedEnemyUnit(target.x, target.y);
             }
 
-            Fx.moveCommand.at(target);
+            if(build != null && build.team() != player.team()){
+                for(var sel : selectedUnits){
+                    ((CommandAI)sel.controller()).commandTarget(build);
+                }
+
+                Fx.attackCommand.at(build);
+            }else{
+                for(var sel : selectedUnits){
+                    ((CommandAI)sel.controller()).commandPosition(target);
+                }
+
+                Fx.moveCommand.at(target);
+            }
+
+
         }
 
         return super.tap(x, y, count, button);
