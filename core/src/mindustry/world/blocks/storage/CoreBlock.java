@@ -116,7 +116,7 @@ public class CoreBlock extends StorageBlock{
     @Override
     public boolean canReplace(Block other){
         //coreblocks can upgrade smaller cores
-        return super.canReplace(other) || (other instanceof CoreBlock && size > other.size);
+        return super.canReplace(other) || (other instanceof CoreBlock && size >= other.size && other != this);
     }
 
     @Override

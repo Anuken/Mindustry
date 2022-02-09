@@ -70,7 +70,7 @@ public class EnergyFieldAbility extends Ability{
 
         for(int i = 0; i < sectors; i++){
             float rot = unit.rotation + i * 360f/sectors - Time.time * rotateSpeed;
-            Lines.swirl(rx, ry, orbRadius + 3f, sectorRad, rot);
+            Lines.arc(rx, ry, orbRadius + 3f, sectorRad, rot);
         }
 
         Lines.stroke(Lines.getStroke() * curStroke);
@@ -78,7 +78,7 @@ public class EnergyFieldAbility extends Ability{
         if(curStroke > 0){
             for(int i = 0; i < sectors; i++){
                 float rot = unit.rotation + i * 360f/sectors + Time.time * rotateSpeed;
-                Lines.swirl(rx, ry, range, sectorRad, rot);
+                Lines.arc(rx, ry, range, sectorRad, rot);
             }
         }
 

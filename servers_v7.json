@@ -17,7 +17,7 @@
   },
   {
     "name": "Omega",
-    "address": ["n3.mindustry.me:5002", "n3.mindustry.me:5003", "n3.mindustry.me:5005", "n3.mindustry.me:5006", "n3.mindustry.me:5007", "n3.mindustry.me", "n3.mindustry.me:4006"]
+    "address": ["omegam.mindustry.me:5002", "omegam.mindustry.me:5003", "omegam.mindustry.me:5005", "omegam.mindustry.me:5006", "omegam.mindustry.me:5007", "omegam.mindustry.me", "omegam.mindustry.me:4006"]
   },
   {
     "name": "MeowLand",
@@ -33,7 +33,7 @@
   },
   {
     "name": "XCore",
-    "address": ["node.procord.vip:2707", "de14.halexnodes.net:40036"]
+    "address": ["sandbox.xcore.tk:2707", "attack.xcore.tk:8141"]
   },
   {
     "name": "Obvilion Network",
@@ -65,7 +65,7 @@
   },
   {
     "name": "MindustryBR",
-    "address": ["n2.mindustry.me:4003", "n2.mindustry.me:4005", "n2.mindustry.me:4008", "panel.mindustry.me:2005", "n2.mindustry.me:4010"]
+    "address": ["mindustryptbr.myddns.me"]
   },
   {
     "name": "LostDustry",

@@ -1,15 +1,19 @@
 [
   {
     "name": "{AA}",
-    "address": ["aamindustry.play.ai", "aamindustry.play.ai:6571", "aamindustry.play.ai:6572", "aamindustry.play.ai:6573", "aamindustry.play.ai:6574"]
+    "address": ["recessive.net"]
   },
   {
     "name": "Yeet Hosting",
-    "address": ["n3.mindustry.me:5004"]
+    "address": ["omegam.mindustry.me:5004", "omegav.mindustry.me:4009", "omegav.mindustry.me:5123"]
   },
   {
     "name": "RCM",
     "address": ["185.104.248.61", "easyplay.su"]
+  },
+    {
+    "name": "Tendhost",
+    "address": ["tendhost.ddns.net"]
   },
   {
     "name": "Atanner",
@@ -57,7 +61,7 @@
   },
   {
     "name": "Omega",
-    "address": ["yeeth.mindustry.me:6568","yeeth.mindustry.me:5002"] 
+    "address": ["omegav.mindustry.me:6572"] 
   },
   {
     "name": "Obvilion Network",
@@ -101,7 +105,7 @@
   },
   {
     "name": "Mindustry Español",
-    "address": ["yeeth.mindustry.me:6578", "yeeth.mindustry.me:6573", "yeeth.mindustry.me:6577", "yeeth.mindustry.me:6576"]
+    "address": ["n4.mindustry.me:6578", "n4.mindustry.me:6573", "n4.mindustry.me:6577", "n4.mindustry.me:6576"]
   },
   {
     "name": "CreateDustry",
@@ -113,7 +117,7 @@
   },
   {
     "name": "MindustryBR",
-    "address": ["mindustryptbr.ddns.net", "mindustryptbr.myddns.me", "n2.mindustry.me:4002", "n2.mindustry.me:4007"]
+    "address": ["mindustryptbr.ddns.net:25579"]
   },
   {
     "name": "Conservatory",
