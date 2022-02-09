@@ -21,7 +21,7 @@ public class CommandAI extends AIController{
         updateVisuals();
         updateTargeting();
 
-        if(invalid(attackTarget)){
+        if(attackTarget != null && invalid(attackTarget)){
             attackTarget = null;
             targetPos = null;
         }
