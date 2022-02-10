@@ -17,6 +17,7 @@ public class ItemImage extends Stack{
 
         add(new Table(t -> {
             t.left().bottom();
+            //TODO outline? .style(Styles.outlineLabel)
             t.add(amount > 1000 ? UI.formatAmount(amount) : amount + "");
             t.pack();
         }));
