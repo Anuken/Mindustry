@@ -3256,8 +3256,7 @@ public class UnitTypes{
             isCounted = false;
             envDisabled = 0;
 
-            ;
-
+            targetPriority = -2;
             lowAltitude = false;
             mineWalls = true;
             mineFloor = false;
