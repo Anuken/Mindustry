@@ -2988,7 +2988,7 @@ public class UnitTypes{
                 abilities.add(new SuppressionFieldAbility(){{
                     orbRadius = orbRad;
                     particleSize = partRad;
-                    y = -33f / 4f;
+                    y = -32f / 4f;
                     x = 43f * i / 4f;
                     particles = parts;
                     //visual only, the middle one does the actual suppressing

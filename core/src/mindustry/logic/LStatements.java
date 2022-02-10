@@ -1271,4 +1271,27 @@ public class LStatements{
             return new SetRuleI(rule, builder.var(value));
         }
     }
+
+    @RegisterStatement("notification")
+    public static class FlushNotificationStatement extends LStatement{
+
+        @Override
+        public void build(Table table){
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicWorld;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new FlushNotificationI();
+        }
+    }
 }

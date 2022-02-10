@@ -325,6 +325,7 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.add(table);
     }
 
+
     /** Shows a label at some position on the screen. Does not fade. */
     public void showInfoPopup(String info, float duration, int align, int top, int left, int bottom, int right){
         Table table = new Table();

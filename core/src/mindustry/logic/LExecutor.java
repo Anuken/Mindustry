@@ -1252,5 +1252,20 @@ public class LExecutor{
         }
     }
 
+    public static class FlushNotificationI implements LInstruction{
+
+        @Override
+        public void run(LExecutor exec){
+            //skip back to self until possible
+            if(ui.hudfrag.hasToast()){
+                exec.var(varCounter).numval --;
+                return;
+            }
+
+            ui.hudfrag.showToast(Icon.info, exec.textBuffer.toString());
+            exec.textBuffer.setLength(0);
+        }
+    }
+
     //endregion
 }

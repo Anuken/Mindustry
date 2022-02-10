@@ -10,7 +10,7 @@ public class ShapePart extends DrawPart{
     public int sides = 3;
     public float radius = 3f, radiusTo = -1f;
     public float x, y, rotation;
-    public float moveX, moveY, rotMove;
+    public float moveX, moveY, moveRot;
     public Color color = Color.white;
     public @Nullable Color colorTo;
     public boolean mirror = false;
@@ -47,7 +47,7 @@ public class ShapePart extends DrawPart{
             }
 
             if(!circle){
-                Fill.poly(rx, ry, sides, rad, rotMove * prog * sign + params.rotation - 90);
+                Fill.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90);
             }else{
                 Fill.circle(rx, ry, rad);
             }

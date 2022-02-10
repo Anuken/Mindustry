@@ -419,6 +419,10 @@ public class HudFragment extends Fragment{
         }
     }
 
+    public boolean hasToast(){
+        return Time.timeSinceMillis(lastToast) < 3.5f * 1000f;
+    }
+
     public void showToast(String text){
         showToast(Icon.ok, text);
     }
