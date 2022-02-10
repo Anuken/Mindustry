@@ -2456,7 +2456,7 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
-                bullet = new BasicBulletType(8f, 110){{
+                bullet = new BasicBulletType(8f, 140){{
                     sprite = "missile-large";
                     width = 9.5f;
                     height = 15f;
@@ -2487,7 +2487,7 @@ public class UnitTypes{
                     rotate = true;
                     rotateSpeed = 2f;
 
-                    bullet = new BasicBulletType(4.5f, 20){{
+                    bullet = new BasicBulletType(4.5f, 25){{
                         width = 6.5f;
                         height = 11f;
                         shootEffect = Fx.sparkShoot;
@@ -2746,7 +2746,7 @@ public class UnitTypes{
                     //TODO better
                     shootEffect = Fx.shootBig2;
                     smokeEffect = Fx.shootSmokeTitan;
-                    splashDamage = 50f;
+                    splashDamage = 60f;
                     splashDamageRadius = 30f;
                     frontColor = Color.white;
                     hitSound = Sounds.none;
@@ -2935,6 +2935,7 @@ public class UnitTypes{
                 unitSpawned = new MissileUnitType("quell-missile"){{
                     speed = 3.8f;
                     maxRange = 80f;
+                    lifetime = 60f * 1.4f;
                     outlineColor = Pal.darkOutline;
                     health = 45;
 

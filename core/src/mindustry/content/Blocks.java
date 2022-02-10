@@ -1691,7 +1691,7 @@ public class Blocks{
         }};
 
         regenProjector = new RegenProjector("regen-projector"){{
-            requirements(Category.effect, with(Items.silicon, 60, Items.tungsten, 60, Items.oxide, 30, Items.beryllium, 80));
+            requirements(Category.effect, with(Items.silicon, 80, Items.tungsten, 60, Items.oxide, 40, Items.beryllium, 80));
             size = 3;
             consumes.power(1f);
             range = 28;
@@ -2572,7 +2572,7 @@ public class Blocks{
             thrusterLength = 34/4f;
             armor = 5f;
 
-            unitCapModifier = 4;
+            unitCapModifier = 2;
             researchCostMultiplier = 0.07f;
         }};
 
@@ -2587,7 +2587,7 @@ public class Blocks{
             thrusterLength = 40/4f;
             armor = 10f;
 
-            unitCapModifier = 8;
+            unitCapModifier = 4;
             researchCostMultiplier = 0.11f;
         }};
 
@@ -2602,7 +2602,7 @@ public class Blocks{
             thrusterLength = 48/4f;
             armor = 15f;
 
-            unitCapModifier = 12;
+            unitCapModifier = 6;
             researchCostMultiplier = 0.11f;
         }};
 
@@ -3509,12 +3509,11 @@ public class Blocks{
         shipAssembler = new UnitAssembler("ship-assembler"){{
             requirements(Category.units, with(Items.beryllium, 700, Items.oxide, 150, Items.tungsten, 500, Items.silicon, 800));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 40f, BlockStack.list(Blocks.berylliumWallLarge, 4, Blocks.duct, 10, Blocks.plasmaBore, 4)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, BlockStack.list(Blocks.berylliumWallLarge, 4, Blocks.duct, 15, Blocks.plasmaBore, 4)));
             consumes.power(3f);
             areaSize = 13;
 
-            //consumes.liquid(Liquids.gallium, 2f / 60f);
-
+            consumes.liquid(Liquids.gallium, 2f / 60f);
         }};
 
         //TODO requirements
