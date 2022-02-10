@@ -99,7 +99,7 @@ public class Separator extends Block{
                 int sum = 0;
                 for(ItemStack stack : results) sum += stack.amount;
 
-                int i = Mathf.randomSeed(seed++, 0, sum);
+                int i = Mathf.randomSeed(seed++, 0, sum - 1);
                 int count = 0;
                 Item item = null;
 
