@@ -9,12 +9,13 @@ import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.logic.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class Item extends UnlockableContent{
+public class Item extends UnlockableContent implements Senseable{
     public Color color;
 
     /** how explosive this item is. */
@@ -127,6 +128,18 @@ public class Item extends UnlockableContent{
                 }
             }
         }
+    }
+
+    @Override
+    public double sense(LAccess sensor){
+        if(sensor == LAccess.color) return color.toFloatBits();
+        return 0;
+    }
+
+    @Override
+    public Object senseObject(LAccess sensor){
+        if(sensor == LAccess.name) return name;
+        return noSensed;
     }
 
     /** Allocates a new array containing all items that generate ores. */

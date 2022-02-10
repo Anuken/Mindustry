@@ -10,12 +10,13 @@ import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.meta.*;
 
 import static mindustry.entities.Puddles.*;
 
 /** A better name for this class would be "fluid", but it's too late for that. */
-public class Liquid extends UnlockableContent{
+public class Liquid extends UnlockableContent implements Senseable{
     //must be static and global so conduits don't conflict - DO NOT INTERACT WITH THESE IN MODS OR I WILL PERSONALLY YELL AT YOU
     public static final int animationFrames = 50;
     public static float animationScaleGas = 190f, animationScaleLiquid = 230f;
@@ -145,6 +146,18 @@ public class Liquid extends UnlockableContent{
         stats.addPercent(Stat.temperature, temperature);
         stats.addPercent(Stat.heatCapacity, heatCapacity);
         stats.addPercent(Stat.viscosity, viscosity);
+    }
+
+    @Override
+    public double sense(LAccess sensor){
+        if(sensor == LAccess.color) return color.toFloatBits();
+        return 0;
+    }
+
+    @Override
+    public Object senseObject(LAccess sensor){
+        if(sensor == LAccess.name) return name;
+        return noSensed;
     }
 
     @Override

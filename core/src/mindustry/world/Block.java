@@ -1153,7 +1153,7 @@ public class Block extends UnlockableContent implements Senseable{
     @Override
     public double sense(LAccess sensor){
         return switch(sensor){
-            case color -> Color.toDoubleBits(mapColor.r, mapColor.g, mapColor.b, mapColor.a);
+            case color -> mapColor.toDoubleBits();
             case health, maxHealth -> health;
             case size -> size * tilesize;
             case itemCapacity -> itemCapacity;
