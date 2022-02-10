@@ -687,7 +687,7 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public boolean tap(float x, float y, int count, KeyCode button){
-        if(scene.hasMouse()) return false;
+        if(scene.hasMouse() || !commandMode) return false;
 
         tappedOne = true;
 
