@@ -1,5 +1,6 @@
 package mindustry.type.unit;
 
+import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -14,6 +15,6 @@ public class ErekirUnitType extends UnitType{
         outlineColor = Pal.darkOutline;
         envDisabled = Env.space;
         coreUnitDock = true;
-        unitBasedDefaultController = u -> !playerControllable || u.team.isAI() ? defaultController.get() : new CommandAI();
+        unitBasedDefaultController = u -> !playerControllable || u.team.isAI() || (Vars.state.rules.attackMode && u.team == Vars.state.rules.waveTeam) ? defaultController.get() : new CommandAI();
     }
 }
