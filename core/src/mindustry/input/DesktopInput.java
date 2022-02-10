@@ -278,16 +278,11 @@ public class DesktopInput extends InputHandler{
         shouldShoot = !scene.hasMouse() && !locked;
 
         if(!locked && state.rules.unitCommand && block == null){
-            if(input.keyTap(Binding.commandMode)){
-                commandMode = !commandMode;
-            }
+            //if(input.keyTap(Binding.commandMode)){
+                commandMode = input.keyDown(Binding.commandMode);
+            //}
         }else{
             commandMode = false;
-        }
-
-        //TODO should selected units be cleared out of command mode?
-        if(!commandMode){
-            //selectedUnits.clear();
         }
 
         //validate commanding units
