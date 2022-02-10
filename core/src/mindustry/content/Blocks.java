@@ -3801,7 +3801,7 @@ public class Blocks{
 
         worldProcessor = new LogicBlock("world-processor"){{
             //currently incomplete, debugOnly for now
-            requirements(Category.logic, BuildVisibility.debugOnly, with());
+            requirements(Category.logic, BuildVisibility.editorOnly, with());
 
             //TODO customizable IPT
             instructionsPerTick = 8;

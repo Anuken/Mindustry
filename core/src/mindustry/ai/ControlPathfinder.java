@@ -3,10 +3,10 @@ package mindustry.ai;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.async.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -17,9 +17,9 @@ import static mindustry.Vars.*;
 import static mindustry.ai.Pathfinder.*;
 
 //TODO I'm sure this class has countless problems
-public class ControlPathfinder implements Runnable{
+public class ControlPathfinder{
     private static final long maxUpdate = Time.millisToNanos(20);
-    private static final int updateFPS = 60;
+    private static final int updateFPS = 50;
     private static final int updateInterval = 1000 / updateFPS;
 
     public static boolean showDebug = false;
@@ -48,19 +48,15 @@ public class ControlPathfinder implements Runnable{
     //increments each tile change
     static volatile int worldUpdateId;
 
-    /** Current pathfinding thread */
-    @Nullable Thread thread;
+    /** Current pathfinding threads, contents may be null */
+    @Nullable PathfindThread[] threads;
     /** for unique target IDs */
     int lastTargetId = 1;
-    /** handles task scheduling on the update thread. */
-    TaskQueue queue = new TaskQueue();
     /** requests per-unit */
     ObjectMap<Unit, PathRequest> requests = new ObjectMap<>();
 
-    /** pathfinding thread access only! */
-    Seq<PathRequest> threadRequests = new Seq<>();
-
     public ControlPathfinder(){
+
         Events.on(WorldLoadEvent.class, event -> {
             stop();
             wwidth = world.width();
@@ -81,7 +77,7 @@ public class ControlPathfinder implements Runnable{
                 //skipped N update -> drop it
                 if(req.lastUpdateId <= state.updateId - 10){
                     requests.remove(req.unit);
-                    queue.post(() -> threadRequests.remove(req));
+                    req.thread.queue.post(() -> req.thread.requests.remove(req));
                 }
             }
         });
@@ -91,10 +87,16 @@ public class ControlPathfinder implements Runnable{
 
             for(var req : requests.values()){
                 if(req.frontier == null) continue;
-                //TODO will this even work
                 Draw.draw(Layer.overlayUI, () -> {
                     if(req.done){
                         int len = req.result.size;
+                        int rp = req.rayPathIndex;
+                        if(rp < len && rp >= 0){
+                            Draw.color(Color.royal);
+                            Tile tile = tile(req.result.items[rp]);
+                            Lines.line(req.unit.x, req.unit.y, tile.worldx(), tile.worldy());
+                        }
+
                         for(int i = 0; i < len; i++){
                             Draw.color(Tmp.c1.set(Color.white).fromHsv(i / (float)len * 360f, 1f, 0.9f));
                             int pos = req.result.items[i];
@@ -129,6 +131,8 @@ public class ControlPathfinder implements Runnable{
 
     /** @return whether a path is ready */
     public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 out){
+        //uninitialized
+        if(threads == null) return false;
 
         int pathType = unit.pathType();
 
@@ -145,7 +149,9 @@ public class ControlPathfinder implements Runnable{
 
         //check for request existence
         if(!requests.containsKey(unit)){
-            var req = new PathRequest();
+            PathfindThread thread = Structs.findMin(threads, t -> t.requestSize);
+
+            var req = new PathRequest(thread);
             req.unit = unit;
             req.pathType = pathType;
             req.destination.set(destination);
@@ -153,11 +159,13 @@ public class ControlPathfinder implements Runnable{
             req.lastUpdateId = state.updateId;
             req.lastPos.set(unit);
             req.lastWorldUpdate = worldUpdateId;
+            //raycast immediately when done
+            req.raycastTimer = 9999f;
 
             requests.put(unit, req);
 
             //add to thread so it gets processed next update
-            queue.post(() -> threadRequests.add(req));
+            thread.queue.post(() -> thread.requests.add(req));
         }else{
             var req = requests.get(unit);
             req.lastUpdateId = state.updateId;
@@ -237,15 +245,24 @@ public class ControlPathfinder implements Runnable{
     /** Starts or restarts the pathfinding thread. */
     private void start(){
         stop();
-        thread = Threads.daemon("ControlPathfinder", this);
+
+        //TODO currently capped at 6 threads, might be a good idea to make it more?
+        threads = new PathfindThread[Mathf.clamp(Runtime.getRuntime().availableProcessors() - 2, 1, 6)];
+        for(int i = 0; i < threads.length; i ++){
+            threads[i] = new PathfindThread("ControlPathfindThread-" + i);
+            threads[i].setDaemon(true);
+            threads[i].start();
+        }
     }
 
     /** Stops the pathfinding thread. */
     private void stop(){
-        if(thread != null){
-            thread.interrupt();
-            thread = null;
+        if(threads != null){
+            for(var thread : threads){
+                thread.interrupt();
+            }
         }
+        threads = null;
         requests.clear();
     }
 
@@ -341,49 +358,64 @@ public class ControlPathfinder implements Runnable{
         return cost(type, b);
     }
 
-    @Override
-    public void run(){
-        while(true){
-            //stop on client, no updating
-            if(net.client()) return;
-            try{
-                if(state.isPlaying()){
-                    queue.run();
+    static class PathfindThread extends Thread{
+        /** handles task scheduling on the update thread. */
+        TaskQueue queue = new TaskQueue();
+        /** pathfinding thread access only! */
+        Seq<PathRequest> requests = new Seq<>();
+        /** volatile for access across threads */
+        volatile int requestSize;
 
-                    //total update time no longer than maxUpdate
-                    for(var req : threadRequests){
-                        //TODO this is flawed with many paths
-                        req.update(maxUpdate / requests.size);
-                    }
-                }
+        public PathfindThread(String name){
+            super(name);
+        }
 
+        @Override
+        public void run(){
+            while(true){
+                //stop on client, no updating
+                if(net.client()) return;
                 try{
-                    Thread.sleep(updateInterval);
-                }catch(InterruptedException e){
-                    //stop looping when interrupted externally
-                    return;
+                    if(state.isPlaying()){
+                        queue.run();
+                        requestSize = requests.size;
+
+                        //total update time no longer than maxUpdate
+                        for(var req : requests){
+                            //TODO this is flawed with many paths
+                            req.update(maxUpdate / requests.size);
+                        }
+                    }
+
+                    try{
+                        Thread.sleep(updateInterval);
+                    }catch(InterruptedException e){
+                        //stop looping when interrupted externally
+                        return;
+                    }
+                }catch(Throwable e){
+                    //do not crash the pathfinding thread
+                    Log.err(e);
                 }
-            }catch(Throwable e){
-                //do not crash the pathfinding thread
-                Log.err(e);
             }
         }
     }
 
     //TODO each one of these could run in its own thread.
     static class PathRequest{
+        final PathfindThread thread;
+
         volatile boolean done = false;
         volatile boolean foundEnd = false;
+        volatile Unit unit;
+        volatile int pathType;
+        volatile int lastWorldUpdate;
 
         final Vec2 lastPos = new Vec2();
         float stuckTimer = 0f;
 
         final Vec2 destination = new Vec2();
         final Vec2 lastDestination = new Vec2();
-
-        volatile Unit unit;
-        volatile int pathType;
-        volatile int lastWorldUpdate;
 
         //TODO only access on main thread??
         volatile int pathIndex;
@@ -404,6 +436,10 @@ public class ControlPathfinder implements Runnable{
         long lastTime;
 
         volatile int lastId, curId;
+
+        public PathRequest(PathfindThread thread){
+            this.thread = thread;
+        }
 
         void update(long maxUpdateNs){
             if(curId != lastId){
@@ -508,7 +544,6 @@ public class ControlPathfinder implements Runnable{
         void clear(){
             done = false;
 
-            //TODO could be less expensive?
             frontier = new PathfindQueue(20);
             cameFrom.clear();
             costs.clear();

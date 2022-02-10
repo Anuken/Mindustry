@@ -122,6 +122,8 @@ public class CoreBlock extends StorageBlock{
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         if(tile == null) return false;
+        //in the editor, you can place them anywhere for convenience
+        if(state.isEditor()) return true;
         CoreBuild core = team.core();
         //must have all requirements
         if(core == null || (!state.rules.infiniteResources && !core.items.has(requirements, state.rules.buildCostMultiplier))) return false;
