@@ -29,7 +29,8 @@ public class MissileAI extends AIController{
     }
 
     @Override
-    public void updateTargeting(){
-        //no
+    public boolean retarget(){
+        //more frequent retarget due to high speed. TODO won't this lag?
+        return timer.get(timerTarget, 10f);
     }
 }

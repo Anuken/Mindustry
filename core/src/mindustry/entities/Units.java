@@ -271,14 +271,16 @@ public class Units{
 
         result = null;
         cdist = 0f;
+        cpriority = -99999f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
             if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.type.targetable) return;
 
             float dst2 = e.dst2(x, y) - (e.hitSize * e.hitSize);
-            if(dst2 < range*range && (result == null || dst2 < cdist)){
+            if(dst2 < range*range && (result == null || dst2 < cdist || e.type.targetPriority > cpriority) && e.type.targetPriority >= cpriority){
                 result = e;
                 cdist = dst2;
+                cpriority = e.type.targetPriority;
             }
         });
 
@@ -297,7 +299,7 @@ public class Units{
             if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.within(x, y, range + e.hitSize/2f) || !e.type.targetable) return;
 
             float cost = sort.cost(e, x, y);
-            if((result == null || cost < cdist) && e.type.targetPriority >= cpriority){
+            if((result == null || cost < cdist || e.type.targetPriority > cpriority) && e.type.targetPriority >= cpriority){
                 result = e;
                 cdist = cost;
                 cpriority = e.type.targetPriority;

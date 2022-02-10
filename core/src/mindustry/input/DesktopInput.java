@@ -124,8 +124,13 @@ public class DesktopInput extends InputHandler{
                 Position lineDest = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
 
                 Tmp.v1.set(lineDest).sub(unit).setLength(unit.hitSize / 2f);
+                Tmp.v2.set(Tmp.v1).scl(-1f).setLength(3.5f);
 
-                Drawf.line(Pal.accent, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, lineDest.getX(), lineDest.getY());
+                Drawf.line(Pal.accent, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, lineDest.getX() + Tmp.v2.x, lineDest.getY() + Tmp.v2.y);
+
+                if(ai.attackTarget == null){
+                    Drawf.square(lineDest.getX(), lineDest.getY(), 3.5f);
+                }
             }
 
             Drawf.square(unit.x, unit.y, unit.hitSize / 1.4f + 1f);

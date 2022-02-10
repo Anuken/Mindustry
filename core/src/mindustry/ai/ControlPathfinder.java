@@ -16,10 +16,9 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 import static mindustry.ai.Pathfinder.*;
 
-//TODO I'm sure this class has countless problems
 public class ControlPathfinder{
     private static final long maxUpdate = Time.millisToNanos(20);
-    private static final int updateFPS = 50;
+    private static final int updateFPS = 60;
     private static final int updateInterval = 1000 / updateFPS;
 
     public static boolean showDebug = false;
@@ -202,6 +201,7 @@ public class ControlPathfinder{
                 for(int i = len - 1; i >= idx; i--){
                     Tile tile = tile(items[i]);
                     float dst = unit.dst2(tile);
+                    //TODO maybe put this on a timer since raycasts can be expensive?
                     if(dst < minDst && !permissiveRaycast(pathType, tileX, tileY, tile.x, tile.y)){
                         req.pathIndex = Math.max(dst <= range * range ? i + 1 : i, req.pathIndex);
                         minDst = Math.min(dst, minDst);
@@ -401,7 +401,6 @@ public class ControlPathfinder{
         }
     }
 
-    //TODO each one of these could run in its own thread.
     static class PathRequest{
         final PathfindThread thread;
 

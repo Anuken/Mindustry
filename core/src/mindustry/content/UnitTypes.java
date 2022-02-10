@@ -3130,6 +3130,7 @@ public class UnitTypes{
             isCounted = false;
             envDisabled = 0;
 
+            targetPriority = -2;
             lowAltitude = false;
             mineWalls = true;
             mineFloor = false;
@@ -3186,6 +3187,7 @@ public class UnitTypes{
             isCounted = false;
             envDisabled = 0;
 
+            targetPriority = -2;
             lowAltitude = false;
             mineWalls = true;
             mineFloor = false;
@@ -3253,6 +3255,8 @@ public class UnitTypes{
             defaultController = BuilderAI::new;
             isCounted = false;
             envDisabled = 0;
+
+            ;
 
             lowAltitude = false;
             mineWalls = true;

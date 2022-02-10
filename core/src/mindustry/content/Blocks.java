@@ -145,7 +145,7 @@ public class Blocks{
     droneCenter,
 
     //payloads
-    payloadConveyor, payloadRouter, reinforcedPayloadConveyor, reinforcedPayloadRouter, payloadPropulsionTower, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
+    payloadConveyor, payloadRouter, reinforcedPayloadConveyor, reinforcedPayloadRouter, payloadMassDriver, payloadPropulsionTower, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
 
 
     //logic
@@ -3575,6 +3575,18 @@ public class Blocks{
             canOverdrive = false;
         }};
 
+        //TODO
+        if(false)
+        payloadMassDriver = new PayloadMassDriver("payload-mass-driver"){{
+            requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.oxide, 60));
+            size = 3;
+            reloadTime = 150f;
+            chargeTime = 120f;
+            range = 300f;
+            maxPayloadSize = 2.5f;
+            consumes.power(3f);
+        }};
+
         payloadPropulsionTower = new PayloadMassDriver("payload-propulsion-tower"){{
             requirements(Category.units, with(Items.thorium, 300, Items.silicon, 200, Items.plastanium, 200, Items.phaseFabric, 50));
             size = 5;
@@ -3623,14 +3635,14 @@ public class Blocks{
         }};
 
         payloadLoader = new PayloadLoader("payload-loader"){{
-            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.copper, 100));
+            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.tungsten, 80));
             hasPower = true;
             consumes.power(2f);
             size = 3;
         }};
 
         payloadUnloader = new PayloadUnloader("payload-unloader"){{
-            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.copper, 100));
+            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.oxide, 30));
             hasPower = true;
             consumes.power(2f);
             size = 3;
