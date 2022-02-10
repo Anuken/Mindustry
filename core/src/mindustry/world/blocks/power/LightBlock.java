@@ -63,7 +63,7 @@ public class LightBlock extends Block{
         @Override
         public void control(LAccess type, double p1, double p2, double p3, double p4){
             if(type == LAccess.color){
-                color = Color.rgba8888(Mathf.clamp((float)p1), Mathf.clamp((float)p2), Mathf.clamp((float)p3), 1f);
+                color = Tmp.c1.fromDouble(p1).rgba8888();
             }
 
             super.control(type, p1, p2, p3, p4);

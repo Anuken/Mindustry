@@ -111,6 +111,7 @@ public class LAssembler{
         g = Strings.parseInt(symbol, 16, 0, 3, 5),
         b = Strings.parseInt(symbol, 16, 0, 5, 7),
         a = symbol.length() == 9 ? Strings.parseInt(symbol, 16, 0, 7, 9) : 255;
+
         return Color.toDoubleBits(r, g, b, a);
     }
 

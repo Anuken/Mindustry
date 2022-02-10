@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 public enum LogicRule{
+    currentWaveTime,
     waveTimer,
     waves,
     waveSpacing,

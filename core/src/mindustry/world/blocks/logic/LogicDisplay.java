@@ -17,14 +17,16 @@ public class LogicDisplay extends Block{
     public static final byte
         commandClear = 0,
         commandColor = 1,
-        commandStroke = 2,
-        commandLine = 3,
-        commandRect = 4,
-        commandLineRect = 5,
-        commandPoly = 6,
-        commandLinePoly = 7,
-        commandTriangle = 8,
-        commandImage = 9;
+        //virtual command, unpacked in instruction
+        commandColorPack = 2,
+        commandStroke = 3,
+        commandLine = 4,
+        commandRect = 5,
+        commandLineRect = 6,
+        commandPoly = 7,
+        commandLinePoly = 8,
+        commandTriangle = 9,
+        commandImage = 10;
 
     public int maxSides = 25;
 
@@ -125,6 +127,8 @@ public class LogicDisplay extends Block{
     public enum GraphicsType{
         clear,
         color,
+        //virtual
+        col,
         stroke,
         line,
         rect,
@@ -132,7 +136,7 @@ public class LogicDisplay extends Block{
         poly,
         linePoly,
         triangle,
-        image;
+        image,;
 
         public static final GraphicsType[] all = values();
     }

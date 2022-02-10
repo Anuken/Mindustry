@@ -1,5 +1,6 @@
 package mindustry.logic;
 
+import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -880,7 +881,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             //graphics on headless servers are useless.
-            if(Vars.headless) return;
+            if(Vars.headless || exec.graphicsBuffer.size >= maxGraphicsBuffer) return;
 
             int num1 = exec.numi(p1);
 
@@ -888,10 +889,25 @@ public class LExecutor{
                 num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
             }
 
-            //add graphics calls, cap graphics buffer size
-            if(exec.graphicsBuffer.size < maxGraphicsBuffer){
+            //explicitly unpack colorPack, it's pre-processed here
+            if(type == LogicDisplay.commandColorPack){
+                double packed = exec.num(x);
+
+                int value = (int)(Double.doubleToRawLongBits(packed)),
+                r = ((value & 0xff000000) >>> 24),
+                g = ((value & 0x00ff0000) >>> 16),
+                b = ((value & 0x0000ff00) >>> 8),
+                a = ((value & 0x000000ff));
+
+                exec.graphicsBuffer.add(DisplayCmd.get(LogicDisplay.commandColor, pack(r), pack(g), pack(b), pack(a), 0, 0));
+            }else{
+                //add graphics calls, cap graphics buffer size
                 exec.graphicsBuffer.add(DisplayCmd.get(type, packSign(exec.numi(x)), packSign(exec.numi(y)), packSign(num1), packSign(exec.numi(p2)), packSign(exec.numi(p3)), packSign(exec.numi(p4))));
             }
+        }
+
+        static int pack(int value){
+            return value & 0b0111111111;
         }
 
         static int packSign(int value){
@@ -1061,7 +1077,7 @@ public class LExecutor{
         }
     }
 
-    //TODO lookup color instruction and inverse lookup
+    //TODO inverse lookup
     public static class LookupI implements LInstruction{
         public int dest;
         public int from;
@@ -1079,6 +1095,26 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             exec.setobj(dest, constants.lookupContent(type, exec.numi(from)));
+        }
+    }
+
+    public static class PackColorI implements LInstruction{
+        public int result, r, g, b, a;
+
+        public PackColorI(int result, int r, int g, int b, int a){
+            this.result = result;
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.a = a;
+        }
+
+        public PackColorI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            exec.setnum(result, Color.toDoubleBits(Mathf.clamp(exec.numf(r)), Mathf.clamp(exec.numf(g)), Mathf.clamp(exec.numf(b)), Mathf.clamp(exec.numf(a))));
         }
     }
 
@@ -1203,6 +1239,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             switch(rule){
                 case waveTimer -> state.rules.waveTimer = exec.bool(value);
+                case currentWaveTime -> state.wavetime = exec.numf(value) * 60f;
                 case waves -> state.rules.waves = exec.bool(value);
                 case attackMode -> state.rules.attackMode = exec.bool(value);
                 case waveSpacing -> state.rules.waveSpacing = exec.numf(value) * 60f;

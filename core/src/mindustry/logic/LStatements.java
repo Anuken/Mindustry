@@ -180,6 +180,9 @@ public class LStatements{
                         row(s);
                         fields(s, "a", p2, v -> p2 = v);
                     }
+                    case col -> {
+                        fields(s, "color", x, v -> x = v).width(144f);
+                    }
                     case stroke -> {
                         s.add().width(4);
                         fields(s, x, v -> x = v);
@@ -722,6 +725,35 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("packcolor")
+    public static class PackColorStatement extends LStatement{
+        public String result = "result", r = "1", g = "0", b = "0", a = "1";
+
+        @Override
+        public void build(Table table){
+            fields(table, result, str -> result = str);
+
+            table.add(" = pack ");
+
+            row(table);
+
+            fields(table, r, str -> r = str);
+            fields(table, g, str -> g = str);
+            fields(table, b, str -> b = str);
+            fields(table, a, str -> a = str);
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicOperations;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new PackColorI(builder.var(result), builder.var(r), builder.var(g), builder.var(b), builder.var(a));
+        }
+    }
+
     @RegisterStatement("end")
     public static class EndStatement extends LStatement{
         @Override
@@ -1217,7 +1249,7 @@ public class LStatements{
             table.button(b -> {
                 b.label(() -> rule.name()).growX().wrap().labelAlign(Align.center);
                 b.clicked(() -> showSelect(b, LogicRule.all, rule, o -> rule = o, 2, c -> c.width(150f)));
-            }, Styles.logict, () -> {}).size(150f, 40f).pad(4f).color(table.color);
+            }, Styles.logict, () -> {}).size(160f, 40f).pad(4f).color(table.color);
 
             table.add(" = ");
 
