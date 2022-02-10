@@ -31,11 +31,12 @@ public class RegionPart extends DrawPart{
     public Blending blending = Blending.normal;
     public float layer = -1, layerOffset = 0f;
     public float outlineLayerOffset = -0.001f;
-    public float rotation, rotMove;
-    public float x, y, moveX, moveY;
+    public float x, y, rotation;
+    public float moveX, moveY, moveRot;
     public @Nullable Color color, colorTo;
     public Color heatColor = Pal.turretHeat.cpy();
     public Seq<DrawPart> children = new Seq<>();
+    public Seq<PartMove> moves = new Seq<>();
 
     public RegionPart(String region){
         this.suffix = region;
@@ -61,6 +62,17 @@ public class RegionPart extends DrawPart{
 
         float prevZ = Draw.z();
         float prog = progress.getClamp(params);
+        float mx = moveX * prog, my = moveY * prog, mr = moveRot * prog;
+
+        if(moves.size > 0){
+            for(int i = 0; i < moves.size; i++){
+                var move = moves.get(i);
+                float p = move.progress.getClamp(params);
+                mx += move.x * p;
+                my += move.y * p;
+                mr += move.rot * p;
+            }
+        }
 
         int len = mirror && params.sideOverride == -1 ? 2 : 1;
 
@@ -71,12 +83,12 @@ public class RegionPart extends DrawPart{
             //can be null
             var region = drawRegion ? regions[Math.min(i, regions.length - 1)] : null;
             float sign = (i == 0 ? 1 : -1) * params.sideMultiplier;
-            Tmp.v1.set((x + moveX * prog) * sign, y + moveY * prog).rotate(params.rotation - 90);
+            Tmp.v1.set((x + mx) * sign, y + my).rotate(params.rotation - 90);
 
             float
                 rx = params.x + Tmp.v1.x,
                 ry = params.y + Tmp.v1.y,
-                rot = rotMove * prog * sign + params.rotation - 90;
+                rot = mr * sign + params.rotation - 90;
 
             Draw.xscl = sign;
 
@@ -113,9 +125,9 @@ public class RegionPart extends DrawPart{
             for(int s = 0; s < len; s++){
                 int i = (params.sideOverride == -1 ? s : params.sideOverride);
                 float sign = (i == 1 ? -1 : 1) * params.sideMultiplier;
-                Tmp.v1.set((x + moveX * prog) * sign, y + moveY * prog).rotate(params.rotation - 90);
+                Tmp.v1.set((x + mx) * sign, y + my).rotate(params.rotation - 90);
 
-                childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.x + Tmp.v1.x, params.y + Tmp.v1.y, i * sign + rotMove * prog * sign + params.rotation);
+                childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.x + Tmp.v1.x, params.y + Tmp.v1.y, i * sign + mr * sign + params.rotation);
                 childParam.sideMultiplier = params.sideMultiplier;
                 childParam.life = params.life;
                 childParam.sideOverride = i;

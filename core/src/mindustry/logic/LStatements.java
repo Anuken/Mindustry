@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
@@ -1203,6 +1204,39 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new SpawnUnitI(builder.var(type), builder.var(x), builder.var(y), builder.var(rotation), builder.var(team), effect, builder.var(result));
+        }
+    }
+
+    @RegisterStatement("setrule")
+    public static class SetRuleStatement extends LStatement{
+        public LogicRule rule = LogicRule.waveSpacing;
+        public String value = "100";
+
+        @Override
+        public void build(Table table){
+            table.button(b -> {
+                b.label(() -> rule.name()).growX().wrap().labelAlign(Align.center);
+                b.clicked(() -> showSelect(b, LogicRule.all, rule, o -> rule = o, 2, c -> c.width(150f)));
+            }, Styles.logict, () -> {}).size(150f, 40f).pad(4f).color(table.color);
+
+            table.add(" = ");
+
+            field(table, value, s -> value = s);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicWorld;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SetRuleI(rule, builder.var(value));
         }
     }
 }

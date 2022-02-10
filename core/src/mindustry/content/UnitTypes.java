@@ -2542,7 +2542,7 @@ public class UnitTypes{
                     under = true;
                     moveX = 0.75f;
                     moveY = 0.75f;
-                    rotMove = 82f;
+                    moveRot = 82f;
                     x = 37 / 4f;
                     y = 8 / 4f;
                 }},
@@ -2578,7 +2578,7 @@ public class UnitTypes{
                         heatColor = new Color(1f, 0.1f, 0.1f);
                         mirror = true;
                         under = true;
-                        rotMove = -40f * fi;
+                        moveRot = -40f * fi;
                         moveX = 3f;
                         layerOffset = -0.002f;
 
@@ -2845,7 +2845,7 @@ public class UnitTypes{
                         y = 10f / 4f;
                         moveY = 1f - fi * 3f;
                         moveX = fi * 0.5f;
-                        rotMove = -30f - fi * 15f;
+                        moveRot = -30f - fi * 15f;
                     }});
                 }
 
@@ -3020,7 +3020,7 @@ public class UnitTypes{
                     heatColor = Color.valueOf("9c50ff");
                     x = 5 / 4f;
                     y = 0f;
-                    rotMove = -33f;
+                    moveRot = -33f;
                     moveY = -1f;
                     moveX = -1f;
                     under = true;
@@ -3059,7 +3059,7 @@ public class UnitTypes{
                     parts.add(new RegionPart("-fin"){{
                         mirror = true;
                         progress = PartProgress.life.mul(3f).curve(Interp.pow5In);
-                        rotMove = 32f;
+                        moveRot = 32f;
                         rotation = -6f;
                         moveY = 1.5f;
                         x = 3f / 4f;

@@ -331,7 +331,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             return node == null || node.parent == null || node.parent.content.unlocked();
         }
 
-        return sector.hasBase() || sector.near().contains(Sector::hasBase); //near an occupied sector
+        return sector.planet.generator != null ?
+            //use planet impl when possible
+            sector.planet.generator.allowLanding(sector) :
+            sector.hasBase() || sector.near().contains(Sector::hasBase); //near an occupied sector
     }
 
     Sector findLauncher(Sector to){

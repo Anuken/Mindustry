@@ -894,6 +894,11 @@ public class MobileInput extends InputHandler implements GestureListener{
             unit.lookAt(unit.prefRotation());
         }
 
+        //validate payload, if it's a destroyed unit/building, remove it
+        if(payloadTarget instanceof Healthc h && !h.isValid()){
+            payloadTarget = null;
+        }
+
         if(payloadTarget != null && unit instanceof Payloadc pay){
             targetPos.set(payloadTarget);
             attractDst = 0f;

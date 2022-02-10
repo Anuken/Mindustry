@@ -1187,5 +1187,33 @@ public class LExecutor{
         }
     }
 
+    public static class SetRuleI implements LInstruction{
+        public LogicRule rule = LogicRule.waveSpacing;
+        public int value;
+
+        public SetRuleI(LogicRule rule, int value){
+            this.rule = rule;
+            this.value = value;
+        }
+
+        public SetRuleI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            switch(rule){
+                case waveTimer -> state.rules.waveTimer = exec.bool(value);
+                case waves -> state.rules.waves = exec.bool(value);
+                case attackMode -> state.rules.attackMode = exec.bool(value);
+                case waveSpacing -> state.rules.waveSpacing = exec.numf(value) * 60f;
+                case enemyCoreBuildRadius -> state.rules.enemyCoreBuildRadius = exec.numf(value) * 8f;
+                case dropZoneRadius -> state.rules.dropZoneRadius = exec.numf(value) * 8f;
+                case unitCap -> state.rules.unitCap = exec.numi(value);
+                case lighting -> state.rules.lighting = exec.bool(value);
+                case ambientLight -> state.rules.ambientLight.fromDouble(exec.num(value));
+            }
+        }
+    }
+
     //endregion
 }

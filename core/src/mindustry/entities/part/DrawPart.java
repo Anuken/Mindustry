@@ -38,6 +38,21 @@ public abstract class DrawPart{
         }
     }
 
+    public static class PartMove{
+        public PartProgress progress = PartProgress.warmup;
+        public float x, y, rot;
+
+        public PartMove(PartProgress progress, float x, float y, float rot){
+            this.progress = progress;
+            this.x = x;
+            this.y = y;
+            this.rot = rot;
+        }
+
+        public PartMove(){
+        }
+    }
+
     public interface PartProgress{
         /** Reload of the weapon - 1 right after shooting, 0 when ready to fire*/
         PartProgress

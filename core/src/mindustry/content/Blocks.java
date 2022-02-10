@@ -3177,7 +3177,7 @@ public class Blocks{
                 new RegionPart("-back"){{
                     progress = PartProgress.warmup;
                     mirror = true;
-                    rotMove = 40f;
+                    moveRot = 40f;
                     x = 22 / 4f;
                     y = -1f / 4f;
                     moveY = 6f / 4f;
@@ -3187,7 +3187,7 @@ public class Blocks{
                 new RegionPart("-front"){{
                     progress = PartProgress.warmup;
                     mirror = true;
-                    rotMove = 40f;
+                    moveRot = 40f;
                     x = 20 / 4f;
                     y = 17f / 4f;
                     moveX = 1f;
@@ -3296,7 +3296,7 @@ public class Blocks{
                     mirror = true;
                     moveX = 2f * 4f / 3f;
                     moveY = -0.5f;
-                    rotMove = -40f;
+                    moveRot = -40f;
                     under = true;
                     heatColor = Color.red.cpy();
                 }});

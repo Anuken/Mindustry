@@ -23,6 +23,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.*;
@@ -37,7 +38,7 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-public class Block extends UnlockableContent{
+public class Block extends UnlockableContent implements Senseable{
     /** If true, buildings have an ItemModule. */
     public boolean hasItems;
     /** If true, buildings have a LiquidModule. */
@@ -1147,5 +1148,29 @@ public class Block extends UnlockableContent{
         if(x == (req.rotation % 2 == 0)){
             req.rotation = Mathf.mod(req.rotation + 2, 4);
         }
+    }
+
+    @Override
+    public double sense(LAccess sensor){
+        return switch(sensor){
+            case color -> Color.toDoubleBits(mapColor.r, mapColor.g, mapColor.b, mapColor.a);
+            case health, maxHealth -> health;
+            case size -> size * tilesize;
+            case itemCapacity -> itemCapacity;
+            case liquidCapacity -> liquidCapacity;
+            case powerCapacity -> consumes.hasPower() && consumes.getPower().buffered ? consumes.getPower().capacity : 0f;
+            default -> Double.NaN;
+        };
+    }
+
+    @Override
+    public double sense(Content content){
+        return Double.NaN;
+    }
+
+    @Override
+    public Object senseObject(LAccess sensor){
+        if(sensor == LAccess.name) return name;
+        return noSensed;
     }
 }
