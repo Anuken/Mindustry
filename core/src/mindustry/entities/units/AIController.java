@@ -33,11 +33,6 @@ public class AIController implements UnitController{
 
     @Override
     public void updateUnit(){
-        if(disabled()){
-            stopShooting();
-            return;
-        }
-
         //use fallback AI when possible
         if(useFallback() && (fallback != null || (fallback = fallback()) != null)){
             if(fallback.unit != unit) fallback.unit(unit);
@@ -55,10 +50,6 @@ public class AIController implements UnitController{
             //ignore mount controllable stats too, they should not shoot either
             mount.shoot = false;
         }
-    }
-
-    public boolean disabled(){
-        return !unit.team.isAI() && !unit.type.defaultAI;
     }
 
     @Nullable

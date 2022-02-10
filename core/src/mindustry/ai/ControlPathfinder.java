@@ -19,7 +19,7 @@ import static mindustry.ai.Pathfinder.*;
 //TODO I'm sure this class has countless problems
 public class ControlPathfinder implements Runnable{
     private static final long maxUpdate = Time.millisToNanos(20);
-    private static final int updateFPS = 40;
+    private static final int updateFPS = 60;
     private static final int updateInterval = 1000 / updateFPS;
 
     public static boolean showDebug = false;
@@ -151,6 +151,7 @@ public class ControlPathfinder implements Runnable{
             req.destination.set(destination);
             req.curId = pathId;
             req.lastUpdateId = state.updateId;
+            req.lastPos.set(unit);
             req.lastWorldUpdate = worldUpdateId;
 
             requests.put(unit, req);
@@ -169,6 +170,16 @@ public class ControlPathfinder implements Runnable{
 
             req.destination.set(destination);
             req.curId = pathId;
+
+            //check for the unit getting stuck every N seconds
+            if((req.stuckTimer += Time.delta) >= 60f * 5f){
+                req.stuckTimer = 0f;
+                //force recalculate
+                if(req.lastPos.within(unit, 1f)){
+                    req.lastWorldUpdate = -1;
+                }
+                req.lastPos.set(unit);
+            }
 
             if(req.done){
                 int[] items = req.result.items;
@@ -193,11 +204,9 @@ public class ControlPathfinder implements Runnable{
                     req.rayPathIndex = req.pathIndex;
                 }
 
-                //TODO indecision dance: moving forward blocks the raycasted node from view, so it moves back.
                 if((req.raycastTimer += Time.delta) >= 50f){
                     for(int i = len - 1; i > req.pathIndex; i--){
                         int val = items[i];
-                        //TODO this raycasting is flawed, it assumes units can move through corners even when they can't.
                         if(!raycast(pathType, tileX, tileY, val % wwidth, val / wwidth)){
                             req.rayPathIndex = i;
                             break;
@@ -343,6 +352,7 @@ public class ControlPathfinder implements Runnable{
 
                     //total update time no longer than maxUpdate
                     for(var req : threadRequests){
+                        //TODO this is flawed with many paths
                         req.update(maxUpdate / requests.size);
                     }
                 }
@@ -365,6 +375,9 @@ public class ControlPathfinder implements Runnable{
         volatile boolean done = false;
         volatile boolean foundEnd = false;
 
+        final Vec2 lastPos = new Vec2();
+        float stuckTimer = 0f;
+
         final Vec2 destination = new Vec2();
         final Vec2 lastDestination = new Vec2();
 
@@ -373,7 +386,8 @@ public class ControlPathfinder implements Runnable{
         volatile int lastWorldUpdate;
 
         //TODO only access on main thread??
-        int pathIndex;
+        volatile int pathIndex;
+
         int rayPathIndex = -1;
         IntSeq result = new IntSeq();
         float raycastTimer;
@@ -386,12 +400,10 @@ public class ControlPathfinder implements Runnable{
 
         int start, goal;
 
+        long lastUpdateId;
         long lastTime;
 
         volatile int lastId, curId;
-
-        //TODO invalidate when not request for a while
-        long lastUpdateId;
 
         void update(long maxUpdateNs){
             if(curId != lastId){

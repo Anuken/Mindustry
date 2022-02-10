@@ -3144,6 +3144,7 @@ public class Blocks{
             coolantOverride = Liquids.water;
             coolantMultiplier = 6f;
 
+            unitFilter = u -> !u.spawnedByCore;
             shootShake = 1f;
             ammoPerShot = 5;
             draw = new DrawTurret("reinforced-");
@@ -3497,7 +3498,7 @@ public class Blocks{
             requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 200, Items.tungsten, 500));
             size = 5;
             //TODO requirements?
-            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 35f, BlockStack.list(Blocks.tungstenWallLarge, 6, Blocks.duct, 14, Blocks.cliffCrusher, 10)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, BlockStack.list(Blocks.tungstenWallLarge, 6, Blocks.duct, 14, Blocks.cliffCrusher, 12)));
             consumes.power(3f);
             areaSize = 13;
 
@@ -3508,8 +3509,8 @@ public class Blocks{
         shipAssembler = new UnitAssembler("ship-assembler"){{
             requirements(Category.units, with(Items.beryllium, 700, Items.oxide, 150, Items.tungsten, 500, Items.silicon, 800));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 25f, BlockStack.list(Blocks.berylliumWallLarge, 4, Blocks.duct, 10, Blocks.plasmaBore, 4)));
-            consumes.power(2f);
+            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 40f, BlockStack.list(Blocks.berylliumWallLarge, 4, Blocks.duct, 10, Blocks.plasmaBore, 4)));
+            consumes.power(3f);
             areaSize = 13;
 
             //consumes.liquid(Liquids.gallium, 2f / 60f);
@@ -3520,8 +3521,8 @@ public class Blocks{
         mechAssembler = new UnitAssembler("mech-assembler"){{
             requirements(Category.units, with(Items.graphite, 600, Items.carbide, 600, Items.oxide, 200, Items.tungsten, 500));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 40f, BlockStack.list(Blocks.tungstenWallLarge, 5, Blocks.duct, 2)));
-            consumes.power(2f);
+            plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 60f, BlockStack.list(Blocks.tungstenWallLarge, 5, Blocks.duct, 2)));
+            consumes.power(3f);
             areaSize = 13;
 
             //consumes.liquid(Liquids.gallium, 2f / 60f);
@@ -3605,6 +3606,7 @@ public class Blocks{
         constructor = new Constructor("constructor"){{
             requirements(Category.units, with(Items.silicon, 100, Items.beryllium, 150, Items.tungsten, 80));
             hasPower = true;
+            buildSpeed = 0.3f;
             consumes.power(2f);
             size = 3;
         }};
@@ -3614,6 +3616,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 150, Items.oxide, 150, Items.tungsten, 200, Items.phaseFabric, 40));
             hasPower = true;
             consumes.power(2f);
+            buildSpeed = 0.3f;
             maxBlockSize = 4;
             minBlockSize = 3;
             size = 5;

@@ -69,8 +69,6 @@ public class UnitType extends UnlockableContent{
     public boolean logicControllable = true;
     public boolean playerControllable = true;
     public boolean allowedInPayloads = true;
-    /** If false, this unit has no AI when not controlled by a player, regardless of AI controller. */
-    public boolean defaultAI = true;
     /** TODO If true, core units need to "dock" to this unit to work, and can un-dock at the unit instead of respawning at core. */
     public boolean coreUnitDock = false;
     public boolean createWreck = true;
@@ -301,10 +299,6 @@ public class UnitType extends UnlockableContent{
                 }).growX().left().height(0f).pad(0f);
             }
         }).growX();
-
-        if(coreUnitDock && !defaultAI){
-            table.row().add("@units.nocontroller").growX().left().row();
-        }
 
         if(unit.controller() instanceof LogicAI){
             table.row();

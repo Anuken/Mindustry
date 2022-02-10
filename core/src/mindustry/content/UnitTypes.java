@@ -3323,7 +3323,6 @@ public class UnitTypes{
 
         manifold = new ErekirUnitType("manifold"){{
             defaultController = CargoAI::new;
-            defaultAI = true;
             isCounted = false;
             allowedInPayloads = false;
             logicControllable = false;
@@ -3350,7 +3349,6 @@ public class UnitTypes{
         assemblyDrone = new ErekirUnitType("assembly-drone"){{
             defaultController = AssemblerAI::new;
 
-            defaultAI = true;
             flying = true;
             drag = 0.06f;
             accel = 0.11f;

@@ -19,11 +19,6 @@ public class SuicideAI extends GroundAI{
 
     @Override
     public void updateUnit(){
-        if(disabled()){
-            stopShooting();
-            return;
-        }
-
         if(Units.invalidateTarget(target, unit.team, unit.x, unit.y, Float.MAX_VALUE)){
             target = null;
         }
