@@ -479,7 +479,7 @@ public class PlacementFragment extends Fragment{
         Tile hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
         if(hoverTile != null){
             //if the tile has a building, display it
-            if(hoverTile.build != null){
+            if(hoverTile.build != null && hoverTile.build.displayable()){
                 hoverTile.build.updateFlow = true;
                 return hoverTile.build;
             }

@@ -3140,7 +3140,7 @@ public class UnitTypes{
             mineTier = 4;
             buildSpeed = 0.8f;
             drag = 0.08f;
-            speed = 5.3f;
+            speed = 5.4f;
             rotateSpeed = 7f;
             accel = 0.09f;
             itemCapacity = 60;
@@ -3197,7 +3197,7 @@ public class UnitTypes{
             mineTier = 4;
             buildSpeed = 1.1f;
             drag = 0.08f;
-            speed = 6.5f;
+            speed = 6.6f;
             rotateSpeed = 8f;
             accel = 0.09f;
             itemCapacity = 90;
@@ -3266,7 +3266,7 @@ public class UnitTypes{
             mineTier = 4;
             buildSpeed = 1.4f;
             drag = 0.08f;
-            speed = 7.3f;
+            speed = 7.4f;
             rotateSpeed = 8f;
             accel = 0.08f;
             itemCapacity = 110;

@@ -3816,6 +3816,7 @@ public class Blocks{
             requirements(Category.logic, BuildVisibility.editorOnly, with());
 
             //TODO customizable IPT
+            targetable = false;
             instructionsPerTick = 8;
             forceDark = true;
             privileged = true;

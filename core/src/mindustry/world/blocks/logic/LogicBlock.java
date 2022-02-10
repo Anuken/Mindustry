@@ -382,6 +382,11 @@ public class LogicBlock extends Block{
         }
 
         @Override
+        public boolean displayable(){
+            return accessible();
+        }
+
+        @Override
         public void damage(float damage){
             if(!privileged){
                 super.damage(damage);
