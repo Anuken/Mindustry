@@ -64,8 +64,17 @@ public class ControlPathfinder{
             start();
         });
 
+        //only update the world when a solid block is removed or placed, everything else doesn't matter
+        Events.on(TilePreChangeEvent.class, e -> {
+            if(e.tile.solid()){
+                worldUpdateId ++;
+            }
+        });
+
         Events.on(TileChangeEvent.class, e -> {
-            worldUpdateId ++;
+            if(e.tile.solid()){
+                worldUpdateId ++;
+            }
         });
 
         Events.on(ResetEvent.class, event -> stop());
@@ -447,7 +456,7 @@ public class ControlPathfinder{
             lastId = curId;
 
             //re-do everything when world updates
-            if(Time.timeSinceMillis(lastTime) > 1000 * 2 && (worldUpdateId != lastWorldUpdate || !destination.epsilonEquals(lastDestination, 2f))){
+            if(Time.timeSinceMillis(lastTime) > 1000 * 3 && (worldUpdateId != lastWorldUpdate || !destination.epsilonEquals(lastDestination, 2f))){
                 lastTime = Time.millis();
                 lastWorldUpdate = worldUpdateId;
                 pathIndex = 0;

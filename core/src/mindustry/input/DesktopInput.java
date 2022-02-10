@@ -280,7 +280,7 @@ public class DesktopInput extends InputHandler{
         }
 
         //validate commanding units
-        selectedUnits.removeAll(u -> !u.isCommandable());
+        selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
 
         if(!scene.hasMouse() && !locked){
             if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){
