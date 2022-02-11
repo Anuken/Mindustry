@@ -180,7 +180,7 @@ public class UnitType extends UnlockableContent{
     public boolean hidden = false;
     public boolean internal = false;
     /** A sample of the unit that this type creates. Do not modify! */
-    public Unit sample;
+    public @Nullable Unit sample;
 
     //for crawlers
     public int segments = 0;
