@@ -89,7 +89,7 @@ public class FogRenderer implements CustomChunk{
         //TODO slow and terrible
         Groups.unit.each(u -> {
             if(u.team == player.team()){
-                Fill.circle(u.x, u.y, u.type.lightRadius);
+                Fill.circle(u.x, u.y, u.type.lightRadius * 1.5f);
             }
         });
 

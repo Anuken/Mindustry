@@ -527,6 +527,19 @@ public class Fx{
         Lines.circle(e.x, e.y, 2f + e.finpow() * 7f);
     }),
 
+    disperseTrail = new Effect(13, e -> {
+        color(Color.white, e.color, e.fin());
+        stroke(0.6f + e.fout() * 1.7f);
+        rand.setSeed(e.id);
+
+        for(int i = 0; i < 2; i++){
+            float rot = e.rotation + rand.range(15f) + 180f;
+            v.trns(rot, rand.random(e.fin() * 27f));
+            lineAngle(e.x + v.x, e.y + v.y, rot, e.fout() * rand.random(2f, 7f) + 1.5f);
+        }
+    }),
+
+
     hitBulletSmall = new Effect(14, e -> {
         color(Color.white, Pal.lightOrange, e.fin());
 

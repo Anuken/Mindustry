@@ -3323,11 +3323,10 @@ public class Blocks{
                 speed = 8.5f;
                 //width = 11f;
                 //height = 19f;
-                width = height = 18;
+                width = height = 16;
                 shrinkY = 0.3f;
                 backSprite = "large-bomb-back";
                 sprite = "mine-bullet";
-                trailColor = Pal.bulletYellowBack;
                 velocityInaccuracy = 0.11f;
                 collidesGround = false;
                 collidesTiles = false;
@@ -3335,10 +3334,13 @@ public class Blocks{
                 smokeEffect = Fx.shootBigSmoke2;
                 frontColor = trailColor = Color.white;
                 backColor = Color.valueOf("869cbe");
-                trailInterval = 3;
+                //trailInterval = 3;
+                trailChance = 0.44f;
 
                 lifetime = 34f;
                 rotationOffset = 90f;
+                trailRotation = true;
+                trailEffect = Fx.disperseTrail;
                 //spin = 360f;
 
                 //controversial
@@ -3350,9 +3352,10 @@ public class Blocks{
             //TODO bullet.
 
             //recoilAmount = 1f;
-            reloadTime = 8f;
-            shootLength = 14f;
+            reloadTime = 9f;
+            shootLength = 15f;
             rotateSpeed = 5f;
+            shootCone = 30f;
 
             coolantUsage = 30f / 60f;
             coolantOverride = Liquids.water;
