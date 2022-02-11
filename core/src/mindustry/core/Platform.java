@@ -79,9 +79,10 @@ public interface Platform{
     }
 
     default Context getScriptContext(){
-        Context c = Context.enter();
-        c.setOptimizationLevel(9);
-        return c;
+        Context context = Context.getCurrentContext();
+        if(context == null) context = Context.enter();
+        context.setOptimizationLevel(9);
+        return context;
     }
 
     /** Update discord RPC. */
