@@ -72,7 +72,6 @@ public class Blocks{
     //erekir
     siliconArcFurnace, electrolyzer, oxidationChamber, atmosphericConcentrator, electricHeater, phaseHeater, heatRedirector, slagIncinerator,
     carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer, heatReactor,
-    cellSynthesisChamber,
 
     //sandbox
     powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator,
@@ -1428,37 +1427,6 @@ public class Blocks{
             consumes.item(Items.thorium, 3);
             consumes.liquid(Liquids.nitrogen, 1f / 60f);
             outputItem = new ItemStack(Items.fissileMatter, 1);
-        }};
-
-        //TODO needs to be completely redone from the ground up
-        if(false)
-        cellSynthesisChamber = new LiquidConverter("cell-synthesis-chamber"){{
-            //TODO booster mechanics?
-            requirements(Category.crafting, with(Items.thorium, 100, Items.phaseFabric, 120, Items.titanium, 150, Items.surgeAlloy, 70));
-            outputLiquid = new LiquidStack(Liquids.neoplasm, 0.4f);
-            craftTime = 200f;
-            size = 3;
-            hasPower = true;
-            hasItems = true;
-            hasLiquids = true;
-            rotate = false;
-            solid = true;
-            outputsLiquid = true;
-            drawer = new DrawCells(){{
-                color = Color.valueOf("9e172c");
-                particleColorFrom = Color.valueOf("9e172c");
-                particleColorTo = Color.valueOf("f98f4a");
-                radius = 2.5f;
-                lifetime = 1400f;
-                recurrence = 2f;
-                particles = 20;
-                range = 3f;
-            }};
-            liquidCapacity = 30f;
-
-            consumes.power(2f);
-            consumes.items(with(Items.sporePod, 3, Items.phaseFabric, 1));
-            consumes.liquid(Liquids.water, 0.8f);
         }};
 
         //endregion
