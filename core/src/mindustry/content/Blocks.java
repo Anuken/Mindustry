@@ -3323,7 +3323,8 @@ public class Blocks{
                 speed = 8.5f;
                 //width = 11f;
                 //height = 19f;
-                width = height = 17;
+                width = height = 18;
+                shrinkY = 0.3f;
                 backSprite = "large-bomb-back";
                 sprite = "mine-bullet";
                 trailColor = Pal.bulletYellowBack;
@@ -3360,6 +3361,7 @@ public class Blocks{
 
             }};
 
+            unitFilter = u -> !u.spawnedByCore;
             shots = 4;
             alternate = true;
             widthSpread = true;
