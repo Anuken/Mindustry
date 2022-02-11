@@ -9,7 +9,6 @@ import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
-import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
@@ -277,10 +276,8 @@ public class DesktopInput extends InputHandler{
 
         shouldShoot = !scene.hasMouse() && !locked;
 
-        if(!locked && state.rules.unitCommand && block == null){
-            //if(input.keyTap(Binding.commandMode)){
-                commandMode = input.keyDown(Binding.commandMode);
-            //}
+        if(!locked && state.rules.unitCommand && block == null && !scene.hasField()){
+            commandMode = input.keyDown(Binding.commandMode);
         }else{
             commandMode = false;
         }
@@ -317,7 +314,7 @@ public class DesktopInput extends InputHandler{
             player.shooting = false;
         }
 
-        if(state.isGame() && !scene.hasDialog() && !(scene.getKeyboardFocus() instanceof TextField)){
+        if(state.isGame() && !scene.hasDialog() && !scene.hasField()){
             if(Core.input.keyTap(Binding.minimap)) ui.minimapfrag.toggle();
             if(Core.input.keyTap(Binding.planet_map) && state.isCampaign()) ui.planet.toggle();
             if(Core.input.keyTap(Binding.research) && state.isCampaign()) ui.research.toggle();
@@ -450,7 +447,7 @@ public class DesktopInput extends InputHandler{
     }
 
     void pollInput(){
-        if(scene.getKeyboardFocus() instanceof TextField) return;
+        if(scene.hasField()) return;
 
         Tile selected = tileAt(Core.input.mouseX(), Core.input.mouseY());
         int cursorX = tileX(Core.input.mouseX());

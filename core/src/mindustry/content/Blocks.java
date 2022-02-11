@@ -3319,23 +3319,31 @@ public class Blocks{
             requirements(Category.turret, with(Items.carbide, 250, Items.surgeAlloy, 160, Items.silicon, 300, Items.beryllium, 400));
 
             ammo(Items.scrap, new BasicBulletType(){{
-                damage = 40;
+                damage = 50;
                 speed = 8.5f;
-                width = 11f;
-                height = 16f;
+                //width = 11f;
+                //height = 19f;
+                width = height = 17;
+                backSprite = "large-bomb-back";
+                sprite = "mine-bullet";
                 trailColor = Pal.bulletYellowBack;
                 velocityInaccuracy = 0.11f;
                 collidesGround = false;
                 collidesTiles = false;
                 shootEffect = Fx.shootBig2;
                 smokeEffect = Fx.shootBigSmoke2;
-                frontColor = Color.white;
+                frontColor = trailColor = Color.white;
                 backColor = Color.valueOf("869cbe");
+                trailInterval = 3;
 
                 lifetime = 34f;
+                rotationOffset = 90f;
+                //spin = 360f;
+
                 //controversial
-                homingDelay = 10f;
-                homingPower = 0.01f;
+                //homingDelay = 10f;
+                //homingPower = 0.01f;
+                hitEffect = despawnEffect = Fx.hitBulletColor;
             }});
 
             //TODO bullet.
@@ -3357,7 +3365,7 @@ public class Blocks{
             widthSpread = true;
             targetGround = false;
             spread = 4.6f;
-            inaccuracy = 9f;
+            inaccuracy = 8f;
 
             restitution = 0.1f;
             shootWarmupSpeed = 0.08f;
@@ -3368,6 +3376,8 @@ public class Blocks{
             scaledHealth = 340;
             range = 270f;
             size = 4;
+
+            limitRange(4f);
         }};
 
         //endregion

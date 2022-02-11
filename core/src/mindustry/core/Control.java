@@ -589,7 +589,7 @@ public class Control implements ApplicationListener, Loadable{
                 }
             }
 
-            if(!mobile && Core.input.keyTap(Binding.screenshot) && !(scene.getKeyboardFocus() instanceof TextField) && !scene.hasKeyboard()){
+            if(!mobile && Core.input.keyTap(Binding.screenshot) && !scene.hasField() && !scene.hasKeyboard()){
                 renderer.takeMapScreenshot();
             }
 
