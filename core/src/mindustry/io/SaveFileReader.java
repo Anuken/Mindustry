@@ -203,6 +203,8 @@ public abstract class SaveFileReader{
     public interface CustomChunk{
         void write(DataOutput stream) throws IOException;
         void read(DataInput stream) throws IOException;
-        boolean shouldWrite();
+        default boolean shouldWrite(){
+            return true;
+        }
     }
 }

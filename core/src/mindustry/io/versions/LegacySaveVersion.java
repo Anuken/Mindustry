@@ -4,14 +4,13 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.game.*;
-import mindustry.io.*;
 import mindustry.world.*;
 
 import java.io.*;
 
 import static mindustry.Vars.*;
 
-public abstract class LegacySaveVersion extends SaveVersion{
+public abstract class LegacySaveVersion extends LegacyRegionSaveVersion{
 
     public LegacySaveVersion(int version){
         super(version);

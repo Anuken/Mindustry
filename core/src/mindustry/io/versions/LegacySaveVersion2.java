@@ -3,12 +3,11 @@ package mindustry.io.versions;
 import arc.func.*;
 import arc.util.io.*;
 import mindustry.gen.*;
-import mindustry.io.*;
 
 import java.io.*;
 
 /** This version did not read/write entity IDs to the save. */
-public class LegacySaveVersion2 extends SaveVersion{
+public class LegacySaveVersion2 extends LegacyRegionSaveVersion{
 
     public LegacySaveVersion2(int version){
         super(version);

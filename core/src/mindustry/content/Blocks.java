@@ -3318,18 +3318,23 @@ public class Blocks{
         disperse = new ItemTurret("disperse"){{
             requirements(Category.turret, with(Items.carbide, 250, Items.surgeAlloy, 160, Items.silicon, 300, Items.beryllium, 400));
 
-            ammo(Items.graphite, new BasicBulletType(){{
+            ammo(Items.scrap, new BasicBulletType(){{
                 damage = 40;
-                speed = 7f;
-                width = 9f;
-                height = 15f;
+                speed = 8f;
+                width = 11f;
+                height = 16f;
                 trailColor = Pal.bulletYellowBack;
+                velocityInaccuracy = 0.11f;
+                collidesGround = false;
+                collidesTiles = false;
+                shootEffect = Fx.shootBig2;
+                smokeEffect = Fx.shootBigSmoke2;
             }});
 
             //TODO bullet.
 
             //recoilAmount = 1f;
-            reloadTime = 5f;
+            reloadTime = 8f;
             shootLength = 15f;
             rotateSpeed = 5f;
 
@@ -3343,7 +3348,9 @@ public class Blocks{
             shots = 4;
             alternate = true;
             widthSpread = true;
+            targetGround = false;
             spread = 4.6f;
+            inaccuracy = 8f;
 
             restitution = 0.1f;
             shootWarmupSpeed = 0.08f;

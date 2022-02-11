@@ -60,11 +60,18 @@ public class FogRenderer implements CustomChunk{
 
     public void drawFog(){
         //resize if world size changes
-        buffer.resize(world.width(), world.height());
+        boolean clear = buffer.resizeCheck(world.width(), world.height());
 
         //set projection to whole map
         Draw.proj(0, 0, buffer.getWidth() * tilesize, buffer.getHeight() * tilesize);
-        buffer.begin();
+
+        //if the buffer resized, it contains garbage now, clear it.
+        if(clear){
+            buffer.begin(Color.black);
+        }else{
+            buffer.begin();
+        }
+
         Gl.blendEquationSeparate(Gl.max, Gl.max);
         ScissorStack.push(rect.set(1, 1, buffer.getWidth() - 2, buffer.getHeight() - 2));
 

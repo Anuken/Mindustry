@@ -553,6 +553,7 @@ public class Turret extends ReloadTurret{
                         bulletOffset.trns(rotation - 90, (spread) * i + Mathf.range(xRand), shootLength);
                         bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
                         shotCounter ++;
+                        effects();
                     }
                 }else{
                     bulletOffset.trns(rotation, shootLength, Mathf.range(xRand));
@@ -561,11 +562,11 @@ public class Turret extends ReloadTurret{
                         bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - (int)(shots / 2f)) * spread);
                         shotCounter ++;
                     }
+                    effects();
                 }
 
                 recoil = recoilAmount;
                 heat = 1f;
-                effects();
                 useAmmo();
             }
         }
