@@ -127,7 +127,7 @@ public class Blocks{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
     //turrets - erekir
-    breach, sublimate, titan, afflict,
+    breach, sublimate, titan, disperse, afflict,
 
     //units
     commandCenter,
@@ -3315,33 +3315,45 @@ public class Blocks{
             size = 4;
         }};
 
-        /*
-        afflict = new ContinuousTurret("afflict"){{
+        disperse = new ItemTurret("disperse"){{
             requirements(Category.turret, with(Items.carbide, 250, Items.surgeAlloy, 160, Items.silicon, 300, Items.beryllium, 400));
+
+            ammo(Items.graphite, new BasicBulletType(){{
+                damage = 40;
+                speed = 7f;
+                width = 9f;
+                height = 15f;
+                trailColor = Pal.bulletYellowBack;
+            }});
 
             //TODO bullet.
 
-            shootShake = 4f;
-            recoilAmount = 1f;
-            reloadTime = 60f * 3f;
-            shootLength = 7f;
-            rotateSpeed = 2.5f;
+            //recoilAmount = 1f;
+            reloadTime = 5f;
+            shootLength = 15f;
+            rotateSpeed = 5f;
 
             coolantUsage = 30f / 60f;
             coolantOverride = Liquids.water;
 
-            draw = new DrawTurret("reinforced-");
+            draw = new DrawTurret("reinforced-"){{
 
-            restitution = 0.02f;
+            }};
+
+            shots = 4;
+            alternate = true;
+            spread = 4.6f;
+
+            restitution = 0.1f;
             shootWarmupSpeed = 0.08f;
 
             outlineColor = Pal.darkOutline;
             acceptCoolant = false;
 
-            scaledHealth = 300;
-            range = 390f;
+            scaledHealth = 340;
+            range = 250f;
             size = 4;
-        }};*/
+        }};
 
         //endregion
         //region units
