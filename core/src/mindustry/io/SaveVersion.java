@@ -23,13 +23,23 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public abstract class SaveVersion extends SaveFileReader{
-    public int version;
+    protected static OrderedMap<String, CustomChunk> customChunks = new OrderedMap<>();
+
+    public final int version;
 
     //HACK stores the last read build of the save file, valid after read meta call
     protected int lastReadBuild;
     //stores entity mappings for use after readEntityMapping
     //if null, fall back to EntityMapping's values
     protected @Nullable Prov[] entityMapping;
+
+    /**
+     * Registers a custom save chunk reader/writer by name. This is mostly used for mods that need to save extra data.
+     * @param name a mod-specific, unique name for identifying this chunk. Prefixing is recommended.
+     * */
+    public static void addCustomChunk(String name, CustomChunk chunk){
+        customChunks.put(name, chunk);
+    }
 
     public SaveVersion(int version){
         this.version = version;
@@ -56,23 +66,49 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     @Override
-    public final void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException{
+    public void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException{
         region("meta", stream, counter, this::readMeta);
         region("content", stream, counter, this::readContentHeader);
 
         try{
             region("map", stream, counter, in -> readMap(in, context));
             region("entities", stream, counter, this::readEntities);
+            region("custom", stream, counter, this::readCustomChunks);
         }finally{
             content.setTemporaryMapper(null);
         }
     }
 
-    public final void write(DataOutputStream stream, StringMap extraTags) throws IOException{
+    public void write(DataOutputStream stream, StringMap extraTags) throws IOException{
         region("meta", stream, out -> writeMeta(out, extraTags));
         region("content", stream, this::writeContentHeader);
         region("map", stream, this::writeMap);
         region("entities", stream, this::writeEntities);
+        region("custom", stream, this::writeCustomChunks);
+    }
+
+    public void writeCustomChunks(DataOutput stream) throws IOException{
+        var chunks = customChunks.orderedKeys().select(s -> customChunks.get(s).shouldWrite());
+        stream.writeInt(chunks.size);
+        for(var chunkName : chunks){
+            var chunk = customChunks.get(chunkName);
+            stream.writeUTF(chunkName);
+
+            writeChunk(stream, false, chunk::write);
+        }
+    }
+
+    public void readCustomChunks(DataInput stream) throws IOException{
+        int amount = stream.readInt();
+        for(int i = 0; i < amount; i++){
+            String name = stream.readUTF();
+            var chunk = customChunks.get(name);
+            if(chunk != null){
+                readChunk(stream, false, chunk::read);
+            }else{
+                skipChunk(stream);
+            }
+        }
     }
 
     public void writeMeta(DataOutput stream, StringMap tags) throws IOException{

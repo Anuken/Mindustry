@@ -113,6 +113,8 @@ public class Rules{
     public ObjectSet<String> researched = new ObjectSet<>();
     /** Block containing these items as requirements are hidden. */
     public ObjectSet<Item> hiddenBuildItems = new ObjectSet<>();
+    /** HIGHLY UNSTABLE/EXPERIMENTAL. DO NOT USE THIS. */
+    public boolean fog = false;
     /** Whether ambient lighting is enabled. */
     public boolean lighting = false;
     /** Whether enemy lighting is visible.

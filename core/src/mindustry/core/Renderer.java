@@ -37,6 +37,7 @@ public class Renderer implements ApplicationListener{
     private static final Interp landInterp = Interp.pow3;
 
     public final BlockRenderer blocks = new BlockRenderer();
+    public final FogRenderer fog = new FogRenderer();
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
     public final LightRenderer lights = new LightRenderer();
@@ -342,6 +343,7 @@ public class Renderer implements ApplicationListener{
         }
 
         Draw.draw(Layer.overlayUI, overlays::drawTop);
+        if(state.rules.fog) Draw.draw(Layer.fogOfWar, fog::drawFog);
         Draw.draw(Layer.space, this::drawLanding);
 
         Events.fire(Trigger.drawOver);

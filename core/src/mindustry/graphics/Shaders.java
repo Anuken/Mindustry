@@ -21,6 +21,7 @@ public class Shaders{
     public static UnitBuildShader build;
     public static UnitArmorShader armor;
     public static DarknessShader darkness;
+    public static FogShader fog;
     public static LightShader light;
     public static SurfaceShader water, mud, tar, slag, cryofluid, space, caustics, arkycite;
     public static PlanetShader planet;
@@ -41,6 +42,7 @@ public class Shaders{
             shield = null;
             t.printStackTrace();
         }
+        fog = new FogShader();
         buildBeam = new BuildBeamShader();
         build = new UnitBuildShader();
         armor = new UnitArmorShader();
@@ -175,6 +177,12 @@ public class Shaders{
     public static class DarknessShader extends LoadShader{
         public DarknessShader(){
             super("darkness", "default");
+        }
+    }
+
+    public static class FogShader extends LoadShader{
+        public FogShader(){
+            super("fog", "default");
         }
     }
 

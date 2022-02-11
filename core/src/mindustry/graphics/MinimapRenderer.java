@@ -2,6 +2,7 @@ package mindustry.graphics;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -133,6 +134,23 @@ public class MinimapRenderer{
         }
 
         Draw.reset();
+
+        if(state.rules.fog){
+            if(withLabels){
+                float z = zoom;
+                //max zoom out fixes everything, somehow?
+                setZoom(99999f);
+                getRegion();
+                zoom = z;
+            }
+            Draw.shader(Shaders.fog);
+            renderer.fog.getTexture().setFilter(TextureFilter.nearest);
+            //crisp pixels
+            Tmp.tr1.set(renderer.fog.getTexture());
+            Tmp.tr1.set(region.u, 1f - region.v, region.u2, 1f - region.v2);
+            Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
+            Draw.shader();
+        }
 
         //TODO might be useful in the standard minimap too
         if(withLabels){

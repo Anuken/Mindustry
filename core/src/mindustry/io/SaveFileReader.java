@@ -72,10 +72,11 @@ public abstract class SaveFileReader{
     "slag", "molten-slag"
     );
 
-    protected final ReusableByteOutStream byteOutput = new ReusableByteOutStream();
-    protected final DataOutputStream dataBytes = new DataOutputStream(byteOutput);
+    protected final ReusableByteOutStream byteOutput = new ReusableByteOutStream(), byteOutput2 = new ReusableByteOutStream();
+    protected final DataOutputStream dataBytes = new DataOutputStream(byteOutput), dataBytes2 = new DataOutputStream(byteOutput2);
     protected final ReusableByteOutStream byteOutputSmall = new ReusableByteOutStream();
     protected final DataOutputStream dataBytesSmall = new DataOutputStream(byteOutputSmall);
+    protected boolean chunkNested = false;
 
     protected int lastRegionLength;
     protected @Nullable CounterInputStream currCounter;
@@ -112,23 +113,41 @@ public abstract class SaveFileReader{
     }
 
     /** Write a chunk of input to the stream. An integer of some length is written first, followed by the data. */
-    public void writeChunk(DataOutput output, boolean isByte, IORunner<DataOutput> runner) throws IOException{
-        ReusableByteOutStream dout = isByte ? byteOutputSmall : byteOutput;
-        //reset output position
-        dout.reset();
-        //write the needed info
-        runner.accept(isByte ? dataBytesSmall : dataBytes);
-        int length = dout.size();
-        //write length (either int or byte) followed by the output bytes
-        if(!isByte){
-            output.writeInt(length);
-        }else{
-            if(length > 65535){
-                throw new IOException("Byte write length exceeded: " + length + " > 65535");
-            }
-            output.writeShort(length);
+    public void writeChunk(DataOutput output, boolean isShort, IORunner<DataOutput> runner) throws IOException{
+
+        //TODO awful
+        boolean wasNested = chunkNested;
+        if(!isShort){
+            chunkNested = true;
         }
-        output.write(dout.getBytes(), 0, length);
+        ReusableByteOutStream dout =
+            isShort ? byteOutputSmall :
+            wasNested ? byteOutput2 :
+            byteOutput;
+        try{
+            //reset output position
+            dout.reset();
+            //write the needed info
+            runner.accept(
+                isShort ? dataBytesSmall :
+                wasNested ? dataBytes2 :
+                dataBytes
+            );
+
+            int length = dout.size();
+            //write length (either int or byte) followed by the output bytes
+            if(!isShort){
+                output.writeInt(length);
+            }else{
+                if(length > 65535){
+                    throw new IOException("Byte write length exceeded: " + length + " > 65535");
+                }
+                output.writeShort(length);
+            }
+            output.write(dout.getBytes(), 0, length);
+        }finally{
+            chunkNested = wasNested;
+        }
     }
 
     public int readChunk(DataInput input, IORunner<DataInput> runner) throws IOException{
@@ -148,8 +167,8 @@ public abstract class SaveFileReader{
     }
 
     /** Skip a chunk completely, discarding the bytes. */
-    public void skipChunk(DataInput input, boolean isByte) throws IOException{
-        int length = readChunk(input, isByte, t -> {});
+    public void skipChunk(DataInput input, boolean isShort) throws IOException{
+        int length = readChunk(input, isShort, t -> {});
         int skipped = input.skipBytes(length);
         if(length != skipped){
             throw new IOException("Could not skip bytes. Expected length: " + length + "; Actual length: " + skipped);
@@ -179,5 +198,11 @@ public abstract class SaveFileReader{
 
     public interface IORunner<T>{
         void accept(T stream) throws IOException;
+    }
+
+    public interface CustomChunk{
+        void write(DataOutput stream) throws IOException;
+        void read(DataInput stream) throws IOException;
+        boolean shouldWrite();
     }
 }

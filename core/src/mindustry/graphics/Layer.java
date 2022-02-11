@@ -92,6 +92,9 @@ public class Layer{
     //names of players in the game
     playerName = 150,
 
+    //fog of war effect, if applicable
+    fogOfWar = 155,
+
     //space effects, currently only the land and launch effects
     space = 160,
 
