@@ -88,6 +88,7 @@ public class Blocks{
     regenProjector, barrierProjector,
     //campaign only
     shieldProjector,
+    largeShieldProjector,
 
     //transport
     conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
@@ -1738,6 +1739,15 @@ public class Blocks{
             requirements(Category.effect, BuildVisibility.editorOnly, with());
 
             size = 3;
+
+            consumes.power(5f);
+        }};
+
+        largeShieldProjector = new BaseShield("large-shield-projector"){{
+            requirements(Category.effect, BuildVisibility.editorOnly, with());
+
+            size = 4;
+            radius = 400f;
 
             consumes.power(5f);
         }};
