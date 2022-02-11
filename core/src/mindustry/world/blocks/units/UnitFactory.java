@@ -94,7 +94,7 @@ public class UnitFactory extends UnitBlock{
     public void setStats(){
         super.setStats();
 
-        stats.remove(Stat.itemCapacity);
+        if(hasItems && itemCapacity > 0) stats.remove(Stat.itemCapacity);
 
         stats.add(Stat.output, table -> {
             Seq<UnitPlan> p = plans.select(u -> u.unit.unlockedNow());
