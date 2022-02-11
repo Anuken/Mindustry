@@ -194,6 +194,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void commandUnits(Player player, int[] unitIds, @Nullable Building buildTarget, @Nullable Unit unitTarget, @Nullable Vec2 posTarget){
         if(player == null || unitIds == null) return;
 
+        //why did I ever think this was a good idea
+        if(unitTarget != null && unitTarget.isNull()) unitTarget = null;
+
         if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> {
             event.unitIDs = unitIds;
         })){

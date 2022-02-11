@@ -443,15 +443,18 @@ public class Weapon implements Cloneable{
         if(unitSpawned == null){
             return bullet.create(unit, unit.team, x, y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd), lifescl);
         }else{
-            Unit spawned = unitSpawned.create(unit.team);
-            spawned.set(x, y);
-            spawned.rotation = angle;
-            //immediately spawn at top speed, since it was launched
-            spawned.vel.trns(angle, unitSpawned.speed);
-            if(spawned.controller() instanceof MissileAI ai){
-                ai.shooter = unit;
+            //don't spawn units clientside!
+            if(!net.client()){
+                Unit spawned = unitSpawned.create(unit.team);
+                spawned.set(x, y);
+                spawned.rotation = angle;
+                //immediately spawn at top speed, since it was launched
+                spawned.vel.trns(angle, unitSpawned.speed);
+                if(spawned.controller() instanceof MissileAI ai){
+                    ai.shooter = unit;
+                }
+                spawned.add();
             }
-            spawned.add();
             //TODO assign AI target here?
             return null;
         }

@@ -728,11 +728,8 @@ public class DesktopInput extends InputHandler{
                 }
 
                 Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
-
             }
         }
-
-
 
         return super.tap(x, y, count, button);
     }

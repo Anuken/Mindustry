@@ -3320,7 +3320,7 @@ public class Blocks{
 
             ammo(Items.scrap, new BasicBulletType(){{
                 damage = 40;
-                speed = 8f;
+                speed = 8.5f;
                 width = 11f;
                 height = 16f;
                 trailColor = Pal.bulletYellowBack;
@@ -3329,13 +3329,20 @@ public class Blocks{
                 collidesTiles = false;
                 shootEffect = Fx.shootBig2;
                 smokeEffect = Fx.shootBigSmoke2;
+                frontColor = Color.white;
+                backColor = Color.valueOf("869cbe");
+
+                lifetime = 34f;
+                //controversial
+                homingDelay = 10f;
+                homingPower = 0.01f;
             }});
 
             //TODO bullet.
 
             //recoilAmount = 1f;
             reloadTime = 8f;
-            shootLength = 15f;
+            shootLength = 14f;
             rotateSpeed = 5f;
 
             coolantUsage = 30f / 60f;
@@ -3350,7 +3357,7 @@ public class Blocks{
             widthSpread = true;
             targetGround = false;
             spread = 4.6f;
-            inaccuracy = 8f;
+            inaccuracy = 9f;
 
             restitution = 0.1f;
             shootWarmupSpeed = 0.08f;
@@ -3359,7 +3366,7 @@ public class Blocks{
             acceptCoolant = false;
 
             scaledHealth = 340;
-            range = 250f;
+            range = 270f;
             size = 4;
         }};
 
