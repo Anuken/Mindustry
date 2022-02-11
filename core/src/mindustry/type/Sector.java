@@ -92,6 +92,10 @@ public class Sector{
             info.resources.remove(Blocks.water);
             info.resources.add(Liquids.water);
         }
+
+        if(info.resources.contains(u -> u == null)){
+            info.resources = info.resources.select(u -> u != null);
+        }
     }
 
     /** Removes any sector info. */

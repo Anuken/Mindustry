@@ -86,7 +86,7 @@ public class Turret extends ReloadTurret{
     /** Ticks between shots if shots > 1. */
     public float burstSpacing = 0;
     /** An inflexible and terrible idea. */
-    public boolean alternate = false;
+    public boolean alternate = false, widthSpread = false;
     /** If true, this turret will accurately target moving targets with respect to charge time. */
     public boolean accurateDelay = false;
 
@@ -544,20 +544,24 @@ public class Turret extends ReloadTurret{
             }else{
                 //otherwise, use the normal shot pattern(s)
 
-                if(alternate){
-                    float i = (shotCounter % shots) - (shots-1)/2f;
+                if(alternate || widthSpread){
+                    int count = !widthSpread ? 1 : shots;
 
-                    bulletOffset.trns(rotation - 90, (spread) * i + Mathf.range(xRand), shootLength);
-                    bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
+                    for(int c = 0; c < count; c++){
+                        float i = (shotCounter % shots) - (shots-1)/2f;
+
+                        bulletOffset.trns(rotation - 90, (spread) * i + Mathf.range(xRand), shootLength);
+                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
+                        shotCounter ++;
+                    }
                 }else{
                     bulletOffset.trns(rotation, shootLength, Mathf.range(xRand));
 
                     for(int i = 0; i < shots; i++){
                         bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - (int)(shots / 2f)) * spread);
+                        shotCounter ++;
                     }
                 }
-
-                shotCounter++;
 
                 recoil = recoilAmount;
                 heat = 1f;

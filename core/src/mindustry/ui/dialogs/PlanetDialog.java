@@ -837,6 +837,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 c.add("@sectors.resources").left().row();
                 c.table(t -> {
                     for(UnlockableContent uc : sector.info.resources){
+                        if(uc == null) continue;
                         t.image(uc.uiIcon).padRight(3).size(iconSmall);
                     }
                 }).padLeft(10f).left().row();

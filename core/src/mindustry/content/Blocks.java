@@ -3342,6 +3342,7 @@ public class Blocks{
 
             shots = 4;
             alternate = true;
+            widthSpread = true;
             spread = 4.6f;
 
             restitution = 0.1f;
