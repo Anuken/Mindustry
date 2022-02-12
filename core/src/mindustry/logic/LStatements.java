@@ -1272,11 +1272,34 @@ public class LStatements{
         }
     }
 
-    @RegisterStatement("notification")
-    public static class FlushNotificationStatement extends LStatement{
+    @RegisterStatement("message")
+    public static class FlushMessageStatement extends LStatement{
+        public MessageType type = MessageType.announce;
+        public String duration = "3";
 
         @Override
         public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
+            table.button(b -> {
+                b.label(() -> type.name()).growX().wrap().labelAlign(Align.center);
+                b.clicked(() -> showSelect(b, MessageType.all, type, o -> {
+                    type = o;
+                    rebuild(table);
+                }, 2, c -> c.width(150f)));
+            }, Styles.logict, () -> {}).size(160f, 40f).padLeft(2).color(table.color);
+
+            switch(type){
+                case announce, toast -> {
+                    table.add(" for ");
+                    fields(table, duration, str -> duration = str);
+                    table.add(" secs ");
+                }
+            }
         }
 
         @Override
@@ -1291,7 +1314,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new FlushNotificationI();
+            return new FlushMessageI(type, builder.var(duration));
         }
     }
 

@@ -75,6 +75,8 @@ public class UI implements ApplicationListener, Loadable{
 
     public Cursor drillCursor, unloadCursor;
 
+    private @Nullable Element lastAnnouncement;
+
     public UI(){
         Fonts.loadFonts();
     }
@@ -323,8 +325,8 @@ public class UI implements ApplicationListener, Loadable{
         table.actions(Actions.delay(duration * 0.9f), Actions.fadeOut(duration * 0.1f, Interp.fade), Actions.remove());
         table.top().table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).padTop(10);
         Core.scene.add(table);
+        lastAnnouncement = table;
     }
-
 
     /** Shows a label at some position on the screen. Does not fade. */
     public void showInfoPopup(String info, float duration, int align, int top, int left, int bottom, int right){
@@ -516,6 +518,10 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
+    public boolean hasAnnouncement(){
+        return lastAnnouncement != null && lastAnnouncement.parent != null;
+    }
+
     /** Display text in the middle of the screen, then fade out. */
     public void announce(String text){
         announce(text, 3);
@@ -531,6 +537,7 @@ public class UI implements ApplicationListener, Loadable{
         t.pack();
         t.act(0.1f);
         Core.scene.add(t);
+        lastAnnouncement = t;
     }
 
     public void showOkText(String title, String text, Runnable confirmed){

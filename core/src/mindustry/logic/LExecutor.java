@@ -1288,17 +1288,39 @@ public class LExecutor{
         }
     }
 
-    public static class FlushNotificationI implements LInstruction{
+    public static class FlushMessageI implements LInstruction{
+        public MessageType type = MessageType.announce;
+        public int duration;
+
+        public FlushMessageI(MessageType type, int duration){
+            this.type = type;
+            this.duration = duration;
+        }
+
+        public FlushMessageI(){
+        }
 
         @Override
         public void run(LExecutor exec){
+            if(headless) return;
+
             //skip back to self until possible
-            if(ui.hudfrag.hasToast()){
+            if(
+                type == MessageType.announce && ui.hudfrag.hasToast() ||
+                type == MessageType.notify && ui.hasAnnouncement() ||
+                type == MessageType.toast && ui.hasAnnouncement()
+            ){
                 exec.var(varCounter).numval --;
                 return;
             }
 
-            ui.hudfrag.showToast(Icon.info, exec.textBuffer.toString());
+            String text = exec.textBuffer.toString();
+            switch(type){
+                case notify -> ui.hudfrag.showToast(Icon.info, text);
+                case announce -> ui.announce(text, exec.numf(duration));
+                case toast -> ui.showInfoToast(text, exec.numf(duration));
+            }
+
             exec.textBuffer.setLength(0);
         }
     }
