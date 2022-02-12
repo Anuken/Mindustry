@@ -1496,6 +1496,14 @@ public class Fx{
         });
     }),
 
+    shootSmokeDisperse = new Effect(25f, e -> {
+        color(Pal.lightOrange, Color.white, Color.gray, e.fin());
+
+        randLenVectors(e.id, 9, e.finpow() * 29f, e.rotation, 18f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 2.2f + 0.1f);
+        });
+    }),
+
     shootSmokeTris = new Effect(30f, e -> {
         color(Color.white, e.color, e.fin());
 

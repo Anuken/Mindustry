@@ -196,6 +196,10 @@ public class ErekirTechTree{
                     node(titan, () -> {
 
                     });
+
+                    node(disperse, () -> {
+
+                    });
                 });
             });
 

@@ -109,7 +109,7 @@ public class ContinuousTurret extends Turret{
                 return;
             }
 
-            if(cons.canConsume() && !charging){
+            if(cons.canConsume() && !charging && shootWarmup >= minWarmup){
                 shoot(peekAmmo());
             }
         }

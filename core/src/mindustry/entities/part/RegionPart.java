@@ -146,13 +146,13 @@ public class RegionPart extends DrawPart{
             //TODO l/r
             if(mirror && turretShading){
                 regions = new TextureRegion[]{
-                Core.atlas.find(realName + "1"),
-                Core.atlas.find(realName + "2")
+                Core.atlas.find(realName + "-r"),
+                Core.atlas.find(realName + "-l")
                 };
 
                 outlines = new TextureRegion[]{
-                Core.atlas.find(realName + "1-outline"),
-                Core.atlas.find(realName + "2-outline")
+                Core.atlas.find(realName + "-r-outline"),
+                Core.atlas.find(realName + "-l-outline")
                 };
             }else{
                 regions = new TextureRegion[]{Core.atlas.find(realName)};

@@ -36,7 +36,10 @@ public class DrawTurret extends DrawBlock{
             part.getOutlines(out);
         }
         if(preview.found()){
-            out.add(block.region);
+            out.add(preview);
+            if(block.region.found()){
+                out.add(block.region);
+            }
         }
     }
 
@@ -75,7 +78,9 @@ public class DrawTurret extends DrawBlock{
     }
 
     public void drawTurret(Turret block, TurretBuild build){
-        Draw.rect(block.region, build.x + build.recoilOffset.x, build.y + build.recoilOffset.y, build.drawrot());
+        if(block.region.found()){
+            Draw.rect(block.region, build.x + build.recoilOffset.x, build.y + build.recoilOffset.y, build.drawrot());
+        }
 
         if(liquid.found()){
             Liquid toDraw = liquidDraw == null ? build.liquids.current() : liquidDraw;

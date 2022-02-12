@@ -3041,7 +3041,7 @@ public class UnitTypes{
                     speed = 4.5f;
                     maxRange = 80f;
                     outlineColor = Pal.darkOutline;
-                    health = 45;
+                    health = 70;
                     homingDelay = 10f;
                     lowAltitude = true;
                     engineSize = 3f;

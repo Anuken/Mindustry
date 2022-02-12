@@ -3215,11 +3215,11 @@ public class Blocks{
         }};
 
         titan = new ItemTurret("titan"){{
-            requirements(Category.turret, with(Items.carbide, 250, Items.surgeAlloy, 160, Items.silicon, 300, Items.beryllium, 400));
+            requirements(Category.turret, with(Items.carbide, 100, Items.tungsten, 250, Items.silicon, 300, Items.beryllium, 400));
 
             ammo(
             //TODO 1 more ammo type, decide on base type
-            Items.fissileMatter, new ArtilleryBulletType(2.5f, 300, "shell"){{
+            Items.carbide, new ArtilleryBulletType(2.5f, 300, "shell"){{
                 hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
                 despawnEffect = Fx.none;
                 knockback = 2f;
@@ -3228,6 +3228,7 @@ public class Blocks{
                 width = 17f;
                 splashDamageRadius = 65f;
                 splashDamage = 250f;
+                scaledSplashDamage = true;
                 backColor = hitColor = trailColor = Color.valueOf("ea8878").lerp(Color.valueOf("feb380"), 0.5f);
                 frontColor = Color.white;
                 ammoMultiplier = 1f;
@@ -3255,7 +3256,9 @@ public class Blocks{
             recoilAmount = 1f;
             reloadTime = 60f * 3f;
             shootLength = 7f;
-            rotateSpeed = 2.5f;
+            rotateSpeed = 1.4f;
+            minWarmup = 0.85f;
+            shootWarmupSpeed = 0.07f;
 
             coolantUsage = 30f / 60f;
             coolantOverride = Liquids.water;
@@ -3263,14 +3266,14 @@ public class Blocks{
             draw = new DrawTurret("reinforced-"){{
                 parts.addAll(
                 new RegionPart("-barrel"){{
-                    progress = PartProgress.warmup.curve(Interp.pow2In);
+                    progress = PartProgress.reload.curve(Interp.pow2In);
                     moveY = -5f * 4f / 3f;
                     heatColor = Color.valueOf("f03b0e");
                     mirror = false;
                 }},
                 new RegionPart("-side"){{
                     heatProgress = PartProgress.warmup;
-                    progress = PartProgress.warmup.curve(Interp.pow2Out);
+                    progress = PartProgress.warmup;
                     mirror = true;
                     moveX = 2f * 4f / 3f;
                     moveY = -0.5f;
@@ -3294,13 +3297,11 @@ public class Blocks{
         }};
 
         disperse = new ItemTurret("disperse"){{
-            requirements(Category.turret, with(Items.carbide, 250, Items.surgeAlloy, 160, Items.silicon, 300, Items.beryllium, 400));
+            requirements(Category.turret, with(Items.carbide, 50, Items.oxide, 150, Items.silicon, 200, Items.beryllium, 350));
 
             ammo(Items.scrap, new BasicBulletType(){{
-                damage = 50;
+                damage = 40;
                 speed = 8.5f;
-                //width = 11f;
-                //height = 19f;
                 width = height = 16;
                 shrinkY = 0.3f;
                 backSprite = "large-bomb-back";
@@ -3309,27 +3310,24 @@ public class Blocks{
                 collidesGround = false;
                 collidesTiles = false;
                 shootEffect = Fx.shootBig2;
-                smokeEffect = Fx.shootBigSmoke2;
+                smokeEffect = Fx.shootSmokeDisperse;
                 frontColor = trailColor = Color.white;
                 backColor = Color.valueOf("869cbe");
-                //trailInterval = 3;
                 trailChance = 0.44f;
 
                 lifetime = 34f;
                 rotationOffset = 90f;
                 trailRotation = true;
                 trailEffect = Fx.disperseTrail;
-                //spin = 360f;
+
+                hitEffect = despawnEffect = Fx.hitBulletColor;
 
                 //controversial
                 //homingDelay = 10f;
                 //homingPower = 0.01f;
-                hitEffect = despawnEffect = Fx.hitBulletColor;
             }});
 
-            //TODO bullet.
 
-            //recoilAmount = 1f;
             reloadTime = 9f;
             shootLength = 15f;
             rotateSpeed = 5f;
@@ -3339,7 +3337,33 @@ public class Blocks{
             coolantOverride = Liquids.water;
 
             draw = new DrawTurret("reinforced-"){{
+                parts.add(new RegionPart("-side"){{
+                    mirror = true;
+                    under = true;
+                    moveX = 1.75f;
+                    moveY = -0.5f;
+                }});
+                parts.add(new RegionPart("-mid"){{
+                    under = true;
+                    moveY = -1f;
+                    progress = PartProgress.reload;
+                    heatProgress = PartProgress.reload.add(0.25f).min(PartProgress.warmup);
+                    heatColor = Color.sky.cpy().a(0.9f);
+                }});
+                parts.add(new RegionPart("-blade"){{
+                    heatProgress = PartProgress.warmup;
+                    heatColor = Color.sky.cpy().a(0.9f);
+                    mirror = true;
+                    under = true;
+                    moveY = 1f;
 
+                    //lame
+                    moveX = 0.5f;
+
+                    //wackier variant
+                    moveX = 1.5f;
+                    moveRot = 8;
+                }});
             }};
 
             unitFilter = u -> !u.spawnedByCore;
@@ -3347,10 +3371,10 @@ public class Blocks{
             alternate = true;
             widthSpread = true;
             targetGround = false;
-            spread = 4.6f;
+            spread = 4.7f;
             inaccuracy = 8f;
 
-            restitution = 0.1f;
+            restitution = 0.11f;
             shootWarmupSpeed = 0.08f;
 
             outlineColor = Pal.darkOutline;

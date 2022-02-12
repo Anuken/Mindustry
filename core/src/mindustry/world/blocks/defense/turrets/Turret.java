@@ -49,6 +49,7 @@ public class Turret extends ReloadTurret{
     //visuals
     public float ammoEjectBack = 1f;
     public float shootWarmupSpeed = 0.1f;
+    public boolean linearWarmup = false;
     public float recoilAmount = 1f;
     public float restitution = 0.02f;
     public float cooldown = 0.02f;
@@ -83,6 +84,8 @@ public class Turret extends ReloadTurret{
     public float xRand = 0f;
     /** Currently used for artillery only. */
     public float minRange = 0f;
+    /** Minimum warmup needed to fire. */
+    public float minWarmup = 0f;
     /** Ticks between shots if shots > 1. */
     public float burstSpacing = 0;
     /** An inflexible and terrible idea. */
@@ -334,8 +337,12 @@ public class Turret extends ReloadTurret{
         public void updateTile(){
             if(!validateTarget()) target = null;
 
-            //TODO make it approach instead and add interp curves to parts
-            shootWarmup = Mathf.lerpDelta(shootWarmup, isShooting() && cons.canConsume() ? 1f : 0f, shootWarmupSpeed);
+            float warmupTarget = isShooting() && cons.canConsume() ? 1f : 0f;
+            if(linearWarmup){
+                shootWarmup = Mathf.approachDelta(shootWarmup, warmupTarget, shootWarmupSpeed);
+            }else{
+                shootWarmup = Mathf.lerpDelta(shootWarmup, warmupTarget, shootWarmupSpeed);
+            }
 
             wasShooting = false;
 
@@ -486,7 +493,7 @@ public class Turret extends ReloadTurret{
 
         protected void updateShooting(){
 
-            if(reload >= reloadTime && !charging){
+            if(reload >= reloadTime && !charging && shootWarmup >= minWarmup){
                 BulletType type = peekAmmo();
 
                 shoot(type);
