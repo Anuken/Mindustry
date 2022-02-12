@@ -3617,15 +3617,14 @@ public class Blocks{
             canOverdrive = false;
         }};
 
-        //TODO
         payloadMassDriver = new PayloadMassDriver("payload-mass-driver"){{
-            requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.oxide, 60));
+            requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.oxide, 70));
             size = 3;
-            reloadTime = 150f;
-            chargeTime = 120f;
+            reloadTime = 130f;
+            chargeTime = 90f;
             range = 300f;
             maxPayloadSize = 2.5f;
-            consumes.power(3f);
+            consumes.power(2f);
         }};
 
         payloadPropulsionTower = new PayloadMassDriver("payload-propulsion-tower"){{

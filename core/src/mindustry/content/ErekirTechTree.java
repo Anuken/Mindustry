@@ -56,26 +56,34 @@ public class ErekirTechTree{
                     });
                 });
 
-                //TODO should only be unlocked in unit sector
-                node(constructor, Seq.with(new Research(siliconArcFurnace), new OnSector(four)), () -> {
+                node(reinforcedPayloadConveyor, Seq.with(new OnSector(four)), () -> {
+                    //TODO should only be unlocked in unit sector
+                    node(constructor, Seq.with(new Research(siliconArcFurnace), new OnSector(four)), () -> {
 
-                    //TODO further limitations
-                    node(payloadLoader, () -> {
-                        node(payloadUnloader, () -> {
-                            node(payloadPropulsionTower, () -> {
+                        node(payloadMassDriver, () -> {
+                            //TODO further limitations
+                            node(payloadLoader, () -> {
+                                node(payloadUnloader, () -> {
+                                    node(payloadPropulsionTower, () -> {
 
+                                    });
+                                });
+                            });
+
+                            node(smallDeconstructor, () -> {
+                                node(largeConstructor, () -> {
+
+                                });
+
+                                node(deconstructor, () -> {
+
+                                });
                             });
                         });
                     });
 
-                    node(smallDeconstructor, () -> {
-                        node(largeConstructor, () -> {
+                    node(reinforcedPayloadRouter, () -> {
 
-                        });
-
-                        node(deconstructor, () -> {
-
-                        });
                     });
                 });
             });
