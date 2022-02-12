@@ -42,7 +42,7 @@ public class ItemSelection{
 
             ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, 24, () -> {
                 if(closeSelect) control.input.frag.config.hideConfig();
-            }).group(group).get();
+            }).group(group).tooltip(item.localizedName).get();
             button.changed(() -> consumer.get(button.isChecked() ? item : null));
             button.getStyle().imageUp = new TextureRegionDrawable(item.uiIcon);
             button.update(() -> button.setChecked(holder.get() == item));
