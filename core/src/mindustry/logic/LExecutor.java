@@ -1145,7 +1145,7 @@ public class LExecutor{
                 }
                 case zoom -> {
                     control.input.logicCutscene = true;
-                    renderer.setScale(Mathf.lerp(renderer.minZoom, renderer.maxZoom, Mathf.clamp(exec.numf(p1))));
+                    control.input.logicCutsceneZoom = Mathf.clamp(exec.numf(p1));
                 }
                 case stop -> {
                     control.input.logicCutscene = false;

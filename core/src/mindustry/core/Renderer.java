@@ -158,7 +158,13 @@ public class Renderer implements ApplicationListener{
     public void update(){
         Color.white.set(1f, 1f, 1f, 1f);
 
-        float dest = Mathf.clamp(Mathf.round(targetscale, 0.5f), minScale(), maxScale());
+        float baseTarget = targetscale;
+
+        if(control.input.logicCutscene){
+            baseTarget = Mathf.lerp(minZoom, maxZoom, control.input.logicCutsceneZoom);
+        }
+
+        float dest = Mathf.clamp(Mathf.round(baseTarget, 0.5f), minScale(), maxScale());
         camerascale = Mathf.lerpDelta(camerascale, dest, 0.1f);
         if(Mathf.equal(camerascale, dest, 0.001f)) camerascale = dest;
         laserOpacity = settings.getInt("lasersopacity") / 100f;

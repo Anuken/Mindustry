@@ -57,6 +57,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public boolean logicCutscene;
     public Vec2 logicCamPan = new Vec2();
     public float logicCamSpeed = 0.1f;
+    public float logicCutsceneZoom = -1f;
 
     /** If any of these functions return true, input is locked. */
     public Seq<Boolp> inputLocks = Seq.with(() -> renderer.isCutscene(), () -> logicCutscene);
@@ -583,6 +584,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void update(){
         if(logicCutscene && !renderer.isCutscene()){
             Core.camera.position.lerpDelta(logicCamPan, logicCamSpeed);
+        }else{
+            logicCutsceneZoom = -1f;
         }
 
         playerPlanTree.clear();
