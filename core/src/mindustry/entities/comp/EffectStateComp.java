@@ -16,8 +16,18 @@ abstract class EffectStateComp implements Posc, Drawc, Timedc, Rotc, Childc{
     Object data;
 
     @Override
+    public void add(){
+        effect.render(effect.added, id, color, time, lifetime, rotation, x, y, data);
+    }
+
+    @Override
     public void draw(){
         lifetime = effect.render(id, color, time, lifetime, rotation, x, y, data);
+    }
+
+    @Override
+    public void remove(){
+        effect.render(effect.removed, id, color, time, lifetime, rotation, x, y, data);
     }
 
     @Replace

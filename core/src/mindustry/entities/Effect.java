@@ -27,6 +27,8 @@ public class Effect{
     public final int id;
 
     public Cons<EffectContainer> renderer = e -> {};
+    public Cons<EffectContainer> added = e -> {};
+    public Cons<EffectContainer> removed = e -> {};
     public float lifetime = 50f;
     /** Clip size. */
     public float clip;
@@ -129,18 +131,26 @@ public class Effect{
         create(this, x, y, rotation, Color.white, data);
     }
 
-    public float render(int id, Color color, float life, float lifetime, float rotation, float x, float y, Object data){
+    public float render(Cons<EffectContainer> renderer, int id, Color color, float life, float lifetime, float rotation, float x, float y, Object data){
         container.set(id, color, life, lifetime, rotation, x, y, data);
         Draw.z(layer);
         Draw.reset();
-        render(container);
+        render(renderer, container);
         Draw.reset();
 
         return container.lifetime;
     }
 
-    public void render(EffectContainer e){
+    public float render(int id, Color color, float life, float lifetime, float rotation, float x, float y, Object data){
+        return render(renderer, id, color, life, lifetime, rotation, x, y, data);
+    }
+
+    public void render(Cons<EffectContainer> renderer, EffectContainer e){
         renderer.get(e);
+    }
+
+    public void render(EffectContainer e){
+        render(renderer, e);
     }
 
     public static @Nullable Effect get(int id){
