@@ -44,12 +44,18 @@ public class Effect{
     public float layer = Layer.effect;
     public float layerDuration;
 
-    public Effect(float life, float clipsize, Cons<EffectContainer> renderer){
+    public Effect(float life, float clipsize, Cons<EffectContainer> renderer, Cons<EffectContainer> added, Cons<EffectContainer> removed){
         this.id = all.size;
         this.lifetime = life;
         this.renderer = renderer;
+        this.added = added;
+        this.removed = removed;
         this.clip = clipsize;
         all.add(this);
+    }
+
+    public Effect(float life, float clipsize, Cons<EffectContainer> renderer){
+        this(life, clipsize, renderer, e -> {}, e -> {});
     }
 
     public Effect(float life, Cons<EffectContainer> renderer){
