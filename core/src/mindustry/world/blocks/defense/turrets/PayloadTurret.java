@@ -1,5 +1,6 @@
 package mindustry.world.blocks.defense.turrets;
 
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.io.*;
@@ -60,7 +61,7 @@ public class PayloadTurret extends Turret{
             @Override
             public void build(Building build, Table table){
                 MultiReqImage image = new MultiReqImage();
-                content.blocks().each(i -> filter.get(i) && i.unlockedNow(), block -> image.add(new ReqImage(new ItemImage(block.uiIcon),
+                content.blocks().each(i -> filter.get(i) && i.unlockedNow(), block -> image.add(new ReqImage(new Image(block.uiIcon),
                 () -> build instanceof PayloadTurretBuild it && !it.blocks.isEmpty() && it.currentBlock() == block)));
 
                 table.add(image).size(8 * 4);

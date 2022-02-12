@@ -17,17 +17,9 @@ public class ItemImage extends Stack{
 
         add(new Table(t -> {
             t.left().bottom();
-            //TODO outline? .style(Styles.outlineLabel)
-            t.add(amount > 1000 ? UI.formatAmount(amount) : amount + "");
+            t.add(amount > 1000 ? UI.formatAmount(amount) : amount + "").style(Styles.outlineLabel);
             t.pack();
         }));
-    }
-
-    public ItemImage(TextureRegion region){
-        Table t = new Table().left().bottom();
-
-        add(new Image(region));
-        add(t);
     }
 
     public ItemImage(ItemStack stack){
@@ -48,5 +40,11 @@ public class ItemImage extends Stack{
 
     public ItemImage(BlockStack stack){
         this(stack.block.uiIcon, stack.amount);
+    }
+
+    /** @deprecated what the heck is this */
+    @Deprecated
+    public ItemImage(TextureRegion region){
+        add(new Image(region));
     }
 }
