@@ -69,7 +69,7 @@ public class UnitType extends UnlockableContent{
     public boolean logicControllable = true;
     public boolean playerControllable = true;
     public boolean allowedInPayloads = true;
-    /** TODO If true, core units need to "dock" to this unit to work, and can un-dock at the unit instead of respawning at core. */
+    /** TODO If true, core units will re-appear on this unit when respawning. */
     public boolean coreUnitDock = false;
     public boolean createWreck = true;
     public boolean createScorch = true;

@@ -3126,7 +3126,7 @@ public class UnitTypes{
 
         //TODO bad name
         evoke = new ErekirUnitType("evoke"){{
-            coreUnitDock = false;
+            coreUnitDock = true;
             defaultController = BuilderAI::new;
             isCounted = false;
             envDisabled = 0;
@@ -3183,7 +3183,7 @@ public class UnitTypes{
         }};
 
         incite = new ErekirUnitType("incite"){{
-            coreUnitDock = false;
+            coreUnitDock = true;
             defaultController = BuilderAI::new;
             isCounted = false;
             envDisabled = 0;
@@ -3252,7 +3252,7 @@ public class UnitTypes{
         }};
 
         emanate = new ErekirUnitType("emanate"){{
-            coreUnitDock = false;
+            coreUnitDock = true;
             defaultController = BuilderAI::new;
             isCounted = false;
             envDisabled = 0;

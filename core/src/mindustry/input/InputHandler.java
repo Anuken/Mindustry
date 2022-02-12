@@ -462,16 +462,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 player.justSwitchTo = unit;
             }
 
-            //TODO range check for docking
+            //TODO range check for docking?
             var before = player.unit();
 
             player.unit(unit);
 
-            //TODO test this in multiplayer
-            if(unit.type.coreUnitDock && before != null && !before.isNull()){
+            if(before != null && !before.isNull()){
                 if(before.spawnedByCore){
                     unit.dockedType = before.type;
-                }else if(before.dockedType != null){
+                }else if(before.dockedType != null && before.dockedType.coreUnitDock){
                     //direct dock transfer???
                     unit.dockedType = before.dockedType;
                 }
@@ -494,7 +493,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(player == null) return;
 
         //TODO test this in multiplayer
-        if(!player.dead() && player.unit().type.coreUnitDock && !player.unit().spawnedByCore){
+        if(!player.dead() && !player.unit().spawnedByCore && player.unit().dockedType != null && player.unit().dockedType.coreUnitDock){
             //TODO respawn ON the unit, with an animation?
             var docked = player.unit().dockedType;
             if(docked == null){

@@ -3345,7 +3345,7 @@ public class Blocks{
                 }});
                 parts.add(new RegionPart("-mid"){{
                     under = true;
-                    moveY = -1f;
+                    moveY = -1.5f;
                     progress = PartProgress.reload;
                     heatProgress = PartProgress.reload.add(0.25f).min(PartProgress.warmup);
                     heatColor = Color.sky.cpy().a(0.9f);
@@ -3384,7 +3384,7 @@ public class Blocks{
             range = 270f;
             size = 4;
 
-            limitRange(4f);
+            limitRange(0f);
         }};
 
         //endregion
@@ -3541,7 +3541,6 @@ public class Blocks{
         tankAssembler = new UnitAssembler("tank-assembler"){{
             requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 200, Items.tungsten, 500));
             size = 5;
-            //TODO requirements?
             plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, BlockStack.list(Blocks.tungstenWallLarge, 6, Blocks.duct, 14, Blocks.cliffCrusher, 12)));
             consumes.power(3f);
             areaSize = 13;
@@ -3619,7 +3618,6 @@ public class Blocks{
         }};
 
         //TODO
-        if(false)
         payloadMassDriver = new PayloadMassDriver("payload-mass-driver"){{
             requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.oxide, 60));
             size = 3;
