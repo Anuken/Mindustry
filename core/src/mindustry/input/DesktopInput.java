@@ -337,6 +337,9 @@ public class DesktopInput extends InputHandler{
 
         if(player.dead() || locked){
             cursorType = SystemCursor.arrow;
+            if(!Core.scene.hasMouse()){
+                Core.graphics.cursor(cursorType);
+            }
             return;
         }
 

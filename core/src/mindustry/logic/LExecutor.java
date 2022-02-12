@@ -1118,6 +1118,42 @@ public class LExecutor{
         }
     }
 
+    public static class CutsceneI implements LInstruction{
+        public CutsceneAction action = CutsceneAction.stop;
+        public int p1, p2, p3, p4;
+
+        public CutsceneI(CutsceneAction action, int p1, int p2, int p3, int p4){
+            this.action = action;
+            this.p1 = p1;
+            this.p2 = p2;
+            this.p3 = p3;
+            this.p4 = p4;
+        }
+
+        public CutsceneI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(headless) return;
+
+            switch(action){
+                case pan -> {
+                    control.input.logicCutscene = true;
+                    control.input.logicCamPan.set(World.unconv(exec.numf(p1)), World.unconv(exec.numf(p2)));
+                    control.input.logicCamSpeed = exec.numf(p3);
+                }
+                case zoom -> {
+                    control.input.logicCutscene = true;
+                    renderer.setScale(Mathf.lerp(renderer.minZoom, renderer.maxZoom, Mathf.clamp(exec.numf(p1))));
+                }
+                case stop -> {
+                    control.input.logicCutscene = false;
+                }
+            }
+        }
+    }
+
     //endregion
     //region privileged / world instructions
 

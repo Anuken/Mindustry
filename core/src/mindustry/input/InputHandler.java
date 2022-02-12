@@ -53,8 +53,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public final OverlayFragment frag = new OverlayFragment();
 
+    /** If true, there is a cutscene currently occurring in logic. */
+    public boolean logicCutscene;
+    public Vec2 logicCamPan = new Vec2();
+    public float logicCamSpeed = 0.1f;
+
     /** If any of these functions return true, input is locked. */
-    public Seq<Boolp> inputLocks = Seq.with(() -> renderer.isCutscene());
+    public Seq<Boolp> inputLocks = Seq.with(() -> renderer.isCutscene(), () -> logicCutscene);
     public Interval controlInterval = new Interval();
     public @Nullable Block block;
     public boolean overrideLineRotation;
@@ -576,6 +581,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void update(){
+        if(logicCutscene && !renderer.isCutscene()){
+            Core.camera.position.lerpDelta(logicCamPan, logicCamSpeed);
+        }
+
         playerPlanTree.clear();
         player.unit().plans.each(playerPlanTree::insert);
 
@@ -596,6 +605,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //you don't want selected blocks while locked, looks weird
         if(locked()){
             block = null;
+
         }
 
         wasShooting = player.shooting;
@@ -678,6 +688,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void updateState(){
         if(state.isMenu()){
             controlledType = null;
+            logicCutscene = false;
         }
     }
 

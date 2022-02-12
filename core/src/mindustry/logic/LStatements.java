@@ -1294,4 +1294,60 @@ public class LStatements{
             return new FlushNotificationI();
         }
     }
+
+    @RegisterStatement("cutscene")
+    public static class CutsceneStatement extends LStatement{
+        public CutsceneAction action = CutsceneAction.pan;
+        public String p1 = "100", p2 = "100", p3 = " 0.06", p4 = "0";
+
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
+            table.button(b -> {
+                b.label(() -> action.name()).growX().wrap().labelAlign(Align.center);
+                b.clicked(() -> showSelect(b, CutsceneAction.all, action, o -> {
+                    action = o;
+                    rebuild(table);
+                }));
+            }, Styles.logict, () -> {}).size(90f, 40f).padLeft(2).color(table.color);
+
+            switch(action){
+                case pan -> {
+                    table.add(" x ");
+                    fields(table, p1, str -> p1 = str);
+                    table.add(" y ");
+                    fields(table, p2, str -> p2 = str);
+
+                    row(table);
+
+                    table.add(" speed ");
+                    fields(table, p3, str -> p3 = str);
+                }
+                case zoom -> {
+                    table.add(" level ");
+                    fields(table, p1, str -> p1 = str);
+                }
+            }
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicWorld;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new CutsceneI(action, builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
+        }
+    }
 }
