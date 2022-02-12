@@ -313,11 +313,11 @@ public class Fx{
     }),
 
     unitAssemble = new Effect(70, e -> {
-        if(!(e.data instanceof Unit unit)) return;
+        if(!(e.data instanceof UnitType type)) return;
 
         alpha(e.fout());
         mixcol(Pal.accent, e.fout());
-        rect(unit.type.fullIcon, unit.x, unit.y, unit.rotation - 90);
+        rect(type.fullIcon, e.x, e.y, e.rotation);
     }).layer(Layer.flyingUnit + 5f),
 
     padlaunch = new Effect(10, e -> {

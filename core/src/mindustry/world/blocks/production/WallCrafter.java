@@ -45,6 +45,7 @@ public class WallCrafter extends Block{
         rotate = true;
         update = true;
         solid = true;
+        regionRotated1 = 1;
 
         envEnabled |= Env.space;
     }

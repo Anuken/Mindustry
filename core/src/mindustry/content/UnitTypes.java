@@ -3141,7 +3141,7 @@ public class UnitTypes{
             mineTier = 4;
             buildSpeed = 0.8f;
             drag = 0.08f;
-            speed = 5.4f;
+            speed = 5.6f;
             rotateSpeed = 7f;
             accel = 0.09f;
             itemCapacity = 60;
@@ -3198,7 +3198,7 @@ public class UnitTypes{
             mineTier = 4;
             buildSpeed = 1.1f;
             drag = 0.08f;
-            speed = 6.6f;
+            speed = 7f;
             rotateSpeed = 8f;
             accel = 0.09f;
             itemCapacity = 90;
@@ -3267,7 +3267,7 @@ public class UnitTypes{
             mineTier = 4;
             buildSpeed = 1.4f;
             drag = 0.08f;
-            speed = 7.4f;
+            speed = 7.5f;
             rotateSpeed = 8f;
             accel = 0.08f;
             itemCapacity = 110;
@@ -3331,6 +3331,7 @@ public class UnitTypes{
             allowedInPayloads = false;
             logicControllable = false;
             envDisabled = 0;
+            payloadCapacity = 0f;
 
             lowAltitude = false;
             flying = true;
@@ -3360,6 +3361,7 @@ public class UnitTypes{
             health = 90;
             engineSize = 2f;
             engineOffset = 6.5f;
+            payloadCapacity = 0f;
 
             outlineColor = Pal.darkOutline;
             isCounted = false;

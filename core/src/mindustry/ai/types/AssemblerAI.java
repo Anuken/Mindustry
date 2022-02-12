@@ -10,7 +10,6 @@ public class AssemblerAI extends AIController{
 
     @Override
     public void updateMovement(){
-        //TODO
         if(!targetPos.isZero()){
             moveTo(targetPos, 1f, 3f);
         }

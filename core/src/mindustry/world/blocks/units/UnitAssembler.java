@@ -45,6 +45,8 @@ public class UnitAssembler extends PayloadBlock{
         rotateDraw = false;
         acceptsPayload = true;
         flags = EnumSet.of(BlockFlag.unitAssembler);
+        regionRotated1 = 1;
+        sync = true;
     }
 
     public Rect getRect(Rect rect, float x, float y, int rotation){
@@ -166,8 +168,22 @@ public class UnitAssembler extends PayloadBlock{
         }
     }
 
+    @Remote(called = Loc.server)
+    public static void assemblerUnitSpawned(Tile tile){
+        if(tile == null || !(tile.build instanceof UnitAssemblerBuild build)) return;
+        build.spawned();
+    }
+
+    @Remote(called = Loc.server)
+    public static void assemblerDroneSpawned(Tile tile, int id){
+        if(tile == null || !(tile.build instanceof UnitAssemblerBuild build)) return;
+        build.droneSpawned(id);
+    }
+
     public class UnitAssemblerBuild extends PayloadBlockBuild<BuildPayload>{
         protected IntSeq readUnits = new IntSeq();
+        //holds drone IDs that have been sent, but not synced yet - add to list as soon as possible
+        protected IntSeq whenSyncedUnits = new IntSeq();
 
         public Seq<Unit> units = new Seq<>();
         public Seq<UnitAssemblerModuleBuild> modules = new Seq<>();
@@ -282,6 +298,16 @@ public class UnitAssembler extends PayloadBlock{
                 readUnits.clear();
             }
 
+            //read newly synced drones on client end
+            if(units.size < dronesCreated && whenSyncedUnits.size > 0){
+                whenSyncedUnits.each(id -> {
+                    var unit = Groups.unit.getByID(id);
+                    if(unit != null){
+                        units.addUnique(unit);
+                    }
+                });
+            }
+
             units.removeAll(u -> !u.isAdded() || u.dead || !(u.controller() instanceof AssemblerAI));
 
             powerWarmup = Mathf.lerpDelta(powerWarmup, efficiency() > 0.0001f ? 1f : 0f, 0.1f);
@@ -289,16 +315,20 @@ public class UnitAssembler extends PayloadBlock{
             totalDroneProgress += droneWarmup * Time.delta;
 
             if(units.size < dronesCreated && (droneProgress += edelta() / droneConstructTime) >= 1f){
-                var unit = droneType.create(team);
-                if(unit instanceof BuildingTetherc bt){
-                    bt.building(this);
+                if(!net.client()){
+                    var unit = droneType.create(team);
+                    if(unit instanceof BuildingTetherc bt){
+                        bt.building(this);
+                    }
+                    unit.set(x, y);
+                    unit.rotation = 90f;
+                    unit.add();
+                    units.add(unit);
+                    Call.assemblerDroneSpawned(tile, unit.id);
                 }
-                unit.set(x, y);
-                unit.rotation = 90f;
-                unit.add();
+            }
 
-                Fx.spawn.at(unit);
-                units.add(unit);
+            if(units.size >= dronesCreated){
                 droneProgress = 0f;
             }
 
@@ -320,7 +350,7 @@ public class UnitAssembler extends PayloadBlock{
 
             wasOccupied = checkSolid(spawn, false);
             boolean visualOccupied = checkSolid(spawn, true);
-            float eff =  (units.count(u -> ((AssemblerAI)u.controller()).inPosition()) / (float)dronesCreated);
+            float eff = (units.count(u -> ((AssemblerAI)u.controller()).inPosition()) / (float)dronesCreated);
 
             sameTypeWarmup = Mathf.lerpDelta(sameTypeWarmup, wasOccupied && !visualOccupied ? 0f : 1f, 0.1f);
             invalidWarmup = Mathf.lerpDelta(invalidWarmup, visualOccupied ? 1f : 0f, 0.1f);
@@ -332,21 +362,36 @@ public class UnitAssembler extends PayloadBlock{
                 warmup = Mathf.lerpDelta(warmup, efficiency(), 0.1f);
 
                 if((progress += edelta() * eff / plan.time) >= 1f){
-                    consume();
-
-                    var unit = plan.unit.create(team);
-                    unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
-                    unit.rotation = 90f;
-                    unit.add();
-                    progress = 0f;
-
-                    Fx.unitAssemble.at(unit.x, unit.y, 0f, unit);
-
-                    blocks.clear();
+                    Call.assemblerUnitSpawned(tile);
                 }
             }else{
                 warmup = Mathf.lerpDelta(warmup, 0f, 0.1f);
             }
+        }
+
+        public void droneSpawned(int id){
+            Fx.spawn.at(x, y);
+            droneProgress = 0f;
+            if(net.client()){
+                whenSyncedUnits.add(id);
+            }
+        }
+
+        public void spawned(){
+            var plan = plan();
+            Vec2 spawn = getUnitSpawn();
+            consume();
+
+            if(!net.client()){
+                var unit = plan.unit.create(team);
+                unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
+                unit.rotation = 90f;
+                unit.add();
+            }
+
+            progress = 0f;
+            Fx.unitAssemble.at(spawn.x, spawn.y, 0f, plan.unit);
+            blocks.clear();
         }
 
         @Override
@@ -372,7 +417,7 @@ public class UnitAssembler extends PayloadBlock{
             Draw.rect(topRegion, x, y);
 
             //draw drone construction
-            if(droneWarmup > 0){
+            if(droneWarmup > 0.001f){
                 Draw.draw(Layer.blockOver + 0.2f, () -> {
                     Drawf.construct(this, droneType.fullIcon, Pal.accent, 0f, droneProgress, droneWarmup, totalDroneProgress, 14f);
                 });
@@ -503,6 +548,7 @@ public class UnitAssembler extends PayloadBlock{
             for(int i = 0; i < count; i++){
                 readUnits.add(read.i());
             }
+            whenSyncedUnits.clear();
 
             blocks.read(read);
         }

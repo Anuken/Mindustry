@@ -286,7 +286,7 @@ public class UnitType extends UnlockableContent{
                 ability.displayBars(unit, bars);
             }
 
-            if(unit instanceof Payloadc payload){
+            if(payloadCapacity > 0 && unit instanceof Payloadc payload){
                 bars.add(new Bar("stat.payloadcapacity", Pal.items, () -> payload.payloadUsed() / unit.type().payloadCapacity));
                 bars.row();
 

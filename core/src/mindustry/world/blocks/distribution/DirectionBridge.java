@@ -38,6 +38,7 @@ public class DirectionBridge extends Block{
         noUpdateDisabled = true;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
         drawArrow = false;
+        regionRotated1 = 1;
     }
 
     @Override

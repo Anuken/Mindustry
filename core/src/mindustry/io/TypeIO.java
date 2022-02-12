@@ -408,6 +408,8 @@ public class TypeIO{
                     write.i(((Unit)ai.attackTarget).id);
                 }
             }
+        }else if(control instanceof AssemblerAI){  //hate
+            write.b(5);
         }else{
             write.b(2);
         }
@@ -464,11 +466,15 @@ public class TypeIO{
             }
 
             return ai;
+        }else if(type == 5){
+            //augh
+            return prev instanceof AssemblerAI ? prev : new AssemblerAI();
         }else{
             //there are two cases here:
             //1: prev controller was not a player, carry on
             //2: prev controller was a player, so replace this controller with *anything else*
             //...since AI doesn't update clientside it doesn't matter
+            //TODO I hate this
             return (!(prev instanceof AIController) || (prev instanceof FormationAI) || (prev instanceof LogicAI)) ? new GroundAI() : prev;
         }
     }
