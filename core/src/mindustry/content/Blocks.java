@@ -3622,7 +3622,8 @@ public class Blocks{
             size = 3;
             reloadTime = 130f;
             chargeTime = 90f;
-            range = 300f;
+            //TODO 500 or 400? does it need to be better than the standard mass driver?
+            range = 400f;
             maxPayloadSize = 2.5f;
             consumes.power(2f);
         }};

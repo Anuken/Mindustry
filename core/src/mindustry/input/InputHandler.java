@@ -492,10 +492,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void unitClear(Player player){
         if(player == null) return;
 
-        //TODO test this in multiplayer
-        if(!player.dead() && !player.unit().spawnedByCore && player.unit().dockedType != null && player.unit().dockedType.coreUnitDock){
-            //TODO respawn ON the unit, with an animation?
+        if(!player.dead() && !player.unit().spawnedByCore){
             var docked = player.unit().dockedType;
+
+            //get best core unit type as approximation
             if(docked == null){
                 var closest = player.bestCore();
                 if(closest != null){
@@ -503,13 +503,20 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
             }
 
-            if(docked != null){
+            //respawn if necessary
+            if(docked != null && docked.coreUnitDock){
                 //TODO animation, etc
                 Fx.spawn.at(player);
 
                 if(!net.client()){
                     Unit unit = docked.create(player.team());
                     unit.set(player.unit());
+                    //translate backwards so it doesn't spawn stuck in the unit
+                    if(player.unit().isFlying() && unit.type.flying){
+                        Tmp.v1.trns(player.unit().rotation + 180f, player.unit().hitSize / 2f + unit.hitSize / 2f);
+                        unit.x += Tmp.v1.x;
+                        unit.y += Tmp.v1.y;
+                    }
                     unit.rotation(player.unit().rotation);
                     //unit.impulse(0f, -3f);
                     //TODO should there be an impulse?
@@ -518,6 +525,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     unit.add();
                 }
 
+                //skip standard respawn code
                 return;
             }
 
