@@ -2934,8 +2934,8 @@ public class UnitTypes{
 
                 unitSpawned = new MissileUnitType("quell-missile"){{
                     speed = 3.8f;
-                    maxRange = 80f;
-                    lifetime = 60f * 1.4f;
+                    maxRange = 15f;
+                    lifetime = 60f * 1.2f;
                     outlineColor = Pal.darkOutline;
                     health = 45;
 
@@ -2944,7 +2944,7 @@ public class UnitTypes{
                         mirror = false;
                         reload = 1f;
                         shootOnDeath = true;
-                        bullet = new ExplosionBulletType(130f, 22f){{
+                        bullet = new ExplosionBulletType(100f, 22f){{
                             shootEffect = Fx.massiveExplosion;
                         }};
                     }});
@@ -3362,6 +3362,7 @@ public class UnitTypes{
             engineSize = 2f;
             engineOffset = 6.5f;
             payloadCapacity = 0f;
+            targetable = false;
 
             outlineColor = Pal.darkOutline;
             isCounted = false;

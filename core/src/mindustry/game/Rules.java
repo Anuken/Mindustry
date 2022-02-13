@@ -36,7 +36,7 @@ public class Rules{
     /** Whether this is the editor gamemode. */
     public boolean editor = false;
     /** Whether a gameover can happen at all. Set this to false to implement custom gameover conditions. */
-    public boolean canGameOver = false;
+    public boolean canGameOver = true;
     /** Whether cores change teams when they are destroyed. */
     public boolean coreCapture = false;
     /** Whether reactors can explode and damage other blocks. */

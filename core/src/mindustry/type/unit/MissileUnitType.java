@@ -30,7 +30,7 @@ public class MissileUnitType extends UnitType{
         speed = 4f;
         lifetime = 60f * 1.7f;
         rotateSpeed = 2.5f;
-        range = 30f;
+        range = 15f;
         targetPriority = -1f;
         outlineColor = Pal.darkOutline;
         //TODO weapon configs, etc?

@@ -1193,7 +1193,7 @@ public class Blocks{
             liquidCapacity = 40f;
             consumes.power(2f);
 
-            heatRequirement = 5f;
+            heatRequirement = 6f;
 
             //TODO continuous output
             outputLiquid = new LiquidStack(Liquids.nitrogen, 4f / 60f);
@@ -1222,7 +1222,7 @@ public class Blocks{
         }};
 
         electricHeater = new HeatProducer("electric-heater"){{
-            requirements(Category.crafting, with(Items.tungsten, 30, Items.graphite, 30));
+            requirements(Category.crafting, with(Items.tungsten, 30, Items.oxide, 30));
 
             researchCostMultiplier = 4f;
 
@@ -1231,7 +1231,7 @@ public class Blocks{
             drawer.iconOverride = new String[]{""};
             size = 2;
             heatOutput = 3f;
-            consumes.power(0.5f / 60f);
+            consumes.power(50f / 60f);
         }};
 
         phaseHeater = new HeatProducer("phase-heater"){{
@@ -2237,7 +2237,7 @@ public class Blocks{
         chemicalCombustionChamber = new ConsumeGenerator("chemical-combustion-chamber"){{
             requirements(Category.power, with(Items.graphite, 40, Items.tungsten, 40, Items.oxide, 40f, Items.silicon, 30));
             powerProduction = 9f;
-            consumes.liquids(LiquidStack.with(Liquids.ozone, 1f / 60f, Liquids.arkycite, 20f / 60f));
+            consumes.liquids(LiquidStack.with(Liquids.ozone, 2f / 60f, Liquids.arkycite, 20f / 60f));
             size = 3;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
                 sinMag = 3f;
@@ -3381,11 +3381,11 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
             acceptCoolant = false;
 
-            scaledHealth = 340;
+            scaledHealth = 420;
             range = 270f;
             size = 4;
 
-            limitRange(0f);
+            limitRange(-5f);
         }};
 
         //endregion
@@ -3546,7 +3546,7 @@ public class Blocks{
             consumes.power(3f);
             areaSize = 13;
 
-            consumes.liquid(Liquids.nitrogen, 12f / 60f);
+            consumes.liquid(Liquids.nitrogen, 24f / 60f);
         }};
 
         //TODO requirements
@@ -3557,7 +3557,7 @@ public class Blocks{
             consumes.power(3f);
             areaSize = 13;
 
-            consumes.liquid(Liquids.nitrogen, 12f / 60f);
+            consumes.liquid(Liquids.nitrogen, 24f / 60f);
         }};
 
         //TODO requirements
@@ -3568,7 +3568,7 @@ public class Blocks{
             consumes.power(3f);
             areaSize = 13;
 
-            consumes.liquid(Liquids.nitrogen, 12f / 60f);
+            consumes.liquid(Liquids.nitrogen, 24f / 60f);
         }};
 
         //TODO requirements
