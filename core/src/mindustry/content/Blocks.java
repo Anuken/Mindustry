@@ -1176,7 +1176,7 @@ public class Blocks{
         atmosphericConcentrator = new HeatCrafter("atmospheric-concentrator"){{
             requirements(Category.crafting, with(Items.oxide, 60, Items.beryllium, 180, Items.silicon, 150));
             size = 3;
-            craftTime = 10f;
+            continuousLiquidOutput = true;
             hasLiquids = true;
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.nitrogen, 4.1f), new DrawBlock(), new DrawHeatInput(),
@@ -1195,7 +1195,8 @@ public class Blocks{
 
             heatRequirement = 5f;
 
-            outputLiquid = new LiquidStack(Liquids.nitrogen, 4f * craftTime / 60f);
+            //TODO continuous output
+            outputLiquid = new LiquidStack(Liquids.nitrogen, 4f / 60f);
         }};
 
         oxidationChamber = new HeatProducer("oxidation-chamber"){{
@@ -3227,7 +3228,7 @@ public class Blocks{
                 height = 19f;
                 width = 17f;
                 splashDamageRadius = 65f;
-                splashDamage = 250f;
+                splashDamage = 350f;
                 scaledSplashDamage = true;
                 backColor = hitColor = trailColor = Color.valueOf("ea8878").lerp(Color.valueOf("feb380"), 0.5f);
                 frontColor = Color.white;
@@ -3254,7 +3255,7 @@ public class Blocks{
             targetAir = false;
             shootShake = 4f;
             recoilAmount = 1f;
-            reloadTime = 60f * 3f;
+            reloadTime = 60f * 2f;
             shootLength = 7f;
             rotateSpeed = 1.4f;
             minWarmup = 0.85f;
@@ -3539,24 +3540,24 @@ public class Blocks{
         //region units - erekir
 
         tankAssembler = new UnitAssembler("tank-assembler"){{
-            requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 200, Items.tungsten, 500));
+            requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 300, Items.tungsten, 500));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, BlockStack.list(Blocks.tungstenWallLarge, 6, Blocks.duct, 14, Blocks.cliffCrusher, 12)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, BlockStack.list(Blocks.tungstenWallLarge, 12, Blocks.duct, 14, Blocks.cliffCrusher, 12)));
             consumes.power(3f);
             areaSize = 13;
 
-            //consumes.liquid(Liquids.gallium, 2f / 60f);
+            consumes.liquid(Liquids.nitrogen, 12f / 60f);
         }};
 
         //TODO requirements
         shipAssembler = new UnitAssembler("ship-assembler"){{
-            requirements(Category.units, with(Items.beryllium, 700, Items.oxide, 150, Items.tungsten, 500, Items.silicon, 800));
+            requirements(Category.units, with(Items.beryllium, 700, Items.oxide, 300, Items.tungsten, 500, Items.silicon, 800));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, BlockStack.list(Blocks.berylliumWallLarge, 4, Blocks.duct, 15, Blocks.plasmaBore, 4)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, BlockStack.list(Blocks.berylliumWallLarge, 12, Blocks.duct, 20, Blocks.plasmaBore, 8)));
             consumes.power(3f);
             areaSize = 13;
 
-            consumes.liquid(Liquids.gallium, 2f / 60f);
+            consumes.liquid(Liquids.nitrogen, 12f / 60f);
         }};
 
         //TODO requirements
@@ -3567,8 +3568,7 @@ public class Blocks{
             consumes.power(3f);
             areaSize = 13;
 
-            //consumes.liquid(Liquids.gallium, 2f / 60f);
-
+            consumes.liquid(Liquids.nitrogen, 12f / 60f);
         }};
 
         //TODO requirements

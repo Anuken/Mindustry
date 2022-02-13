@@ -196,7 +196,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    @Remote(called = Loc.both, targets = Loc.both, forward = true)
+    @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void commandUnits(Player player, int[] unitIds, @Nullable Building buildTarget, @Nullable Unit unitTarget, @Nullable Vec2 posTarget){
         if(player == null || unitIds == null) return;
 
