@@ -34,6 +34,22 @@ public class MemoryBlock extends Block{
         }
 
         @Override
+        public boolean collide(Bullet other){
+            return !privileged;
+        }
+
+        @Override
+        public boolean displayable(){
+            return !privileged;
+        }
+
+        @Override
+        public void damage(float damage){
+            if(privileged) return;
+            super.damage(damage);
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
 

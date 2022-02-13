@@ -17,6 +17,7 @@ import static mindustry.Vars.*;
 import static mindustry.ai.Pathfinder.*;
 
 public class ControlPathfinder{
+    //TODO this FPS-based update system could be flawed.
     private static final long maxUpdate = Time.millisToNanos(20);
     private static final int updateFPS = 60;
     private static final int updateInterval = 1000 / updateFPS;
@@ -316,7 +317,7 @@ public class ControlPathfinder{
         int ww = world.width(), wh = world.height();
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
-        int e2, err = dx - dy;
+        int err = dx - dy;
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
             if(solid(type, x + y * wwidth)) return true;
@@ -455,7 +456,7 @@ public class ControlPathfinder{
             }
             lastId = curId;
 
-            //re-do everything when world updates
+            //re-do everything when world updates, but keep the old path around
             if(Time.timeSinceMillis(lastTime) > 1000 * 3 && (worldUpdateId != lastWorldUpdate || !destination.epsilonEquals(lastDestination, 2f))){
                 lastTime = Time.millis();
                 lastWorldUpdate = worldUpdateId;
@@ -466,7 +467,6 @@ public class ControlPathfinder{
 
             long ns = Time.nanos();
             int counter = 0;
-            //Log.info("running; @ in frontier", frontier.size);
 
             while(frontier.size > 0){
                 int current = frontier.poll();

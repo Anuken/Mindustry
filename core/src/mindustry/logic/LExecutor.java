@@ -1208,19 +1208,21 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
+            if(net.client()) return;
+
             Tile tile = world.tile(exec.numi(x), exec.numi(y));
             if(tile != null && exec.obj(block) instanceof Block b){
                 //TODO this can be quite laggy...
                 switch(layer){
                     case ore -> {
-                        if(b instanceof OverlayFloor o) tile.setOverlay(o);
+                        if(b instanceof OverlayFloor o) tile.setOverlayNet(o);
                     }
                     case floor -> {
-                        if(b instanceof Floor f) tile.setFloor(f);
+                        if(b instanceof Floor f) tile.setFloorNet(f);
                     }
                     case block -> {
                         Team t = exec.obj(team) instanceof Team steam ? steam : Team.derelict;
-                        tile.setBlock(b, t, Mathf.clamp(exec.numi(rotation), 0, 3));
+                        tile.setNet(b, t, Mathf.clamp(exec.numi(rotation), 0, 3));
                     }
                     //building case not allowed
                 }
@@ -1230,7 +1232,6 @@ public class LExecutor{
 
     public static class SpawnUnitI implements LInstruction{
         public int type, x, y, rotation, team, result;
-        public boolean effect;
 
         public SpawnUnitI(int type, int x, int y, int rotation, int team, boolean effect, int result){
             this.type = type;
@@ -1238,7 +1239,6 @@ public class LExecutor{
             this.y = y;
             this.rotation = rotation;
             this.team = team;
-            this.effect = effect;
             this.result = result;
         }
 
@@ -1247,13 +1247,13 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
+            if(net.client()) return;
+
             if(exec.obj(type) instanceof UnitType type && !type.hidden && exec.obj(team) instanceof Team team && Units.canCreate(team, type)){
                 //random offset to prevent stacking
                 var unit = type.spawn(team, World.unconv(exec.numf(x)) + Mathf.range(0.01f), World.unconv(exec.numf(y)) + Mathf.range(0.01f));
                 unit.rotation = exec.numf(rotation);
-                if(effect){
-                    spawner.spawnEffect(unit);
-                }
+                spawner.spawnEffect(unit);
                 exec.setobj(result, unit);
             }
         }

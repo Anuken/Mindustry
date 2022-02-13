@@ -163,7 +163,7 @@ public class MinimapRenderer{
 
         TextureRegion icon = Icon.units.getRegion();
 
-        Lines.stroke(3f);
+        Lines.stroke(Scl.scl(3f));
 
         Draw.color(state.rules.waveTeam.color, Tmp.c2.set(state.rules.waveTeam.color).value(1.2f), Mathf.absin(Time.time, 16f, 1f));
 

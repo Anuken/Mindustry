@@ -369,6 +369,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         setFloorNet(floor, Blocks.air);
     }
 
+    /** set()-s this tile, except it's synced across the network */
+    public void setOverlayNet(Block overlay){
+        Call.setOverlay(this, overlay);
+    }
+
     public short overlayID(){
         return overlay.id;
     }
@@ -696,6 +701,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     @Remote(called = Loc.server)
     public static void setFloor(Tile tile, Block floor, Block overlay){
         tile.setFloor(floor.asFloor());
+        tile.setOverlay(overlay);
+    }
+
+    @Remote(called = Loc.server)
+    public static void setOverlay(Tile tile, Block overlay){
         tile.setOverlay(overlay);
     }
 

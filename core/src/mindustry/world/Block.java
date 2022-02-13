@@ -105,6 +105,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean breakable;
     /** whether to add this block to brokenblocks */
     public boolean rebuildable = true;
+    /** if true, this logic-related block can only be used with privileged processors (or is one itself) */
+    public boolean privileged = false;
     /** whether this block can only be placed on water */
     public boolean requiresWater = false;
     /** whether this block can be placed on any liquids, anywhere */

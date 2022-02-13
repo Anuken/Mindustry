@@ -101,11 +101,19 @@ public class LaunchLoadoutDialog extends BaseDialog{
             });
         }).width(204);
 
-        buttons.button("@launch.text", Icon.ok, () -> {
+        boolean rows = Core.graphics.isPortrait() && mobile;
+
+        if(rows) buttons.row();
+
+        var cell = buttons.button("@launch.text", Icon.ok, () -> {
             universe.updateLoadout(core, selected);
             confirm.run();
             hide();
         }).disabled(b -> !valid);
+
+        if(rows){
+            cell.colspan(2).size(160f + 204f + 4f, 64f);
+        }
 
         int cols = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
         ButtonGroup<Button> group = new ButtonGroup<>();

@@ -488,7 +488,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         //TODO what if any sector is selectable?
         //TODO launch criteria - which planets can be launched to? Where should this be defined? Should planets even be selectable?
         if(mode == planetLaunch) return launchSector != null && planet != launchSector.planet && launchSector.planet.launchCandidates.contains(planet);
-        return (planet.alwaysUnlocked && planet.isLandable()) || planet.sectors.contains(Sector::hasBase);
+        return (planet.alwaysUnlocked && planet.isLandable()) || planet.sectors.contains(Sector::hasBase) || debugSelect;
     }
 
     void setup(){

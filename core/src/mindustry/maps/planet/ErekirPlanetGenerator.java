@@ -56,7 +56,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
     @Override
     public float getSizeScl(){
-        return 2000 * 1.06f;
+        //TODO should sectors be 600, or 500 blocks?
+        return 2000 * 1.07f * 6f / 5f;
     }
 
     @Override
@@ -139,8 +140,50 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         }
     }
 
+    private @Nullable String lastSec;
+
+    private void sec(String name){
+        if(lastSec != null){
+            float elapsed = Time.elapsed();
+            Log.info("@: @ (@ sec)", lastSec.toUpperCase(), elapsed, Strings.fixed(elapsed / 1000f, 2));
+        }
+        if(name != null){
+            Time.mark();
+        }
+        lastSec = name;
+    }
+
+    //TODO remove
+    @Override
+    public void generate(Tiles tiles, Sector sec, int seed){
+        this.tiles = tiles;
+        this.seed = seed + baseSeed;
+        this.sector = sec;
+        this.width = tiles.width;
+        this.height = tiles.height;
+        this.rand.setSeed(sec.id + seed + baseSeed);
+
+        long begin = Time.millis();
+        sec("genTile");
+
+        TileGen gen = new TileGen();
+        for(int y = 0; y < height; y++){
+            for(int x = 0; x < width; x++){
+                gen.reset();
+                Vec3 position = sector.rect.project(x / (float)tiles.width, y / (float)tiles.height);
+
+                genTile(position, gen);
+                tiles.set(x, y, new Tile(x, y, gen.floor, gen.overlay, gen.block));
+            }
+        }
+
+        generate(tiles);
+        Log.info("TOTAL TILE: @ (@ sec)", Time.timeSinceMillis(begin), Strings.fixed(Time.timeSinceMillis(begin) / 1000f, 2));
+    }
+
     @Override
     protected void generate(){
+        sec("tempPass");
         float temp = rawTemp(sector.tile.v);
 
         if(temp > 0.7){
@@ -165,6 +208,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             });
         }
 
+        sec("cells1");
+
         cells(4);
 
         //regolith walls for more dense terrain
@@ -175,7 +220,6 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         });
 
         //TODO: yellow regolith biome tweaks
-        //TODO: crystal biome on the dark side w/ terrain tweaks
         //TODO ice biome
 
         float length = width/3f;
@@ -185,9 +229,13 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         endX = (int)(-trns.x + width/2f), endY = (int)(-trns.y + height/2f);
         float maxd = Mathf.dst(width/2f, height/2f);
 
+        sec("pathfinding");
+
         erase(spawnX, spawnY, 15);
         brush(pathfind(spawnX, spawnY, endX, endY, tile -> (tile.solid() ? 300f : 0f) + maxd - tile.dst(width/2f, height/2f)/10f, Astar.manhattan), 9);
         erase(endX, endY, 15);
+
+        sec("arkycite");
 
         //arkycite
         pass((x, y) -> {
@@ -211,18 +259,25 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         blend(Blocks.arkyciteFloor, Blocks.arkyicStone, 4);
 
+        sec("slag");
+
         //TODO may overwrite floor blocks under walls and look bad
         blend(Blocks.slag, Blocks.yellowStonePlates, 4);
 
-        distort(10f, 12f);
+        sec("distort");
 
+        distort(10f, 12f);
         distort(5f, 7f);
+
+        sec("arkycite-slag-median");
 
         //does arkycite need smoothing?
         median(2, 0.6, Blocks.arkyciteFloor);
 
         //smooth out slag to prevent random 1-tile patches
         median(3, 0.6, Blocks.slag);
+
+        sec("details 1");
 
         pass((x, y) -> {
             //rough rhyolite
@@ -240,6 +295,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
             float max = 0;
             for(Point2 p : Geometry.d8){
+                //TODO I think this is the cause of lag
                 max = Math.max(max, world.getDarkness(x + p.x, y + p.y));
             }
             if(max > 0){
@@ -256,10 +312,16 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             }
         });
 
+        sec("inverse flood fill");
+
         inverseFloodFill(tiles.getn(spawnX, spawnY));
+
+        sec("redStone");
 
         //TODO veins, blend after inverse flood fill?
         blend(Blocks.redStoneWall, Blocks.denseRedStone, 4);
+
+        sec("ores");
 
         //make sure enemies have room
         erase(endX, endY, 6);
@@ -321,6 +383,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             //}
         });
 
+        sec("trim dark");
+
         //remove props near ores, they're too annoying
         pass((x, y) -> {
             if(ore.asFloor().wallOre || block.itemDrop != null || (block == Blocks.air && ore != Blocks.air)){
@@ -329,6 +393,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         });
 
         trimDark();
+
+        sec("vents");
 
         int minVents = rand.random(6, 9);
         int ventCount = 0;
@@ -437,6 +503,8 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             }
         }
 
+        sec("decoration");
+
         for(Tile tile : tiles){
             if(tile.overlay().needsSurface && !tile.floor().hasSurface()){
                 tile.setOverlay(Blocks.air);
@@ -456,5 +524,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         //all sectors are wave sectors
         state.rules.waves = true;
         state.rules.showSpawns = true;
+
+        sec("");
     }
 }

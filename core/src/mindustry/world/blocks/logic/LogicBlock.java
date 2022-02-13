@@ -34,7 +34,6 @@ public class LogicBlock extends Block{
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
     public float range = 8 * 10;
-    public boolean privileged;
 
     public LogicBlock(String name){
         super(name);
@@ -535,7 +534,7 @@ public class LogicBlock extends Block{
         }
 
         public boolean validLink(Building other){
-            return other != null && other.isValid() && (privileged || (other.team == team && other.within(this, range + other.block.size*tilesize/2f))) && !(other instanceof ConstructBuild);
+            return other != null && other.isValid() && (privileged || (!other.block.privileged && other.team == team && other.within(this, range + other.block.size*tilesize/2f))) && !(other instanceof ConstructBuild);
         }
 
         @Override
