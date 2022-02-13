@@ -504,7 +504,7 @@ public class World{
         }
 
         if(state.hasSector() && state.getSector().preset == null){
-            int circleBlend = 7;
+            int circleBlend = 5;
             //quantized angle
             float offset = state.getSector().rect.rotation + 90;
             float angle = Angles.angle(x, y, tiles.width/2, tiles.height/2) + offset;

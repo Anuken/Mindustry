@@ -25,6 +25,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
     public static float liqThresh = 0.64f, liqScl = 87f, redThresh = 3.1f, noArkThresh = 0.3f;
     public static int crystalSeed = 8, crystalOct = 2;
     public static float crystalScl = 0.9f, crystalMag = 0.3f;
+    public static float airThresh = 0.13f, airScl = 14;
 
     Block[] terrain = {Blocks.regolith, Blocks.regolith, Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.carbonStone};
 
@@ -130,7 +131,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         tile.block = tile.floor.asFloor().wall;
 
-        if(Ridged.noise3d(seed + 1, position.x, position.y, position.z, 2, 14) > 0.14){
+        if(Ridged.noise3d(seed + 1, position.x, position.y, position.z, 2, airScl) > airThresh){
             tile.block = Blocks.air;
         }
 
