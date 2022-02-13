@@ -10,8 +10,9 @@ import mindustry.world.blocks.power.*;
 import mindustry.world.meta.*;
 
 public class Consumers{
-    private Consume[] map = new Consume[ConsumeType.values().length];
-    private Consume[] results, optionalResults;
+    private Consume[] map = new Consume[ConsumeType.all.length];
+
+    public Consume[] all = {}, optionals = {};
 
     public final Bits itemFilters = new Bits(Vars.content.items().size);
     public final Bits liquidfilters = new Bits(Vars.content.liquids().size);
@@ -25,7 +26,7 @@ public class Consumers{
     }
 
     public boolean any(){
-        return results != null && results.length > 0;
+        return all.length > 0;
     }
 
     public void each(Cons<Consume> c){
@@ -37,10 +38,10 @@ public class Consumers{
     }
 
     public void init(){
-        results = Structs.filter(Consume.class, map, m -> m != null);
-        optionalResults = Structs.filter(Consume.class, map, m -> m != null && m.isOptional());
+        all = Structs.filter(Consume.class, map, m -> m != null);
+        optionals = Structs.filter(Consume.class, map, m -> m != null && m.isOptional());
 
-        for(Consume cons : results){
+        for(Consume cons : all){
             cons.applyItemFilter(itemFilters);
             cons.applyLiquidFilter(liquidfilters);
         }
@@ -126,18 +127,20 @@ public class Consumers{
         return (T)map[type.ordinal()];
     }
 
-    @Nullable
-    public <T extends Consume> T getOrNull(ConsumeType type){
+    public @Nullable <T extends Consume>T getOrNull(ConsumeType type){
         return (T)map[type.ordinal()];
     }
 
-    @Nullable
+    /** @deprecated unnecessary getter */
+    @Deprecated
     public Consume[] all(){
-        return results;
+        return all;
     }
 
+    /** @deprecated unnecessary getter */
+    @Deprecated
     public Consume[] optionals(){
-        return optionalResults;
+        return optionals;
     }
 
     public void display(Stats stats){

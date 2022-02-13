@@ -4,5 +4,7 @@ public enum ConsumeType{
     item,
     power,
     liquid,
-    payload
+    payload;
+
+    public static final ConsumeType[] all = values();
 }

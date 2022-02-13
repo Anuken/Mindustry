@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.types.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -1323,6 +1324,44 @@ public class LExecutor{
             }
 
             exec.textBuffer.setLength(0);
+        }
+    }
+
+    public static class ExplosionI implements LInstruction{
+        public int team, x, y, radius, damage, air, ground, pierce;
+
+        public ExplosionI(int team, int x, int y, int radius, int damage, int air, int ground, int pierce){
+            this.team = team;
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            this.damage = damage;
+            this.air = air;
+            this.ground = ground;
+            this.pierce = pierce;
+        }
+
+        public ExplosionI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(net.client()) return;
+
+            Team t = exec.obj(team) instanceof Team te ? te : null;
+            //note that there is a radius cap
+            Call.logicExplosion(t, World.unconv(exec.numf(x)), World.unconv(exec.numf(y)), World.unconv(Math.min(exec.numf(radius), 100)), exec.numf(damage), exec.bool(air), exec.bool(ground), exec.bool(pierce));
+        }
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void logicExplosion(Team team, float x, float y, float radius, float damage, boolean air, boolean ground, boolean pierce){
+
+        Damage.damage(team, x, y, radius, damage, pierce, air, ground);
+        if(pierce){
+            Fx.spawnShockwave.at(x, y, World.conv(radius));
+        }else{
+            Fx.dynamicExplosion.at(x, y, World.conv(radius) / 8f);
         }
     }
 

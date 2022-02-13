@@ -81,7 +81,7 @@ public class PowerTestFixture{
             Tile tile = new Tile(x, y);
 
             //workaround since init() is not called for custom blocks
-            if(block.consumes.all() == null){
+            if(block.consumes.all == null || block.consumes.all.length == 0){
                 block.consumes.init();
             }
 

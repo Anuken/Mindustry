@@ -1369,7 +1369,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void displayConsumption(Table table){
         table.left();
-        for(Consume cons : block.consumes.all()){
+        for(Consume cons : block.consumes.all){
             if(cons.isOptional() && cons.isBoost()) continue;
             cons.build(self(), table);
         }
@@ -1708,11 +1708,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void update(){
         if(state.isEditor()) return;
 
+        //TODO refactor to timestamp-based system
         timeScaleDuration -= Time.delta;
         if(timeScaleDuration <= 0f || !block.canOverdrive){
             timeScale = 1f;
         }
 
+        //TODO unacceptable overhead?
         if(!enabled && block.autoResetEnabled){
             noSleep();
             enabledControlTime -= Time.delta;
@@ -1722,10 +1724,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
+        //TODO this check should not be here, just remove unsupported buildings instead
         if(team == Team.derelict || !block.supportsEnv(state.rules.environment)){
             enabled = false;
         }
 
+        //TODO separate system for sound?
         if(!headless){
             if(sound != null){
                 sound.update(x, y, shouldActiveSound());
@@ -1736,6 +1740,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
+        //TODO consume module is not necessary for every building, e.g. conveyors should not have it - perhaps it should be nullable?
         if(cons != null){
             cons.update();
         }
@@ -1744,6 +1749,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             updateTile();
         }
 
+        //TODO unnecessary updates?
         if(items != null){
             items.update(updateFlow);
         }
@@ -1752,6 +1758,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             liquids.update(updateFlow);
         }
 
+        //TODO power graph should be separate entity
         if(power != null){
             power.graph.update();
         }

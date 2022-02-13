@@ -348,7 +348,7 @@ public class PowerGraph{
     }
 
     private boolean otherConsumersAreValid(Building build, Consume consumePower){
-        for(Consume cons : build.block.consumes.all()){
+        for(Consume cons : build.block.consumes.all){
             if(cons != consumePower && !cons.isOptional() && !cons.valid(build)){
                 return false;
             }

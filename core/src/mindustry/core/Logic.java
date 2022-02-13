@@ -107,6 +107,8 @@ public class Logic implements ApplicationListener{
                 weather.cooldown = sum + Mathf.random(weather.maxFrequency);
                 sum += weather.cooldown;
             }
+            //tick resets on new save play
+            state.tick = 0f;
         });
 
         Events.on(WorldLoadEvent.class, e -> {
