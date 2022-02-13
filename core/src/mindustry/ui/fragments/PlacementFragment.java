@@ -37,10 +37,11 @@ public class PlacementFragment extends Fragment{
     boolean[] categoryEmpty = new boolean[Category.all.length];
     ObjectMap<Category,Block> selectedBlocks = new ObjectMap<>();
     ObjectFloatMap<Category> scrollPositions = new ObjectFloatMap<>();
-    Block menuHoverBlock;
-    Displayable hover;
-    Object lastDisplayState;
-    Team lastTeam;
+    @Nullable Block menuHoverBlock;
+    @Nullable Displayable hover;
+    @Nullable Building lastFlowBuild, nextFlowBuild;
+    @Nullable Object lastDisplayState;
+    @Nullable Team lastTeam;
     boolean wasHovered;
     Table blockTable, toggler, topTable, blockCatTable, commandTable;
     Stack mainStack;
@@ -82,6 +83,21 @@ public class PlacementFragment extends Fragment{
 
         Events.on(ResetEvent.class, event -> {
             selectedBlocks.clear();
+        });
+
+        Events.run(Trigger.update, () -> {
+            //disable flow updating on previous building so it doesn't waste CPU
+            if(lastFlowBuild != null && lastFlowBuild != nextFlowBuild){
+                if(lastFlowBuild.items != null) lastFlowBuild.flowItems().stopFlow();
+                if(lastFlowBuild.liquids != null) lastFlowBuild.liquids.stopFlow();
+            }
+
+            lastFlowBuild = nextFlowBuild;
+
+            if(nextFlowBuild != null){
+                if(nextFlowBuild.items != null) nextFlowBuild.flowItems().updateFlow();
+                if(nextFlowBuild.liquids != null) nextFlowBuild.liquids.updateFlow();
+            }
         });
     }
 
@@ -549,8 +565,7 @@ public class PlacementFragment extends Fragment{
         if(hoverTile != null){
             //if the tile has a building, display it
             if(hoverTile.build != null && hoverTile.build.displayable()){
-                hoverTile.build.updateFlow = true;
-                return hoverTile.build;
+                return nextFlowBuild = hoverTile.build;
             }
 
             //if the tile has a drop, display the drop

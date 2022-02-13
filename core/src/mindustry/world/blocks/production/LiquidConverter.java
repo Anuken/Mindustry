@@ -46,7 +46,7 @@ public class LiquidConverter extends GenericCrafter{
         public void updateTile(){
             ConsumeLiquid cl = consumes.get(ConsumeType.liquid);
 
-            if(cons.valid()){
+            if(consValid()){
                 if(Mathf.chanceDelta(updateEffectChance)){
                     updateEffect.at(x + Mathf.range(size * 4f), y + Mathf.range(size * 4));
                 }
@@ -65,7 +65,7 @@ public class LiquidConverter extends GenericCrafter{
                 }
             }else{
                 //warmup is still 1 even if not consuming
-                warmup = Mathf.lerp(warmup, cons.canConsume() ? 1f : 0f, 0.02f);
+                warmup = Mathf.lerp(warmup, canConsume() ? 1f : 0f, 0.02f);
             }
 
             dumpLiquid(outputLiquid.liquid);

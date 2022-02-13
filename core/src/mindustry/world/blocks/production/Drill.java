@@ -277,7 +277,7 @@ public class Drill extends Block{
 
                 float speed = 1f;
 
-                if(cons.optionalValid()){
+                if(consOptionalValid()){
                     speed = liquidBoostIntensity;
                 }
 

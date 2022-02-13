@@ -2,89 +2,49 @@ package mindustry.world.modules;
 
 import arc.util.io.*;
 import mindustry.gen.*;
-import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
+/** @deprecated why is it a module? literally two booleans, why did I think it was a good idea? yay, more pointers???
+ * the braindead java "make everything a separate class" mentality
+ * */
+@Deprecated
 public class ConsumeModule extends BlockModule{
-    private boolean valid, optionalValid;
-    private final Building entity;
+    private final Building build;
 
-    public ConsumeModule(Building entity){
-        this.entity = entity;
+    public ConsumeModule(Building build){
+        this.build = build;
     }
 
     public BlockStatus status(){
-        if(entity.enabledControlTime > 0 && !entity.enabled){
-            return BlockStatus.logicDisable;
-        }
-
-        if(!entity.shouldConsume()){
-            return BlockStatus.noOutput;
-        }
-
-        if(!valid || !entity.productionValid()){
-            return BlockStatus.noInput;
-        }
-
-        return BlockStatus.active;
+        return build.status();
     }
 
     public void update(){
-        //everything is valid when cheating
-        if(entity.cheating()){
-            valid = optionalValid = true;
-            return;
-        }
-
-        boolean prevValid = valid();
-        valid = true;
-        optionalValid = true;
-        boolean docons = entity.shouldConsume() && entity.productionValid();
-
-        for(Consume cons : entity.block.consumes.all){
-            if(cons.isOptional()) continue;
-
-            if(docons && cons.isUpdate() && prevValid && cons.valid(entity)){
-                cons.update(entity);
-            }
-
-            valid &= cons.valid(entity);
-        }
-
-        for(Consume cons : entity.block.consumes.optionals){
-            if(docons && cons.isUpdate() && prevValid && cons.valid(entity)){
-                cons.update(entity);
-            }
-
-            optionalValid &= cons.valid(entity);
-        }
+        build.updateConsumption();
     }
 
     public void trigger(){
-        for(Consume cons : entity.block.consumes.all){
-            cons.trigger(entity);
-        }
+        build.consume();
     }
 
     public boolean valid(){
-        return valid && entity.shouldConsume() && entity.enabled;
+        return build.consValid();
     }
 
     public boolean canConsume(){
-        return valid && entity.enabled;
+        return build.canConsume();
     }
 
     public boolean optionalValid(){
-        return valid() && optionalValid && entity.enabled;
+        return build.consOptionalValid();
     }
 
+    //hahahahahahahahahaha
     @Override
     public void write(Writes write){
-        write.bool(valid);
     }
 
     @Override
     public void read(Reads read){
-        valid = read.bool();
     }
 }

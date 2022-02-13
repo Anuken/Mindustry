@@ -56,7 +56,7 @@ public class Separator extends Block{
 
         @Override
         public boolean shouldAmbientSound(){
-            return cons.valid();
+            return consValid();
         }
 
         @Override

@@ -121,7 +121,7 @@ public class SolidPump extends Pump{
         public void updateTile(){
             float fraction = Math.max(validTiles + boost + (attribute == null ? 0 : attribute.env()), 0);
 
-            if(cons.valid() && typeLiquid() < liquidCapacity - 0.001f){
+            if(consValid() && typeLiquid() < liquidCapacity - 0.001f){
                 float maxPump = Math.min(liquidCapacity - typeLiquid(), pumpAmount * delta() * fraction * efficiency());
                 liquids.add(result, maxPump);
                 lastPump = maxPump / Time.delta;

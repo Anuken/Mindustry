@@ -251,7 +251,7 @@ public class BeamDrill extends Block{
 
             float multiplier = 1f;
 
-            if(cons.optionalValid()){
+            if(consOptionalValid()){
                 boostWarmup = Mathf.lerpDelta(boostWarmup, 1f, 0.1f);
                 multiplier *= optionalBoostIntensity;
             }else{

@@ -62,7 +62,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient Tile tile;
     transient Block block;
     transient Seq<Building> proximity = new Seq<>(6);
-    transient boolean updateFlow;
     transient byte cdump;
     transient int rotation;
     transient float payloadRotation;
@@ -70,15 +69,20 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient float enabledControlTime;
     transient String lastAccessed;
     transient boolean wasDamaged; //used only by the indexer
+    transient float visualLiquid;
 
     @Nullable PowerModule power;
     @Nullable ItemModule items;
     @Nullable LiquidModule liquids;
-    @Nullable ConsumeModule cons;
+
+    /** @deprecated use building methods instead, this is just a proxy! */
+    @Deprecated
+    ConsumeModule cons = new ConsumeModule(self());
 
     public transient float healSuppressionTime = -1f;
     public transient float lastHealTime = -120f * 10f;
 
+    private transient boolean consValid, consOptionalValid;
     private transient float timeScale = 1f, timeScaleDuration;
     private transient float dumpAccum;
 
@@ -127,7 +131,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         maxHealth(block.health);
         timer(new Interval(block.timers));
 
-        cons = new ConsumeModule(self());
         if(block.hasItems) items = new ItemModule();
         if(block.hasLiquids) liquids = new LiquidModule();
         if(block.hasPower){
@@ -166,7 +169,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(items != null) items.write(write);
         if(power != null) power.write(write);
         if(liquids != null) liquids.write(write);
-        if(cons != null) cons.write(write);
+        write.bool(consValid);
     }
 
     public final void readBase(Reads read){
@@ -200,11 +203,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if((moduleBits & 1) != 0) (items == null ? new ItemModule() : items).read(read, legacy);
         if((moduleBits & 2) != 0) (power == null ? new PowerModule() : power).read(read, legacy);
         if((moduleBits & 4) != 0) (liquids == null ? new LiquidModule() : liquids).read(read, legacy);
-        if((moduleBits & 8) != 0) (cons == null ? new ConsumeModule(self()) : cons).read(read, legacy);
+        if((moduleBits & 8) != 0) consValid = read.bool();
     }
 
     public int moduleBitmask(){
-        return (items != null ? 1 : 0) | (power != null ? 2 : 0) | (liquids != null ? 4 : 0) | (cons != null ? 8 : 0);
+        return (items != null ? 1 : 0) | (power != null ? 2 : 0) | (liquids != null ? 4 : 0) | 8;
     }
 
     public void writeAll(Writes write){
@@ -435,11 +438,21 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public boolean consValid(){
-        return cons.valid();
+        return consValid && enabled && shouldConsume();
+    }
+
+    public boolean consOptionalValid(){
+        return consValid() && consOptionalValid;
     }
 
     public void consume(){
-        cons.trigger();
+        for(Consume cons : block.consumes.all){
+            cons.trigger(self());
+        }
+    }
+
+    public boolean canConsume(){
+        return consValid && enabled;
     }
 
     /** Scaled delta. */
@@ -483,7 +496,19 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public BlockStatus status(){
-        return cons.status();
+        if(enabledControlTime > 0 && !enabled){
+            return BlockStatus.logicDisable;
+        }
+
+        if(!shouldConsume()){
+            return BlockStatus.noOutput;
+        }
+
+        if(!consValid() || !productionValid()){
+            return BlockStatus.noInput;
+        }
+
+        return BlockStatus.active;
     }
 
     /** Call when nothing is happening to the entity. This increments the internal sleep timer. */
@@ -1084,7 +1109,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void drawLight(){
         if(block.hasLiquids && block.drawLiquidLight && liquids.current().lightColor.a > 0.001f){
-            drawLiquidLight(liquids.current(), liquids.smoothAmount());
+            //yes, I am updating in draw()... but this is purely visual anyway, better have it here than in update() where it wastes time
+            visualLiquid = Mathf.lerpDelta(visualLiquid, liquids.currentAmount(), 0.07f);
+            drawLiquidLight(liquids.current(), visualLiquid);
         }
     }
 
@@ -1554,6 +1581,37 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
+    public void updateConsumption(){
+        //everything is valid when cheating
+        if(cheating()){
+            consValid = consOptionalValid = true;
+            return;
+        }
+
+        boolean prevValid = consValid();
+        consValid = true;
+        consOptionalValid = true;
+        boolean docons = shouldConsume() && productionValid();
+
+        for(Consume cons : block.consumes.all){
+            if(cons.isOptional()) continue;
+
+            if(docons && cons.isUpdate() && prevValid && cons.valid(self())){
+                cons.update(self());
+            }
+
+            consValid &= cons.valid(self());
+        }
+
+        for(Consume cons : block.consumes.optionals){
+            if(docons && cons.isUpdate() && prevValid && cons.valid(self())){
+                cons.update(self());
+            }
+
+            consOptionalValid &= cons.valid(self());
+        }
+    }
+
     public void updateTile(){
 
     }
@@ -1708,7 +1766,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         afterDestroyed();
     }
 
-    //TODO awful method and should be benchmarked
+    //TODO atrocious method and should be squished
     @Final
     @Override
     public void update(){
@@ -1748,30 +1806,17 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         //TODO consume module is not necessary for every building, e.g. conveyors should not have it - perhaps it should be nullable?
-        if(cons != null){
-            cons.update();
-        }
+        updateConsumption();
 
         //TODO just handle per-block instead
         if(enabled || !block.noUpdateDisabled){
             updateTile();
         }
 
-        //TODO unnecessary updates for everything below
-        if(items != null){
-            items.update(updateFlow);
-        }
-
-        if(liquids != null){
-            liquids.update(updateFlow);
-        }
-
         //TODO power graph should be separate entity
         if(power != null){
             power.graph.update();
         }
-
-        updateFlow = false;
     }
 
     @Override

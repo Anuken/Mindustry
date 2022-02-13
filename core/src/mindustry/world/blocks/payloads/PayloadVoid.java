@@ -56,7 +56,7 @@ public class PayloadVoid extends PayloadBlock{
         @Override
         public void updateTile(){
             super.updateTile();
-            if(moveInPayload(false) && cons.valid()){
+            if(moveInPayload(false) && consValid()){
                 payload = null;
                 incinerateEffect.at(this);
                 incinerateSound.at(this);

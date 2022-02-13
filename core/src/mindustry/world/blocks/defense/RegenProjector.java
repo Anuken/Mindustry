@@ -122,12 +122,12 @@ public class RegenProjector extends Block{
             }
 
             if(consValid()){
-                if(cons.optionalValid() && (optionalTimer += Time.delta) >= optionalUseTime){
-                    cons.trigger();
+                if(consOptionalValid() && (optionalTimer += Time.delta) >= optionalUseTime){
+                    consume();
                     optionalUseTime = 0f;
                 }
 
-                float healAmount = (cons.optionalValid() ? optionalMultiplier : 1f) * healPercent;
+                float healAmount = (consOptionalValid() ? optionalMultiplier : 1f) * healPercent;
 
                 //use Math.max to prevent stacking
                 for(var build : targets){

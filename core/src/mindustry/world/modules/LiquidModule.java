@@ -22,55 +22,51 @@ public class LiquidModule extends BlockModule{
 
     private float[] liquids = new float[content.liquids().size];
     private Liquid current = content.liquid(0);
-    private float total, smoothLiquid;
+    private float total;
 
     private @Nullable WindowedMean[] flow;
 
-    public void update(boolean showFlow){
-        smoothLiquid = Mathf.lerpDelta(smoothLiquid, currentAmount(), 0.1f);
-
-        if(showFlow){
-
-            if(flowTimer.get(1, pollScl)){
-
-                if(flow == null){
-                    if(cacheFlow == null || cacheFlow.length != liquids.length){
-                        cacheFlow = new WindowedMean[liquids.length];
-                        for(int i = 0; i < liquids.length; i++){
-                            cacheFlow[i] = new WindowedMean(windowSize);
-                        }
-                        cacheSums = new float[liquids.length];
-                        displayFlow = new float[liquids.length];
-                    }else{
-                        for(int i = 0; i < liquids.length; i++){
-                            cacheFlow[i].reset();
-                        }
-                        Arrays.fill(cacheSums, 0);
-                        cacheBits.clear();
+    public void updateFlow(){
+        if(flowTimer.get(1, pollScl)){
+            if(flow == null){
+                if(cacheFlow == null || cacheFlow.length != liquids.length){
+                    cacheFlow = new WindowedMean[liquids.length];
+                    for(int i = 0; i < liquids.length; i++){
+                        cacheFlow[i] = new WindowedMean(windowSize);
                     }
-
-                    Arrays.fill(displayFlow, -1);
-
-                    flow = cacheFlow;
+                    cacheSums = new float[liquids.length];
+                    displayFlow = new float[liquids.length];
+                }else{
+                    for(int i = 0; i < liquids.length; i++){
+                        cacheFlow[i].reset();
+                    }
+                    Arrays.fill(cacheSums, 0);
+                    cacheBits.clear();
                 }
 
-                boolean updateFlow = flowTimer.get(30);
+                Arrays.fill(displayFlow, -1);
 
-                for(int i = 0; i < liquids.length; i++){
-                    flow[i].add(cacheSums[i]);
-                    if(cacheSums[i] > 0){
-                        cacheBits.set(i);
-                    }
-                    cacheSums[i] = 0;
+                flow = cacheFlow;
+            }
 
-                    if(updateFlow){
-                        displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() / pollScl : -1;
-                    }
+            boolean updateFlow = flowTimer.get(30);
+
+            for(int i = 0; i < liquids.length; i++){
+                flow[i].add(cacheSums[i]);
+                if(cacheSums[i] > 0){
+                    cacheBits.set(i);
+                }
+                cacheSums[i] = 0;
+
+                if(updateFlow){
+                    displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() / pollScl : -1;
                 }
             }
-        }else{
-            flow = null;
         }
+    }
+
+    public void stopFlow(){
+        flow = null;
     }
 
     /** @return current liquid's flow rate in u/s; any value < 0 means 'not ready'. */
@@ -80,10 +76,6 @@ public class LiquidModule extends BlockModule{
 
     public boolean hasFlowLiquid(Liquid liquid){
         return flow != null && cacheBits.get(liquid.id);
-    }
-
-    public float smoothAmount(){
-        return smoothLiquid;
     }
 
     /**

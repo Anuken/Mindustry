@@ -25,11 +25,6 @@ public class ItemVoid extends Block{
         }
 
         @Override
-        public void updateTile(){
-            flowItems.update(updateFlow);
-        }
-
-        @Override
         public void handleItem(Building source, Item item){
             flowItems.handleFlow(item, 1);
         }

@@ -75,7 +75,8 @@ public abstract class LegacySaveVersion extends LegacyRegionSaveVersion{
                             if(tile.build.items != null) tile.build.items.read(Reads.get(stream), true);
                             if(tile.build.power != null) tile.build.power.read(Reads.get(stream), true);
                             if(tile.build.liquids != null) tile.build.liquids.read(Reads.get(stream), true);
-                            if(tile.build.cons != null) tile.build.cons.read(Reads.get(stream), true);
+                            //skip cons.valid boolean, it's not very important here
+                            stream.readByte();
 
                             //read only from subclasses!
                             tile.build.read(Reads.get(in), version);

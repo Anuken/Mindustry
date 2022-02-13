@@ -100,7 +100,7 @@ public class PowerTestFixture{
 
             // Assign incredibly high health so the block does not get destroyed on e.g. burning Blast Compound
             block.health = 100000;
-            tile.build.health(100000.0f);
+            tile.build.health = 100000.0f;
 
             return tile;
         }catch(Exception ex){

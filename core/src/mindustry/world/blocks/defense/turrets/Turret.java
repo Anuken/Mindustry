@@ -337,7 +337,7 @@ public class Turret extends ReloadTurret{
         public void updateTile(){
             if(!validateTarget()) target = null;
 
-            float warmupTarget = isShooting() && cons.canConsume() ? 1f : 0f;
+            float warmupTarget = isShooting() && canConsume() ? 1f : 0f;
             if(linearWarmup){
                 shootWarmup = Mathf.approachDelta(shootWarmup, warmupTarget, shootWarmupSpeed);
             }else{
@@ -474,7 +474,7 @@ public class Turret extends ReloadTurret{
         /** @return whether the turret has ammo. */
         public boolean hasAmmo(){
             //used for "side-ammo" like gas in some turrets
-            if(!cons.canConsume()) return false;
+            if(!canConsume()) return false;
 
             //skip first entry if it has less than the required amount of ammo
             if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot && ammo.get(ammo.size - 2).amount >= ammoPerShot){

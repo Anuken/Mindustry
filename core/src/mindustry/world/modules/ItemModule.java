@@ -39,49 +39,49 @@ public class ItemModule extends BlockModule{
         System.arraycopy(other.items, 0, items, 0, items.length);
     }
 
-    public void update(boolean showFlow){
-        if(showFlow){
-            //update the flow at 30fps at most
-            if(flowTimer.get(1, pollScl)){
+    public void updateFlow(){
+        //update the flow at N fps at most
+        if(flowTimer.get(1, pollScl)){
 
-                if(flow == null){
-                    if(cacheFlow == null || cacheFlow.length != items.length){
-                        cacheFlow = new WindowedMean[items.length];
-                        for(int i = 0; i < items.length; i++){
-                            cacheFlow[i] = new WindowedMean(windowSize);
-                        }
-                        cacheSums = new float[items.length];
-                        displayFlow = new float[items.length];
-                    }else{
-                        for(int i = 0; i < items.length; i++){
-                            cacheFlow[i].reset();
-                        }
-                        Arrays.fill(cacheSums, 0);
-                        cacheBits.clear();
+            if(flow == null){
+                if(cacheFlow == null || cacheFlow.length != items.length){
+                    cacheFlow = new WindowedMean[items.length];
+                    for(int i = 0; i < items.length; i++){
+                        cacheFlow[i] = new WindowedMean(windowSize);
                     }
-
-                    Arrays.fill(displayFlow, -1);
-
-                    flow = cacheFlow;
+                    cacheSums = new float[items.length];
+                    displayFlow = new float[items.length];
+                }else{
+                    for(int i = 0; i < items.length; i++){
+                        cacheFlow[i].reset();
+                    }
+                    Arrays.fill(cacheSums, 0);
+                    cacheBits.clear();
                 }
 
-                boolean updateFlow = flowTimer.get(30);
+                Arrays.fill(displayFlow, -1);
 
-                for(int i = 0; i < items.length; i++){
-                    flow[i].add(cacheSums[i]);
-                    if(cacheSums[i] > 0){
-                        cacheBits.set(i);
-                    }
-                    cacheSums[i] = 0;
+                flow = cacheFlow;
+            }
 
-                    if(updateFlow){
-                        displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() / pollScl : -1;
-                    }
+            boolean updateFlow = flowTimer.get(30);
+
+            for(int i = 0; i < items.length; i++){
+                flow[i].add(cacheSums[i]);
+                if(cacheSums[i] > 0){
+                    cacheBits.set(i);
+                }
+                cacheSums[i] = 0;
+
+                if(updateFlow){
+                    displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() / pollScl : -1;
                 }
             }
-        }else{
-            flow = null;
         }
+    }
+
+    public void stopFlow(){
+        flow = null;
     }
 
     public int length(){

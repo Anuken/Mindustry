@@ -48,7 +48,7 @@ public class ContinuousTurret extends Turret{
         @Override
         public boolean hasAmmo(){
             //TODO update ammo in unit so it corresponds to liquids
-            return cons.canConsume();
+            return canConsume();
         }
 
         @Override
@@ -109,7 +109,7 @@ public class ContinuousTurret extends Turret{
                 return;
             }
 
-            if(cons.canConsume() && !charging && shootWarmup >= minWarmup){
+            if(canConsume() && !charging && shootWarmup >= minWarmup){
                 shoot(peekAmmo());
             }
         }

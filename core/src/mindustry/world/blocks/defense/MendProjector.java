@@ -82,9 +82,9 @@ public class MendProjector extends Block{
             heat = Mathf.lerpDelta(heat, consValid() && canHeal ? 1f : 0f, 0.08f);
             charge += heat * delta();
 
-            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
+            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(consOptionalValid()), 0.1f);
 
-            if(cons.optionalValid() && timer(timerUse, useTime) && efficiency() > 0 && canHeal){
+            if(consOptionalValid() && timer(timerUse, useTime) && efficiency() > 0 && canHeal){
                 consume();
             }
 
