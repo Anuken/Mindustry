@@ -430,7 +430,7 @@ public class ControlPathfinder{
 
         int rayPathIndex = -1;
         IntSeq result = new IntSeq();
-        float raycastTimer;
+        volatile float raycastTimer;
 
         PathfindQueue frontier = new PathfindQueue();
         //node index -> node it came from
@@ -451,7 +451,7 @@ public class ControlPathfinder{
 
         void update(long maxUpdateNs){
             if(curId != lastId){
-                clear();
+                clear(true);
             }
             lastId = curId;
 
@@ -459,10 +459,7 @@ public class ControlPathfinder{
             if(Time.timeSinceMillis(lastTime) > 1000 * 3 && (worldUpdateId != lastWorldUpdate || !destination.epsilonEquals(lastDestination, 2f))){
                 lastTime = Time.millis();
                 lastWorldUpdate = worldUpdateId;
-                pathIndex = 0;
-                rayPathIndex = -1;
-                result.clear();
-                clear();
+                clear(false);
             }
 
             if(done) return;
@@ -512,7 +509,11 @@ public class ControlPathfinder{
             }
 
             lastTime = Time.millis();
+            raycastTimer = 9999f;
             result.clear();
+
+            pathIndex = 0;
+            rayPathIndex = -1;
 
             if(foundEnd){
                 int cur = goal;
@@ -549,7 +550,7 @@ public class ControlPathfinder{
             result.size = output + 1;
         }
 
-        void clear(){
+        void clear(boolean resetCurrent){
             done = false;
 
             frontier = new PathfindQueue(20);
@@ -565,8 +566,11 @@ public class ControlPathfinder{
             frontier.add(start, 0);
 
             foundEnd = false;
-            result.clear();
             lastDestination.set(destination);
+
+            if(resetCurrent){
+                result.clear();
+            }
         }
     }
 }

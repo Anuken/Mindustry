@@ -2934,7 +2934,7 @@ public class UnitTypes{
 
                 unitSpawned = new MissileUnitType("quell-missile"){{
                     speed = 3.8f;
-                    maxRange = 15f;
+                    maxRange = 6f;
                     lifetime = 60f * 1.2f;
                     outlineColor = Pal.darkOutline;
                     health = 45;
@@ -3392,10 +3392,6 @@ public class UnitTypes{
             new UnitEngine(ew, -ew, es, 315f)
             );
         }};
-
-        //payloadDrone = new UnitType("payload-drone"){{
-
-        //}};
 
         //endregion
     }
