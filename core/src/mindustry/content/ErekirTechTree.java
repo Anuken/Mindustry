@@ -152,13 +152,13 @@ public class ErekirTechTree{
 
                                     });
 
-                                    node(atmosphericConcentrator, () -> {
+                                    node(atmosphericConcentrator, Seq.with(new OnSector(four)), () -> {
                                         node(cyanogenSynthesizer, () -> {
 
                                         });
                                     });
 
-                                    node(carbideCrucible, () -> {
+                                    node(carbideCrucible, Seq.with(tmpNever), () -> {
                                         node(surgeCrucible, () -> {
                                             node(phaseSynthesizer, () -> {
                                                 node(phaseHeater, () -> {

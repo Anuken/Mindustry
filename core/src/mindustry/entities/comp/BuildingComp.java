@@ -71,10 +71,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient String lastAccessed;
     transient boolean wasDamaged; //used only by the indexer
 
-    PowerModule power;
-    ItemModule items;
-    LiquidModule liquids;
-    ConsumeModule cons;
+    @Nullable PowerModule power;
+    @Nullable ItemModule items;
+    @Nullable LiquidModule liquids;
+    @Nullable ConsumeModule cons;
 
     public transient float healSuppressionTime = -1f;
     public transient float lastHealTime = -120f * 10f;
@@ -475,6 +475,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public float progress(){
         return 0f;
+    }
+
+    /** @return whether this block is allowed to update based on team/environment */
+    public boolean shouldUpdate(){
+        return team != Team.derelict && block.supportsEnv(state.rules.environment);
     }
 
     public BlockStatus status(){
@@ -1703,9 +1708,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         afterDestroyed();
     }
 
+    //TODO awful method and should be benchmarked
     @Final
     @Override
     public void update(){
+        //TODO should just avoid updating buildings instead
         if(state.isEditor()) return;
 
         //TODO refactor to timestamp-based system
@@ -1729,7 +1736,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             enabled = false;
         }
 
-        //TODO separate system for sound?
+        //TODO separate system for sound? AudioSource, etc
         if(!headless){
             if(sound != null){
                 sound.update(x, y, shouldActiveSound());
@@ -1745,11 +1752,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             cons.update();
         }
 
+        //TODO just handle per-block instead
         if(enabled || !block.noUpdateDisabled){
             updateTile();
         }
 
-        //TODO unnecessary updates?
+        //TODO unnecessary updates for everything below
         if(items != null){
             items.update(updateFlow);
         }
