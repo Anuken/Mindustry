@@ -913,7 +913,7 @@ public class ApplicationTests{
                 if(state.rules.attackMode){
                     bossWave = 100;
                 }else{
-                    //assertNotEquals(0, bossWave, "Sector " + zone.name + " doesn't have a boss/end wave.");
+                    assertNotEquals(0, bossWave, "Sector " + zone.name + " doesn't have a boss/end wave.");
                 }
 
                 if(state.rules.winWave > 0) bossWave = state.rules.winWave - 1;

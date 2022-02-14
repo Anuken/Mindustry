@@ -109,7 +109,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         set(tile.drawx(), tile.drawy());
 
-        if(shouldAdd){
+        if(shouldAdd && shouldUpdate()){
             add();
         }
 
@@ -524,7 +524,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Call when this entity is updating. This wakes it up. */
     public void noSleep(){
         sleepTime = 0f;
-        if(sleeping){
+        if(sleeping && shouldUpdate()){
             add();
             sleeping = false;
             sleepingEntities--;
@@ -1508,6 +1508,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         this.team = next;
         indexer.addIndex(tile);
         Events.fire(teamChangeEvent.set(last, self()));
+
+        if(!shouldUpdate()){
+            remove();
+        }
     }
 
     public boolean canPickup(){
@@ -1522,6 +1526,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Called right after this building is picked up. */
     public void afterPickedUp(){
         if(power != null){
+            //TODO can lead to ghost graphs?
             power.graph = new PowerGraph();
             power.links.clear();
             if(block.consumes.hasPower() && !block.consumes.getPower().buffered){
@@ -1773,9 +1778,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //TODO should just avoid updating buildings instead
         if(state.isEditor()) return;
 
-        //TODO refactor to timestamp-based system
-        timeScaleDuration -= Time.delta;
-        if(timeScaleDuration <= 0f || !block.canOverdrive){
+        //TODO refactor to timestamp-based system?
+        if((timeScaleDuration -= Time.delta) <= 0f || !block.canOverdrive){
             timeScale = 1f;
         }
 
@@ -1789,11 +1793,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
-        //TODO this check should not be here, just remove unsupported buildings instead
-        if(team == Team.derelict || !block.supportsEnv(state.rules.environment)){
-            enabled = false;
-        }
-
         //TODO separate system for sound? AudioSource, etc
         if(!headless){
             if(sound != null){
@@ -1805,17 +1804,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
-        //TODO consume module is not necessary for every building, e.g. conveyors should not have it - perhaps it should be nullable?
+        //TODO updating consumption is not necessary for every building, e.g. conveyors should not have it
         updateConsumption();
 
         //TODO just handle per-block instead
         if(enabled || !block.noUpdateDisabled){
             updateTile();
-        }
-
-        //TODO power graph should be separate entity
-        if(power != null){
-            power.graph.update();
         }
     }
 

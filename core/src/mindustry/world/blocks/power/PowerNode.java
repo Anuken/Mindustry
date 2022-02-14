@@ -380,11 +380,6 @@ public class PowerNode extends PowerBlock{
         }
 
         @Override
-        public void updateTile(){
-            power.graph.update();
-        }
-
-        @Override
         public boolean onConfigureTileTapped(Building other){
             if(linkValid(this, other)){
                 configure(other.pos());

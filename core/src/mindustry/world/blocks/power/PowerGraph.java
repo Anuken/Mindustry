@@ -6,8 +6,6 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.world.consumers.*;
 
-import static mindustry.Vars.*;
-
 public class PowerGraph{
     private static final Queue<Building> queue = new Queue<>();
     private static final Seq<Building> outArray1 = new Seq<>();
@@ -20,17 +18,19 @@ public class PowerGraph{
     public final Seq<Building> batteries = new Seq<>(false);
     public final Seq<Building> all = new Seq<>(false);
 
+    private final PowerGraphUpdater entity;
     private final WindowedMean powerBalance = new WindowedMean(60);
     private float lastPowerProduced, lastPowerNeeded, lastPowerStored;
     private float lastScaledPowerIn, lastScaledPowerOut, lastCapacity;
     //diodes workaround for correct energy production info
     private float energyDelta = 0f;
 
-    private long lastFrameUpdated = -1;
     private final int graphID;
     private static int lastGraphID;
 
-    {
+    public PowerGraph(){
+        entity = PowerGraphUpdater.create();
+        entity.graph = this;
         graphID = lastGraphID++;
     }
 
@@ -207,9 +207,7 @@ public class PowerGraph{
     }
 
     public void update(){
-        if(state.updateId == lastFrameUpdated){
-            return;
-        }else if(!consumers.isEmpty() && consumers.first().cheating()){
+        if(!consumers.isEmpty() && consumers.first().cheating()){
             //when cheating, just set status to 1
             for(Building tile : consumers){
                 tile.power.status = 1f;
@@ -218,8 +216,6 @@ public class PowerGraph{
             lastPowerNeeded = lastPowerProduced = 1f;
             return;
         }
-
-        lastFrameUpdated = state.updateId;
 
         float powerNeeded = getPowerNeeded();
         float powerProduced = getPowerProduced();
@@ -255,6 +251,8 @@ public class PowerGraph{
 
     public void addGraph(PowerGraph graph){
         if(graph == this) return;
+        //other entity should be removed as the graph was merged
+        graph.entity.remove();
 
         for(Building tile : graph.all){
             add(tile);
@@ -265,9 +263,16 @@ public class PowerGraph{
         if(build == null || build.power == null) return;
 
         if(build.power.graph != this || !build.power.init){
+            //any old graph that is added here MUST be invalid, remove it
+            if(build.power.graph != null && build.power.graph != this){
+                build.power.graph.entity.remove();
+            }
+
             build.power.graph = this;
             build.power.init = true;
             all.add(build);
+            //there's something to update, add the entity
+            entity.add();
 
             if(build.block.outputsPower && build.block.consumesPower && !build.block.consumes.getPower().buffered){
                 producers.add(build);
@@ -287,6 +292,8 @@ public class PowerGraph{
         producers.clear();
         consumers.clear();
         batteries.clear();
+        //nothing left
+        entity.remove();
     }
 
     public void reflow(Building tile){
@@ -313,7 +320,7 @@ public class PowerGraph{
     }
 
     /** Note that this does not actually remove the building from the graph;
-     * it creates *new* graphs that contain the correct buildings. */
+     * it creates *new* graphs that contain the correct buildings. Doing this invalidates the graph. */
     public void remove(Building tile){
 
         //go through all the connections of this tile
@@ -345,6 +352,9 @@ public class PowerGraph{
             //update the graph once so direct consumers without any connected producer lose their power
             graph.update();
         }
+
+        //implied empty graph here
+        entity.remove();
     }
 
     private boolean otherConsumersAreValid(Building build, Consume consumePower){
@@ -363,7 +373,6 @@ public class PowerGraph{
         ", consumers=" + consumers +
         ", batteries=" + batteries +
         ", all=" + all +
-        ", lastFrameUpdated=" + lastFrameUpdated +
         ", graphID=" + graphID +
         '}';
     }

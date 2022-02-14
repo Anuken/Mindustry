@@ -26,8 +26,8 @@ public class PowerTestFixture{
     @BeforeAll
     static void initializeDependencies(){
         headless = true;
-        Core.graphics = new FakeGraphics();
         Core.files = new MockFiles();
+        Groups.init();
 
         boolean make = content == null;
 
