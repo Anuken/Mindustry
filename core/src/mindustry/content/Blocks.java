@@ -3650,7 +3650,7 @@ public class Blocks{
             deconstructSpeed = 1f;
         }};
 
-        //TODO consider usefulness and applicability to serpulo
+        //TODO consider usefulness and applicability to serpulo... or anything really
         deconstructor = new PayloadDeconstructor("deconstructor"){{
             requirements(Category.units, with(Items.beryllium, 250, Items.oxide, 100, Items.silicon, 250, Items.carbide, 250));
             itemCapacity = 250;
@@ -3659,13 +3659,14 @@ public class Blocks{
             deconstructSpeed = 2f;
         }};
 
-        //TODO move completely to erekir tech tree?
         constructor = new Constructor("constructor"){{
             requirements(Category.units, with(Items.silicon, 100, Items.beryllium, 150, Items.tungsten, 80));
             hasPower = true;
             buildSpeed = 0.3f;
             consumes.power(2f);
             size = 3;
+            //TODO expand this list
+            filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.cliffCrusher, Blocks.plasmaBore, Blocks.reinforcedLiquidTank, Blocks.duct);
         }};
 
         //yes this block is pretty much useless
