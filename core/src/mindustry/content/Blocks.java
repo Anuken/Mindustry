@@ -3543,7 +3543,7 @@ public class Blocks{
             requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 250, Items.tungsten, 400, Items.silicon, 500));
             size = 5;
             //TODO remove ducts and crushers, replace with 2-3 high cost special blocks with silicon requirements
-            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, BlockStack.list(Blocks.tungstenWallLarge, 12, Blocks.duct, 14, Blocks.cliffCrusher, 12)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, BlockStack.list(Blocks.tungstenWallLarge, 12, Blocks.cliffCrusher, 12)));
             consumes.power(3f);
             areaSize = 13;
             researchCostMultiplier = 0.4f;
@@ -3555,7 +3555,7 @@ public class Blocks{
         shipAssembler = new UnitAssembler("ship-assembler"){{
             requirements(Category.units, with(Items.beryllium, 700, Items.oxide, 300, Items.tungsten, 500, Items.silicon, 800));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, BlockStack.list(Blocks.berylliumWallLarge, 12, Blocks.duct, 20, Blocks.plasmaBore, 8)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, BlockStack.list(Blocks.berylliumWallLarge, 12, Blocks.plasmaBore, 8)));
             consumes.power(3f);
             areaSize = 13;
 
@@ -3566,7 +3566,7 @@ public class Blocks{
         mechAssembler = new UnitAssembler("mech-assembler"){{
             requirements(Category.units, with(Items.graphite, 500, Items.carbide, 600, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 900));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 60f, BlockStack.list(Blocks.tungstenWallLarge, 5, Blocks.duct, 2)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 60f, BlockStack.list(Blocks.tungstenWallLarge, 5)));
             consumes.power(3f);
             areaSize = 13;
 
@@ -3860,12 +3860,12 @@ public class Blocks{
         worldProcessor = new LogicBlock("world-processor"){{
             requirements(Category.logic, BuildVisibility.editorOnly, with());
 
-            //TODO customizable IPT
             targetable = false;
             instructionsPerTick = 8;
             forceDark = true;
             privileged = true;
             size = 1;
+            maxInstructionsPerTick = 30;
         }};
 
         worldCell = new MemoryBlock("world-cell"){{

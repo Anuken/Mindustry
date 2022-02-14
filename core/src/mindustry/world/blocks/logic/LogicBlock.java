@@ -33,6 +33,8 @@ public class LogicBlock extends Block{
 
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
+    //privileged only
+    public int maxInstructionsPerTick = 40;
     public float range = 8 * 10;
 
     public LogicBlock(String name){
@@ -220,12 +222,15 @@ public class LogicBlock extends Block{
         public float accumulator = 0;
         public Seq<LogicLink> links = new Seq<>();
         public boolean checkedDuplicates = false;
+        //dynamic only for privileged processors
+        public int ipt = instructionsPerTick;
 
         /** Block of code to run after load. */
         public @Nullable Runnable loadBlock;
 
         {
             executor.privileged = privileged;
+            executor.build = this;
         }
 
         public void readCompressed(byte[] data, boolean relative){
@@ -474,10 +479,14 @@ public class LogicBlock extends Block{
                 updateCode(code, true, null);
             }
 
-            if(enabled && executor.initialized()){
-                accumulator += edelta() * instructionsPerTick * (consValid() ? 1 : 0);
+            if(!privileged){
+                ipt = instructionsPerTick;
+            }
 
-                if(accumulator > maxInstructionScale * instructionsPerTick) accumulator = maxInstructionScale * instructionsPerTick;
+            if(enabled && executor.initialized()){
+                accumulator += edelta() * ipt * (consValid() ? 1 : 0);
+
+                if(accumulator > maxInstructionScale * ipt) accumulator = maxInstructionScale * ipt;
 
                 for(int i = 0; i < (int)accumulator; i++){
                     executor.runOnce();
@@ -567,7 +576,7 @@ public class LogicBlock extends Block{
 
         @Override
         public byte version(){
-            return 1;
+            return 2;
         }
 
         @Override
@@ -600,13 +609,17 @@ public class LogicBlock extends Block{
 
             //no memory
             write.i(0);
+
+            if(privileged){
+                write.s(ipt);
+            }
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
 
-            if(revision == 1){
+            if(revision >= 1){
                 int compl = read.i();
                 byte[] bytes = new byte[compl];
                 read.b(bytes);
@@ -651,6 +664,10 @@ public class LogicBlock extends Block{
                     }
                 }
             });
+
+            if(privileged && revision >= 2){
+                ipt = Math.max(read.s(), 1);
+            }
 
         }
     }

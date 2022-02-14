@@ -1403,4 +1403,29 @@ public class LStatements{
             return new ExplosionI(b.var(team), b.var(x), b.var(y), b.var(radius), b.var(damage), b.var(air), b.var(ground), b.var(pierce));
         }
     }
+
+    @RegisterStatement("setrate")
+    public static class SetRateStatement extends LStatement{
+        public String amount = "10";
+
+        @Override
+        public void build(Table table){
+            fields(table, "ipt = ", amount, str -> amount = str);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicWorld;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SetRateI(builder.var(amount));
+        }
+    }
 }

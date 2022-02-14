@@ -19,6 +19,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
+import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 import mindustry.world.blocks.logic.MemoryBlock.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
@@ -46,9 +47,11 @@ public class LExecutor{
     public Var counter;
     public int[] binds;
 
+    public int iptIndex = -1;
     public LongSeq graphicsBuffer = new LongSeq();
     public StringBuilder textBuffer = new StringBuilder();
     public Building[] links = {};
+    public @Nullable LogicBuild build;
     public IntSet linkIds = new IntSet();
     public Team team = Team.derelict;
     public boolean privileged = false;
@@ -73,10 +76,14 @@ public class LExecutor{
     public void load(LAssembler builder){
         vars = new Var[builder.vars.size];
         instructions = builder.instructions;
+        iptIndex = -1;
 
         builder.vars.each((name, var) -> {
             Var dest = new Var(name);
             vars[var.id] = dest;
+            if(dest.name.equals("@ipt")){
+                iptIndex = var.id;
+            }
 
             dest.constant = var.constant;
 
@@ -1361,6 +1368,27 @@ public class LExecutor{
             Fx.spawnShockwave.at(x, y, World.conv(radius));
         }else{
             Fx.dynamicExplosion.at(x, y, World.conv(radius) / 8f);
+        }
+    }
+
+    public static class SetRateI implements LInstruction{
+        public int amount;
+
+        public SetRateI(int amount){
+            this.amount = amount;
+        }
+
+        public SetRateI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(exec.build != null && exec.build.block.privileged){
+                exec.build.ipt = Mathf.clamp(exec.numi(amount), 1, ((LogicBlock)exec.build.block).maxInstructionsPerTick);
+                if(exec.iptIndex >= 0 && exec.vars.length > exec.iptIndex){
+                    exec.vars[exec.iptIndex].numval = exec.build.ipt;
+                }
+            }
         }
     }
 
