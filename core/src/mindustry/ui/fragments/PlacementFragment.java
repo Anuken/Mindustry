@@ -539,7 +539,8 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean unlocked(Block block){
-        return block.unlockedNow() && block.placeablePlayer && block.environmentBuildable();
+        return block.unlockedNow() && block.placeablePlayer && block.environmentBuildable() &&
+            block.supportsEnv(state.rules.environment); //TODO this hides env unsupported blocks, not always a good thing
     }
 
     boolean hasInfoBox(){

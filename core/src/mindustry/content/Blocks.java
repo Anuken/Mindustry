@@ -2483,7 +2483,7 @@ public class Blocks{
         //TODO awful name
         largePlasmaBore = new BeamDrill("large-plasma-bore"){{
             //TODO requirements
-            requirements(Category.production, with(Items.graphite, 30, Items.oxide, 30, Items.beryllium, 20, Items.carbide, 30));
+            requirements(Category.production, with(Items.silicon, 100, Items.oxide, 30, Items.beryllium, 100, Items.tungsten, 70));
             consumes.power(0.8f);
             drillTime = 120f;
             tier = 5;
@@ -2492,12 +2492,13 @@ public class Blocks{
             laserWidth = 0.7f;
             itemCapacity = 20;
 
-            consumes.liquid(Liquids.hydrogen, 0.5f / 60f).boost();
+            consumes.liquid(Liquids.hydrogen, 1f / 60f).boost();
+            consumes.liquid(Liquids.nitrogen, 4f / 60f).boost();
         }};
 
         //TODO should be crusher or something
         impactDrill = new BurstDrill("impact-drill"){{
-            requirements(Category.production, with(Items.silicon, 60, Items.beryllium, 90, Items.graphite, 60));
+            requirements(Category.production, with(Items.silicon, 70, Items.beryllium, 90, Items.graphite, 60));
             drillTime = 60f * 12f;
             size = 4;
             hasPower = true;
@@ -2514,7 +2515,7 @@ public class Blocks{
 
         //TODO bad name
         eruptionDrill = new BurstDrill("eruption-drill"){{
-            requirements(Category.production, with(Items.silicon, 200, Items.beryllium, 250, Items.oxide, 80, Items.carbide, 80));
+            requirements(Category.production, with(Items.silicon, 200, Items.beryllium, 250, Items.oxide, 80, Items.tungsten, 200, Items.carbide, 120));
             drillTime = 60f * 9f;
             size = 5;
             hasPower = true;
@@ -3256,7 +3257,7 @@ public class Blocks{
         }};
 
         titan = new ItemTurret("titan"){{
-            requirements(Category.turret, with(Items.carbide, 100, Items.tungsten, 250, Items.silicon, 300, Items.beryllium, 400));
+            requirements(Category.turret, with(Items.thorium, 300, Items.tungsten, 250, Items.silicon, 300, Items.beryllium, 400));
 
             ammo(
             //TODO 1 more ammo type, decide on base type
