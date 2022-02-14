@@ -159,6 +159,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean expanded = false;
     /** Clipping size of this block. Should be as large as the block will draw. */
     public float clipSize = -1f;
+    /** When placeRangeCheck is enabled, this is the range checked for enemy blocks. */
+    public float placeOverlapRange = 30f;
     /** Max of timers used. */
     public int timers = 0;
     /** Cache layer. Only used for 'cached' rendering. */

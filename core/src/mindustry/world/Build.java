@@ -94,7 +94,7 @@ public class Build{
 
         Block previous = tile.block();
         Block sub = ConstructBlock.get(result.size);
-        Seq<Building> prevBuild = new Seq<>(9);
+        var prevBuild = new Seq<Building>(9);
 
         result.beforePlaceBegan(tile, previous);
         tmp.clear();
@@ -201,7 +201,15 @@ public class Build{
             }
         }
 
+        if(state.rules.placeRangeCheck && getEnemyOverlap(type, team, x, y) != null){
+            return false;
+        }
+
         return true;
+    }
+
+    public static @Nullable Building getEnemyOverlap(Block block, Team team, int x, int y){
+        return indexer.findEnemyTile(team, x * tilesize + block.size, y * tilesize + block.size, block.placeOverlapRange + 4f, p -> true);
     }
 
     public static boolean contactsGround(int x, int y, Block block){

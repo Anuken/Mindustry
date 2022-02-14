@@ -118,6 +118,10 @@ public class Drawf{
         Draw.z(pz);
     }
 
+    public static void dashLineDst(Color color, float x, float y, float x2, float y2){
+        dashLine(color, x, y, x2, y2, (int)(Mathf.dst(x, y, x2, y2) / tilesize * 2));
+    }
+
     public static void dashLine(Color color, float x, float y, float x2, float y2){
         dashLine(color, x, y, x2, y2, (int)(Math.max(Math.abs(x - x2), Math.abs(y - y2)) / tilesize * 2));
     }

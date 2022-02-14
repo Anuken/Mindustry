@@ -445,6 +445,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         state.rules.attributes.set(Attribute.heat, 0.8f);
         state.rules.environment = sector.planet.defaultEnv;
         state.rules.unitCommand = true;
+        state.rules.placeRangeCheck = true;
 
         //TODO remove slag and arkycite around core.
         Schematics.placeLaunchLoadout(spawnX, spawnY);

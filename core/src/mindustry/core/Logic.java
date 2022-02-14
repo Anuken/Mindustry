@@ -89,6 +89,8 @@ public class Logic implements ApplicationListener{
                     }
                 }
 
+                state.getSector().planet.ruleSetter.get(state.rules);
+
                 //reset values
                 info.damage = 0f;
                 info.wavesPassed = 0;

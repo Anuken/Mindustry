@@ -45,6 +45,7 @@ public class BaseTurret extends Block{
             consumes.add(coolantOverride != null ? new ConsumeLiquid(coolantOverride, coolantUsage) : new ConsumeCoolant(coolantUsage)).update(false).boost();
         }
 
+        placeOverlapRange = Math.max(placeOverlapRange, range);
         super.init();
     }
 

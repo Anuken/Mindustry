@@ -61,6 +61,10 @@ public class Planets{
             lightSrcTo = 0.5f;
             lightDstFrom = 0.2f;
             hiddenItems.addAll(Items.serpuloItems).removeAll(Items.erekirItems);
+            ruleSetter = r -> {
+                r.unitCommand = true;
+                r.placeRangeCheck = true;
+            };
 
             unlockedOnLand.add(Blocks.coreBastion);
         }};
