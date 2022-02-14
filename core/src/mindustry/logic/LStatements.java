@@ -1191,7 +1191,6 @@ public class LStatements{
     @RegisterStatement("spawn")
     public static class SpawnUnitStatement extends LStatement{
         public String type = "@dagger", x = "10", y = "10", rotation = "90", team = "@sharded", result = "result";
-        public boolean effect = true;
 
         @Override
         public void build(Table table){
@@ -1217,10 +1216,6 @@ public class LStatements{
 
             table.add(" rot ");
             fields(table, rotation, str -> rotation = str).left();
-
-            //effect mostly unnecessary and looks bad
-            //row(table);
-            //table.check("effect", effect, val -> effect = val);
         }
 
         @Override
@@ -1235,7 +1230,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new SpawnUnitI(builder.var(type), builder.var(x), builder.var(y), builder.var(rotation), builder.var(team), effect, builder.var(result));
+            return new SpawnUnitI(builder.var(type), builder.var(x), builder.var(y), builder.var(rotation), builder.var(team), builder.var(result));
         }
     }
 
@@ -1371,6 +1366,41 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new CutsceneI(action, builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
+        }
+    }
+
+    @RegisterStatement("explosion")
+    public static class ExplosionStatement extends LStatement{
+        public String team = "@crux", x = "0", y = "0", radius = "5", damage = "50", air = "true", ground = "true", pierce = "false";
+
+        @Override
+        public void build(Table table){
+            fields(table, "team", team, str -> team = str);
+            fields(table, "x", x, str -> x = str);
+            row(table);
+            fields(table, "y", y, str -> y = str);
+            fields(table, "radius", radius, str -> radius = str);
+            table.row();
+            fields(table, "damage", damage, str -> damage = str);
+            fields(table, "air", air, str -> air = str);
+            row(table);
+            fields(table, "ground", ground, str -> ground = str);
+            fields(table, "pierce", pierce, str -> pierce = str);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicWorld;
+        }
+
+        @Override
+        public LInstruction build(LAssembler b){
+            return new ExplosionI(b.var(team), b.var(x), b.var(y), b.var(radius), b.var(damage), b.var(air), b.var(ground), b.var(pierce));
         }
     }
 }

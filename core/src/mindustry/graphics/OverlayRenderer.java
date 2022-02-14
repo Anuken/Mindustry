@@ -206,7 +206,7 @@ public class OverlayRenderer{
 
             if(build != null && build.team == player.team()){
                 build.drawSelect();
-                if((!build.enabled && build.block.drawDisabled) || !build.shouldUpdate()){
+                if(!build.enabled && build.block.drawDisabled){
                    build.drawDisabled();
                 }
 

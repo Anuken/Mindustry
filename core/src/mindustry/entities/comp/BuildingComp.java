@@ -109,7 +109,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         set(tile.drawx(), tile.drawy());
 
-        if(shouldAdd && shouldUpdate()){
+        if(shouldAdd){
             add();
         }
 
@@ -491,7 +491,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     /** @return whether this block is allowed to update based on team/environment */
-    public boolean shouldUpdate(){
+    public boolean allowUpdate(){
         return team != Team.derelict && block.supportsEnv(state.rules.environment);
     }
 
@@ -524,7 +524,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Call when this entity is updating. This wakes it up. */
     public void noSleep(){
         sleepTime = 0f;
-        if(sleeping && shouldUpdate()){
+        if(sleeping){
             add();
             sleeping = false;
             sleepingEntities--;
@@ -1508,10 +1508,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         this.team = next;
         indexer.addIndex(tile);
         Events.fire(teamChangeEvent.set(last, self()));
-
-        if(!shouldUpdate()){
-            remove();
-        }
     }
 
     public boolean canPickup(){
@@ -1781,6 +1777,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //TODO refactor to timestamp-based system?
         if((timeScaleDuration -= Time.delta) <= 0f || !block.canOverdrive){
             timeScale = 1f;
+        }
+
+        if(!allowUpdate()){
+            enabled = false;
         }
 
         //TODO unacceptable overhead?

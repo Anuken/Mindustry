@@ -1234,7 +1234,7 @@ public class LExecutor{
     public static class SpawnUnitI implements LInstruction{
         public int type, x, y, rotation, team, result;
 
-        public SpawnUnitI(int type, int x, int y, int rotation, int team, boolean effect, int result){
+        public SpawnUnitI(int type, int x, int y, int rotation, int team, int result){
             this.type = type;
             this.x = x;
             this.y = y;
@@ -1356,7 +1356,6 @@ public class LExecutor{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void logicExplosion(Team team, float x, float y, float radius, float damage, boolean air, boolean ground, boolean pierce){
-
         Damage.damage(team, x, y, radius, damage, pierce, air, ground);
         if(pierce){
             Fx.spawnShockwave.at(x, y, World.conv(radius));
