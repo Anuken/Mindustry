@@ -137,12 +137,12 @@ public class Blocks{
     repairPoint, repairTurret,
 
     //unit - erekir
-    tankAssembler,
-    shipAssembler,
-    mechAssembler,
+    tankAssembler, shipAssembler, mechAssembler,
     //TODO maybe making it 5x5 would be more appropriate, seems kinda cheap.
     basicAssemblerModule,
+    primeControlCore,
 
+    //TODO remove
     droneCenter,
 
     //payloads
@@ -2590,7 +2590,7 @@ public class Blocks{
         }};
 
         coreCitadel = new CoreBlock("core-citadel"){{
-            requirements(Category.effect, with(Items.silicon, 7000, Items.beryllium, 7000, Items.tungsten, 4000, Items.oxide, 2000));
+            requirements(Category.effect, with(Items.silicon, 7000, Items.beryllium, 7000, Items.tungsten, 4000, Items.oxide, 2500));
 
             unitType = UnitTypes.incite;
             health = 18000;
@@ -2600,7 +2600,8 @@ public class Blocks{
             armor = 10f;
 
             unitCapModifier = 4;
-            researchCostMultiplier = 0.3f;
+            researchCostMultipliers.put(Items.silicon, 0.4f);
+            researchCostMultiplier = 0.14f;
         }};
 
         coreAcropolis = new CoreBlock("core-acropolis"){{
@@ -2615,7 +2616,8 @@ public class Blocks{
             armor = 15f;
 
             unitCapModifier = 6;
-            researchCostMultiplier = 0.3f;
+            researchCostMultipliers.put(Items.silicon, 0.3f);
+            researchCostMultiplier = 0.1f;
         }};
 
         container = new StorageBlock("container"){{
@@ -3572,11 +3574,18 @@ public class Blocks{
         //endregion
         //region units - erekir
 
+        primeControlCore = new ControlCore("prime-control-core"){{
+            requirements(Category.units, with(Items.silicon, 120, Items.oxide, 30));
+            size = 2;
+            placeablePlayer = false;
+            researchCostMultiplier = 0f;
+        }};
+
         tankAssembler = new UnitAssembler("tank-assembler"){{
             requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 250, Items.tungsten, 400, Items.silicon, 500));
             size = 5;
             //TODO remove ducts and crushers, replace with 2-3 high cost special blocks with silicon requirements
-            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, BlockStack.list(Blocks.tungstenWallLarge, 12, Blocks.cliffCrusher, 12)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, BlockStack.list(Blocks.tungstenWallLarge, 12, Blocks.primeControlCore, 2)));
             consumes.power(3f);
             areaSize = 13;
             researchCostMultiplier = 0.4f;
@@ -3588,7 +3597,7 @@ public class Blocks{
         shipAssembler = new UnitAssembler("ship-assembler"){{
             requirements(Category.units, with(Items.beryllium, 700, Items.oxide, 300, Items.tungsten, 500, Items.silicon, 800));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, BlockStack.list(Blocks.berylliumWallLarge, 12, Blocks.plasmaBore, 8)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, BlockStack.list(Blocks.berylliumWallLarge, 12, Blocks.primeControlCore, 2)));
             consumes.power(3f);
             areaSize = 13;
 
@@ -3599,7 +3608,8 @@ public class Blocks{
         mechAssembler = new UnitAssembler("mech-assembler"){{
             requirements(Category.units, with(Items.graphite, 500, Items.carbide, 600, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 900));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 60f, BlockStack.list(Blocks.tungstenWallLarge, 5)));
+            //TODO different reqs
+            plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 60f, BlockStack.list(Blocks.tungstenWallLarge, 12, Blocks.primeControlCore, 2)));
             consumes.power(3f);
             areaSize = 13;
 
@@ -3624,6 +3634,7 @@ public class Blocks{
 
             droneType = UnitTypes.effectDrone;
         }};
+
 
         //endregion
         //region payloads
@@ -3660,7 +3671,7 @@ public class Blocks{
             reloadTime = 130f;
             chargeTime = 90f;
             //TODO 500 or 400? does it need to be better than the standard mass driver?
-            range = 400f;
+            range = 450f;
             maxPayloadSize = 2.5f;
             consumes.power(2f);
         }};
@@ -3699,7 +3710,7 @@ public class Blocks{
             consumes.power(2f);
             size = 3;
             //TODO expand this list
-            filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.reinforcedLiquidTank);
+            filter = Seq.with(Blocks.primeControlCore, Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.reinforcedLiquidContainer);
         }};
 
         //yes this block is pretty much useless

@@ -282,6 +282,8 @@ public class Block extends UnlockableContent implements Senseable{
     public Effect destroyEffect = Fx.dynamicExplosion;
     /** Multiplier for cost of research in tech tree. */
     public float researchCostMultiplier = 1;
+    /** Cost multipliers per-item. */
+    public ObjectFloatMap<Item> researchCostMultipliers = new ObjectFloatMap<>();
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
     /** Whether you can rotate this block after it is placed. */
@@ -887,9 +889,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     @Override
     public ItemStack[] researchRequirements(){
+        if(researchCostMultiplier <= 0f) return ItemStack.empty;
         ItemStack[] out = new ItemStack[requirements.length];
         for(int i = 0; i < out.length; i++){
-            int quantity = 60 + Mathf.round(Mathf.pow(requirements[i].amount, 1.11f) * 20 * researchCostMultiplier, 10);
+            int quantity = 60 + Mathf.round(Mathf.pow(requirements[i].amount, 1.11f) * 20 * researchCostMultiplier * researchCostMultipliers.get(requirements[i].item, 1f), 10);
 
             out[i] = new ItemStack(requirements[i].item, UI.roundAmount(quantity));
         }

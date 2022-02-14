@@ -5,6 +5,7 @@ import mindustry.entities.*;
 /**
  * Renders multiple particle effects in sequence.
  * Will not work correctly for effects that modify life dynamically.
+ * Z layer of child effects is ignored.
  * */
 public class SeqEffect extends Effect{
     public Effect[] effects = {};
