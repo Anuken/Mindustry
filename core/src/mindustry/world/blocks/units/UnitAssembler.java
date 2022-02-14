@@ -17,6 +17,7 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -34,7 +35,7 @@ public class UnitAssembler extends PayloadBlock{
     public int areaSize = 11;
     public UnitType droneType = UnitTypes.assemblyDrone;
     public int dronesCreated = 4;
-    public float droneConstructTime = 60f * 3f;
+    public float droneConstructTime = 60f * 4f;
 
     public Seq<AssemblerUnitPlan> plans = new Seq<>(4);
 
@@ -312,9 +313,16 @@ public class UnitAssembler extends PayloadBlock{
 
             units.removeAll(u -> !u.isAdded() || u.dead || !(u.controller() instanceof AssemblerAI));
 
+            //unsupported
+            if(!allowUpdate()){
+                progress = 0f;
+                units.each(Unit::kill);
+                units.clear();
+            }
+
             powerWarmup = Mathf.lerpDelta(powerWarmup, efficiency() > 0.0001f ? 1f : 0f, 0.1f);
             droneWarmup = Mathf.lerpDelta(droneWarmup, units.size < dronesCreated ? efficiency() : 0f, 0.1f);
-            totalDroneProgress += droneWarmup * Time.delta;
+            totalDroneProgress += droneWarmup * delta();
 
             if(units.size < dronesCreated && (droneProgress += edelta() / droneConstructTime) >= 1f){
                 if(!net.client()){
@@ -514,6 +522,12 @@ public class UnitAssembler extends PayloadBlock{
             float rot = payload.angleTo(spawn);
             Fx.shootPayloadDriver.at(payload.x(), payload.y(), rot);
             Fx.payloadDeposit.at(payload.x(), payload.y(), rot, new YeetData(spawn.cpy(), payload.block()));
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return progress;
+            return super.sense(sensor);
         }
 
         @Override

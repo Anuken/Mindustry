@@ -1779,10 +1779,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             timeScale = 1f;
         }
 
-        if(!allowUpdate()){
-            enabled = false;
-        }
-
         //TODO unacceptable overhead?
         if(!enabled && block.autoResetEnabled){
             noSleep();
@@ -1791,6 +1787,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             if(enabledControlTime <= 0){
                 enabled = true;
             }
+        }
+
+        if(!allowUpdate()){
+            enabled = false;
         }
 
         //TODO separate system for sound? AudioSource, etc
