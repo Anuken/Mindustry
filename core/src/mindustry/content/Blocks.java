@@ -3608,6 +3608,7 @@ public class Blocks{
             moveTime = 35f;
             canOverdrive = false;
             health = 800;
+            researchCostMultiplier = 4f;
         }};
 
         reinforcedPayloadRouter = new PayloadRouter("reinforced-payload-router"){{
@@ -3615,6 +3616,7 @@ public class Blocks{
             moveTime = 35f;
             health = 800;
             canOverdrive = false;
+            researchCostMultiplier = 4f;
         }};
 
         payloadMassDriver = new PayloadMassDriver("payload-mass-driver"){{

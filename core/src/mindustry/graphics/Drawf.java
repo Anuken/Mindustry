@@ -119,7 +119,7 @@ public class Drawf{
     }
 
     public static void dashLineDst(Color color, float x, float y, float x2, float y2){
-        dashLine(color, x, y, x2, y2, (int)(Mathf.dst(x, y, x2, y2) / tilesize));
+        dashLine(color, x, y, x2, y2, (int)(Mathf.dst(x, y, x2, y2) / tilesize * 1.6f));
     }
 
     public static void dashLine(Color color, float x, float y, float x2, float y2){

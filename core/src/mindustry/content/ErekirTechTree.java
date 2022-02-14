@@ -20,6 +20,8 @@ public class ErekirTechTree{
         costMultipliers.put(Items.phaseFabric, 4);
         costMultipliers.put(Items.thorium, 9);
         costMultipliers.put(Items.graphite, 9);
+        //oxide is hard to make
+        costMultipliers.put(Items.oxide, 0.5f);
 
         //TODO remove
         Objective tmpNever = new Research(Items.fissileMatter);
