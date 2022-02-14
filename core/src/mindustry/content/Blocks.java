@@ -2617,7 +2617,7 @@ public class Blocks{
 
             unitCapModifier = 6;
             researchCostMultipliers.put(Items.silicon, 0.3f);
-            researchCostMultiplier = 0.1f;
+            researchCostMultiplier = 0.2f;
         }};
 
         container = new StorageBlock("container"){{
@@ -3585,7 +3585,7 @@ public class Blocks{
             requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 250, Items.tungsten, 400, Items.silicon, 500));
             size = 5;
             //TODO remove ducts and crushers, replace with 2-3 high cost special blocks with silicon requirements
-            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, BlockStack.list(Blocks.tungstenWallLarge, 12, Blocks.primeControlCore, 2)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, BlockStack.list(Blocks.tungstenWallLarge, 10, Blocks.primeControlCore, 2)));
             consumes.power(3f);
             areaSize = 13;
             researchCostMultiplier = 0.4f;
@@ -3597,7 +3597,7 @@ public class Blocks{
         shipAssembler = new UnitAssembler("ship-assembler"){{
             requirements(Category.units, with(Items.beryllium, 700, Items.oxide, 300, Items.tungsten, 500, Items.silicon, 800));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, BlockStack.list(Blocks.berylliumWallLarge, 12, Blocks.primeControlCore, 2)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, BlockStack.list(Blocks.berylliumWallLarge, 20, Blocks.primeControlCore, 2)));
             consumes.power(3f);
             areaSize = 13;
 

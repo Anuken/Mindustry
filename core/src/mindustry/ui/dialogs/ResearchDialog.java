@@ -32,6 +32,8 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class ResearchDialog extends BaseDialog{
+    public static boolean debugShowRequirements = false;
+
     public final float nodeSize = Scl.scl(60f);
     public ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
     public TechTreeNode root = new TechTreeNode(TechTree.roots.first(), null);
@@ -584,7 +586,7 @@ public class ResearchDialog extends BaseDialog{
                     desc.left().defaults().left();
                     desc.add(selectable ? node.content.localizedName : "[accent]???");
                     desc.row();
-                    if(locked(node)){
+                    if(locked(node) || debugShowRequirements){
 
                         desc.table(t -> {
                             t.left();
@@ -618,11 +620,11 @@ public class ResearchDialog extends BaseDialog{
                                     ItemStack completed = node.finishedRequirements[i];
 
                                     //skip finished stacks
-                                    if(req.amount <= completed.amount) continue;
+                                    if(req.amount <= completed.amount && !debugShowRequirements) continue;
                                     boolean shiny = shine != null && shine[i];
 
                                     t.table(list -> {
-                                        int reqAmount = req.amount - completed.amount;
+                                        int reqAmount = debugShowRequirements ? req.amount : req.amount - completed.amount;
 
                                         list.left();
                                         list.image(req.item.uiIcon).size(8 * 3).padRight(3);
