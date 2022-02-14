@@ -16,6 +16,7 @@ import static mindustry.Vars.*;
 
 public class BaseTurret extends Block{
     public float range = 80f;
+    public float placeOverlapMargin = 8 * 6f;
     public float rotateSpeed = 5;
 
     public float coolantUsage = 0.2f;
@@ -45,7 +46,7 @@ public class BaseTurret extends Block{
             consumes.add(coolantOverride != null ? new ConsumeLiquid(coolantOverride, coolantUsage) : new ConsumeCoolant(coolantUsage)).update(false).boost();
         }
 
-        placeOverlapRange = Math.max(placeOverlapRange, range);
+        placeOverlapRange = Math.max(placeOverlapRange, range + placeOverlapMargin);
         super.init();
     }
 

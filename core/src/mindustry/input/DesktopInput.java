@@ -234,7 +234,7 @@ public class DesktopInput extends InputHandler{
                 if(!valid && state.rules.placeRangeCheck){
                     var blocker = Build.getEnemyOverlap(block, player.team(), cursorX, cursorY);
                     if(blocker != null){
-                        Drawf.selected(blocker, blocker.team.color);
+                        Drawf.selected(blocker, Pal.remove);
                         Tmp.v1.set(cursorX, cursorY).scl(tilesize).add(block.offset, block.offset).sub(blocker).scl(-1f).nor();
                         Drawf.dashLineDst(Pal.remove,
                             cursorX * tilesize + block.offset + Tmp.v1.x * block.size * tilesize/2f,
