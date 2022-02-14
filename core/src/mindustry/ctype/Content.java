@@ -34,6 +34,20 @@ public abstract class Content implements Comparable<Content>{
     /** Called right after load(). */
     public void loadIcon(){}
 
+    /**
+     * Use if you save instance before ResetEvent, and pass it to game.
+     * <code>
+     *     var inst = Blocks.arc
+     *     Events.on(xxxEvent.class,()->{
+     *         tile.setBlock(inst.reGet())
+     *     })
+     * </code>
+     * @return Instance get from Vars.content
+     */
+    public <T extends Content> T reGet(){
+        return Vars.content.getByID(getContentType(), id);
+    }
+
     /** @return whether an error occurred during mod loading. */
     public boolean hasErrored(){
         return minfo.error != null;
