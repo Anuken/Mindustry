@@ -21,7 +21,7 @@ public class ControlPathfinder{
     private static final long maxUpdate = Time.millisToNanos(20);
     private static final int updateFPS = 60;
     private static final int updateInterval = 1000 / updateFPS;
-    private static final int wallImpassable = -2;
+    private static final int wallImpassableCap = 100_000;
 
     public static boolean showDebug = false;
 
@@ -30,8 +30,10 @@ public class ControlPathfinder{
         (team, tile) ->
         //deep is impassable
         PathTile.allDeep(tile) ? impassable :
-        ((PathTile.team(tile) != team && PathTile.team(tile) != 0) && PathTile.solid(tile)) ? wallImpassable :
-        PathTile.solid(tile) ? impassable :
+        //impassable same-team or neutral block
+        PathTile.solid(tile) && (PathTile.team(tile) == team || PathTile.team(tile) == 0) ? impassable :
+        //impassable synthetic enemy block
+        ((PathTile.team(tile) != team && PathTile.team(tile) != 0) && PathTile.solid(tile) ? wallImpassableCap : 0) +
         1 +
         (PathTile.nearSolid(tile) ? 6 : 0) +
         (PathTile.nearLiquid(tile) ? 8 : 0) +
@@ -39,12 +41,14 @@ public class ControlPathfinder{
         (PathTile.damages(tile) ? 50 : 0),
 
         //legs
-        (team, tile) -> PathTile.legSolid(tile) ? impassable : 1 +
+        (team, tile) ->
+        PathTile.legSolid(tile) ? impassable : 1 +
         (PathTile.deep(tile) ? 6000 : 0) +
         (PathTile.nearSolid(tile) || PathTile.solid(tile) ? 3 : 0),
 
         //water
-        (team, tile) -> (PathTile.solid(tile) || !PathTile.liquid(tile) ? impassable : 1) +
+        (team, tile) ->
+        (PathTile.solid(tile) || !PathTile.liquid(tile) ? impassable : 1) +
         (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 2 : 0) +
         (PathTile.deep(tile) ? 0 : 1)
     );
@@ -305,17 +309,6 @@ public class ControlPathfinder{
                 y += sy;
             }
 
-
-            //no diagonals allowed here, mimics how units actually move
-            /*
-            if(2 * err + dy > dx - 2 * err){
-                err -= dy;
-                x += sx;
-            }else{
-                err += dx;
-                y += sy;
-            }*/
-
         }
 
         return true;
@@ -368,11 +361,12 @@ public class ControlPathfinder{
 
     private static boolean avoid(int type, int tilePos){
         int cost = cost(type, tilePos);
-        return cost <= impassable || cost >= 2;
+        return cost == impassable || cost >= 2;
     }
 
     private static boolean solid(int type, int tilePos){
-        return cost(type, tilePos) <= impassable;
+        int cost = cost(type, tilePos);
+        return cost == impassable || cost >= 6000;
     }
 
     private static float tileCost(int type, int a, int b){
@@ -428,7 +422,6 @@ public class ControlPathfinder{
 
         volatile boolean done = false;
         volatile boolean foundEnd = false;
-        volatile boolean fallback = false;
         volatile Unit unit;
         volatile int pathType;
         volatile int team;
@@ -492,22 +485,21 @@ public class ControlPathfinder{
 
                 int cx = current % wwidth, cy = current / wwidth;
 
-                //TODO corner traps? d8 vs d4 here?
                 for(Point2 point : Geometry.d4){
                     int newx = cx + point.x, newy = cy + point.y;
                     int next = newx + wwidth * newy;
 
                     if(newx >= wwidth || newy >= wheight || newx < 0 || newy < 0) continue;
 
-                    float passTest = tcost(team, pathType, next);
-
                     //in fallback mode, enemy walls are passable
-                    if((passTest <= impassable) && !(fallback && passTest == wallImpassable)) continue;
+                    if(tcost(team, pathType, next) == impassable) continue;
 
                     float add = tileCost(pathType, current, next);
+                    float currentCost = costs.get(current);
 
-                    //the cost can include an impassable enemy wall, so handle that and add a base cost
-                    float newCost = costs.get(current) + (add == wallImpassable ? 12 : add);
+                    //the cost can include an impassable enemy wall, so cap the cost if so and add the base cost instead
+                    //essentially this means that any path with enemy walls will only count the walls once, preventing strange behavior like avoiding based on wall count
+                    float newCost = currentCost >= wallImpassableCap && add >= wallImpassableCap ? currentCost + add - wallImpassableCap : currentCost + add;
 
                     //a cost of 0 means "not set"
                     if(!costs.containsKey(next) || newCost < costs.get(next)){
@@ -537,7 +529,6 @@ public class ControlPathfinder{
             rayPathIndex = -1;
 
             if(foundEnd){
-                fallback = false;
                 int cur = goal;
                 while(cur != start){
                     result.add(cur);
@@ -547,14 +538,9 @@ public class ControlPathfinder{
                 result.reverse();
 
                 smoothPath();
-                done = true;
-            }else if(!fallback && pathType != 1){
-                clear(true);
-                //it's not over!
-                fallback = true;
-            }else{
-                done = true;
             }
+
+            done = true;
 
             //TODO free resources?
         }
@@ -586,7 +572,6 @@ public class ControlPathfinder{
 
             start = world.packArray(unit.tileX(), unit.tileY());
             goal = world.packArray(World.toTile(destination.x), World.toTile(destination.y));
-            fallback = false;
 
             cameFrom.put(start, start);
             costs.put(start, 0);
