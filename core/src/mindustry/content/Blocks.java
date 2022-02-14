@@ -3545,6 +3545,7 @@ public class Blocks{
             plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, BlockStack.list(Blocks.tungstenWallLarge, 12, Blocks.duct, 14, Blocks.cliffCrusher, 12)));
             consumes.power(3f);
             areaSize = 13;
+            researchCostMultiplier = 0.4f;
 
             consumes.liquid(Liquids.nitrogen, 24f / 60f);
         }};
