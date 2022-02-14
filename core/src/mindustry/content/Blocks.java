@@ -3542,6 +3542,7 @@ public class Blocks{
         tankAssembler = new UnitAssembler("tank-assembler"){{
             requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 300, Items.tungsten, 500));
             size = 5;
+            //TODO remove ducts and crushers, replace with 2-3 high cost speicla blocks with silicon requirements
             plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, BlockStack.list(Blocks.tungstenWallLarge, 12, Blocks.duct, 14, Blocks.cliffCrusher, 12)));
             consumes.power(3f);
             areaSize = 13;

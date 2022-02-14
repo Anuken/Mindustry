@@ -14,5 +14,6 @@ public class ErekirUnitType extends UnitType{
         outlineColor = Pal.darkOutline;
         envDisabled = Env.space;
         unitBasedDefaultController = u -> !playerControllable || u.team.isAI() ? defaultController.get() : new CommandAI();
+        researchCostMultiplier = 10f;
     }
 }
