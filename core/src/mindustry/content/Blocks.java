@@ -2237,7 +2237,7 @@ public class Blocks{
         chemicalCombustionChamber = new ConsumeGenerator("chemical-combustion-chamber"){{
             requirements(Category.power, with(Items.graphite, 40, Items.tungsten, 40, Items.oxide, 40f, Items.silicon, 30));
             powerProduction = 9f;
-            consumes.liquids(LiquidStack.with(Liquids.ozone, 2f / 60f, Liquids.arkycite, 20f / 60f));
+            consumes.liquids(LiquidStack.with(Liquids.ozone, 2f / 60f, Liquids.arkycite, 40f / 60f));
             size = 3;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
                 sinMag = 3f;
@@ -3540,9 +3540,9 @@ public class Blocks{
         //region units - erekir
 
         tankAssembler = new UnitAssembler("tank-assembler"){{
-            requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 300, Items.tungsten, 500));
+            requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 250, Items.tungsten, 400, Items.silicon, 500));
             size = 5;
-            //TODO remove ducts and crushers, replace with 2-3 high cost speicla blocks with silicon requirements
+            //TODO remove ducts and crushers, replace with 2-3 high cost special blocks with silicon requirements
             plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, BlockStack.list(Blocks.tungstenWallLarge, 12, Blocks.duct, 14, Blocks.cliffCrusher, 12)));
             consumes.power(3f);
             areaSize = 13;
@@ -3564,7 +3564,7 @@ public class Blocks{
 
         //TODO requirements
         mechAssembler = new UnitAssembler("mech-assembler"){{
-            requirements(Category.units, with(Items.graphite, 600, Items.carbide, 600, Items.oxide, 200, Items.tungsten, 500));
+            requirements(Category.units, with(Items.graphite, 500, Items.carbide, 600, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 900));
             size = 5;
             plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 60f, BlockStack.list(Blocks.tungstenWallLarge, 5, Blocks.duct, 2)));
             consumes.power(3f);
