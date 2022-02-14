@@ -1,6 +1,7 @@
 package mindustry.world.blocks.power;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -99,6 +100,8 @@ public class ItemLiquidGenerator extends PowerGenerator{
     }
 
     public class ItemLiquidGeneratorBuild extends GeneratorBuild{
+        protected Boolf<Liquid> liquidFilter = other -> liquids.get(other) >= 0.001f && getLiquidEfficiency(other) >= minLiquidEfficiency;
+
         public float explosiveness, heat, totalTime;
 
         @Override
@@ -120,14 +123,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
                 return;
             }
 
-            Liquid liquid = null;
-            for(Liquid other : content.liquids()){
-                if(hasLiquids && liquids.get(other) >= 0.001f && getLiquidEfficiency(other) >= minLiquidEfficiency){
-                    liquid = other;
-                    break;
-                }
-            }
-
+            Liquid liquid = hasLiquids ? content.liquids().find(liquidFilter) : null;
             totalTime += heat * Time.delta;
 
             //liquid takes priority over solids

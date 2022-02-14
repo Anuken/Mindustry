@@ -352,6 +352,13 @@ public class NetClient implements ApplicationListener{
         player.set(x, y);
     }
 
+    @Remote(variants = Variant.both, unreliable = true)
+    public static void setCameraPosition(float x, float y){
+        if(Core.camera != null){
+            Core.camera.position.set(x, y);
+        }
+    }
+
     @Remote
     public static void playerDisconnect(int playerid){
         if(netClient != null){
