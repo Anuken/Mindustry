@@ -62,7 +62,7 @@ public class ErekirTechTree{
                     //TODO should only be unlocked in unit sector
                     node(constructor, Seq.with(new Research(siliconArcFurnace), new OnSector(four)), () -> {
 
-                        node(payloadMassDriver, () -> {
+                        node(payloadMassDriver, Seq.with(new OnSector(five)), () -> {
                             //TODO further limitations
                             node(payloadLoader, () -> {
                                 node(payloadUnloader, () -> {
@@ -155,7 +155,7 @@ public class ErekirTechTree{
                                     });
 
                                     node(atmosphericConcentrator, Seq.with(new OnSector(four)), () -> {
-                                        node(cyanogenSynthesizer, () -> {
+                                        node(cyanogenSynthesizer, Seq.with(new OnSector(five)), () -> {
 
                                         });
                                     });
@@ -207,7 +207,7 @@ public class ErekirTechTree{
 
                     });
 
-                    node(disperse, () -> {
+                    node(disperse, Seq.with(new OnSector(five)), () -> {
 
                     });
                 });
@@ -231,7 +231,7 @@ public class ErekirTechTree{
                     });
                 });
 
-                node(shipAssembler, () -> {
+                node(shipAssembler, Seq.with(new OnSector(five)), () -> {
                     node(UnitTypes.quell, () -> {
                         node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
 
@@ -253,7 +253,10 @@ public class ErekirTechTree{
                 node(aware, Seq.with(new SectorComplete(onset), new Research(ductRouter)), () -> {
                     node(three, Seq.with(new SectorComplete(aware), new Research(reinforcedContainer), new Research(ductUnloader), new Research(ventCondenser)), () -> {
                         node(four, Seq.with(new SectorComplete(three), new Research(electrolyzer), new Research(oxidationChamber), new Research(chemicalCombustionChamber)), () -> {
+                            //TODO research reqs?
+                            node(five, Seq.with(new SectorComplete(four)), () -> {
 
+                            });
                         });
                     });
                 });

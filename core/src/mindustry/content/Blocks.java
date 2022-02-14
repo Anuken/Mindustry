@@ -2040,6 +2040,7 @@ public class Blocks{
             liquidCapacity = 20f;
             liquidPressure = 1.03f;
             health = 250;
+            researchCostMultiplier = 6;
         }};
 
         //TODO is this necessary? junctions are not good design
@@ -2049,12 +2050,14 @@ public class Blocks{
             buildCostMultiplier = 3f;
             health = 260;
             ((Conduit)reinforcedConduit).junctionReplacement = this;
+            researchCostMultiplier = 6;
         }};
 
         reinforcedBridgeConduit = new DirectionLiquidBridge("reinforced-bridge-conduit"){{
             requirements(Category.liquid, with(Items.graphite, 6, Items.beryllium, 10));
             range = 4;
             hasPower = false;
+            researchCostMultiplier = 6;
 
             ((Conduit)reinforcedConduit).rotBridgeReplacement = this;
         }};
@@ -2064,6 +2067,7 @@ public class Blocks{
             liquidCapacity = 30f;
             newDrawing = true;
             liquidPadding = 3f/4f;
+            researchCostMultiplier = 6;
         }};
 
         //TODO is there a need for a container if unloaders can unload 3x3s?
@@ -2073,6 +2077,7 @@ public class Blocks{
             size = 2;
             newDrawing = true;
             liquidPadding = 6f/4f;
+            researchCostMultiplier = 4;
         }};
 
         reinforcedLiquidTank = new LiquidRouter("reinforced-liquid-tank"){{

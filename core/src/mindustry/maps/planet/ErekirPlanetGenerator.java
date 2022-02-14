@@ -27,7 +27,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
     public static float crystalScl = 0.9f, crystalMag = 0.3f;
     public static float airThresh = 0.13f, airScl = 14;
 
-    Block[] terrain = {Blocks.regolith, Blocks.regolith, Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.carbonStone};
+    Block[] terrain = {Blocks.regolith, Blocks.regolith, Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.rhyolite, Blocks.carbonStone};
 
     {
         baseSeed = 2;
