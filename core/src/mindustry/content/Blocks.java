@@ -1481,6 +1481,7 @@ public class Blocks{
             envDisabled |= Env.scorching;
         }};
 
+        //TODO all these should be hidden from view completely
         thoriumWall = new Wall("thorium-wall"){{
             requirements(Category.defense, with(Items.thorium, 6));
             health = 200 * wallHealthMultiplier;
@@ -2575,7 +2576,7 @@ public class Blocks{
 
         coreBastion = new CoreBlock("core-bastion"){{
             //TODO cost
-            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.graphite, 1000, Items.beryllium, 800));
+            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.graphite, 1000, Items.silicon, 2000, Items.beryllium, 800));
 
             unitType = UnitTypes.evoke;
             health = 7000;
@@ -2589,8 +2590,7 @@ public class Blocks{
         }};
 
         coreCitadel = new CoreBlock("core-citadel"){{
-            //TODO cost
-            requirements(Category.effect, with(Items.silicon, 5000, Items.beryllium, 8000, Items.tungsten, 5000, Items.carbide, 5000));
+            requirements(Category.effect, with(Items.silicon, 7000, Items.beryllium, 7000, Items.tungsten, 4000, Items.oxide, 2000));
 
             unitType = UnitTypes.incite;
             health = 18000;
@@ -2600,7 +2600,7 @@ public class Blocks{
             armor = 10f;
 
             unitCapModifier = 4;
-            researchCostMultiplier = 0.11f;
+            researchCostMultiplier = 0.3f;
         }};
 
         coreAcropolis = new CoreBlock("core-acropolis"){{
@@ -2615,7 +2615,7 @@ public class Blocks{
             armor = 15f;
 
             unitCapModifier = 6;
-            researchCostMultiplier = 0.11f;
+            researchCostMultiplier = 0.3f;
         }};
 
         container = new StorageBlock("container"){{
