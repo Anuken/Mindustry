@@ -45,6 +45,14 @@ public class AIController implements UnitController{
         updateMovement();
     }
 
+    /**
+     * @return whether controller state should not be reset after reading.
+     * Do not override unless you know exactly what you are doing.
+     * */
+    public boolean keepState(){
+        return false;
+    }
+
     public void stopShooting(){
         for(var mount : unit.mounts){
             //ignore mount controllable stats too, they should not shoot either

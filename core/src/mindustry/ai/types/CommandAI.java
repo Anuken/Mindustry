@@ -79,6 +79,11 @@ public class CommandAI extends AIController{
     }
 
     @Override
+    public boolean keepState(){
+        return true;
+    }
+
+    @Override
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
         return attackTarget == null ? super.findTarget(x, y, range, air, ground) : attackTarget;
     }

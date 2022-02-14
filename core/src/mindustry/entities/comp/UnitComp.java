@@ -334,7 +334,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void afterRead(){
         afterSync();
         //reset controller state
-        controller(type.createController(self()));
+        if(!(controller instanceof AIController ai && ai.keepState())){
+            controller(type.createController(self()));
+        }
     }
 
     @Override
