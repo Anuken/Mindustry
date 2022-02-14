@@ -179,7 +179,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         //TODO: yellow regolith biome tweaks
         //TODO ice biome
 
-        float length = width/3f;
+        float length = width/2.6f;
         Vec2 trns = Tmp.v1.trns(rand.random(360f), length);
         int
         spawnX = (int)(trns.x + width/2f), spawnY = (int)(trns.y + height/2f),

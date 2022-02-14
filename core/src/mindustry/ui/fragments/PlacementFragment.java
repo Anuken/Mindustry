@@ -88,14 +88,14 @@ public class PlacementFragment extends Fragment{
         Events.run(Trigger.update, () -> {
             //disable flow updating on previous building so it doesn't waste CPU
             if(lastFlowBuild != null && lastFlowBuild != nextFlowBuild){
-                if(lastFlowBuild.items != null) lastFlowBuild.flowItems().stopFlow();
+                if(lastFlowBuild.flowItems() != null) lastFlowBuild.flowItems().stopFlow();
                 if(lastFlowBuild.liquids != null) lastFlowBuild.liquids.stopFlow();
             }
 
             lastFlowBuild = nextFlowBuild;
 
             if(nextFlowBuild != null){
-                if(nextFlowBuild.items != null) nextFlowBuild.flowItems().updateFlow();
+                if(nextFlowBuild.flowItems() != null) nextFlowBuild.flowItems().updateFlow();
                 if(nextFlowBuild.liquids != null) nextFlowBuild.liquids.updateFlow();
             }
         });

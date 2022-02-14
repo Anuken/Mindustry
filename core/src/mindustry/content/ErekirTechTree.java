@@ -217,7 +217,7 @@ public class ErekirTechTree{
                 });
             });
 
-            node(tankAssembler, Seq.with(new OnSector(four), new Research(constructor), new Research(slagCentrifuge), new Research(Liquids.gallium)), () -> {
+            node(tankAssembler, Seq.with(new OnSector(four), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
                 node(UnitTypes.vanquish, () -> {
                     node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
 

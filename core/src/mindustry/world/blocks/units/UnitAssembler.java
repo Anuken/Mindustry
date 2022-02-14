@@ -267,6 +267,8 @@ public class UnitAssembler extends PayloadBlock{
         public void display(Table table){
             super.display(table);
 
+            if(team != player.team()) return;
+
             table.row();
             table.table(t -> {
                 t.left().defaults().left();
