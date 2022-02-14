@@ -42,7 +42,7 @@ public class Pathfinder implements Runnable{
 
     public static final Seq<PathCost> costTypes = Seq.with(
         //ground
-        (team, tile) -> (PathTile.allDeep(tile) || (PathTile.team(tile) == team.id || PathTile.team(tile) == 0) && PathTile.solid(tile)) ? impassable : 1 +
+        (team, tile) -> (PathTile.allDeep(tile) || (PathTile.team(tile) == team || PathTile.team(tile) == 0) && PathTile.solid(tile)) ? impassable : 1 +
             PathTile.health(tile) * 5 +
             (PathTile.nearSolid(tile) ? 2 : 0) +
             (PathTile.nearLiquid(tile) ? 6 : 0) +
@@ -306,7 +306,7 @@ public class Pathfinder implements Runnable{
         }
 
         //update cost of the tile TODO maybe only update the cost when it's not passable
-        path.weights[packed] = path.cost.getCost(path.team, tiles[packed]);
+        path.weights[packed] = path.cost.getCost(path.team.id, tiles[packed]);
 
         //clear frontier to prevent contamination
         path.frontier.clear();
@@ -391,7 +391,7 @@ public class Pathfinder implements Runnable{
                     if(dx < 0 || dy < 0 || dx >= wwidth || dy >= wheight) continue;
 
                     int newPos = tile + point.x + point.y * wwidth;
-                    int otherCost = path.cost.getCost(path.team, tiles[newPos]);
+                    int otherCost = path.cost.getCost(path.team.id, tiles[newPos]);
 
                     if((path.weights[newPos] > cost + otherCost || path.searches[newPos] < path.search) && otherCost != impassable){
                         path.frontier.addFirst(newPos);
@@ -485,7 +485,7 @@ public class Pathfinder implements Runnable{
         }
 
         protected boolean passable(int pos){
-            return cost.getCost(team, pathfinder.tiles[pos]) != impassable;
+            return cost.getCost(team.id, pathfinder.tiles[pos]) != impassable;
         }
 
         /** Gets targets to pathfind towards. This must run on the main thread. */
@@ -493,7 +493,7 @@ public class Pathfinder implements Runnable{
     }
 
     public interface PathCost{
-        int getCost(Team traversing, int tile);
+        int getCost(int team, int tile);
     }
 
     /** Holds a copy of tile data for a specific tile position. */

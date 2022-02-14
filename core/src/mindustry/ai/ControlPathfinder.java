@@ -21,16 +21,22 @@ public class ControlPathfinder{
     private static final long maxUpdate = Time.millisToNanos(20);
     private static final int updateFPS = 60;
     private static final int updateInterval = 1000 / updateFPS;
+    private static final int wallImpassable = -2;
 
     public static boolean showDebug = false;
 
     public static final Seq<PathCost> costTypes = Seq.with(
         //ground
-        (team, tile) -> (PathTile.allDeep(tile) || PathTile.solid(tile)) ? impassable : 1 +
+        (team, tile) ->
+        //deep is impassable
+        PathTile.allDeep(tile) ? impassable :
+        ((PathTile.team(tile) != team && PathTile.team(tile) != 0) && PathTile.solid(tile)) ? wallImpassable :
+        PathTile.solid(tile) ? impassable :
+        1 +
         (PathTile.nearSolid(tile) ? 6 : 0) +
         (PathTile.nearLiquid(tile) ? 8 : 0) +
         (PathTile.deep(tile) ? 6000 : 0) +
-        (PathTile.damages(tile) ? 40 : 0),
+        (PathTile.damages(tile) ? 50 : 0),
 
         //legs
         (team, tile) -> PathTile.legSolid(tile) ? impassable : 1 +
@@ -165,6 +171,7 @@ public class ControlPathfinder{
             req.pathType = pathType;
             req.destination.set(destination);
             req.curId = pathId;
+            req.team = unit.team.id;
             req.lastUpdateId = state.updateId;
             req.lastPos.set(unit);
             req.lastWorldUpdate = worldUpdateId;
@@ -178,6 +185,7 @@ public class ControlPathfinder{
         }else{
             var req = requests.get(unit);
             req.lastUpdateId = state.updateId;
+            req.team = unit.team.id;
             if(req.curId != req.lastId || req.curId != pathId){
                 req.pathIndex = 0;
                 req.rayPathIndex = -1;
@@ -350,17 +358,21 @@ public class ControlPathfinder{
         return Math.abs(x - x2) + Math.abs(y - y2);
     }
 
+    private static int tcost(int team, int type, int tilePos){
+        return costTypes.items[type].getCost(team, pathfinder.tiles[tilePos]);
+    }
+
     private static int cost(int type, int tilePos){
-        return costTypes.items[type].getCost(null, pathfinder.tiles[tilePos]);
+        return costTypes.items[type].getCost(-1, pathfinder.tiles[tilePos]);
     }
 
     private static boolean avoid(int type, int tilePos){
         int cost = cost(type, tilePos);
-        return cost == impassable || cost >= 2;
+        return cost <= impassable || cost >= 2;
     }
 
     private static boolean solid(int type, int tilePos){
-        return cost(type, tilePos) == impassable;
+        return cost(type, tilePos) <= impassable;
     }
 
     private static float tileCost(int type, int a, int b){
@@ -416,8 +428,10 @@ public class ControlPathfinder{
 
         volatile boolean done = false;
         volatile boolean foundEnd = false;
+        volatile boolean fallback = false;
         volatile Unit unit;
         volatile int pathType;
+        volatile int team;
         volatile int lastWorldUpdate;
 
         final Vec2 lastPos = new Vec2();
@@ -485,9 +499,16 @@ public class ControlPathfinder{
 
                     if(newx >= wwidth || newy >= wheight || newx < 0 || newy < 0) continue;
 
-                    if(cost(pathType, next) == impassable) continue;
+                    float passTest = tcost(team, pathType, next);
 
-                    float newCost = costs.get(current) + tileCost(pathType, current, next);
+                    //in fallback mode, enemy walls are passable
+                    if((passTest <= impassable) && !(fallback && passTest == wallImpassable)) continue;
+
+                    float add = tileCost(pathType, current, next);
+
+                    //the cost can include an impassable enemy wall, so handle that and add a base cost
+                    float newCost = costs.get(current) + (add == wallImpassable ? 12 : add);
+
                     //a cost of 0 means "not set"
                     if(!costs.containsKey(next) || newCost < costs.get(next)){
                         costs.put(next, newCost);
@@ -516,6 +537,7 @@ public class ControlPathfinder{
             rayPathIndex = -1;
 
             if(foundEnd){
+                fallback = false;
                 int cur = goal;
                 while(cur != start){
                     result.add(cur);
@@ -525,11 +547,16 @@ public class ControlPathfinder{
                 result.reverse();
 
                 smoothPath();
+                done = true;
+            }else if(!fallback && pathType != 1){
+                clear(true);
+                //it's not over!
+                fallback = true;
+            }else{
+                done = true;
             }
 
             //TODO free resources?
-
-            done = true;
         }
 
         void smoothPath(){
@@ -559,6 +586,7 @@ public class ControlPathfinder{
 
             start = world.packArray(unit.tileX(), unit.tileY());
             goal = world.packArray(World.toTile(destination.x), World.toTile(destination.y));
+            fallback = false;
 
             cameFrom.put(start, start);
             costs.put(start, 0);
