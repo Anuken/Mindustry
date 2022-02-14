@@ -5,8 +5,6 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.mod.Mods.*;
 
-import java.util.*;
-
 /** Base class for a content type that is loaded in {@link mindustry.core.ContentLoader}. */
 public abstract class Content implements Comparable<Content>{
     public short id;
@@ -60,7 +58,7 @@ public abstract class Content implements Comparable<Content>{
 
     @Override
     public int hashCode(){
-        return Objects.hash(getContentType(), id);
+        return id | getContentType().ordinal() << 16;
     }
 
     public static class ModContentInfo{
