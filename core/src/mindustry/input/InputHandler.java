@@ -719,6 +719,22 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+    public void drawOverlapCheck(Block block, int cursorX, int cursorY, boolean valid){
+        if(!valid && state.rules.placeRangeCheck){
+            var blocker = Build.getEnemyOverlap(block, player.team(), cursorX, cursorY);
+            if(blocker != null){
+                Drawf.selected(blocker, Pal.remove);
+                Tmp.v1.set(cursorX, cursorY).scl(tilesize).add(block.offset, block.offset).sub(blocker).scl(-1f).nor();
+                Drawf.dashLineDst(Pal.remove,
+                cursorX * tilesize + block.offset + Tmp.v1.x * block.size * tilesize/2f,
+                cursorY * tilesize + block.offset + Tmp.v1.y * block.size * tilesize/2f,
+                blocker.x + Tmp.v1.x * -blocker.block.size * tilesize/2f,
+                blocker.y + Tmp.v1.y * -blocker.block.size * tilesize/2f
+                );
+            }
+        }
+    }
+
     public boolean requestMatches(BuildPlan request){
         Tile tile = world.tile(request.x, request.y);
         return tile != null && tile.build instanceof ConstructBuild cons && cons.current == request.block;

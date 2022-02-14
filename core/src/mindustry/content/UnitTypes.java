@@ -3039,7 +3039,7 @@ public class UnitTypes{
 
                 unitSpawned = new MissileUnitType("disrupt-missile"){{
                     speed = 4.5f;
-                    maxRange = 80f;
+                    maxRange = 5f;
                     outlineColor = Pal.darkOutline;
                     health = 70;
                     homingDelay = 10f;
@@ -3072,7 +3072,7 @@ public class UnitTypes{
                         mirror = false;
                         reload = 1f;
                         shootOnDeath = true;
-                        bullet = new ExplosionBulletType(145f, 25f){{
+                        bullet = new ExplosionBulletType(120f, 25f){{
                             suppressionRange = 140f;
                             shootEffect = new ExplosionEffect(){{
                                 lifetime = 50f;
