@@ -60,6 +60,7 @@ public class Planets{
             totalRadius += 2.6f;
             lightSrcTo = 0.5f;
             lightDstFrom = 0.2f;
+            clearSectorOnLose = true;
             hiddenItems.addAll(Items.serpuloItems).removeAll(Items.erekirItems);
             ruleSetter = r -> {
                 r.unitCommand = true;

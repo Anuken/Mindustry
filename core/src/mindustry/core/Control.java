@@ -346,7 +346,7 @@ public class Control implements ApplicationListener, Loadable{
             ui.planet.hide();
             SaveSlot slot = sector.save;
             sector.planet.setLastSector(sector);
-            if(slot != null && !clearSectors){
+            if(slot != null && !clearSectors && (!sector.planet.clearSectorOnLose || sector.info.hasCore)){
 
                 try{
                     boolean hadNoCore = !sector.info.hasCore;

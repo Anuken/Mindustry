@@ -226,14 +226,14 @@ public class ErekirTechTree{
                     });
                 });
 
-                node(shipAssembler, Seq.with(tmpNever), () -> {
+                node(shipAssembler, () -> {
                     node(UnitTypes.quell, () -> {
                         node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
 
                         });
                     });
 
-                    node(mechAssembler, () -> {
+                    node(mechAssembler, Seq.with(tmpNever), () -> {
                         node(UnitTypes.bulwark, () -> {
                             node(UnitTypes.krepost, Seq.with(tmpNever), () -> {
 

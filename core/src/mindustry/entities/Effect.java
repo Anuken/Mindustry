@@ -280,6 +280,10 @@ public class Effect{
             return (T)data;
         }
 
+        public EffectContainer inner(){
+            return innerContainer == null ? (innerContainer = new EffectContainer()) : innerContainer;
+        }
+
         public void scaled(float lifetime, Cons<EffectContainer> cons){
             if(innerContainer == null) innerContainer = new EffectContainer();
             if(time <= lifetime){
