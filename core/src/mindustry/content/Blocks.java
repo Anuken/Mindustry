@@ -77,8 +77,9 @@ public class Blocks{
     powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator,
 
     //defense
-    copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, berylliumWall, berylliumWallLarge, tungstenWall, tungstenWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
+    copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge,
+    berylliumWall, berylliumWallLarge, tungstenWall, tungstenWallLarge, carbideWall, carbideWallLarge,
     mender, mendProjector, overdriveProjector, overdriveDome, forceProjector, shockMine,
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
@@ -1438,23 +1439,27 @@ public class Blocks{
         copperWall = new Wall("copper-wall"){{
             requirements(Category.defense, with(Items.copper, 6));
             health = 80 * wallHealthMultiplier;
+            envDisabled |= Env.scorching;
         }};
 
         copperWallLarge = new Wall("copper-wall-large"){{
             requirements(Category.defense, ItemStack.mult(copperWall.requirements, 4));
             health = 80 * 4 * wallHealthMultiplier;
             size = 2;
+            envDisabled |= Env.scorching;
         }};
 
         titaniumWall = new Wall("titanium-wall"){{
             requirements(Category.defense, with(Items.titanium, 6));
             health = 110 * wallHealthMultiplier;
+            envDisabled |= Env.scorching;
         }};
 
         titaniumWallLarge = new Wall("titanium-wall-large"){{
             requirements(Category.defense, ItemStack.mult(titaniumWall.requirements, 4));
             health = 110 * wallHealthMultiplier * 4;
             size = 2;
+            envDisabled |= Env.scorching;
         }};
 
         plastaniumWall = new Wall("plastanium-wall"){{
@@ -1463,6 +1468,7 @@ public class Blocks{
             insulated = true;
             absorbLasers = true;
             schematicPriority = 10;
+            envDisabled |= Env.scorching;
         }};
 
         plastaniumWallLarge = new Wall("plastanium-wall-large"){{
@@ -1472,6 +1478,104 @@ public class Blocks{
             insulated = true;
             absorbLasers = true;
             schematicPriority = 10;
+            envDisabled |= Env.scorching;
+        }};
+
+        thoriumWall = new Wall("thorium-wall"){{
+            requirements(Category.defense, with(Items.thorium, 6));
+            health = 200 * wallHealthMultiplier;
+            envDisabled |= Env.scorching;
+        }};
+
+        thoriumWallLarge = new Wall("thorium-wall-large"){{
+            requirements(Category.defense, ItemStack.mult(thoriumWall.requirements, 4));
+            health = 200 * wallHealthMultiplier * 4;
+            size = 2;
+            envDisabled |= Env.scorching;
+        }};
+
+        phaseWall = new Wall("phase-wall"){{
+            requirements(Category.defense, with(Items.phaseFabric, 6));
+            health = 150 * wallHealthMultiplier;
+            chanceDeflect = 10f;
+            flashHit = true;
+            envDisabled |= Env.scorching;
+        }};
+
+        phaseWallLarge = new Wall("phase-wall-large"){{
+            requirements(Category.defense, ItemStack.mult(phaseWall.requirements, 4));
+            health = 150 * 4 * wallHealthMultiplier;
+            size = 2;
+            chanceDeflect = 10f;
+            flashHit = true;
+            envDisabled |= Env.scorching;
+        }};
+
+        surgeWall = new Wall("surge-wall"){{
+            requirements(Category.defense, with(Items.surgeAlloy, 6));
+            health = 230 * wallHealthMultiplier;
+            lightningChance = 0.05f;
+            envDisabled |= Env.scorching;
+        }};
+
+        surgeWallLarge = new Wall("surge-wall-large"){{
+            requirements(Category.defense, ItemStack.mult(surgeWall.requirements, 4));
+            health = 230 * 4 * wallHealthMultiplier;
+            size = 2;
+            lightningChance = 0.05f;
+            envDisabled |= Env.scorching;
+        }};
+
+        door = new Door("door"){{
+            requirements(Category.defense, with(Items.titanium, 6, Items.silicon, 4));
+            health = 100 * wallHealthMultiplier;
+            envDisabled |= Env.scorching;
+        }};
+
+        doorLarge = new Door("door-large"){{
+            requirements(Category.defense, ItemStack.mult(door.requirements, 4));
+            openfx = Fx.dooropenlarge;
+            closefx = Fx.doorcloselarge;
+            health = 100 * 4 * wallHealthMultiplier;
+            size = 2;
+            envDisabled |= Env.scorching;
+        }};
+
+        scrapWall = new Wall("scrap-wall"){{
+            requirements(Category.defense, BuildVisibility.sandboxOnly, with(Items.scrap, 6));
+            health = 60 * wallHealthMultiplier;
+            variants = 5;
+            envDisabled |= Env.scorching;
+        }};
+
+        scrapWallLarge = new Wall("scrap-wall-large"){{
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.mult(scrapWall.requirements, 4));
+            health = 60 * 4 * wallHealthMultiplier;
+            size = 2;
+            variants = 4;
+            envDisabled |= Env.scorching;
+        }};
+
+        scrapWallHuge = new Wall("scrap-wall-huge"){{
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.mult(scrapWall.requirements, 9));
+            health = 60 * 9 * wallHealthMultiplier;
+            size = 3;
+            variants = 3;
+            envDisabled |= Env.scorching;
+        }};
+
+        scrapWallGigantic = new Wall("scrap-wall-gigantic"){{
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.mult(scrapWall.requirements, 16));
+            health = 60 * 16 * wallHealthMultiplier;
+            size = 4;
+            envDisabled |= Env.scorching;
+        }};
+
+        thruster = new Thruster("thruster"){{
+            requirements(Category.defense, BuildVisibility.sandboxOnly, with(Items.scrap, 96));
+            health = 55 * 16 * wallHealthMultiplier;
+            size = 4;
+            envDisabled |= Env.scorching;
         }};
 
         berylliumWall = new Wall("beryllium-wall"){{
@@ -1500,88 +1604,17 @@ public class Blocks{
             size = 2;
         }};
 
-        thoriumWall = new Wall("thorium-wall"){{
-            requirements(Category.defense, with(Items.thorium, 6));
-            health = 200 * wallHealthMultiplier;
+        carbideWall = new Wall("carbide-wall"){{
+            requirements(Category.defense, with(Items.thorium, 6, Items.carbide, 6));
+            health = 240 * wallHealthMultiplier;
+            armor = 16f;
         }};
 
-        thoriumWallLarge = new Wall("thorium-wall-large"){{
+        carbideWallLarge = new Wall("carbide-wall-large"){{
             requirements(Category.defense, ItemStack.mult(thoriumWall.requirements, 4));
-            health = 200 * wallHealthMultiplier * 4;
+            health = 240 * wallHealthMultiplier * 4;
+            armor = 16f;
             size = 2;
-        }};
-
-        phaseWall = new Wall("phase-wall"){{
-            requirements(Category.defense, with(Items.phaseFabric, 6));
-            health = 150 * wallHealthMultiplier;
-            chanceDeflect = 10f;
-            flashHit = true;
-        }};
-
-        phaseWallLarge = new Wall("phase-wall-large"){{
-            requirements(Category.defense, ItemStack.mult(phaseWall.requirements, 4));
-            health = 150 * 4 * wallHealthMultiplier;
-            size = 2;
-            chanceDeflect = 10f;
-            flashHit = true;
-        }};
-
-        surgeWall = new Wall("surge-wall"){{
-            requirements(Category.defense, with(Items.surgeAlloy, 6));
-            health = 230 * wallHealthMultiplier;
-            lightningChance = 0.05f;
-        }};
-
-        surgeWallLarge = new Wall("surge-wall-large"){{
-            requirements(Category.defense, ItemStack.mult(surgeWall.requirements, 4));
-            health = 230 * 4 * wallHealthMultiplier;
-            size = 2;
-            lightningChance = 0.05f;
-        }};
-
-        door = new Door("door"){{
-            requirements(Category.defense, with(Items.titanium, 6, Items.silicon, 4));
-            health = 100 * wallHealthMultiplier;
-        }};
-
-        doorLarge = new Door("door-large"){{
-            requirements(Category.defense, ItemStack.mult(door.requirements, 4));
-            openfx = Fx.dooropenlarge;
-            closefx = Fx.doorcloselarge;
-            health = 100 * 4 * wallHealthMultiplier;
-            size = 2;
-        }};
-
-        scrapWall = new Wall("scrap-wall"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, with(Items.scrap, 6));
-            health = 60 * wallHealthMultiplier;
-            variants = 5;
-        }};
-
-        scrapWallLarge = new Wall("scrap-wall-large"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.mult(scrapWall.requirements, 4));
-            health = 60 * 4 * wallHealthMultiplier;
-            size = 2;
-            variants = 4;
-        }};
-
-        scrapWallHuge = new Wall("scrap-wall-huge"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.mult(scrapWall.requirements, 9));
-            health = 60 * 9 * wallHealthMultiplier;
-            size = 3;
-            variants = 3;
-        }};
-
-        scrapWallGigantic = new Wall("scrap-wall-gigantic"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.mult(scrapWall.requirements, 16));
-            health = 60 * 16 * wallHealthMultiplier;
-            size = 4;
-        }};
-
-        thruster = new Thruster("thruster"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, with(Items.scrap, 96));
-            health = 55 * 16 * wallHealthMultiplier;
-            size = 4;
         }};
 
         mender = new MendProjector("mender"){{
@@ -3666,7 +3699,7 @@ public class Blocks{
             consumes.power(2f);
             size = 3;
             //TODO expand this list
-            filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.cliffCrusher, Blocks.plasmaBore, Blocks.reinforcedLiquidTank, Blocks.duct);
+            filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.reinforcedLiquidTank);
         }};
 
         //yes this block is pretty much useless
