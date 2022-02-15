@@ -3605,7 +3605,7 @@ public class Blocks{
             plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, BlockStack.list(Blocks.berylliumWallLarge, 20, Blocks.primeControlCore, 2)));
             consumes.power(3f);
             areaSize = 13;
-            researchCostMultiplier = 0.5f;
+            researchCostMultiplier = 0.4f;
 
             consumes.liquid(Liquids.nitrogen, 24f / 60f);
         }};
