@@ -11,9 +11,7 @@ public abstract class Consume{
     public boolean optional;
     /** If true, this consumer will be displayed as a boost input. */
     public boolean booster;
-
-    //TODO bad.
-    @Deprecated
+    //TODO bad. I don't like it.
     public boolean update = true;
 
     /**
@@ -33,7 +31,6 @@ public abstract class Consume{
         return optional(true, true);
     }
 
-    @Deprecated
     public Consume update(boolean update){
         this.update = update;
         return this;

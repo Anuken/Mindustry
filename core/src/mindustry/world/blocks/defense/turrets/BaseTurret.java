@@ -20,7 +20,7 @@ public class BaseTurret extends Block{
     public float rotateSpeed = 5;
 
     public float coolantUsage = 0.2f;
-    @Deprecated
+    //TODO
     public boolean acceptCoolant = true;
     /** Effect displayed when coolant is used. */
     public Effect coolEffect = Fx.fuelburn;
@@ -44,7 +44,7 @@ public class BaseTurret extends Block{
 
     @Override
     public void init(){
-        //TODO fundamentally flawed
+        //TODO bad
         if(acceptCoolant && findConsumer(f -> f instanceof ConsumeLiquidBase) == null){
             hasLiquids = true;
             consume(coolantOverride != null ? new ConsumeLiquid(coolantOverride, coolantUsage) : new ConsumeCoolant(coolantUsage)).update(false).boost();

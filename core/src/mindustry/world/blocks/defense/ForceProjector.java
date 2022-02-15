@@ -20,7 +20,6 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-@Deprecated
 public class ForceProjector extends Block{
     public final int timerUse = timers++;
     public float phaseUseTime = 350f;
@@ -39,7 +38,7 @@ public class ForceProjector extends Block{
     public @Load("@-top") TextureRegion topRegion;
 
     //TODO json support
-    public @Nullable Consume boostConsumer;
+    public @Nullable Consume itemConsumer, coolantConsumer;
 
     protected static ForceBuild paramEntity;
     protected static Effect paramEffect;
@@ -65,7 +64,7 @@ public class ForceProjector extends Block{
         ambientSoundVolume = 0.08f;
 
         if(consumeCoolant){
-            consume(new ConsumeCoolant(coolantConsumption)).boost().update(false);
+            consume(coolantConsumer = new ConsumeCoolant(coolantConsumption)).boost().update(false);
         }
     }
 
@@ -88,7 +87,7 @@ public class ForceProjector extends Block{
 
     @Override
     public void setStats(){
-        boolean consItems = boostConsumer != null;
+        boolean consItems = itemConsumer != null;
 
         if(consItems) stats.timePeriod = phaseUseTime;
         super.setStats();
@@ -143,7 +142,7 @@ public class ForceProjector extends Block{
 
         @Override
         public void updateTile(){
-            boolean phaseValid = boostConsumer != null && boostConsumer.valid(this);
+            boolean phaseValid = itemConsumer != null && itemConsumer.valid(this);
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
 
@@ -163,14 +162,12 @@ public class ForceProjector extends Block{
                 float scale = !broken ? cooldownNormal : cooldownBrokenBase;
 
                 //TODO I hate this system
-                /*
-                if(consumes.has(ConsumeType.liquid)){
-                    Consume cons = consumes.get(ConsumeType.liquid);
-                    if(cons.valid(this)){
-                        cons.update(this);
+                if(coolantConsumer != null){
+                    if(coolantConsumer.valid(this)){
+                        coolantConsumer.update(this);
                         scale *= (cooldownLiquid * (1f + (liquids.current().heatCapacity - 0.4f) * 0.9f));
                     }
-                }*/
+                }
 
                 buildup -= delta() * scale;
             }

@@ -9,7 +9,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-/** A turret that fires a continuous beam with a delay between shots. Liquid coolant is required. Yes, this class name is awful. */
+/** A turret that fires a continuous beam with a delay between shots. Liquid coolant is required. Yes, this class name is awful. NEEDS RENAME */
 @Deprecated
 public class LaserTurret extends PowerTurret{
     public float firingMoveFract = 0.25f;
@@ -26,8 +26,7 @@ public class LaserTurret extends PowerTurret{
         super.setStats();
 
         stats.remove(Stat.booster);
-        //TODO bad
-        stats.add(Stat.input, StatValues.boosters(reloadTime, coolantConsumer.amount, coolantMultiplier, false, l -> consumesLiquid(l)));
+        stats.add(Stat.input, StatValues.boosters(reloadTime, coolantConsumer.amount, coolantMultiplier, false, this::consumesLiquid));
     }
 
     public class LaserTurretBuild extends PowerTurretBuild{

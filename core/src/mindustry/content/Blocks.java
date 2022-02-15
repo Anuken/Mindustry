@@ -1671,7 +1671,7 @@ public class Blocks{
             cooldownLiquid = 1.2f;
             cooldownBrokenBase = 0.35f;
 
-            boostConsumer = consumeItem(Items.phaseFabric).boost();
+            itemConsumer = consumeItem(Items.phaseFabric).boost();
             consumePower(4f);
         }};
 
