@@ -3605,6 +3605,7 @@ public class Blocks{
             plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, BlockStack.list(Blocks.berylliumWallLarge, 20, Blocks.primeControlCore, 2)));
             consumes.power(3f);
             areaSize = 13;
+            researchCostMultiplier = 0.5f;
 
             consumes.liquid(Liquids.nitrogen, 24f / 60f);
         }};
@@ -3742,7 +3743,6 @@ public class Blocks{
             consumes.power(2f);
             size = 3;
         }};
-        //annihilation
 
         //endregion
         //region sandbox
