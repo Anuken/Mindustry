@@ -93,7 +93,7 @@ public class ErekirTechTree{
             //TODO move into turbine condenser?
             node(plasmaBore, () -> {
                 node(impactDrill, Seq.with(new OnSector(aware)), () -> {
-                    node(largePlasmaBore, Seq.with(new OnSector(four)), () -> {
+                    node(largePlasmaBore, Seq.with(new OnSector(five)), () -> {
                         node(eruptionDrill, () -> {
 
                         });
@@ -203,7 +203,7 @@ public class ErekirTechTree{
 
                 node(sublimate, () -> {
                     //TODO implement
-                    node(titan, () -> {
+                    node(titan, Seq.with(new OnSector(five)), () -> {
 
                     });
 

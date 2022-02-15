@@ -46,7 +46,6 @@ public class Blocks{
     redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     redweed, purbush, yellowCoral,
-    //TODO rename steamvent to rhyolite vent, maybe add red vent or crystal vent
     rhyoliteVent, carbonVent, arkyicVent, yellowStoneVent, redStoneVent,
     regolithWall, yellowStoneWall, rhyoliteWall, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall, arkyicWall, crystallineStoneWall, redStoneWall, redDiamondWall,
     ferricStone, ferricCraters, carbonStone, beryllicStone, crystallineStone, crystalFloor, yellowStonePlates,
@@ -60,7 +59,7 @@ public class Blocks{
 
     //ores
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
-    oreTungsten, oreCrystalThorium,
+    oreTungsten, oreCrystalThorium, wallOreThorium,
 
     //wall ores
     wallOreBeryl, graphiticWall, wallOreTungsten,
@@ -827,6 +826,10 @@ public class Blocks{
         oreTungsten = new OreBlock(Items.tungsten);
 
         oreCrystalThorium = new OreBlock("ore-crystal-thorium", Items.thorium);
+
+        wallOreThorium = new OreBlock("ore-wall-thorium", Items.thorium){{
+            wallOre = true;
+        }};
 
         wallOreBeryl = new OreBlock("ore-wall-beryllium", Items.beryllium){{
             wallOre = true;
