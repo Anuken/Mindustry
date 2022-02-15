@@ -167,7 +167,7 @@ public class Block extends UnlockableContent{
     public boolean configurable;
     /** If true, the building inventory can be shown with the config. */
     public boolean allowConfigInventory = true;
-    /** Used in blocks with selection menus such sorters for how large the menu should be */
+    /** Defines how large selection menus, such as that of sorters, should be. */
     public int selectionRows = 5, selectionColumns = 4;
     /** If true, this block can be configured by logic. */
     public boolean logicConfigurable = false;
