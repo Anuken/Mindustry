@@ -35,7 +35,7 @@ public class TractorBeamTurret extends BaseTurret{
     public Sound shootSound = Sounds.tractorbeam;
     public float shootSoundVolume = 0.9f;
 
-    public @Load("block-@size") TextureRegion baseRegion;
+    public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
     public @Load("@-laser") TextureRegion laser;
     public @Load(value = "@-laser-start", fallback = "@-laser-end") TextureRegion laserStart;
     public @Load("@-laser-end") TextureRegion laserEnd;

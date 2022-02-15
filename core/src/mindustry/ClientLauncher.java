@@ -152,16 +152,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 }
                 mods.eachClass(Mod::init);
                 finished = true;
-                var event = new ClientLoadEvent();
-                //a temporary measure for compatibility with certain mods
-                Events.fireWrap(event.getClass(), event, listener -> {
-                    try{
-                        listener.get(event);
-                    }catch(NoSuchFieldError | NoSuchMethodError | NoClassDefFoundError error){
-                        Log.err(error);
-                    }
-
-                });
+                Events.fire(new ClientLoadEvent());
                 clientLoaded = true;
                 super.resize(graphics.getWidth(), graphics.getHeight());
                 app.post(() -> app.post(() -> app.post(() -> app.post(() -> {

@@ -89,6 +89,19 @@ public class ContentParser{
             }
         });
         put(Color.class, (type, data) -> Color.valueOf(data.asString()));
+        put(StatusEffect.class, (type, data) -> {
+            if(data.isString()){
+                StatusEffect result = locate(ContentType.status, data.asString());
+                if(result != null) return result;
+                result = (StatusEffect)fieldOpt(StatusEffects.class, data);
+                if(result != null) return result;
+                throw new IllegalArgumentException("Unknown status effect: '" + data.asString() + "'");
+            }
+            StatusEffect effect = new StatusEffect(currentMod.name + "-" + data.getString("name"));
+            effect.minfo.mod = currentMod;
+            readFields(effect, data);
+            return effect;
+        });
         put(BulletType.class, (type, data) -> {
             if(data.isString()){
                 return field(Bullets.class, data);
@@ -508,19 +521,6 @@ public class ContentParser{
             currentContent = planet;
             read(() -> readFields(planet, value));
             return planet;
-        },
-        ContentType.status, (TypeParser<StatusEffect>)(mod, name, value) -> {
-            if(value.isString()){
-                StatusEffect result = locate(ContentType.status, value.asString());
-                if(result != null) return result;
-                result = (StatusEffect)fieldOpt(StatusEffects.class, value);
-                if(result != null) return result;
-                throw new IllegalArgumentException("Unknown status effect: '" + value.asString() + "'");
-            }
-            StatusEffect effect = new StatusEffect(currentMod.name + "-" + value.getString("name"));
-            currentContent = effect;
-            readFields(effect, value);
-            return effect;
         }
     );
 

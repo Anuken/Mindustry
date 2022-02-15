@@ -2257,6 +2257,7 @@ public class UnitTypes{
                     backColor = Pal.heal;
                     frontColor = Color.white;
                     width = height = 12f;
+                    shrinkY = 0f;
                     speed = 5f;
                     trailLength = 20;
                     trailWidth = 6f;
@@ -2833,7 +2834,7 @@ public class UnitTypes{
                 velocityRnd = 0.1f;
                 heatColor = Color.red;
 
-                for(int i = 0; i < 3; i++){
+                for(int i = 0; i < 6; i++){
                     int fi = i;
                     parts.add(new RegionPart("-blade"){{
                         under = true;
