@@ -153,10 +153,6 @@ public class Block extends UnlockableContent implements Senseable{
     public int size = 1;
     /** multiblock offset */
     public float offset = 0f;
-    /** Deprecated for removal: Use clipSize instead.
-     * This does nothing, and is kept to preserve compatibility with v6 mods. */
-    @Deprecated
-    public boolean expanded = false;
     /** Clipping size of this block. Should be as large as the block will draw. */
     public float clipSize = -1f;
     /** When placeRangeCheck is enabled, this is the range checked for enemy blocks. */
@@ -965,11 +961,6 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         clipSize = Math.max(clipSize, size * tilesize);
-
-        //only kept to ensure compatibility with v6 mods.
-        if(expanded){
-            clipSize += tilesize * 10f;
-        }
 
         if(emitLight){
             clipSize = Math.max(clipSize, lightRadius * 2f);

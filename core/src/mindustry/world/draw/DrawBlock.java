@@ -9,7 +9,6 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 
 /** An implementation of custom rendering behavior for a crafter block.
  * This is used mostly for mods. */
@@ -18,14 +17,6 @@ public class DrawBlock{
 
     /** If set, the icon is overridden to be these strings, in order. Each string is a suffix. */
     public @Nullable String[] iconOverride = null;
-
-    /** @deprecated no longer called! not specific to generic crafters! */
-    @Deprecated
-    public void draw(GenericCrafterBuild build){}
-
-    /** @deprecated no longer called! not specific to generic crafters! */
-    @Deprecated
-    public void drawLight(GenericCrafterBuild build){}
 
     public void getRegionsToOutline(Block block, Seq<TextureRegion> out){
 

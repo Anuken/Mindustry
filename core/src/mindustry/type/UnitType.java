@@ -211,12 +211,6 @@ public class UnitType extends UnlockableContent{
         constructor = EntityMapping.map(this.name);
     }
 
-    /** @deprecated use the createController method instead */
-    @Deprecated
-    public UnitController createController(){
-        return defaultController.get();
-    }
-
     public UnitController createController(Unit unit){
         return unitBasedDefaultController.get(unit);
     }

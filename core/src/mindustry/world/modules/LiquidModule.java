@@ -78,16 +78,6 @@ public class LiquidModule extends BlockModule{
         return flow != null && cacheBits.get(liquid.id);
     }
 
-    /**
-     * @deprecated There is no good reason to check the total amount of liquids of a block.
-     * Use of this method is almost certainly a bug; currentAmount() is probably what you want instead.
-     * All liquid storage systems either store one liquid type, or have per-liquid inventories, and as such total liquid is irrelevant.
-     * */
-    @Deprecated
-    public float total(){
-        return total;
-    }
-
     /** Last received or loaded liquid. Only valid for liquid modules with 1 type of liquid. */
     public Liquid current(){
         return current;

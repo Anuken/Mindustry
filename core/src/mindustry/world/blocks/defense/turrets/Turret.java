@@ -10,7 +10,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -109,25 +108,6 @@ public class Turret extends ReloadTurret{
     public Boolf<Unit> unitFilter = u -> true;
 
     public DrawBlock draw = new DrawTurret();
-
-    /** @deprecated loaded in {@link #draw} instead, unused */
-    @Deprecated
-    public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
-    /** @deprecated loaded in {@link #draw} instead, unused */
-    @Deprecated
-    public @Load("@-heat") TextureRegion heatRegion;
-    /** @deprecated use bulletOffset; this will always be zero. **/
-    @Deprecated
-    protected Vec2 tr = new Vec2();
-    /** @deprecated use recoilOffset; this will always be zero. **/
-    @Deprecated
-    protected Vec2 tr2 = new Vec2();
-    /** @deprecated set the draw field instead, this does nothing */
-    @Deprecated
-    public Cons<TurretBuild> drawer = tile -> {};
-    /** @deprecated set the draw field instead, this does nothing */
-    @Deprecated
-    public Cons<TurretBuild> heatDrawer = tile -> {};
 
     public Turret(String name){
         super(name);

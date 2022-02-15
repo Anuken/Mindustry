@@ -61,18 +61,6 @@ public abstract class UnlockableContent extends MappableContent{
         uiIcon = Core.atlas.find(getContentType().name() + "-" + name + "-ui", fullIcon);
     }
 
-    /** @deprecated use the {@link #techNode} field instead. */
-    @Deprecated
-    public @Nullable TechNode node(){
-        return techNode;
-    }
-
-    /** @deprecated Use fullIcon / uiIcon instead! This will be removed. */
-    @Deprecated
-    public TextureRegion icon(Cicon icon){
-        return icon == Cicon.full ? fullIcon : uiIcon;
-    }
-
     public String displayDescription(){
         return minfo.mod == null ? description : description + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName());
     }

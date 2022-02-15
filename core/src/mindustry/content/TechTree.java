@@ -70,19 +70,6 @@ public class TechTree{
         return context;
     }
 
-    /** @deprecated use {@link UnlockableContent#techNode} instead. */
-    @Deprecated
-    public static @Nullable TechNode get(UnlockableContent content){
-        return content.techNode;
-    }
-
-    /** @deprecated use {@link UnlockableContent#techNode} instead. */
-    @Deprecated
-    public static TechNode getNotNull(UnlockableContent content){
-        if(content.techNode == null) throw new RuntimeException(content + " does not have a tech node");
-        return content.techNode;
-    }
-
     public static class TechNode{
         /** Depth in tech tree. */
         public int depth;

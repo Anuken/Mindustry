@@ -158,10 +158,6 @@ public class Blocks{
 
     ;
 
-    /** @deprecated use the blocks with proper names */
-    @Deprecated
-    public static Block blockForge, blockLoader, blockUnloader;
-
     public static void load(){
         //region environment
 
@@ -3746,11 +3742,7 @@ public class Blocks{
             consumes.power(2f);
             size = 3;
         }};
-
-        //deprecated, will be removed.
-        blockForge = constructor;
-        blockLoader = payloadLoader;
-        blockUnloader = payloadUnloader;
+        //annihilation
 
         //endregion
         //region sandbox

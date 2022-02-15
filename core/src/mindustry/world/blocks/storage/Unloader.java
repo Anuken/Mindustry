@@ -14,6 +14,8 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
 public class Unloader extends Block{
@@ -55,22 +57,32 @@ public class Unloader extends Block{
         bars.remove("items");
     }
 
+    public static class ContainerStat{
+        Building building;
+        float loadFactor;
+        boolean canLoad;
+        boolean canUnload;
+        int index;
+    }
+
     public class UnloaderBuild extends Building{
         public float unloadTimer = 0f;
         public Item sortItem = null;
         public int offset = 0;
         public int rotations = 0;
         public Seq<ContainerStat> possibleBlocks = new Seq<>();
-
-        public class ContainerStat{
-            Building building;
-            float loadFactor;
-            boolean canLoad;
-            boolean canUnload;
-            int index;
-        }
-
         public int[] lastUsed;
+
+        protected final Comparator<ContainerStat> comparator = Structs.comps(
+            Structs.comps(
+                Structs.comparingBool(e -> e.building.block.highUnloadPriority && !e.canLoad),
+                Structs.comparingBool(e -> e.canUnload && !e.canLoad)
+            ),
+            Structs.comps(
+                Structs.comparingFloat(e -> e.loadFactor),
+                Structs.comparingInt(e -> -lastUsed[e.index])
+            )
+        );
 
         @Override
         public void updateTile(){
@@ -146,18 +158,7 @@ public class Unloader extends Block{
                 }
 
                 //sort so it gives full priority to blocks that can give but not receive (stackConveyors and Storage), and then by load, and then by last use
-                possibleBlocks.sort(
-                    Structs.comps(
-                        Structs.comps(
-                            Structs.comparingBool(e -> e.building.block.highUnloadPriority && !e.canLoad),
-                            Structs.comparingBool(e -> e.canUnload && !e.canLoad)
-                        ),
-                        Structs.comps(
-                            Structs.comparingFloat(e -> e.loadFactor),
-                            Structs.comparingInt(e -> -lastUsed[e.index])
-                        )
-                    )
-                );
+                possibleBlocks.sort(comparator);
 
                 ContainerStat dumpingFrom = null;
                 ContainerStat dumpingTo = null;

@@ -131,18 +131,6 @@ public class Consumers{
         return (T)map[type.ordinal()];
     }
 
-    /** @deprecated unnecessary getter */
-    @Deprecated
-    public Consume[] all(){
-        return all;
-    }
-
-    /** @deprecated unnecessary getter */
-    @Deprecated
-    public Consume[] optionals(){
-        return optionals;
-    }
-
     public void display(Stats stats){
         for(Consume c : map){
             if(c != null){

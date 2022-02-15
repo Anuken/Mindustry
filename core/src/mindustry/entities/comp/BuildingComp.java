@@ -75,10 +75,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Nullable ItemModule items;
     @Nullable LiquidModule liquids;
 
-    /** @deprecated use building methods instead, this is just a proxy! */
-    @Deprecated
-    ConsumeModule cons = new ConsumeModule(self());
-
     public transient float healSuppressionTime = -1f;
     public transient float lastHealTime = -120f * 10f;
 

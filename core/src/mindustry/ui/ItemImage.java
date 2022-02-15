@@ -41,10 +41,4 @@ public class ItemImage extends Stack{
     public ItemImage(BlockStack stack){
         this(stack.block.uiIcon, stack.amount);
     }
-
-    /** @deprecated what the heck is this */
-    @Deprecated
-    public ItemImage(TextureRegion region){
-        add(new Image(region));
-    }
 }

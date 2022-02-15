@@ -3,10 +3,8 @@ package mindustry.world.blocks.power;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
@@ -36,16 +34,6 @@ public class ItemLiquidGenerator extends PowerGenerator{
     public Effect explodeEffect = Fx.generatespark;
     public boolean randomlyExplode = true;
     public boolean defaults = false;
-
-    /** @deprecated unused, use a custom drawer instead */
-    @Deprecated
-    public Color heatColor = Color.valueOf("ff9b59");
-    /** @deprecated unused, use a custom drawer instead */
-    @Deprecated
-    public @Load("@-top") TextureRegion topRegion;
-    /** @deprecated unused, use a custom drawer instead */
-    @Deprecated
-    public @Load("@-liquid") TextureRegion liquidRegion;
 
     public ItemLiquidGenerator(boolean hasItems, boolean hasLiquids, String name){
         this(name);

@@ -29,18 +29,6 @@ public class LAssembler{
         putConst("@this", null);
     }
 
-    /** @deprecated use the one with the privileged parameter */
-    @Deprecated
-    public static LAssembler assemble(String data){
-        return assemble(data, false);
-    }
-
-    /** @deprecated use the one with the privileged parameter */
-    @Deprecated
-    public static Seq<LStatement> read(String text){
-        return read(text, false);
-    }
-
     public static LAssembler assemble(String data, boolean privileged){
         LAssembler asm = new LAssembler();
 

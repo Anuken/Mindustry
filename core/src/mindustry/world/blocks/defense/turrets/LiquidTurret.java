@@ -1,8 +1,6 @@
 package mindustry.world.blocks.defense.turrets;
 
-import arc.graphics.g2d.*;
 import arc.struct.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -18,11 +16,6 @@ import static mindustry.Vars.*;
 public class LiquidTurret extends Turret{
     public ObjectMap<Liquid, BulletType> ammoTypes = new ObjectMap<>();
     public boolean extinguish = true;
-
-    /** @deprecated loaded in {@link #draw} instead, unused */
-    public @Deprecated @Load("@-liquid") TextureRegion liquidRegion;
-    /** @deprecated loaded in {@link #draw} instead, unused */
-    public @Deprecated @Load("@-top") TextureRegion topRegion;
 
     public LiquidTurret(String name){
         super(name);

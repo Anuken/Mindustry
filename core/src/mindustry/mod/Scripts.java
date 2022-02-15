@@ -1,7 +1,6 @@
 package mindustry.mod;
 
 import arc.*;
-import arc.audio.*;
 import arc.files.*;
 import arc.func.*;
 import arc.util.*;
@@ -80,18 +79,6 @@ public class Scripts implements Disposable{
 
     public byte[] readBytes(String path){
         return Vars.tree.get(path, true).readBytes();
-    }
-
-    /** @deprecated use Vars.tree.loadSound(soundName) instead */
-    @Deprecated
-    public Sound loadSound(String soundName){
-        return Vars.tree.loadSound(soundName);
-    }
-
-    /** @deprecated use Vars.tree.loadMusic(musicName) instead */
-    @Deprecated
-    public Music loadMusic(String musicName){
-        return Vars.tree.loadMusic(musicName);
     }
 
     /** Ask the user to select a file to read for a certain purpose like "Please upload a sprite" */

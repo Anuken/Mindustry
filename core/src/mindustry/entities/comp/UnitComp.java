@@ -77,7 +77,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public void approach(Vec2 vector){
-        vel.approachDelta(vector, type.accel * realSpeed());
+        vel.approachDelta(vector, type.accel * speed());
     }
 
     public void rotateMove(Vec2 vec){
@@ -122,12 +122,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         float boost = Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation);
         //limit speed to minimum formation speed to preserve formation
         return (isCommanding() ? minFormationSpeed * 0.98f : type.speed) * strafePenalty * boost * floorSpeedMultiplier();
-    }
-
-    /** @deprecated use speed() instead */
-    @Deprecated
-    public float realSpeed(){
-        return speed();
     }
 
     /** Iterates through this unit and everything it is controlling. */

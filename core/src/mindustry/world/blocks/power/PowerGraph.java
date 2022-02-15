@@ -84,12 +84,6 @@ public class PowerGraph{
         return Mathf.clamp(lastPowerProduced / lastPowerNeeded);
     }
 
-    /** @deprecated unused mechanic that always returns 1, I really don't know why you would use this outside of copy-pasted code */
-    @Deprecated
-    public float getUsageFraction(){
-        return 1f;
-    }
-
     public float getPowerProduced(){
         float powerProduced = 0f;
         for(Building producer : producers){
